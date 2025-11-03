@@ -20,7 +20,8 @@ import (
 )
 
 type WebFlags struct {
-	port string
+	port    string
+	baseURL string
 }
 
 var webFlags WebFlags
@@ -28,6 +29,7 @@ var webFlags WebFlags
 func init() {
 	f := cmdWeb.Flags
 	f().StringVarP(&webFlags.port, "port", "p", "8080", "Port to run web server on")
+	f().StringVarP(&webFlags.baseURL, "url", "b", "zion-english-admin", "Base URL")
 	rootCmd.AddCommand(cmdWeb)
 }
 
@@ -39,6 +41,15 @@ var cmdWeb = &cobra.Command{
 			panic(err)
 		}
 
+		// Handle routes with baseURL
+		if webFlags.baseURL != "" {
+			basePath := "/" + strings.TrimPrefix(webFlags.baseURL, "/")
+			http.HandleFunc(basePath, handleIndex)
+			http.HandleFunc(basePath+"/process", handleProcess)
+			http.HandleFunc(basePath+"/download/", handleDownload)
+		}
+
+		// Also handle root routes (for localhost)
 		http.HandleFunc("/", handleIndex)
 		http.HandleFunc("/process", handleProcess)
 		http.HandleFunc("/download/", handleDownload)
@@ -48,7 +59,11 @@ var cmdWeb = &cobra.Command{
 			port = ":" + port
 		}
 
-		logs.Log().Info("Starting web server", zap.String("port", port))
+		logs.Log().Info(
+			"Starting web server",
+			zap.String("port", port),
+			zap.String("base URL", webFlags.baseURL),
+		)
 		if err := http.ListenAndServe(port, nil); err != nil {
 			panic(err)
 		}

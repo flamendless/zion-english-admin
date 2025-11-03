@@ -216,7 +216,7 @@
             <div class="form-group">
                 <label for="name">Name *</label>
                 <input type="text" id="name" name="name" required
-                       pattern="^[a-zA-Z0-9_-]+$"
+                       pattern="[a-zA-Z0-9\-_]+"
                        placeholder="teacher-name">
                 <div class="error-message" id="nameError">Name must contain only letters, numbers, dashes, and underscores</div>
             </div>
@@ -346,6 +346,12 @@
         const statusColSelect = document.getElementById('statusCol');
 
         let currentFileName = '';
+
+        const baseURL = window.location.pathname.split('/').slice(0, -1).join('/') || '';
+
+        function buildURL(path) {
+            return baseURL + path;
+        }
 
         // Validate date range
         function validateDates() {
@@ -504,7 +510,7 @@
             };
 
             try {
-                const response = await fetch('/process', {
+                const response = await fetch(buildURL('/process'), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -575,7 +581,7 @@
 
         downloadBtn.addEventListener('click', () => {
             if (currentFileName) {
-                window.location.href = `/download/${currentFileName}`;
+                window.location.href = buildURL(`/download/${currentFileName}`);
             }
         });
 
