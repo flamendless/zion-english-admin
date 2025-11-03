@@ -45,18 +45,10 @@ var cmdWeb = &cobra.Command{
 			panic(err)
 		}
 
-		// Handle routes with baseURL
-		if webFlags.baseURL != "" {
-			basePath := "/" + strings.TrimPrefix(webFlags.baseURL, "/")
-			http.HandleFunc(basePath, handleIndex)
-			http.HandleFunc(basePath+"/process", handleProcess)
-			http.HandleFunc(basePath+"/download/", handleDownload)
-		}
-
-		// Also handle root routes (for localhost)
-		http.HandleFunc("/", handleIndex)
-		http.HandleFunc("/process", handleProcess)
-		http.HandleFunc("/download/", handleDownload)
+		basePath := "/" + strings.TrimPrefix(webFlags.baseURL, "/")
+		http.HandleFunc(basePath, handleIndex)
+		http.HandleFunc(basePath+"/process", handleProcess)
+		http.HandleFunc(basePath+"/download/", handleDownload)
 
 		port := webFlags.port
 		if !strings.HasPrefix(port, ":") {

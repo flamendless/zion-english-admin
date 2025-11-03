@@ -347,7 +347,26 @@
 
         let currentFileName = '';
 
-        const baseURL = window.location.pathname.split('/').slice(0, -1).join('/') || '';
+        function getBaseURL() {
+            const pathname = window.location.pathname;
+            const cleanPath = pathname.replace(/\/$/, '');
+            const parts = cleanPath.split('/').filter(p => p !== '');
+
+            if (parts.length === 0 || cleanPath.endsWith('.html')) {
+                if (cleanPath.includes('/zion-english-admin')) {
+                    return '/zion-english-admin';
+                }
+                return '';
+            }
+
+            if (parts.length === 1) {
+                return '/' + parts[0];
+            }
+
+            return '/' + parts.slice(0, -1).join('/');
+        }
+
+        const baseURL = getBaseURL();
 
         function buildURL(path) {
             return baseURL + path;
