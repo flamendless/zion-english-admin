@@ -22,6 +22,8 @@ import (
 type WebFlags struct {
 	port    string
 	baseURL string
+	https   bool
+	address string
 }
 
 var webFlags WebFlags
@@ -30,6 +32,8 @@ func init() {
 	f := cmdWeb.Flags
 	f().StringVarP(&webFlags.port, "port", "p", "8080", "Port to run web server on")
 	f().StringVarP(&webFlags.baseURL, "url", "b", "zion-english-admin", "Base URL")
+	f().BoolVar(&webFlags.https, "https", false, "Enable HTTPS")
+	f().StringVar(&webFlags.address, "address", "", "Domain address for Let's Encrypt certificates (e.g., flamendless.xyz)")
 	rootCmd.AddCommand(cmdWeb)
 }
 
@@ -63,8 +67,28 @@ var cmdWeb = &cobra.Command{
 			"Starting web server",
 			zap.String("port", port),
 			zap.String("base URL", webFlags.baseURL),
+			zap.Bool("https", webFlags.https),
 		)
-		if err := http.ListenAndServe(port, nil); err != nil {
+
+		var err error
+		if webFlags.https {
+			if webFlags.address == "" {
+				panic("--address flag is required when --https is enabled")
+			}
+			certFile := fmt.Sprintf("/etc/letsencrypt/live/%s/fullchain.pem", webFlags.address)
+			keyFile := fmt.Sprintf("/etc/letsencrypt/live/%s/privkey.pem", webFlags.address)
+			logs.Log().Info(
+				"Starting HTTPS server",
+				zap.String("address", webFlags.address),
+				zap.String("cert", certFile),
+				zap.String("key", keyFile),
+			)
+			err = http.ListenAndServeTLS(port, certFile, keyFile, nil)
+		} else {
+			err = http.ListenAndServe(port, nil)
+		}
+
+		if err != nil {
 			panic(err)
 		}
 	},
