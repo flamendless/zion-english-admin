@@ -90,16 +90,14 @@ var cmdParseTeacher = &cobra.Command{
 		startDateStr := strings.TrimSpace(parseTeacherFlags.startDate)
 		parsedStartDate, err := parseDateString(startDateStr)
 		if err != nil {
-			logs.Log().Error("Failed to parse start date", zap.String("date", startDateStr), zap.Error(err))
-			return
+			panic(err)
 		}
 		targetStartDate := *parsedStartDate
 
 		endDateStr := strings.TrimSpace(parseTeacherFlags.endDate)
 		parsedEndDate, err := parseDateString(endDateStr)
 		if err != nil {
-			logs.Log().Error("Failed to parse end date", zap.String("date", endDateStr), zap.Error(err))
-			return
+			panic(err)
 		}
 		targetEndDate := *parsedEndDate
 
@@ -113,16 +111,14 @@ var cmdParseTeacher = &cobra.Command{
 
 		file, err := os.Open(parseTeacherFlags.filepath)
 		if err != nil {
-			logs.Log().Error("Failed to open file", zap.Error(err))
-			return
+			panic(err)
 		}
 		defer file.Close()
 
 		reader := csv.NewReader(file)
 		records, err := reader.ReadAll()
 		if err != nil {
-			logs.Log().Error("Failed to read CSV", zap.Error(err))
-			return
+			panic(err)
 		}
 
 		var startIdx int = -1
@@ -235,7 +231,6 @@ var cmdParseTeacher = &cobra.Command{
 			return dateI.Before(*dateJ)
 		})
 
-		// TODO: (Brandon) Save to output file or process further
 		for _, rec := range sortedTeacherRecords {
 			logs.Log().Info("Record",
 				zap.String("name", rec.Name),

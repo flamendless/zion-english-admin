@@ -1,11 +1,8 @@
 package cmd
 
 import (
-	"os"
-	"os/exec"
-	"path/filepath"
 	"zion-english/internal/logs"
-	"zion-english/internal/utils"
+	"zion-english/internal/sheet"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -45,35 +42,9 @@ var cmdGetDriveSheet = &cobra.Command{
 			zap.String("output", outputPath),
 		)
 
-		exportURL, err := utils.DriveURLToExportURL(driveURL, "csv")
-		if err != nil {
-			logs.Log().Error("Failed to convert drive URL to export URL", zap.Error(err))
-			return
+		if err := sheet.DownloadDriveSheet(driveURL, outputPath); err != nil {
+			panic(err)
 		}
-
-		logs.Log().Info("Export URL", zap.String("url", exportURL))
-
-		if err := downloadFileWithCurl(exportURL, outputPath); err != nil {
-			logs.Log().Error("Failed to download file", zap.Error(err))
-			return
-		}
-
 		logs.Log().Info("Successfully downloaded file", zap.String("output", outputPath))
 	},
-}
-
-func downloadFileWithCurl(url, outputPath string) error {
-	outputDir := filepath.Dir(outputPath)
-	if outputDir != "." && outputDir != "" {
-		if err := os.MkdirAll(outputDir, 0755); err != nil {
-			return err
-		}
-	}
-
-	cmd := exec.Command("curl", "-L", "-o", outputPath, url)
-	if err := cmd.Run(); err != nil {
-		return err
-	}
-
-	return nil
 }
