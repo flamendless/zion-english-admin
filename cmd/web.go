@@ -258,7 +258,17 @@ func handleDownload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	name := strings.TrimPrefix(r.URL.Path, "/download/")
+	path := strings.TrimPrefix(r.URL.Path, "/")
+	parts := strings.Split(path, "/")
+
+	var name string
+	for i, part := range parts {
+		if part == "download" && i+1 < len(parts) {
+			name = parts[i+1]
+			break
+		}
+	}
+
 	if name == "" {
 		http.Error(w, "Missing filename", http.StatusBadRequest)
 		return

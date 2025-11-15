@@ -8,6 +8,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"zion-english/internal/logs"
+
+	"go.uber.org/zap"
 )
 
 func ProcessCSVFile(filePath string, startDate, endDate time.Time, colIndices ColumnIndices) ([]ClassRecord, error) {
@@ -23,29 +27,9 @@ func ProcessCSVFile(filePath string, startDate, endDate time.Time, colIndices Co
 		return nil, err
 	}
 
-	var startIdx int = -1
-	for i, record := range records {
-		if len(record) <= 0 {
-			continue
-		}
-		parsedDate, err := ParseDateFromRecord(record, startDate.Year())
-		if err != nil {
-			continue
-		}
-
-		if parsedDate.Year() == startDate.Year() &&
-			parsedDate.Month() == startDate.Month() &&
-			parsedDate.Day() == startDate.Day() {
-			startIdx = i
-			break
-		}
-	}
-	if startIdx == -1 {
-		return nil, fmt.Errorf("start date not found in CSV")
-	}
-
 	var endIdx int = -1
-	for i, record := range records {
+	for i := len(records) - 1; i >= 0; i-- {
+		record := records[i]
 		if len(record) <= 0 {
 			continue
 		}
@@ -65,8 +49,57 @@ func ProcessCSVFile(filePath string, startDate, endDate time.Time, colIndices Co
 		return nil, fmt.Errorf("end date not found in CSV")
 	}
 
+	var startIdx int = -1
+	for i := endIdx; i >= 0; i-- {
+		record := records[i]
+		if len(record) <= 0 {
+			continue
+		}
+		parsedDate, err := ParseDateFromRecord(record, endDate.Year())
+		if err != nil {
+			continue
+		}
+
+		if parsedDate.Month() == startDate.Month() &&
+			parsedDate.Day() == startDate.Day() &&
+			parsedDate.Year() == endDate.Year() {
+			startIdx = i
+			break
+		}
+	}
+	if startIdx == -1 {
+		return nil, fmt.Errorf("start date not found in CSV")
+	}
+
+	logs.Log().Info(
+		"Date row indices",
+		zap.Int("startIndex", startIdx),
+		zap.Int("endIndex", endIdx),
+	)
+
 	var teacherRecords []ClassRecord
-	currentDate := startDate
+	type dateRow struct {
+		index int
+		date  time.Time
+	}
+	var dateRows []dateRow
+
+	for i := startIdx; i <= endIdx; i++ {
+		record := records[i]
+		if len(record) == 0 || strings.TrimSpace(record[0]) == "" {
+			continue
+		}
+		parsedDate, err := ParseDateFromRecord(record, endDate.Year())
+		if err == nil {
+			if parsedDate.After(endDate) {
+				break
+			}
+			if !parsedDate.Before(startDate) {
+				dateRows = append(dateRows, dateRow{index: i, date: *parsedDate})
+			}
+		}
+	}
+
 	for i := startIdx + 1; i < len(records); i++ {
 		record := records[i]
 		if len(record) == 0 || strings.TrimSpace(record[0]) == "" {
@@ -78,12 +111,31 @@ func ProcessCSVFile(filePath string, startDate, endDate time.Time, colIndices Co
 			if parsedDate.After(endDate) {
 				break
 			}
-			currentDate = *parsedDate
 			continue
 		}
 
-		if currentDate.After(endDate) {
-			break
+		var currentDate time.Time
+		found := false
+		for j := len(dateRows) - 1; j >= 0; j-- {
+			if dateRows[j].index < i {
+				currentDate = dateRows[j].date
+				found = true
+				break
+			}
+		}
+		if !found && len(dateRows) > 0 {
+			lastDateRow := dateRows[len(dateRows)-1]
+			if lastDateRow.index == endIdx && i > endIdx {
+				currentDate = lastDateRow.date
+				found = true
+			}
+		}
+		if !found {
+			continue
+		}
+
+		if currentDate.Before(startDate) || currentDate.After(endDate) {
+			continue
 		}
 
 		teacherRec := parseTeacherRecord(record, currentDate, colIndices)
@@ -130,9 +182,7 @@ func parseTeacherRecord(record []string, date time.Time, colIndices ColumnIndice
 	timeMin := 0
 	if colIndices.Duration >= 0 && len(record) > colIndices.Duration {
 		timeStr := strings.TrimSpace(record[colIndices.Duration])
-		// Normalize to uppercase for consistent parsing
 		timeStr = strings.ToUpper(timeStr)
-		// Remove common suffixes: "MINS", "MIN", "MINS.", "MIN.", etc.
 		timeStr = strings.TrimSuffix(timeStr, ".")
 		timeStr = strings.TrimSuffix(timeStr, "MINS")
 		timeStr = strings.TrimSuffix(timeStr, "MIN")
