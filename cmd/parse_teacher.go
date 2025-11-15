@@ -154,7 +154,7 @@ var cmdParseTeacher = &cobra.Command{
 			zap.Float64("total", totalRate),
 		)
 
-		if err := processor.SaveRecordsToCSV(sortedTeacherRecords, parseTeacherFlags.output, colIndices); err != nil {
+		if err := processor.SaveRecords(sortedTeacherRecords, parseTeacherFlags.output, colIndices); err != nil {
 			panic(err)
 		}
 	},

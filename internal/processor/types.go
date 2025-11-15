@@ -11,6 +11,7 @@ type ClassRecord struct {
 	GoogleLink        string
 	Status            string
 	Date              string
+	OriginalRowIndex  int
 }
 
 type ColumnIndices struct {

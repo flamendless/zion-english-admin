@@ -98,11 +98,12 @@ type ProcessRequest struct {
 }
 
 type ProcessResponse struct {
-	Success bool        `json:"success"`
-	Message string      `json:"message"`
-	Logs    []string    `json:"logs"`
-	Records []RecordRow `json:"records"`
-	Total   float64     `json:"total"`
+	Success  bool        `json:"success"`
+	Message  string      `json:"message"`
+	Logs     []string    `json:"logs"`
+	Records  []RecordRow `json:"records"`
+	Total    float64     `json:"total"`
+	RowRange string      `json:"rowRange,omitempty"`
 }
 
 type RecordRow struct {
@@ -206,22 +207,39 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 
 	addLog(fmt.Sprintf("Processed %d records", len(records)))
 
-	// Save output
-	outputPath := filepath.Join("tmp", fmt.Sprintf("%s_output.csv", req.Name))
-	if err := processor.SaveRecordsToCSV(records, outputPath, colIndices); err != nil {
+	outputPath := filepath.Join("tmp", fmt.Sprintf("%s_output.xlsx", req.Name))
+	if err := processor.SaveRecords(records, outputPath, colIndices); err != nil {
 		sendErrorResponse(w, fmt.Sprintf("Failed to save output: %v", err))
 		return
 	}
 
 	addLog(fmt.Sprintf("Saved output to: %s", outputPath))
 
-	// Calculate total
 	var total float64
+	var minRow, maxRow int
+	if len(records) > 0 {
+		minRow = records[0].OriginalRowIndex
+		maxRow = records[0].OriginalRowIndex
+	}
 	for _, rec := range records {
 		total += rec.Rate
+		if rec.OriginalRowIndex < minRow {
+			minRow = rec.OriginalRowIndex
+		}
+		if rec.OriginalRowIndex > maxRow {
+			maxRow = rec.OriginalRowIndex
+		}
 	}
 
-	// Convert to response format
+	var rowRange string
+	if len(records) > 0 {
+		if minRow == maxRow {
+			rowRange = fmt.Sprintf("Row: %d", minRow)
+		} else {
+			rowRange = fmt.Sprintf("Rows: %d-%d", minRow, maxRow)
+		}
+	}
+
 	responseRecords := make([]RecordRow, len(records))
 	for i, rec := range records {
 		responseRecords[i] = RecordRow{
@@ -241,11 +259,12 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := ProcessResponse{
-		Success: true,
-		Message: "Processing completed successfully",
-		Logs:    logMessages,
-		Records: responseRecords,
-		Total:   total,
+		Success:  true,
+		Message:  "Processing completed successfully",
+		Logs:     logMessages,
+		Records:  responseRecords,
+		Total:    total,
+		RowRange: rowRange,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -281,7 +300,7 @@ func handleDownload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	outputPath := filepath.Join("tmp", fmt.Sprintf("%s_output.csv", name))
+	outputPath := filepath.Join("tmp", fmt.Sprintf("%s_output.xlsx", name))
 
 	// Check if file exists
 	if _, err := os.Stat(outputPath); os.IsNotExist(err) {
@@ -289,8 +308,8 @@ func handleDownload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/csv")
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s.csv\"", name))
+	w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s.xlsx\"", name))
 	http.ServeFile(w, r, outputPath)
 }
 
@@ -335,11 +354,12 @@ func validateRequest(req *ProcessRequest) error {
 
 func sendErrorResponse(w http.ResponseWriter, message string) {
 	response := ProcessResponse{
-		Success: false,
-		Message: message,
-		Logs:    logMessages,
-		Records: []RecordRow{},
-		Total:   0,
+		Success:  false,
+		Message:  message,
+		Logs:     logMessages,
+		Records:  []RecordRow{},
+		Total:    0,
+		RowRange: "",
 	}
 
 	w.Header().Set("Content-Type", "application/json")

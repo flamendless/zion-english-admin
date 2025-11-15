@@ -199,6 +199,23 @@
             font-weight: bold;
             background-color: #f0f0f0;
         }
+
+        .info-display {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-display > div {
+            flex: 1;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -309,8 +326,12 @@
         <div class="results-section" id="resultsSection">
             <h3>Results</h3>
             <div class="button-group">
-                <button class="download-btn" id="downloadBtn">Download CSV</button>
+                <button class="download-btn" id="downloadBtn">Download XLSX</button>
                 <button class="clear-btn" id="clearBtn">Clear Table</button>
+            </div>
+            <div id="infoDisplay" class="info-display">
+                <div id="rowRangeDisplay"></div>
+                <div id="totalDisplay"></div>
             </div>
             <table id="resultsTable">
                 <thead>
@@ -547,7 +568,7 @@
 
                     // Display results
                     currentFileName = formData.name;
-                    displayResults(data.records, data.total);
+                    displayResults(data.records, data.total, data.rowRange);
                 } else {
                     logOutput.textContent += '\n✗ Error: ' + data.message;
                 }
@@ -570,11 +591,74 @@
             return `${months[month]} ${day}, ${year}`;
         }
 
-        function displayResults(records, total) {
+        // Light color palette matching Go implementation
+        const lightColors = [
+            '#FFE6E6', // light red
+            '#E6F3FF', // light blue
+            '#E6FFE6', // light green
+            '#FFF9E6', // light yellow
+            '#F0E6FF', // light purple
+            '#FFE6CC', // light orange
+            '#FFE6F0', // light pink
+            '#E6FFFF', // light cyan
+            '#F5F5F5', // light gray
+            '#E6F5FF', // light sky blue
+            '#FFF0E6', // light peach
+            '#F0FFE6', // light lime
+            '#FFE6F5', // light rose
+            '#E6E6FF', // light lavender
+            '#FFFFE6'  // light cream
+        ];
+
+        // Hash function matching Go's fnv32a
+        function hashString(str) {
+            let hash = 2166136261; // FNV offset basis
+            for (let i = 0; i < str.length; i++) {
+                hash ^= str.charCodeAt(i);
+                hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+            }
+            return hash >>> 0; // Convert to unsigned 32-bit
+        }
+
+        function getColorForName(name) {
+            const hash = hashString(name);
+            return lightColors[hash % lightColors.length];
+        }
+
+        function displayResults(records, total, rowRange) {
             resultsBody.innerHTML = '';
 
-            records.forEach(record => {
+            if (records.length === 0) {
+                document.getElementById('infoDisplay').style.display = 'none';
+                resultsSection.style.display = 'block';
+                return;
+            }
+
+            // Display row range and total at top
+            const rowRangeDisplay = document.getElementById('rowRangeDisplay');
+            const totalDisplay = document.getElementById('totalDisplay');
+            const infoDisplay = document.getElementById('infoDisplay');
+
+            rowRangeDisplay.textContent = rowRange || 'Rows: N/A';
+            totalDisplay.textContent = `Total: ${total.toFixed(2)}`;
+            infoDisplay.style.display = 'flex';
+
+            // Calculate colors for each name group
+            const nameGroups = {};
+            records.forEach((record) => {
+                if (!nameGroups[record.name]) {
+                    nameGroups[record.name] = {
+                        color: getColorForName(record.name)
+                    };
+                }
+            });
+
+            // Display records with colors
+            records.forEach((record) => {
                 const row = document.createElement('tr');
+                const group = nameGroups[record.name];
+
+                row.style.backgroundColor = group.color;
                 row.innerHTML = `
                     <td>${escapeHtml(record.name)}</td>
                     <td>${escapeHtml(record.date)}</td>
@@ -584,16 +668,6 @@
                 `;
                 resultsBody.appendChild(row);
             });
-
-            // Add total row
-            const totalRow = document.createElement('tr');
-            totalRow.className = 'total-row';
-            totalRow.innerHTML = `
-                <td colspan="3"><strong>Total</strong></td>
-                <td><strong>${total.toFixed(2)}</strong></td>
-                <td></td>
-            `;
-            resultsBody.appendChild(totalRow);
 
             resultsSection.style.display = 'block';
         }
@@ -606,6 +680,8 @@
 
         clearBtn.addEventListener('click', () => {
             resultsBody.innerHTML = '';
+            const infoDisplay = document.getElementById('infoDisplay');
+            infoDisplay.style.display = 'none';
             resultsSection.style.display = 'none';
             currentFileName = '';
         });
