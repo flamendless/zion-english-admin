@@ -50,6 +50,7 @@ var cmdWeb = &cobra.Command{
 		http.HandleFunc(basePath, handleIndex)
 		http.HandleFunc(basePath+"/process", handleProcess)
 		http.HandleFunc(basePath+"/download/", handleDownload)
+		http.Handle(basePath+"/static/", http.StripPrefix(basePath+"/static/", http.FileServer(http.Dir("static"))))
 
 		port := webFlags.port
 		if !strings.HasPrefix(port, ":") {
@@ -223,7 +224,7 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 	addLog(fmt.Sprintf("Processed %d records", len(records)))
 
 	outputPath := filepath.Join("tmp", fmt.Sprintf("%s_output.xlsx", req.Name))
-	if err := processor.SaveRecords(records, outputPath, colIndices); err != nil {
+	if err := processor.SaveRecords(records, outputPath, colIndices, req.Name); err != nil {
 		sendErrorResponse(w, fmt.Sprintf("Failed to save output: %v", err))
 		return
 	}

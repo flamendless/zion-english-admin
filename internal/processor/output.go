@@ -11,7 +11,7 @@ const (
 )
 
 type RecordWriter interface {
-	WriteRecords(records []ClassRecord, outputPath string, colIndices ColumnIndices) error
+	WriteRecords(records []ClassRecord, outputPath string, colIndices ColumnIndices, name string) error
 }
 
 func GetWriter(format OutputFormat) RecordWriter {
@@ -41,12 +41,12 @@ func GetOutputFormatFromPath(outputPath string) OutputFormat {
 	return OutputFormatUndefined
 }
 
-func SaveRecords(records []ClassRecord, outputPath string, colIndices ColumnIndices) error {
+func SaveRecords(records []ClassRecord, outputPath string, colIndices ColumnIndices, name string) error {
 	writer := GetWriterFromPath(outputPath)
-	return writer.WriteRecords(records, outputPath, colIndices)
+	return writer.WriteRecords(records, outputPath, colIndices, name)
 }
 
-func SaveRecordsWithFormat(records []ClassRecord, outputPath string, colIndices ColumnIndices, format OutputFormat) error {
+func SaveRecordsWithFormat(records []ClassRecord, outputPath string, colIndices ColumnIndices, format OutputFormat, name string) error {
 	writer := GetWriter(format)
-	return writer.WriteRecords(records, outputPath, colIndices)
+	return writer.WriteRecords(records, outputPath, colIndices, name)
 }

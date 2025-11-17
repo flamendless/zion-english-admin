@@ -26,7 +26,7 @@ var lightColors = []string{
 	"FFFFE6", // light cream
 }
 
-func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colIndices ColumnIndices) error {
+func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colIndices ColumnIndices, name string) error {
 	f := excelize.NewFile()
 	defer func() {
 		if err := f.Close(); err != nil {
@@ -37,30 +37,39 @@ func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colI
 	sheetName := "Sheet1"
 	f.SetActiveSheet(0)
 
+	rowNum := 1
+
+	if name != "" {
+		cell, _ := excelize.CoordinatesToCellName(1, rowNum)
+		f.SetCellValue(sheetName, cell, fmt.Sprintf("Teacher Name: %s", name))
+		rowNum++
+		rowNum++
+	}
+
 	headers := []string{"Name", "Date", "Duration", "Rate"}
 	colIndex := 1
 	for _, header := range headers {
-		cell, _ := excelize.CoordinatesToCellName(colIndex, 1)
+		cell, _ := excelize.CoordinatesToCellName(colIndex, rowNum)
 		f.SetCellValue(sheetName, cell, header)
 		colIndex++
 	}
 
 	if colIndices.StartTime >= 0 {
-		cell, _ := excelize.CoordinatesToCellName(colIndex, 1)
+		cell, _ := excelize.CoordinatesToCellName(colIndex, rowNum)
 		f.SetCellValue(sheetName, cell, "StartTime")
 		colIndex++
 	}
 	if colIndices.EndTime >= 0 {
-		cell, _ := excelize.CoordinatesToCellName(colIndex, 1)
+		cell, _ := excelize.CoordinatesToCellName(colIndex, rowNum)
 		f.SetCellValue(sheetName, cell, "EndTime")
 		colIndex++
 	}
 	if colIndices.Link >= 0 {
-		cell, _ := excelize.CoordinatesToCellName(colIndex, 1)
+		cell, _ := excelize.CoordinatesToCellName(colIndex, rowNum)
 		f.SetCellValue(sheetName, cell, "GoogleLink")
 		colIndex++
 	}
-	cell, _ := excelize.CoordinatesToCellName(colIndex, 1)
+	cell, _ := excelize.CoordinatesToCellName(colIndex, rowNum)
 	f.SetCellValue(sheetName, cell, "Status")
 
 	// Style header row
@@ -72,9 +81,10 @@ func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colI
 	if err != nil {
 		return err
 	}
-	f.SetCellStyle(sheetName, "A1", getColumnLetter(colIndex)+"1", headerStyle)
+	headerRowCell := fmt.Sprintf("A%d", rowNum)
+	f.SetCellStyle(sheetName, headerRowCell, getColumnLetter(colIndex)+fmt.Sprintf("%d", rowNum), headerStyle)
 
-	rowNum := 2
+	rowNum++
 	var total float64
 	nameColorMap := make(map[string]string)
 	uniqueNames := make([]string, 0)

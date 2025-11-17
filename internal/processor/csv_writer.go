@@ -9,7 +9,7 @@ import (
 
 type CSVWriter struct{}
 
-func (w *CSVWriter) WriteRecords(records []ClassRecord, outputPath string, colIndices ColumnIndices) error {
+func (w *CSVWriter) WriteRecords(records []ClassRecord, outputPath string, colIndices ColumnIndices, name string) error {
 	outputFile, err := os.Create(outputPath)
 	if err != nil {
 		return err
@@ -18,6 +18,15 @@ func (w *CSVWriter) WriteRecords(records []ClassRecord, outputPath string, colIn
 
 	writer := csv.NewWriter(outputFile)
 	defer writer.Flush()
+
+	if name != "" {
+		if err := writer.Write([]string{fmt.Sprintf("Teacher Name: %s", name)}); err != nil {
+			return err
+		}
+		if err := writer.Write([]string{""}); err != nil {
+			return err
+		}
+	}
 
 	header := []string{"Name", "Date", "Duration", "Rate"}
 	if colIndices.StartTime >= 0 {
@@ -80,5 +89,5 @@ func (w *CSVWriter) WriteRecords(records []ClassRecord, outputPath string, colIn
 
 func SaveRecordsToCSV(records []ClassRecord, outputPath string, colIndices ColumnIndices) error {
 	writer := &CSVWriter{}
-	return writer.WriteRecords(records, outputPath, colIndices)
+	return writer.WriteRecords(records, outputPath, colIndices, "")
 }

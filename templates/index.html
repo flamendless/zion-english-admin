@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSV Processing Tool</title>
+    <title>Zion English Admin Tool</title>
+    <link rel="icon" type="image/x-icon" id="favicon">
     <style>
         * {
             box-sizing: border-box;
@@ -27,11 +28,26 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        h1 {
-            color: #333;
+        .header-section {
             margin-bottom: 30px;
             border-bottom: 2px solid #4CAF50;
             padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        h1 {
+            color: #333;
+            margin: 0;
+            flex: 1;
+        }
+
+        .header-subtext {
+            color: #666;
+            margin: 0;
+            font-size: 14px;
+            white-space: nowrap;
         }
 
         .form-group {
@@ -220,7 +236,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>CSV Processing Tool</h1>
+        <div class="header-section">
+            <h1>Zion English Admin Tool</h1>
+            <p class="header-subtext">
+                made by <a href="https://flamendless.xyz" target="_blank" style="color: #4CAF50; text-decoration: none;">@flamendless</a>
+            </p>
+        </div>
 
         <form id="processForm">
             <div class="form-group">
@@ -400,6 +421,12 @@
 
         function buildURL(path) {
             return baseURL + path;
+        }
+
+        // Set favicon with base URL
+        const favicon = document.getElementById('favicon');
+        if (favicon) {
+            favicon.href = buildURL('/static/favicon.ico');
         }
 
         // Validate date range
