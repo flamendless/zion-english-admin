@@ -45,7 +45,9 @@ prod() {
 
 	sleep 1
 
-	echo "go run . web -p 1010 --https --address flamendless.xyz > outlog 2>&1"
+	echo "Please run:"
+	echo "    go run . web -p 1010 --https --address flamendless.xyz > outlog 2>&1 &"
+
 }
 
 if [ "$#" -eq 0 ]; then
