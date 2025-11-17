@@ -14,7 +14,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func ProcessCSVFile(filePath string, startDate, endDate time.Time, colIndices ColumnIndices) ([]ClassRecord, error) {
+func ProcessCSVFile(filePath string, startDate, endDate time.Time, colIndices ColumnIndices, excludedRows map[int]bool) ([]ClassRecord, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
@@ -138,9 +138,14 @@ func ProcessCSVFile(filePath string, startDate, endDate time.Time, colIndices Co
 			continue
 		}
 
+		rowNumber := i + 1
+		if excludedRows != nil && excludedRows[rowNumber] {
+			continue
+		}
+
 		teacherRec := parseTeacherRecord(record, currentDate, colIndices)
 		if teacherRec != nil {
-			teacherRec.OriginalRowIndex = i + 1
+			teacherRec.OriginalRowIndex = rowNumber
 			teacherRecords = append(teacherRecords, *teacherRec)
 		}
 	}

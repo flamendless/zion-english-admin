@@ -92,7 +92,7 @@ var cmdParseTeacher = &cobra.Command{
 			Link:      processor.ColumnLetterToIndex(parseTeacherFlags.linkCol),
 		}
 
-		teacherRecords, err := processor.ProcessCSVFile(parseTeacherFlags.filepath, targetStartDate, targetEndDate, colIndices)
+		teacherRecords, err := processor.ProcessCSVFile(parseTeacherFlags.filepath, targetStartDate, targetEndDate, colIndices, nil)
 		if err != nil {
 			panic(err)
 		}

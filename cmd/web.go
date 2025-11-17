@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 	"zion-english/internal/logs"
@@ -87,14 +88,15 @@ var cmdWeb = &cobra.Command{
 }
 
 type ProcessRequest struct {
-	DriveURL    string `json:"driveUrl"`
-	Name        string `json:"name"`
-	StartDate   string `json:"startDate"`
-	EndDate     string `json:"endDate"`
-	NameCol     string `json:"nameCol"`
-	DurationCol string `json:"durationCol"`
-	RateCol     string `json:"rateCol"`
-	StatusCol   string `json:"statusCol"`
+	DriveURL     string `json:"driveUrl"`
+	Name         string `json:"name"`
+	StartDate    string `json:"startDate"`
+	EndDate      string `json:"endDate"`
+	NameCol      string `json:"nameCol"`
+	DurationCol  string `json:"durationCol"`
+	RateCol      string `json:"rateCol"`
+	StatusCol    string `json:"statusCol"`
+	ExcludedRows string `json:"excludedRows"`
 }
 
 type ProcessResponse struct {
@@ -199,7 +201,20 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 		Link:      -1,
 	}
 
-	records, err := processor.ProcessCSVFile(inputPath, targetStartDate, targetEndDate, colIndices)
+	excludedRows := make(map[int]bool)
+	if req.ExcludedRows != "" {
+		parts := strings.Split(req.ExcludedRows, ",")
+		for _, part := range parts {
+			part = strings.TrimSpace(part)
+			if part != "" {
+				if rowNum, err := strconv.Atoi(part); err == nil && rowNum > 0 {
+					excludedRows[rowNum] = true
+				}
+			}
+		}
+	}
+
+	records, err := processor.ProcessCSVFile(inputPath, targetStartDate, targetEndDate, colIndices, excludedRows)
 	if err != nil {
 		sendErrorResponse(w, fmt.Sprintf("Failed to process CSV: %v", err))
 		return

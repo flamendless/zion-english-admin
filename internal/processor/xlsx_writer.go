@@ -2,7 +2,6 @@ package processor
 
 import (
 	"fmt"
-	"hash/fnv"
 
 	"github.com/xuri/excelize/v2"
 )
@@ -25,13 +24,6 @@ var lightColors = []string{
 	"FFE6F5", // light rose
 	"E6E6FF", // light lavender
 	"FFFFE6", // light cream
-}
-
-func getColorForName(name string) string {
-	h := fnv.New32a()
-	h.Write([]byte(name))
-	hash := h.Sum32()
-	return lightColors[hash%uint32(len(lightColors))]
 }
 
 func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colIndices ColumnIndices) error {
@@ -85,16 +77,27 @@ func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colI
 	rowNum := 2
 	var total float64
 	nameColorMap := make(map[string]string)
+	uniqueNames := make([]string, 0)
+	seenNames := make(map[string]bool)
+
+	// First pass: collect unique names in order
+	for _, rec := range records {
+		if !seenNames[rec.Name] {
+			uniqueNames = append(uniqueNames, rec.Name)
+			seenNames[rec.Name] = true
+		}
+	}
+
+	// Assign colors sequentially to ensure different colors for consecutive names
+	for i, name := range uniqueNames {
+		nameColorMap[name] = lightColors[i%len(lightColors)]
+	}
 
 	for _, rec := range records {
 		colIndex := 1
 
-		// Get or assign color for this name
-		color, exists := nameColorMap[rec.Name]
-		if !exists {
-			color = getColorForName(rec.Name)
-			nameColorMap[rec.Name] = color
-		}
+		// Get color for this name (already assigned)
+		color := nameColorMap[rec.Name]
 
 		// Name
 		cell, _ := excelize.CoordinatesToCellName(colIndex, rowNum)
