@@ -2,11 +2,11 @@ package processor
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 	"time"
 )
 
-// ColumnLetterToIndex converts a column letter (e.g., "A", "B") to a 0-based index
 func ColumnLetterToIndex(col string) int {
 	col = strings.ToUpper(strings.TrimSpace(col))
 	if len(col) == 0 {
@@ -23,6 +23,40 @@ func ParseDateStringWithYear(dateStr string, year int) (*time.Time, error) {
 	dateStr = strings.Trim(dateStr, `"`)
 	dateStr = strings.TrimSpace(dateStr)
 
+	// Try parsing "MM/DD/YY" or "M/D/YY" format (e.g., "11/30/25", "5/16/25")
+	if strings.Contains(dateStr, "/") {
+		parts := strings.Split(dateStr, "/")
+		if len(parts) == 3 {
+			month, err1 := strconv.Atoi(strings.TrimSpace(parts[0]))
+			day, err2 := strconv.Atoi(strings.TrimSpace(parts[1]))
+			yearStr := strings.TrimSpace(parts[2])
+
+			if err1 == nil && err2 == nil && month >= 1 && month <= 12 && day >= 1 && day <= 31 {
+				// Parse year from string
+				yearVal, err3 := strconv.Atoi(yearStr)
+				if err3 == nil {
+					useYear := yearVal
+					if len(yearStr) == 2 {
+						// Convert 2-digit year to 4-digit (25 -> 2025, assuming 2000s)
+						useYear = 2000 + yearVal
+					} else if len(yearStr) == 4 {
+						useYear = yearVal
+					} else {
+						// Fallback to parameter year or current year
+						if year != 0 {
+							useYear = year
+						} else {
+							useYear = max(time.Now().Year(), 2025)
+						}
+					}
+
+					parsedDate := time.Date(useYear, time.Month(month), day, 0, 0, 0, 0, time.UTC)
+					return &parsedDate, nil
+				}
+			}
+		}
+	}
+
 	normalized := normalizeDateString(dateStr)
 
 	parsedDate, err := time.Parse("January 2, 2006", normalized)
@@ -30,26 +64,41 @@ func ParseDateStringWithYear(dateStr string, year int) (*time.Time, error) {
 		parsedDate, err = time.Parse("January 02, 2006", normalized)
 	}
 	if err != nil {
+		// Try "January 2" format without comma (e.g., "November 29", "November 2")
+		parsedDate, err = time.Parse("January 2", normalized)
+		if err != nil {
+			parsedDate, err = time.Parse("January 02", normalized)
+		}
+	}
+	if err != nil {
+		// Try "Mon DD" format (e.g., "Nov 29", "Nov 2")
+		parsedDate, err = time.Parse("Jan 2", normalized)
+		if err != nil {
+			parsedDate, err = time.Parse("Jan 02", normalized)
+		}
+	}
+	if err != nil {
 		// Try "Mon-DD" format (e.g., "Oct-16", "Oct.-16")
 		parsedDate, err = time.Parse("Jan-02", normalized)
 		if err != nil {
 			parsedDate, err = time.Parse("Jan-2", normalized)
 		}
+	}
+	if err != nil {
+		// Try "DD-Mon" format (e.g., "16-Jan", "16-Jan.")
+		parsedDate, err = time.Parse("02-Jan", normalized)
 		if err != nil {
-			// Try "DD-Mon" format (e.g., "16-Jan", "16-Jan.")
-			parsedDate, err = time.Parse("02-Jan", normalized)
-			if err != nil {
-				parsedDate, err = time.Parse("2-Jan", normalized)
-			}
-		}
-		if err == nil {
-			useYear := year
-			if useYear == 0 {
-				useYear = max(time.Now().Year(), 2025)
-			}
-			parsedDate = time.Date(useYear, parsedDate.Month(), parsedDate.Day(), 0, 0, 0, 0, time.UTC)
+			parsedDate, err = time.Parse("2-Jan", normalized)
 		}
 	}
+
+	// If parsing succeeded but no year was in the format, use the current year
+	// Formats without year (like "Jan 2", "January 2", "Jan-2", "2-Jan") will have year <= 1
+	if err == nil && parsedDate.Year() <= 1 {
+		useYear := time.Now().Year()
+		parsedDate = time.Date(useYear, parsedDate.Month(), parsedDate.Day(), 0, 0, 0, 0, time.UTC)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +141,6 @@ func normalizeDateString(dateStr string) string {
 	return strings.TrimSpace(result)
 }
 
-// ParseTimeString parses a time string and combines it with a date
 func ParseTimeString(timeStr string, date time.Time) (time.Time, error) {
 	parsedTime, err := time.Parse("15:04", timeStr)
 	if err != nil {
