@@ -259,8 +259,26 @@
                 <div class="error-message" id="nameError">Name must contain only letters, numbers, dashes, and underscores</div>
             </div>
 
+            <div class="form-group">
+                <label for="templateSelect">Template</label>
+                <select id="templateSelect" name="templateSelect">
+                    <option value="">-- Select Template --</option>
+                    <option value="A,B,C,G">A,B,C,G</option>
+                    <option value="A,C,D,H">A,C,D,H</option>
+                </select>
+            </div>
+
             <div class="column-mapping">
                 <h3>Date Range</h3>
+                <div class="form-group">
+                    <label for="datePreset">Date Preset</label>
+                    <select id="datePreset" name="datePreset">
+                        <option value="">-- Select Range --</option>
+                        <option value="1-15">1 - 15</option>
+                        <option value="16-30">16 - 30</option>
+                    </select>
+                </div>
+
                 <div class="column-row">
                     <div class="form-group">
                         <label for="startDate">Start Date *</label>
@@ -395,6 +413,8 @@
         const rateColSelect = document.getElementById('rateCol');
         const statusColSelect = document.getElementById('statusCol');
         const excludedRowsInput = document.getElementById('excludedRows');
+        const templateSelect = document.getElementById('templateSelect');
+        const datePresetSelect = document.getElementById('datePreset');
 
         let currentFileName = '';
 
@@ -445,6 +465,40 @@
                 return true;
             }
         }
+
+        datePresetSelect.addEventListener('change', () => {
+            const value = datePresetSelect.value;
+            if (!value) return;
+
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth(); // 0-indexed
+
+            function formatDate(date) {
+                const y = date.getFullYear();
+                const m = String(date.getMonth() + 1).padStart(2, '0');
+                const d = String(date.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+
+            if (value === '1-15') {
+                const start = new Date(year, month, 1);
+                const end = new Date(year, month, 15);
+
+                startDateInput.value = formatDate(start);
+                endDateInput.value = formatDate(end);
+            }
+
+            if (value === '16-30') {
+                const start = new Date(year, month, 16);
+                const end = new Date(year, month, 30);
+
+                startDateInput.value = formatDate(start);
+                endDateInput.value = formatDate(end);
+            }
+
+            validateDates();
+        });
 
         // Validate URL
         function validateURL() {
@@ -517,6 +571,22 @@
                 return true;
             }
         }
+
+        templateSelect.addEventListener('change', () => {
+            const value = templateSelect.value;
+
+            if (!value) return;
+
+            const parts = value.split(',');
+
+            if (parts.length === 4) {
+                nameColSelect.value = parts[0];
+                durationColSelect.value = parts[1];
+                rateColSelect.value = parts[2];
+                statusColSelect.value = parts[3];
+                validateColumns();
+            }
+        });
 
         // Validate column selections are unique
         function validateColumns() {
