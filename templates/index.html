@@ -232,6 +232,16 @@
             font-weight: bold;
             text-align: center;
         }
+
+        .nav-link {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -239,6 +249,7 @@
         <div class="header-section">
             <h1>Zion English Admin Tool</h1>
             <p class="header-subtext">
+                <a href="#" id="logsLink" class="nav-link">View Logs</a> |
                 made by <a href="https://flamendless.xyz" target="_blank" style="color: #4CAF50; text-decoration: none;">@flamendless</a>
             </p>
         </div>
@@ -442,6 +453,19 @@
         function buildURL(path) {
             return baseURL + path;
         }
+
+        const logsLink = document.getElementById('logsLink');
+
+        function getAuthHeader() {
+            const credentials = sessionStorage.getItem('authCredentials');
+            if (!credentials) return null;
+            return 'Basic ' + btoa(credentials);
+        }
+
+        logsLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = buildURL('/logs');
+        });
 
         // Set favicon with base URL
         const favicon = document.getElementById('favicon');
@@ -686,6 +710,7 @@
             const formData = {
                 driveUrl: driveUrlInput.value.trim(),
                 name: nameInput.value.trim(),
+                template: templateSelect.value,
                 startDate: formatDateForServer(startDateInput.value),
                 endDate: formatDateForServer(endDateInput.value),
                 nameCol: document.getElementById('nameCol').value,
@@ -699,7 +724,8 @@
                 const response = await fetch(buildURL('/process'), {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': getAuthHeader()
                     },
                     body: JSON.stringify(formData)
                 });

@@ -2,3 +2,4 @@ out/
 assets/*.csv
 tmp/
 *DS_STORE
+data
