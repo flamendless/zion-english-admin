@@ -1,3 +1,4 @@
+.env
 out/
 assets/*.csv
 tmp/

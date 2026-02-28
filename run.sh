@@ -2,7 +2,7 @@
 
 # @Brandon Blanker Lim-it
 
-set -euf -o pipefail
+set -eufx -o pipefail
 
 TMP="./tmp"
 
@@ -17,6 +17,8 @@ elif grep -qi Microsoft /proc/version; then
 fi
 
 serve() {
+	gensql
+	gentempl
 	local -; set -x;
 
 	if "${ISWSL}"; then
@@ -30,6 +32,8 @@ serve() {
 
 prod() {
 	echo "running in production server"
+	gensql
+	gentempl
 
 	if "${ISMAC}"; then
 		PIDS=$(lsof -ti:1010 2>/dev/null || true)
@@ -50,12 +54,22 @@ prod() {
 
 }
 
+gentempl() {
+	go tool templ generate templ -v
+}
+
+gensql() {
+	go tool sqlc generate
+}
+
 if [ "$#" -eq 0 ]; then
 	echo "First use: chmod +x ${0}"
 	echo "Usage: ${0}"
 	echo "Commands:"
 	echo "    serve"
 	echo "    prod"
+	echo "    gentempl"
+	echo "    gensql"
 else
 	echo "Running ${1}"
 	time "$1" "$@"

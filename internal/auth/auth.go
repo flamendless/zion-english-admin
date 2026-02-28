@@ -6,24 +6,11 @@ import (
 	"strings"
 )
 
-type Config struct {
-	Username string `env:"ADMIN_USERNAME" required:"true"`
-	Password string `env:"ADMIN_PASSWORD" required:"true"`
-}
-
-func NewConfig() *Config {
-	return &Config{}
-}
-
-func (c *Config) IsValid() bool {
-	return c.Username != "" && c.Password != ""
-}
-
-func Middleware(cfg *Config, next http.Handler) http.Handler {
+func Middleware(username, password string, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		username, password, hasAuth := r.BasicAuth()
+		usr, pwd, hasAuth := r.BasicAuth()
 
-		if !hasAuth || !validateCredentials(username, password, cfg) {
+		if !hasAuth || usr != username || pwd != password {
 			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Write([]byte("401 Unauthorized"))
@@ -32,10 +19,6 @@ func Middleware(cfg *Config, next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
-}
-
-func validateCredentials(username, password string, cfg *Config) bool {
-	return username == cfg.Username && password == cfg.Password
 }
 
 func ExtractBasicAuth(r *http.Request) (username, password string, ok bool) {

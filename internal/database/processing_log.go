@@ -1,114 +1,36 @@
 package database
 
 import (
-	"time"
+	"context"
+
+	"zion-english/internal/database/queries"
 )
 
-type ProcessingLog struct {
-	ID             int64
-	GoogleDriveURL string
-	Name           string
-	Template       string
-	StartDate      string
-	EndDate        string
-	ExcludedRows   string
-	UserAgent      string
-	OutputPath     string
-	Errors         string
-	CreatedAt      time.Time
-}
+type ProcessingLog = queries.TblProcessingLog
 
-func InsertProcessingLog(log *ProcessingLog) (int64, error) {
-	query := `
-		INSERT INTO processing_logs (
-			google_drive_url, name, template, start_date, end_date,
-			excluded_rows, useragent, output_path, errors
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-	`
-
-	result, err := DB.Exec(
-		query,
-		log.GoogleDriveURL,
-		log.Name,
-		log.Template,
-		log.StartDate,
-		log.EndDate,
-		log.ExcludedRows,
-		log.UserAgent,
-		log.OutputPath,
-		log.Errors,
-	)
-	if err != nil {
-		return 0, err
+func InsertProcessingLog(db Service, log *ProcessingLog) error {
+	params := queries.InsertProcessingLogParams{
+		GoogleDriveUrl: log.GoogleDriveUrl,
+		Name:           log.Name,
+		Template:       log.Template,
+		StartDate:      log.StartDate,
+		EndDate:        log.EndDate,
+		ExcludedRows:   log.ExcludedRows,
+		Useragent:      log.Useragent,
+		OutputPath:     log.OutputPath,
+		Errors:         log.Errors,
 	}
-
-	return result.LastInsertId()
+	return db.GetQueries().InsertProcessingLog(context.Background(), params)
 }
 
-func GetAllProcessingLogs() ([]ProcessingLog, error) {
-	query := `
-		SELECT id, google_drive_url, name, template, start_date, end_date,
-		       excluded_rows, useragent, output_path, errors, created_at
-		FROM processing_logs
-		ORDER BY created_at DESC
-	`
+func GetAllProcessingLogs(db Service) ([]ProcessingLog, error) {
+	return db.GetQueries().GetAllProcessingLogs(context.Background())
+}
 
-	rows, err := DB.Query(query)
+func GetProcessingLogByID(db Service, id int64) (*ProcessingLog, error) {
+	log, err := db.GetQueries().GetProcessingLogByID(context.Background(), id)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
-	var logs []ProcessingLog
-	for rows.Next() {
-		var log ProcessingLog
-		err := rows.Scan(
-			&log.ID,
-			&log.GoogleDriveURL,
-			&log.Name,
-			&log.Template,
-			&log.StartDate,
-			&log.EndDate,
-			&log.ExcludedRows,
-			&log.UserAgent,
-			&log.OutputPath,
-			&log.Errors,
-			&log.CreatedAt,
-		)
-		if err != nil {
-			return nil, err
-		}
-		logs = append(logs, log)
-	}
-
-	return logs, nil
-}
-
-func GetProcessingLogByID(id int64) (*ProcessingLog, error) {
-	query := `
-		SELECT id, google_drive_url, name, template, start_date, end_date,
-		       excluded_rows, useragent, output_path, errors, created_at
-		FROM processing_logs
-		WHERE id = ?
-	`
-
-	var log ProcessingLog
-	err := DB.QueryRow(query, id).Scan(
-		&log.ID,
-		&log.GoogleDriveURL,
-		&log.Name,
-		&log.Template,
-		&log.StartDate,
-		&log.EndDate,
-		&log.ExcludedRows,
-		&log.UserAgent,
-		&log.OutputPath,
-		&log.Errors,
-		&log.CreatedAt,
-	)
-	if err != nil {
-		return nil, err
-	}
-
 	return &log, nil
 }

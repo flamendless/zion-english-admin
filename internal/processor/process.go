@@ -14,7 +14,12 @@ import (
 	"go.uber.org/zap"
 )
 
-func ProcessCSVFile(filePath string, startDate, endDate time.Time, colIndices ColumnIndices, excludedRows map[int]bool) ([]ClassRecord, error) {
+func ProcessCSVFile(
+	filePath string,
+	startDate, endDate time.Time,
+	colIndices ColumnIndices,
+	excludedRows map[int]bool,
+) ([]ClassRecord, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err

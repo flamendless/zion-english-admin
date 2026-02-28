@@ -1,10 +1,10 @@
 package cmd
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"html/template"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -12,14 +12,18 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"zion-english/frontend"
 	"zion-english/internal/auth"
+	"zion-english/internal/conf"
 	"zion-english/internal/database"
+	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
+	"zion-english/internal/models"
 	"zion-english/internal/processor"
 	"zion-english/internal/sheet"
 
-	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/spf13/cobra"
+	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
 )
 
@@ -30,14 +34,10 @@ type WebFlags struct {
 	address string
 }
 
-type AppConfig struct {
-	AdminUsername string `env:"ADMIN_USERNAME" required:"true"`
-	AdminPassword string `env:"ADMIN_PASSWORD" required:"true"`
-}
-
-var appConfig AppConfig
-
 var webFlags WebFlags
+
+var dbRW database.Service
+var dbRO database.Service
 
 func init() {
 	f := cmdWeb.Flags
@@ -46,41 +46,38 @@ func init() {
 	f().BoolVar(&webFlags.https, "https", false, "Enable HTTPS")
 	f().StringVar(&webFlags.address, "address", "", "Domain address for Let's Encrypt certificates (e.g., flamendless.xyz)")
 	rootCmd.AddCommand(cmdWeb)
-
-	if err := cleanenv.ReadEnv(&appConfig); err != nil {
-		fmt.Printf("Error reading config: %v\n", err)
-		os.Exit(1)
-	}
 }
 
 var cmdWeb = &cobra.Command{
 	Use:   "web",
 	Short: "Start web server",
 	Run: func(cmd *cobra.Command, args []string) {
+		cfg := conf.Conf()
 		if err := os.MkdirAll("tmp", 0755); err != nil {
 			panic(err)
 		}
 
-		if err := database.Init("data/processing_logs.db"); err != nil {
+		if err := database.Init("data/zion.db"); err != nil {
 			panic(fmt.Sprintf("Failed to initialize database: %v", err))
 		}
 		defer database.Close()
+
+		dbRW = database.New(database.DB_MODE_RW)
+		dbRO = database.New(database.DB_MODE_RO)
 
 		basePath := "/" + strings.TrimPrefix(webFlags.baseURL, "/")
 
 		mux := http.NewServeMux()
 		mux.HandleFunc(basePath, handleIndex)
+		mux.HandleFunc("/", handleIndex)
 		mux.HandleFunc(basePath+"/process", handleProcess)
+		mux.HandleFunc(basePath+"/finalize", handleFinalize)
 		mux.HandleFunc(basePath+"/download/", handleDownload)
 		mux.Handle(basePath+"/static/", http.StripPrefix(basePath+"/static/", http.FileServer(http.Dir("static"))))
 
-		authCfg := &auth.Config{
-			Username: appConfig.AdminUsername,
-			Password: appConfig.AdminPassword,
-		}
 		authMux := http.NewServeMux()
 		authMux.HandleFunc(basePath+"/logs", handleLogs)
-		authHandler := auth.Middleware(authCfg, authMux)
+		authHandler := auth.Middleware(cfg.AdminUsername, cfg.AdminPassword, authMux)
 
 		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if strings.HasPrefix(r.URL.Path, basePath+"/logs") {
@@ -126,39 +123,6 @@ var cmdWeb = &cobra.Command{
 	},
 }
 
-type ProcessRequest struct {
-	DriveURL     string `json:"driveUrl"`
-	Name         string `json:"name"`
-	Template     string `json:"template"`
-	StartDate    string `json:"startDate"`
-	EndDate      string `json:"endDate"`
-	NameCol      string `json:"nameCol"`
-	DurationCol  string `json:"durationCol"`
-	RateCol      string `json:"rateCol"`
-	StatusCol    string `json:"statusCol"`
-	ExcludedRows string `json:"excludedRows"`
-}
-
-type ProcessResponse struct {
-	Success  bool        `json:"success"`
-	Message  string      `json:"message"`
-	Logs     []string    `json:"logs"`
-	Records  []RecordRow `json:"records"`
-	Total    float64     `json:"total"`
-	RowRange string      `json:"rowRange,omitempty"`
-}
-
-type RecordRow struct {
-	Name      string  `json:"name"`
-	Date      string  `json:"date"`
-	Duration  int     `json:"duration"`
-	Rate      float64 `json:"rate"`
-	StartTime string  `json:"startTime,omitempty"`
-	EndTime   string  `json:"endTime,omitempty"`
-	Link      string  `json:"link,omitempty"`
-	Status    string  `json:"status"`
-}
-
 var logMessages []string
 
 func addLog(msg string) {
@@ -172,16 +136,8 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles("templates/index.html")
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Error loading template: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	if err := tmpl.Execute(w, nil); err != nil {
-		http.Error(w, fmt.Sprintf("Error rendering template: %v", err), http.StatusInternalServerError)
-		return
-	}
+	w.Header().Set("Content-Type", "text/html")
+	frontend.Index().Render(r.Context(), w)
 }
 
 func handleProcess(w http.ResponseWriter, r *http.Request) {
@@ -191,7 +147,7 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logMessages = []string{}
-	var req ProcessRequest
+	var req models.ProcessRequest
 	var outputPath string
 	var errMsg string
 
@@ -300,9 +256,9 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	responseRecords := make([]RecordRow, len(records))
+	responseRecords := make([]models.RecordRow, len(records))
 	for i, rec := range records {
-		responseRecords[i] = RecordRow{
+		responseRecords[i] = models.RecordRow{
 			Name:     rec.Name,
 			Date:     rec.Date,
 			Duration: rec.DurationInMinutes,
@@ -318,15 +274,111 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 		responseRecords[i].Link = rec.GoogleLink
 	}
 
-	logToDB(&req, r.UserAgent(), outputPath, "")
+	logToDB(dbRW, &req, r.UserAgent(), outputPath, "")
 
-	response := ProcessResponse{
+	response := models.ProcessResponse{
 		Success:  true,
 		Message:  "Processing completed successfully",
 		Logs:     logMessages,
 		Records:  responseRecords,
 		Total:    total,
 		RowRange: rowRange,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+type FinalizeRequest struct {
+	Name     string `json:"name"`
+	DriveURL string `json:"driveUrl"`
+}
+
+func handleFinalize(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req FinalizeRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+
+	if req.Name == "" || req.DriveURL == "" {
+		http.Error(w, "Missing name or drive URL", http.StatusBadRequest)
+		return
+	}
+
+	outputPath := filepath.Join("tmp", fmt.Sprintf("%s_output.xlsx", req.Name))
+	if _, err := os.Stat(outputPath); os.IsNotExist(err) {
+		http.Error(w, "Output file not found. Please process CSV first.", http.StatusNotFound)
+		return
+	}
+
+	f, err := excelize.OpenFile(outputPath)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to open output file: %v", err), http.StatusInternalServerError)
+		return
+	}
+	defer f.Close()
+
+	sheetName := "Sheet1"
+	rows, err := f.GetRows(sheetName)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to read sheet: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	rowNum := 0
+	for _, row := range rows {
+		rowNum++
+		if rowNum < 4 {
+			continue
+		}
+		if len(row) < 4 {
+			continue
+		}
+
+		studentName := row[0]
+		date := row[1]
+		if studentName == "" || date == "" {
+			continue
+		}
+
+		durationMinutes := row[2]
+		rate := row[3]
+		status := row[len(row)-1]
+
+		durationFloat := 0.0
+		if durationMinutes != "" {
+			durationFloat, _ = strconv.ParseFloat(durationMinutes, 64)
+		}
+
+		rateFloat := 0.0
+		if rate != "" {
+			rateFloat, _ = strconv.ParseFloat(rate, 64)
+		}
+
+		err = dbRW.GetQueries().InsertRecord(r.Context(), queries.InsertRecordParams{
+			GoogleDriveUrl:  req.DriveURL,
+			StudentName:     studentName,
+			Date:            date,
+			DurationMinutes: durationFloat,
+			Rate:            rateFloat,
+			Status:          status,
+		})
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to insert record: %v", err), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	response := map[string]interface{}{
+		"success": true,
+		"message": fmt.Sprintf("Successfully finalized %d records", rowNum-3),
+		"count":   rowNum - 3,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -375,7 +427,7 @@ func handleDownload(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, outputPath)
 }
 
-func validateRequest(req *ProcessRequest) error {
+func validateRequest(req *models.ProcessRequest) error {
 	if req.DriveURL == "" {
 		return errors.New("google drive uRL is required")
 	}
@@ -414,16 +466,16 @@ func validateRequest(req *ProcessRequest) error {
 	return nil
 }
 
-func sendErrorResponse(w http.ResponseWriter, message string, req *ProcessRequest, userAgent, outputPath, errMsg string) {
+func sendErrorResponse(w http.ResponseWriter, message string, req *models.ProcessRequest, userAgent, outputPath, errMsg string) {
 	if req != nil {
-		logToDB(req, userAgent, outputPath, errMsg)
+		logToDB(dbRW, req, userAgent, outputPath, errMsg)
 	}
 
-	response := ProcessResponse{
+	response := models.ProcessResponse{
 		Success:  false,
 		Message:  message,
 		Logs:     logMessages,
-		Records:  []RecordRow{},
+		Records:  []models.RecordRow{},
 		Total:    0,
 		RowRange: "",
 	}
@@ -433,24 +485,24 @@ func sendErrorResponse(w http.ResponseWriter, message string, req *ProcessReques
 	json.NewEncoder(w).Encode(response)
 }
 
-func logToDB(req *ProcessRequest, userAgent, outputPath, errMsg string) {
+func logToDB(dbService database.Service, req *models.ProcessRequest, userAgent, outputPath, errMsg string) {
 	if req == nil {
 		return
 	}
 
 	procLog := &database.ProcessingLog{
-		GoogleDriveURL: req.DriveURL,
+		GoogleDriveUrl: req.DriveURL,
 		Name:           req.Name,
-		Template:       req.Template,
+		Template:       sql.NullString{String: req.Template, Valid: req.Template != ""},
 		StartDate:      req.StartDate,
 		EndDate:        req.EndDate,
-		ExcludedRows:   req.ExcludedRows,
-		UserAgent:      userAgent,
-		OutputPath:     outputPath,
-		Errors:         errMsg,
+		ExcludedRows:   sql.NullString{String: req.ExcludedRows, Valid: req.ExcludedRows != ""},
+		Useragent:      sql.NullString{String: userAgent, Valid: userAgent != ""},
+		OutputPath:     sql.NullString{String: outputPath, Valid: outputPath != ""},
+		Errors:         sql.NullString{String: errMsg, Valid: errMsg != ""},
 	}
 
-	if _, err := database.InsertProcessingLog(procLog); err != nil {
+	if err := database.InsertProcessingLog(dbService, procLog); err != nil {
 		logs.Log().Error("Failed to insert processing log", zap.Error(err))
 	}
 }
@@ -461,51 +513,29 @@ func handleLogs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logs, err := database.GetAllProcessingLogs()
+	logs, err := database.GetAllProcessingLogs(dbRO)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to fetch logs: %v", err), http.StatusInternalServerError)
 		return
 	}
 
-	type logView struct {
-		ID             int64  `json:"id"`
-		GoogleDriveURL string `json:"google_drive_url"`
-		Name           string `json:"name"`
-		Template       string `json:"template"`
-		StartDate      string `json:"start_date"`
-		EndDate        string `json:"end_date"`
-		ExcludedRows   string `json:"excluded_rows"`
-		UserAgent      string `json:"useragent"`
-		OutputPath     string `json:"output_path"`
-		Errors         string `json:"errors"`
-		CreatedAt      string `json:"created_at"`
-	}
-
-	viewLogs := make([]logView, len(logs))
+	viewLogs := make([]frontend.LogItem, len(logs))
 	for i, l := range logs {
-		viewLogs[i] = logView{
-			ID:             l.ID,
-			GoogleDriveURL: l.GoogleDriveURL,
+		viewLogs[i] = frontend.LogItem{
+			ID:             strconv.FormatInt(l.ID, 10),
+			GoogleDriveURL: l.GoogleDriveUrl,
 			Name:           l.Name,
-			Template:       l.Template,
+			Template:       l.Template.String,
 			StartDate:      l.StartDate,
 			EndDate:        l.EndDate,
-			ExcludedRows:   l.ExcludedRows,
-			UserAgent:      l.UserAgent,
-			OutputPath:     l.OutputPath,
-			Errors:         l.Errors,
-			CreatedAt:      l.CreatedAt.Format("2006-01-02 15:04:05"),
+			ExcludedRows:   l.ExcludedRows.String,
+			UserAgent:      l.Useragent.String,
+			OutputPath:     l.OutputPath.String,
+			Errors:         l.Errors.String,
+			CreatedAt:      l.CreatedAt.Time.Format("2006-01-02 15:04:05"),
 		}
 	}
 
-	tmpl, err := template.ParseFiles("templates/logs.html")
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Error loading template: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	if err := tmpl.Execute(w, map[string]interface{}{"Logs": viewLogs}); err != nil {
-		http.Error(w, fmt.Sprintf("Error rendering template: %v", err), http.StatusInternalServerError)
-		return
-	}
+	w.Header().Set("Content-Type", "text/html")
+	frontend.Logs(frontend.LogData{Logs: viewLogs}).Render(r.Context(), w)
 }
