@@ -1,8 +1,10 @@
 module zion-english
 
-go 1.25.1
+go 1.26.0
 
 require (
+	github.com/ilyakaznacheev/cleanenv v1.5.0
+	github.com/mattn/go-sqlite3 v1.14.34
 	github.com/spf13/cobra v1.10.1
 	github.com/xuri/excelize/v2 v2.10.0
 	go.uber.org/zap v1.27.0
@@ -10,10 +12,8 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
-	github.com/ilyakaznacheev/cleanenv v1.5.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
-	github.com/mattn/go-sqlite3 v1.14.34 // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.4 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
