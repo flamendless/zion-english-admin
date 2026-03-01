@@ -81,7 +81,9 @@ templ Header(props HeaderProps) {
 			<div class="header-left">
 				if props.ShowNavLinks {
 					<div class="nav-links">
-						<a href={utils.URL("/logs")} id="logsLink" class="nav-link">View Logs</a>
+						<a href={utils.URL("/logs")} id="logsLink" class="nav-link">View Process Logs</a>
+						<span class="nav-separator">|</span>
+						<a href={utils.URL("/students")} id="studentsLink" class="nav-link">View Students</a>
 						<span class="nav-separator">|</span>
 						<a href={utils.URL("/students/register")} id="registerLink" class="nav-link">Register Student</a>
 					</div>

@@ -52,6 +52,46 @@ func (q *Queries) GetAllProcessingLogs(ctx context.Context) ([]TblProcessingLog,
 	return items, nil
 }
 
+const getAllStudents = `-- name: GetAllStudents :many
+SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, created_at, updated_at
+FROM tbl_students
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetAllStudents(ctx context.Context) ([]TblStudent, error) {
+	rows, err := q.db.QueryContext(ctx, getAllStudents)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TblStudent
+	for rows.Next() {
+		var i TblStudent
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Currency,
+			&i.Contact,
+			&i.RatePerClass,
+			&i.ParentName,
+			&i.AssignedColor,
+			&i.Status,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProcessingLogByID = `-- name: GetProcessingLogByID :one
 SELECT id, google_drive_url, name, template, start_date, end_date,
        excluded_rows, useragent, output_path, errors, created_at

@@ -77,6 +77,7 @@ var cmdWeb = &cobra.Command{
 
 		authMux := http.NewServeMux()
 		authMux.HandleFunc(basePath+"/logs", handleLogs)
+		authMux.HandleFunc(basePath+"/students", handleStudents)
 		authMux.HandleFunc(basePath+"/students/register", handleStudentRegister)
 		authHandler := auth.Middleware(cfg.AdminUsername, cfg.AdminPassword, authMux)
 
@@ -539,6 +540,38 @@ func handleLogs(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
 	frontend.Logs(frontend.LogData{Logs: viewLogs}).Render(r.Context(), w)
+}
+
+func handleStudents(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	students, err := database.GetAllStudents(dbRO)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to fetch students: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	viewStudents := make([]frontend.StudentItem, len(students))
+	for i, s := range students {
+		viewStudents[i] = frontend.StudentItem{
+			ID:            strconv.FormatInt(s.ID, 10),
+			Name:          s.Name,
+			Currency:      s.Currency,
+			Contact:       s.Contact.String,
+			RatePerClass:  s.RatePerClass,
+			ParentName:    s.ParentName.String,
+			AssignedColor: s.AssignedColor,
+			Status:        s.Status,
+			CreatedAt:     s.CreatedAt.Time.Format("2006-01-02 15:04:05"),
+			UpdatedAt:     s.UpdatedAt.Time.Format("2006-01-02 15:04:05"),
+		}
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	frontend.Students(frontend.StudentData{Students: viewStudents}).Render(r.Context(), w)
 }
 
 func handleStudentRegister(w http.ResponseWriter, r *http.Request) {

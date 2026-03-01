@@ -27,3 +27,8 @@ VALUES (?, ?, ?, ?, ?, ?, ?);
 -- name: GetStudentByName :one
 SELECT COUNT(*) as count FROM tbl_students WHERE name = ?;
 
+-- name: GetAllStudents :many
+SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, created_at, updated_at
+FROM tbl_students
+ORDER BY created_at DESC;
+
