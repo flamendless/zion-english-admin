@@ -36,27 +36,8 @@ templ Students(data StudentData) {
 		<title>Students - Zion English Admin Tool</title>
 		<link rel="icon" type="image/x-icon" id="favicon">
 		<style>
-			* {
-				box-sizing: border-box;
-				margin: 0;
-				padding: 0;
-			}
-
-			body {
-				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-				background-color: #f5f5f5;
-				padding: 20px;
-				line-height: 1.6;
-			}
-
-			.button-group {
-				margin-bottom: 20px;
-				display: flex;
-				gap: 10px;
-			}
-
-			.refresh-btn, .add-btn {
-				background-color: #4CAF50;
+			.add-btn {
+				background-color: var(--color-primary);
 				color: white;
 				padding: 10px 20px;
 				border: none;
@@ -64,32 +45,18 @@ templ Students(data StudentData) {
 				cursor: pointer;
 				font-size: 14px;
 				font-weight: 500;
+				text-decoration: none;
+				display: inline-block;
 			}
 
-			.refresh-btn:hover, .add-btn:hover {
-				background-color: #45a049;
+			.add-btn:hover {
+				opacity: 0.9;
 			}
 
 			table {
 				width: 100%;
 				border-collapse: collapse;
 				margin-bottom: 20px;
-			}
-
-			th, td {
-				padding: 12px;
-				text-align: left;
-				border-bottom: 1px solid #ddd;
-			}
-
-			th {
-				background-color: #4CAF50;
-				color: white;
-				font-weight: 600;
-			}
-
-			tr:hover {
-				background-color: #f5f5f5;
 			}
 
 			.color-cell {

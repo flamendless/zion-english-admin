@@ -56,7 +56,7 @@ func Students(data StudentData) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Students - Zion English Admin Tool</title><link rel=\"icon\" type=\"image/x-icon\" id=\"favicon\"><style>\n\t\t\t* {\n\t\t\t\tbox-sizing: border-box;\n\t\t\t\tmargin: 0;\n\t\t\t\tpadding: 0;\n\t\t\t}\n\n\t\t\tbody {\n\t\t\t\tfont-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;\n\t\t\t\tbackground-color: #f5f5f5;\n\t\t\t\tpadding: 20px;\n\t\t\t\tline-height: 1.6;\n\t\t\t}\n\n\t\t\t.button-group {\n\t\t\t\tmargin-bottom: 20px;\n\t\t\t\tdisplay: flex;\n\t\t\t\tgap: 10px;\n\t\t\t}\n\n\t\t\t.refresh-btn, .add-btn {\n\t\t\t\tbackground-color: #4CAF50;\n\t\t\t\tcolor: white;\n\t\t\t\tpadding: 10px 20px;\n\t\t\t\tborder: none;\n\t\t\t\tborder-radius: 4px;\n\t\t\t\tcursor: pointer;\n\t\t\t\tfont-size: 14px;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.refresh-btn:hover, .add-btn:hover {\n\t\t\t\tbackground-color: #45a049;\n\t\t\t}\n\n\t\t\ttable {\n\t\t\t\twidth: 100%;\n\t\t\t\tborder-collapse: collapse;\n\t\t\t\tmargin-bottom: 20px;\n\t\t\t}\n\n\t\t\tth, td {\n\t\t\t\tpadding: 12px;\n\t\t\t\ttext-align: left;\n\t\t\t\tborder-bottom: 1px solid #ddd;\n\t\t\t}\n\n\t\t\tth {\n\t\t\t\tbackground-color: #4CAF50;\n\t\t\t\tcolor: white;\n\t\t\t\tfont-weight: 600;\n\t\t\t}\n\n\t\t\ttr:hover {\n\t\t\t\tbackground-color: #f5f5f5;\n\t\t\t}\n\n\t\t\t.color-cell {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: center;\n\t\t\t\tgap: 10px;\n\t\t\t}\n\n\t\t\t.color-box {\n\t\t\t\twidth: 24px;\n\t\t\t\theight: 24px;\n\t\t\t\tborder-radius: 4px;\n\t\t\t\tborder: 1px solid #ddd;\n\t\t\t}\n\n\t\t\t.status-active {\n\t\t\t\tcolor: #28a745;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.status-inactive {\n\t\t\t\tcolor: #dc3545;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.empty-state {\n\t\t\t\ttext-align: center;\n\t\t\t\tpadding: 40px;\n\t\t\t\tcolor: #666;\n\t\t\t}\n\n\t\t\t.currency-cell {\n\t\t\t\twhite-space: nowrap;\n\t\t\t}\n\n\t\t\t.rate-cell {\n\t\t\t\twhite-space: nowrap;\n\t\t\t\tfont-family: 'Courier New', monospace;\n\t\t\t}\n\t\t</style></head><body><div class=\"container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Students - Zion English Admin Tool</title><link rel=\"icon\" type=\"image/x-icon\" id=\"favicon\"><style>\n\t\t\t.add-btn {\n\t\t\t\tbackground-color: var(--color-primary);\n\t\t\t\tcolor: white;\n\t\t\t\tpadding: 10px 20px;\n\t\t\t\tborder: none;\n\t\t\t\tborder-radius: 4px;\n\t\t\t\tcursor: pointer;\n\t\t\t\tfont-size: 14px;\n\t\t\t\tfont-weight: 500;\n\t\t\t\ttext-decoration: none;\n\t\t\t\tdisplay: inline-block;\n\t\t\t}\n\n\t\t\t.add-btn:hover {\n\t\t\t\topacity: 0.9;\n\t\t\t}\n\n\t\t\ttable {\n\t\t\t\twidth: 100%;\n\t\t\t\tborder-collapse: collapse;\n\t\t\t\tmargin-bottom: 20px;\n\t\t\t}\n\n\t\t\t.color-cell {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: center;\n\t\t\t\tgap: 10px;\n\t\t\t}\n\n\t\t\t.color-box {\n\t\t\t\twidth: 24px;\n\t\t\t\theight: 24px;\n\t\t\t\tborder-radius: 4px;\n\t\t\t\tborder: 1px solid #ddd;\n\t\t\t}\n\n\t\t\t.status-active {\n\t\t\t\tcolor: #28a745;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.status-inactive {\n\t\t\t\tcolor: #dc3545;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.empty-state {\n\t\t\t\ttext-align: center;\n\t\t\t\tpadding: 40px;\n\t\t\t\tcolor: #666;\n\t\t\t}\n\n\t\t\t.currency-cell {\n\t\t\t\twhite-space: nowrap;\n\t\t\t}\n\n\t\t\t.rate-cell {\n\t\t\t\twhite-space: nowrap;\n\t\t\t\tfont-family: 'Courier New', monospace;\n\t\t\t}\n\t\t</style></head><body><div class=\"container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -71,7 +71,7 @@ func Students(data StudentData) templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/students/register"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 139, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 106, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -94,7 +94,7 @@ func Students(data StudentData) templ.Component {
 				var templ_7745c5c3_Var3 string
 				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(student.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 159, Col: 26}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 126, Col: 26}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 				if templ_7745c5c3_Err != nil {
@@ -107,7 +107,7 @@ func Students(data StudentData) templ.Component {
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(student.Currency)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 160, Col: 52}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 127, Col: 52}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -120,7 +120,7 @@ func Students(data StudentData) templ.Component {
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(student.Contact))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 161, Col: 46}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 128, Col: 46}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -133,7 +133,7 @@ func Students(data StudentData) templ.Component {
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(formatRate(student.RatePerClass, student.Currency))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 162, Col: 82}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 129, Col: 82}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
@@ -146,7 +146,7 @@ func Students(data StudentData) templ.Component {
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(student.ParentName))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 163, Col: 49}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 130, Col: 49}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -159,7 +159,7 @@ func Students(data StudentData) templ.Component {
 				var templ_7745c5c3_Var8 string
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color: " + student.AssignedColor)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 166, Col: 85}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 133, Col: 85}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
@@ -172,7 +172,7 @@ func Students(data StudentData) templ.Component {
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(student.AssignedColor)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 167, Col: 39}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 134, Col: 39}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -207,7 +207,7 @@ func Students(data StudentData) templ.Component {
 				var templ_7745c5c3_Var12 string
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(student.Status)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 170, Col: 69}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 137, Col: 69}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
@@ -220,7 +220,7 @@ func Students(data StudentData) templ.Component {
 				var templ_7745c5c3_Var13 string
 				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(student.CreatedAt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 171, Col: 31}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 138, Col: 31}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
