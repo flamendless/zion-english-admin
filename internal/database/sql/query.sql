@@ -19,3 +19,11 @@ WHERE id = ?;
 -- name: InsertRecord :exec
 INSERT INTO tbl_records (google_drive_url, student_name, date, duration_minutes, rate, status)
 VALUES (?, ?, ?, ?, ?, ?);
+
+-- name: InsertStudent :exec
+INSERT INTO tbl_students (name, currency, contact, rate_per_class, parent_name, assigned_color, status)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+-- name: GetStudentByName :one
+SELECT COUNT(*) as count FROM tbl_students WHERE name = ?;
+

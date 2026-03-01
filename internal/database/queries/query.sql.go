@@ -78,6 +78,17 @@ func (q *Queries) GetProcessingLogByID(ctx context.Context, id int64) (TblProces
 	return i, err
 }
 
+const getStudentByName = `-- name: GetStudentByName :one
+SELECT COUNT(*) as count FROM tbl_students WHERE name = ?
+`
+
+func (q *Queries) GetStudentByName(ctx context.Context, name string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getStudentByName, name)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const insertProcessingLog = `-- name: InsertProcessingLog :exec
 INSERT INTO tbl_processing_logs (
     google_drive_url, name, template, start_date, end_date,
@@ -133,6 +144,34 @@ func (q *Queries) InsertRecord(ctx context.Context, arg InsertRecordParams) erro
 		arg.Date,
 		arg.DurationMinutes,
 		arg.Rate,
+		arg.Status,
+	)
+	return err
+}
+
+const insertStudent = `-- name: InsertStudent :exec
+INSERT INTO tbl_students (name, currency, contact, rate_per_class, parent_name, assigned_color, status)
+VALUES (?, ?, ?, ?, ?, ?, ?)
+`
+
+type InsertStudentParams struct {
+	Name          string
+	Currency      string
+	Contact       sql.NullString
+	RatePerClass  float64
+	ParentName    sql.NullString
+	AssignedColor string
+	Status        string
+}
+
+func (q *Queries) InsertStudent(ctx context.Context, arg InsertStudentParams) error {
+	_, err := q.db.ExecContext(ctx, insertStudent,
+		arg.Name,
+		arg.Currency,
+		arg.Contact,
+		arg.RatePerClass,
+		arg.ParentName,
+		arg.AssignedColor,
 		arg.Status,
 	)
 	return err

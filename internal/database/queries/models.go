@@ -32,3 +32,16 @@ type TblRecord struct {
 	Status          string
 	CreatedAt       sql.NullTime
 }
+
+type TblStudent struct {
+	ID            int64
+	Name          string
+	Currency      string
+	Contact       sql.NullString
+	RatePerClass  float64
+	ParentName    sql.NullString
+	AssignedColor string
+	Status        string
+	CreatedAt     sql.NullTime
+	UpdatedAt     sql.NullTime
+}

@@ -1,7 +1,5 @@
 package frontend
 
-import "zion-english/internal/utils"
-
 templ Index() {
 	<!DOCTYPE html>
 	<html lang="en">
@@ -31,28 +29,6 @@ templ Index() {
 				padding: 30px;
 				border-radius: 8px;
 				box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-			}
-
-			.header-section {
-				margin-bottom: 30px;
-				border-bottom: 2px solid #4CAF50;
-				padding-bottom: 10px;
-				display: flex;
-				justify-content: space-between;
-				align-items: baseline;
-			}
-
-			h1 {
-				color: #333;
-				margin: 0;
-				flex: 1;
-			}
-
-			.header-subtext {
-				color: #666;
-				margin: 0;
-				font-size: 14px;
-				white-space: nowrap;
 			}
 
 			.form-group {
@@ -237,27 +213,11 @@ templ Index() {
 				font-weight: bold;
 				text-align: center;
 			}
-
-			.nav-link {
-				color: #4CAF50;
-				text-decoration: none;
-				font-weight: 500;
-			}
-
-			.nav-link:hover {
-				text-decoration: underline;
-			}
 		</style>
 	</head>
 	<body>
 		<div class="container">
-			<div class="header-section">
-				<h1>Zion English Admin Tool</h1>
-				<p class="header-subtext">
-					<a href={utils.URL("/logs")} id="logsLink" class="nav-link">View Logs</a> |
-					made by <a href="https://flamendless.xyz" target="_blank" style="color: #4CAF50; text-decoration: none;">{ "@" }flamendless</a>
-				</p>
-			</div>
+			@HeaderWithNav("Zion English Admin Tool")
 
 			<form id="processForm">
 				<div class="form-group">

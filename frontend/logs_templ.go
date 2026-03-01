@@ -77,20 +77,15 @@ func Logs(logs LogData) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Logs - Zion English Admin Tool</title><link rel=\"icon\" type=\"image/x-icon\" id=\"favicon\"><style>\n\t\t\t* {\n\t\t\t\tbox-sizing: border-box;\n\t\t\t\tmargin: 0;\n\t\t\t\tpadding: 0;\n\t\t\t}\n\n\t\t\tbody {\n\t\t\t\tfont-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;\n\t\t\t\tbackground-color: #f5f5f5;\n\t\t\t\tpadding: 20px;\n\t\t\t\tline-height: 1.6;\n\t\t\t}\n\n\t\t\t.container {\n\t\t\t\tmax-width: 1400px;\n\t\t\t\tmargin: 0 auto;\n\t\t\t\tbackground: white;\n\t\t\t\tpadding: 30px;\n\t\t\t\tborder-radius: 8px;\n\t\t\t\tbox-shadow: 0 2px 4px rgba(0,0,0,0.1);\n\t\t\t}\n\n\t\t\t.header-section {\n\t\t\t\tmargin-bottom: 30px;\n\t\t\t\tborder-bottom: 2px solid #4CAF50;\n\t\t\t\tpadding-bottom: 10px;\n\t\t\t\tdisplay: flex;\n\t\t\t\tjustify-content: space-between;\n\t\t\t\talign-items: baseline;\n\t\t\t}\n\n\t\t\th1 {\n\t\t\t\tcolor: #333;\n\t\t\t\tmargin: 0;\n\t\t\t}\n\n\t\t\t.nav-link {\n\t\t\t\tcolor: #4CAF50;\n\t\t\t\ttext-decoration: none;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.nav-link:hover {\n\t\t\t\ttext-decoration: underline;\n\t\t\t}\n\n\t\t\t.button-group {\n\t\t\t\tmargin-bottom: 20px;\n\t\t\t\tdisplay: flex;\n\t\t\t\tgap: 10px;\n\t\t\t}\n\n\t\t\tbutton {\n\t\t\t\tbackground-color: #4CAF50;\n\t\t\t\tcolor: white;\n\t\t\t\tpadding: 12px 30px;\n\t\t\t\tborder: none;\n\t\t\t\tborder-radius: 4px;\n\t\t\t\tcursor: pointer;\n\t\t\t\tfont-size: 16px;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\tbutton:hover {\n\t\t\t\tbackground-color: #45a049;\n\t\t\t}\n\n\t\t\tbutton:disabled {\n\t\t\t\tbackground-color: #ccc;\n\t\t\t\tcursor: not-allowed;\n\t\t\t}\n\n\t\t\t.export-btn {\n\t\t\t\tbackground-color: #2196F3;\n\t\t\t}\n\n\t\t\t.export-btn:hover {\n\t\t\t\tbackground-color: #0b7dda;\n\t\t\t}\n\n\t\t\t.refresh-btn {\n\t\t\t\tbackground-color: #FF9800;\n\t\t\t}\n\n\t\t\t.refresh-btn:hover {\n\t\t\t\tbackground-color: #e68900;\n\t\t\t}\n\n\t\t\ttable {\n\t\t\t\twidth: 100%;\n\t\t\t\tborder-collapse: collapse;\n\t\t\t\tmargin-bottom: 20px;\n\t\t\t\tfont-size: 14px;\n\t\t\t}\n\n\t\t\tth, td {\n\t\t\t\tpadding: 12px;\n\t\t\t\ttext-align: left;\n\t\t\t\tborder-bottom: 1px solid #ddd;\n\t\t\t}\n\n\t\t\tth {\n\t\t\t\tbackground-color: #4CAF50;\n\t\t\t\tcolor: white;\n\t\t\t\tfont-weight: 600;\n\t\t\t\twhite-space: nowrap;\n\t\t\t}\n\n\t\t\ttr:hover {\n\t\t\t\tbackground-color: #f5f5f5;\n\t\t\t}\n\n\t\t\t.error-cell {\n\t\t\t\tcolor: #dc3545;\n\t\t\t\tmax-width: 200px;\n\t\t\t\toverflow: hidden;\n\t\t\t\ttext-overflow: ellipsis;\n\t\t\t\twhite-space: nowrap;\n\t\t\t}\n\n\t\t\t.error-cell:hover {\n\t\t\t\twhite-space: normal;\n\t\t\t\tword-break: break-word;\n\t\t\t}\n\n\t\t\t.success-cell {\n\t\t\t\tcolor: #28a745;\n\t\t\t}\n\n\t\t\t.empty-state {\n\t\t\t\ttext-align: center;\n\t\t\t\tpadding: 40px;\n\t\t\t\tcolor: #666;\n\t\t\t}\n\n\t\t\t.date-cell {\n\t\t\t\twhite-space: nowrap;\n\t\t\t}\n\n\t\t\t.loading {\n\t\t\t\ttext-align: center;\n\t\t\t\tpadding: 40px;\n\t\t\t\tcolor: #666;\n\t\t\t}\n\t\t</style></head><body><div class=\"container\"><div class=\"header-section\"><h1>Processing Logs</h1><p><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Logs - Zion English Admin Tool</title><link rel=\"icon\" type=\"image/x-icon\" id=\"favicon\"><style>\n\t\t\t* {\n\t\t\t\tbox-sizing: border-box;\n\t\t\t\tmargin: 0;\n\t\t\t\tpadding: 0;\n\t\t\t}\n\n\t\t\tbody {\n\t\t\t\tfont-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;\n\t\t\t\tbackground-color: #f5f5f5;\n\t\t\t\tpadding: 20px;\n\t\t\t\tline-height: 1.6;\n\t\t\t}\n\n\t\t\t.container {\n\t\t\t\tmax-width: 1200px;\n\t\t\t\tmargin: 0 auto;\n\t\t\t\tbackground: white;\n\t\t\t\tpadding: 30px;\n\t\t\t\tborder-radius: 8px;\n\t\t\t\tbox-shadow: 0 2px 4px rgba(0,0,0,0.1);\n\t\t\t}\n\n\t\t\t.button-group {\n\t\t\t\tmargin-bottom: 20px;\n\t\t\t\tdisplay: flex;\n\t\t\t\tgap: 10px;\n\t\t\t}\n\n\t\t\tbutton {\n\t\t\t\tbackground-color: #4CAF50;\n\t\t\t\tcolor: white;\n\t\t\t\tpadding: 12px 30px;\n\t\t\t\tborder: none;\n\t\t\t\tborder-radius: 4px;\n\t\t\t\tcursor: pointer;\n\t\t\t\tfont-size: 16px;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\tbutton:hover {\n\t\t\t\tbackground-color: #45a049;\n\t\t\t}\n\n\t\t\tbutton:disabled {\n\t\t\t\tbackground-color: #ccc;\n\t\t\t\tcursor: not-allowed;\n\t\t\t}\n\n\t\t\t.export-btn {\n\t\t\t\tbackground-color: #2196F3;\n\t\t\t}\n\n\t\t\t.export-btn:hover {\n\t\t\t\tbackground-color: #0b7dda;\n\t\t\t}\n\n\t\t\t.refresh-btn {\n\t\t\t\tbackground-color: #FF9800;\n\t\t\t}\n\n\t\t\t.refresh-btn:hover {\n\t\t\t\tbackground-color: #e68900;\n\t\t\t}\n\n\t\t\ttable {\n\t\t\t\twidth: 100%;\n\t\t\t\tborder-collapse: collapse;\n\t\t\t\tmargin-bottom: 20px;\n\t\t\t\tfont-size: 14px;\n\t\t\t}\n\n\t\t\tth, td {\n\t\t\t\tpadding: 12px;\n\t\t\t\ttext-align: left;\n\t\t\t\tborder-bottom: 1px solid #ddd;\n\t\t\t}\n\n\t\t\tth {\n\t\t\t\tbackground-color: #4CAF50;\n\t\t\t\tcolor: white;\n\t\t\t\tfont-weight: 600;\n\t\t\t\twhite-space: nowrap;\n\t\t\t}\n\n\t\t\ttr:hover {\n\t\t\t\tbackground-color: #f5f5f5;\n\t\t\t}\n\n\t\t\t.error-cell {\n\t\t\t\tcolor: #dc3545;\n\t\t\t\tmax-width: 200px;\n\t\t\t\toverflow: hidden;\n\t\t\t\ttext-overflow: ellipsis;\n\t\t\t\twhite-space: nowrap;\n\t\t\t}\n\n\t\t\t.error-cell:hover {\n\t\t\t\twhite-space: normal;\n\t\t\t\tword-break: break-word;\n\t\t\t}\n\n\t\t\t.success-cell {\n\t\t\t\tcolor: #28a745;\n\t\t\t}\n\n\t\t\t.empty-state {\n\t\t\t\ttext-align: center;\n\t\t\t\tpadding: 40px;\n\t\t\t\tcolor: #666;\n\t\t\t}\n\n\t\t\t.date-cell {\n\t\t\t\twhite-space: nowrap;\n\t\t\t}\n\n\t\t\t.loading {\n\t\t\t\ttext-align: center;\n\t\t\t\tpadding: 40px;\n\t\t\t\tcolor: #666;\n\t\t\t}\n\t\t</style></head><body><div class=\"container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var2 templ.SafeURL
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 211, Col: 28}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+		templ_7745c5c3_Err = HeaderWithBack("Processing Logs", utils.URL("/"), "Back to Process").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" class=\"nav-link\">Back to Process</a></p></div><div class=\"button-group\"><button class=\"refresh-btn\" id=\"refreshBtn\">Refresh</button></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"button-group\"><button class=\"refresh-btn\" id=\"refreshBtn\">Refresh</button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -104,12 +99,12 @@ func Logs(logs LogData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var3 string
-				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(log.ID)
+				var templ_7745c5c3_Var2 string
+				templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(log.ID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 236, Col: 20}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 207, Col: 20}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -117,12 +112,12 @@ func Logs(logs LogData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var4 string
-				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(log.Name)
+				var templ_7745c5c3_Var3 string
+				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(log.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 237, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 208, Col: 22}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -130,12 +125,12 @@ func Logs(logs LogData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var5 string
-				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(log.OutputPath)
+				var templ_7745c5c3_Var4 string
+				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(log.OutputPath)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 238, Col: 28}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 209, Col: 28}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -143,12 +138,12 @@ func Logs(logs LogData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var6 string
-				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(log.Template))
+				var templ_7745c5c3_Var5 string
+				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(log.Template))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 239, Col: 43}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 210, Col: 43}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -156,12 +151,12 @@ func Logs(logs LogData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var7 string
-				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(log.StartDate)
+				var templ_7745c5c3_Var6 string
+				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(log.StartDate)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 240, Col: 45}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 211, Col: 45}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -169,12 +164,12 @@ func Logs(logs LogData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var8 string
-				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(log.EndDate)
+				var templ_7745c5c3_Var7 string
+				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(log.EndDate)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 240, Col: 63}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 211, Col: 63}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -182,12 +177,12 @@ func Logs(logs LogData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var9 string
-				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(log.ExcludedRows))
+				var templ_7745c5c3_Var8 string
+				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(log.ExcludedRows))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 241, Col: 47}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 212, Col: 47}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -195,12 +190,12 @@ func Logs(logs LogData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var10 string
-				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(log.CreatedAt)
+				var templ_7745c5c3_Var9 string
+				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(log.CreatedAt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 242, Col: 45}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 213, Col: 45}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -208,8 +203,8 @@ func Logs(logs LogData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var11 = []any{getErrorClass(log.Errors)}
-				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var11...)
+				var templ_7745c5c3_Var10 = []any{getErrorClass(log.Errors)}
+				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var10...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -217,12 +212,12 @@ func Logs(logs LogData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var12 string
-				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var11).String())
+				var templ_7745c5c3_Var11 string
+				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var10).String())
 				if templ_7745c5c3_Err != nil {
 					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 1, Col: 0}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -230,12 +225,12 @@ func Logs(logs LogData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var13 string
-				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(getErrorTitle(log.Errors))
+				var templ_7745c5c3_Var12 string
+				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(getErrorTitle(log.Errors))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 243, Col: 81}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 214, Col: 81}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -243,12 +238,12 @@ func Logs(logs LogData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var14 string
-				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(getErrorDisplay(log.Errors))
+				var templ_7745c5c3_Var13 string
+				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(getErrorDisplay(log.Errors))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 244, Col: 38}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/logs.templ`, Line: 215, Col: 38}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

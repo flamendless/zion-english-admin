@@ -46,3 +46,19 @@ type LogView struct {
 	Errors         string `json:"errors"`
 	CreatedAt      string `json:"created_at"`
 }
+
+type StudentRegisterRequest struct {
+	Name          string  `json:"name"`
+	Currency      string  `json:"currency"`
+	Contact       string  `json:"contact"`
+	RatePerClass  float64 `json:"ratePerClass"`
+	ParentName    string  `json:"parentName"`
+	AssignedColor string  `json:"assignedColor"`
+	Status        string  `json:"status"`
+}
+
+type StudentRegisterResponse struct {
+	Success bool     `json:"success"`
+	Message string   `json:"message"`
+	Logs    []string `json:"logs"`
+}

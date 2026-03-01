@@ -1,0 +1,125 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+type HeaderProps struct {
+	Title        string
+	ShowNavLinks bool
+	BackLink     string
+	BackLinkText string
+}
+
+templ Header(props HeaderProps) {
+	<style>
+		.header-section {
+			margin-bottom: 30px;
+			border-bottom: 2px solid #4CAF50;
+			padding-bottom: 10px;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.header-bottom {
+			display: flex;
+		}
+
+		.header-left {
+			display: flex;
+			align-items: baseline;
+			gap: 20px;
+			flex: 1;
+		}
+
+		.header-right {
+			flex-shrink: 0;
+		}
+
+		.nav-links {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.nav-separator {
+			color: #ccc;
+		}
+
+		.made-by {
+			color: #666;
+			margin: 0;
+			font-size: 14px;
+		}
+
+		.made-by a {
+			color: #4CAF50;
+			text-decoration: none;
+		}
+
+		.made-by a:hover {
+			text-decoration: underline;
+		}
+
+		.header-section h1 {
+			color: #333;
+			margin: 0;
+		}
+
+		.nav-link {
+			color: #4CAF50;
+			text-decoration: none;
+			font-weight: 500;
+		}
+
+		.nav-link:hover {
+			text-decoration: underline;
+		}
+	</style>
+
+	<div class="header-section">
+		<h1>{ props.Title }</h1>
+		<div class="header-bottom">
+			<div class="header-left">
+				if props.ShowNavLinks {
+					<div class="nav-links">
+						<a href={utils.URL("/logs")} id="logsLink" class="nav-link">View Logs</a>
+						<span class="nav-separator">|</span>
+						<a href={utils.URL("/students/register")} id="registerLink" class="nav-link">Register Student</a>
+					</div>
+				}
+				if props.BackLink != "" {
+					<div class="nav-links">
+						<a href={props.BackLink} class="nav-link">{ props.BackLinkText }</a>
+					</div>
+				}
+			</div>
+			<div class="header-right">
+				<p class="made-by">
+					made by <a href="https://flamendless.xyz" target="_blank">{"@"}flamendless</a>
+				</p>
+			</div>
+		</div>
+	</div>
+}
+
+templ HeaderSimple(title string) {
+	@Header(HeaderProps{
+		Title:        title,
+		ShowNavLinks: false,
+	})
+}
+
+templ HeaderWithNav(title string) {
+	@Header(HeaderProps{
+		Title:        title,
+		ShowNavLinks: true,
+	})
+}
+
+templ HeaderWithBack(title string, backLink string, backLinkText string) {
+	@Header(HeaderProps{
+		Title:        title,
+		ShowNavLinks: false,
+		BackLink:     backLink,
+		BackLinkText: backLinkText,
+	})
+}

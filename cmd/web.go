@@ -77,10 +77,11 @@ var cmdWeb = &cobra.Command{
 
 		authMux := http.NewServeMux()
 		authMux.HandleFunc(basePath+"/logs", handleLogs)
+		authMux.HandleFunc(basePath+"/students/register", handleStudentRegister)
 		authHandler := auth.Middleware(cfg.AdminUsername, cfg.AdminPassword, authMux)
 
 		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if strings.HasPrefix(r.URL.Path, basePath+"/logs") {
+			if strings.HasPrefix(r.URL.Path, basePath+"/logs") || strings.HasPrefix(r.URL.Path, basePath+"/students") {
 				authHandler.ServeHTTP(w, r)
 			} else {
 				mux.ServeHTTP(w, r)
@@ -538,4 +539,112 @@ func handleLogs(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
 	frontend.Logs(frontend.LogData{Logs: viewLogs}).Render(r.Context(), w)
+}
+
+func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		w.Header().Set("Content-Type", "text/html")
+		frontend.RegisterStudent().Render(r.Context(), w)
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	logMessages = []string{}
+	var req models.StudentRegisterRequest
+	var errMsg string
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		errMsg = fmt.Sprintf("Invalid request: %v", err)
+		sendStudentErrorResponse(w, errMsg)
+		return
+	}
+
+	if err := validateStudentRequest(&req); err != nil {
+		errMsg = err.Error()
+		sendStudentErrorResponse(w, errMsg)
+		return
+	}
+
+	addLog(fmt.Sprintf("Registering student: %s", req.Name))
+
+	existingCount, err := dbRW.GetQueries().GetStudentByName(r.Context(), req.Name)
+	if err != nil {
+		errMsg = fmt.Sprintf("Database error: %v", err)
+		sendStudentErrorResponse(w, errMsg)
+		return
+	}
+
+	if existingCount > 0 {
+		errMsg = "A student with this name already exists"
+		sendStudentErrorResponse(w, errMsg)
+		return
+	}
+
+	err = dbRW.GetQueries().InsertStudent(r.Context(), queries.InsertStudentParams{
+		Name:          req.Name,
+		Currency:      req.Currency,
+		Contact:       sql.NullString{String: req.Contact, Valid: req.Contact != ""},
+		RatePerClass:  req.RatePerClass,
+		ParentName:    sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
+		AssignedColor: req.AssignedColor,
+		Status:        req.Status,
+	})
+	if err != nil {
+		errMsg = fmt.Sprintf("Failed to register student: %v", err)
+		sendStudentErrorResponse(w, errMsg)
+		return
+	}
+
+	addLog(fmt.Sprintf("Successfully registered student: %s", req.Name))
+
+	response := models.StudentRegisterResponse{
+		Success: true,
+		Message: fmt.Sprintf("Student '%s' registered successfully", req.Name),
+		Logs:    logMessages,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+func validateStudentRequest(req *models.StudentRegisterRequest) error {
+	if req.Name == "" {
+		return errors.New("name is required")
+	}
+
+	validCurrencies := map[string]bool{"KRW": true, "CAD": true, "YEN": true, "PHP": true}
+	if !validCurrencies[req.Currency] {
+		return errors.New("invalid currency. Must be KRW, CAD, YEN, or PHP")
+	}
+
+	if req.RatePerClass < 0 {
+		return errors.New("rate per class cannot be negative")
+	}
+
+	if req.AssignedColor == "" {
+		return errors.New("assigned color is required")
+	}
+
+	validStatuses := map[string]bool{"active": true, "inactive": true}
+	if !validStatuses[req.Status] {
+		return errors.New("invalid status. Must be active or inactive")
+	}
+
+	return nil
+}
+
+func sendStudentErrorResponse(w http.ResponseWriter, message string) {
+	response := models.StudentRegisterResponse{
+		Success: false,
+		Message: message,
+		Logs:    logMessages,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusBadRequest)
+	json.NewEncoder(w).Encode(response)
 }
