@@ -68,9 +68,9 @@ var cmdWeb = &cobra.Command{
 		basePath := "/" + strings.TrimPrefix(webFlags.baseURL, "/")
 
 		mux := http.NewServeMux()
-		mux.HandleFunc(basePath, handleIndex)
-		mux.HandleFunc("/", handleIndex)
-		mux.HandleFunc(basePath+"/process", handleProcess)
+		mux.HandleFunc(basePath, handleHome)
+		mux.HandleFunc("/", handleHome)
+		mux.HandleFunc(basePath+"/process", handleProcessPage)
 		mux.HandleFunc(basePath+"/finalize", handleFinalize)
 		mux.HandleFunc(basePath+"/download/", handleDownload)
 		mux.Handle(basePath+"/static/", http.StripPrefix(basePath+"/static/", http.FileServer(http.Dir("static"))))
@@ -134,7 +134,17 @@ func addLog(msg string) {
 	logs.Log().Info(msg)
 }
 
-func handleIndex(w http.ResponseWriter, r *http.Request) {
+func handleHome(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	frontend.Home().Render(r.Context(), w)
+}
+
+func handleProcessPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

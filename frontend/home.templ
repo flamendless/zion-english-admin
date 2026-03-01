@@ -1,0 +1,163 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+templ Home() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Zion English Admin</title>
+		<link rel="icon" type="image/x-icon" id="favicon">
+		<style>
+			.home-container {
+				max-width: 900px;
+				margin: 0 auto;
+				padding: 40px 20px;
+			}
+
+			.home-title {
+				text-align: center;
+				margin-bottom: 10px;
+			}
+
+			.home-title h1 {
+				font-size: 48px;
+				color: #333;
+				margin: 0;
+			}
+
+			.home-subtitle {
+				text-align: center;
+				margin-bottom: 40px;
+				color: #666;
+				font-size: 18px;
+			}
+
+			.home-subtitle a {
+				color: var(--color-primary);
+				text-decoration: none;
+				font-weight: 500;
+			}
+
+			.home-subtitle a:hover {
+				text-decoration: underline;
+			}
+
+			.cards-grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 30px;
+			}
+
+			.card {
+				background: white;
+				border-radius: 8px;
+				padding: 25px;
+				box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+				transition: transform 0.2s, box-shadow 0.2s;
+				text-decoration: none;
+				display: block;
+			}
+
+			.card:hover {
+				transform: translateY(-4px);
+				box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+			}
+
+			.card h2 {
+				margin: 0 0 15px 0;
+				font-size: 24px;
+				color: #333;
+			}
+
+			.card p {
+				margin: 0;
+				color: #666;
+				font-size: 14px;
+			}
+
+			.card-icon {
+				font-size: 32px;
+				margin-bottom: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="home-container">
+			<div class="home-title">
+				<h1>Zion English</h1>
+			</div>
+			<p class="home-subtext">
+				Admin Tools made by <a href="https://flamendless.xyz" target="_blank">{"@"}flamendless</a>
+			</p>
+
+			<div class="cards-grid">
+				<a href={utils.URL("/logs")} class="card">
+					<div class="card-icon">📋</div>
+					<h2>Process Logs</h2>
+					<p>View and manage processing logs</p>
+				</a>
+				<a href={utils.URL("/process")} class="card">
+					<div class="card-icon">⚙️</div>
+					<h2>Process</h2>
+					<p>Process CSV files from Google Drive</p>
+				</a>
+				<a href={utils.URL("/students")} class="card">
+					<div class="card-icon">👨‍🎓</div>
+					<h2>Students</h2>
+					<p>View and manage students</p>
+				</a>
+				<a href={utils.URL("/students/register")} class="card">
+					<div class="card-icon">➕</div>
+					<h2>Register Student</h2>
+					<p>Add a new student</p>
+				</a>
+				<a href={utils.URL("/teachers")} class="card">
+					<div class="card-icon">👨‍🏫</div>
+					<h2>Teachers</h2>
+					<p>View and manage teachers</p>
+				</a>
+				<a href={utils.URL("/teachers/register")} class="card">
+					<div class="card-icon">➕</div>
+					<h2>Register Teacher</h2>
+					<p>Add a new teacher</p>
+				</a>
+			</div>
+		</div>
+
+		<script>
+			function getBaseURL() {
+				const pathname = window.location.pathname;
+				const cleanPath = pathname.replace(/\/$/, '');
+				const parts = cleanPath.split('/').filter(p => p !== '');
+
+				if (parts.length === 0 || cleanPath.endsWith('.html')) {
+					if (cleanPath.includes('/zion-english-admin')) {
+						return '/zion-english-admin';
+					}
+					return '';
+				}
+
+				if (parts.length === 1) {
+					return '/' + parts[0];
+				}
+
+				return '/' + parts.slice(0, -1).join('/');
+			}
+
+			const baseURL = getBaseURL();
+
+			function buildURL(path) {
+				return baseURL + path;
+			}
+
+			const favicon = document.getElementById('favicon');
+			if (favicon) {
+				favicon.href = buildURL('/static/favicon.ico');
+			}
+		</script>
+	</body>
+	</html>
+}
