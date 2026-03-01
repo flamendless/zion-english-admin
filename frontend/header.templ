@@ -3,14 +3,20 @@ package frontend
 import "zion-english/internal/utils"
 
 type HeaderProps struct {
-	Title        string
-	ShowNavLinks bool
-	BackLink     string
-	BackLinkText string
+	Title string
 }
 
 templ Header(props HeaderProps) {
 	<style>
+		.container {
+			max-width: 80%;
+			margin: 0 auto;
+			background: white;
+			padding: 30px;
+			border-radius: 8px;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+		}
+
 		.header-section {
 			margin-bottom: 30px;
 			border-bottom: 2px solid #4CAF50;
@@ -64,6 +70,15 @@ templ Header(props HeaderProps) {
 			margin: 0;
 		}
 
+		.header-section h1 a {
+			color: #333;
+			text-decoration: none;
+		}
+
+		.header-section h1 a:hover {
+			text-decoration: underline;
+		}
+
 		.nav-link {
 			color: #4CAF50;
 			text-decoration: none;
@@ -76,23 +91,20 @@ templ Header(props HeaderProps) {
 	</style>
 
 	<div class="header-section">
-		<h1>{ props.Title }</h1>
+		<h1><a href={utils.URL("/")}>{ props.Title }</a></h1>
 		<div class="header-bottom">
 			<div class="header-left">
-				if props.ShowNavLinks {
-					<div class="nav-links">
-						<a href={utils.URL("/logs")} id="logsLink" class="nav-link">View Process Logs</a>
-						<span class="nav-separator">|</span>
-						<a href={utils.URL("/students")} id="studentsLink" class="nav-link">View Students</a>
-						<span class="nav-separator">|</span>
-						<a href={utils.URL("/students/register")} id="registerLink" class="nav-link">Register Student</a>
-					</div>
-				}
-				if props.BackLink != "" {
-					<div class="nav-links">
-						<a href={props.BackLink} class="nav-link">{ props.BackLinkText }</a>
-					</div>
-				}
+				<div class="nav-links">
+					<a href={utils.URL("/logs")} id="logsLink" class="nav-link">View Process Logs</a>
+					<span class="nav-separator">|</span>
+					<a href={utils.URL("/students")} id="studentsLink" class="nav-link">View Students</a>
+					<span class="nav-separator">|</span>
+					<a href={utils.URL("/students/register")} id="registerStudentLink" class="nav-link">Register Student</a>
+					<span class="nav-separator">|</span>
+					<a href={utils.URL("/teachers")} id="teachersLink" class="nav-link">View Teachers</a>
+					<span class="nav-separator">|</span>
+					<a href={utils.URL("/teachers/register")} id="registerTeacherLink" class="nav-link">Register Teacher</a>
+				</div>
 			</div>
 			<div class="header-right">
 				<p class="made-by">
@@ -104,24 +116,5 @@ templ Header(props HeaderProps) {
 }
 
 templ HeaderSimple(title string) {
-	@Header(HeaderProps{
-		Title:        title,
-		ShowNavLinks: false,
-	})
-}
-
-templ HeaderWithNav(title string) {
-	@Header(HeaderProps{
-		Title:        title,
-		ShowNavLinks: true,
-	})
-}
-
-templ HeaderWithBack(title string, backLink string, backLinkText string) {
-	@Header(HeaderProps{
-		Title:        title,
-		ShowNavLinks: false,
-		BackLink:     backLink,
-		BackLinkText: backLinkText,
-	})
+	@Header(HeaderProps{Title: title})
 }

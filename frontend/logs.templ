@@ -1,7 +1,5 @@
 package frontend
 
-import "zion-english/internal/utils"
-
 type LogData struct {
 	Logs []LogItem
 }
@@ -68,15 +66,6 @@ templ Logs(logs LogData) {
 				background-color: #f5f5f5;
 				padding: 20px;
 				line-height: 1.6;
-			}
-
-			.container {
-				max-width: 1200px;
-				margin: 0 auto;
-				background: white;
-				padding: 30px;
-				border-radius: 8px;
-				box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 			}
 
 			.button-group {
@@ -181,7 +170,7 @@ templ Logs(logs LogData) {
 	</head>
 	<body>
 		<div class="container">
-			@HeaderWithBack("Processing Logs", utils.URL("/"), "Back to Process")
+			@HeaderSimple("Processing Logs")
 
 			<div class="button-group">
 				<button class="refresh-btn" id="refreshBtn">Refresh</button>

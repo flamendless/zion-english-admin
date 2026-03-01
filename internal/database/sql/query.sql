@@ -32,3 +32,15 @@ SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color,
 FROM tbl_students
 ORDER BY created_at DESC;
 
+-- name: InsertTeacher :exec
+INSERT INTO tbl_teachers (name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+-- name: GetTeacherByName :one
+SELECT COUNT(*) as count FROM tbl_teachers WHERE name = ?;
+
+-- name: GetAllTeachers :many
+SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, created_at, updated_at
+FROM tbl_teachers
+ORDER BY created_at DESC;
+

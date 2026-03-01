@@ -1,39 +1,33 @@
 package frontend
 
-import "fmt"
 import "zion-english/internal/utils"
 
-type StudentData struct {
-	Students []StudentItem
+type TeacherData struct {
+	Teachers []TeacherItem
 }
 
-type StudentItem struct {
-	ID            string
-	Name          string
-	Currency      string
-	Contact       string
-	RatePerClass  float64
-	ParentName    string
-	AssignedColor string
-	Status        string
-	CreatedAt     string
-	UpdatedAt     string
+type TeacherItem struct {
+	ID             string
+	Name           string
+	Birthdate      string
+	Address        string
+	JoiningDate    string
+	MobileNumber   string
+	Email          string
+	Certifications string
+	AssignedColor  string
+	RatePerClass   float64
+	Currency       string
+	CreatedAt      string
 }
 
-func getStatusClass(status string) string {
-	if status == "active" {
-		return "status-active"
-	}
-	return "status-inactive"
-}
-
-templ Students(data StudentData) {
+templ Teachers(data TeacherData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Students - Zion English Admin Tool</title>
+		<title>Teachers - Zion English Admin Tool</title>
 		<link rel="icon" type="image/x-icon" id="favicon">
 		<style>
 			* {
@@ -55,7 +49,7 @@ templ Students(data StudentData) {
 				gap: 10px;
 			}
 
-			.refresh-btn, .add-btn {
+			.add-btn {
 				background-color: #4CAF50;
 				color: white;
 				padding: 10px 20px;
@@ -64,9 +58,10 @@ templ Students(data StudentData) {
 				cursor: pointer;
 				font-size: 14px;
 				font-weight: 500;
+				text-decoration: none;
 			}
 
-			.refresh-btn:hover, .add-btn:hover {
+			.add-btn:hover {
 				background-color: #45a049;
 			}
 
@@ -105,16 +100,6 @@ templ Students(data StudentData) {
 				border: 1px solid #ddd;
 			}
 
-			.status-active {
-				color: #28a745;
-				font-weight: 500;
-			}
-
-			.status-inactive {
-				color: #dc3545;
-				font-weight: 500;
-			}
-
 			.empty-state {
 				text-align: center;
 				padding: 40px;
@@ -123,60 +108,73 @@ templ Students(data StudentData) {
 
 			.currency-cell {
 				white-space: nowrap;
+				font-family: 'Courier New', monospace;
 			}
 
 			.rate-cell {
 				white-space: nowrap;
 				font-family: 'Courier New', monospace;
 			}
+
+			.email-cell {
+				color: #4CAF50;
+			}
+
+			.date-cell {
+				white-space: nowrap;
+			}
 		</style>
 	</head>
 	<body>
 		<div class="container">
-			@HeaderSimple("Students")
+			@HeaderSimple("Teachers")
 
 			<div class="button-group">
-				<a href={utils.URL("/students/register")} class="add-btn">Register New Student</a>
+				<a href={utils.URL("/teachers/register")} class="add-btn">Register New Teacher</a>
 			</div>
 
-			if len(data.Students) > 0 {
-				<table id="studentsTable">
+			if len(data.Teachers) > 0 {
+				<table id="teachersTable">
 					<thead>
 						<tr>
 							<th>Name</th>
-							<th>Currency</th>
-							<th>Contact</th>
-							<th>Rate Per Class</th>
-							<th>Parent Name</th>
+							<th>Birthdate</th>
+							<th>Address</th>
+							<th>Joining Date</th>
+							<th>Mobile</th>
+							<th>Email</th>
+							<th>Certifications</th>
 							<th>Color</th>
-							<th>Status</th>
+							<th>Rate Per Class</th>
 							<th>Created At</th>
 						</tr>
 					</thead>
 					<tbody>
-						for _, student := range data.Students {
+						for _, teacher := range data.Teachers {
 							<tr>
-								<td>{ student.Name }</td>
-								<td class="currency-cell">{ student.Currency }</td>
-								<td>{ getDisplayValue(student.Contact) }</td>
-								<td class="rate-cell">{ formatRate(student.RatePerClass, student.Currency) }</td>
-								<td>{ getDisplayValue(student.ParentName) }</td>
+								<td>{ teacher.Name }</td>
+								<td class="date-cell">{ getDisplayValue(teacher.Birthdate) }</td>
+								<td>{ getDisplayValue(teacher.Address) }</td>
+								<td class="date-cell">{ teacher.JoiningDate }</td>
+								<td>{ getDisplayValue(teacher.MobileNumber) }</td>
+								<td class="email-cell">{ getDisplayValue(teacher.Email) }</td>
+								<td>{ getDisplayValue(teacher.Certifications) }</td>
 								<td>
 									<div class="color-cell">
-										<div class="color-box" style={ "background-color: " + student.AssignedColor }></div>
-										<span>{ student.AssignedColor }</span>
+										<div class="color-box" style={ "background-color: " + teacher.AssignedColor }></div>
+										<span>{ teacher.AssignedColor }</span>
 									</div>
 								</td>
-								<td class={ getStatusClass(student.Status) }>{ student.Status }</td>
-								<td>{ student.CreatedAt }</td>
+								<td class="rate-cell">{ formatRate(teacher.RatePerClass, teacher.Currency) }</td>
+								<td class="date-cell">{ teacher.CreatedAt }</td>
 							</tr>
 						}
 					</tbody>
 				</table>
 			} else {
 				<div class="empty-state">
-					<p>No students registered yet.</p>
-					<p>Click "Register New Student" to add one.</p>
+					<p>No teachers registered yet.</p>
+					<p>Click "Register New Teacher" to add one.</p>
 				</div>
 			}
 		</div>
@@ -215,8 +213,4 @@ templ Students(data StudentData) {
 		</script>
 	</body>
 	</html>
-}
-
-func formatRate(rate float64, currency string) string {
-	return fmt.Sprintf("%.2f %s", rate, currency)
 }

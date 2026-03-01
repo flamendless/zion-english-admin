@@ -1,14 +1,12 @@
 package frontend
 
-import "zion-english/internal/utils"
-
-templ RegisterStudent() {
+templ RegisterTeacher() {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Register Student - Zion English Admin</title>
+		<title>Register Teacher - Zion English Admin</title>
 		<link rel="icon" type="image/x-icon" id="favicon">
 		<style>
 			* {
@@ -24,15 +22,6 @@ templ RegisterStudent() {
 				line-height: 1.6;
 			}
 
-			.container {
-				max-width: 700px;
-				margin: 0 auto;
-				background: white;
-				padding: 30px;
-				border-radius: 8px;
-				box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-			}
-
 			.form-group {
 				margin-bottom: 20px;
 			}
@@ -46,6 +35,8 @@ templ RegisterStudent() {
 
 			input[type="text"],
 			input[type="number"],
+			input[type="date"],
+			input[type="email"],
 			select {
 				width: 100%;
 				padding: 10px;
@@ -134,36 +125,68 @@ templ RegisterStudent() {
 				word-wrap: break-word;
 			}
 
-			.nav-link {
-				color: #4CAF50;
-				text-decoration: none;
-				font-weight: 500;
-			}
-
-			.nav-link:hover {
-				text-decoration: underline;
-			}
-
 			.form-row {
 				display: grid;
 				grid-template-columns: 1fr 1fr;
+				gap: 15px;
+			}
+
+			.form-row-3 {
+				display: grid;
+				grid-template-columns: 1fr 1fr 1fr;
 				gap: 15px;
 			}
 		</style>
 	</head>
 	<body>
 		<div class="container">
-			@HeaderWithBack("Register Student", utils.URL("/"), "Back to Process")
+			@HeaderSimple("Register Teacher")
 
 			<form id="registerForm">
 				<div class="form-group">
-					<label for="name">Student Name *</label>
+					<label for="name">Teacher Name *</label>
 					<input type="text" id="name" name="name" required
-					       placeholder="Enter student name">
+					       placeholder="Enter teacher name">
 					<div class="error-message" id="nameError">Name is required</div>
 				</div>
 
 				<div class="form-row">
+					<div class="form-group">
+						<label for="birthdate">Birthdate</label>
+						<input type="date" id="birthdate" name="birthdate">
+					</div>
+					<div class="form-group">
+						<label for="joiningDate">Joining Date *</label>
+						<input type="date" id="joiningDate" name="joiningDate" required>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="address">Address</label>
+					<input type="text" id="address" name="address"
+					       placeholder="Enter address">
+				</div>
+
+				<div class="form-row">
+					<div class="form-group">
+						<label for="mobileNumber">Mobile Number</label>
+						<input type="text" id="mobileNumber" name="mobileNumber"
+					       placeholder="Enter mobile number">
+					</div>
+					<div class="form-group">
+						<label for="email">Email</label>
+						<input type="email" id="email" name="email"
+					       placeholder="Enter email">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="certifications">Certifications (comma-separated)</label>
+					<input type="text" id="certifications" name="certifications"
+					       placeholder="e.g., TESOL, CELTA, Bachelor in Education">
+				</div>
+
+				<div class="form-row-3">
 					<div class="form-group">
 						<label for="currency">Currency *</label>
 						<select id="currency" name="currency" required>
@@ -175,41 +198,22 @@ templ RegisterStudent() {
 						</select>
 					</div>
 					<div class="form-group">
-						<label for="status">Status *</label>
-						<select id="status" name="status" required>
-							<option value="active">Active</option>
-							<option value="inactive">Inactive</option>
-						</select>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label for="contact">Contact</label>
-					<input type="text" id="contact" name="contact"
-					       placeholder="Enter contact information">
-				</div>
-
-				<div class="form-group">
-					<label for="ratePerClass">Rate Per Class *</label>
-					<input type="number" id="ratePerClass" name="ratePerClass" required
+						<label for="ratePerClass">Rate Per Class *</label>
+						<input type="number" id="ratePerClass" name="ratePerClass" required
 					       step="0.01" min="0" placeholder="0.00">
-				</div>
-
-				<div class="form-group">
-					<label for="parentName">Parent's Name</label>
-					<input type="text" id="parentName" name="parentName"
-					       placeholder="Enter parent's name">
-				</div>
-
-				<div class="form-group">
-					<label for="assignedColor">Assigned Color *</label>
-					<div class="color-group">
-						<input type="color" id="assignedColor" name="assignedColor" required
-						       value="#4CAF50">
+					</div>
+					<div class="form-group">
+						<label for="assignedColor">Assigned Color *</label>
+						<div class="color-group">
+							<input type="color" id="assignedColor" name="assignedColor" required
+							       value="#4CAF50">
+							<div class="color-preview" id="colorPreview" style="background-color: #4CAF50;"></div>
+							<span id="colorValue">#4CAF50</span>
+						</div>
 					</div>
 				</div>
 
-				<button type="submit" id="submitBtn">Register Student</button>
+				<button type="submit" id="submitBtn">Register Teacher</button>
 			</form>
 
 			<div class="logs-section">
@@ -223,12 +227,17 @@ templ RegisterStudent() {
 			const logOutput = document.getElementById('logOutput');
 			const submitBtn = document.getElementById('submitBtn');
 			const nameInput = document.getElementById('name');
+			const birthdateInput = document.getElementById('birthdate');
+			const joiningDateInput = document.getElementById('joiningDate');
+			const addressInput = document.getElementById('address');
+			const mobileNumberInput = document.getElementById('mobileNumber');
+			const emailInput = document.getElementById('email');
+			const certificationsInput = document.getElementById('certifications');
 			const currencySelect = document.getElementById('currency');
-			const contactInput = document.getElementById('contact');
 			const ratePerClassInput = document.getElementById('ratePerClass');
-			const parentNameInput = document.getElementById('parentName');
 			const assignedColorInput = document.getElementById('assignedColor');
-			const statusSelect = document.getElementById('status');
+			const colorPreview = document.getElementById('colorPreview');
+			const colorValue = document.getElementById('colorValue');
 
 			function getBaseURL() {
 				const pathname = window.location.pathname;
@@ -260,6 +269,12 @@ templ RegisterStudent() {
 				favicon.href = buildURL('/static/favicon.ico');
 			}
 
+			assignedColorInput.addEventListener('input', () => {
+				const color = assignedColorInput.value;
+				colorPreview.style.backgroundColor = color;
+				colorValue.textContent = color;
+			});
+
 			function validateForm() {
 				let isValid = true;
 
@@ -271,6 +286,13 @@ templ RegisterStudent() {
 				} else {
 					nameError.style.display = 'none';
 					nameInput.setCustomValidity('');
+				}
+
+				if (!joiningDateInput.value) {
+					joiningDateInput.setCustomValidity('Joining date is required');
+					isValid = false;
+				} else {
+					joiningDateInput.setCustomValidity('');
 				}
 
 				if (!currencySelect.value) {
@@ -294,21 +316,14 @@ templ RegisterStudent() {
 					assignedColorInput.setCustomValidity('');
 				}
 
-				if (!statusSelect.value) {
-					statusSelect.setCustomValidity('Please select a status');
-					isValid = false;
-				} else {
-					statusSelect.setCustomValidity('');
-				}
-
 				return isValid;
 			}
 
 			nameInput.addEventListener('blur', validateForm);
+			joiningDateInput.addEventListener('change', validateForm);
 			currencySelect.addEventListener('change', validateForm);
 			ratePerClassInput.addEventListener('blur', validateForm);
 			assignedColorInput.addEventListener('change', validateForm);
-			statusSelect.addEventListener('change', validateForm);
 
 			form.addEventListener('submit', async (e) => {
 				e.preventDefault();
@@ -318,16 +333,19 @@ templ RegisterStudent() {
 				}
 
 				submitBtn.disabled = true;
-				logOutput.textContent = 'Registering student...';
+				logOutput.textContent = 'Registering teacher...';
 
 				const formData = {
 					name: nameInput.value.trim(),
+					birthdate: birthdateInput.value,
+					address: addressInput.value.trim(),
+					joiningDate: joiningDateInput.value,
+					mobileNumber: mobileNumberInput.value.trim(),
+					email: emailInput.value.trim(),
+					certifications: certificationsInput.value.trim(),
 					currency: currencySelect.value,
-					contact: contactInput.value.trim(),
 					ratePerClass: parseFloat(ratePerClassInput.value) || 0,
-					parentName: parentNameInput.value.trim(),
-					assignedColor: assignedColorInput.value,
-					status: statusSelect.value
+					assignedColor: assignedColorInput.value
 				};
 
 				try {
@@ -347,6 +365,8 @@ templ RegisterStudent() {
 						logOutput.textContent += '\n✓ ' + data.message;
 						form.reset();
 						assignedColorInput.value = '#4CAF50';
+						colorPreview.style.backgroundColor = '#4CAF50';
+						colorValue.textContent = '#4CAF50';
 					} else {
 						logOutput.textContent += '\n✗ Error: ' + data.message;
 					}

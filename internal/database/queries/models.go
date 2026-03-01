@@ -45,3 +45,19 @@ type TblStudent struct {
 	CreatedAt     sql.NullTime
 	UpdatedAt     sql.NullTime
 }
+
+type TblTeacher struct {
+	ID             int64
+	Name           string
+	Birthdate      sql.NullString
+	Address        sql.NullString
+	JoiningDate    string
+	MobileNumber   sql.NullString
+	Email          sql.NullString
+	Certifications sql.NullString
+	AssignedColor  string
+	RatePerClass   float64
+	Currency       string
+	CreatedAt      sql.NullTime
+	UpdatedAt      sql.NullTime
+}

@@ -79,10 +79,12 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/logs", handleLogs)
 		authMux.HandleFunc(basePath+"/students", handleStudents)
 		authMux.HandleFunc(basePath+"/students/register", handleStudentRegister)
+		authMux.HandleFunc(basePath+"/teachers", handleTeachers)
+		authMux.HandleFunc(basePath+"/teachers/register", handleTeacherRegister)
 		authHandler := auth.Middleware(cfg.AdminUsername, cfg.AdminPassword, authMux)
 
 		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if strings.HasPrefix(r.URL.Path, basePath+"/logs") || strings.HasPrefix(r.URL.Path, basePath+"/students") {
+			if strings.HasPrefix(r.URL.Path, basePath+"/logs") || strings.HasPrefix(r.URL.Path, basePath+"/students") || strings.HasPrefix(r.URL.Path, basePath+"/teachers") {
 				authHandler.ServeHTTP(w, r)
 			} else {
 				mux.ServeHTTP(w, r)
@@ -672,6 +674,150 @@ func validateStudentRequest(req *models.StudentRegisterRequest) error {
 
 func sendStudentErrorResponse(w http.ResponseWriter, message string) {
 	response := models.StudentRegisterResponse{
+		Success: false,
+		Message: message,
+		Logs:    logMessages,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusBadRequest)
+	json.NewEncoder(w).Encode(response)
+}
+
+func handleTeachers(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	teachers, err := database.GetAllTeachers(dbRO)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to fetch teachers: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	viewTeachers := make([]frontend.TeacherItem, len(teachers))
+	for i, t := range teachers {
+		viewTeachers[i] = frontend.TeacherItem{
+			ID:             strconv.FormatInt(t.ID, 10),
+			Name:           t.Name,
+			Birthdate:      t.Birthdate.String,
+			Address:        t.Address.String,
+			JoiningDate:    t.JoiningDate,
+			MobileNumber:   t.MobileNumber.String,
+			Email:          t.Email.String,
+			Certifications: t.Certifications.String,
+			AssignedColor:  t.AssignedColor,
+			RatePerClass:   t.RatePerClass,
+			Currency:       t.Currency,
+			CreatedAt:      t.CreatedAt.Time.Format("2006-01-02 15:04:05"),
+		}
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	frontend.Teachers(frontend.TeacherData{Teachers: viewTeachers}).Render(r.Context(), w)
+}
+
+func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		w.Header().Set("Content-Type", "text/html")
+		frontend.RegisterTeacher().Render(r.Context(), w)
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	logMessages = []string{}
+	var req models.TeacherRegisterRequest
+	var errMsg string
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		errMsg = fmt.Sprintf("Invalid request: %v", err)
+		sendTeacherErrorResponse(w, errMsg)
+		return
+	}
+
+	if err := validateTeacherRequest(&req); err != nil {
+		errMsg = err.Error()
+		sendTeacherErrorResponse(w, errMsg)
+		return
+	}
+
+	addLog(fmt.Sprintf("Registering teacher: %s", req.Name))
+
+	existingCount, err := dbRW.GetQueries().GetTeacherByName(r.Context(), req.Name)
+	if err != nil {
+		errMsg = fmt.Sprintf("Database error: %v", err)
+		sendTeacherErrorResponse(w, errMsg)
+		return
+	}
+
+	if existingCount > 0 {
+		errMsg = "A teacher with this name already exists"
+		sendTeacherErrorResponse(w, errMsg)
+		return
+	}
+
+	err = dbRW.GetQueries().InsertTeacher(r.Context(), queries.InsertTeacherParams{
+		Name:           req.Name,
+		Birthdate:      sql.NullString{String: req.Birthdate, Valid: req.Birthdate != ""},
+		Address:        sql.NullString{String: req.Address, Valid: req.Address != ""},
+		JoiningDate:    req.JoiningDate,
+		MobileNumber:   sql.NullString{String: req.MobileNumber, Valid: req.MobileNumber != ""},
+		Email:          sql.NullString{String: req.Email, Valid: req.Email != ""},
+		Certifications: sql.NullString{String: req.Certifications, Valid: req.Certifications != ""},
+		AssignedColor:  req.AssignedColor,
+		RatePerClass:   req.RatePerClass,
+		Currency:       req.Currency,
+	})
+	if err != nil {
+		errMsg = fmt.Sprintf("Failed to register teacher: %v", err)
+		sendTeacherErrorResponse(w, errMsg)
+		return
+	}
+
+	addLog(fmt.Sprintf("Successfully registered teacher: %s", req.Name))
+
+	response := models.TeacherRegisterResponse{
+		Success: true,
+		Message: fmt.Sprintf("Teacher '%s' registered successfully", req.Name),
+		Logs:    logMessages,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
+	if req.Name == "" {
+		return errors.New("name is required")
+	}
+
+	if req.JoiningDate == "" {
+		return errors.New("joining date is required")
+	}
+
+	validCurrencies := map[string]bool{"KRW": true, "CAD": true, "YEN": true, "PHP": true}
+	if !validCurrencies[req.Currency] {
+		return errors.New("invalid currency. Must be KRW, CAD, YEN, or PHP")
+	}
+
+	if req.RatePerClass < 0 {
+		return errors.New("rate per class cannot be negative")
+	}
+
+	if req.AssignedColor == "" {
+		return errors.New("assigned color is required")
+	}
+
+	return nil
+}
+
+func sendTeacherErrorResponse(w http.ResponseWriter, message string) {
+	response := models.TeacherRegisterResponse{
 		Success: false,
 		Message: message,
 		Logs:    logMessages,

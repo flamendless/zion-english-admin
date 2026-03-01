@@ -62,3 +62,22 @@ type StudentRegisterResponse struct {
 	Message string   `json:"message"`
 	Logs    []string `json:"logs"`
 }
+
+type TeacherRegisterRequest struct {
+	Name           string  `json:"name"`
+	Birthdate      string  `json:"birthdate"`
+	Address        string  `json:"address"`
+	JoiningDate    string  `json:"joiningDate"`
+	MobileNumber   string  `json:"mobileNumber"`
+	Email          string  `json:"email"`
+	Certifications string  `json:"certifications"`
+	AssignedColor  string  `json:"assignedColor"`
+	RatePerClass   float64 `json:"ratePerClass"`
+	Currency       string  `json:"currency"`
+}
+
+type TeacherRegisterResponse struct {
+	Success bool     `json:"success"`
+	Message string   `json:"message"`
+	Logs    []string `json:"logs"`
+}

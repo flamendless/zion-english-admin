@@ -92,6 +92,49 @@ func (q *Queries) GetAllStudents(ctx context.Context) ([]TblStudent, error) {
 	return items, nil
 }
 
+const getAllTeachers = `-- name: GetAllTeachers :many
+SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, created_at, updated_at
+FROM tbl_teachers
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetAllTeachers(ctx context.Context) ([]TblTeacher, error) {
+	rows, err := q.db.QueryContext(ctx, getAllTeachers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TblTeacher
+	for rows.Next() {
+		var i TblTeacher
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Birthdate,
+			&i.Address,
+			&i.JoiningDate,
+			&i.MobileNumber,
+			&i.Email,
+			&i.Certifications,
+			&i.AssignedColor,
+			&i.RatePerClass,
+			&i.Currency,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProcessingLogByID = `-- name: GetProcessingLogByID :one
 SELECT id, google_drive_url, name, template, start_date, end_date,
        excluded_rows, useragent, output_path, errors, created_at
@@ -124,6 +167,17 @@ SELECT COUNT(*) as count FROM tbl_students WHERE name = ?
 
 func (q *Queries) GetStudentByName(ctx context.Context, name string) (int64, error) {
 	row := q.db.QueryRowContext(ctx, getStudentByName, name)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const getTeacherByName = `-- name: GetTeacherByName :one
+SELECT COUNT(*) as count FROM tbl_teachers WHERE name = ?
+`
+
+func (q *Queries) GetTeacherByName(ctx context.Context, name string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getTeacherByName, name)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
@@ -213,6 +267,40 @@ func (q *Queries) InsertStudent(ctx context.Context, arg InsertStudentParams) er
 		arg.ParentName,
 		arg.AssignedColor,
 		arg.Status,
+	)
+	return err
+}
+
+const insertTeacher = `-- name: InsertTeacher :exec
+INSERT INTO tbl_teachers (name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+`
+
+type InsertTeacherParams struct {
+	Name           string
+	Birthdate      sql.NullString
+	Address        sql.NullString
+	JoiningDate    string
+	MobileNumber   sql.NullString
+	Email          sql.NullString
+	Certifications sql.NullString
+	AssignedColor  string
+	RatePerClass   float64
+	Currency       string
+}
+
+func (q *Queries) InsertTeacher(ctx context.Context, arg InsertTeacherParams) error {
+	_, err := q.db.ExecContext(ctx, insertTeacher,
+		arg.Name,
+		arg.Birthdate,
+		arg.Address,
+		arg.JoiningDate,
+		arg.MobileNumber,
+		arg.Email,
+		arg.Certifications,
+		arg.AssignedColor,
+		arg.RatePerClass,
+		arg.Currency,
 	)
 	return err
 }
