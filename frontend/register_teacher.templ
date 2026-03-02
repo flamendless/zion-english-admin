@@ -20,11 +20,28 @@ templ RegisterTeacher() {
 			@HeaderSimple()
 
 			<form id="registerForm">
+				<div class="form-row">
+					<div class="form-group">
+						<label for="name">Teacher Name *</label>
+						<input type="text" id="name" name="name" required
+						       placeholder="Enter teacher name">
+						<div class="error-message" id="nameError">Name is required</div>
+					</div>
+					<div class="form-group">
+						<label for="sex">Sex</label>
+						<select id="sex" name="sex">
+							<option value="">-- Select Sex --</option>
+							<option value="M">M</option>
+							<option value="F">F</option>
+						</select>
+					</div>
+				</div>
+
 				<div class="form-group">
-					<label for="name">Teacher Name *</label>
-					<input type="text" id="name" name="name" required
-					       placeholder="Enter teacher name">
-					<div class="error-message" id="nameError">Name is required</div>
+					<label for="driveUrl">Google Drive URL *</label>
+					<input type="text" id="driveUrl" name="driveUrl" required
+					       placeholder="https://docs.google.com/spreadsheets/...">
+					<div class="error-message" id="driveUrlError">Drive URL is required</div>
 				</div>
 
 				<div class="form-row">
@@ -115,6 +132,8 @@ templ RegisterTeacher() {
 			const assignedColorInput = document.getElementById('assignedColor');
 			const colorPreview = document.getElementById('colorPreview');
 			const colorValue = document.getElementById('colorValue');
+			const driveUrlInput = document.getElementById('driveUrl');
+			const sexSelect = document.getElementById('sex');
 
 			function getBaseURL() {
 				const pathname = window.location.pathname;
@@ -186,12 +205,27 @@ templ RegisterTeacher() {
 					ratePerClassInput.setCustomValidity('');
 				}
 
-				if (!assignedColorInput.value) {
-					assignedColorInput.setCustomValidity('Please select a color');
-					isValid = false;
-				} else {
-					assignedColorInput.setCustomValidity('');
-				}
+			if (!assignedColorInput.value) {
+				assignedColorInput.setCustomValidity('Please select a color');
+				isValid = false;
+			} else {
+				assignedColorInput.setCustomValidity('');
+			}
+
+			if (!driveUrlInput.value.trim()) {
+				driveUrlInput.setCustomValidity('Drive URL is required');
+				isValid = false;
+			} else {
+				driveUrlInput.setCustomValidity('');
+			}
+
+			const validSex = ['M', 'F'];
+			if (sexSelect.value && !validSex.includes(sexSelect.value)) {
+				sexSelect.setCustomValidity('Invalid sex');
+				isValid = false;
+			} else {
+				sexSelect.setCustomValidity('');
+			}
 
 				return isValid;
 			}
@@ -222,7 +256,9 @@ templ RegisterTeacher() {
 					certifications: certificationsInput.value.trim(),
 					currency: currencySelect.value,
 					ratePerClass: parseFloat(ratePerClassInput.value) || 0,
-					assignedColor: assignedColorInput.value
+					assignedColor: assignedColorInput.value,
+					driveUrl: driveUrlInput.value.trim(),
+					sex: sexSelect.value
 				};
 
 				try {

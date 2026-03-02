@@ -74,10 +74,18 @@ type TeacherRegisterRequest struct {
 	AssignedColor  string  `json:"assignedColor"`
 	RatePerClass   float64 `json:"ratePerClass"`
 	Currency       string  `json:"currency"`
+	DriveUrl       string  `json:"driveUrl"`
+	Sex            string  `json:"sex"`
 }
 
 type TeacherRegisterResponse struct {
 	Success bool     `json:"success"`
 	Message string   `json:"message"`
 	Logs    []string `json:"logs"`
+}
+
+type TeacherAPIResponse struct {
+	ID       int64  `json:"id"`
+	Name     string `json:"name"`
+	DriveUrl string `json:"driveUrl"`
 }

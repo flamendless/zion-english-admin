@@ -73,6 +73,7 @@ var cmdWeb = &cobra.Command{
 		mux.HandleFunc(basePath+"/process", handleProcessPage)
 		mux.HandleFunc(basePath+"/finalize", handleFinalize)
 		mux.HandleFunc(basePath+"/download/", handleDownload)
+		mux.HandleFunc(basePath+"/api/teachers", handleGetTeachers)
 		mux.Handle(basePath+"/static/", http.StripPrefix(basePath+"/static/", http.FileServer(http.Dir("static"))))
 
 		authMux := http.NewServeMux()
@@ -723,6 +724,8 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 			AssignedColor:  t.AssignedColor,
 			RatePerClass:   t.RatePerClass,
 			Currency:       t.Currency,
+			DriveUrl:       t.DriveUrl,
+			Sex:            t.Sex.String,
 			CreatedAt:      t.CreatedAt.Time.Format("2006-01-02 15:04:05"),
 		}
 	}
@@ -785,6 +788,8 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		AssignedColor:  req.AssignedColor,
 		RatePerClass:   req.RatePerClass,
 		Currency:       req.Currency,
+		DriveUrl:       req.DriveUrl,
+		Sex:            sql.NullString{String: req.Sex, Valid: req.Sex != ""},
 	})
 	if err != nil {
 		errMsg = fmt.Sprintf("Failed to register teacher: %v", err)
@@ -826,6 +831,15 @@ func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
 		return errors.New("assigned color is required")
 	}
 
+	if req.DriveUrl == "" {
+		return errors.New("drive URL is required")
+	}
+
+	validSex := map[string]bool{"M": true, "F": true}
+	if req.Sex != "" && !validSex[req.Sex] {
+		return errors.New("invalid sex. Must be M or F")
+	}
+
 	return nil
 }
 
@@ -838,5 +852,30 @@ func sendTeacherErrorResponse(w http.ResponseWriter, message string) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusBadRequest)
+	json.NewEncoder(w).Encode(response)
+}
+
+func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	teachers, err := dbRO.GetQueries().GetAllTeachers(r.Context())
+	if err != nil {
+		http.Error(w, "Failed to fetch teachers", http.StatusInternalServerError)
+		return
+	}
+
+	var response []models.TeacherAPIResponse
+	for _, t := range teachers {
+		response = append(response, models.TeacherAPIResponse{
+			ID:       t.ID,
+			Name:     t.Name,
+			DriveUrl: t.DriveUrl,
+		})
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }

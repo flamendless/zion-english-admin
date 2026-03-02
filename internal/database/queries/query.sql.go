@@ -93,20 +93,38 @@ func (q *Queries) GetAllStudents(ctx context.Context) ([]TblStudent, error) {
 }
 
 const getAllTeachers = `-- name: GetAllTeachers :many
-SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, created_at, updated_at
+SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, created_at, updated_at
 FROM tbl_teachers
 ORDER BY created_at DESC
 `
 
-func (q *Queries) GetAllTeachers(ctx context.Context) ([]TblTeacher, error) {
+type GetAllTeachersRow struct {
+	ID             int64
+	Name           string
+	Birthdate      sql.NullString
+	Address        sql.NullString
+	JoiningDate    string
+	MobileNumber   sql.NullString
+	Email          sql.NullString
+	Certifications sql.NullString
+	AssignedColor  string
+	RatePerClass   float64
+	Currency       string
+	DriveUrl       string
+	Sex            sql.NullString
+	CreatedAt      sql.NullTime
+	UpdatedAt      sql.NullTime
+}
+
+func (q *Queries) GetAllTeachers(ctx context.Context) ([]GetAllTeachersRow, error) {
 	rows, err := q.db.QueryContext(ctx, getAllTeachers)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TblTeacher
+	var items []GetAllTeachersRow
 	for rows.Next() {
-		var i TblTeacher
+		var i GetAllTeachersRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
@@ -119,6 +137,8 @@ func (q *Queries) GetAllTeachers(ctx context.Context) ([]TblTeacher, error) {
 			&i.AssignedColor,
 			&i.RatePerClass,
 			&i.Currency,
+			&i.DriveUrl,
+			&i.Sex,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -272,8 +292,8 @@ func (q *Queries) InsertStudent(ctx context.Context, arg InsertStudentParams) er
 }
 
 const insertTeacher = `-- name: InsertTeacher :exec
-INSERT INTO tbl_teachers (name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO tbl_teachers (name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 type InsertTeacherParams struct {
@@ -287,6 +307,8 @@ type InsertTeacherParams struct {
 	AssignedColor  string
 	RatePerClass   float64
 	Currency       string
+	DriveUrl       string
+	Sex            sql.NullString
 }
 
 func (q *Queries) InsertTeacher(ctx context.Context, arg InsertTeacherParams) error {
@@ -301,6 +323,8 @@ func (q *Queries) InsertTeacher(ctx context.Context, arg InsertTeacherParams) er
 		arg.AssignedColor,
 		arg.RatePerClass,
 		arg.Currency,
+		arg.DriveUrl,
+		arg.Sex,
 	)
 	return err
 }

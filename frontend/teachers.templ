@@ -18,6 +18,8 @@ type TeacherItem struct {
 	AssignedColor  string
 	RatePerClass   float64
 	Currency       string
+	DriveUrl       string
+	Sex            string
 	CreatedAt      string
 }
 
@@ -89,6 +91,11 @@ templ Teachers(data TeacherData) {
 			.date-cell {
 				white-space: nowrap;
 			}
+
+			.table-wrapper {
+				overflow-x: auto;
+				margin-bottom: 20px;
+			}
 		</style>
 	</head>
 	<body>
@@ -100,43 +107,49 @@ templ Teachers(data TeacherData) {
 			</div>
 
 			if len(data.Teachers) > 0 {
-				<table id="teachersTable">
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th>Birthdate</th>
-							<th>Address</th>
-							<th>Joining Date</th>
-							<th>Mobile</th>
-							<th>Email</th>
-							<th>Certifications</th>
-							<th>Color</th>
-							<th>Rate Per Class</th>
-							<th>Created At</th>
-						</tr>
-					</thead>
-					<tbody>
-						for _, teacher := range data.Teachers {
+				<div class="table-wrapper">
+					<table id="teachersTable">
+						<thead>
 							<tr>
-								<td>{ teacher.Name }</td>
-								<td class="date-cell">{ getDisplayValue(teacher.Birthdate) }</td>
-								<td>{ getDisplayValue(teacher.Address) }</td>
-								<td class="date-cell">{ teacher.JoiningDate }</td>
-								<td>{ getDisplayValue(teacher.MobileNumber) }</td>
-								<td class="email-cell">{ getDisplayValue(teacher.Email) }</td>
-								<td>{ getDisplayValue(teacher.Certifications) }</td>
-								<td>
-									<div class="color-cell">
-										<div class="color-box" style={ "background-color: " + teacher.AssignedColor }></div>
-										<span>{ teacher.AssignedColor }</span>
-									</div>
-								</td>
-								<td class="rate-cell">{ formatRate(teacher.RatePerClass, teacher.Currency) }</td>
-								<td class="date-cell">{ teacher.CreatedAt }</td>
+								<th>Name</th>
+								<th>Sex</th>
+								<th>Birthdate</th>
+								<th>Address</th>
+								<th>Joining Date</th>
+								<th>Mobile</th>
+								<th>Email</th>
+								<th>Certifications</th>
+								<th>Drive URL</th>
+								<th>Color</th>
+								<th>Rate Per Class</th>
+								<th>Created At</th>
 							</tr>
-						}
-					</tbody>
-				</table>
+						</thead>
+						<tbody>
+							for _, teacher := range data.Teachers {
+								<tr>
+									<td>{ teacher.Name }</td>
+									<td>{ getDisplayValue(teacher.Sex) }</td>
+									<td class="date-cell">{ getDisplayValue(teacher.Birthdate) }</td>
+									<td>{ getDisplayValue(teacher.Address) }</td>
+									<td class="date-cell">{ teacher.JoiningDate }</td>
+									<td>{ getDisplayValue(teacher.MobileNumber) }</td>
+									<td class="email-cell">{ getDisplayValue(teacher.Email) }</td>
+									<td>{ getDisplayValue(teacher.Certifications) }</td>
+									<td>{ getDisplayValue(teacher.DriveUrl) }</td>
+									<td>
+										<div class="color-cell">
+											<div class="color-box" style={ "background-color: " + teacher.AssignedColor }></div>
+											<span>{ teacher.AssignedColor }</span>
+										</div>
+									</td>
+									<td class="rate-cell">{ formatRate(teacher.RatePerClass, teacher.Currency) }</td>
+									<td class="date-cell">{ teacher.CreatedAt }</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
 			} else {
 				<div class="empty-state">
 					<p>No teachers registered yet.</p>

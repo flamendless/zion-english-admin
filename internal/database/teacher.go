@@ -9,5 +9,29 @@ import (
 type Teacher = queries.TblTeacher
 
 func GetAllTeachers(db Service) ([]Teacher, error) {
-	return db.GetQueries().GetAllTeachers(context.Background())
+	rows, err := db.GetQueries().GetAllTeachers(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	teachers := make([]Teacher, len(rows))
+	for i, r := range rows {
+		teachers[i] = Teacher{
+			ID:             r.ID,
+			Name:           r.Name,
+			Birthdate:      r.Birthdate,
+			Address:        r.Address,
+			JoiningDate:    r.JoiningDate,
+			MobileNumber:   r.MobileNumber,
+			Email:          r.Email,
+			Certifications: r.Certifications,
+			AssignedColor:  r.AssignedColor,
+			RatePerClass:   r.RatePerClass,
+			Currency:       r.Currency,
+			DriveUrl:       r.DriveUrl,
+			Sex:            r.Sex,
+			CreatedAt:      r.CreatedAt,
+			UpdatedAt:      r.UpdatedAt,
+		}
+	}
+	return teachers, nil
 }

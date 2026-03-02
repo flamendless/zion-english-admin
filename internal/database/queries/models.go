@@ -60,4 +60,6 @@ type TblTeacher struct {
 	Currency       string
 	CreatedAt      sql.NullTime
 	UpdatedAt      sql.NullTime
+	DriveUrl       string
+	Sex            sql.NullString
 }

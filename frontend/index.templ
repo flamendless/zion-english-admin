@@ -92,6 +92,13 @@ templ Index() {
 
 			<form id="processForm">
 				<div class="form-group">
+					<label for="teacherSelect">Select Teacher</label>
+					<select id="teacherSelect" name="teacherSelect">
+						<option value="">-- Select Teacher --</option>
+					</select>
+				</div>
+
+				<div class="form-group">
 					<label for="driveUrl">Google Drive URL *</label>
 					<input type="text" id="driveUrl" name="driveUrl" required
 					       placeholder="https://docs.google.com/spreadsheets/...">
@@ -264,6 +271,7 @@ templ Index() {
 			const excludedRowsInput = document.getElementById('excludedRows');
 			const templateSelect = document.getElementById('templateSelect');
 			const datePresetSelect = document.getElementById('datePreset');
+			const teacherSelect = document.getElementById('teacherSelect');
 
 			let currentFileName = '';
 			let currentDriveUrl = '';
@@ -310,6 +318,33 @@ templ Index() {
 			if (favicon) {
 				favicon.href = buildURL('/static/favicon.ico');
 			}
+
+			async function loadTeachers() {
+				try {
+					const response = await fetch(buildURL('/api/teachers'));
+					if (!response.ok) return;
+					const teachers = await response.json();
+					teachers.forEach(teacher => {
+						const option = document.createElement('option');
+						option.value = teacher.id;
+						option.textContent = teacher.name;
+						option.dataset.driveUrl = teacher.driveUrl;
+						teacherSelect.appendChild(option);
+					});
+				} catch (error) {
+					console.error('Failed to load teachers:', error);
+				}
+			}
+
+			loadTeachers();
+
+			teacherSelect.addEventListener('change', () => {
+				const selectedOption = teacherSelect.options[teacherSelect.selectedIndex];
+				if (selectedOption.value) {
+					nameInput.value = selectedOption.textContent;
+					driveUrlInput.value = selectedOption.dataset.driveUrl || '';
+				}
+			});
 
 			function validateDates() {
 				const startDate = new Date(startDateInput.value);
