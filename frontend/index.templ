@@ -221,7 +221,7 @@ templ Index() {
 			<div class="results-section" id="resultsSection">
 				<h3>Results</h3>
 				<div class="button-group">
-					<button class="download-btn" id="downloadBtn">Download XLSX</button>
+					<button class="download-btn" id="downloadBtn" disabled>Download XLSX</button>
 					<button class="clear-btn" id="clearBtn">Clear Table</button>
 				</div>
 				<div id="infoDisplay" class="info-display">
@@ -359,6 +359,7 @@ templ Index() {
 				}
 
 				validateDates();
+				downloadBtn.disabled = true;
 			});
 
 			function validateURL() {
@@ -444,6 +445,8 @@ templ Index() {
 					statusColSelect.value = parts[3];
 					validateColumns();
 				}
+
+				downloadBtn.disabled = true;
 			});
 
 			function validateColumns() {
@@ -515,14 +518,41 @@ templ Index() {
 			}
 
 			startDateInput.addEventListener('change', validateDates);
+			startDateInput.addEventListener('input', () => {
+				downloadBtn.disabled = true;
+			});
 			endDateInput.addEventListener('change', validateDates);
+			endDateInput.addEventListener('input', () => {
+				downloadBtn.disabled = true;
+			});
 			driveUrlInput.addEventListener('blur', validateURL);
+			driveUrlInput.addEventListener('input', () => {
+				downloadBtn.disabled = true;
+			});
 			nameInput.addEventListener('blur', validateName);
+			nameInput.addEventListener('input', () => {
+				downloadBtn.disabled = true;
+			});
 			excludedRowsInput.addEventListener('blur', validateExcludedRows);
+			excludedRowsInput.addEventListener('input', () => {
+				downloadBtn.disabled = true;
+			});
 			nameColSelect.addEventListener('change', validateColumns);
+			nameColSelect.addEventListener('input', () => {
+				downloadBtn.disabled = true;
+			});
 			durationColSelect.addEventListener('change', validateColumns);
+			durationColSelect.addEventListener('input', () => {
+				downloadBtn.disabled = true;
+			});
 			rateColSelect.addEventListener('change', validateColumns);
+			rateColSelect.addEventListener('input', () => {
+				downloadBtn.disabled = true;
+			});
 			statusColSelect.addEventListener('change', validateColumns);
+			statusColSelect.addEventListener('input', () => {
+				downloadBtn.disabled = true;
+			});
 
 			form.addEventListener('submit', async (e) => {
 				e.preventDefault();
@@ -568,6 +598,7 @@ templ Index() {
 						currentFileName = formData.name;
 						currentDriveUrl = formData.driveUrl;
 						finalizeBtn.disabled = false;
+						downloadBtn.disabled = false;
 						displayResults(data.records, data.total, data.rowRange);
 					} else {
 						logOutput.textContent += '\n✗ Error: ' + data.message;
@@ -703,6 +734,8 @@ templ Index() {
 				infoDisplay.style.display = 'none';
 				resultsSection.style.display = 'none';
 				currentFileName = '';
+				currentDriveUrl = '';
+				downloadBtn.disabled = true;
 			});
 
 			function escapeHtml(text) {

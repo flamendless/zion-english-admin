@@ -145,13 +145,16 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleProcessPage(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if r.Method == http.MethodGet {
+		w.Header().Set("Content-Type", "text/html")
+		frontend.Index().Render(r.Context(), w)
 		return
 	}
-
-	w.Header().Set("Content-Type", "text/html")
-	frontend.Index().Render(r.Context(), w)
+	if r.Method == http.MethodPost {
+		handleProcess(w, r)
+		return
+	}
+	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 }
 
 func handleProcess(w http.ResponseWriter, r *http.Request) {
