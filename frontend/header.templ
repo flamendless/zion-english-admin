@@ -2,10 +2,6 @@ package frontend
 
 import "zion-english/internal/utils"
 
-type HeaderProps struct {
-	Title string
-}
-
 templ GlobalStyles() {
 	<style>
 		:root {
@@ -232,6 +228,11 @@ templ GlobalStyles() {
 			text-decoration: none;
 		}
 
+		.header-logo {
+			max-height: 50px;
+			width: auto;
+		}
+
 		.header-section h1 a:hover {
 			text-decoration: underline;
 		}
@@ -284,10 +285,14 @@ templ GlobalStyles() {
 	</style>
 }
 
-templ Header(props HeaderProps) {
+templ Header() {
 	@GlobalStyles()
 	<div class="header-section">
-		<h1><a href={utils.URL("/")}>{ props.Title }</a></h1>
+		<h1>
+			<a href={utils.URL("/")}>
+				<img src={utils.URL("/static/logo.png")} alt="Zion English" class="header-logo">
+			</a>
+		</h1>
 		<div class="header-bottom">
 			<div class="header-left">
 				<div class="nav-links">
@@ -311,6 +316,6 @@ templ Header(props HeaderProps) {
 	</div>
 }
 
-templ HeaderSimple(title string) {
-	@Header(HeaderProps{Title: title})
+templ HeaderSimple() {
+	@Header()
 }

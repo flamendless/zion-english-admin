@@ -10,10 +10,6 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "zion-english/internal/utils"
 
-type HeaderProps struct {
-	Title string
-}
-
 func GlobalStyles() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -35,7 +31,7 @@ func GlobalStyles() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<style>\n\t\t:root {\n\t\t\t--color-primary: #B9D283;\n\t\t\t--color-secondary: #F0CA8C;\n\t\t\t--color-tertiary: #F59E97;\n\t\t\t--color-accent: #8BC5E3;\n\t\t}\n\n\t\t* {\n\t\t\tbox-sizing: border-box;\n\t\t\tmargin: 0;\n\t\t\tpadding: 0;\n\t\t}\n\n\t\tbody {\n\t\t\tfont-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;\n\t\t\tbackground-color: #f5f5f5;\n\t\t\tpadding: 20px;\n\t\t\tline-height: 1.6;\n\t\t}\n\n\t\t.container {\n\t\t\tmax-width: 80%;\n\t\t\tmargin: 0 auto;\n\t\t\tbackground: white;\n\t\t\tpadding: 30px;\n\t\t\tborder-radius: 8px;\n\t\t\tbox-shadow: 0 2px 4px rgba(0,0,0,0.1);\n\t\t}\n\n\t\t.form-group {\n\t\t\tmargin-bottom: 20px;\n\t\t}\n\n\t\tlabel {\n\t\t\tdisplay: block;\n\t\t\tmargin-bottom: 5px;\n\t\t\tcolor: #555;\n\t\t\tfont-weight: 500;\n\t\t}\n\n\t\tinput[type=\"text\"],\n\t\tinput[type=\"number\"],\n\t\tinput[type=\"date\"],\n\t\tinput[type=\"email\"],\n\t\tselect {\n\t\t\twidth: 100%;\n\t\t\tpadding: 10px;\n\t\t\tborder: 1px solid #ddd;\n\t\t\tborder-radius: 4px;\n\t\t\tfont-size: 14px;\n\t\t}\n\n\t\tinput[type=\"color\"] {\n\t\t\twidth: 60px;\n\t\t\theight: 40px;\n\t\t\tpadding: 2px;\n\t\t\tborder: 1px solid #ddd;\n\t\t\tborder-radius: 4px;\n\t\t\tcursor: pointer;\n\t\t}\n\n\t\tinput:invalid {\n\t\t\tborder-color: #dc3545;\n\t\t}\n\n\t\t.error-message {\n\t\t\tcolor: #dc3545;\n\t\t\tfont-size: 12px;\n\t\t\tmargin-top: 5px;\n\t\t\tdisplay: none;\n\t\t}\n\n\t\tbutton, .btn {\n\t\t\tbackground-color: var(--color-primary);\n\t\t\tcolor: white;\n\t\t\tpadding: 12px 30px;\n\t\t\tborder: none;\n\t\t\tborder-radius: 4px;\n\t\t\tcursor: pointer;\n\t\t\tfont-size: 16px;\n\t\t\tfont-weight: 500;\n\t\t\ttext-decoration: none;\n\t\t\tdisplay: inline-block;\n\t\t}\n\n\t\tbutton:hover, .btn:hover {\n\t\t\topacity: 0.9;\n\t\t}\n\n\t\tbutton:disabled, .btn:disabled {\n\t\t\tbackground-color: #ccc;\n\t\t\tcursor: not-allowed;\n\t\t}\n\n\t\t.logs-section {\n\t\t\tmargin-top: 30px;\n\t\t\tpadding: 15px;\n\t\t\tbackground-color: #f9f9f9;\n\t\t\tborder-radius: 4px;\n\t\t\tborder: 1px solid #ddd;\n\t\t}\n\n\t\t.logs-section h3 {\n\t\t\tmargin-bottom: 10px;\n\t\t\tcolor: #333;\n\t\t}\n\n\t\t#logOutput {\n\t\t\tbackground-color: #2d2d2d;\n\t\t\tcolor: #f8f8f2;\n\t\t\tpadding: 15px;\n\t\t\tborder-radius: 4px;\n\t\t\tfont-family: 'Courier New', monospace;\n\t\t\tfont-size: 12px;\n\t\t\tmax-height: 200px;\n\t\t\toverflow-y: auto;\n\t\t\twhite-space: pre-wrap;\n\t\t\tword-wrap: break-word;\n\t\t}\n\n\t\t.form-row {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: 1fr 1fr;\n\t\t\tgap: 15px;\n\t\t}\n\n\t\t.form-row-3 {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: 1fr 1fr 1fr;\n\t\t\tgap: 15px;\n\t\t}\n\n\t\t.button-group {\n\t\t\tmargin-bottom: 20px;\n\t\t\tdisplay: flex;\n\t\t\tgap: 10px;\n\t\t}\n\n\t\ttable {\n\t\t\twidth: 100%;\n\t\t\tborder-collapse: collapse;\n\t\t\tmargin-bottom: 20px;\n\t\t}\n\n\t\tth, td {\n\t\t\tpadding: 12px;\n\t\t\ttext-align: left;\n\t\t\tborder-bottom: 1px solid #ddd;\n\t\t}\n\n\t\tth {\n\t\t\tbackground-color: var(--color-primary);\n\t\t\tcolor: white;\n\t\t\tfont-weight: 600;\n\t\t}\n\n\t\ttr:hover {\n\t\t\tbackground-color: #f5f5f5;\n\t\t}\n\n\t\t.empty-state {\n\t\t\ttext-align: center;\n\t\t\tpadding: 40px;\n\t\t\tcolor: #666;\n\t\t}\n\n\t\t.header-section {\n\t\t\tmargin-bottom: 30px;\n\t\t\tborder-bottom: 2px solid var(--color-primary);\n\t\t\tpadding-bottom: 10px;\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t}\n\n\t\t.header-bottom {\n\t\t\tdisplay: flex;\n\t\t}\n\n\t\t.header-left {\n\t\t\tdisplay: flex;\n\t\t\talign-items: baseline;\n\t\t\tgap: 20px;\n\t\t\tflex: 1;\n\t\t}\n\n\t\t.header-right {\n\t\t\tflex-shrink: 0;\n\t\t}\n\n\t\t.nav-links {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: 8px;\n\t\t}\n\n\t\t.nav-separator {\n\t\t\tcolor: #ccc;\n\t\t}\n\n\t\t.made-by {\n\t\t\tcolor: #666;\n\t\t\tmargin: 0;\n\t\t\tfont-size: 14px;\n\t\t}\n\n\t\t.made-by a {\n\t\t\tcolor: var(--color-primary);\n\t\t\ttext-decoration: none;\n\t\t}\n\n\t\t.made-by a:hover {\n\t\t\ttext-decoration: underline;\n\t\t}\n\n\t\t.header-section h1 {\n\t\t\tcolor: #333;\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.header-section h1 a {\n\t\t\tcolor: #333;\n\t\t\ttext-decoration: none;\n\t\t}\n\n\t\t.header-section h1 a:hover {\n\t\t\ttext-decoration: underline;\n\t\t}\n\n\t\t.nav-link {\n\t\t\tcolor: var(--color-primary);\n\t\t\ttext-decoration: none;\n\t\t\tfont-weight: 500;\n\t\t}\n\n\t\t.nav-link:hover {\n\t\t\ttext-decoration: underline;\n\t\t}\n\n\t\t.color-cell {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: 10px;\n\t\t}\n\n\t\t.color-box {\n\t\t\twidth: 24px;\n\t\t\theight: 24px;\n\t\t\tborder-radius: 4px;\n\t\t\tborder: 1px solid #ddd;\n\t\t}\n\n\t\t.color-group {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: 15px;\n\t\t}\n\n\t\t.color-preview {\n\t\t\twidth: 40px;\n\t\t\theight: 40px;\n\t\t\tborder-radius: 4px;\n\t\t\tborder: 1px solid #ddd;\n\t\t}\n\n\t\t.status-active {\n\t\t\tcolor: #28a745;\n\t\t\tfont-weight: 500;\n\t\t}\n\n\t\t.status-inactive {\n\t\t\tcolor: #dc3545;\n\t\t\tfont-weight: 500;\n\t\t}\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<style>\n\t\t:root {\n\t\t\t--color-primary: #B9D283;\n\t\t\t--color-secondary: #F0CA8C;\n\t\t\t--color-tertiary: #F59E97;\n\t\t\t--color-accent: #8BC5E3;\n\t\t}\n\n\t\t* {\n\t\t\tbox-sizing: border-box;\n\t\t\tmargin: 0;\n\t\t\tpadding: 0;\n\t\t}\n\n\t\tbody {\n\t\t\tfont-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;\n\t\t\tbackground-color: #f5f5f5;\n\t\t\tpadding: 20px;\n\t\t\tline-height: 1.6;\n\t\t}\n\n\t\t.container {\n\t\t\tmax-width: 80%;\n\t\t\tmargin: 0 auto;\n\t\t\tbackground: white;\n\t\t\tpadding: 30px;\n\t\t\tborder-radius: 8px;\n\t\t\tbox-shadow: 0 2px 4px rgba(0,0,0,0.1);\n\t\t}\n\n\t\t.form-group {\n\t\t\tmargin-bottom: 20px;\n\t\t}\n\n\t\tlabel {\n\t\t\tdisplay: block;\n\t\t\tmargin-bottom: 5px;\n\t\t\tcolor: #555;\n\t\t\tfont-weight: 500;\n\t\t}\n\n\t\tinput[type=\"text\"],\n\t\tinput[type=\"number\"],\n\t\tinput[type=\"date\"],\n\t\tinput[type=\"email\"],\n\t\tselect {\n\t\t\twidth: 100%;\n\t\t\tpadding: 10px;\n\t\t\tborder: 1px solid #ddd;\n\t\t\tborder-radius: 4px;\n\t\t\tfont-size: 14px;\n\t\t}\n\n\t\tinput[type=\"color\"] {\n\t\t\twidth: 60px;\n\t\t\theight: 40px;\n\t\t\tpadding: 2px;\n\t\t\tborder: 1px solid #ddd;\n\t\t\tborder-radius: 4px;\n\t\t\tcursor: pointer;\n\t\t}\n\n\t\tinput:invalid {\n\t\t\tborder-color: #dc3545;\n\t\t}\n\n\t\t.error-message {\n\t\t\tcolor: #dc3545;\n\t\t\tfont-size: 12px;\n\t\t\tmargin-top: 5px;\n\t\t\tdisplay: none;\n\t\t}\n\n\t\tbutton, .btn {\n\t\t\tbackground-color: var(--color-primary);\n\t\t\tcolor: white;\n\t\t\tpadding: 12px 30px;\n\t\t\tborder: none;\n\t\t\tborder-radius: 4px;\n\t\t\tcursor: pointer;\n\t\t\tfont-size: 16px;\n\t\t\tfont-weight: 500;\n\t\t\ttext-decoration: none;\n\t\t\tdisplay: inline-block;\n\t\t}\n\n\t\tbutton:hover, .btn:hover {\n\t\t\topacity: 0.9;\n\t\t}\n\n\t\tbutton:disabled, .btn:disabled {\n\t\t\tbackground-color: #ccc;\n\t\t\tcursor: not-allowed;\n\t\t}\n\n\t\t.logs-section {\n\t\t\tmargin-top: 30px;\n\t\t\tpadding: 15px;\n\t\t\tbackground-color: #f9f9f9;\n\t\t\tborder-radius: 4px;\n\t\t\tborder: 1px solid #ddd;\n\t\t}\n\n\t\t.logs-section h3 {\n\t\t\tmargin-bottom: 10px;\n\t\t\tcolor: #333;\n\t\t}\n\n\t\t#logOutput {\n\t\t\tbackground-color: #2d2d2d;\n\t\t\tcolor: #f8f8f2;\n\t\t\tpadding: 15px;\n\t\t\tborder-radius: 4px;\n\t\t\tfont-family: 'Courier New', monospace;\n\t\t\tfont-size: 12px;\n\t\t\tmax-height: 200px;\n\t\t\toverflow-y: auto;\n\t\t\twhite-space: pre-wrap;\n\t\t\tword-wrap: break-word;\n\t\t}\n\n\t\t.form-row {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: 1fr 1fr;\n\t\t\tgap: 15px;\n\t\t}\n\n\t\t.form-row-3 {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: 1fr 1fr 1fr;\n\t\t\tgap: 15px;\n\t\t}\n\n\t\t.button-group {\n\t\t\tmargin-bottom: 20px;\n\t\t\tdisplay: flex;\n\t\t\tgap: 10px;\n\t\t}\n\n\t\ttable {\n\t\t\twidth: 100%;\n\t\t\tborder-collapse: collapse;\n\t\t\tmargin-bottom: 20px;\n\t\t}\n\n\t\tth, td {\n\t\t\tpadding: 12px;\n\t\t\ttext-align: left;\n\t\t\tborder-bottom: 1px solid #ddd;\n\t\t}\n\n\t\tth {\n\t\t\tbackground-color: var(--color-primary);\n\t\t\tcolor: white;\n\t\t\tfont-weight: 600;\n\t\t}\n\n\t\ttr:hover {\n\t\t\tbackground-color: #f5f5f5;\n\t\t}\n\n\t\t.empty-state {\n\t\t\ttext-align: center;\n\t\t\tpadding: 40px;\n\t\t\tcolor: #666;\n\t\t}\n\n\t\t.header-section {\n\t\t\tmargin-bottom: 30px;\n\t\t\tborder-bottom: 2px solid var(--color-primary);\n\t\t\tpadding-bottom: 10px;\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t}\n\n\t\t.header-bottom {\n\t\t\tdisplay: flex;\n\t\t}\n\n\t\t.header-left {\n\t\t\tdisplay: flex;\n\t\t\talign-items: baseline;\n\t\t\tgap: 20px;\n\t\t\tflex: 1;\n\t\t}\n\n\t\t.header-right {\n\t\t\tflex-shrink: 0;\n\t\t}\n\n\t\t.nav-links {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: 8px;\n\t\t}\n\n\t\t.nav-separator {\n\t\t\tcolor: #ccc;\n\t\t}\n\n\t\t.made-by {\n\t\t\tcolor: #666;\n\t\t\tmargin: 0;\n\t\t\tfont-size: 14px;\n\t\t}\n\n\t\t.made-by a {\n\t\t\tcolor: var(--color-primary);\n\t\t\ttext-decoration: none;\n\t\t}\n\n\t\t.made-by a:hover {\n\t\t\ttext-decoration: underline;\n\t\t}\n\n\t\t.header-section h1 {\n\t\t\tcolor: #333;\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.header-section h1 a {\n\t\t\tcolor: #333;\n\t\t\ttext-decoration: none;\n\t\t}\n\n\t\t.header-logo {\n\t\t\tmax-height: 50px;\n\t\t\twidth: auto;\n\t\t}\n\n\t\t.header-section h1 a:hover {\n\t\t\ttext-decoration: underline;\n\t\t}\n\n\t\t.nav-link {\n\t\t\tcolor: var(--color-primary);\n\t\t\ttext-decoration: none;\n\t\t\tfont-weight: 500;\n\t\t}\n\n\t\t.nav-link:hover {\n\t\t\ttext-decoration: underline;\n\t\t}\n\n\t\t.color-cell {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: 10px;\n\t\t}\n\n\t\t.color-box {\n\t\t\twidth: 24px;\n\t\t\theight: 24px;\n\t\t\tborder-radius: 4px;\n\t\t\tborder: 1px solid #ddd;\n\t\t}\n\n\t\t.color-group {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: 15px;\n\t\t}\n\n\t\t.color-preview {\n\t\t\twidth: 40px;\n\t\t\theight: 40px;\n\t\t\tborder-radius: 4px;\n\t\t\tborder: 1px solid #ddd;\n\t\t}\n\n\t\t.status-active {\n\t\t\tcolor: #28a745;\n\t\t\tfont-weight: 500;\n\t\t}\n\n\t\t.status-inactive {\n\t\t\tcolor: #dc3545;\n\t\t\tfont-weight: 500;\n\t\t}\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -43,7 +39,7 @@ func GlobalStyles() templ.Component {
 	})
 }
 
-func Header(props HeaderProps) templ.Component {
+func Header() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -75,33 +71,33 @@ func Header(props HeaderProps) templ.Component {
 		var templ_7745c5c3_Var3 templ.SafeURL
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 290, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 292, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(props.Title)
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/static/logo.png"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 290, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 293, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</a></h1><div class=\"header-bottom\"><div class=\"header-left\"><div class=\"nav-links\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" alt=\"Zion English\" class=\"header-logo\"></a></h1><div class=\"header-bottom\"><div class=\"header-left\"><div class=\"nav-links\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 templ.SafeURL
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/logs"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 294, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 299, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -114,7 +110,7 @@ func Header(props HeaderProps) templ.Component {
 		var templ_7745c5c3_Var6 templ.SafeURL
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/students"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 296, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 301, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -127,7 +123,7 @@ func Header(props HeaderProps) templ.Component {
 		var templ_7745c5c3_Var7 templ.SafeURL
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/students/register"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 298, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 303, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -140,7 +136,7 @@ func Header(props HeaderProps) templ.Component {
 		var templ_7745c5c3_Var8 templ.SafeURL
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/teachers"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 300, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 305, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -153,7 +149,7 @@ func Header(props HeaderProps) templ.Component {
 		var templ_7745c5c3_Var9 templ.SafeURL
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/teachers/register"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 302, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 307, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -166,7 +162,7 @@ func Header(props HeaderProps) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs("@")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 307, Col: 67}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 312, Col: 67}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -180,7 +176,7 @@ func Header(props HeaderProps) templ.Component {
 	})
 }
 
-func HeaderSimple(title string) templ.Component {
+func HeaderSimple() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -201,7 +197,7 @@ func HeaderSimple(title string) templ.Component {
 			templ_7745c5c3_Var11 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Header(HeaderProps{Title: title}).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Header().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

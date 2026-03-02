@@ -22,10 +22,9 @@ templ Home() {
 				margin-bottom: 10px;
 			}
 
-			.home-title h1 {
-				font-size: 48px;
-				color: #333;
-				margin: 0;
+			.home-logo {
+				max-width: 300px;
+				height: auto;
 			}
 
 			.home-subtitle {
@@ -87,7 +86,7 @@ templ Home() {
 	<body>
 		<div class="home-container">
 			<div class="home-title">
-				<h1>Zion English</h1>
+				<img src={utils.URL("/static/logo.png")} alt="Zion English" class="home-logo">
 			</div>
 			<p class="home-subtext">
 				Admin Tools made by <a href="https://flamendless.xyz" target="_blank">{"@"}flamendless</a>
