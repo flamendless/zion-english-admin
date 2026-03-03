@@ -77,15 +77,19 @@ var cmdWeb = &cobra.Command{
 		mux.Handle(basePath+"/static/", http.StripPrefix(basePath+"/static/", http.FileServer(http.Dir("static"))))
 
 		authMux := http.NewServeMux()
-		authMux.HandleFunc(basePath+"/logs", handleLogs)
-		authMux.HandleFunc(basePath+"/students", handleStudents)
-		authMux.HandleFunc(basePath+"/students/register", handleStudentRegister)
-		authMux.HandleFunc(basePath+"/teachers", handleTeachers)
-		authMux.HandleFunc(basePath+"/teachers/register", handleTeacherRegister)
-		authHandler := auth.Middleware(cfg.AdminUsername, cfg.AdminPassword, authMux)
+		authMux.HandleFunc(basePath+"/role", handleGetRole)
+		authMux.HandleFunc(basePath+"/logs", auth.RequireRole(auth.RoleSuperuser)(handleLogs))
+		authMux.HandleFunc(basePath+"/students", auth.RequireRole(auth.RoleSuperuser)(handleStudents))
+		authMux.HandleFunc(basePath+"/students/register", auth.RequireRole(auth.RoleSuperuser)(handleStudentRegister))
+		authMux.HandleFunc(basePath+"/teachers", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleTeachers))
+		authMux.HandleFunc(basePath+"/teachers/register", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleTeacherRegister))
+		authHandler := auth.Middleware(cfg, authMux)
 
 		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if strings.HasPrefix(r.URL.Path, basePath+"/logs") || strings.HasPrefix(r.URL.Path, basePath+"/students") || strings.HasPrefix(r.URL.Path, basePath+"/teachers") {
+			if strings.HasPrefix(r.URL.Path, basePath+"/logs") ||
+				strings.HasPrefix(r.URL.Path, basePath+"/students") ||
+				strings.HasPrefix(r.URL.Path, basePath+"/teachers") ||
+				strings.HasPrefix(r.URL.Path, basePath+"/role") {
 				authHandler.ServeHTTP(w, r)
 			} else {
 				mux.ServeHTTP(w, r)
@@ -878,4 +882,18 @@ func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
+}
+
+func handleGetRole(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx := r.Context()
+	role := auth.GetRole(ctx)
+	if _, err := w.Write(fmt.Appendf(nil, "Welcome, %s!", role)); err != nil {
+		logs.Log().Error("handle get role", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }

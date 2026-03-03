@@ -283,6 +283,17 @@ templ GlobalStyles() {
 			font-weight: 500;
 		}
 	</style>
+	@ScrHTMX()
+}
+
+templ WelcomeRole() {
+	<h3
+		hx-get={ utils.URL("/role") }
+		hx-trigger="load once"
+		hx-swap="textContent"
+	>
+		Welcome!
+	</h3>
 }
 
 templ Header() {
@@ -293,6 +304,9 @@ templ Header() {
 				<img src={utils.URL("/static/logo.png")} alt="Zion English" class="header-logo">
 			</a>
 		</h1>
+
+		@WelcomeRole()
+
 		<div class="header-bottom">
 			<div class="header-left">
 				<div class="nav-links">

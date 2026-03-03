@@ -1,24 +1,43 @@
 package auth
 
 import (
+	"context"
 	"encoding/base64"
 	"net/http"
 	"strings"
+	"zion-english/internal/conf"
 )
 
-func Middleware(username, password string, next http.Handler) http.Handler {
+func Middleware(cfg *conf.Config, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		usr, pwd, hasAuth := r.BasicAuth()
-
-		if !hasAuth || usr != username || pwd != password {
-			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte("401 Unauthorized"))
+		username, password, ok := r.BasicAuth()
+		if !ok {
+			unauthorized(w)
 			return
 		}
 
-		next.ServeHTTP(w, r)
+		var role Role
+
+		switch {
+		case username == cfg.AdminTeacherUsername && password == cfg.AdminTeacherPassword:
+			role = RoleTeacher
+
+		case username == cfg.SuperuserUsername && password == cfg.SuperuserPassword:
+			role = RoleSuperuser
+
+		default:
+			unauthorized(w)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), roleKey, role)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func unauthorized(w http.ResponseWriter) {
+	w.Header().Set("WWW-Authenticate", `Basic realm="restricted"`)
+	http.Error(w, "Unauthorized", http.StatusUnauthorized)
 }
 
 func ExtractBasicAuth(r *http.Request) (username, password string, ok bool) {
@@ -44,4 +63,21 @@ func ExtractBasicAuth(r *http.Request) (username, password string, ok bool) {
 	}
 
 	return credentials[:colonIndex], credentials[colonIndex+1:], true
+}
+
+func RequireRole(allowed ...Role) func(http.HandlerFunc) http.HandlerFunc {
+	return func(next http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			role := GetRole(r.Context())
+
+			for _, a := range allowed {
+				if role == a {
+					next(w, r)
+					return
+				}
+			}
+
+			unauthorized(w)
+		}
+	}
 }

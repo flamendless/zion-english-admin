@@ -31,111 +31,119 @@ func Home() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Zion English Admin</title><link rel=\"icon\" type=\"image/x-icon\" id=\"favicon\"><style>\n\t\t\t.home-container {\n\t\t\t\tmax-width: 900px;\n\t\t\t\tmargin: 0 auto;\n\t\t\t\tpadding: 40px 20px;\n\t\t\t}\n\n\t\t\t.home-title {\n\t\t\t\ttext-align: center;\n\t\t\t\tmargin-bottom: 10px;\n\t\t\t}\n\n\t\t\t.home-logo {\n\t\t\t\tmax-width: 300px;\n\t\t\t\theight: auto;\n\t\t\t}\n\n\t\t\t.home-subtitle {\n\t\t\t\ttext-align: center;\n\t\t\t\tmargin-bottom: 40px;\n\t\t\t\tcolor: #666;\n\t\t\t\tfont-size: 18px;\n\t\t\t}\n\n\t\t\t.home-subtitle a {\n\t\t\t\tcolor: var(--color-primary);\n\t\t\t\ttext-decoration: none;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.home-subtitle a:hover {\n\t\t\t\ttext-decoration: underline;\n\t\t\t}\n\n\t\t\t.cards-grid {\n\t\t\t\tdisplay: grid;\n\t\t\t\tgrid-template-columns: 1fr 1fr;\n\t\t\t\tgap: 30px;\n\t\t\t}\n\n\t\t\t.card {\n\t\t\t\tbackground: white;\n\t\t\t\tborder-radius: 8px;\n\t\t\t\tpadding: 25px;\n\t\t\t\tbox-shadow: 0 2px 8px rgba(0,0,0,0.1);\n\t\t\t\ttransition: transform 0.2s, box-shadow 0.2s;\n\t\t\t\ttext-decoration: none;\n\t\t\t\tdisplay: block;\n\t\t\t}\n\n\t\t\t.card:hover {\n\t\t\t\ttransform: translateY(-4px);\n\t\t\t\tbox-shadow: 0 4px 16px rgba(0,0,0,0.15);\n\t\t\t}\n\n\t\t\t.card h2 {\n\t\t\t\tmargin: 0 0 15px 0;\n\t\t\t\tfont-size: 24px;\n\t\t\t\tcolor: #333;\n\t\t\t}\n\n\t\t\t.card p {\n\t\t\t\tmargin: 0;\n\t\t\t\tcolor: #666;\n\t\t\t\tfont-size: 14px;\n\t\t\t}\n\n\t\t\t.card-icon {\n\t\t\t\tfont-size: 32px;\n\t\t\t\tmargin-bottom: 10px;\n\t\t\t}\n\t\t</style></head><body><div class=\"home-container\"><div class=\"home-title\"><img src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Zion English Admin</title><link rel=\"icon\" type=\"image/x-icon\" id=\"favicon\"><style>\n\t\t\t.home-container {\n\t\t\t\tmax-width: 900px;\n\t\t\t\tmargin: 0 auto;\n\t\t\t\tpadding: 40px 20px;\n\t\t\t}\n\n\t\t\t.home-title {\n\t\t\t\ttext-align: center;\n\t\t\t\tmargin-bottom: 10px;\n\t\t\t}\n\n\t\t\t.home-logo {\n\t\t\t\tmax-width: 300px;\n\t\t\t\theight: auto;\n\t\t\t}\n\n\t\t\t.home-subtitle {\n\t\t\t\ttext-align: center;\n\t\t\t\tmargin-bottom: 40px;\n\t\t\t\tcolor: #666;\n\t\t\t\tfont-size: 18px;\n\t\t\t}\n\n\t\t\t.home-subtitle a {\n\t\t\t\tcolor: var(--color-primary);\n\t\t\t\ttext-decoration: none;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.home-subtitle a:hover {\n\t\t\t\ttext-decoration: underline;\n\t\t\t}\n\n\t\t\t.cards-grid {\n\t\t\t\tdisplay: grid;\n\t\t\t\tgrid-template-columns: 1fr 1fr;\n\t\t\t\tgap: 30px;\n\t\t\t}\n\n\t\t\t.card {\n\t\t\t\tbackground: white;\n\t\t\t\tborder-radius: 8px;\n\t\t\t\tpadding: 25px;\n\t\t\t\tbox-shadow: 0 2px 8px rgba(0,0,0,0.1);\n\t\t\t\ttransition: transform 0.2s, box-shadow 0.2s;\n\t\t\t\ttext-decoration: none;\n\t\t\t\tdisplay: block;\n\t\t\t}\n\n\t\t\t.card:hover {\n\t\t\t\ttransform: translateY(-4px);\n\t\t\t\tbox-shadow: 0 4px 16px rgba(0,0,0,0.15);\n\t\t\t}\n\n\t\t\t.card h2 {\n\t\t\t\tmargin: 0 0 15px 0;\n\t\t\t\tfont-size: 24px;\n\t\t\t\tcolor: #333;\n\t\t\t}\n\n\t\t\t.card p {\n\t\t\t\tmargin: 0;\n\t\t\t\tcolor: #666;\n\t\t\t\tfont-size: 14px;\n\t\t\t}\n\n\t\t\t.card-icon {\n\t\t\t\tfont-size: 32px;\n\t\t\t\tmargin-bottom: 10px;\n\t\t\t}\n\t\t</style>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ScrHTMX().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body><div class=\"home-container\"><div class=\"home-title\"><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/static/logo.png"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 89, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 91, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" alt=\"Zion English\" class=\"home-logo\"></div><p class=\"home-subtext\">Admin Tools made by <a href=\"https://flamendless.xyz\" target=\"_blank\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" alt=\"Zion English\" class=\"home-logo\"></div><p class=\"home-subtext\">Admin Tools made by <a href=\"https://flamendless.xyz\" target=\"_blank\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("@")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 92, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 95, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "flamendless</a></p><div class=\"cards-grid\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "flamendless</a></p><div class=\"cards-grid\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 templ.SafeURL
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/logs"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 96, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 99, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"card\"><div class=\"card-icon\">📋</div><h2>Process Logs</h2><p>View and manage processing logs</p></a> <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"card\"><div class=\"card-icon\">📋</div><h2>Process Logs</h2><p>View and manage processing logs</p></a> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 templ.SafeURL
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/process"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 101, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 104, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"card\"><div class=\"card-icon\">⚙️</div><h2>Process</h2><p>Process CSV files from Google Drive</p></a> <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"card\"><div class=\"card-icon\">⚙️</div><h2>Process</h2><p>Process CSV files from Google Drive</p></a> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 templ.SafeURL
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/students"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 106, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 109, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"card\"><div class=\"card-icon\">👨\u200d🎓</div><h2>Students</h2><p>View and manage students</p></a> <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"card\"><div class=\"card-icon\">👨\u200d🎓</div><h2>Students</h2><p>View and manage students</p></a> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 templ.SafeURL
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/students/register"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 111, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 114, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"card\"><div class=\"card-icon\">➕</div><h2>Register Student</h2><p>Add a new student</p></a> <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" class=\"card\"><div class=\"card-icon\">➕</div><h2>Register Student</h2><p>Add a new student</p></a> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 templ.SafeURL
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/teachers"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 116, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 119, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" class=\"card\"><div class=\"card-icon\">👨\u200d🏫</div><h2>Teachers</h2><p>View and manage teachers</p></a> <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"card\"><div class=\"card-icon\">👨\u200d🏫</div><h2>Teachers</h2><p>View and manage teachers</p></a> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var9 templ.SafeURL
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/teachers/register"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 121, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 124, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"card\"><div class=\"card-icon\">➕</div><h2>Register Teacher</h2><p>Add a new teacher</p></a></div></div><script>\n\t\t\tfunction getBaseURL() {\n\t\t\t\tconst pathname = window.location.pathname;\n\t\t\t\tconst cleanPath = pathname.replace(/\\/$/, '');\n\t\t\t\tconst parts = cleanPath.split('/').filter(p => p !== '');\n\n\t\t\t\tif (parts.length === 0 || cleanPath.endsWith('.html')) {\n\t\t\t\t\tif (cleanPath.includes('/zion-english-admin')) {\n\t\t\t\t\t\treturn '/zion-english-admin';\n\t\t\t\t\t}\n\t\t\t\t\treturn '';\n\t\t\t\t}\n\n\t\t\t\tif (parts.length === 1) {\n\t\t\t\t\treturn '/' + parts[0];\n\t\t\t\t}\n\n\t\t\t\treturn '/' + parts.slice(0, -1).join('/');\n\t\t\t}\n\n\t\t\tconst baseURL = getBaseURL();\n\n\t\t\tfunction buildURL(path) {\n\t\t\t\treturn baseURL + path;\n\t\t\t}\n\n\t\t\tconst favicon = document.getElementById('favicon');\n\t\t\tif (favicon) {\n\t\t\t\tfavicon.href = buildURL('/static/favicon.ico');\n\t\t\t}\n\t\t</script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"card\"><div class=\"card-icon\">➕</div><h2>Register Teacher</h2><p>Add a new teacher</p></a></div></div><script>\n\t\t\tfunction getBaseURL() {\n\t\t\t\tconst pathname = window.location.pathname;\n\t\t\t\tconst cleanPath = pathname.replace(/\\/$/, '');\n\t\t\t\tconst parts = cleanPath.split('/').filter(p => p !== '');\n\n\t\t\t\tif (parts.length === 0 || cleanPath.endsWith('.html')) {\n\t\t\t\t\tif (cleanPath.includes('/zion-english-admin')) {\n\t\t\t\t\t\treturn '/zion-english-admin';\n\t\t\t\t\t}\n\t\t\t\t\treturn '';\n\t\t\t\t}\n\n\t\t\t\tif (parts.length === 1) {\n\t\t\t\t\treturn '/' + parts[0];\n\t\t\t\t}\n\n\t\t\t\treturn '/' + parts.slice(0, -1).join('/');\n\t\t\t}\n\n\t\t\tconst baseURL = getBaseURL();\n\n\t\t\tfunction buildURL(path) {\n\t\t\t\treturn baseURL + path;\n\t\t\t}\n\n\t\t\tconst favicon = document.getElementById('favicon');\n\t\t\tif (favicon) {\n\t\t\t\tfavicon.href = buildURL('/static/favicon.ico');\n\t\t\t}\n\t\t</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

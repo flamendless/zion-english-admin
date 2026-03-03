@@ -8,9 +8,11 @@ import (
 )
 
 type Config struct {
-	AppEnv        string `env:"APP_ENV" env-required:""`
-	AdminUsername string `env:"ADMIN_USERNAME" env-required:""`
-	AdminPassword string `env:"ADMIN_PASSWORD" env-required:""`
+	AppEnv               string `env:"APP_ENV" env-required:""`
+	AdminTeacherUsername string `env:"ADMIN_TEACHER_USERNAME" env-required:""`
+	AdminTeacherPassword string `env:"ADMIN_TEACHER_PASSWORD" env-required:""`
+	SuperuserUsername    string `env:"SUPERUSER_USERNAME" env-required:""`
+	SuperuserPassword    string `env:"SUPERUSER_PASSWORD" env-required:""`
 }
 
 var cfg *Config
@@ -25,6 +27,11 @@ func Conf() *Config {
 		if co.AppEnv != "local" && co.AppEnv != "prod" {
 			panic(fmt.Sprintf("Invalid APP_ENV. Got '%s'", co.AppEnv))
 		}
+
+		if co.AdminTeacherUsername == co.SuperuserUsername {
+			panic("admin teacher username and superuser username must be different")
+		}
+
 		cfg = &co
 	})
 	return cfg
