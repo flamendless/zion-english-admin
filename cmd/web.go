@@ -325,7 +325,7 @@ func handleFinalize(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.Name == "" || req.DriveURL == "" {
-		http.Error(w, "Missing name or drive URL", http.StatusBadRequest)
+		http.Error(w, "Missing name or spreadsheet URL", http.StatusBadRequest)
 		return
 	}
 
@@ -447,10 +447,10 @@ func handleDownload(w http.ResponseWriter, r *http.Request) {
 
 func validateRequest(req *models.ProcessRequest) error {
 	if req.DriveURL == "" {
-		return errors.New("google drive uRL is required")
+		return errors.New("google spreadsheet url is required")
 	}
 	if !strings.Contains(req.DriveURL, "docs.google.com") {
-		return errors.New("invalid Google Drive URL")
+		return errors.New("invalid Google Spreadsheet URL")
 	}
 
 	// Validate name
@@ -832,7 +832,7 @@ func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
 	}
 
 	if req.DriveUrl == "" {
-		return errors.New("drive URL is required")
+		return errors.New("spreadsheet URL is required")
 	}
 
 	validSex := map[string]bool{"M": true, "F": true}

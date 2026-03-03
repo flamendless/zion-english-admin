@@ -118,11 +118,10 @@ templ Teachers(data TeacherData) {
 								<th>Joining Date</th>
 								<th>Mobile</th>
 								<th>Email</th>
-								<th>Certifications</th>
-								<th>Drive URL</th>
-								<th>Color</th>
 								<th>Rate Per Class</th>
-								<th>Created At</th>
+								<th>Spreadsheet URL</th>
+								<th>Certifications</th>
+								<th>Assigned Color</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -135,16 +134,15 @@ templ Teachers(data TeacherData) {
 									<td class="date-cell">{ teacher.JoiningDate }</td>
 									<td>{ getDisplayValue(teacher.MobileNumber) }</td>
 									<td class="email-cell">{ getDisplayValue(teacher.Email) }</td>
+									<td class="rate-cell">{ formatRate(teacher.RatePerClass, teacher.Currency) }</td>
+									<td>@displayURL(teacher.DriveUrl)</td>
 									<td>{ getDisplayValue(teacher.Certifications) }</td>
-									<td>{ getDisplayValue(teacher.DriveUrl) }</td>
 									<td>
 										<div class="color-cell">
 											<div class="color-box" style={ "background-color: " + teacher.AssignedColor }></div>
 											<span>{ teacher.AssignedColor }</span>
 										</div>
 									</td>
-									<td class="rate-cell">{ formatRate(teacher.RatePerClass, teacher.Currency) }</td>
-									<td class="date-cell">{ teacher.CreatedAt }</td>
 								</tr>
 							}
 						</tbody>

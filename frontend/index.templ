@@ -99,7 +99,7 @@ templ Index() {
 				</div>
 
 				<div class="form-group">
-					<label for="driveUrl">Google Drive URL *</label>
+					<label for="driveUrl">Spreadsheet URL *</label>
 					<input type="text" id="driveUrl" name="driveUrl" required
 					       placeholder="https://docs.google.com/spreadsheets/...">
 					<div class="error-message" id="driveUrlError"></div>
@@ -402,9 +402,9 @@ templ Index() {
 				const errorDiv = document.getElementById('driveUrlError');
 
 				if (url && !url.includes('docs.google.com')) {
-					errorDiv.textContent = 'URL must be a valid Google Drive URL';
+					errorDiv.textContent = 'URL must be a valid Spreadsheet URL';
 					errorDiv.style.display = 'block';
-					driveUrlInput.setCustomValidity('Invalid Google Drive URL');
+					driveUrlInput.setCustomValidity('Invalid Spreadsheet URL');
 					return false;
 				} else {
 					errorDiv.style.display = 'none';

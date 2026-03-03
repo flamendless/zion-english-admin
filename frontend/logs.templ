@@ -46,6 +46,16 @@ func getDisplayValue(value string) string {
 	return "-"
 }
 
+templ displayURL(value string) {
+	if value != "" {
+		<a href={ templ.SafeURL(value) } target="_blank">
+			open in new tab
+		</a>
+	} else {
+		<p>-</p>
+	}
+}
+
 templ Logs(logs LogData) {
 	<!DOCTYPE html>
 	<html lang="en">

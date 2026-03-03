@@ -38,10 +38,10 @@ templ RegisterTeacher() {
 				</div>
 
 				<div class="form-group">
-					<label for="driveUrl">Google Drive URL *</label>
+					<label for="driveUrl">Spreadsheet URL *</label>
 					<input type="text" id="driveUrl" name="driveUrl" required
 					       placeholder="https://docs.google.com/spreadsheets/...">
-					<div class="error-message" id="driveUrlError">Drive URL is required</div>
+					<div class="error-message" id="driveUrlError">Spreadsheet URL is required</div>
 				</div>
 
 				<div class="form-row">
@@ -213,7 +213,7 @@ templ RegisterTeacher() {
 			}
 
 			if (!driveUrlInput.value.trim()) {
-				driveUrlInput.setCustomValidity('Drive URL is required');
+				driveUrlInput.setCustomValidity('Spreadsheet URL is required');
 				isValid = false;
 			} else {
 				driveUrlInput.setCustomValidity('');
