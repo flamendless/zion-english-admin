@@ -61,6 +61,8 @@ templ Classes() {
 	<body>
 		<div class="container">
 			@HeaderSimple()
+			@SuccessBanner()
+			@ErrorBanner()
 
 			<div class="toolbar">
 				@TeacherDropdown()
@@ -201,6 +203,7 @@ templ Classes() {
 					totalCurrencySpan.textContent = data.records.length > 0 ? data.records[0].currency : '';
 				} catch (error) {
 					console.error('Failed to load class records:', error);
+					showErrorBanner(error.message);
 					tableBody.innerHTML = '<tr><td colspan="6" class="empty-state">Error loading classes</td></tr>';
 				}
 			});

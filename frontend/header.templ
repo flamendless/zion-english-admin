@@ -301,8 +301,28 @@ templ GlobalStyles() {
 		.success-banner.show {
 			opacity: 1;
 		}
+
+		.error-banner {
+			position: fixed;
+			top: 20px;
+			left: 50%;
+			transform: translateX(-50%);
+			background-color: #dc3545;
+			color: white;
+			padding: 15px 30px;
+			border-radius: 4px;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+			z-index: 1000;
+			opacity: 0;
+			transition: opacity 0.3s ease;
+		}
+
+		.error-banner.show {
+			opacity: 1;
+		}
 	</style>
 	@ScrHTMX()
+	@ErrorBannerHandlers()
 }
 
 templ WelcomeRole() {
@@ -369,5 +389,57 @@ templ SuccessBannerScript(message string) {
 				}, 3000);
 			}
 		})();
+	</script>
+}
+
+templ ErrorBanner() {
+	<div id="errorBanner" class="error-banner"></div>
+}
+
+templ ErrorBannerScript(message string) {
+	<script>
+		(function() {
+			const banner = document.getElementById('errorBanner');
+			if (banner) {
+				banner.textContent = $message$;
+				banner.classList.add('show');
+				setTimeout(() => {
+					banner.classList.remove('show');
+				}, 5000);
+			}
+		})();
+	</script>
+}
+
+templ ErrorBannerHandlers() {
+	<script>
+		function showErrorBanner(message) {
+			const banner = document.getElementById('errorBanner');
+			if (banner) {
+				banner.textContent = message;
+				banner.classList.add('show');
+				setTimeout(() => {
+					banner.classList.remove('show');
+				}, 5000);
+			}
+		}
+
+		(function() {
+			const match = document.cookie.match(/error_flash=([^;]+)/);
+			if (match) {
+				showErrorBanner(decodeURIComponent(match[1].replace(/\+/g, ' ')));
+				document.cookie = 'error_flash=; Max-Age=0; path=/';
+			}
+		})();
+
+		document.addEventListener('htmx:responseError', function(evt) {
+			const xhr = evt.detail.xhr;
+			const message = xhr.responseText || 'An error occurred';
+			showErrorBanner(message);
+		});
+
+		document.addEventListener('htmx:sendError', function(evt) {
+			showErrorBanner('Network error. Please check your connection.');
+		});
 	</script>
 }

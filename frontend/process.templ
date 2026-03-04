@@ -91,6 +91,8 @@ templ Process() {
 	<body>
 		<div class="container">
 			@HeaderSimple()
+			@SuccessBanner()
+			@ErrorBanner()
 
 			<form id="processForm">
 				<div class="form-group">
@@ -327,6 +329,7 @@ templ Process() {
 					});
 				} catch (error) {
 					console.error('Failed to load teachers:', error);
+					showErrorBanner(error.message);
 				}
 			}
 

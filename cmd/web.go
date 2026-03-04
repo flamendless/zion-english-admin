@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -26,6 +27,15 @@ import (
 	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
 )
+
+func HttpError(w http.ResponseWriter, msg string, code int) {
+	http.SetCookie(w, &http.Cookie{
+		Name:  "error_flash",
+		Value: url.QueryEscape(msg),
+		Path:  "/",
+	})
+	http.Error(w, msg, code)
+}
 
 type WebFlags struct {
 	port    string
@@ -146,7 +156,7 @@ func addLog(msg string) {
 
 func handleHome(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -158,7 +168,7 @@ func handleProcessPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		w.Header().Set("Content-Type", "text/html")
 		if err := frontend.Process().Render(r.Context(), w); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			HttpError(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}
@@ -166,12 +176,12 @@ func handleProcessPage(w http.ResponseWriter, r *http.Request) {
 		handleProcess(w, r)
 		return
 	}
-	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 }
 
 func handleProcess(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -325,30 +335,30 @@ type FinalizeRequest struct {
 
 func handleFinalize(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	var req FinalizeRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
+		HttpError(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
 
 	if req.Name == "" || req.DriveURL == "" {
-		http.Error(w, "Missing name or spreadsheet URL", http.StatusBadRequest)
+		HttpError(w, "Missing name or spreadsheet URL", http.StatusBadRequest)
 		return
 	}
 
 	outputPath := filepath.Join("tmp", fmt.Sprintf("%s_output.xlsx", req.Name))
 	if _, err := os.Stat(outputPath); os.IsNotExist(err) {
-		http.Error(w, "Output file not found. Please process CSV first.", http.StatusNotFound)
+		HttpError(w, "Output file not found. Please process CSV first.", http.StatusNotFound)
 		return
 	}
 
 	f, err := excelize.OpenFile(outputPath)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to open output file: %v", err), http.StatusInternalServerError)
+		HttpError(w, fmt.Sprintf("Failed to open output file: %v", err), http.StatusInternalServerError)
 		return
 	}
 	defer f.Close()
@@ -356,7 +366,7 @@ func handleFinalize(w http.ResponseWriter, r *http.Request) {
 	sheetName := "Sheet1"
 	rows, err := f.GetRows(sheetName)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to read sheet: %v", err), http.StatusInternalServerError)
+		HttpError(w, fmt.Sprintf("Failed to read sheet: %v", err), http.StatusInternalServerError)
 		return
 	}
 
@@ -399,7 +409,7 @@ func handleFinalize(w http.ResponseWriter, r *http.Request) {
 			Status:          status,
 		})
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Failed to insert record: %v", err), http.StatusInternalServerError)
+			HttpError(w, fmt.Sprintf("Failed to insert record: %v", err), http.StatusInternalServerError)
 			return
 		}
 	}
@@ -416,7 +426,7 @@ func handleFinalize(w http.ResponseWriter, r *http.Request) {
 
 func handleDownload(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -432,14 +442,14 @@ func handleDownload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if name == "" {
-		http.Error(w, "Missing filename", http.StatusBadRequest)
+		HttpError(w, "Missing filename", http.StatusBadRequest)
 		return
 	}
 
 	// Validate name to prevent directory traversal
 	matched, _ := regexp.MatchString(`^[a-zA-Z0-9_-]+$`, name)
 	if !matched {
-		http.Error(w, "Invalid filename", http.StatusBadRequest)
+		HttpError(w, "Invalid filename", http.StatusBadRequest)
 		return
 	}
 
@@ -447,7 +457,7 @@ func handleDownload(w http.ResponseWriter, r *http.Request) {
 
 	// Check if file exists
 	if _, err := os.Stat(outputPath); os.IsNotExist(err) {
-		http.Error(w, "File not found", http.StatusNotFound)
+		HttpError(w, "File not found", http.StatusNotFound)
 		return
 	}
 
@@ -538,13 +548,13 @@ func logToDB(dbService database.Service, req *models.ProcessRequest, userAgent, 
 
 func handleLogs(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	logs, err := database.GetAllProcessingLogs(dbRO)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to fetch logs: %v", err), http.StatusInternalServerError)
+		HttpError(w, fmt.Sprintf("Failed to fetch logs: %v", err), http.StatusInternalServerError)
 		return
 	}
 
@@ -571,13 +581,13 @@ func handleLogs(w http.ResponseWriter, r *http.Request) {
 
 func handleStudents(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	students, err := database.GetAllStudents(dbRO)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to fetch students: %v", err), http.StatusInternalServerError)
+		HttpError(w, fmt.Sprintf("Failed to fetch students: %v", err), http.StatusInternalServerError)
 		return
 	}
 
@@ -609,7 +619,7 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -711,13 +721,13 @@ func sendStudentErrorResponse(w http.ResponseWriter, message string) {
 
 func handleTeachers(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	teachers, err := database.GetAllTeachers(dbRO)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to fetch teachers: %v", err), http.StatusInternalServerError)
+		HttpError(w, fmt.Sprintf("Failed to fetch teachers: %v", err), http.StatusInternalServerError)
 		return
 	}
 
@@ -753,7 +763,7 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -868,13 +878,13 @@ func sendTeacherErrorResponse(w http.ResponseWriter, message string) {
 
 func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	teachers, err := dbRO.GetQueries().GetAllTeachers(r.Context())
 	if err != nil {
-		http.Error(w, "Failed to fetch teachers", http.StatusInternalServerError)
+		HttpError(w, "Failed to fetch teachers", http.StatusInternalServerError)
 		return
 	}
 
@@ -888,14 +898,14 @@ func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 	if err := frontend.TeacherOptions(teacherResponses).Render(r.Context(), w); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
 func handleGetRole(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -903,19 +913,19 @@ func handleGetRole(w http.ResponseWriter, r *http.Request) {
 	role := auth.GetRole(ctx)
 	if _, err := fmt.Fprintf(w, "Welcome, %s!", role); err != nil {
 		logs.Log().Error("handle get role", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func handleGetStudents(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	students, err := dbRO.GetQueries().GetActiveStudents(r.Context())
 	if err != nil {
-		http.Error(w, "Failed to fetch students", http.StatusInternalServerError)
+		HttpError(w, "Failed to fetch students", http.StatusInternalServerError)
 		return
 	}
 
@@ -931,14 +941,14 @@ func handleGetStudents(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := frontend.StudentOptions(studentResponses).Render(r.Context(), w); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
 func handleGetClassRecords(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -947,13 +957,13 @@ func handleGetClassRecords(w http.ResponseWriter, r *http.Request) {
 	endDate := r.URL.Query().Get("endDate")
 
 	if teacherIDStr == "" || startDate == "" || endDate == "" {
-		http.Error(w, "Missing required parameters", http.StatusBadRequest)
+		HttpError(w, "Missing required parameters", http.StatusBadRequest)
 		return
 	}
 
 	teacherID, err := strconv.ParseInt(teacherIDStr, 10, 64)
 	if err != nil {
-		http.Error(w, "Invalid teacher ID", http.StatusBadRequest)
+		HttpError(w, "Invalid teacher ID", http.StatusBadRequest)
 		return
 	}
 
@@ -963,7 +973,7 @@ func handleGetClassRecords(w http.ResponseWriter, r *http.Request) {
 		Date_2:    endDate,
 	})
 	if err != nil {
-		http.Error(w, "Failed to fetch class records", http.StatusInternalServerError)
+		HttpError(w, "Failed to fetch class records", http.StatusInternalServerError)
 		return
 	}
 
@@ -973,7 +983,7 @@ func handleGetClassRecords(w http.ResponseWriter, r *http.Request) {
 		Date_2:    endDate,
 	})
 	if err != nil {
-		http.Error(w, "Failed to fetch total rate", http.StatusInternalServerError)
+		HttpError(w, "Failed to fetch total rate", http.StatusInternalServerError)
 		return
 	}
 
@@ -1010,7 +1020,7 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -1065,7 +1075,7 @@ func handleClasses(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 }
 
 func validateClassRecordRequest(req *models.ClassRecordRequest) error {
