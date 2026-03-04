@@ -1,0 +1,258 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+templ RecordClass() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Record a Class - Zion English Admin</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		<style>
+			button {
+				margin-top: 20px;
+			}
+
+			.success-banner {
+				position: fixed;
+				top: 20px;
+				left: 50%;
+				transform: translateX(-50%);
+				background-color: #28a745;
+				color: white;
+				padding: 15px 30px;
+				border-radius: 4px;
+				box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+				z-index: 1000;
+				opacity: 0;
+				transition: opacity 0.3s ease;
+			}
+
+			.success-banner.show {
+				opacity: 1;
+			}
+		</style>
+		@ScrHTMX()
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@SuccessBanner()
+
+			<form id="recordForm" hx-post={ utils.URL("/classes/record") } hx-swap="none">
+				<div class="form-row">
+					@TeacherDropdown()
+					@StudentDropdown()
+				</div>
+
+				<div class="form-row">
+					<div class="form-group">
+						<label for="date">Date *</label>
+						<input type="date" id="date" name="date" required>
+					</div>
+					<div class="form-group">
+						<label for="duration">Duration (minutes) *</label>
+						<input type="number" id="duration" name="duration" required min="1" placeholder="e.g., 60">
+					</div>
+				</div>
+
+				<div class="form-row">
+					<div class="form-group">
+						<label for="rate">Rate *</label>
+						<input type="number" id="rate" name="rate" required min="0" step="0.01" placeholder="0.00">
+					</div>
+					@CurrencyDropdown()
+				</div>
+
+				<div class="form-row">
+					@ClassStatusDropdown()
+					<div class="form-group">
+						<label for="reason">Reason</label>
+						<input type="text" id="reason" name="reason" placeholder="Reason for cancellation/reschedule">
+					</div>
+				</div>
+
+				<button type="submit" id="submitBtn">Record Class</button>
+			</form>
+
+			<div class="logs-section">
+				<h3>Logs and Errors</h3>
+				<div id="logOutput">Waiting for submission...</div>
+			</div>
+		</div>
+
+		<script>
+			const form = document.getElementById('recordForm');
+			const logOutput = document.getElementById('logOutput');
+			const submitBtn = document.getElementById('submitBtn');
+			const teacherSelect = document.getElementById('teacher');
+			const studentSelect = document.getElementById('student');
+			const dateInput = document.getElementById('date');
+			const durationInput = document.getElementById('duration');
+			const rateInput = document.getElementById('rate');
+			const currencySelect = document.getElementById('currency');
+			const statusSelect = document.getElementById('status');
+			const reasonInput = document.getElementById('reason');
+
+			function getBaseURL() {
+				const pathname = window.location.pathname;
+				const cleanPath = pathname.replace(/\/$/, '');
+				const parts = cleanPath.split('/').filter(p => p !== '');
+
+				if (parts.length === 0 || cleanPath.endsWith('.html')) {
+					if (cleanPath.includes('/zion-english-admin')) {
+						return '/zion-english-admin';
+					}
+					return '';
+				}
+
+				if (parts.length === 1) {
+					return '/' + parts[0];
+				}
+
+				return '/' + parts.slice(0, -1).join('/');
+			}
+
+			const baseURL = getBaseURL();
+
+			function buildURL(path) {
+				return baseURL + path;
+			}
+
+			const today = new Date();
+			const year = today.getFullYear();
+			const month = String(today.getMonth() + 1).padStart(2, '0');
+			const day = String(today.getDate()).padStart(2, '0');
+			dateInput.value = `${year}-${month}-${day}`;
+
+			teacherSelect.addEventListener('change', () => {
+				const teacherId = teacherSelect.value;
+				if (teacherId) {
+					const selectedOption = teacherSelect.options[teacherSelect.selectedIndex];
+					if (selectedOption && selectedOption.dataset.rate) {
+						rateInput.value = selectedOption.dataset.rate;
+					}
+				}
+			});
+
+			studentSelect.addEventListener('change', () => {
+				const selectedOption = studentSelect.options[studentSelect.selectedIndex];
+				if (selectedOption && selectedOption.dataset.currency) {
+					currencySelect.value = selectedOption.dataset.currency;
+				}
+			});
+
+			function validateForm() {
+				let isValid = true;
+
+				if (!teacherSelect.value) {
+					teacherSelect.setCustomValidity('Please select a teacher');
+					isValid = false;
+				} else {
+					teacherSelect.setCustomValidity('');
+				}
+
+				if (!studentSelect.value) {
+					studentSelect.setCustomValidity('Please select a student');
+					isValid = false;
+				} else {
+					studentSelect.setCustomValidity('');
+				}
+
+				if (!dateInput.value) {
+					dateInput.setCustomValidity('Please select a date');
+					isValid = false;
+				} else {
+					dateInput.setCustomValidity('');
+				}
+
+				if (!durationInput.value || parseInt(durationInput.value) <= 0) {
+					durationInput.setCustomValidity('Please enter a valid duration');
+					isValid = false;
+				} else {
+					durationInput.setCustomValidity('');
+				}
+
+				if (!rateInput.value || parseFloat(rateInput.value) < 0) {
+					rateInput.setCustomValidity('Please enter a valid rate');
+					isValid = false;
+				} else {
+					rateInput.setCustomValidity('');
+				}
+
+				if (!currencySelect.value) {
+					currencySelect.setCustomValidity('Please select a currency');
+					isValid = false;
+				} else {
+					currencySelect.setCustomValidity('');
+				}
+
+				if (!statusSelect.value) {
+					statusSelect.setCustomValidity('Please select a status');
+					isValid = false;
+				} else {
+					statusSelect.setCustomValidity('');
+				}
+
+				const validStatuses = ['conducted', 'cancelled', 'rescheduled'];
+				if (statusSelect.value && !validStatuses.includes(statusSelect.value)) {
+					statusSelect.setCustomValidity('Invalid status');
+					isValid = false;
+				}
+
+				return isValid;
+			}
+
+			teacherSelect.addEventListener('change', validateForm);
+			studentSelect.addEventListener('change', validateForm);
+			dateInput.addEventListener('change', validateForm);
+			durationInput.addEventListener('blur', validateForm);
+			rateInput.addEventListener('blur', validateForm);
+			currencySelect.addEventListener('change', validateForm);
+			statusSelect.addEventListener('change', validateForm);
+
+			form.addEventListener('htmx:afterRequest', function(event) {
+				const xhr = event.detail.xhr;
+				if (xhr.status === 200) {
+					const data = JSON.parse(xhr.responseText);
+
+					logOutput.textContent = data.logs.join('\n') + '\n';
+
+					if (data.success) {
+						const banner = document.getElementById('successBanner');
+						banner.textContent = '✓ Class recorded successfully!';
+						banner.classList.add('show');
+						setTimeout(() => {
+							banner.classList.remove('show');
+						}, 3000);
+						form.reset();
+						const today = new Date();
+						const year = today.getFullYear();
+						const month = String(today.getMonth() + 1).padStart(2, '0');
+						const day = String(today.getDate()).padStart(2, '0');
+						dateInput.value = `${year}-${month}-${day}`;
+						teacherSelect.dispatchEvent(new Event('htmx:load'));
+						studentSelect.dispatchEvent(new Event('htmx:load'));
+					} else {
+						logOutput.textContent += '\n✗ Error: ' + data.message;
+					}
+				} else {
+					logOutput.textContent += '\n✗ Error: ' + xhr.statusText;
+				}
+				submitBtn.disabled = false;
+			});
+
+			form.addEventListener('submit', function(e) {
+				if (!validateForm()) {
+					e.preventDefault();
+					return;
+				}
+				submitBtn.disabled = true;
+				logOutput.textContent = 'Recording class...';
+			});
+		</script>
+	</body>
+	</html>
+}

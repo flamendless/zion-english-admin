@@ -34,7 +34,7 @@ templ Students(data StudentData) {
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Students - Zion English Admin Tool</title>
-		<link rel="icon" type="image/x-icon" id="favicon">
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		<style>
 			.add-btn {
 				background-color: var(--color-primary);
@@ -154,39 +154,6 @@ templ Students(data StudentData) {
 				</div>
 			}
 		</div>
-
-		<script>
-			const favicon = document.getElementById('favicon');
-
-			function getBaseURL() {
-				const pathname = window.location.pathname;
-				const cleanPath = pathname.replace(/\/$/, '');
-				const parts = cleanPath.split('/').filter(p => p !== '');
-
-				if (parts.length === 0 || cleanPath.endsWith('.html')) {
-					if (cleanPath.includes('/zion-english-admin')) {
-						return '/zion-english-admin';
-					}
-					return '';
-				}
-
-				if (parts.length === 1) {
-					return '/' + parts[0];
-				}
-
-				return '/' + parts.slice(0, -1).join('/');
-			}
-
-			const baseURL = getBaseURL();
-
-			function buildURL(path) {
-				return baseURL + path;
-			}
-
-			if (favicon) {
-				favicon.href = buildURL('/static/favicon.ico');
-			}
-		</script>
 	</body>
 	</html>
 }

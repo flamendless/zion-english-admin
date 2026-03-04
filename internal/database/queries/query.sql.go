@@ -10,6 +10,47 @@ import (
 	"database/sql"
 )
 
+const getActiveStudents = `-- name: GetActiveStudents :many
+SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, created_at, updated_at
+FROM tbl_students
+WHERE status = 'active'
+ORDER BY name ASC
+`
+
+func (q *Queries) GetActiveStudents(ctx context.Context) ([]TblStudent, error) {
+	rows, err := q.db.QueryContext(ctx, getActiveStudents)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TblStudent
+	for rows.Next() {
+		var i TblStudent
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Currency,
+			&i.Contact,
+			&i.RatePerClass,
+			&i.ParentName,
+			&i.AssignedColor,
+			&i.Status,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getAllProcessingLogs = `-- name: GetAllProcessingLogs :many
 SELECT id, google_drive_url, name, template, start_date, end_date,
        excluded_rows, useragent, output_path, errors, created_at
@@ -155,6 +196,77 @@ func (q *Queries) GetAllTeachers(ctx context.Context) ([]GetAllTeachersRow, erro
 	return items, nil
 }
 
+const getClassRecordsByTeacherAndDateRange = `-- name: GetClassRecordsByTeacherAndDateRange :many
+SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.created_at, cr.updated_at, cr.recorded_by_role,
+       s.name as student_name, t.name as teacher_name
+FROM tbl_class_records cr
+JOIN tbl_students s ON cr.student_id = s.id
+JOIN tbl_teachers t ON cr.teacher_id = t.id
+WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ?
+ORDER BY cr.created_at DESC
+`
+
+type GetClassRecordsByTeacherAndDateRangeParams struct {
+	TeacherID int64
+	Date      string
+	Date_2    string
+}
+
+type GetClassRecordsByTeacherAndDateRangeRow struct {
+	ID              int64
+	StudentID       int64
+	TeacherID       int64
+	Date            string
+	DurationMinutes int64
+	Rate            float64
+	Currency        string
+	Status          string
+	Reason          sql.NullString
+	CreatedAt       string
+	UpdatedAt       string
+	RecordedByRole  string
+	StudentName     string
+	TeacherName     string
+}
+
+func (q *Queries) GetClassRecordsByTeacherAndDateRange(ctx context.Context, arg GetClassRecordsByTeacherAndDateRangeParams) ([]GetClassRecordsByTeacherAndDateRangeRow, error) {
+	rows, err := q.db.QueryContext(ctx, getClassRecordsByTeacherAndDateRange, arg.TeacherID, arg.Date, arg.Date_2)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetClassRecordsByTeacherAndDateRangeRow
+	for rows.Next() {
+		var i GetClassRecordsByTeacherAndDateRangeRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.StudentID,
+			&i.TeacherID,
+			&i.Date,
+			&i.DurationMinutes,
+			&i.Rate,
+			&i.Currency,
+			&i.Status,
+			&i.Reason,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.RecordedByRole,
+			&i.StudentName,
+			&i.TeacherName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProcessingLogByID = `-- name: GetProcessingLogByID :one
 SELECT id, google_drive_url, name, template, start_date, end_date,
        excluded_rows, useragent, output_path, errors, created_at
@@ -201,6 +313,57 @@ func (q *Queries) GetTeacherByName(ctx context.Context, name string) (int64, err
 	var count int64
 	err := row.Scan(&count)
 	return count, err
+}
+
+const getTotalRateByTeacherAndDateRange = `-- name: GetTotalRateByTeacherAndDateRange :one
+SELECT COALESCE(SUM(cr.rate), 0) as total_rate
+FROM tbl_class_records cr
+WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ?
+`
+
+type GetTotalRateByTeacherAndDateRangeParams struct {
+	TeacherID int64
+	Date      string
+	Date_2    string
+}
+
+func (q *Queries) GetTotalRateByTeacherAndDateRange(ctx context.Context, arg GetTotalRateByTeacherAndDateRangeParams) (interface{}, error) {
+	row := q.db.QueryRowContext(ctx, getTotalRateByTeacherAndDateRange, arg.TeacherID, arg.Date, arg.Date_2)
+	var total_rate interface{}
+	err := row.Scan(&total_rate)
+	return total_rate, err
+}
+
+const insertClassRecord = `-- name: InsertClassRecord :exec
+INSERT INTO tbl_class_records (student_id, teacher_id, date, duration_minutes, rate, currency, status, reason, recorded_by_role)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+`
+
+type InsertClassRecordParams struct {
+	StudentID       int64
+	TeacherID       int64
+	Date            string
+	DurationMinutes int64
+	Rate            float64
+	Currency        string
+	Status          string
+	Reason          sql.NullString
+	RecordedByRole  string
+}
+
+func (q *Queries) InsertClassRecord(ctx context.Context, arg InsertClassRecordParams) error {
+	_, err := q.db.ExecContext(ctx, insertClassRecord,
+		arg.StudentID,
+		arg.TeacherID,
+		arg.Date,
+		arg.DurationMinutes,
+		arg.Rate,
+		arg.Currency,
+		arg.Status,
+		arg.Reason,
+		arg.RecordedByRole,
+	)
+	return err
 }
 
 const insertProcessingLog = `-- name: InsertProcessingLog :exec

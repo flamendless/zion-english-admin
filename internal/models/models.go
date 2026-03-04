@@ -85,7 +85,47 @@ type TeacherRegisterResponse struct {
 }
 
 type TeacherAPIResponse struct {
-	ID       int64  `json:"id"`
-	Name     string `json:"name"`
-	DriveUrl string `json:"driveUrl"`
+	ID           int64   `json:"id"`
+	Name         string  `json:"name"`
+	DriveUrl     string  `json:"driveUrl"`
+	RatePerClass float64 `json:"ratePerClass"`
+}
+
+type StudentAPIResponse struct {
+	ID           int64   `json:"id"`
+	Name         string  `json:"name"`
+	Currency     string  `json:"currency"`
+	RatePerClass float64 `json:"ratePerClass"`
+}
+
+type ClassRecordRequest struct {
+	StudentID       int64   `json:"studentId"`
+	TeacherID       int64   `json:"teacherId"`
+	Date            string  `json:"date"`
+	DurationMinutes int64   `json:"durationMinutes"`
+	Rate            float64 `json:"rate"`
+	Currency        string  `json:"currency"`
+	Status          string  `json:"status"`
+	Reason          string  `json:"reason"`
+}
+
+type ClassRecordResponse struct {
+	Success bool     `json:"success"`
+	Message string   `json:"message"`
+	Logs    []string `json:"logs"`
+}
+
+type ClassRecordView struct {
+	ID              int64   `json:"id"`
+	StudentID       int64   `json:"studentId"`
+	TeacherID       int64   `json:"teacherId"`
+	StudentName     string  `json:"studentName"`
+	TeacherName     string  `json:"teacherName"`
+	Date            string  `json:"date"`
+	DurationMinutes int64   `json:"durationMinutes"`
+	Rate            float64 `json:"rate"`
+	Currency        string  `json:"currency"`
+	Status          string  `json:"status"`
+	Reason          string  `json:"reason"`
+	CreatedAt       string  `json:"createdAt"`
 }

@@ -9,7 +9,7 @@ templ Home() {
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Zion English Admin</title>
-		<link rel="icon" type="image/x-icon" id="favicon">
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		<style>
 			.home-container {
 				max-width: 900px;
@@ -91,75 +91,25 @@ templ Home() {
 				<img src={utils.URL("/static/logo.png")} alt="Zion English" class="home-logo">
 			</div>
 
-			<p class="home-subtext">
-				Admin Tools made by <a href="https://flamendless.xyz" target="_blank">{"@"}flamendless</a>
-			</p>
+			<span style={ "display: flex; flex-direction: row;" }>
+				<p class="home-subtext">Admin Tools</p>
+				@Flam()
+			</span>
 
 			<div class="cards-grid">
-				<a href={utils.URL("/logs")} class="card">
-					<div class="card-icon">📋</div>
-					<h2>Process Logs</h2>
-					<p>View and manage processing logs</p>
-				</a>
-				<a href={utils.URL("/process")} class="card">
-					<div class="card-icon">⚙️</div>
-					<h2>Process</h2>
-					<p>Process CSV files from Google Drive</p>
-				</a>
-				<a href={utils.URL("/students")} class="card">
-					<div class="card-icon">👨‍🎓</div>
-					<h2>Students</h2>
-					<p>View and manage students</p>
-				</a>
-				<a href={utils.URL("/students/register")} class="card">
-					<div class="card-icon">➕</div>
-					<h2>Register Student</h2>
-					<p>Add a new student</p>
-				</a>
-				<a href={utils.URL("/teachers")} class="card">
-					<div class="card-icon">👨‍🏫</div>
-					<h2>Teachers</h2>
-					<p>View and manage teachers</p>
-				</a>
-				<a href={utils.URL("/teachers/register")} class="card">
-					<div class="card-icon">➕</div>
-					<h2>Register Teacher</h2>
-					<p>Add a new teacher</p>
-				</a>
+				@ActionCard("/classes", "Classes", "View recorded classes")
+				@ActionCard("/classes/record", "Record a Class", "Record a new class")
+
+				@ActionCard("/students", "Students", "View and manage students")
+				@ActionCard("/students/register", "Register a student", "Add a new student")
+
+				@ActionCard("/teachers", "Teachers", "View and manage teachers")
+				@ActionCard("/teachers/register", "Register a teacher", "Add a new teacher")
+
+				@ActionCard("/logs", "Process logs", "View and manage processing logs")
+				@ActionCard("/process", "Process", "Process CSV/XLSX files")
 			</div>
 		</div>
-
-		<script>
-			function getBaseURL() {
-				const pathname = window.location.pathname;
-				const cleanPath = pathname.replace(/\/$/, '');
-				const parts = cleanPath.split('/').filter(p => p !== '');
-
-				if (parts.length === 0 || cleanPath.endsWith('.html')) {
-					if (cleanPath.includes('/zion-english-admin')) {
-						return '/zion-english-admin';
-					}
-					return '';
-				}
-
-				if (parts.length === 1) {
-					return '/' + parts[0];
-				}
-
-				return '/' + parts.slice(0, -1).join('/');
-			}
-
-			const baseURL = getBaseURL();
-
-			function buildURL(path) {
-				return baseURL + path;
-			}
-
-			const favicon = document.getElementById('favicon');
-			if (favicon) {
-				favicon.href = buildURL('/static/favicon.ico');
-			}
-		</script>
 	</body>
 	</html>
 }

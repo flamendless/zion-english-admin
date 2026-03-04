@@ -1,0 +1,210 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+templ Classes() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>View Classes - Zion English Admin</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		<style>
+			.toolbar {
+				display: flex;
+				gap: 20px;
+				align-items: flex-end;
+				margin-bottom: 20px;
+				flex-wrap: wrap;
+			}
+
+			.toolbar .form-group {
+				margin-bottom: 0;
+				min-width: 150px;
+			}
+
+			.toolbar label {
+				margin-bottom: 5px;
+			}
+
+			.total-section {
+				margin-left: auto;
+				padding: 10px 20px;
+				background-color: var(--color-primary);
+				color: white;
+				border-radius: 4px;
+				font-weight: 600;
+			}
+
+			.row-cancelled {
+				background-color: #ffebee !important;
+			}
+
+			.status-conducted {
+				color: #28a745;
+				font-weight: 500;
+			}
+
+			.status-cancelled {
+				color: #dc3545;
+				font-weight: 500;
+			}
+
+			.status-rescheduled {
+				color: #ffc107;
+				font-weight: 500;
+			}
+		</style>
+		@ScrHTMX()
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+
+			<div class="toolbar">
+				@TeacherDropdown()
+				@DatePreset()
+				<button type="button" id="filterBtn">Filter</button>
+				<div class="total-section">
+					Total: <span id="totalRate">0</span> <span id="totalCurrency"></span>
+				</div>
+			</div>
+
+			<table id="classesTable">
+				<thead>
+					<tr>
+						<th>Student Name</th>
+						<th>Duration (min)</th>
+						<th>Rate</th>
+						<th>Status</th>
+						<th>Reason</th>
+						<th>Date</th>
+					</tr>
+				</thead>
+				<tbody id="classesTableBody">
+					<tr>
+						<td colspan="6" class="empty-state">Select a teacher and date range to view classes</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<script>
+			const teacherSelect = document.getElementById('teacher');
+			const datePresetSelect = document.getElementById('datePreset');
+			const filterBtn = document.getElementById('filterBtn');
+			const tableBody = document.getElementById('classesTableBody');
+			const totalRateSpan = document.getElementById('totalRate');
+			const totalCurrencySpan = document.getElementById('totalCurrency');
+
+			function getBaseURL() {
+				const pathname = window.location.pathname;
+				const cleanPath = pathname.replace(/\/$/, '');
+				const parts = cleanPath.split('/').filter(p => p !== '');
+
+				if (parts.length === 0 || cleanPath.endsWith('.html')) {
+					if (cleanPath.includes('/zion-english-admin')) {
+						return '/zion-english-admin';
+					}
+					return '';
+				}
+
+				if (parts.length === 1) {
+					return '/' + parts[0];
+				}
+
+				return '/' + parts.slice(0, -1).join('/');
+			}
+
+			const baseURL = getBaseURL();
+
+			function buildURL(path) {
+				return baseURL + path;
+			}
+
+			datePresetSelect.addEventListener('change', () => {
+				const value = datePresetSelect.value;
+				if (!value) return;
+
+				const today = new Date();
+				const year = today.getFullYear();
+				const month = today.getMonth();
+
+				function formatDate(date) {
+					const y = date.getFullYear();
+					const m = String(date.getMonth() + 1).padStart(2, '0');
+					const d = String(date.getDate()).padStart(2, '0');
+					return y + '-' + m + '-' + d;
+				}
+
+				if (value === '1-15') {
+					const start = new Date(year, month, 1);
+					const end = new Date(year, month, 15);
+					datePresetSelect.dataset.startDate = formatDate(start);
+					datePresetSelect.dataset.endDate = formatDate(end);
+				}
+
+				if (value === '16-30') {
+					const start = new Date(year, month, 16);
+					const end = new Date(year, month, 30);
+					datePresetSelect.dataset.startDate = formatDate(start);
+					datePresetSelect.dataset.endDate = formatDate(end);
+				}
+			});
+
+			filterBtn.addEventListener('click', async () => {
+				const teacherId = teacherSelect.value;
+				const startDate = datePresetSelect.dataset.startDate;
+				const endDate = datePresetSelect.dataset.endDate;
+
+				if (!teacherId) {
+					alert('Please select a teacher');
+					return;
+				}
+
+				if (!startDate || !endDate) {
+					alert('Please select a date range');
+					return;
+				}
+
+				try {
+					const response = await fetch(
+						buildURL(`/api/class-records?teacherId=${teacherId}&startDate=${startDate}&endDate=${endDate}`)
+					);
+					const data = await response.json();
+
+					tableBody.innerHTML = '';
+
+					if (data.records.length === 0) {
+						tableBody.innerHTML = '<tr><td colspan="6" class="empty-state">No classes found for the selected criteria</td></tr>';
+					} else {
+						data.records.forEach(record => {
+							const row = document.createElement('tr');
+							if (record.status === 'cancelled') {
+								row.classList.add('row-cancelled');
+							}
+
+							row.innerHTML = `
+								<td>${record.studentName}</td>
+								<td>${record.durationMinutes}</td>
+								<td>${record.rate} ${record.currency}</td>
+								<td class="status-${record.status}">${record.status}</td>
+								<td>${record.reason || '-'}</td>
+								<td>${record.date}</td>
+							`;
+							tableBody.appendChild(row);
+						});
+					}
+
+					totalRateSpan.textContent = data.totalRate || 0;
+					totalCurrencySpan.textContent = data.records.length > 0 ? data.records[0].currency : '';
+				} catch (error) {
+					console.error('Failed to load class records:', error);
+					tableBody.innerHTML = '<tr><td colspan="6" class="empty-state">Error loading classes</td></tr>';
+				}
+			});
+		</script>
+	</body>
+	</html>
+}

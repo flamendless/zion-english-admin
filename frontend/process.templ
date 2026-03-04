@@ -1,13 +1,15 @@
 package frontend
 
-templ Index() {
+import "zion-english/internal/utils"
+
+templ Process() {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Zion English Admin Tool</title>
-		<link rel="icon" type="image/x-icon" id="favicon">
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		<style>
 			.column-mapping {
 				background-color: #f9f9f9;
@@ -92,10 +94,7 @@ templ Index() {
 
 			<form id="processForm">
 				<div class="form-group">
-					<label for="teacherSelect">Select Teacher</label>
-					<select id="teacherSelect" name="teacherSelect">
-						<option value="">-- Select Teacher --</option>
-					</select>
+					@TeacherDropdown()
 				</div>
 
 				<div class="form-group">
@@ -313,11 +312,6 @@ templ Index() {
 				e.preventDefault();
 				window.location.href = buildURL('/logs');
 			});
-
-			const favicon = document.getElementById('favicon');
-			if (favicon) {
-				favicon.href = buildURL('/static/favicon.ico');
-			}
 
 			async function loadTeachers() {
 				try {

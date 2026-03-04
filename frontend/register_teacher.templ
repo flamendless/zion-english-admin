@@ -1,5 +1,7 @@
 package frontend
 
+import "zion-english/internal/utils"
+
 templ RegisterTeacher() {
 	<!DOCTYPE html>
 	<html lang="en">
@@ -7,7 +9,7 @@ templ RegisterTeacher() {
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Register Teacher - Zion English Admin</title>
-		<link rel="icon" type="image/x-icon" id="favicon">
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		<style>
 			button {
 				margin-top: 20px;
@@ -18,6 +20,7 @@ templ RegisterTeacher() {
 	<body>
 		<div class="container">
 			@HeaderSimple()
+			@SuccessBanner()
 
 			<form id="registerForm">
 				<div class="form-row">
@@ -160,11 +163,6 @@ templ RegisterTeacher() {
 				return baseURL + path;
 			}
 
-			const favicon = document.getElementById('favicon');
-			if (favicon) {
-				favicon.href = buildURL('/static/favicon.ico');
-			}
-
 			assignedColorInput.addEventListener('input', () => {
 				const color = assignedColorInput.value;
 				colorPreview.style.backgroundColor = color;
@@ -275,7 +273,12 @@ templ RegisterTeacher() {
 					logOutput.textContent = data.logs.join('\n') + '\n';
 
 					if (data.success) {
-						logOutput.textContent += '\n✓ ' + data.message;
+						const banner = document.getElementById('successBanner');
+						banner.textContent = '✓ Teacher registered successfully!';
+						banner.classList.add('show');
+						setTimeout(() => {
+							banner.classList.remove('show');
+						}, 3000);
 						form.reset();
 						assignedColorInput.value = 'var(--color-primary)';
 						colorPreview.style.backgroundColor = 'var(--color-primary)';

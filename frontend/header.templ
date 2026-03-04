@@ -282,6 +282,25 @@ templ GlobalStyles() {
 			color: #dc3545;
 			font-weight: 500;
 		}
+
+		.success-banner {
+			position: fixed;
+			top: 20px;
+			left: 50%;
+			transform: translateX(-50%);
+			background-color: #28a745;
+			color: white;
+			padding: 15px 30px;
+			border-radius: 4px;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+			z-index: 1000;
+			opacity: 0;
+			transition: opacity 0.3s ease;
+		}
+
+		.success-banner.show {
+			opacity: 1;
+		}
 	</style>
 	@ScrHTMX()
 }
@@ -310,23 +329,21 @@ templ Header() {
 		<div class="header-bottom">
 			<div class="header-left">
 				<div class="nav-links">
-					<a href={utils.URL("/process")} id="process" class="nav-link">Process</a>
-					<span class="nav-separator">|</span>
-					<a href={utils.URL("/logs")} id="logsLink" class="nav-link">View Process Logs</a>
-					<span class="nav-separator">|</span>
-					<a href={utils.URL("/students")} id="studentsLink" class="nav-link">View Students</a>
-					<span class="nav-separator">|</span>
-					<a href={utils.URL("/students/register")} id="registerStudentLink" class="nav-link">Register Student</a>
-					<span class="nav-separator">|</span>
-					<a href={utils.URL("/teachers")} id="teachersLink" class="nav-link">View Teachers</a>
-					<span class="nav-separator">|</span>
-					<a href={utils.URL("/teachers/register")} id="registerTeacherLink" class="nav-link">Register Teacher</a>
+					@NavLink("/process", "process", "Process")
+					@NavLink("/logs", "logsLink", "Process Logs")
+
+					@NavLink("/students", "studentsLink", "Students")
+					@NavLink("/students/register", "registerStudentLink", "+Student")
+
+					@NavLink("/teachers", "teachersLink", "Teachers")
+					@NavLink("/teachers/register", "registerTeacherLink", "+Teacher")
+
+					@NavLink("/classes", "classesLink", "Classes")
+					@NavLink("/classes/record", "recordClassLink", "+Class")
 				</div>
 			</div>
 			<div class="header-right">
-				<p class="made-by">
-					made by <a href="https://flamendless.xyz" target="_blank">{"@"}flamendless</a>
-				</p>
+				@Flam()
 			</div>
 		</div>
 	</div>
@@ -334,4 +351,23 @@ templ Header() {
 
 templ HeaderSimple() {
 	@Header()
+}
+
+templ SuccessBanner() {
+	<div id="successBanner" class="success-banner"></div>
+}
+
+templ SuccessBannerScript(message string) {
+	<script>
+		(function() {
+			const banner = document.getElementById('successBanner');
+			if (banner) {
+				banner.textContent = $message$;
+				banner.classList.add('show');
+				setTimeout(() => {
+					banner.classList.remove('show');
+				}, 3000);
+			}
+		})();
+	</script>
 }

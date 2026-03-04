@@ -8,6 +8,21 @@ import (
 	"database/sql"
 )
 
+type TblClassRecord struct {
+	ID              int64
+	StudentID       int64
+	TeacherID       int64
+	Date            string
+	DurationMinutes int64
+	Rate            float64
+	Currency        string
+	Status          string
+	Reason          sql.NullString
+	CreatedAt       string
+	UpdatedAt       string
+	RecordedByRole  string
+}
+
 type TblProcessingLog struct {
 	ID             int64
 	GoogleDriveUrl string

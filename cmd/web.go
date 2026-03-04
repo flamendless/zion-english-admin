@@ -74,6 +74,8 @@ var cmdWeb = &cobra.Command{
 		mux.HandleFunc(basePath+"/finalize", handleFinalize)
 		mux.HandleFunc(basePath+"/download/", handleDownload)
 		mux.HandleFunc(basePath+"/api/teachers", handleGetTeachers)
+		mux.HandleFunc(basePath+"/api/students", handleGetStudents)
+		mux.HandleFunc(basePath+"/api/class-records", handleGetClassRecords)
 		mux.Handle(basePath+"/static/", http.StripPrefix(basePath+"/static/", http.FileServer(http.Dir("static"))))
 
 		authMux := http.NewServeMux()
@@ -83,12 +85,15 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/students/register", auth.RequireRole(auth.RoleSuperuser)(handleStudentRegister))
 		authMux.HandleFunc(basePath+"/teachers", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleTeachers))
 		authMux.HandleFunc(basePath+"/teachers/register", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleTeacherRegister))
+		authMux.HandleFunc(basePath+"/classes/record", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClassRecord))
+		authMux.HandleFunc(basePath+"/classes", auth.RequireRole(auth.RoleSuperuser)(handleClasses))
 		authHandler := auth.Middleware(cfg, authMux)
 
 		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if strings.HasPrefix(r.URL.Path, basePath+"/logs") ||
 				strings.HasPrefix(r.URL.Path, basePath+"/students") ||
 				strings.HasPrefix(r.URL.Path, basePath+"/teachers") ||
+				strings.HasPrefix(r.URL.Path, basePath+"/classes") ||
 				strings.HasPrefix(r.URL.Path, basePath+"/role") {
 				authHandler.ServeHTTP(w, r)
 			} else {
@@ -152,7 +157,9 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 func handleProcessPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		w.Header().Set("Content-Type", "text/html")
-		frontend.Index().Render(r.Context(), w)
+		if err := frontend.Process().Render(r.Context(), w); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 	if r.Method == http.MethodPost {
@@ -871,17 +878,19 @@ func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var response []models.TeacherAPIResponse
+	var teacherResponses []models.TeacherAPIResponse
 	for _, t := range teachers {
-		response = append(response, models.TeacherAPIResponse{
-			ID:       t.ID,
-			Name:     t.Name,
-			DriveUrl: t.DriveUrl,
+		teacherResponses = append(teacherResponses, models.TeacherAPIResponse{
+			ID:           t.ID,
+			Name:         t.Name,
+			DriveUrl:     t.DriveUrl,
+			RatePerClass: t.RatePerClass,
 		})
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if err := frontend.TeacherOptions(teacherResponses).Render(r.Context(), w); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func handleGetRole(w http.ResponseWriter, r *http.Request) {
@@ -892,8 +901,204 @@ func handleGetRole(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	role := auth.GetRole(ctx)
-	if _, err := w.Write(fmt.Appendf(nil, "Welcome, %s!", role)); err != nil {
+	if _, err := fmt.Fprintf(w, "Welcome, %s!", role); err != nil {
 		logs.Log().Error("handle get role", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func handleGetStudents(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	students, err := dbRO.GetQueries().GetActiveStudents(r.Context())
+	if err != nil {
+		http.Error(w, "Failed to fetch students", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	var studentResponses []models.StudentAPIResponse
+	for _, s := range students {
+		studentResponses = append(studentResponses, models.StudentAPIResponse{
+			ID:           s.ID,
+			Name:         s.Name,
+			Currency:     s.Currency,
+			RatePerClass: s.RatePerClass,
+		})
+	}
+
+	if err := frontend.StudentOptions(studentResponses).Render(r.Context(), w); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func handleGetClassRecords(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	teacherIDStr := r.URL.Query().Get("teacherId")
+	startDate := r.URL.Query().Get("startDate")
+	endDate := r.URL.Query().Get("endDate")
+
+	if teacherIDStr == "" || startDate == "" || endDate == "" {
+		http.Error(w, "Missing required parameters", http.StatusBadRequest)
+		return
+	}
+
+	teacherID, err := strconv.ParseInt(teacherIDStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid teacher ID", http.StatusBadRequest)
+		return
+	}
+
+	records, err := dbRO.GetQueries().GetClassRecordsByTeacherAndDateRange(r.Context(), queries.GetClassRecordsByTeacherAndDateRangeParams{
+		TeacherID: teacherID,
+		Date:      startDate,
+		Date_2:    endDate,
+	})
+	if err != nil {
+		http.Error(w, "Failed to fetch class records", http.StatusInternalServerError)
+		return
+	}
+
+	totalRate, err := dbRO.GetQueries().GetTotalRateByTeacherAndDateRange(r.Context(), queries.GetTotalRateByTeacherAndDateRangeParams{
+		TeacherID: teacherID,
+		Date:      startDate,
+		Date_2:    endDate,
+	})
+	if err != nil {
+		http.Error(w, "Failed to fetch total rate", http.StatusInternalServerError)
+		return
+	}
+
+	var response []models.ClassRecordView
+	for _, cr := range records {
+		response = append(response, models.ClassRecordView{
+			ID:              cr.ID,
+			StudentID:       cr.StudentID,
+			TeacherID:       cr.TeacherID,
+			StudentName:     cr.StudentName,
+			TeacherName:     cr.TeacherName,
+			Date:            cr.Date,
+			DurationMinutes: cr.DurationMinutes,
+			Rate:            cr.Rate,
+			Currency:        cr.Currency,
+			Status:          cr.Status,
+			Reason:          cr.Reason.String,
+			CreatedAt:       cr.CreatedAt,
+		})
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"records":   response,
+		"totalRate": totalRate,
+	})
+}
+
+func handleClassRecord(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		w.Header().Set("Content-Type", "text/html")
+		frontend.RecordClass().Render(r.Context(), w)
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	logMessages = []string{}
+	var req models.ClassRecordRequest
+	var errMsg string
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		errMsg = fmt.Sprintf("Invalid request: %v", err)
+		sendClassRecordErrorResponse(w, errMsg)
+		return
+	}
+
+	if err := validateClassRecordRequest(&req); err != nil {
+		errMsg = err.Error()
+		sendClassRecordErrorResponse(w, errMsg)
+		return
+	}
+
+	ctx := r.Context()
+	role := auth.GetRole(ctx)
+
+	err := dbRW.GetQueries().InsertClassRecord(r.Context(), queries.InsertClassRecordParams{
+		StudentID:       req.StudentID,
+		TeacherID:       req.TeacherID,
+		Date:            req.Date,
+		DurationMinutes: req.DurationMinutes,
+		Rate:            req.Rate,
+		Currency:        req.Currency,
+		Status:          req.Status,
+		Reason:          sql.NullString{String: req.Reason, Valid: req.Reason != ""},
+		RecordedByRole:  string(role),
+	})
+	if err != nil {
+		errMsg = fmt.Sprintf("Failed to record class: %v", err)
+		sendClassRecordErrorResponse(w, errMsg)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(models.ClassRecordResponse{
+		Success: true,
+		Message: "Class recorded successfully!",
+		Logs:    logMessages,
+	})
+}
+
+func handleClasses(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		w.Header().Set("Content-Type", "text/html")
+		frontend.Classes().Render(r.Context(), w)
+		return
+	}
+
+	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+}
+
+func validateClassRecordRequest(req *models.ClassRecordRequest) error {
+	if req.StudentID == 0 {
+		return errors.New("student is required")
+	}
+	if req.TeacherID == 0 {
+		return errors.New("teacher is required")
+	}
+	if req.Date == "" {
+		return errors.New("date is required")
+	}
+	if req.DurationMinutes == 0 {
+		return errors.New("duration is required")
+	}
+	if req.Rate == 0 {
+		return errors.New("rate is required")
+	}
+	if req.Currency == "" {
+		return errors.New("currency is required")
+	}
+	validStatuses := map[string]bool{"conducted": true, "cancelled": true, "rescheduled": true}
+	if !validStatuses[req.Status] {
+		return errors.New("invalid status")
+	}
+	return nil
+}
+
+func sendClassRecordErrorResponse(w http.ResponseWriter, errMsg string) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(models.ClassRecordResponse{
+		Success: false,
+		Message: errMsg,
+		Logs:    logMessages,
+	})
 }

@@ -1,0 +1,48 @@
+package frontend
+
+import "fmt"
+import "zion-english/internal/models"
+import "zion-english/internal/utils"
+
+templ Flam() {
+	<p class="made-by">
+		made by
+		<a href="https://flamendless.xyz" target="_blank">{"@"}flamendless</a>
+	</p>
+}
+
+templ ActionCard(url string, h2 string, desc string) {
+	<a href={utils.URL(url)} class="card">
+		<h2>{ h2 }</h2>
+		<p>{ desc }</p>
+	</a>
+}
+
+templ TeacherOptions(teachers []models.TeacherAPIResponse) {
+	<option value="">-- Select Teacher --</option>
+	for _, t := range teachers {
+		<option value={ fmt.Sprintf("%d", t.ID) } data-rate={ fmt.Sprintf("%.2f", t.RatePerClass) }>{ t.Name }</option>
+	}
+}
+
+templ StudentOptions(students []models.StudentAPIResponse) {
+	<option value="">-- Select Student --</option>
+	for _, s := range students {
+		<option value={ fmt.Sprintf("%d", s.ID) } data-rate={ fmt.Sprintf("%.2f", s.RatePerClass) } data-currency={ s.Currency }>{ s.Name }</option>
+	}
+}
+
+templ DatePreset() {
+	<div class="form-group">
+		<label for="datePreset">Date Range</label>
+		<select id="datePreset" name="datePreset">
+			<option value="">-- Select Range --</option>
+			<option value="1-15">1 - 15</option>
+			<option value="16-30">16 - 30</option>
+		</select>
+	</div>
+}
+
+templ NavLink(url string, id string, text string) {
+	<a href={utils.URL(url)} id={ id } class="nav-link">{ text }</a>
+}

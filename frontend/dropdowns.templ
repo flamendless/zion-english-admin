@@ -1,0 +1,63 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+templ TeacherDropdown() {
+	<div class="form-group">
+		<label for="teacher">Teacher *</label>
+		<select id="teacher" name="teacher" required
+			hx-get={ utils.URL("/api/teachers") }
+			hx-trigger="load"
+			hx-swap="innerHTML"
+		>
+			<option value="">-- Select Teacher --</option>
+		</select>
+	</div>
+}
+
+templ StudentDropdown() {
+	<div class="form-group">
+		<label for="student">Student *</label>
+		<select id="student" name="student" required
+			hx-get={ utils.URL("/api/students") }
+			hx-trigger="load"
+			hx-swap="innerHTML"
+		>
+			<option value="">-- Select Student --</option>
+		</select>
+	</div>
+}
+
+templ CurrencyDropdown() {
+	<div class="form-group">
+		<label for="currency">Currency *</label>
+		<select id="currency" name="currency" required>
+			<option value="">-- Select Currency --</option>
+			<option value="KRW">KRW (Korean Won)</option>
+			<option value="CAD">CAD (Canadian Dollar)</option>
+			<option value="YEN">YEN (Japanese Yen)</option>
+			<option value="PHP">PHP (Philippine Peso)</option>
+		</select>
+	</div>
+}
+
+templ ClassStatusDropdown() {
+	<div class="form-group">
+		<label for="status">Status *</label>
+		<select id="status" name="status" required>
+			<option value="conducted">Conducted</option>
+			<option value="cancelled">Cancelled</option>
+			<option value="rescheduled">Rescheduled</option>
+		</select>
+	</div>
+}
+
+templ StudentStatusDropdown() {
+	<div class="form-group">
+		<label for="status">Status *</label>
+		<select id="status" name="status" required>
+			<option value="active">Active</option>
+			<option value="inactive">Inactive</option>
+		</select>
+	</div>
+}

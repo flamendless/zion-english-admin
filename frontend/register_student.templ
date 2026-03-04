@@ -1,5 +1,7 @@
 package frontend
 
+import "zion-english/internal/utils"
+
 templ RegisterStudent() {
 	<!DOCTYPE html>
 	<html lang="en">
@@ -7,16 +9,36 @@ templ RegisterStudent() {
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Register Student - Zion English Admin</title>
-		<link rel="icon" type="image/x-icon" id="favicon">
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		<style>
 			button {
 				margin-top: 20px;
+			}
+
+			.success-banner {
+				position: fixed;
+				top: 20px;
+				left: 50%;
+				transform: translateX(-50%);
+				background-color: #28a745;
+				color: white;
+				padding: 15px 30px;
+				border-radius: 4px;
+				box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+				z-index: 1000;
+				opacity: 0;
+				transition: opacity 0.3s ease;
+			}
+
+			.success-banner.show {
+				opacity: 1;
 			}
 		</style>
 	</head>
 	<body>
 		<div class="container">
 			@HeaderSimple()
+			@SuccessBanner()
 
 			<form id="registerForm">
 				<div class="form-group">
@@ -27,23 +49,8 @@ templ RegisterStudent() {
 				</div>
 
 				<div class="form-row">
-					<div class="form-group">
-						<label for="currency">Currency *</label>
-						<select id="currency" name="currency" required>
-							<option value="">-- Select Currency --</option>
-							<option value="KRW">KRW (Korean Won)</option>
-							<option value="CAD">CAD (Canadian Dollar)</option>
-							<option value="YEN">YEN (Japanese Yen)</option>
-							<option value="PHP">PHP (Philippine Peso)</option>
-						</select>
-					</div>
-					<div class="form-group">
-						<label for="status">Status *</label>
-						<select id="status" name="status" required>
-							<option value="active">Active</option>
-							<option value="inactive">Inactive</option>
-						</select>
-					</div>
+					@CurrencyDropdown()
+					@StudentStatusDropdown()
 				</div>
 
 				<div class="form-group">
@@ -116,11 +123,6 @@ templ RegisterStudent() {
 
 			function buildURL(path) {
 				return baseURL + path;
-			}
-
-			const favicon = document.getElementById('favicon');
-			if (favicon) {
-				favicon.href = buildURL('/static/favicon.ico');
 			}
 
 			function validateForm() {
@@ -207,7 +209,12 @@ templ RegisterStudent() {
 					logOutput.textContent = data.logs.join('\n') + '\n';
 
 					if (data.success) {
-						logOutput.textContent += '\n✓ ' + data.message;
+						const banner = document.getElementById('successBanner');
+						banner.textContent = '✓ Student registered successfully!';
+						banner.classList.add('show');
+						setTimeout(() => {
+							banner.classList.remove('show');
+						}, 3000);
 						form.reset();
 						assignedColorInput.value = 'var(--color-primary)';
 					} else {
