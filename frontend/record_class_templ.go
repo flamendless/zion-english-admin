@@ -9,6 +9,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import "zion-english/internal/utils"
+import "time"
 
 func RecordClass() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -38,7 +39,7 @@ func RecordClass() templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 12, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 13, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -49,6 +50,10 @@ func RecordClass() templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = ScrHTMX().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ScrHyperscript().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -75,13 +80,13 @@ func RecordClass() templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/classes/record"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 45, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 49, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-swap=\"none\"><div class=\"form-row\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-swap=\"none\" hx-target=\"#logOutput\" hx-indicator=\"#submitBtn\" _=\"\n\t\t\t\t\ton submit\n\t\t\t\t\t\tif #teacher.value is ''\n\t\t\t\t\t\t\talert('Please select a teacher')\n\t\t\t\t\t\t\thalt\n\t\t\t\t\t\tend\n\t\t\t\t\t\tif #student.value is ''\n\t\t\t\t\t\t\talert('Please select a student')\n\t\t\t\t\t\t\thalt\n\t\t\t\t\t\tend\n\t\t\t\t\t\tif #duration.value <= 0\n\t\t\t\t\t\t\talert('Invalid duration')\n\t\t\t\t\t\t\thalt\n\t\t\t\t\t\tend\n\t\t\t\t\t\tif #rate.value < 0\n\t\t\t\t\t\t\talert('Invalid rate')\n\t\t\t\t\t\t\thalt\n\t\t\t\t\t\tend\n\t\t\t\t\tend\n\t\t\t\t\"><div class=\"form-row\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -93,7 +98,20 @@ func RecordClass() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div><div class=\"form-row\"><div class=\"form-group\"><label for=\"date\">Date *</label> <input type=\"date\" id=\"date\" name=\"date\" required></div><div class=\"form-group\"><label for=\"duration\">Duration (minutes) *</label> <input type=\"number\" id=\"duration\" name=\"duration\" required min=\"1\" placeholder=\"e.g., 60\"></div></div><div class=\"form-row\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div><div class=\"form-row\"><div class=\"form-group\"><label for=\"date\">Date *</label> <input type=\"date\" id=\"date\" name=\"date\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var4 string
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(time.Now().Format("2006-01-02"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 86, Col: 46}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" required></div><div class=\"form-group\"><label for=\"duration\">Duration (minutes) *</label> <input type=\"number\" id=\"duration\" name=\"duration\" required min=\"1\" placeholder=\"e.g., 60\"></div></div><div class=\"form-row\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -101,7 +119,7 @@ func RecordClass() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"form-group\"><label for=\"rate\">Rate *</label> <input type=\"number\" id=\"rate\" name=\"rate\" required min=\"0\" step=\"0.01\" placeholder=\"0.00\"></div></div><div class=\"form-row\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"form-group\"><label for=\"rate\">Rate *</label> <input type=\"number\" id=\"rate\" name=\"rate\" required min=\"0\" step=\"0.01\" placeholder=\"0.00\"></div></div><div class=\"form-row\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -109,7 +127,7 @@ func RecordClass() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"form-group\"><label for=\"reason\">Reason</label> <input type=\"text\" id=\"reason\" name=\"reason\" placeholder=\"Reason for cancellation/reschedule\"></div></div><button type=\"submit\" id=\"submitBtn\">Record Class</button></form><div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div></div><script>\n\t\t\tconst form = document.getElementById('recordForm');\n\t\t\tconst logOutput = document.getElementById('logOutput');\n\t\t\tconst submitBtn = document.getElementById('submitBtn');\n\t\t\tconst teacherSelect = document.getElementById('teacher');\n\t\t\tconst studentSelect = document.getElementById('student');\n\t\t\tconst dateInput = document.getElementById('date');\n\t\t\tconst durationInput = document.getElementById('duration');\n\t\t\tconst rateInput = document.getElementById('rate');\n\t\t\tconst currencySelect = document.getElementById('currency');\n\t\t\tconst statusSelect = document.getElementById('status');\n\t\t\tconst reasonInput = document.getElementById('reason');\n\n\t\t\tfunction getBaseURL() {\n\t\t\t\tconst pathname = window.location.pathname;\n\t\t\t\tconst cleanPath = pathname.replace(/\\/$/, '');\n\t\t\t\tconst parts = cleanPath.split('/').filter(p => p !== '');\n\n\t\t\t\tif (parts.length === 0 || cleanPath.endsWith('.html')) {\n\t\t\t\t\tif (cleanPath.includes('/zion-english-admin')) {\n\t\t\t\t\t\treturn '/zion-english-admin';\n\t\t\t\t\t}\n\t\t\t\t\treturn '';\n\t\t\t\t}\n\n\t\t\t\tif (parts.length === 1) {\n\t\t\t\t\treturn '/' + parts[0];\n\t\t\t\t}\n\n\t\t\t\treturn '/' + parts.slice(0, -1).join('/');\n\t\t\t}\n\n\t\t\tconst baseURL = getBaseURL();\n\n\t\t\tfunction buildURL(path) {\n\t\t\t\treturn baseURL + path;\n\t\t\t}\n\n\t\t\tconst today = new Date();\n\t\t\tconst year = today.getFullYear();\n\t\t\tconst month = String(today.getMonth() + 1).padStart(2, '0');\n\t\t\tconst day = String(today.getDate()).padStart(2, '0');\n\t\t\tdateInput.value = `${year}-${month}-${day}`;\n\n\t\t\tstudentSelect.addEventListener('change', () => {\n\t\t\t\tconst selectedOption = studentSelect.options[studentSelect.selectedIndex];\n\t\t\t\tif (selectedOption && selectedOption.dataset.currency) {\n\t\t\t\t\tcurrencySelect.value = selectedOption.dataset.currency;\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tfunction validateForm() {\n\t\t\t\tlet isValid = true;\n\n\t\t\t\tif (!teacherSelect.value) {\n\t\t\t\t\tteacherSelect.setCustomValidity('Please select a teacher');\n\t\t\t\t\tisValid = false;\n\t\t\t\t} else {\n\t\t\t\t\tteacherSelect.setCustomValidity('');\n\t\t\t\t}\n\n\t\t\t\tif (!studentSelect.value) {\n\t\t\t\t\tstudentSelect.setCustomValidity('Please select a student');\n\t\t\t\t\tisValid = false;\n\t\t\t\t} else {\n\t\t\t\t\tstudentSelect.setCustomValidity('');\n\t\t\t\t}\n\n\t\t\t\tif (!dateInput.value) {\n\t\t\t\t\tdateInput.setCustomValidity('Please select a date');\n\t\t\t\t\tisValid = false;\n\t\t\t\t} else {\n\t\t\t\t\tdateInput.setCustomValidity('');\n\t\t\t\t}\n\n\t\t\t\tif (!durationInput.value || parseInt(durationInput.value) <= 0) {\n\t\t\t\t\tdurationInput.setCustomValidity('Please enter a valid duration');\n\t\t\t\t\tisValid = false;\n\t\t\t\t} else {\n\t\t\t\t\tdurationInput.setCustomValidity('');\n\t\t\t\t}\n\n\t\t\t\tif (!rateInput.value || parseFloat(rateInput.value) < 0) {\n\t\t\t\t\trateInput.setCustomValidity('Please enter a valid rate');\n\t\t\t\t\tisValid = false;\n\t\t\t\t} else {\n\t\t\t\t\trateInput.setCustomValidity('');\n\t\t\t\t}\n\n\t\t\t\tif (!currencySelect.value) {\n\t\t\t\t\tcurrencySelect.setCustomValidity('Please select a currency');\n\t\t\t\t\tisValid = false;\n\t\t\t\t} else {\n\t\t\t\t\tcurrencySelect.setCustomValidity('');\n\t\t\t\t}\n\n\t\t\t\tif (!statusSelect.value) {\n\t\t\t\t\tstatusSelect.setCustomValidity('Please select a status');\n\t\t\t\t\tisValid = false;\n\t\t\t\t} else {\n\t\t\t\t\tstatusSelect.setCustomValidity('');\n\t\t\t\t}\n\n\t\t\t\tconst validStatuses = ['conducted', 'cancelled', 'rescheduled'];\n\t\t\t\tif (statusSelect.value && !validStatuses.includes(statusSelect.value)) {\n\t\t\t\t\tstatusSelect.setCustomValidity('Invalid status');\n\t\t\t\t\tisValid = false;\n\t\t\t\t}\n\n\t\t\t\treturn isValid;\n\t\t\t}\n\n\t\t\tteacherSelect.addEventListener('change', validateForm);\n\t\t\tstudentSelect.addEventListener('change', validateForm);\n\t\t\tdateInput.addEventListener('change', validateForm);\n\t\t\tdurationInput.addEventListener('blur', validateForm);\n\t\t\trateInput.addEventListener('blur', validateForm);\n\t\t\tcurrencySelect.addEventListener('change', validateForm);\n\t\t\tstatusSelect.addEventListener('change', validateForm);\n\n\t\t\tform.addEventListener('htmx:afterRequest', function(event) {\n\t\t\t\tconst xhr = event.detail.xhr;\n\t\t\t\ttry {\n\t\t\t\t\tif (xhr.status === 200) {\n\t\t\t\t\t\tconst data = JSON.parse(xhr.responseText);\n\n\t\t\t\t\t\tlogOutput.textContent = data.logs.join('\\n') + '\\n';\n\n\t\t\t\t\t\tif (data.success) {\n\t\t\t\t\t\t\tconst banner = document.getElementById('successBanner');\n\t\t\t\t\t\t\tbanner.textContent = '✓ Class recorded successfully!';\n\t\t\t\t\t\t\tbanner.classList.add('show');\n\t\t\t\t\t\t\tsetTimeout(() => {\n\t\t\t\t\t\t\t\tbanner.classList.remove('show');\n\t\t\t\t\t\t\t}, 3000);\n\t\t\t\t\t\t\tform.reset();\n\t\t\t\t\t\t\tconst today = new Date();\n\t\t\t\t\t\t\tconst year = today.getFullYear();\n\t\t\t\t\t\t\tconst month = String(today.getMonth() + 1).padStart(2, '0');\n\t\t\t\t\t\t\tconst day = String(today.getDate()).padStart(2, '0');\n\t\t\t\t\t\t\tdateInput.value = `${year}-${month}-${day}`;\n\t\t\t\t\t\t\tteacherSelect.dispatchEvent(new Event('htmx:load'));\n\t\t\t\t\t\t\tstudentSelect.dispatchEvent(new Event('htmx:load'));\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\tlogOutput.textContent += '\\n✗ Error: ' + data.message;\n\t\t\t\t\t\t}\n\t\t\t\t\t} else {\n\t\t\t\t\t\tlogOutput.textContent += '\\n✗ Error: ' + xhr.statusText;\n\t\t\t\t\t}\n\t\t\t\t} catch (err) {\n\t\t\t\t\tconsole.error('Failed to parse response:', err);\n\t\t\t\t\tshowErrorBanner('Failed to parse response: ' + xhr.responseText);\n\t\t\t\t}\n\t\t\t\tsubmitBtn.disabled = false;\n\t\t\t});\n\n\t\t\tform.addEventListener('submit', function(e) {\n\t\t\t\tif (!validateForm()) {\n\t\t\t\t\te.preventDefault();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tsubmitBtn.disabled = true;\n\t\t\t\tlogOutput.textContent = 'Recording class...';\n\t\t\t});\n\t\t</script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"form-group\"><label for=\"reason\">Reason</label> <input type=\"text\" id=\"reason\" name=\"reason\" placeholder=\"Reason for cancellation/reschedule\"></div></div><button type=\"submit\" id=\"submitBtn\">Record Class</button></form><div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

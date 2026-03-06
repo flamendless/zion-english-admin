@@ -46,3 +46,20 @@ templ DatePreset() {
 templ NavLink(url string, id string, text string) {
 	<a href={utils.URL(url)} id={ id } class="nav-link">{ text }</a>
 }
+
+templ DriveURLInput() {
+	<div class="form-group">
+		<label for="driveUrl">Spreadsheet URL *</label>
+		<input type="text" id="driveUrl" name="driveUrl" required
+			   placeholder="https://docs.google.com/spreadsheets/...">
+		<div class="error-message" id="driveUrlError"></div>
+	</div>
+}
+
+templ DateInput(id string, text string) {
+	<div class="form-group">
+		<label for={ id }>{ text }</label>
+		<input type="date" id={ id } name={ id } required>
+		{ children... }
+	</div>
+}

@@ -5,3 +5,7 @@ import "zion-english/internal/utils"
 templ ScrHTMX() {
 	<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/htmx.min.js")) }></script>
 }
+
+templ ScrHyperscript() {
+	<script async type="text/javascript" src={ templ.URL(utils.URL("/static/js/hyperscript.min.js")) }></script>
+}

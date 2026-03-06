@@ -80,6 +80,7 @@ var cmdWeb = &cobra.Command{
 		mux := http.NewServeMux()
 		mux.HandleFunc(basePath, handleHome)
 		mux.HandleFunc("/", handleHome)
+		mux.HandleFunc(basePath+"/refresh", handleRefreshPage)
 		mux.HandleFunc(basePath+"/process", handleProcessPage)
 		mux.HandleFunc(basePath+"/finalize", handleFinalize)
 		mux.HandleFunc(basePath+"/download/", handleDownload)
@@ -160,13 +161,23 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/html")
-	frontend.Home().Render(r.Context(), w)
+	if err := frontend.Home().Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func handleRefreshPage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	w.Header().Set("HX-Refresh", "true")
+	w.WriteHeader(http.StatusOK)
 }
 
 func handleProcessPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		w.Header().Set("Content-Type", "text/html")
 		if err := frontend.Process().Render(r.Context(), w); err != nil {
 			HttpError(w, err.Error(), http.StatusInternalServerError)
 		}

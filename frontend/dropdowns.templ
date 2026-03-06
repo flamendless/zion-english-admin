@@ -9,6 +9,7 @@ templ TeacherDropdown() {
 			hx-get={ utils.URL("/api/teachers") }
 			hx-trigger="load"
 			hx-swap="innerHTML"
+			hx-target="this"
 		>
 			<option value="">-- Select Teacher --</option>
 		</select>
@@ -22,6 +23,7 @@ templ StudentDropdown() {
 			hx-get={ utils.URL("/api/students") }
 			hx-trigger="load"
 			hx-swap="innerHTML"
+			hx-target="this"
 		>
 			<option value="">-- Select Student --</option>
 		</select>
@@ -59,5 +61,18 @@ templ StudentStatusDropdown() {
 			<option value="active">Active</option>
 			<option value="inactive">Inactive</option>
 		</select>
+	</div>
+}
+
+var letters = []string{"A", "B", "C", "D", "E", "F", "G", "H"}
+templ Letters(id string, text string, initial string) {
+	<div class="form-group">
+		<label for={ id }>{ text }</label>
+		<select id={ id } name={ id } required>
+			for _, letter := range letters {
+				<option value={ letter } selected?={ letter == initial }>{  letter }</option>
+			}
+		</select>
+		{ children... }
 	</div>
 }

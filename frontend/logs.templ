@@ -129,7 +129,12 @@ templ Logs(logs LogData) {
 			@HeaderSimple()
 
 			<div class="button-group">
-				<button class="refresh-btn" id="refreshBtn">Refresh</button>
+				<button
+					class="refresh-btn"
+					hx-get={ utils.URL("/refresh") }
+				>
+					Refresh
+				</button>
 			</div>
 
 			if len(logs.Logs) > 0 {

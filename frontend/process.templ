@@ -95,21 +95,13 @@ templ Process() {
 			@ErrorBanner()
 
 			<form id="processForm">
-				<div class="form-group">
-					@TeacherDropdown()
-				</div>
-
-				<div class="form-group">
-					<label for="driveUrl">Spreadsheet URL *</label>
-					<input type="text" id="driveUrl" name="driveUrl" required
-					       placeholder="https://docs.google.com/spreadsheets/...">
-					<div class="error-message" id="driveUrlError"></div>
-				</div>
+				@TeacherDropdown()
+				@DriveURLInput()
 
 				<div class="form-group">
 					<label for="name">Name *</label>
 					<input type="text" id="name" name="name" required
-					       pattern="[a-zA-Z0-9\-_]+"
+					       pattern="[a-zA-Z0-9\-_\w]+"
 					       placeholder="teacher-name">
 					<div class="error-message" id="nameError">Name must contain only letters, numbers, dashes, and underscores</div>
 				</div>
@@ -125,25 +117,13 @@ templ Process() {
 
 				<div class="column-mapping">
 					<h3>Date Range</h3>
-					<div class="form-group">
-						<label for="datePreset">Date Preset</label>
-						<select id="datePreset" name="datePreset">
-							<option value="">-- Select Range --</option>
-							<option value="1-15">1 - 15</option>
-							<option value="16-30">16 - 30</option>
-						</select>
-					</div>
+					@DatePreset()
 
 					<div class="column-row">
-						<div class="form-group">
-							<label for="startDate">Start Date *</label>
-							<input type="date" id="startDate" name="startDate" required>
-						</div>
-						<div class="form-group">
-							<label for="endDate">End Date *</label>
-							<input type="date" id="endDate" name="endDate" required>
+						@DateInput("startDate", "Start Date *")
+						@DateInput("endDate", "End Date *") {
 							<div class="error-message" id="endDateError">End date must be after start date</div>
-						</div>
+						}
 					</div>
 
 					<h3>Options</h3>
@@ -156,64 +136,20 @@ templ Process() {
 
 					<h3>Column Mapping</h3>
 					<div class="column-row">
-						<div class="form-group">
-							<label for="nameCol">Name Column *</label>
-							<select id="nameCol" name="nameCol" required>
-								<option value="A">A</option>
-								<option value="B">B</option>
-								<option value="C">C</option>
-								<option value="D">D</option>
-								<option value="E">E</option>
-								<option value="F">F</option>
-								<option value="G">G</option>
-								<option value="H">H</option>
-							</select>
+						@Letters("nameCol", "Name Column *", "A") {
 							<div class="column-error" id="nameColError"></div>
-						</div>
-						<div class="form-group">
-							<label for="durationCol">Duration Column *</label>
-							<select id="durationCol" name="durationCol" required>
-								<option value="A">A</option>
-								<option value="B" selected>B</option>
-								<option value="C">C</option>
-								<option value="D">D</option>
-								<option value="E">E</option>
-								<option value="F">F</option>
-								<option value="G">G</option>
-								<option value="H">H</option>
-							</select>
+						}
+						@Letters("durationCol", "Duration Column *", "B") {
 							<div class="column-error" id="durationColError"></div>
-						</div>
+						}
 					</div>
 					<div class="column-row">
-						<div class="form-group">
-							<label for="rateCol">Rate Column *</label>
-							<select id="rateCol" name="rateCol" required>
-								<option value="A">A</option>
-								<option value="B">B</option>
-								<option value="C" selected>C</option>
-								<option value="D">D</option>
-								<option value="E">E</option>
-								<option value="F">F</option>
-								<option value="G">G</option>
-								<option value="H">H</option>
-							</select>
+						@Letters("rateCol", "Rate Column *", "C") {
 							<div class="column-error" id="rateColError"></div>
-						</div>
-						<div class="form-group">
-							<label for="statusCol">Status Column *</label>
-							<select id="statusCol" name="statusCol" required>
-								<option value="A">A</option>
-								<option value="B">B</option>
-								<option value="C">C</option>
-								<option value="D">D</option>
-								<option value="E">E</option>
-								<option value="F">F</option>
-								<option value="G" selected>G</option>
-								<option value="H">H</option>
-							</select>
-							<div class="column-error" id="statusColError"></div>
-						</div>
+						}
+						@Letters("statusCol", "Status Column *", "G") {
+							<div class="column-error" id="rateColError"></div>
+						}
 					</div>
 				</div>
 
