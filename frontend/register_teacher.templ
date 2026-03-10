@@ -11,10 +11,51 @@ templ RegisterTeacher() {
 		<title>Register Teacher - Zion English Admin</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		<style>
-			button {
-				margin-top: 20px;
+			.password-group {
+				display: flex;
+				gap: 10px;
+				align-items: center;
+			}
+			.password-group input {
+				flex: 1;
+			}
+			.suggest-btn {
+				margin-top: 0;
+				padding: 8px 12px;
+				font-size: 12px;
+				white-space: nowrap;
+			}
+			.password-strength {
+				height: 4px;
+				margin-top: 5px;
+				background: #ddd;
+				border-radius: 2px;
+				overflow: hidden;
+			}
+			.password-strength-bar {
+				height: 100%;
+				transition: width 0.3s, background-color 0.3s;
+			}
+			.password-strength-bar.weak { width: 25%; background: #e74c3c; }
+			.password-strength-bar.fair { width: 50%; background: #f39c12; }
+			.password-strength-bar.good { width: 75%; background: #3498db; }
+			.password-strength-bar.strong { width: 100%; background: #27ae60; }
+			.password-requirements {
+				font-size: 11px;
+				color: #666;
+				margin-top: 5px;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+			}
+			.password-requirements span {
+				transition: color 0.2s;
+			}
+			.password-requirements span.met {
+				color: #27ae60;
 			}
 		</style>
+		@GlobalIncludes()
 
 	</head>
 	<body>
@@ -51,30 +92,30 @@ templ RegisterTeacher() {
 				<div class="form-row">
 					<div class="form-group">
 						<label for="birthdate">Birthdate</label>
-						<input type="date" id="birthdate" name="birthdate">
+						<input type="date" id="birthdate" name="birthdate" required>
 					</div>
 					<div class="form-group">
 						<label for="joiningDate">Joining Date *</label>
 						<input type="date" id="joiningDate" name="joiningDate" required>
 					</div>
-				</div>
+				</div> required
 
 				<div class="form-group">
 					<label for="address">Address</label>
 					<input type="text" id="address" name="address"
-					       placeholder="Enter address">
+					       placeholder="Enter address" required>
 				</div>
 
 				<div class="form-row">
 					<div class="form-group">
 						<label for="mobileNumber">Mobile Number</label>
 						<input type="text" id="mobileNumber" name="mobileNumber"
-					       placeholder="Enter mobile number">
+					       placeholder="Enter mobile number" required>
 					</div>
 					<div class="form-group">
 						<label for="email">Email</label>
 						<input type="email" id="email" name="email"
-					       placeholder="Enter email">
+					       placeholder="Enter email" required>
 					</div>
 				</div>
 
@@ -84,17 +125,33 @@ templ RegisterTeacher() {
 					       placeholder="e.g., TESOL, CELTA, Bachelor in Education">
 				</div>
 
-				<div class="form-row-3">
-					<div class="form-group">
-						<label for="currency">Currency *</label>
-						<select id="currency" name="currency" required>
-							<option value="">-- Select Currency --</option>
-							<option value="KRW">KRW (Korean Won)</option>
-							<option value="CAD">CAD (Canadian Dollar)</option>
-							<option value="YEN">YEN (Japanese Yen)</option>
-							<option value="PHP">PHP (Philippine Peso)</option>
-						</select>
+				<div class="form-group">
+					<label for="password">Password *</label>
+					<div class="password-group">
+						<input type="password" id="password" name="password" required
+						       minlength="8" maxlength="32" placeholder="8-32 characters">
+						<button type="button" id="suggestPasswordBtn" class="suggest-btn">Suggest Strong Password</button>
 					</div>
+					<div class="password-strength" id="passwordStrength"></div>
+					<div class="password-requirements" id="passwordRequirements">
+						<span id="reqLength">- 8-32 characters</span>
+						<span id="reqUpper">- Uppercase</span>
+						<span id="reqLower">- Lowercase</span>
+						<span id="reqNumber">- Number</span>
+						<span id="reqSymbol">- Symbol (!@#$%^&*)</span>
+					</div>
+					<div class="error-message" id="passwordError">Password does not meet requirements</div>
+				</div>
+
+				<div class="form-group">
+					<label for="retypePassword">Retype Password *</label>
+					<input type="password" id="retypePassword" name="retypePassword" required
+					       minlength="8" maxlength="32" placeholder="Re-enter password">
+					<div class="error-message" id="retypePasswordError">Passwords do not match</div>
+				</div>
+
+				<div class="form-row-3">
+					@CurrencyDropdown()
 					<div class="form-group">
 						<label for="ratePerClass">Rate Per Class *</label>
 						<input type="number" id="ratePerClass" name="ratePerClass" required
@@ -125,7 +182,7 @@ templ RegisterTeacher() {
 			const logOutput = document.getElementById('logOutput');
 			const submitBtn = document.getElementById('submitBtn');
 			const nameInput = document.getElementById('name');
-			const birthdateInput = document.getElementById('birthdate');
+			const birthdateElementById = document.getElementById('birthdate');
 			const joiningDateInput = document.getElementById('joiningDate');
 			const addressInput = document.getElementById('address');
 			const mobileNumberInput = document.getElementById('mobileNumber');
@@ -138,6 +195,19 @@ templ RegisterTeacher() {
 			const colorValue = document.getElementById('colorValue');
 			const driveUrlInput = document.getElementById('driveUrl');
 			const sexSelect = document.getElementById('sex');
+			const passwordInput = document.getElementById('password');
+			const retypePasswordInput = document.getElementById('retypePassword');
+			const suggestPasswordBtn = document.getElementById('suggestPasswordBtn');
+			const passwordStrength = document.getElementById('passwordStrength');
+			const passwordError = document.getElementById('passwordError');
+			const retypePasswordError = document.getElementById('retypePasswordError');
+			const reqLength = document.getElementById('reqLength');
+			const reqUpper = document.getElementById('reqUpper');
+			const reqLower = document.getElementById('reqLower');
+			const reqNumber = document.getElementById('reqNumber');
+			const reqSymbol = document.getElementById('reqSymbol');
+
+			const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,32}$/;
 
 			function getBaseURL() {
 				const pathname = window.location.pathname;
@@ -168,6 +238,77 @@ templ RegisterTeacher() {
 				const color = assignedColorInput.value;
 				colorPreview.style.backgroundColor = color;
 				colorValue.textContent = color;
+			});
+
+			function generateStrongPassword() {
+				const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+				const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+				const numbers = '0123456789';
+				const symbols = '!@#$%^&*';
+				const allChars = uppercase + lowercase + numbers + symbols;
+
+				let password = '';
+				password += uppercase[Math.floor(Math.random() * uppercase.length)];
+				password += lowercase[Math.floor(Math.random() * lowercase.length)];
+				password += numbers[Math.floor(Math.random() * numbers.length)];
+				password += symbols[Math.floor(Math.random() * symbols.length)];
+
+				for (let i = 4; i < 16; i++) {
+					password += allChars[Math.floor(Math.random() * allChars.length)];
+				}
+
+				return password.split('').sort(() => Math.random() - 0.5).join('');
+			}
+
+			function checkPasswordStrength(password) {
+				const hasUpper = /[A-Z]/.test(password);
+				const hasLower = /[a-z]/.test(password);
+				const hasNumber = /\d/.test(password);
+				const hasSymbol = /[!@#$%^&*]/.test(password);
+				const isValidLength = password.length >= 8 && password.length <= 32;
+
+				reqLength.classList.toggle('met', isValidLength);
+				reqUpper.classList.toggle('met', hasUpper);
+				reqLower.classList.toggle('met', hasLower);
+				reqNumber.classList.toggle('met', hasNumber);
+				reqSymbol.classList.toggle('met', hasSymbol);
+
+				const metCount = [isValidLength, hasUpper, hasLower, hasNumber, hasSymbol].filter(Boolean).length;
+
+				passwordStrength.innerHTML = '<div class="password-strength-bar ' +
+					(metCount <= 2 ? 'weak' : metCount <= 3 ? 'fair' : metCount <= 4 ? 'good' : 'strong') +
+					'"></div>';
+
+				return isValidLength && hasUpper && hasLower && hasNumber && hasSymbol;
+			}
+
+			passwordInput.addEventListener('input', () => {
+				const password = passwordInput.value;
+				if (password.length === 0) {
+					passwordStrength.innerHTML = '';
+					passwordError.style.display = 'none';
+				} else {
+					const isValid = checkPasswordStrength(password);
+					passwordError.style.display = isValid ? 'none' : 'block';
+				}
+			});
+
+			retypePasswordInput.addEventListener('input', () => {
+				if (retypePasswordInput.value.length === 0) {
+					retypePasswordError.style.display = 'none';
+				} else {
+					retypePasswordError.style.display =
+						passwordInput.value === retypePasswordInput.value ? 'none' : 'block';
+				}
+			});
+
+			suggestPasswordBtn.addEventListener('click', () => {
+				const password = generateStrongPassword();
+				passwordInput.value = password;
+				retypePasswordInput.value = password;
+				checkPasswordStrength(password);
+				retypePasswordError.style.display = 'none';
+				passwordError.style.display = 'none';
 			});
 
 			function validateForm() {
@@ -226,6 +367,24 @@ templ RegisterTeacher() {
 				sexSelect.setCustomValidity('');
 			}
 
+			if (!PASSWORD_REGEX.test(passwordInput.value)) {
+				passwordError.style.display = 'block';
+				passwordInput.setCustomValidity('Password does not meet requirements');
+				isValid = false;
+			} else {
+				passwordError.style.display = 'none';
+				passwordInput.setCustomValidity('');
+			}
+
+			if (passwordInput.value !== retypePasswordInput.value) {
+				retypePasswordError.style.display = 'block';
+				retypePasswordInput.setCustomValidity('Passwords do not match');
+				isValid = false;
+			} else {
+				retypePasswordError.style.display = 'none';
+				retypePasswordInput.setCustomValidity('');
+			}
+
 				return isValid;
 			}
 
@@ -234,6 +393,8 @@ templ RegisterTeacher() {
 			currencySelect.addEventListener('change', validateForm);
 			ratePerClassInput.addEventListener('blur', validateForm);
 			assignedColorInput.addEventListener('change', validateForm);
+			passwordInput.addEventListener('blur', validateForm);
+			retypePasswordInput.addEventListener('blur', validateForm);
 
 			form.addEventListener('submit', async (e) => {
 				e.preventDefault();
@@ -257,7 +418,9 @@ templ RegisterTeacher() {
 					ratePerClass: parseFloat(ratePerClassInput.value) || 0,
 					assignedColor: assignedColorInput.value,
 					driveUrl: driveUrlInput.value.trim(),
-					sex: sexSelect.value
+					sex: sexSelect.value,
+					password: passwordInput.value,
+					retypePassword: retypePasswordInput.value
 				};
 
 				try {
@@ -284,6 +447,12 @@ templ RegisterTeacher() {
 						assignedColorInput.value = 'var(--color-primary)';
 						colorPreview.style.backgroundColor = 'var(--color-primary)';
 						colorValue.textContent = 'var(--color-primary)';
+						passwordStrength.innerHTML = '';
+						reqLength.classList.remove('met');
+						reqUpper.classList.remove('met');
+						reqLower.classList.remove('met');
+						reqNumber.classList.remove('met');
+						reqSymbol.classList.remove('met');
 					} else {
 						logOutput.textContent += '\n✗ Error: ' + data.message;
 					}

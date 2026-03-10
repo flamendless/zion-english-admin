@@ -22,10 +22,12 @@ import (
 	"zion-english/internal/models"
 	"zion-english/internal/processor"
 	"zion-english/internal/sheet"
+	"zion-english/internal/utils"
 
 	"github.com/spf13/cobra"
 	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func HttpError(w http.ResponseWriter, msg string, code int) {
@@ -35,6 +37,11 @@ func HttpError(w http.ResponseWriter, msg string, code int) {
 		Path:  "/",
 	})
 	http.Error(w, msg, code)
+}
+
+func HttpRedirect(w http.ResponseWriter, url string) {
+	w.Header().Set("HX-Redirect", utils.URL(url))
+	w.WriteHeader(http.StatusFound)
 }
 
 type WebFlags struct {
@@ -76,41 +83,61 @@ var cmdWeb = &cobra.Command{
 		dbRO = database.New(database.DB_MODE_RO)
 
 		basePath := "/" + strings.TrimPrefix(webFlags.baseURL, "/")
+		cfg.BasePath = basePath
 
-		mux := http.NewServeMux()
-		mux.HandleFunc(basePath, handleHome)
-		mux.HandleFunc("/", handleHome)
-		mux.HandleFunc(basePath+"/refresh", handleRefreshPage)
-		mux.HandleFunc(basePath+"/process", handleProcessPage)
-		mux.HandleFunc(basePath+"/finalize", handleFinalize)
-		mux.HandleFunc(basePath+"/download/", handleDownload)
-		mux.HandleFunc(basePath+"/api/teachers", handleGetTeachers)
-		mux.HandleFunc(basePath+"/api/students", handleGetStudents)
-		mux.HandleFunc(basePath+"/api/class-records", handleGetClassRecords)
-		mux.Handle(basePath+"/static/", http.StripPrefix(basePath+"/static/", http.FileServer(http.Dir("static"))))
+		publicMux := http.NewServeMux()
+		publicMux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			http.Redirect(w, r, basePath, http.StatusFound)
+		})
+		publicMux.HandleFunc(basePath+"/role", handleGetRole)
+		publicMux.HandleFunc(basePath+"/refresh", handleRefreshPage)
+		publicMux.HandleFunc(basePath+"/auth/login", handleLogin)
+		publicMux.HandleFunc(basePath+"/auth/logout", handleLogout)
+		publicMux.HandleFunc(basePath+"/teachers/register", handleTeacherRegister)
+
+		publicMux.HandleFunc(basePath+"/api/teachers", handleGetTeachers)
+		publicMux.HandleFunc(basePath+"/api/students", handleGetStudents)
+		publicMux.HandleFunc(basePath+"/api/class-records", handleGetClassRecords)
+
+		publicMux.Handle(
+			basePath+"/static/",
+			http.StripPrefix(basePath+"/static/", http.FileServer(http.Dir("static"))),
+		)
 
 		authMux := http.NewServeMux()
-		authMux.HandleFunc(basePath+"/role", handleGetRole)
-		authMux.HandleFunc(basePath+"/logs", auth.RequireRole(auth.RoleSuperuser)(handleLogs))
+		authMux.HandleFunc(basePath, auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleHome))
+		authMux.HandleFunc(basePath+"/", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleHome))
 		authMux.HandleFunc(basePath+"/students", auth.RequireRole(auth.RoleSuperuser)(handleStudents))
 		authMux.HandleFunc(basePath+"/students/register", auth.RequireRole(auth.RoleSuperuser)(handleStudentRegister))
 		authMux.HandleFunc(basePath+"/teachers", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleTeachers))
-		authMux.HandleFunc(basePath+"/teachers/register", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleTeacherRegister))
 		authMux.HandleFunc(basePath+"/classes/record", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClassRecord))
 		authMux.HandleFunc(basePath+"/classes", auth.RequireRole(auth.RoleSuperuser)(handleClasses))
-		authHandler := auth.Middleware(cfg, authMux)
 
-		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if strings.HasPrefix(r.URL.Path, basePath+"/logs") ||
-				strings.HasPrefix(r.URL.Path, basePath+"/students") ||
-				strings.HasPrefix(r.URL.Path, basePath+"/teachers") ||
-				strings.HasPrefix(r.URL.Path, basePath+"/classes") ||
-				strings.HasPrefix(r.URL.Path, basePath+"/role") {
-				authHandler.ServeHTTP(w, r)
-			} else {
-				mux.ServeHTTP(w, r)
-			}
+		authHandler := auth.Middleware(cfg, dbRO.GetQueries(), authMux)
+
+		rootMux := http.NewServeMux()
+
+		// public routes
+		rootMux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			http.Redirect(w, r, basePath, http.StatusFound)
 		})
+		rootMux.Handle(basePath+"/role", publicMux)
+		rootMux.Handle(basePath+"/auth/", publicMux)
+		rootMux.Handle(basePath+"/api/", publicMux)
+		rootMux.Handle(basePath+"/static/", publicMux)
+		rootMux.Handle(basePath+"/refresh", publicMux)
+		rootMux.Handle(basePath+"/teachers/register", publicMux)
+
+		// protected routes
+		rootMux.Handle(basePath, authHandler)
+		rootMux.Handle(basePath+"/students", authHandler)
+		rootMux.Handle(basePath+"/students/", authHandler)
+		rootMux.Handle(basePath+"/teachers", authHandler)
+		rootMux.Handle(basePath+"/teachers/", authHandler)
+		rootMux.Handle(basePath+"/classes", authHandler)
+		rootMux.Handle(basePath+"/classes/", authHandler)
+
+		handler := rootMux
 
 		port := webFlags.port
 		if !strings.HasPrefix(port, ":") {
@@ -161,7 +188,7 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := frontend.Home().Render(r.Context(), w); err != nil {
+	if err := frontend.Home(auth.GetRole(r.Context())).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -747,11 +774,11 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 		viewTeachers[i] = frontend.TeacherItem{
 			ID:             strconv.FormatInt(t.ID, 10),
 			Name:           t.Name,
-			Birthdate:      t.Birthdate.String,
-			Address:        t.Address.String,
+			Birthdate:      t.Birthdate,
+			Address:        t.Address,
 			JoiningDate:    t.JoiningDate,
-			MobileNumber:   t.MobileNumber.String,
-			Email:          t.Email.String,
+			MobileNumber:   t.MobileNumber,
+			Email:          t.Email,
 			Certifications: t.Certifications.String,
 			AssignedColor:  t.AssignedColor,
 			RatePerClass:   t.RatePerClass,
@@ -768,8 +795,9 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 
 func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		w.Header().Set("Content-Type", "text/html")
-		frontend.RegisterTeacher().Render(r.Context(), w)
+		if err := frontend.RegisterTeacher().Render(r.Context(), w); err != nil {
+			HttpError(w, err.Error(), http.StatusMethodNotAllowed)
+		}
 		return
 	}
 
@@ -809,19 +837,33 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if req.Password != req.RetypePassword {
+		errMsg = "Passwords must be the same"
+		sendTeacherErrorResponse(w, errMsg)
+		return
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		errMsg = "Failed to hash password"
+		sendTeacherErrorResponse(w, errMsg)
+		return
+	}
+
 	err = dbRW.GetQueries().InsertTeacher(r.Context(), queries.InsertTeacherParams{
 		Name:           req.Name,
-		Birthdate:      sql.NullString{String: req.Birthdate, Valid: req.Birthdate != ""},
-		Address:        sql.NullString{String: req.Address, Valid: req.Address != ""},
+		Birthdate:      req.Birthdate,
+		Address:        req.Address,
 		JoiningDate:    req.JoiningDate,
-		MobileNumber:   sql.NullString{String: req.MobileNumber, Valid: req.MobileNumber != ""},
-		Email:          sql.NullString{String: req.Email, Valid: req.Email != ""},
+		MobileNumber:   req.MobileNumber,
+		Email:          req.Email,
 		Certifications: sql.NullString{String: req.Certifications, Valid: req.Certifications != ""},
 		AssignedColor:  req.AssignedColor,
 		RatePerClass:   req.RatePerClass,
 		Currency:       req.Currency,
 		DriveUrl:       req.DriveUrl,
 		Sex:            sql.NullString{String: req.Sex, Valid: req.Sex != ""},
+		Password:       string(hashedPassword),
 	})
 	if err != nil {
 		errMsg = fmt.Sprintf("Failed to register teacher: %v", err)
@@ -872,6 +914,19 @@ func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
 		return errors.New("invalid sex. Must be M or F")
 	}
 
+	if req.Password == "" {
+		return errors.New("password is required")
+	}
+
+	passwordRegex := regexp.MustCompile(`^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,32}$`)
+	if !passwordRegex.MatchString(req.Password) {
+		return errors.New("password must be 8-32 characters with uppercase, lowercase, number, and symbol (!@#$%^&*)")
+	}
+
+	if req.Password != req.RetypePassword {
+		return errors.New("passwords do not match")
+	}
+
 	return nil
 }
 
@@ -914,6 +969,50 @@ func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleLogin(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Handle Login]"
+	if r.Method == http.MethodGet {
+		if err := frontend.Login().Render(r.Context(), w); err != nil {
+			HttpError(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
+
+	if err := r.ParseForm(); err != nil {
+		logs.Log().Error(logtag, zap.Error(err))
+		http.Error(w, "Invalid form submission", http.StatusBadRequest)
+		return
+	}
+
+	email := r.FormValue("email")
+	password := r.FormValue("password")
+	if email == "" || password == "" {
+		fmt.Fprint(w, "Invalid email or password")
+		return
+	}
+
+	if err := auth.Login(w, r, conf.Conf(), dbRO.GetQueries(), email, password); err != nil {
+		fmt.Fprint(w, "Invalid email or password")
+		return
+	}
+
+	HttpRedirect(w, "/")
+}
+
+func handleLogout(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Handle Logout]"
+	if r.Method != http.MethodPost {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	auth.Logout(w)
+	HttpRedirect(w, "/")
+}
+
 func handleGetRole(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -921,8 +1020,17 @@ func handleGetRole(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
+	greetings := "Welcome!"
 	role := auth.GetRole(ctx)
-	if _, err := fmt.Fprintf(w, "Welcome, %s!", role); err != nil {
+	switch role {
+	case auth.RoleSuperuser:
+		greetings = "Welcome, superuser!"
+	case auth.RoleTeacher:
+		user := auth.GetUser(ctx)
+		greetings = fmt.Sprintf("Welcome, teacher %s!", user.Name)
+	}
+
+	if _, err := fmt.Fprint(w, greetings); err != nil {
 		logs.Log().Error("handle get role", zap.Error(err))
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}

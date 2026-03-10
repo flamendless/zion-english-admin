@@ -87,6 +87,7 @@ templ Process() {
 				text-align: center;
 			}
 		</style>
+		@GlobalIncludes()
 	</head>
 	<body>
 		<div class="container">
@@ -101,9 +102,9 @@ templ Process() {
 				<div class="form-group">
 					<label for="name">Name *</label>
 					<input type="text" id="name" name="name" required
-					       pattern="[a-zA-Z0-9\-_\w]+"
+					       pattern="[a-zA-Z\-\w]+"
 					       placeholder="teacher-name">
-					<div class="error-message" id="nameError">Name must contain only letters, numbers, dashes, and underscores</div>
+					<div class="error-message" id="nameError">Name must contain only letters, spaces, and dashes</div>
 				</div>
 
 				<div class="form-group">
@@ -250,26 +251,6 @@ templ Process() {
 				e.preventDefault();
 				window.location.href = buildURL('/logs');
 			});
-
-			async function loadTeachers() {
-				try {
-					const response = await fetch(buildURL('/api/teachers'));
-					if (!response.ok) return;
-					const teachers = await response.json();
-					teachers.forEach(teacher => {
-						const option = document.createElement('option');
-						option.value = teacher.id;
-						option.textContent = teacher.name;
-						option.dataset.driveUrl = teacher.driveUrl;
-						teacherSelect.appendChild(option);
-					});
-				} catch (error) {
-					console.error('Failed to load teachers:', error);
-					showErrorBanner(error.message);
-				}
-			}
-
-			loadTeachers();
 
 			teacherSelect.addEventListener('change', () => {
 				const selectedOption = teacherSelect.options[teacherSelect.selectedIndex];

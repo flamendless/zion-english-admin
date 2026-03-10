@@ -35,73 +35,7 @@ templ Students(data StudentData) {
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Students - Zion English Admin Tool</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		<style>
-			.add-btn {
-				background-color: var(--color-primary);
-				color: white;
-				padding: 10px 20px;
-				border: none;
-				border-radius: 4px;
-				cursor: pointer;
-				font-size: 14px;
-				font-weight: 500;
-				text-decoration: none;
-				display: inline-block;
-			}
-
-			.add-btn:hover {
-				opacity: 0.9;
-			}
-
-			table {
-				width: 100%;
-				border-collapse: collapse;
-				margin-bottom: 20px;
-			}
-
-			.color-cell {
-				display: flex;
-				align-items: center;
-				gap: 10px;
-			}
-
-			.color-box {
-				width: 24px;
-				height: 24px;
-				border-radius: 4px;
-				border: 1px solid #ddd;
-			}
-
-			.status-active {
-				color: #28a745;
-				font-weight: 500;
-			}
-
-			.status-inactive {
-				color: #dc3545;
-				font-weight: 500;
-			}
-
-			.empty-state {
-				text-align: center;
-				padding: 40px;
-				color: #666;
-			}
-
-			.currency-cell {
-				white-space: nowrap;
-			}
-
-			.rate-cell {
-				white-space: nowrap;
-				font-family: 'Courier New', monospace;
-			}
-
-			.table-wrapper {
-				overflow-x: auto;
-				margin-bottom: 20px;
-			}
-		</style>
+		@GlobalIncludes()
 	</head>
 	<body>
 		<div class="container">

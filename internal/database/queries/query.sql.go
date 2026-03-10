@@ -134,7 +134,7 @@ func (q *Queries) GetAllStudents(ctx context.Context) ([]TblStudent, error) {
 }
 
 const getAllTeachers = `-- name: GetAllTeachers :many
-SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, created_at, updated_at
+SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, created_at, updated_at
 FROM tbl_teachers
 ORDER BY created_at DESC
 `
@@ -142,17 +142,18 @@ ORDER BY created_at DESC
 type GetAllTeachersRow struct {
 	ID             int64
 	Name           string
-	Birthdate      sql.NullString
-	Address        sql.NullString
+	Birthdate      string
+	Address        string
 	JoiningDate    string
-	MobileNumber   sql.NullString
-	Email          sql.NullString
+	MobileNumber   string
+	Email          string
 	Certifications sql.NullString
 	AssignedColor  string
 	RatePerClass   float64
 	Currency       string
 	DriveUrl       string
 	Sex            sql.NullString
+	Password       string
 	CreatedAt      sql.NullTime
 	UpdatedAt      sql.NullTime
 }
@@ -180,6 +181,7 @@ func (q *Queries) GetAllTeachers(ctx context.Context) ([]GetAllTeachersRow, erro
 			&i.Currency,
 			&i.DriveUrl,
 			&i.Sex,
+			&i.Password,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -302,6 +304,29 @@ func (q *Queries) GetStudentByName(ctx context.Context, name string) (int64, err
 	var count int64
 	err := row.Scan(&count)
 	return count, err
+}
+
+const getTeacherByEmail = `-- name: GetTeacherByEmail :one
+SELECT id, name, email, password FROM tbl_teachers WHERE email = ?
+`
+
+type GetTeacherByEmailRow struct {
+	ID       int64
+	Name     string
+	Email    string
+	Password string
+}
+
+func (q *Queries) GetTeacherByEmail(ctx context.Context, email string) (GetTeacherByEmailRow, error) {
+	row := q.db.QueryRowContext(ctx, getTeacherByEmail, email)
+	var i GetTeacherByEmailRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.Password,
+	)
+	return i, err
 }
 
 const getTeacherByName = `-- name: GetTeacherByName :one
@@ -455,23 +480,24 @@ func (q *Queries) InsertStudent(ctx context.Context, arg InsertStudentParams) er
 }
 
 const insertTeacher = `-- name: InsertTeacher :exec
-INSERT INTO tbl_teachers (name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO tbl_teachers (name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 type InsertTeacherParams struct {
 	Name           string
-	Birthdate      sql.NullString
-	Address        sql.NullString
+	Birthdate      string
+	Address        string
 	JoiningDate    string
-	MobileNumber   sql.NullString
-	Email          sql.NullString
+	MobileNumber   string
+	Email          string
 	Certifications sql.NullString
 	AssignedColor  string
 	RatePerClass   float64
 	Currency       string
 	DriveUrl       string
 	Sex            sql.NullString
+	Password       string
 }
 
 func (q *Queries) InsertTeacher(ctx context.Context, arg InsertTeacherParams) error {
@@ -488,6 +514,7 @@ func (q *Queries) InsertTeacher(ctx context.Context, arg InsertTeacherParams) er
 		arg.Currency,
 		arg.DriveUrl,
 		arg.Sex,
+		arg.Password,
 	)
 	return err
 }

@@ -11,32 +11,7 @@ templ RecordClass() {
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Record a Class - Zion English Admin</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		<style>
-			button {
-				margin-top: 20px;
-			}
-
-			.success-banner {
-				position: fixed;
-				top: 20px;
-				left: 50%;
-				transform: translateX(-50%);
-				background-color: #28a745;
-				color: white;
-				padding: 15px 30px;
-				border-radius: 4px;
-				box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-				z-index: 1000;
-				opacity: 0;
-				transition: opacity 0.3s ease;
-			}
-
-			.success-banner.show {
-				opacity: 1;
-			}
-		</style>
-		@ScrHTMX()
-		@ScrHyperscript()
+		@GlobalIncludes()
 	</head>
 	<body>
 		<div class="container">

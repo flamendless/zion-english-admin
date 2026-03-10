@@ -64,11 +64,11 @@ type TblStudent struct {
 type TblTeacher struct {
 	ID             int64
 	Name           string
-	Birthdate      sql.NullString
-	Address        sql.NullString
+	Birthdate      string
+	Address        string
 	JoiningDate    string
-	MobileNumber   sql.NullString
-	Email          sql.NullString
+	MobileNumber   string
+	Email          string
 	Certifications sql.NullString
 	AssignedColor  string
 	RatePerClass   float64
@@ -77,4 +77,5 @@ type TblTeacher struct {
 	UpdatedAt      sql.NullTime
 	DriveUrl       string
 	Sex            sql.NullString
+	Password       string
 }

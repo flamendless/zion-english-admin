@@ -83,13 +83,6 @@ templ Logs(logs LogData) {
 				background-color: #e68900;
 			}
 
-			table {
-				width: 100%;
-				border-collapse: collapse;
-				margin-bottom: 20px;
-				font-size: 14px;
-			}
-
 			.error-cell {
 				color: #dc3545;
 				max-width: 200px;
@@ -107,22 +100,13 @@ templ Logs(logs LogData) {
 				color: #28a745;
 			}
 
-			.empty-state {
-				text-align: center;
-				padding: 40px;
-				color: #666;
-			}
-
-			.date-cell {
-				white-space: nowrap;
-			}
-
 			.loading {
 				text-align: center;
 				padding: 40px;
 				color: #666;
 			}
 		</style>
+		@GlobalIncludes()
 	</head>
 	<body>
 		<div class="container">

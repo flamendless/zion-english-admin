@@ -9,11 +9,23 @@ const (
 	RoleSuperuser Role = "superuser"
 )
 
+type User struct {
+	ID    int64
+	Name  string
+	Email string
+	Role  Role
+}
+
 type contextKey string
 
-const roleKey contextKey = "role"
+const userKey contextKey = "user"
+
+func GetUser(ctx context.Context) User {
+	user, _ := ctx.Value(userKey).(User)
+	return user
+}
 
 func GetRole(ctx context.Context) Role {
-	role, _ := ctx.Value(roleKey).(Role)
-	return role
+	user := GetUser(ctx)
+	return user.Role
 }

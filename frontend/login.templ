@@ -1,0 +1,167 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+templ Login() {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Login - Zion English Admin</title>
+			<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+			<style>
+			body {
+				min-height: 100vh;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+
+			.login-card {
+				background: white;
+				border-radius: 8px;
+				box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+				padding: 40px;
+				width: 100%;
+				max-width: 400px;
+			}
+
+			.login-logo {
+				display: block;
+				max-width: 200px;
+				height: auto;
+				margin: 0 auto 30px;
+			}
+
+			.login-title {
+				text-align: center;
+				margin-bottom: 30px;
+				color: #333;
+			}
+
+			.login-error {
+				background: #fee;
+				border: 1px solid #fcc;
+				color: #c33;
+				padding: 10px;
+				border-radius: 4px;
+				margin-bottom: 20px;
+				display: none;
+			}
+
+			.login-error.show {
+				display: block;
+			}
+
+			.login-error:not(:empty) {
+				display: block;
+			}
+
+			.login-success {
+				background: #efe;
+				border: 1px solid #cfc;
+				color: #3c3;
+				padding: 10px;
+				border-radius: 4px;
+				margin-bottom: 20px;
+				display: none;
+			}
+
+			.login-success.show {
+				display: block;
+			}
+
+			.login-flam {
+				margin-top: 30px;
+				text-align: center;
+			}
+
+			.password-wrapper {
+				position: relative;
+				display: flex;
+				align-items: center;
+			}
+
+			.password-wrapper input {
+				flex: 1;
+				padding-right: 40px;
+			}
+
+			.password-toggle {
+				position: absolute;
+				right: 10px;
+				background: none;
+				border: none;
+				cursor: pointer;
+				padding: 5px;
+				color: #666;
+				font-size: 14px;
+				margin-top: 0;
+			}
+
+			.password-toggle:hover {
+				color: #333;
+			}
+		</style>
+			@GlobalIncludes()
+		</head>
+		<body>
+			<div class="login-card">
+				<img src={ utils.URL("/static/logo.png") } alt="Zion English" class="login-logo"/>
+				<h1 class="login-title">Login</h1>
+				<div id="loginError" class="login-error"></div>
+				<div id="loginSuccess" class="login-success"></div>
+				<form>
+					<div class="form-group">
+						<label for="email">Email</label>
+						<input
+							type="email"
+							name="email"
+							required
+							placeholder="Enter your email"
+						/>
+					</div>
+					<div class="form-group">
+						<label for="password">Password</label>
+						<div class="password-wrapper">
+							<input
+								type="password"
+								id="password"
+								name="password"
+								required
+								placeholder="Enter your password"
+							/>
+							<button type="button" class="password-toggle" onclick="togglePassword()">Show</button>
+						</div>
+					</div>
+					<div class="form-group" style="text-align: center;">
+						<button
+							hx-post={ utils.URL("/auth/login") }
+							hx-target="#loginError"
+							hx-swap="innerHTML"
+						>
+							Login
+						</button>
+					</div>
+				</form>
+				<div class="login-flam">
+					@Flam()
+				</div>
+			</div>
+			<script>
+			function togglePassword() {
+				const passwordInput = document.getElementById('password');
+				const toggleBtn = document.querySelector('.password-toggle');
+				if (passwordInput.type === 'password') {
+					passwordInput.type = 'text';
+					toggleBtn.textContent = 'Hide';
+				} else {
+					passwordInput.type = 'password';
+					toggleBtn.textContent = 'Show';
+				}
+			}
+		</script>
+		</body>
+	</html>
+}

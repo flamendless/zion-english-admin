@@ -1,8 +1,19 @@
 package frontend
 
+import "slices"
+import "zion-english/internal/auth"
 import "zion-english/internal/utils"
 
-templ Home() {
+var whitelistTeachers = []string{
+	"/classes/record",
+	"/teachers/register",
+}
+
+func isAccessible(role auth.Role, url string) bool {
+	return role == auth.RoleSuperuser || slices.Contains(whitelistTeachers, url)
+}
+
+templ Home(role auth.Role) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
@@ -82,8 +93,7 @@ templ Home() {
 				margin-bottom: 10px;
 			}
 		</style>
-		@ScrHTMX()
-		@ScrHyperscript()
+		@GlobalIncludes()
 	</head>
 
 	<body>
@@ -91,24 +101,38 @@ templ Home() {
 			<div class="home-title">
 				<img src={utils.URL("/static/logo.png")} alt="Zion English" class="home-logo">
 			</div>
-
-			<span style={ "display: flex; flex-direction: row;" }>
-				<p class="home-subtext">Admin Tools</p>
+			<span style={ "display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%;" }>
+				@Logout()
 				@Flam()
 			</span>
 
+			@WelcomeRole()
+
 			<div class="cards-grid">
-				@ActionCard("/classes", "Classes", "View recorded classes")
-				@ActionCard("/classes/record", "Record a Class", "Record a new class")
+				if isAccessible(role, "/classes") {
+					@ActionCard("/classes", "Classes", "View recorded classes")
+				}
+				if isAccessible(role, "/classes/record") {
+					@ActionCard("/classes/record", "Record a Class", "Record a new class")
+				}
 
-				@ActionCard("/students", "Students", "View and manage students")
-				@ActionCard("/students/register", "Register a student", "Add a new student")
+				if isAccessible(role, "/students") {
+					@ActionCard("/students", "Students", "View and manage students")
+				}
+				if isAccessible(role, "/students/register") {
+					@ActionCard("/students/register", "Register a student", "Add a new student")
+				}
 
-				@ActionCard("/teachers", "Teachers", "View and manage teachers")
-				@ActionCard("/teachers/register", "Register a teacher", "Add a new teacher")
+				if isAccessible(role, "/teachers") {
+					@ActionCard("/teachers", "Teachers", "View and manage teachers")
+				}
+				if isAccessible(role, "/teachers/register") {
+					@ActionCard("/teachers/register", "Register a teacher", "Add a new teacher")
+				}
 
-				@ActionCard("/logs", "Process logs", "View and manage processing logs")
-				@ActionCard("/process", "Process", "Process CSV/XLSX files")
+				<!-- INFO: (flam) this will be outdated after we centralized class records via admin tool -->
+				<!-- @ActionCard("/logs", "Process logs", "View and manage processing logs") -->
+				<!-- @ActionCard("/process", "Process", "Process CSV/XLSX files") -->
 			</div>
 		</div>
 	</body>

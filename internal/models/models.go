@@ -76,12 +76,25 @@ type TeacherRegisterRequest struct {
 	Currency       string  `json:"currency"`
 	DriveUrl       string  `json:"driveUrl"`
 	Sex            string  `json:"sex"`
+	Password       string  `json:"password"`
+	RetypePassword string  `json:"retypePassword"`
 }
 
 type TeacherRegisterResponse struct {
 	Success bool     `json:"success"`
 	Message string   `json:"message"`
 	Logs    []string `json:"logs"`
+}
+
+type LoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type LoginResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+	Token   string `json:"token,omitempty"`
 }
 
 type TeacherAPIResponse struct {
