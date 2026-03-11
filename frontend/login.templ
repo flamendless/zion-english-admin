@@ -10,102 +10,130 @@ templ Login() {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<title>Login - Zion English Admin</title>
 			<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+
 			<style>
-			body {
-				min-height: 100vh;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-			}
+				body {
+					min-height: 100vh;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					padding: 20px;
+					background: #f7f7f7;
+				}
 
-			.login-card {
-				background: white;
-				border-radius: 8px;
-				box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-				padding: 40px;
-				width: 100%;
-				max-width: 400px;
-			}
+				.login-card {
+					background: white;
+					border-radius: 8px;
+					box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+					padding: 40px;
+					width: 100%;
+					max-width: 400px;
+				}
 
-			.login-logo {
-				display: block;
-				max-width: 200px;
-				height: auto;
-				margin: 0 auto 30px;
-			}
+				.login-logo {
+					display: block;
+					max-width: 200px;
+					height: auto;
+					margin: 0 auto 30px;
+				}
 
-			.login-title {
-				text-align: center;
-				margin-bottom: 30px;
-				color: #333;
-			}
+				.login-title {
+					text-align: center;
+					margin-bottom: 30px;
+					color: #333;
+				}
 
-			.login-error {
-				background: #fee;
-				border: 1px solid #fcc;
-				color: #c33;
-				padding: 10px;
-				border-radius: 4px;
-				margin-bottom: 20px;
-				display: none;
-			}
+				.login-error {
+					background: #fee;
+					border: 1px solid #fcc;
+					color: #c33;
+					padding: 10px;
+					border-radius: 4px;
+					margin-bottom: 20px;
+					display: none;
+				}
 
-			.login-error.show {
-				display: block;
-			}
+				.login-error.show,
+				.login-error:not(:empty) {
+					display: block;
+				}
 
-			.login-error:not(:empty) {
-				display: block;
-			}
+				.login-success {
+					background: #efe;
+					border: 1px solid #cfc;
+					color: #3c3;
+					padding: 10px;
+					border-radius: 4px;
+					margin-bottom: 20px;
+					display: none;
+				}
 
-			.login-success {
-				background: #efe;
-				border: 1px solid #cfc;
-				color: #3c3;
-				padding: 10px;
-				border-radius: 4px;
-				margin-bottom: 20px;
-				display: none;
-			}
+				.login-success.show {
+					display: block;
+				}
 
-			.login-success.show {
-				display: block;
-			}
+				.login-flam {
+					margin-top: 30px;
+					text-align: center;
+				}
 
-			.login-flam {
-				margin-top: 30px;
-				text-align: center;
-			}
+				.password-wrapper {
+					position: relative;
+					width: 100%;
+				}
 
-			.password-wrapper {
-				position: relative;
-				display: flex;
-				align-items: center;
-			}
+				.password-wrapper input {
+					width: 100%;
+					padding-right: 60px; /* space for toggle */
+				}
 
-			.password-wrapper input {
-				flex: 1;
-				padding-right: 40px;
-			}
+				.password-wrapper .password-toggle {
+					position: absolute !important;
+					right: 12px;
+					top: 50%;
+					transform: translateY(-50%);
+					background: none;
+					border: none;
+					cursor: pointer;
+					font-size: 14px;
+					color: #666;
+					padding: 0;
+					margin: 0;
+					width: auto;
+				}
 
-			.password-toggle {
-				position: absolute;
-				right: 10px;
-				background: none;
-				border: none;
-				cursor: pointer;
-				padding: 5px;
-				color: #666;
-				font-size: 14px;
-				margin-top: 0;
-			}
 
-			.password-toggle:hover {
-				color: #333;
-			}
-		</style>
+				/* Mobile responsiveness */
+				@media (max-width: 480px) {
+					body {
+						align-items: flex-start;
+						padding-top: 40px;
+					}
+
+					.login-card {
+						padding: 25px;
+						border-radius: 6px;
+					}
+
+					.login-logo {
+						max-width: 160px;
+						margin-bottom: 20px;
+					}
+
+					.login-title {
+						font-size: 22px;
+						margin-bottom: 20px;
+					}
+
+					.password-wrapper input {
+						padding-right: 65px;
+					}
+				}
+			</style>
+
 			@GlobalIncludes()
 		</head>
+
 		<body>
 			<div class="login-card">
 				<img src={ utils.URL("/static/logo.png") } alt="Zion English" class="login-logo"/>
@@ -149,19 +177,20 @@ templ Login() {
 					@Flam()
 				</div>
 			</div>
+
 			<script>
-			function togglePassword() {
-				const passwordInput = document.getElementById('password');
-				const toggleBtn = document.querySelector('.password-toggle');
-				if (passwordInput.type === 'password') {
-					passwordInput.type = 'text';
-					toggleBtn.textContent = 'Hide';
-				} else {
-					passwordInput.type = 'password';
-					toggleBtn.textContent = 'Show';
+				function togglePassword() {
+					const passwordInput = document.getElementById('password');
+					const toggleBtn = document.querySelector('.password-toggle');
+					if (passwordInput.type === 'password') {
+						passwordInput.type = 'text';
+						toggleBtn.textContent = 'Hide';
+					} else {
+						passwordInput.type = 'password';
+						toggleBtn.textContent = 'Show';
+					}
 				}
-			}
-		</script>
+			</script>
 		</body>
 	</html>
 }

@@ -11,50 +11,15 @@ templ RegisterTeacher() {
 			<title>Register Teacher - Zion English Admin</title>
 			<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 			<style>
-			.password-group {
-				display: flex;
-				gap: 10px;
-				align-items: center;
-			}
-			.password-group input {
-				flex: 1;
-			}
-			.suggest-btn {
-				margin-top: 0;
-				padding: 8px 12px;
-				font-size: 12px;
-				white-space: nowrap;
-			}
-			.password-strength {
-				height: 4px;
-				margin-top: 5px;
-				background: #ddd;
-				border-radius: 2px;
-				overflow: hidden;
-			}
-			.password-strength-bar {
-				height: 100%;
-				transition: width 0.3s, background-color 0.3s;
-			}
-			.password-strength-bar.weak { width: 25%; background: #e74c3c; }
-			.password-strength-bar.fair { width: 50%; background: #f39c12; }
-			.password-strength-bar.good { width: 75%; background: #3498db; }
-			.password-strength-bar.strong { width: 100%; background: #27ae60; }
-			.password-requirements {
-				font-size: 11px;
-				color: #666;
-				margin-top: 5px;
-				display: flex;
-				flex-wrap: wrap;
-				gap: 8px;
-			}
-			.password-requirements span {
-				transition: color 0.2s;
-			}
-			.password-requirements span.met {
-				color: #27ae60;
-			}
-		</style>
+				.password-group {
+					display: flex;
+					gap: 10px;
+					align-items: center;
+				}
+				.password-group input {
+					flex: 1;
+				}
+			</style>
 			@GlobalIncludes()
 		</head>
 		<body>

@@ -44,7 +44,7 @@ func RegisterTeacher() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><style>\n\t\t\t.password-group {\n\t\t\t\tdisplay: flex;\n\t\t\t\tgap: 10px;\n\t\t\t\talign-items: center;\n\t\t\t}\n\t\t\t.password-group input {\n\t\t\t\tflex: 1;\n\t\t\t}\n\t\t\t.suggest-btn {\n\t\t\t\tmargin-top: 0;\n\t\t\t\tpadding: 8px 12px;\n\t\t\t\tfont-size: 12px;\n\t\t\t\twhite-space: nowrap;\n\t\t\t}\n\t\t\t.password-strength {\n\t\t\t\theight: 4px;\n\t\t\t\tmargin-top: 5px;\n\t\t\t\tbackground: #ddd;\n\t\t\t\tborder-radius: 2px;\n\t\t\t\toverflow: hidden;\n\t\t\t}\n\t\t\t.password-strength-bar {\n\t\t\t\theight: 100%;\n\t\t\t\ttransition: width 0.3s, background-color 0.3s;\n\t\t\t}\n\t\t\t.password-strength-bar.weak { width: 25%; background: #e74c3c; }\n\t\t\t.password-strength-bar.fair { width: 50%; background: #f39c12; }\n\t\t\t.password-strength-bar.good { width: 75%; background: #3498db; }\n\t\t\t.password-strength-bar.strong { width: 100%; background: #27ae60; }\n\t\t\t.password-requirements {\n\t\t\t\tfont-size: 11px;\n\t\t\t\tcolor: #666;\n\t\t\t\tmargin-top: 5px;\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-wrap: wrap;\n\t\t\t\tgap: 8px;\n\t\t\t}\n\t\t\t.password-requirements span {\n\t\t\t\ttransition: color 0.2s;\n\t\t\t}\n\t\t\t.password-requirements span.met {\n\t\t\t\tcolor: #27ae60;\n\t\t\t}\n\t\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><style>\n\t\t\t\t.password-group {\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\tgap: 10px;\n\t\t\t\t\talign-items: center;\n\t\t\t\t}\n\t\t\t\t.password-group input {\n\t\t\t\t\tflex: 1;\n\t\t\t\t}\n\t\t\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -75,7 +75,7 @@ func RegisterTeacher() templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/teachers/register"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/register_teacher.templ`, Line: 65, Col: 69}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/register_teacher.templ`, Line: 30, Col: 69}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
