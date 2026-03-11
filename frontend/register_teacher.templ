@@ -113,15 +113,18 @@ templ RegisterTeacher() {
 					</div>
 					<div class="form-group">
 						<label for="password">Password *</label>
-						<input
-							type="password"
-							id="password"
-							name="password"
-							required
-							minlength="8"
-							maxlength="32"
-							placeholder="8-32 characters with uppercase, lowercase, number, and symbol (!@#%^&*)"
-						/>
+						<div class="password-wrapper">
+							<input
+								type="password"
+								id="password"
+								name="password"
+								required
+								minlength="8"
+								maxlength="32"
+								placeholder="8-32 characters with uppercase, lowercase, number, and symbol (!@#%^&*)"
+							/>
+							@ShowPassword()
+						</div>
 					</div>
 					<div class="form-group">
 						<label for="retypePassword">Retype Password *</label>

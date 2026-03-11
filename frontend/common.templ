@@ -4,6 +4,8 @@ import "fmt"
 import "zion-english/internal/models"
 import "zion-english/internal/utils"
 
+var onceScrPassword = templ.NewOnceHandle()
+
 templ Flam() {
 	<p class="made-by">
 		made by
@@ -76,4 +78,50 @@ templ Logout() {
 	>
 		Logout
 	</button>
+}
+
+templ ShowPassword() {
+	<button type="button" class="password-toggle" onclick="togglePassword()">Show</button>
+
+	@onceScrPassword.Once() {
+		<style>
+			.password-wrapper {
+				position: relative;
+				width: 100%;
+			}
+
+			.password-wrapper input {
+				width: 100%;
+				padding-right: 60px; /* space for toggle */
+			}
+
+			.password-wrapper .password-toggle {
+				position: absolute !important;
+				right: 12px;
+				top: 50%;
+				transform: translateY(-50%);
+				background: none;
+				border: none;
+				cursor: pointer;
+				font-size: 14px;
+				color: #666;
+				padding: 0;
+				margin: 0;
+				width: auto;
+			}
+		</style>
+		<script>
+			function togglePassword() {
+				const passwordInput = document.getElementById('password');
+				const toggleBtn = document.querySelector('.password-toggle');
+				if (passwordInput.type === 'password') {
+					passwordInput.type = 'text';
+					toggleBtn.textContent = 'Hide';
+				} else {
+					passwordInput.type = 'password';
+					toggleBtn.textContent = 'Show';
+				}
+			}
+		</script>
+	}
 }
