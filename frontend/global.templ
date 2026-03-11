@@ -23,10 +23,10 @@ templ GlobalIncludes() {
 		}
 
 		.container {
-			max-width: 80%;
+			max-width: 90%;
 			margin: 0 auto;
 			background: white;
-			padding: 30px;
+			padding: 2em;
 			border-radius: 8px;
 			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 		}
@@ -358,6 +358,114 @@ templ GlobalIncludes() {
 
 		.email-cell {
 			color: var(--color-primary);
+		}
+
+		/* ============================= */
+		/* Responsive Styles */
+		/* ============================= */
+
+		/* Tablet */
+		@media (max-width: 1024px) {
+			.container {
+				max-width: 100%;
+				padding: 1.5em;
+			}
+
+			.header-bottom {
+				flex-direction: column;
+				gap: 10px;
+				align-items: flex-start;
+			}
+
+			.header-left {
+				flex-wrap: wrap;
+			}
+
+			.button-group {
+				flex-wrap: wrap;
+			}
+
+			table {
+				font-size: 14px;
+			}
+		}
+
+		/* Mobile */
+		@media (max-width: 768px) {
+			body {
+				padding: 10px;
+			}
+
+			.container {
+				padding: 1em;
+			}
+
+			.form-row,
+			.form-row-3 {
+				grid-template-columns: 1fr;
+			}
+
+			.button-group {
+				flex-direction: column;
+				align-items: stretch;
+			}
+
+			button,
+			.btn,
+			.add-btn {
+				width: 100%;
+				text-align: center;
+			}
+
+			.header-section {
+				align-items: flex-start;
+			}
+
+			.header-logo {
+				max-height: 40px;
+			}
+
+			.header-left {
+				flex-direction: column;
+				gap: 5px;
+			}
+
+			.nav-links {
+				flex-wrap: wrap;
+			}
+
+			th, td {
+				padding: 10px;
+			}
+
+			.success-banner,
+			.error-banner {
+				width: calc(100% - 40px);
+				left: 20px;
+				transform: none;
+				text-align: center;
+			}
+		}
+
+		/* Small phones */
+		@media (max-width: 480px) {
+			body {
+				font-size: 14px;
+			}
+
+			input,
+			select {
+				font-size: 14px;
+			}
+
+			h1 {
+				font-size: 20px;
+			}
+
+			th, td {
+				font-size: 13px;
+				padding: 8px;
+			}
 		}
 	</style>
 	@ScrHTMX()
