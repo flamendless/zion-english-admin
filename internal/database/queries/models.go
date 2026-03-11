@@ -8,6 +8,16 @@ import (
 	"database/sql"
 )
 
+type TblAccess struct {
+	ID          int64
+	TeacherID   int64
+	LoginAt     string
+	LogoutAt    sql.NullString
+	UseragentID int64
+	CreatedAt   string
+	UpdatedAt   string
+}
+
 type TblClassRecord struct {
 	ID              int64
 	StudentID       int64
@@ -78,4 +88,15 @@ type TblTeacher struct {
 	DriveUrl       string
 	Sex            sql.NullString
 	Password       string
+}
+
+type TblUseragent struct {
+	ID             int64
+	UserAgent      string
+	Browser        string
+	BrowserVersion string
+	Os             string
+	Device         string
+	CreatedAt      string
+	UpdatedAt      string
 }

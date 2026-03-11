@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -52,6 +53,29 @@ func parseInt64(n string) int64 {
 		logs.Log().Error("parse int 64", zap.Error(err), zap.String("n", n))
 	}
 	return v
+}
+
+func getOrCreateUserAgentID(ctx context.Context, db database.Service, userAgentStr string) int64 {
+	if userAgentStr == "" {
+		return 0
+	}
+
+	uaInfo := utils.ParseUserAgent(userAgentStr)
+	if uaInfo.Browser == "" {
+		return 0
+	}
+
+	id, err := db.GetQueries().UpsertUserAgent(ctx, queries.UpsertUserAgentParams{
+		UserAgent:      userAgentStr,
+		Browser:        uaInfo.Browser,
+		BrowserVersion: uaInfo.BrowserVersion,
+		Os:             uaInfo.OS,
+		Device:         uaInfo.Device,
+	})
+	if err != nil {
+		return 0
+	}
+	return id
 }
 
 func validatePassword(p string) bool {
@@ -860,7 +884,7 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		Email:          r.FormValue("email"),
 		Certifications: r.FormValue("certifications"),
 		AssignedColor:  r.FormValue("assignedColor"),
-		RatePerClass:  parseFloat64(r.FormValue("ratePerClass")),
+		RatePerClass:   parseFloat64(r.FormValue("ratePerClass")),
 		Currency:       r.FormValue("currency"),
 		DriveUrl:       r.FormValue("driveUrl"),
 		Sex:            r.FormValue("sex"),
@@ -1021,8 +1045,9 @@ func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Handle Login]"
+	ctx := r.Context()
 	if r.Method == http.MethodGet {
-		if err := frontend.Login().Render(r.Context(), w); err != nil {
+		if err := frontend.Login().Render(ctx, w); err != nil {
 			HttpError(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
@@ -1048,6 +1073,16 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	if err := auth.Login(w, r, conf.Conf(), dbRO.GetQueries(), email, password); err != nil {
 		fmt.Fprint(w, "Invalid email or password")
 		return
+	}
+
+	if ua := r.UserAgent(); ua != "" {
+		useragentID := getOrCreateUserAgentID(context.Background(), dbRW, ua)
+		if _, err := dbRW.GetQueries().CreateAccess(context.Background(), queries.CreateAccessParams{
+			TeacherID:   auth.GetUser(ctx).ID,
+			UseragentID: useragentID,
+		}); err != nil {
+			logs.Log().Warn(logtag, zap.Error(err))
+		}
 	}
 
 	HttpRedirect(w, "/")
