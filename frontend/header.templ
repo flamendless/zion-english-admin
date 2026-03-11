@@ -85,6 +85,31 @@ templ ErrorBannerScript(message string) {
 	</script>
 }
 
+templ SuccessBannerHandlers() {
+	<script>
+		function showSuccessBanner(message) {
+			const banner = document.getElementById('successBanner');
+			if (banner) {
+				banner.textContent = message;
+				banner.classList.add('show');
+				setTimeout(() => {
+					banner.classList.remove('show');
+				}, 3000);
+			}
+		}
+
+		document.addEventListener('htmx:afterRequest', function(evt) {
+			if (evt.detail.successful) {
+				const xhr = evt.detail.xhr;
+				const responseText = xhr.responseText;
+				if (responseText.includes('successfully')) {
+					showSuccessBanner('Operation completed successfully!');
+				}
+			}
+		});
+	</script>
+}
+
 templ ErrorBannerHandlers() {
 	<script>
 		function showErrorBanner(message) {

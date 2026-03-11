@@ -304,7 +304,7 @@ func ErrorBannerScript(message string) templ.Component {
 	})
 }
 
-func ErrorBannerHandlers() templ.Component {
+func SuccessBannerHandlers() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -325,7 +325,36 @@ func ErrorBannerHandlers() templ.Component {
 			templ_7745c5c3_Var11 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<script>\n\t\tfunction showErrorBanner(message) {\n\t\t\tconst banner = document.getElementById('errorBanner');\n\t\t\tif (banner) {\n\t\t\t\tbanner.textContent = message;\n\t\t\t\tbanner.classList.add('show');\n\t\t\t\tsetTimeout(() => {\n\t\t\t\t\tbanner.classList.remove('show');\n\t\t\t\t}, 5000);\n\t\t\t}\n\t\t}\n\n\t\t(function() {\n\t\t\tconst match = document.cookie.match(/error_flash=([^;]+)/);\n\t\t\tif (match) {\n\t\t\t\tshowErrorBanner(decodeURIComponent(match[1].replace(/\\+/g, ' ')));\n\t\t\t\tdocument.cookie = 'error_flash=; Max-Age=0; path=/';\n\t\t\t}\n\t\t})();\n\n\t\tdocument.addEventListener('htmx:responseError', function(evt) {\n\t\t\tconst xhr = evt.detail.xhr;\n\t\t\tconst message = xhr.responseText || 'An error occurred';\n\t\t\tshowErrorBanner(message);\n\t\t});\n\n\t\tdocument.addEventListener('htmx:sendError', function(evt) {\n\t\t\tshowErrorBanner('Network error. Please check your connection.');\n\t\t});\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<script>\n\t\tfunction showSuccessBanner(message) {\n\t\t\tconst banner = document.getElementById('successBanner');\n\t\t\tif (banner) {\n\t\t\t\tbanner.textContent = message;\n\t\t\t\tbanner.classList.add('show');\n\t\t\t\tsetTimeout(() => {\n\t\t\t\t\tbanner.classList.remove('show');\n\t\t\t\t}, 3000);\n\t\t\t}\n\t\t}\n\n\t\tdocument.addEventListener('htmx:afterRequest', function(evt) {\n\t\t\tif (evt.detail.successful) {\n\t\t\t\tconst xhr = evt.detail.xhr;\n\t\t\t\tconst responseText = xhr.responseText;\n\t\t\t\tif (responseText.includes('successfully')) {\n\t\t\t\t\tshowSuccessBanner('Operation completed successfully!');\n\t\t\t\t}\n\t\t\t}\n\t\t});\n\t</script>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func ErrorBannerHandlers() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var12 == nil {
+			templ_7745c5c3_Var12 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<script>\n\t\tfunction showErrorBanner(message) {\n\t\t\tconst banner = document.getElementById('errorBanner');\n\t\t\tif (banner) {\n\t\t\t\tbanner.textContent = message;\n\t\t\t\tbanner.classList.add('show');\n\t\t\t\tsetTimeout(() => {\n\t\t\t\t\tbanner.classList.remove('show');\n\t\t\t\t}, 5000);\n\t\t\t}\n\t\t}\n\n\t\t(function() {\n\t\t\tconst match = document.cookie.match(/error_flash=([^;]+)/);\n\t\t\tif (match) {\n\t\t\t\tshowErrorBanner(decodeURIComponent(match[1].replace(/\\+/g, ' ')));\n\t\t\t\tdocument.cookie = 'error_flash=; Max-Age=0; path=/';\n\t\t\t}\n\t\t})();\n\n\t\tdocument.addEventListener('htmx:responseError', function(evt) {\n\t\t\tconst xhr = evt.detail.xhr;\n\t\t\tconst message = xhr.responseText || 'An error occurred';\n\t\t\tshowErrorBanner(message);\n\t\t});\n\n\t\tdocument.addEventListener('htmx:sendError', function(evt) {\n\t\t\tshowErrorBanner('Network error. Please check your connection.');\n\t\t});\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

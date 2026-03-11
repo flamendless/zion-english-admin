@@ -38,6 +38,22 @@ var (
 	reLength  = regexp.MustCompile(`^[A-Za-z\d!@#$%^&*]{8,32}$`)
 )
 
+func parseFloat64(n string) float64 {
+	v, err := strconv.ParseFloat(n, 64)
+	if err != nil {
+		logs.Log().Error("parse float 64", zap.Error(err), zap.String("n", n))
+	}
+	return v
+}
+
+func parseInt64(n string) int64 {
+	v, err := strconv.ParseInt(n, 10, 64)
+	if err != nil {
+		logs.Log().Error("parse int 64", zap.Error(err), zap.String("n", n))
+	}
+	return v
+}
+
 func validatePassword(p string) bool {
 	return reLength.MatchString(p) &&
 		reLower.MatchString(p) &&
@@ -446,12 +462,12 @@ func handleFinalize(w http.ResponseWriter, r *http.Request) {
 
 		durationFloat := 0.0
 		if durationMinutes != "" {
-			durationFloat, _ = strconv.ParseFloat(durationMinutes, 64)
+			durationFloat = parseFloat64(durationMinutes)
 		}
 
 		rateFloat := 0.0
 		if rate != "" {
-			rateFloat, _ = strconv.ParseFloat(rate, 64)
+			rateFloat = parseFloat64(rate)
 		}
 
 		err = dbRW.GetQueries().InsertRecord(r.Context(), queries.InsertRecordParams{
@@ -678,18 +694,24 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logMessages = []string{}
-	var req models.StudentRegisterRequest
-	var errMsg string
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		errMsg = fmt.Sprintf("Invalid request: %v", err)
-		sendStudentErrorResponse(w, errMsg)
+	if err := r.ParseForm(); err != nil {
+		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
 		return
 	}
 
+	req := models.StudentRegisterRequest{
+		Name:          r.FormValue("name"),
+		Currency:      r.FormValue("currency"),
+		Contact:       r.FormValue("contact"),
+		RatePerClass:  parseFloat64(r.FormValue("ratePerClass")),
+		ParentName:    r.FormValue("parentName"),
+		AssignedColor: r.FormValue("assignedColor"),
+		Status:        r.FormValue("status"),
+	}
+
 	if err := validateStudentRequest(&req); err != nil {
-		errMsg = err.Error()
-		sendStudentErrorResponse(w, errMsg)
+		sendErrorLog(w, err.Error())
 		return
 	}
 
@@ -697,14 +719,12 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 
 	existingCount, err := dbRW.GetQueries().GetStudentByName(r.Context(), req.Name)
 	if err != nil {
-		errMsg = fmt.Sprintf("Database error: %v", err)
-		sendStudentErrorResponse(w, errMsg)
+		sendErrorLog(w, fmt.Sprintf("Database error: %v", err))
 		return
 	}
 
 	if existingCount > 0 {
-		errMsg = "A student with this name already exists"
-		sendStudentErrorResponse(w, errMsg)
+		sendErrorLog(w, "A student with this name already exists")
 		return
 	}
 
@@ -718,21 +738,23 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		Status:        req.Status,
 	})
 	if err != nil {
-		errMsg = fmt.Sprintf("Failed to register student: %v", err)
-		sendStudentErrorResponse(w, errMsg)
+		sendErrorLog(w, fmt.Sprintf("Failed to register student: %v", err))
 		return
 	}
 
 	addLog(fmt.Sprintf("Successfully registered student: %s", req.Name))
 
-	response := models.StudentRegisterResponse{
-		Success: true,
-		Message: fmt.Sprintf("Student '%s' registered successfully", req.Name),
-		Logs:    logMessages,
+	if _, err := fmt.Fprintf(w, fmt.Sprintf("Student '%s' registered successfully\n", req.Name)); err != nil {
+		sendErrorLog(w, err.Error())
+		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	for _, log := range logMessages {
+		if _, err := fmt.Fprintf(w, log+"\n"); err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+	}
 }
 
 func validateStudentRequest(req *models.StudentRegisterRequest) error {
@@ -825,7 +847,7 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 	logMessages = []string{}
 
 	if err := r.ParseForm(); err != nil {
-		sendTeacherErrorResponse(w, fmt.Sprintf("Invalid request: %v", err))
+		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
 		return
 	}
 
@@ -838,7 +860,7 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		Email:          r.FormValue("email"),
 		Certifications: r.FormValue("certifications"),
 		AssignedColor:  r.FormValue("assignedColor"),
-		RatePerClass:   func() float64 { v, _ := strconv.ParseFloat(r.FormValue("ratePerClass"), 64); return v }(),
+		RatePerClass:  parseFloat64(r.FormValue("ratePerClass")),
 		Currency:       r.FormValue("currency"),
 		DriveUrl:       r.FormValue("driveUrl"),
 		Sex:            r.FormValue("sex"),
@@ -847,7 +869,7 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := validateTeacherRequest(&req); err != nil {
-		sendTeacherErrorResponse(w, err.Error())
+		sendErrorLog(w, err.Error())
 		return
 	}
 
@@ -855,23 +877,23 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 
 	existingCount, err := dbRW.GetQueries().GetTeacherByName(r.Context(), req.Name)
 	if err != nil {
-		sendTeacherErrorResponse(w, err.Error())
+		sendErrorLog(w, err.Error())
 		return
 	}
 
 	if existingCount > 0 {
-		sendTeacherErrorResponse(w, "A teacher with this name already exists")
+		sendErrorLog(w, "A teacher with this name already exists")
 		return
 	}
 
 	if req.Password != req.RetypePassword {
-		sendTeacherErrorResponse(w, "Passwords must be the same")
+		sendErrorLog(w, "Passwords must be the same")
 		return
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		sendTeacherErrorResponse(w, "Failed to hash password")
+		sendErrorLog(w, "Failed to hash password")
 		return
 	}
 
@@ -891,7 +913,7 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		Password:       string(hashedPassword),
 	})
 	if err != nil {
-		sendTeacherErrorResponse(w, err.Error())
+		sendErrorLog(w, err.Error())
 		return
 	}
 
@@ -904,13 +926,13 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if _, err := fmt.Fprintf(w, response.Message+"\n"); err != nil {
-		sendTeacherErrorResponse(w, err.Error())
+		sendErrorLog(w, err.Error())
 		return
 	}
 
 	for _, log := range logMessages {
 		if _, err := fmt.Fprintf(w, log+"\n"); err != nil {
-			sendTeacherErrorResponse(w, err.Error())
+			sendErrorLog(w, err.Error())
 			return
 		}
 	}
@@ -962,10 +984,10 @@ func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
 	return nil
 }
 
-func sendTeacherErrorResponse(w http.ResponseWriter, message string) {
+func sendErrorLog(w http.ResponseWriter, message string) {
 	w.WriteHeader(http.StatusBadRequest)
 	if _, err := fmt.Fprintf(w, message+"\n"); err != nil {
-		sendTeacherErrorResponse(w, err.Error())
+		logs.Log().Error("error response", zap.String("message", message), zap.Error(err))
 		return
 	}
 }
@@ -1172,18 +1194,24 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logMessages = []string{}
-	var req models.ClassRecordRequest
-	var errMsg string
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		errMsg = fmt.Sprintf("Invalid request: %v", err)
-		sendClassRecordErrorResponse(w, errMsg)
+	if err := r.ParseForm(); err != nil {
+		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
 		return
 	}
 
+	req := models.ClassRecordRequest{
+		StudentID:       parseInt64(r.FormValue("student")),
+		TeacherID:       parseInt64(r.FormValue("teacher")),
+		Date:            r.FormValue("date"),
+		DurationMinutes: parseInt64(r.FormValue("duration")),
+		Rate:            parseFloat64(r.FormValue("rate")),
+		Currency:        r.FormValue("currency"),
+		Status:          r.FormValue("status"),
+		Reason:          r.FormValue("reason"),
+	}
+
 	if err := validateClassRecordRequest(&req); err != nil {
-		errMsg = err.Error()
-		sendClassRecordErrorResponse(w, errMsg)
+		sendErrorLog(w, err.Error())
 		return
 	}
 
@@ -1202,17 +1230,21 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		RecordedByRole:  string(role),
 	})
 	if err != nil {
-		errMsg = fmt.Sprintf("Failed to record class: %v", err)
-		sendClassRecordErrorResponse(w, errMsg)
+		sendClassRecordErrorResponse(w, err.Error())
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(models.ClassRecordResponse{
-		Success: true,
-		Message: "Class recorded successfully!",
-		Logs:    logMessages,
-	})
+	if _, err := fmt.Fprintf(w, "Class recorded successfully!\n"); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	for _, log := range logMessages {
+		if _, err := fmt.Fprintf(w, log+"\n"); err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+	}
 }
 
 func handleClasses(w http.ResponseWriter, r *http.Request) {

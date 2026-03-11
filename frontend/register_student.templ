@@ -18,7 +18,7 @@ templ RegisterStudent() {
 			@SuccessBanner()
 			@ErrorBanner()
 
-			<form id="registerForm">
+			<form id="registerForm" hx-post={ utils.URL("/students/register") } hx-swap="innerHTML" hx-target="#logOutput">
 				<div class="form-group">
 					<label for="name">Student Name *</label>
 					<input type="text" id="name" name="name" required
@@ -53,11 +53,19 @@ templ RegisterStudent() {
 					<label for="assignedColor">Assigned Color *</label>
 					<div class="color-group">
 						<input type="color" id="assignedColor" name="assignedColor" required
-						       value="var(--color-primary)">
+						       value="var(--color-primary)"
+							_="
+								on input
+									set #colorPreview.style.backgroundColor to me.value
+									set #colorValue.textContent to me.value
+								end
+							">
+						<div class="color-preview" id="colorPreview" style="background-color: var(--color-primary);"></div>
+						<span id="colorValue">var(--color-primary)</span>
 					</div>
 				</div>
 
-				<button type="submit" id="submitBtn">Register Student</button>
+				<button type="submit" id="submitBtn" hx-indicator="Registering student...">Register Student</button>
 			</form>
 
 			<div class="logs-section">
@@ -66,145 +74,6 @@ templ RegisterStudent() {
 			</div>
 		</div>
 
-		<script>
-			const form = document.getElementById('registerForm');
-			const logOutput = document.getElementById('logOutput');
-			const submitBtn = document.getElementById('submitBtn');
-			const nameInput = document.getElementById('name');
-			const currencySelect = document.getElementById('currency');
-			const contactInput = document.getElementById('contact');
-			const ratePerClassInput = document.getElementById('ratePerClass');
-			const parentNameInput = document.getElementById('parentName');
-			const assignedColorInput = document.getElementById('assignedColor');
-			const statusSelect = document.getElementById('status');
-
-			function getBaseURL() {
-				const pathname = window.location.pathname;
-				const cleanPath = pathname.replace(/\/$/, '');
-				const parts = cleanPath.split('/').filter(p => p !== '');
-
-				if (parts.length === 0 || cleanPath.endsWith('.html')) {
-					if (cleanPath.includes('/zion-english-admin')) {
-						return '/zion-english-admin';
-					}
-					return '';
-				}
-
-				if (parts.length === 1) {
-					return '/' + parts[0];
-				}
-
-				return '/' + parts.slice(0, -1).join('/');
-			}
-
-			const baseURL = getBaseURL();
-
-			function buildURL(path) {
-				return baseURL + path;
-			}
-
-			function validateForm() {
-				let isValid = true;
-
-				const nameError = document.getElementById('nameError');
-				if (!nameInput.value.trim()) {
-					nameError.style.display = 'block';
-					nameInput.setCustomValidity('Name is required');
-					isValid = false;
-				} else {
-					nameError.style.display = 'none';
-					nameInput.setCustomValidity('');
-				}
-
-				if (!currencySelect.value) {
-					currencySelect.setCustomValidity('Please select a currency');
-					isValid = false;
-				} else {
-					currencySelect.setCustomValidity('');
-				}
-
-				if (!ratePerClassInput.value || parseFloat(ratePerClassInput.value) < 0) {
-					ratePerClassInput.setCustomValidity('Please enter a valid rate');
-					isValid = false;
-				} else {
-					ratePerClassInput.setCustomValidity('');
-				}
-
-				if (!assignedColorInput.value) {
-					assignedColorInput.setCustomValidity('Please select a color');
-					isValid = false;
-				} else {
-					assignedColorInput.setCustomValidity('');
-				}
-
-				if (!statusSelect.value) {
-					statusSelect.setCustomValidity('Please select a status');
-					isValid = false;
-				} else {
-					statusSelect.setCustomValidity('');
-				}
-
-				return isValid;
-			}
-
-			nameInput.addEventListener('blur', validateForm);
-			currencySelect.addEventListener('change', validateForm);
-			ratePerClassInput.addEventListener('blur', validateForm);
-			assignedColorInput.addEventListener('change', validateForm);
-			statusSelect.addEventListener('change', validateForm);
-
-			form.addEventListener('submit', async (e) => {
-				e.preventDefault();
-
-				if (!validateForm()) {
-					return;
-				}
-
-				submitBtn.disabled = true;
-				logOutput.textContent = 'Registering student...';
-
-				const formData = {
-					name: nameInput.value.trim(),
-					currency: currencySelect.value,
-					contact: contactInput.value.trim(),
-					ratePerClass: parseFloat(ratePerClassInput.value) || 0,
-					parentName: parentNameInput.value.trim(),
-					assignedColor: assignedColorInput.value,
-					status: statusSelect.value
-				};
-
-				try {
-					const response = await fetch(buildURL('/register'), {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json'
-						},
-						body: JSON.stringify(formData)
-					});
-
-					const data = await response.json();
-
-					logOutput.textContent = data.logs.join('\n') + '\n';
-
-					if (data.success) {
-						const banner = document.getElementById('successBanner');
-						banner.textContent = '✓ Student registered successfully!';
-						banner.classList.add('show');
-						setTimeout(() => {
-							banner.classList.remove('show');
-						}, 3000);
-						form.reset();
-						assignedColorInput.value = 'var(--color-primary)';
-					} else {
-						logOutput.textContent += '\n✗ Error: ' + data.message;
-					}
-				} catch (error) {
-					logOutput.textContent += '\n✗ Network error: ' + error.message;
-				} finally {
-					submitBtn.disabled = false;
-				}
-			});
-		</script>
 	</body>
 	</html>
 }
