@@ -30,6 +30,22 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var (
+	reLower   = regexp.MustCompile(`[a-z]`)
+	reUpper   = regexp.MustCompile(`[A-Z]`)
+	reDigit   = regexp.MustCompile(`\d`)
+	reSpecial = regexp.MustCompile(`[!@#$%^&*]`)
+	reLength  = regexp.MustCompile(`^[A-Za-z\d!@#$%^&*]{8,32}$`)
+)
+
+func validatePassword(p string) bool {
+	return reLength.MatchString(p) &&
+		reLower.MatchString(p) &&
+		reUpper.MatchString(p) &&
+		reDigit.MatchString(p) &&
+		reSpecial.MatchString(p)
+}
+
 func HttpError(w http.ResponseWriter, msg string, code int) {
 	http.SetCookie(w, &http.Cookie{
 		Name:  "error_flash",
@@ -807,18 +823,31 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logMessages = []string{}
-	var req models.TeacherRegisterRequest
-	var errMsg string
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		errMsg = fmt.Sprintf("Invalid request: %v", err)
-		sendTeacherErrorResponse(w, errMsg)
+	if err := r.ParseForm(); err != nil {
+		sendTeacherErrorResponse(w, fmt.Sprintf("Invalid request: %v", err))
 		return
 	}
 
+	req := models.TeacherRegisterRequest{
+		Name:           r.FormValue("name"),
+		Birthdate:      r.FormValue("birthdate"),
+		Address:        r.FormValue("address"),
+		JoiningDate:    r.FormValue("joiningDate"),
+		MobileNumber:   r.FormValue("mobileNumber"),
+		Email:          r.FormValue("email"),
+		Certifications: r.FormValue("certifications"),
+		AssignedColor:  r.FormValue("assignedColor"),
+		RatePerClass:   func() float64 { v, _ := strconv.ParseFloat(r.FormValue("ratePerClass"), 64); return v }(),
+		Currency:       r.FormValue("currency"),
+		DriveUrl:       r.FormValue("driveUrl"),
+		Sex:            r.FormValue("sex"),
+		Password:       r.FormValue("password"),
+		RetypePassword: r.FormValue("retypePassword"),
+	}
+
 	if err := validateTeacherRequest(&req); err != nil {
-		errMsg = err.Error()
-		sendTeacherErrorResponse(w, errMsg)
+		sendTeacherErrorResponse(w, err.Error())
 		return
 	}
 
@@ -826,27 +855,23 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 
 	existingCount, err := dbRW.GetQueries().GetTeacherByName(r.Context(), req.Name)
 	if err != nil {
-		errMsg = fmt.Sprintf("Database error: %v", err)
-		sendTeacherErrorResponse(w, errMsg)
+		sendTeacherErrorResponse(w, err.Error())
 		return
 	}
 
 	if existingCount > 0 {
-		errMsg = "A teacher with this name already exists"
-		sendTeacherErrorResponse(w, errMsg)
+		sendTeacherErrorResponse(w, "A teacher with this name already exists")
 		return
 	}
 
 	if req.Password != req.RetypePassword {
-		errMsg = "Passwords must be the same"
-		sendTeacherErrorResponse(w, errMsg)
+		sendTeacherErrorResponse(w, "Passwords must be the same")
 		return
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		errMsg = "Failed to hash password"
-		sendTeacherErrorResponse(w, errMsg)
+		sendTeacherErrorResponse(w, "Failed to hash password")
 		return
 	}
 
@@ -866,8 +891,7 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		Password:       string(hashedPassword),
 	})
 	if err != nil {
-		errMsg = fmt.Sprintf("Failed to register teacher: %v", err)
-		sendTeacherErrorResponse(w, errMsg)
+		sendTeacherErrorResponse(w, err.Error())
 		return
 	}
 
@@ -879,8 +903,17 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		Logs:    logMessages,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if _, err := fmt.Fprintf(w, response.Message+"\n"); err != nil {
+		sendTeacherErrorResponse(w, err.Error())
+		return
+	}
+
+	for _, log := range logMessages {
+		if _, err := fmt.Fprintf(w, log+"\n"); err != nil {
+			sendTeacherErrorResponse(w, err.Error())
+			return
+		}
+	}
 }
 
 func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
@@ -918,8 +951,7 @@ func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
 		return errors.New("password is required")
 	}
 
-	passwordRegex := regexp.MustCompile(`^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,32}$`)
-	if !passwordRegex.MatchString(req.Password) {
+	if !validatePassword(req.Password) {
 		return errors.New("password must be 8-32 characters with uppercase, lowercase, number, and symbol (!@#$%^&*)")
 	}
 
@@ -931,15 +963,11 @@ func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
 }
 
 func sendTeacherErrorResponse(w http.ResponseWriter, message string) {
-	response := models.TeacherRegisterResponse{
-		Success: false,
-		Message: message,
-		Logs:    logMessages,
-	}
-
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusBadRequest)
-	json.NewEncoder(w).Encode(response)
+	if _, err := fmt.Fprintf(w, message+"\n"); err != nil {
+		sendTeacherErrorResponse(w, err.Error())
+		return
+	}
 }
 
 func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
