@@ -774,7 +774,7 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, log := range logMessages {
-		if _, err := fmt.Fprintf(w, log+"\n"); err != nil {
+		if _, err := fmt.Fprint(w, log+"\n"); err != nil {
 			sendErrorLog(w, err.Error())
 			return
 		}
@@ -949,13 +949,13 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		Logs:    logMessages,
 	}
 
-	if _, err := fmt.Fprintf(w, response.Message+"\n"); err != nil {
+	if _, err := fmt.Fprint(w, response.Message+"\n"); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
 
 	for _, log := range logMessages {
-		if _, err := fmt.Fprintf(w, log+"\n"); err != nil {
+		if _, err := fmt.Fprint(w, log+"\n"); err != nil {
 			sendErrorLog(w, err.Error())
 			return
 		}
@@ -1010,7 +1010,7 @@ func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
 
 func sendErrorLog(w http.ResponseWriter, message string) {
 	w.WriteHeader(http.StatusBadRequest)
-	if _, err := fmt.Fprintf(w, message+"\n"); err != nil {
+	if _, err := fmt.Fprint(w, message+"\n"); err != nil {
 		logs.Log().Error("error response", zap.String("message", message), zap.Error(err))
 		return
 	}
@@ -1269,13 +1269,13 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err := fmt.Fprintf(w, "Class recorded successfully!\n"); err != nil {
+	if _, err := fmt.Fprint(w, "Class recorded successfully!\n"); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
 
 	for _, log := range logMessages {
-		if _, err := fmt.Fprintf(w, log+"\n"); err != nil {
+		if _, err := fmt.Fprint(w, log+"\n"); err != nil {
 			sendErrorLog(w, err.Error())
 			return
 		}

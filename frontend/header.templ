@@ -66,25 +66,6 @@ templ SuccessBannerScript(message string) {
 	</script>
 }
 
-templ ErrorBanner() {
-	<div id="errorBanner" class="error-banner"></div>
-}
-
-templ ErrorBannerScript(message string) {
-	<script>
-		(function() {
-			const banner = document.getElementById('errorBanner');
-			if (banner) {
-				banner.textContent = $message$;
-				banner.classList.add('show');
-				setTimeout(() => {
-					banner.classList.remove('show');
-				}, 5000);
-			}
-		})();
-	</script>
-}
-
 templ SuccessBannerHandlers() {
 	<script>
 		function showSuccessBanner(message) {
@@ -107,6 +88,25 @@ templ SuccessBannerHandlers() {
 				}
 			}
 		});
+	</script>
+}
+
+templ ErrorBanner() {
+	<div id="errorBanner" class="error-banner"></div>
+}
+
+templ ErrorBannerScript(message string) {
+	<script>
+		(function() {
+			const banner = document.getElementById('errorBanner');
+			if (banner) {
+				banner.textContent = $message$;
+				banner.classList.add('show');
+				setTimeout(() => {
+					banner.classList.remove('show');
+				}, 5000);
+			}
+		})();
 	</script>
 }
 
