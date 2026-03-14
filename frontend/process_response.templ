@@ -1,0 +1,100 @@
+package frontend
+
+import "fmt"
+import "zion-english/internal/utils"
+
+var colors = []string{
+	"#FFE6E6",
+	"#E6F3FF",
+	"#E6FFE6",
+	"#FFF9E6",
+	"#F0E6FF",
+	"#FFE6CC",
+	"#FFE6F0",
+	"#E6FFFF",
+	"#F5F5F5",
+	"#E6F5FF",
+	"#FFF0E6",
+	"#F0FFE6",
+	"#FFE6F5",
+	"#E6E6FF",
+	"#FFFFE6",
+}
+
+type ProcessRecord struct {
+	Name     string
+	Date     string
+	Duration int
+	Rate     float64
+	Status   string
+}
+
+templ ProcessResultRow(rec ProcessRecord) {
+	<tr style={ getRowColor(rec.Name) }>
+		<td>{ rec.Name }</td>
+		<td>{ rec.Date }</td>
+		<td>{ fmt.Sprintf("%d", rec.Duration) }</td>
+		<td>{ fmt.Sprintf("%.2f", rec.Rate) }</td>
+		<td>{ rec.Status }</td>
+	</tr>
+}
+
+func getRowColor(name string) string {
+	hash := 0
+	for _, c := range name {
+		hash = hash*31 + int(c)
+	}
+
+	return "background-color: " + colors[abs(hash)%len(colors)] + ";"
+}
+
+func abs(n int) int {
+	if n < 0 {
+		return -n
+	}
+	return n
+}
+
+templ ProcessResponse(
+	filename, driveURL, rowRange string,
+	total float64,
+	records []ProcessRecord,
+	logs []string,
+) {
+	<input type="hidden" id="currentFileName" name="currentFileName" value={ filename }/>
+	<input type="hidden" id="currentDriveUrl" name="currentDriveUrl" value={ driveURL }/>
+
+	<div class="logs-section">
+		<h3>Logs and Errors</h3>
+		for _, log := range logs {
+			<p>{ log }</p>
+		}
+	</div>
+
+	<div id="resultsSection" class="results-section" style="display: block;">
+		<div class="info-display" style="display: flex;">
+			<div>{ rowRange }</div>
+			<div>Total: { fmt.Sprintf("%.2f", total) }</div>
+		</div>
+		<table>
+			<thead>
+				<tr><th>Name</th><th>Date</th><th>Duration (min)</th><th>Rate</th><th>Status</th></tr>
+			</thead>
+			<tbody id="resultsBody">
+				for _, rec := range records {
+					@ProcessResultRow(rec)
+				}
+			</tbody>
+		</table>
+
+		<div class="button-group">
+			<a
+				id="downloadBtn" class="btn download-btn" disabled
+				href={ utils.URL("/download/processed?filename=" + filename) }
+				hx-swap="none"
+			>
+				Download XLSX
+			</a>
+		</div>
+	</div>
+}

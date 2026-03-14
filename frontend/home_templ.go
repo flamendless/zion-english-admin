@@ -149,7 +149,17 @@ func Home(role auth.Role) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<!-- INFO: (flam) this will be outdated after we centralized class records via admin tool --><!-- @ActionCard(\"/logs\", \"Process logs\", \"View and manage processing logs\") --><!-- @ActionCard(\"/process\", \"Process\", \"Process CSV/XLSX files\") --></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<!-- INFO: (flam) this will be outdated after we centralized class records via admin tool --><!-- @ActionCard(\"/logs\", \"Process logs\", \"View and manage processing logs\") -->")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if isAccessible(role, "/process") {
+			templ_7745c5c3_Err = ActionCard("/process", "Process", "Process CSV/XLSX files").Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

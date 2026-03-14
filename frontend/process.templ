@@ -32,7 +32,6 @@ templ Process() {
 
 			.results-section {
 				margin-top: 30px;
-				display: none;
 			}
 
 			.results-section h3 {
@@ -86,16 +85,41 @@ templ Process() {
 				font-weight: bold;
 				text-align: center;
 			}
+
+			.log-error {
+				color: #dc3545;
+				background-color: #f8d7da;
+				padding: 10px;
+				border-radius: 4px;
+				margin-bottom: 10px;
+			}
+
+			.log-success {
+				color: #155724;
+				background-color: #d4edda;
+				padding: 10px;
+				border-radius: 4px;
+				margin-bottom: 10px;
+			}
+
+			.btn:disabled {
+				opacity: 0.5;
+				cursor: not-allowed;
+			}
 		</style>
 		@GlobalIncludes()
 	</head>
+
 	<body>
 		<div class="container">
 			@HeaderSimple()
 			@SuccessBanner()
 			@ErrorBanner()
 
-			<form id="processForm">
+			<form hx-post={ utils.URL("/process") }
+			      hx-target="#results"
+			      hx-swap="innerHTML"
+			      hx-indicator="#submitBtn">
 				@TeacherDropdown()
 				@DriveURLInput()
 
@@ -109,7 +133,18 @@ templ Process() {
 
 				<div class="form-group">
 					<label for="templateSelect">Template</label>
-					<select id="templateSelect" name="templateSelect">
+					<select id="templateSelect" name="templateSelect"
+						_="on change
+							if me.value == ''
+								halt
+							end
+							set cols to me.value.split(',')
+							set #nameCol.value to cols[0]
+							set #durationCol.value to cols[1]
+							set #rateCol.value to cols[2]
+							set #statusCol.value to cols[3]
+							set #downloadBtn.@disabled to 'disabled'
+						">
 						<option value="">-- Select Template --</option>
 						<option value="A,B,C,G">A,B,C,G</option>
 						<option value="A,C,D,H">A,C,D,H</option>
@@ -155,544 +190,12 @@ templ Process() {
 				</div>
 
 				<button type="submit" id="submitBtn">Process CSV</button>
-				<button type="button" id="finalizeBtn" disabled>Finalize</button>
 			</form>
 
-			<div class="logs-section">
-				<h3>Logs and Errors</h3>
-				<div id="logOutput">Waiting for submission...</div>
-			</div>
-
-			<div class="results-section" id="resultsSection">
-				<h3>Results</h3>
-				<div class="button-group">
-					<button class="download-btn" id="downloadBtn" disabled>Download XLSX</button>
-					<button class="clear-btn" id="clearBtn">Clear Table</button>
-				</div>
-				<div id="infoDisplay" class="info-display">
-					<div id="rowRangeDisplay"></div>
-					<div id="totalDisplay"></div>
-				</div>
-				<table id="resultsTable">
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th>Date</th>
-							<th>Duration (min)</th>
-							<th>Rate</th>
-							<th>Status</th>
-						</tr>
-					</thead>
-					<tbody id="resultsBody">
-					</tbody>
-				</table>
+			<div id="results">
+				//ProcessResponse
 			</div>
 		</div>
-
-		<script>
-			const form = document.getElementById('processForm');
-			const logOutput = document.getElementById('logOutput');
-			const resultsSection = document.getElementById('resultsSection');
-			const resultsBody = document.getElementById('resultsBody');
-			const downloadBtn = document.getElementById('downloadBtn');
-			const clearBtn = document.getElementById('clearBtn');
-			const submitBtn = document.getElementById('submitBtn');
-			const finalizeBtn = document.getElementById('finalizeBtn');
-			const endDateInput = document.getElementById('endDate');
-			const startDateInput = document.getElementById('startDate');
-			const driveUrlInput = document.getElementById('driveUrl');
-			const nameInput = document.getElementById('name');
-			const nameColSelect = document.getElementById('nameCol');
-			const durationColSelect = document.getElementById('durationCol');
-			const rateColSelect = document.getElementById('rateCol');
-			const statusColSelect = document.getElementById('statusCol');
-			const excludedRowsInput = document.getElementById('excludedRows');
-			const templateSelect = document.getElementById('templateSelect');
-			const datePresetSelect = document.getElementById('datePreset');
-			const teacherSelect = document.getElementById('teacherSelect');
-
-			let currentFileName = '';
-			let currentDriveUrl = '';
-
-			function getBaseURL() {
-				const pathname = window.location.pathname;
-				const cleanPath = pathname.replace(/\/$/, '');
-				const parts = cleanPath.split('/').filter(p => p !== '');
-
-				if (parts.length === 0 || cleanPath.endsWith('.html')) {
-					if (cleanPath.includes('/zion-english-admin')) {
-						return '/zion-english-admin';
-					}
-					return '';
-				}
-
-				if (parts.length === 1) {
-					return '/' + parts[0];
-				}
-
-				return '/' + parts.slice(0, -1).join('/');
-			}
-
-			const baseURL = getBaseURL();
-
-			function buildURL(path) {
-				return baseURL + path;
-			}
-
-			const logsLink = document.getElementById('logsLink');
-
-			function getAuthHeader() {
-				const credentials = sessionStorage.getItem('authCredentials');
-				if (!credentials) return null;
-				return 'Basic ' + btoa(credentials);
-			}
-
-			logsLink.addEventListener('click', (e) => {
-				e.preventDefault();
-				window.location.href = buildURL('/logs');
-			});
-
-			teacherSelect.addEventListener('change', () => {
-				const selectedOption = teacherSelect.options[teacherSelect.selectedIndex];
-				if (selectedOption.value) {
-					nameInput.value = selectedOption.textContent;
-					driveUrlInput.value = selectedOption.dataset.driveUrl || '';
-				}
-			});
-
-			function validateDates() {
-				const startDate = new Date(startDateInput.value);
-				const endDate = new Date(endDateInput.value);
-				const endDateError = document.getElementById('endDateError');
-
-				if (startDateInput.value && endDateInput.value && endDate <= startDate) {
-					endDateError.style.display = 'block';
-					endDateInput.setCustomValidity('End date must be after start date');
-					return false;
-				} else {
-					endDateError.style.display = 'none';
-					endDateInput.setCustomValidity('');
-					return true;
-				}
-			}
-
-			datePresetSelect.addEventListener('change', () => {
-				const value = datePresetSelect.value;
-				if (!value) return;
-
-				const today = new Date();
-				const year = today.getFullYear();
-				const month = today.getMonth();
-
-				function formatDate(date) {
-					const y = date.getFullYear();
-					const m = String(date.getMonth() + 1).padStart(2, '0');
-					const d = String(date.getDate()).padStart(2, '0');
-					return y + '-' + m + '-' + d;
-				}
-
-				if (value === '1-15') {
-					const start = new Date(year, month, 1);
-					const end = new Date(year, month, 15);
-
-					startDateInput.value = formatDate(start);
-					endDateInput.value = formatDate(end);
-				}
-
-				if (value === '16-30') {
-					const start = new Date(year, month, 16);
-					const end = new Date(year, month, 30);
-
-					startDateInput.value = formatDate(start);
-					endDateInput.value = formatDate(end);
-				}
-
-				validateDates();
-				downloadBtn.disabled = true;
-			});
-
-			function validateURL() {
-				const url = driveUrlInput.value;
-				const errorDiv = document.getElementById('driveUrlError');
-
-				if (url && !url.includes('docs.google.com')) {
-					errorDiv.textContent = 'URL must be a valid Spreadsheet URL';
-					errorDiv.style.display = 'block';
-					driveUrlInput.setCustomValidity('Invalid Spreadsheet URL');
-					return false;
-				} else {
-					errorDiv.style.display = 'none';
-					driveUrlInput.setCustomValidity('');
-					return true;
-				}
-			}
-
-			function validateName() {
-				const name = nameInput.value;
-				const errorDiv = document.getElementById('nameError');
-				const pattern = /^[a-zA-Z0-9_-]+$/;
-
-				if (name && !pattern.test(name)) {
-					errorDiv.style.display = 'block';
-					nameInput.setCustomValidity('Invalid characters in name');
-					return false;
-				} else {
-					errorDiv.style.display = 'none';
-					nameInput.setCustomValidity('');
-					return true;
-				}
-			}
-
-			function validateExcludedRows() {
-				const excludedRows = excludedRowsInput.value.trim();
-				const errorDiv = document.getElementById('excludedRowsError');
-
-				if (!excludedRows) {
-					errorDiv.style.display = 'none';
-					excludedRowsInput.setCustomValidity('');
-					return true;
-				}
-
-				const parts = excludedRows.split(',');
-				const pattern = /^\s*\d+\s*$/;
-				let isValid = true;
-
-				for (const part of parts) {
-					if (!pattern.test(part)) {
-						isValid = false;
-						break;
-					}
-					const num = parseInt(part.trim(), 10);
-					if (isNaN(num) || num <= 0) {
-						isValid = false;
-						break;
-					}
-				}
-
-				if (!isValid) {
-					errorDiv.style.display = 'block';
-					excludedRowsInput.setCustomValidity('Enter valid row numbers separated by commas');
-					return false;
-				} else {
-					errorDiv.style.display = 'none';
-					excludedRowsInput.setCustomValidity('');
-					return true;
-				}
-			}
-
-			templateSelect.addEventListener('change', () => {
-				const value = templateSelect.value;
-
-				if (!value) return;
-
-				const parts = value.split(',');
-
-				if (parts.length === 4) {
-					nameColSelect.value = parts[0];
-					durationColSelect.value = parts[1];
-					rateColSelect.value = parts[2];
-					statusColSelect.value = parts[3];
-					validateColumns();
-				}
-
-				downloadBtn.disabled = true;
-			});
-
-			function validateColumns() {
-				const nameCol = nameColSelect.value;
-				const durationCol = durationColSelect.value;
-				const rateCol = rateColSelect.value;
-				const statusCol = statusColSelect.value;
-
-				const columns = {
-					nameCol: nameCol,
-					durationCol: durationCol,
-					rateCol: rateCol,
-					statusCol: statusCol
-				};
-
-				const columnNames = Object.keys(columns);
-				const values = Object.values(columns);
-				const duplicates = new Set();
-				const valueToFields = {};
-
-				values.forEach((value, index) => {
-					if (!valueToFields[value]) {
-						valueToFields[value] = [];
-					}
-					valueToFields[value].push(columnNames[index]);
-				});
-
-				Object.keys(valueToFields).forEach(value => {
-					if (valueToFields[value].length > 1) {
-						valueToFields[value].forEach(field => duplicates.add(field));
-					}
-				});
-
-				const errorElements = {
-					nameCol: document.getElementById('nameColError'),
-					durationCol: document.getElementById('durationColError'),
-					rateCol: document.getElementById('rateColError'),
-					statusCol: document.getElementById('statusColError')
-				};
-
-				Object.values(errorElements).forEach(el => {
-					el.style.display = 'none';
-					el.textContent = '';
-				});
-
-				if (duplicates.size > 0) {
-					const fieldNames = {
-						nameCol: 'Name Column',
-						durationCol: 'Duration Column',
-						rateCol: 'Rate Column',
-						statusCol: 'Status Column'
-					};
-
-					duplicates.forEach(field => {
-						const otherFields = valueToFields[columns[field]].filter(f => f !== field);
-						const otherNames = otherFields.map(f => fieldNames[f]).join(' and ');
-						errorElements[field].textContent = 'Duplicate column selection (also used by ' + otherNames + ')';
-						errorElements[field].style.display = 'block';
-						document.getElementById(field).setCustomValidity('Duplicate column selection');
-					});
-					return false;
-				}
-
-				Object.keys(columns).forEach(field => {
-					document.getElementById(field).setCustomValidity('');
-				});
-
-				return true;
-			}
-
-			startDateInput.addEventListener('change', validateDates);
-			startDateInput.addEventListener('input', () => {
-				downloadBtn.disabled = true;
-			});
-			endDateInput.addEventListener('change', validateDates);
-			endDateInput.addEventListener('input', () => {
-				downloadBtn.disabled = true;
-			});
-			driveUrlInput.addEventListener('blur', validateURL);
-			driveUrlInput.addEventListener('input', () => {
-				downloadBtn.disabled = true;
-			});
-			nameInput.addEventListener('blur', validateName);
-			nameInput.addEventListener('input', () => {
-				downloadBtn.disabled = true;
-			});
-			excludedRowsInput.addEventListener('blur', validateExcludedRows);
-			excludedRowsInput.addEventListener('input', () => {
-				downloadBtn.disabled = true;
-			});
-			nameColSelect.addEventListener('change', validateColumns);
-			nameColSelect.addEventListener('input', () => {
-				downloadBtn.disabled = true;
-			});
-			durationColSelect.addEventListener('change', validateColumns);
-			durationColSelect.addEventListener('input', () => {
-				downloadBtn.disabled = true;
-			});
-			rateColSelect.addEventListener('change', validateColumns);
-			rateColSelect.addEventListener('input', () => {
-				downloadBtn.disabled = true;
-			});
-			statusColSelect.addEventListener('change', validateColumns);
-			statusColSelect.addEventListener('input', () => {
-				downloadBtn.disabled = true;
-			});
-
-			form.addEventListener('submit', async (e) => {
-				e.preventDefault();
-
-				if (!validateDates() || !validateURL() || !validateName() || !validateExcludedRows() || !validateColumns()) {
-					return;
-				}
-
-				submitBtn.disabled = true;
-				logOutput.textContent = 'Processing...\n';
-				resultsSection.style.display = 'none';
-
-				const formData = {
-					driveUrl: driveUrlInput.value.trim(),
-					name: nameInput.value.trim(),
-					template: templateSelect.value,
-					startDate: formatDateForServer(startDateInput.value),
-					endDate: formatDateForServer(endDateInput.value),
-					nameCol: document.getElementById('nameCol').value,
-					durationCol: document.getElementById('durationCol').value,
-					rateCol: document.getElementById('rateCol').value,
-					statusCol: document.getElementById('statusCol').value,
-					excludedRows: document.getElementById('excludedRows').value.trim()
-				};
-
-				try {
-					const response = await fetch(buildURL('/process'), {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-							'Authorization': getAuthHeader()
-						},
-						body: JSON.stringify(formData)
-					});
-
-					const data = await response.json();
-
-					logOutput.textContent = data.logs.join('\n') + '\n';
-
-					if (data.success) {
-						logOutput.textContent += '\n✓ ' + data.message;
-
-						currentFileName = formData.name;
-						currentDriveUrl = formData.driveUrl;
-						finalizeBtn.disabled = false;
-						downloadBtn.disabled = false;
-						displayResults(data.records, data.total, data.rowRange);
-					} else {
-						logOutput.textContent += '\n✗ Error: ' + data.message;
-					}
-				} catch (error) {
-					logOutput.textContent += '\n✗ Network error: ' + error.message;
-				} finally {
-					submitBtn.disabled = false;
-				}
-			});
-
-			finalizeBtn.addEventListener('click', async () => {
-				if (!currentFileName || !currentDriveUrl) {
-					logOutput.textContent += '\n✗ No processed data to finalize';
-					return;
-				}
-
-				finalizeBtn.disabled = true;
-				logOutput.textContent += '\nFinalizing records...';
-
-				try {
-					const response = await fetch(buildURL('/finalize'), {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-							'Authorization': getAuthHeader()
-						},
-						body: JSON.stringify({
-							name: currentFileName,
-							driveUrl: currentDriveUrl
-						})
-					});
-
-					const data = await response.json();
-
-					if (data.success) {
-						logOutput.textContent += '\n✓ ' + data.message;
-						finalizeBtn.disabled = true;
-					} else {
-						logOutput.textContent += '\n✗ Error: ' + data.message;
-						finalizeBtn.disabled = false;
-					}
-				} catch (error) {
-					logOutput.textContent += '\n✗ Network error: ' + error.message;
-					finalizeBtn.disabled = false;
-				}
-			});
-
-			function formatDateForServer(dateStr) {
-				const parts = dateStr.split('-');
-				const year = parseInt(parts[0], 10);
-				const month = parseInt(parts[1], 10) - 1;
-				const day = parseInt(parts[2], 10);
-				const months = ['January', 'February', 'March', 'April', 'May', 'June',
-							  'July', 'August', 'September', 'October', 'November', 'December'];
-				return months[month] + ' ' + day + ', ' + year;
-			}
-
-			const lightColors = [
-				'#FFE6E6',
-				'#E6F3FF',
-				'#E6FFE6',
-				'#FFF9E6',
-				'#F0E6FF',
-				'#FFE6CC',
-				'#FFE6F0',
-				'#E6FFFF',
-				'#F5F5F5',
-				'#E6F5FF',
-				'#FFF0E6',
-				'#F0FFE6',
-				'#FFE6F5',
-				'#E6E6FF',
-				'#FFFFE6'
-			];
-
-
-			function displayResults(records, total, rowRange) {
-				resultsBody.innerHTML = '';
-
-				if (records.length === 0) {
-					document.getElementById('infoDisplay').style.display = 'none';
-					resultsSection.style.display = 'block';
-					return;
-				}
-
-				const rowRangeDisplay = document.getElementById('rowRangeDisplay');
-				const totalDisplay = document.getElementById('totalDisplay');
-				const infoDisplay = document.getElementById('infoDisplay');
-
-				rowRangeDisplay.textContent = rowRange || 'Rows: N/A';
-				totalDisplay.textContent = 'Total: ' + total.toFixed(2);
-				infoDisplay.style.display = 'flex';
-
-				const nameGroups = {};
-				const uniqueNames = [];
-				const nameSet = new Set();
-
-				records.forEach((record) => {
-					if (!nameSet.has(record.name)) {
-						uniqueNames.push(record.name);
-						nameSet.add(record.name);
-					}
-				});
-
-				uniqueNames.forEach((name, index) => {
-					nameGroups[name] = {
-						color: lightColors[index % lightColors.length]
-					};
-				});
-
-				records.forEach((record) => {
-					const row = document.createElement('tr');
-					const group = nameGroups[record.name];
-
-					row.style.backgroundColor = group.color;
-					row.innerHTML = '<td>' + escapeHtml(record.name) + '</td><td>' + escapeHtml(record.date) + '</td><td>' + record.duration + '</td><td>' + record.rate.toFixed(2) + '</td><td>' + escapeHtml(record.status) + '</td>';
-					resultsBody.appendChild(row);
-				});
-
-				resultsSection.style.display = 'block';
-			}
-
-			downloadBtn.addEventListener('click', () => {
-				if (currentFileName) {
-					window.location.href = buildURL('/download/' + currentFileName);
-				}
-			});
-
-			clearBtn.addEventListener('click', () => {
-				resultsBody.innerHTML = '';
-				const infoDisplay = document.getElementById('infoDisplay');
-				infoDisplay.style.display = 'none';
-				resultsSection.style.display = 'none';
-				currentFileName = '';
-				currentDriveUrl = '';
-				downloadBtn.disabled = true;
-			});
-
-			function escapeHtml(text) {
-				const div = document.createElement('div');
-				div.textContent = text;
-				return div.innerHTML;
-			}
-		</script>
 	</body>
 	</html>
 }

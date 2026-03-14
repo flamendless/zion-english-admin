@@ -132,7 +132,9 @@ templ Home(role auth.Role) {
 
 				<!-- INFO: (flam) this will be outdated after we centralized class records via admin tool -->
 				<!-- @ActionCard("/logs", "Process logs", "View and manage processing logs") -->
-				<!-- @ActionCard("/process", "Process", "Process CSV/XLSX files") -->
+				if isAccessible(role, "/process") {
+					@ActionCard("/process", "Process", "Process CSV/XLSX files")
+				}
 			</div>
 		</div>
 	</body>

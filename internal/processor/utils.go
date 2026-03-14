@@ -59,6 +59,10 @@ func ParseDateStringWithYear(dateStr string, year int) (*time.Time, error) {
 
 	normalized := normalizeDateString(dateStr)
 
+	if parsedDate, err := time.Parse("2006-01-02", normalized); err == nil {
+		return &parsedDate, err
+	}
+
 	parsedDate, err := time.Parse("January 2, 2006", normalized)
 	if err != nil {
 		parsedDate, err = time.Parse("January 02, 2006", normalized)

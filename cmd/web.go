@@ -145,6 +145,9 @@ var cmdWeb = &cobra.Command{
 		publicMux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, basePath, http.StatusFound)
 		})
+		publicMux.HandleFunc(basePath+"/process", handleProcessPage)
+		publicMux.HandleFunc(basePath+"/download/processed", handleDownload)
+
 		publicMux.HandleFunc(basePath+"/role", handleGetRole)
 		publicMux.HandleFunc(basePath+"/refresh", handleRefreshPage)
 		publicMux.HandleFunc(basePath+"/auth/login", handleLogin)
@@ -177,6 +180,8 @@ var cmdWeb = &cobra.Command{
 		rootMux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, basePath, http.StatusFound)
 		})
+		rootMux.Handle(basePath+"/download/processed", publicMux)
+		rootMux.Handle(basePath+"/process", publicMux)
 		rootMux.Handle(basePath+"/role", publicMux)
 		rootMux.Handle(basePath+"/auth/", publicMux)
 		rootMux.Handle(basePath+"/api/", publicMux)
@@ -282,43 +287,48 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 	logMessages = []string{}
 	var req models.ProcessRequest
 	var outputPath string
-	var errMsg string
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		errMsg = fmt.Sprintf("Invalid request: %v", err)
-		sendErrorResponse(w, errMsg, &req, r.UserAgent(), "", errMsg)
+	if err := r.ParseForm(); err != nil {
+		sendErrorLog(w, err.Error())
 		return
 	}
 
-	if err := validateRequest(&req); err != nil {
-		errMsg = err.Error()
-		sendErrorResponse(w, errMsg, &req, r.UserAgent(), "", errMsg)
+	req.DriveURL = r.FormValue("driveUrl")
+	req.Name = r.FormValue("name")
+	req.Template = r.FormValue("templateSelect")
+	req.StartDate = r.FormValue("startDate")
+	req.EndDate = r.FormValue("endDate")
+	req.NameCol = r.FormValue("nameCol")
+	req.DurationCol = r.FormValue("durationCol")
+	req.RateCol = r.FormValue("rateCol")
+	req.StatusCol = r.FormValue("statusCol")
+	req.ExcludedRows = r.FormValue("excludedRows")
+
+	if err := validateProcessRequest(&req); err != nil {
+		sendErrorLog(w, err.Error())
 		return
 	}
 
-	addLog(fmt.Sprintf("Processing request for: %s", req.Name))
+	addLog("Processing request for: " + req.Name)
 
 	inputPath := filepath.Join("tmp", fmt.Sprintf("%s_input.csv", req.Name))
 	if err := sheet.DownloadDriveSheet(req.DriveURL, inputPath); err != nil {
-		errMsg = fmt.Sprintf("Failed to download file: %v", err)
-		sendErrorResponse(w, errMsg, &req, r.UserAgent(), "", errMsg)
+		sendErrorLog(w, err.Error())
 		return
 	}
 
-	addLog(fmt.Sprintf("Downloaded file to: %s", inputPath))
+	addLog("Downloaded file to: " + inputPath)
 
 	parsedStartDate, err := processor.ParseDateString(req.StartDate)
 	if err != nil {
-		errMsg = fmt.Sprintf("Invalid start date: %v", err)
-		sendErrorResponse(w, errMsg, &req, r.UserAgent(), "", errMsg)
+		sendErrorLog(w, err.Error())
 		return
 	}
 	targetStartDate := *parsedStartDate
 
 	parsedEndDate, err := processor.ParseDateString(req.EndDate)
 	if err != nil {
-		errMsg = fmt.Sprintf("Invalid end date: %v", err)
-		sendErrorResponse(w, errMsg, &req, r.UserAgent(), "", errMsg)
+		sendErrorLog(w, err.Error())
 		return
 	}
 	targetEndDate := *parsedEndDate
@@ -348,21 +358,21 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 
 	records, err := processor.ProcessCSVFile(inputPath, targetStartDate, targetEndDate, colIndices, excludedRows)
 	if err != nil {
-		errMsg = fmt.Sprintf("Failed to process CSV: %v", err)
-		sendErrorResponse(w, errMsg, &req, r.UserAgent(), "", errMsg)
+		sendErrorLog(w, err.Error())
 		return
 	}
 
 	addLog(fmt.Sprintf("Processed %d records", len(records)))
 
-	outputPath = filepath.Join("tmp", fmt.Sprintf("%s_output.xlsx", req.Name))
+	safename := utils.SanitizeFilename(req.Name)
+	filename := fmt.Sprintf("%s_output_%s.xlsx", safename, utils.RandomString(8))
+	outputPath = filepath.Join("tmp", filename)
 	if err := processor.SaveRecords(records, outputPath, colIndices, req.Name); err != nil {
-		errMsg = fmt.Sprintf("Failed to save output: %v", err)
-		sendErrorResponse(w, errMsg, &req, r.UserAgent(), "", errMsg)
+		sendErrorLog(w, err.Error())
 		return
 	}
 
-	addLog(fmt.Sprintf("Saved output to: %s", outputPath))
+	addLog("Saved output to: " + outputPath)
 
 	var total float64
 	var minRow, maxRow int
@@ -409,22 +419,33 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 
 	logToDB(dbRW, &req, r.UserAgent(), outputPath, "")
 
-	response := models.ProcessResponse{
-		Success:  true,
-		Message:  "Processing completed successfully",
-		Logs:     logMessages,
-		Records:  responseRecords,
-		Total:    total,
-		RowRange: rowRange,
+	processRecords := make([]frontend.ProcessRecord, len(responseRecords))
+	for i, rec := range responseRecords {
+		processRecords[i] = frontend.ProcessRecord{
+			Name:     rec.Name,
+			Date:     rec.Date,
+			Duration: rec.Duration,
+			Rate:     rec.Rate,
+			Status:   rec.Status,
+		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if err := frontend.ProcessResponse(
+		filename,
+		req.DriveURL,
+		rowRange,
+		total,
+		processRecords,
+		logMessages,
+	).Render(r.Context(), w); err != nil {
+		logs.Log().Error("failed to render process response", zap.Error(err))
+		sendErrorLog(w, err.Error())
+	}
 }
 
 type FinalizeRequest struct {
-	Name     string `json:"name"`
-	DriveURL string `json:"driveUrl"`
+	Name     string `form:"name"`
+	DriveURL string `form:"driveUrl"`
 }
 
 func handleFinalize(w http.ResponseWriter, r *http.Request) {
@@ -433,26 +454,30 @@ func handleFinalize(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req FinalizeRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		HttpError(w, "Invalid request", http.StatusBadRequest)
+	if err := r.ParseForm(); err != nil {
+		sendErrorResponseHTML(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
 
+	req := FinalizeRequest{
+		Name:     r.FormValue("name"),
+		DriveURL: r.FormValue("driveUrl"),
+	}
+
 	if req.Name == "" || req.DriveURL == "" {
-		HttpError(w, "Missing name or spreadsheet URL", http.StatusBadRequest)
+		sendErrorResponseHTML(w, "Missing name or spreadsheet URL", http.StatusBadRequest)
 		return
 	}
 
 	outputPath := filepath.Join("tmp", fmt.Sprintf("%s_output.xlsx", req.Name))
 	if _, err := os.Stat(outputPath); os.IsNotExist(err) {
-		HttpError(w, "Output file not found. Please process CSV first.", http.StatusNotFound)
+		sendErrorResponseHTML(w, "Output file not found. Please process CSV first.", http.StatusNotFound)
 		return
 	}
 
 	f, err := excelize.OpenFile(outputPath)
 	if err != nil {
-		HttpError(w, fmt.Sprintf("Failed to open output file: %v", err), http.StatusInternalServerError)
+		sendErrorResponseHTML(w, fmt.Sprintf("Failed to open output file: %v", err), http.StatusInternalServerError)
 		return
 	}
 	defer f.Close()
@@ -460,7 +485,7 @@ func handleFinalize(w http.ResponseWriter, r *http.Request) {
 	sheetName := "Sheet1"
 	rows, err := f.GetRows(sheetName)
 	if err != nil {
-		HttpError(w, fmt.Sprintf("Failed to read sheet: %v", err), http.StatusInternalServerError)
+		sendErrorResponseHTML(w, fmt.Sprintf("Failed to read sheet: %v", err), http.StatusInternalServerError)
 		return
 	}
 
@@ -503,64 +528,46 @@ func handleFinalize(w http.ResponseWriter, r *http.Request) {
 			Status:          status,
 		})
 		if err != nil {
-			HttpError(w, fmt.Sprintf("Failed to insert record: %v", err), http.StatusInternalServerError)
+			sendErrorResponseHTML(w, fmt.Sprintf("Failed to insert record: %v", err), http.StatusInternalServerError)
 			return
 		}
 	}
 
-	response := map[string]interface{}{
-		"success": true,
-		"message": fmt.Sprintf("Successfully finalized %d records", rowNum-3),
-		"count":   rowNum - 3,
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	w.Header().Set("Content-Type", "text/html")
+	fmt.Fprintf(w, `<div class="log-success">✓ Successfully finalized %d records</div>`, rowNum-3)
 }
 
 func handleDownload(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		sendErrorLog(w, "Method not allowed")
 		return
 	}
 
-	path := strings.TrimPrefix(r.URL.Path, "/")
-	parts := strings.Split(path, "/")
-
-	var name string
-	for i, part := range parts {
-		if part == "download" && i+1 < len(parts) {
-			name = parts[i+1]
-			break
-		}
-	}
-
-	if name == "" {
-		HttpError(w, "Missing filename", http.StatusBadRequest)
+	filename := r.URL.Query().Get("filename")
+	if filename == "" {
+		sendErrorLog(w, "missing filename")
 		return
 	}
 
-	// Validate name to prevent directory traversal
-	matched, _ := regexp.MatchString(`^[a-zA-Z0-9_-]+$`, name)
-	if !matched {
-		HttpError(w, "Invalid filename", http.StatusBadRequest)
+	const baseDir = "tmp"
+	cleanPath := filepath.Clean(filename)
+	fullPath := filepath.Join(baseDir, cleanPath)
+	if !strings.HasPrefix(fullPath, filepath.Clean(baseDir)+string(os.PathSeparator)) {
+		sendErrorLog(w, "invalid path")
 		return
 	}
 
-	outputPath := filepath.Join("tmp", fmt.Sprintf("%s_output.xlsx", name))
-
-	// Check if file exists
-	if _, err := os.Stat(outputPath); os.IsNotExist(err) {
-		HttpError(w, "File not found", http.StatusNotFound)
+	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+		sendErrorLog(w, "file not found")
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s.xlsx\"", name))
-	http.ServeFile(w, r, outputPath)
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename))
+	http.ServeFile(w, r, fullPath)
 }
 
-func validateRequest(req *models.ProcessRequest) error {
+func validateProcessRequest(req *models.ProcessRequest) error {
 	if req.DriveURL == "" {
 		return errors.New("google spreadsheet url is required")
 	}
@@ -599,23 +606,19 @@ func validateRequest(req *models.ProcessRequest) error {
 	return nil
 }
 
-func sendErrorResponse(w http.ResponseWriter, message string, req *models.ProcessRequest, userAgent, outputPath, errMsg string) {
-	if req != nil {
-		logToDB(dbRW, req, userAgent, outputPath, errMsg)
-	}
+func sendErrorResponseHTML(w http.ResponseWriter, message string, statusCode int) {
+	w.Header().Set("Content-Type", "text/html")
+	w.WriteHeader(statusCode)
+	fmt.Fprintf(w, `<div class="log-error">✗ %s</div>`, message)
+}
 
-	response := models.ProcessResponse{
-		Success:  false,
-		Message:  message,
-		Logs:     logMessages,
-		Records:  []models.RecordRow{},
-		Total:    0,
-		RowRange: "",
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusBadRequest)
-	json.NewEncoder(w).Encode(response)
+func escapeHTML(s string) string {
+	s = strings.ReplaceAll(s, "&", "&amp;")
+	s = strings.ReplaceAll(s, "<", "&lt;")
+	s = strings.ReplaceAll(s, ">", "&gt;")
+	s = strings.ReplaceAll(s, `"`, "&quot;")
+	s = strings.ReplaceAll(s, "'", "&#39;")
+	return s
 }
 
 func logToDB(dbService database.Service, req *models.ProcessRequest, userAgent, outputPath, errMsg string) {
