@@ -38,7 +38,7 @@ func Process() templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/process.templ`, Line: 12, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/process.templ`, Line: 12, Col: 79}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -75,13 +75,13 @@ func Process() templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/process"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/process.templ`, Line: 119, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/process.templ`, Line: 118, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-target=\"#results\" hx-swap=\"innerHTML\" hx-indicator=\"#submitBtn\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-target=\"#results\" hx-swap=\"innerHTML\" hx-indicator=\"#submitBtn\"><div _=\"\n\t\t\t\t\t\t\ton change from #teacher\n\t\t\t\t\t\t\t\tset nameAttr to event.target.selectedOptions[0].dataset.name\n\t\t\t\t\t\t\t\tset #name.value to nameAttr\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -89,11 +89,15 @@ func Process() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = DriveURLInput().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"form-group\"><label for=\"name\">Name *</label> <input type=\"text\" id=\"name\" name=\"name\" required pattern=\"[a-zA-Z\\-\\w]+\" placeholder=\"teacher-name\"><div class=\"error-message\" id=\"nameError\">Name must contain only letters, spaces, and dashes</div></div><div class=\"form-group\"><label for=\"templateSelect\">Template</label> <select id=\"templateSelect\" name=\"templateSelect\" _=\"on change\n\t\t\t\t\t\t\tif me.value == ''\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tset cols to me.value.split(',')\n\t\t\t\t\t\t\tset #nameCol.value to cols[0]\n\t\t\t\t\t\t\tset #durationCol.value to cols[1]\n\t\t\t\t\t\t\tset #rateCol.value to cols[2]\n\t\t\t\t\t\t\tset #statusCol.value to cols[3]\n\t\t\t\t\t\t\tset #downloadBtn.@disabled to 'disabled'\n\t\t\t\t\t\t\"><option value=\"\">-- Select Template --</option> <option value=\"A,B,C,G\">A,B,C,G</option> <option value=\"A,C,D,H\">A,C,D,H</option></select></div><div class=\"column-mapping\"><h3>Date Range</h3>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"form-group\"><label for=\"name\">Name *</label> <input type=\"text\" id=\"name\" name=\"name\" required pattern=\"[a-zA-Z\\-\\w]+\" placeholder=\"teacher-name\"><div class=\"error-message\" id=\"nameError\">Name must contain only letters, spaces, and dashes</div></div><div class=\"form-group\"><label for=\"templateSelect\">Template</label> <select id=\"templateSelect\" name=\"templateSelect\" _=\"on change\n\t\t\t\t\t\t\tif me.value == ''\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tset cols to me.value.split(',')\n\t\t\t\t\t\t\tset #nameCol.value to cols[0]\n\t\t\t\t\t\t\tset #durationCol.value to cols[1]\n\t\t\t\t\t\t\tset #rateCol.value to cols[2]\n\t\t\t\t\t\t\tset #statusCol.value to cols[3]\n\t\t\t\t\t\t\"><option value=\"\">-- Select Template --</option> <option value=\"A,B,C,G\">A,B,C,G</option> <option value=\"A,C,D,H\">A,C,D,H</option></select></div><div class=\"column-mapping\"><h3>Date Range</h3><div _=\"\n\t\t\t\t\t\t\t\ton change from #datePreset\n\t\t\t\t\t\t\t\t\tset parts to #datePreset.value.split('|')\n\t\t\t\t\t\t\t\t\tset #startDate.value to parts[0]\n\t\t\t\t\t\t\t\t\tset #endDate.value to parts[1]\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -101,7 +105,7 @@ func Process() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"column-row\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div><div class=\"column-row\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -121,7 +125,7 @@ func Process() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"error-message\" id=\"endDateError\">End date must be after start date</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"error-message\" id=\"endDateError\">End date must be after start date</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -131,7 +135,7 @@ func Process() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div><h3>Options</h3><div class=\"form-group\"><label for=\"excludedRows\">Exclude Rows (comma-separated)</label> <input type=\"text\" id=\"excludedRows\" name=\"excludedRows\" placeholder=\"e.g., 5, 10, 15\"><div class=\"error-message\" id=\"excludedRowsError\">Enter valid row numbers separated by commas (for excluding row with total)</div></div><h3>Column Mapping</h3><div class=\"column-row\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div><h3>Options</h3><div class=\"form-group\"><label for=\"excludedRows\">Exclude Rows (comma-separated)</label> <input type=\"text\" id=\"excludedRows\" name=\"excludedRows\" placeholder=\"e.g., 5, 10, 15\"><div class=\"error-message\" id=\"excludedRowsError\">Enter valid row numbers separated by commas (for excluding row with total)</div></div><h3>Column Mapping</h3><div class=\"column-row\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -147,7 +151,7 @@ func Process() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"column-error\" id=\"nameColError\"></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"column-error\" id=\"nameColError\"></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -169,7 +173,7 @@ func Process() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"column-error\" id=\"durationColError\"></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"column-error\" id=\"durationColError\"></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -179,7 +183,7 @@ func Process() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div><div class=\"column-row\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div><div class=\"column-row\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -195,7 +199,7 @@ func Process() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"column-error\" id=\"rateColError\"></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"column-error\" id=\"rateColError\"></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -217,7 +221,7 @@ func Process() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"column-error\" id=\"rateColError\"></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"column-error\" id=\"rateColError\"></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -227,7 +231,7 @@ func Process() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div></div><button type=\"submit\" id=\"submitBtn\">Process CSV</button></form><div id=\"results\"></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</div></div><button type=\"submit\" id=\"submitBtn\">Process CSV</button></form><div id=\"results\"></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

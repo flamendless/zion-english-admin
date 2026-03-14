@@ -5,12 +5,12 @@ import "zion-english/internal/utils"
 templ Process() {
 	<!DOCTYPE html>
 	<html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Zion English Admin Tool</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		<style>
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Zion English Admin Tool</title>
+			<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+			<style>
 			.column-mapping {
 				background-color: #f9f9f9;
 				padding: 20px;
@@ -107,34 +107,48 @@ templ Process() {
 				cursor: not-allowed;
 			}
 		</style>
-		@GlobalIncludes()
-	</head>
-
-	<body>
-		<div class="container">
-			@HeaderSimple()
-			@SuccessBanner()
-			@ErrorBanner()
-
-			<form hx-post={ utils.URL("/process") }
-			      hx-target="#results"
-			      hx-swap="innerHTML"
-			      hx-indicator="#submitBtn">
-				@TeacherDropdown()
-				@DriveURLInput()
-
-				<div class="form-group">
-					<label for="name">Name *</label>
-					<input type="text" id="name" name="name" required
-					       pattern="[a-zA-Z\-\w]+"
-					       placeholder="teacher-name">
-					<div class="error-message" id="nameError">Name must contain only letters, spaces, and dashes</div>
-				</div>
-
-				<div class="form-group">
-					<label for="templateSelect">Template</label>
-					<select id="templateSelect" name="templateSelect"
-						_="on change
+			@GlobalIncludes()
+		</head>
+		<body>
+			<div class="container">
+				@HeaderSimple()
+				@SuccessBanner()
+				@ErrorBanner()
+				<form
+					hx-post={ utils.URL("/process") }
+					hx-target="#results"
+					hx-swap="innerHTML"
+					hx-indicator="#submitBtn"
+				>
+					<div
+						_="
+							on change from #teacher
+								set nameAttr to event.target.selectedOptions[0].dataset.name
+								set #name.value to nameAttr
+							end
+						"
+					>
+						@TeacherDropdown()
+					</div>
+					@DriveURLInput()
+					<div class="form-group">
+						<label for="name">Name *</label>
+						<input
+							type="text"
+							id="name"
+							name="name"
+							required
+							pattern="[a-zA-Z\-\w]+"
+							placeholder="teacher-name"
+						/>
+						<div class="error-message" id="nameError">Name must contain only letters, spaces, and dashes</div>
+					</div>
+					<div class="form-group">
+						<label for="templateSelect">Template</label>
+						<select
+							id="templateSelect"
+							name="templateSelect"
+							_="on change
 							if me.value == ''
 								halt
 							end
@@ -143,59 +157,67 @@ templ Process() {
 							set #durationCol.value to cols[1]
 							set #rateCol.value to cols[2]
 							set #statusCol.value to cols[3]
-							set #downloadBtn.@disabled to 'disabled'
-						">
-						<option value="">-- Select Template --</option>
-						<option value="A,B,C,G">A,B,C,G</option>
-						<option value="A,C,D,H">A,C,D,H</option>
-					</select>
+						"
+						>
+							<option value="">-- Select Template --</option>
+							<option value="A,B,C,G">A,B,C,G</option>
+							<option value="A,C,D,H">A,C,D,H</option>
+						</select>
+					</div>
+					<div class="column-mapping">
+						<h3>Date Range</h3>
+						<div
+							_="
+								on change from #datePreset
+									set parts to #datePreset.value.split('|')
+									set #startDate.value to parts[0]
+									set #endDate.value to parts[1]
+								end
+							"
+						>
+							@DatePreset()
+						</div>
+						<div class="column-row">
+							@DateInput("startDate", "Start Date *")
+							@DateInput("endDate", "End Date *") {
+								<div class="error-message" id="endDateError">End date must be after start date</div>
+							}
+						</div>
+						<h3>Options</h3>
+						<div class="form-group">
+							<label for="excludedRows">Exclude Rows (comma-separated)</label>
+							<input
+								type="text"
+								id="excludedRows"
+								name="excludedRows"
+								placeholder="e.g., 5, 10, 15"
+							/>
+							<div class="error-message" id="excludedRowsError">Enter valid row numbers separated by commas (for excluding row with total)</div>
+						</div>
+						<h3>Column Mapping</h3>
+						<div class="column-row">
+							@Letters("nameCol", "Name Column *", "A") {
+								<div class="column-error" id="nameColError"></div>
+							}
+							@Letters("durationCol", "Duration Column *", "B") {
+								<div class="column-error" id="durationColError"></div>
+							}
+						</div>
+						<div class="column-row">
+							@Letters("rateCol", "Rate Column *", "C") {
+								<div class="column-error" id="rateColError"></div>
+							}
+							@Letters("statusCol", "Status Column *", "G") {
+								<div class="column-error" id="rateColError"></div>
+							}
+						</div>
+					</div>
+					<button type="submit" id="submitBtn">Process CSV</button>
+				</form>
+				<div id="results">
+					//ProcessResponse
 				</div>
-
-				<div class="column-mapping">
-					<h3>Date Range</h3>
-					@DatePreset()
-
-					<div class="column-row">
-						@DateInput("startDate", "Start Date *")
-						@DateInput("endDate", "End Date *") {
-							<div class="error-message" id="endDateError">End date must be after start date</div>
-						}
-					</div>
-
-					<h3>Options</h3>
-					<div class="form-group">
-						<label for="excludedRows">Exclude Rows (comma-separated)</label>
-						<input type="text" id="excludedRows" name="excludedRows"
-						       placeholder="e.g., 5, 10, 15">
-						<div class="error-message" id="excludedRowsError">Enter valid row numbers separated by commas (for excluding row with total)</div>
-					</div>
-
-					<h3>Column Mapping</h3>
-					<div class="column-row">
-						@Letters("nameCol", "Name Column *", "A") {
-							<div class="column-error" id="nameColError"></div>
-						}
-						@Letters("durationCol", "Duration Column *", "B") {
-							<div class="column-error" id="durationColError"></div>
-						}
-					</div>
-					<div class="column-row">
-						@Letters("rateCol", "Rate Column *", "C") {
-							<div class="column-error" id="rateColError"></div>
-						}
-						@Letters("statusCol", "Status Column *", "G") {
-							<div class="column-error" id="rateColError"></div>
-						}
-					</div>
-				</div>
-
-				<button type="submit" id="submitBtn">Process CSV</button>
-			</form>
-
-			<div id="results">
-				//ProcessResponse
 			</div>
-		</div>
-	</body>
+		</body>
 	</html>
 }
