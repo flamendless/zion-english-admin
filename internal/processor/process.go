@@ -2,7 +2,7 @@ package processor
 
 import (
 	"encoding/csv"
-	"fmt"
+	"io"
 	"os"
 	"sort"
 	"strconv"
@@ -26,7 +26,16 @@ func ProcessCSVFile(
 	}
 	defer file.Close()
 
-	reader := csv.NewReader(file)
+	return ProcessCSV(file, startDate, endDate, colIndices, excludedRows)
+}
+
+func ProcessCSV(
+	r io.Reader,
+	startDate, endDate time.Time,
+	colIndices ColumnIndices,
+	excludedRows map[int]bool,
+) ([]ClassRecord, error) {
+	reader := csv.NewReader(r)
 	records, err := reader.ReadAll()
 	if err != nil {
 		return nil, err
@@ -43,19 +52,17 @@ func ProcessCSVFile(
 			continue
 		}
 
-		if parsedDate.Year() == endDate.Year() &&
-			parsedDate.Month() == endDate.Month() &&
-			parsedDate.Day() == endDate.Day() {
+		if !parsedDate.Before(endDate) {
 			endIdx = i
 			break
 		}
 	}
 	if endIdx == -1 {
-		return nil, fmt.Errorf("end date not found in CSV")
+		endIdx = len(records) - 1
 	}
 
 	var startIdx int = -1
-	for i := endIdx; i >= 0; i-- {
+	for i := 0; i <= endIdx; i++ {
 		record := records[i]
 		if len(record) <= 0 {
 			continue
@@ -65,15 +72,13 @@ func ProcessCSVFile(
 			continue
 		}
 
-		if parsedDate.Month() == startDate.Month() &&
-			parsedDate.Day() == startDate.Day() &&
-			parsedDate.Year() == endDate.Year() {
+		if !parsedDate.Before(startDate) {
 			startIdx = i
 			break
 		}
 	}
 	if startIdx == -1 {
-		return nil, fmt.Errorf("start date not found in CSV")
+		startIdx = 0
 	}
 
 	logs.Log().Info(
