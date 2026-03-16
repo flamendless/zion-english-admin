@@ -61,8 +61,9 @@ templ Students(data StudentData) {
 							</tr>
 						</thead>
 						<tbody>
-							for _, student := range data.Students {
+							for i, student := range data.Students {
 								<tr>
+									<td>{ i+1 }</td>
 									<td>{ student.Name }</td>
 									<td class="currency-cell">{ student.Currency }</td>
 									<td>{ getDisplayValue(student.Contact) }</td>

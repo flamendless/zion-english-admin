@@ -60,8 +60,9 @@ templ Teachers(data TeacherData) {
 							</tr>
 						</thead>
 						<tbody>
-							for _, teacher := range data.Teachers {
+							for i, teacher := range data.Teachers {
 								<tr>
+									<td>{ i+1 }</td>
 									<td>{ teacher.Name }</td>
 									<td>{ getDisplayValue(teacher.Sex) }</td>
 									<td class="date-cell">{ getDisplayValue(teacher.Birthdate) }</td>

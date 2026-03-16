@@ -5,6 +5,7 @@ go 1.26.0
 require (
 	github.com/a-h/templ v0.3.1001
 	github.com/golang-jwt/jwt/v4 v4.5.2
+	github.com/gookit/goutil v0.7.4
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/mattn/go-sqlite3 v1.14.34
 	github.com/medama-io/go-useragent v1.2.3
@@ -101,6 +102,7 @@ require (
 	golang.org/x/net v0.50.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/term v0.40.0 // indirect
 	golang.org/x/text v0.34.0 // indirect
 	golang.org/x/tools v0.42.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260226221140-a57be14db171 // indirect

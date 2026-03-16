@@ -164,6 +164,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/teachers", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleTeachers))
 		authMux.HandleFunc(basePath+"/classes/record", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClassRecord))
 		authMux.HandleFunc(basePath+"/classes", auth.RequireRole(auth.RoleSuperuser)(handleClasses))
+		authMux.HandleFunc(basePath+"/api/me/students", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetMyStudents))
 
 		authHandler := auth.Middleware(cfg, dbRO.GetQueries(), authMux)
 
@@ -190,6 +191,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/teachers/", authHandler)
 		rootMux.Handle(basePath+"/classes", authHandler)
 		rootMux.Handle(basePath+"/classes/", authHandler)
+		rootMux.Handle(basePath+"/api/me/students", authHandler)
 
 		handler := rootMux
 
@@ -728,6 +730,7 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		ParentName:    r.FormValue("parentName"),
 		AssignedColor: r.FormValue("assignedColor"),
 		Status:        r.FormValue("status"),
+		TeacherID:     parseInt64(r.FormValue("teacher")),
 	}
 
 	if err := validateStudentRequest(&req); err != nil {
@@ -762,6 +765,22 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	studentID, err := dbRW.GetQueries().GetStudentIDByName(r.Context(), req.Name)
+	if err != nil {
+		sendErrorLog(w, fmt.Sprintf("Failed to get student ID: %v", err))
+		return
+	}
+
+	err = dbRW.GetQueries().InsertTeacherStudentM2M(r.Context(), queries.InsertTeacherStudentM2MParams{
+		TeacherID: req.TeacherID,
+		StudentID: studentID,
+	})
+	if err != nil {
+		sendErrorLog(w, fmt.Sprintf("Failed to assign teacher: %v", err))
+		return
+	}
+	addLog(fmt.Sprintf("Assigned student to teacher ID: %d", req.TeacherID))
+
 	addLog(fmt.Sprintf("Successfully registered student: %s", req.Name))
 
 	if _, err := fmt.Fprintf(w, fmt.Sprintf("Student '%s' registered successfully\n", req.Name)); err != nil {
@@ -793,6 +812,10 @@ func validateStudentRequest(req *models.StudentRegisterRequest) error {
 
 	if req.AssignedColor == "" {
 		return errors.New("assigned color is required")
+	}
+
+	if req.TeacherID == 0 {
+		return errors.New("assigned teacher is required")
 	}
 
 	validStatuses := map[string]bool{"active": true, "inactive": true}
@@ -1146,6 +1169,41 @@ func handleGetStudents(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleGetMyStudents(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	user := auth.GetUser(r.Context())
+	if user.ID == 0 {
+		HttpError(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	students, err := dbRO.GetQueries().GetStudentsByTeacherID(r.Context(), user.ID)
+	if err != nil {
+		HttpError(w, "Failed to fetch students", http.StatusInternalServerError)
+		return
+	}
+
+	var studentResponses []models.StudentAPIResponse
+	for _, s := range students {
+		studentResponses = append(studentResponses, models.StudentAPIResponse{
+			ID:           s.ID,
+			Name:         s.Name,
+			Currency:     s.Currency,
+			RatePerClass: s.RatePerClass,
+		})
+	}
+	fmt.Println(1111, students, studentResponses)
+
+	if err := frontend.StudentOptions(studentResponses).Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func handleGetClassRecords(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -1224,6 +1282,13 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ctx := r.Context()
+	user := auth.GetUser(ctx)
+	if user.ID == 0 {
+		HttpError(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
 	logMessages = []string{}
 	if err := r.ParseForm(); err != nil {
 		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
@@ -1232,7 +1297,7 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 
 	req := models.ClassRecordRequest{
 		StudentID:       parseInt64(r.FormValue("student")),
-		TeacherID:       parseInt64(r.FormValue("teacher")),
+		TeacherID:       user.ID,
 		Date:            r.FormValue("date"),
 		DurationMinutes: parseInt64(r.FormValue("duration")),
 		Rate:            parseFloat64(r.FormValue("rate")),
@@ -1246,9 +1311,6 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx := r.Context()
-	role := auth.GetRole(ctx)
-
 	err := dbRW.GetQueries().InsertClassRecord(r.Context(), queries.InsertClassRecordParams{
 		StudentID:       req.StudentID,
 		TeacherID:       req.TeacherID,
@@ -1258,7 +1320,7 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		Currency:        req.Currency,
 		Status:          req.Status,
 		Reason:          sql.NullString{String: req.Reason, Valid: req.Reason != ""},
-		RecordedByRole:  string(role),
+		RecordedByRole:  string(user.Role),
 	})
 	if err != nil {
 		sendClassRecordErrorResponse(w, err.Error())
@@ -1270,6 +1332,7 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	addLog("Class recorded successfully")
 	for _, log := range logMessages {
 		if _, err := fmt.Fprint(w, log+"\n"); err != nil {
 			sendErrorLog(w, err.Error())

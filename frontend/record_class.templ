@@ -22,7 +22,7 @@ templ RecordClass() {
 			<form
 				id="recordForm"
 				hx-post={ utils.URL("/classes/record") }
-				hx-swap="none"
+				hx-swap="innerHTML"
 				hx-target="#logOutput"
 				hx-indicator="#submitBtn"
 				_="
@@ -47,8 +47,8 @@ templ RecordClass() {
 				"
 			>
 				<div class="form-row">
-					@TeacherDropdown()
-					@StudentDropdown()
+					<!-- @MeTeacherDropdown() -->
+					@TeacherStudentsDropdown()
 				</div>
 
 				<div class="form-row">

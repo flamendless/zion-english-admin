@@ -90,6 +90,12 @@ type TblTeacher struct {
 	Password       string
 }
 
+type TblTeachersStudentsM2m struct {
+	TeacherID int64
+	StudentID int64
+	CreatedAt string
+}
+
 type TblUseragent struct {
 	ID             int64
 	UserAgent      string

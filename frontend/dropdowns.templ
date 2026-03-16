@@ -17,6 +17,36 @@ templ TeacherDropdown() {
 	</div>
 }
 
+templ TeacherDropdownEx(label string) {
+	<div class="form-group">
+		<label for="teacher">{ label }</label>
+		<select id="teacher" name="teacher" required
+			hx-get={ utils.URL("/api/teachers") }
+			hx-trigger="load"
+			hx-swap="innerHTML"
+			hx-target="this"
+		>
+			//TeacherOption
+			<option value="">-- Select Teacher --</option>
+		</select>
+	</div>
+}
+
+templ TeacherStudentsDropdown() {
+	<div class="form-group">
+		<label for="student">Student *</label>
+		<select id="student" name="student" required
+			hx-get={ utils.URL("/api/me/students") }
+			hx-trigger="load"
+			hx-swap="innerHTML"
+			hx-target="this"
+		>
+			//StudentOption
+			<option value="">-- Select Student --</option>
+		</select>
+	</div>
+}
+
 templ StudentDropdown() {
 	<div class="form-group">
 		<label for="student">Student *</label>

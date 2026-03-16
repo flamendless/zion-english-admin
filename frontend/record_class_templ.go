@@ -82,15 +82,11 @@ func RecordClass() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-swap=\"none\" hx-target=\"#logOutput\" hx-indicator=\"#submitBtn\" _=\"\n\t\t\t\t\ton submit\n\t\t\t\t\t\tif #teacher.value is ''\n\t\t\t\t\t\t\talert('Please select a teacher')\n\t\t\t\t\t\t\thalt\n\t\t\t\t\t\tend\n\t\t\t\t\t\tif #student.value is ''\n\t\t\t\t\t\t\talert('Please select a student')\n\t\t\t\t\t\t\thalt\n\t\t\t\t\t\tend\n\t\t\t\t\t\tif #duration.value <= 0\n\t\t\t\t\t\t\talert('Invalid duration')\n\t\t\t\t\t\t\thalt\n\t\t\t\t\t\tend\n\t\t\t\t\t\tif #rate.value < 0\n\t\t\t\t\t\t\talert('Invalid rate')\n\t\t\t\t\t\t\thalt\n\t\t\t\t\t\tend\n\t\t\t\t\tend\n\t\t\t\t\"><div class=\"form-row\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-swap=\"innerHTML\" hx-target=\"#logOutput\" hx-indicator=\"#submitBtn\" _=\"\n\t\t\t\t\ton submit\n\t\t\t\t\t\tif #teacher.value is ''\n\t\t\t\t\t\t\talert('Please select a teacher')\n\t\t\t\t\t\t\thalt\n\t\t\t\t\t\tend\n\t\t\t\t\t\tif #student.value is ''\n\t\t\t\t\t\t\talert('Please select a student')\n\t\t\t\t\t\t\thalt\n\t\t\t\t\t\tend\n\t\t\t\t\t\tif #duration.value <= 0\n\t\t\t\t\t\t\talert('Invalid duration')\n\t\t\t\t\t\t\thalt\n\t\t\t\t\t\tend\n\t\t\t\t\t\tif #rate.value < 0\n\t\t\t\t\t\t\talert('Invalid rate')\n\t\t\t\t\t\t\thalt\n\t\t\t\t\t\tend\n\t\t\t\t\tend\n\t\t\t\t\"><div class=\"form-row\"><!-- @MeTeacherDropdown() -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TeacherDropdown().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = StudentDropdown().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = TeacherStudentsDropdown().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
