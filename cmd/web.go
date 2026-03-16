@@ -17,6 +17,7 @@ import (
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/conf"
+	"zion-english/internal/constants"
 	"zion-english/internal/database"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
@@ -29,14 +30,6 @@ import (
 	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
-)
-
-var (
-	reLower   = regexp.MustCompile(`[a-z]`)
-	reUpper   = regexp.MustCompile(`[A-Z]`)
-	reDigit   = regexp.MustCompile(`\d`)
-	reSpecial = regexp.MustCompile(`[!@#$%^&*]`)
-	reLength  = regexp.MustCompile(`^[A-Za-z\d!@#$%^&*]{8,32}$`)
 )
 
 func parseFloat64(n string) float64 {
@@ -79,11 +72,11 @@ func getOrCreateUserAgentID(ctx context.Context, db database.Service, userAgentS
 }
 
 func validatePassword(p string) bool {
-	return reLength.MatchString(p) &&
-		reLower.MatchString(p) &&
-		reUpper.MatchString(p) &&
-		reDigit.MatchString(p) &&
-		reSpecial.MatchString(p)
+	return constants.ReLength.MatchString(p) &&
+		constants.ReLower.MatchString(p) &&
+		constants.ReUpper.MatchString(p) &&
+		constants.ReDigit.MatchString(p) &&
+		constants.ReSpecial.MatchString(p)
 }
 
 func HttpError(w http.ResponseWriter, msg string, code int) {
