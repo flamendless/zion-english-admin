@@ -52,7 +52,7 @@ func ProcessCSV(
 			continue
 		}
 
-		if !parsedDate.Before(endDate) {
+		if parsedDate.After(endDate) {
 			endIdx = i
 			break
 		}
@@ -62,7 +62,7 @@ func ProcessCSV(
 	}
 
 	var startIdx int = -1
-	for i := 0; i <= endIdx; i++ {
+	for i := endIdx; i > 0; i-- {
 		record := records[i]
 		if len(record) <= 0 {
 			continue
@@ -72,7 +72,7 @@ func ProcessCSV(
 			continue
 		}
 
-		if !parsedDate.Before(startDate) {
+		if !parsedDate.After(startDate) {
 			startIdx = i
 			break
 		}
@@ -83,6 +83,8 @@ func ProcessCSV(
 
 	logs.Log().Info(
 		"Date row indices",
+		zap.Time("start date", startDate),
+		zap.Time("end date", endDate),
 		zap.Int("startIndex", startIdx),
 		zap.Int("endIndex", endIdx),
 	)

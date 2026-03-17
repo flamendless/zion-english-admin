@@ -359,6 +359,12 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 
 	addLog(fmt.Sprintf("Processed %d records", len(records)))
 
+	if len(records) == 0 {
+		addLog("No record found...")
+		sendErrorLog(w, "no record found")
+		return
+	}
+
 	safename := utils.SanitizeFilename(req.Name)
 	filename := fmt.Sprintf("%s_output_%s.xlsx", safename, utils.RandomString(8))
 	outputPath = filepath.Join("tmp", filename)
@@ -1323,7 +1329,7 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		RecordedByRole:  string(user.Role),
 	})
 	if err != nil {
-		sendClassRecordErrorResponse(w, err.Error())
+		sendErrorLog(w, err.Error())
 		return
 	}
 
@@ -1377,11 +1383,11 @@ func validateClassRecordRequest(req *models.ClassRecordRequest) error {
 	return nil
 }
 
-func sendClassRecordErrorResponse(w http.ResponseWriter, errMsg string) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(models.ClassRecordResponse{
-		Success: false,
-		Message: errMsg,
-		Logs:    logMessages,
-	})
+func sendLogs(w http.ResponseWriter) {
+	for _, log := range logMessages {
+		if _, err := fmt.Fprint(w, log+"\n"); err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+	}
 }
