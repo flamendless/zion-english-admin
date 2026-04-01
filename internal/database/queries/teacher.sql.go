@@ -11,7 +11,7 @@ import (
 )
 
 const getAllTeachers = `-- name: GetAllTeachers :many
-SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, created_at, updated_at
+SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at
 FROM tbl_teachers
 ORDER BY name ASC
 `
@@ -31,6 +31,7 @@ type GetAllTeachersRow struct {
 	DriveUrl       string
 	Sex            sql.NullString
 	Password       string
+	Template       sql.NullString
 	CreatedAt      sql.NullTime
 	UpdatedAt      sql.NullTime
 }
@@ -59,6 +60,7 @@ func (q *Queries) GetAllTeachers(ctx context.Context) ([]GetAllTeachersRow, erro
 			&i.DriveUrl,
 			&i.Sex,
 			&i.Password,
+			&i.Template,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -98,6 +100,23 @@ func (q *Queries) GetTeacherByEmail(ctx context.Context, email string) (GetTeach
 	return i, err
 }
 
+const getTeacherByID = `-- name: GetTeacherByID :one
+SELECT id, name, template FROM tbl_teachers WHERE id = ?
+`
+
+type GetTeacherByIDRow struct {
+	ID       int64
+	Name     string
+	Template sql.NullString
+}
+
+func (q *Queries) GetTeacherByID(ctx context.Context, id int64) (GetTeacherByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getTeacherByID, id)
+	var i GetTeacherByIDRow
+	err := row.Scan(&i.ID, &i.Name, &i.Template)
+	return i, err
+}
+
 const getTeacherByName = `-- name: GetTeacherByName :one
 SELECT COUNT(*) as count FROM tbl_teachers WHERE name = ?
 `
@@ -107,6 +126,17 @@ func (q *Queries) GetTeacherByName(ctx context.Context, name string) (int64, err
 	var count int64
 	err := row.Scan(&count)
 	return count, err
+}
+
+const getTeacherIDByName = `-- name: GetTeacherIDByName :one
+SELECT id FROM tbl_teachers WHERE name = ?
+`
+
+func (q *Queries) GetTeacherIDByName(ctx context.Context, name string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getTeacherIDByName, name)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
 const insertTeacher = `-- name: InsertTeacher :exec
@@ -146,5 +176,19 @@ func (q *Queries) InsertTeacher(ctx context.Context, arg InsertTeacherParams) er
 		arg.Sex,
 		arg.Password,
 	)
+	return err
+}
+
+const updateTeacherTemplate = `-- name: UpdateTeacherTemplate :exec
+UPDATE tbl_teachers SET template = ? WHERE id = ?
+`
+
+type UpdateTeacherTemplateParams struct {
+	Template sql.NullString
+	ID       int64
+}
+
+func (q *Queries) UpdateTeacherTemplate(ctx context.Context, arg UpdateTeacherTemplateParams) error {
+	_, err := q.db.ExecContext(ctx, updateTeacherTemplate, arg.Template, arg.ID)
 	return err
 }

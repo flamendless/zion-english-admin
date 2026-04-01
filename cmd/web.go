@@ -420,6 +420,14 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 
 	logToDB(dbRW, &req, r.UserAgent(), outputPath, "")
 
+	teacherID, err := dbRW.GetQueries().GetTeacherIDByName(r.Context(), req.Name)
+	if err == nil && teacherID > 0 {
+		dbRW.GetQueries().UpdateTeacherTemplate(r.Context(), queries.UpdateTeacherTemplateParams{
+			Template: sql.NullString{String: req.Template, Valid: true},
+			ID:       teacherID,
+		})
+	}
+
 	processRecords := make([]frontend.ProcessRecord, len(responseRecords))
 	for i, rec := range responseRecords {
 		processRecords[i] = frontend.ProcessRecord{
@@ -1055,11 +1063,16 @@ func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
 
 	var teacherResponses []models.TeacherAPIResponse
 	for _, t := range teachers {
+		template := ""
+		if t.Template.Valid {
+			template = t.Template.String
+		}
 		teacherResponses = append(teacherResponses, models.TeacherAPIResponse{
 			ID:           t.ID,
 			Name:         t.Name,
 			DriveUrl:     t.DriveUrl,
 			RatePerClass: t.RatePerClass,
+			Template:     template,
 		})
 	}
 	if err := frontend.TeacherOptions(teacherResponses).Render(r.Context(), w); err != nil {

@@ -81,7 +81,7 @@ func Process() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-target=\"#results\" hx-swap=\"innerHTML\" hx-indicator=\"#submitBtn\"><div _=\"\n\t\t\t\t\t\t\ton change from #teacher\n\t\t\t\t\t\t\t\tset nameAttr to event.target.selectedOptions[0].dataset.name\n\t\t\t\t\t\t\t\tset #name.value to nameAttr\n\n\t\t\t\t\t\t\t\tset driveURLAttr to event.target.selectedOptions[0].dataset.driveurl\n\t\t\t\t\t\t\t\tset #driveUrl.value to driveURLAttr\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-target=\"#results\" hx-swap=\"innerHTML\" hx-indicator=\"#submitBtn\"><div _=\"\n\t\t\t\t\t\t\ton change from #teacher\n\t\t\t\t\t\t\t\tset nameAttr to event.target.selectedOptions[0].dataset.name\n\t\t\t\t\t\t\t\tset #name.value to nameAttr\n\n\t\t\t\t\t\t\t\tset driveURLAttr to event.target.selectedOptions[0].dataset.driveurl\n\t\t\t\t\t\t\t\tset #driveUrl.value to driveURLAttr\n\n\t\t\t\t\t\t\t\tset templateAttr to event.target.selectedOptions[0].dataset.template\n\t\t\t\t\t\t\t\tif templateAttr != ''\n\t\t\t\t\t\t\t\t\tset #templateSelect.value to templateAttr\n\t\t\t\t\t\t\t\t\tset cols to templateAttr.split(',')\n\t\t\t\t\t\t\t\t\tset #nameCol.value to cols[0]\n\t\t\t\t\t\t\t\t\tset #durationCol.value to cols[1]\n\t\t\t\t\t\t\t\t\tset #rateCol.value to cols[2]\n\t\t\t\t\t\t\t\t\tset #statusCol.value to cols[3]\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

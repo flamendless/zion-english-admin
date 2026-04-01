@@ -88,6 +88,7 @@ type TblTeacher struct {
 	DriveUrl       string
 	Sex            sql.NullString
 	Password       string
+	Template       sql.NullString
 }
 
 type TblTeachersStudentsM2m struct {

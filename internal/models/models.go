@@ -103,6 +103,7 @@ type TeacherAPIResponse struct {
 	Name         string  `json:"name"`
 	DriveUrl     string  `json:"driveUrl"`
 	RatePerClass float64 `json:"ratePerClass"`
+	Template     string  `json:"template"`
 }
 
 type StudentAPIResponse struct {

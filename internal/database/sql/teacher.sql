@@ -5,11 +5,19 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 -- name: GetTeacherByName :one
 SELECT COUNT(*) as count FROM tbl_teachers WHERE name = ?;
 
+-- name: GetTeacherIDByName :one
+SELECT id FROM tbl_teachers WHERE name = ?;
+
 -- name: GetTeacherByEmail :one
 SELECT id, name, email, password FROM tbl_teachers WHERE email = ?;
 
 -- name: GetAllTeachers :many
-SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, created_at, updated_at
+SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at
 FROM tbl_teachers
 ORDER BY name ASC;
 
+-- name: GetTeacherByID :one
+SELECT id, name, template FROM tbl_teachers WHERE id = ?;
+
+-- name: UpdateTeacherTemplate :exec
+UPDATE tbl_teachers SET template = ? WHERE id = ?;

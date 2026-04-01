@@ -29,6 +29,7 @@ templ TeacherOptions(teachers []models.TeacherAPIResponse) {
 			data-rate={ fmt.Sprintf("%.2f", t.RatePerClass) }
 			data-name={ t.Name }
 			data-driveurl={ t.DriveUrl }
+			data-template={ t.Template }
 		>
 			{ t.Name }
 		</option>

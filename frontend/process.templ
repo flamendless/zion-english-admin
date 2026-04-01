@@ -128,6 +128,16 @@ templ Process() {
 
 								set driveURLAttr to event.target.selectedOptions[0].dataset.driveurl
 								set #driveUrl.value to driveURLAttr
+
+								set templateAttr to event.target.selectedOptions[0].dataset.template
+								if templateAttr != ''
+									set #templateSelect.value to templateAttr
+									set cols to templateAttr.split(',')
+									set #nameCol.value to cols[0]
+									set #durationCol.value to cols[1]
+									set #rateCol.value to cols[2]
+									set #statusCol.value to cols[3]
+								end
 							end
 						"
 					>
