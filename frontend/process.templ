@@ -125,6 +125,9 @@ templ Process() {
 							on change from #teacher
 								set nameAttr to event.target.selectedOptions[0].dataset.name
 								set #name.value to nameAttr
+
+								set driveURLAttr to event.target.selectedOptions[0].dataset.driveurl
+								set #driveUrl.value to driveURLAttr
 							end
 						"
 					>

@@ -81,7 +81,7 @@ func Process() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-target=\"#results\" hx-swap=\"innerHTML\" hx-indicator=\"#submitBtn\"><div _=\"\n\t\t\t\t\t\t\ton change from #teacher\n\t\t\t\t\t\t\t\tset nameAttr to event.target.selectedOptions[0].dataset.name\n\t\t\t\t\t\t\t\tset #name.value to nameAttr\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-target=\"#results\" hx-swap=\"innerHTML\" hx-indicator=\"#submitBtn\"><div _=\"\n\t\t\t\t\t\t\ton change from #teacher\n\t\t\t\t\t\t\t\tset nameAttr to event.target.selectedOptions[0].dataset.name\n\t\t\t\t\t\t\t\tset #name.value to nameAttr\n\n\t\t\t\t\t\t\t\tset driveURLAttr to event.target.selectedOptions[0].dataset.driveurl\n\t\t\t\t\t\t\t\tset #driveUrl.value to driveURLAttr\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
