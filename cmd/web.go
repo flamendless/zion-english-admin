@@ -577,9 +577,9 @@ func validateProcessRequest(req *models.ProcessRequest) error {
 	}
 
 	// Validate name
-	matched, _ := regexp.MatchString(`^[a-zA-Z0-9_-]+$`, req.Name)
+	matched, _ := regexp.MatchString(`^[a-zA-Z -]+$`, req.Name)
 	if !matched {
-		return errors.New("name must contain only letters, numbers, dashes, and underscores")
+		return errors.New("name must contain only letters, dashes, and space")
 	}
 
 	// Validate dates
