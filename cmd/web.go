@@ -1042,6 +1042,7 @@ func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
 }
 
 func sendErrorLog(w http.ResponseWriter, message string) {
+	logs.Log().Error(message)
 	w.WriteHeader(http.StatusBadRequest)
 	if _, err := fmt.Fprint(w, message+"\n"); err != nil {
 		logs.Log().Error("error response", zap.String("message", message), zap.Error(err))
