@@ -164,6 +164,8 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/teachers", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleTeachers))
 		authMux.HandleFunc(basePath+"/classes/record", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClassRecord))
 		authMux.HandleFunc(basePath+"/classes", auth.RequireRole(auth.RoleSuperuser)(handleClasses))
+		authMux.HandleFunc(basePath+"/logs", auth.RequireRole(auth.RoleSuperuser)(handleSystemLogs))
+		authMux.HandleFunc(basePath+"/process-logs", auth.RequireRole(auth.RoleSuperuser)(handleLogs))
 		authMux.HandleFunc(basePath+"/api/me/students", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetMyStudents))
 
 		authHandler := auth.Middleware(cfg, dbRO.GetQueries(), authMux)
@@ -185,6 +187,8 @@ var cmdWeb = &cobra.Command{
 
 		// protected routes
 		rootMux.Handle(basePath, authHandler)
+		rootMux.Handle(basePath+"/logs", authHandler)
+		rootMux.Handle(basePath+"/process-logs", authHandler)
 		rootMux.Handle(basePath+"/students", authHandler)
 		rootMux.Handle(basePath+"/students/", authHandler)
 		rootMux.Handle(basePath+"/teachers", authHandler)
@@ -278,6 +282,7 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	ctx := r.Context()
 
 	logMessages = []string{}
 	var req models.ProcessRequest
@@ -288,6 +293,7 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	req.TeacherID = r.FormValue("teacherID")
 	req.DriveURL = r.FormValue("driveUrl")
 	req.Name = r.FormValue("name")
 	req.Template = r.FormValue("templateSelect")
@@ -420,12 +426,21 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 
 	logToDB(dbRW, &req, r.UserAgent(), outputPath, "")
 
-	teacherID, err := dbRW.GetQueries().GetTeacherIDByName(r.Context(), req.Name)
-	if err == nil && teacherID > 0 {
-		dbRW.GetQueries().UpdateTeacherTemplate(r.Context(), queries.UpdateTeacherTemplateParams{
-			Template: sql.NullString{String: req.Template, Valid: true},
-			ID:       teacherID,
-		})
+	updateTeacherErr := dbRW.GetQueries().UpdateTeacherTemplate(ctx, queries.UpdateTeacherTemplateParams{
+		ID:       parseInt64(req.TeacherID),
+		Template: sql.NullString{String: req.Template, Valid: true},
+	})
+	if updateTeacherErr != nil {
+		logs.Log().Error("update teacher template", zap.Error(err))
+	} else {
+		user := auth.GetUser(ctx)
+		if err := dbRW.GetQueries().InsertLog(ctx, queries.InsertLogParams{
+			Module:    "process",
+			Message:   fmt.Sprintf("update teacher '%s' template with '%s'", req.Name, req.Template),
+			CreatedBy: sql.NullInt64{Int64: user.ID, Valid: true},
+		}); err != nil {
+			logs.Log().Info("system logs", zap.Error(err))
+		}
 	}
 
 	processRecords := make([]frontend.ProcessRecord, len(responseRecords))
@@ -446,7 +461,7 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 		total,
 		processRecords,
 		logMessages,
-	).Render(r.Context(), w); err != nil {
+	).Render(ctx, w); err != nil {
 		logs.Log().Error("failed to render process response", zap.Error(err))
 		sendErrorLog(w, err.Error())
 	}
@@ -664,9 +679,9 @@ func handleLogs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	viewLogs := make([]frontend.LogItem, len(logs))
+	viewLogs := make([]frontend.ProcessingLogItem, len(logs))
 	for i, l := range logs {
-		viewLogs[i] = frontend.LogItem{
+		viewLogs[i] = frontend.ProcessingLogItem{
 			ID:             strconv.FormatInt(l.ID, 10),
 			GoogleDriveURL: l.GoogleDriveUrl,
 			Name:           l.Name,
@@ -682,7 +697,38 @@ func handleLogs(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html")
-	frontend.Logs(frontend.LogData{Logs: viewLogs}).Render(r.Context(), w)
+	frontend.ProcessingLogs(frontend.ProcessingLogData{Logs: viewLogs}).Render(r.Context(), w)
+}
+
+func handleSystemLogs(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	logs, err := database.GetAllSystemLogs(dbRO)
+	if err != nil {
+		HttpError(w, fmt.Sprintf("Failed to fetch logs: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	viewLogs := make([]frontend.SystemLogItem, len(logs))
+	for i, l := range logs {
+		createdBy := ""
+		if l.CreatedByName.Valid {
+			createdBy = l.CreatedByName.String
+		}
+		viewLogs[i] = frontend.SystemLogItem{
+			ID:        strconv.FormatInt(l.ID, 10),
+			Module:    l.Module,
+			Message:   l.Message,
+			CreatedBy: createdBy,
+			CreatedAt: l.CreatedAt,
+		}
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	frontend.SystemLogs(frontend.SystemLogData{Logs: viewLogs}).Render(r.Context(), w)
 }
 
 func handleStudents(w http.ResponseWriter, r *http.Request) {

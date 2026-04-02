@@ -135,6 +135,12 @@ templ Home(role auth.Role) {
 				if isAccessible(role, "/process") {
 					@ActionCard("/process", "Process", "Process CSV/XLSX files")
 				}
+				if isAccessible(role, "/process-logs") {
+					@ActionCard("/process-logs", "Processing Logs", "View processing logs")
+				}
+				if isAccessible(role, "/logs") {
+					@ActionCard("/logs", "Logs", "View system logs")
+				}
 			</div>
 		</div>
 	</body>

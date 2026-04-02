@@ -2,11 +2,11 @@ package frontend
 
 import "zion-english/internal/utils"
 
-type LogData struct {
-	Logs []LogItem
+type ProcessingLogData struct {
+	Logs []ProcessingLogItem
 }
 
-type LogItem struct {
+type ProcessingLogItem struct {
 	ID             string
 	GoogleDriveURL string
 	Name           string
@@ -48,23 +48,13 @@ func getDisplayValue(value string) string {
 	return "-"
 }
 
-templ displayURL(value string) {
-	if value != "" {
-		<a href={ templ.SafeURL(value) } target="_blank">
-			open in new tab
-		</a>
-	} else {
-		<p>-</p>
-	}
-}
-
-templ Logs(logs LogData) {
+templ ProcessingLogs(data ProcessingLogData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Logs - Zion English Admin Tool</title>
+		<title>Processing Logs - Zion English Admin Tool</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		<style>
 			.export-btn {
@@ -115,13 +105,13 @@ templ Logs(logs LogData) {
 			<div class="button-group">
 				<button
 					class="refresh-btn"
-					hx-get={ utils.URL("/refresh") }
+					id="refreshBtn"
 				>
 					Refresh
 				</button>
 			</div>
 
-			if len(logs.Logs) > 0 {
+			if len(data.Logs) > 0 {
 				<table id="logsTable">
 					<thead>
 						<tr>
@@ -136,7 +126,7 @@ templ Logs(logs LogData) {
 						</tr>
 					</thead>
 					<tbody>
-						for _, log := range logs.Logs {
+						for _, log := range data.Logs {
 							<tr>
 								<td>{ log.ID }</td>
 								<td>{ log.Name }</td>
@@ -158,34 +148,7 @@ templ Logs(logs LogData) {
 		</div>
 
 		<script>
-			function getBaseURL() {
-				const pathname = window.location.pathname;
-				const cleanPath = pathname.replace(/\/$/, '');
-				const parts = cleanPath.split('/').filter(p => p !== '');
-
-				if (parts.length === 0 || cleanPath.endsWith('.html')) {
-					if (cleanPath.includes('/zion-english-admin')) {
-						return '/zion-english-admin';
-					}
-					return '';
-				}
-
-				if (parts.length === 1) {
-					return '/' + parts[0];
-				}
-
-				return '/' + parts.slice(0, -1).join('/');
-			}
-
-			const baseURL = getBaseURL();
-
-			function buildURL(path) {
-				return baseURL + path;
-			}
-
-			const refreshBtn = document.getElementById('refreshBtn');
-
-			refreshBtn.addEventListener('click', () => {
+			document.getElementById('refreshBtn').addEventListener('click', () => {
 				window.location.reload();
 			});
 		</script>

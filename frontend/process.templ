@@ -120,9 +120,13 @@ templ Process() {
 					hx-swap="innerHTML"
 					hx-indicator="#submitBtn"
 				>
+					<input type="hidden" id="teacherID" name="teacherID" />
 					<div
 						_="
 							on change from #teacher
+								set idAttr to event.target.selectedOptions[0].dataset.id
+								set #teacherID.value to idAttr
+
 								set nameAttr to event.target.selectedOptions[0].dataset.name
 								set #name.value to nameAttr
 

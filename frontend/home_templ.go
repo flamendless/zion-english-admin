@@ -159,6 +159,18 @@ func Home(role auth.Role) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
+		if isAccessible(role, "/process-logs") {
+			templ_7745c5c3_Err = ActionCard("/process-logs", "Processing Logs", "View processing logs").Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		if isAccessible(role, "/logs") {
+			templ_7745c5c3_Err = ActionCard("/logs", "Logs", "View system logs").Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

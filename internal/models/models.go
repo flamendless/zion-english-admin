@@ -1,6 +1,7 @@
 package models
 
 type ProcessRequest struct {
+	TeacherID    string `json:"teacherID"`
 	DriveURL     string `json:"driveUrl"`
 	Name         string `json:"name"`
 	Template     string `json:"template"`

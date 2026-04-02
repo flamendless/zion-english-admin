@@ -33,6 +33,14 @@ type TblClassRecord struct {
 	RecordedByRole  string
 }
 
+type TblLog struct {
+	ID        int64
+	Module    string
+	Message   string
+	CreatedBy sql.NullInt64
+	CreatedAt string
+}
+
 type TblProcessingLog struct {
 	ID             int64
 	GoogleDriveUrl string

@@ -1,0 +1,64 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+type SystemLogData struct {
+	Logs []SystemLogItem
+}
+
+type SystemLogItem struct {
+	ID        string
+	Module    string
+	Message   string
+	CreatedBy string
+	CreatedAt string
+}
+
+templ SystemLogs(data SystemLogData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Logs - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+
+			if len(data.Logs) > 0 {
+				<div class="table-wrapper">
+					<table id="logsTable">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Module</th>
+								<th>Message</th>
+								<th>Created By</th>
+								<th>Created At</th>
+							</tr>
+						</thead>
+						<tbody>
+							for i, log := range data.Logs {
+								<tr>
+									<td>{ i+1 }</td>
+									<td>{ log.Module }</td>
+									<td>{ log.Message }</td>
+									<td>{ getDisplayValue(log.CreatedBy) }</td>
+									<td class="date-cell">{ log.CreatedAt }</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			} else {
+				<div class="empty-state">
+					<p>No logs recorded yet.</p>
+				</div>
+			}
+		</div>
+	</body>
+	</html>
+}
