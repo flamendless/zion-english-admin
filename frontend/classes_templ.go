@@ -10,7 +10,13 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "zion-english/internal/utils"
 
-func Classes() templ.Component {
+type ClassesData struct {
+	LockTeacher bool
+	TeacherID   string
+	TeacherName string
+}
+
+func Classes(data ClassesData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -38,13 +44,13 @@ func Classes() templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 12, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 18, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><style>\n\t\t\t.toolbar {\n\t\t\t\tdisplay: flex;\n\t\t\t\tgap: 20px;\n\t\t\t\talign-items: flex-end;\n\t\t\t\tmargin-bottom: 20px;\n\t\t\t\tflex-wrap: wrap;\n\t\t\t}\n\n\t\t\t.toolbar .form-group {\n\t\t\t\tmargin-bottom: 0;\n\t\t\t\tmin-width: 150px;\n\t\t\t}\n\n\t\t\t.toolbar label {\n\t\t\t\tmargin-bottom: 5px;\n\t\t\t}\n\n\t\t\t.total-section {\n\t\t\t\tmargin-left: auto;\n\t\t\t\tpadding: 10px 20px;\n\t\t\t\tbackground-color: var(--color-primary);\n\t\t\t\tcolor: white;\n\t\t\t\tborder-radius: 4px;\n\t\t\t\tfont-weight: 600;\n\t\t\t}\n\n\t\t\t.row-cancelled {\n\t\t\t\tbackground-color: #ffebee !important;\n\t\t\t}\n\n\t\t\t.status-conducted {\n\t\t\t\tcolor: #28a745;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.status-cancelled {\n\t\t\t\tcolor: #dc3545;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.status-rescheduled {\n\t\t\t\tcolor: #ffc107;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\t\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><style>\n\t\t\t.total-section {\n\t\t\t\tmargin-left: auto;\n\t\t\t\tpadding: 10px 20px;\n\t\t\t\tbackground-color: var(--color-primary);\n\t\t\t\tcolor: white;\n\t\t\t\tborder-radius: 4px;\n\t\t\t\tfont-weight: 600;\n\t\t\t}\n\n\t\t\t.row-cancelled {\n\t\t\t\tbackground-color: #ffebee !important;\n\t\t\t}\n\n\t\t\t.status-conducted {\n\t\t\t\tcolor: #28a745;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.status-cancelled {\n\t\t\t\tcolor: #dc3545;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.status-rescheduled {\n\t\t\t\tcolor: #ffc107;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\t\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -72,15 +78,63 @@ func Classes() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TeacherDropdown().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
+		if data.LockTeacher {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<input type=\"hidden\" id=\"teacher\" value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.TeacherID)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 58, Col: 61}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\"><div class=\"form-group\"><label>Teacher</label> <input type=\"text\" value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(data.TeacherName)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 61, Col: 49}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" disabled></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = TeacherDropdown().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
 		templ_7745c5c3_Err = DatePreset().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<button type=\"button\" id=\"filterBtn\">Filter</button><div class=\"total-section\">Total: <span id=\"totalRate\">0</span> <span id=\"totalCurrency\"></span></div></div><table id=\"classesTable\"><thead><tr><th>Student Name</th><th>Duration (min)</th><th>Rate</th><th>Status</th><th>Reason</th><th>Date</th></tr></thead> <tbody id=\"classesTableBody\"><tr><td colspan=\"6\" class=\"empty-state\">Select a teacher and date range to view classes</td></tr></tbody></table></div><script>\n\t\t\tconst teacherSelect = document.getElementById('teacher');\n\t\t\tconst datePresetSelect = document.getElementById('datePreset');\n\t\t\tconst filterBtn = document.getElementById('filterBtn');\n\t\t\tconst tableBody = document.getElementById('classesTableBody');\n\t\t\tconst totalRateSpan = document.getElementById('totalRate');\n\t\t\tconst totalCurrencySpan = document.getElementById('totalCurrency');\n\n\t\t\tfunction getBaseURL() {\n\t\t\t\tconst pathname = window.location.pathname;\n\t\t\t\tconst cleanPath = pathname.replace(/\\/$/, '');\n\t\t\t\tconst parts = cleanPath.split('/').filter(p => p !== '');\n\n\t\t\t\tif (parts.length === 0 || cleanPath.endsWith('.html')) {\n\t\t\t\t\tif (cleanPath.includes('/zion-english-admin')) {\n\t\t\t\t\t\treturn '/zion-english-admin';\n\t\t\t\t\t}\n\t\t\t\t\treturn '';\n\t\t\t\t}\n\n\t\t\t\tif (parts.length === 1) {\n\t\t\t\t\treturn '/' + parts[0];\n\t\t\t\t}\n\n\t\t\t\treturn '/' + parts.slice(0, -1).join('/');\n\t\t\t}\n\n\t\t\tconst baseURL = getBaseURL();\n\n\t\t\tfunction buildURL(path) {\n\t\t\t\treturn baseURL + path;\n\t\t\t}\n\n\t\t\tdatePresetSelect.addEventListener('change', () => {\n\t\t\t\tconst value = datePresetSelect.value;\n\t\t\t\tif (!value) return;\n\n\t\t\t\tconst today = new Date();\n\t\t\t\tconst year = today.getFullYear();\n\t\t\t\tconst month = today.getMonth();\n\n\t\t\t\tfunction formatDate(date) {\n\t\t\t\t\tconst y = date.getFullYear();\n\t\t\t\t\tconst m = String(date.getMonth() + 1).padStart(2, '0');\n\t\t\t\t\tconst d = String(date.getDate()).padStart(2, '0');\n\t\t\t\t\treturn y + '-' + m + '-' + d;\n\t\t\t\t}\n\n\t\t\t\tif (value === '1-15') {\n\t\t\t\t\tconst start = new Date(year, month, 1);\n\t\t\t\t\tconst end = new Date(year, month, 15);\n\t\t\t\t\tdatePresetSelect.dataset.startDate = formatDate(start);\n\t\t\t\t\tdatePresetSelect.dataset.endDate = formatDate(end);\n\t\t\t\t}\n\n\t\t\t\tif (value === '16-30') {\n\t\t\t\t\tconst start = new Date(year, month, 16);\n\t\t\t\t\tconst end = new Date(year, month, 30);\n\t\t\t\t\tdatePresetSelect.dataset.startDate = formatDate(start);\n\t\t\t\t\tdatePresetSelect.dataset.endDate = formatDate(end);\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tfilterBtn.addEventListener('click', async () => {\n\t\t\t\tconst teacherId = teacherSelect.value;\n\t\t\t\tconst startDate = datePresetSelect.dataset.startDate;\n\t\t\t\tconst endDate = datePresetSelect.dataset.endDate;\n\n\t\t\t\tif (!teacherId) {\n\t\t\t\t\talert('Please select a teacher');\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tif (!startDate || !endDate) {\n\t\t\t\t\talert('Please select a date range');\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\ttry {\n\t\t\t\t\tconst response = await fetch(\n\t\t\t\t\t\tbuildURL(`/api/class-records?teacherId=${teacherId}&startDate=${startDate}&endDate=${endDate}`)\n\t\t\t\t\t);\n\t\t\t\t\tconst data = await response.json();\n\n\t\t\t\t\ttableBody.innerHTML = '';\n\n\t\t\t\t\tif (data.records.length === 0) {\n\t\t\t\t\t\ttableBody.innerHTML = '<tr><td colspan=\"6\" class=\"empty-state\">No classes found for the selected criteria</td></tr>';\n\t\t\t\t\t} else {\n\t\t\t\t\t\tdata.records.forEach(record => {\n\t\t\t\t\t\t\tconst row = document.createElement('tr');\n\t\t\t\t\t\t\tif (record.status === 'cancelled') {\n\t\t\t\t\t\t\t\trow.classList.add('row-cancelled');\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\trow.innerHTML = `\n\t\t\t\t\t\t\t\t<td>${record.studentName}</td>\n\t\t\t\t\t\t\t\t<td>${record.durationMinutes}</td>\n\t\t\t\t\t\t\t\t<td>${record.rate} ${record.currency}</td>\n\t\t\t\t\t\t\t\t<td class=\"status-${record.status}\">${record.status}</td>\n\t\t\t\t\t\t\t\t<td>${record.reason || '-'}</td>\n\t\t\t\t\t\t\t\t<td>${record.date}</td>\n\t\t\t\t\t\t\t`;\n\t\t\t\t\t\t\ttableBody.appendChild(row);\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\n\t\t\t\t\ttotalRateSpan.textContent = data.totalRate || 0;\n\t\t\t\t\ttotalCurrencySpan.textContent = data.records.length > 0 ? data.records[0].currency : '';\n\t\t\t\t} catch (error) {\n\t\t\t\t\tconsole.error('Failed to load class records:', error);\n\t\t\t\t\tshowErrorBanner(error.message);\n\t\t\t\t\ttableBody.innerHTML = '<tr><td colspan=\"6\" class=\"empty-state\">Error loading classes</td></tr>';\n\t\t\t\t}\n\t\t\t});\n\t\t</script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<button type=\"button\" id=\"filterBtn\">Filter</button><div class=\"total-section\">Total: <span id=\"totalRate\">0</span> <span id=\"totalCurrency\"></span></div></div><div class=\"table-wrapper\"><table id=\"classesTable\"><thead><tr><th>Student Name</th><th>Duration (min)</th><th>Rate</th><th>Status</th><th>Reason</th><th>Date</th></tr></thead> <tbody id=\"classesTableBody\"><tr>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.LockTeacher {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<td colspan=\"6\" class=\"empty-state\">Select a date range to view classes</td>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<td colspan=\"6\" class=\"empty-state\">Select a teacher and date range to view classes</td>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</tr></tbody></table></div></div><script>\n\t\t\tconst teacherSelect = document.getElementById('teacher');\n\t\t\tconst datePresetSelect = document.getElementById('datePreset');\n\t\t\tconst filterBtn = document.getElementById('filterBtn');\n\t\t\tconst tableBody = document.getElementById('classesTableBody');\n\t\t\tconst totalRateSpan = document.getElementById('totalRate');\n\t\t\tconst totalCurrencySpan = document.getElementById('totalCurrency');\n\n\t\t\tfunction getBaseURL() {\n\t\t\t\tconst pathname = window.location.pathname;\n\t\t\t\tconst cleanPath = pathname.replace(/\\/$/, '');\n\t\t\t\tconst parts = cleanPath.split('/').filter(p => p !== '');\n\n\t\t\t\tif (parts.length === 0 || cleanPath.endsWith('.html')) {\n\t\t\t\t\tif (cleanPath.includes('/zion-english-admin')) {\n\t\t\t\t\t\treturn '/zion-english-admin';\n\t\t\t\t\t}\n\t\t\t\t\treturn '';\n\t\t\t\t}\n\n\t\t\t\tif (parts.length === 1) {\n\t\t\t\t\treturn '/' + parts[0];\n\t\t\t\t}\n\n\t\t\t\treturn '/' + parts.slice(0, -1).join('/');\n\t\t\t}\n\n\t\t\tconst baseURL = getBaseURL();\n\n\t\t\tfunction buildURL(path) {\n\t\t\t\treturn baseURL + path;\n\t\t\t}\n\n\t\t\tdatePresetSelect.addEventListener('change', () => {\n\t\t\t\tconst value = datePresetSelect.value;\n\t\t\t\tif (!value) return;\n\n\t\t\t\tconst today = new Date();\n\t\t\t\tconst year = today.getFullYear();\n\t\t\t\tconst month = today.getMonth();\n\n\t\t\t\tfunction formatDate(date) {\n\t\t\t\t\tconst y = date.getFullYear();\n\t\t\t\t\tconst m = String(date.getMonth() + 1).padStart(2, '0');\n\t\t\t\t\tconst d = String(date.getDate()).padStart(2, '0');\n\t\t\t\t\treturn y + '-' + m + '-' + d;\n\t\t\t\t}\n\n\t\t\t\tif (value === '1-15') {\n\t\t\t\t\tconst start = new Date(year, month, 1);\n\t\t\t\t\tconst end = new Date(year, month, 15);\n\t\t\t\t\tdatePresetSelect.dataset.startDate = formatDate(start);\n\t\t\t\t\tdatePresetSelect.dataset.endDate = formatDate(end);\n\t\t\t\t}\n\n\t\t\t\tif (value === '16-30') {\n\t\t\t\t\tconst start = new Date(year, month, 16);\n\t\t\t\t\tconst end = new Date(year, month, 30);\n\t\t\t\t\tdatePresetSelect.dataset.startDate = formatDate(start);\n\t\t\t\t\tdatePresetSelect.dataset.endDate = formatDate(end);\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tfilterBtn.addEventListener('click', async () => {\n\t\t\t\tconst teacherId = teacherSelect.value;\n\t\t\t\tconst startDate = datePresetSelect.dataset.startDate;\n\t\t\t\tconst endDate = datePresetSelect.dataset.endDate;\n\n\t\t\t\tif (!teacherId) {\n\t\t\t\t\talert('Please select a teacher');\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tif (!startDate || !endDate) {\n\t\t\t\t\talert('Please select a date range');\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\ttry {\n\t\t\t\t\tconst response = await fetch(\n\t\t\t\t\t\tbuildURL(`/api/class-records?teacherId=${teacherId}&startDate=${startDate}&endDate=${endDate}`)\n\t\t\t\t\t);\n\t\t\t\t\tconst data = await response.json();\n\n\t\t\t\t\ttableBody.innerHTML = '';\n\n\t\t\t\t\tif (data.records.length === 0) {\n\t\t\t\t\t\ttableBody.innerHTML = '<tr><td colspan=\"6\" class=\"empty-state\">No classes found for the selected criteria</td></tr>';\n\t\t\t\t\t} else {\n\t\t\t\t\t\tdata.records.forEach(record => {\n\t\t\t\t\t\t\tconst row = document.createElement('tr');\n\t\t\t\t\t\t\tif (record.status === 'cancelled') {\n\t\t\t\t\t\t\t\trow.classList.add('row-cancelled');\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\trow.innerHTML = `\n\t\t\t\t\t\t\t\t<td>${record.studentName}</td>\n\t\t\t\t\t\t\t\t<td>${record.durationMinutes}</td>\n\t\t\t\t\t\t\t\t<td>${record.rate} ${record.currency}</td>\n\t\t\t\t\t\t\t\t<td class=\"status-${record.status}\">${record.status}</td>\n\t\t\t\t\t\t\t\t<td>${record.reason || '-'}</td>\n\t\t\t\t\t\t\t\t<td>${record.date}</td>\n\t\t\t\t\t\t\t`;\n\t\t\t\t\t\t\ttableBody.appendChild(row);\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\n\t\t\t\t\ttotalRateSpan.textContent = data.totalRate || 0;\n\t\t\t\t\ttotalCurrencySpan.textContent = data.records.length > 0 ? data.records[0].currency : '';\n\t\t\t\t} catch (error) {\n\t\t\t\t\tconsole.error('Failed to load class records:', error);\n\t\t\t\t\tshowErrorBanner(error.message);\n\t\t\t\t\ttableBody.innerHTML = '<tr><td colspan=\"6\" class=\"empty-state\">Error loading classes</td></tr>';\n\t\t\t\t}\n\t\t\t});\n\t\t</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

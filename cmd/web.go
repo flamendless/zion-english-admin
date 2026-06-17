@@ -93,6 +93,22 @@ func HttpRedirect(w http.ResponseWriter, url string) {
 	w.WriteHeader(http.StatusFound)
 }
 
+func redirectToPortal(w http.ResponseWriter, r *http.Request) {
+	if r.Header.Get("HX-Request") == "true" {
+		HttpRedirect(w, "/")
+		return
+	}
+	http.Redirect(w, r, utils.URL("/"), http.StatusFound)
+}
+
+func teacherRegisterAllowed(r *http.Request) (auth.User, bool) {
+	user, loggedIn := auth.UserFromRequest(r, conf.Conf())
+	if !loggedIn {
+		return user, true
+	}
+	return user, user.Role == auth.RoleSuperuser
+}
+
 type WebFlags struct {
 	port    string
 	baseURL string
@@ -138,18 +154,9 @@ var cmdWeb = &cobra.Command{
 		publicMux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, basePath, http.StatusFound)
 		})
-		publicMux.HandleFunc(basePath+"/process", handleProcessPage)
-		publicMux.HandleFunc(basePath+"/download/processed", handleDownload)
-
-		publicMux.HandleFunc(basePath+"/role", handleGetRole)
-		publicMux.HandleFunc(basePath+"/refresh", handleRefreshPage)
 		publicMux.HandleFunc(basePath+"/auth/login", handleLogin)
 		publicMux.HandleFunc(basePath+"/auth/logout", handleLogout)
 		publicMux.HandleFunc(basePath+"/teachers/register", handleTeacherRegister)
-
-		publicMux.HandleFunc(basePath+"/api/teachers", handleGetTeachers)
-		publicMux.HandleFunc(basePath+"/api/students", handleGetStudents)
-		publicMux.HandleFunc(basePath+"/api/class-records", handleGetClassRecords)
 
 		publicMux.Handle(
 			basePath+"/static/",
@@ -161,12 +168,19 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleHome))
 		authMux.HandleFunc(basePath+"/students", auth.RequireRole(auth.RoleSuperuser)(handleStudents))
 		authMux.HandleFunc(basePath+"/students/register", auth.RequireRole(auth.RoleSuperuser)(handleStudentRegister))
-		authMux.HandleFunc(basePath+"/teachers", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleTeachers))
+		authMux.HandleFunc(basePath+"/teachers", auth.RequireRole(auth.RoleSuperuser)(handleTeachers))
 		authMux.HandleFunc(basePath+"/classes/record", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClassRecord))
-		authMux.HandleFunc(basePath+"/classes", auth.RequireRole(auth.RoleSuperuser)(handleClasses))
+		authMux.HandleFunc(basePath+"/classes", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClasses))
 		authMux.HandleFunc(basePath+"/logs", auth.RequireRole(auth.RoleSuperuser)(handleSystemLogs))
 		authMux.HandleFunc(basePath+"/process-logs", auth.RequireRole(auth.RoleSuperuser)(handleLogs))
+		authMux.HandleFunc(basePath+"/process", auth.RequireRole(auth.RoleSuperuser)(handleProcessPage))
+		authMux.HandleFunc(basePath+"/download/processed", auth.RequireRole(auth.RoleSuperuser)(handleDownload))
+		authMux.HandleFunc(basePath+"/role", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetRole))
+		authMux.HandleFunc(basePath+"/refresh", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleRefreshPage))
+		authMux.HandleFunc(basePath+"/api/teachers", auth.RequireRole(auth.RoleSuperuser)(handleGetTeachers))
+		authMux.HandleFunc(basePath+"/api/students", auth.RequireRole(auth.RoleSuperuser)(handleGetStudents))
 		authMux.HandleFunc(basePath+"/api/me/students", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetMyStudents))
+		authMux.HandleFunc(basePath+"/api/class-records", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetClassRecords))
 
 		authHandler := auth.Middleware(cfg, dbRO.GetQueries(), authMux)
 
@@ -176,25 +190,26 @@ var cmdWeb = &cobra.Command{
 		rootMux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, basePath, http.StatusFound)
 		})
-		rootMux.Handle(basePath+"/download/processed", publicMux)
-		rootMux.Handle(basePath+"/process", publicMux)
-		rootMux.Handle(basePath+"/role", publicMux)
 		rootMux.Handle(basePath+"/auth/", publicMux)
-		rootMux.Handle(basePath+"/api/", publicMux)
 		rootMux.Handle(basePath+"/static/", publicMux)
-		rootMux.Handle(basePath+"/refresh", publicMux)
 		rootMux.Handle(basePath+"/teachers/register", publicMux)
 
 		// protected routes
 		rootMux.Handle(basePath, authHandler)
 		rootMux.Handle(basePath+"/logs", authHandler)
 		rootMux.Handle(basePath+"/process-logs", authHandler)
+		rootMux.Handle(basePath+"/process", authHandler)
+		rootMux.Handle(basePath+"/download/processed", authHandler)
+		rootMux.Handle(basePath+"/role", authHandler)
+		rootMux.Handle(basePath+"/refresh", authHandler)
 		rootMux.Handle(basePath+"/students", authHandler)
 		rootMux.Handle(basePath+"/students/", authHandler)
 		rootMux.Handle(basePath+"/teachers", authHandler)
-		rootMux.Handle(basePath+"/teachers/", authHandler)
 		rootMux.Handle(basePath+"/classes", authHandler)
 		rootMux.Handle(basePath+"/classes/", authHandler)
+		rootMux.Handle(basePath+"/api/teachers", authHandler)
+		rootMux.Handle(basePath+"/api/students", authHandler)
+		rootMux.Handle(basePath+"/api/class-records", authHandler)
 		rootMux.Handle(basePath+"/api/me/students", authHandler)
 
 		handler := rootMux
@@ -935,8 +950,16 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
+	user, allowed := teacherRegisterAllowed(r)
+	if !allowed {
+		redirectToPortal(w, r)
+		return
+	}
+
 	if r.Method == http.MethodGet {
-		if err := frontend.RegisterTeacher().Render(r.Context(), w); err != nil {
+		loggedIn := user.Role != ""
+		role := user.Role
+		if err := frontend.RegisterTeacher(loggedIn, role).Render(r.Context(), w); err != nil {
 			HttpError(w, err.Error(), http.StatusMethodNotAllowed)
 		}
 		return
@@ -1000,6 +1023,10 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if req.AssignedColor == "" {
+		req.AssignedColor = "#B9D283"
+	}
+
 	err = dbRW.GetQueries().InsertTeacher(r.Context(), queries.InsertTeacherParams{
 		Name:           req.Name,
 		Birthdate:      req.Birthdate,
@@ -1021,24 +1048,7 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	addLog(fmt.Sprintf("Successfully registered teacher: %s", req.Name))
-
-	response := models.TeacherRegisterResponse{
-		Success: true,
-		Message: fmt.Sprintf("Teacher '%s' registered successfully", req.Name),
-		Logs:    logMessages,
-	}
-
-	if _, err := fmt.Fprint(w, response.Message+"\n"); err != nil {
-		sendErrorLog(w, err.Error())
-		return
-	}
-
-	for _, log := range logMessages {
-		if _, err := fmt.Fprint(w, log+"\n"); err != nil {
-			sendErrorLog(w, err.Error())
-			return
-		}
-	}
+	HttpRedirect(w, "/auth/login")
 }
 
 func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
@@ -1059,10 +1069,6 @@ func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
 		return errors.New("rate per class cannot be negative")
 	}
 
-	if req.AssignedColor == "" {
-		return errors.New("assigned color is required")
-	}
-
 	if req.DriveUrl == "" {
 		return errors.New("spreadsheet URL is required")
 	}
@@ -1077,7 +1083,7 @@ func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
 	}
 
 	if !validatePassword(req.Password) {
-		return errors.New("password must be 8-32 characters with uppercase, lowercase, number, and symbol (!@#$%^&*)")
+		return errors.New("password must be 8-32 characters with uppercase, lowercase, number, and symbol (!@#$%^&*?)")
 	}
 
 	if req.Password != req.RetypePassword {
@@ -1131,6 +1137,11 @@ func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
 func handleLogin(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Handle Login]"
 	ctx := r.Context()
+	if _, loggedIn := auth.UserFromRequest(r, conf.Conf()); loggedIn {
+		redirectToPortal(w, r)
+		return
+	}
+
 	if r.Method == http.MethodGet {
 		if err := frontend.Login().Render(ctx, w); err != nil {
 			HttpError(w, err.Error(), http.StatusInternalServerError)
@@ -1262,7 +1273,6 @@ func handleGetMyStudents(w http.ResponseWriter, r *http.Request) {
 			RatePerClass: s.RatePerClass,
 		})
 	}
-	fmt.Println(1111, students, studentResponses)
 
 	if err := frontend.StudentOptions(studentResponses).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
@@ -1289,6 +1299,14 @@ func handleGetClassRecords(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		HttpError(w, "Invalid teacher ID", http.StatusBadRequest)
 		return
+	}
+
+	if auth.GetRole(r.Context()) == auth.RoleTeacher {
+		user := auth.GetUser(r.Context())
+		if teacherID != user.ID {
+			HttpError(w, "Forbidden", http.StatusForbidden)
+			return
+		}
 	}
 
 	records, err := dbRO.GetQueries().GetClassRecordsByTeacherAndDateRange(r.Context(), queries.GetClassRecordsByTeacherAndDateRangeParams{
@@ -1409,8 +1427,17 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 
 func handleClasses(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
+		data := frontend.ClassesData{}
+		if auth.GetRole(r.Context()) == auth.RoleTeacher {
+			user := auth.GetUser(r.Context())
+			data = frontend.ClassesData{
+				LockTeacher: true,
+				TeacherID:   strconv.FormatInt(user.ID, 10),
+				TeacherName: user.Name,
+			}
+		}
 		w.Header().Set("Content-Type", "text/html")
-		frontend.Classes().Render(r.Context(), w)
+		frontend.Classes(data).Render(r.Context(), w)
 		return
 	}
 

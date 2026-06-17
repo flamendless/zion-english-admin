@@ -44,7 +44,7 @@ func Login() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><style>\n\t\t\t\tbody {\n\t\t\t\t\tmin-height: 100vh;\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\tjustify-content: center;\n\t\t\t\t\talign-items: center;\n\t\t\t\t\tpadding: 20px;\n\t\t\t\t\tbackground: #f7f7f7;\n\t\t\t\t}\n\n\t\t\t\t.login-card {\n\t\t\t\t\tbackground: white;\n\t\t\t\t\tborder-radius: 8px;\n\t\t\t\t\tbox-shadow: 0 2px 8px rgba(0,0,0,0.1);\n\t\t\t\t\tpadding: 40px;\n\t\t\t\t\twidth: 100%;\n\t\t\t\t\tmax-width: 400px;\n\t\t\t\t}\n\n\t\t\t\t.login-logo {\n\t\t\t\t\tdisplay: block;\n\t\t\t\t\tmax-width: 200px;\n\t\t\t\t\theight: auto;\n\t\t\t\t\tmargin: 0 auto 30px;\n\t\t\t\t}\n\n\t\t\t\t.login-title {\n\t\t\t\t\ttext-align: center;\n\t\t\t\t\tmargin-bottom: 30px;\n\t\t\t\t\tcolor: #333;\n\t\t\t\t}\n\n\t\t\t\t.login-error {\n\t\t\t\t\tbackground: #fee;\n\t\t\t\t\tborder: 1px solid #fcc;\n\t\t\t\t\tcolor: #c33;\n\t\t\t\t\tpadding: 10px;\n\t\t\t\t\tborder-radius: 4px;\n\t\t\t\t\tmargin-bottom: 20px;\n\t\t\t\t\tdisplay: none;\n\t\t\t\t}\n\n\t\t\t\t.login-error.show,\n\t\t\t\t.login-error:not(:empty) {\n\t\t\t\t\tdisplay: block;\n\t\t\t\t}\n\n\t\t\t\t.login-success {\n\t\t\t\t\tbackground: #efe;\n\t\t\t\t\tborder: 1px solid #cfc;\n\t\t\t\t\tcolor: #3c3;\n\t\t\t\t\tpadding: 10px;\n\t\t\t\t\tborder-radius: 4px;\n\t\t\t\t\tmargin-bottom: 20px;\n\t\t\t\t\tdisplay: none;\n\t\t\t\t}\n\n\t\t\t\t.login-success.show {\n\t\t\t\t\tdisplay: block;\n\t\t\t\t}\n\n\t\t\t\t.login-flam {\n\t\t\t\t\tmargin-top: 30px;\n\t\t\t\t\ttext-align: center;\n\t\t\t\t}\n\n\t\t\t\t/* Mobile responsiveness */\n\t\t\t\t@media (max-width: 480px) {\n\t\t\t\t\tbody {\n\t\t\t\t\t\talign-items: flex-start;\n\t\t\t\t\t\tpadding-top: 40px;\n\t\t\t\t\t}\n\n\t\t\t\t\t.login-card {\n\t\t\t\t\t\tpadding: 25px;\n\t\t\t\t\t\tborder-radius: 6px;\n\t\t\t\t\t}\n\n\t\t\t\t\t.login-logo {\n\t\t\t\t\t\tmax-width: 160px;\n\t\t\t\t\t\tmargin-bottom: 20px;\n\t\t\t\t\t}\n\n\t\t\t\t\t.login-title {\n\t\t\t\t\t\tfont-size: 22px;\n\t\t\t\t\t\tmargin-bottom: 20px;\n\t\t\t\t\t}\n\n\t\t\t\t\t.password-wrapper input {\n\t\t\t\t\t\tpadding-right: 65px;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -52,14 +52,14 @@ func Login() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</head><body><div class=\"login-card\"><img src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<style>\n\t\t\t\tbody.login-page {\n\t\t\t\t\tmin-height: 100vh;\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\tjustify-content: center;\n\t\t\t\t\talign-items: center;\n\t\t\t\t\tpadding: 20px;\n\t\t\t\t\tbackground: #f7f7f7;\n\t\t\t\t}\n\n\t\t\t\t.login-card {\n\t\t\t\t\tbackground: white;\n\t\t\t\t\tborder-radius: 8px;\n\t\t\t\t\tbox-shadow: 0 2px 8px rgba(0,0,0,0.1);\n\t\t\t\t\tpadding: 40px;\n\t\t\t\t\twidth: 100%;\n\t\t\t\t\tmax-width: 400px;\n\t\t\t\t}\n\n\t\t\t\t.login-logo {\n\t\t\t\t\tdisplay: block;\n\t\t\t\t\tmax-width: 200px;\n\t\t\t\t\theight: auto;\n\t\t\t\t\tmargin: 0 auto 30px;\n\t\t\t\t}\n\n\t\t\t\t.login-title {\n\t\t\t\t\ttext-align: center;\n\t\t\t\t\tmargin-bottom: 30px;\n\t\t\t\t\tcolor: #333;\n\t\t\t\t}\n\n\t\t\t\t.login-error {\n\t\t\t\t\tbackground: #fee;\n\t\t\t\t\tborder: 1px solid #fcc;\n\t\t\t\t\tcolor: #c33;\n\t\t\t\t\tpadding: 10px;\n\t\t\t\t\tborder-radius: 4px;\n\t\t\t\t\tmargin-bottom: 20px;\n\t\t\t\t\tdisplay: none;\n\t\t\t\t}\n\n\t\t\t\t.login-error.show,\n\t\t\t\t.login-error:not(:empty) {\n\t\t\t\t\tdisplay: block;\n\t\t\t\t}\n\n\t\t\t\t.login-success {\n\t\t\t\t\tbackground: #efe;\n\t\t\t\t\tborder: 1px solid #cfc;\n\t\t\t\t\tcolor: #3c3;\n\t\t\t\t\tpadding: 10px;\n\t\t\t\t\tborder-radius: 4px;\n\t\t\t\t\tmargin-bottom: 20px;\n\t\t\t\t\tdisplay: none;\n\t\t\t\t}\n\n\t\t\t\t.login-success.show {\n\t\t\t\t\tdisplay: block;\n\t\t\t\t}\n\n\t\t\t\t.login-flam {\n\t\t\t\t\tmargin-top: 30px;\n\t\t\t\t\ttext-align: center;\n\t\t\t\t}\n\n\t\t\t\t/* Mobile responsiveness */\n\t\t\t\t@media (max-width: 480px) {\n\t\t\t\t\tbody.login-page {\n\t\t\t\t\t\talign-items: flex-start;\n\t\t\t\t\t\tpadding-top: 40px;\n\t\t\t\t\t}\n\n\t\t\t\t\t.login-card {\n\t\t\t\t\t\tpadding: 25px;\n\t\t\t\t\t\tborder-radius: 6px;\n\t\t\t\t\t}\n\n\t\t\t\t\t.login-logo {\n\t\t\t\t\t\tmax-width: 160px;\n\t\t\t\t\t\tmargin-bottom: 20px;\n\t\t\t\t\t}\n\n\t\t\t\t\t.login-title {\n\t\t\t\t\t\tfont-size: 22px;\n\t\t\t\t\t\tmargin-bottom: 20px;\n\t\t\t\t\t}\n\n\t\t\t\t\t.password-wrapper input {\n\t\t\t\t\t\tpadding-right: 65px;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t</style></head><body class=\"login-page\"><div class=\"login-card\"><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/static/logo.png"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/login.templ`, Line: 113, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/login.templ`, Line: 112, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -69,7 +69,7 @@ func Login() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = ShowPassword().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ShowPassword("password").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -80,7 +80,7 @@ func Login() templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/auth/login"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/login.templ`, Line: 142, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/login.templ`, Line: 141, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {

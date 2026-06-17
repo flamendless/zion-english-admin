@@ -92,6 +92,10 @@ templ DateInput(id string, text string) {
 	</div>
 }
 
+templ LoginButton() {
+	<a href={ utils.URL("/auth/login") } class="btn">Login</a>
+}
+
 templ Logout() {
 	<button
 		hx-post={ utils.URL("/auth/logout") }
@@ -111,8 +115,8 @@ templ displayURL(value string) {
 	}
 }
 
-templ ShowPassword() {
-	<button type="button" class="password-toggle" onclick="togglePassword()">Show</button>
+templ ShowPassword(inputID string) {
+	<button type="button" class="password-toggle" data-target={ inputID } onclick="togglePasswordField(this)">Show</button>
 
 	@onceScrPassword.Once() {
 		<style>
@@ -142,15 +146,15 @@ templ ShowPassword() {
 			}
 		</style>
 		<script>
-			function togglePassword() {
-				const passwordInput = document.getElementById('password');
-				const toggleBtn = document.querySelector('.password-toggle');
+			function togglePasswordField(btn) {
+				const passwordInput = document.getElementById(btn.dataset.target);
+				if (!passwordInput) return;
 				if (passwordInput.type === 'password') {
 					passwordInput.type = 'text';
-					toggleBtn.textContent = 'Hide';
+					btn.textContent = 'Hide';
 				} else {
 					passwordInput.type = 'password';
-					toggleBtn.textContent = 'Show';
+					btn.textContent = 'Show';
 				}
 			}
 		</script>

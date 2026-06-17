@@ -1,8 +1,9 @@
 package frontend
 
+import "zion-english/internal/auth"
 import "zion-english/internal/utils"
 
-templ RegisterTeacher() {
+templ RegisterTeacher(loggedIn bool, role auth.Role) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -10,21 +11,11 @@ templ RegisterTeacher() {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<title>Register Teacher - Zion English Admin</title>
 			<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-			<style>
-				.password-group {
-					display: flex;
-					gap: 10px;
-					align-items: center;
-				}
-				.password-group input {
-					flex: 1;
-				}
-			</style>
 			@GlobalIncludes()
 		</head>
 		<body>
 			<div class="container">
-				@HeaderSimple()
+				@Header(loggedIn, role)
 				@SuccessBanner()
 				@ErrorBanner()
 				<form id="registerForm" hx-post={ utils.URL("/teachers/register") } hx-swap="innerHTML" hx-target="#logOutput">
@@ -121,22 +112,25 @@ templ RegisterTeacher() {
 								required
 								minlength="8"
 								maxlength="32"
-								placeholder="8-32 characters with uppercase, lowercase, number, and symbol (!@#%^&*)"
+								placeholder="8-32 characters with uppercase, lowercase, number, and symbol (!@#%^&*?)"
 							/>
-							@ShowPassword()
+							@ShowPassword("password")
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="retypePassword">Retype Password *</label>
-						<input
-							type="password"
-							id="retypePassword"
-							name="retypePassword"
-							required
-							minlength="8"
-							maxlength="32"
-							placeholder="Re-enter password"
-						/>
+						<div class="password-wrapper">
+							<input
+								type="password"
+								id="retypePassword"
+								name="retypePassword"
+								required
+								minlength="8"
+								maxlength="32"
+								placeholder="Re-enter password"
+							/>
+							@ShowPassword("retypePassword")
+						</div>
 					</div>
 					<div class="form-row-3">
 						@CurrencyDropdown()
@@ -153,14 +147,13 @@ templ RegisterTeacher() {
 							/>
 						</div>
 						<div class="form-group">
-							<label for="assignedColor">Assigned Color *</label>
+							<label for="assignedColor">Assigned Color (optional)</label>
 							<div class="color-group">
 								<input
 									type="color"
 									id="assignedColor"
 									name="assignedColor"
-									required
-									value="var(--color-primary)"
+									value="#B9D283"
 									_="
 										on input
 											set #colorPreview.style.backgroundColor to me.value
@@ -168,8 +161,8 @@ templ RegisterTeacher() {
 										end
 									"
 								/>
-								<div class="color-preview" id="colorPreview" style="background-color: var(--color-primary);"></div>
-								<span id="colorValue">var(--color-primary)</span>
+								<div class="color-preview" id="colorPreview" style="background-color: #B9D283;"></div>
+								<span id="colorValue">#B9D283</span>
 							</div>
 						</div>
 					</div>

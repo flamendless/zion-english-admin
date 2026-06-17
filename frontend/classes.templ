@@ -2,7 +2,13 @@ package frontend
 
 import "zion-english/internal/utils"
 
-templ Classes() {
+type ClassesData struct {
+	LockTeacher bool
+	TeacherID   string
+	TeacherName string
+}
+
+templ Classes(data ClassesData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
@@ -11,23 +17,6 @@ templ Classes() {
 		<title>View Classes - Zion English Admin</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		<style>
-			.toolbar {
-				display: flex;
-				gap: 20px;
-				align-items: flex-end;
-				margin-bottom: 20px;
-				flex-wrap: wrap;
-			}
-
-			.toolbar .form-group {
-				margin-bottom: 0;
-				min-width: 150px;
-			}
-
-			.toolbar label {
-				margin-bottom: 5px;
-			}
-
 			.total-section {
 				margin-left: auto;
 				padding: 10px 20px;
@@ -65,7 +54,15 @@ templ Classes() {
 			@ErrorBanner()
 
 			<div class="toolbar">
-				@TeacherDropdown()
+				if data.LockTeacher {
+					<input type="hidden" id="teacher" value={ data.TeacherID }/>
+					<div class="form-group">
+						<label>Teacher</label>
+						<input type="text" value={ data.TeacherName } disabled/>
+					</div>
+				} else {
+					@TeacherDropdown()
+				}
 				@DatePreset()
 				<button type="button" id="filterBtn">Filter</button>
 				<div class="total-section">
@@ -73,6 +70,7 @@ templ Classes() {
 				</div>
 			</div>
 
+			<div class="table-wrapper">
 			<table id="classesTable">
 				<thead>
 					<tr>
@@ -86,10 +84,15 @@ templ Classes() {
 				</thead>
 				<tbody id="classesTableBody">
 					<tr>
-						<td colspan="6" class="empty-state">Select a teacher and date range to view classes</td>
+						if data.LockTeacher {
+							<td colspan="6" class="empty-state">Select a date range to view classes</td>
+						} else {
+							<td colspan="6" class="empty-state">Select a teacher and date range to view classes</td>
+						}
 					</tr>
 				</tbody>
 			</table>
+			</div>
 		</div>
 
 		<script>

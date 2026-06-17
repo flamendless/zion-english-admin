@@ -1,0 +1,61 @@
+---
+description: Templ frontend patterns, HTMX, and view struct conventions
+alwaysApply: true
+---
+
+# Templ Frontend
+
+Package: `frontend`. One page/feature per file (`students.templ`, `process.templ`).
+
+## Page Structure
+
+Full HTML with shared includes:
+
+```templ
+templ Students(data StudentData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<title>Students - Zion English Admin Tool</title>
+		<link rel="icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			// content
+		</div>
+	</body>
+	</html>
+}
+```
+
+## View vs API Structs
+
+- Display structs (`StudentData`, `StudentItem`) → define in `.templ` file
+- Form/API DTOs → `internal/models`; handlers map between them
+
+## Shared Components
+
+| Component | File |
+|-----------|------|
+| `@GlobalIncludes()` | `global.templ` |
+| `@HeaderSimple()` | `header.templ` |
+| `@TeacherDropdown()` | `dropdowns.templ` |
+| `@ScrHTMX()` | `scripts.templ` |
+
+## URLs
+
+Always use `utils.URL("/path")` — prepends `/zion-english-admin` in local dev.
+
+## HTMX Forms
+
+```templ
+<form hx-post={ utils.URL("/process") } hx-target="#results" hx-swap="innerHTML">
+```
+
+Dropdowns load via HTMX on page load: `hx-get`, `hx-trigger="load"`, `hx-target="this"`.
+
+## CSS
+
+CSS variables in `:root` (`global.templ`). Page-specific styles in inline `<style>` blocks.

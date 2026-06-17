@@ -72,20 +72,22 @@ templ ProcessResponse(
 	</div>
 
 	<div id="resultsSection" class="results-section" style="display: block;">
-		<div class="info-display" style="display: flex;">
+		<div class="info-display">
 			<div>{ rowRange }</div>
 			<div>Total: { fmt.Sprintf("%.2f", total) }</div>
 		</div>
-		<table>
-			<thead>
-				<tr><th>Name</th><th>Date</th><th>Duration (min)</th><th>Rate</th><th>Status</th></tr>
-			</thead>
-			<tbody id="resultsBody">
-				for _, rec := range records {
-					@ProcessResultRow(rec)
-				}
-			</tbody>
-		</table>
+		<div class="table-wrapper">
+			<table>
+				<thead>
+					<tr><th>Name</th><th>Date</th><th>Duration (min)</th><th>Rate</th><th>Status</th></tr>
+				</thead>
+				<tbody id="resultsBody">
+					for _, rec := range records {
+						@ProcessResultRow(rec)
+					}
+				</tbody>
+			</table>
+		</div>
 
 		<div class="button-group">
 			<a

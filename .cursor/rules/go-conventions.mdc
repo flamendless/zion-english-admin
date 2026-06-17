@@ -1,0 +1,54 @@
+---
+description: Go coding conventions for handlers, errors, naming, and imports
+alwaysApply: true
+---
+
+# Go Conventions
+
+## Imports
+
+Stdlib, then third-party, then `zion-english/...` — no blank lines between groups:
+
+```go
+import (
+	"context"
+	"errors"
+	"zion-english/internal/auth"
+	"github.com/spf13/cobra"
+)
+```
+
+## Naming
+
+- Handlers: `handleHome`, `handleStudentRegister` (`handle` prefix, camelCase)
+- HTTP helpers: `HttpError`, `HttpRedirect` (PascalCase — project convention)
+- Validation: `validateProcessRequest`, `validateStudentRequest`
+- DB mode constants: `DB_MODE_RO`, `DB_MODE_RW`
+- Tables: `tbl_teachers`, `tbl_students` (migration prefix)
+
+## Handler Pattern (cmd/web.go)
+
+1. Check HTTP method → `HttpError(w, "Method not allowed", 405)`
+2. Parse form/query params
+3. Validate via `validate*()` → `errors.New("human-readable message")`
+4. Call `dbRO` (reads) or `dbRW` (writes)
+5. Map DB rows → `frontend.*Item` view structs
+6. Render: `frontend.Page(data).Render(r.Context(), w)`
+
+## Error Handling
+
+- Startup/CLI fatal: `panic(err)`
+- HTTP errors: `HttpError`, `sendErrorLog`, or `fmt.Fprint(w, message)`
+- Logging: `logs.Log().Error("msg", zap.Error(err), zap.String("key", val))`
+
+## Nullable DB Fields
+
+```go
+Contact: sql.NullString{String: req.Contact, Valid: req.Contact != ""},
+```
+
+## HTMX Redirects
+
+```go
+w.Header().Set("HX-Redirect", utils.URL("/"))
+```

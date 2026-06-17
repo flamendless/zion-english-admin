@@ -1,0 +1,41 @@
+---
+description: Auth, config, logging, and domain-specific patterns
+alwaysApply: true
+---
+
+# Auth, Config & Domain
+
+## Config (`internal/conf`)
+
+Singleton via `conf.Conf()`. Required env: `APP_ENV` (`local`|`prod`), `SECRET`, `SUPERUSER_USERNAME`, `SUPERUSER_PASSWORD`. Use `cfg.IsProd()` for URL prefixing.
+
+## Auth
+
+Roles: `RoleSuperuser`, `RoleTeacher`. JWT in `session_token` HttpOnly cookie.
+
+- `auth.Middleware(cfg, dbRO, handler)` — parses JWT, injects user into context
+- `auth.RequireRole(roles...)(handler)` — role gate per route
+- Context: `auth.GetUser(ctx)`, `auth.GetRole(ctx)`
+- Routes: `publicMux` (login, process, API) vs `authMux` (home, students, teachers, logs)
+
+## Logging
+
+- App logs: `logs.Log()` (zap singleton), structured fields
+- Audit logs: DB table `tbl_logs` via `InsertLog`
+- Processing logs: DB table `tbl_processing_logs`
+
+## Processor Pipeline
+
+1. `sheet.DownloadDriveSheet(url, path)` — curl CSV from Google Drive
+2. `processor.ProcessCSVFile(...)` — parse rows into `ClassRecord`
+3. `processor.SaveRecords(...)` — write XLSX
+
+Column mapping stored per teacher in `tbl_teachers.template` (comma-separated Excel letters).
+
+## Enums (validated in Go)
+
+- Currencies: `KRW`, `CAD`, `YEN`, `PHP`
+- Student status: `active`, `inactive`
+- Class status: `conducted`, `cancelled`, `rescheduled`
+
+Password validation via regexes in `internal/constants/re.go` (8–32 chars, upper, lower, digit, symbol).

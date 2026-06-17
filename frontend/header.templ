@@ -1,5 +1,6 @@
 package frontend
 
+import "zion-english/internal/auth"
 import "zion-english/internal/utils"
 
 templ WelcomeRole() {
@@ -12,31 +13,45 @@ templ WelcomeRole() {
 	</h3>
 }
 
-templ Header() {
-	@GlobalIncludes()
+templ Header(loggedIn bool, role auth.Role) {
 	<div class="header-section">
 		<h1>
 			<a href={ utils.URL("/") }>
 				<img src={ utils.URL("/static/logo.png") } alt="Zion English" class="header-logo"/>
 			</a>
 		</h1>
-		@WelcomeRole()
+		if loggedIn {
+			@WelcomeRole()
+		}
 		<div class="header-bottom">
 			<div class="header-left">
 				<div class="nav-links">
-					<!-- INFO: (flam) this will be outdated after we centralized class records via admin tool -->
-					<!-- @NavLink("/process", "process", "Process") -->
-					<!-- @NavLink("/logs", "logsLink", "Process Logs") -->
-					@NavLink("/students", "studentsLink", "Students")
-					@NavLink("/students/register", "registerStudentLink", "+Student")
-					@NavLink("/teachers", "teachersLink", "Teachers")
-					@NavLink("/teachers/register", "registerTeacherLink", "+Teacher")
-					@NavLink("/classes", "classesLink", "Classes")
-					@NavLink("/classes/record", "recordClassLink", "+Class")
+					if IsNavAccessible(role, "/students") {
+						@NavLink("/students", "studentsLink", "Students")
+					}
+					if IsNavAccessible(role, "/students/register") {
+						@NavLink("/students/register", "registerStudentLink", "+Student")
+					}
+					if IsNavAccessible(role, "/teachers") {
+						@NavLink("/teachers", "teachersLink", "Teachers")
+					}
+					if IsNavAccessible(role, "/teachers/register") {
+						@NavLink("/teachers/register", "registerTeacherLink", "+Teacher")
+					}
+					if IsNavAccessible(role, "/classes") {
+						@NavLink("/classes", "classesLink", "Classes")
+					}
+					if IsNavAccessible(role, "/classes/record") {
+						@NavLink("/classes/record", "recordClassLink", "+Class")
+					}
 				</div>
 			</div>
 			<div class="header-right">
-				@Logout()
+				if loggedIn {
+					@Logout()
+				} else {
+					@LoginButton()
+				}
 				@Flam()
 			</div>
 		</div>
@@ -44,7 +59,11 @@ templ Header() {
 }
 
 templ HeaderSimple() {
-	@Header()
+	{{
+		role := auth.GetRole(ctx)
+		loggedIn := role != ""
+	}}
+	@Header(loggedIn, role)
 }
 
 templ SuccessBanner() {

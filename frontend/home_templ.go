@@ -8,18 +8,8 @@ package frontend
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "slices"
 import "zion-english/internal/auth"
 import "zion-english/internal/utils"
-
-var whitelistTeachers = []string{
-	"/classes/record",
-	"/teachers/register",
-}
-
-func isAccessible(role auth.Role, url string) bool {
-	return role == auth.RoleSuperuser || slices.Contains(whitelistTeachers, url)
-}
 
 func Home(role auth.Role) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -49,13 +39,13 @@ func Home(role auth.Role) templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 23, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 13, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><style>\n\t\t\t.home-container {\n\t\t\t\tmax-width: 900px;\n\t\t\t\tmargin: 0 auto;\n\t\t\t\tpadding: 40px 20px;\n\t\t\t}\n\n\t\t\t.home-title {\n\t\t\t\ttext-align: center;\n\t\t\t\tmargin-bottom: 10px;\n\t\t\t}\n\n\t\t\t.home-logo {\n\t\t\t\tmax-width: 300px;\n\t\t\t\theight: auto;\n\t\t\t}\n\n\t\t\t.home-subtitle {\n\t\t\t\ttext-align: center;\n\t\t\t\tmargin-bottom: 40px;\n\t\t\t\tcolor: #666;\n\t\t\t\tfont-size: 18px;\n\t\t\t}\n\n\t\t\t.home-subtitle a {\n\t\t\t\tcolor: var(--color-primary);\n\t\t\t\ttext-decoration: none;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.home-subtitle a:hover {\n\t\t\t\ttext-decoration: underline;\n\t\t\t}\n\n\t\t\t.cards-grid {\n\t\t\t\tdisplay: grid;\n\t\t\t\tgrid-template-columns: 1fr 1fr;\n\t\t\t\tgap: 30px;\n\t\t\t}\n\n\t\t\t.card {\n\t\t\t\tbackground: white;\n\t\t\t\tborder-radius: 8px;\n\t\t\t\tpadding: 25px;\n\t\t\t\tbox-shadow: 0 2px 8px rgba(0,0,0,0.1);\n\t\t\t\ttransition: transform 0.2s, box-shadow 0.2s;\n\t\t\t\ttext-decoration: none;\n\t\t\t\tdisplay: block;\n\t\t\t}\n\n\t\t\t.card:hover {\n\t\t\t\ttransform: translateY(-4px);\n\t\t\t\tbox-shadow: 0 4px 16px rgba(0,0,0,0.15);\n\t\t\t}\n\n\t\t\t.card h2 {\n\t\t\t\tmargin: 0 0 15px 0;\n\t\t\t\tfont-size: 24px;\n\t\t\t\tcolor: #333;\n\t\t\t}\n\n\t\t\t.card p {\n\t\t\t\tmargin: 0;\n\t\t\t\tcolor: #666;\n\t\t\t\tfont-size: 14px;\n\t\t\t}\n\n\t\t\t.card-icon {\n\t\t\t\tfont-size: 32px;\n\t\t\t\tmargin-bottom: 10px;\n\t\t\t}\n\t\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><style>\n\t\t\t.home-container {\n\t\t\t\tmax-width: 900px;\n\t\t\t\tmargin: 0 auto;\n\t\t\t\tpadding: 40px 20px;\n\t\t\t}\n\n\t\t\t.home-title {\n\t\t\t\ttext-align: center;\n\t\t\t\tmargin-bottom: 10px;\n\t\t\t}\n\n\t\t\t.home-logo {\n\t\t\t\tmax-width: 300px;\n\t\t\t\theight: auto;\n\t\t\t}\n\n\t\t\t.home-subtitle {\n\t\t\t\ttext-align: center;\n\t\t\t\tmargin-bottom: 40px;\n\t\t\t\tcolor: #666;\n\t\t\t\tfont-size: 18px;\n\t\t\t}\n\n\t\t\t.home-subtitle a {\n\t\t\t\tcolor: var(--color-primary);\n\t\t\t\ttext-decoration: none;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.home-subtitle a:hover {\n\t\t\t\ttext-decoration: underline;\n\t\t\t}\n\n\t\t\t.cards-grid {\n\t\t\t\tdisplay: grid;\n\t\t\t\tgrid-template-columns: 1fr 1fr;\n\t\t\t\tgap: 30px;\n\t\t\t}\n\n\t\t\t.card {\n\t\t\t\tbackground: white;\n\t\t\t\tborder-radius: 8px;\n\t\t\t\tpadding: 25px;\n\t\t\t\tbox-shadow: 0 2px 8px rgba(0,0,0,0.1);\n\t\t\t\ttransition: transform 0.2s, box-shadow 0.2s;\n\t\t\t\ttext-decoration: none;\n\t\t\t\tdisplay: block;\n\t\t\t}\n\n\t\t\t.card:hover {\n\t\t\t\ttransform: translateY(-4px);\n\t\t\t\tbox-shadow: 0 4px 16px rgba(0,0,0,0.15);\n\t\t\t}\n\n\t\t\t.card h2 {\n\t\t\t\tmargin: 0 0 15px 0;\n\t\t\t\tfont-size: 24px;\n\t\t\t\tcolor: #333;\n\t\t\t}\n\n\t\t\t.card p {\n\t\t\t\tmargin: 0;\n\t\t\t\tcolor: #666;\n\t\t\t\tfont-size: 14px;\n\t\t\t}\n\n\t\t\t.card-icon {\n\t\t\t\tfont-size: 32px;\n\t\t\t\tmargin-bottom: 10px;\n\t\t\t}\n\n\t\t\t.home-top-bar {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: row;\n\t\t\t\tjustify-content: space-between;\n\t\t\t\talign-items: center;\n\t\t\t\twidth: 100%;\n\t\t\t\tmargin-bottom: 20px;\n\t\t\t}\n\n\t\t\t@media (max-width: 768px) {\n\t\t\t\t.home-container {\n\t\t\t\t\tpadding: 20px 12px;\n\t\t\t\t}\n\n\t\t\t\t.home-logo {\n\t\t\t\t\tmax-width: 220px;\n\t\t\t\t}\n\n\t\t\t\t.home-subtitle {\n\t\t\t\t\tfont-size: 16px;\n\t\t\t\t\tmargin-bottom: 24px;\n\t\t\t\t}\n\n\t\t\t\t.cards-grid {\n\t\t\t\t\tgrid-template-columns: 1fr;\n\t\t\t\t\tgap: 16px;\n\t\t\t\t}\n\n\t\t\t\t.card {\n\t\t\t\t\tpadding: 20px;\n\t\t\t\t}\n\n\t\t\t\t.card h2 {\n\t\t\t\t\tfont-size: 20px;\n\t\t\t\t}\n\n\t\t\t\t.home-top-bar {\n\t\t\t\t\tflex-direction: column;\n\t\t\t\t\tgap: 12px;\n\t\t\t\t\talign-items: center;\n\t\t\t\t}\n\t\t\t}\n\n\t\t\t@media (max-width: 480px) {\n\t\t\t\t.home-container {\n\t\t\t\t\tpadding: 16px 10px;\n\t\t\t\t}\n\n\t\t\t\t.home-logo {\n\t\t\t\t\tmax-width: 180px;\n\t\t\t\t}\n\t\t\t}\n\t\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -70,26 +60,13 @@ func Home(role auth.Role) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/static/logo.png"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 102, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 145, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" alt=\"Zion English\" class=\"home-logo\"></div><span style=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%;")
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 104, Col: 120}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" alt=\"Zion English\" class=\"home-logo\"></div><span class=\"home-top-bar\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -101,7 +78,7 @@ func Home(role auth.Role) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -109,69 +86,69 @@ func Home(role auth.Role) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"cards-grid\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"cards-grid\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if isAccessible(role, "/classes") {
+		if IsNavAccessible(role, "/classes") {
 			templ_7745c5c3_Err = ActionCard("/classes", "Classes", "View recorded classes").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		if isAccessible(role, "/classes/record") {
+		if IsNavAccessible(role, "/classes/record") {
 			templ_7745c5c3_Err = ActionCard("/classes/record", "Record a Class", "Record a new class").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		if isAccessible(role, "/students") {
+		if IsNavAccessible(role, "/students") {
 			templ_7745c5c3_Err = ActionCard("/students", "Students", "View and manage students").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		if isAccessible(role, "/students/register") {
+		if IsNavAccessible(role, "/students/register") {
 			templ_7745c5c3_Err = ActionCard("/students/register", "Register a student", "Add a new student").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		if isAccessible(role, "/teachers") {
+		if IsNavAccessible(role, "/teachers") {
 			templ_7745c5c3_Err = ActionCard("/teachers", "Teachers", "View and manage teachers").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		if isAccessible(role, "/teachers/register") {
+		if IsNavAccessible(role, "/teachers/register") {
 			templ_7745c5c3_Err = ActionCard("/teachers/register", "Register a teacher", "Add a new teacher").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<!-- INFO: (flam) this will be outdated after we centralized class records via admin tool --><!-- @ActionCard(\"/logs\", \"Process logs\", \"View and manage processing logs\") -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<!-- INFO: (flam) this will be outdated after we centralized class records via admin tool --><!-- @ActionCard(\"/logs\", \"Process logs\", \"View and manage processing logs\") -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if isAccessible(role, "/process") {
+		if IsNavAccessible(role, "/process") {
 			templ_7745c5c3_Err = ActionCard("/process", "Process", "Process CSV/XLSX files").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		if isAccessible(role, "/process-logs") {
+		if IsNavAccessible(role, "/process-logs") {
 			templ_7745c5c3_Err = ActionCard("/process-logs", "Processing Logs", "View processing logs").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		if isAccessible(role, "/logs") {
+		if IsNavAccessible(role, "/logs") {
 			templ_7745c5c3_Err = ActionCard("/logs", "Logs", "View system logs").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -1,17 +1,7 @@
 package frontend
 
-import "slices"
 import "zion-english/internal/auth"
 import "zion-english/internal/utils"
-
-var whitelistTeachers = []string{
-	"/classes/record",
-	"/teachers/register",
-}
-
-func isAccessible(role auth.Role, url string) bool {
-	return role == auth.RoleSuperuser || slices.Contains(whitelistTeachers, url)
-}
 
 templ Home(role auth.Role) {
 	<!DOCTYPE html>
@@ -92,6 +82,59 @@ templ Home(role auth.Role) {
 				font-size: 32px;
 				margin-bottom: 10px;
 			}
+
+			.home-top-bar {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				width: 100%;
+				margin-bottom: 20px;
+			}
+
+			@media (max-width: 768px) {
+				.home-container {
+					padding: 20px 12px;
+				}
+
+				.home-logo {
+					max-width: 220px;
+				}
+
+				.home-subtitle {
+					font-size: 16px;
+					margin-bottom: 24px;
+				}
+
+				.cards-grid {
+					grid-template-columns: 1fr;
+					gap: 16px;
+				}
+
+				.card {
+					padding: 20px;
+				}
+
+				.card h2 {
+					font-size: 20px;
+				}
+
+				.home-top-bar {
+					flex-direction: column;
+					gap: 12px;
+					align-items: center;
+				}
+			}
+
+			@media (max-width: 480px) {
+				.home-container {
+					padding: 16px 10px;
+				}
+
+				.home-logo {
+					max-width: 180px;
+				}
+			}
 		</style>
 		@GlobalIncludes()
 	</head>
@@ -101,7 +144,7 @@ templ Home(role auth.Role) {
 			<div class="home-title">
 				<img src={utils.URL("/static/logo.png")} alt="Zion English" class="home-logo">
 			</div>
-			<span style={ "display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%;" }>
+			<span class="home-top-bar">
 				@Logout()
 				@Flam()
 			</span>
@@ -109,36 +152,36 @@ templ Home(role auth.Role) {
 			@WelcomeRole()
 
 			<div class="cards-grid">
-				if isAccessible(role, "/classes") {
+				if IsNavAccessible(role, "/classes") {
 					@ActionCard("/classes", "Classes", "View recorded classes")
 				}
-				if isAccessible(role, "/classes/record") {
+				if IsNavAccessible(role, "/classes/record") {
 					@ActionCard("/classes/record", "Record a Class", "Record a new class")
 				}
 
-				if isAccessible(role, "/students") {
+				if IsNavAccessible(role, "/students") {
 					@ActionCard("/students", "Students", "View and manage students")
 				}
-				if isAccessible(role, "/students/register") {
+				if IsNavAccessible(role, "/students/register") {
 					@ActionCard("/students/register", "Register a student", "Add a new student")
 				}
 
-				if isAccessible(role, "/teachers") {
+				if IsNavAccessible(role, "/teachers") {
 					@ActionCard("/teachers", "Teachers", "View and manage teachers")
 				}
-				if isAccessible(role, "/teachers/register") {
+				if IsNavAccessible(role, "/teachers/register") {
 					@ActionCard("/teachers/register", "Register a teacher", "Add a new teacher")
 				}
 
 				<!-- INFO: (flam) this will be outdated after we centralized class records via admin tool -->
 				<!-- @ActionCard("/logs", "Process logs", "View and manage processing logs") -->
-				if isAccessible(role, "/process") {
+				if IsNavAccessible(role, "/process") {
 					@ActionCard("/process", "Process", "Process CSV/XLSX files")
 				}
-				if isAccessible(role, "/process-logs") {
+				if IsNavAccessible(role, "/process-logs") {
 					@ActionCard("/process-logs", "Processing Logs", "View processing logs")
 				}
-				if isAccessible(role, "/logs") {
+				if IsNavAccessible(role, "/logs") {
 					@ActionCard("/logs", "Logs", "View system logs")
 				}
 			</div>

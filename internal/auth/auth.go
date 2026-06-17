@@ -114,6 +114,28 @@ func Login(w http.ResponseWriter, r *http.Request, cfg *conf.Config, dbRO *queri
 	return nil
 }
 
+func UserFromRequest(r *http.Request, cfg *conf.Config) (User, bool) {
+	cookie, err := r.Cookie("session_token")
+	if err != nil || cookie.Value == "" {
+		return User{}, false
+	}
+
+	claims := &Claims{}
+	token, err := jwt.ParseWithClaims(cookie.Value, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(cfg.Secret), nil
+	})
+	if err != nil || !token.Valid {
+		return User{}, false
+	}
+
+	return User{
+		ID:    claims.UserID,
+		Name:  claims.Name,
+		Email: claims.Email,
+		Role:  claims.Role,
+	}, true
+}
+
 func Logout(w http.ResponseWriter) {
 	logs.Log().Info("Triggered log out")
 	http.SetCookie(w, &http.Cookie{

@@ -1,0 +1,45 @@
+---
+description: Zion English project layout, architecture, and dev workflow
+alwaysApply: true
+---
+
+# Project Overview
+
+Go 1.26 admin tool. Module: `zion-english`. Entry: `main.go` → `cmd.Execute()`.
+
+## Layout
+
+| Path | Purpose |
+|------|---------|
+| `cmd/` | Cobra CLI + all HTTP handlers (`web.go`) |
+| `internal/` | Private packages (auth, conf, database, processor, models, utils) |
+| `frontend/` | Templ templates (`*.templ`) + generated `*_templ.go` |
+| `static/` | Assets (logo, favicon, htmx, hyperscript) |
+| `migrations/sqlite3/` | Goose migrations (schema source of truth) |
+| `internal/database/sql/` | Hand-written sqlc queries |
+| `internal/database/queries/` | Generated sqlc code — never edit |
+| `data/` | SQLite DB (`data/zion.db`) |
+| `tmp/` | Runtime temp files (CSV downloads, XLSX output) |
+
+## Where New Code Goes
+
+- HTTP route → handler in `cmd/web.go`, register in `publicMux` or `authMux`
+- Domain logic → `internal/processor`, `internal/sheet`, etc.
+- API/form DTOs → `internal/models`
+- View/display structs → co-located in `frontend/*.templ`
+- DB queries → SQL in `internal/database/sql/`, optional wrapper in `internal/database/`
+
+## Dev Workflow
+
+```bash
+./run.sh serve    # gensql + gentempl + go run . web
+./run.sh gentempl # go tool templ generate templ -v
+./run.sh gensql   # go tool sqlc generate
+```
+
+Local URL: `http://localhost:8080/zion-english-admin` (prod uses bare paths via `utils.URL`).
+
+## Do Not Edit
+
+- `internal/database/queries/*` — regenerate with sqlc
+- `frontend/*_templ.go` — regenerate with templ

@@ -7,6 +7,6 @@ var (
 	ReLower    = regexp.MustCompile(`[a-z]`)
 	ReUpper    = regexp.MustCompile(`[A-Z]`)
 	ReDigit    = regexp.MustCompile(`\d`)
-	ReSpecial  = regexp.MustCompile(`[!@#$%^&*]`)
-	ReLength   = regexp.MustCompile(`^[A-Za-z\d!@#$%^&*]{8,32}$`)
+	ReSpecial  = regexp.MustCompile(`[!@#$%^&*?]`)
+	ReLength   = regexp.MustCompile(`^[A-Za-z\d!@#$%^&*?]{8,32}$`)
 )

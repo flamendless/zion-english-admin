@@ -1,0 +1,51 @@
+---
+description: Database, sqlc, and migration conventions
+alwaysApply: true
+---
+
+# Database & sqlc
+
+SQLite with dual connections: `dbRO` (reads), `dbRW` (writes). WAL mode enabled.
+
+## Adding a Query
+
+1. Add SQL to `internal/database/sql/<domain>.sql`
+2. Run `./run.sh gensql`
+3. Optionally add wrapper in `internal/database/<domain>.go`
+
+Query annotation style:
+
+```sql
+-- name: InsertTeacher :exec
+INSERT INTO tbl_teachers (...) VALUES (?, ?, ...);
+
+-- name: GetAllTeachers :many
+SELECT id, name FROM tbl_teachers ORDER BY name ASC;
+
+-- name: GetTeacherByEmail :one
+SELECT id, email FROM tbl_teachers WHERE email = ?;
+```
+
+## Service Layer
+
+```go
+// Type alias to generated type
+type Teacher = queries.TblTeacher
+
+func GetAllTeachers(db Service) ([]Teacher, error) {
+	rows, err := db.GetQueries().GetAllTeachers(context.Background())
+	// map fields if needed
+}
+```
+
+Two access patterns coexist:
+- Wrappers: `database.GetAllStudents(dbRO)` — list pages
+- Direct: `dbRW.GetQueries().InsertStudent(ctx, params)` — form handlers
+
+## Migrations
+
+Goose format in `migrations/sqlite3/` with `-- +goose Up/Down`. Tables prefixed `tbl_`.
+
+## Testing
+
+Table-driven tests in same package (`*_test.go`). Focus on pure logic in `internal/processor` and `internal/utils`. HTTP handlers, auth, and DB layer are not currently tested.

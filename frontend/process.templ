@@ -11,6 +11,10 @@ templ Process() {
 			<title>Zion English Admin Tool</title>
 			<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 			<style>
+			.results-section {
+				margin-top: 30px;
+			}
+
 			.column-mapping {
 				background-color: #f9f9f9;
 				padding: 20px;
@@ -21,17 +25,6 @@ templ Process() {
 			.column-mapping h3 {
 				margin-bottom: 15px;
 				color: #333;
-			}
-
-			.column-row {
-				display: grid;
-				grid-template-columns: 1fr 1fr;
-				gap: 15px;
-				margin-bottom: 15px;
-			}
-
-			.results-section {
-				margin-top: 30px;
 			}
 
 			.results-section h3 {
@@ -69,23 +62,6 @@ templ Process() {
 				background-color: #f0f0f0;
 			}
 
-			.info-display {
-				display: flex;
-				gap: 15px;
-				margin-bottom: 20px;
-			}
-
-			.info-display > div {
-				flex: 1;
-				background-color: var(--color-primary);
-				color: white;
-				padding: 15px;
-				border-radius: 4px;
-				font-size: 18px;
-				font-weight: bold;
-				text-align: center;
-			}
-
 			.log-error {
 				color: #dc3545;
 				background-color: #f8d7da;
@@ -105,6 +81,17 @@ templ Process() {
 			.btn:disabled {
 				opacity: 0.5;
 				cursor: not-allowed;
+			}
+
+			@media (max-width: 768px) {
+				.clear-btn {
+					margin-left: 0;
+					margin-top: 10px;
+				}
+
+				.column-mapping {
+					padding: 15px;
+				}
 			}
 		</style>
 			@GlobalIncludes()

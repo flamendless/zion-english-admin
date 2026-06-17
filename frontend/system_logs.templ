@@ -41,9 +41,9 @@ templ SystemLogs(data SystemLogData) {
 							</tr>
 						</thead>
 						<tbody>
-							for i, log := range data.Logs {
+							for _, log := range data.Logs {
 								<tr>
-									<td>{ i+1 }</td>
+									<td>{ log.ID }</td>
 									<td>{ log.Module }</td>
 									<td>{ log.Message }</td>
 									<td>{ getDisplayValue(log.CreatedBy) }</td>

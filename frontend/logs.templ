@@ -112,6 +112,7 @@ templ ProcessingLogs(data ProcessingLogData) {
 			</div>
 
 			if len(data.Logs) > 0 {
+				<div class="table-wrapper">
 				<table id="logsTable">
 					<thead>
 						<tr>
@@ -142,6 +143,7 @@ templ ProcessingLogs(data ProcessingLogData) {
 						}
 					</tbody>
 				</table>
+				</div>
 			} else {
 				<div class="empty-state">No processing logs found.</div>
 			}
