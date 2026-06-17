@@ -10,3 +10,7 @@ func URL(path string) string {
 	}
 	return "/zion-english-admin" + path
 }
+
+func BasePath() string {
+	return conf.Conf().BasePath
+}

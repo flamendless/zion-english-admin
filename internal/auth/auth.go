@@ -2,10 +2,13 @@ package auth
 
 import (
 	"context"
+	"crypto/subtle"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 	"zion-english/internal/conf"
+	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
 	"zion-english/internal/utils"
@@ -15,6 +18,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var loginLimiter = NewLoginLimiter(5, 15*time.Minute)
+
 type Claims struct {
 	UserID int64  `json:"user_id"`
 	Name   string `json:"name"`
@@ -23,25 +28,83 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+func LoginAllowed(ip string) bool {
+	return loginLimiter.Allow(ip)
+}
+
+func RecordLoginFailure(ip string) {
+	loginLimiter.RecordFailure(ip)
+}
+
+func ResetLoginFailures(ip string) {
+	loginLimiter.Reset(ip)
+}
+
+var ErrTeacherPendingApproval = errors.New("your account is pending approval. please wait for an administrator to approve your registration")
+
+func parseClaims(tokenString string, cfg *conf.Config) (*Claims, error) {
+	claims := &Claims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		if token.Method != jwt.SigningMethodHS256 {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(cfg.Secret), nil
+	})
+	if err != nil || !token.Valid {
+		return nil, errors.New("invalid token")
+	}
+	if claims.Role != RoleTeacher && claims.Role != RoleSuperuser {
+		return nil, errors.New("invalid role")
+	}
+	return claims, nil
+}
+
+func setSessionCookie(w http.ResponseWriter, cfg *conf.Config, value string, expires time.Time, maxAge int) {
+	cookie := &http.Cookie{
+		Name:     "session_token",
+		Value:    value,
+		Path:     cfg.BasePath,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+		Expires:  expires,
+	}
+	if maxAge != 0 {
+		cookie.MaxAge = maxAge
+	}
+	if cfg.IsProd() {
+		cookie.Secure = true
+	}
+	http.SetCookie(w, cookie)
+}
+
 func Middleware(cfg *conf.Config, dbRO *queries.Queries, next http.Handler) http.Handler {
 	const logtag = "[Auth Middleware]"
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("session_token")
 		if err != nil {
 			logs.Log().Error(logtag, zap.Error(err))
-			unauthorized(w, r)
+			invalidateSession(w, r)
 			return
 		}
 
-		claims := &Claims{}
-		token, err := jwt.ParseWithClaims(cookie.Value, claims, func(token *jwt.Token) (interface{}, error) {
-			return []byte(cfg.Secret), nil
-		})
-
-		if err != nil || !token.Valid {
+		claims, err := parseClaims(cookie.Value, cfg)
+		if err != nil {
 			logs.Log().Error(logtag, zap.Error(err))
-			unauthorized(w, r)
+			invalidateSession(w, r)
 			return
+		}
+
+		if claims.Role == RoleTeacher {
+			if claims.UserID == 0 {
+				logs.Log().Error(logtag, zap.String("reason", "teacher token missing user id"))
+				invalidateSession(w, r)
+				return
+			}
+			if _, err := dbRO.GetTeacherByID(r.Context(), claims.UserID); err != nil {
+				logs.Log().Error(logtag, zap.Error(err), zap.Int64("teacher_id", claims.UserID))
+				invalidateSession(w, r)
+				return
+			}
 		}
 
 		user := User{
@@ -56,25 +119,32 @@ func Middleware(cfg *conf.Config, dbRO *queries.Queries, next http.Handler) http
 	})
 }
 
-func Login(w http.ResponseWriter, r *http.Request, cfg *conf.Config, dbRO *queries.Queries, email, password string) error {
+func Login(w http.ResponseWriter, r *http.Request, cfg *conf.Config, dbRO *queries.Queries, email, password string) (User, error) {
 	var user User
 
+	isSuperuser := subtle.ConstantTimeCompare([]byte(email), []byte(cfg.SuperuserUsername)) == 1 &&
+		subtle.ConstantTimeCompare([]byte(password), []byte(cfg.SuperuserPassword)) == 1
+
 	switch {
-	case email == cfg.SuperuserUsername && password == cfg.SuperuserPassword:
+	case isSuperuser:
 		user = User{
 			Name:  "superuser",
-			Email: "superuser",
+			Email: cfg.SuperuserUsername,
 			Role:  RoleSuperuser,
 		}
 
 	default:
 		teacher, err := dbRO.GetTeacherByEmail(r.Context(), email)
 		if err != nil {
-			return errors.New("invalid credentials")
+			return User{}, errors.New("invalid credentials")
 		}
 
 		if err := bcrypt.CompareHashAndPassword([]byte(teacher.Password), []byte(password)); err != nil {
-			return errors.New("invalid credentials")
+			return User{}, errors.New("invalid credentials")
+		}
+
+		if teacher.Status != string(constants.TeacherStatusApproved) {
+			return User{}, ErrTeacherPendingApproval
 		}
 
 		user = User{
@@ -99,19 +169,13 @@ func Login(w http.ResponseWriter, r *http.Request, cfg *conf.Config, dbRO *queri
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(cfg.Secret))
 	if err != nil {
-		return err
+		return User{}, err
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    tokenString,
-		Path:     conf.Conf().BasePath,
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-		Expires:  time.Now().Add(24 * time.Hour),
-	})
+	expires := time.Now().Add(24 * time.Hour)
+	setSessionCookie(w, cfg, tokenString, expires, 0)
 
-	return nil
+	return user, nil
 }
 
 func UserFromRequest(r *http.Request, cfg *conf.Config) (User, bool) {
@@ -120,11 +184,8 @@ func UserFromRequest(r *http.Request, cfg *conf.Config) (User, bool) {
 		return User{}, false
 	}
 
-	claims := &Claims{}
-	token, err := jwt.ParseWithClaims(cookie.Value, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(cfg.Secret), nil
-	})
-	if err != nil || !token.Valid {
+	claims, err := parseClaims(cookie.Value, cfg)
+	if err != nil {
 		return User{}, false
 	}
 
@@ -138,17 +199,31 @@ func UserFromRequest(r *http.Request, cfg *conf.Config) (User, bool) {
 
 func Logout(w http.ResponseWriter) {
 	logs.Log().Info("Triggered log out")
-	http.SetCookie(w, &http.Cookie{
-		Name:     "session_token",
-		Value:    "",
-		Path:     conf.Conf().BasePath,
-		MaxAge:   -1,
-		SameSite: http.SameSiteStrictMode,
-		Expires:  time.Unix(0, 0),
-	})
+	cfg := conf.Conf()
+	setSessionCookie(w, cfg, "", time.Unix(0, 0), -1)
 }
 
-func unauthorized(w http.ResponseWriter, r *http.Request) {
+func ClearSession(w http.ResponseWriter) {
+	cfg := conf.Conf()
+	setSessionCookie(w, cfg, "", time.Unix(0, 0), -1)
+}
+
+func SessionUserValid(ctx context.Context, dbRO *queries.Queries, user User) bool {
+	switch user.Role {
+	case RoleSuperuser:
+		return true
+	case RoleTeacher:
+		if user.ID == 0 {
+			return false
+		}
+		_, err := dbRO.GetTeacherByID(ctx, user.ID)
+		return err == nil
+	default:
+		return false
+	}
+}
+
+func redirectToLogin(w http.ResponseWriter, r *http.Request) {
 	url := utils.URL("/auth/login")
 	if r.Header.Get("HX-Request") == "true" {
 		w.Header().Set("HX-Redirect", url)
@@ -156,6 +231,15 @@ func unauthorized(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Redirect(w, r, url, http.StatusFound)
+}
+
+func invalidateSession(w http.ResponseWriter, r *http.Request) {
+	ClearSession(w)
+	redirectToLogin(w, r)
+}
+
+func accessDenied(w http.ResponseWriter, r *http.Request) {
+	redirectToLogin(w, r)
 }
 
 func RequireRole(allowed ...Role) func(http.HandlerFunc) http.HandlerFunc {
@@ -170,7 +254,7 @@ func RequireRole(allowed ...Role) func(http.HandlerFunc) http.HandlerFunc {
 				}
 			}
 
-			unauthorized(w, r)
+			accessDenied(w, r)
 		}
 	}
 }

@@ -20,7 +20,22 @@ type TeacherItem struct {
 	Currency       string
 	DriveUrl       string
 	Sex            string
+	Status         string
 	CreatedAt      string
+}
+
+func getTeacherRowClass(status string) string {
+	if status == "pending" {
+		return "teacher-pending"
+	}
+	return ""
+}
+
+func getTeacherStatusClass(status string) string {
+	if status == "approved" {
+		return "status-active"
+	}
+	return "status-inactive"
 }
 
 templ Teachers(data TeacherData) {
@@ -32,6 +47,26 @@ templ Teachers(data TeacherData) {
 		<title>Teachers - Zion English Admin Tool</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
+		<style>
+			.teacher-pending {
+				background-color: #fff5f5;
+			}
+
+			.approve-btn {
+				background-color: var(--color-primary);
+				color: #333;
+				border: none;
+				padding: 6px 12px;
+				border-radius: 4px;
+				cursor: pointer;
+				font-size: 13px;
+				font-weight: 500;
+			}
+
+			.approve-btn:hover {
+				opacity: 0.9;
+			}
+		</style>
 	</head>
 	<body>
 		<div class="container">
@@ -47,6 +82,7 @@ templ Teachers(data TeacherData) {
 						<thead>
 							<tr>
 								<th>Name</th>
+								<th>Status</th>
 								<th>Sex</th>
 								<th>Birthdate</th>
 								<th>Address</th>
@@ -57,12 +93,14 @@ templ Teachers(data TeacherData) {
 								<th>Spreadsheet URL</th>
 								<th>Certifications</th>
 								<th>Assigned Color</th>
+								<th>Action</th>
 							</tr>
 						</thead>
 						<tbody>
 							for _, teacher := range data.Teachers {
-								<tr>
+								<tr class={ getTeacherRowClass(teacher.Status) }>
 									<td>{ teacher.Name }</td>
+									<td class={ getTeacherStatusClass(teacher.Status) }>{ teacher.Status }</td>
 									<td>{ getDisplayValue(teacher.Sex) }</td>
 									<td class="date-cell">{ getDisplayValue(teacher.Birthdate) }</td>
 									<td>{ getDisplayValue(teacher.Address) }</td>
@@ -77,6 +115,17 @@ templ Teachers(data TeacherData) {
 											<div class="color-box" style={ "background-color: " + teacher.AssignedColor }></div>
 											<span>{ teacher.AssignedColor }</span>
 										</div>
+									</td>
+									<td>
+										if teacher.Status == "pending" {
+											<button
+												type="button"
+												class="approve-btn"
+												hx-post={ utils.URL("/teachers/approve") }
+												hx-vals={ `{"id": "` + teacher.ID + `"}` }
+												hx-swap="none"
+											>Approve</button>
+										}
 									</td>
 								</tr>
 							}

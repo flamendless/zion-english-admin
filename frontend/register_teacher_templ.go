@@ -106,7 +106,22 @@ func RegisterTeacher(loggedIn bool, role auth.Role) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"form-group\"><label for=\"ratePerClass\">Rate Per Class *</label> <input type=\"number\" id=\"ratePerClass\" name=\"ratePerClass\" required step=\"0.01\" min=\"0\" placeholder=\"0.00\"></div><div class=\"form-group\"><label for=\"assignedColor\">Assigned Color (optional)</label><div class=\"color-group\"><input type=\"color\" id=\"assignedColor\" name=\"assignedColor\" value=\"#B9D283\" _=\"\n\t\t\t\t\t\t\t\t\t\ton input\n\t\t\t\t\t\t\t\t\t\t\tset #colorPreview.style.backgroundColor to me.value\n\t\t\t\t\t\t\t\t\t\t\tset #colorValue.textContent to me.value\n\t\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\t\"><div class=\"color-preview\" id=\"colorPreview\" style=\"background-color: #B9D283;\"></div><span id=\"colorValue\">#B9D283</span></div></div></div><button type=\"submit\" id=\"submitBtn\" hx-indicator=\"Registering teacher...\">Register Teacher</button></form><div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"form-group\"><label for=\"ratePerClass\">Rate Per Class *</label> <input type=\"number\" id=\"ratePerClass\" name=\"ratePerClass\" required step=\"0.01\" min=\"0\" placeholder=\"0.00\"></div><div class=\"form-group\"><label for=\"assignedColor\">Assigned Color (optional)</label><div class=\"color-group\"><input type=\"color\" id=\"assignedColor\" name=\"assignedColor\" value=\"#B9D283\" _=\"\n\t\t\t\t\t\t\t\t\t\ton input\n\t\t\t\t\t\t\t\t\t\t\tset #colorPreview.style.backgroundColor to me.value\n\t\t\t\t\t\t\t\t\t\t\tset #colorValue.textContent to me.value\n\t\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\t\"><div class=\"color-preview\" id=\"colorPreview\" style=\"background-color: #B9D283;\"></div><span id=\"colorValue\">#B9D283</span></div></div></div><button type=\"submit\" id=\"submitBtn\" hx-indicator=\"Registering teacher...\">Register Teacher</button></form>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if loggedIn {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div id=\"logOutput\" style=\"display: none;\"></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

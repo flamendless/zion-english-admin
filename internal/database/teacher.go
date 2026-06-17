@@ -29,6 +29,7 @@ func GetAllTeachers(db Service) ([]Teacher, error) {
 			Currency:       r.Currency,
 			DriveUrl:       r.DriveUrl,
 			Sex:            r.Sex,
+			Status:         r.Status,
 			CreatedAt:      r.CreatedAt,
 			UpdatedAt:      r.UpdatedAt,
 		}

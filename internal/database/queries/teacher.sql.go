@@ -10,10 +10,19 @@ import (
 	"database/sql"
 )
 
+const approveTeacher = `-- name: ApproveTeacher :exec
+UPDATE tbl_teachers SET status = 'approved', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending'
+`
+
+func (q *Queries) ApproveTeacher(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, approveTeacher, id)
+	return err
+}
+
 const getAllTeachers = `-- name: GetAllTeachers :many
-SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at
+SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
 FROM tbl_teachers
-ORDER BY name ASC
+ORDER BY CASE status WHEN 'pending' THEN 0 ELSE 1 END, name ASC
 `
 
 type GetAllTeachersRow struct {
@@ -34,6 +43,7 @@ type GetAllTeachersRow struct {
 	Template       sql.NullString
 	CreatedAt      sql.NullTime
 	UpdatedAt      sql.NullTime
+	Status         string
 }
 
 func (q *Queries) GetAllTeachers(ctx context.Context) ([]GetAllTeachersRow, error) {
@@ -63,6 +73,77 @@ func (q *Queries) GetAllTeachers(ctx context.Context) ([]GetAllTeachersRow, erro
 			&i.Template,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.Status,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getApprovedTeachers = `-- name: GetApprovedTeachers :many
+SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
+FROM tbl_teachers
+WHERE status = 'approved'
+ORDER BY name ASC
+`
+
+type GetApprovedTeachersRow struct {
+	ID             int64
+	Name           string
+	Birthdate      string
+	Address        string
+	JoiningDate    string
+	MobileNumber   string
+	Email          string
+	Certifications sql.NullString
+	AssignedColor  string
+	RatePerClass   float64
+	Currency       string
+	DriveUrl       string
+	Sex            sql.NullString
+	Password       string
+	Template       sql.NullString
+	CreatedAt      sql.NullTime
+	UpdatedAt      sql.NullTime
+	Status         string
+}
+
+func (q *Queries) GetApprovedTeachers(ctx context.Context) ([]GetApprovedTeachersRow, error) {
+	rows, err := q.db.QueryContext(ctx, getApprovedTeachers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetApprovedTeachersRow
+	for rows.Next() {
+		var i GetApprovedTeachersRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Birthdate,
+			&i.Address,
+			&i.JoiningDate,
+			&i.MobileNumber,
+			&i.Email,
+			&i.Certifications,
+			&i.AssignedColor,
+			&i.RatePerClass,
+			&i.Currency,
+			&i.DriveUrl,
+			&i.Sex,
+			&i.Password,
+			&i.Template,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Status,
 		); err != nil {
 			return nil, err
 		}
@@ -78,7 +159,7 @@ func (q *Queries) GetAllTeachers(ctx context.Context) ([]GetAllTeachersRow, erro
 }
 
 const getTeacherByEmail = `-- name: GetTeacherByEmail :one
-SELECT id, name, email, password FROM tbl_teachers WHERE email = ?
+SELECT id, name, email, password, status FROM tbl_teachers WHERE email = ?
 `
 
 type GetTeacherByEmailRow struct {
@@ -86,6 +167,7 @@ type GetTeacherByEmailRow struct {
 	Name     string
 	Email    string
 	Password string
+	Status   string
 }
 
 func (q *Queries) GetTeacherByEmail(ctx context.Context, email string) (GetTeacherByEmailRow, error) {
@@ -96,6 +178,7 @@ func (q *Queries) GetTeacherByEmail(ctx context.Context, email string) (GetTeach
 		&i.Name,
 		&i.Email,
 		&i.Password,
+		&i.Status,
 	)
 	return i, err
 }
@@ -128,6 +211,17 @@ func (q *Queries) GetTeacherByName(ctx context.Context, name string) (int64, err
 	return count, err
 }
 
+const getTeacherCountByEmail = `-- name: GetTeacherCountByEmail :one
+SELECT COUNT(*) as count FROM tbl_teachers WHERE email = ?
+`
+
+func (q *Queries) GetTeacherCountByEmail(ctx context.Context, email string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getTeacherCountByEmail, email)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getTeacherIDByName = `-- name: GetTeacherIDByName :one
 SELECT id FROM tbl_teachers WHERE name = ?
 `
@@ -140,8 +234,8 @@ func (q *Queries) GetTeacherIDByName(ctx context.Context, name string) (int64, e
 }
 
 const insertTeacher = `-- name: InsertTeacher :exec
-INSERT INTO tbl_teachers (name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO tbl_teachers (name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, status)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 type InsertTeacherParams struct {
@@ -158,6 +252,7 @@ type InsertTeacherParams struct {
 	DriveUrl       string
 	Sex            sql.NullString
 	Password       string
+	Status         string
 }
 
 func (q *Queries) InsertTeacher(ctx context.Context, arg InsertTeacherParams) error {
@@ -175,6 +270,7 @@ func (q *Queries) InsertTeacher(ctx context.Context, arg InsertTeacherParams) er
 		arg.DriveUrl,
 		arg.Sex,
 		arg.Password,
+		arg.Status,
 	)
 	return err
 }

@@ -6,7 +6,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
+	"net/mail"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -27,25 +29,44 @@ import (
 	"zion-english/internal/utils"
 
 	"github.com/spf13/cobra"
-	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 )
 
-func parseFloat64(n string) float64 {
+func requireFloat64(n string) (float64, error) {
+	if n == "" {
+		return 0, errors.New("missing numeric value")
+	}
 	v, err := strconv.ParseFloat(n, 64)
 	if err != nil {
-		logs.Log().Error("parse float 64", zap.Error(err), zap.String("n", n))
+		return 0, fmt.Errorf("invalid number: %s", n)
 	}
-	return v
+	return v, nil
 }
 
-func parseInt64(n string) int64 {
+func requireInt64(n string) (int64, error) {
+	if n == "" {
+		return 0, errors.New("missing integer value")
+	}
 	v, err := strconv.ParseInt(n, 10, 64)
 	if err != nil {
-		logs.Log().Error("parse int 64", zap.Error(err), zap.String("n", n))
+		return 0, fmt.Errorf("invalid integer: %s", n)
 	}
-	return v
+	return v, nil
+}
+
+func clientIP(r *http.Request) string {
+	if forwarded := r.Header.Get("X-Forwarded-For"); forwarded != "" {
+		if ip, _, ok := strings.Cut(forwarded, ","); ok {
+			return strings.TrimSpace(ip)
+		}
+		return strings.TrimSpace(forwarded)
+	}
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		return r.RemoteAddr
+	}
+	return host
 }
 
 func getOrCreateUserAgentID(ctx context.Context, db database.Service, userAgentStr string) int64 {
@@ -79,13 +100,71 @@ func validatePassword(p string) bool {
 		constants.ReSpecial.MatchString(p)
 }
 
+func setSuccessFlash(w http.ResponseWriter, msg string) {
+	cfg := conf.Conf()
+	cookie := &http.Cookie{
+		Name:     "success_flash",
+		Value:    url.QueryEscape(msg),
+		Path:     cfg.BasePath,
+		SameSite: http.SameSiteStrictMode,
+	}
+	if cfg.IsProd() {
+		cookie.Secure = true
+	}
+	http.SetCookie(w, cookie)
+}
+
+func readFlashCookie(w http.ResponseWriter, r *http.Request, name string) string {
+	cookie, err := r.Cookie(name)
+	if err != nil || cookie.Value == "" {
+		return ""
+	}
+
+	msg, err := url.QueryUnescape(cookie.Value)
+	if err != nil {
+		msg = cookie.Value
+	}
+
+	cfg := conf.Conf()
+	clearCookie := &http.Cookie{
+		Name:     name,
+		Value:    "",
+		Path:     cfg.BasePath,
+		MaxAge:   -1,
+		SameSite: http.SameSiteStrictMode,
+	}
+	if cfg.IsProd() {
+		clearCookie.Secure = true
+	}
+	http.SetCookie(w, clearCookie)
+
+	return msg
+}
+
 func HttpError(w http.ResponseWriter, msg string, code int) {
-	http.SetCookie(w, &http.Cookie{
-		Name:  "error_flash",
-		Value: url.QueryEscape(msg),
-		Path:  "/",
-	})
+	cfg := conf.Conf()
+	cookie := &http.Cookie{
+		Name:     "error_flash",
+		Value:    url.QueryEscape(msg),
+		Path:     cfg.BasePath,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	}
+	if cfg.IsProd() {
+		cookie.Secure = true
+	}
+	http.SetCookie(w, cookie)
 	http.Error(w, msg, code)
+}
+
+func securityHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-Frame-Options", "DENY")
+		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
+		w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:")
+		next.ServeHTTP(w, r)
+	})
 }
 
 func HttpRedirect(w http.ResponseWriter, url string) {
@@ -99,14 +178,6 @@ func redirectToPortal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Redirect(w, r, utils.URL("/"), http.StatusFound)
-}
-
-func teacherRegisterAllowed(r *http.Request) (auth.User, bool) {
-	user, loggedIn := auth.UserFromRequest(r, conf.Conf())
-	if !loggedIn {
-		return user, true
-	}
-	return user, user.Role == auth.RoleSuperuser
 }
 
 type WebFlags struct {
@@ -169,6 +240,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/students", auth.RequireRole(auth.RoleSuperuser)(handleStudents))
 		authMux.HandleFunc(basePath+"/students/register", auth.RequireRole(auth.RoleSuperuser)(handleStudentRegister))
 		authMux.HandleFunc(basePath+"/teachers", auth.RequireRole(auth.RoleSuperuser)(handleTeachers))
+		authMux.HandleFunc(basePath+"/teachers/approve", auth.RequireRole(auth.RoleSuperuser)(handleTeacherApprove))
 		authMux.HandleFunc(basePath+"/classes/record", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClassRecord))
 		authMux.HandleFunc(basePath+"/classes", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClasses))
 		authMux.HandleFunc(basePath+"/logs", auth.RequireRole(auth.RoleSuperuser)(handleSystemLogs))
@@ -205,6 +277,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/students", authHandler)
 		rootMux.Handle(basePath+"/students/", authHandler)
 		rootMux.Handle(basePath+"/teachers", authHandler)
+		rootMux.Handle(basePath+"/teachers/approve", authHandler)
 		rootMux.Handle(basePath+"/classes", authHandler)
 		rootMux.Handle(basePath+"/classes/", authHandler)
 		rootMux.Handle(basePath+"/api/teachers", authHandler)
@@ -212,7 +285,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/api/class-records", authHandler)
 		rootMux.Handle(basePath+"/api/me/students", authHandler)
 
-		handler := rootMux
+		handler := securityHeaders(rootMux)
 
 		port := webFlags.port
 		if !strings.HasPrefix(port, ":") {
@@ -250,10 +323,13 @@ var cmdWeb = &cobra.Command{
 	},
 }
 
-var logMessages []string
+type requestLogs struct {
+	messages []string
+}
 
-func addLog(msg string) {
-	logMessages = append(logMessages, fmt.Sprintf("[%s] %s", time.Now().Format("15:04:05"), msg))
+func (l *requestLogs) add(msg string) {
+	entry := fmt.Sprintf("[%s] %s", time.Now().Format("15:04:05"), msg)
+	l.messages = append(l.messages, entry)
 	logs.Log().Info(msg)
 }
 
@@ -298,8 +374,7 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ctx := r.Context()
-
-	logMessages = []string{}
+	rl := &requestLogs{}
 	var req models.ProcessRequest
 	var outputPath string
 
@@ -325,7 +400,7 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	addLog("Processing request for: " + req.Name)
+	rl.add("Processing request for: " + req.Name)
 
 	inputPath := filepath.Join("tmp", fmt.Sprintf("%s_input.csv", req.Name))
 	if err := sheet.DownloadDriveSheet(req.DriveURL, inputPath); err != nil {
@@ -333,7 +408,7 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	addLog("Downloaded file to: " + inputPath)
+	rl.add("Downloaded file to: " + inputPath)
 
 	parsedStartDate, err := processor.ParseDateString(req.StartDate)
 	if err != nil {
@@ -378,10 +453,10 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	addLog(fmt.Sprintf("Processed %d records", len(records)))
+	rl.add(fmt.Sprintf("Processed %d records", len(records)))
 
 	if len(records) == 0 {
-		addLog("No record found...")
+		rl.add("No record found...")
 		sendErrorLog(w, "no record found")
 		return
 	}
@@ -394,7 +469,7 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	addLog("Saved output to: " + outputPath)
+	rl.add("Saved output to: " + outputPath)
 
 	var total float64
 	var minRow, maxRow int
@@ -441,12 +516,18 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 
 	logToDB(dbRW, &req, r.UserAgent(), outputPath, "")
 
+	teacherID, err := requireInt64(req.TeacherID)
+	if err != nil {
+		sendErrorLog(w, "invalid teacher ID")
+		return
+	}
+
 	updateTeacherErr := dbRW.GetQueries().UpdateTeacherTemplate(ctx, queries.UpdateTeacherTemplateParams{
-		ID:       parseInt64(req.TeacherID),
+		ID:       teacherID,
 		Template: sql.NullString{String: req.Template, Valid: true},
 	})
 	if updateTeacherErr != nil {
-		logs.Log().Error("update teacher template", zap.Error(err))
+		logs.Log().Error("update teacher template", zap.Error(updateTeacherErr))
 	} else {
 		user := auth.GetUser(ctx)
 		if err := dbRW.GetQueries().InsertLog(ctx, queries.InsertLogParams{
@@ -475,105 +556,11 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 		rowRange,
 		total,
 		processRecords,
-		logMessages,
+		rl.messages,
 	).Render(ctx, w); err != nil {
 		logs.Log().Error("failed to render process response", zap.Error(err))
 		sendErrorLog(w, err.Error())
 	}
-}
-
-type FinalizeRequest struct {
-	Name     string `form:"name"`
-	DriveURL string `form:"driveUrl"`
-}
-
-func handleFinalize(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	if err := r.ParseForm(); err != nil {
-		sendErrorResponseHTML(w, "Invalid request", http.StatusBadRequest)
-		return
-	}
-
-	req := FinalizeRequest{
-		Name:     r.FormValue("name"),
-		DriveURL: r.FormValue("driveUrl"),
-	}
-
-	if req.Name == "" || req.DriveURL == "" {
-		sendErrorResponseHTML(w, "Missing name or spreadsheet URL", http.StatusBadRequest)
-		return
-	}
-
-	outputPath := filepath.Join("tmp", fmt.Sprintf("%s_output.xlsx", req.Name))
-	if _, err := os.Stat(outputPath); os.IsNotExist(err) {
-		sendErrorResponseHTML(w, "Output file not found. Please process CSV first.", http.StatusNotFound)
-		return
-	}
-
-	f, err := excelize.OpenFile(outputPath)
-	if err != nil {
-		sendErrorResponseHTML(w, fmt.Sprintf("Failed to open output file: %v", err), http.StatusInternalServerError)
-		return
-	}
-	defer f.Close()
-
-	sheetName := "Sheet1"
-	rows, err := f.GetRows(sheetName)
-	if err != nil {
-		sendErrorResponseHTML(w, fmt.Sprintf("Failed to read sheet: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	rowNum := 0
-	for _, row := range rows {
-		rowNum++
-		if rowNum < 4 {
-			continue
-		}
-		if len(row) < 4 {
-			continue
-		}
-
-		studentName := row[0]
-		date := row[1]
-		if studentName == "" || date == "" {
-			continue
-		}
-
-		durationMinutes := row[2]
-		rate := row[3]
-		status := row[len(row)-1]
-
-		durationFloat := 0.0
-		if durationMinutes != "" {
-			durationFloat = parseFloat64(durationMinutes)
-		}
-
-		rateFloat := 0.0
-		if rate != "" {
-			rateFloat = parseFloat64(rate)
-		}
-
-		err = dbRW.GetQueries().InsertRecord(r.Context(), queries.InsertRecordParams{
-			GoogleDriveUrl:  req.DriveURL,
-			StudentName:     studentName,
-			Date:            date,
-			DurationMinutes: durationFloat,
-			Rate:            rateFloat,
-			Status:          status,
-		})
-		if err != nil {
-			sendErrorResponseHTML(w, fmt.Sprintf("Failed to insert record: %v", err), http.StatusInternalServerError)
-			return
-		}
-	}
-
-	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprintf(w, `<div class="log-success">✓ Successfully finalized %d records</div>`, rowNum-3)
 }
 
 func handleDownload(w http.ResponseWriter, r *http.Request) {
@@ -610,7 +597,7 @@ func validateProcessRequest(req *models.ProcessRequest) error {
 	if req.DriveURL == "" {
 		return errors.New("google spreadsheet url is required")
 	}
-	if !strings.Contains(req.DriveURL, "docs.google.com") {
+	if _, err := utils.DriveURLToExportURL(req.DriveURL, "csv"); err != nil {
 		return errors.New("invalid Google Spreadsheet URL")
 	}
 
@@ -643,12 +630,6 @@ func validateProcessRequest(req *models.ProcessRequest) error {
 	}
 
 	return nil
-}
-
-func sendErrorResponseHTML(w http.ResponseWriter, message string, statusCode int) {
-	w.Header().Set("Content-Type", "text/html")
-	w.WriteHeader(statusCode)
-	fmt.Fprintf(w, `<div class="log-error">✗ %s</div>`, message)
 }
 
 func escapeHTML(s string) string {
@@ -790,10 +771,21 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logMessages = []string{}
+	rl := &requestLogs{}
 
 	if err := r.ParseForm(); err != nil {
 		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
+		return
+	}
+
+	ratePerClass, err := requireFloat64(r.FormValue("ratePerClass"))
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+	teacherID, err := requireInt64(r.FormValue("teacher"))
+	if err != nil {
+		sendErrorLog(w, err.Error())
 		return
 	}
 
@@ -801,11 +793,11 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		Name:          r.FormValue("name"),
 		Currency:      r.FormValue("currency"),
 		Contact:       r.FormValue("contact"),
-		RatePerClass:  parseFloat64(r.FormValue("ratePerClass")),
+		RatePerClass:  ratePerClass,
 		ParentName:    r.FormValue("parentName"),
 		AssignedColor: r.FormValue("assignedColor"),
 		Status:        r.FormValue("status"),
-		TeacherID:     parseInt64(r.FormValue("teacher")),
+		TeacherID:     teacherID,
 	}
 
 	if err := validateStudentRequest(&req); err != nil {
@@ -813,7 +805,7 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	addLog(fmt.Sprintf("Registering student: %s", req.Name))
+	rl.add(fmt.Sprintf("Registering student: %s", req.Name))
 
 	existingCount, err := dbRW.GetQueries().GetStudentByName(r.Context(), req.Name)
 	if err != nil {
@@ -854,16 +846,16 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		sendErrorLog(w, fmt.Sprintf("Failed to assign teacher: %v", err))
 		return
 	}
-	addLog(fmt.Sprintf("Assigned student to teacher ID: %d", req.TeacherID))
+	rl.add(fmt.Sprintf("Assigned student to teacher ID: %d", req.TeacherID))
 
-	addLog(fmt.Sprintf("Successfully registered student: %s", req.Name))
+	rl.add(fmt.Sprintf("Successfully registered student: %s", req.Name))
 
-	if _, err := fmt.Fprintf(w, fmt.Sprintf("Student '%s' registered successfully\n", req.Name)); err != nil {
+	if _, err := fmt.Fprintf(w, "Student '%s' registered successfully\n", req.Name); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
 
-	for _, log := range logMessages {
+	for _, log := range rl.messages {
 		if _, err := fmt.Fprint(w, log+"\n"); err != nil {
 			sendErrorLog(w, err.Error())
 			return
@@ -901,18 +893,6 @@ func validateStudentRequest(req *models.StudentRegisterRequest) error {
 	return nil
 }
 
-func sendStudentErrorResponse(w http.ResponseWriter, message string) {
-	response := models.StudentRegisterResponse{
-		Success: false,
-		Message: message,
-		Logs:    logMessages,
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusBadRequest)
-	json.NewEncoder(w).Encode(response)
-}
-
 func handleTeachers(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -941,6 +921,7 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 			Currency:       t.Currency,
 			DriveUrl:       t.DriveUrl,
 			Sex:            t.Sex.String,
+			Status:         t.Status,
 			CreatedAt:      t.CreatedAt.Time.Format("2006-01-02 15:04:05"),
 		}
 	}
@@ -950,17 +931,21 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
-	user, allowed := teacherRegisterAllowed(r)
-	if !allowed {
-		redirectToPortal(w, r)
-		return
+	user, loggedIn := auth.UserFromRequest(r, conf.Conf())
+	var role auth.Role
+	if loggedIn && auth.SessionUserValid(r.Context(), dbRO.GetQueries(), user) {
+		role = user.Role
+		if role == auth.RoleTeacher {
+			HttpError(w, "Access denied", http.StatusForbidden)
+			return
+		}
 	}
 
+	isSuperuser := role == auth.RoleSuperuser
+
 	if r.Method == http.MethodGet {
-		loggedIn := user.Role != ""
-		role := user.Role
-		if err := frontend.RegisterTeacher(loggedIn, role).Render(r.Context(), w); err != nil {
-			HttpError(w, err.Error(), http.StatusMethodNotAllowed)
+		if err := frontend.RegisterTeacher(isSuperuser, role).Render(r.Context(), w); err != nil {
+			HttpError(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}
@@ -970,10 +955,16 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logMessages = []string{}
+	rl := &requestLogs{}
 
 	if err := r.ParseForm(); err != nil {
 		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
+		return
+	}
+
+	ratePerClass, err := requireFloat64(r.FormValue("ratePerClass"))
+	if err != nil {
+		sendErrorLog(w, err.Error())
 		return
 	}
 
@@ -986,7 +977,7 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		Email:          r.FormValue("email"),
 		Certifications: r.FormValue("certifications"),
 		AssignedColor:  r.FormValue("assignedColor"),
-		RatePerClass:   parseFloat64(r.FormValue("ratePerClass")),
+		RatePerClass:   ratePerClass,
 		Currency:       r.FormValue("currency"),
 		DriveUrl:       r.FormValue("driveUrl"),
 		Sex:            r.FormValue("sex"),
@@ -999,7 +990,7 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	addLog(fmt.Sprintf("Registering teacher: %s", req.Name))
+	rl.add(fmt.Sprintf("Registering teacher: %s", req.Name))
 
 	existingCount, err := dbRW.GetQueries().GetTeacherByName(r.Context(), req.Name)
 	if err != nil {
@@ -1012,8 +1003,13 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.Password != req.RetypePassword {
-		sendErrorLog(w, "Passwords must be the same")
+	emailCount, err := dbRW.GetQueries().GetTeacherCountByEmail(r.Context(), req.Email)
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+	if emailCount > 0 {
+		sendErrorLog(w, "A teacher with this email already exists")
 		return
 	}
 
@@ -1025,6 +1021,11 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 
 	if req.AssignedColor == "" {
 		req.AssignedColor = "#B9D283"
+	}
+
+	teacherStatus := string(constants.TeacherStatusPending)
+	if isSuperuser {
+		teacherStatus = string(constants.TeacherStatusApproved)
 	}
 
 	err = dbRW.GetQueries().InsertTeacher(r.Context(), queries.InsertTeacherParams{
@@ -1041,19 +1042,43 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		DriveUrl:       req.DriveUrl,
 		Sex:            sql.NullString{String: req.Sex, Valid: req.Sex != ""},
 		Password:       string(hashedPassword),
+		Status:         teacherStatus,
 	})
 	if err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
 
-	addLog(fmt.Sprintf("Successfully registered teacher: %s", req.Name))
+	rl.add(fmt.Sprintf("Successfully registered teacher: %s", req.Name))
+
+	if isSuperuser {
+		if _, err := fmt.Fprintf(w, "Teacher '%s' registered successfully\n", req.Name); err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+		for _, log := range rl.messages {
+			if _, err := fmt.Fprint(w, log+"\n"); err != nil {
+				sendErrorLog(w, err.Error())
+				return
+			}
+		}
+		return
+	}
+
+	setSuccessFlash(w, "Registration successful. Please wait for admin approval before logging in.")
 	HttpRedirect(w, "/auth/login")
 }
 
 func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
 	if req.Name == "" {
 		return errors.New("name is required")
+	}
+
+	if req.Email == "" {
+		return errors.New("email is required")
+	}
+	if _, err := mail.ParseAddress(req.Email); err != nil {
+		return errors.New("invalid email address")
 	}
 
 	if req.JoiningDate == "" {
@@ -1071,6 +1096,9 @@ func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
 
 	if req.DriveUrl == "" {
 		return errors.New("spreadsheet URL is required")
+	}
+	if _, err := utils.DriveURLToExportURL(req.DriveUrl, "csv"); err != nil {
+		return errors.New("invalid spreadsheet URL")
 	}
 
 	validSex := map[string]bool{"M": true, "F": true}
@@ -1093,6 +1121,32 @@ func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
 	return nil
 }
 
+func handleTeacherApprove(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
+		return
+	}
+
+	teacherID, err := requireInt64(r.FormValue("id"))
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	if err := dbRW.GetQueries().ApproveTeacher(r.Context(), teacherID); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	setSuccessFlash(w, "Teacher approved successfully.")
+	HttpRedirect(w, "/teachers")
+}
+
 func sendErrorLog(w http.ResponseWriter, message string) {
 	logs.Log().Error(message)
 	w.WriteHeader(http.StatusBadRequest)
@@ -1108,7 +1162,7 @@ func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	teachers, err := dbRO.GetQueries().GetAllTeachers(r.Context())
+	teachers, err := dbRO.GetQueries().GetApprovedTeachers(r.Context())
 	if err != nil {
 		HttpError(w, "Failed to fetch teachers", http.StatusInternalServerError)
 		return
@@ -1136,14 +1190,17 @@ func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Handle Login]"
-	ctx := r.Context()
-	if _, loggedIn := auth.UserFromRequest(r, conf.Conf()); loggedIn {
-		redirectToPortal(w, r)
-		return
+	if user, loggedIn := auth.UserFromRequest(r, conf.Conf()); loggedIn {
+		if auth.SessionUserValid(r.Context(), dbRO.GetQueries(), user) {
+			redirectToPortal(w, r)
+			return
+		}
+		auth.ClearSession(w)
 	}
 
 	if r.Method == http.MethodGet {
-		if err := frontend.Login().Render(ctx, w); err != nil {
+		successMsg := readFlashCookie(w, r, "success_flash")
+		if err := frontend.Login(successMsg).Render(r.Context(), w); err != nil {
 			HttpError(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
@@ -1151,6 +1208,13 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodPost {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ip := clientIP(r)
+	if !auth.LoginAllowed(ip) {
+		fmt.Fprint(w, "Too many login attempts. Please try again later.")
+		return
 	}
 
 	if err := r.ParseForm(); err != nil {
@@ -1162,19 +1226,27 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 	if email == "" || password == "" {
+		auth.RecordLoginFailure(ip)
 		fmt.Fprint(w, "Invalid email or password")
 		return
 	}
 
-	if err := auth.Login(w, r, conf.Conf(), dbRO.GetQueries(), email, password); err != nil {
+	user, err := auth.Login(w, r, conf.Conf(), dbRO.GetQueries(), email, password)
+	if err != nil {
+		auth.RecordLoginFailure(ip)
+		if errors.Is(err, auth.ErrTeacherPendingApproval) {
+			fmt.Fprint(w, err.Error())
+			return
+		}
 		fmt.Fprint(w, "Invalid email or password")
 		return
 	}
+	auth.ResetLoginFailures(ip)
 
-	if ua := r.UserAgent(); ua != "" {
-		useragentID := getOrCreateUserAgentID(context.Background(), dbRW, ua)
-		if _, err := dbRW.GetQueries().CreateAccess(context.Background(), queries.CreateAccessParams{
-			TeacherID:   auth.GetUser(ctx).ID,
+	if ua := r.UserAgent(); ua != "" && user.Role == auth.RoleTeacher && user.ID != 0 {
+		useragentID := getOrCreateUserAgentID(r.Context(), dbRW, ua)
+		if _, err := dbRW.GetQueries().CreateAccess(r.Context(), queries.CreateAccessParams{
+			TeacherID:   user.ID,
 			UseragentID: useragentID,
 		}); err != nil {
 			logs.Log().Warn(logtag, zap.Error(err))
@@ -1185,7 +1257,6 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleLogout(w http.ResponseWriter, r *http.Request) {
-	const logtag = "[Handle Logout]"
 	if r.Method != http.MethodPost {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -1355,9 +1426,15 @@ func handleGetClassRecords(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleClassRecord(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	user := auth.GetUser(ctx)
+	role := auth.GetRole(ctx)
+
 	if r.Method == http.MethodGet {
 		w.Header().Set("Content-Type", "text/html")
-		frontend.RecordClass().Render(r.Context(), w)
+		frontend.RecordClass(frontend.RecordClassData{
+			IsSuperuser: role == auth.RoleSuperuser,
+		}).Render(ctx, w)
 		return
 	}
 
@@ -1366,25 +1443,48 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx := r.Context()
-	user := auth.GetUser(ctx)
-	if user.ID == 0 {
+	if role == auth.RoleTeacher && user.ID == 0 {
 		HttpError(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	logMessages = []string{}
+	rl := &requestLogs{}
 	if err := r.ParseForm(); err != nil {
 		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
 		return
 	}
 
+	studentID, err := requireInt64(r.FormValue("student"))
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+	duration, err := requireInt64(r.FormValue("duration"))
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+	rate, err := requireFloat64(r.FormValue("rate"))
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	teacherID := user.ID
+	if role == auth.RoleSuperuser {
+		teacherID, err = requireInt64(r.FormValue("teacher"))
+		if err != nil {
+			sendErrorLog(w, "teacher is required")
+			return
+		}
+	}
+
 	req := models.ClassRecordRequest{
-		StudentID:       parseInt64(r.FormValue("student")),
-		TeacherID:       user.ID,
+		StudentID:       studentID,
+		TeacherID:       teacherID,
 		Date:            r.FormValue("date"),
-		DurationMinutes: parseInt64(r.FormValue("duration")),
-		Rate:            parseFloat64(r.FormValue("rate")),
+		DurationMinutes: duration,
+		Rate:            rate,
 		Currency:        r.FormValue("currency"),
 		Status:          r.FormValue("status"),
 		Reason:          r.FormValue("reason"),
@@ -1395,7 +1495,22 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := dbRW.GetQueries().InsertClassRecord(r.Context(), queries.InsertClassRecordParams{
+	if role == auth.RoleTeacher {
+		assigned, err := dbRO.GetQueries().IsStudentAssignedToTeacher(ctx, queries.IsStudentAssignedToTeacherParams{
+			TeacherID: teacherID,
+			StudentID: studentID,
+		})
+		if err != nil {
+			sendErrorLog(w, "Failed to verify student assignment")
+			return
+		}
+		if assigned == 0 {
+			sendErrorLog(w, "student is not assigned to this teacher")
+			return
+		}
+	}
+
+	err = dbRW.GetQueries().InsertClassRecord(ctx, queries.InsertClassRecordParams{
 		StudentID:       req.StudentID,
 		TeacherID:       req.TeacherID,
 		Date:            req.Date,
@@ -1416,8 +1531,8 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	addLog("Class recorded successfully")
-	for _, log := range logMessages {
+	rl.add("Class recorded successfully")
+	for _, log := range rl.messages {
 		if _, err := fmt.Fprint(w, log+"\n"); err != nil {
 			sendErrorLog(w, err.Error())
 			return
@@ -1468,13 +1583,4 @@ func validateClassRecordRequest(req *models.ClassRecordRequest) error {
 		return errors.New("invalid status")
 	}
 	return nil
-}
-
-func sendLogs(w http.ResponseWriter) {
-	for _, log := range logMessages {
-		if _, err := fmt.Fprint(w, log+"\n"); err != nil {
-			sendErrorLog(w, err.Error())
-			return
-		}
-	}
 }

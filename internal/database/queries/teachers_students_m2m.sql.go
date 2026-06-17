@@ -133,3 +133,19 @@ func (q *Queries) InsertTeacherStudentM2M(ctx context.Context, arg InsertTeacher
 	_, err := q.db.ExecContext(ctx, insertTeacherStudentM2M, arg.TeacherID, arg.StudentID)
 	return err
 }
+
+const isStudentAssignedToTeacher = `-- name: IsStudentAssignedToTeacher :one
+SELECT COUNT(*) as count FROM tbl_teachers_students_m2m WHERE teacher_id = ? AND student_id = ?
+`
+
+type IsStudentAssignedToTeacherParams struct {
+	TeacherID int64
+	StudentID int64
+}
+
+func (q *Queries) IsStudentAssignedToTeacher(ctx context.Context, arg IsStudentAssignedToTeacherParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, isStudentAssignedToTeacher, arg.TeacherID, arg.StudentID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}

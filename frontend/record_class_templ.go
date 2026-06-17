@@ -8,10 +8,14 @@ package frontend
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "zion-english/internal/utils"
 import "time"
+import "zion-english/internal/utils"
 
-func RecordClass() templ.Component {
+type RecordClassData struct {
+	IsSuperuser bool
+}
+
+func RecordClass(data RecordClassData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -39,7 +43,7 @@ func RecordClass() templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 13, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 17, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -69,41 +73,122 @@ func RecordClass() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<form id=\"recordForm\" hx-post=\"")
+		if data.IsSuperuser {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<form id=\"recordForm\" hx-post=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/classes/record"))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 29, Col: 43}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-swap=\"innerHTML\" hx-target=\"#logOutput\" hx-indicator=\"#submitBtn\" _=\"\n\t\t\t\t\t\ton submit\n\t\t\t\t\t\t\tif #teacher.value is ''\n\t\t\t\t\t\t\t\talert('Please select a teacher')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #student.value is ''\n\t\t\t\t\t\t\t\talert('Please select a student')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #duration.value <= 0\n\t\t\t\t\t\t\t\talert('Invalid duration')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #rate.value < 0\n\t\t\t\t\t\t\t\talert('Invalid rate')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\tend\n\t\t\t\t\t\"><div class=\"form-row\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = TeacherDropdown().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = StudentDropdown().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = RecordClassFields().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</form>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<form id=\"recordForm\" hx-post=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/classes/record"))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 64, Col: 43}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-swap=\"innerHTML\" hx-target=\"#logOutput\" hx-indicator=\"#submitBtn\" _=\"\n\t\t\t\t\t\ton submit\n\t\t\t\t\t\t\tif #student.value is ''\n\t\t\t\t\t\t\t\talert('Please select a student')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #duration.value <= 0\n\t\t\t\t\t\t\t\talert('Invalid duration')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #rate.value < 0\n\t\t\t\t\t\t\t\talert('Invalid rate')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\tend\n\t\t\t\t\t\"><div class=\"form-row\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = TeacherStudentsDropdown().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = RecordClassFields().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</form>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/classes/record"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 24, Col: 42}
+		return nil
+	})
+}
+
+func RecordClassFields() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var5 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var5 == nil {
+			templ_7745c5c3_Var5 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"form-row\"><div class=\"form-group\"><label for=\"date\">Date *</label> <input type=\"date\" id=\"date\" name=\"date\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-swap=\"innerHTML\" hx-target=\"#logOutput\" hx-indicator=\"#submitBtn\" _=\"\n\t\t\t\t\ton submit\n\t\t\t\t\t\tif #teacher.value is ''\n\t\t\t\t\t\t\talert('Please select a teacher')\n\t\t\t\t\t\t\thalt\n\t\t\t\t\t\tend\n\t\t\t\t\t\tif #student.value is ''\n\t\t\t\t\t\t\talert('Please select a student')\n\t\t\t\t\t\t\thalt\n\t\t\t\t\t\tend\n\t\t\t\t\t\tif #duration.value <= 0\n\t\t\t\t\t\t\talert('Invalid duration')\n\t\t\t\t\t\t\thalt\n\t\t\t\t\t\tend\n\t\t\t\t\t\tif #rate.value < 0\n\t\t\t\t\t\t\talert('Invalid rate')\n\t\t\t\t\t\t\thalt\n\t\t\t\t\t\tend\n\t\t\t\t\tend\n\t\t\t\t\"><div class=\"form-row\"><!-- @MeTeacherDropdown() -->")
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(time.Now().Format("2006-01-02"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 110, Col: 43}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TeacherStudentsDropdown().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div><div class=\"form-row\"><div class=\"form-group\"><label for=\"date\">Date *</label> <input type=\"date\" id=\"date\" name=\"date\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(time.Now().Format("2006-01-02"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 61, Col: 46}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" required></div><div class=\"form-group\"><label for=\"duration\">Duration (minutes) *</label> <input type=\"number\" id=\"duration\" name=\"duration\" required min=\"1\" placeholder=\"e.g., 60\"></div></div><div class=\"form-row\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" required></div><div class=\"form-group\"><label for=\"duration\">Duration (minutes) *</label> <input type=\"number\" id=\"duration\" name=\"duration\" required min=\"1\" placeholder=\"e.g., 60\"></div></div><div class=\"form-row\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -111,7 +196,7 @@ func RecordClass() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"form-group\"><label for=\"rate\">Rate *</label> <input type=\"number\" id=\"rate\" name=\"rate\" required min=\"0\" step=\"0.01\" placeholder=\"0.00\"></div></div><div class=\"form-row\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"form-group\"><label for=\"rate\">Rate *</label> <input type=\"number\" id=\"rate\" name=\"rate\" required min=\"0\" step=\"0.01\" placeholder=\"0.00\"></div></div><div class=\"form-row\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -119,7 +204,7 @@ func RecordClass() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"form-group\"><label for=\"reason\">Reason</label> <input type=\"text\" id=\"reason\" name=\"reason\" placeholder=\"Reason for cancellation/reschedule\"></div></div><button type=\"submit\" id=\"submitBtn\">Record Class</button></form><div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"form-group\"><label for=\"reason\">Reason</label> <input type=\"text\" id=\"reason\" name=\"reason\" placeholder=\"Reason for cancellation/reschedule\"></div></div><button type=\"submit\" id=\"submitBtn\">Record Class</button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

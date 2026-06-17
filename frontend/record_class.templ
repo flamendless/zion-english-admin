@@ -1,9 +1,13 @@
 package frontend
 
-import "zion-english/internal/utils"
 import "time"
+import "zion-english/internal/utils"
 
-templ RecordClass() {
+type RecordClassData struct {
+	IsSuperuser bool
+}
+
+templ RecordClass(data RecordClassData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
@@ -19,73 +23,72 @@ templ RecordClass() {
 			@SuccessBanner()
 			@ErrorBanner()
 
-			<form
-				id="recordForm"
-				hx-post={ utils.URL("/classes/record") }
-				hx-swap="innerHTML"
-				hx-target="#logOutput"
-				hx-indicator="#submitBtn"
-				_="
-					on submit
-						if #teacher.value is ''
-							alert('Please select a teacher')
-							halt
+			if data.IsSuperuser {
+				<form
+					id="recordForm"
+					hx-post={ utils.URL("/classes/record") }
+					hx-swap="innerHTML"
+					hx-target="#logOutput"
+					hx-indicator="#submitBtn"
+					_="
+						on submit
+							if #teacher.value is ''
+								alert('Please select a teacher')
+								halt
+							end
+							if #student.value is ''
+								alert('Please select a student')
+								halt
+							end
+							if #duration.value <= 0
+								alert('Invalid duration')
+								halt
+							end
+							if #rate.value < 0
+								alert('Invalid rate')
+								halt
+							end
 						end
-						if #student.value is ''
-							alert('Please select a student')
-							halt
+					"
+				>
+					<div class="form-row">
+						@TeacherDropdown()
+						@StudentDropdown()
+					</div>
+
+					@RecordClassFields()
+				</form>
+			} else {
+				<form
+					id="recordForm"
+					hx-post={ utils.URL("/classes/record") }
+					hx-swap="innerHTML"
+					hx-target="#logOutput"
+					hx-indicator="#submitBtn"
+					_="
+						on submit
+							if #student.value is ''
+								alert('Please select a student')
+								halt
+							end
+							if #duration.value <= 0
+								alert('Invalid duration')
+								halt
+							end
+							if #rate.value < 0
+								alert('Invalid rate')
+								halt
+							end
 						end
-						if #duration.value <= 0
-							alert('Invalid duration')
-							halt
-						end
-						if #rate.value < 0
-							alert('Invalid rate')
-							halt
-						end
-					end
-				"
-			>
-				<div class="form-row">
-					<!-- @MeTeacherDropdown() -->
-					@TeacherStudentsDropdown()
-				</div>
-
-				<div class="form-row">
-					<div class="form-group">
-						<label for="date">Date *</label>
-						<input
-							type="date"
-							id="date"
-							name="date"
-							value={ time.Now().Format("2006-01-02") }
-							required
-						>
+					"
+				>
+					<div class="form-row">
+						@TeacherStudentsDropdown()
 					</div>
-					<div class="form-group">
-						<label for="duration">Duration (minutes) *</label>
-						<input type="number" id="duration" name="duration" required min="1" placeholder="e.g., 60">
-					</div>
-				</div>
 
-				<div class="form-row">
-					@CurrencyDropdown()
-					<div class="form-group">
-						<label for="rate">Rate *</label>
-						<input type="number" id="rate" name="rate" required min="0" step="0.01" placeholder="0.00">
-					</div>
-				</div>
-
-				<div class="form-row">
-					@ClassStatusDropdown()
-					<div class="form-group">
-						<label for="reason">Reason</label>
-						<input type="text" id="reason" name="reason" placeholder="Reason for cancellation/reschedule">
-					</div>
-				</div>
-
-				<button type="submit" id="submitBtn">Record Class</button>
-			</form>
+					@RecordClassFields()
+				</form>
+			}
 
 			<div class="logs-section">
 				<h3>Logs and Errors</h3>
@@ -94,4 +97,41 @@ templ RecordClass() {
 		</div>
 	</body>
 	</html>
+}
+
+templ RecordClassFields() {
+	<div class="form-row">
+		<div class="form-group">
+			<label for="date">Date *</label>
+			<input
+				type="date"
+				id="date"
+				name="date"
+				value={ time.Now().Format("2006-01-02") }
+				required
+			>
+		</div>
+		<div class="form-group">
+			<label for="duration">Duration (minutes) *</label>
+			<input type="number" id="duration" name="duration" required min="1" placeholder="e.g., 60">
+		</div>
+	</div>
+
+	<div class="form-row">
+		@CurrencyDropdown()
+		<div class="form-group">
+			<label for="rate">Rate *</label>
+			<input type="number" id="rate" name="rate" required min="0" step="0.01" placeholder="0.00">
+		</div>
+	</div>
+
+	<div class="form-row">
+		@ClassStatusDropdown()
+		<div class="form-group">
+			<label for="reason">Reason</label>
+			<input type="text" id="reason" name="reason" placeholder="Reason for cancellation/reschedule">
+		</div>
+	</div>
+
+	<button type="submit" id="submitBtn">Record Class</button>
 }

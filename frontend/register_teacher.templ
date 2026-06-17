@@ -172,10 +172,14 @@ templ RegisterTeacher(loggedIn bool, role auth.Role) {
 						hx-indicator="Registering teacher..."
 					>Register Teacher</button>
 				</form>
-				<div class="logs-section">
-					<h3>Logs and Errors</h3>
-					<div id="logOutput">Waiting for submission...</div>
-				</div>
+				if loggedIn {
+					<div class="logs-section">
+						<h3>Logs and Errors</h3>
+						<div id="logOutput">Waiting for submission...</div>
+					</div>
+				} else {
+					<div id="logOutput" style="display: none;"></div>
+				}
 			</div>
 		</body>
 	</html>

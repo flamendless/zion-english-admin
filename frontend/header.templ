@@ -98,6 +98,24 @@ templ SuccessBannerHandlers() {
 			}
 		}
 
+		(function() {
+			function readSuccessFlash() {
+				const banner = document.getElementById('successBanner');
+				const cookiePath = document.getElementById('errorBanner')?.dataset.basePath || '/';
+				const match = document.cookie.match(/success_flash=([^;]+)/);
+				if (match && banner) {
+					showSuccessBanner(decodeURIComponent(match[1].replace(/\+/g, ' ')));
+					document.cookie = 'success_flash=; Max-Age=0; path=' + encodeURIComponent(cookiePath);
+				}
+			}
+
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', readSuccessFlash);
+			} else {
+				readSuccessFlash();
+			}
+		})();
+
 		document.addEventListener('htmx:afterRequest', function(evt) {
 			if (evt.detail.successful) {
 				const xhr = evt.detail.xhr;
@@ -111,7 +129,7 @@ templ SuccessBannerHandlers() {
 }
 
 templ ErrorBanner() {
-	<div id="errorBanner" class="error-banner"></div>
+	<div id="errorBanner" class="error-banner" data-base-path={ utils.BasePath() }></div>
 }
 
 templ ErrorBannerScript(message string) {
@@ -143,10 +161,12 @@ templ ErrorBannerHandlers() {
 		}
 
 		(function() {
+			const banner = document.getElementById('errorBanner');
+			const cookiePath = banner?.dataset.basePath || '/';
 			const match = document.cookie.match(/error_flash=([^;]+)/);
 			if (match) {
 				showErrorBanner(decodeURIComponent(match[1].replace(/\+/g, ' ')));
-				document.cookie = 'error_flash=; Max-Age=0; path=/';
+				document.cookie = 'error_flash=; Max-Age=0; path=' + encodeURIComponent(cookiePath);
 			}
 		})();
 

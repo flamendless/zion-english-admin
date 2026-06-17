@@ -2,7 +2,7 @@ package frontend
 
 import "zion-english/internal/utils"
 
-templ Login() {
+templ Login(successMessage string) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -12,6 +12,8 @@ templ Login() {
 			<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 
 			@GlobalIncludes()
+			@SuccessBanner()
+			@ErrorBanner()
 			<style>
 				body.login-page {
 					min-height: 100vh;
@@ -146,10 +148,23 @@ templ Login() {
 						</button>
 					</div>
 				</form>
+				<p style="text-align: center; margin-top: 20px;">
+					<a href={ utils.URL("/teachers/register") }>Register as a teacher</a>
+				</p>
 				<div class="login-flam">
 					@Flam()
 				</div>
 			</div>
+			if successMessage != "" {
+				@SuccessBannerScript(successMessage)
+			}
+			<script>
+				document.body.addEventListener('htmx:afterSwap', function(evt) {
+					if (evt.detail.target.id === 'loginError' && evt.detail.target.textContent.trim()) {
+						showErrorBanner(evt.detail.target.textContent.trim());
+					}
+				});
+			</script>
 		</body>
 	</html>
 }

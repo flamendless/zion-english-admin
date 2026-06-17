@@ -2,6 +2,9 @@
 INSERT INTO tbl_teachers_students_m2m (teacher_id, student_id)
 VALUES (?, ?);
 
+-- name: IsStudentAssignedToTeacher :one
+SELECT COUNT(*) as count FROM tbl_teachers_students_m2m WHERE teacher_id = ? AND student_id = ?;
+
 -- name: GetStudentsByTeacherID :many
 SELECT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
 FROM tbl_students s

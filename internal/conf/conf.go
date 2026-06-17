@@ -27,6 +27,12 @@ func Conf() *Config {
 		if co.AppEnv != "local" && co.AppEnv != "prod" {
 			panic(fmt.Sprintf("Invalid APP_ENV. Got '%s'", co.AppEnv))
 		}
+		if co.Secret == "" {
+			panic("SECRET is required")
+		}
+		if co.SuperuserUsername == "" || co.SuperuserPassword == "" {
+			panic("SUPERUSER_USERNAME and SUPERUSER_PASSWORD are required")
+		}
 
 		cfg = &co
 	})
