@@ -41,6 +41,18 @@ type TblLog struct {
 	CreatedAt string
 }
 
+type TblPasswordResetEvent struct {
+	ID         int64
+	Email      string
+	IpAddress  string
+	TeacherID  sql.NullInt64
+	ResetToken sql.NullString
+	Status     string
+	Event      string
+	CreatedAt  string
+	ExpiresAt  sql.NullString
+}
+
 type TblProcessingLog struct {
 	ID             int64
 	GoogleDriveUrl string

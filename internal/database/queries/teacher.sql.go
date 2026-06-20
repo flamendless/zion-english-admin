@@ -284,6 +284,20 @@ func (q *Queries) UnapproveTeacher(ctx context.Context, id int64) error {
 	return err
 }
 
+const updateTeacherPassword = `-- name: UpdateTeacherPassword :exec
+UPDATE tbl_teachers SET password = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+`
+
+type UpdateTeacherPasswordParams struct {
+	Password string
+	ID       int64
+}
+
+func (q *Queries) UpdateTeacherPassword(ctx context.Context, arg UpdateTeacherPasswordParams) error {
+	_, err := q.db.ExecContext(ctx, updateTeacherPassword, arg.Password, arg.ID)
+	return err
+}
+
 const updateTeacherTemplate = `-- name: UpdateTeacherTemplate :exec
 UPDATE tbl_teachers SET template = ? WHERE id = ?
 `

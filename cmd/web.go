@@ -28,6 +28,7 @@ import (
 	"zion-english/internal/sheet"
 	"zion-english/internal/utils"
 
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
@@ -227,6 +228,8 @@ var cmdWeb = &cobra.Command{
 		})
 		publicMux.HandleFunc(basePath+"/auth/login", handleLogin)
 		publicMux.HandleFunc(basePath+"/auth/logout", handleLogout)
+		publicMux.HandleFunc(basePath+"/auth/forgot-password", handleForgotPassword)
+		publicMux.HandleFunc(basePath+"/auth/forgot-password/reset", handleResetPassword)
 		publicMux.HandleFunc(basePath+"/teachers/register", handleTeacherRegister)
 
 		publicMux.Handle(
@@ -1291,6 +1294,249 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 	}
 	auth.Logout(w)
 	HttpRedirect(w, "/")
+}
+
+const passwordResetTokenTTL = 30 * time.Minute
+
+func insertPasswordResetEvent(ctx context.Context, email, ip, status, event string, teacherID sql.NullInt64, token sql.NullString, expires sql.NullString) error {
+	return dbRW.GetQueries().InsertPasswordResetEvent(ctx, queries.InsertPasswordResetEventParams{
+		Email:      email,
+		IpAddress:  ip,
+		TeacherID:  teacherID,
+		ResetToken: token,
+		Status:     status,
+		Event:      event,
+		ExpiresAt:  expires,
+	})
+}
+
+func passwordResetTokenValid(ctx context.Context, token string) (queries.TblPasswordResetEvent, error) {
+	tokenNull := sql.NullString{String: token, Valid: token != ""}
+	if token == "" {
+		return queries.TblPasswordResetEvent{}, errors.New("missing token")
+	}
+
+	completed, err := dbRO.GetQueries().HasCompletedPasswordResetForToken(ctx, tokenNull)
+	if err != nil {
+		return queries.TblPasswordResetEvent{}, err
+	}
+	if completed > 0 {
+		return queries.TblPasswordResetEvent{}, errors.New("token already used")
+	}
+
+	row, err := dbRO.GetQueries().GetPasswordResetByToken(ctx, tokenNull)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return queries.TblPasswordResetEvent{}, errors.New("invalid token")
+		}
+		return queries.TblPasswordResetEvent{}, err
+	}
+
+	if !row.ExpiresAt.Valid {
+		return queries.TblPasswordResetEvent{}, errors.New("token expired")
+	}
+	expires, err := time.Parse("2006-01-02 15:04:05", row.ExpiresAt.String)
+	if err != nil {
+		return queries.TblPasswordResetEvent{}, errors.New("token expired")
+	}
+	if time.Now().After(expires) {
+		_ = insertPasswordResetEvent(ctx, row.Email, row.IpAddress, "failed", "token_expired", row.TeacherID, tokenNull, row.ExpiresAt)
+		return queries.TblPasswordResetEvent{}, errors.New("token expired")
+	}
+
+	return row, nil
+}
+
+func handleForgotPassword(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Handle Forgot Password]"
+	ctx := r.Context()
+
+	if user, loggedIn := auth.UserFromRequest(r, conf.Conf()); loggedIn {
+		if auth.SessionUserValid(ctx, dbRO.GetQueries(), user) {
+			redirectToPortal(w, r)
+			return
+		}
+		auth.ClearSession(w)
+	}
+
+	if r.Method == http.MethodGet {
+		successMsg := readFlashCookie(w, r, "success_flash")
+		if err := frontend.ForgotPassword(successMsg).Render(ctx, w); err != nil {
+			HttpError(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ip := clientIP(r)
+	if err := r.ParseForm(); err != nil {
+		logs.Log().Error(logtag, zap.Error(err))
+		http.Error(w, "Invalid form submission", http.StatusBadRequest)
+		return
+	}
+
+	email := strings.TrimSpace(r.FormValue("email"))
+	if email == "" {
+		if err := frontend.ForgotPasswordError("Email is required").Render(ctx, w); err != nil {
+			HttpError(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	if _, err := mail.ParseAddress(email); err != nil {
+		if err := frontend.ForgotPasswordError("Invalid email address").Render(ctx, w); err != nil {
+			HttpError(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	if !auth.ResetRequestAllowed(ip) {
+		if err := insertPasswordResetEvent(ctx, email, ip, "blocked", "ip_rate_limited", sql.NullInt64{}, sql.NullString{}, sql.NullString{}); err != nil {
+			logs.Log().Error(logtag, zap.Error(err))
+		}
+		if err := frontend.ForgotPasswordError("Too many attempts. Please try again in 30 minutes.").Render(ctx, w); err != nil {
+			HttpError(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	auth.RecordResetRequest(ip)
+
+	if err := insertPasswordResetEvent(ctx, email, ip, "requested", "request_submitted", sql.NullInt64{}, sql.NullString{}, sql.NullString{}); err != nil {
+		logs.Log().Error(logtag, zap.Error(err))
+	}
+
+	teacher, err := dbRO.GetQueries().GetTeacherByEmail(ctx, email)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			if err := insertPasswordResetEvent(ctx, email, ip, "requested", "email_not_found", sql.NullInt64{}, sql.NullString{}, sql.NullString{}); err != nil {
+				logs.Log().Error(logtag, zap.Error(err))
+			}
+			if err := frontend.ForgotPasswordSuccess().Render(ctx, w); err != nil {
+				HttpError(w, err.Error(), http.StatusInternalServerError)
+			}
+			return
+		}
+		logs.Log().Error(logtag, zap.Error(err))
+		HttpError(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	if teacher.Status != "approved" {
+		if err := insertPasswordResetEvent(ctx, email, ip, "requested", "teacher_pending", sql.NullInt64{Int64: teacher.ID, Valid: true}, sql.NullString{}, sql.NullString{}); err != nil {
+			logs.Log().Error(logtag, zap.Error(err))
+		}
+		if err := frontend.ForgotPasswordSuccess().Render(ctx, w); err != nil {
+			HttpError(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	resetToken := uuid.New().String()
+	expiresAt := time.Now().Add(passwordResetTokenTTL).Format("2006-01-02 15:04:05")
+	if err := insertPasswordResetEvent(ctx, email, ip, "token_issued", "token_issued", sql.NullInt64{Int64: teacher.ID, Valid: true}, sql.NullString{String: resetToken, Valid: true}, sql.NullString{String: expiresAt, Valid: true}); err != nil {
+		logs.Log().Error(logtag, zap.Error(err))
+		HttpError(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	HttpRedirect(w, "/auth/forgot-password/reset?token="+url.QueryEscape(resetToken))
+}
+
+func handleResetPassword(w http.ResponseWriter, r *http.Request) {
+	const logtag = "[Handle Reset Password]"
+	ctx := r.Context()
+
+	if user, loggedIn := auth.UserFromRequest(r, conf.Conf()); loggedIn {
+		if auth.SessionUserValid(ctx, dbRO.GetQueries(), user) {
+			redirectToPortal(w, r)
+			return
+		}
+		auth.ClearSession(w)
+	}
+
+	if r.Method == http.MethodGet {
+		token := r.URL.Query().Get("token")
+		row, err := passwordResetTokenValid(ctx, token)
+		if err != nil {
+			setSuccessFlash(w, "Password reset sent")
+			http.Redirect(w, r, utils.URL("/auth/forgot-password"), http.StatusFound)
+			return
+		}
+		if err := frontend.ResetPassword(row.Email, token).Render(ctx, w); err != nil {
+			HttpError(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		logs.Log().Error(logtag, zap.Error(err))
+		http.Error(w, "Invalid form submission", http.StatusBadRequest)
+		return
+	}
+
+	token := r.FormValue("token")
+	email := strings.TrimSpace(r.FormValue("email"))
+	password := r.FormValue("password")
+	confirmPassword := r.FormValue("confirmPassword")
+
+	row, err := passwordResetTokenValid(ctx, token)
+	if err != nil {
+		fmt.Fprint(w, "Invalid or expired reset link. Please request a new password reset.")
+		return
+	}
+	if row.Email != email {
+		fmt.Fprint(w, "Invalid or expired reset link. Please request a new password reset.")
+		return
+	}
+	if !row.TeacherID.Valid {
+		fmt.Fprint(w, "Invalid or expired reset link. Please request a new password reset.")
+		return
+	}
+
+	if password == "" {
+		fmt.Fprint(w, "Password is required")
+		return
+	}
+	if !validatePassword(password) {
+		fmt.Fprint(w, "Password must be 8-32 characters with uppercase, lowercase, number, and symbol (!@#$%^&*?)")
+		return
+	}
+	if password != confirmPassword {
+		fmt.Fprint(w, "Passwords do not match")
+		return
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		logs.Log().Error(logtag, zap.Error(err))
+		fmt.Fprint(w, "Something went wrong")
+		return
+	}
+
+	if err := dbRW.GetQueries().UpdateTeacherPassword(ctx, queries.UpdateTeacherPasswordParams{
+		Password: string(hashedPassword),
+		ID:       row.TeacherID.Int64,
+	}); err != nil {
+		logs.Log().Error(logtag, zap.Error(err))
+		fmt.Fprint(w, "Something went wrong")
+		return
+	}
+
+	tokenNull := sql.NullString{String: token, Valid: true}
+	if err := insertPasswordResetEvent(ctx, email, row.IpAddress, "completed", "password_updated", row.TeacherID, tokenNull, row.ExpiresAt); err != nil {
+		logs.Log().Error(logtag, zap.Error(err))
+	}
+
+	setSuccessFlash(w, "Password reset successfully. Please log in.")
+	HttpRedirect(w, "/auth/login")
 }
 
 func handleGetRole(w http.ResponseWriter, r *http.Request) {

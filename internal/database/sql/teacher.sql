@@ -36,3 +36,6 @@ SELECT id, name, template FROM tbl_teachers WHERE id = ?;
 
 -- name: UpdateTeacherTemplate :exec
 UPDATE tbl_teachers SET template = ? WHERE id = ?;
+
+-- name: UpdateTeacherPassword :exec
+UPDATE tbl_teachers SET password = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?;

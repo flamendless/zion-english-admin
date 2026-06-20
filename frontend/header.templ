@@ -73,13 +73,18 @@ templ SuccessBanner() {
 templ SuccessBannerScript(message string) {
 	<script>
 		(function() {
-			const banner = document.getElementById('successBanner');
-			if (banner) {
-				banner.textContent = $message$;
-				banner.classList.add('show');
-				setTimeout(() => {
-					banner.classList.remove('show');
-				}, 3000);
+			const msg = {{ message }};
+			if (typeof showSuccessBanner === 'function') {
+				showSuccessBanner(msg);
+			} else {
+				const banner = document.getElementById('successBanner');
+				if (banner) {
+					banner.textContent = msg;
+					banner.classList.add('show');
+					setTimeout(() => {
+						banner.classList.remove('show');
+					}, 3000);
+				}
 			}
 		})();
 	</script>

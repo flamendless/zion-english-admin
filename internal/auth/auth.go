@@ -19,6 +19,7 @@ import (
 )
 
 var loginLimiter = NewLoginLimiter(5, 15*time.Minute)
+var resetRequestLimiter = NewLoginLimiter(3, 30*time.Minute)
 
 type Claims struct {
 	UserID int64  `json:"user_id"`
@@ -38,6 +39,14 @@ func RecordLoginFailure(ip string) {
 
 func ResetLoginFailures(ip string) {
 	loginLimiter.Reset(ip)
+}
+
+func ResetRequestAllowed(ip string) bool {
+	return resetRequestLimiter.Allow(ip)
+}
+
+func RecordResetRequest(ip string) {
+	resetRequestLimiter.RecordFailure(ip)
 }
 
 var ErrTeacherPendingApproval = errors.New("your account is pending approval. please wait for an administrator to approve your registration")
