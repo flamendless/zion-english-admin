@@ -37,13 +37,6 @@ func getTeacherRowClass(status string) string {
 	return ""
 }
 
-func getTeacherRowStyle(status, assignedColor string) string {
-	if status == "approved" && assignedColor != "" {
-		return "background-color: " + assignedColor
-	}
-	return ""
-}
-
 func getTeacherStatusClass(status string) string {
 	if status == "approved" {
 		return "status-active"
@@ -196,7 +189,7 @@ templ Teachers(data TeacherData) {
 						</thead>
 						<tbody>
 							for i, teacher := range data.Teachers {
-								<tr class={ getTeacherRowClass(teacher.Status) } style={ getTeacherRowStyle(teacher.Status, teacher.AssignedColor) }>
+								<tr class={ getTeacherRowClass(teacher.Status) }>
 									<td class="num-cell">{ fmt.Sprintf("%d", i+1) }</td>
 									<td>{ teacher.Name }</td>
 									<td class={ getTeacherStatusClass(teacher.Status) }>{ teacher.Status }</td>
