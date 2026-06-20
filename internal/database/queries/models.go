@@ -34,11 +34,12 @@ type TblClassRecord struct {
 }
 
 type TblLog struct {
-	ID        int64
-	Module    string
-	Message   string
-	CreatedBy sql.NullInt64
-	CreatedAt string
+	ID            int64
+	Module        string
+	Message       string
+	CreatedBy     sql.NullInt64
+	CreatedAt     string
+	CreatedByName sql.NullString
 }
 
 type TblPasswordResetEvent struct {

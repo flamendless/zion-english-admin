@@ -535,10 +535,15 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 		logs.Log().Error("update teacher template", zap.Error(updateTeacherErr))
 	} else {
 		user := auth.GetUser(ctx)
+		var createdBy sql.NullInt64
+		if user.ID > 0 {
+			createdBy = sql.NullInt64{Int64: user.ID, Valid: true}
+		}
 		if err := dbRW.GetQueries().InsertLog(ctx, queries.InsertLogParams{
-			Module:    "process",
-			Message:   fmt.Sprintf("update teacher '%s' template with '%s'", req.Name, req.Template),
-			CreatedBy: sql.NullInt64{Int64: user.ID, Valid: true},
+			Module:        "process",
+			Message:       fmt.Sprintf("update teacher '%s' template with '%s'", req.Name, req.Template),
+			CreatedBy:     createdBy,
+			CreatedByName: sql.NullString{String: user.Name, Valid: user.Name != ""},
 		}); err != nil {
 			logs.Log().Info("system logs", zap.Error(err))
 		}
@@ -715,15 +720,11 @@ func handleSystemLogs(w http.ResponseWriter, r *http.Request) {
 
 	viewLogs := make([]frontend.SystemLogItem, len(logs))
 	for i, l := range logs {
-		createdBy := ""
-		if l.CreatedByName.Valid {
-			createdBy = l.CreatedByName.String
-		}
 		viewLogs[i] = frontend.SystemLogItem{
 			ID:        strconv.FormatInt(l.ID, 10),
 			Module:    l.Module,
 			Message:   l.Message,
-			CreatedBy: createdBy,
+			CreatedBy: l.CreatedByName,
 			CreatedAt: l.CreatedAt,
 		}
 	}

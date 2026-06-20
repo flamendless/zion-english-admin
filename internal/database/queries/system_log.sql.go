@@ -11,7 +11,8 @@ import (
 )
 
 const getAllLogs = `-- name: GetAllLogs :many
-SELECT l.id, l.module, l.message, l.created_by, l.created_at, t.name as created_by_name
+SELECT l.id, l.module, l.message, l.created_by, l.created_at,
+    COALESCE(t.name, l.created_by_name) as created_by_name
 FROM tbl_logs l
 LEFT JOIN tbl_teachers t ON l.created_by = t.id
 ORDER BY l.created_at DESC
@@ -23,7 +24,7 @@ type GetAllLogsRow struct {
 	Message       string
 	CreatedBy     sql.NullInt64
 	CreatedAt     string
-	CreatedByName sql.NullString
+	CreatedByName string
 }
 
 func (q *Queries) GetAllLogs(ctx context.Context) ([]GetAllLogsRow, error) {
@@ -61,19 +62,26 @@ INSERT INTO tbl_logs (
     module,
     message,
     created_by,
+    created_by_name,
     created_at
 ) VALUES (
-    ?, ?, ?, datetime('now')
+    ?, ?, ?, ?, datetime('now')
 )
 `
 
 type InsertLogParams struct {
-	Module    string
-	Message   string
-	CreatedBy sql.NullInt64
+	Module        string
+	Message       string
+	CreatedBy     sql.NullInt64
+	CreatedByName sql.NullString
 }
 
 func (q *Queries) InsertLog(ctx context.Context, arg InsertLogParams) error {
-	_, err := q.db.ExecContext(ctx, insertLog, arg.Module, arg.Message, arg.CreatedBy)
+	_, err := q.db.ExecContext(ctx, insertLog,
+		arg.Module,
+		arg.Message,
+		arg.CreatedBy,
+		arg.CreatedByName,
+	)
 	return err
 }
