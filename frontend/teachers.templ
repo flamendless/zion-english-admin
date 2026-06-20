@@ -1,6 +1,9 @@
 package frontend
 
-import "zion-english/internal/utils"
+import (
+	"fmt"
+	"zion-english/internal/utils"
+)
 
 type TeacherData struct {
 	Teachers []TeacherItem
@@ -28,6 +31,16 @@ func getTeacherRowClass(status string) string {
 	if status == "pending" {
 		return "teacher-pending"
 	}
+	if status == "approved" {
+		return "teacher-approved"
+	}
+	return ""
+}
+
+func getTeacherRowStyle(status, assignedColor string) string {
+	if status == "approved" && assignedColor != "" {
+		return "background-color: " + assignedColor
+	}
 	return ""
 }
 
@@ -36,6 +49,22 @@ func getTeacherStatusClass(status string) string {
 		return "status-active"
 	}
 	return "status-inactive"
+}
+
+templ CopyableTextCell(value string) {
+	if value != "" {
+		<div class="copyable-cell">
+			<span class="copyable-text" title={ value }>{ value }</span>
+			<button type="button" class="copy-btn" data-copy={ value } onclick="copyCellText(this)" title="Copy to clipboard" aria-label="Copy to clipboard">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+					<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+				</svg>
+			</button>
+		</div>
+	} else {
+		<span>-</span>
+	}
 }
 
 templ Teachers(data TeacherData) {
@@ -52,21 +81,90 @@ templ Teachers(data TeacherData) {
 				background-color: #fff5f5;
 			}
 
-			.approve-btn {
-				background-color: var(--color-primary);
-				color: #333;
+			#teachersTable tr.teacher-approved:hover {
+				filter: brightness(0.92);
+			}
+
+			.copyable-cell {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				max-width: 220px;
+			}
+
+			.copyable-text {
+				flex: 1;
+				min-width: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.copy-btn {
+				flex-shrink: 0;
+				background: none;
+				border: none;
+				padding: 4px;
+				margin: 0;
+				cursor: pointer;
+				color: #555;
+				border-radius: 4px;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.copy-btn:hover {
+				background-color: rgba(0, 0, 0, 0.08);
+				opacity: 1;
+			}
+
+			.copy-btn.copied {
+				color: #28a745;
+			}
+
+			.approve-btn,
+			.unapprove-btn {
 				border: none;
 				padding: 6px 12px;
 				border-radius: 4px;
 				cursor: pointer;
 				font-size: 13px;
 				font-weight: 500;
+				margin-top: 0;
 			}
 
-			.approve-btn:hover {
+			.approve-btn {
+				background-color: var(--color-primary);
+				color: #333;
+			}
+
+			.unapprove-btn {
+				background-color: #f59e0b;
+				color: #333;
+			}
+
+			.approve-btn:hover,
+			.unapprove-btn:hover {
 				opacity: 0.9;
 			}
+
+			.num-cell {
+				width: 48px;
+				text-align: center;
+				color: #666;
+			}
 		</style>
+		<script>
+			function copyCellText(btn) {
+				const text = btn.dataset.copy;
+				if (!text) return;
+				navigator.clipboard.writeText(text).then(function () {
+					btn.classList.add('copied');
+					setTimeout(function () { btn.classList.remove('copied'); }, 1500);
+				});
+			}
+		</script>
 	</head>
 	<body>
 		<div class="container">
@@ -81,41 +179,36 @@ templ Teachers(data TeacherData) {
 					<table id="teachersTable">
 						<thead>
 							<tr>
+								<th>#</th>
 								<th>Name</th>
 								<th>Status</th>
-								<th>Sex</th>
-								<th>Birthdate</th>
-								<th>Address</th>
-								<th>Joining Date</th>
-								<th>Mobile</th>
 								<th>Email</th>
-								<th>Rate Per Class</th>
+								<th>Mobile Number</th>
 								<th>Spreadsheet URL</th>
+								<th>Sex</th>
+								<th>Address</th>
 								<th>Certifications</th>
-								<th>Assigned Color</th>
-								<th>Action</th>
+								<th>Birthdate</th>
+								<th>Joining Date</th>
+								<th>Rates Per Class</th>
+								<th>Actions</th>
 							</tr>
 						</thead>
 						<tbody>
-							for _, teacher := range data.Teachers {
-								<tr class={ getTeacherRowClass(teacher.Status) }>
+							for i, teacher := range data.Teachers {
+								<tr class={ getTeacherRowClass(teacher.Status) } style={ getTeacherRowStyle(teacher.Status, teacher.AssignedColor) }>
+									<td class="num-cell">{ fmt.Sprintf("%d", i+1) }</td>
 									<td>{ teacher.Name }</td>
 									<td class={ getTeacherStatusClass(teacher.Status) }>{ teacher.Status }</td>
-									<td>{ getDisplayValue(teacher.Sex) }</td>
-									<td class="date-cell">{ getDisplayValue(teacher.Birthdate) }</td>
-									<td>{ getDisplayValue(teacher.Address) }</td>
-									<td class="date-cell">{ teacher.JoiningDate }</td>
-									<td>{ getDisplayValue(teacher.MobileNumber) }</td>
 									<td class="email-cell">{ getDisplayValue(teacher.Email) }</td>
-									<td class="rate-cell">{ formatRate(teacher.RatePerClass, teacher.Currency) }</td>
+									<td>{ getDisplayValue(teacher.MobileNumber) }</td>
 									<td>@displayURL(teacher.DriveUrl)</td>
-									<td>{ getDisplayValue(teacher.Certifications) }</td>
-									<td>
-										<div class="color-cell">
-											<div class="color-box" style={ "background-color: " + teacher.AssignedColor }></div>
-											<span>{ teacher.AssignedColor }</span>
-										</div>
-									</td>
+									<td>{ getDisplayValue(teacher.Sex) }</td>
+									<td>@CopyableTextCell(teacher.Address)</td>
+									<td>@CopyableTextCell(teacher.Certifications)</td>
+									<td class="date-cell">{ getDisplayValue(teacher.Birthdate) }</td>
+									<td class="date-cell">{ teacher.JoiningDate }</td>
+									<td class="rate-cell">{ formatRate(teacher.RatePerClass, teacher.Currency) }</td>
 									<td>
 										if teacher.Status == "pending" {
 											<button
@@ -125,6 +218,15 @@ templ Teachers(data TeacherData) {
 												hx-vals={ `{"id": "` + teacher.ID + `"}` }
 												hx-swap="none"
 											>Approve</button>
+										}
+										if teacher.Status == "approved" {
+											<button
+												type="button"
+												class="unapprove-btn"
+												hx-post={ utils.URL("/teachers/unapprove") }
+												hx-vals={ `{"id": "` + teacher.ID + `"}` }
+												hx-swap="none"
+											>Un-approve</button>
 										}
 									</td>
 								</tr>

@@ -275,6 +275,15 @@ func (q *Queries) InsertTeacher(ctx context.Context, arg InsertTeacherParams) er
 	return err
 }
 
+const unapproveTeacher = `-- name: UnapproveTeacher :exec
+UPDATE tbl_teachers SET status = 'pending', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'approved'
+`
+
+func (q *Queries) UnapproveTeacher(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, unapproveTeacher, id)
+	return err
+}
+
 const updateTeacherTemplate = `-- name: UpdateTeacherTemplate :exec
 UPDATE tbl_teachers SET template = ? WHERE id = ?
 `

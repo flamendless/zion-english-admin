@@ -28,6 +28,9 @@ ORDER BY name ASC;
 -- name: ApproveTeacher :exec
 UPDATE tbl_teachers SET status = 'approved', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending';
 
+-- name: UnapproveTeacher :exec
+UPDATE tbl_teachers SET status = 'pending', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'approved';
+
 -- name: GetTeacherByID :one
 SELECT id, name, template FROM tbl_teachers WHERE id = ?;
 

@@ -241,6 +241,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/students/register", auth.RequireRole(auth.RoleSuperuser)(handleStudentRegister))
 		authMux.HandleFunc(basePath+"/teachers", auth.RequireRole(auth.RoleSuperuser)(handleTeachers))
 		authMux.HandleFunc(basePath+"/teachers/approve", auth.RequireRole(auth.RoleSuperuser)(handleTeacherApprove))
+		authMux.HandleFunc(basePath+"/teachers/unapprove", auth.RequireRole(auth.RoleSuperuser)(handleTeacherUnapprove))
 		authMux.HandleFunc(basePath+"/classes/record", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClassRecord))
 		authMux.HandleFunc(basePath+"/classes", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClasses))
 		authMux.HandleFunc(basePath+"/logs", auth.RequireRole(auth.RoleSuperuser)(handleSystemLogs))
@@ -278,6 +279,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/students/", authHandler)
 		rootMux.Handle(basePath+"/teachers", authHandler)
 		rootMux.Handle(basePath+"/teachers/approve", authHandler)
+		rootMux.Handle(basePath+"/teachers/unapprove", authHandler)
 		rootMux.Handle(basePath+"/classes", authHandler)
 		rootMux.Handle(basePath+"/classes/", authHandler)
 		rootMux.Handle(basePath+"/api/teachers", authHandler)
@@ -1144,6 +1146,32 @@ func handleTeacherApprove(w http.ResponseWriter, r *http.Request) {
 	}
 
 	setSuccessFlash(w, "Teacher approved successfully.")
+	HttpRedirect(w, "/teachers")
+}
+
+func handleTeacherUnapprove(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
+		return
+	}
+
+	teacherID, err := requireInt64(r.FormValue("id"))
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	if err := dbRW.GetQueries().UnapproveTeacher(r.Context(), teacherID); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	setSuccessFlash(w, "Teacher set to pending.")
 	HttpRedirect(w, "/teachers")
 }
 
