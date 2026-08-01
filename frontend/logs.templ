@@ -56,46 +56,6 @@ templ ProcessingLogs(data ProcessingLogData) {
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Processing Logs - Zion English Admin Tool</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		<style>
-			.export-btn {
-				background-color: #2196F3;
-			}
-
-			.export-btn:hover {
-				background-color: #0b7dda;
-			}
-
-			.refresh-btn {
-				background-color: #FF9800;
-			}
-
-			.refresh-btn:hover {
-				background-color: #e68900;
-			}
-
-			.error-cell {
-				color: #dc3545;
-				max-width: 200px;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
-			}
-
-			.error-cell:hover {
-				white-space: normal;
-				word-break: break-word;
-			}
-
-			.success-cell {
-				color: #28a745;
-			}
-
-			.loading {
-				text-align: center;
-				padding: 40px;
-				color: #666;
-			}
-		</style>
 		@GlobalIncludes()
 	</head>
 	<body>

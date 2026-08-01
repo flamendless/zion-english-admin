@@ -2,17 +2,20 @@
 INSERT INTO tbl_teachers (name, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, status)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
--- name: GetTeacherByName :one
-SELECT COUNT(*) as count FROM tbl_teachers WHERE name = ?;
-
 -- name: GetTeacherCountByEmail :one
 SELECT COUNT(*) as count FROM tbl_teachers WHERE email = ?;
+
+-- name: GetTeacherCountByMobile :one
+SELECT COUNT(*) as count FROM tbl_teachers WHERE mobile_number = ?;
 
 -- name: GetTeacherIDByName :one
 SELECT id FROM tbl_teachers WHERE name = ?;
 
 -- name: GetTeacherByEmail :one
 SELECT id, name, email, password, status FROM tbl_teachers WHERE email = ?;
+
+-- name: GetTeacherByMobile :one
+SELECT id, name, email, password, status FROM tbl_teachers WHERE mobile_number = ?;
 
 -- name: GetAllTeachers :many
 SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status

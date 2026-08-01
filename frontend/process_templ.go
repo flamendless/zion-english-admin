@@ -44,7 +44,7 @@ func Process() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><style>\n\t\t\t.results-section {\n\t\t\t\tmargin-top: 30px;\n\t\t\t}\n\n\t\t\t.column-mapping {\n\t\t\t\tbackground-color: #f9f9f9;\n\t\t\t\tpadding: 20px;\n\t\t\t\tborder-radius: 4px;\n\t\t\t\tmargin-top: 10px;\n\t\t\t}\n\n\t\t\t.column-mapping h3 {\n\t\t\t\tmargin-bottom: 15px;\n\t\t\t\tcolor: #333;\n\t\t\t}\n\n\t\t\t.results-section h3 {\n\t\t\t\tmargin-bottom: 15px;\n\t\t\t\tcolor: #333;\n\t\t\t}\n\n\t\t\t.download-btn {\n\t\t\t\tbackground-color: #2196F3;\n\t\t\t\tmargin-top: 0;\n\t\t\t}\n\n\t\t\t.download-btn:hover {\n\t\t\t\tbackground-color: #0b7dda;\n\t\t\t}\n\n\t\t\t.clear-btn {\n\t\t\t\tbackground-color: #f44336;\n\t\t\t\tmargin-left: 10px;\n\t\t\t}\n\n\t\t\t.clear-btn:hover {\n\t\t\t\tbackground-color: #da190b;\n\t\t\t}\n\n\t\t\t.column-error {\n\t\t\t\tcolor: #dc3545;\n\t\t\t\tfont-size: 12px;\n\t\t\t\tmargin-top: 5px;\n\t\t\t\tdisplay: none;\n\t\t\t}\n\n\t\t\t.total-row {\n\t\t\t\tfont-weight: bold;\n\t\t\t\tbackground-color: #f0f0f0;\n\t\t\t}\n\n\t\t\t.log-error {\n\t\t\t\tcolor: #dc3545;\n\t\t\t\tbackground-color: #f8d7da;\n\t\t\t\tpadding: 10px;\n\t\t\t\tborder-radius: 4px;\n\t\t\t\tmargin-bottom: 10px;\n\t\t\t}\n\n\t\t\t.log-success {\n\t\t\t\tcolor: #155724;\n\t\t\t\tbackground-color: #d4edda;\n\t\t\t\tpadding: 10px;\n\t\t\t\tborder-radius: 4px;\n\t\t\t\tmargin-bottom: 10px;\n\t\t\t}\n\n\t\t\t.btn:disabled {\n\t\t\t\topacity: 0.5;\n\t\t\t\tcursor: not-allowed;\n\t\t\t}\n\n\t\t\t@media (max-width: 768px) {\n\t\t\t\t.clear-btn {\n\t\t\t\t\tmargin-left: 0;\n\t\t\t\t\tmargin-top: 10px;\n\t\t\t\t}\n\n\t\t\t\t.column-mapping {\n\t\t\t\t\tpadding: 15px;\n\t\t\t\t}\n\t\t\t}\n\t\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -75,7 +75,7 @@ func Process() templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/process"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/process.templ`, Line: 105, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/process.templ`, Line: 21, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {

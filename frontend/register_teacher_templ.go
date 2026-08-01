@@ -82,7 +82,15 @@ func RegisterTeacher(loggedIn bool, role auth.Role) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-swap=\"innerHTML\" hx-target=\"#logOutput\"><div class=\"form-row\"><div class=\"form-group\"><label for=\"firstName\">First Name *</label> <input type=\"text\" id=\"firstName\" name=\"firstName\" required placeholder=\"Enter first name\"></div><div class=\"form-group\"><label for=\"middleName\">Middle Name</label> <input type=\"text\" id=\"middleName\" name=\"middleName\" placeholder=\"Enter middle name (optional)\"></div><div class=\"form-group\"><label for=\"lastName\">Last Name *</label> <input type=\"text\" id=\"lastName\" name=\"lastName\" required placeholder=\"Enter last name\"></div></div><div class=\"form-row\"><div class=\"form-group\"><label for=\"sex\">Sex</label> <select id=\"sex\" name=\"sex\"><option value=\"\">-- Select Sex --</option> <option value=\"M\">M</option> <option value=\"F\">F</option></select></div></div><div class=\"form-group\"><label for=\"driveUrl\">Spreadsheet URL *</label> <input type=\"text\" id=\"driveUrl\" name=\"driveUrl\" required placeholder=\"https://docs.google.com/spreadsheets/...\"><div class=\"error-message\" id=\"driveUrlError\">Spreadsheet URL is required</div></div><div class=\"form-row\"><div class=\"form-group\"><label for=\"birthdate\">Birthdate *</label> <input type=\"date\" id=\"birthdate\" name=\"birthdate\" required></div><div class=\"form-group\"><label for=\"joiningDate\">Date Joined</label> <input type=\"date\" id=\"joiningDate\" name=\"joiningDate\"></div></div><div class=\"form-group\"><label for=\"address\">Address *</label> <input type=\"text\" id=\"address\" name=\"address\" placeholder=\"Enter address\" required></div><div class=\"form-row\"><div class=\"form-group\"><label for=\"mobileNumber\">Mobile Number *</label> <input type=\"text\" id=\"mobileNumber\" name=\"mobileNumber\" placeholder=\"Enter mobile number\" required></div><div class=\"form-group\"><label for=\"email\">Email *</label> <input type=\"email\" id=\"email\" name=\"email\" placeholder=\"Enter email\" required></div></div><div class=\"form-group\"><label for=\"certifications\">Certifications (comma-separated)</label> <input type=\"text\" id=\"certifications\" name=\"certifications\" placeholder=\"e.g., TESOL, CELTA, Bachelor in Education\"></div><div class=\"form-group\"><label for=\"password\">Password *</label><div class=\"password-wrapper\"><input type=\"password\" id=\"password\" name=\"password\" required minlength=\"8\" maxlength=\"32\" placeholder=\"8-32 characters with uppercase, lowercase, number, and symbol (!@#%^&*?)\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-swap=\"innerHTML\" hx-target=\"#logOutput\"><div class=\"form-row\"><div class=\"form-group\"><label for=\"firstName\">First Name *</label> <input type=\"text\" id=\"firstName\" name=\"firstName\" required placeholder=\"Enter first name\"></div><div class=\"form-group\"><label for=\"middleName\">Middle Name</label> <input type=\"text\" id=\"middleName\" name=\"middleName\" placeholder=\"Enter middle name (optional)\"></div><div class=\"form-group\"><label for=\"lastName\">Last Name *</label> <input type=\"text\" id=\"lastName\" name=\"lastName\" required placeholder=\"Enter last name\"></div></div><div class=\"form-row\"><div class=\"form-group\"><label for=\"sex\">Sex</label> <select id=\"sex\" name=\"sex\"><option value=\"\">-- Select Sex --</option> <option value=\"M\">M</option> <option value=\"F\">F</option></select></div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = DriveURLInput().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"form-row\"><div class=\"form-group\"><label for=\"birthdate\">Birthdate *</label> <input type=\"date\" id=\"birthdate\" name=\"birthdate\" required></div><div class=\"form-group\"><label for=\"joiningDate\">Date Joined</label> <input type=\"date\" id=\"joiningDate\" name=\"joiningDate\"></div></div><div class=\"form-group\"><label for=\"address\">Address *</label> <input type=\"text\" id=\"address\" name=\"address\" placeholder=\"Enter address\" required></div><div class=\"form-row\"><div class=\"form-group\"><label for=\"mobileNumber\">Mobile Number *</label> <input type=\"text\" id=\"mobileNumber\" name=\"mobileNumber\" placeholder=\"Enter mobile number\" required></div><div class=\"form-group\"><label for=\"email\">Email *</label> <input type=\"email\" id=\"email\" name=\"email\" placeholder=\"Enter email\" required></div></div><div class=\"form-group\"><label for=\"certifications\">Certifications (comma-separated)</label> <input type=\"text\" id=\"certifications\" name=\"certifications\" placeholder=\"e.g., TESOL, CELTA, Bachelor in Education\"></div><div class=\"form-group\"><label for=\"password\">Password *</label><div class=\"password-wrapper\"><input type=\"password\" id=\"password\" name=\"password\" required minlength=\"8\" maxlength=\"32\" placeholder=\"8-32 characters with uppercase, lowercase, number, and symbol (!@#%^&*?)\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -90,7 +98,7 @@ func RegisterTeacher(loggedIn bool, role auth.Role) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div></div><div class=\"form-group\"><label for=\"retypePassword\">Retype Password *</label><div class=\"password-wrapper\"><input type=\"password\" id=\"retypePassword\" name=\"retypePassword\" required minlength=\"8\" maxlength=\"32\" placeholder=\"Re-enter password\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div></div><div class=\"form-group\"><label for=\"retypePassword\">Retype Password *</label><div class=\"password-wrapper\"><input type=\"password\" id=\"retypePassword\" name=\"retypePassword\" required minlength=\"8\" maxlength=\"32\" placeholder=\"Re-enter password\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -98,7 +106,7 @@ func RegisterTeacher(loggedIn bool, role auth.Role) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div></div><div class=\"form-row-3\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></div><div class=\"form-row-3\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -106,22 +114,22 @@ func RegisterTeacher(loggedIn bool, role auth.Role) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"form-group\"><label for=\"ratePerClass\">Rate Per Class *</label> <input type=\"number\" id=\"ratePerClass\" name=\"ratePerClass\" required step=\"0.01\" min=\"0\" placeholder=\"0.00\"></div><div class=\"form-group\"><label for=\"assignedColor\">Assigned Color (optional)</label><div class=\"color-group\"><input type=\"color\" id=\"assignedColor\" name=\"assignedColor\" value=\"#B9D283\" _=\"\n\t\t\t\t\t\t\t\t\t\ton input\n\t\t\t\t\t\t\t\t\t\t\tset #colorPreview.style.backgroundColor to me.value\n\t\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\t\"><div class=\"color-preview\" id=\"colorPreview\" style=\"background-color: #B9D283;\"></div></div></div></div><button type=\"submit\" id=\"submitBtn\" hx-indicator=\"Registering teacher...\">Register Teacher</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"form-group\"><label for=\"ratePerClass\">Rate Per Class *</label> <input type=\"number\" id=\"ratePerClass\" name=\"ratePerClass\" required step=\"0.01\" min=\"0\" placeholder=\"0.00\"></div><div class=\"form-group\"><label for=\"assignedColor\">Assigned Color (optional)</label><div class=\"color-group\"><input type=\"color\" id=\"assignedColor\" name=\"assignedColor\" value=\"#90C020\" _=\"\n\t\t\t\t\t\t\t\t\t\ton input\n\t\t\t\t\t\t\t\t\t\t\tset #colorPreview.style.backgroundColor to me.value\n\t\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\t\"><div class=\"color-preview\" id=\"colorPreview\" style=\"background-color: #90C020;\"></div></div></div></div><button type=\"submit\" id=\"submitBtn\" hx-indicator=\"Registering teacher...\">Register Teacher</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if loggedIn {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div id=\"logOutput\" style=\"display: none;\"></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div id=\"logOutput\" style=\"display: none;\"></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

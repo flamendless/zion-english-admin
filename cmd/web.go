@@ -147,16 +147,19 @@ func normalizeEmail(email string) string {
 }
 
 func insertAuditLog(ctx context.Context, module, message string) {
-	user := auth.GetUser(ctx)
+	insertAuditLogAs(ctx, auth.GetUser(ctx), module, message)
+}
+
+func insertAuditLogAs(ctx context.Context, actor auth.User, module, message string) {
 	var createdBy sql.NullInt64
-	if user.ID > 0 {
-		createdBy = sql.NullInt64{Int64: user.ID, Valid: true}
+	if actor.ID > 0 {
+		createdBy = sql.NullInt64{Int64: actor.ID, Valid: true}
 	}
 	if err := dbRW.GetQueries().InsertLog(ctx, queries.InsertLogParams{
 		Module:        module,
 		Message:       message,
 		CreatedBy:     createdBy,
-		CreatedByName: sql.NullString{String: user.Name, Valid: user.Name != ""},
+		CreatedByName: sql.NullString{String: actor.Name, Valid: actor.Name != ""},
 	}); err != nil {
 		logs.Log().Info("system logs", zap.Error(err))
 	}
@@ -1067,14 +1070,18 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 
 	rl.add(fmt.Sprintf("Registering teacher: %s", req.Name))
 
-	existingCount, err := dbRW.GetQueries().GetTeacherByName(r.Context(), req.Name)
+	mobileCount, err := dbRW.GetQueries().GetTeacherCountByMobile(r.Context(), req.MobileNumber)
 	if err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
-
-	if existingCount > 0 {
-		sendErrorLog(w, "A teacher with this name already exists")
+	if mobileCount > 0 {
+		existing, lookupErr := dbRW.GetQueries().GetTeacherByMobile(r.Context(), req.MobileNumber)
+		if lookupErr == nil && existing.Status == string(constants.TeacherStatusPending) {
+			sendErrorLog(w, "An account with this mobile number is awaiting approval")
+			return
+		}
+		sendErrorLog(w, "A teacher with this mobile number already exists")
 		return
 	}
 
@@ -1138,7 +1145,15 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 
 	rl.add(fmt.Sprintf("Successfully registered teacher: %s", req.Name))
 
-	insertAuditLog(r.Context(), "teachers", fmt.Sprintf("registered teacher '%s' (status %s)", req.Name, teacherStatus))
+	auditActor := auth.GetUser(r.Context())
+	if auditActor.Name == "" {
+		if loggedIn {
+			auditActor = user
+		} else {
+			auditActor = auth.User{Name: req.Name}
+		}
+	}
+	insertAuditLogAs(r.Context(), auditActor, "teachers", fmt.Sprintf("registered teacher '%s' (status %s)", req.Name, teacherStatus))
 
 	if isSuperuser {
 		if _, err := fmt.Fprintf(w, "Teacher '%s' registered successfully\n", req.Name); err != nil {

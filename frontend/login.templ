@@ -10,119 +10,27 @@ templ Login(successMessage string) {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<title>Login - Zion English Admin</title>
 			<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-
 			@GlobalIncludes()
 			@SuccessBanner()
 			@ErrorBanner()
-			<style>
-				body.login-page {
-					min-height: 100vh;
-					display: flex;
-					justify-content: center;
-					align-items: center;
-					padding: 20px;
-					background: #f7f7f7;
-				}
-
-				.login-card {
-					background: white;
-					border-radius: 8px;
-					box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-					padding: 40px;
-					width: 100%;
-					max-width: 400px;
-				}
-
-				.login-logo {
-					display: block;
-					max-width: 200px;
-					height: auto;
-					margin: 0 auto 30px;
-				}
-
-				.login-title {
-					text-align: center;
-					margin-bottom: 30px;
-					color: #333;
-				}
-
-				.login-error {
-					background: #fee;
-					border: 1px solid #fcc;
-					color: #c33;
-					padding: 10px;
-					border-radius: 4px;
-					margin-bottom: 20px;
-					display: none;
-				}
-
-				.login-error.show,
-				.login-error:not(:empty) {
-					display: block;
-				}
-
-				.login-success {
-					background: #efe;
-					border: 1px solid #cfc;
-					color: #3c3;
-					padding: 10px;
-					border-radius: 4px;
-					margin-bottom: 20px;
-					display: none;
-				}
-
-				.login-success.show {
-					display: block;
-				}
-
-				.login-flam {
-					margin-top: 30px;
-					text-align: center;
-				}
-
-				/* Mobile responsiveness */
-				@media (max-width: 480px) {
-					body.login-page {
-						align-items: flex-start;
-						padding-top: 40px;
-					}
-
-					.login-card {
-						padding: 25px;
-						border-radius: 6px;
-					}
-
-					.login-logo {
-						max-width: 160px;
-						margin-bottom: 20px;
-					}
-
-					.login-title {
-						font-size: 22px;
-						margin-bottom: 20px;
-					}
-
-					.password-wrapper input {
-						padding-right: 65px;
-					}
-				}
-			</style>
 		</head>
 
-		<body class="login-page">
-			<div class="login-card">
-				<img src={ utils.URL("/static/logo.png") } alt="Zion English" class="login-logo"/>
-				<h1 class="login-title">Login</h1>
-				<div id="loginError" class="login-error"></div>
+		<body class="auth-page">
+			<div class="auth-card">
+				<img src={ utils.URL("/static/logo.png") } alt="Zion English" class="auth-logo"/>
+				<h1 class="auth-title">Login</h1>
+				<div id="loginError" class="login-error" role="alert"></div>
 				<div id="loginSuccess" class="login-success"></div>
 				<form>
 					<div class="form-group">
 						<label for="email">Email</label>
 						<input
 							type="email"
+							id="email"
 							name="email"
 							required
 							placeholder="Enter your email"
+							autocomplete="email"
 						/>
 					</div>
 					<div class="form-group">
@@ -134,11 +42,12 @@ templ Login(successMessage string) {
 								name="password"
 								required
 								placeholder="Enter your password"
+								autocomplete="current-password"
 							/>
 							@ShowPassword("password")
 						</div>
 					</div>
-					<div class="form-group" style="text-align: center;">
+					<div class="form-group">
 						<button
 							hx-post={ utils.URL("/auth/login") }
 							hx-target="#loginError"
@@ -148,12 +57,12 @@ templ Login(successMessage string) {
 						</button>
 					</div>
 				</form>
-				<p style="text-align: center; margin-top: 20px;">
+				<p class="auth-links">
 					<a href={ utils.URL("/teachers/register") }>Register as a teacher</a>
 					<br/>
 					<a href={ utils.URL("/auth/forgot-password") }>Forgot password?</a>
 				</p>
-				<div class="login-flam">
+				<div class="auth-footer">
 					@Flam()
 				</div>
 			</div>

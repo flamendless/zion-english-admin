@@ -101,7 +101,7 @@ func RegisterStudent() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"form-group\"><label for=\"assignedColor\">Assigned Color *</label><div class=\"color-group\"><input type=\"color\" id=\"assignedColor\" name=\"assignedColor\" required value=\"#B9D283\" _=\"\n\t\t\t\t\t\t\t\ton input\n\t\t\t\t\t\t\t\t\tset #colorPreview.style.backgroundColor to me.value\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\"><div class=\"color-preview\" id=\"colorPreview\" style=\"background-color: #B9D283;\"></div></div></div><button type=\"submit\" id=\"submitBtn\" hx-indicator=\"Registering student...\">Register Student</button></form><div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"form-group\"><label for=\"assignedColor\">Assigned Color *</label><div class=\"color-group\"><input type=\"color\" id=\"assignedColor\" name=\"assignedColor\" required value=\"#90C020\" _=\"\n\t\t\t\t\t\t\t\ton input\n\t\t\t\t\t\t\t\t\tset #colorPreview.style.backgroundColor to me.value\n\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\"><div class=\"color-preview\" id=\"colorPreview\" style=\"background-color: #90C020;\"></div></div></div><button type=\"submit\" id=\"submitBtn\" hx-indicator=\"Registering student...\">Register Student</button></form><div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

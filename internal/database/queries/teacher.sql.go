@@ -206,15 +206,29 @@ func (q *Queries) GetTeacherByID(ctx context.Context, id int64) (GetTeacherByIDR
 	return i, err
 }
 
-const getTeacherByName = `-- name: GetTeacherByName :one
-SELECT COUNT(*) as count FROM tbl_teachers WHERE name = ?
+const getTeacherByMobile = `-- name: GetTeacherByMobile :one
+SELECT id, name, email, password, status FROM tbl_teachers WHERE mobile_number = ?
 `
 
-func (q *Queries) GetTeacherByName(ctx context.Context, name string) (int64, error) {
-	row := q.db.QueryRowContext(ctx, getTeacherByName, name)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
+type GetTeacherByMobileRow struct {
+	ID       int64
+	Name     string
+	Email    string
+	Password string
+	Status   string
+}
+
+func (q *Queries) GetTeacherByMobile(ctx context.Context, mobileNumber string) (GetTeacherByMobileRow, error) {
+	row := q.db.QueryRowContext(ctx, getTeacherByMobile, mobileNumber)
+	var i GetTeacherByMobileRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.Password,
+		&i.Status,
+	)
+	return i, err
 }
 
 const getTeacherCountByEmail = `-- name: GetTeacherCountByEmail :one
@@ -223,6 +237,17 @@ SELECT COUNT(*) as count FROM tbl_teachers WHERE email = ?
 
 func (q *Queries) GetTeacherCountByEmail(ctx context.Context, email string) (int64, error) {
 	row := q.db.QueryRowContext(ctx, getTeacherCountByEmail, email)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const getTeacherCountByMobile = `-- name: GetTeacherCountByMobile :one
+SELECT COUNT(*) as count FROM tbl_teachers WHERE mobile_number = ?
+`
+
+func (q *Queries) GetTeacherCountByMobile(ctx context.Context, mobileNumber string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getTeacherCountByMobile, mobileNumber)
 	var count int64
 	err := row.Scan(&count)
 	return count, err

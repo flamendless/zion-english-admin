@@ -11,131 +11,6 @@ templ Home(role auth.Role) {
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Zion English Admin</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		<style>
-			.home-container {
-				max-width: 900px;
-				margin: 0 auto;
-				padding: 40px 20px;
-			}
-
-			.home-title {
-				text-align: center;
-				margin-bottom: 10px;
-			}
-
-			.home-logo {
-				max-width: 300px;
-				height: auto;
-			}
-
-			.home-subtitle {
-				text-align: center;
-				margin-bottom: 40px;
-				color: #666;
-				font-size: 18px;
-			}
-
-			.home-subtitle a {
-				color: var(--color-primary);
-				text-decoration: none;
-				font-weight: 500;
-			}
-
-			.home-subtitle a:hover {
-				text-decoration: underline;
-			}
-
-			.cards-grid {
-				display: grid;
-				grid-template-columns: 1fr 1fr;
-				gap: 30px;
-			}
-
-			.card {
-				background: white;
-				border-radius: 8px;
-				padding: 25px;
-				box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-				transition: transform 0.2s, box-shadow 0.2s;
-				text-decoration: none;
-				display: block;
-			}
-
-			.card:hover {
-				transform: translateY(-4px);
-				box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-			}
-
-			.card h2 {
-				margin: 0 0 15px 0;
-				font-size: 24px;
-				color: #333;
-			}
-
-			.card p {
-				margin: 0;
-				color: #666;
-				font-size: 14px;
-			}
-
-			.card-icon {
-				font-size: 32px;
-				margin-bottom: 10px;
-			}
-
-			.home-top-bar {
-				display: flex;
-				flex-direction: row;
-				justify-content: space-between;
-				align-items: center;
-				width: 100%;
-				margin-bottom: 20px;
-			}
-
-			@media (max-width: 768px) {
-				.home-container {
-					padding: 20px 12px;
-				}
-
-				.home-logo {
-					max-width: 220px;
-				}
-
-				.home-subtitle {
-					font-size: 16px;
-					margin-bottom: 24px;
-				}
-
-				.cards-grid {
-					grid-template-columns: 1fr;
-					gap: 16px;
-				}
-
-				.card {
-					padding: 20px;
-				}
-
-				.card h2 {
-					font-size: 20px;
-				}
-
-				.home-top-bar {
-					flex-direction: column;
-					gap: 12px;
-					align-items: center;
-				}
-			}
-
-			@media (max-width: 480px) {
-				.home-container {
-					padding: 16px 10px;
-				}
-
-				.home-logo {
-					max-width: 180px;
-				}
-			}
-		</style>
 		@GlobalIncludes()
 	</head>
 
@@ -149,7 +24,9 @@ templ Home(role auth.Role) {
 				@Flam()
 			</span>
 
-			@WelcomeRole()
+			<div class="home-welcome">
+				@WelcomeRole()
+			</div>
 
 			<div class="cards-grid">
 				if IsNavAccessible(role, "/classes") {

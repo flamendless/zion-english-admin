@@ -50,7 +50,7 @@ func Classes(data ClassesData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><style>\n\t\t\t.total-section {\n\t\t\t\tmargin-left: auto;\n\t\t\t\tpadding: 10px 20px;\n\t\t\t\tbackground-color: var(--color-primary);\n\t\t\t\tcolor: white;\n\t\t\t\tborder-radius: 4px;\n\t\t\t\tfont-weight: 600;\n\t\t\t}\n\n\t\t\t.row-cancelled {\n\t\t\t\tbackground-color: #ffebee !important;\n\t\t\t}\n\n\t\t\t.status-conducted {\n\t\t\t\tcolor: #28a745;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.status-cancelled {\n\t\t\t\tcolor: #dc3545;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.status-rescheduled {\n\t\t\t\tcolor: #ffc107;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\t\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -86,7 +86,7 @@ func Classes(data ClassesData) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.TeacherID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 58, Col: 61}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 29, Col: 61}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -99,7 +99,7 @@ func Classes(data ClassesData) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(data.TeacherName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 61, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 32, Col: 49}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {

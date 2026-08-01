@@ -491,7 +491,7 @@ func DriveURLInput() templ.Component {
 			templ_7745c5c3_Var27 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<div class=\"form-group\"><label for=\"driveUrl\">Spreadsheet URL *</label> <input type=\"text\" id=\"driveUrl\" name=\"driveUrl\" required placeholder=\"https://docs.google.com/spreadsheets/...\"><div class=\"error-message\" id=\"driveUrlError\"></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<div class=\"form-group\"><label for=\"driveUrl\">Google Sheet URL *</label><p class=\"field-hint\">Link to your Google Sheet that you use for tracking classes</p><input type=\"text\" id=\"driveUrl\" name=\"driveUrl\" required placeholder=\"https://docs.google.com/spreadsheets/...\"><div class=\"error-message\" id=\"driveUrlError\">Google Sheet URL is required</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -527,7 +527,7 @@ func DateInput(id string, text string) templ.Component {
 		var templ_7745c5c3_Var29 string
 		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/common.templ`, Line: 89, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/common.templ`, Line: 90, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 		if templ_7745c5c3_Err != nil {
@@ -540,7 +540,7 @@ func DateInput(id string, text string) templ.Component {
 		var templ_7745c5c3_Var30 string
 		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(text)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/common.templ`, Line: 89, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/common.templ`, Line: 90, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 		if templ_7745c5c3_Err != nil {
@@ -553,7 +553,7 @@ func DateInput(id string, text string) templ.Component {
 		var templ_7745c5c3_Var31 string
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/common.templ`, Line: 90, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/common.templ`, Line: 91, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 		if templ_7745c5c3_Err != nil {
@@ -566,7 +566,7 @@ func DateInput(id string, text string) templ.Component {
 		var templ_7745c5c3_Var32 string
 		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/common.templ`, Line: 90, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/common.templ`, Line: 91, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 		if templ_7745c5c3_Err != nil {
@@ -616,7 +616,7 @@ func LoginButton() templ.Component {
 		var templ_7745c5c3_Var34 templ.SafeURL
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/auth/login"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/common.templ`, Line: 96, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/common.templ`, Line: 97, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {
@@ -658,7 +658,7 @@ func Logout() templ.Component {
 		var templ_7745c5c3_Var36 string
 		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/auth/logout"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/common.templ`, Line: 101, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/common.templ`, Line: 102, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 		if templ_7745c5c3_Err != nil {
@@ -701,7 +701,7 @@ func displayURL(value string) templ.Component {
 			var templ_7745c5c3_Var38 templ.SafeURL
 			templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL(value))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/common.templ`, Line: 110, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/common.templ`, Line: 111, Col: 32}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 			if templ_7745c5c3_Err != nil {
@@ -749,13 +749,13 @@ func ShowPassword(inputID string) templ.Component {
 		var templ_7745c5c3_Var40 string
 		templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(inputID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/common.templ`, Line: 119, Col: 68}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/common.templ`, Line: 123, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "\" onclick=\"togglePasswordField(this)\">Show</button>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "\" aria-label=\"Show password\" onclick=\"togglePasswordField(this)\"><svg class=\"password-toggle-icon password-toggle-show\" xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z\"></path> <circle cx=\"12\" cy=\"12\" r=\"3\"></circle></svg> <svg class=\"password-toggle-icon password-toggle-hide\" xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M17.94 17.94A10.94 10.94 0 0 1 12 19c-6.5 0-10-7-10-7a20.77 20.77 0 0 1 5.06-5.94\"></path> <path d=\"M9.9 4.24A10.94 10.94 0 0 1 12 5c6.5 0 10 7 10 7a20.77 20.77 0 0 1-3.17 4.19\"></path> <path d=\"M1 1l22 22\"></path> <path d=\"M14.12 14.12a3 3 0 1 1-4.24-4.24\"></path></svg></button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -771,7 +771,7 @@ func ShowPassword(inputID string) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<style>\n\t\t\t.password-wrapper {\n\t\t\t\tposition: relative;\n\t\t\t\twidth: 100%;\n\t\t\t}\n\n\t\t\t.password-wrapper input {\n\t\t\t\twidth: 100%;\n\t\t\t\tpadding-right: 60px; /* space for toggle */\n\t\t\t}\n\n\t\t\t.password-wrapper .password-toggle {\n\t\t\t\tposition: absolute !important;\n\t\t\t\tright: 12px;\n\t\t\t\ttop: 50%;\n\t\t\t\ttransform: translateY(-50%);\n\t\t\t\tbackground: none;\n\t\t\t\tborder: none;\n\t\t\t\tcursor: pointer;\n\t\t\t\tfont-size: 14px;\n\t\t\t\tcolor: #666;\n\t\t\t\tpadding: 0;\n\t\t\t\tmargin: 0;\n\t\t\t\twidth: auto;\n\t\t\t}\n\t\t</style> <script>\n\t\t\tfunction togglePasswordField(btn) {\n\t\t\t\tconst passwordInput = document.getElementById(btn.dataset.target);\n\t\t\t\tif (!passwordInput) return;\n\t\t\t\tif (passwordInput.type === 'password') {\n\t\t\t\t\tpasswordInput.type = 'text';\n\t\t\t\t\tbtn.textContent = 'Hide';\n\t\t\t\t} else {\n\t\t\t\t\tpasswordInput.type = 'password';\n\t\t\t\t\tbtn.textContent = 'Show';\n\t\t\t\t}\n\t\t\t}\n\t\t</script>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<style>\n\t\t\t.password-wrapper {\n\t\t\t\tposition: relative;\n\t\t\t\twidth: 100%;\n\t\t\t}\n\n\t\t\t.password-wrapper input {\n\t\t\t\twidth: 100%;\n\t\t\t\tpadding-right: 44px;\n\t\t\t}\n\n\t\t\t.password-wrapper .password-toggle {\n\t\t\t\tposition: absolute !important;\n\t\t\t\tright: 6px;\n\t\t\t\ttop: 50%;\n\t\t\t\ttransform: translateY(-50%);\n\t\t\t\tbackground: none;\n\t\t\t\tborder: none;\n\t\t\t\tcursor: pointer;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tpadding: 0;\n\t\t\t\tmargin: 0;\n\t\t\t\twidth: 36px;\n\t\t\t\theight: 36px;\n\t\t\t\tborder-radius: var(--radius-sm);\n\t\t\t\tdisplay: inline-flex;\n\t\t\t\talign-items: center;\n\t\t\t\tjustify-content: center;\n\t\t\t\ttransition: background-color var(--transition-fast), color var(--transition-fast);\n\t\t\t}\n\n\t\t\t.password-wrapper .password-toggle:hover {\n\t\t\t\tbackground-color: var(--color-info-bg);\n\t\t\t\tcolor: var(--color-accent);\n\t\t\t}\n\n\t\t\t.password-wrapper .password-toggle:active {\n\t\t\t\ttransform: translateY(-50%);\n\t\t\t}\n\n\t\t\t.password-toggle-icon {\n\t\t\t\tdisplay: block;\n\t\t\t}\n\n\t\t\t.password-toggle-hide {\n\t\t\t\tdisplay: none;\n\t\t\t}\n\n\t\t\t.password-toggle.is-visible .password-toggle-show {\n\t\t\t\tdisplay: none;\n\t\t\t}\n\n\t\t\t.password-toggle.is-visible .password-toggle-hide {\n\t\t\t\tdisplay: block;\n\t\t\t}\n\t\t</style> <script>\n\t\t\tfunction togglePasswordField(btn) {\n\t\t\t\tconst passwordInput = document.getElementById(btn.dataset.target);\n\t\t\t\tif (!passwordInput) return;\n\t\t\t\tconst isPassword = passwordInput.type === 'password';\n\t\t\t\tpasswordInput.type = isPassword ? 'text' : 'password';\n\t\t\t\tbtn.classList.toggle('is-visible', isPassword);\n\t\t\t\tbtn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');\n\t\t\t}\n\t\t</script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

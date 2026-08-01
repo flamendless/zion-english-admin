@@ -169,7 +169,7 @@ func Teachers(data TeacherData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<style>\n\t\t\t.teacher-pending {\n\t\t\t\tbackground-color: #fff5f5;\n\t\t\t}\n\n\t\t\t#teachersTable tr.teacher-approved:hover {\n\t\t\t\tfilter: brightness(0.92);\n\t\t\t}\n\n\t\t\t.copyable-cell {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: center;\n\t\t\t\tgap: 6px;\n\t\t\t\tmax-width: 220px;\n\t\t\t}\n\n\t\t\t.copyable-text {\n\t\t\t\tflex: 1;\n\t\t\t\tmin-width: 0;\n\t\t\t\toverflow: hidden;\n\t\t\t\ttext-overflow: ellipsis;\n\t\t\t\twhite-space: nowrap;\n\t\t\t}\n\n\t\t\t.copy-btn {\n\t\t\t\tflex-shrink: 0;\n\t\t\t\tbackground: none;\n\t\t\t\tborder: none;\n\t\t\t\tpadding: 4px;\n\t\t\t\tmargin: 0;\n\t\t\t\tcursor: pointer;\n\t\t\t\tcolor: #555;\n\t\t\t\tborder-radius: 4px;\n\t\t\t\tdisplay: inline-flex;\n\t\t\t\talign-items: center;\n\t\t\t\tjustify-content: center;\n\t\t\t}\n\n\t\t\t.copy-btn:hover {\n\t\t\t\tbackground-color: rgba(0, 0, 0, 0.08);\n\t\t\t\topacity: 1;\n\t\t\t}\n\n\t\t\t.copy-btn.copied {\n\t\t\t\tcolor: #28a745;\n\t\t\t}\n\n\t\t\t.approve-btn,\n\t\t\t.unapprove-btn {\n\t\t\t\tborder: none;\n\t\t\t\tpadding: 6px 12px;\n\t\t\t\tborder-radius: 4px;\n\t\t\t\tcursor: pointer;\n\t\t\t\tfont-size: 13px;\n\t\t\t\tfont-weight: 500;\n\t\t\t\tmargin-top: 0;\n\t\t\t}\n\n\t\t\t.approve-btn {\n\t\t\t\tbackground-color: var(--color-primary);\n\t\t\t\tcolor: #333;\n\t\t\t}\n\n\t\t\t.unapprove-btn {\n\t\t\t\tbackground-color: #f59e0b;\n\t\t\t\tcolor: #333;\n\t\t\t}\n\n\t\t\t.approve-btn:hover,\n\t\t\t.unapprove-btn:hover {\n\t\t\t\topacity: 0.9;\n\t\t\t}\n\n\t\t\t.num-cell {\n\t\t\t\twidth: 48px;\n\t\t\t\ttext-align: center;\n\t\t\t\tcolor: #666;\n\t\t\t}\n\t\t</style><script>\n\t\t\tfunction copyCellText(btn) {\n\t\t\t\tconst text = btn.dataset.copy;\n\t\t\t\tif (!text) return;\n\t\t\t\tnavigator.clipboard.writeText(text).then(function () {\n\t\t\t\t\tbtn.classList.add('copied');\n\t\t\t\t\tsetTimeout(function () { btn.classList.remove('copied'); }, 1500);\n\t\t\t\t});\n\t\t\t}\n\t\t</script></head><body><div class=\"container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<script>\n\t\t\tfunction copyCellText(btn) {\n\t\t\t\tconst text = btn.dataset.copy;\n\t\t\t\tif (!text) return;\n\t\t\t\tnavigator.clipboard.writeText(text).then(function () {\n\t\t\t\t\tbtn.classList.add('copied');\n\t\t\t\t\tsetTimeout(function () { btn.classList.remove('copied'); }, 1500);\n\t\t\t\t});\n\t\t\t}\n\t\t</script></head><body><div class=\"container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -184,7 +184,7 @@ func Teachers(data TeacherData) templ.Component {
 		var templ_7745c5c3_Var7 templ.SafeURL
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/teachers/register"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 167, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 88, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -195,7 +195,7 @@ func Teachers(data TeacherData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if len(data.Teachers) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"table-wrapper\"><table id=\"teachersTable\"><thead><tr><th>#</th><th>Name</th><th>Status</th><th>Email</th><th>Mobile Number</th><th>Spreadsheet URL</th><th>Sex</th><th>Address</th><th>Certifications</th><th>Birthdate</th><th>Joining Date</th><th>Rates Per Class</th><th>Actions</th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"table-wrapper\"><table id=\"teachersTable\"><thead><tr><th>#</th><th>Name</th><th>Status</th><th>Email</th><th>Mobile Number</th><th>Google Sheet URL</th><th>Sex</th><th>Address</th><th>Certifications</th><th>Birthdate</th><th>Joining Date</th><th>Rates Per Class</th><th>Actions</th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -225,7 +225,7 @@ func Teachers(data TeacherData) templ.Component {
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", i+1))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 193, Col: 54}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 114, Col: 54}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -238,7 +238,7 @@ func Teachers(data TeacherData) templ.Component {
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(teacher.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 194, Col: 27}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 115, Col: 27}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -273,7 +273,7 @@ func Teachers(data TeacherData) templ.Component {
 				var templ_7745c5c3_Var14 string
 				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(teacher.Status)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 195, Col: 77}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 116, Col: 77}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 				if templ_7745c5c3_Err != nil {
@@ -286,7 +286,7 @@ func Teachers(data TeacherData) templ.Component {
 				var templ_7745c5c3_Var15 string
 				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(teacher.Email))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 196, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 117, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 				if templ_7745c5c3_Err != nil {
@@ -299,7 +299,7 @@ func Teachers(data TeacherData) templ.Component {
 				var templ_7745c5c3_Var16 string
 				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(teacher.MobileNumber))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 197, Col: 52}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 118, Col: 52}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 				if templ_7745c5c3_Err != nil {
@@ -320,7 +320,7 @@ func Teachers(data TeacherData) templ.Component {
 				var templ_7745c5c3_Var17 string
 				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(teacher.Sex))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 199, Col: 43}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 120, Col: 43}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 				if templ_7745c5c3_Err != nil {
@@ -349,7 +349,7 @@ func Teachers(data TeacherData) templ.Component {
 				var templ_7745c5c3_Var18 string
 				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(teacher.Birthdate))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 202, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 123, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 				if templ_7745c5c3_Err != nil {
@@ -362,7 +362,7 @@ func Teachers(data TeacherData) templ.Component {
 				var templ_7745c5c3_Var19 string
 				templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(teacher.JoiningDate)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 203, Col: 52}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 124, Col: 52}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 				if templ_7745c5c3_Err != nil {
@@ -375,7 +375,7 @@ func Teachers(data TeacherData) templ.Component {
 				var templ_7745c5c3_Var20 string
 				templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(formatRate(teacher.RatePerClass, teacher.Currency))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 204, Col: 83}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 125, Col: 83}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 				if templ_7745c5c3_Err != nil {
@@ -393,7 +393,7 @@ func Teachers(data TeacherData) templ.Component {
 					var templ_7745c5c3_Var21 string
 					templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/teachers/approve"))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 210, Col: 52}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 131, Col: 52}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 					if templ_7745c5c3_Err != nil {
@@ -406,7 +406,7 @@ func Teachers(data TeacherData) templ.Component {
 					var templ_7745c5c3_Var22 string
 					templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(`{"id": "` + teacher.ID + `"}`)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 211, Col: 52}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 132, Col: 52}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 					if templ_7745c5c3_Err != nil {
@@ -425,7 +425,7 @@ func Teachers(data TeacherData) templ.Component {
 					var templ_7745c5c3_Var23 string
 					templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/teachers/unapprove"))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 219, Col: 54}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 140, Col: 54}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 					if templ_7745c5c3_Err != nil {
@@ -438,7 +438,7 @@ func Teachers(data TeacherData) templ.Component {
 					var templ_7745c5c3_Var24 string
 					templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(`{"id": "` + teacher.ID + `"}`)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 220, Col: 52}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teachers.templ`, Line: 141, Col: 52}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 					if templ_7745c5c3_Err != nil {

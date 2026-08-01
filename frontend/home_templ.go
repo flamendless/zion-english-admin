@@ -45,7 +45,7 @@ func Home(role auth.Role) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><style>\n\t\t\t.home-container {\n\t\t\t\tmax-width: 900px;\n\t\t\t\tmargin: 0 auto;\n\t\t\t\tpadding: 40px 20px;\n\t\t\t}\n\n\t\t\t.home-title {\n\t\t\t\ttext-align: center;\n\t\t\t\tmargin-bottom: 10px;\n\t\t\t}\n\n\t\t\t.home-logo {\n\t\t\t\tmax-width: 300px;\n\t\t\t\theight: auto;\n\t\t\t}\n\n\t\t\t.home-subtitle {\n\t\t\t\ttext-align: center;\n\t\t\t\tmargin-bottom: 40px;\n\t\t\t\tcolor: #666;\n\t\t\t\tfont-size: 18px;\n\t\t\t}\n\n\t\t\t.home-subtitle a {\n\t\t\t\tcolor: var(--color-primary);\n\t\t\t\ttext-decoration: none;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.home-subtitle a:hover {\n\t\t\t\ttext-decoration: underline;\n\t\t\t}\n\n\t\t\t.cards-grid {\n\t\t\t\tdisplay: grid;\n\t\t\t\tgrid-template-columns: 1fr 1fr;\n\t\t\t\tgap: 30px;\n\t\t\t}\n\n\t\t\t.card {\n\t\t\t\tbackground: white;\n\t\t\t\tborder-radius: 8px;\n\t\t\t\tpadding: 25px;\n\t\t\t\tbox-shadow: 0 2px 8px rgba(0,0,0,0.1);\n\t\t\t\ttransition: transform 0.2s, box-shadow 0.2s;\n\t\t\t\ttext-decoration: none;\n\t\t\t\tdisplay: block;\n\t\t\t}\n\n\t\t\t.card:hover {\n\t\t\t\ttransform: translateY(-4px);\n\t\t\t\tbox-shadow: 0 4px 16px rgba(0,0,0,0.15);\n\t\t\t}\n\n\t\t\t.card h2 {\n\t\t\t\tmargin: 0 0 15px 0;\n\t\t\t\tfont-size: 24px;\n\t\t\t\tcolor: #333;\n\t\t\t}\n\n\t\t\t.card p {\n\t\t\t\tmargin: 0;\n\t\t\t\tcolor: #666;\n\t\t\t\tfont-size: 14px;\n\t\t\t}\n\n\t\t\t.card-icon {\n\t\t\t\tfont-size: 32px;\n\t\t\t\tmargin-bottom: 10px;\n\t\t\t}\n\n\t\t\t.home-top-bar {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: row;\n\t\t\t\tjustify-content: space-between;\n\t\t\t\talign-items: center;\n\t\t\t\twidth: 100%;\n\t\t\t\tmargin-bottom: 20px;\n\t\t\t}\n\n\t\t\t@media (max-width: 768px) {\n\t\t\t\t.home-container {\n\t\t\t\t\tpadding: 20px 12px;\n\t\t\t\t}\n\n\t\t\t\t.home-logo {\n\t\t\t\t\tmax-width: 220px;\n\t\t\t\t}\n\n\t\t\t\t.home-subtitle {\n\t\t\t\t\tfont-size: 16px;\n\t\t\t\t\tmargin-bottom: 24px;\n\t\t\t\t}\n\n\t\t\t\t.cards-grid {\n\t\t\t\t\tgrid-template-columns: 1fr;\n\t\t\t\t\tgap: 16px;\n\t\t\t\t}\n\n\t\t\t\t.card {\n\t\t\t\t\tpadding: 20px;\n\t\t\t\t}\n\n\t\t\t\t.card h2 {\n\t\t\t\t\tfont-size: 20px;\n\t\t\t\t}\n\n\t\t\t\t.home-top-bar {\n\t\t\t\t\tflex-direction: column;\n\t\t\t\t\tgap: 12px;\n\t\t\t\t\talign-items: center;\n\t\t\t\t}\n\t\t\t}\n\n\t\t\t@media (max-width: 480px) {\n\t\t\t\t.home-container {\n\t\t\t\t\tpadding: 16px 10px;\n\t\t\t\t}\n\n\t\t\t\t.home-logo {\n\t\t\t\t\tmax-width: 180px;\n\t\t\t\t}\n\t\t\t}\n\t\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -60,7 +60,7 @@ func Home(role auth.Role) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(utils.URL("/static/logo.png"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 145, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 20, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -78,7 +78,7 @@ func Home(role auth.Role) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span><div class=\"home-welcome\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -86,7 +86,7 @@ func Home(role auth.Role) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"cards-grid\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div><div class=\"cards-grid\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -60,17 +60,7 @@ templ RegisterTeacher(loggedIn bool, role auth.Role) {
 							</select>
 						</div>
 					</div>
-					<div class="form-group">
-						<label for="driveUrl">Spreadsheet URL *</label>
-						<input
-							type="text"
-							id="driveUrl"
-							name="driveUrl"
-							required
-							placeholder="https://docs.google.com/spreadsheets/..."
-						/>
-						<div class="error-message" id="driveUrlError">Spreadsheet URL is required</div>
-					</div>
+					@DriveURLInput()
 					<div class="form-row">
 						<div class="form-group">
 							<label for="birthdate">Birthdate *</label>
@@ -173,14 +163,14 @@ templ RegisterTeacher(loggedIn bool, role auth.Role) {
 									type="color"
 									id="assignedColor"
 									name="assignedColor"
-									value="#B9D283"
+									value="#90C020"
 									_="
 										on input
 											set #colorPreview.style.backgroundColor to me.value
 										end
 									"
 								/>
-								<div class="color-preview" id="colorPreview" style="background-color: #B9D283;"></div>
+								<div class="color-preview" id="colorPreview" style="background-color: #90C020;"></div>
 							</div>
 						</div>
 					</div>

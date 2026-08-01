@@ -95,6 +95,9 @@ type TblStudent struct {
 type TblTeacher struct {
 	ID             int64
 	Name           string
+	FirstName      string
+	MiddleName     string
+	LastName       string
 	Birthdate      string
 	Address        string
 	JoiningDate    string
@@ -104,16 +107,13 @@ type TblTeacher struct {
 	AssignedColor  string
 	RatePerClass   float64
 	Currency       string
-	CreatedAt      sql.NullTime
-	UpdatedAt      sql.NullTime
 	DriveUrl       string
 	Sex            sql.NullString
 	Password       string
 	Template       sql.NullString
 	Status         string
-	FirstName      string
-	MiddleName     string
-	LastName       string
+	CreatedAt      sql.NullTime
+	UpdatedAt      sql.NullTime
 }
 
 type TblTeachersStudentsM2m struct {
