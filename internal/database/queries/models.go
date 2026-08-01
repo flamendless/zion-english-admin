@@ -111,6 +111,9 @@ type TblTeacher struct {
 	Password       string
 	Template       sql.NullString
 	Status         string
+	FirstName      string
+	MiddleName     string
+	LastName       string
 }
 
 type TblTeachersStudentsM2m struct {

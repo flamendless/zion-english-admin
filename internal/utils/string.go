@@ -3,6 +3,7 @@ package utils
 import (
 	"math/rand"
 	"path/filepath"
+	"strings"
 	"time"
 	"zion-english/internal/constants"
 )
@@ -17,6 +18,16 @@ func RandomString(length int) string {
 		b[i] = letters[rng.Intn(len(letters))]
 	}
 	return string(b)
+}
+
+func ComposePersonName(first, middle, last string) string {
+	parts := make([]string, 0, 3)
+	for _, part := range []string{strings.TrimSpace(first), strings.TrimSpace(middle), strings.TrimSpace(last)} {
+		if part != "" {
+			parts = append(parts, part)
+		}
+	}
+	return strings.Join(parts, " ")
 }
 
 func SanitizeFilename(name string) string {

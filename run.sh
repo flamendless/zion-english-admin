@@ -16,41 +16,53 @@ elif grep -qi Microsoft /proc/version; then
 	ISWSL=true
 fi
 
+load_env() {
+	if [ -f .env ]; then
+		set -a
+		# shellcheck disable=SC1091
+		source .env
+		set +a
+	fi
+	PORT="${PORT:-8080}"
+}
+
 serve() {
+	load_env
 	gensql
 	gentempl
 	local -; set -x;
 
 	if "${ISWSL}"; then
-		cmd.exe /c "start ${BROWSER} http://localhost:8080/zion-english-admin"
+		cmd.exe /c "start ${BROWSER} http://localhost:${PORT}/zion-english-admin"
 	elif "${ISMAC}"; then
-		open -a ${BROWSER} "http://localhost:8080/zion-english-admin"
+		open -a ${BROWSER} "http://localhost:${PORT}/zion-english-admin"
 	fi
 
 	go run . web
 }
 
 prod() {
+	load_env
 	echo "running in production server"
 	gensql
 	gentempl
 
 	if "${ISMAC}"; then
-		PIDS=$(lsof -ti:1010 2>/dev/null || true)
+		PIDS=$(lsof -ti:"${PORT}" 2>/dev/null || true)
 		if [ -n "$PIDS" ]; then
 			echo "$PIDS" | xargs kill -9 2>/dev/null || true
 		fi
 	elif "${ISWSL}"; then
-		fuser -k 1010/tcp 2>/dev/null || true
+		fuser -k "${PORT}"/tcp 2>/dev/null || true
 	else
-		fuser -k 1010/tcp 2>/dev/null || \
-		(netstat -tlnp 2>/dev/null | grep :1010 | awk '{print $7}' | cut -d'/' -f1 | xargs -r kill -9) || true
+		fuser -k "${PORT}"/tcp 2>/dev/null || \
+		(netstat -tlnp 2>/dev/null | grep ":${PORT}" | awk '{print $7}' | cut -d'/' -f1 | xargs -r kill -9) || true
 	fi
 
 	sleep 1
 
 	echo "Please run:"
-	echo "    go run . web -p 1010 --https --address flamendless.xyz > outlog 2>&1 &"
+	echo "    go run . web -p ${PORT} --https --address flamendless.xyz > outlog 2>&1 &"
 
 }
 

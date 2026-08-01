@@ -66,6 +66,9 @@ type StudentRegisterResponse struct {
 }
 
 type TeacherRegisterRequest struct {
+	FirstName      string  `json:"firstName"`
+	MiddleName     string  `json:"middleName"`
+	LastName       string  `json:"lastName"`
 	Name           string  `json:"name"`
 	Birthdate      string  `json:"birthdate"`
 	Address        string  `json:"address"`

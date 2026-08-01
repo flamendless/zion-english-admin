@@ -21,16 +21,36 @@ templ RegisterTeacher(loggedIn bool, role auth.Role) {
 				<form id="registerForm" hx-post={ utils.URL("/teachers/register") } hx-swap="innerHTML" hx-target="#logOutput">
 					<div class="form-row">
 						<div class="form-group">
-							<label for="name">Teacher Name *</label>
+							<label for="firstName">First Name *</label>
 							<input
 								type="text"
-								id="name"
-								name="name"
+								id="firstName"
+								name="firstName"
 								required
-								placeholder="Enter teacher name"
+								placeholder="Enter first name"
 							/>
-							<div class="error-message" id="nameError">Name is required</div>
 						</div>
+						<div class="form-group">
+							<label for="middleName">Middle Name</label>
+							<input
+								type="text"
+								id="middleName"
+								name="middleName"
+								placeholder="Enter middle name (optional)"
+							/>
+						</div>
+						<div class="form-group">
+							<label for="lastName">Last Name *</label>
+							<input
+								type="text"
+								id="lastName"
+								name="lastName"
+								required
+								placeholder="Enter last name"
+							/>
+						</div>
+					</div>
+					<div class="form-row">
 						<div class="form-group">
 							<label for="sex">Sex</label>
 							<select id="sex" name="sex">
@@ -53,16 +73,16 @@ templ RegisterTeacher(loggedIn bool, role auth.Role) {
 					</div>
 					<div class="form-row">
 						<div class="form-group">
-							<label for="birthdate">Birthdate</label>
+							<label for="birthdate">Birthdate *</label>
 							<input type="date" id="birthdate" name="birthdate" required/>
 						</div>
 						<div class="form-group">
-							<label for="joiningDate">Joining Date *</label>
-							<input type="date" id="joiningDate" name="joiningDate" required/>
+							<label for="joiningDate">Date Joined</label>
+							<input type="date" id="joiningDate" name="joiningDate"/>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="address">Address</label>
+						<label for="address">Address *</label>
 						<input
 							type="text"
 							id="address"
@@ -73,7 +93,7 @@ templ RegisterTeacher(loggedIn bool, role auth.Role) {
 					</div>
 					<div class="form-row">
 						<div class="form-group">
-							<label for="mobileNumber">Mobile Number</label>
+							<label for="mobileNumber">Mobile Number *</label>
 							<input
 								type="text"
 								id="mobileNumber"
@@ -83,7 +103,7 @@ templ RegisterTeacher(loggedIn bool, role auth.Role) {
 							/>
 						</div>
 						<div class="form-group">
-							<label for="email">Email</label>
+							<label for="email">Email *</label>
 							<input
 								type="email"
 								id="email"
@@ -157,12 +177,10 @@ templ RegisterTeacher(loggedIn bool, role auth.Role) {
 									_="
 										on input
 											set #colorPreview.style.backgroundColor to me.value
-											set #colorValue.textContent to me.value
 										end
 									"
 								/>
 								<div class="color-preview" id="colorPreview" style="background-color: #B9D283;"></div>
-								<span id="colorValue">#B9D283</span>
 							</div>
 						</div>
 					</div>

@@ -184,19 +184,25 @@ func (q *Queries) GetTeacherByEmail(ctx context.Context, email string) (GetTeach
 }
 
 const getTeacherByID = `-- name: GetTeacherByID :one
-SELECT id, name, template FROM tbl_teachers WHERE id = ?
+SELECT id, name, template, status FROM tbl_teachers WHERE id = ?
 `
 
 type GetTeacherByIDRow struct {
 	ID       int64
 	Name     string
 	Template sql.NullString
+	Status   string
 }
 
 func (q *Queries) GetTeacherByID(ctx context.Context, id int64) (GetTeacherByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getTeacherByID, id)
 	var i GetTeacherByIDRow
-	err := row.Scan(&i.ID, &i.Name, &i.Template)
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Template,
+		&i.Status,
+	)
 	return i, err
 }
 
@@ -234,12 +240,15 @@ func (q *Queries) GetTeacherIDByName(ctx context.Context, name string) (int64, e
 }
 
 const insertTeacher = `-- name: InsertTeacher :exec
-INSERT INTO tbl_teachers (name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, status)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO tbl_teachers (name, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, status)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 type InsertTeacherParams struct {
 	Name           string
+	FirstName      string
+	MiddleName     string
+	LastName       string
 	Birthdate      string
 	Address        string
 	JoiningDate    string
@@ -258,6 +267,9 @@ type InsertTeacherParams struct {
 func (q *Queries) InsertTeacher(ctx context.Context, arg InsertTeacherParams) error {
 	_, err := q.db.ExecContext(ctx, insertTeacher,
 		arg.Name,
+		arg.FirstName,
+		arg.MiddleName,
+		arg.LastName,
 		arg.Birthdate,
 		arg.Address,
 		arg.JoiningDate,

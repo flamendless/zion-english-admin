@@ -20,6 +20,7 @@ import (
 
 var loginLimiter = NewLoginLimiter(5, 15*time.Minute)
 var resetRequestLimiter = NewLoginLimiter(3, 30*time.Minute)
+var registrationLimiter = NewLoginLimiter(1, 24*time.Hour)
 
 type Claims struct {
 	UserID int64  `json:"user_id"`
@@ -47,6 +48,14 @@ func ResetRequestAllowed(ip string) bool {
 
 func RecordResetRequest(ip string) {
 	resetRequestLimiter.RecordFailure(ip)
+}
+
+func RegistrationAllowed(ip string) bool {
+	return registrationLimiter.Allow(ip)
+}
+
+func RecordRegistration(ip string) {
+	registrationLimiter.RecordFailure(ip)
 }
 
 var ErrTeacherPendingApproval = errors.New("your account is pending approval. please wait for an administrator to approve your registration")
@@ -109,8 +118,14 @@ func Middleware(cfg *conf.Config, dbRO *queries.Queries, next http.Handler) http
 				invalidateSession(w, r)
 				return
 			}
-			if _, err := dbRO.GetTeacherByID(r.Context(), claims.UserID); err != nil {
+			teacher, err := dbRO.GetTeacherByID(r.Context(), claims.UserID)
+			if err != nil {
 				logs.Log().Error(logtag, zap.Error(err), zap.Int64("teacher_id", claims.UserID))
+				invalidateSession(w, r)
+				return
+			}
+			if teacher.Status != string(constants.TeacherStatusApproved) {
+				logs.Log().Error(logtag, zap.String("reason", "teacher not approved"), zap.Int64("teacher_id", claims.UserID))
 				invalidateSession(w, r)
 				return
 			}
@@ -225,8 +240,11 @@ func SessionUserValid(ctx context.Context, dbRO *queries.Queries, user User) boo
 		if user.ID == 0 {
 			return false
 		}
-		_, err := dbRO.GetTeacherByID(ctx, user.ID)
-		return err == nil
+		teacher, err := dbRO.GetTeacherByID(ctx, user.ID)
+		if err != nil {
+			return false
+		}
+		return teacher.Status == string(constants.TeacherStatusApproved)
 	default:
 		return false
 	}

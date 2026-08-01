@@ -10,6 +10,7 @@ import (
 type Config struct {
 	BasePath          string
 	AppEnv            string `env:"APP_ENV" env-required:""`
+	Port              int    `env:"PORT" env-default:"8080"`
 	SuperuserUsername string `env:"SUPERUSER_USERNAME" env-required:""`
 	SuperuserPassword string `env:"SUPERUSER_PASSWORD" env-required:""`
 	Secret            string `env:"SECRET" env-required:""`
@@ -26,6 +27,9 @@ func Conf() *Config {
 		}
 		if co.AppEnv != "local" && co.AppEnv != "prod" {
 			panic(fmt.Sprintf("Invalid APP_ENV. Got '%s'", co.AppEnv))
+		}
+		if co.Port < 1 || co.Port > 65535 {
+			panic(fmt.Sprintf("Invalid PORT. Got '%d'", co.Port))
 		}
 		if co.Secret == "" {
 			panic("SECRET is required")

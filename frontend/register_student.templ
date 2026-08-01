@@ -55,15 +55,13 @@ templ RegisterStudent() {
 					<label for="assignedColor">Assigned Color *</label>
 					<div class="color-group">
 						<input type="color" id="assignedColor" name="assignedColor" required
-						       value="var(--color-primary)"
+						       value="#B9D283"
 							_="
 								on input
 									set #colorPreview.style.backgroundColor to me.value
-									set #colorValue.textContent to me.value
 								end
 							">
-						<div class="color-preview" id="colorPreview" style="background-color: var(--color-primary);"></div>
-						<span id="colorValue">var(--color-primary)</span>
+						<div class="color-preview" id="colorPreview" style="background-color: #B9D283;"></div>
 					</div>
 				</div>
 

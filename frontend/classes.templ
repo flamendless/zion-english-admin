@@ -190,14 +190,22 @@ templ Classes(data ClassesData) {
 								row.classList.add('row-cancelled');
 							}
 
-							row.innerHTML = `
-								<td>${record.studentName}</td>
-								<td>${record.durationMinutes}</td>
-								<td>${record.rate} ${record.currency}</td>
-								<td class="status-${record.status}">${record.status}</td>
-								<td>${record.reason || '-'}</td>
-								<td>${record.date}</td>
-							`;
+							const cells = [
+								record.studentName,
+								String(record.durationMinutes),
+								`${record.rate} ${record.currency}`,
+								record.status,
+								record.reason || '-',
+								record.date,
+							];
+							cells.forEach((text, index) => {
+								const cell = document.createElement('td');
+								cell.textContent = text;
+								if (index === 3) {
+									cell.className = `status-${record.status}`;
+								}
+								row.appendChild(cell);
+							});
 							tableBody.appendChild(row);
 						});
 					}

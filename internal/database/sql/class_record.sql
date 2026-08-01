@@ -14,5 +14,5 @@ ORDER BY cr.created_at DESC;
 -- name: GetTotalRateByTeacherAndDateRange :one
 SELECT COALESCE(SUM(cr.rate), 0) as total_rate
 FROM tbl_class_records cr
-WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ?;
+WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ? AND cr.status = 'conducted';
 

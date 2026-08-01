@@ -142,6 +142,26 @@ func readFlashCookie(w http.ResponseWriter, r *http.Request, name string) string
 	return msg
 }
 
+func normalizeEmail(email string) string {
+	return strings.ToLower(strings.TrimSpace(email))
+}
+
+func insertAuditLog(ctx context.Context, module, message string) {
+	user := auth.GetUser(ctx)
+	var createdBy sql.NullInt64
+	if user.ID > 0 {
+		createdBy = sql.NullInt64{Int64: user.ID, Valid: true}
+	}
+	if err := dbRW.GetQueries().InsertLog(ctx, queries.InsertLogParams{
+		Module:        module,
+		Message:       message,
+		CreatedBy:     createdBy,
+		CreatedByName: sql.NullString{String: user.Name, Valid: user.Name != ""},
+	}); err != nil {
+		logs.Log().Info("system logs", zap.Error(err))
+	}
+}
+
 func HttpError(w http.ResponseWriter, msg string, code int) {
 	cfg := conf.Conf()
 	cookie := &http.Cookie{
@@ -293,6 +313,9 @@ var cmdWeb = &cobra.Command{
 		handler := securityHeaders(rootMux)
 
 		port := webFlags.port
+		if !cmd.Flags().Changed("port") {
+			port = strconv.Itoa(cfg.Port)
+		}
 		if !strings.HasPrefix(port, ":") {
 			port = ":" + port
 		}
@@ -612,9 +635,9 @@ func validateProcessRequest(req *models.ProcessRequest) error {
 	}
 
 	// Validate name
-	matched, _ := regexp.MatchString(`^[a-zA-Z -]+$`, req.Name)
+	matched, _ := regexp.MatchString(`^[a-zA-Z.\s-]+$`, req.Name)
 	if !matched {
-		return errors.New("name must contain only letters, dashes, and space")
+		return errors.New("name must contain only letters, periods, dashes, and spaces")
 	}
 
 	// Validate dates
@@ -811,6 +834,16 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	teacher, err := dbRO.GetQueries().GetTeacherByID(r.Context(), req.TeacherID)
+	if err != nil {
+		sendErrorLog(w, "assigned teacher not found")
+		return
+	}
+	if teacher.Status != string(constants.TeacherStatusApproved) {
+		sendErrorLog(w, "assigned teacher must be an approved teacher")
+		return
+	}
+
 	rl.add(fmt.Sprintf("Registering student: %s", req.Name))
 
 	existingCount, err := dbRW.GetQueries().GetStudentByName(r.Context(), req.Name)
@@ -824,7 +857,20 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = dbRW.GetQueries().InsertStudent(r.Context(), queries.InsertStudentParams{
+	if req.AssignedColor == "" {
+		req.AssignedColor = "#B9D283"
+	}
+
+	tx, err := dbRW.GetDB().BeginTx(r.Context(), nil)
+	if err != nil {
+		sendErrorLog(w, "Failed to start transaction")
+		return
+	}
+	defer tx.Rollback()
+
+	qtx := dbRW.GetQueries().WithTx(tx)
+
+	err = qtx.InsertStudent(r.Context(), queries.InsertStudentParams{
 		Name:          req.Name,
 		Currency:      req.Currency,
 		Contact:       sql.NullString{String: req.Contact, Valid: req.Contact != ""},
@@ -834,27 +880,34 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		Status:        req.Status,
 	})
 	if err != nil {
-		sendErrorLog(w, fmt.Sprintf("Failed to register student: %v", err))
+		sendErrorLog(w, "Failed to register student")
 		return
 	}
 
-	studentID, err := dbRW.GetQueries().GetStudentIDByName(r.Context(), req.Name)
+	studentID, err := qtx.GetStudentIDByName(r.Context(), req.Name)
 	if err != nil {
-		sendErrorLog(w, fmt.Sprintf("Failed to get student ID: %v", err))
+		sendErrorLog(w, "Failed to get student ID")
 		return
 	}
 
-	err = dbRW.GetQueries().InsertTeacherStudentM2M(r.Context(), queries.InsertTeacherStudentM2MParams{
+	err = qtx.InsertTeacherStudentM2M(r.Context(), queries.InsertTeacherStudentM2MParams{
 		TeacherID: req.TeacherID,
 		StudentID: studentID,
 	})
 	if err != nil {
-		sendErrorLog(w, fmt.Sprintf("Failed to assign teacher: %v", err))
+		sendErrorLog(w, "Failed to assign teacher")
+		return
+	}
+
+	if err := tx.Commit(); err != nil {
+		sendErrorLog(w, "Failed to register student")
 		return
 	}
 	rl.add(fmt.Sprintf("Assigned student to teacher ID: %d", req.TeacherID))
 
 	rl.add(fmt.Sprintf("Successfully registered student: %s", req.Name))
+
+	insertAuditLog(r.Context(), "students", fmt.Sprintf("registered student '%s' (teacher id %d)", req.Name, req.TeacherID))
 
 	if _, err := fmt.Fprintf(w, "Student '%s' registered successfully\n", req.Name); err != nil {
 		sendErrorLog(w, err.Error())
@@ -961,6 +1014,14 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !isSuperuser {
+		ip := clientIP(r)
+		if !auth.RegistrationAllowed(ip) {
+			sendErrorLog(w, "Registration limit reached for this network. Please try again later or contact an administrator.")
+			return
+		}
+	}
+
 	rl := &requestLogs{}
 
 	if err := r.ParseForm(); err != nil {
@@ -975,12 +1036,14 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req := models.TeacherRegisterRequest{
-		Name:           r.FormValue("name"),
+		FirstName:      strings.TrimSpace(r.FormValue("firstName")),
+		MiddleName:     strings.TrimSpace(r.FormValue("middleName")),
+		LastName:       strings.TrimSpace(r.FormValue("lastName")),
 		Birthdate:      r.FormValue("birthdate"),
-		Address:        r.FormValue("address"),
+		Address:        strings.TrimSpace(r.FormValue("address")),
 		JoiningDate:    r.FormValue("joiningDate"),
-		MobileNumber:   r.FormValue("mobileNumber"),
-		Email:          r.FormValue("email"),
+		MobileNumber:   strings.TrimSpace(r.FormValue("mobileNumber")),
+		Email:          normalizeEmail(r.FormValue("email")),
 		Certifications: r.FormValue("certifications"),
 		AssignedColor:  r.FormValue("assignedColor"),
 		RatePerClass:   ratePerClass,
@@ -990,6 +1053,12 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		Password:       r.FormValue("password"),
 		RetypePassword: r.FormValue("retypePassword"),
 	}
+
+	if req.JoiningDate == "" {
+		req.JoiningDate = time.Now().Format("2006-01-02")
+	}
+
+	req.Name = utils.ComposePersonName(req.FirstName, req.MiddleName, req.LastName)
 
 	if err := validateTeacherRequest(&req); err != nil {
 		sendErrorLog(w, err.Error())
@@ -1015,6 +1084,11 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if emailCount > 0 {
+		existing, lookupErr := dbRW.GetQueries().GetTeacherByEmail(r.Context(), req.Email)
+		if lookupErr == nil && existing.Status == string(constants.TeacherStatusPending) {
+			sendErrorLog(w, "An account with this email is awaiting approval")
+			return
+		}
 		sendErrorLog(w, "A teacher with this email already exists")
 		return
 	}
@@ -1036,6 +1110,9 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 
 	err = dbRW.GetQueries().InsertTeacher(r.Context(), queries.InsertTeacherParams{
 		Name:           req.Name,
+		FirstName:      req.FirstName,
+		MiddleName:     req.MiddleName,
+		LastName:       req.LastName,
 		Birthdate:      req.Birthdate,
 		Address:        req.Address,
 		JoiningDate:    req.JoiningDate,
@@ -1055,7 +1132,13 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !isSuperuser {
+		auth.RecordRegistration(clientIP(r))
+	}
+
 	rl.add(fmt.Sprintf("Successfully registered teacher: %s", req.Name))
+
+	insertAuditLog(r.Context(), "teachers", fmt.Sprintf("registered teacher '%s' (status %s)", req.Name, teacherStatus))
 
 	if isSuperuser {
 		if _, err := fmt.Fprintf(w, "Teacher '%s' registered successfully\n", req.Name); err != nil {
@@ -1076,8 +1159,26 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 }
 
 func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
+	if strings.TrimSpace(req.FirstName) == "" {
+		return errors.New("first name is required")
+	}
+	if strings.TrimSpace(req.LastName) == "" {
+		return errors.New("last name is required")
+	}
 	if req.Name == "" {
 		return errors.New("name is required")
+	}
+
+	if req.Birthdate == "" {
+		return errors.New("birthdate is required")
+	}
+
+	if strings.TrimSpace(req.Address) == "" {
+		return errors.New("address is required")
+	}
+
+	if strings.TrimSpace(req.MobileNumber) == "" {
+		return errors.New("mobile number is required")
 	}
 
 	if req.Email == "" {
@@ -1085,10 +1186,6 @@ func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
 	}
 	if _, err := mail.ParseAddress(req.Email); err != nil {
 		return errors.New("invalid email address")
-	}
-
-	if req.JoiningDate == "" {
-		return errors.New("joining date is required")
 	}
 
 	validCurrencies := map[string]bool{"KRW": true, "CAD": true, "YEN": true, "PHP": true}
@@ -1255,7 +1352,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	email := r.FormValue("email")
+	email := normalizeEmail(r.FormValue("email"))
 	password := r.FormValue("password")
 	if email == "" || password == "" {
 		auth.RecordLoginFailure(ip)
@@ -1380,7 +1477,7 @@ func handleForgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	email := strings.TrimSpace(r.FormValue("email"))
+	email := normalizeEmail(r.FormValue("email"))
 	if email == "" {
 		if err := frontend.ForgotPasswordError("Email is required").Render(ctx, w); err != nil {
 			HttpError(w, err.Error(), http.StatusInternalServerError)
@@ -1484,7 +1581,7 @@ func handleResetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token := r.FormValue("token")
-	email := strings.TrimSpace(r.FormValue("email"))
+	email := normalizeEmail(r.FormValue("email"))
 	password := r.FormValue("password")
 	confirmPassword := r.FormValue("confirmPassword")
 
@@ -1801,6 +1898,8 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	insertAuditLog(ctx, "classes", fmt.Sprintf("recorded class for student id %d (teacher id %d, date %s, status %s)", req.StudentID, req.TeacherID, req.Date, req.Status))
+
 	if _, err := fmt.Fprint(w, "Class recorded successfully!\n"); err != nil {
 		sendErrorLog(w, err.Error())
 		return
@@ -1844,14 +1943,18 @@ func validateClassRecordRequest(req *models.ClassRecordRequest) error {
 	if req.Date == "" {
 		return errors.New("date is required")
 	}
-	if req.DurationMinutes == 0 {
-		return errors.New("duration is required")
+	if req.DurationMinutes <= 0 {
+		return errors.New("duration must be greater than zero")
 	}
-	if req.Rate == 0 {
-		return errors.New("rate is required")
+	if req.Rate <= 0 {
+		return errors.New("rate must be greater than zero")
 	}
 	if req.Currency == "" {
 		return errors.New("currency is required")
+	}
+	validCurrencies := map[string]bool{"KRW": true, "CAD": true, "YEN": true, "PHP": true}
+	if !validCurrencies[req.Currency] {
+		return errors.New("invalid currency. Must be KRW, CAD, YEN, or PHP")
 	}
 	validStatuses := map[string]bool{"conducted": true, "cancelled": true, "rescheduled": true}
 	if !validStatuses[req.Status] {
