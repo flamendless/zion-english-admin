@@ -487,6 +487,43 @@ templ GlobalIncludes() {
 			gap: var(--space-4);
 		}
 
+		.student-search {
+			position: relative;
+		}
+
+		.student-search-results {
+			position: absolute;
+			top: 100%;
+			left: 0;
+			right: 0;
+			z-index: 20;
+			margin-top: var(--space-1);
+			background: var(--color-surface);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-md);
+			box-shadow: var(--shadow-md);
+			max-height: 220px;
+			overflow-y: auto;
+		}
+
+		.student-search-item {
+			display: block;
+			width: 100%;
+			padding: var(--space-3) var(--space-4);
+			border: none;
+			background: none;
+			text-align: left;
+			font: inherit;
+			color: var(--color-foreground);
+			cursor: pointer;
+		}
+
+		.student-search-item:hover,
+		.student-search-item:focus {
+			background: var(--color-primary-light);
+			outline: none;
+		}
+
 		.button-group {
 			margin-bottom: var(--space-5);
 			display: flex;

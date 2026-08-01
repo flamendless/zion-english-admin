@@ -91,6 +91,30 @@ func (q *Queries) GetAllStudents(ctx context.Context) ([]TblStudent, error) {
 	return items, nil
 }
 
+const getStudentByID = `-- name: GetStudentByID :one
+SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, created_at, updated_at
+FROM tbl_students
+WHERE id = ?
+`
+
+func (q *Queries) GetStudentByID(ctx context.Context, id int64) (TblStudent, error) {
+	row := q.db.QueryRowContext(ctx, getStudentByID, id)
+	var i TblStudent
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Currency,
+		&i.Contact,
+		&i.RatePerClass,
+		&i.ParentName,
+		&i.AssignedColor,
+		&i.Status,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getStudentByName = `-- name: GetStudentByName :one
 SELECT COUNT(*) as count FROM tbl_students WHERE name = ?
 `
@@ -139,4 +163,46 @@ func (q *Queries) InsertStudent(ctx context.Context, arg InsertStudentParams) er
 		arg.Status,
 	)
 	return err
+}
+
+const searchStudentsByName = `-- name: SearchStudentsByName :many
+SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, created_at, updated_at
+FROM tbl_students
+WHERE name LIKE '%' || ? || '%'
+ORDER BY name ASC
+LIMIT 10
+`
+
+func (q *Queries) SearchStudentsByName(ctx context.Context, dollar_1 sql.NullString) ([]TblStudent, error) {
+	rows, err := q.db.QueryContext(ctx, searchStudentsByName, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TblStudent
+	for rows.Next() {
+		var i TblStudent
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Currency,
+			&i.Contact,
+			&i.RatePerClass,
+			&i.ParentName,
+			&i.AssignedColor,
+			&i.Status,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

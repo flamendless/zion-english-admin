@@ -62,6 +62,25 @@ templ StudentDropdown() {
 	</div>
 }
 
+templ StudentSearchbox() {
+	<div class="form-group student-search">
+		<label for="relatedStudentSearch">Existing Student</label>
+		<input
+			type="text"
+			id="relatedStudentSearch"
+			name="q"
+			autocomplete="off"
+			placeholder="Search registered student..."
+			hx-get={ utils.URL("/api/students/search") }
+			hx-trigger="input changed delay:300ms"
+			hx-target="#relatedStudentResults"
+			hx-include="this"
+		/>
+		<input type="hidden" id="relatedStudentId" name="relatedStudentId"/>
+		<div id="relatedStudentResults"></div>
+	</div>
+}
+
 templ CurrencyDropdown() {
 	<div class="form-group">
 		<label for="currency">Currency *</label>

@@ -92,6 +92,13 @@ type TblStudent struct {
 	UpdatedAt     sql.NullTime
 }
 
+type TblStudentRelationship struct {
+	StudentID        int64
+	RelatedStudentID int64
+	Relationship     sql.NullString
+	CreatedAt        string
+}
+
 type TblTeacher struct {
 	ID             int64
 	Name           string

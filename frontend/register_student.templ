@@ -49,6 +49,18 @@ templ RegisterStudent() {
 					       placeholder="Enter parent's name">
 				</div>
 
+				<div class="form-group">
+					<label>Related To</label>
+					<div class="form-row">
+						<div class="form-group">
+							<label for="relationship">Relationship</label>
+							<input type="text" id="relationship" name="relationship"
+							       placeholder="siblings">
+						</div>
+						@StudentSearchbox()
+					</div>
+				</div>
+
 				@TeacherDropdownEx("Assign to teacher")
 
 				<div class="form-group">

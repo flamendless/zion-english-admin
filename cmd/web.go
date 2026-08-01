@@ -278,6 +278,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/refresh", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleRefreshPage))
 		authMux.HandleFunc(basePath+"/api/teachers", auth.RequireRole(auth.RoleSuperuser)(handleGetTeachers))
 		authMux.HandleFunc(basePath+"/api/students", auth.RequireRole(auth.RoleSuperuser)(handleGetStudents))
+		authMux.HandleFunc(basePath+"/api/students/search", auth.RequireRole(auth.RoleSuperuser)(handleSearchStudents))
 		authMux.HandleFunc(basePath+"/api/me/students", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetMyStudents))
 		authMux.HandleFunc(basePath+"/api/class-records", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetClassRecords))
 
@@ -310,6 +311,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/classes/", authHandler)
 		rootMux.Handle(basePath+"/api/teachers", authHandler)
 		rootMux.Handle(basePath+"/api/students", authHandler)
+		rootMux.Handle(basePath+"/api/students/", authHandler)
 		rootMux.Handle(basePath+"/api/class-records", authHandler)
 		rootMux.Handle(basePath+"/api/me/students", authHandler)
 
@@ -759,6 +761,21 @@ func handleSystemLogs(w http.ResponseWriter, r *http.Request) {
 	frontend.SystemLogs(frontend.SystemLogData{Logs: viewLogs}).Render(r.Context(), w)
 }
 
+func formatStudentRelationships(rels []queries.GetAllStudentRelationshipsRow) string {
+	if len(rels) == 0 {
+		return ""
+	}
+	parts := make([]string, len(rels))
+	for i, r := range rels {
+		if r.Relationship.Valid && r.Relationship.String != "" {
+			parts[i] = fmt.Sprintf("%s → %s", r.Relationship.String, r.RelatedStudentName)
+		} else {
+			parts[i] = r.RelatedStudentName
+		}
+	}
+	return strings.Join(parts, "; ")
+}
+
 func handleStudents(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -771,19 +788,31 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	relationships, err := dbRO.GetQueries().GetAllStudentRelationships(r.Context())
+	if err != nil {
+		HttpError(w, fmt.Sprintf("Failed to fetch student relationships: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	relationshipsByStudent := make(map[int64][]queries.GetAllStudentRelationshipsRow)
+	for _, rel := range relationships {
+		relationshipsByStudent[rel.StudentID] = append(relationshipsByStudent[rel.StudentID], rel)
+	}
+
 	viewStudents := make([]frontend.StudentItem, len(students))
 	for i, s := range students {
 		viewStudents[i] = frontend.StudentItem{
-			ID:            strconv.FormatInt(s.ID, 10),
-			Name:          s.Name,
-			Currency:      s.Currency,
-			Contact:       s.Contact.String,
-			RatePerClass:  s.RatePerClass,
-			ParentName:    s.ParentName.String,
-			AssignedColor: s.AssignedColor,
-			Status:        s.Status,
-			CreatedAt:     s.CreatedAt.Time.Format("2006-01-02 15:04:05"),
-			UpdatedAt:     s.UpdatedAt.Time.Format("2006-01-02 15:04:05"),
+			ID:               strconv.FormatInt(s.ID, 10),
+			Name:             s.Name,
+			Currency:         s.Currency,
+			Contact:          s.Contact.String,
+			RatePerClass:     s.RatePerClass,
+			ParentName:       s.ParentName.String,
+			AssignedColor:    s.AssignedColor,
+			Status:           s.Status,
+			RelatedToDisplay: formatStudentRelationships(relationshipsByStudent[s.ID]),
+			CreatedAt:        s.CreatedAt.Time.Format("2006-01-02 15:04:05"),
+			UpdatedAt:        s.UpdatedAt.Time.Format("2006-01-02 15:04:05"),
 		}
 	}
 
@@ -821,15 +850,26 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	relatedStudentID := int64(0)
+	if relatedStudentValue := r.FormValue("relatedStudentId"); relatedStudentValue != "" {
+		relatedStudentID, err = strconv.ParseInt(relatedStudentValue, 10, 64)
+		if err != nil {
+			sendErrorLog(w, "invalid related student")
+			return
+		}
+	}
+
 	req := models.StudentRegisterRequest{
-		Name:          r.FormValue("name"),
-		Currency:      r.FormValue("currency"),
-		Contact:       r.FormValue("contact"),
-		RatePerClass:  ratePerClass,
-		ParentName:    r.FormValue("parentName"),
-		AssignedColor: r.FormValue("assignedColor"),
-		Status:        r.FormValue("status"),
-		TeacherID:     teacherID,
+		Name:             r.FormValue("name"),
+		Currency:         r.FormValue("currency"),
+		Contact:          r.FormValue("contact"),
+		RatePerClass:     ratePerClass,
+		ParentName:       r.FormValue("parentName"),
+		AssignedColor:    r.FormValue("assignedColor"),
+		Status:           r.FormValue("status"),
+		TeacherID:        teacherID,
+		Relationship:     r.FormValue("relationship"),
+		RelatedStudentID: relatedStudentID,
 	}
 
 	if err := validateStudentRequest(&req); err != nil {
@@ -862,6 +902,14 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 
 	if req.AssignedColor == "" {
 		req.AssignedColor = "#B9D283"
+	}
+
+	if req.RelatedStudentID > 0 {
+		_, err := dbRO.GetQueries().GetStudentByID(r.Context(), req.RelatedStudentID)
+		if err != nil {
+			sendErrorLog(w, "related student not found")
+			return
+		}
 	}
 
 	tx, err := dbRW.GetDB().BeginTx(r.Context(), nil)
@@ -900,6 +948,24 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		sendErrorLog(w, "Failed to assign teacher")
 		return
+	}
+
+	if req.RelatedStudentID > 0 {
+		if req.RelatedStudentID == studentID {
+			sendErrorLog(w, "a student cannot be related to themselves")
+			return
+		}
+
+		err = qtx.InsertStudentRelationship(r.Context(), queries.InsertStudentRelationshipParams{
+			StudentID:        studentID,
+			RelatedStudentID: req.RelatedStudentID,
+			Relationship:     sql.NullString{String: req.Relationship, Valid: req.Relationship != ""},
+		})
+		if err != nil {
+			sendErrorLog(w, "Failed to save student relationship")
+			return
+		}
+		rl.add(fmt.Sprintf("Linked to related student ID: %d", req.RelatedStudentID))
 	}
 
 	if err := tx.Commit(); err != nil {
@@ -1671,6 +1737,40 @@ func handleGetRole(w http.ResponseWriter, r *http.Request) {
 
 	if _, err := fmt.Fprint(w, greetings); err != nil {
 		logs.Log().Error("handle get role", zap.Error(err))
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func handleSearchStudents(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	w.Header().Set("Content-Type", "text/html")
+	if q == "" {
+		frontend.StudentSearchResults(nil).Render(r.Context(), w)
+		return
+	}
+
+	students, err := dbRO.GetQueries().SearchStudentsByName(r.Context(), sql.NullString{String: q, Valid: true})
+	if err != nil {
+		HttpError(w, "Failed to search students", http.StatusInternalServerError)
+		return
+	}
+
+	var studentResponses []models.StudentAPIResponse
+	for _, s := range students {
+		studentResponses = append(studentResponses, models.StudentAPIResponse{
+			ID:           s.ID,
+			Name:         s.Name,
+			Currency:     s.Currency,
+			RatePerClass: s.RatePerClass,
+		})
+	}
+
+	if err := frontend.StudentSearchResults(studentResponses).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }

@@ -8,16 +8,17 @@ type StudentData struct {
 }
 
 type StudentItem struct {
-	ID            string
-	Name          string
-	Currency      string
-	Contact       string
-	RatePerClass  float64
-	ParentName    string
-	AssignedColor string
-	Status        string
-	CreatedAt     string
-	UpdatedAt     string
+	ID               string
+	Name             string
+	Currency         string
+	Contact          string
+	RatePerClass     float64
+	ParentName       string
+	AssignedColor    string
+	Status           string
+	RelatedToDisplay string
+	CreatedAt        string
+	UpdatedAt        string
 }
 
 func getStatusClass(status string) string {
@@ -55,6 +56,7 @@ templ Students(data StudentData) {
 								<th>Contact</th>
 								<th>Rate Per Class</th>
 								<th>Parent Name</th>
+								<th>Related To</th>
 								<th>Color</th>
 								<th>Status</th>
 								<th>Created At</th>
@@ -68,6 +70,7 @@ templ Students(data StudentData) {
 									<td>{ getDisplayValue(student.Contact) }</td>
 									<td class="rate-cell">{ formatRate(student.RatePerClass, student.Currency) }</td>
 									<td>{ getDisplayValue(student.ParentName) }</td>
+									<td>{ getDisplayValue(student.RelatedToDisplay) }</td>
 									<td>
 										<div class="color-cell">
 											<div class="color-box" style={ "background-color: " + student.AssignedColor }></div>

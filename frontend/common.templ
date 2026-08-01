@@ -44,6 +44,28 @@ templ StudentOptions(students []models.StudentAPIResponse) {
 	}
 }
 
+templ StudentSearchResults(students []models.StudentAPIResponse) {
+	<div class="student-search-results">
+		for _, s := range students {
+			<button
+				type="button"
+				class="student-search-item"
+				data-id={ fmt.Sprintf("%d", s.ID) }
+				data-name={ s.Name }
+				_="
+					on click
+						set #relatedStudentId.value to my @data-id
+						set #relatedStudentSearch.value to my @data-name
+						set #relatedStudentResults.innerHTML to ''
+					end
+				"
+			>
+				{ s.Name }
+			</button>
+		}
+	</div>
+}
+
 templ DatePreset() {
 	{{
 		now := time.Now()

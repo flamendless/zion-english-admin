@@ -49,14 +49,16 @@ type LogView struct {
 }
 
 type StudentRegisterRequest struct {
-	Name          string  `json:"name"`
-	Currency      string  `json:"currency"`
-	Contact       string  `json:"contact"`
-	RatePerClass  float64 `json:"ratePerClass"`
-	ParentName    string  `json:"parentName"`
-	AssignedColor string  `json:"assignedColor"`
-	Status        string  `json:"status"`
-	TeacherID     int64   `json:"teacherID"`
+	Name             string  `json:"name"`
+	Currency         string  `json:"currency"`
+	Contact          string  `json:"contact"`
+	RatePerClass     float64 `json:"ratePerClass"`
+	ParentName       string  `json:"parentName"`
+	AssignedColor    string  `json:"assignedColor"`
+	Status           string  `json:"status"`
+	TeacherID        int64   `json:"teacherID"`
+	Relationship     string  `json:"relationship"`
+	RelatedStudentID int64   `json:"relatedStudentId"`
 }
 
 type StudentRegisterResponse struct {
