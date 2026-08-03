@@ -20,7 +20,7 @@ import (
 
 var loginLimiter = NewLoginLimiter(5, 15*time.Minute)
 var resetRequestLimiter = NewLoginLimiter(3, 30*time.Minute)
-var registrationLimiter = NewLoginLimiter(1, 24*time.Hour)
+var registrationLimiter = NewLoginLimiter(5, time.Hour)
 
 type Claims struct {
 	UserID int64  `json:"user_id"`
