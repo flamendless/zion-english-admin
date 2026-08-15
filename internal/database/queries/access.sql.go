@@ -66,6 +66,21 @@ func (q *Queries) GetAccessByID(ctx context.Context, id int64) (TblAccess, error
 	return i, err
 }
 
+const getLatestOpenAccessByTeacherID = `-- name: GetLatestOpenAccessByTeacherID :one
+SELECT id
+FROM tbl_accesses
+WHERE teacher_id = ? AND logout_at IS NULL
+ORDER BY login_at DESC
+LIMIT 1
+`
+
+func (q *Queries) GetLatestOpenAccessByTeacherID(ctx context.Context, teacherID int64) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getLatestOpenAccessByTeacherID, teacherID)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
 const getUserAgentByID = `-- name: GetUserAgentByID :one
 SELECT
     id,

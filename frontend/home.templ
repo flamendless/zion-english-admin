@@ -2,8 +2,26 @@ package frontend
 
 import "zion-english/internal/auth"
 import "zion-english/internal/utils"
+import "fmt"
 
-templ Home(role auth.Role) {
+type CurrencyTotal struct {
+	Currency string
+	Total    float64
+}
+
+type DashboardData struct {
+	Role                   auth.Role
+	ActiveStudents         int64
+	InactiveStudents       int64
+	PendingTeachers        int64
+	MyStudentCount         int64
+	ClassesConductedWeek   int64
+	ClassesCancelledWeek   int64
+	ClassesRescheduledWeek int64
+	MonthlyTotals          []CurrencyTotal
+}
+
+templ Home(data DashboardData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
@@ -13,7 +31,6 @@ templ Home(role auth.Role) {
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
 	</head>
-
 	<body>
 		<div class="home-container">
 			<div class="home-title">
@@ -28,41 +45,33 @@ templ Home(role auth.Role) {
 				@WelcomeRole()
 			</div>
 
+			@DashboardStats(data)
+
 			<div class="cards-grid">
-				if IsNavAccessible(role, "/classes") {
-					@ActionCard("/classes", "Classes", "View recorded classes")
-				}
-				if IsNavAccessible(role, "/classes/record") {
-					@ActionCard("/classes/record", "Record a Class", "Record a new class")
-				}
-				if IsNavAccessible(role, "/profile") {
+				if IsNavAccessible(data.Role, "/profile") {
 					@ActionCard("/profile", "My Profile", "View account info and update settings")
 				}
-
-				if IsNavAccessible(role, "/students") {
-					@ActionCard("/students", "Students", "View and manage students")
-				}
-				if IsNavAccessible(role, "/students/register") {
-					@ActionCard("/students/register", "Register a student", "Add a new student")
-				}
-
-				if IsNavAccessible(role, "/teachers") {
+				if IsNavAccessible(data.Role, "/teachers") {
 					@ActionCard("/teachers", "Teachers", "View and manage teachers")
 				}
-				if IsNavAccessible(role, "/teachers/register") {
-					@ActionCard("/teachers/register", "Register a teacher", "Add a new teacher")
+				if IsNavAccessible(data.Role, "/students") {
+					@ActionCard("/students", "Students", "View and manage students")
 				}
-
-				<!-- INFO: (flam) this will be outdated after we centralized class records via admin tool -->
-				<!-- @ActionCard("/logs", "Process logs", "View and manage processing logs") -->
-				if IsNavAccessible(role, "/process") {
-					@ActionCard("/process", "Process", "Process CSV/XLSX files")
+				if IsNavAccessible(data.Role, "/classes") {
+					if data.Role == auth.RoleTeacher {
+						@ActionCard("/classes", "My Classes", "View and record your classes")
+					} else {
+						@ActionCard("/classes", "Classes", "View and record classes")
+					}
 				}
-				if IsNavAccessible(role, "/process-logs") {
-					@ActionCard("/process-logs", "Processing Logs", "View processing logs")
+				if IsNavAccessible(data.Role, "/my-students") {
+					@ActionCard("/my-students", "My Students", "View your assigned students")
 				}
-				if IsNavAccessible(role, "/logs") {
-					if role == auth.RoleTeacher {
+				if IsNavAccessible(data.Role, "/process") {
+					@ActionCard("/process", "Process", "Process CSV files and view logs")
+				}
+				if IsNavAccessible(data.Role, "/logs") {
+					if data.Role == auth.RoleTeacher {
 						@ActionCard("/logs", "My Activity", "View your recent actions")
 					} else {
 						@ActionCard("/logs", "Logs", "View system logs")
@@ -72,4 +81,40 @@ templ Home(role auth.Role) {
 		</div>
 	</body>
 	</html>
+}
+
+templ DashboardStats(data DashboardData) {
+	<div class="dashboard-stats">
+		if data.Role == auth.RoleSuperuser {
+			<div class="stat-card">
+				<span class="stat-label">Active Students</span>
+				<span class="stat-value">{ fmt.Sprintf("%d", data.ActiveStudents) }</span>
+			</div>
+			<div class="stat-card">
+				<span class="stat-label">Inactive Students</span>
+				<span class="stat-value">{ fmt.Sprintf("%d", data.InactiveStudents) }</span>
+			</div>
+			<div class="stat-card">
+				<span class="stat-label">Pending Teachers</span>
+				<span class="stat-value">{ fmt.Sprintf("%d", data.PendingTeachers) }</span>
+			</div>
+		}
+		if data.Role == auth.RoleTeacher {
+			<div class="stat-card">
+				<span class="stat-label">My Students</span>
+				<span class="stat-value">{ fmt.Sprintf("%d", data.MyStudentCount) }</span>
+			</div>
+		}
+		<div class="stat-card">
+			<span class="stat-label">Classes This Week</span>
+			<span class="stat-value">{ fmt.Sprintf("%d conducted", data.ClassesConductedWeek) }</span>
+			<span class="stat-sub">{ fmt.Sprintf("%d cancelled, %d rescheduled", data.ClassesCancelledWeek, data.ClassesRescheduledWeek) }</span>
+		</div>
+		for _, mt := range data.MonthlyTotals {
+			<div class="stat-card">
+				<span class="stat-label">Month ({ mt.Currency })</span>
+				<span class="stat-value">{ fmt.Sprintf("%.2f", mt.Total) }</span>
+			</div>
+		}
+	</div>
 }

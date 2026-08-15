@@ -19,6 +19,48 @@ func (q *Queries) ApproveTeacher(ctx context.Context, id int64) error {
 	return err
 }
 
+const countTeachersByStatus = `-- name: CountTeachersByStatus :one
+SELECT COUNT(*) as count FROM tbl_teachers WHERE status = ?
+`
+
+func (q *Queries) CountTeachersByStatus(ctx context.Context, status string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countTeachersByStatus, status)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countTeachersFiltered = `-- name: CountTeachersFiltered :one
+SELECT COUNT(*) as count
+FROM tbl_teachers
+WHERE (? = '' OR name LIKE '%' || ? || '%')
+  AND (? = '' OR status = ?)
+  AND (? = '' OR email LIKE '%' || ? || '%')
+`
+
+type CountTeachersFilteredParams struct {
+	Column1 interface{}
+	Column2 sql.NullString
+	Column3 interface{}
+	Status  string
+	Column5 interface{}
+	Column6 sql.NullString
+}
+
+func (q *Queries) CountTeachersFiltered(ctx context.Context, arg CountTeachersFilteredParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countTeachersFiltered,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Status,
+		arg.Column5,
+		arg.Column6,
+	)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getAllTeachers = `-- name: GetAllTeachers :many
 SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
 FROM tbl_teachers
@@ -242,6 +284,22 @@ func (q *Queries) GetTeacherCountByEmail(ctx context.Context, email string) (int
 	return count, err
 }
 
+const getTeacherCountByEmailExcludingID = `-- name: GetTeacherCountByEmailExcludingID :one
+SELECT COUNT(*) as count FROM tbl_teachers WHERE email = ? AND id != ?
+`
+
+type GetTeacherCountByEmailExcludingIDParams struct {
+	Email string
+	ID    int64
+}
+
+func (q *Queries) GetTeacherCountByEmailExcludingID(ctx context.Context, arg GetTeacherCountByEmailExcludingIDParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getTeacherCountByEmailExcludingID, arg.Email, arg.ID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getTeacherCountByMobile = `-- name: GetTeacherCountByMobile :one
 SELECT COUNT(*) as count FROM tbl_teachers WHERE mobile_number = ?
 `
@@ -251,6 +309,81 @@ func (q *Queries) GetTeacherCountByMobile(ctx context.Context, mobileNumber stri
 	var count int64
 	err := row.Scan(&count)
 	return count, err
+}
+
+const getTeacherCountByMobileExcludingID = `-- name: GetTeacherCountByMobileExcludingID :one
+SELECT COUNT(*) as count FROM tbl_teachers WHERE mobile_number = ? AND id != ?
+`
+
+type GetTeacherCountByMobileExcludingIDParams struct {
+	MobileNumber string
+	ID           int64
+}
+
+func (q *Queries) GetTeacherCountByMobileExcludingID(ctx context.Context, arg GetTeacherCountByMobileExcludingIDParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getTeacherCountByMobileExcludingID, arg.MobileNumber, arg.ID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const getTeacherFullByID = `-- name: GetTeacherFullByID :one
+SELECT id, name, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
+FROM tbl_teachers
+WHERE id = ?
+`
+
+type GetTeacherFullByIDRow struct {
+	ID             int64
+	Name           string
+	FirstName      string
+	MiddleName     string
+	LastName       string
+	Birthdate      string
+	Address        string
+	JoiningDate    string
+	MobileNumber   string
+	Email          string
+	Certifications sql.NullString
+	AssignedColor  string
+	RatePerClass   float64
+	Currency       string
+	DriveUrl       string
+	Sex            sql.NullString
+	Password       string
+	Template       sql.NullString
+	CreatedAt      sql.NullTime
+	UpdatedAt      sql.NullTime
+	Status         string
+}
+
+func (q *Queries) GetTeacherFullByID(ctx context.Context, id int64) (GetTeacherFullByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getTeacherFullByID, id)
+	var i GetTeacherFullByIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.FirstName,
+		&i.MiddleName,
+		&i.LastName,
+		&i.Birthdate,
+		&i.Address,
+		&i.JoiningDate,
+		&i.MobileNumber,
+		&i.Email,
+		&i.Certifications,
+		&i.AssignedColor,
+		&i.RatePerClass,
+		&i.Currency,
+		&i.DriveUrl,
+		&i.Sex,
+		&i.Password,
+		&i.Template,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Status,
+	)
+	return i, err
 }
 
 const getTeacherIDByName = `-- name: GetTeacherIDByName :one
@@ -338,6 +471,99 @@ func (q *Queries) GetTeacherProfileByID(ctx context.Context, id int64) (GetTeach
 	return i, err
 }
 
+const getTeachersFiltered = `-- name: GetTeachersFiltered :many
+SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
+FROM tbl_teachers
+WHERE (? = '' OR name LIKE '%' || ? || '%')
+  AND (? = '' OR status = ?)
+  AND (? = '' OR email LIKE '%' || ? || '%')
+ORDER BY CASE status WHEN 'pending' THEN 0 ELSE 1 END, name ASC
+LIMIT ? OFFSET ?
+`
+
+type GetTeachersFilteredParams struct {
+	Column1 interface{}
+	Column2 sql.NullString
+	Column3 interface{}
+	Status  string
+	Column5 interface{}
+	Column6 sql.NullString
+	Limit   int64
+	Offset  int64
+}
+
+type GetTeachersFilteredRow struct {
+	ID             int64
+	Name           string
+	Birthdate      string
+	Address        string
+	JoiningDate    string
+	MobileNumber   string
+	Email          string
+	Certifications sql.NullString
+	AssignedColor  string
+	RatePerClass   float64
+	Currency       string
+	DriveUrl       string
+	Sex            sql.NullString
+	Password       string
+	Template       sql.NullString
+	CreatedAt      sql.NullTime
+	UpdatedAt      sql.NullTime
+	Status         string
+}
+
+func (q *Queries) GetTeachersFiltered(ctx context.Context, arg GetTeachersFilteredParams) ([]GetTeachersFilteredRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTeachersFiltered,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Status,
+		arg.Column5,
+		arg.Column6,
+		arg.Limit,
+		arg.Offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTeachersFilteredRow
+	for rows.Next() {
+		var i GetTeachersFilteredRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Birthdate,
+			&i.Address,
+			&i.JoiningDate,
+			&i.MobileNumber,
+			&i.Email,
+			&i.Certifications,
+			&i.AssignedColor,
+			&i.RatePerClass,
+			&i.Currency,
+			&i.DriveUrl,
+			&i.Sex,
+			&i.Password,
+			&i.Template,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Status,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const insertTeacher = `-- name: InsertTeacher :exec
 INSERT INTO tbl_teachers (name, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, status)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -392,6 +618,55 @@ UPDATE tbl_teachers SET status = 'pending', updated_at = CURRENT_TIMESTAMP WHERE
 
 func (q *Queries) UnapproveTeacher(ctx context.Context, id int64) error {
 	_, err := q.db.ExecContext(ctx, unapproveTeacher, id)
+	return err
+}
+
+const updateTeacherBySuperuser = `-- name: UpdateTeacherBySuperuser :exec
+UPDATE tbl_teachers
+SET name = ?, first_name = ?, middle_name = ?, last_name = ?, birthdate = ?, address = ?, joining_date = ?,
+    mobile_number = ?, email = ?, certifications = ?, assigned_color = ?, rate_per_class = ?, currency = ?,
+    drive_url = ?, sex = ?, updated_at = datetime('now')
+WHERE id = ?
+`
+
+type UpdateTeacherBySuperuserParams struct {
+	Name           string
+	FirstName      string
+	MiddleName     string
+	LastName       string
+	Birthdate      string
+	Address        string
+	JoiningDate    string
+	MobileNumber   string
+	Email          string
+	Certifications sql.NullString
+	AssignedColor  string
+	RatePerClass   float64
+	Currency       string
+	DriveUrl       string
+	Sex            sql.NullString
+	ID             int64
+}
+
+func (q *Queries) UpdateTeacherBySuperuser(ctx context.Context, arg UpdateTeacherBySuperuserParams) error {
+	_, err := q.db.ExecContext(ctx, updateTeacherBySuperuser,
+		arg.Name,
+		arg.FirstName,
+		arg.MiddleName,
+		arg.LastName,
+		arg.Birthdate,
+		arg.Address,
+		arg.JoiningDate,
+		arg.MobileNumber,
+		arg.Email,
+		arg.Certifications,
+		arg.AssignedColor,
+		arg.RatePerClass,
+		arg.Currency,
+		arg.DriveUrl,
+		arg.Sex,
+		arg.ID,
+	)
 	return err
 }
 

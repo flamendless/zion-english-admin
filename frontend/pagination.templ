@@ -1,0 +1,115 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+templ HubHeader(title string, actionLabel string, actionHref string, showAction bool) {
+	<div class="hub-header">
+		<h2 class="hub-title">{ title }</h2>
+		if showAction && actionLabel != "" && actionHref != "" {
+			<a href={ actionHref } class="add-btn">{ actionLabel }</a>
+		}
+	</div>
+}
+
+templ PaginationBar(hasPrev bool, prevURL string, hasNext bool, nextURL string, pageNum int, totalPages int, total int64) {
+	<div class="pagination-bar">
+		if hasPrev {
+			<a href={ prevURL } class="pagination-btn">Previous</a>
+		} else {
+			<span class="pagination-btn disabled">Previous</span>
+		}
+		<span class="pagination-info">Page { pageNum } of { totalPages } ({ total } total)</span>
+		if hasNext {
+			<a href={ nextURL } class="pagination-btn">Next</a>
+		} else {
+			<span class="pagination-btn disabled">Next</span>
+		}
+	</div>
+}
+
+templ ListFilterForm(actionPath string, query string, status string, teacherID string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool) {
+	<form class="list-toolbar" method="GET" action={ actionPath }>
+		<div class="form-group">
+			<label for="q">Search</label>
+			<input type="text" id="q" name="q" value={ query } placeholder="Name..."/>
+		</div>
+		<div class="form-group">
+			<label for="status">Status</label>
+			<select id="status" name="status">
+				<option value="">All</option>
+				<option value="active" selected?={ status == "active" }>Active</option>
+				<option value="inactive" selected?={ status == "inactive" }>Inactive</option>
+				<option value="pending" selected?={ status == "pending" }>Pending</option>
+				<option value="approved" selected?={ status == "approved" }>Approved</option>
+				<option value="conducted" selected?={ status == "conducted" }>Conducted</option>
+				<option value="cancelled" selected?={ status == "cancelled" }>Cancelled</option>
+				<option value="rescheduled" selected?={ status == "rescheduled" }>Rescheduled</option>
+			</select>
+		</div>
+		if showTeacher {
+			@TeacherFilterDropdown(teacherID)
+		}
+		if showEmail {
+			<div class="form-group">
+				<label for="email">Email</label>
+				<input type="text" id="email" name="email" value={ email } placeholder="Email..."/>
+			</div>
+		}
+		if showModule {
+			<div class="form-group">
+				<label for="module">Module</label>
+				<input type="text" id="module" name="module" value={ module } placeholder="e.g. classes"/>
+			</div>
+		}
+		if showDateRange {
+			<div class="form-group">
+				<label for="startDate">From</label>
+				<input type="date" id="startDate" name="startDate" value={ startDate }/>
+			</div>
+			<div class="form-group">
+				<label for="endDate">To</label>
+				<input type="date" id="endDate" name="endDate" value={ endDate }/>
+			</div>
+		}
+		<button type="submit">Filter</button>
+	</form>
+}
+
+templ TeacherFilterDropdown(selectedID string) {
+	<div class="form-group">
+		<label for="teacherId">Teacher</label>
+		<select
+			id="teacherId"
+			name="teacherId"
+			hx-get={ utils.URL("/api/teachers") }
+			hx-trigger="load"
+			hx-target="this"
+			hx-swap="innerHTML"
+		>
+			<option value="">All teachers</option>
+			if selectedID != "" {
+				<option value={ selectedID } selected>{ "Teacher #" + selectedID }</option>
+			}
+		</select>
+	</div>
+}
+
+type TeacherOption struct {
+	ID       string
+	Name     string
+	Selected bool
+}
+
+templ TeacherMultiSelect(teachers []TeacherOption) {
+	<div class="form-group">
+		<label>Assigned Teachers *</label>
+		<div class="checkbox-group">
+			for _, t := range teachers {
+				<label class="checkbox-label">
+					<input type="checkbox" name="teachers" value={ t.ID } checked?={ t.Selected }/>
+					{ t.Name }
+				</label>
+			}
+		</div>
+	</div>
+}

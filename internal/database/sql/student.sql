@@ -8,6 +8,9 @@ SELECT COUNT(*) as count FROM tbl_students WHERE name = ?;
 -- name: GetStudentIDByName :one
 SELECT id FROM tbl_students WHERE name = ?;
 
+-- name: GetStudentByNameExcludingID :one
+SELECT COUNT(*) as count FROM tbl_students WHERE name = ? AND id != ?;
+
 -- name: GetAllStudents :many
 SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, created_at, updated_at
 FROM tbl_students
@@ -24,6 +27,11 @@ SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color,
 FROM tbl_students
 WHERE id = ?;
 
+-- name: UpdateStudent :exec
+UPDATE tbl_students
+SET name = ?, currency = ?, contact = ?, rate_per_class = ?, parent_name = ?, assigned_color = ?, status = ?, updated_at = datetime('now')
+WHERE id = ?;
+
 -- name: SearchStudentsByName :many
 SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, created_at, updated_at
 FROM tbl_students
@@ -31,3 +39,25 @@ WHERE name LIKE '%' || ? || '%'
 ORDER BY name ASC
 LIMIT 10;
 
+-- name: CountStudentsFiltered :one
+SELECT COUNT(DISTINCT s.id) as count
+FROM tbl_students s
+LEFT JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
+WHERE (? = '' OR s.name LIKE '%' || ? || '%')
+  AND (? = '' OR s.status = ?)
+  AND (? = 0 OR m2m.teacher_id = ?);
+
+-- name: GetStudentsFiltered :many
+SELECT DISTINCT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
+FROM tbl_students s
+LEFT JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
+WHERE (? = '' OR s.name LIKE '%' || ? || '%')
+  AND (? = '' OR s.status = ?)
+  AND (? = 0 OR m2m.teacher_id = ?)
+ORDER BY s.created_at DESC
+LIMIT ? OFFSET ?;
+
+-- name: CountStudentsByStatus :many
+SELECT status, COUNT(*) as count
+FROM tbl_students
+GROUP BY status;

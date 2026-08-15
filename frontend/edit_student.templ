@@ -1,0 +1,65 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+type EditStudentData struct {
+	ID            string
+	Name          string
+	Currency      string
+	Contact       string
+	RatePerClass  float64
+	ParentName    string
+	AssignedColor string
+	Status        string
+	Teachers      []TeacherOption
+}
+
+templ EditStudent(data EditStudentData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Edit Student - Zion English Admin</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@SuccessBanner()
+			@ErrorBanner()
+
+			<form hx-post={ utils.URL("/students/" + data.ID + "/edit") } hx-swap="innerHTML" hx-target="#logOutput">
+				<div class="form-group">
+					<label for="name">Student Name *</label>
+					<input type="text" id="name" name="name" required value={ data.Name }/>
+				</div>
+				<div class="form-row">
+					@CurrencyDropdownWithValue(data.Currency)
+					@StudentStatusDropdownWithValue(data.Status)
+				</div>
+				<div class="form-group">
+					<label for="contact">Contact</label>
+					<input type="text" id="contact" name="contact" value={ data.Contact }/>
+				</div>
+				<div class="form-group">
+					<label for="ratePerClass">Rate Per Class *</label>
+					<input type="number" id="ratePerClass" name="ratePerClass" required step="0.01" min="0" value={ formatFloat(data.RatePerClass) }/>
+				</div>
+				<div class="form-group">
+					<label for="parentName">Parent's Name</label>
+					<input type="text" id="parentName" name="parentName" value={ data.ParentName }/>
+				</div>
+				@TeacherMultiSelect(data.Teachers)
+				<div class="form-group">
+					<label for="assignedColor">Assigned Color *</label>
+					<input type="color" id="assignedColor" name="assignedColor" required value={ data.AssignedColor }/>
+				</div>
+				<button type="submit">Save Changes</button>
+			</form>
+			<div id="logOutput"></div>
+		</div>
+	</body>
+	</html>
+}

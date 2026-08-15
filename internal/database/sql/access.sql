@@ -88,3 +88,10 @@ SELECT
 FROM tbl_accesses
 WHERE id = ?
 LIMIT 1;
+
+-- name: GetLatestOpenAccessByTeacherID :one
+SELECT id
+FROM tbl_accesses
+WHERE teacher_id = ? AND logout_at IS NULL
+ORDER BY login_at DESC
+LIMIT 1;

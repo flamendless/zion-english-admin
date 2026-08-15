@@ -5,6 +5,13 @@ import "time"
 import "zion-english/internal/models"
 import "zion-english/internal/utils"
 
+func getDisplayValue(value string) string {
+	if value != "" {
+		return value
+	}
+	return "-"
+}
+
 var onceScrPassword = templ.NewOnceHandle()
 
 templ Flam() {
@@ -66,24 +73,38 @@ templ StudentSearchResults(students []models.StudentAPIResponse) {
 	</div>
 }
 
-templ DatePreset() {
-	{{
-		now := time.Now()
-		year, month, _ := now.Date()
-		firstOfMonth := time.Date(year, month, 1, 0, 0, 0, 0, time.Local)
-		lastOfMonth := firstOfMonth.AddDate(0, 1, -1).Day() // Day() gives day number
+func currentCutoffRange() (firstCutoff string, secondCutoff string, activeCutoff string) {
+	now := time.Now()
+	year, month, day := now.Date()
+	lastOfMonth := time.Date(year, month, 1, 0, 0, 0, 0, time.Local).AddDate(0, 1, -1).Day()
 
-		a := time.Date(year, month, 1, 0, 0, 0, 0, time.Local).Format("2006-01-02")
-		b := time.Date(year, month, 15, 0, 0, 0, 0, time.Local).Format("2006-01-02")
-		c := time.Date(year, month, 16, 0, 0, 0, 0, time.Local).Format("2006-01-02")
-		d := time.Date(year, month, lastOfMonth, 0, 0, 0, 0, time.Local).Format("2006-01-02")
+	a := time.Date(year, month, 1, 0, 0, 0, 0, time.Local).Format("2006-01-02")
+	b := time.Date(year, month, 15, 0, 0, 0, 0, time.Local).Format("2006-01-02")
+	c := time.Date(year, month, 16, 0, 0, 0, 0, time.Local).Format("2006-01-02")
+	d := time.Date(year, month, lastOfMonth, 0, 0, 0, 0, time.Local).Format("2006-01-02")
+
+	firstCutoff = fmt.Sprintf("%s|%s", a, b)
+	secondCutoff = fmt.Sprintf("%s|%s", c, d)
+	if day <= 15 {
+		activeCutoff = firstCutoff
+	} else {
+		activeCutoff = secondCutoff
+	}
+	return firstCutoff, secondCutoff, activeCutoff
+}
+
+templ DatePreset(selectCurrentCutoff bool) {
+	{{
+		firstCutoff, secondCutoff, activeCutoff := currentCutoffRange()
 	}}
 	<div class="form-group">
 		<label for="datePreset">Date Range</label>
 		<select id="datePreset" name="datePreset">
-			<option value="">-- Select Range --</option>
-			<option value={ fmt.Sprintf("%s|%s", a, b) }>first cut-off</option>
-			<option value={ fmt.Sprintf("%s|%s", c, d) }>second cut-off</option>
+			if !selectCurrentCutoff {
+				<option value="">-- Select Range --</option>
+			}
+			<option value={ firstCutoff } selected?={ selectCurrentCutoff && activeCutoff == firstCutoff }>first cut-off</option>
+			<option value={ secondCutoff } selected?={ selectCurrentCutoff && activeCutoff == secondCutoff }>second cut-off</option>
 		</select>
 	</div>
 }

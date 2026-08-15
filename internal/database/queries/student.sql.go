@@ -10,6 +10,72 @@ import (
 	"database/sql"
 )
 
+const countStudentsByStatus = `-- name: CountStudentsByStatus :many
+SELECT status, COUNT(*) as count
+FROM tbl_students
+GROUP BY status
+`
+
+type CountStudentsByStatusRow struct {
+	Status string
+	Count  int64
+}
+
+func (q *Queries) CountStudentsByStatus(ctx context.Context) ([]CountStudentsByStatusRow, error) {
+	rows, err := q.db.QueryContext(ctx, countStudentsByStatus)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CountStudentsByStatusRow
+	for rows.Next() {
+		var i CountStudentsByStatusRow
+		if err := rows.Scan(&i.Status, &i.Count); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const countStudentsFiltered = `-- name: CountStudentsFiltered :one
+SELECT COUNT(DISTINCT s.id) as count
+FROM tbl_students s
+LEFT JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
+WHERE (? = '' OR s.name LIKE '%' || ? || '%')
+  AND (? = '' OR s.status = ?)
+  AND (? = 0 OR m2m.teacher_id = ?)
+`
+
+type CountStudentsFilteredParams struct {
+	Column1   interface{}
+	Column2   sql.NullString
+	Column3   interface{}
+	Status    string
+	Column5   interface{}
+	TeacherID int64
+}
+
+func (q *Queries) CountStudentsFiltered(ctx context.Context, arg CountStudentsFilteredParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countStudentsFiltered,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Status,
+		arg.Column5,
+		arg.TeacherID,
+	)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getActiveStudents = `-- name: GetActiveStudents :many
 SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, created_at, updated_at
 FROM tbl_students
@@ -126,6 +192,22 @@ func (q *Queries) GetStudentByName(ctx context.Context, name string) (int64, err
 	return count, err
 }
 
+const getStudentByNameExcludingID = `-- name: GetStudentByNameExcludingID :one
+SELECT COUNT(*) as count FROM tbl_students WHERE name = ? AND id != ?
+`
+
+type GetStudentByNameExcludingIDParams struct {
+	Name string
+	ID   int64
+}
+
+func (q *Queries) GetStudentByNameExcludingID(ctx context.Context, arg GetStudentByNameExcludingIDParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getStudentByNameExcludingID, arg.Name, arg.ID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getStudentIDByName = `-- name: GetStudentIDByName :one
 SELECT id FROM tbl_students WHERE name = ?
 `
@@ -135,6 +217,71 @@ func (q *Queries) GetStudentIDByName(ctx context.Context, name string) (int64, e
 	var id int64
 	err := row.Scan(&id)
 	return id, err
+}
+
+const getStudentsFiltered = `-- name: GetStudentsFiltered :many
+SELECT DISTINCT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
+FROM tbl_students s
+LEFT JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
+WHERE (? = '' OR s.name LIKE '%' || ? || '%')
+  AND (? = '' OR s.status = ?)
+  AND (? = 0 OR m2m.teacher_id = ?)
+ORDER BY s.created_at DESC
+LIMIT ? OFFSET ?
+`
+
+type GetStudentsFilteredParams struct {
+	Column1   interface{}
+	Column2   sql.NullString
+	Column3   interface{}
+	Status    string
+	Column5   interface{}
+	TeacherID int64
+	Limit     int64
+	Offset    int64
+}
+
+func (q *Queries) GetStudentsFiltered(ctx context.Context, arg GetStudentsFilteredParams) ([]TblStudent, error) {
+	rows, err := q.db.QueryContext(ctx, getStudentsFiltered,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Status,
+		arg.Column5,
+		arg.TeacherID,
+		arg.Limit,
+		arg.Offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TblStudent
+	for rows.Next() {
+		var i TblStudent
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Currency,
+			&i.Contact,
+			&i.RatePerClass,
+			&i.ParentName,
+			&i.AssignedColor,
+			&i.Status,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const insertStudent = `-- name: InsertStudent :exec
@@ -205,4 +352,35 @@ func (q *Queries) SearchStudentsByName(ctx context.Context, dollar_1 sql.NullStr
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateStudent = `-- name: UpdateStudent :exec
+UPDATE tbl_students
+SET name = ?, currency = ?, contact = ?, rate_per_class = ?, parent_name = ?, assigned_color = ?, status = ?, updated_at = datetime('now')
+WHERE id = ?
+`
+
+type UpdateStudentParams struct {
+	Name          string
+	Currency      string
+	Contact       sql.NullString
+	RatePerClass  float64
+	ParentName    sql.NullString
+	AssignedColor string
+	Status        string
+	ID            int64
+}
+
+func (q *Queries) UpdateStudent(ctx context.Context, arg UpdateStudentParams) error {
+	_, err := q.db.ExecContext(ctx, updateStudent,
+		arg.Name,
+		arg.Currency,
+		arg.Contact,
+		arg.RatePerClass,
+		arg.ParentName,
+		arg.AssignedColor,
+		arg.Status,
+		arg.ID,
+	)
+	return err
 }

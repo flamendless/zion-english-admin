@@ -10,6 +10,37 @@ import (
 	"database/sql"
 )
 
+const countProcessingLogsFiltered = `-- name: CountProcessingLogsFiltered :one
+SELECT COUNT(*) as count
+FROM tbl_processing_logs
+WHERE (? = '' OR name LIKE '%' || ? || '%')
+  AND (? = '' OR created_at >= ?)
+  AND (? = '' OR created_at <= ?)
+`
+
+type CountProcessingLogsFilteredParams struct {
+	Column1     interface{}
+	Column2     sql.NullString
+	Column3     interface{}
+	CreatedAt   sql.NullTime
+	Column5     interface{}
+	CreatedAt_2 sql.NullTime
+}
+
+func (q *Queries) CountProcessingLogsFiltered(ctx context.Context, arg CountProcessingLogsFilteredParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countProcessingLogsFiltered,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.CreatedAt,
+		arg.Column5,
+		arg.CreatedAt_2,
+	)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getAllProcessingLogs = `-- name: GetAllProcessingLogs :many
 SELECT id, google_drive_url, name, template, start_date, end_date,
        excluded_rows, useragent, output_path, errors, created_at
@@ -76,6 +107,72 @@ func (q *Queries) GetProcessingLogByID(ctx context.Context, id int64) (TblProces
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const getProcessingLogsFiltered = `-- name: GetProcessingLogsFiltered :many
+SELECT id, google_drive_url, name, template, start_date, end_date,
+       excluded_rows, useragent, output_path, errors, created_at
+FROM tbl_processing_logs
+WHERE (? = '' OR name LIKE '%' || ? || '%')
+  AND (? = '' OR created_at >= ?)
+  AND (? = '' OR created_at <= ?)
+ORDER BY created_at DESC
+LIMIT ? OFFSET ?
+`
+
+type GetProcessingLogsFilteredParams struct {
+	Column1     interface{}
+	Column2     sql.NullString
+	Column3     interface{}
+	CreatedAt   sql.NullTime
+	Column5     interface{}
+	CreatedAt_2 sql.NullTime
+	Limit       int64
+	Offset      int64
+}
+
+func (q *Queries) GetProcessingLogsFiltered(ctx context.Context, arg GetProcessingLogsFilteredParams) ([]TblProcessingLog, error) {
+	rows, err := q.db.QueryContext(ctx, getProcessingLogsFiltered,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.CreatedAt,
+		arg.Column5,
+		arg.CreatedAt_2,
+		arg.Limit,
+		arg.Offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TblProcessingLog
+	for rows.Next() {
+		var i TblProcessingLog
+		if err := rows.Scan(
+			&i.ID,
+			&i.GoogleDriveUrl,
+			&i.Name,
+			&i.Template,
+			&i.StartDate,
+			&i.EndDate,
+			&i.ExcludedRows,
+			&i.Useragent,
+			&i.OutputPath,
+			&i.Errors,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const insertProcessingLog = `-- name: InsertProcessingLog :exec

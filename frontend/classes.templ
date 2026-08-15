@@ -14,7 +14,11 @@ templ Classes(data ClassesData) {
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>View Classes - Zion English Admin</title>
+		if data.LockTeacher {
+			<title>My Classes - Zion English Admin</title>
+		} else {
+			<title>View Classes - Zion English Admin</title>
+		}
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
 	</head>
@@ -23,6 +27,11 @@ templ Classes(data ClassesData) {
 			@HeaderSimple()
 			@SuccessBanner()
 			@ErrorBanner()
+			if data.LockTeacher {
+				@HubHeader("My Classes", "Record Class", utils.URL("/classes/record"), true)
+			} else {
+				@HubHeader("Classes", "Record Class", utils.URL("/classes/record"), true)
+			}
 
 			<div class="toolbar">
 				if data.LockTeacher {
@@ -34,12 +43,27 @@ templ Classes(data ClassesData) {
 				} else {
 					@TeacherDropdown()
 				}
-				@DatePreset()
+				@DatePreset(true)
+				<div class="form-group">
+					<label for="statusFilter">Status</label>
+					<select id="statusFilter">
+						<option value="">All</option>
+						<option value="conducted">Conducted</option>
+						<option value="cancelled">Cancelled</option>
+						<option value="rescheduled">Rescheduled</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label for="studentSearch">Student</label>
+					<input type="text" id="studentSearch" placeholder="Search student name..."/>
+				</div>
 				<button type="button" id="filterBtn">Filter</button>
 				<div class="total-section">
 					Total: <span id="totalRate">0</span> <span id="totalCurrency"></span>
 				</div>
 			</div>
+
+			<div id="paginationTop" class="pagination-bar"></div>
 
 			<div class="table-wrapper">
 			<table id="classesTable">
@@ -50,20 +74,23 @@ templ Classes(data ClassesData) {
 						<th>Rate</th>
 						<th>Status</th>
 						<th>Reason</th>
+						<th>Notes</th>
 						<th>Date</th>
+						<th>Actions</th>
 					</tr>
 				</thead>
 				<tbody id="classesTableBody">
 					<tr>
 						if data.LockTeacher {
-							<td colspan="6" class="empty-state">Select a date range to view classes</td>
+							<td colspan="8" class="empty-state">Loading classes...</td>
 						} else {
-							<td colspan="6" class="empty-state">Select a teacher and date range to view classes</td>
+							<td colspan="8" class="empty-state">Select a teacher to view classes</td>
 						}
 					</tr>
 				</tbody>
 			</table>
 			</div>
+			<div id="paginationBottom" class="pagination-bar"></div>
 		</div>
 
 		<script>
@@ -73,23 +100,27 @@ templ Classes(data ClassesData) {
 			const tableBody = document.getElementById('classesTableBody');
 			const totalRateSpan = document.getElementById('totalRate');
 			const totalCurrencySpan = document.getElementById('totalCurrency');
+			const statusFilter = document.getElementById('statusFilter');
+			const studentSearch = document.getElementById('studentSearch');
+			const paginationTop = document.getElementById('paginationTop');
+			const paginationBottom = document.getElementById('paginationBottom');
+
+			let currentPage = 1;
+			const pageSize = 25;
 
 			function getBaseURL() {
 				const pathname = window.location.pathname;
 				const cleanPath = pathname.replace(/\/$/, '');
 				const parts = cleanPath.split('/').filter(p => p !== '');
-
 				if (parts.length === 0 || cleanPath.endsWith('.html')) {
 					if (cleanPath.includes('/zion-english-admin')) {
 						return '/zion-english-admin';
 					}
 					return '';
 				}
-
 				if (parts.length === 1) {
 					return '/' + parts[0];
 				}
-
 				return '/' + parts.slice(0, -1).join('/');
 			}
 
@@ -99,96 +130,147 @@ templ Classes(data ClassesData) {
 				return baseURL + path;
 			}
 
+			function setDateRangeFromPreset(value) {
+				if (!value) {
+					delete datePresetSelect.dataset.startDate;
+					delete datePresetSelect.dataset.endDate;
+					return;
+				}
+				const parts = value.split('|');
+				if (parts.length !== 2) return;
+				datePresetSelect.dataset.startDate = parts[0];
+				datePresetSelect.dataset.endDate = parts[1];
+			}
+
 			datePresetSelect.addEventListener('change', () => {
-				const value = datePresetSelect.value;
-				if (!value) return;
-
-				const today = new Date();
-				const year = today.getFullYear();
-				const month = today.getMonth();
-
-				function formatDate(date) {
-					const y = date.getFullYear();
-					const m = String(date.getMonth() + 1).padStart(2, '0');
-					const d = String(date.getDate()).padStart(2, '0');
-					return y + '-' + m + '-' + d;
-				}
-
-				if (value === '1-15') {
-					const start = new Date(year, month, 1);
-					const end = new Date(year, month, 15);
-					datePresetSelect.dataset.startDate = formatDate(start);
-					datePresetSelect.dataset.endDate = formatDate(end);
-				}
-
-				if (value === '16-30') {
-					const start = new Date(year, month, 16);
-					const end = new Date(year, month, 30);
-					datePresetSelect.dataset.startDate = formatDate(start);
-					datePresetSelect.dataset.endDate = formatDate(end);
-				}
+				setDateRangeFromPreset(datePresetSelect.value);
 			});
 
-			filterBtn.addEventListener('click', async () => {
+			function renderPagination(page) {
+				let html = '';
+				if (page.number > 1) {
+					html += '<button type="button" class="pagination-btn" data-page="' + (page.number - 1) + '">Previous</button>';
+				} else {
+					html += '<span class="pagination-btn disabled">Previous</span>';
+				}
+				html += '<span class="pagination-info">Page ' + page.number + ' of ' + page.totalPages + ' (' + page.total + ' total)</span>';
+				if (page.number < page.totalPages) {
+					html += '<button type="button" class="pagination-btn" data-page="' + (page.number + 1) + '">Next</button>';
+				} else {
+					html += '<span class="pagination-btn disabled">Next</span>';
+				}
+				paginationTop.innerHTML = html;
+				paginationBottom.innerHTML = html;
+				document.querySelectorAll('.pagination-btn[data-page]').forEach(btn => {
+					btn.addEventListener('click', () => {
+						currentPage = parseInt(btn.dataset.page, 10);
+						loadRecords();
+					});
+				});
+			}
+
+			async function loadRecords() {
 				const teacherId = teacherSelect.value;
 				const startDate = datePresetSelect.dataset.startDate;
 				const endDate = datePresetSelect.dataset.endDate;
+				const status = statusFilter.value;
+				const q = studentSearch.value.trim();
 
 				if (!teacherId) {
 					alert('Please select a teacher');
 					return;
 				}
-
 				if (!startDate || !endDate) {
 					alert('Please select a date range');
 					return;
 				}
 
 				try {
-					const response = await fetch(
-						buildURL(`/api/class-records?teacherId=${teacherId}&startDate=${startDate}&endDate=${endDate}`)
-					);
+					const params = new URLSearchParams({
+						teacherId, startDate, endDate,
+						page: String(currentPage),
+						pageSize: String(pageSize),
+					});
+					if (status) params.set('status', status);
+					if (q) params.set('q', q);
+
+					const response = await fetch(buildURL(`/api/class-records?${params}`));
 					const data = await response.json();
 
 					tableBody.innerHTML = '';
 
-					if (data.records.length === 0) {
-						tableBody.innerHTML = '<tr><td colspan="6" class="empty-state">No classes found for the selected criteria</td></tr>';
+					if (!data.records || data.records.length === 0) {
+						tableBody.innerHTML = '<tr><td colspan="8" class="empty-state">No classes found for the selected criteria</td></tr>';
 					} else {
 						data.records.forEach(record => {
 							const row = document.createElement('tr');
 							if (record.status === 'cancelled') {
 								row.classList.add('row-cancelled');
 							}
-
+							const editHref = buildURL('/classes/' + record.id + '/edit');
 							const cells = [
 								record.studentName,
 								String(record.durationMinutes),
-								`${record.rate} ${record.currency}`,
+								record.rate + ' ' + record.currency,
 								record.status,
 								record.reason || '-',
+								record.notes || '-',
 								record.date,
 							];
 							cells.forEach((text, index) => {
 								const cell = document.createElement('td');
 								cell.textContent = text;
 								if (index === 3) {
-									cell.className = `status-${record.status}`;
+									cell.className = 'status-' + record.status;
 								}
 								row.appendChild(cell);
 							});
+							const actionCell = document.createElement('td');
+							const editLink = document.createElement('a');
+							editLink.href = editHref;
+							editLink.className = 'edit-btn';
+							editLink.textContent = 'Edit';
+							actionCell.appendChild(editLink);
+							row.appendChild(actionCell);
 							tableBody.appendChild(row);
 						});
 					}
 
 					totalRateSpan.textContent = data.totalRate || 0;
-					totalCurrencySpan.textContent = data.records.length > 0 ? data.records[0].currency : '';
+					totalCurrencySpan.textContent = data.records && data.records.length > 0 ? data.records[0].currency : '';
+					if (data.page) {
+						renderPagination(data.page);
+					}
 				} catch (error) {
 					console.error('Failed to load class records:', error);
 					showErrorBanner(error.message);
-					tableBody.innerHTML = '<tr><td colspan="6" class="empty-state">Error loading classes</td></tr>';
+					tableBody.innerHTML = '<tr><td colspan="8" class="empty-state">Error loading classes</td></tr>';
 				}
+			}
+
+			filterBtn.addEventListener('click', () => {
+				currentPage = 1;
+				loadRecords();
 			});
+
+			teacherSelect.addEventListener('change', () => {
+				if (!teacherSelect.value || !datePresetSelect.dataset.startDate) {
+					return;
+				}
+				currentPage = 1;
+				loadRecords();
+			});
+
+			function initPage() {
+				if (datePresetSelect.value) {
+					setDateRangeFromPreset(datePresetSelect.value);
+				}
+				if (teacherSelect.value && datePresetSelect.dataset.startDate) {
+					loadRecords();
+				}
+			}
+
+			initPage();
 		</script>
 	</body>
 	</html>

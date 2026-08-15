@@ -3,8 +3,20 @@ package frontend
 import "zion-english/internal/utils"
 
 type SystemLogData struct {
-	Logs          []SystemLogItem
-	HideCreatedBy bool
+	Logs           []SystemLogItem
+	HideCreatedBy  bool
+	Query          string
+	Module         string
+	StartDate      string
+	EndDate        string
+	PageNumber     int
+	PageTotalPages int
+	PageTotal      int64
+	PrevURL        string
+	NextURL        string
+	HasPrev        bool
+	HasNext        bool
+	FilterPath     string
 }
 
 type SystemLogItem struct {
@@ -32,6 +44,13 @@ templ SystemLogs(data SystemLogData) {
 	<body>
 		<div class="container">
 			@HeaderSimple()
+			if data.HideCreatedBy {
+				@HubHeader("My Activity", "", "", false)
+			} else {
+				@HubHeader("Logs", "", "", false)
+			}
+
+			@ListFilterForm(data.FilterPath, data.Query, "", "", "", data.Module, data.StartDate, data.EndDate, false, false, true, true)
 
 			if len(data.Logs) > 0 {
 				<div class="table-wrapper">
@@ -62,6 +81,7 @@ templ SystemLogs(data SystemLogData) {
 						</tbody>
 					</table>
 				</div>
+				@PaginationBar(data.HasPrev, data.PrevURL, data.HasNext, data.NextURL, data.PageNumber, data.PageTotalPages, data.PageTotal)
 			} else {
 				<div class="empty-state">
 					<p>No logs recorded yet.</p>

@@ -6,7 +6,18 @@ import (
 )
 
 type TeacherData struct {
-	Teachers []TeacherItem
+	Teachers       []TeacherItem
+	Query          string
+	Status         string
+	Email          string
+	PageNumber     int
+	PageTotalPages int
+	PageTotal      int64
+	PrevURL        string
+	NextURL        string
+	HasPrev        bool
+	HasNext        bool
+	FilterPath     string
 }
 
 type TeacherItem struct {
@@ -83,10 +94,9 @@ templ Teachers(data TeacherData) {
 	<body>
 		<div class="container">
 			@HeaderSimple()
+			@HubHeader("Teachers", "New Teacher", utils.URL("/teachers/register"), true)
 
-			<div class="button-group">
-				<a href={utils.URL("/teachers/register")} class="add-btn">Register New Teacher</a>
-			</div>
+			@ListFilterForm(data.FilterPath, data.Query, data.Status, "", data.Email, "", "", "", false, true, false, false)
 
 			if len(data.Teachers) > 0 {
 				<div class="table-wrapper">
@@ -124,6 +134,7 @@ templ Teachers(data TeacherData) {
 									<td class="date-cell">{ teacher.JoiningDate }</td>
 									<td class="rate-cell">{ formatRate(teacher.RatePerClass, teacher.Currency) }</td>
 									<td>
+										<a href={ utils.URL("/teachers/" + teacher.ID + "/edit") } class="edit-btn">Edit</a>
 										if teacher.Status == "pending" {
 											<button
 												type="button"
@@ -148,10 +159,10 @@ templ Teachers(data TeacherData) {
 						</tbody>
 					</table>
 				</div>
+				@PaginationBar(data.HasPrev, data.PrevURL, data.HasNext, data.NextURL, data.PageNumber, data.PageTotalPages, data.PageTotal)
 			} else {
 				<div class="empty-state">
-					<p>No teachers registered yet.</p>
-					<p>Click "Register New Teacher" to add one.</p>
+					<p>No teachers found.</p>
 				</div>
 			}
 		</div>

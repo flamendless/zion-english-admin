@@ -128,6 +128,7 @@ type ClassRecordRequest struct {
 	Currency        string  `json:"currency"`
 	Status          string  `json:"status"`
 	Reason          string  `json:"reason"`
+	Notes           string  `json:"notes"`
 }
 
 type ClassRecordResponse struct {
@@ -148,5 +149,6 @@ type ClassRecordView struct {
 	Currency        string  `json:"currency"`
 	Status          string  `json:"status"`
 	Reason          string  `json:"reason"`
+	Notes           string  `json:"notes"`
 	CreatedAt       string  `json:"createdAt"`
 }

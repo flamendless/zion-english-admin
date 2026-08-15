@@ -8,11 +8,14 @@ func IsNavAccessible(role auth.Role, path string) bool {
 	}
 
 	if role == auth.RoleSuperuser {
+		if path == "/my-students" {
+			return false
+		}
 		return true
 	}
 
 	switch path {
-	case "/classes", "/classes/record", "/profile", "/logs":
+	case "/classes", "/classes/record", "/profile", "/logs", "/my-students":
 		return true
 	default:
 		return false

@@ -10,6 +10,81 @@ import (
 	"database/sql"
 )
 
+const countAllLogsFiltered = `-- name: CountAllLogsFiltered :one
+SELECT COUNT(*) as count
+FROM tbl_logs l
+WHERE (? = '' OR l.module = ?)
+  AND (? = '' OR l.message LIKE '%' || ? || '%')
+  AND (? = '' OR l.created_at >= ?)
+  AND (? = '' OR l.created_at <= ?)
+`
+
+type CountAllLogsFilteredParams struct {
+	Column1     interface{}
+	Module      string
+	Column3     interface{}
+	Column4     sql.NullString
+	Column5     interface{}
+	CreatedAt   string
+	Column7     interface{}
+	CreatedAt_2 string
+}
+
+func (q *Queries) CountAllLogsFiltered(ctx context.Context, arg CountAllLogsFilteredParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countAllLogsFiltered,
+		arg.Column1,
+		arg.Module,
+		arg.Column3,
+		arg.Column4,
+		arg.Column5,
+		arg.CreatedAt,
+		arg.Column7,
+		arg.CreatedAt_2,
+	)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countLogsByCreatedByFiltered = `-- name: CountLogsByCreatedByFiltered :one
+SELECT COUNT(*) as count
+FROM tbl_logs l
+WHERE l.created_by = ?
+  AND (? = '' OR l.module = ?)
+  AND (? = '' OR l.message LIKE '%' || ? || '%')
+  AND (? = '' OR l.created_at >= ?)
+  AND (? = '' OR l.created_at <= ?)
+`
+
+type CountLogsByCreatedByFilteredParams struct {
+	CreatedBy   sql.NullInt64
+	Column2     interface{}
+	Module      string
+	Column4     interface{}
+	Column5     sql.NullString
+	Column6     interface{}
+	CreatedAt   string
+	Column8     interface{}
+	CreatedAt_2 string
+}
+
+func (q *Queries) CountLogsByCreatedByFiltered(ctx context.Context, arg CountLogsByCreatedByFilteredParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countLogsByCreatedByFiltered,
+		arg.CreatedBy,
+		arg.Column2,
+		arg.Module,
+		arg.Column4,
+		arg.Column5,
+		arg.Column6,
+		arg.CreatedAt,
+		arg.Column8,
+		arg.CreatedAt_2,
+	)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getAllLogs = `-- name: GetAllLogs :many
 SELECT l.id, l.module, l.message, l.created_by, l.created_at,
     COALESCE(t.name, l.created_by_name, '') as created_by_name
@@ -36,6 +111,82 @@ func (q *Queries) GetAllLogs(ctx context.Context) ([]GetAllLogsRow, error) {
 	var items []GetAllLogsRow
 	for rows.Next() {
 		var i GetAllLogsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Module,
+			&i.Message,
+			&i.CreatedBy,
+			&i.CreatedAt,
+			&i.CreatedByName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllLogsFiltered = `-- name: GetAllLogsFiltered :many
+SELECT l.id, l.module, l.message, l.created_by, l.created_at,
+    COALESCE(t.name, l.created_by_name, '') as created_by_name
+FROM tbl_logs l
+LEFT JOIN tbl_teachers t ON l.created_by = t.id
+WHERE (? = '' OR l.module = ?)
+  AND (? = '' OR l.message LIKE '%' || ? || '%')
+  AND (? = '' OR l.created_at >= ?)
+  AND (? = '' OR l.created_at <= ?)
+ORDER BY l.created_at DESC
+LIMIT ? OFFSET ?
+`
+
+type GetAllLogsFilteredParams struct {
+	Column1     interface{}
+	Module      string
+	Column3     interface{}
+	Column4     sql.NullString
+	Column5     interface{}
+	CreatedAt   string
+	Column7     interface{}
+	CreatedAt_2 string
+	Limit       int64
+	Offset      int64
+}
+
+type GetAllLogsFilteredRow struct {
+	ID            int64
+	Module        string
+	Message       string
+	CreatedBy     sql.NullInt64
+	CreatedAt     string
+	CreatedByName string
+}
+
+func (q *Queries) GetAllLogsFiltered(ctx context.Context, arg GetAllLogsFilteredParams) ([]GetAllLogsFilteredRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllLogsFiltered,
+		arg.Column1,
+		arg.Module,
+		arg.Column3,
+		arg.Column4,
+		arg.Column5,
+		arg.CreatedAt,
+		arg.Column7,
+		arg.CreatedAt_2,
+		arg.Limit,
+		arg.Offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllLogsFilteredRow
+	for rows.Next() {
+		var i GetAllLogsFilteredRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Module,
@@ -84,6 +235,85 @@ func (q *Queries) GetLogsByCreatedBy(ctx context.Context, createdBy sql.NullInt6
 	var items []GetLogsByCreatedByRow
 	for rows.Next() {
 		var i GetLogsByCreatedByRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Module,
+			&i.Message,
+			&i.CreatedBy,
+			&i.CreatedAt,
+			&i.CreatedByName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getLogsByCreatedByFiltered = `-- name: GetLogsByCreatedByFiltered :many
+SELECT l.id, l.module, l.message, l.created_by, l.created_at,
+    COALESCE(t.name, l.created_by_name, '') as created_by_name
+FROM tbl_logs l
+LEFT JOIN tbl_teachers t ON l.created_by = t.id
+WHERE l.created_by = ?
+  AND (? = '' OR l.module = ?)
+  AND (? = '' OR l.message LIKE '%' || ? || '%')
+  AND (? = '' OR l.created_at >= ?)
+  AND (? = '' OR l.created_at <= ?)
+ORDER BY l.created_at DESC
+LIMIT ? OFFSET ?
+`
+
+type GetLogsByCreatedByFilteredParams struct {
+	CreatedBy   sql.NullInt64
+	Column2     interface{}
+	Module      string
+	Column4     interface{}
+	Column5     sql.NullString
+	Column6     interface{}
+	CreatedAt   string
+	Column8     interface{}
+	CreatedAt_2 string
+	Limit       int64
+	Offset      int64
+}
+
+type GetLogsByCreatedByFilteredRow struct {
+	ID            int64
+	Module        string
+	Message       string
+	CreatedBy     sql.NullInt64
+	CreatedAt     string
+	CreatedByName string
+}
+
+func (q *Queries) GetLogsByCreatedByFiltered(ctx context.Context, arg GetLogsByCreatedByFilteredParams) ([]GetLogsByCreatedByFilteredRow, error) {
+	rows, err := q.db.QueryContext(ctx, getLogsByCreatedByFiltered,
+		arg.CreatedBy,
+		arg.Column2,
+		arg.Module,
+		arg.Column4,
+		arg.Column5,
+		arg.Column6,
+		arg.CreatedAt,
+		arg.Column8,
+		arg.CreatedAt_2,
+		arg.Limit,
+		arg.Offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetLogsByCreatedByFilteredRow
+	for rows.Next() {
+		var i GetLogsByCreatedByFilteredRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Module,

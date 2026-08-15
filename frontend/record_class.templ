@@ -48,6 +48,10 @@ templ RecordClass(data RecordClassData) {
 								alert('Invalid rate')
 								halt
 							end
+							if #status.value is not 'conducted' and #reason.value is ''
+								alert('Reason is required for cancelled or rescheduled classes')
+								halt
+							end
 						end
 					"
 				>
@@ -77,6 +81,10 @@ templ RecordClass(data RecordClassData) {
 							end
 							if #rate.value < 0
 								alert('Invalid rate')
+								halt
+							end
+							if #status.value is not 'conducted' and #reason.value is ''
+								alert('Reason is required for cancelled or rescheduled classes')
 								halt
 							end
 						end
@@ -125,12 +133,34 @@ templ RecordClassFields() {
 		</div>
 	</div>
 
-	<div class="form-row">
+	<div
+		class="form-row"
+		_="
+			on change from #status
+				if #status.value is 'conducted'
+					add @hidden to #reasonGroup
+					set #reason.value to ''
+				else
+					remove @hidden from #reasonGroup
+				end
+			end
+			on load
+				if #status.value is 'conducted'
+					add @hidden to #reasonGroup
+				end
+			end
+		"
+	>
 		@ClassStatusDropdown()
-		<div class="form-group">
-			<label for="reason">Reason</label>
+		<div class="form-group" id="reasonGroup" hidden>
+			<label for="reason">Reason *</label>
 			<input type="text" id="reason" name="reason" placeholder="Reason for cancellation/reschedule">
 		</div>
+	</div>
+
+	<div class="form-group">
+		<label for="notes">Notes</label>
+		<textarea id="notes" name="notes" rows="4" placeholder="Lesson notes..."></textarea>
 	</div>
 
 	<button type="submit" id="submitBtn">Record Class</button>

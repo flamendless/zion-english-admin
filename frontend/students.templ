@@ -4,7 +4,18 @@ import "fmt"
 import "zion-english/internal/utils"
 
 type StudentData struct {
-	Students []StudentItem
+	Students       []StudentItem
+	Query          string
+	Status         string
+	TeacherID      string
+	PageNumber     int
+	PageTotalPages int
+	PageTotal      int64
+	PrevURL        string
+	NextURL        string
+	HasPrev        bool
+	HasNext        bool
+	FilterPath     string
 }
 
 type StudentItem struct {
@@ -41,10 +52,9 @@ templ Students(data StudentData) {
 	<body>
 		<div class="container">
 			@HeaderSimple()
+			@HubHeader("Students", "New Student", utils.URL("/students/register"), true)
 
-			<div class="button-group">
-				<a href={utils.URL("/students/register")} class="add-btn">Register New Student</a>
-			</div>
+			@ListFilterForm(data.FilterPath, data.Query, data.Status, data.TeacherID, "", "", "", "", true, false, false, false)
 
 			if len(data.Students) > 0 {
 				<div class="table-wrapper">
@@ -60,6 +70,7 @@ templ Students(data StudentData) {
 								<th>Color</th>
 								<th>Status</th>
 								<th>Created At</th>
+								<th>Actions</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -79,15 +90,18 @@ templ Students(data StudentData) {
 									</td>
 									<td class={ getStatusClass(student.Status) }>{ student.Status }</td>
 									<td>{ student.CreatedAt }</td>
+									<td>
+										<a href={ utils.URL("/students/" + student.ID + "/edit") } class="edit-btn">Edit</a>
+									</td>
 								</tr>
 							}
 						</tbody>
 					</table>
 				</div>
+				@PaginationBar(data.HasPrev, data.PrevURL, data.HasNext, data.NextURL, data.PageNumber, data.PageTotalPages, data.PageTotal)
 			} else {
 				<div class="empty-state">
-					<p>No students registered yet.</p>
-					<p>Click "Register New Student" to add one.</p>
+					<p>No students found.</p>
 				</div>
 			}
 		</div>

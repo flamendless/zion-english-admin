@@ -31,6 +31,7 @@ type TblClassRecord struct {
 	CreatedAt       string
 	UpdatedAt       string
 	RecordedByRole  string
+	Notes           sql.NullString
 }
 
 type TblLog struct {

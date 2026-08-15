@@ -1052,6 +1052,122 @@ templ GlobalIncludes() {
 			gap: var(--space-5);
 		}
 
+		.dashboard-stats {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+			gap: var(--space-4);
+			margin-bottom: var(--space-6);
+		}
+
+		.stat-card {
+			background: var(--color-surface);
+			border: 1px solid var(--color-border-subtle);
+			border-radius: var(--radius-md);
+			padding: var(--space-4);
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-2);
+		}
+
+		.stat-label {
+			font-size: 0.85rem;
+			color: var(--color-text-muted);
+		}
+
+		.stat-value {
+			font-size: 1.25rem;
+			font-weight: 600;
+		}
+
+		.stat-sub {
+			font-size: 0.8rem;
+			color: var(--color-text-muted);
+		}
+
+		.hub-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: var(--space-4);
+			margin-bottom: var(--space-4);
+		}
+
+		.hub-title {
+			margin: 0;
+		}
+
+		.list-toolbar {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--space-3);
+			align-items: flex-end;
+			margin-bottom: var(--space-4);
+			padding: var(--space-4);
+			background: var(--color-surface);
+			border-radius: var(--radius-md);
+			border: 1px solid var(--color-border-subtle);
+		}
+
+		.pagination-bar {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: var(--space-4);
+			margin: var(--space-4) 0;
+		}
+
+		.pagination-btn {
+			padding: var(--space-2) var(--space-4);
+			border-radius: var(--radius-sm);
+			background: var(--color-primary);
+			color: white;
+			text-decoration: none;
+			border: none;
+			cursor: pointer;
+		}
+
+		.pagination-btn.disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+			background: var(--color-border);
+		}
+
+		.pagination-info {
+			font-size: 0.9rem;
+			color: var(--color-text-muted);
+		}
+
+		.edit-btn {
+			display: inline-block;
+			padding: var(--space-1) var(--space-3);
+			border-radius: var(--radius-sm);
+			background: var(--color-surface-elevated);
+			border: 1px solid var(--color-border);
+			text-decoration: none;
+			font-size: 0.85rem;
+		}
+
+		.checkbox-group {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-2);
+		}
+
+		.checkbox-label {
+			display: flex;
+			align-items: center;
+			gap: var(--space-2);
+		}
+
+		textarea {
+			width: 100%;
+			min-height: 80px;
+			padding: var(--space-3);
+			border-radius: var(--radius-sm);
+			border: 1px solid var(--color-border);
+			font-family: inherit;
+		}
+
 		.card {
 			background: var(--color-surface);
 			border-radius: var(--radius-lg);

@@ -15,6 +15,9 @@ templ Process() {
 		<body>
 			<div class="container">
 				@HeaderSimple()
+				<div class="button-group">
+					<a href={ utils.URL("/process-logs") } class="add-btn">View Processing Logs</a>
+				</div>
 				@SuccessBanner()
 				@ErrorBanner()
 				<form
@@ -95,7 +98,7 @@ templ Process() {
 								end
 							"
 						>
-							@DatePreset()
+							@DatePreset(false)
 						</div>
 						<div class="column-row">
 							@DateInput("startDate", "Start Date *")

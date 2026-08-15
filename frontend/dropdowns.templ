@@ -81,6 +81,39 @@ templ StudentSearchbox() {
 	</div>
 }
 
+templ CurrencyDropdownWithValue(selected string) {
+	<div class="form-group">
+		<label for="currency">Currency *</label>
+		<select id="currency" name="currency" required>
+			<option value="KRW" selected?={ selected == "KRW" }>KRW (Korean Won)</option>
+			<option value="CAD" selected?={ selected == "CAD" }>CAD (Canadian Dollar)</option>
+			<option value="YEN" selected?={ selected == "YEN" }>YEN (Japanese Yen)</option>
+			<option value="PHP" selected?={ selected == "PHP" }>PHP (Philippine Peso)</option>
+		</select>
+	</div>
+}
+
+templ ClassStatusDropdownWithValue(selected string) {
+	<div class="form-group">
+		<label for="status">Status *</label>
+		<select id="status" name="status" required>
+			<option value="conducted" selected?={ selected == "conducted" }>Conducted</option>
+			<option value="cancelled" selected?={ selected == "cancelled" }>Cancelled</option>
+			<option value="rescheduled" selected?={ selected == "rescheduled" }>Rescheduled</option>
+		</select>
+	</div>
+}
+
+templ StudentStatusDropdownWithValue(selected string) {
+	<div class="form-group">
+		<label for="status">Status *</label>
+		<select id="status" name="status" required>
+			<option value="active" selected?={ selected == "active" }>Active</option>
+			<option value="inactive" selected?={ selected == "inactive" }>Inactive</option>
+		</select>
+	</div>
+}
+
 templ CurrencyDropdown() {
 	<div class="form-group">
 		<label for="currency">Currency *</label>

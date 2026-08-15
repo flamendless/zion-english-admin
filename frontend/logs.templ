@@ -3,7 +3,18 @@ package frontend
 import "zion-english/internal/utils"
 
 type ProcessingLogData struct {
-	Logs []ProcessingLogItem
+	Logs           []ProcessingLogItem
+	Query          string
+	StartDate      string
+	EndDate        string
+	PageNumber     int
+	PageTotalPages int
+	PageTotal      int64
+	PrevURL        string
+	NextURL        string
+	HasPrev        bool
+	HasNext        bool
+	FilterPath     string
 }
 
 type ProcessingLogItem struct {
@@ -41,13 +52,6 @@ func getErrorDisplay(errors string) string {
 	return "Success"
 }
 
-func getDisplayValue(value string) string {
-	if value != "" {
-		return value
-	}
-	return "-"
-}
-
 templ ProcessingLogs(data ProcessingLogData) {
 	<!DOCTYPE html>
 	<html lang="en">
@@ -61,15 +65,13 @@ templ ProcessingLogs(data ProcessingLogData) {
 	<body>
 		<div class="container">
 			@HeaderSimple()
+			@HubHeader("Processing Logs", "", "", false)
 
 			<div class="button-group">
-				<button
-					class="refresh-btn"
-					id="refreshBtn"
-				>
-					Refresh
-				</button>
+				<a href={ utils.URL("/process") } class="add-btn">Back to Process</a>
 			</div>
+
+			@ListFilterForm(data.FilterPath, data.Query, "", "", "", "", data.StartDate, data.EndDate, false, false, false, true)
 
 			if len(data.Logs) > 0 {
 				<div class="table-wrapper">
@@ -104,16 +106,11 @@ templ ProcessingLogs(data ProcessingLogData) {
 					</tbody>
 				</table>
 				</div>
+				@PaginationBar(data.HasPrev, data.PrevURL, data.HasNext, data.NextURL, data.PageNumber, data.PageTotalPages, data.PageTotal)
 			} else {
 				<div class="empty-state">No processing logs found.</div>
 			}
 		</div>
-
-		<script>
-			document.getElementById('refreshBtn').addEventListener('click', () => {
-				window.location.reload();
-			});
-		</script>
 	</body>
 	</html>
 }
