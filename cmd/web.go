@@ -191,17 +191,18 @@ func securityHeaders(next http.Handler) http.Handler {
 	})
 }
 
-func HttpRedirect(w http.ResponseWriter, url string) {
-	w.Header().Set("HX-Redirect", utils.URL(url))
-	w.WriteHeader(http.StatusFound)
+func HttpRedirect(w http.ResponseWriter, r *http.Request, url string) {
+	target := utils.URL(url)
+	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Set("HX-Redirect", target)
+		w.WriteHeader(http.StatusFound)
+		return
+	}
+	http.Redirect(w, r, target, http.StatusFound)
 }
 
 func redirectToPortal(w http.ResponseWriter, r *http.Request) {
-	if r.Header.Get("HX-Request") == "true" {
-		HttpRedirect(w, "/")
-		return
-	}
-	http.Redirect(w, r, utils.URL("/"), http.StatusFound)
+	HttpRedirect(w, r, "/")
 }
 
 type WebFlags struct {
@@ -231,6 +232,9 @@ var cmdWeb = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg := conf.Conf()
 		if err := os.MkdirAll("tmp", 0755); err != nil {
+			panic(err)
+		}
+		if err := os.MkdirAll("data/avatars", 0755); err != nil {
 			panic(err)
 		}
 
@@ -270,10 +274,16 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/teachers/unapprove", auth.RequireRole(auth.RoleSuperuser)(handleTeacherUnapprove))
 		authMux.HandleFunc(basePath+"/classes/record", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClassRecord))
 		authMux.HandleFunc(basePath+"/classes", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClasses))
-		authMux.HandleFunc(basePath+"/logs", auth.RequireRole(auth.RoleSuperuser)(handleSystemLogs))
+		authMux.HandleFunc(basePath+"/logs", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleSystemLogs))
 		authMux.HandleFunc(basePath+"/process-logs", auth.RequireRole(auth.RoleSuperuser)(handleLogs))
 		authMux.HandleFunc(basePath+"/process", auth.RequireRole(auth.RoleSuperuser)(handleProcessPage))
 		authMux.HandleFunc(basePath+"/download/processed", auth.RequireRole(auth.RoleSuperuser)(handleDownload))
+		authMux.HandleFunc(basePath+"/profile", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleProfile))
+		authMux.HandleFunc(basePath+"/profile/mobile", auth.RequireRole(auth.RoleTeacher)(handleProfileMobile))
+		authMux.HandleFunc(basePath+"/profile/password", auth.RequireRole(auth.RoleTeacher)(handleProfilePassword))
+		// Profile picture upload disabled for now.
+		// authMux.HandleFunc(basePath+"/profile/avatar", auth.RequireRole(auth.RoleTeacher)(handleProfileAvatar))
+		// authMux.HandleFunc(basePath+"/profile/picture", auth.RequireRole(auth.RoleTeacher)(handleProfilePicture))
 		authMux.HandleFunc(basePath+"/role", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetRole))
 		authMux.HandleFunc(basePath+"/refresh", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleRefreshPage))
 		authMux.HandleFunc(basePath+"/api/teachers", auth.RequireRole(auth.RoleSuperuser)(handleGetTeachers))
@@ -309,6 +319,8 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/teachers/unapprove", authHandler)
 		rootMux.Handle(basePath+"/classes", authHandler)
 		rootMux.Handle(basePath+"/classes/", authHandler)
+		rootMux.Handle(basePath+"/profile", authHandler)
+		rootMux.Handle(basePath+"/profile/", authHandler)
 		rootMux.Handle(basePath+"/api/teachers", authHandler)
 		rootMux.Handle(basePath+"/api/students", authHandler)
 		rootMux.Handle(basePath+"/api/students/", authHandler)
@@ -740,7 +752,17 @@ func handleSystemLogs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logs, err := database.GetAllSystemLogs(dbRO)
+	role := auth.GetRole(r.Context())
+	var logs []database.SystemLog
+	var err error
+	hideCreatedBy := false
+	if role == auth.RoleTeacher {
+		user := auth.GetUser(r.Context())
+		logs, err = database.GetSystemLogsByCreatedBy(dbRO, user.ID)
+		hideCreatedBy = true
+	} else {
+		logs, err = database.GetAllSystemLogs(dbRO)
+	}
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to fetch logs: %v", err), http.StatusInternalServerError)
 		return
@@ -758,7 +780,10 @@ func handleSystemLogs(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html")
-	frontend.SystemLogs(frontend.SystemLogData{Logs: viewLogs}).Render(r.Context(), w)
+	frontend.SystemLogs(frontend.SystemLogData{
+		Logs:          viewLogs,
+		HideCreatedBy: hideCreatedBy,
+	}).Render(r.Context(), w)
 }
 
 func formatStudentRelationships(rels []queries.GetAllStudentRelationshipsRow) string {
@@ -1236,7 +1261,7 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	setSuccessFlash(w, "Registration successful. Please wait for admin approval before logging in.")
-	HttpRedirect(w, "/auth/login")
+	HttpRedirect(w, r, "/auth/login")
 }
 
 func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
@@ -1328,7 +1353,7 @@ func handleTeacherApprove(w http.ResponseWriter, r *http.Request) {
 	}
 
 	setSuccessFlash(w, "Teacher approved successfully.")
-	HttpRedirect(w, "/teachers")
+	HttpRedirect(w, r, "/teachers")
 }
 
 func handleTeacherUnapprove(w http.ResponseWriter, r *http.Request) {
@@ -1354,7 +1379,7 @@ func handleTeacherUnapprove(w http.ResponseWriter, r *http.Request) {
 	}
 
 	setSuccessFlash(w, "Teacher set to pending.")
-	HttpRedirect(w, "/teachers")
+	HttpRedirect(w, r, "/teachers")
 }
 
 func sendErrorLog(w http.ResponseWriter, message string) {
@@ -1463,7 +1488,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	HttpRedirect(w, "/")
+	HttpRedirect(w, r, "/")
 }
 
 func handleLogout(w http.ResponseWriter, r *http.Request) {
@@ -1472,7 +1497,7 @@ func handleLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	auth.Logout(w)
-	HttpRedirect(w, "/")
+	HttpRedirect(w, r, "/")
 }
 
 const passwordResetTokenTTL = 30 * time.Minute
@@ -1621,7 +1646,7 @@ func handleForgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	HttpRedirect(w, "/auth/forgot-password/reset?token="+url.QueryEscape(resetToken))
+	HttpRedirect(w, r, "/auth/forgot-password/reset?token="+url.QueryEscape(resetToken))
 }
 
 func handleResetPassword(w http.ResponseWriter, r *http.Request) {
@@ -1715,7 +1740,7 @@ func handleResetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	setSuccessFlash(w, "Password reset successfully. Please log in.")
-	HttpRedirect(w, "/auth/login")
+	HttpRedirect(w, r, "/auth/login")
 }
 
 func handleGetRole(w http.ResponseWriter, r *http.Request) {

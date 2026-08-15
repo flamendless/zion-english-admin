@@ -674,6 +674,24 @@ templ GlobalIncludes() {
 		/* Banners & alerts              */
 		/* ============================= */
 
+		html.is-dev::before {
+			content: 'DEV';
+			position: fixed;
+			top: 18px;
+			right: -34px;
+			z-index: 10000;
+			background: var(--color-destructive);
+			color: #fff;
+			font-family: 'Fira Sans', sans-serif;
+			font-weight: 700;
+			font-size: 11px;
+			letter-spacing: 0.15em;
+			padding: 6px 48px;
+			transform: rotate(45deg);
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+			pointer-events: none;
+		}
+
 		.success-banner,
 		.error-banner {
 			position: fixed;
@@ -1323,6 +1341,9 @@ templ GlobalIncludes() {
 			}
 		}
 	</style>
+	if ShowDevBanner() {
+		<script>document.documentElement.classList.add('is-dev')</script>
+	}
 	@ScrHTMX()
 	@ScrHyperscript()
 	@SuccessBannerHandlers()

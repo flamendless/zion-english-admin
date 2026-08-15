@@ -3,7 +3,8 @@ package frontend
 import "zion-english/internal/utils"
 
 type SystemLogData struct {
-	Logs []SystemLogItem
+	Logs          []SystemLogItem
+	HideCreatedBy bool
 }
 
 type SystemLogItem struct {
@@ -20,7 +21,11 @@ templ SystemLogs(data SystemLogData) {
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Logs - Zion English Admin Tool</title>
+		if data.HideCreatedBy {
+			<title>My Activity - Zion English Admin Tool</title>
+		} else {
+			<title>Logs - Zion English Admin Tool</title>
+		}
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
 	</head>
@@ -36,7 +41,9 @@ templ SystemLogs(data SystemLogData) {
 								<th>ID</th>
 								<th>Module</th>
 								<th>Message</th>
-								<th>Created By</th>
+								if !data.HideCreatedBy {
+									<th>Created By</th>
+								}
 								<th>Created At</th>
 							</tr>
 						</thead>
@@ -46,7 +53,9 @@ templ SystemLogs(data SystemLogData) {
 									<td>{ log.ID }</td>
 									<td>{ log.Module }</td>
 									<td>{ log.Message }</td>
-									<td>{ getDisplayValue(log.CreatedBy) }</td>
+									if !data.HideCreatedBy {
+										<td>{ getDisplayValue(log.CreatedBy) }</td>
+									}
 									<td class="date-cell">{ log.CreatedAt }</td>
 								</tr>
 							}

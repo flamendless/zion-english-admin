@@ -35,6 +35,9 @@ templ Home(role auth.Role) {
 				if IsNavAccessible(role, "/classes/record") {
 					@ActionCard("/classes/record", "Record a Class", "Record a new class")
 				}
+				if IsNavAccessible(role, "/profile") {
+					@ActionCard("/profile", "My Profile", "View account info and update settings")
+				}
 
 				if IsNavAccessible(role, "/students") {
 					@ActionCard("/students", "Students", "View and manage students")
@@ -59,7 +62,11 @@ templ Home(role auth.Role) {
 					@ActionCard("/process-logs", "Processing Logs", "View processing logs")
 				}
 				if IsNavAccessible(role, "/logs") {
-					@ActionCard("/logs", "Logs", "View system logs")
+					if role == auth.RoleTeacher {
+						@ActionCard("/logs", "My Activity", "View your recent actions")
+					} else {
+						@ActionCard("/logs", "Logs", "View system logs")
+					}
 				}
 			</div>
 		</div>

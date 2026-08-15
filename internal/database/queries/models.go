@@ -100,27 +100,30 @@ type TblStudentRelationship struct {
 }
 
 type TblTeacher struct {
-	ID             int64
-	Name           string
-	FirstName      string
-	MiddleName     string
-	LastName       string
-	Birthdate      string
-	Address        string
-	JoiningDate    string
-	MobileNumber   string
-	Email          string
-	Certifications sql.NullString
-	AssignedColor  string
-	RatePerClass   float64
-	Currency       string
-	DriveUrl       string
-	Sex            sql.NullString
-	Password       string
-	Template       sql.NullString
-	Status         string
-	CreatedAt      sql.NullTime
-	UpdatedAt      sql.NullTime
+	ID                int64
+	Name              string
+	FirstName         string
+	MiddleName        string
+	LastName          string
+	Birthdate         string
+	Address           string
+	JoiningDate       string
+	MobileNumber      string
+	Email             string
+	Certifications    sql.NullString
+	AssignedColor     string
+	RatePerClass      float64
+	Currency          string
+	DriveUrl          string
+	Sex               sql.NullString
+	Password          string
+	Template          sql.NullString
+	Status            string
+	CreatedAt         sql.NullTime
+	UpdatedAt         sql.NullTime
+	ProfilePicture    sql.NullString
+	PasswordChangedAt sql.NullTime
+	MobileChangedAt   sql.NullTime
 }
 
 type TblTeachersStudentsM2m struct {

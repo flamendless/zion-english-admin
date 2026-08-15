@@ -26,6 +26,9 @@ templ Header(loggedIn bool, role auth.Role) {
 		<div class="header-bottom">
 			<div class="header-left">
 				<div class="nav-links">
+					if IsNavAccessible(role, "/profile") {
+						@NavLink("/profile", "profileLink", "My Profile")
+					}
 					if IsNavAccessible(role, "/students") {
 						@NavLink("/students", "studentsLink", "Students")
 					}
@@ -43,6 +46,13 @@ templ Header(loggedIn bool, role auth.Role) {
 					}
 					if IsNavAccessible(role, "/classes/record") {
 						@NavLink("/classes/record", "recordClassLink", "+Class")
+					}
+					if IsNavAccessible(role, "/logs") {
+						if role == auth.RoleTeacher {
+							@NavLink("/logs", "logsLink", "Activity")
+						} else {
+							@NavLink("/logs", "logsLink", "Logs")
+						}
 					}
 				</div>
 			</div>

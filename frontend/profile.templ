@@ -1,0 +1,425 @@
+package frontend
+
+import "fmt"
+import "zion-english/internal/auth"
+import "zion-english/internal/utils"
+
+type ProfileData struct {
+	IsSuperuser          bool
+	Name                 string
+	Email                string
+	Role                 string
+	FirstName            string
+	MiddleName           string
+	LastName             string
+	Birthdate            string
+	Address              string
+	JoiningDate          string
+	MobileNumber         string
+	Certifications       string
+	AssignedColor        string
+	RatePerClass         float64
+	Currency             string
+	DriveUrl             string
+	Sex                  string
+	Status               string
+	HasProfilePicture    bool
+	Avatar               AvatarProps
+	CanChangeMobile      bool
+	MobileDaysRemaining  int
+	CanChangePassword    bool
+	PasswordDaysRemaining int
+}
+
+templ Profile(data ProfileData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>My Profile - Zion English Admin</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@AvatarStyles()
+		<style>
+			.profile-layout {
+				display: grid;
+				gap: var(--space-6);
+			}
+
+			@media (min-width: 900px) {
+				.profile-layout {
+					grid-template-columns: 280px 1fr;
+					align-items: start;
+				}
+			}
+
+			.profile-card {
+				background: var(--color-muted);
+				border: 1px solid var(--color-border-subtle);
+				border-radius: var(--radius-lg);
+				padding: var(--space-6);
+			}
+
+			.profile-card h2 {
+				margin-bottom: var(--space-4);
+				font-size: 1.125rem;
+			}
+
+			.profile-identity {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				text-align: center;
+				gap: var(--space-3);
+			}
+
+			.profile-identity h2 {
+				margin: 0;
+			}
+
+			.profile-role {
+				display: inline-block;
+				padding: 4px 12px;
+				border-radius: var(--radius-full);
+				background: var(--color-primary-light);
+				color: var(--color-primary-hover);
+				font-size: 0.8125rem;
+				font-weight: 600;
+				text-transform: capitalize;
+			}
+
+			.profile-email {
+				color: var(--color-muted-foreground);
+				font-size: 0.875rem;
+				word-break: break-all;
+			}
+
+			.profile-upload-form {
+				margin-top: var(--space-4);
+				width: 100%;
+			}
+
+			.profile-upload-form input[type="file"] {
+				width: 100%;
+				font-size: 0.8125rem;
+				padding: var(--space-2);
+			}
+
+			.profile-upload-hint {
+				margin-top: var(--space-2);
+				font-size: 0.75rem;
+				color: var(--color-muted-foreground);
+			}
+
+			.profile-details {
+				display: grid;
+				gap: var(--space-4);
+			}
+
+			@media (min-width: 640px) {
+				.profile-details {
+					grid-template-columns: 1fr 1fr;
+				}
+			}
+
+			.profile-detail {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-1);
+			}
+
+			.profile-detail-label {
+				font-size: 0.75rem;
+				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.04em;
+				color: var(--color-muted-foreground);
+			}
+
+			.profile-detail-value {
+				font-size: 0.9375rem;
+				color: var(--color-foreground);
+				word-break: break-word;
+			}
+
+			.profile-section {
+				margin-top: var(--space-6);
+			}
+
+			.profile-section + .profile-section {
+				padding-top: var(--space-6);
+				border-top: 1px solid var(--color-border-subtle);
+			}
+
+			.profile-section-desc {
+				margin-bottom: var(--space-4);
+				color: var(--color-muted-foreground);
+				font-size: 0.875rem;
+			}
+
+			.cooldown-notice {
+				display: flex;
+				align-items: flex-start;
+				gap: var(--space-2);
+				padding: var(--space-3) var(--space-4);
+				margin-bottom: var(--space-4);
+				border-radius: var(--radius-md);
+				background: var(--color-warning-bg);
+				color: var(--color-foreground);
+				font-size: 0.875rem;
+				border: 1px solid color-mix(in srgb, var(--color-warning) 35%, transparent);
+			}
+
+			.cooldown-notice svg {
+				flex-shrink: 0;
+				margin-top: 2px;
+				color: var(--color-warning);
+			}
+
+			.profile-form-actions {
+				margin-top: var(--space-4);
+			}
+
+			.superuser-note {
+				padding: var(--space-4);
+				border-radius: var(--radius-md);
+				background: var(--color-info-bg);
+				border: 1px solid color-mix(in srgb, var(--color-info) 25%, transparent);
+				color: var(--color-foreground);
+				font-size: 0.875rem;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@SuccessBanner()
+			@ErrorBanner()
+
+			<div class="page-header" style="margin-bottom: var(--space-6);">
+				<h1>My Profile</h1>
+				<p style="color: var(--color-muted-foreground); margin-top: var(--space-2);">View your account details and manage security settings.</p>
+			</div>
+
+			<div class="profile-layout">
+				<div class="profile-card">
+					<div class="profile-identity">
+						@Avatar(data.Avatar)
+						<h2>{ data.Name }</h2>
+						<span class="profile-role">{ data.Role }</span>
+						<p class="profile-email">{ data.Email }</p>
+					</div>
+
+					// Profile picture upload disabled for now.
+					// @ProfilePictureUpload(data)
+				</div>
+
+				<div>
+					<div class="profile-card">
+						<h2>Account information</h2>
+						if data.IsSuperuser {
+							<div class="superuser-note">
+								Superuser credentials are managed by your system administrator and cannot be changed here.
+							</div>
+						}
+						<div class="profile-details">
+							if !data.IsSuperuser {
+								<div class="profile-detail">
+									<span class="profile-detail-label">First name</span>
+									<span class="profile-detail-value">{ data.FirstName }</span>
+								</div>
+								<div class="profile-detail">
+									<span class="profile-detail-label">Middle name</span>
+									<span class="profile-detail-value">{ displayOrDash(data.MiddleName) }</span>
+								</div>
+								<div class="profile-detail">
+									<span class="profile-detail-label">Last name</span>
+									<span class="profile-detail-value">{ data.LastName }</span>
+								</div>
+								<div class="profile-detail">
+									<span class="profile-detail-label">Status</span>
+									<span class="profile-detail-value">{ data.Status }</span>
+								</div>
+								<div class="profile-detail">
+									<span class="profile-detail-label">Birthdate</span>
+									<span class="profile-detail-value">{ data.Birthdate }</span>
+								</div>
+								<div class="profile-detail">
+									<span class="profile-detail-label">Date joined</span>
+									<span class="profile-detail-value">{ data.JoiningDate }</span>
+								</div>
+								<div class="profile-detail">
+									<span class="profile-detail-label">Address</span>
+									<span class="profile-detail-value">{ data.Address }</span>
+								</div>
+								<div class="profile-detail">
+									<span class="profile-detail-label">Sex</span>
+									<span class="profile-detail-value">{ displayOrDash(data.Sex) }</span>
+								</div>
+								<div class="profile-detail">
+									<span class="profile-detail-label">Rate per class</span>
+									<span class="profile-detail-value">{ fmt.Sprintf("%.2f %s", data.RatePerClass, data.Currency) }</span>
+								</div>
+								<div class="profile-detail">
+									<span class="profile-detail-label">Certifications</span>
+									<span class="profile-detail-value">{ displayOrDash(data.Certifications) }</span>
+								</div>
+								<div class="profile-detail">
+									<span class="profile-detail-label">Google Sheet</span>
+									<span class="profile-detail-value">
+										@displayURL(data.DriveUrl)
+									</span>
+								</div>
+							}
+							<div class="profile-detail">
+								<span class="profile-detail-label">Email</span>
+								<span class="profile-detail-value">{ data.Email }</span>
+							</div>
+							if !data.IsSuperuser {
+								<div class="profile-detail">
+									<span class="profile-detail-label">Mobile number</span>
+									<span class="profile-detail-value">{ data.MobileNumber }</span>
+								</div>
+							}
+						</div>
+					</div>
+
+					if !data.IsSuperuser {
+						<div class="profile-card profile-section">
+							<h2>Mobile number</h2>
+							<p class="profile-section-desc">Update your contact number. Changes are limited to once every 7 days.</p>
+							if !data.CanChangeMobile {
+								@CooldownNotice(data.MobileDaysRemaining, "mobile number")
+							}
+							<form method="POST" action={ utils.URL("/profile/mobile") }>
+								<div class="form-group">
+									<label for="mobileNumber">New mobile number</label>
+									<input
+										type="text"
+										id="mobileNumber"
+										name="mobileNumber"
+										value={ data.MobileNumber }
+										required
+										disabled?={ !data.CanChangeMobile }
+										placeholder="Enter mobile number"
+									/>
+								</div>
+								<div class="profile-form-actions">
+									<button type="submit" disabled?={ !data.CanChangeMobile }>Update mobile number</button>
+								</div>
+							</form>
+						</div>
+
+						<div class="profile-card profile-section">
+							<h2>Password</h2>
+							<p class="profile-section-desc">Choose a strong password. Changes are limited to once every 7 days.</p>
+							if !data.CanChangePassword {
+								@CooldownNotice(data.PasswordDaysRemaining, "password")
+							}
+							<form method="POST" action={ utils.URL("/profile/password") }>
+								<div class="form-group">
+									<label for="currentPassword">Current password</label>
+									<div class="password-wrapper">
+										<input
+											type="password"
+											id="currentPassword"
+											name="currentPassword"
+											required
+											disabled?={ !data.CanChangePassword }
+											autocomplete="current-password"
+										/>
+										@ShowPassword("currentPassword")
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="newPassword">New password</label>
+									<div class="password-wrapper">
+										<input
+											type="password"
+											id="newPassword"
+											name="newPassword"
+											required
+											disabled?={ !data.CanChangePassword }
+											autocomplete="new-password"
+										/>
+										@ShowPassword("newPassword")
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="confirmPassword">Confirm new password</label>
+									<div class="password-wrapper">
+										<input
+											type="password"
+											id="confirmPassword"
+											name="confirmPassword"
+											required
+											disabled?={ !data.CanChangePassword }
+											autocomplete="new-password"
+										/>
+										@ShowPassword("confirmPassword")
+									</div>
+								</div>
+								<div class="profile-form-actions">
+									<button type="submit" disabled?={ !data.CanChangePassword }>Update password</button>
+								</div>
+							</form>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+		@SuccessBannerHandlers()
+		@ErrorBannerHandlers()
+	</body>
+	</html>
+}
+
+templ CooldownNotice(daysRemaining int, fieldLabel string) {
+	<div class="cooldown-notice" role="status">
+		<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<circle cx="12" cy="12" r="10"></circle>
+			<polyline points="12 6 12 12 16 14"></polyline>
+		</svg>
+		<span>
+			You can change your { fieldLabel } again in { fmt.Sprintf("%d", daysRemaining) } day(s).
+		</span>
+	</div>
+}
+
+func displayOrDash(value string) string {
+	if value == "" {
+		return "-"
+	}
+	return value
+}
+
+func ProfileRoleLabel(role auth.Role) string {
+	switch role {
+	case auth.RoleSuperuser:
+		return "superuser"
+	case auth.RoleTeacher:
+		return "teacher"
+	default:
+		return string(role)
+	}
+}
+
+// Profile picture upload disabled for now — re-enable with routes in cmd/web.go.
+templ ProfilePictureUpload(data ProfileData) {
+	if !data.IsSuperuser {
+		<form
+			class="profile-upload-form"
+			method="POST"
+			action={ utils.URL("/profile/avatar") }
+			enctype="multipart/form-data"
+		>
+			<label for="avatar">Profile picture</label>
+			<input type="file" id="avatar" name="avatar" accept="image/jpeg,image/png"/>
+			<p class="profile-upload-hint">JPEG or PNG, up to 2 MB. Shows your initials when no photo is set.</p>
+			<div class="profile-form-actions">
+				<button type="submit">Upload photo</button>
+			</div>
+		</form>
+	}
+}

@@ -7,6 +7,12 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
+const (
+	EnvLocal      = "local"
+	EnvProd       = "prod"
+	EnvPseudoProd = "pseudo_prod"
+)
+
 type Config struct {
 	BasePath          string
 	AppEnv            string `env:"APP_ENV" env-required:""`
@@ -25,7 +31,9 @@ func Conf() *Config {
 		if err := cleanenv.ReadConfig(".env", &co); err != nil {
 			fmt.Printf("Error reading config: %v\n", err)
 		}
-		if co.AppEnv != "local" && co.AppEnv != "prod" {
+		switch co.AppEnv {
+		case EnvLocal, EnvProd, EnvPseudoProd:
+		default:
 			panic(fmt.Sprintf("Invalid APP_ENV. Got '%s'", co.AppEnv))
 		}
 		if co.Port < 1 || co.Port > 65535 {
@@ -44,5 +52,9 @@ func Conf() *Config {
 }
 
 func (c *Config) IsProd() bool {
-	return c.AppEnv == "prod"
+	return c.AppEnv == EnvProd
+}
+
+func (c *Config) IsLocal() bool {
+	return c.AppEnv == EnvLocal
 }

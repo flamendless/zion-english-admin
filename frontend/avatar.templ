@@ -1,0 +1,94 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+type AvatarProps struct {
+	Size          string
+	Initials      string
+	AssignedColor string
+	PictureURL    string
+	HasPicture    bool
+	Alt           string
+}
+
+templ Avatar(props AvatarProps) {
+	<div
+		class={ "avatar avatar-" + props.Size }
+		style={ templ.SafeCSS("background-color: " + props.AssignedColor + ";") }
+		aria-label={ props.Alt }
+	>
+		if props.HasPicture {
+			<img src={ props.PictureURL } alt={ props.Alt } class="avatar-image"/>
+		} else {
+			<span class="avatar-initials" aria-hidden="true">{ props.Initials }</span>
+		}
+	</div>
+}
+
+templ AvatarStyles() {
+	<style>
+		.avatar {
+			position: relative;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: var(--radius-full);
+			overflow: hidden;
+			flex-shrink: 0;
+			border: 2px solid var(--color-surface);
+			box-shadow: var(--shadow-sm);
+			color: var(--color-on-primary);
+			font-weight: 600;
+			text-transform: uppercase;
+			user-select: none;
+		}
+
+		.avatar-sm {
+			width: 32px;
+			height: 32px;
+			font-size: 0.6875rem;
+		}
+
+		.avatar-md {
+			width: 48px;
+			height: 48px;
+			font-size: 0.875rem;
+		}
+
+		.avatar-lg {
+			width: 96px;
+			height: 96px;
+			font-size: 1.75rem;
+		}
+
+		.avatar-xl {
+			width: 128px;
+			height: 128px;
+			font-size: 2.25rem;
+		}
+
+		.avatar-image {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			display: block;
+		}
+
+		.avatar-initials {
+			line-height: 1;
+			letter-spacing: 0.02em;
+		}
+	</style>
+}
+
+templ ProfileAvatar(props AvatarProps) {
+	@AvatarStyles()
+	@Avatar(props)
+}
+
+templ HeaderAvatar(props AvatarProps) {
+	@AvatarStyles()
+	<a href={ utils.URL("/profile") } class="header-avatar-link" title="My profile">
+		@Avatar(props)
+	</a>
+}

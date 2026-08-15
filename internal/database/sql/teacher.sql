@@ -41,4 +41,18 @@ SELECT id, name, template, status FROM tbl_teachers WHERE id = ?;
 UPDATE tbl_teachers SET template = ? WHERE id = ?;
 
 -- name: UpdateTeacherPassword :exec
-UPDATE tbl_teachers SET password = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?;
+UPDATE tbl_teachers SET password = ?, password_changed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?;
+
+-- name: GetTeacherProfileByID :one
+SELECT id, name, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, template, status, profile_picture, password_changed_at, mobile_changed_at, created_at, updated_at
+FROM tbl_teachers
+WHERE id = ?;
+
+-- name: GetTeacherPasswordByID :one
+SELECT password FROM tbl_teachers WHERE id = ?;
+
+-- name: UpdateTeacherMobile :exec
+UPDATE tbl_teachers SET mobile_number = ?, mobile_changed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?;
+
+-- name: UpdateTeacherProfilePicture :exec
+UPDATE tbl_teachers SET profile_picture = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?;

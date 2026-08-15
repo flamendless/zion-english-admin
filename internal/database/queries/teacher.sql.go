@@ -264,6 +264,80 @@ func (q *Queries) GetTeacherIDByName(ctx context.Context, name string) (int64, e
 	return id, err
 }
 
+const getTeacherPasswordByID = `-- name: GetTeacherPasswordByID :one
+SELECT password FROM tbl_teachers WHERE id = ?
+`
+
+func (q *Queries) GetTeacherPasswordByID(ctx context.Context, id int64) (string, error) {
+	row := q.db.QueryRowContext(ctx, getTeacherPasswordByID, id)
+	var password string
+	err := row.Scan(&password)
+	return password, err
+}
+
+const getTeacherProfileByID = `-- name: GetTeacherProfileByID :one
+SELECT id, name, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, template, status, profile_picture, password_changed_at, mobile_changed_at, created_at, updated_at
+FROM tbl_teachers
+WHERE id = ?
+`
+
+type GetTeacherProfileByIDRow struct {
+	ID                int64
+	Name              string
+	FirstName         string
+	MiddleName        string
+	LastName          string
+	Birthdate         string
+	Address           string
+	JoiningDate       string
+	MobileNumber      string
+	Email             string
+	Certifications    sql.NullString
+	AssignedColor     string
+	RatePerClass      float64
+	Currency          string
+	DriveUrl          string
+	Sex               sql.NullString
+	Template          sql.NullString
+	Status            string
+	ProfilePicture    sql.NullString
+	PasswordChangedAt sql.NullTime
+	MobileChangedAt   sql.NullTime
+	CreatedAt         sql.NullTime
+	UpdatedAt         sql.NullTime
+}
+
+func (q *Queries) GetTeacherProfileByID(ctx context.Context, id int64) (GetTeacherProfileByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getTeacherProfileByID, id)
+	var i GetTeacherProfileByIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.FirstName,
+		&i.MiddleName,
+		&i.LastName,
+		&i.Birthdate,
+		&i.Address,
+		&i.JoiningDate,
+		&i.MobileNumber,
+		&i.Email,
+		&i.Certifications,
+		&i.AssignedColor,
+		&i.RatePerClass,
+		&i.Currency,
+		&i.DriveUrl,
+		&i.Sex,
+		&i.Template,
+		&i.Status,
+		&i.ProfilePicture,
+		&i.PasswordChangedAt,
+		&i.MobileChangedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const insertTeacher = `-- name: InsertTeacher :exec
 INSERT INTO tbl_teachers (name, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, status)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -321,8 +395,22 @@ func (q *Queries) UnapproveTeacher(ctx context.Context, id int64) error {
 	return err
 }
 
+const updateTeacherMobile = `-- name: UpdateTeacherMobile :exec
+UPDATE tbl_teachers SET mobile_number = ?, mobile_changed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+`
+
+type UpdateTeacherMobileParams struct {
+	MobileNumber string
+	ID           int64
+}
+
+func (q *Queries) UpdateTeacherMobile(ctx context.Context, arg UpdateTeacherMobileParams) error {
+	_, err := q.db.ExecContext(ctx, updateTeacherMobile, arg.MobileNumber, arg.ID)
+	return err
+}
+
 const updateTeacherPassword = `-- name: UpdateTeacherPassword :exec
-UPDATE tbl_teachers SET password = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+UPDATE tbl_teachers SET password = ?, password_changed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?
 `
 
 type UpdateTeacherPasswordParams struct {
@@ -332,6 +420,20 @@ type UpdateTeacherPasswordParams struct {
 
 func (q *Queries) UpdateTeacherPassword(ctx context.Context, arg UpdateTeacherPasswordParams) error {
 	_, err := q.db.ExecContext(ctx, updateTeacherPassword, arg.Password, arg.ID)
+	return err
+}
+
+const updateTeacherProfilePicture = `-- name: UpdateTeacherProfilePicture :exec
+UPDATE tbl_teachers SET profile_picture = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+`
+
+type UpdateTeacherProfilePictureParams struct {
+	ProfilePicture sql.NullString
+	ID             int64
+}
+
+func (q *Queries) UpdateTeacherProfilePicture(ctx context.Context, arg UpdateTeacherProfilePictureParams) error {
+	_, err := q.db.ExecContext(ctx, updateTeacherProfilePicture, arg.ProfilePicture, arg.ID)
 	return err
 }
 

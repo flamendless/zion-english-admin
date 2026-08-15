@@ -57,6 +57,54 @@ func (q *Queries) GetAllLogs(ctx context.Context) ([]GetAllLogsRow, error) {
 	return items, nil
 }
 
+const getLogsByCreatedBy = `-- name: GetLogsByCreatedBy :many
+SELECT l.id, l.module, l.message, l.created_by, l.created_at,
+    COALESCE(t.name, l.created_by_name, '') as created_by_name
+FROM tbl_logs l
+LEFT JOIN tbl_teachers t ON l.created_by = t.id
+WHERE l.created_by = ?
+ORDER BY l.created_at DESC
+`
+
+type GetLogsByCreatedByRow struct {
+	ID            int64
+	Module        string
+	Message       string
+	CreatedBy     sql.NullInt64
+	CreatedAt     string
+	CreatedByName string
+}
+
+func (q *Queries) GetLogsByCreatedBy(ctx context.Context, createdBy sql.NullInt64) ([]GetLogsByCreatedByRow, error) {
+	rows, err := q.db.QueryContext(ctx, getLogsByCreatedBy, createdBy)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetLogsByCreatedByRow
+	for rows.Next() {
+		var i GetLogsByCreatedByRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Module,
+			&i.Message,
+			&i.CreatedBy,
+			&i.CreatedAt,
+			&i.CreatedByName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const insertLog = `-- name: InsertLog :exec
 INSERT INTO tbl_logs (
     module,
