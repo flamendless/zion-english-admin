@@ -134,6 +134,16 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 				})
 			}
 		}
+		today := time.Now().Format("2006-01-02")
+		scheduledToday, err := dbRO.GetQueries().CountScheduledClassesByStatusAndDate(ctx, queries.CountScheduledClassesByStatusAndDateParams{
+			ScheduledDate: today,
+			Status:        "scheduled",
+			Column3:       user.ID,
+			TeacherID:     user.ID,
+		})
+		if err == nil {
+			data.ScheduledToday = scheduledToday
+		}
 	}
 
 	if err := frontend.Home(data).Render(ctx, w); err != nil {
@@ -224,11 +234,17 @@ func handleLogoutWithAccess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if user, ok := auth.UserFromRequest(r, conf.Conf()); ok && user.Role == auth.RoleTeacher && user.ID > 0 {
-		accessID, err := dbRW.GetQueries().GetLatestOpenAccessByTeacherID(r.Context(), user.ID)
-		if err == nil && accessID > 0 {
-			if _, err := dbRW.GetQueries().UpdateAccessLogout(r.Context(), accessID); err != nil {
-				logs.Log().Warn("[Handle Logout]", zap.Error(err))
+	ctx := r.Context()
+	if user, ok := auth.UserFromRequest(r, conf.Conf()); ok {
+		if user.Role == auth.RoleSuperuser {
+			insertAuditLogAs(ctx, user, "auth", "logged out")
+		} else if user.Role == auth.RoleTeacher && user.ID > 0 {
+			insertAuditLogAs(ctx, user, "auth", "logged out")
+			accessID, err := dbRW.GetQueries().GetLatestOpenAccessByTeacherID(ctx, user.ID)
+			if err == nil && accessID > 0 {
+				if _, err := dbRW.GetQueries().UpdateAccessLogout(ctx, accessID); err != nil {
+					logs.Log().Warn("[Handle Logout]", zap.Error(err))
+				}
 			}
 		}
 	}

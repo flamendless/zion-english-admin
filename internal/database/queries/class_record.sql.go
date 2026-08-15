@@ -92,30 +92,32 @@ const countClassRecordsFiltered = `-- name: CountClassRecordsFiltered :one
 SELECT COUNT(*) as count
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
-WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ?
+WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
   AND (? = '' OR cr.status = ?)
   AND (? = '' OR s.name LIKE '%' || ? || '%')
 `
 
 type CountClassRecordsFilteredParams struct {
+	Column1   interface{}
 	TeacherID int64
 	Date      string
 	Date_2    string
-	Column4   interface{}
+	Column5   interface{}
 	Status    string
-	Column6   interface{}
-	Column7   sql.NullString
+	Column7   interface{}
+	Column8   sql.NullString
 }
 
 func (q *Queries) CountClassRecordsFiltered(ctx context.Context, arg CountClassRecordsFilteredParams) (int64, error) {
 	row := q.db.QueryRowContext(ctx, countClassRecordsFiltered,
+		arg.Column1,
 		arg.TeacherID,
 		arg.Date,
 		arg.Date_2,
-		arg.Column4,
+		arg.Column5,
 		arg.Status,
-		arg.Column6,
 		arg.Column7,
+		arg.Column8,
 	)
 	var count int64
 	err := row.Scan(&count)
@@ -251,21 +253,22 @@ SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.duration_minutes, cr.rat
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
-WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ?
+WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
   AND (? = '' OR cr.status = ?)
   AND (? = '' OR s.name LIKE '%' || ? || '%')
-ORDER BY cr.date DESC, cr.created_at DESC
+ORDER BY CASE WHEN cr.date = date('now', 'localtime') THEN 0 ELSE 1 END, cr.date DESC, cr.created_at DESC
 LIMIT ? OFFSET ?
 `
 
 type GetClassRecordsFilteredParams struct {
+	Column1   interface{}
 	TeacherID int64
 	Date      string
 	Date_2    string
-	Column4   interface{}
+	Column5   interface{}
 	Status    string
-	Column6   interface{}
-	Column7   sql.NullString
+	Column7   interface{}
+	Column8   sql.NullString
 	Limit     int64
 	Offset    int64
 }
@@ -290,13 +293,14 @@ type GetClassRecordsFilteredRow struct {
 
 func (q *Queries) GetClassRecordsFiltered(ctx context.Context, arg GetClassRecordsFilteredParams) ([]GetClassRecordsFilteredRow, error) {
 	rows, err := q.db.QueryContext(ctx, getClassRecordsFiltered,
+		arg.Column1,
 		arg.TeacherID,
 		arg.Date,
 		arg.Date_2,
-		arg.Column4,
+		arg.Column5,
 		arg.Status,
-		arg.Column6,
 		arg.Column7,
+		arg.Column8,
 		arg.Limit,
 		arg.Offset,
 	)
@@ -340,17 +344,23 @@ func (q *Queries) GetClassRecordsFiltered(ctx context.Context, arg GetClassRecor
 const getTotalRateByTeacherAndDateRange = `-- name: GetTotalRateByTeacherAndDateRange :one
 SELECT COALESCE(SUM(cr.rate), 0) as total_rate
 FROM tbl_class_records cr
-WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ? AND cr.status = 'conducted'
+WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ? AND cr.status = 'conducted'
 `
 
 type GetTotalRateByTeacherAndDateRangeParams struct {
+	Column1   interface{}
 	TeacherID int64
 	Date      string
 	Date_2    string
 }
 
 func (q *Queries) GetTotalRateByTeacherAndDateRange(ctx context.Context, arg GetTotalRateByTeacherAndDateRangeParams) (interface{}, error) {
-	row := q.db.QueryRowContext(ctx, getTotalRateByTeacherAndDateRange, arg.TeacherID, arg.Date, arg.Date_2)
+	row := q.db.QueryRowContext(ctx, getTotalRateByTeacherAndDateRange,
+		arg.Column1,
+		arg.TeacherID,
+		arg.Date,
+		arg.Date_2,
+	)
 	var total_rate interface{}
 	err := row.Scan(&total_rate)
 	return total_rate, err

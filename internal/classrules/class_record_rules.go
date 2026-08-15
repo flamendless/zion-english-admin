@@ -11,6 +11,7 @@ var (
 	ErrInactiveStudent    = errors.New("cannot record class for an inactive student")
 	ErrDuplicateClass     = errors.New("a class with the same student, teacher, date, and duration already exists")
 	ErrStudentNotAssigned = errors.New("student is not assigned to this teacher")
+	ErrStudentNotFound    = errors.New("student not found")
 	ErrTeacherNotOwner    = errors.New("you can only edit your own class records")
 )
 
@@ -35,7 +36,7 @@ type ClassRecordRules struct {
 func (r ClassRecordRules) Validate(ctx context.Context, actor auth.User, input ClassRecordInput) error {
 	student, err := r.DB.GetStudentByID(ctx, input.StudentID)
 	if err != nil {
-		return errors.New("student not found")
+		return ErrStudentNotFound
 	}
 	if student.Status != "active" {
 		return ErrInactiveStudent

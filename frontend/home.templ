@@ -18,6 +18,7 @@ type DashboardData struct {
 	ClassesConductedWeek   int64
 	ClassesCancelledWeek   int64
 	ClassesRescheduledWeek int64
+	ScheduledToday         int64
 	MonthlyTotals          []CurrencyTotal
 }
 
@@ -47,6 +48,7 @@ templ Home(data DashboardData) {
 
 			@DashboardStats(data)
 
+			<h2 class="dashboard-section-title">Quick actions</h2>
 			<div class="cards-grid">
 				if IsNavAccessible(data.Role, "/profile") {
 					@ActionCard("/profile", "My Profile", "View account info and update settings")
@@ -63,6 +65,12 @@ templ Home(data DashboardData) {
 					} else {
 						@ActionCard("/classes", "Classes", "View and record classes")
 					}
+				}
+				if IsNavAccessible(data.Role, "/schedule") {
+					<a href={ utils.URL("/schedule") } class="card card-feature">
+						<h2>Class Schedule</h2>
+						<p>View and plan upcoming classes</p>
+					</a>
 				}
 				if IsNavAccessible(data.Role, "/my-students") {
 					@ActionCard("/my-students", "My Students", "View your assigned students")
@@ -84,6 +92,7 @@ templ Home(data DashboardData) {
 }
 
 templ DashboardStats(data DashboardData) {
+	<h2 class="dashboard-section-title">Overview</h2>
 	<div class="dashboard-stats">
 		if data.Role == auth.RoleSuperuser {
 			<div class="stat-card">
@@ -103,6 +112,10 @@ templ DashboardStats(data DashboardData) {
 			<div class="stat-card">
 				<span class="stat-label">My Students</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.MyStudentCount) }</span>
+			</div>
+			<div class="stat-card stat-card-accent">
+				<span class="stat-label">Scheduled Today</span>
+				<span class="stat-value">{ fmt.Sprintf("%d", data.ScheduledToday) }</span>
 			</div>
 		}
 		<div class="stat-card">

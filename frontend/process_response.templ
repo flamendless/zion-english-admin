@@ -31,11 +31,11 @@ type ProcessRecord struct {
 
 templ ProcessResultRow(rec ProcessRecord) {
 	<tr style={ getRowColor(rec.Name) }>
-		<td>{ rec.Name }</td>
-		<td>{ rec.Date }</td>
-		<td>{ fmt.Sprintf("%d", rec.Duration) }</td>
-		<td>{ fmt.Sprintf("%.2f", rec.Rate) }</td>
-		<td>{ rec.Status }</td>
+		<td data-label="Name">{ rec.Name }</td>
+		<td data-label="Date">{ rec.Date }</td>
+		<td data-label="Duration">{ fmt.Sprintf("%d", rec.Duration) }</td>
+		<td data-label="Rate">{ fmt.Sprintf("%.2f", rec.Rate) }</td>
+		<td data-label="Status">{ rec.Status }</td>
 	</tr>
 }
 
@@ -77,7 +77,7 @@ templ ProcessResponse(
 			<div>Total: { fmt.Sprintf("%.2f", total) }</div>
 		</div>
 		<div class="table-wrapper">
-			<table>
+			<table class="table-stack-mobile">
 				<thead>
 					<tr><th>Name</th><th>Date</th><th>Duration (min)</th><th>Rate</th><th>Status</th></tr>
 				</thead>

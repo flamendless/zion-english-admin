@@ -1,11 +1,22 @@
 package frontend
 
-import "zion-english/internal/utils"
+import (
+	"fmt"
+	"zion-english/internal/utils"
+)
+
+func classesTableColspan(data ClassesData) int {
+	if data.ShowAllTeachers {
+		return 9
+	}
+	return 8
+}
 
 type ClassesData struct {
-	LockTeacher bool
-	TeacherID   string
-	TeacherName string
+	LockTeacher     bool
+	ShowAllTeachers bool
+	TeacherID       string
+	TeacherName     string
 }
 
 templ Classes(data ClassesData) {
@@ -23,7 +34,7 @@ templ Classes(data ClassesData) {
 		@GlobalIncludes()
 	</head>
 	<body>
-		<div class="container">
+		<div class="container" data-show-all-teachers={ fmt.Sprintf("%t", data.ShowAllTeachers) }>
 			@HeaderSimple()
 			@SuccessBanner()
 			@ErrorBanner()
@@ -34,7 +45,13 @@ templ Classes(data ClassesData) {
 			}
 
 			<div class="toolbar">
-				if data.LockTeacher {
+				if data.ShowAllTeachers {
+					<input type="hidden" id="teacher" value="0"/>
+					<div class="form-group">
+						<label>Teacher</label>
+						<input type="text" value="All teachers" disabled/>
+					</div>
+				} else if data.LockTeacher {
 					<input type="hidden" id="teacher" value={ data.TeacherID }/>
 					<div class="form-group">
 						<label>Teacher</label>
@@ -66,9 +83,12 @@ templ Classes(data ClassesData) {
 			<div id="paginationTop" class="pagination-bar"></div>
 
 			<div class="table-wrapper">
-			<table id="classesTable">
+			<table id="classesTable" class="table-stack-mobile">
 				<thead>
 					<tr>
+						if data.ShowAllTeachers {
+							<th>Teacher</th>
+						}
 						<th>Student Name</th>
 						<th>Duration (min)</th>
 						<th>Rate</th>
@@ -81,8 +101,8 @@ templ Classes(data ClassesData) {
 				</thead>
 				<tbody id="classesTableBody">
 					<tr>
-						if data.LockTeacher {
-							<td colspan="8" class="empty-state">Loading classes...</td>
+						if data.LockTeacher || data.ShowAllTeachers {
+							<td colspan={ fmt.Sprintf("%d", classesTableColspan(data)) } class="empty-state">Loading classes...</td>
 						} else {
 							<td colspan="8" class="empty-state">Select a teacher to view classes</td>
 						}
@@ -94,6 +114,8 @@ templ Classes(data ClassesData) {
 		</div>
 
 		<script>
+			const showAllTeachers = document.querySelector('.container').dataset.showAllTeachers === 'true';
+			const tableColspan = showAllTeachers ? 9 : 8;
 			const teacherSelect = document.getElementById('teacher');
 			const datePresetSelect = document.getElementById('datePreset');
 			const filterBtn = document.getElementById('filterBtn');
@@ -176,7 +198,7 @@ templ Classes(data ClassesData) {
 				const status = statusFilter.value;
 				const q = studentSearch.value.trim();
 
-				if (!teacherId) {
+				if (!teacherId && !showAllTeachers) {
 					alert('Please select a teacher');
 					return;
 				}
@@ -200,7 +222,7 @@ templ Classes(data ClassesData) {
 					tableBody.innerHTML = '';
 
 					if (!data.records || data.records.length === 0) {
-						tableBody.innerHTML = '<tr><td colspan="8" class="empty-state">No classes found for the selected criteria</td></tr>';
+						tableBody.innerHTML = '<tr><td colspan="' + tableColspan + '" class="empty-state">No classes found for the selected criteria</td></tr>';
 					} else {
 						data.records.forEach(record => {
 							const row = document.createElement('tr');
@@ -208,7 +230,16 @@ templ Classes(data ClassesData) {
 								row.classList.add('row-cancelled');
 							}
 							const editHref = buildURL('/classes/' + record.id + '/edit');
-							const cells = [
+							const columnLabels = [];
+							if (showAllTeachers) {
+								columnLabels.push('Teacher');
+							}
+							columnLabels.push('Student Name', 'Duration (min)', 'Rate', 'Status', 'Reason', 'Notes', 'Date');
+							const cells = [];
+							if (showAllTeachers) {
+								cells.push(record.teacherName);
+							}
+							cells.push(
 								record.studentName,
 								String(record.durationMinutes),
 								record.rate + ' ' + record.currency,
@@ -216,35 +247,45 @@ templ Classes(data ClassesData) {
 								record.reason || '-',
 								record.notes || '-',
 								record.date,
-							];
+							);
 							cells.forEach((text, index) => {
 								const cell = document.createElement('td');
 								cell.textContent = text;
-								if (index === 3) {
+								cell.dataset.label = columnLabels[index];
+								const statusIndex = showAllTeachers ? 4 : 3;
+								if (index === statusIndex) {
 									cell.className = 'status-' + record.status;
 								}
 								row.appendChild(cell);
 							});
 							const actionCell = document.createElement('td');
+							actionCell.dataset.label = 'Actions';
+							const actionsWrap = document.createElement('div');
+							actionsWrap.className = 'table-actions';
 							const editLink = document.createElement('a');
 							editLink.href = editHref;
 							editLink.className = 'edit-btn';
 							editLink.textContent = 'Edit';
-							actionCell.appendChild(editLink);
+							actionsWrap.appendChild(editLink);
+							actionCell.appendChild(actionsWrap);
 							row.appendChild(actionCell);
 							tableBody.appendChild(row);
 						});
 					}
 
 					totalRateSpan.textContent = data.totalRate || 0;
-					totalCurrencySpan.textContent = data.records && data.records.length > 0 ? data.records[0].currency : '';
+					if (showAllTeachers) {
+						totalCurrencySpan.textContent = '';
+					} else {
+						totalCurrencySpan.textContent = data.records && data.records.length > 0 ? data.records[0].currency : '';
+					}
 					if (data.page) {
 						renderPagination(data.page);
 					}
 				} catch (error) {
 					console.error('Failed to load class records:', error);
 					showErrorBanner(error.message);
-					tableBody.innerHTML = '<tr><td colspan="8" class="empty-state">Error loading classes</td></tr>';
+					tableBody.innerHTML = '<tr><td colspan="' + tableColspan + '" class="empty-state">Error loading classes</td></tr>';
 				}
 			}
 
@@ -265,7 +306,7 @@ templ Classes(data ClassesData) {
 				if (datePresetSelect.value) {
 					setDateRangeFromPreset(datePresetSelect.value);
 				}
-				if (teacherSelect.value && datePresetSelect.dataset.startDate) {
+				if ((teacherSelect.value || showAllTeachers) && datePresetSelect.dataset.startDate) {
 					loadRecords();
 				}
 			}

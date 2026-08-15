@@ -50,11 +50,11 @@ templ SystemLogs(data SystemLogData) {
 				@HubHeader("Logs", "", "", false)
 			}
 
-			@ListFilterForm(data.FilterPath, data.Query, "", "", "", data.Module, data.StartDate, data.EndDate, false, false, true, true)
+			@ListFilterForm(data.FilterPath, data.Query, "", "", "", data.Module, data.StartDate, data.EndDate, false, false, true, true, false)
 
 			if len(data.Logs) > 0 {
 				<div class="table-wrapper">
-					<table id="logsTable">
+					<table id="logsTable" class="table-stack-mobile">
 						<thead>
 							<tr>
 								<th>ID</th>
@@ -69,13 +69,13 @@ templ SystemLogs(data SystemLogData) {
 						<tbody>
 							for _, log := range data.Logs {
 								<tr>
-									<td>{ log.ID }</td>
-									<td>{ log.Module }</td>
-									<td>{ log.Message }</td>
+									<td data-label="ID">{ log.ID }</td>
+									<td data-label="Module">{ log.Module }</td>
+									<td data-label="Message">{ log.Message }</td>
 									if !data.HideCreatedBy {
-										<td>{ getDisplayValue(log.CreatedBy) }</td>
+										<td data-label="Created By">{ getDisplayValue(log.CreatedBy) }</td>
 									}
-									<td class="date-cell">{ log.CreatedAt }</td>
+									<td class="date-cell" data-label="Created">{ log.CreatedAt }</td>
 								</tr>
 							}
 						</tbody>

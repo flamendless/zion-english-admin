@@ -71,11 +71,11 @@ templ ProcessingLogs(data ProcessingLogData) {
 				<a href={ utils.URL("/process") } class="add-btn">Back to Process</a>
 			</div>
 
-			@ListFilterForm(data.FilterPath, data.Query, "", "", "", "", data.StartDate, data.EndDate, false, false, false, true)
+			@ListFilterForm(data.FilterPath, data.Query, "", "", "", "", data.StartDate, data.EndDate, false, false, false, true, false)
 
 			if len(data.Logs) > 0 {
 				<div class="table-wrapper">
-				<table id="logsTable">
+				<table id="logsTable" class="table-stack-mobile">
 					<thead>
 						<tr>
 							<th>ID</th>
@@ -91,14 +91,14 @@ templ ProcessingLogs(data ProcessingLogData) {
 					<tbody>
 						for _, log := range data.Logs {
 							<tr>
-								<td>{ log.ID }</td>
-								<td>{ log.Name }</td>
-								<td>{ log.OutputPath }</td>
-								<td>{ getDisplayValue(log.Template) }</td>
-								<td class="date-cell">{ log.StartDate } - { log.EndDate }</td>
-								<td>{ getDisplayValue(log.ExcludedRows) }</td>
-								<td class="date-cell">{ log.CreatedAt }</td>
-								<td class={ getErrorClass(log.Errors) } title={ getErrorTitle(log.Errors) }>
+								<td data-label="ID">{ log.ID }</td>
+								<td data-label="Name">{ log.Name }</td>
+								<td data-label="Output">{ log.OutputPath }</td>
+								<td data-label="Template">{ getDisplayValue(log.Template) }</td>
+								<td class="date-cell" data-label="Date Range">{ log.StartDate } - { log.EndDate }</td>
+								<td data-label="Excluded">{ getDisplayValue(log.ExcludedRows) }</td>
+								<td class="date-cell" data-label="Created">{ log.CreatedAt }</td>
+								<td class={ getErrorClass(log.Errors) } data-label="Errors" title={ getErrorTitle(log.Errors) }>
 									{ getErrorDisplay(log.Errors) }
 								</td>
 							</tr>

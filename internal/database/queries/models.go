@@ -80,6 +80,22 @@ type TblRecord struct {
 	CreatedAt       sql.NullTime
 }
 
+type TblScheduledClass struct {
+	ID              int64
+	StudentID       int64
+	TeacherID       int64
+	ScheduledDate   string
+	StartTime       sql.NullString
+	DurationMinutes int64
+	Rate            float64
+	Currency        string
+	Status          string
+	Reason          sql.NullString
+	CreatedByRole   string
+	CreatedAt       string
+	UpdatedAt       string
+}
+
 type TblStudent struct {
 	ID            int64
 	Name          string

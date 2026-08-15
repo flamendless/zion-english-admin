@@ -216,6 +216,43 @@ func classRecordViewFromRow(cr queries.GetClassRecordsFilteredRow) models.ClassR
 	}
 }
 
+func classRecordsCountParams(teacherID int64, startDate, endDate, statusFilter, nameFilter string) queries.CountClassRecordsFilteredParams {
+	return queries.CountClassRecordsFilteredParams{
+		Column1:   teacherID,
+		TeacherID: teacherID,
+		Date:      startDate,
+		Date_2:    endDate,
+		Column5:   statusFilter,
+		Status:    statusFilter,
+		Column7:   nameFilter,
+		Column8:   sql.NullString{String: nameFilter, Valid: true},
+	}
+}
+
+func classRecordsListParams(teacherID int64, startDate, endDate, statusFilter, nameFilter string, limit, offset int64) queries.GetClassRecordsFilteredParams {
+	return queries.GetClassRecordsFilteredParams{
+		Column1:   teacherID,
+		TeacherID: teacherID,
+		Date:      startDate,
+		Date_2:    endDate,
+		Column5:   statusFilter,
+		Status:    statusFilter,
+		Column7:   nameFilter,
+		Column8:   sql.NullString{String: nameFilter, Valid: true},
+		Limit:     limit,
+		Offset:    offset,
+	}
+}
+
+func totalRateParams(teacherID int64, startDate, endDate string) queries.GetTotalRateByTeacherAndDateRangeParams {
+	return queries.GetTotalRateByTeacherAndDateRangeParams{
+		Column1:   teacherID,
+		TeacherID: teacherID,
+		Date:      startDate,
+		Date_2:    endDate,
+	}
+}
+
 func handleGetClassRecords(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -228,64 +265,52 @@ func handleGetClassRecords(w http.ResponseWriter, r *http.Request) {
 	statusFilter := r.URL.Query().Get("status")
 	nameFilter := r.URL.Query().Get("q")
 
-	if teacherIDStr == "" || startDate == "" || endDate == "" {
+	if startDate == "" || endDate == "" {
 		HttpError(w, "Missing required parameters", http.StatusBadRequest)
 		return
 	}
 
-	teacherID, err := strconv.ParseInt(teacherIDStr, 10, 64)
-	if err != nil {
-		HttpError(w, "Invalid teacher ID", http.StatusBadRequest)
-		return
-	}
-
-	if auth.GetRole(r.Context()) == auth.RoleTeacher {
-		user := auth.GetUser(r.Context())
-		if teacherID != user.ID {
-			HttpError(w, "Forbidden", http.StatusForbidden)
+	role := auth.GetRole(r.Context())
+	var teacherID int64
+	if teacherIDStr == "" {
+		if role != auth.RoleSuperuser {
+			HttpError(w, "Missing required parameters", http.StatusBadRequest)
 			return
+		}
+	} else {
+		parsedID, err := strconv.ParseInt(teacherIDStr, 10, 64)
+		if err != nil {
+			HttpError(w, "Invalid teacher ID", http.StatusBadRequest)
+			return
+		}
+		teacherID = parsedID
+		if role == auth.RoleTeacher {
+			user := auth.GetUser(r.Context())
+			if teacherID != user.ID {
+				HttpError(w, "Forbidden", http.StatusForbidden)
+				return
+			}
 		}
 	}
 
 	page := utils.ParsePageQuery(r)
 	ctx := r.Context()
 
-		total, err := dbRO.GetQueries().CountClassRecordsFiltered(ctx, queries.CountClassRecordsFilteredParams{
-		TeacherID: teacherID,
-		Date:      startDate,
-		Date_2:    endDate,
-		Column4:   statusFilter,
-		Status:    statusFilter,
-		Column6:   nameFilter,
-		Column7:   sql.NullString{String: nameFilter, Valid: true},
-	})
+	countParams := classRecordsCountParams(teacherID, startDate, endDate, statusFilter, nameFilter)
+	total, err := dbRO.GetQueries().CountClassRecordsFiltered(ctx, countParams)
 	if err != nil {
 		HttpError(w, "Failed to count class records", http.StatusInternalServerError)
 		return
 	}
 	page.Total = total
 
-	records, err := dbRO.GetQueries().GetClassRecordsFiltered(ctx, queries.GetClassRecordsFilteredParams{
-		TeacherID: teacherID,
-		Date:      startDate,
-		Date_2:    endDate,
-		Column4:   statusFilter,
-		Status:    statusFilter,
-		Column6:   nameFilter,
-		Column7:   sql.NullString{String: nameFilter, Valid: true},
-		Limit:     int64(page.Size),
-		Offset:    int64(page.Offset()),
-	})
+	records, err := dbRO.GetQueries().GetClassRecordsFiltered(ctx, classRecordsListParams(teacherID, startDate, endDate, statusFilter, nameFilter, int64(page.Size), int64(page.Offset())))
 	if err != nil {
 		HttpError(w, "Failed to fetch class records", http.StatusInternalServerError)
 		return
 	}
 
-	totalRate, err := dbRO.GetQueries().GetTotalRateByTeacherAndDateRange(ctx, queries.GetTotalRateByTeacherAndDateRangeParams{
-		TeacherID: teacherID,
-		Date:      startDate,
-		Date_2:    endDate,
-	})
+	totalRate, err := dbRO.GetQueries().GetTotalRateByTeacherAndDateRange(ctx, totalRateParams(teacherID, startDate, endDate))
 	if err != nil {
 		HttpError(w, "Failed to fetch total rate", http.StatusInternalServerError)
 		return
@@ -315,9 +340,11 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 	role := auth.GetRole(ctx)
 
 	if r.Method == http.MethodGet {
+		prefill := parseRecordClassPrefill(r)
 		w.Header().Set("Content-Type", "text/html")
 		frontend.RecordClass(frontend.RecordClassData{
 			IsSuperuser: role == auth.RoleSuperuser,
+			Prefill:     prefill,
 		}).Render(ctx, w)
 		return
 	}
@@ -366,6 +393,19 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if fromSchedule := r.FormValue("fromSchedule"); fromSchedule != "" {
+		scheduleID, err := strconv.ParseInt(fromSchedule, 10, 64)
+		if err != nil || scheduleID <= 0 {
+			sendErrorLog(w, "invalid schedule reference")
+			return
+		}
+		if err := markScheduledClassConducted(ctx, scheduleID, req); err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+		insertAuditLog(ctx, "schedule", fmt.Sprintf("marked scheduled class id %d as conducted", scheduleID))
+	}
+
 	insertAuditLog(ctx, "classes", fmt.Sprintf("recorded class for student id %d (teacher id %d, date %s, status %s)", req.StudentID, req.TeacherID, req.Date, req.Status))
 
 	if _, err := fmt.Fprint(w, "Class recorded successfully!\n"); err != nil {
@@ -385,11 +425,14 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 func handleClasses(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		data := frontend.ClassesData{}
-		if auth.GetRole(r.Context()) == auth.RoleTeacher {
+		role := auth.GetRole(r.Context())
+		if role == auth.RoleTeacher {
 			user := auth.GetUser(r.Context())
 			data.LockTeacher = true
 			data.TeacherID = strconv.FormatInt(user.ID, 10)
 			data.TeacherName = user.Name
+		} else {
+			data.ShowAllTeachers = true
 		}
 		w.Header().Set("Content-Type", "text/html")
 		frontend.Classes(data).Render(r.Context(), w)
@@ -430,4 +473,55 @@ func validateClassRecordRequest(req *models.ClassRecordRequest) error {
 		return errors.New("reason is required for cancelled or rescheduled classes")
 	}
 	return nil
+}
+
+func parseRecordClassPrefill(r *http.Request) models.RecordClassPrefill {
+	q := r.URL.Query()
+	fromSchedule := q.Get("fromSchedule")
+	if fromSchedule == "" {
+		return models.RecordClassPrefill{}
+	}
+
+	prefill := models.RecordClassPrefill{
+		FromSchedule:    fromSchedule,
+		StudentID:       q.Get("student"),
+		TeacherID:       q.Get("teacher"),
+		Date:            q.Get("date"),
+		DurationMinutes: q.Get("duration"),
+		Rate:            q.Get("rate"),
+		Currency:        q.Get("currency"),
+		Status:          q.Get("status"),
+		HasPrefill:      true,
+	}
+	if prefill.Status == "" {
+		prefill.Status = "conducted"
+	}
+
+	scheduleID, err := strconv.ParseInt(fromSchedule, 10, 64)
+	if err != nil || scheduleID <= 0 {
+		return models.RecordClassPrefill{}
+	}
+
+	existing, err := dbRO.GetQueries().GetScheduledClassByID(r.Context(), scheduleID)
+	if err != nil {
+		return models.RecordClassPrefill{}
+	}
+
+	if role := auth.GetRole(r.Context()); role == auth.RoleTeacher {
+		user := auth.GetUser(r.Context())
+		if existing.TeacherID != user.ID {
+			return models.RecordClassPrefill{}
+		}
+	}
+
+	prefill.StudentName = existing.StudentName
+	prefill.TeacherName = existing.TeacherName
+	prefill.StudentID = strconv.FormatInt(existing.StudentID, 10)
+	prefill.TeacherID = strconv.FormatInt(existing.TeacherID, 10)
+	prefill.Date = existing.ScheduledDate
+	prefill.DurationMinutes = strconv.FormatInt(existing.DurationMinutes, 10)
+	prefill.Rate = strconv.FormatFloat(existing.Rate, 'f', -1, 64)
+	prefill.Currency = existing.Currency
+
+	return prefill
 }

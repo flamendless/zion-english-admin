@@ -14,7 +14,7 @@ ORDER BY cr.created_at DESC;
 -- name: GetTotalRateByTeacherAndDateRange :one
 SELECT COALESCE(SUM(cr.rate), 0) as total_rate
 FROM tbl_class_records cr
-WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ? AND cr.status = 'conducted';
+WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ? AND cr.status = 'conducted';
 
 -- name: GetClassRecordByID :one
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
@@ -39,7 +39,7 @@ WHERE student_id = ? AND teacher_id = ? AND date = ? AND duration_minutes = ?
 SELECT COUNT(*) as count
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
-WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ?
+WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
   AND (? = '' OR cr.status = ?)
   AND (? = '' OR s.name LIKE '%' || ? || '%');
 
@@ -49,10 +49,10 @@ SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.duration_minutes, cr.rat
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
-WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ?
+WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
   AND (? = '' OR cr.status = ?)
   AND (? = '' OR s.name LIKE '%' || ? || '%')
-ORDER BY cr.date DESC, cr.created_at DESC
+ORDER BY CASE WHEN cr.date = date('now', 'localtime') THEN 0 ELSE 1 END, cr.date DESC, cr.created_at DESC
 LIMIT ? OFFSET ?;
 
 -- name: CountClassRecordsByStatusAndDateRange :many

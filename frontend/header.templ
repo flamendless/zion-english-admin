@@ -48,6 +48,9 @@ templ Header(loggedIn bool, role auth.Role) {
 							@NavLink("/classes", "classesLink", "Classes")
 						}
 					}
+					if IsNavAccessible(role, "/schedule") {
+						@NavLink("/schedule", "scheduleLink", "Class Schedule")
+					}
 					if IsNavAccessible(role, "/classes/record") {
 						@NavLink("/classes/record", "recordClassLink", "+Class")
 					}

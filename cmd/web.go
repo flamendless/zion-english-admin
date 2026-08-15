@@ -276,6 +276,8 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/classes/", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClassesPath))
 		authMux.HandleFunc(basePath+"/classes/record", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClassRecord))
 		authMux.HandleFunc(basePath+"/classes", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClasses))
+		authMux.HandleFunc(basePath+"/schedule/", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleSchedulePath))
+		authMux.HandleFunc(basePath+"/schedule", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleSchedule))
 		authMux.HandleFunc(basePath+"/my-students", auth.RequireRole(auth.RoleTeacher)(handleMyStudents))
 		authMux.HandleFunc(basePath+"/logs", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleSystemLogs))
 		authMux.HandleFunc(basePath+"/process-logs", auth.RequireRole(auth.RoleSuperuser)(handleLogs))
@@ -294,6 +296,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/api/students/search", auth.RequireRole(auth.RoleSuperuser)(handleSearchStudents))
 		authMux.HandleFunc(basePath+"/api/me/students", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetMyStudents))
 		authMux.HandleFunc(basePath+"/api/class-records", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetClassRecords))
+		authMux.HandleFunc(basePath+"/api/scheduled-classes", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetScheduledClasses))
 
 		authHandler := auth.Middleware(cfg, dbRO.GetQueries(), authMux)
 
@@ -322,6 +325,8 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/teachers/unapprove", authHandler)
 		rootMux.Handle(basePath+"/classes", authHandler)
 		rootMux.Handle(basePath+"/classes/", authHandler)
+		rootMux.Handle(basePath+"/schedule", authHandler)
+		rootMux.Handle(basePath+"/schedule/", authHandler)
 		rootMux.Handle(basePath+"/my-students", authHandler)
 		rootMux.Handle(basePath+"/profile", authHandler)
 		rootMux.Handle(basePath+"/profile/", authHandler)
@@ -329,6 +334,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/api/students", authHandler)
 		rootMux.Handle(basePath+"/api/students/", authHandler)
 		rootMux.Handle(basePath+"/api/class-records", authHandler)
+		rootMux.Handle(basePath+"/api/scheduled-classes", authHandler)
 		rootMux.Handle(basePath+"/api/me/students", authHandler)
 
 		handler := securityHeaders(rootMux)
@@ -1337,6 +1343,11 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	auth.ResetLoginFailures(ip)
 
+	switch user.Role {
+	case auth.RoleSuperuser, auth.RoleTeacher:
+		insertAuditLogAs(r.Context(), user, "auth", "logged in")
+	}
+
 	if ua := r.UserAgent(); ua != "" && user.Role == auth.RoleTeacher && user.ID != 0 {
 		useragentID := getOrCreateUserAgentID(r.Context(), dbRW, ua)
 		if _, err := dbRW.GetQueries().CreateAccess(r.Context(), queries.CreateAccessParams{
@@ -1656,7 +1667,32 @@ func handleGetStudents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	students, err := dbRO.GetQueries().GetActiveStudents(r.Context())
+	ctx := r.Context()
+	teacherIDStr := r.URL.Query().Get("teacher")
+	if teacherIDStr == "" {
+		teacherIDStr = r.URL.Query().Get("teacherId")
+	}
+
+	var students []queries.TblStudent
+	var err error
+	if teacherIDStr != "" {
+		teacherID, parseErr := strconv.ParseInt(teacherIDStr, 10, 64)
+		if parseErr != nil || teacherID <= 0 {
+			HttpError(w, "Invalid teacher ID", http.StatusBadRequest)
+			return
+		}
+		role := auth.GetRole(ctx)
+		if role == auth.RoleTeacher {
+			user := auth.GetUser(ctx)
+			if teacherID != user.ID {
+				HttpError(w, "Forbidden", http.StatusForbidden)
+				return
+			}
+		}
+		students, err = dbRO.GetQueries().GetStudentsByTeacherID(ctx, teacherID)
+	} else {
+		students, err = dbRO.GetQueries().GetActiveStudents(ctx)
+	}
 	if err != nil {
 		HttpError(w, "Failed to fetch students", http.StatusInternalServerError)
 		return
@@ -1673,7 +1709,7 @@ func handleGetStudents(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	if err := frontend.StudentOptions(studentResponses).Render(r.Context(), w); err != nil {
+	if err := frontend.StudentOptions(studentResponses).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

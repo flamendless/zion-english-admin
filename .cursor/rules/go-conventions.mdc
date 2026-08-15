@@ -30,7 +30,7 @@ import (
 
 1. Check HTTP method → `HttpError(w, "Method not allowed", 405)`
 2. Parse form/query params
-3. Validate via `validate*()` → `errors.New("human-readable message")`
+3. Validate via `validate*()` → return sentinel `Err…` vars (or propagate from domain packages)
 4. Call `dbRO` (reads) or `dbRW` (writes)
 5. Map DB rows → `frontend.*Item` view structs
 6. Render: `frontend.Page(data).Render(r.Context(), w)`
@@ -40,6 +40,29 @@ import (
 - Startup/CLI fatal: `panic(err)`
 - HTTP errors: `HttpError`, `sendErrorLog`, or `fmt.Fprint(w, message)`
 - Logging: `logs.Log().Error("msg", zap.Error(err), zap.String("key", val))`
+
+### Sentinel Errors
+
+Use package-level `var Err… = errors.New("…")` for domain and validation errors that callers may compare with `errors.Is`. See `internal/classrules` and `internal/utils/time_range.go`.
+
+```go
+var (
+	ErrInvalidStartTime = errors.New("invalid start time")
+	ErrEndBeforeStart   = errors.New("end time must be after start time")
+)
+
+func DurationMinutesFromRange(start, end string) (int64, error) {
+	startT, err := ParseTimeHM(start)
+	if err != nil {
+		return 0, ErrInvalidStartTime
+	}
+	// ...
+}
+```
+
+- Return sentinels directly for stable, user-facing validation failures.
+- Wrap with `%w` only when adding context (e.g. `fmt.Errorf("%w: %s", ErrInvalidTimeFormat, value)`).
+- Ad-hoc `errors.New` is fine for one-off internal failures (DB lookup errors, etc.) that are not compared with `errors.Is`.
 
 ## Nullable DB Fields
 

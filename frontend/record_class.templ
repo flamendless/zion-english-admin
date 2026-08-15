@@ -1,10 +1,12 @@
 package frontend
 
 import "time"
+import "zion-english/internal/models"
 import "zion-english/internal/utils"
 
 type RecordClassData struct {
 	IsSuperuser bool
+	Prefill     models.RecordClassPrefill
 }
 
 templ RecordClass(data RecordClassData) {
@@ -55,12 +57,28 @@ templ RecordClass(data RecordClassData) {
 						end
 					"
 				>
-					<div class="form-row">
-						@TeacherDropdown()
-						@StudentDropdown()
-					</div>
+					if data.Prefill.HasPrefill {
+						<input type="hidden" id="fromSchedule" name="fromSchedule" value={ data.Prefill.FromSchedule }/>
+						<input type="hidden" id="teacher" name="teacher" value={ data.Prefill.TeacherID }/>
+						<input type="hidden" id="student" name="student" value={ data.Prefill.StudentID }/>
+						<div class="form-row">
+							<div class="form-group">
+								<label>Teacher</label>
+								<input type="text" value={ data.Prefill.TeacherName } disabled/>
+							</div>
+							<div class="form-group">
+								<label>Student</label>
+								<input type="text" value={ data.Prefill.StudentName } disabled/>
+							</div>
+						</div>
+					} else {
+						<div class="form-row">
+							@TeacherDropdown()
+							@StudentDropdown()
+						</div>
+					}
 
-					@RecordClassFields()
+					@RecordClassFields(data.Prefill)
 				</form>
 			} else {
 				<form
@@ -90,11 +108,22 @@ templ RecordClass(data RecordClassData) {
 						end
 					"
 				>
-					<div class="form-row">
-						@TeacherStudentsDropdown()
-					</div>
+					if data.Prefill.HasPrefill {
+						<input type="hidden" id="fromSchedule" name="fromSchedule" value={ data.Prefill.FromSchedule }/>
+						<input type="hidden" id="student" name="student" value={ data.Prefill.StudentID }/>
+						<div class="form-row">
+							<div class="form-group">
+								<label>Student</label>
+								<input type="text" value={ data.Prefill.StudentName } disabled/>
+							</div>
+						</div>
+					} else {
+						<div class="form-row">
+							@TeacherStudentsDropdown()
+						</div>
+					}
 
-					@RecordClassFields()
+					@RecordClassFields(data.Prefill)
 				</form>
 			}
 
@@ -107,29 +136,45 @@ templ RecordClass(data RecordClassData) {
 	</html>
 }
 
-templ RecordClassFields() {
+templ RecordClassFields(prefill models.RecordClassPrefill) {
 	<div class="form-row">
 		<div class="form-group">
 			<label for="date">Date *</label>
-			<input
-				type="date"
-				id="date"
-				name="date"
-				value={ time.Now().Format("2006-01-02") }
-				required
-			>
+			if prefill.HasPrefill && prefill.Date != "" {
+				<input type="date" id="date" name="date" value={ prefill.Date } required readonly/>
+			} else {
+				<input
+					type="date"
+					id="date"
+					name="date"
+					value={ time.Now().Format("2006-01-02") }
+					required
+				/>
+			}
 		</div>
 		<div class="form-group">
 			<label for="duration">Duration (minutes) *</label>
-			<input type="number" id="duration" name="duration" required min="1" placeholder="e.g., 60">
+			if prefill.HasPrefill && prefill.DurationMinutes != "" {
+				<input type="number" id="duration" name="duration" required min="1" value={ prefill.DurationMinutes } readonly/>
+			} else {
+				<input type="number" id="duration" name="duration" required min="1" placeholder="e.g., 60"/>
+			}
 		</div>
 	</div>
 
 	<div class="form-row">
-		@CurrencyDropdown()
+		if prefill.HasPrefill && prefill.Currency != "" {
+			@CurrencyDropdownWithValue(prefill.Currency)
+		} else {
+			@CurrencyDropdown()
+		}
 		<div class="form-group">
 			<label for="rate">Rate *</label>
-			<input type="number" id="rate" name="rate" required min="0" step="0.01" placeholder="0.00">
+			if prefill.HasPrefill && prefill.Rate != "" {
+				<input type="number" id="rate" name="rate" required min="0" step="0.01" value={ prefill.Rate } readonly/>
+			} else {
+				<input type="number" id="rate" name="rate" required min="0" step="0.01" placeholder="0.00"/>
+			}
 		</div>
 	</div>
 
@@ -151,7 +196,11 @@ templ RecordClassFields() {
 			end
 		"
 	>
-		@ClassStatusDropdown()
+		if prefill.HasPrefill && prefill.Status != "" {
+			@ClassStatusDropdownWithValue(prefill.Status)
+		} else {
+			@ClassStatusDropdown()
+		}
 		<div class="form-group" id="reasonGroup" hidden>
 			<label for="reason">Reason *</label>
 			<input type="text" id="reason" name="reason" placeholder="Reason for cancellation/reschedule">

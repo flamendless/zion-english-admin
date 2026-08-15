@@ -296,9 +296,11 @@ templ Profile(data ProfileData) {
 								<div class="form-group">
 									<label for="mobileNumber">New mobile number</label>
 									<input
-										type="text"
+										type="tel"
 										id="mobileNumber"
 										name="mobileNumber"
+										inputmode="tel"
+										autocomplete="tel"
 										value={ data.MobileNumber }
 										required
 										disabled?={ !data.CanChangeMobile }

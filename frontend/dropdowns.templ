@@ -62,6 +62,29 @@ templ StudentDropdown() {
 	</div>
 }
 
+templ ScheduleModalTeacherDropdown() {
+	<div class="form-group">
+		<label for="schedule_teacher">Teacher *</label>
+		<select id="schedule_teacher" name="schedule_teacher" required
+			hx-get={ utils.URL("/api/teachers") }
+			hx-trigger="load"
+			hx-swap="innerHTML"
+			hx-target="this"
+		>
+			<option value="">-- Select Teacher --</option>
+		</select>
+	</div>
+}
+
+templ ScheduleModalStudentDropdown() {
+	<div class="form-group">
+		<label for="schedule_student">Student *</label>
+		<select id="schedule_student" name="schedule_student" required>
+			<option value="">-- Select teacher first --</option>
+		</select>
+	</div>
+}
+
 templ StudentSearchbox() {
 	<div class="form-group student-search">
 		<label for="relatedStudentSearch">Existing Student</label>

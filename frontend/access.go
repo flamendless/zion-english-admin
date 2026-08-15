@@ -15,7 +15,7 @@ func IsNavAccessible(role auth.Role, path string) bool {
 	}
 
 	switch path {
-	case "/classes", "/classes/record", "/profile", "/logs", "/my-students":
+	case "/classes", "/classes/record", "/schedule", "/profile", "/logs", "/my-students":
 		return true
 	default:
 		return false

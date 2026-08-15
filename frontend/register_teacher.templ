@@ -19,7 +19,7 @@ templ RegisterTeacher(loggedIn bool, role auth.Role) {
 				@SuccessBanner()
 				@ErrorBanner()
 				<form id="registerForm" hx-post={ utils.URL("/teachers/register") } hx-swap="innerHTML" hx-target="#logOutput">
-					<div class="form-row">
+					<div class="form-row-3">
 						<div class="form-group">
 							<label for="firstName">First Name *</label>
 							<input
@@ -85,9 +85,11 @@ templ RegisterTeacher(loggedIn bool, role auth.Role) {
 						<div class="form-group">
 							<label for="mobileNumber">Mobile Number *</label>
 							<input
-								type="text"
+								type="tel"
 								id="mobileNumber"
 								name="mobileNumber"
+								inputmode="tel"
+								autocomplete="tel"
 								placeholder="Enter mobile number"
 								required
 							/>
@@ -98,6 +100,7 @@ templ RegisterTeacher(loggedIn bool, role auth.Role) {
 								type="email"
 								id="email"
 								name="email"
+								autocomplete="email"
 								placeholder="Enter email"
 								required
 							/>

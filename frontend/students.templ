@@ -54,11 +54,11 @@ templ Students(data StudentData) {
 			@HeaderSimple()
 			@HubHeader("Students", "New Student", utils.URL("/students/register"), true)
 
-			@ListFilterForm(data.FilterPath, data.Query, data.Status, data.TeacherID, "", "", "", "", true, false, false, false)
+			@ListFilterForm(data.FilterPath, data.Query, data.Status, data.TeacherID, "", "", "", "", true, false, false, false, true)
 
 			if len(data.Students) > 0 {
 				<div class="table-wrapper">
-					<table id="studentsTable">
+					<table id="studentsTable" class="table-stack-mobile">
 						<thead>
 							<tr>
 								<th>Name</th>
@@ -76,22 +76,24 @@ templ Students(data StudentData) {
 						<tbody>
 							for _, student := range data.Students {
 								<tr>
-									<td>{ student.Name }</td>
-									<td class="currency-cell">{ student.Currency }</td>
-									<td>{ getDisplayValue(student.Contact) }</td>
-									<td class="rate-cell">{ formatRate(student.RatePerClass, student.Currency) }</td>
-									<td>{ getDisplayValue(student.ParentName) }</td>
-									<td>{ getDisplayValue(student.RelatedToDisplay) }</td>
-									<td>
+									<td data-label="Name">{ student.Name }</td>
+									<td class="currency-cell" data-label="Currency">{ student.Currency }</td>
+									<td data-label="Contact">{ getDisplayValue(student.Contact) }</td>
+									<td class="rate-cell" data-label="Rate">{ formatRate(student.RatePerClass, student.Currency) }</td>
+									<td data-label="Parent">{ getDisplayValue(student.ParentName) }</td>
+									<td data-label="Related To">{ getDisplayValue(student.RelatedToDisplay) }</td>
+									<td data-label="Color">
 										<div class="color-cell">
 											<div class="color-box" style={ "background-color: " + student.AssignedColor }></div>
 											<span>{ student.AssignedColor }</span>
 										</div>
 									</td>
-									<td class={ getStatusClass(student.Status) }>{ student.Status }</td>
-									<td>{ student.CreatedAt }</td>
-									<td>
-										<a href={ utils.URL("/students/" + student.ID + "/edit") } class="edit-btn">Edit</a>
+									<td class={ getStatusClass(student.Status) } data-label="Status">{ student.Status }</td>
+									<td data-label="Created">{ student.CreatedAt }</td>
+									<td data-label="Actions">
+										<div class="table-actions">
+											<a href={ utils.URL("/students/" + student.ID + "/edit") } class="edit-btn">Edit</a>
+										</div>
 									</td>
 								</tr>
 							}

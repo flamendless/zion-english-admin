@@ -152,3 +152,44 @@ type ClassRecordView struct {
 	Notes           string  `json:"notes"`
 	CreatedAt       string  `json:"createdAt"`
 }
+
+type ScheduledClassRequest struct {
+	StudentID       int64   `json:"studentId"`
+	TeacherID       int64   `json:"teacherId"`
+	ScheduledDate   string  `json:"scheduledDate"`
+	StartTime       string  `json:"startTime"`
+	DurationMinutes int64   `json:"durationMinutes"`
+	Rate            float64 `json:"rate"`
+	Currency        string  `json:"currency"`
+}
+
+type ScheduledClassView struct {
+	ID              int64   `json:"id"`
+	StudentID       int64   `json:"studentId"`
+	TeacherID       int64   `json:"teacherId"`
+	StudentName     string  `json:"studentName"`
+	TeacherName     string  `json:"teacherName"`
+	ScheduledDate   string  `json:"scheduledDate"`
+	StartTime       string  `json:"startTime"`
+	EndTime         string  `json:"endTime"`
+	DurationMinutes int64   `json:"durationMinutes"`
+	Rate            float64 `json:"rate"`
+	Currency        string  `json:"currency"`
+	Status          string  `json:"status"`
+	Reason          string  `json:"reason"`
+	CreatedAt       string  `json:"createdAt"`
+}
+
+type RecordClassPrefill struct {
+	FromSchedule    string
+	StudentID       string
+	TeacherID       string
+	StudentName     string
+	TeacherName     string
+	Date            string
+	DurationMinutes string
+	Rate            string
+	Currency        string
+	Status          string
+	HasPrefill      bool
+}

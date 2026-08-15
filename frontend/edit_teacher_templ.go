@@ -99,7 +99,7 @@ func EditTeacher(data EditTeacherData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-swap=\"innerHTML\" hx-target=\"#logOutput\"><div class=\"form-row\"><div class=\"form-group\"><label for=\"firstName\">First Name *</label> <input type=\"text\" id=\"firstName\" name=\"firstName\" required value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-swap=\"innerHTML\" hx-target=\"#logOutput\"><div class=\"form-row-3\"><div class=\"form-group\"><label for=\"firstName\">First Name *</label> <input type=\"text\" id=\"firstName\" name=\"firstName\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -220,27 +220,27 @@ func EditTeacher(data EditTeacherData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\"></div><div class=\"form-row\"><div class=\"form-group\"><label for=\"mobileNumber\">Mobile Number *</label> <input type=\"text\" id=\"mobileNumber\" name=\"mobileNumber\" required value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\"></div><div class=\"form-row\"><div class=\"form-group\"><label for=\"mobileNumber\">Mobile Number *</label> <input type=\"tel\" id=\"mobileNumber\" name=\"mobileNumber\" inputmode=\"tel\" autocomplete=\"tel\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.MobileNumber)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 85, Col: 97}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 85, Col: 131}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\"></div><div class=\"form-group\"><label for=\"email\">Email *</label> <input type=\"email\" id=\"email\" name=\"email\" required value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\"></div><div class=\"form-group\"><label for=\"email\">Email *</label> <input type=\"email\" id=\"email\" name=\"email\" autocomplete=\"email\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 89, Col: 77}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 89, Col: 98}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 		if templ_7745c5c3_Err != nil {

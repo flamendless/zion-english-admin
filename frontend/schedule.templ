@@ -1,0 +1,918 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/utils"
+)
+
+type ScheduleData struct {
+	LockTeacher     bool
+	ShowAllTeachers bool
+	TeacherID       string
+	TeacherName     string
+}
+
+templ Schedule(data ScheduleData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Class Schedule - Zion English Admin</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+	</head>
+	<body>
+		<div
+			class="container schedule-page"
+			data-show-all-teachers={ fmt.Sprintf("%t", data.ShowAllTeachers) }
+			data-lock-teacher={ fmt.Sprintf("%t", data.LockTeacher) }
+			data-teacher-id={ data.TeacherID }
+			data-teacher-name={ data.TeacherName }
+		>
+			@HeaderSimple()
+			@SuccessBanner()
+			@ErrorBanner()
+			@HubHeader("Class Schedule", "", "", false)
+
+			<div class="schedule-toolbar">
+				if data.ShowAllTeachers {
+					<input type="hidden" id="listTeacher" value="0"/>
+					<div class="form-group">
+						<label>Teacher</label>
+						<input type="text" value="All teachers" disabled/>
+					</div>
+				} else if data.LockTeacher {
+					<input type="hidden" id="listTeacher" value={ data.TeacherID }/>
+					<div class="form-group">
+						<label>Teacher</label>
+						<input type="text" value={ data.TeacherName } disabled/>
+					</div>
+				} else {
+					<div class="form-group">
+						<label for="listTeacher">Teacher</label>
+						<select id="listTeacher"
+							hx-get={ utils.URL("/api/teachers") }
+							hx-trigger="load"
+							hx-swap="innerHTML"
+							hx-target="this"
+						>
+							<option value="">-- Select Teacher --</option>
+						</select>
+					</div>
+				}
+			</div>
+
+			<div class="schedule-layout">
+				<aside class="schedule-section schedule-today-section" aria-labelledby="todayHeading">
+					<h3 id="todayHeading">Today's Classes</h3>
+					<p class="schedule-today-date" id="todayDateLabel"></p>
+					<div id="todayScheduleList" class="day-classes-list">
+						<p class="day-classes-empty">Loading today's schedule...</p>
+					</div>
+				</aside>
+
+				<div class="schedule-section schedule-calendar-section" aria-labelledby="calendarHeading">
+					<div class="schedule-section-head">
+						<h3 id="calendarHeading">Calendar</h3>
+						<div class="calendar-legend" aria-hidden="true">
+							<span class="legend-item"><span class="legend-swatch legend-vacant"></span> Vacant</span>
+							<span class="legend-item"><span class="legend-swatch legend-scheduled"></span> Has class</span>
+							<span class="legend-item"><span class="legend-swatch legend-today"></span> Today</span>
+						</div>
+					</div>
+
+					<div class="schedule-calendar schedule-calendar-full" role="application" aria-label="Class schedule calendar">
+					<div class="calendar-header">
+						<button type="button" class="calendar-nav-btn" id="calPrev" aria-label="Previous month">&lsaquo;</button>
+						<span class="calendar-month-label" id="calMonthLabel"></span>
+						<button type="button" class="calendar-nav-btn" id="calNext" aria-label="Next month">&rsaquo;</button>
+						<button type="button" class="calendar-today-btn" id="calToday" aria-label="Jump to today">Today</button>
+					</div>
+					<div class="calendar-weekdays" aria-hidden="true">
+						<span class="calendar-weekday">Sun</span>
+						<span class="calendar-weekday">Mon</span>
+						<span class="calendar-weekday">Tue</span>
+						<span class="calendar-weekday">Wed</span>
+						<span class="calendar-weekday">Thu</span>
+						<span class="calendar-weekday">Fri</span>
+						<span class="calendar-weekday">Sat</span>
+					</div>
+					<div class="calendar-grid-wrap">
+						<div class="calendar-loading" id="calendarLoading" hidden aria-live="polite">
+							<span class="loading-spinner" aria-hidden="true"></span>
+							<span>Loading schedule…</span>
+						</div>
+						<div class="calendar-grid calendar-grid-full" id="calendarGrid"></div>
+					</div>
+				</div>
+				</div>
+			</div>
+
+			<div class="modal-overlay" id="scheduleModal" hidden>
+				<div class="modal-dialog modal-dialog-schedule" role="dialog" aria-modal="true" aria-labelledby="modalDateTitle">
+					<div class="modal-header">
+						<h3 id="modalDateTitle">Schedule</h3>
+						<button type="button" class="modal-close" id="modalCloseBtn" aria-label="Close">&times;</button>
+					</div>
+					<div class="modal-body">
+						<section class="modal-section" aria-labelledby="dayClassesHeading">
+							<h4 class="modal-section-title" id="dayClassesHeading">Scheduled classes</h4>
+							<div id="dayClassesList" class="day-classes-list"></div>
+							<div id="cancelConfirmPanel" class="cancel-confirm-panel" hidden>
+								<p class="cancel-confirm-title">Cancel this class?</p>
+								<p class="field-hint">Optional reason will be saved in the activity log.</p>
+								<div class="form-group">
+									<label for="cancelReason">Reason</label>
+									<input type="text" id="cancelReason" placeholder="e.g. student unavailable"/>
+								</div>
+								<div class="cancel-confirm-actions">
+									<button type="button" class="btn btn-secondary" id="cancelConfirmBack">Keep class</button>
+									<button type="button" class="btn btn-danger" id="cancelConfirmSubmit">Confirm cancel</button>
+								</div>
+							</div>
+						</section>
+						<div id="modalFormOutput" class="form-message" role="alert" aria-live="assertive"></div>
+						if data.LockTeacher {
+							<form id="scheduleModalForm" class="schedule-modal-form">
+								<input type="hidden" id="modal_teacher" name="teacher" value={ data.TeacherID }/>
+								<input type="hidden" id="scheduled_date" name="scheduled_date"/>
+								<h4 class="modal-section-title" id="addClassHeading">Add class</h4>
+								<div class="form-row">
+									@TeacherStudentsDropdown()
+								</div>
+								@ScheduleModalFields()
+								<div class="modal-footer">
+									<button type="submit" id="modalSubmitBtn" class="btn">Schedule Class</button>
+								</div>
+							</form>
+						} else {
+							<form id="scheduleModalForm" class="schedule-modal-form">
+								<input type="hidden" id="scheduled_date" name="scheduled_date"/>
+								<h4 class="modal-section-title" id="addClassHeading">Add class</h4>
+								<div class="form-row">
+									@ScheduleModalTeacherDropdown()
+									@ScheduleModalStudentDropdown()
+								</div>
+								@ScheduleModalFields()
+								<div class="modal-footer">
+									<button type="submit" id="modalSubmitBtn" class="btn">Schedule Class</button>
+								</div>
+							</form>
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			const pageRoot = document.querySelector('.schedule-page');
+			const showAllTeachers = pageRoot.dataset.showAllTeachers === 'true';
+			const lockTeacher = pageRoot.dataset.lockTeacher === 'true';
+			const listTeacher = document.getElementById('listTeacher');
+			const calendarGrid = document.getElementById('calendarGrid');
+			const calMonthLabel = document.getElementById('calMonthLabel');
+			const calPrev = document.getElementById('calPrev');
+			const calNext = document.getElementById('calNext');
+			const calToday = document.getElementById('calToday');
+			const calendarLoading = document.getElementById('calendarLoading');
+			const scheduleModal = document.getElementById('scheduleModal');
+			const modalCloseBtn = document.getElementById('modalCloseBtn');
+			const modalDateTitle = document.getElementById('modalDateTitle');
+			const dayClassesList = document.getElementById('dayClassesList');
+			const todayScheduleList = document.getElementById('todayScheduleList');
+			const todayDateLabel = document.getElementById('todayDateLabel');
+			const scheduleModalForm = document.getElementById('scheduleModalForm');
+			const scheduledDateInput = document.getElementById('scheduled_date');
+			const modalFormOutput = document.getElementById('modalFormOutput');
+			const cancelConfirmPanel = document.getElementById('cancelConfirmPanel');
+			const cancelReasonInput = document.getElementById('cancelReason');
+			const cancelConfirmBack = document.getElementById('cancelConfirmBack');
+			const cancelConfirmSubmit = document.getElementById('cancelConfirmSubmit');
+			const modalSubmitBtn = document.getElementById('modalSubmitBtn');
+			const startTimeInput = document.getElementById('start_time');
+			const endTimeInput = document.getElementById('end_time');
+			const durationPreview = document.getElementById('durationPreview');
+
+			function getFormStudentEl() {
+				if (lockTeacher) {
+					return scheduleModalForm ? scheduleModalForm.querySelector('[name="student"]') : document.getElementById('student');
+				}
+				return document.getElementById('schedule_student');
+			}
+
+			function getFormTeacherEl() {
+				if (lockTeacher) {
+					return scheduleModalForm ? scheduleModalForm.querySelector('[name="teacher"]') : document.getElementById('modal_teacher');
+				}
+				return document.getElementById('schedule_teacher');
+			}
+
+			function buildScheduleFormData() {
+				const params = new URLSearchParams();
+				const studentEl = getFormStudentEl();
+				const teacherEl = getFormTeacherEl();
+				const currencyEl = document.getElementById('currency');
+				const rateEl = document.getElementById('rate');
+
+				params.append('scheduled_date', scheduledDateInput ? scheduledDateInput.value : '');
+				if (studentEl && studentEl.value) {
+					if (lockTeacher) {
+						params.append('student', studentEl.value);
+					} else {
+						params.append('schedule_student', studentEl.value);
+					}
+				}
+				if (teacherEl && teacherEl.value) {
+					if (lockTeacher) {
+						params.append('teacher', teacherEl.value);
+					} else {
+						params.append('schedule_teacher', teacherEl.value);
+					}
+				}
+				params.append('start_time', startTimeInput ? startTimeInput.value : '');
+				params.append('end_time', endTimeInput ? endTimeInput.value : '');
+				params.append('rate', rateEl ? rateEl.value : '');
+				params.append('currency', currencyEl ? currencyEl.value : '');
+				return params;
+			}
+
+			let calendarMonth = new Date();
+			calendarMonth.setDate(1);
+			let activeDate = '';
+			let monthRecordsByDate = {};
+			let monthRecordsFlat = [];
+			let todayRecords = [];
+			let pendingCancelId = null;
+			let modalTriggerEl = null;
+			let calendarLoadingCount = 0;
+
+			const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+			function getBaseURL() {
+				const banner = document.getElementById('errorBanner');
+				if (banner && banner.dataset.basePath) {
+					return banner.dataset.basePath.replace(/\/$/, '');
+				}
+				const pathname = window.location.pathname;
+				const cleanPath = pathname.replace(/\/$/, '');
+				const parts = cleanPath.split('/').filter(p => p !== '');
+				if (parts.length === 0 || cleanPath.endsWith('.html')) {
+					return cleanPath.includes('/zion-english-admin') ? '/zion-english-admin' : '';
+				}
+				if (parts.length === 1) return '/' + parts[0];
+				return '/' + parts.slice(0, -1).join('/');
+			}
+
+			const baseURL = getBaseURL();
+			function buildURL(path) { return baseURL + path; }
+
+			function formatDate(date) {
+				const y = date.getFullYear();
+				const m = String(date.getMonth() + 1).padStart(2, '0');
+				const d = String(date.getDate()).padStart(2, '0');
+				return y + '-' + m + '-' + d;
+			}
+
+			function formatDisplayDate(dateStr) {
+				const [y, m, d] = dateStr.split('-').map(Number);
+				const dt = new Date(y, m - 1, d);
+				return dt.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+			}
+
+			function parseTimeToMinutes(value) {
+				if (!value) return null;
+				const parts = value.split(':');
+				return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+			}
+
+			function formatDurationLabel(minutes) {
+				if (minutes < 60) return minutes + ' min';
+				const h = Math.floor(minutes / 60);
+				const m = minutes % 60;
+				return m === 0 ? h + ' hr' : h + ' hr ' + m + ' min';
+			}
+
+			function recordField(record, camel, snake) {
+				if (record[camel] !== undefined && record[camel] !== null && record[camel] !== '') {
+					return record[camel];
+				}
+				return record[snake] || '';
+			}
+
+			function normalizeTime(value) {
+				if (!value) return '';
+				const text = String(value);
+				const match = text.match(/(\d{1,2}):(\d{2})/);
+				if (!match) return '';
+				return String(match[1]).padStart(2, '0') + ':' + match[2];
+			}
+
+			function formatTimeRange(record) {
+				const start = normalizeTime(recordField(record, 'startTime', 'start_time'));
+				let end = normalizeTime(recordField(record, 'endTime', 'end_time'));
+				const durationMinutes = Number(recordField(record, 'durationMinutes', 'duration_minutes')) || 0;
+				if (!end && start && durationMinutes) {
+					const startMins = parseTimeToMinutes(start);
+					if (startMins !== null) {
+						const total = startMins + durationMinutes;
+						const h = Math.floor(total / 60) % 24;
+						const m = total % 60;
+						end = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+					}
+				}
+				if (start && end) return start + ' – ' + end;
+				if (start) return start;
+				return 'Time not set';
+			}
+
+			function sortByStartTime(records) {
+				return records.slice().sort((a, b) => {
+					const aStart = parseTimeToMinutes(normalizeTime(recordField(a, 'startTime', 'start_time'))) ?? 9999;
+					const bStart = parseTimeToMinutes(normalizeTime(recordField(b, 'startTime', 'start_time'))) ?? 9999;
+					return aStart - bStart;
+				});
+			}
+
+			function updateDurationPreview() {
+				if (!durationPreview || !startTimeInput || !endTimeInput) return;
+				const start = parseTimeToMinutes(startTimeInput.value);
+				const end = parseTimeToMinutes(endTimeInput.value);
+				if (start === null || end === null) {
+					durationPreview.textContent = '';
+					durationPreview.hidden = true;
+					durationPreview.classList.remove('is-invalid');
+					return;
+				}
+				durationPreview.hidden = false;
+				const diff = end - start;
+				if (diff <= 0) {
+					durationPreview.textContent = 'End time must be after start time';
+					durationPreview.classList.add('is-invalid');
+					return;
+				}
+				durationPreview.textContent = 'Duration: ' + formatDurationLabel(diff);
+				durationPreview.classList.remove('is-invalid');
+			}
+
+			function setCalendarLoading(active) {
+				if (!calendarLoading) return;
+				calendarLoadingCount += active ? 1 : -1;
+				if (calendarLoadingCount < 0) calendarLoadingCount = 0;
+				calendarLoading.hidden = calendarLoadingCount === 0;
+			}
+
+			function showFormMessage(text, isError) {
+				if (!modalFormOutput) return;
+				modalFormOutput.textContent = text || '';
+				modalFormOutput.classList.toggle('is-error', Boolean(isError && text));
+				modalFormOutput.classList.toggle('is-success', Boolean(!isError && text));
+			}
+
+			function hideCancelConfirm() {
+				pendingCancelId = null;
+				if (cancelConfirmPanel) cancelConfirmPanel.hidden = true;
+				if (cancelReasonInput) cancelReasonInput.value = '';
+				if (dayClassesList) dayClassesList.hidden = false;
+			}
+
+			function showCancelConfirm(id) {
+				pendingCancelId = id;
+				if (cancelConfirmPanel) cancelConfirmPanel.hidden = false;
+				if (dayClassesList) dayClassesList.hidden = true;
+				if (cancelReasonInput) {
+					cancelReasonInput.value = '';
+					cancelReasonInput.focus();
+				}
+			}
+
+			function getModalFocusables() {
+				if (!scheduleModal) return [];
+				return Array.from(scheduleModal.querySelectorAll(
+					'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+				)).filter(el => !el.hidden && el.offsetParent !== null);
+			}
+
+			function trapModalFocus(e) {
+				if (!scheduleModal || scheduleModal.hidden || e.key !== 'Tab') return;
+				const focusables = getModalFocusables();
+				if (!focusables.length) return;
+				const first = focusables[0];
+				const last = focusables[focusables.length - 1];
+				if (e.shiftKey && document.activeElement === first) {
+					e.preventDefault();
+					last.focus();
+				} else if (!e.shiftKey && document.activeElement === last) {
+					e.preventDefault();
+					first.focus();
+				}
+			}
+			function getTeacherId() {
+				return listTeacher ? listTeacher.value : '';
+			}
+
+			function canLoadCalendar() {
+				const teacherId = getTeacherId();
+				return showAllTeachers || lockTeacher || (teacherId !== '' && teacherId !== null);
+			}
+
+			async function loadTodayData() {
+				const todayStr = formatDate(new Date());
+				if (todayDateLabel) {
+					todayDateLabel.textContent = formatDisplayDate(todayStr);
+				}
+
+				if (!canLoadCalendar()) {
+					todayRecords = [];
+					renderTodayList();
+					return;
+				}
+
+				const params = new URLSearchParams({
+					teacherId: getTeacherId() || '0',
+					startDate: todayStr,
+					endDate: todayStr,
+					page: '1',
+					pageSize: '100',
+					status: 'scheduled',
+				});
+
+				setCalendarLoading(true);
+				try {
+					const response = await fetch(buildURL('/api/scheduled-classes?' + params.toString()));
+					const data = await response.json();
+					if (!response.ok) throw new Error(data.message || 'Failed to load today\'s schedule');
+					todayRecords = data.records || [];
+				} catch (err) {
+					console.error(err);
+					todayRecords = [];
+				} finally {
+					setCalendarLoading(false);
+				}
+				renderTodayList();
+			}
+
+			async function loadMonthData() {
+				if (!canLoadCalendar()) {
+					monthRecordsByDate = {};
+					monthRecordsFlat = [];
+					return;
+				}
+
+				const year = calendarMonth.getFullYear();
+				const month = calendarMonth.getMonth();
+				const start = formatDate(new Date(year, month, 1));
+				const end = formatDate(new Date(year, month + 1, 0));
+
+				const params = new URLSearchParams({
+					teacherId: getTeacherId() || '0',
+					startDate: start,
+					endDate: end,
+					page: '1',
+					pageSize: '500',
+					status: 'scheduled',
+				});
+
+				setCalendarLoading(true);
+				try {
+					const response = await fetch(buildURL('/api/scheduled-classes?' + params.toString()));
+					const data = await response.json();
+					if (!response.ok) throw new Error(data.message || 'Failed to load schedule');
+
+					monthRecordsByDate = {};
+					monthRecordsFlat = data.records || [];
+					monthRecordsFlat.forEach(record => {
+						const key = record.scheduledDate;
+						if (!monthRecordsByDate[key]) monthRecordsByDate[key] = [];
+						monthRecordsByDate[key].push(record);
+					});
+				} catch (err) {
+					console.error(err);
+					showErrorBanner(err.message);
+					monthRecordsByDate = {};
+					monthRecordsFlat = [];
+				} finally {
+					setCalendarLoading(false);
+				}
+			}
+
+			function renderCalendar() {
+				if (!calendarGrid || !calMonthLabel) return;
+
+				const year = calendarMonth.getFullYear();
+				const month = calendarMonth.getMonth();
+				calMonthLabel.textContent = monthNames[month] + ' ' + year;
+				calendarGrid.innerHTML = '';
+
+				if (!canLoadCalendar()) {
+					const msg = document.createElement('p');
+					msg.className = 'calendar-empty-msg';
+					msg.textContent = 'Select a teacher to view the calendar.';
+					calendarGrid.appendChild(msg);
+					return;
+				}
+
+				const firstDay = new Date(year, month, 1).getDay();
+				const daysInMonth = new Date(year, month + 1, 0).getDate();
+				const todayStr = formatDate(new Date());
+
+				for (let i = 0; i < firstDay; i++) {
+					const empty = document.createElement('span');
+					empty.className = 'calendar-day is-empty';
+					empty.setAttribute('aria-hidden', 'true');
+					calendarGrid.appendChild(empty);
+				}
+
+				for (let day = 1; day <= daysInMonth; day++) {
+					const dateStr = formatDate(new Date(year, month, day));
+					const count = (monthRecordsByDate[dateStr] || []).length;
+					const btn = document.createElement('button');
+					btn.type = 'button';
+					btn.className = 'calendar-day';
+					btn.dataset.date = dateStr;
+
+					const num = document.createElement('span');
+					num.className = 'calendar-day-num';
+					num.textContent = String(day);
+					btn.appendChild(num);
+
+					if (count > 0) {
+						btn.classList.add('has-scheduled');
+						const badge = document.createElement('span');
+						badge.className = 'calendar-day-badge';
+						badge.textContent = String(count);
+						btn.appendChild(badge);
+					} else {
+						btn.classList.add('is-vacant');
+					}
+
+					if (dateStr === todayStr) btn.classList.add('is-today');
+					if (dateStr < todayStr) btn.classList.add('is-past');
+					if (dateStr === activeDate) btn.classList.add('is-active');
+
+					btn.setAttribute('aria-label', formatDisplayDate(dateStr) + (count ? ', ' + count + ' scheduled' : ', vacant'));
+					btn.addEventListener('click', () => {
+						modalTriggerEl = btn;
+						openDayModal(dateStr);
+					});
+					calendarGrid.appendChild(btn);
+				}
+			}
+
+			function buildConductURL(record) {
+				const params = new URLSearchParams({
+					fromSchedule: String(record.id),
+					student: String(record.studentId),
+					teacher: String(record.teacherId),
+					date: record.scheduledDate,
+					duration: String(record.durationMinutes),
+					rate: String(record.rate),
+					currency: record.currency,
+					status: 'conducted',
+				});
+				return buildURL('/classes/record?' + params.toString());
+			}
+
+			async function cancelClass(id, reason) {
+				const formData = new FormData();
+				formData.append('reason', reason || '');
+				const response = await fetch(buildURL('/schedule/' + id + '/cancel'), { method: 'POST', body: formData });
+				const text = await response.text();
+				if (!response.ok) { showErrorBanner(text); return false; }
+				showSuccessBanner('Class cancelled');
+				hideCancelConfirm();
+				await refreshCalendar();
+				openDayModal(activeDate);
+				return true;
+			}
+
+			function renderClassList(container, records, emptyMessage) {
+				if (!container) return;
+				container.innerHTML = '';
+				if (!records.length) {
+					const empty = document.createElement('p');
+					empty.className = 'day-classes-empty';
+					empty.textContent = emptyMessage;
+					container.appendChild(empty);
+					return;
+				}
+
+				const list = document.createElement('ul');
+				list.className = 'day-classes-items';
+				sortByStartTime(records).forEach(record => {
+					const li = document.createElement('li');
+					li.className = 'day-class-item';
+
+					const info = document.createElement('div');
+					info.className = 'day-class-info';
+
+					const title = document.createElement('strong');
+					title.textContent = showAllTeachers ? record.studentName + ' · ' + record.teacherName : record.studentName;
+					info.appendChild(title);
+
+					const time = document.createElement('span');
+					time.className = 'day-class-time';
+					time.textContent = formatTimeRange(record);
+					info.appendChild(time);
+
+					const rate = document.createElement('span');
+					rate.className = 'day-class-rate';
+					rate.textContent = record.rate + ' ' + record.currency;
+					info.appendChild(rate);
+
+					li.appendChild(info);
+
+					const actions = document.createElement('div');
+					actions.className = 'day-class-actions';
+
+					const conduct = document.createElement('a');
+					conduct.href = buildConductURL(record);
+					conduct.className = 'btn';
+					conduct.textContent = 'Conduct';
+					actions.appendChild(conduct);
+
+					const cancelBtn = document.createElement('button');
+					cancelBtn.type = 'button';
+					cancelBtn.className = 'btn btn-secondary btn-sm';
+					cancelBtn.textContent = 'Cancel';
+					cancelBtn.onclick = () => showCancelConfirm(record.id);
+					actions.appendChild(cancelBtn);
+
+					li.appendChild(actions);
+					list.appendChild(li);
+				});
+				container.appendChild(list);
+			}
+
+			function renderTodayList() {
+				renderClassList(
+					todayScheduleList,
+					todayRecords,
+					canLoadCalendar() ? 'No classes scheduled for today.' : 'Select a teacher to view today\'s schedule.'
+				);
+			}
+
+			function renderDayClasses(dateStr) {
+				const records = monthRecordsByDate[dateStr] || [];
+				renderClassList(
+					dayClassesList,
+					records,
+					'No classes scheduled for this day.'
+				);
+			}
+
+			function openDayModal(dateStr) {
+				activeDate = dateStr;
+				hideCancelConfirm();
+				if (scheduledDateInput) scheduledDateInput.value = dateStr;
+				if (modalDateTitle) modalDateTitle.textContent = formatDisplayDate(dateStr);
+				showFormMessage('', false);
+				renderDayClasses(dateStr);
+				renderCalendar();
+
+				const todayStr = formatDate(new Date());
+				const formSection = scheduleModalForm;
+				const isPast = dateStr < todayStr;
+				if (formSection) formSection.style.display = isPast ? 'none' : '';
+				if (modalSubmitBtn) modalSubmitBtn.disabled = isPast;
+
+				scheduleModal.hidden = false;
+				document.body.classList.add('modal-open');
+				requestAnimationFrame(() => {
+					const focusables = getModalFocusables();
+					if (focusables.length) focusables[0].focus();
+				});
+			}
+
+			function closeModal() {
+				scheduleModal.hidden = true;
+				document.body.classList.remove('modal-open');
+				hideCancelConfirm();
+				activeDate = '';
+				if (scheduleModalForm) scheduleModalForm.reset();
+				if (!lockTeacher) {
+					loadStudentsForTeacher('');
+				}
+				updateDurationPreview();
+				showFormMessage('', false);
+				if (modalSubmitBtn) {
+					modalSubmitBtn.disabled = false;
+					modalSubmitBtn.classList.remove('is-loading');
+				}
+				renderCalendar();
+				if (modalTriggerEl && typeof modalTriggerEl.focus === 'function') {
+					modalTriggerEl.focus();
+				}
+				modalTriggerEl = null;
+			}
+
+			async function refreshCalendar() {
+				await Promise.all([loadMonthData(), loadTodayData()]);
+				renderCalendar();
+			}
+
+			async function loadStudentsForTeacher(teacherId) {
+				const studentEl = getFormStudentEl();
+				if (!studentEl) return;
+				if (!teacherId) {
+					studentEl.innerHTML = '<option value="">-- Select teacher first --</option>';
+					studentEl.value = '';
+					return;
+				}
+				try {
+					const response = await fetch(buildURL('/api/students?teacher=' + encodeURIComponent(teacherId)));
+					const html = await response.text();
+					if (!response.ok) throw new Error(html);
+					studentEl.innerHTML = html;
+					studentEl.value = '';
+				} catch (err) {
+					showErrorBanner(err.message || 'Failed to load students');
+					studentEl.innerHTML = '<option value="">-- Select teacher first --</option>';
+					studentEl.value = '';
+				}
+			}
+
+			function wireTeacherStudentDropdown() {
+				const teacherEl = getFormTeacherEl();
+				if (!teacherEl || lockTeacher) return;
+				teacherEl.addEventListener('change', () => {
+					loadStudentsForTeacher(teacherEl.value);
+				});
+			}
+
+			if (calToday) {
+				calToday.addEventListener('click', async () => {
+					calendarMonth = new Date();
+					calendarMonth.setDate(1);
+					await refreshCalendar();
+				});
+			}
+			if (cancelConfirmBack) {
+				cancelConfirmBack.addEventListener('click', hideCancelConfirm);
+			}
+			if (cancelConfirmSubmit) {
+				cancelConfirmSubmit.addEventListener('click', async () => {
+					if (!pendingCancelId) return;
+					cancelConfirmSubmit.disabled = true;
+					cancelConfirmSubmit.classList.add('is-loading');
+					const reason = cancelReasonInput ? cancelReasonInput.value : '';
+					await cancelClass(pendingCancelId, reason);
+					cancelConfirmSubmit.disabled = false;
+					cancelConfirmSubmit.classList.remove('is-loading');
+				});
+			}
+			if (calPrev) {
+				calPrev.addEventListener('click', async () => {
+					calendarMonth.setMonth(calendarMonth.getMonth() - 1);
+					await refreshCalendar();
+				});
+			}
+			if (calNext) {
+				calNext.addEventListener('click', async () => {
+					calendarMonth.setMonth(calendarMonth.getMonth() + 1);
+					await refreshCalendar();
+				});
+			}
+			if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+			if (scheduleModal) {
+				scheduleModal.addEventListener('click', (e) => {
+					if (e.target === scheduleModal) closeModal();
+				});
+			}
+			document.addEventListener('keydown', (e) => {
+				if (e.key === 'Escape' && scheduleModal && !scheduleModal.hidden) {
+					if (pendingCancelId) {
+						hideCancelConfirm();
+					} else {
+						closeModal();
+					}
+				}
+				trapModalFocus(e);
+			});
+
+			if (startTimeInput) startTimeInput.addEventListener('change', updateDurationPreview);
+			if (endTimeInput) endTimeInput.addEventListener('change', updateDurationPreview);
+
+			if (scheduleModalForm) {
+				scheduleModalForm.addEventListener('change', (e) => {
+					const target = e.target;
+					if (!target || (target.id !== 'schedule_student' && target.id !== 'student')) return;
+					const opt = target.options[target.selectedIndex];
+					if (!opt || !opt.value) return;
+					const rate = opt.getAttribute('data-rate');
+					const currency = opt.getAttribute('data-currency');
+					const rateEl = document.getElementById('rate');
+					const currencyEl = document.getElementById('currency');
+					if (rate && rateEl) rateEl.value = rate;
+					if (currency && currencyEl) currencyEl.value = currency;
+				});
+			}
+
+			if (listTeacher && listTeacher.tagName === 'SELECT') {
+				listTeacher.addEventListener('change', refreshCalendar);
+			}
+
+			if (scheduleModalForm) {
+				scheduleModalForm.addEventListener('submit', async (e) => {
+					e.preventDefault();
+					const studentEl = getFormStudentEl();
+					const teacherEl = getFormTeacherEl();
+					if (!lockTeacher) {
+						if (!teacherEl || !teacherEl.value) {
+							showFormMessage('Please select a teacher', true);
+							if (teacherEl) teacherEl.focus();
+							return;
+						}
+					}
+					if (!studentEl || !studentEl.value) {
+						showFormMessage('Please select a student', true);
+						if (studentEl) studentEl.focus();
+						return;
+					}
+					if (!scheduledDateInput || !scheduledDateInput.value) {
+						showFormMessage('No date selected', true);
+						return;
+					}
+					if (!startTimeInput.value || !endTimeInput.value) {
+						showFormMessage('Please set start and end times', true);
+						if (!startTimeInput.value) startTimeInput.focus();
+						else endTimeInput.focus();
+						return;
+					}
+					const rateEl = document.getElementById('rate');
+					if (!rateEl || rateEl.value <= 0) {
+						showFormMessage('Please enter a valid rate', true);
+						if (rateEl) rateEl.focus();
+						return;
+					}
+
+					const formData = buildScheduleFormData();
+					if (modalSubmitBtn) {
+						modalSubmitBtn.disabled = true;
+						modalSubmitBtn.classList.add('is-loading');
+					}
+					try {
+						const response = await fetch(buildURL('/schedule'), {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+							body: formData.toString(),
+						});
+						const text = await response.text();
+						if (!response.ok) {
+							showFormMessage(text, true);
+							showErrorBanner(text);
+							return;
+						}
+						showSuccessBanner('Class scheduled');
+						showFormMessage(text, false);
+						scheduleModalForm.reset();
+						if (!lockTeacher) {
+							loadStudentsForTeacher('');
+						}
+						if (scheduledDateInput) scheduledDateInput.value = activeDate;
+						updateDurationPreview();
+						await refreshCalendar();
+						renderDayClasses(activeDate);
+					} catch (err) {
+						showFormMessage(err.message, true);
+						showErrorBanner(err.message);
+					} finally {
+						if (modalSubmitBtn) {
+							modalSubmitBtn.disabled = false;
+							modalSubmitBtn.classList.remove('is-loading');
+						}
+					}
+				});
+			}
+
+			refreshCalendar();
+			updateDurationPreview();
+			wireTeacherStudentDropdown();
+			if (!lockTeacher) {
+				loadStudentsForTeacher('');
+			}
+		</script>
+	</body>
+	</html>
+}
+
+templ ScheduleModalFields() {
+	<div class="time-range-group">
+		<div class="form-group time-input-wrap">
+			<label for="start_time">Start time *</label>
+			<input type="time" id="start_time" name="start_time" step="300" required/>
+		</div>
+		<div class="form-group time-input-wrap">
+			<label for="end_time">End time *</label>
+			<input type="time" id="end_time" name="end_time" step="300" required/>
+		</div>
+	</div>
+	<div class="duration-preview" id="durationPreview" aria-live="polite" hidden></div>
+	<div class="form-row">
+		@CurrencyDropdown()
+		<div class="form-group">
+			<label for="rate">Rate *</label>
+			<input type="number" id="rate" name="rate" required min="0" step="0.01" placeholder="0.00"/>
+		</div>
+	</div>
+}

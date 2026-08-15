@@ -96,11 +96,11 @@ templ Teachers(data TeacherData) {
 			@HeaderSimple()
 			@HubHeader("Teachers", "New Teacher", utils.URL("/teachers/register"), true)
 
-			@ListFilterForm(data.FilterPath, data.Query, data.Status, "", data.Email, "", "", "", false, true, false, false)
+			@ListFilterForm(data.FilterPath, data.Query, data.Status, "", data.Email, "", "", "", false, true, false, false, true)
 
 			if len(data.Teachers) > 0 {
 				<div class="table-wrapper">
-					<table id="teachersTable">
+					<table id="teachersTable" class="table-stack-mobile">
 						<thead>
 							<tr>
 								<th>#</th>
@@ -121,38 +121,40 @@ templ Teachers(data TeacherData) {
 						<tbody>
 							for i, teacher := range data.Teachers {
 								<tr class={ getTeacherRowClass(teacher.Status) }>
-									<td class="num-cell">{ fmt.Sprintf("%d", i+1) }</td>
-									<td>{ teacher.Name }</td>
-									<td class={ getTeacherStatusClass(teacher.Status) }>{ teacher.Status }</td>
-									<td class="email-cell">{ getDisplayValue(teacher.Email) }</td>
-									<td>{ getDisplayValue(teacher.MobileNumber) }</td>
-									<td>@displayURL(teacher.DriveUrl)</td>
-									<td>{ getDisplayValue(teacher.Sex) }</td>
-									<td>@CopyableTextCell(teacher.Address)</td>
-									<td>@CopyableTextCell(teacher.Certifications)</td>
-									<td class="date-cell">{ getDisplayValue(teacher.Birthdate) }</td>
-									<td class="date-cell">{ teacher.JoiningDate }</td>
-									<td class="rate-cell">{ formatRate(teacher.RatePerClass, teacher.Currency) }</td>
-									<td>
-										<a href={ utils.URL("/teachers/" + teacher.ID + "/edit") } class="edit-btn">Edit</a>
-										if teacher.Status == "pending" {
-											<button
-												type="button"
-												class="approve-btn"
-												hx-post={ utils.URL("/teachers/approve") }
-												hx-vals={ `{"id": "` + teacher.ID + `"}` }
-												hx-swap="none"
-											>Approve</button>
-										}
-										if teacher.Status == "approved" {
-											<button
-												type="button"
-												class="unapprove-btn"
-												hx-post={ utils.URL("/teachers/unapprove") }
-												hx-vals={ `{"id": "` + teacher.ID + `"}` }
-												hx-swap="none"
-											>Un-approve</button>
-										}
+									<td class="num-cell" data-label="#">{ fmt.Sprintf("%d", i+1) }</td>
+									<td data-label="Name">{ teacher.Name }</td>
+									<td class={ getTeacherStatusClass(teacher.Status) } data-label="Status">{ teacher.Status }</td>
+									<td class="email-cell" data-label="Email">{ getDisplayValue(teacher.Email) }</td>
+									<td data-label="Mobile">{ getDisplayValue(teacher.MobileNumber) }</td>
+									<td data-label="Sheet URL">@displayURL(teacher.DriveUrl)</td>
+									<td data-label="Sex">{ getDisplayValue(teacher.Sex) }</td>
+									<td data-label="Address">@CopyableTextCell(teacher.Address)</td>
+									<td data-label="Certifications">@CopyableTextCell(teacher.Certifications)</td>
+									<td class="date-cell" data-label="Birthdate">{ getDisplayValue(teacher.Birthdate) }</td>
+									<td class="date-cell" data-label="Joined">{ teacher.JoiningDate }</td>
+									<td class="rate-cell" data-label="Rate">{ formatRate(teacher.RatePerClass, teacher.Currency) }</td>
+									<td data-label="Actions">
+										<div class="table-actions">
+											<a href={ utils.URL("/teachers/" + teacher.ID + "/edit") } class="edit-btn">Edit</a>
+											if teacher.Status == "pending" {
+												<button
+													type="button"
+													class="approve-btn"
+													hx-post={ utils.URL("/teachers/approve") }
+													hx-vals={ `{"id": "` + teacher.ID + `"}` }
+													hx-swap="none"
+												>Approve</button>
+											}
+											if teacher.Status == "approved" {
+												<button
+													type="button"
+													class="unapprove-btn"
+													hx-post={ utils.URL("/teachers/unapprove") }
+													hx-vals={ `{"id": "` + teacher.ID + `"}` }
+													hx-swap="none"
+												>Un-approve</button>
+											}
+										</div>
 									</td>
 								</tr>
 							}
