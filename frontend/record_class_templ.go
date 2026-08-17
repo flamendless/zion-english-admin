@@ -392,7 +392,7 @@ func RecordClassFields(prefill models.RecordClassPrefill) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</div></div><div class=\"form-row\" _=\"\n\t\t\ton change from #status\n\t\t\t\tif #status.value is 'conducted'\n\t\t\t\t\tadd @hidden to #reasonGroup\n\t\t\t\t\tset #reason.value to ''\n\t\t\t\telse\n\t\t\t\t\tremove @hidden from #reasonGroup\n\t\t\t\tend\n\t\t\tend\n\t\t\ton load\n\t\t\t\tif #status.value is 'conducted'\n\t\t\t\t\tadd @hidden to #reasonGroup\n\t\t\t\tend\n\t\t\tend\n\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</div></div><div class=\"form-row\" _=\"\n\t\t\ton change from #status\n\t\t\t\tif #status.value is 'conducted'\n\t\t\t\t\tadd @hidden to #reasonGroup\n\t\t\t\t\tremove @required from #reason\n\t\t\t\t\tset #reason.value to ''\n\t\t\t\telse\n\t\t\t\t\tremove @hidden from #reasonGroup\n\t\t\t\t\tadd @required to #reason\n\t\t\t\tend\n\t\t\tend\n\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -407,7 +407,27 @@ func RecordClassFields(prefill models.RecordClassPrefill) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<div class=\"form-group\" id=\"reasonGroup\" hidden><label for=\"reason\">Reason *</label> <input type=\"text\" id=\"reason\" name=\"reason\" placeholder=\"Reason for cancellation/reschedule\"></div></div><div class=\"form-group\"><label for=\"notes\">Notes</label> <textarea id=\"notes\" name=\"notes\" rows=\"4\" placeholder=\"Lesson notes...\"></textarea></div><button type=\"submit\" id=\"submitBtn\">Record Class</button>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<div class=\"form-group\" id=\"reasonGroup\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if prefill.Status == "" || prefill.Status == "conducted" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, " hidden")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "><label for=\"reason\">Reason *</label> <input type=\"text\" id=\"reason\" name=\"reason\" placeholder=\"Reason for cancellation/reschedule\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if prefill.Status != "" && prefill.Status != "conducted" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, " required")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "></div></div><div class=\"form-group\"><label for=\"notes\">Notes</label> <textarea id=\"notes\" name=\"notes\" rows=\"4\" placeholder=\"Lesson notes...\"></textarea></div><button type=\"submit\" id=\"submitBtn\">Record Class</button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

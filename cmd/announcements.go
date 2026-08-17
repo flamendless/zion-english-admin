@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
-	"time"
 	"zion-english/frontend"
 	"zion-english/internal/announcements"
 	"zion-english/internal/database/queries"
@@ -49,7 +47,7 @@ func handleAnnouncements(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	today := todayPHTString()
+	today := utils.TodayPHT()
 	items := make([]frontend.AnnouncementListItem, 0, len(rows))
 	for _, row := range rows {
 		audience := "All teachers"
@@ -79,8 +77,8 @@ func handleAnnouncements(w http.ResponseWriter, r *http.Request) {
 		PageNumber:     page.Number,
 		PageTotalPages: page.TotalPages(),
 		PageTotal:      page.Total,
-		PrevURL:        pageURL(filterPath, page.Number-1, page.Size, nil),
-		NextURL:        pageURL(filterPath, page.Number+1, page.Size, nil),
+		PrevURL:        utils.BuildPageURLAt(filterPath, page.Number-1, page.Size, nil),
+		NextURL:        utils.BuildPageURLAt(filterPath, page.Number+1, page.Size, nil),
 		HasPrev:        page.HasPrev(),
 		HasNext:        page.HasNext(),
 	}
@@ -99,7 +97,7 @@ func handleAnnouncementRegister(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		renderAnnouncementForm(w, r, frontend.AnnouncementFormData{
-			Today:     todayPHTString(),
+			Today:     utils.TodayPHT(),
 			VisibleTo: "all",
 			Level:     announcements.LevelInfo,
 			Teachers:  teachers,
@@ -195,7 +193,7 @@ func handleAnnouncementEdit(w http.ResponseWriter, r *http.Request, announcement
 			EndDate:     row.EndDate,
 			VisibleTo:   visibleTo,
 			Teachers:    teachers,
-			Today:       todayPHTString(),
+			Today:       utils.TodayPHT(),
 			IsEdit:      true,
 		})
 	case http.MethodPost:
@@ -288,8 +286,8 @@ func parseAnnouncementRequest(r *http.Request) announcements.Request {
 		teacherIDs, _ = parseAssignedTeacherIDs(r.Context(), dbRO.GetQueries(), r.Form["teachers"])
 	}
 	return announcements.Request{
-		Title:        strings.TrimSpace(r.FormValue("title")),
-		Description:  strings.TrimSpace(r.FormValue("description")),
+		Title:        r.FormValue("title"),
+		Description:  r.FormValue("description"),
 		Level:        r.FormValue("level"),
 		StartDate:    r.FormValue("start_date"),
 		EndDate:      r.FormValue("end_date"),
@@ -324,10 +322,6 @@ func renderAnnouncementForm(w http.ResponseWriter, r *http.Request, data fronten
 	if err := frontend.AnnouncementForm(data).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
-}
-
-func todayPHTString() string {
-	return utils.DatePHT(time.Now())
 }
 
 func announcementStatus(today, start, end string) string {

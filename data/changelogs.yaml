@@ -30,10 +30,13 @@ versions:
     bug_fixes:
       - text: "Fixed an issue where creating an announcement did not redirect back to the announcements list."
       - text: "Fixed Edit and Delete actions on the announcements list so they use consistent bordered button styling."
+      - text: "Fixed an issue where superusers could not save teacher edits when password fields were left empty on the edit form."
     removed: []
     security: []
     deprecated: []
-    internal: []
+    internal:
+      - text: "Consolidated shared validation helpers for currencies, passwords, Google Sheet URLs, and dates across admin handlers."
+        commit: "9a147b0"
 
   - version: "2026.08.15"
     date: "2026-08-15"

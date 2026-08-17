@@ -3,7 +3,6 @@ package announcements
 import (
 	"errors"
 	"strings"
-	"time"
 
 	"zion-english/internal/utils"
 )
@@ -37,10 +36,10 @@ func ValidateRequest(req Request, isUpdate bool) error {
 	req.Title = strings.TrimSpace(req.Title)
 	req.Description = strings.TrimSpace(req.Description)
 
-	if req.Title == "" {
+	if utils.IsBlank(req.Title) {
 		return ErrTitleRequired
 	}
-	if req.Description == "" {
+	if utils.IsBlank(req.Description) {
 		return ErrDescriptionRequired
 	}
 	if !ValidLevel(req.Level) {
@@ -62,7 +61,7 @@ func ValidateRequest(req Request, isUpdate bool) error {
 		return ErrInvalidEndDate
 	}
 
-	today := utils.DatePHT(time.Now())
+	today := utils.TodayPHT()
 	startDay := utils.DatePHT(*start)
 	endDay := utils.DatePHT(*end)
 

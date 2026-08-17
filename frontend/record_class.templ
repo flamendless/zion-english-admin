@@ -178,14 +178,11 @@ templ RecordClassFields(prefill models.RecordClassPrefill) {
 			on change from #status
 				if #status.value is 'conducted'
 					add @hidden to #reasonGroup
+					remove @required from #reason
 					set #reason.value to ''
 				else
 					remove @hidden from #reasonGroup
-				end
-			end
-			on load
-				if #status.value is 'conducted'
-					add @hidden to #reasonGroup
+					add @required to #reason
 				end
 			end
 		"
@@ -195,9 +192,15 @@ templ RecordClassFields(prefill models.RecordClassPrefill) {
 		} else {
 			@ClassStatusDropdown()
 		}
-		<div class="form-group" id="reasonGroup" hidden>
+		<div class="form-group" id="reasonGroup" hidden?={ prefill.Status == "" || prefill.Status == "conducted" }>
 			<label for="reason">Reason *</label>
-			<input type="text" id="reason" name="reason" placeholder="Reason for cancellation/reschedule">
+			<input
+				type="text"
+				id="reason"
+				name="reason"
+				placeholder="Reason for cancellation/reschedule"
+				required?={ prefill.Status != "" && prefill.Status != "conducted" }
+			/>
 		</div>
 	</div>
 

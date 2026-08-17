@@ -3,7 +3,6 @@ package announcements
 import (
 	"context"
 	"net/http"
-	"time"
 
 	"zion-english/internal/auth"
 	"zion-english/internal/database/queries"
@@ -35,7 +34,7 @@ func Middleware(db *queries.Queries, next http.Handler) http.Handler {
 			return
 		}
 
-		today := utils.DatePHT(time.Now())
+		today := utils.TodayPHT()
 		var banners []Banner
 
 		if user.Role == auth.RoleSuperuser {

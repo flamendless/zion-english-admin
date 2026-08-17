@@ -4,6 +4,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"zion-english/internal/utils"
 )
 
 func sortVersions(versions []Version) {
@@ -24,13 +26,9 @@ func sortVersions(versions []Version) {
 }
 
 func parseVersionDate(value string) (time.Time, bool) {
-	value = strings.TrimSpace(value)
-	if value == "" {
+	t, err := utils.ParseDatePHT(value)
+	if err != nil || t == nil {
 		return time.Time{}, false
 	}
-	t, err := time.Parse("2006-01-02", value)
-	if err != nil {
-		return time.Time{}, false
-	}
-	return t, true
+	return *t, true
 }

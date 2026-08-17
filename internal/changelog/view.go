@@ -52,7 +52,7 @@ func buildUnreleasedView(sections Sections) frontend.ChangelogVersionView {
 func buildVersionView(v Version) frontend.ChangelogVersionView {
 	out := frontend.ChangelogVersionView{
 		Label:     v.Version,
-		DateLabel: formatChangelogDate(v.Date),
+		DateLabel: utils.NormalizeDatePHT(v.Date),
 	}
 	out.Sections = buildSectionViews(v.Sections())
 	return out
@@ -97,18 +97,6 @@ func buildCurrentURL(info version.Info) string {
 		return ""
 	}
 	return version.GitHubCommitURL(commit)
-}
-
-func formatChangelogDate(value string) string {
-	value = strings.TrimSpace(value)
-	if value == "" {
-		return ""
-	}
-	t, err := utils.ParseDatePHT(value)
-	if err != nil || t == nil {
-		return value
-	}
-	return utils.DatePHT(*t)
 }
 
 func buildEntryView(entry Entry) frontend.ChangelogEntryView {

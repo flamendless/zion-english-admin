@@ -17,6 +17,7 @@ import (
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/conf"
+	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
 	"zion-english/internal/utils"
@@ -390,7 +391,7 @@ func handleProfilePassword(w http.ResponseWriter, r *http.Request) {
 		HttpRedirect(w, r, "/profile")
 		return
 	}
-	if !validatePassword(newPassword) {
+	if !constants.ValidPassword(newPassword) {
 		setErrorFlash(w, "Password must be 8-32 characters with uppercase, lowercase, number, and symbol (!@#$%^&*?)")
 		HttpRedirect(w, r, "/profile")
 		return

@@ -93,14 +93,6 @@ func getOrCreateUserAgentID(ctx context.Context, db database.Service, userAgentS
 	return id
 }
 
-func validatePassword(p string) bool {
-	return constants.ReLength.MatchString(p) &&
-		constants.ReLower.MatchString(p) &&
-		constants.ReUpper.MatchString(p) &&
-		constants.ReDigit.MatchString(p) &&
-		constants.ReSpecial.MatchString(p)
-}
-
 func setSuccessFlash(w http.ResponseWriter, msg string) {
 	cfg := conf.Conf()
 	cookie := &http.Cookie{
@@ -654,11 +646,11 @@ func handleDownload(w http.ResponseWriter, r *http.Request) {
 }
 
 func validateProcessRequest(req *models.ProcessRequest) error {
-	if req.DriveURL == "" {
+	if err := utils.ValidateDriveSpreadsheetURL(req.DriveURL); err != nil {
+		if errors.Is(err, utils.ErrInvalidDriveSpreadsheetURL) {
+			return errors.New("invalid Google Spreadsheet URL")
+		}
 		return errors.New("google spreadsheet url is required")
-	}
-	if _, err := utils.DriveURLToExportURL(req.DriveURL, "csv"); err != nil {
-		return errors.New("invalid Google Spreadsheet URL")
 	}
 
 	// Validate name
@@ -690,15 +682,6 @@ func validateProcessRequest(req *models.ProcessRequest) error {
 	}
 
 	return nil
-}
-
-func escapeHTML(s string) string {
-	s = strings.ReplaceAll(s, "&", "&amp;")
-	s = strings.ReplaceAll(s, "<", "&lt;")
-	s = strings.ReplaceAll(s, ">", "&gt;")
-	s = strings.ReplaceAll(s, `"`, "&quot;")
-	s = strings.ReplaceAll(s, "'", "&#39;")
-	return s
 }
 
 func logToDB(dbService database.Service, req *models.ProcessRequest, userAgent, outputPath, errMsg string) {
@@ -905,34 +888,12 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func validateStudentUpdateRequest(req *models.StudentRegisterRequest) error {
-	if req.Name == "" {
-		return errors.New("name is required")
-	}
-	validCurrencies := map[string]bool{"KRW": true, "CAD": true, "YEN": true, "PHP": true}
-	if !validCurrencies[req.Currency] {
-		return errors.New("invalid currency. Must be KRW, CAD, YEN, or PHP")
-	}
-	if req.RatePerClass < 0 {
-		return errors.New("rate per class cannot be negative")
-	}
-	if req.AssignedColor == "" {
-		return errors.New("assigned color is required")
-	}
-	validStatuses := map[string]bool{"active": true, "inactive": true}
-	if !validStatuses[req.Status] {
-		return errors.New("invalid status. Must be active or inactive")
-	}
-	return nil
-}
-
 func validateStudentRequest(req *models.StudentRegisterRequest) error {
 	if req.Name == "" {
 		return errors.New("name is required")
 	}
 
-	validCurrencies := map[string]bool{"KRW": true, "CAD": true, "YEN": true, "PHP": true}
-	if !validCurrencies[req.Currency] {
+	if !constants.ValidCurrency(req.Currency) {
 		return errors.New("invalid currency. Must be KRW, CAD, YEN, or PHP")
 	}
 
@@ -944,8 +905,7 @@ func validateStudentRequest(req *models.StudentRegisterRequest) error {
 		return errors.New("assigned color is required")
 	}
 
-	validStatuses := map[string]bool{"active": true, "inactive": true}
-	if !validStatuses[req.Status] {
+	if !constants.ValidStudentStatus(req.Status) {
 		return errors.New("invalid status. Must be active or inactive")
 	}
 
@@ -1002,38 +962,17 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ratePerClass, err := requireFloat64(r.FormValue("ratePerClass"))
+	req, err := parseTeacherForm(r, true)
 	if err != nil {
 		sendErrorLog(w, err.Error())
 		return
-	}
-
-	req := models.TeacherRegisterRequest{
-		FirstName:      strings.TrimSpace(r.FormValue("firstName")),
-		MiddleName:     strings.TrimSpace(r.FormValue("middleName")),
-		LastName:       strings.TrimSpace(r.FormValue("lastName")),
-		Birthdate:      r.FormValue("birthdate"),
-		Address:        strings.TrimSpace(r.FormValue("address")),
-		JoiningDate:    r.FormValue("joiningDate"),
-		MobileNumber:   strings.TrimSpace(r.FormValue("mobileNumber")),
-		Email:          normalizeEmail(r.FormValue("email")),
-		Certifications: r.FormValue("certifications"),
-		AssignedColor:  r.FormValue("assignedColor"),
-		RatePerClass:   ratePerClass,
-		Currency:       r.FormValue("currency"),
-		DriveUrl:       r.FormValue("driveUrl"),
-		Sex:            r.FormValue("sex"),
-		Password:       r.FormValue("password"),
-		RetypePassword: r.FormValue("retypePassword"),
 	}
 
 	if req.JoiningDate == "" {
 		req.JoiningDate = time.Now().Format("2006-01-02")
 	}
 
-	req.Name = utils.ComposePersonName(req.FirstName, req.MiddleName, req.LastName)
-
-	if err := validateTeacherRequest(&req); err != nil {
+	if err := validateTeacherRegisterRequest(&req); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
@@ -1143,7 +1082,36 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 	HttpRedirect(w, r, "/auth/login")
 }
 
-func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
+func parseTeacherForm(r *http.Request, includePassword bool) (models.TeacherRegisterRequest, error) {
+	ratePerClass, err := requireFloat64(r.FormValue("ratePerClass"))
+	if err != nil {
+		return models.TeacherRegisterRequest{}, err
+	}
+	req := models.TeacherRegisterRequest{
+		FirstName:      strings.TrimSpace(r.FormValue("firstName")),
+		MiddleName:     strings.TrimSpace(r.FormValue("middleName")),
+		LastName:       strings.TrimSpace(r.FormValue("lastName")),
+		Birthdate:      r.FormValue("birthdate"),
+		Address:        strings.TrimSpace(r.FormValue("address")),
+		JoiningDate:    r.FormValue("joiningDate"),
+		MobileNumber:   strings.TrimSpace(r.FormValue("mobileNumber")),
+		Email:          normalizeEmail(r.FormValue("email")),
+		Certifications: r.FormValue("certifications"),
+		AssignedColor:  r.FormValue("assignedColor"),
+		RatePerClass:   ratePerClass,
+		Currency:       r.FormValue("currency"),
+		DriveUrl:       r.FormValue("driveUrl"),
+		Sex:            r.FormValue("sex"),
+	}
+	if includePassword {
+		req.Password = r.FormValue("password")
+		req.RetypePassword = r.FormValue("retypePassword")
+	}
+	req.Name = utils.ComposePersonName(req.FirstName, req.MiddleName, req.LastName)
+	return req, nil
+}
+
+func validateTeacherFields(req *models.TeacherRegisterRequest) error {
 	req.FirstName = strings.TrimSpace(req.FirstName)
 	req.MiddleName = strings.TrimSpace(req.MiddleName)
 	req.LastName = strings.TrimSpace(req.LastName)
@@ -1163,11 +1131,11 @@ func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
 		return errors.New("birthdate is required")
 	}
 
-	if strings.TrimSpace(req.Address) == "" {
+	if utils.IsBlank(req.Address) {
 		return errors.New("address is required")
 	}
 
-	if strings.TrimSpace(req.MobileNumber) == "" {
+	if utils.IsBlank(req.MobileNumber) {
 		return errors.New("mobile number is required")
 	}
 
@@ -1178,8 +1146,7 @@ func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
 		return errors.New("invalid email address")
 	}
 
-	validCurrencies := map[string]bool{"KRW": true, "CAD": true, "YEN": true, "PHP": true}
-	if !validCurrencies[req.Currency] {
+	if !constants.ValidCurrency(req.Currency) {
 		return errors.New("invalid currency. Must be KRW, CAD, YEN, or PHP")
 	}
 
@@ -1187,23 +1154,27 @@ func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
 		return errors.New("rate per class cannot be negative")
 	}
 
-	if req.DriveUrl == "" {
-		return errors.New("spreadsheet URL is required")
-	}
-	if _, err := utils.DriveURLToExportURL(req.DriveUrl, "csv"); err != nil {
-		return errors.New("invalid spreadsheet URL")
+	if err := utils.ValidateDriveSpreadsheetURL(req.DriveUrl); err != nil {
+		return err
 	}
 
-	validSex := map[string]bool{"M": true, "F": true}
-	if req.Sex != "" && !validSex[req.Sex] {
+	if !constants.ValidSex(req.Sex) {
 		return errors.New("invalid sex. Must be M or F")
+	}
+
+	return nil
+}
+
+func validateTeacherRegisterRequest(req *models.TeacherRegisterRequest) error {
+	if err := validateTeacherFields(req); err != nil {
+		return err
 	}
 
 	if req.Password == "" {
 		return errors.New("password is required")
 	}
 
-	if !validatePassword(req.Password) {
+	if !constants.ValidPassword(req.Password) {
 		return errors.New("password must be 8-32 characters with uppercase, lowercase, number, and symbol (!@#$%^&*?)")
 	}
 
@@ -1589,7 +1560,7 @@ func handleResetPassword(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Password is required")
 		return
 	}
-	if !validatePassword(password) {
+	if !constants.ValidPassword(password) {
 		fmt.Fprint(w, "Password must be 8-32 characters with uppercase, lowercase, number, and symbol (!@#$%^&*?)")
 		return
 	}

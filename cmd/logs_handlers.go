@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"time"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/database/queries"
@@ -142,8 +141,8 @@ func handleSystemLogs(w http.ResponseWriter, r *http.Request) {
 		PageNumber:     page.Number,
 		PageTotalPages: page.TotalPages(),
 		PageTotal:      page.Total,
-		PrevURL:        pageURL(utils.URL("/logs"), page.Number-1, page.Size, params),
-		NextURL:        pageURL(utils.URL("/logs"), page.Number+1, page.Size, params),
+		PrevURL:        utils.BuildPageURLAt(utils.URL("/logs"), page.Number-1, page.Size, params),
+		NextURL:        utils.BuildPageURLAt(utils.URL("/logs"), page.Number+1, page.Size, params),
 		HasPrev:        page.HasPrev(),
 		HasNext:        page.HasNext(),
 		FilterPath:     utils.URL("/logs"),
@@ -186,14 +185,11 @@ func formatNullTime(t sql.NullTime) string {
 }
 
 func nullTimeFromDate(s string) sql.NullTime {
-	if s == "" {
+	t, err := utils.ParseDatePHT(s)
+	if err != nil || t == nil {
 		return sql.NullTime{}
 	}
-	t, err := time.Parse("2006-01-02", s)
-	if err != nil {
-		return sql.NullTime{}
-	}
-	return sql.NullTime{Time: t, Valid: true}
+	return sql.NullTime{Time: *t, Valid: true}
 }
 
 func processingLogFilterParams(q, startDate, endDate string) queries.CountProcessingLogsFilteredParams {
@@ -269,8 +265,8 @@ func handleLogs(w http.ResponseWriter, r *http.Request) {
 		PageNumber:     page.Number,
 		PageTotalPages: page.TotalPages(),
 		PageTotal:      page.Total,
-		PrevURL:        pageURL(utils.URL("/process-logs"), page.Number-1, page.Size, params),
-		NextURL:        pageURL(utils.URL("/process-logs"), page.Number+1, page.Size, params),
+		PrevURL:        utils.BuildPageURLAt(utils.URL("/process-logs"), page.Number-1, page.Size, params),
+		NextURL:        utils.BuildPageURLAt(utils.URL("/process-logs"), page.Number+1, page.Size, params),
 		HasPrev:        page.HasPrev(),
 		HasNext:        page.HasNext(),
 		FilterPath:     utils.URL("/process-logs"),

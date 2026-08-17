@@ -9,10 +9,10 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/classrules"
+	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/models"
 	"zion-english/internal/utils"
@@ -350,8 +350,8 @@ func markScheduledClassConducted(ctx context.Context, scheduleID int64, req mode
 	}
 
 	return dbRW.GetQueries().UpdateScheduledClassStatus(ctx, queries.UpdateScheduledClassStatusParams{
-		Status: "conducted",
-		Reason: sql.NullString{},
+		Status: req.Status,
+		Reason: sql.NullString{String: req.Reason, Valid: req.Status != "conducted" && req.Reason != ""},
 		ID:     scheduleID,
 	})
 }
@@ -422,7 +422,7 @@ func validateScheduledClassRequest(req *models.ScheduledClassRequest) error {
 	if req.ScheduledDate == "" {
 		return errors.New("date is required")
 	}
-	if _, err := time.Parse("2006-01-02", req.ScheduledDate); err != nil {
+	if _, err := utils.ParseDatePHT(req.ScheduledDate); err != nil {
 		return errors.New("invalid date format")
 	}
 	if req.StartTime == "" {
@@ -440,8 +440,7 @@ func validateScheduledClassRequest(req *models.ScheduledClassRequest) error {
 	if req.Currency == "" {
 		return errors.New("currency is required")
 	}
-	validCurrencies := map[string]bool{"KRW": true, "CAD": true, "YEN": true, "PHP": true}
-	if !validCurrencies[req.Currency] {
+	if !constants.ValidCurrency(req.Currency) {
 		return errors.New("invalid currency. Must be KRW, CAD, YEN, or PHP")
 	}
 	return nil

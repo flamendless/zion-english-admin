@@ -12,6 +12,7 @@ import (
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/classrules"
+	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/models"
 	"zion-english/internal/utils"
@@ -417,7 +418,7 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 			sendErrorLog(w, err.Error())
 			return
 		}
-		insertAuditLog(ctx, "schedule", fmt.Sprintf("marked scheduled class id %d as conducted", scheduleID))
+		insertAuditLog(ctx, "schedule", fmt.Sprintf("marked scheduled class id %d as %s", scheduleID, req.Status))
 	}
 
 	insertAuditLog(ctx, "classes", fmt.Sprintf("recorded class for student id %d (teacher id %d, date %s, status %s)", req.StudentID, req.TeacherID, req.Date, req.Status))
@@ -475,15 +476,13 @@ func validateClassRecordRequest(req *models.ClassRecordRequest) error {
 	if req.Currency == "" {
 		return errors.New("currency is required")
 	}
-	validCurrencies := map[string]bool{"KRW": true, "CAD": true, "YEN": true, "PHP": true}
-	if !validCurrencies[req.Currency] {
+	if !constants.ValidCurrency(req.Currency) {
 		return errors.New("invalid currency. Must be KRW, CAD, YEN, or PHP")
 	}
-	validStatuses := map[string]bool{"conducted": true, "cancelled": true, "rescheduled": true}
-	if !validStatuses[req.Status] {
+	if !constants.ValidClassStatus(req.Status) {
 		return errors.New("invalid status")
 	}
-	if req.Status != "conducted" && strings.TrimSpace(req.Reason) == "" {
+	if req.Status != "conducted" && utils.IsBlank(req.Reason) {
 		return errors.New("reason is required for cancelled or rescheduled classes")
 	}
 	return nil

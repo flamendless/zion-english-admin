@@ -66,7 +66,7 @@ func QueryParamInt64(r *http.Request, key string) int64 {
 
 func BuildPageURL(basePath string, page Page, params map[string]string) string {
 	q := "page=" + strconv.Itoa(page.Number)
-	if page.Size != DefaultPageSize {
+	if page.Size > 0 && page.Size != DefaultPageSize {
 		q += "&pageSize=" + strconv.Itoa(page.Size)
 	}
 	for k, v := range params {
@@ -84,6 +84,11 @@ func BuildPageURL(basePath string, page Page, params map[string]string) string {
 		sep = "&"
 	}
 	return basePath + sep + q
+}
+
+func BuildPageURLAt(basePath string, pageNum int, pageSize int, params map[string]string) string {
+	page := Page{Number: pageNum, Size: pageSize}
+	return BuildPageURL(basePath, page, params)
 }
 
 func containsQuery(s string) bool {

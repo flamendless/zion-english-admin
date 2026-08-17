@@ -5,10 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"zion-english/frontend"
 	"zion-english/internal/database/queries"
-	"zion-english/internal/models"
 	"zion-english/internal/utils"
 )
 
@@ -146,8 +144,8 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 		PageNumber:     page.Number,
 		PageTotalPages: page.TotalPages(),
 		PageTotal:      page.Total,
-		PrevURL:        pageURL(utils.URL("/teachers"), page.Number-1, page.Size, params),
-		NextURL:        pageURL(utils.URL("/teachers"), page.Number+1, page.Size, params),
+		PrevURL:        utils.BuildPageURLAt(utils.URL("/teachers"), page.Number-1, page.Size, params),
+		NextURL:        utils.BuildPageURLAt(utils.URL("/teachers"), page.Number+1, page.Size, params),
 		HasPrev:        page.HasPrev(),
 		HasNext:        page.HasNext(),
 		FilterPath:     utils.URL("/teachers"),
@@ -195,31 +193,13 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		return
 	}
 
-	ratePerClass, err := requireFloat64(r.FormValue("ratePerClass"))
+	req, err := parseTeacherForm(r, false)
 	if err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
 
-	req := models.TeacherRegisterRequest{
-		FirstName:      strings.TrimSpace(r.FormValue("firstName")),
-		MiddleName:     strings.TrimSpace(r.FormValue("middleName")),
-		LastName:       strings.TrimSpace(r.FormValue("lastName")),
-		Birthdate:      r.FormValue("birthdate"),
-		Address:        strings.TrimSpace(r.FormValue("address")),
-		JoiningDate:    r.FormValue("joiningDate"),
-		MobileNumber:   strings.TrimSpace(r.FormValue("mobileNumber")),
-		Email:          normalizeEmail(r.FormValue("email")),
-		Certifications: r.FormValue("certifications"),
-		AssignedColor:  r.FormValue("assignedColor"),
-		RatePerClass:   ratePerClass,
-		Currency:       r.FormValue("currency"),
-		DriveUrl:       r.FormValue("driveUrl"),
-		Sex:            r.FormValue("sex"),
-	}
-	req.Name = utils.ComposePersonName(req.FirstName, req.MiddleName, req.LastName)
-
-	if err := validateTeacherRequest(&req); err != nil {
+	if err := validateTeacherFields(&req); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}

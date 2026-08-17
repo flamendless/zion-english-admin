@@ -133,8 +133,8 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		PageNumber:     page.Number,
 		PageTotalPages: page.TotalPages(),
 		PageTotal:      page.Total,
-		PrevURL:        pageURL(utils.URL("/students"), page.Number-1, page.Size, params),
-		NextURL:        pageURL(utils.URL("/students"), page.Number+1, page.Size, params),
+		PrevURL:        utils.BuildPageURLAt(utils.URL("/students"), page.Number-1, page.Size, params),
+		NextURL:        utils.BuildPageURLAt(utils.URL("/students"), page.Number+1, page.Size, params),
 		HasPrev:        page.HasPrev(),
 		HasNext:        page.HasNext(),
 		FilterPath:     utils.URL("/students"),
@@ -208,7 +208,7 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		AssignedColor: r.FormValue("assignedColor"),
 		Status:        r.FormValue("status"),
 	}
-	if err := validateStudentUpdateRequest(&req); err != nil {
+	if err := validateStudentRequest(&req); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}

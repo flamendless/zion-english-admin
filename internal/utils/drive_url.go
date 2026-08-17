@@ -7,6 +7,11 @@ import (
 	"strings"
 )
 
+var (
+	ErrDriveURLRequired           = errors.New("spreadsheet URL is required")
+	ErrInvalidDriveSpreadsheetURL = errors.New("invalid spreadsheet URL")
+)
+
 func DriveURLToExportURL(driveURL string, format string) (string, error) {
 	parsedURL, err := url.Parse(driveURL)
 	if err != nil {
@@ -50,4 +55,14 @@ func DriveURLToExportURL(driveURL string, format string) (string, error) {
 	query.Set("gid", gid)
 	exportURL.RawQuery = query.Encode()
 	return exportURL.String(), nil
+}
+
+func ValidateDriveSpreadsheetURL(url string) error {
+	if url == "" {
+		return ErrDriveURLRequired
+	}
+	if _, err := DriveURLToExportURL(url, "csv"); err != nil {
+		return ErrInvalidDriveSpreadsheetURL
+	}
+	return nil
 }
