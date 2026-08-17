@@ -323,21 +323,6 @@ func readFlashCookie(w http.ResponseWriter, r *http.Request, name string) string
 	return msg
 }
 
-func insertAuditLogAs(ctx context.Context, actor auth.User, module, message string) {
-	var createdBy sql.NullInt64
-	if actor.ID > 0 {
-		createdBy = sql.NullInt64{Int64: actor.ID, Valid: true}
-	}
-	if err := dbRW.GetQueries().InsertLog(ctx, queries.InsertLogParams{
-		Module:        module,
-		Message:       message,
-		CreatedBy:     createdBy,
-		CreatedByName: sql.NullString{String: actor.Name, Valid: actor.Name != ""},
-	}); err != nil {
-		logs.Log().Info("system logs", zap.Error(err))
-	}
-}
-
 func HttpError(w http.ResponseWriter, msg string, code int) {
 	cfg := conf.Conf()
 	cookie := &http.Cookie{
@@ -557,27 +542,19 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updateTeacherErr := dbRW.GetQueries().UpdateTeacherTemplate(ctx, queries.UpdateTeacherTemplateParams{
+	processMsg := fmt.Sprintf(
+		"processed sheet for teacher '%s': %d records (%s to %s), %s",
+		req.Name, len(records), req.StartDate, req.EndDate, filename,
+	)
+	if err := dbRW.GetQueries().UpdateTeacherTemplate(ctx, queries.UpdateTeacherTemplateParams{
 		ID:       teacherID,
 		Template: sql.NullString{String: req.Template, Valid: true},
-	})
-	if updateTeacherErr != nil {
-		logs.Log().Error("update teacher template", zap.Error(updateTeacherErr))
+	}); err != nil {
+		logs.Log().Error("update teacher template", zap.Error(err))
 	} else {
-		user := auth.GetUser(ctx)
-		var createdBy sql.NullInt64
-		if user.ID > 0 {
-			createdBy = sql.NullInt64{Int64: user.ID, Valid: true}
-		}
-		if err := dbRW.GetQueries().InsertLog(ctx, queries.InsertLogParams{
-			Module:        "process",
-			Message:       fmt.Sprintf("update teacher '%s' template with '%s'", req.Name, req.Template),
-			CreatedBy:     createdBy,
-			CreatedByName: sql.NullString{String: user.Name, Valid: user.Name != ""},
-		}); err != nil {
-			logs.Log().Info("system logs", zap.Error(err))
-		}
+		processMsg += fmt.Sprintf(", template updated to '%s'", req.Template)
 	}
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "process", processMsg)
 
 	processRecords := make([]frontend.ProcessRecord, len(responseRecords))
 	for i, rec := range responseRecords {
@@ -1190,11 +1167,27 @@ func handleTeacherApprove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := dbRW.GetQueries().ApproveTeacher(r.Context(), teacherID); err != nil {
+	ctx := r.Context()
+	existing, err := dbRO.GetQueries().GetTeacherFullByID(ctx, teacherID)
+	if err != nil {
+		sendErrorLog(w, "Teacher not found")
+		return
+	}
+	if existing.Deleted != 0 {
+		sendErrorLog(w, "Teacher is already deleted")
+		return
+	}
+	if existing.Status != string(constants.TeacherStatusPending) {
+		sendErrorLog(w, "Only pending teachers can be approved")
+		return
+	}
+
+	if err := dbRW.GetQueries().ApproveTeacher(ctx, teacherID); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
 
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "teachers", fmt.Sprintf("approved teacher '%s' (id %d)", existing.Name, teacherID))
 	setSuccessFlash(w, "Teacher approved successfully.")
 	HttpRedirect(w, r, "/teachers")
 }
@@ -1216,11 +1209,27 @@ func handleTeacherUnapprove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := dbRW.GetQueries().UnapproveTeacher(r.Context(), teacherID); err != nil {
+	ctx := r.Context()
+	existing, err := dbRO.GetQueries().GetTeacherFullByID(ctx, teacherID)
+	if err != nil {
+		sendErrorLog(w, "Teacher not found")
+		return
+	}
+	if existing.Deleted != 0 {
+		sendErrorLog(w, "Teacher is already deleted")
+		return
+	}
+	if existing.Status != string(constants.TeacherStatusApproved) {
+		sendErrorLog(w, "Only approved teachers can be unapproved")
+		return
+	}
+
+	if err := dbRW.GetQueries().UnapproveTeacher(ctx, teacherID); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
 
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "teachers", fmt.Sprintf("unapproved teacher '%s' (id %d)", existing.Name, teacherID))
 	setSuccessFlash(w, "Teacher set to pending.")
 	HttpRedirect(w, r, "/teachers")
 }
@@ -1527,6 +1536,7 @@ func handleForgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	insertAuditLogAs(ctx, auth.User{ID: teacher.ID, Name: teacher.Name}, "auth", fmt.Sprintf("requested password reset for '%s'", email))
 	HttpRedirect(w, r, "/auth/forgot-password/reset?token="+url.QueryEscape(resetToken))
 }
 
@@ -1619,6 +1629,12 @@ func handleResetPassword(w http.ResponseWriter, r *http.Request) {
 	if err := insertPasswordResetEvent(ctx, email, row.IpAddress, "completed", "password_updated", row.TeacherID, tokenNull, row.ExpiresAt); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
 	}
+
+	resetActor := auth.User{ID: row.TeacherID.Int64}
+	if teacher, err := dbRO.GetQueries().GetTeacherFullByID(ctx, row.TeacherID.Int64); err == nil {
+		resetActor.Name = teacher.Name
+	}
+	insertAuditLogAs(ctx, resetActor, "auth", fmt.Sprintf("completed password reset for '%s'", email))
 
 	setSuccessFlash(w, "Password reset successfully. Please log in.")
 	HttpRedirect(w, r, "/auth/login")

@@ -1,12 +1,31 @@
 package cmd
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"strconv"
 	"strings"
+	"zion-english/internal/auth"
 	"zion-english/internal/database/queries"
+	"zion-english/internal/logs"
+	"go.uber.org/zap"
 )
+
+func insertAuditLogAs(ctx context.Context, actor auth.User, module, message string) {
+	var createdBy sql.NullInt64
+	if actor.ID > 0 {
+		createdBy = sql.NullInt64{Int64: actor.ID, Valid: true}
+	}
+	if err := dbRW.GetQueries().InsertLog(ctx, queries.InsertLogParams{
+		Module:        module,
+		Message:       message,
+		CreatedBy:     createdBy,
+		CreatedByName: sql.NullString{String: actor.Name, Valid: actor.Name != ""},
+	}); err != nil {
+		logs.Log().Info("system logs", zap.Error(err))
+	}
+}
 
 func auditStr(v sql.NullString) string {
 	if v.Valid && v.String != "" {

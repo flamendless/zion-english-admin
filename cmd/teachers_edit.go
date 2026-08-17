@@ -11,14 +11,17 @@ import (
 	"zion-english/internal/utils"
 )
 
-func teacherFilterParams(q, status, email string) queries.CountTeachersFilteredParams {
+func teacherFilterParams(q, status string) queries.CountTeachersFilteredParams {
+	qNull := sql.NullString{String: q, Valid: q != ""}
 	return queries.CountTeachersFilteredParams{
 		Column1: q,
-		Column2: sql.NullString{String: q, Valid: true},
-		Column3: status,
+		Column2: qNull,
+		Column3: qNull,
+		Column4: status,
+		Column5: status,
+		Column6: status,
+		Column7: status,
 		Status:  status,
-		Column5: email,
-		Column6: sql.NullString{String: email, Valid: true},
 	}
 }
 
@@ -88,10 +91,9 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	q := r.URL.Query().Get("q")
 	status := r.URL.Query().Get("status")
-	email := r.URL.Query().Get("email")
 	page := utils.ParsePageQuery(r)
 
-	filter := teacherFilterParams(q, status, email)
+	filter := teacherFilterParams(q, status)
 	total, err := dbRO.GetQueries().CountTeachersFiltered(ctx, filter)
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to count teachers: %v", err), http.StatusInternalServerError)
@@ -103,9 +105,11 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 		Column1: filter.Column1,
 		Column2: filter.Column2,
 		Column3: filter.Column3,
-		Status:  filter.Status,
+		Column4: filter.Column4,
 		Column5: filter.Column5,
 		Column6: filter.Column6,
+		Column7: filter.Column7,
+		Status:  filter.Status,
 		Limit:   int64(page.Size),
 		Offset:  int64(page.Offset()),
 	})
@@ -142,7 +146,6 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 		Teachers:       viewTeachers,
 		Query:          q,
 		Status:         status,
-		Email:          email,
 		PageNumber:     page.Number,
 		PageTotalPages: page.TotalPages(),
 		PageTotal:      page.Total,

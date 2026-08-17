@@ -9,6 +9,20 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.08.17.2"
+    date: "2026-08-17"
+    released: true
+    breaking_changes: []
+    new_features: []
+    improvements:
+      - text: "You can search the teachers list by name or email using a single search box."
+      - text: "The teachers list status filter now includes Deleted, and the toolbar is simplified to search, status, and Filter."
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
   - version: "2026.08.17.1"
     date: "2026-08-17"
     released: true

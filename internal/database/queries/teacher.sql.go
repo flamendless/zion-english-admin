@@ -33,18 +33,23 @@ func (q *Queries) CountTeachersByStatus(ctx context.Context, status string) (int
 const countTeachersFiltered = `-- name: CountTeachersFiltered :one
 SELECT COUNT(*) as count
 FROM tbl_teachers
-WHERE (? = '' OR name LIKE '%' || ? || '%')
-  AND (? = '' OR status = ?)
-  AND (? = '' OR email LIKE '%' || ? || '%')
+WHERE (? = '' OR name LIKE '%' || ? || '%' OR email LIKE '%' || ? || '%')
+  AND (
+    ? = ''
+    OR (? = 'deleted' AND deleted = 1)
+    OR (? != 'deleted' AND ? != '' AND status = ? AND deleted = 0)
+  )
 `
 
 type CountTeachersFilteredParams struct {
 	Column1 interface{}
 	Column2 sql.NullString
-	Column3 interface{}
-	Status  string
+	Column3 sql.NullString
+	Column4 interface{}
 	Column5 interface{}
-	Column6 sql.NullString
+	Column6 interface{}
+	Column7 interface{}
+	Status  string
 }
 
 func (q *Queries) CountTeachersFiltered(ctx context.Context, arg CountTeachersFilteredParams) (int64, error) {
@@ -52,9 +57,11 @@ func (q *Queries) CountTeachersFiltered(ctx context.Context, arg CountTeachersFi
 		arg.Column1,
 		arg.Column2,
 		arg.Column3,
-		arg.Status,
+		arg.Column4,
 		arg.Column5,
 		arg.Column6,
+		arg.Column7,
+		arg.Status,
 	)
 	var count int64
 	err := row.Scan(&count)
@@ -477,9 +484,12 @@ func (q *Queries) GetTeacherProfileByID(ctx context.Context, id int64) (GetTeach
 const getTeachersFiltered = `-- name: GetTeachersFiltered :many
 SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted, deleted_at
 FROM tbl_teachers
-WHERE (? = '' OR name LIKE '%' || ? || '%')
-  AND (? = '' OR status = ?)
-  AND (? = '' OR email LIKE '%' || ? || '%')
+WHERE (? = '' OR name LIKE '%' || ? || '%' OR email LIKE '%' || ? || '%')
+  AND (
+    ? = ''
+    OR (? = 'deleted' AND deleted = 1)
+    OR (? != 'deleted' AND ? != '' AND status = ? AND deleted = 0)
+  )
 ORDER BY CASE WHEN deleted = 1 THEN 2 WHEN status = 'pending' THEN 0 ELSE 1 END, name ASC
 LIMIT ? OFFSET ?
 `
@@ -487,10 +497,12 @@ LIMIT ? OFFSET ?
 type GetTeachersFilteredParams struct {
 	Column1 interface{}
 	Column2 sql.NullString
-	Column3 interface{}
-	Status  string
+	Column3 sql.NullString
+	Column4 interface{}
 	Column5 interface{}
-	Column6 sql.NullString
+	Column6 interface{}
+	Column7 interface{}
+	Status  string
 	Limit   int64
 	Offset  int64
 }
@@ -523,9 +535,11 @@ func (q *Queries) GetTeachersFiltered(ctx context.Context, arg GetTeachersFilter
 		arg.Column1,
 		arg.Column2,
 		arg.Column3,
-		arg.Status,
+		arg.Column4,
 		arg.Column5,
 		arg.Column6,
+		arg.Column7,
+		arg.Status,
 		arg.Limit,
 		arg.Offset,
 	)
