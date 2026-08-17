@@ -58,6 +58,9 @@ templ Home(data DashboardData) {
 					} else {
 						@ActionCard(item.Path, item.Title, item.Description)
 					}
+					if item.Path == "/profile" {
+						@ActionCard("/guides", "Guides", "Step-by-step help for using the admin tool")
+					}
 					if data.Role == auth.RoleSuperuser && item.Path == "/schedule" {
 						@ActionCard("/announcements", "Announcements", "Create and manage system-wide banners")
 					}
