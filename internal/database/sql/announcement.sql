@@ -1,18 +1,18 @@
 -- name: InsertAnnouncement :one
-INSERT INTO tbl_announcements (title, description, level, start_date, end_date, visible_to_all)
-VALUES (?, ?, ?, ?, ?, ?)
+INSERT INTO tbl_announcements (title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 RETURNING id;
 
 -- name: UpdateAnnouncement :exec
 UPDATE tbl_announcements
-SET title = ?, description = ?, level = ?, start_date = ?, end_date = ?, visible_to_all = ?, updated_at = datetime('now')
+SET title = ?, description = ?, level = ?, start_date = ?, end_date = ?, visible_to_all = ?, cta_label = ?, cta_url = ?, updated_at = datetime('now')
 WHERE id = ?;
 
 -- name: DeleteAnnouncement :exec
 DELETE FROM tbl_announcements WHERE id = ?;
 
 -- name: GetAnnouncementByID :one
-SELECT id, title, description, level, start_date, end_date, visible_to_all, created_at, updated_at
+SELECT id, title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url, created_at, updated_at
 FROM tbl_announcements
 WHERE id = ?;
 
@@ -20,13 +20,13 @@ WHERE id = ?;
 SELECT COUNT(*) FROM tbl_announcements;
 
 -- name: GetAnnouncementsPaged :many
-SELECT id, title, description, level, start_date, end_date, visible_to_all, created_at, updated_at
+SELECT id, title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url, created_at, updated_at
 FROM tbl_announcements
 ORDER BY start_date DESC, id DESC
 LIMIT ? OFFSET ?;
 
 -- name: GetActiveAnnouncementsAll :many
-SELECT id, title, description, level, start_date, end_date, visible_to_all, created_at, updated_at
+SELECT id, title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url, created_at, updated_at
 FROM tbl_announcements
 WHERE date(?) BETWEEN start_date AND end_date
 ORDER BY
@@ -35,7 +35,7 @@ ORDER BY
     id ASC;
 
 -- name: GetActiveAnnouncementsForTeacher :many
-SELECT a.id, a.title, a.description, a.level, a.start_date, a.end_date, a.visible_to_all, a.created_at, a.updated_at
+SELECT a.id, a.title, a.description, a.level, a.start_date, a.end_date, a.visible_to_all, a.cta_label, a.cta_url, a.created_at, a.updated_at
 FROM tbl_announcements a
 WHERE date(?) BETWEEN a.start_date AND a.end_date
 AND (

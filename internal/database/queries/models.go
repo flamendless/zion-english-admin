@@ -28,6 +28,8 @@ type TblAnnouncement struct {
 	VisibleToAll int64
 	CreatedAt    string
 	UpdatedAt    string
+	CtaLabel     string
+	CtaUrl       string
 }
 
 type TblAnnouncementsTeachersM2m struct {

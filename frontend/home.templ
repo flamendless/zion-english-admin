@@ -34,7 +34,6 @@ templ Home(data DashboardData) {
 	</head>
 	<body>
 		<div class="home-container">
-			@AnnouncementBanners()
 			<div class="home-title">
 				<img src={utils.URL("/static/logo.png")} alt="Zion English" class="home-logo">
 			</div>
@@ -46,6 +45,7 @@ templ Home(data DashboardData) {
 			<div class="home-welcome">
 				@WelcomeRole()
 				@DigitalClock("hero")
+				@AnnouncementBanners()
 			</div>
 
 			@DashboardStats(data)

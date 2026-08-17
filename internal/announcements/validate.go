@@ -2,6 +2,7 @@ package announcements
 
 import (
 	"errors"
+	"net/url"
 	"strings"
 
 	"zion-english/internal/utils"
@@ -19,7 +20,13 @@ var (
 	ErrEndDatePast         = errors.New("end date cannot be in the past")
 	ErrEndBeforeStart      = errors.New("end date must be on or after start date")
 	ErrTeachersRequired    = errors.New("select at least one teacher when not visible to all")
+	ErrCTALabelRequired    = errors.New("CTA label is required when CTA URL is set")
+	ErrCTAURLRequired      = errors.New("CTA URL is required when CTA label is set")
+	ErrCTALabelTooLong     = errors.New("CTA label must be 60 characters or fewer")
+	ErrInvalidCTAURL       = errors.New("CTA URL must be http(s):// or an internal path starting with /")
 )
+
+const maxCTALabelLen = 60
 
 type Request struct {
 	Title         string
@@ -30,6 +37,8 @@ type Request struct {
 	VisibleToAll  bool
 	TeacherIDs    []int64
 	OriginalStart string
+	CTALabel      string
+	CTAURL        string
 }
 
 func ValidateRequest(req Request, isUpdate bool) error {
@@ -86,5 +95,34 @@ func ValidateRequest(req Request, isUpdate bool) error {
 		return ErrTeachersRequired
 	}
 
+	req.CTALabel = strings.TrimSpace(req.CTALabel)
+	req.CTAURL = strings.TrimSpace(req.CTAURL)
+	if req.CTALabel == "" && req.CTAURL == "" {
+		return nil
+	}
+	if req.CTALabel == "" {
+		return ErrCTALabelRequired
+	}
+	if req.CTAURL == "" {
+		return ErrCTAURLRequired
+	}
+	if len(req.CTALabel) > maxCTALabelLen {
+		return ErrCTALabelTooLong
+	}
+	if !validCTAURL(req.CTAURL) {
+		return ErrInvalidCTAURL
+	}
+
 	return nil
+}
+
+func validCTAURL(raw string) bool {
+	if strings.HasPrefix(raw, "/") {
+		return true
+	}
+	parsed, err := url.Parse(raw)
+	if err != nil {
+		return false
+	}
+	return parsed.Scheme == "http" || parsed.Scheme == "https"
 }

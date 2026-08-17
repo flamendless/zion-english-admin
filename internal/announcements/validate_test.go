@@ -91,6 +91,72 @@ func TestValidateRequestCreate(t *testing.T) {
 			},
 			wantErr: announcements.ErrTeachersRequired,
 		},
+		{
+			name: "cta label without url",
+			req: announcements.Request{
+				Title:        "Test",
+				Description:  "Details",
+				Level:        announcements.LevelInfo,
+				StartDate:    today,
+				EndDate:      tomorrow,
+				VisibleToAll: true,
+				CTALabel:     "Learn more",
+			},
+			wantErr: announcements.ErrCTAURLRequired,
+		},
+		{
+			name: "cta url without label",
+			req: announcements.Request{
+				Title:        "Test",
+				Description:  "Details",
+				Level:        announcements.LevelInfo,
+				StartDate:    today,
+				EndDate:      tomorrow,
+				VisibleToAll: true,
+				CTAURL:       "https://example.com",
+			},
+			wantErr: announcements.ErrCTALabelRequired,
+		},
+		{
+			name: "invalid cta url",
+			req: announcements.Request{
+				Title:        "Test",
+				Description:  "Details",
+				Level:        announcements.LevelInfo,
+				StartDate:    today,
+				EndDate:      tomorrow,
+				VisibleToAll: true,
+				CTALabel:     "Go",
+				CTAURL:       "javascript:alert(1)",
+			},
+			wantErr: announcements.ErrInvalidCTAURL,
+		},
+		{
+			name: "valid cta external url",
+			req: announcements.Request{
+				Title:        "Test",
+				Description:  "Details",
+				Level:        announcements.LevelInfo,
+				StartDate:    today,
+				EndDate:      tomorrow,
+				VisibleToAll: true,
+				CTALabel:     "Learn more",
+				CTAURL:       "https://example.com",
+			},
+		},
+		{
+			name: "valid cta internal path",
+			req: announcements.Request{
+				Title:        "Test",
+				Description:  "Details",
+				Level:        announcements.LevelInfo,
+				StartDate:    today,
+				EndDate:      tomorrow,
+				VisibleToAll: true,
+				CTALabel:     "View students",
+				CTAURL:       "/students",
+			},
+		},
 	}
 
 	for _, tt := range tests {

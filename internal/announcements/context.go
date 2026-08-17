@@ -18,6 +18,8 @@ type Banner struct {
 	Title       string
 	Description string
 	Level       string
+	CTALabel    string
+	CTAURL      string
 }
 
 func GetBanners(ctx context.Context) []Banner {
@@ -40,7 +42,7 @@ func Middleware(db *queries.Queries, next http.Handler) http.Handler {
 		if user.Role == auth.RoleSuperuser {
 			rows, err := db.GetActiveAnnouncementsAll(ctx, today)
 			if err == nil {
-				banners = mapRows(rows)
+				banners = mapAllRows(rows)
 			}
 		} else if user.Role == auth.RoleTeacher && user.ID > 0 {
 			rows, err := db.GetActiveAnnouncementsForTeacher(ctx, queries.GetActiveAnnouncementsForTeacherParams{
@@ -48,7 +50,7 @@ func Middleware(db *queries.Queries, next http.Handler) http.Handler {
 				TeacherID: user.ID,
 			})
 			if err == nil {
-				banners = mapRows(rows)
+				banners = mapTeacherRows(rows)
 			}
 		}
 
@@ -57,15 +59,29 @@ func Middleware(db *queries.Queries, next http.Handler) http.Handler {
 	})
 }
 
-func mapRows(rows []queries.TblAnnouncement) []Banner {
+func mapAllRows(rows []queries.GetActiveAnnouncementsAllRow) []Banner {
 	banners := make([]Banner, 0, len(rows))
 	for _, row := range rows {
-		banners = append(banners, Banner{
-			ID:          row.ID,
-			Title:       row.Title,
-			Description: row.Description,
-			Level:       row.Level,
-		})
+		banners = append(banners, mapBanner(row.ID, row.Title, row.Description, row.Level, row.CtaLabel, row.CtaUrl))
 	}
 	return banners
+}
+
+func mapTeacherRows(rows []queries.GetActiveAnnouncementsForTeacherRow) []Banner {
+	banners := make([]Banner, 0, len(rows))
+	for _, row := range rows {
+		banners = append(banners, mapBanner(row.ID, row.Title, row.Description, row.Level, row.CtaLabel, row.CtaUrl))
+	}
+	return banners
+}
+
+func mapBanner(id int64, title, description, level, ctaLabel, ctaURL string) Banner {
+	return Banner{
+		ID:          id,
+		Title:       title,
+		Description: description,
+		Level:       level,
+		CTALabel:    ctaLabel,
+		CTAURL:      ctaURL,
+	}
 }

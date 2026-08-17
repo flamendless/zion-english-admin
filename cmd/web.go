@@ -131,7 +131,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/announcements/register", auth.RequireRole(auth.RoleSuperuser)(handleAnnouncementRegister))
 		authMux.HandleFunc(basePath+"/announcements/", auth.RequireRole(auth.RoleSuperuser)(handleAnnouncementsPath))
 
-		authHandler := announcements.Middleware(dbRO.GetQueries(), auth.Middleware(cfg, dbRO.GetQueries(), authMux))
+		authHandler := auth.Middleware(cfg, dbRO.GetQueries(), announcements.Middleware(dbRO.GetQueries(), authMux))
 
 		rootMux := http.NewServeMux()
 

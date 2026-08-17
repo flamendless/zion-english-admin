@@ -50,7 +50,7 @@ func (q *Queries) DeleteAnnouncementTeacherLinks(ctx context.Context, announceme
 }
 
 const getActiveAnnouncementsAll = `-- name: GetActiveAnnouncementsAll :many
-SELECT id, title, description, level, start_date, end_date, visible_to_all, created_at, updated_at
+SELECT id, title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url, created_at, updated_at
 FROM tbl_announcements
 WHERE date(?) BETWEEN start_date AND end_date
 ORDER BY
@@ -59,15 +59,29 @@ ORDER BY
     id ASC
 `
 
-func (q *Queries) GetActiveAnnouncementsAll(ctx context.Context, date interface{}) ([]TblAnnouncement, error) {
+type GetActiveAnnouncementsAllRow struct {
+	ID           int64
+	Title        string
+	Description  string
+	Level        string
+	StartDate    string
+	EndDate      string
+	VisibleToAll int64
+	CtaLabel     string
+	CtaUrl       string
+	CreatedAt    string
+	UpdatedAt    string
+}
+
+func (q *Queries) GetActiveAnnouncementsAll(ctx context.Context, date interface{}) ([]GetActiveAnnouncementsAllRow, error) {
 	rows, err := q.db.QueryContext(ctx, getActiveAnnouncementsAll, date)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TblAnnouncement
+	var items []GetActiveAnnouncementsAllRow
 	for rows.Next() {
-		var i TblAnnouncement
+		var i GetActiveAnnouncementsAllRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
@@ -76,6 +90,8 @@ func (q *Queries) GetActiveAnnouncementsAll(ctx context.Context, date interface{
 			&i.StartDate,
 			&i.EndDate,
 			&i.VisibleToAll,
+			&i.CtaLabel,
+			&i.CtaUrl,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -93,7 +109,7 @@ func (q *Queries) GetActiveAnnouncementsAll(ctx context.Context, date interface{
 }
 
 const getActiveAnnouncementsForTeacher = `-- name: GetActiveAnnouncementsForTeacher :many
-SELECT a.id, a.title, a.description, a.level, a.start_date, a.end_date, a.visible_to_all, a.created_at, a.updated_at
+SELECT a.id, a.title, a.description, a.level, a.start_date, a.end_date, a.visible_to_all, a.cta_label, a.cta_url, a.created_at, a.updated_at
 FROM tbl_announcements a
 WHERE date(?) BETWEEN a.start_date AND a.end_date
 AND (
@@ -114,15 +130,29 @@ type GetActiveAnnouncementsForTeacherParams struct {
 	TeacherID int64
 }
 
-func (q *Queries) GetActiveAnnouncementsForTeacher(ctx context.Context, arg GetActiveAnnouncementsForTeacherParams) ([]TblAnnouncement, error) {
+type GetActiveAnnouncementsForTeacherRow struct {
+	ID           int64
+	Title        string
+	Description  string
+	Level        string
+	StartDate    string
+	EndDate      string
+	VisibleToAll int64
+	CtaLabel     string
+	CtaUrl       string
+	CreatedAt    string
+	UpdatedAt    string
+}
+
+func (q *Queries) GetActiveAnnouncementsForTeacher(ctx context.Context, arg GetActiveAnnouncementsForTeacherParams) ([]GetActiveAnnouncementsForTeacherRow, error) {
 	rows, err := q.db.QueryContext(ctx, getActiveAnnouncementsForTeacher, arg.Date, arg.TeacherID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TblAnnouncement
+	var items []GetActiveAnnouncementsForTeacherRow
 	for rows.Next() {
-		var i TblAnnouncement
+		var i GetActiveAnnouncementsForTeacherRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
@@ -131,6 +161,8 @@ func (q *Queries) GetActiveAnnouncementsForTeacher(ctx context.Context, arg GetA
 			&i.StartDate,
 			&i.EndDate,
 			&i.VisibleToAll,
+			&i.CtaLabel,
+			&i.CtaUrl,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -148,14 +180,28 @@ func (q *Queries) GetActiveAnnouncementsForTeacher(ctx context.Context, arg GetA
 }
 
 const getAnnouncementByID = `-- name: GetAnnouncementByID :one
-SELECT id, title, description, level, start_date, end_date, visible_to_all, created_at, updated_at
+SELECT id, title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url, created_at, updated_at
 FROM tbl_announcements
 WHERE id = ?
 `
 
-func (q *Queries) GetAnnouncementByID(ctx context.Context, id int64) (TblAnnouncement, error) {
+type GetAnnouncementByIDRow struct {
+	ID           int64
+	Title        string
+	Description  string
+	Level        string
+	StartDate    string
+	EndDate      string
+	VisibleToAll int64
+	CtaLabel     string
+	CtaUrl       string
+	CreatedAt    string
+	UpdatedAt    string
+}
+
+func (q *Queries) GetAnnouncementByID(ctx context.Context, id int64) (GetAnnouncementByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getAnnouncementByID, id)
-	var i TblAnnouncement
+	var i GetAnnouncementByIDRow
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
@@ -164,6 +210,8 @@ func (q *Queries) GetAnnouncementByID(ctx context.Context, id int64) (TblAnnounc
 		&i.StartDate,
 		&i.EndDate,
 		&i.VisibleToAll,
+		&i.CtaLabel,
+		&i.CtaUrl,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -171,7 +219,7 @@ func (q *Queries) GetAnnouncementByID(ctx context.Context, id int64) (TblAnnounc
 }
 
 const getAnnouncementsPaged = `-- name: GetAnnouncementsPaged :many
-SELECT id, title, description, level, start_date, end_date, visible_to_all, created_at, updated_at
+SELECT id, title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url, created_at, updated_at
 FROM tbl_announcements
 ORDER BY start_date DESC, id DESC
 LIMIT ? OFFSET ?
@@ -182,15 +230,29 @@ type GetAnnouncementsPagedParams struct {
 	Offset int64
 }
 
-func (q *Queries) GetAnnouncementsPaged(ctx context.Context, arg GetAnnouncementsPagedParams) ([]TblAnnouncement, error) {
+type GetAnnouncementsPagedRow struct {
+	ID           int64
+	Title        string
+	Description  string
+	Level        string
+	StartDate    string
+	EndDate      string
+	VisibleToAll int64
+	CtaLabel     string
+	CtaUrl       string
+	CreatedAt    string
+	UpdatedAt    string
+}
+
+func (q *Queries) GetAnnouncementsPaged(ctx context.Context, arg GetAnnouncementsPagedParams) ([]GetAnnouncementsPagedRow, error) {
 	rows, err := q.db.QueryContext(ctx, getAnnouncementsPaged, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TblAnnouncement
+	var items []GetAnnouncementsPagedRow
 	for rows.Next() {
-		var i TblAnnouncement
+		var i GetAnnouncementsPagedRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
@@ -199,6 +261,8 @@ func (q *Queries) GetAnnouncementsPaged(ctx context.Context, arg GetAnnouncement
 			&i.StartDate,
 			&i.EndDate,
 			&i.VisibleToAll,
+			&i.CtaLabel,
+			&i.CtaUrl,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -243,8 +307,8 @@ func (q *Queries) GetTeacherIDsByAnnouncementID(ctx context.Context, announcemen
 }
 
 const insertAnnouncement = `-- name: InsertAnnouncement :one
-INSERT INTO tbl_announcements (title, description, level, start_date, end_date, visible_to_all)
-VALUES (?, ?, ?, ?, ?, ?)
+INSERT INTO tbl_announcements (title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 RETURNING id
 `
 
@@ -255,6 +319,8 @@ type InsertAnnouncementParams struct {
 	StartDate    string
 	EndDate      string
 	VisibleToAll int64
+	CtaLabel     string
+	CtaUrl       string
 }
 
 func (q *Queries) InsertAnnouncement(ctx context.Context, arg InsertAnnouncementParams) (int64, error) {
@@ -265,6 +331,8 @@ func (q *Queries) InsertAnnouncement(ctx context.Context, arg InsertAnnouncement
 		arg.StartDate,
 		arg.EndDate,
 		arg.VisibleToAll,
+		arg.CtaLabel,
+		arg.CtaUrl,
 	)
 	var id int64
 	err := row.Scan(&id)
@@ -287,7 +355,7 @@ func (q *Queries) InsertAnnouncementTeacherM2M(ctx context.Context, arg InsertAn
 
 const updateAnnouncement = `-- name: UpdateAnnouncement :exec
 UPDATE tbl_announcements
-SET title = ?, description = ?, level = ?, start_date = ?, end_date = ?, visible_to_all = ?, updated_at = datetime('now')
+SET title = ?, description = ?, level = ?, start_date = ?, end_date = ?, visible_to_all = ?, cta_label = ?, cta_url = ?, updated_at = datetime('now')
 WHERE id = ?
 `
 
@@ -298,6 +366,8 @@ type UpdateAnnouncementParams struct {
 	StartDate    string
 	EndDate      string
 	VisibleToAll int64
+	CtaLabel     string
+	CtaUrl       string
 	ID           int64
 }
 
@@ -309,6 +379,8 @@ func (q *Queries) UpdateAnnouncement(ctx context.Context, arg UpdateAnnouncement
 		arg.StartDate,
 		arg.EndDate,
 		arg.VisibleToAll,
+		arg.CtaLabel,
+		arg.CtaUrl,
 		arg.ID,
 	)
 	return err

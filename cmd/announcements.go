@@ -135,6 +135,8 @@ func handleAnnouncementCreate(w http.ResponseWriter, r *http.Request) {
 		StartDate:    req.StartDate,
 		EndDate:      req.EndDate,
 		VisibleToAll: visibleToAll,
+		CtaLabel:     req.CTALabel,
+		CtaUrl:       req.CTAURL,
 	})
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to create announcement: %v", err), http.StatusInternalServerError)
@@ -196,6 +198,8 @@ func handleAnnouncementEdit(w http.ResponseWriter, r *http.Request, announcement
 			Teachers:    teachers,
 			Today:       utils.TodayPHT(),
 			IsEdit:      true,
+			CTALabel:    row.CtaLabel,
+			CTAURL:      row.CtaUrl,
 		})
 	case http.MethodPost:
 		handleAnnouncementUpdate(w, r, announcementID)
@@ -236,6 +240,8 @@ func handleAnnouncementUpdate(w http.ResponseWriter, r *http.Request, announceme
 		StartDate:    req.StartDate,
 		EndDate:      req.EndDate,
 		VisibleToAll: visibleToAll,
+		CtaLabel:     req.CTALabel,
+		CtaUrl:       req.CTAURL,
 		ID:           announcementID,
 	}); err != nil {
 		HttpError(w, fmt.Sprintf("Failed to update announcement: %v", err), http.StatusInternalServerError)
@@ -294,6 +300,8 @@ func parseAnnouncementRequest(r *http.Request) announcements.Request {
 		EndDate:      r.FormValue("end_date"),
 		VisibleToAll: visibleToAll,
 		TeacherIDs:   teacherIDs,
+		CTALabel:     r.FormValue("cta_label"),
+		CTAURL:       r.FormValue("cta_url"),
 	}
 }
 

@@ -9,6 +9,23 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.08.17.3"
+    date: "2026-08-17"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "You can open step-by-step Guides from the dashboard for help with everyday admin tasks."
+        commit: "4b13e68"
+      - text: "Announcements can include an optional call-to-action button with a label and link."
+    improvements:
+      - text: "Announcement banners now appear below the clock on the dashboard and page headers."
+    bug_fixes:
+      - text: "Fixed an issue where announcement banners did not appear for superusers."
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
   - version: "2026.08.17.2"
     date: "2026-08-17"
     released: true

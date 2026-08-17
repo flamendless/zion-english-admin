@@ -23,6 +23,7 @@ templ Header(loggedIn bool, role auth.Role) {
 			</h1>
 			@DigitalClock("compact")
 		</div>
+		@AnnouncementBanners()
 		if loggedIn {
 			@WelcomeRole()
 		}
@@ -52,7 +53,6 @@ templ HeaderSimple() {
 		loggedIn := role != ""
 	}}
 	@Header(loggedIn, role)
-	@AnnouncementBanners()
 }
 
 templ SuccessBanner() {
