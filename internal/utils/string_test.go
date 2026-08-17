@@ -2,6 +2,45 @@ package utils
 
 import "testing"
 
+func TestProfileNameEditable(t *testing.T) {
+	tests := []struct {
+		in   string
+		want bool
+	}{
+		{"", true},
+		{"Jane", false},
+		{"   ", false},
+		{"-", false},
+	}
+
+	for _, tt := range tests {
+		got := ProfileNameEditable(tt.in)
+		if got != tt.want {
+			t.Fatalf("ProfileNameEditable(%q) = %v, want %v", tt.in, got, tt.want)
+		}
+	}
+}
+
+func TestIsBlank(t *testing.T) {
+	tests := []struct {
+		in   string
+		want bool
+	}{
+		{"", true},
+		{"   ", true},
+		{"\t", true},
+		{"Jane", false},
+		{" Jane ", false},
+	}
+
+	for _, tt := range tests {
+		got := IsBlank(tt.in)
+		if got != tt.want {
+			t.Fatalf("IsBlank(%q) = %v, want %v", tt.in, got, tt.want)
+		}
+	}
+}
+
 func TestComposePersonName(t *testing.T) {
 	tests := []struct {
 		first  string

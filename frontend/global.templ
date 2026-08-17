@@ -1022,7 +1022,8 @@ templ GlobalIncludes() {
 		.table-actions .edit-btn,
 		.table-actions .view-btn,
 		.table-actions .approve-btn,
-		.table-actions .unapprove-btn {
+		.table-actions .unapprove-btn,
+		.table-actions .delete-btn {
 			margin-top: 0;
 		}
 
@@ -2111,6 +2112,30 @@ templ GlobalIncludes() {
 			font-size: 0.85rem;
 		}
 
+		.delete-btn {
+			display: inline-block;
+			padding: var(--space-1) var(--space-3);
+			border-radius: var(--radius-sm);
+			background: var(--color-error-bg);
+			border: 1px solid color-mix(in srgb, var(--color-destructive) 35%, transparent);
+			color: var(--color-destructive);
+			font-size: 0.85rem;
+			font-family: inherit;
+			font-weight: 500;
+			cursor: pointer;
+			transition: background-color var(--transition-fast), border-color var(--transition-fast);
+		}
+
+		.delete-btn:hover {
+			background: color-mix(in srgb, var(--color-error-bg) 70%, var(--color-destructive));
+			border-color: var(--color-destructive);
+		}
+
+		.table-action-form {
+			display: inline-flex;
+			margin: 0;
+		}
+
 		.view-btn {
 			display: inline-block;
 			padding: var(--space-1) var(--space-3);
@@ -2142,6 +2167,57 @@ templ GlobalIncludes() {
 
 		.name-link:hover {
 			color: var(--color-accent-hover);
+		}
+
+		.teacher-assign-rows {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-2);
+		}
+
+		.teacher-assign-row {
+			display: flex;
+			gap: var(--space-2);
+			align-items: center;
+		}
+
+		.teacher-assign-row select {
+			flex: 1;
+		}
+
+		.teacher-assign-add,
+		.teacher-assign-remove {
+			flex-shrink: 0;
+			width: 36px;
+			height: 36px;
+			padding: 0;
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-sm);
+			background: var(--color-surface);
+			color: var(--color-foreground);
+			font-size: 18px;
+			font-weight: 500;
+			line-height: 1;
+			cursor: pointer;
+			font-family: inherit;
+			transition: background-color var(--transition-fast), border-color var(--transition-fast);
+		}
+
+		.teacher-assign-add {
+			margin-top: var(--space-2);
+			background-color: var(--color-primary);
+			border-color: var(--color-primary);
+			color: var(--color-on-primary);
+		}
+
+		.teacher-assign-add:hover {
+			background-color: var(--color-primary-hover);
+			border-color: var(--color-primary-hover);
+		}
+
+		.teacher-assign-remove:hover {
+			background: var(--color-muted);
+			border-color: var(--color-muted-foreground);
 		}
 
 		.checkbox-group {
@@ -2324,7 +2400,8 @@ templ GlobalIncludes() {
 			.table-stack-mobile .table-actions .edit-btn,
 			.table-stack-mobile .table-actions .view-btn,
 			.table-stack-mobile .table-actions .approve-btn,
-			.table-stack-mobile .table-actions .unapprove-btn {
+			.table-stack-mobile .table-actions .unapprove-btn,
+			.table-stack-mobile .table-actions .delete-btn {
 				width: 100%;
 				text-align: center;
 				padding: 10px 14px;

@@ -684,6 +684,31 @@ func (q *Queries) UpdateTeacherMobile(ctx context.Context, arg UpdateTeacherMobi
 	return err
 }
 
+const updateTeacherNames = `-- name: UpdateTeacherNames :exec
+UPDATE tbl_teachers
+SET name = ?, first_name = ?, middle_name = ?, last_name = ?, updated_at = CURRENT_TIMESTAMP
+WHERE id = ?
+`
+
+type UpdateTeacherNamesParams struct {
+	Name       string
+	FirstName  string
+	MiddleName string
+	LastName   string
+	ID         int64
+}
+
+func (q *Queries) UpdateTeacherNames(ctx context.Context, arg UpdateTeacherNamesParams) error {
+	_, err := q.db.ExecContext(ctx, updateTeacherNames,
+		arg.Name,
+		arg.FirstName,
+		arg.MiddleName,
+		arg.LastName,
+		arg.ID,
+	)
+	return err
+}
+
 const updateTeacherPassword = `-- name: UpdateTeacherPassword :exec
 UPDATE tbl_teachers SET password = ?, password_changed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?
 `

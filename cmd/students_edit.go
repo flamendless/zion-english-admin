@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -11,6 +13,33 @@ import (
 	"zion-english/internal/models"
 	"zion-english/internal/utils"
 )
+
+func parseAssignedTeacherIDs(ctx context.Context, q *queries.Queries, raw []string) ([]int64, error) {
+	if len(raw) == 0 {
+		return nil, errors.New("at least one assigned teacher is required")
+	}
+	seen := make(map[int64]bool)
+	var ids []int64
+	for _, tidStr := range raw {
+		tid, err := strconv.ParseInt(tidStr, 10, 64)
+		if err != nil || tid == 0 {
+			continue
+		}
+		if seen[tid] {
+			return nil, errors.New("duplicate teacher assignment")
+		}
+		seen[tid] = true
+		teacher, err := q.GetTeacherByID(ctx, tid)
+		if err != nil || teacher.Status != "approved" {
+			return nil, errors.New("invalid assigned teacher")
+		}
+		ids = append(ids, tid)
+	}
+	if len(ids) == 0 {
+		return nil, errors.New("at least one assigned teacher is required")
+	}
+	return ids, nil
+}
 
 func studentFilterParams(q, status string, teacherID int64) queries.CountStudentsFilteredParams {
 	return queries.CountStudentsFilteredParams{
@@ -128,22 +157,9 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 	}
 
 	if r.Method == http.MethodGet {
-		approved, err := dbRO.GetQueries().GetApprovedTeachers(ctx)
-		if err != nil {
-			HttpError(w, "Failed to load teachers", http.StatusInternalServerError)
-			return
-		}
-		selected := make(map[int64]bool)
-		for _, t := range assignedTeachers {
-			selected[t.ID] = true
-		}
-		teacherOptions := make([]frontend.TeacherOption, len(approved))
-		for i, t := range approved {
-			teacherOptions[i] = frontend.TeacherOption{
-				ID:       strconv.FormatInt(t.ID, 10),
-				Name:     t.Name,
-				Selected: selected[t.ID],
-			}
+		teacherIDs := make([]string, len(assignedTeachers))
+		for i, t := range assignedTeachers {
+			teacherIDs[i] = strconv.FormatInt(t.ID, 10)
 		}
 
 		w.Header().Set("Content-Type", "text/html")
@@ -156,7 +172,7 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 			ParentName:    existing.ParentName.String,
 			AssignedColor: existing.AssignedColor,
 			Status:        existing.Status,
-			Teachers:      teacherOptions,
+			TeacherIDs:    teacherIDs,
 		}).Render(ctx, w)
 		return
 	}
@@ -177,9 +193,9 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		return
 	}
 
-	teacherIDs := r.Form["teachers"]
-	if len(teacherIDs) == 0 {
-		sendErrorLog(w, "at least one assigned teacher is required")
+	teacherIDs, err := parseAssignedTeacherIDs(ctx, dbRO.GetQueries(), r.Form["teachers"])
+	if err != nil {
+		sendErrorLog(w, err.Error())
 		return
 	}
 
@@ -233,16 +249,7 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 	}
 
 	var newTeacherIDs []string
-	for _, tidStr := range teacherIDs {
-		tid, err := strconv.ParseInt(tidStr, 10, 64)
-		if err != nil || tid == 0 {
-			continue
-		}
-		teacher, err := dbRO.GetQueries().GetTeacherByID(ctx, tid)
-		if err != nil || teacher.Status != "approved" {
-			sendErrorLog(w, "invalid assigned teacher")
-			return
-		}
+	for _, tid := range teacherIDs {
 		if err := dbRW.GetQueries().InsertTeacherStudentM2M(ctx, queries.InsertTeacherStudentM2MParams{
 			TeacherID: tid,
 			StudentID: studentID,
@@ -250,7 +257,7 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 			sendErrorLog(w, err.Error())
 			return
 		}
-		newTeacherIDs = append(newTeacherIDs, tidStr)
+		newTeacherIDs = append(newTeacherIDs, strconv.FormatInt(tid, 10))
 	}
 
 	updated, _ := dbRW.GetQueries().GetStudentByID(ctx, studentID)

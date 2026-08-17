@@ -65,6 +65,11 @@ SELECT password FROM tbl_teachers WHERE id = ?;
 -- name: UpdateTeacherMobile :exec
 UPDATE tbl_teachers SET mobile_number = ?, mobile_changed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?;
 
+-- name: UpdateTeacherNames :exec
+UPDATE tbl_teachers
+SET name = ?, first_name = ?, middle_name = ?, last_name = ?, updated_at = CURRENT_TIMESTAMP
+WHERE id = ?;
+
 -- name: UpdateTeacherProfilePicture :exec
 UPDATE tbl_teachers SET profile_picture = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?;
 

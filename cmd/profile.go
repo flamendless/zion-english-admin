@@ -150,6 +150,9 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 		MobileDaysRemaining:   mobileDays,
 		CanChangePassword:     canChangePassword,
 		PasswordDaysRemaining: passwordDays,
+		CanEditFirstName:      utils.ProfileNameEditable(row.FirstName),
+		CanEditMiddleName:     utils.ProfileNameEditable(row.MiddleName),
+		CanEditLastName:       utils.ProfileNameEditable(row.LastName),
 	}
 
 	if err := frontend.Profile(data).Render(ctx, w); err != nil {
@@ -228,6 +231,115 @@ func handleProfileMobile(w http.ResponseWriter, r *http.Request) {
 
 	insertAuditLogAs(ctx, user, "profile", fmt.Sprintf("updated mobile number for teacher '%s'", user.Name))
 	setSuccessFlash(w, "Mobile number updated successfully.")
+	HttpRedirect(w, r, "/profile")
+}
+
+func handleProfileNames(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx := r.Context()
+	user := auth.GetUser(ctx)
+	if auth.GetRole(ctx) != auth.RoleTeacher {
+		HttpError(w, "Access denied", http.StatusForbidden)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		setErrorFlash(w, "Invalid form submission")
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+
+	row, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, user.ID)
+	if err != nil {
+		logs.Log().Error("get teacher profile for name update", zap.Error(err))
+		setErrorFlash(w, "Failed to load profile")
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+
+	canEditFirst := utils.ProfileNameEditable(row.FirstName)
+	canEditMiddle := utils.ProfileNameEditable(row.MiddleName)
+	canEditLast := utils.ProfileNameEditable(row.LastName)
+	if !canEditFirst && !canEditMiddle && !canEditLast {
+		setErrorFlash(w, "Your name is already complete and cannot be changed here")
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+
+	firstName := strings.TrimSpace(r.FormValue("firstName"))
+	middleName := strings.TrimSpace(r.FormValue("middleName"))
+	lastName := strings.TrimSpace(r.FormValue("lastName"))
+
+	newFirst := row.FirstName
+	newMiddle := row.MiddleName
+	newLast := row.LastName
+
+	if canEditFirst {
+		if utils.IsBlank(firstName) {
+			setErrorFlash(w, "First name is required")
+			HttpRedirect(w, r, "/profile")
+			return
+		}
+		newFirst = firstName
+	} else if firstName != "" && firstName != strings.TrimSpace(row.FirstName) {
+		setErrorFlash(w, "First name cannot be changed")
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+
+	if canEditMiddle {
+		newMiddle = middleName
+	} else if middleName != "" && middleName != strings.TrimSpace(row.MiddleName) {
+		setErrorFlash(w, "Middle name cannot be changed")
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+
+	if canEditLast {
+		if utils.IsBlank(lastName) {
+			setErrorFlash(w, "Last name is required")
+			HttpRedirect(w, r, "/profile")
+			return
+		}
+		newLast = lastName
+	} else if lastName != "" && lastName != strings.TrimSpace(row.LastName) {
+		setErrorFlash(w, "Last name cannot be changed")
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+
+	name := utils.ComposePersonName(newFirst, newMiddle, newLast)
+	if name == "" {
+		setErrorFlash(w, "Name is required")
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+
+	if newFirst == row.FirstName && newMiddle == row.MiddleName && newLast == row.LastName {
+		setErrorFlash(w, "No name changes to save")
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+
+	if err := dbRW.GetQueries().UpdateTeacherNames(ctx, queries.UpdateTeacherNamesParams{
+		Name:       name,
+		FirstName:  newFirst,
+		MiddleName: newMiddle,
+		LastName:   newLast,
+		ID:         user.ID,
+	}); err != nil {
+		logs.Log().Error("update teacher names", zap.Error(err))
+		setErrorFlash(w, "Failed to update name")
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+
+	insertAuditLogAs(ctx, user, "profile", fmt.Sprintf("updated name for teacher '%s'", name))
+	setSuccessFlash(w, "Name updated successfully.")
 	HttpRedirect(w, r, "/profile")
 }
 

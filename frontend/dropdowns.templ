@@ -213,6 +213,48 @@ templ StudentStatusDropdown() {
 	</div>
 }
 
+templ TeacherAssignRow(selectedID string, removable bool) {
+	<div class="teacher-assign-row">
+		<select name="teachers" required
+			hx-get={ utils.URL("/api/teachers?selected=" + selectedID) }
+			hx-trigger="load"
+			hx-swap="innerHTML"
+			hx-target="this"
+		>
+			<option value="">-- Select Teacher --</option>
+		</select>
+		if removable {
+			<button type="button" class="teacher-assign-remove" aria-label="Remove teacher"
+				_="on click
+					if #teacherRows.children.length > 1
+						remove closest .teacher-assign-row
+					end
+				"
+			>−</button>
+		}
+	</div>
+}
+
+templ TeacherAssignRows(selectedIDs []string) {
+	<div class="form-group teacher-assign">
+		<label>Assigned Teachers *</label>
+		<div id="teacherRows" class="teacher-assign-rows">
+			if len(selectedIDs) == 0 {
+				@TeacherAssignRow("", false)
+			} else {
+				for i, id := range selectedIDs {
+					@TeacherAssignRow(id, i > 0 || len(selectedIDs) > 1)
+				}
+			}
+		</div>
+		<button type="button" class="teacher-assign-add" aria-label="Add teacher"
+			hx-get={ utils.URL("/api/teacher-row") }
+			hx-target="#teacherRows"
+			hx-swap="beforeend"
+		>+</button>
+	</div>
+}
+
 var letters = []string{"A", "B", "C", "D", "E", "F", "G", "H"}
 templ Letters(id string, text string, initial string) {
 	<div class="form-group">

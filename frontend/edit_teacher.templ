@@ -45,7 +45,7 @@ templ EditTeacher(data EditTeacherData) {
 				<div class="form-row-3">
 					<div class="form-group">
 						<label for="firstName">First Name *</label>
-						<input type="text" id="firstName" name="firstName" required value={ data.FirstName } placeholder="Enter first name"/>
+						<input type="text" id="firstName" name="firstName" required pattern=".*\S.*" title="First name cannot be empty or whitespace only" value={ data.FirstName } placeholder="Enter first name"/>
 					</div>
 					<div class="form-group">
 						<label for="middleName">Middle Name</label>
@@ -53,7 +53,7 @@ templ EditTeacher(data EditTeacherData) {
 					</div>
 					<div class="form-group">
 						<label for="lastName">Last Name *</label>
-						<input type="text" id="lastName" name="lastName" required value={ data.LastName } placeholder="Enter last name"/>
+						<input type="text" id="lastName" name="lastName" required pattern=".*\S.*" title="Last name cannot be empty or whitespace only" value={ data.LastName } placeholder="Enter last name"/>
 					</div>
 				</div>
 				<div class="form-row">

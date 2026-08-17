@@ -99,22 +99,3 @@ templ TeacherFilterDropdown(selectedID string) {
 	</div>
 }
 
-type TeacherOption struct {
-	ID       string
-	Name     string
-	Selected bool
-}
-
-templ TeacherMultiSelect(teachers []TeacherOption) {
-	<div class="form-group">
-		<label>Assigned Teachers *</label>
-		<div class="checkbox-group">
-			for _, t := range teachers {
-				<label class="checkbox-label">
-					<input type="checkbox" name="teachers" value={ t.ID } checked?={ t.Selected }/>
-					{ t.Name }
-				</label>
-			}
-		</div>
-	</div>
-}

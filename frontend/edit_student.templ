@@ -11,7 +11,7 @@ type EditStudentData struct {
 	ParentName    string
 	AssignedColor string
 	Status        string
-	Teachers      []TeacherOption
+	TeacherIDs    []string
 }
 
 templ EditStudent(data EditStudentData) {
@@ -51,7 +51,7 @@ templ EditStudent(data EditStudentData) {
 					<label for="parentName">Parent's Name</label>
 					<input type="text" id="parentName" name="parentName" value={ data.ParentName }/>
 				</div>
-				@TeacherMultiSelect(data.Teachers)
+				@TeacherAssignRows(data.TeacherIDs)
 				<div class="form-group">
 					<label for="assignedColor">Assigned Color *</label>
 					<input type="color" id="assignedColor" name="assignedColor" required value={ data.AssignedColor }/>

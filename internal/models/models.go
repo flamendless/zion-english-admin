@@ -56,7 +56,6 @@ type StudentRegisterRequest struct {
 	ParentName       string  `json:"parentName"`
 	AssignedColor    string  `json:"assignedColor"`
 	Status           string  `json:"status"`
-	TeacherID        int64   `json:"teacherID"`
 	Relationship     string  `json:"relationship"`
 	RelatedStudentID int64   `json:"relatedStudentId"`
 }

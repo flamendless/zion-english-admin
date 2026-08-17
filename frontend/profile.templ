@@ -1,6 +1,7 @@
 package frontend
 
 import "fmt"
+import "strings"
 import "zion-english/internal/auth"
 import "zion-english/internal/utils"
 
@@ -29,6 +30,9 @@ type ProfileData struct {
 	MobileDaysRemaining  int
 	CanChangePassword    bool
 	PasswordDaysRemaining int
+	CanEditFirstName     bool
+	CanEditMiddleName    bool
+	CanEditLastName      bool
 }
 
 templ Profile(data ProfileData) {
@@ -227,15 +231,15 @@ templ Profile(data ProfileData) {
 							if !data.IsSuperuser {
 								<div class="profile-detail">
 									<span class="profile-detail-label">First name</span>
-									<span class="profile-detail-value">{ data.FirstName }</span>
+									<span class="profile-detail-value">{ displayProfileName(data.FirstName, data.CanEditFirstName) }</span>
 								</div>
 								<div class="profile-detail">
 									<span class="profile-detail-label">Middle name</span>
-									<span class="profile-detail-value">{ displayOrDash(data.MiddleName) }</span>
+									<span class="profile-detail-value">{ displayProfileName(data.MiddleName, data.CanEditMiddleName) }</span>
 								</div>
 								<div class="profile-detail">
 									<span class="profile-detail-label">Last name</span>
-									<span class="profile-detail-value">{ data.LastName }</span>
+									<span class="profile-detail-value">{ displayProfileName(data.LastName, data.CanEditLastName) }</span>
 								</div>
 								<div class="profile-detail">
 									<span class="profile-detail-label">Status</span>
@@ -286,6 +290,60 @@ templ Profile(data ProfileData) {
 					</div>
 
 					if !data.IsSuperuser {
+						if data.CanEditFirstName || data.CanEditMiddleName || data.CanEditLastName {
+							<div class="profile-card profile-section">
+								<h2>Name</h2>
+								<p class="profile-section-desc">Complete your name. Each field can only be set once.</p>
+								<form method="POST" action={ utils.URL("/profile/names") }>
+									if data.CanEditFirstName {
+										<div class="form-group">
+											<label for="firstName">First name</label>
+											<input
+												type="text"
+												id="firstName"
+												name="firstName"
+												required
+												pattern=".*\S.*"
+												title="First name cannot be empty or whitespace only"
+												autocomplete="given-name"
+												placeholder="Enter first name"
+											/>
+										</div>
+									}
+									if data.CanEditMiddleName {
+										<div class="form-group">
+											<label for="middleName">Middle name</label>
+											<input
+												type="text"
+												id="middleName"
+												name="middleName"
+												autocomplete="additional-name"
+												placeholder="Enter middle name (optional)"
+											/>
+										</div>
+									}
+									if data.CanEditLastName {
+										<div class="form-group">
+											<label for="lastName">Last name</label>
+											<input
+												type="text"
+												id="lastName"
+												name="lastName"
+												required
+												pattern=".*\S.*"
+												title="Last name cannot be empty or whitespace only"
+												autocomplete="family-name"
+												placeholder="Enter last name"
+											/>
+										</div>
+									}
+									<div class="profile-form-actions">
+										<button type="submit">Save name</button>
+									</div>
+								</form>
+							</div>
+						}
+
 						<div class="profile-card profile-section">
 							<h2>Mobile number</h2>
 							<p class="profile-section-desc">Update your contact number. Changes are limited to once every 7 days.</p>
@@ -387,6 +445,16 @@ templ CooldownNotice(daysRemaining int, fieldLabel string) {
 			You can change your { fieldLabel } again in { fmt.Sprintf("%d", daysRemaining) } day(s).
 		</span>
 	</div>
+}
+
+func displayProfileName(stored string, editable bool) string {
+	if stored == "" {
+		if editable {
+			return "Not set"
+		}
+		return "-"
+	}
+	return strings.TrimSpace(stored)
 }
 
 func displayOrDash(value string) string {

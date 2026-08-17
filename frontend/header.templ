@@ -52,6 +52,7 @@ templ HeaderSimple() {
 		loggedIn := role != ""
 	}}
 	@Header(loggedIn, role)
+	@AnnouncementBanners()
 }
 
 templ SuccessBanner() {

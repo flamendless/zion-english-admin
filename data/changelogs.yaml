@@ -14,6 +14,9 @@ versions:
     released: true
     breaking_changes: []
     new_features:
+      - text: "Superusers can create and manage system announcements that appear as persistent banners on the dashboard and all pages."
+      - text: "Announcements support info, warning, and critical levels, a schedule, and visibility for all teachers or selected teachers only."
+      - text: "Teachers can complete missing first, middle, or last name on their profile when those fields were not set at registration."
       - text: "You can browse release notes on the Changelogs page from the dashboard."
         commit: "b1aa64a"
       - text: "You can record and edit classes with start and end times instead of entering duration only."
@@ -21,9 +24,12 @@ versions:
       - text: "Superusers can view teacher profile details in a quick-view modal from the teachers list."
         commit: "b1aa64a"
     improvements:
+      - text: "Student registration and edit forms use an improved teacher assignment picker with add/remove rows."
       - text: "A live digital clock appears on the dashboard and page headers."
         commit: "b1aa64a"
-    bug_fixes: []
+    bug_fixes:
+      - text: "Fixed an issue where creating an announcement did not redirect back to the announcements list."
+      - text: "Fixed Edit and Delete actions on the announcements list so they use consistent bordered button styling."
     removed: []
     security: []
     deprecated: []

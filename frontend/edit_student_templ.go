@@ -19,7 +19,7 @@ type EditStudentData struct {
 	ParentName    string
 	AssignedColor string
 	Status        string
-	Teachers      []TeacherOption
+	TeacherIDs    []string
 }
 
 func EditStudent(data EditStudentData) templ.Component {
@@ -161,7 +161,7 @@ func EditStudent(data EditStudentData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TeacherMultiSelect(data.Teachers).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = TeacherAssignRows(data.TeacherIDs).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

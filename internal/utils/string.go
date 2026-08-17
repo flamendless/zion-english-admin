@@ -20,6 +20,16 @@ func RandomString(length int) string {
 	return string(b)
 }
 
+func IsBlank(s string) bool {
+	return strings.TrimSpace(s) == ""
+}
+
+// ProfileNameEditable reports whether a teacher may set this name field on their profile.
+// It checks the raw stored database value only; display placeholders such as "-" are never used.
+func ProfileNameEditable(stored string) bool {
+	return stored == ""
+}
+
 func ComposePersonName(first, middle, last string) string {
 	parts := make([]string, 0, 3)
 	for _, part := range []string{strings.TrimSpace(first), strings.TrimSpace(middle), strings.TrimSpace(last)} {

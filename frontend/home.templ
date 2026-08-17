@@ -34,6 +34,7 @@ templ Home(data DashboardData) {
 	</head>
 	<body>
 		<div class="home-container">
+			@AnnouncementBanners()
 			<div class="home-title">
 				<img src={utils.URL("/static/logo.png")} alt="Zion English" class="home-logo">
 			</div>
@@ -56,6 +57,9 @@ templ Home(data DashboardData) {
 						@ActionCardFeature(item.Path, item.Title, item.Description)
 					} else {
 						@ActionCard(item.Path, item.Title, item.Description)
+					}
+					if data.Role == auth.RoleSuperuser && item.Path == "/schedule" {
+						@ActionCard("/announcements", "Announcements", "Create and manage system-wide banners")
 					}
 				}
 				@ActionCard("/changelogs", "Changelogs", "See what's new in the admin tool")

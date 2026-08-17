@@ -27,6 +27,8 @@ templ RegisterTeacher(loggedIn bool, role auth.Role) {
 								id="firstName"
 								name="firstName"
 								required
+								pattern=".*\S.*"
+								title="First name cannot be empty or whitespace only"
 								placeholder="Enter first name"
 							/>
 						</div>
@@ -46,6 +48,8 @@ templ RegisterTeacher(loggedIn bool, role auth.Role) {
 								id="lastName"
 								name="lastName"
 								required
+								pattern=".*\S.*"
+								title="Last name cannot be empty or whitespace only"
 								placeholder="Enter last name"
 							/>
 						</div>

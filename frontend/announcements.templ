@@ -1,0 +1,886 @@
+package frontend
+
+import (
+	"zion-english/internal/announcements"
+	"zion-english/internal/utils"
+)
+
+type AnnouncementListItem struct {
+	ID          string
+	Title       string
+	Level       string
+	StartDate   string
+	EndDate     string
+	Audience    string
+	Status      string
+	StatusClass string
+}
+
+type AnnouncementListData struct {
+	Announcements  []AnnouncementListItem
+	PageNumber     int
+	PageTotalPages int
+	PageTotal      int64
+	PrevURL        string
+	NextURL        string
+	HasPrev        bool
+	HasNext        bool
+}
+
+type AnnouncementTeacherOption struct {
+	ID       string
+	Name     string
+	Selected bool
+}
+
+type AnnouncementFormData struct {
+	ID          string
+	Title       string
+	Description string
+	Level       string
+	StartDate   string
+	EndDate     string
+	VisibleTo   string
+	Teachers    []AnnouncementTeacherOption
+	Today       string
+	IsEdit      bool
+}
+
+func announcementLevelLabel(level string) string {
+	switch level {
+	case announcements.LevelWarning:
+		return "Warning"
+	case announcements.LevelCritical:
+		return "Critical"
+	default:
+		return "Info"
+	}
+}
+
+templ AnnouncementBanners() {
+	{{
+		items := announcements.GetBanners(ctx)
+	}}
+	if len(items) > 0 {
+		<div class="announcement-banners" role="region" aria-label="Announcements">
+			for _, item := range items {
+				@AnnouncementBanner(item.Title, item.Description, item.Level)
+			}
+		</div>
+	}
+}
+
+templ AnnouncementBanner(title string, description string, level string) {
+	<div class={ "announcement-banner announcement-banner--" + level } role="status">
+		<div class="announcement-banner__icon" aria-hidden="true">
+			@AnnouncementLevelIcon(level)
+		</div>
+		<div class="announcement-banner__content">
+			<p class="announcement-banner__title">{ title }</p>
+			<p class="announcement-banner__description">{ description }</p>
+		</div>
+	</div>
+}
+
+templ AnnouncementLevelIcon(level string) {
+	switch level {
+	case announcements.LevelWarning:
+		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+			<line x1="12" y1="9" x2="12" y2="13"></line>
+			<line x1="12" y1="17" x2="12.01" y2="17"></line>
+		</svg>
+	case announcements.LevelCritical:
+		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+			<line x1="12" y1="8" x2="12" y2="12"></line>
+			<line x1="12" y1="16" x2="12.01" y2="16"></line>
+		</svg>
+	default:
+		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<circle cx="12" cy="12" r="10"></circle>
+			<line x1="12" y1="16" x2="12" y2="12"></line>
+			<line x1="12" y1="8" x2="12.01" y2="8"></line>
+		</svg>
+	}
+}
+
+templ Announcements(data AnnouncementListData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>Announcements - Zion English Admin</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@AnnouncementPageStyles()
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@HubHeader("Announcements", "New Announcement", utils.URL("/announcements/register"), true)
+			@SuccessBanner()
+			@ErrorBanner()
+
+			if len(data.Announcements) > 0 {
+				<div class="table-wrapper">
+					<table class="table-stack-mobile">
+						<thead>
+							<tr>
+								<th>Title</th>
+								<th>Level</th>
+								<th>Schedule</th>
+								<th>Audience</th>
+								<th>Status</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							for _, item := range data.Announcements {
+								<tr>
+									<td data-label="Title">
+										<span class="announcement-list-title">{ item.Title }</span>
+									</td>
+									<td data-label="Level">
+										<span class={ "announcement-level-pill announcement-level-pill--" + item.Level }>
+											{ announcementLevelLabel(item.Level) }
+										</span>
+									</td>
+									<td data-label="Schedule">
+										<span class="announcement-schedule">{ item.StartDate } → { item.EndDate }</span>
+									</td>
+									<td data-label="Audience">{ item.Audience }</td>
+									<td data-label="Status">
+										<span class={ item.StatusClass }>{ item.Status }</span>
+									</td>
+									<td data-label="Actions">
+										<div class="table-actions">
+											<a href={ utils.URL("/announcements/" + item.ID + "/edit") } class="edit-btn">Edit</a>
+											<form method="POST" action={ utils.URL("/announcements/" + item.ID + "/delete") } class="table-action-form" onsubmit="return confirm('Delete this announcement?');">
+												<button type="submit" class="delete-btn">Delete</button>
+											</form>
+										</div>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+				@PaginationBar(data.HasPrev, data.PrevURL, data.HasNext, data.NextURL, data.PageNumber, data.PageTotalPages, data.PageTotal)
+			} else {
+				<div class="announcement-empty">
+					<p>No announcements yet.</p>
+					<a href={ utils.URL("/announcements/register") } class="add-btn">Create your first announcement</a>
+				</div>
+			}
+		</div>
+	</body>
+	</html>
+}
+
+templ AnnouncementForm(data AnnouncementFormData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>{ announcementFormTitle(data) } - Zion English Admin</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@AnnouncementPageStyles()
+	</head>
+	<body>
+		<div class="container announcement-form-page">
+			@HeaderSimple()
+			@SuccessBanner()
+			@ErrorBanner()
+
+			<div class="hub-header">
+				<h2 class="hub-title">{ announcementFormTitle(data) }</h2>
+				<a href={ utils.URL("/announcements") } class="add-btn add-btn-secondary">Back to list</a>
+			</div>
+
+			<div class="announcement-form-layout">
+				<form
+					id="announcementForm"
+					class="announcement-form"
+					method="POST"
+					action={ announcementFormAction(data) }
+				>
+					<section class="announcement-form-section" aria-labelledby="announcementContentHeading">
+						<h3 id="announcementContentHeading" class="announcement-form-section-title">Content</h3>
+						<div class="form-group">
+							<label for="title">Title *</label>
+							<input
+								type="text"
+								id="title"
+								name="title"
+								required
+								maxlength="120"
+								value={ data.Title }
+								placeholder="Short headline for the banner"
+								data-preview-target="title"
+							/>
+						</div>
+						<div class="form-group">
+							<label for="description">Description *</label>
+							<textarea
+								id="description"
+								name="description"
+								required
+								rows="4"
+								maxlength="500"
+								placeholder="Additional details shown below the title"
+								data-preview-target="description"
+							>{ data.Description }</textarea>
+							<p class="field-hint">Keep it concise — this appears in the persistent banner across all pages.</p>
+						</div>
+					</section>
+
+					<section class="announcement-form-section" aria-labelledby="announcementLevelHeading">
+						<h3 id="announcementLevelHeading" class="announcement-form-section-title">Level</h3>
+						<p class="field-hint">Determines banner color and icon. Critical appears first when multiple announcements are active.</p>
+						<div class="announcement-level-picker" role="radiogroup" aria-label="Announcement level">
+							@AnnouncementLevelOption(announcements.LevelInfo, "Info", "General updates and reminders", data.Level)
+							@AnnouncementLevelOption(announcements.LevelWarning, "Warning", "Important changes teachers should know", data.Level)
+							@AnnouncementLevelOption(announcements.LevelCritical, "Critical", "Urgent — schedule or system issues", data.Level)
+						</div>
+					</section>
+
+					<section class="announcement-form-section" aria-labelledby="announcementScheduleHeading">
+						<h3 id="announcementScheduleHeading" class="announcement-form-section-title">Schedule</h3>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="start_date">Start date *</label>
+								<input
+									type="date"
+									id="start_date"
+									name="start_date"
+									required
+									min={ data.Today }
+									value={ data.StartDate }
+								/>
+							</div>
+							<div class="form-group">
+								<label for="end_date">End date *</label>
+								<input
+									type="date"
+									id="end_date"
+									name="end_date"
+									required
+									min={ data.Today }
+									value={ data.EndDate }
+								/>
+							</div>
+						</div>
+						<p class="field-hint">Banner is visible from start through end date (inclusive, PHT).</p>
+					</section>
+
+					<section class="announcement-form-section" aria-labelledby="announcementAudienceHeading">
+						<h3 id="announcementAudienceHeading" class="announcement-form-section-title">Visible to</h3>
+						<div class="announcement-visibility-options">
+							<label class="announcement-visibility-card">
+								<input
+									type="radio"
+									name="visible_to"
+									value="all"
+									checked?={ data.VisibleTo != "selected" }
+									data-visibility-toggle="all"
+								/>
+								<span class="announcement-visibility-card__body">
+									<span class="announcement-visibility-card__title">All teachers</span>
+									<span class="announcement-visibility-card__desc">Everyone sees this banner, including superuser</span>
+								</span>
+							</label>
+							<label class="announcement-visibility-card">
+								<input
+									type="radio"
+									name="visible_to"
+									value="selected"
+									checked?={ data.VisibleTo == "selected" }
+									data-visibility-toggle="selected"
+								/>
+								<span class="announcement-visibility-card__body">
+									<span class="announcement-visibility-card__title">Selected teachers</span>
+									<span class="announcement-visibility-card__desc">Only checked teachers will see this banner</span>
+								</span>
+							</label>
+						</div>
+						@AnnouncementTeacherSelect(data.Teachers, data.VisibleTo == "selected")
+					</section>
+
+					<div class="announcement-form-actions">
+						<button type="submit" class="announcement-submit-btn">{ announcementSubmitLabel(data) }</button>
+					</div>
+				</form>
+
+				<aside class="announcement-preview-panel" aria-labelledby="announcementPreviewHeading">
+					<h3 id="announcementPreviewHeading" class="announcement-form-section-title">Live preview</h3>
+					<p class="field-hint">How the banner will appear below the navbar.</p>
+					<div id="announcementPreview" class="announcement-preview-stack">
+						@AnnouncementBanner(
+							previewOrDefault(data.Title, "Announcement title"),
+							previewOrDefault(data.Description, "Description text appears here."),
+							previewOrDefault(data.Level, announcements.LevelInfo),
+						)
+					</div>
+				</aside>
+			</div>
+		</div>
+		@AnnouncementFormScript()
+	</body>
+	</html>
+}
+
+func previewOrDefault(value, fallback string) string {
+	if value == "" {
+		return fallback
+	}
+	return value
+}
+
+func announcementFormAction(data AnnouncementFormData) string {
+	if data.IsEdit {
+		return utils.URL("/announcements/" + data.ID + "/edit")
+	}
+	return utils.URL("/announcements/register")
+}
+
+func announcementFormTitle(data AnnouncementFormData) string {
+	if data.IsEdit {
+		return "Edit Announcement"
+	}
+	return "New Announcement"
+}
+
+func announcementSubmitLabel(data AnnouncementFormData) string {
+	if data.IsEdit {
+		return "Save changes"
+	}
+	return "Create announcement"
+}
+
+templ AnnouncementLevelOption(value string, label string, desc string, selected string) {
+	<label class={ "announcement-level-option announcement-level-option--" + value }>
+		<input type="radio" name="level" value={ value } checked?={ selected == value || (selected == "" && value == announcements.LevelInfo) } data-level={ value }/>
+		<span class="announcement-level-option__icon" aria-hidden="true">
+			@AnnouncementLevelIcon(value)
+		</span>
+		<span class="announcement-level-option__text">
+			<span class="announcement-level-option__label">{ label }</span>
+			<span class="announcement-level-option__desc">{ desc }</span>
+		</span>
+	</label>
+}
+
+templ AnnouncementTeacherSelect(teachers []AnnouncementTeacherOption, showPanel bool) {
+	<div id="teacherSelectPanel" class="announcement-teacher-panel" hidden?={ !showPanel }>
+		<div class="announcement-teacher-panel__toolbar">
+			<span class="announcement-teacher-panel__label">Teachers</span>
+			<label class="announcement-select-all">
+				<input type="checkbox" id="selectAllTeachers" aria-controls="teacherCheckboxList"/>
+				Select all
+			</label>
+		</div>
+		<div id="teacherCheckboxList" class="announcement-teacher-list" role="group" aria-label="Select teachers">
+			if len(teachers) == 0 {
+				<p class="field-hint">No approved teachers available.</p>
+			}
+			for _, t := range teachers {
+				<label class="announcement-teacher-item">
+					<input type="checkbox" name="teachers" value={ t.ID } class="teacher-checkbox" checked?={ t.Selected }/>
+					<span>{ t.Name }</span>
+				</label>
+			}
+		</div>
+	</div>
+}
+
+templ AnnouncementFormScript() {
+	<script>
+		(function () {
+			const form = document.getElementById('announcementForm');
+			const preview = document.getElementById('announcementPreview');
+			if (!form || !preview) return;
+
+			const titleInput = form.querySelector('[data-preview-target="title"]');
+			const descInput = form.querySelector('[data-preview-target="description"]');
+			const levelInputs = form.querySelectorAll('input[name="level"]');
+			const visibilityRadios = form.querySelectorAll('[data-visibility-toggle]');
+			const teacherPanel = document.getElementById('teacherSelectPanel');
+			const selectAll = document.getElementById('selectAllTeachers');
+			const teacherCheckboxes = () => Array.from(form.querySelectorAll('.teacher-checkbox'));
+
+			function currentLevel() {
+				const checked = form.querySelector('input[name="level"]:checked');
+				return checked ? checked.value : 'info';
+			}
+
+			function escapeHTML(value) {
+				return value
+					.replace(/&/g, '&amp;')
+					.replace(/</g, '&lt;')
+					.replace(/>/g, '&gt;')
+					.replace(/"/g, '&quot;');
+			}
+
+			function levelIcon(level) {
+				if (level === 'warning') {
+					return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>';
+				}
+				if (level === 'critical') {
+					return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+				}
+				return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+			}
+
+			function updatePreview() {
+				const title = (titleInput && titleInput.value.trim()) || 'Announcement title';
+				const description = (descInput && descInput.value.trim()) || 'Description text appears here.';
+				const level = currentLevel();
+				preview.innerHTML =
+					'<div class="announcement-banner announcement-banner--' + level + '" role="status">' +
+						'<div class="announcement-banner__icon" aria-hidden="true">' + levelIcon(level) + '</div>' +
+						'<div class="announcement-banner__content">' +
+							'<p class="announcement-banner__title">' + escapeHTML(title) + '</p>' +
+							'<p class="announcement-banner__description">' + escapeHTML(description) + '</p>' +
+						'</div>' +
+					'</div>';
+			}
+
+			function syncVisibilityPanel() {
+				const selected = form.querySelector('[data-visibility-toggle="selected"]');
+				if (!teacherPanel) return;
+				const show = selected && selected.checked;
+				teacherPanel.hidden = !show;
+			}
+
+			function syncSelectAllState() {
+				if (!selectAll) return;
+				const boxes = teacherCheckboxes();
+				if (boxes.length === 0) {
+					selectAll.checked = false;
+					selectAll.indeterminate = false;
+					return;
+				}
+				const checkedCount = boxes.filter(function (cb) { return cb.checked; }).length;
+				selectAll.checked = checkedCount === boxes.length;
+				selectAll.indeterminate = checkedCount > 0 && checkedCount < boxes.length;
+			}
+
+			if (titleInput) titleInput.addEventListener('input', updatePreview);
+			if (descInput) descInput.addEventListener('input', updatePreview);
+			levelInputs.forEach(function (input) {
+				input.addEventListener('change', updatePreview);
+			});
+
+			visibilityRadios.forEach(function (radio) {
+				radio.addEventListener('change', syncVisibilityPanel);
+			});
+
+			if (selectAll) {
+				selectAll.addEventListener('change', function () {
+					teacherCheckboxes().forEach(function (cb) {
+						cb.checked = selectAll.checked;
+					});
+					selectAll.indeterminate = false;
+				});
+			}
+
+			teacherCheckboxes().forEach(function (cb) {
+				cb.addEventListener('change', syncSelectAllState);
+			});
+
+			const startDate = form.querySelector('#start_date');
+			const endDate = form.querySelector('#end_date');
+			if (startDate && endDate) {
+				startDate.addEventListener('change', function () {
+					if (startDate.value) {
+						endDate.min = startDate.value;
+					}
+				});
+			}
+
+			syncVisibilityPanel();
+			syncSelectAllState();
+			updatePreview();
+		})();
+	</script>
+}
+
+templ AnnouncementPageStyles() {
+	<style>
+		/* Announcement banners (global display) */
+		.announcement-banners {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-2);
+			margin-bottom: var(--space-4);
+		}
+
+		.home-container .announcement-banners {
+			margin-top: var(--space-2);
+			margin-bottom: var(--space-5);
+		}
+
+		.announcement-banner {
+			display: flex;
+			align-items: flex-start;
+			gap: var(--space-3);
+			padding: var(--space-3) var(--space-4);
+			border-radius: var(--radius-md);
+			border: 1px solid transparent;
+			border-left-width: 4px;
+			line-height: 1.5;
+		}
+
+		.announcement-banner__icon {
+			flex-shrink: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 36px;
+			height: 36px;
+			border-radius: var(--radius-full);
+		}
+
+		.announcement-banner__title {
+			font-weight: 600;
+			font-size: 0.9375rem;
+			margin-bottom: 2px;
+		}
+
+		.announcement-banner__description {
+			font-size: 0.875rem;
+			opacity: 0.92;
+		}
+
+		.announcement-banner--info {
+			background: var(--color-info-bg);
+			border-color: var(--color-info);
+			color: #0C4A6E;
+		}
+		.announcement-banner--info .announcement-banner__icon {
+			background: rgba(32, 160, 224, 0.15);
+			color: var(--color-info);
+		}
+
+		.announcement-banner--warning {
+			background: var(--color-warning-bg);
+			border-color: var(--color-warning);
+			color: #7A4E00;
+		}
+		.announcement-banner--warning .announcement-banner__icon {
+			background: rgba(240, 176, 48, 0.2);
+			color: #B45309;
+		}
+
+		.announcement-banner--critical {
+			background: var(--color-error-bg);
+			border-color: var(--color-tertiary);
+			color: #7F1D1D;
+		}
+		.announcement-banner--critical .announcement-banner__icon {
+			background: rgba(240, 96, 96, 0.18);
+			color: var(--color-destructive);
+		}
+
+		/* List page */
+		.announcement-list-title {
+			font-weight: 500;
+		}
+
+		.announcement-level-pill {
+			display: inline-block;
+			padding: 2px 10px;
+			border-radius: var(--radius-full);
+			font-size: 0.75rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.03em;
+		}
+		.announcement-level-pill--info { background: var(--color-info-bg); color: #0C4A6E; }
+		.announcement-level-pill--warning { background: var(--color-warning-bg); color: #7A4E00; }
+		.announcement-level-pill--critical { background: var(--color-error-bg); color: #7F1D1D; }
+
+		.announcement-schedule {
+			font-family: 'Fira Code', monospace;
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+		}
+
+		.announcement-empty {
+			text-align: center;
+			padding: var(--space-10) var(--space-4);
+			color: var(--color-muted-foreground);
+		}
+		.announcement-empty p {
+			margin-bottom: var(--space-4);
+		}
+
+		/* Form layout */
+		.announcement-form-layout {
+			display: grid;
+			grid-template-columns: 1fr 340px;
+			gap: var(--space-6);
+			align-items: start;
+		}
+
+		.announcement-form-section {
+			margin-bottom: var(--space-6);
+			padding-bottom: var(--space-5);
+			border-bottom: 1px solid var(--color-border-subtle);
+		}
+		.announcement-form-section:last-of-type {
+			border-bottom: none;
+		}
+
+		.announcement-form-section-title {
+			font-size: 1rem;
+			margin-bottom: var(--space-3);
+		}
+
+		.field-hint {
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+			margin-top: var(--space-2);
+		}
+
+		textarea {
+			width: 100%;
+			padding: var(--space-3);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-md);
+			font-family: inherit;
+			font-size: 0.9375rem;
+			resize: vertical;
+			min-height: 100px;
+			transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+		}
+		textarea:focus {
+			outline: none;
+			border-color: var(--color-ring);
+			box-shadow: 0 0 0 3px rgba(144, 192, 32, 0.2);
+		}
+
+		/* Level picker cards */
+		.announcement-level-picker {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: var(--space-3);
+		}
+
+		.announcement-level-option {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: var(--space-2);
+			padding: var(--space-4);
+			border: 2px solid var(--color-border);
+			border-radius: var(--radius-md);
+			cursor: pointer;
+			transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
+			text-align: center;
+		}
+		.announcement-level-option:hover {
+			border-color: var(--color-border);
+			background: var(--color-muted);
+		}
+		.announcement-level-option input {
+			position: absolute;
+			opacity: 0;
+			pointer-events: none;
+		}
+		.announcement-level-option:has(input:checked) {
+			box-shadow: var(--shadow-sm);
+		}
+		.announcement-level-option--info:has(input:checked) {
+			border-color: var(--color-info);
+			background: var(--color-info-bg);
+		}
+		.announcement-level-option--warning:has(input:checked) {
+			border-color: var(--color-warning);
+			background: var(--color-warning-bg);
+		}
+		.announcement-level-option--critical:has(input:checked) {
+			border-color: var(--color-tertiary);
+			background: var(--color-error-bg);
+		}
+
+		.announcement-level-option__icon {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 40px;
+			height: 40px;
+			border-radius: var(--radius-full);
+			background: var(--color-surface);
+		}
+		.announcement-level-option__label {
+			display: block;
+			font-weight: 600;
+			font-size: 0.875rem;
+		}
+		.announcement-level-option__desc {
+			display: block;
+			font-size: 0.75rem;
+			color: var(--color-muted-foreground);
+			line-height: 1.4;
+		}
+
+		/* Visibility cards */
+		.announcement-visibility-options {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: var(--space-3);
+			margin-bottom: var(--space-3);
+		}
+
+		.announcement-visibility-card {
+			display: flex;
+			align-items: flex-start;
+			gap: var(--space-3);
+			padding: var(--space-4);
+			border: 2px solid var(--color-border);
+			border-radius: var(--radius-md);
+			cursor: pointer;
+			transition: border-color var(--transition-fast), background var(--transition-fast);
+		}
+		.announcement-visibility-card:hover {
+			background: var(--color-muted);
+		}
+		.announcement-visibility-card:has(input:checked) {
+			border-color: var(--color-primary);
+			background: var(--color-primary-light);
+		}
+		.announcement-visibility-card input {
+			margin-top: 4px;
+			accent-color: var(--color-primary);
+		}
+		.announcement-visibility-card__title {
+			display: block;
+			font-weight: 600;
+			font-size: 0.9375rem;
+		}
+		.announcement-visibility-card__desc {
+			display: block;
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+			margin-top: 2px;
+		}
+
+		/* Teacher select panel */
+		.announcement-teacher-panel {
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-md);
+			background: var(--color-muted);
+			padding: var(--space-3);
+		}
+		.announcement-teacher-panel[hidden] {
+			display: none;
+		}
+
+		.announcement-teacher-panel__toolbar {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: var(--space-3);
+			padding-bottom: var(--space-2);
+			border-bottom: 1px solid var(--color-border);
+		}
+		.announcement-teacher-panel__label {
+			font-weight: 600;
+			font-size: 0.875rem;
+		}
+
+		.announcement-select-all {
+			display: flex;
+			align-items: center;
+			gap: var(--space-2);
+			font-size: 0.875rem;
+			cursor: pointer;
+			user-select: none;
+		}
+		.announcement-select-all input {
+			accent-color: var(--color-primary);
+		}
+
+		.announcement-teacher-list {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+			gap: var(--space-2);
+			max-height: 240px;
+			overflow-y: auto;
+		}
+
+		.announcement-teacher-item {
+			display: flex;
+			align-items: center;
+			gap: var(--space-2);
+			padding: var(--space-2) var(--space-3);
+			background: var(--color-surface);
+			border: 1px solid var(--color-border-subtle);
+			border-radius: var(--radius-sm);
+			font-size: 0.875rem;
+			cursor: pointer;
+			transition: border-color var(--transition-fast);
+		}
+		.announcement-teacher-item:hover {
+			border-color: var(--color-border);
+		}
+		.announcement-teacher-item:has(input:checked) {
+			border-color: var(--color-primary);
+			background: var(--color-primary-light);
+		}
+		.announcement-teacher-item input {
+			accent-color: var(--color-primary);
+		}
+
+		/* Preview panel */
+		.announcement-preview-panel {
+			position: sticky;
+			top: var(--space-5);
+			padding: var(--space-4);
+			background: var(--color-muted);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-lg);
+		}
+		.announcement-preview-stack .announcement-banners {
+			margin-bottom: 0;
+		}
+
+		.announcement-form-actions {
+			padding-top: var(--space-2);
+		}
+		.announcement-submit-btn {
+			min-width: 180px;
+		}
+
+		.add-btn-secondary {
+			background: var(--color-surface);
+			color: var(--color-foreground);
+			border: 1px solid var(--color-border);
+		}
+		.add-btn-secondary:hover {
+			background: var(--color-muted);
+			color: var(--color-foreground);
+		}
+
+		@media (max-width: 900px) {
+			.announcement-form-layout {
+				grid-template-columns: 1fr;
+			}
+			.announcement-preview-panel {
+				position: static;
+				order: -1;
+			}
+			.announcement-level-picker {
+				grid-template-columns: 1fr;
+			}
+			.announcement-visibility-options {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+}

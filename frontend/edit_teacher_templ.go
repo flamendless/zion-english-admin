@@ -99,14 +99,14 @@ func EditTeacher(data EditTeacherData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-swap=\"innerHTML\" hx-target=\"#logOutput\"><div class=\"form-row-3\"><div class=\"form-group\"><label for=\"firstName\">First Name *</label> <input type=\"text\" id=\"firstName\" name=\"firstName\" required value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-swap=\"innerHTML\" hx-target=\"#logOutput\"><div class=\"form-row-3\"><div class=\"form-group\"><label for=\"firstName\">First Name *</label> <input type=\"text\" id=\"firstName\" name=\"firstName\" required pattern=\".*\\S.*\" title=\"First name cannot be empty or whitespace only\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.FirstName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 48, Col: 88}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 48, Col: 159}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 		if templ_7745c5c3_Err != nil {
@@ -125,14 +125,14 @@ func EditTeacher(data EditTeacherData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" placeholder=\"Enter middle name (optional)\"></div><div class=\"form-group\"><label for=\"lastName\">Last Name *</label> <input type=\"text\" id=\"lastName\" name=\"lastName\" required value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" placeholder=\"Enter middle name (optional)\"></div><div class=\"form-group\"><label for=\"lastName\">Last Name *</label> <input type=\"text\" id=\"lastName\" name=\"lastName\" required pattern=\".*\\S.*\" title=\"Last name cannot be empty or whitespace only\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.LastName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 56, Col: 85}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 56, Col: 155}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 		if templ_7745c5c3_Err != nil {

@@ -16,6 +16,7 @@ import (
 	"strings"
 	"time"
 	"zion-english/frontend"
+	"zion-english/internal/announcements"
 	"zion-english/internal/auth"
 	"zion-english/internal/conf"
 	"zion-english/internal/constants"
@@ -286,6 +287,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/download/processed", auth.RequireRole(auth.RoleSuperuser)(handleDownload))
 		authMux.HandleFunc(basePath+"/profile", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleProfile))
 		authMux.HandleFunc(basePath+"/profile/mobile", auth.RequireRole(auth.RoleTeacher)(handleProfileMobile))
+		authMux.HandleFunc(basePath+"/profile/names", auth.RequireRole(auth.RoleTeacher)(handleProfileNames))
 		authMux.HandleFunc(basePath+"/profile/password", auth.RequireRole(auth.RoleTeacher)(handleProfilePassword))
 		// Profile picture upload disabled for now.
 		// authMux.HandleFunc(basePath+"/profile/avatar", auth.RequireRole(auth.RoleTeacher)(handleProfileAvatar))
@@ -293,13 +295,17 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/role", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetRole))
 		authMux.HandleFunc(basePath+"/refresh", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleRefreshPage))
 		authMux.HandleFunc(basePath+"/api/teachers", auth.RequireRole(auth.RoleSuperuser)(handleGetTeachers))
+		authMux.HandleFunc(basePath+"/api/teacher-row", auth.RequireRole(auth.RoleSuperuser)(handleGetTeacherRow))
 		authMux.HandleFunc(basePath+"/api/students", auth.RequireRole(auth.RoleSuperuser)(handleGetStudents))
 		authMux.HandleFunc(basePath+"/api/students/search", auth.RequireRole(auth.RoleSuperuser)(handleSearchStudents))
 		authMux.HandleFunc(basePath+"/api/me/students", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetMyStudents))
 		authMux.HandleFunc(basePath+"/api/class-records", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetClassRecords))
 		authMux.HandleFunc(basePath+"/api/scheduled-classes", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetScheduledClasses))
+		authMux.HandleFunc(basePath+"/announcements", auth.RequireRole(auth.RoleSuperuser)(handleAnnouncements))
+		authMux.HandleFunc(basePath+"/announcements/register", auth.RequireRole(auth.RoleSuperuser)(handleAnnouncementRegister))
+		authMux.HandleFunc(basePath+"/announcements/", auth.RequireRole(auth.RoleSuperuser)(handleAnnouncementsPath))
 
-		authHandler := auth.Middleware(cfg, dbRO.GetQueries(), authMux)
+		authHandler := announcements.Middleware(dbRO.GetQueries(), auth.Middleware(cfg, dbRO.GetQueries(), authMux))
 
 		rootMux := http.NewServeMux()
 
@@ -334,11 +340,14 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/profile", authHandler)
 		rootMux.Handle(basePath+"/profile/", authHandler)
 		rootMux.Handle(basePath+"/api/teachers", authHandler)
+		rootMux.Handle(basePath+"/api/teacher-row", authHandler)
 		rootMux.Handle(basePath+"/api/students", authHandler)
 		rootMux.Handle(basePath+"/api/students/", authHandler)
 		rootMux.Handle(basePath+"/api/class-records", authHandler)
 		rootMux.Handle(basePath+"/api/scheduled-classes", authHandler)
 		rootMux.Handle(basePath+"/api/me/students", authHandler)
+		rootMux.Handle(basePath+"/announcements", authHandler)
+		rootMux.Handle(basePath+"/announcements/", authHandler)
 
 		handler := securityHeaders(rootMux)
 
@@ -753,7 +762,8 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		sendErrorLog(w, err.Error())
 		return
 	}
-	teacherID, err := requireInt64(r.FormValue("teacher"))
+
+	teacherIDs, err := parseAssignedTeacherIDs(r.Context(), dbRO.GetQueries(), r.Form["teachers"])
 	if err != nil {
 		sendErrorLog(w, err.Error())
 		return
@@ -776,23 +786,12 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		ParentName:       r.FormValue("parentName"),
 		AssignedColor:    r.FormValue("assignedColor"),
 		Status:           r.FormValue("status"),
-		TeacherID:        teacherID,
 		Relationship:     r.FormValue("relationship"),
 		RelatedStudentID: relatedStudentID,
 	}
 
 	if err := validateStudentRequest(&req); err != nil {
 		sendErrorLog(w, err.Error())
-		return
-	}
-
-	teacher, err := dbRO.GetQueries().GetTeacherByID(r.Context(), req.TeacherID)
-	if err != nil {
-		sendErrorLog(w, "assigned teacher not found")
-		return
-	}
-	if teacher.Status != string(constants.TeacherStatusApproved) {
-		sendErrorLog(w, "assigned teacher must be an approved teacher")
 		return
 	}
 
@@ -850,13 +849,15 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = qtx.InsertTeacherStudentM2M(r.Context(), queries.InsertTeacherStudentM2MParams{
-		TeacherID: req.TeacherID,
-		StudentID: studentID,
-	})
-	if err != nil {
-		sendErrorLog(w, "Failed to assign teacher")
-		return
+	for _, tid := range teacherIDs {
+		err = qtx.InsertTeacherStudentM2M(r.Context(), queries.InsertTeacherStudentM2MParams{
+			TeacherID: tid,
+			StudentID: studentID,
+		})
+		if err != nil {
+			sendErrorLog(w, "Failed to assign teacher")
+			return
+		}
 	}
 
 	if req.RelatedStudentID > 0 {
@@ -881,11 +882,15 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		sendErrorLog(w, "Failed to register student")
 		return
 	}
-	rl.add(fmt.Sprintf("Assigned student to teacher ID: %d", req.TeacherID))
+	teacherIDStrs := make([]string, len(teacherIDs))
+	for i, tid := range teacherIDs {
+		teacherIDStrs[i] = strconv.FormatInt(tid, 10)
+		rl.add(fmt.Sprintf("Assigned student to teacher ID: %d", tid))
+	}
 
 	rl.add(fmt.Sprintf("Successfully registered student: %s", req.Name))
 
-	insertAuditLog(r.Context(), "students", fmt.Sprintf("registered student '%s' (teacher id %d)", req.Name, req.TeacherID))
+	insertAuditLog(r.Context(), "students", fmt.Sprintf("registered student '%s' (teacher ids %s)", req.Name, strings.Join(teacherIDStrs, ",")))
 
 	if _, err := fmt.Fprintf(w, "Student '%s' registered successfully\n", req.Name); err != nil {
 		sendErrorLog(w, err.Error())
@@ -939,16 +944,22 @@ func validateStudentRequest(req *models.StudentRegisterRequest) error {
 		return errors.New("assigned color is required")
 	}
 
-	if req.TeacherID == 0 {
-		return errors.New("assigned teacher is required")
-	}
-
 	validStatuses := map[string]bool{"active": true, "inactive": true}
 	if !validStatuses[req.Status] {
 		return errors.New("invalid status. Must be active or inactive")
 	}
 
 	return nil
+}
+
+func handleGetTeacherRow(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if err := frontend.TeacherAssignRow("", true).Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
@@ -1133,10 +1144,15 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 }
 
 func validateTeacherRequest(req *models.TeacherRegisterRequest) error {
-	if strings.TrimSpace(req.FirstName) == "" {
+	req.FirstName = strings.TrimSpace(req.FirstName)
+	req.MiddleName = strings.TrimSpace(req.MiddleName)
+	req.LastName = strings.TrimSpace(req.LastName)
+	req.Name = utils.ComposePersonName(req.FirstName, req.MiddleName, req.LastName)
+
+	if utils.IsBlank(req.FirstName) {
 		return errors.New("first name is required")
 	}
-	if strings.TrimSpace(req.LastName) == "" {
+	if utils.IsBlank(req.LastName) {
 		return errors.New("last name is required")
 	}
 	if req.Name == "" {

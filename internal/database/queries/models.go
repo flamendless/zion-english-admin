@@ -18,6 +18,24 @@ type TblAccess struct {
 	UpdatedAt   string
 }
 
+type TblAnnouncement struct {
+	ID           int64
+	Title        string
+	Description  string
+	Level        string
+	StartDate    string
+	EndDate      string
+	VisibleToAll int64
+	CreatedAt    string
+	UpdatedAt    string
+}
+
+type TblAnnouncementsTeachersM2m struct {
+	AnnouncementID int64
+	TeacherID      int64
+	CreatedAt      string
+}
+
 type TblClassRecord struct {
 	ID              int64
 	StudentID       int64
