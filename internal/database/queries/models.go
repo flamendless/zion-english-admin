@@ -161,6 +161,8 @@ type TblTeacher struct {
 	ProfilePicture    sql.NullString
 	PasswordChangedAt sql.NullTime
 	MobileChangedAt   sql.NullTime
+	Deleted           int64
+	DeletedAt         sql.NullTime
 }
 
 type TblTeachersStudentsM2m struct {

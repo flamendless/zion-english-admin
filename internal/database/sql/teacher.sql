@@ -3,48 +3,52 @@ INSERT INTO tbl_teachers (name, first_name, middle_name, last_name, birthdate, a
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 -- name: GetTeacherCountByEmail :one
-SELECT COUNT(*) as count FROM tbl_teachers WHERE email = ?;
+SELECT COUNT(*) as count FROM tbl_teachers WHERE email = ? AND deleted = 0;
 
 -- name: GetTeacherCountByEmailExcludingID :one
-SELECT COUNT(*) as count FROM tbl_teachers WHERE email = ? AND id != ?;
+SELECT COUNT(*) as count FROM tbl_teachers WHERE email = ? AND id != ? AND deleted = 0;
 
 -- name: GetTeacherCountByMobile :one
-SELECT COUNT(*) as count FROM tbl_teachers WHERE mobile_number = ?;
+SELECT COUNT(*) as count FROM tbl_teachers WHERE mobile_number = ? AND deleted = 0;
 
 -- name: GetTeacherCountByMobileExcludingID :one
-SELECT COUNT(*) as count FROM tbl_teachers WHERE mobile_number = ? AND id != ?;
+SELECT COUNT(*) as count FROM tbl_teachers WHERE mobile_number = ? AND id != ? AND deleted = 0;
 
 -- name: GetTeacherIDByName :one
 SELECT id FROM tbl_teachers WHERE name = ?;
 
 -- name: GetTeacherByEmail :one
-SELECT id, name, email, password, status FROM tbl_teachers WHERE email = ?;
+SELECT id, name, email, password, status FROM tbl_teachers WHERE email = ? AND deleted = 0;
 
 -- name: GetTeacherByMobile :one
-SELECT id, name, email, password, status FROM tbl_teachers WHERE mobile_number = ?;
+SELECT id, name, email, password, status FROM tbl_teachers WHERE mobile_number = ? AND deleted = 0;
 
 -- name: GetAllTeachers :many
 SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
 FROM tbl_teachers
-ORDER BY CASE status WHEN 'pending' THEN 0 ELSE 1 END, name ASC;
+WHERE deleted = 0
+ORDER BY CASE WHEN deleted = 1 THEN 2 WHEN status = 'pending' THEN 0 ELSE 1 END, name ASC;
 
 -- name: GetApprovedTeachers :many
 SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
 FROM tbl_teachers
-WHERE status = 'approved'
+WHERE status = 'approved' AND deleted = 0
 ORDER BY name ASC;
 
 -- name: ApproveTeacher :exec
-UPDATE tbl_teachers SET status = 'approved', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending';
+UPDATE tbl_teachers SET status = 'approved', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending' AND deleted = 0;
 
 -- name: UnapproveTeacher :exec
-UPDATE tbl_teachers SET status = 'pending', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'approved';
+UPDATE tbl_teachers SET status = 'pending', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'approved' AND deleted = 0;
+
+-- name: SoftDeleteTeacher :exec
+UPDATE tbl_teachers SET deleted = 1, deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending' AND deleted = 0;
 
 -- name: GetTeacherByID :one
 SELECT id, name, template, status FROM tbl_teachers WHERE id = ?;
 
 -- name: GetTeacherFullByID :one
-SELECT id, name, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
+SELECT id, name, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted
 FROM tbl_teachers
 WHERE id = ?;
 
@@ -88,13 +92,13 @@ WHERE (? = '' OR name LIKE '%' || ? || '%')
   AND (? = '' OR email LIKE '%' || ? || '%');
 
 -- name: GetTeachersFiltered :many
-SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
+SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted, deleted_at
 FROM tbl_teachers
 WHERE (? = '' OR name LIKE '%' || ? || '%')
   AND (? = '' OR status = ?)
   AND (? = '' OR email LIKE '%' || ? || '%')
-ORDER BY CASE status WHEN 'pending' THEN 0 ELSE 1 END, name ASC
+ORDER BY CASE WHEN deleted = 1 THEN 2 WHEN status = 'pending' THEN 0 ELSE 1 END, name ASC
 LIMIT ? OFFSET ?;
 
 -- name: CountTeachersByStatus :one
-SELECT COUNT(*) as count FROM tbl_teachers WHERE status = ?;
+SELECT COUNT(*) as count FROM tbl_teachers WHERE status = ? AND deleted = 0;

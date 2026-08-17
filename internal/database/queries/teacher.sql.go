@@ -11,7 +11,7 @@ import (
 )
 
 const approveTeacher = `-- name: ApproveTeacher :exec
-UPDATE tbl_teachers SET status = 'approved', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending'
+UPDATE tbl_teachers SET status = 'approved', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending' AND deleted = 0
 `
 
 func (q *Queries) ApproveTeacher(ctx context.Context, id int64) error {
@@ -20,7 +20,7 @@ func (q *Queries) ApproveTeacher(ctx context.Context, id int64) error {
 }
 
 const countTeachersByStatus = `-- name: CountTeachersByStatus :one
-SELECT COUNT(*) as count FROM tbl_teachers WHERE status = ?
+SELECT COUNT(*) as count FROM tbl_teachers WHERE status = ? AND deleted = 0
 `
 
 func (q *Queries) CountTeachersByStatus(ctx context.Context, status string) (int64, error) {
@@ -64,7 +64,8 @@ func (q *Queries) CountTeachersFiltered(ctx context.Context, arg CountTeachersFi
 const getAllTeachers = `-- name: GetAllTeachers :many
 SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
 FROM tbl_teachers
-ORDER BY CASE status WHEN 'pending' THEN 0 ELSE 1 END, name ASC
+WHERE deleted = 0
+ORDER BY CASE WHEN deleted = 1 THEN 2 WHEN status = 'pending' THEN 0 ELSE 1 END, name ASC
 `
 
 type GetAllTeachersRow struct {
@@ -133,7 +134,7 @@ func (q *Queries) GetAllTeachers(ctx context.Context) ([]GetAllTeachersRow, erro
 const getApprovedTeachers = `-- name: GetApprovedTeachers :many
 SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
 FROM tbl_teachers
-WHERE status = 'approved'
+WHERE status = 'approved' AND deleted = 0
 ORDER BY name ASC
 `
 
@@ -201,7 +202,7 @@ func (q *Queries) GetApprovedTeachers(ctx context.Context) ([]GetApprovedTeacher
 }
 
 const getTeacherByEmail = `-- name: GetTeacherByEmail :one
-SELECT id, name, email, password, status FROM tbl_teachers WHERE email = ?
+SELECT id, name, email, password, status FROM tbl_teachers WHERE email = ? AND deleted = 0
 `
 
 type GetTeacherByEmailRow struct {
@@ -249,7 +250,7 @@ func (q *Queries) GetTeacherByID(ctx context.Context, id int64) (GetTeacherByIDR
 }
 
 const getTeacherByMobile = `-- name: GetTeacherByMobile :one
-SELECT id, name, email, password, status FROM tbl_teachers WHERE mobile_number = ?
+SELECT id, name, email, password, status FROM tbl_teachers WHERE mobile_number = ? AND deleted = 0
 `
 
 type GetTeacherByMobileRow struct {
@@ -274,7 +275,7 @@ func (q *Queries) GetTeacherByMobile(ctx context.Context, mobileNumber string) (
 }
 
 const getTeacherCountByEmail = `-- name: GetTeacherCountByEmail :one
-SELECT COUNT(*) as count FROM tbl_teachers WHERE email = ?
+SELECT COUNT(*) as count FROM tbl_teachers WHERE email = ? AND deleted = 0
 `
 
 func (q *Queries) GetTeacherCountByEmail(ctx context.Context, email string) (int64, error) {
@@ -285,7 +286,7 @@ func (q *Queries) GetTeacherCountByEmail(ctx context.Context, email string) (int
 }
 
 const getTeacherCountByEmailExcludingID = `-- name: GetTeacherCountByEmailExcludingID :one
-SELECT COUNT(*) as count FROM tbl_teachers WHERE email = ? AND id != ?
+SELECT COUNT(*) as count FROM tbl_teachers WHERE email = ? AND id != ? AND deleted = 0
 `
 
 type GetTeacherCountByEmailExcludingIDParams struct {
@@ -301,7 +302,7 @@ func (q *Queries) GetTeacherCountByEmailExcludingID(ctx context.Context, arg Get
 }
 
 const getTeacherCountByMobile = `-- name: GetTeacherCountByMobile :one
-SELECT COUNT(*) as count FROM tbl_teachers WHERE mobile_number = ?
+SELECT COUNT(*) as count FROM tbl_teachers WHERE mobile_number = ? AND deleted = 0
 `
 
 func (q *Queries) GetTeacherCountByMobile(ctx context.Context, mobileNumber string) (int64, error) {
@@ -312,7 +313,7 @@ func (q *Queries) GetTeacherCountByMobile(ctx context.Context, mobileNumber stri
 }
 
 const getTeacherCountByMobileExcludingID = `-- name: GetTeacherCountByMobileExcludingID :one
-SELECT COUNT(*) as count FROM tbl_teachers WHERE mobile_number = ? AND id != ?
+SELECT COUNT(*) as count FROM tbl_teachers WHERE mobile_number = ? AND id != ? AND deleted = 0
 `
 
 type GetTeacherCountByMobileExcludingIDParams struct {
@@ -328,7 +329,7 @@ func (q *Queries) GetTeacherCountByMobileExcludingID(ctx context.Context, arg Ge
 }
 
 const getTeacherFullByID = `-- name: GetTeacherFullByID :one
-SELECT id, name, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
+SELECT id, name, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted
 FROM tbl_teachers
 WHERE id = ?
 `
@@ -355,6 +356,7 @@ type GetTeacherFullByIDRow struct {
 	CreatedAt      sql.NullTime
 	UpdatedAt      sql.NullTime
 	Status         string
+	Deleted        int64
 }
 
 func (q *Queries) GetTeacherFullByID(ctx context.Context, id int64) (GetTeacherFullByIDRow, error) {
@@ -382,6 +384,7 @@ func (q *Queries) GetTeacherFullByID(ctx context.Context, id int64) (GetTeacherF
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Status,
+		&i.Deleted,
 	)
 	return i, err
 }
@@ -472,12 +475,12 @@ func (q *Queries) GetTeacherProfileByID(ctx context.Context, id int64) (GetTeach
 }
 
 const getTeachersFiltered = `-- name: GetTeachersFiltered :many
-SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
+SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted, deleted_at
 FROM tbl_teachers
 WHERE (? = '' OR name LIKE '%' || ? || '%')
   AND (? = '' OR status = ?)
   AND (? = '' OR email LIKE '%' || ? || '%')
-ORDER BY CASE status WHEN 'pending' THEN 0 ELSE 1 END, name ASC
+ORDER BY CASE WHEN deleted = 1 THEN 2 WHEN status = 'pending' THEN 0 ELSE 1 END, name ASC
 LIMIT ? OFFSET ?
 `
 
@@ -511,6 +514,8 @@ type GetTeachersFilteredRow struct {
 	CreatedAt      sql.NullTime
 	UpdatedAt      sql.NullTime
 	Status         string
+	Deleted        int64
+	DeletedAt      sql.NullTime
 }
 
 func (q *Queries) GetTeachersFiltered(ctx context.Context, arg GetTeachersFilteredParams) ([]GetTeachersFilteredRow, error) {
@@ -550,6 +555,8 @@ func (q *Queries) GetTeachersFiltered(ctx context.Context, arg GetTeachersFilter
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.Status,
+			&i.Deleted,
+			&i.DeletedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -612,8 +619,17 @@ func (q *Queries) InsertTeacher(ctx context.Context, arg InsertTeacherParams) er
 	return err
 }
 
+const softDeleteTeacher = `-- name: SoftDeleteTeacher :exec
+UPDATE tbl_teachers SET deleted = 1, deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending' AND deleted = 0
+`
+
+func (q *Queries) SoftDeleteTeacher(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, softDeleteTeacher, id)
+	return err
+}
+
 const unapproveTeacher = `-- name: UnapproveTeacher :exec
-UPDATE tbl_teachers SET status = 'pending', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'approved'
+UPDATE tbl_teachers SET status = 'pending', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'approved' AND deleted = 0
 `
 
 func (q *Queries) UnapproveTeacher(ctx context.Context, id int64) error {

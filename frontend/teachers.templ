@@ -34,10 +34,14 @@ type TeacherItem struct {
 	DriveUrl       string
 	Sex            string
 	Status         string
+	Deleted        bool
 	CreatedAt      string
 }
 
-func getTeacherRowClass(status string) string {
+func getTeacherRowClass(status string, deleted bool) string {
+	if deleted {
+		return "teacher-deleted"
+	}
 	if status == "pending" {
 		return "teacher-pending"
 	}
@@ -47,7 +51,17 @@ func getTeacherRowClass(status string) string {
 	return ""
 }
 
-func getTeacherStatusClass(status string) string {
+func getTeacherDisplayStatus(status string, deleted bool) string {
+	if deleted {
+		return "deleted"
+	}
+	return status
+}
+
+func getTeacherStatusClass(status string, deleted bool) string {
+	if deleted {
+		return "status-inactive"
+	}
 	if status == "approved" {
 		return "status-active"
 	}
@@ -146,7 +160,7 @@ templ Teachers(data TeacherData) {
 						</thead>
 						<tbody>
 							for _, teacher := range data.Teachers {
-								<tr class={ getTeacherRowClass(teacher.Status) }>
+								<tr class={ getTeacherRowClass(teacher.Status, teacher.Deleted) }>
 									<td data-label="Name">
 										<button
 											type="button"
@@ -156,7 +170,7 @@ templ Teachers(data TeacherData) {
 											hx-swap="innerHTML"
 										>{ teacher.Name }</button>
 									</td>
-									<td class={ getTeacherStatusClass(teacher.Status) } data-label="Status">{ teacher.Status }</td>
+									<td class={ getTeacherStatusClass(teacher.Status, teacher.Deleted) } data-label="Status">{ getTeacherDisplayStatus(teacher.Status, teacher.Deleted) }</td>
 									<td class="email-cell" data-label="Email">{ getDisplayValue(teacher.Email) }</td>
 									<td data-label="Mobile">{ getDisplayValue(teacher.MobileNumber) }</td>
 									<td data-label="Actions">
@@ -168,24 +182,34 @@ templ Teachers(data TeacherData) {
 												hx-target="#teacherViewModalHost"
 												hx-swap="innerHTML"
 											>View</button>
-											<a href={ utils.URL("/teachers/" + teacher.ID + "/edit") } class="edit-btn">Edit</a>
-											if teacher.Status == "pending" {
-												<button
-													type="button"
-													class="approve-btn"
-													hx-post={ utils.URL("/teachers/approve") }
-													hx-vals={ `{"id": "` + teacher.ID + `"}` }
-													hx-swap="none"
-												>Approve</button>
-											}
-											if teacher.Status == "approved" {
-												<button
-													type="button"
-													class="unapprove-btn"
-													hx-post={ utils.URL("/teachers/unapprove") }
-													hx-vals={ `{"id": "` + teacher.ID + `"}` }
-													hx-swap="none"
-												>Un-approve</button>
+											if !teacher.Deleted {
+												<a href={ utils.URL("/teachers/" + teacher.ID + "/edit") } class="edit-btn">Edit</a>
+												if teacher.Status == "pending" {
+													<button
+														type="button"
+														class="approve-btn"
+														hx-post={ utils.URL("/teachers/approve") }
+														hx-vals={ `{"id": "` + teacher.ID + `"}` }
+														hx-swap="none"
+													>Approve</button>
+													<button
+														type="button"
+														class="delete-btn"
+														hx-post={ utils.URL("/teachers/delete") }
+														hx-vals={ `{"id": "` + teacher.ID + `"}` }
+														hx-confirm="Delete this teacher?"
+														hx-swap="none"
+													>Delete</button>
+												}
+												if teacher.Status == "approved" {
+													<button
+														type="button"
+														class="unapprove-btn"
+														hx-post={ utils.URL("/teachers/unapprove") }
+														hx-vals={ `{"id": "` + teacher.ID + `"}` }
+														hx-swap="none"
+													>Un-approve</button>
+												}
 											}
 										</div>
 									</td>

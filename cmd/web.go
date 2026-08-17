@@ -264,6 +264,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/teachers", auth.RequireRole(auth.RoleSuperuser)(handleTeachers))
 		authMux.HandleFunc(basePath+"/teachers/approve", auth.RequireRole(auth.RoleSuperuser)(handleTeacherApprove))
 		authMux.HandleFunc(basePath+"/teachers/unapprove", auth.RequireRole(auth.RoleSuperuser)(handleTeacherUnapprove))
+		authMux.HandleFunc(basePath+"/teachers/delete", auth.RequireRole(auth.RoleSuperuser)(handleTeacherDelete))
 		authMux.HandleFunc(basePath+"/students/", auth.RequireRole(auth.RoleSuperuser)(handleStudentsPath))
 		authMux.HandleFunc(basePath+"/teachers/", auth.RequireRole(auth.RoleSuperuser)(handleTeachersPath))
 		authMux.HandleFunc(basePath+"/classes/", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClassesPath))
@@ -1234,6 +1235,48 @@ func handleTeacherUnapprove(w http.ResponseWriter, r *http.Request) {
 	}
 
 	setSuccessFlash(w, "Teacher set to pending.")
+	HttpRedirect(w, r, "/teachers")
+}
+
+func handleTeacherDelete(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
+		return
+	}
+
+	teacherID, err := requireInt64(r.FormValue("id"))
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	ctx := r.Context()
+	existing, err := dbRO.GetQueries().GetTeacherFullByID(ctx, teacherID)
+	if err != nil {
+		sendErrorLog(w, "Teacher not found")
+		return
+	}
+	if existing.Deleted != 0 {
+		sendErrorLog(w, "Teacher is already deleted")
+		return
+	}
+	if existing.Status != string(constants.TeacherStatusPending) {
+		sendErrorLog(w, "Only pending teachers can be deleted")
+		return
+	}
+
+	if err := dbRW.GetQueries().SoftDeleteTeacher(ctx, teacherID); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	insertAuditLog(ctx, "teachers", fmt.Sprintf("deleted teacher '%s' (id %d)", existing.Name, teacherID))
+	setSuccessFlash(w, "Teacher deleted successfully.")
 	HttpRedirect(w, r, "/teachers")
 }
 

@@ -130,6 +130,7 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 			DriveUrl:       t.DriveUrl,
 			Sex:            t.Sex.String,
 			Status:         t.Status,
+			Deleted:        t.Deleted != 0,
 			CreatedAt:      t.CreatedAt.Time.Format("2006-01-02 15:04:05"),
 		}
 	}
@@ -157,6 +158,10 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 
 	existing, err := dbRO.GetQueries().GetTeacherFullByID(ctx, teacherID)
 	if err != nil {
+		HttpError(w, "Teacher not found", http.StatusNotFound)
+		return
+	}
+	if existing.Deleted != 0 {
 		HttpError(w, "Teacher not found", http.StatusNotFound)
 		return
 	}

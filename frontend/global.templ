@@ -967,6 +967,10 @@ templ GlobalIncludes() {
 			background-color: var(--color-warning-bg) !important;
 		}
 
+		.teacher-deleted {
+			background-color: var(--color-error-bg) !important;
+		}
+
 		.copyable-cell {
 			display: flex;
 			align-items: center;
@@ -2340,12 +2344,20 @@ templ GlobalIncludes() {
 				background: var(--color-warning-bg);
 			}
 
+			.table-stack-mobile tbody tr.teacher-deleted {
+				background: var(--color-error-bg);
+			}
+
 			.table-stack-mobile tbody tr:hover {
 				background-color: var(--color-surface);
 			}
 
 			.table-stack-mobile tbody tr.teacher-pending:hover {
 				background: var(--color-warning-bg);
+			}
+
+			.table-stack-mobile tbody tr.teacher-deleted:hover {
+				background: var(--color-error-bg);
 			}
 
 			.table-stack-mobile td {
