@@ -175,6 +175,7 @@ templ Logout() {
 	<button
 		hx-post={ utils.URL("/auth/logout") }
 		hx-trigger="click"
+		hx-confirm="Log out?"
 	>
 		Logout
 	</button>

@@ -29,7 +29,7 @@ templ MyStudents(data MyStudentsData) {
 	<body>
 		<div class="container">
 			@HeaderSimple()
-			@HubHeader("My Students", "", "", false)
+			@HubHeader("My Students", "Register Student", utils.URL("/students/register"), true)
 
 			@ListFilterForm(data.FilterPath, data.Query, data.Status, "student", "", "", "", "", "", false, false, false, false, true)
 

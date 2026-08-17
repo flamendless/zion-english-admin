@@ -9,6 +9,20 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.08.17.4"
+    date: "2026-08-17"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Teachers can register new students from My Students with a simplified form; the student is automatically assigned to them."
+      - text: "The site root now shows a public landing page with an overview of admin features and a sign-in link."
+    improvements: []
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
   - version: "2026.08.17.3"
     date: "2026-08-17"
     released: true

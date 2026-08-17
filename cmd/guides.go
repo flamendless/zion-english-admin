@@ -21,7 +21,7 @@ func handleGuides(w http.ResponseWriter, r *http.Request) {
 			{
 				Slug:        "getting-started",
 				Title:       "Getting Started",
-				Description: "Learn the basics: profile, classes, schedule, and editing records.",
+				Description: "Learn the basics: profile, students, classes, schedule, and editing records.",
 				Audience:    "For teachers",
 			},
 		},

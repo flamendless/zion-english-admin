@@ -284,16 +284,23 @@ func GuideGettingStarted() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<div class=\"guides-hero\"><p class=\"guides-subtitle\">A quick walkthrough for teachers on profile settings, recording classes, planning your schedule, and editing past records.</p></div><div class=\"guide-content\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<div class=\"guides-hero\"><p class=\"guides-subtitle\">A quick walkthrough for teachers on profile settings, student registration, recording classes, planning your schedule, and editing past records.</p></div><div class=\"guide-content\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = GuideBetaCallout().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = GuideSection(
 			"My Profile",
 			utils.URL("/profile"),
-			"Update your mobile number or password.",
+			"Update your name, mobile number, or password.",
 			[]string{
 				"Open My Profile from the dashboard or navigation.",
+				"Scroll to the Name section.",
+				"Enter your first, middle (optional), and last name correctly — each field can only be set once.",
+				"Click Update name.",
 				"Scroll to the Mobile number section, enter your new number, and click Update mobile number. Changes are limited to once every 7 days.",
 				"Scroll to the Password section, enter your current password and a new strong password, then click Update password. Password changes are also limited to once every 7 days.",
 			},
@@ -302,15 +309,16 @@ func GuideGettingStarted() templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = GuideSection(
-			"My Classes",
-			utils.URL("/classes"),
-			"View your class history and record new classes.",
+			"Student Registration",
+			utils.URL("/students/register"),
+			"Register your assigned students with names that match your Google Sheets exactly.",
 			[]string{
-				"Open My Classes to see your recorded classes. Use the date range, status, and student filters to find specific entries.",
-				"Click Record Class in the page header to log a new class.",
-				"Select the student, date, start and end times, rate, and status (conducted, cancelled, or rescheduled).",
-				"If the status is cancelled or rescheduled, a reason is required before you can submit.",
-				"Click Record Class to save. A success message confirms the entry was added.",
+				"Open My Students from the dashboard, then click Register Student in the page header (or go directly to Register Student).",
+				"Enter the student name using the exact casing as in your Google Sheet (e.g. Kim Min-Ji, not kim min-ji). This is critical for matching records during processing.",
+				"Select currency and status (active or inactive).",
+				"Enter the rate per class and click Register Student.",
+				"You are automatically assigned as the student's teacher — no teacher picker is shown.",
+				"Confirm the new student appears in My Students before scheduling or recording classes.",
 			},
 		).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
@@ -326,6 +334,22 @@ func GuideGettingStarted() templ.Component {
 				"To add a class, choose the student, set start and end times, confirm the rate, and click Schedule Class.",
 				"Today's Classes lists everything scheduled for today. Use Conduct to record a class as completed, or Cancel to mark it cancelled.",
 				"Conduct and Cancel open the record form with details prefilled so you can finish quickly.",
+			},
+		).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = GuideSection(
+			"My Classes",
+			utils.URL("/classes"),
+			"View your class history and record new classes.",
+			[]string{
+				"Open My Classes to see your recorded classes. Use the date range, status, and student filters to find specific entries.",
+				"Click Record Class in the page header to log a new class.",
+				"Select the student, date, start and end times, rate, and status (conducted, cancelled, or rescheduled).",
+				"If the status is cancelled or rescheduled, a reason is required before you can submit.",
+				"Click Record Class to save. A success message confirms the entry was added.",
+				"During the beta phase, continue recording classes in your Google Sheet as well for auditing.",
 			},
 		).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
@@ -352,7 +376,7 @@ func GuideGettingStarted() templ.Component {
 		var templ_7745c5c3_Var11 templ.SafeURL
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/guides"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 150, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 168, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -367,6 +391,35 @@ func GuideGettingStarted() templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "All guides</a></div></div></body></html>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func GuideBetaCallout() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var12 == nil {
+			templ_7745c5c3_Var12 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<div class=\"guide-beta-card\" role=\"note\" aria-label=\"Beta testing instructions\"><span class=\"guide-beta-ribbon\" aria-hidden=\"true\">BETA</span><h2 class=\"guide-beta-title\">Early testing phase</h2><p class=\"guide-beta-intro\">Teachers, since this system is still in testing and early phase, please do the following:</p><ul class=\"guide-beta-list\"><li>Update your first, middle, and last names correctly</li><li>Register your students (use the exact casing from your Google Sheets)</li><li>Plot some class schedules for the upcoming week</li><li>Conduct/record all classes in the admin tool WHILE ALSO CONTINUING to record them in your Google Sheets for auditing</li></ul></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -390,38 +443,38 @@ func GuideSection(title string, href string, summary string, steps []string) tem
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var12 == nil {
-			templ_7745c5c3_Var12 = templ.NopComponent
+		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var13 == nil {
+			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<section class=\"guide-section\"><h2 class=\"guide-section-title\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<section class=\"guide-section\"><h2 class=\"guide-section-title\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var13 templ.SafeURL
-		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinURLErrs(href)
+		var templ_7745c5c3_Var14 templ.SafeURL
+		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinURLErrs(href)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 164, Col: 15}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" class=\"guide-section-link\" target=\"_blank\" rel=\"noopener noreferrer\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var14 string
-		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(title)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 169, Col: 11}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 198, Col: 15}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, " <span class=\"guide-external-icon\" aria-hidden=\"true\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\" class=\"guide-section-link\" target=\"_blank\" rel=\"noopener noreferrer\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var15 string
+		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(title)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 203, Col: 11}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, " <span class=\"guide-external-icon\" aria-hidden=\"true\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -429,43 +482,43 @@ func GuideSection(title string, href string, summary string, steps []string) tem
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</span></a></h2><p class=\"guide-section-summary\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</span></a></h2><p class=\"guide-section-summary\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var15 string
-		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(summary)
+		var templ_7745c5c3_Var16 string
+		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(summary)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 175, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 209, Col: 44}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</p><ol class=\"guide-steps\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</p><ol class=\"guide-steps\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, step := range steps {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<li>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<li>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var16 string
-			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(step)
+			var templ_7745c5c3_Var17 string
+			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(step)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 178, Col: 14}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 212, Col: 14}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</li>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</li>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</ol></section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</ol></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -489,12 +542,12 @@ func GuideStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var17 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var17 == nil {
-			templ_7745c5c3_Var17 = templ.NopComponent
+		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var18 == nil {
+			templ_7745c5c3_Var18 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<style>\r\n\t\t.guides-page {\r\n\t\t\tpadding-bottom: var(--space-10);\r\n\t\t}\r\n\r\n\t\t.guides-hero {\r\n\t\t\tmargin-bottom: var(--space-6);\r\n\t\t\tmax-width: 42rem;\r\n\t\t}\r\n\r\n\t\t.guides-subtitle {\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 1rem;\r\n\t\t\tline-height: 1.625;\r\n\t\t}\r\n\r\n\t\t.guides-empty {\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 1rem;\r\n\t\t\tline-height: 1.625;\r\n\t\t}\r\n\r\n\t\t.guides-grid {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: repeat(auto-fill, minmax(280px, 1fr));\r\n\t\t\tgap: var(--space-4);\r\n\t\t\tmax-width: 52rem;\r\n\t\t}\r\n\r\n\t\t.guide-card {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tgap: var(--space-4);\r\n\t\t\tpadding: var(--space-5);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\ttext-decoration: none;\r\n\t\t\tcolor: inherit;\r\n\t\t\tcursor: pointer;\r\n\t\t\ttransition:\r\n\t\t\t\tborder-color var(--transition-fast),\r\n\t\t\t\tbox-shadow var(--transition-fast),\r\n\t\t\t\ttransform var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.guide-card:hover {\r\n\t\t\tborder-color: var(--color-primary);\r\n\t\t\tbox-shadow: var(--shadow-md);\r\n\t\t\ttransform: translateY(-2px);\r\n\t\t}\r\n\r\n\t\t.guide-card:focus-visible {\r\n\t\t\toutline: 2px solid var(--color-ring);\r\n\t\t\toutline-offset: 2px;\r\n\t\t}\r\n\r\n\t\t.guide-card-icon {\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 44px;\r\n\t\t\theight: 44px;\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-primary-light);\r\n\t\t\tcolor: var(--color-primary-hover);\r\n\t\t}\r\n\r\n\t\t.guide-card-body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-1);\r\n\t\t\tflex: 1;\r\n\t\t\tmin-width: 0;\r\n\t\t}\r\n\r\n\t\t.guide-card-audience {\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.guide-card-title {\r\n\t\t\tfont-size: 1.0625rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tline-height: 1.35;\r\n\t\t}\r\n\r\n\t\t.guide-card-desc {\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tline-height: 1.5;\r\n\t\t}\r\n\r\n\t\t.guide-card-arrow {\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\talign-self: center;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\ttransition: color var(--transition-fast), transform var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.guide-card:hover .guide-card-arrow {\r\n\t\t\tcolor: var(--color-primary-hover);\r\n\t\t\ttransform: translateX(2px);\r\n\t\t}\r\n\r\n\t\t.guides-breadcrumb {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tline-height: 1.5;\r\n\t\t}\r\n\r\n\t\t.guides-breadcrumb-link {\r\n\t\t\tcolor: var(--color-primary-hover);\r\n\t\t\ttext-decoration: none;\r\n\t\t\ttransition: color var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.guides-breadcrumb-link:hover {\r\n\t\t\tcolor: var(--color-primary);\r\n\t\t\ttext-decoration: underline;\r\n\t\t}\r\n\r\n\t\t.guides-breadcrumb-sep {\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.guides-breadcrumb-current {\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.guide-content {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-6);\r\n\t\t\tmax-width: 48rem;\r\n\t\t}\r\n\r\n\t\t.guide-section {\r\n\t\t\tpadding: var(--space-5);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t}\r\n\r\n\t\t.guide-section-title {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 1.25rem;\r\n\t\t\tline-height: 1.35;\r\n\t\t}\r\n\r\n\t\t.guide-section-link {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tcolor: var(--color-primary-hover);\r\n\t\t\ttext-decoration: none;\r\n\t\t\ttransition: color var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.guide-section-link:hover {\r\n\t\t\tcolor: var(--color-primary);\r\n\t\t\ttext-decoration: underline;\r\n\t\t}\r\n\r\n\t\t.guide-section-link:focus-visible {\r\n\t\t\toutline: 2px solid var(--color-ring);\r\n\t\t\toutline-offset: 2px;\r\n\t\t\tborder-radius: var(--radius-sm);\r\n\t\t}\r\n\r\n\t\t.guide-external-icon {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\topacity: 0.75;\r\n\t\t}\r\n\r\n\t\t.guide-section-summary {\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tline-height: 1.625;\r\n\t\t}\r\n\r\n\t\t.guide-steps {\r\n\t\t\tmargin-top: var(--space-4);\r\n\t\t\tpadding-left: 1.25rem;\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.guide-steps li {\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tline-height: 1.625;\r\n\t\t}\r\n\r\n\t\t.guides-footer-nav {\r\n\t\t\tmargin-top: var(--space-8);\r\n\t\t\tmax-width: 48rem;\r\n\t\t}\r\n\r\n\t\t.guides-back-link {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\tcolor: var(--color-primary-hover);\r\n\t\t\ttext-decoration: none;\r\n\t\t\tcursor: pointer;\r\n\t\t\ttransition: color var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.guides-back-link:hover {\r\n\t\t\tcolor: var(--color-primary);\r\n\t\t\ttext-decoration: underline;\r\n\t\t}\r\n\r\n\t\t.guides-back-link:focus-visible {\r\n\t\t\toutline: 2px solid var(--color-ring);\r\n\t\t\toutline-offset: 2px;\r\n\t\t\tborder-radius: var(--radius-sm);\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<style>\r\n\t\t.guides-page {\r\n\t\t\tpadding-bottom: var(--space-10);\r\n\t\t}\r\n\r\n\t\t.guides-hero {\r\n\t\t\tmargin-bottom: var(--space-6);\r\n\t\t\tmax-width: 42rem;\r\n\t\t}\r\n\r\n\t\t.guides-subtitle {\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 1rem;\r\n\t\t\tline-height: 1.625;\r\n\t\t}\r\n\r\n\t\t.guides-empty {\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 1rem;\r\n\t\t\tline-height: 1.625;\r\n\t\t}\r\n\r\n\t\t.guides-grid {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: repeat(auto-fill, minmax(280px, 1fr));\r\n\t\t\tgap: var(--space-4);\r\n\t\t\tmax-width: 52rem;\r\n\t\t}\r\n\r\n\t\t.guide-card {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tgap: var(--space-4);\r\n\t\t\tpadding: var(--space-5);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\ttext-decoration: none;\r\n\t\t\tcolor: inherit;\r\n\t\t\tcursor: pointer;\r\n\t\t\ttransition:\r\n\t\t\t\tborder-color var(--transition-fast),\r\n\t\t\t\tbox-shadow var(--transition-fast),\r\n\t\t\t\ttransform var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.guide-card:hover {\r\n\t\t\tborder-color: var(--color-primary);\r\n\t\t\tbox-shadow: var(--shadow-md);\r\n\t\t\ttransform: translateY(-2px);\r\n\t\t}\r\n\r\n\t\t.guide-card:focus-visible {\r\n\t\t\toutline: 2px solid var(--color-ring);\r\n\t\t\toutline-offset: 2px;\r\n\t\t}\r\n\r\n\t\t.guide-card-icon {\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 44px;\r\n\t\t\theight: 44px;\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-primary-light);\r\n\t\t\tcolor: var(--color-primary-hover);\r\n\t\t}\r\n\r\n\t\t.guide-card-body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-1);\r\n\t\t\tflex: 1;\r\n\t\t\tmin-width: 0;\r\n\t\t}\r\n\r\n\t\t.guide-card-audience {\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.guide-card-title {\r\n\t\t\tfont-size: 1.0625rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tline-height: 1.35;\r\n\t\t}\r\n\r\n\t\t.guide-card-desc {\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tline-height: 1.5;\r\n\t\t}\r\n\r\n\t\t.guide-card-arrow {\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\talign-self: center;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\ttransition: color var(--transition-fast), transform var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.guide-card:hover .guide-card-arrow {\r\n\t\t\tcolor: var(--color-primary-hover);\r\n\t\t\ttransform: translateX(2px);\r\n\t\t}\r\n\r\n\t\t.guides-breadcrumb {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tline-height: 1.5;\r\n\t\t}\r\n\r\n\t\t.guides-breadcrumb-link {\r\n\t\t\tcolor: var(--color-primary-hover);\r\n\t\t\ttext-decoration: none;\r\n\t\t\ttransition: color var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.guides-breadcrumb-link:hover {\r\n\t\t\tcolor: var(--color-primary);\r\n\t\t\ttext-decoration: underline;\r\n\t\t}\r\n\r\n\t\t.guides-breadcrumb-sep {\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.guides-breadcrumb-current {\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.guide-content {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-6);\r\n\t\t\tmax-width: 48rem;\r\n\t\t}\r\n\r\n\t\t.guide-beta-card {\r\n\t\t\tposition: relative;\r\n\t\t\toverflow: hidden;\r\n\t\t\tpadding: var(--space-5);\r\n\t\t\tborder: 1px solid var(--color-accent);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t}\r\n\r\n\t\t.guide-beta-ribbon {\r\n\t\t\tposition: absolute;\r\n\t\t\ttop: 14px;\r\n\t\t\tright: -34px;\r\n\t\t\twidth: 120px;\r\n\t\t\tpadding: var(--space-1) 0;\r\n\t\t\tbackground: var(--color-warning-bg);\r\n\t\t\tcolor: #7A4E00;\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\ttext-align: center;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.06em;\r\n\t\t\ttransform: rotate(45deg);\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t}\r\n\r\n\t\t.guide-beta-title {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 1.25rem;\r\n\t\t\tline-height: 1.35;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.guide-beta-intro {\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tline-height: 1.625;\r\n\t\t}\r\n\r\n\t\t.guide-beta-list {\r\n\t\t\tmargin-top: var(--space-4);\r\n\t\t\tpadding-left: 1.25rem;\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.guide-beta-list li {\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tline-height: 1.625;\r\n\t\t}\r\n\r\n\t\t.guide-section {\r\n\t\t\tpadding: var(--space-5);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t}\r\n\r\n\t\t.guide-section-title {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 1.25rem;\r\n\t\t\tline-height: 1.35;\r\n\t\t}\r\n\r\n\t\t.guide-section-link {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tcolor: var(--color-primary-hover);\r\n\t\t\ttext-decoration: none;\r\n\t\t\ttransition: color var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.guide-section-link:hover {\r\n\t\t\tcolor: var(--color-primary);\r\n\t\t\ttext-decoration: underline;\r\n\t\t}\r\n\r\n\t\t.guide-section-link:focus-visible {\r\n\t\t\toutline: 2px solid var(--color-ring);\r\n\t\t\toutline-offset: 2px;\r\n\t\t\tborder-radius: var(--radius-sm);\r\n\t\t}\r\n\r\n\t\t.guide-external-icon {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\topacity: 0.75;\r\n\t\t}\r\n\r\n\t\t.guide-section-summary {\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tline-height: 1.625;\r\n\t\t}\r\n\r\n\t\t.guide-steps {\r\n\t\t\tmargin-top: var(--space-4);\r\n\t\t\tpadding-left: 1.25rem;\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.guide-steps li {\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tline-height: 1.625;\r\n\t\t}\r\n\r\n\t\t.guides-footer-nav {\r\n\t\t\tmargin-top: var(--space-8);\r\n\t\t\tmax-width: 48rem;\r\n\t\t}\r\n\r\n\t\t.guides-back-link {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\tcolor: var(--color-primary-hover);\r\n\t\t\ttext-decoration: none;\r\n\t\t\tcursor: pointer;\r\n\t\t\ttransition: color var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.guides-back-link:hover {\r\n\t\t\tcolor: var(--color-primary);\r\n\t\t\ttext-decoration: underline;\r\n\t\t}\r\n\r\n\t\t.guides-back-link:focus-visible {\r\n\t\t\toutline: 2px solid var(--color-ring);\r\n\t\t\toutline-offset: 2px;\r\n\t\t\tborder-radius: var(--radius-sm);\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -518,12 +571,12 @@ func GuideBookIcon() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var18 == nil {
-			templ_7745c5c3_Var18 = templ.NopComponent
+		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var19 == nil {
+			templ_7745c5c3_Var19 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 19.5A2.5 2.5 0 0 1 6.5 17H20\"></path> <path d=\"M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z\"></path></svg>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 19.5A2.5 2.5 0 0 1 6.5 17H20\"></path> <path d=\"M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z\"></path></svg>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -547,12 +600,12 @@ func GuideArrowIcon() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var19 == nil {
-			templ_7745c5c3_Var19 = templ.NopComponent
+		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var20 == nil {
+			templ_7745c5c3_Var20 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path> <path d=\"m12 5 7 7-7 7\"></path></svg>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"></path> <path d=\"m12 5 7 7-7 7\"></path></svg>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -576,12 +629,12 @@ func GuideBackIcon() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var20 == nil {
-			templ_7745c5c3_Var20 = templ.NopComponent
+		templ_7745c5c3_Var21 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var21 == nil {
+			templ_7745c5c3_Var21 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m15 18-6-6 6-6\"></path></svg>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m15 18-6-6 6-6\"></path></svg>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -605,12 +658,12 @@ func GuideExternalIcon() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var21 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var21 == nil {
-			templ_7745c5c3_Var21 = templ.NopComponent
+		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var22 == nil {
+			templ_7745c5c3_Var22 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6\"></path> <polyline points=\"15 3 21 3 21 9\"></polyline> <line x1=\"10\" y1=\"14\" x2=\"21\" y2=\"3\"></line></svg>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6\"></path> <polyline points=\"15 3 21 3 21 9\"></polyline> <line x1=\"10\" y1=\"14\" x2=\"21\" y2=\"3\"></line></svg>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -2,7 +2,11 @@ package frontend
 
 import "zion-english/internal/utils"
 
-templ RegisterStudent() {
+type RegisterStudentData struct {
+	IsSuperuser bool
+}
+
+templ RegisterStudent(data RegisterStudentData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
@@ -31,11 +35,13 @@ templ RegisterStudent() {
 					@StudentStatusDropdown()
 				</div>
 
-				<div class="form-group">
-					<label for="contact">Contact</label>
-					<input type="text" id="contact" name="contact"
-					       placeholder="Enter contact information">
-				</div>
+				if data.IsSuperuser {
+					<div class="form-group">
+						<label for="contact">Contact</label>
+						<input type="text" id="contact" name="contact"
+						       placeholder="Enter contact information">
+					</div>
+				}
 
 				<div class="form-group">
 					<label for="ratePerClass">Rate Per Class *</label>
@@ -43,39 +49,41 @@ templ RegisterStudent() {
 					       step="0.01" min="0" placeholder="0.00">
 				</div>
 
-				<div class="form-group">
-					<label for="parentName">Parent's Name</label>
-					<input type="text" id="parentName" name="parentName"
-					       placeholder="Enter parent's name">
-				</div>
+				if data.IsSuperuser {
+					<div class="form-group">
+						<label for="parentName">Parent's Name</label>
+						<input type="text" id="parentName" name="parentName"
+						       placeholder="Enter parent's name">
+					</div>
 
-				<div class="form-group">
-					<label>Related To</label>
-					<div class="form-row">
-						<div class="form-group">
-							<label for="relationship">Relationship</label>
-							<input type="text" id="relationship" name="relationship"
-							       placeholder="siblings">
+					<div class="form-group">
+						<label>Related To</label>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="relationship">Relationship</label>
+								<input type="text" id="relationship" name="relationship"
+								       placeholder="siblings">
+							</div>
+							@StudentSearchbox()
 						</div>
-						@StudentSearchbox()
 					</div>
-				</div>
 
-				@TeacherAssignRows(nil)
+					@TeacherAssignRows(nil)
 
-				<div class="form-group">
-					<label for="assignedColor">Assigned Color *</label>
-					<div class="color-group">
-						<input type="color" id="assignedColor" name="assignedColor" required
-						       value="#90C020"
-							_="
-								on input
-									set #colorPreview.style.backgroundColor to me.value
-								end
-							">
-						<div class="color-preview" id="colorPreview" style="background-color: #90C020;"></div>
+					<div class="form-group">
+						<label for="assignedColor">Assigned Color *</label>
+						<div class="color-group">
+							<input type="color" id="assignedColor" name="assignedColor" required
+							       value="#90C020"
+								_="
+									on input
+										set #colorPreview.style.backgroundColor to me.value
+									end
+								">
+							<div class="color-preview" id="colorPreview" style="background-color: #90C020;"></div>
+						</div>
 					</div>
-				</div>
+				}
 
 				<button type="submit" id="submitBtn" hx-indicator="Registering student...">Register Student</button>
 			</form>

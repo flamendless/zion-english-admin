@@ -94,31 +94,36 @@ templ GuideGettingStarted() {
 
 			<div class="guides-hero">
 				<p class="guides-subtitle">
-					A quick walkthrough for teachers on profile settings, recording classes, planning your schedule, and editing past records.
+					A quick walkthrough for teachers on profile settings, student registration, recording classes, planning your schedule, and editing past records.
 				</p>
 			</div>
 
 			<div class="guide-content">
+				@GuideBetaCallout()
 				@GuideSection(
 					"My Profile",
 					utils.URL("/profile"),
-					"Update your mobile number or password.",
+					"Update your name, mobile number, or password.",
 					[]string{
 						"Open My Profile from the dashboard or navigation.",
+						"Scroll to the Name section.",
+						"Enter your first, middle (optional), and last name correctly — each field can only be set once.",
+						"Click Update name.",
 						"Scroll to the Mobile number section, enter your new number, and click Update mobile number. Changes are limited to once every 7 days.",
 						"Scroll to the Password section, enter your current password and a new strong password, then click Update password. Password changes are also limited to once every 7 days.",
 					},
 				)
 				@GuideSection(
-					"My Classes",
-					utils.URL("/classes"),
-					"View your class history and record new classes.",
+					"Student Registration",
+					utils.URL("/students/register"),
+					"Register your assigned students with names that match your Google Sheets exactly.",
 					[]string{
-						"Open My Classes to see your recorded classes. Use the date range, status, and student filters to find specific entries.",
-						"Click Record Class in the page header to log a new class.",
-						"Select the student, date, start and end times, rate, and status (conducted, cancelled, or rescheduled).",
-						"If the status is cancelled or rescheduled, a reason is required before you can submit.",
-						"Click Record Class to save. A success message confirms the entry was added.",
+						"Open My Students from the dashboard, then click Register Student in the page header (or go directly to Register Student).",
+						"Enter the student name using the exact casing as in your Google Sheet (e.g. Kim Min-Ji, not kim min-ji). This is critical for matching records during processing.",
+						"Select currency and status (active or inactive).",
+						"Enter the rate per class and click Register Student.",
+						"You are automatically assigned as the student's teacher — no teacher picker is shown.",
+						"Confirm the new student appears in My Students before scheduling or recording classes.",
 					},
 				)
 				@GuideSection(
@@ -131,6 +136,19 @@ templ GuideGettingStarted() {
 						"To add a class, choose the student, set start and end times, confirm the rate, and click Schedule Class.",
 						"Today's Classes lists everything scheduled for today. Use Conduct to record a class as completed, or Cancel to mark it cancelled.",
 						"Conduct and Cancel open the record form with details prefilled so you can finish quickly.",
+					},
+				)
+				@GuideSection(
+					"My Classes",
+					utils.URL("/classes"),
+					"View your class history and record new classes.",
+					[]string{
+						"Open My Classes to see your recorded classes. Use the date range, status, and student filters to find specific entries.",
+						"Click Record Class in the page header to log a new class.",
+						"Select the student, date, start and end times, rate, and status (conducted, cancelled, or rescheduled).",
+						"If the status is cancelled or rescheduled, a reason is required before you can submit.",
+						"Click Record Class to save. A success message confirms the entry was added.",
+						"During the beta phase, continue recording classes in your Google Sheet as well for auditing.",
 					},
 				)
 				@GuideSection(
@@ -155,6 +173,22 @@ templ GuideGettingStarted() {
 		</div>
 	</body>
 	</html>
+}
+
+templ GuideBetaCallout() {
+	<div class="guide-beta-card" role="note" aria-label="Beta testing instructions">
+		<span class="guide-beta-ribbon" aria-hidden="true">BETA</span>
+		<h2 class="guide-beta-title">Early testing phase</h2>
+		<p class="guide-beta-intro">
+			Teachers, since this system is still in testing and early phase, please do the following:
+		</p>
+		<ul class="guide-beta-list">
+			<li>Update your first, middle, and last names correctly</li>
+			<li>Register your students (use the exact casing from your Google Sheets)</li>
+			<li>Plot some class schedules for the upcoming week</li>
+			<li>Conduct/record all classes in the admin tool WHILE ALSO CONTINUING to record them in your Google Sheets for auditing</li>
+		</ul>
+	</div>
 }
 
 templ GuideSection(title string, href string, summary string, steps []string) {
@@ -330,6 +364,61 @@ templ GuideStyles() {
 			flex-direction: column;
 			gap: var(--space-6);
 			max-width: 48rem;
+		}
+
+		.guide-beta-card {
+			position: relative;
+			overflow: hidden;
+			padding: var(--space-5);
+			border: 1px solid var(--color-accent);
+			border-radius: var(--radius-lg);
+			background: var(--color-surface);
+			box-shadow: var(--shadow-sm);
+		}
+
+		.guide-beta-ribbon {
+			position: absolute;
+			top: 14px;
+			right: -34px;
+			width: 120px;
+			padding: var(--space-1) 0;
+			background: var(--color-warning-bg);
+			color: #7A4E00;
+			font-size: 0.6875rem;
+			font-weight: 700;
+			text-align: center;
+			text-transform: uppercase;
+			letter-spacing: 0.06em;
+			transform: rotate(45deg);
+			box-shadow: var(--shadow-sm);
+		}
+
+		.guide-beta-title {
+			margin: 0;
+			font-size: 1.25rem;
+			line-height: 1.35;
+			color: var(--color-foreground);
+		}
+
+		.guide-beta-intro {
+			margin-top: var(--space-2);
+			color: var(--color-muted-foreground);
+			font-size: 0.9375rem;
+			line-height: 1.625;
+		}
+
+		.guide-beta-list {
+			margin-top: var(--space-4);
+			padding-left: 1.25rem;
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-3);
+		}
+
+		.guide-beta-list li {
+			color: var(--color-foreground);
+			font-size: 0.9375rem;
+			line-height: 1.625;
 		}
 
 		.guide-section {

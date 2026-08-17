@@ -88,10 +88,9 @@ var cmdWeb = &cobra.Command{
 		)
 
 		authMux := http.NewServeMux()
-		authMux.HandleFunc(basePath, auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleHome))
-		authMux.HandleFunc(basePath+"/", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleHome))
+		authMux.HandleFunc(basePath+"/dashboard", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleHome))
 		authMux.HandleFunc(basePath+"/students", auth.RequireRole(auth.RoleSuperuser)(handleStudents))
-		authMux.HandleFunc(basePath+"/students/register", auth.RequireRole(auth.RoleSuperuser)(handleStudentRegister))
+		authMux.HandleFunc(basePath+"/students/register", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleStudentRegister))
 		authMux.HandleFunc(basePath+"/teachers", auth.RequireRole(auth.RoleSuperuser)(handleTeachers))
 		authMux.HandleFunc(basePath+"/teachers/approve", auth.RequireRole(auth.RoleSuperuser)(handleTeacherApprove))
 		authMux.HandleFunc(basePath+"/teachers/unapprove", auth.RequireRole(auth.RoleSuperuser)(handleTeacherUnapprove))
@@ -139,12 +138,16 @@ var cmdWeb = &cobra.Command{
 		rootMux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, basePath, http.StatusFound)
 		})
+		rootMux.HandleFunc(basePath, handleLanding)
+		rootMux.HandleFunc(basePath+"/", func(w http.ResponseWriter, r *http.Request) {
+			http.Redirect(w, r, basePath, http.StatusMovedPermanently)
+		})
 		rootMux.Handle(basePath+"/auth/", publicMux)
 		rootMux.Handle(basePath+"/static/", publicMux)
 		rootMux.Handle(basePath+"/teachers/register", publicMux)
 
 		// protected routes
-		rootMux.Handle(basePath, authHandler)
+		rootMux.Handle(basePath+"/dashboard", authHandler)
 		rootMux.Handle(basePath+"/logs", authHandler)
 		rootMux.Handle(basePath+"/changelogs", authHandler)
 		rootMux.Handle(basePath+"/guides", authHandler)
@@ -691,14 +694,26 @@ func formatStudentRelationships(rels []queries.GetAllStudentRelationshipsRow) st
 }
 
 func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	user := auth.GetUser(ctx)
+	role := auth.GetRole(ctx)
+	isSuperuser := role == auth.RoleSuperuser
+
 	if r.Method == http.MethodGet {
 		w.Header().Set("Content-Type", "text/html")
-		frontend.RegisterStudent().Render(r.Context(), w)
+		frontend.RegisterStudent(frontend.RegisterStudentData{
+			IsSuperuser: isSuperuser,
+		}).Render(ctx, w)
 		return
 	}
 
 	if r.Method != http.MethodPost {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if role == auth.RoleTeacher && user.ID == 0 {
+		HttpError(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
@@ -715,31 +730,46 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	teacherIDs, err := parseAssignedTeacherIDs(r.Context(), dbRO.GetQueries(), r.Form["teachers"])
-	if err != nil {
-		sendErrorLog(w, err.Error())
-		return
-	}
-
-	relatedStudentID := int64(0)
-	if relatedStudentValue := r.FormValue("relatedStudentId"); relatedStudentValue != "" {
-		relatedStudentID, err = strconv.ParseInt(relatedStudentValue, 10, 64)
+	var teacherIDs []int64
+	if isSuperuser {
+		teacherIDs, err = parseAssignedTeacherIDs(ctx, dbRO.GetQueries(), r.Form["teachers"])
 		if err != nil {
-			sendErrorLog(w, "invalid related student")
+			sendErrorLog(w, err.Error())
+			return
+		}
+	} else {
+		teacherIDs, err = parseAssignedTeacherIDs(ctx, dbRO.GetQueries(), []string{strconv.FormatInt(user.ID, 10)})
+		if err != nil {
+			sendErrorLog(w, err.Error())
 			return
 		}
 	}
 
+	relatedStudentID := int64(0)
+	if isSuperuser {
+		if relatedStudentValue := r.FormValue("relatedStudentId"); relatedStudentValue != "" {
+			relatedStudentID, err = strconv.ParseInt(relatedStudentValue, 10, 64)
+			if err != nil {
+				sendErrorLog(w, "invalid related student")
+				return
+			}
+		}
+	}
+
 	req := models.StudentRegisterRequest{
-		Name:             r.FormValue("name"),
-		Currency:         r.FormValue("currency"),
-		Contact:          r.FormValue("contact"),
-		RatePerClass:     ratePerClass,
-		ParentName:       r.FormValue("parentName"),
-		AssignedColor:    r.FormValue("assignedColor"),
-		Status:           r.FormValue("status"),
-		Relationship:     r.FormValue("relationship"),
-		RelatedStudentID: relatedStudentID,
+		Name:         r.FormValue("name"),
+		Currency:     r.FormValue("currency"),
+		RatePerClass: ratePerClass,
+		Status:       r.FormValue("status"),
+	}
+	if isSuperuser {
+		req.Contact = r.FormValue("contact")
+		req.ParentName = r.FormValue("parentName")
+		req.AssignedColor = r.FormValue("assignedColor")
+		req.Relationship = r.FormValue("relationship")
+		req.RelatedStudentID = relatedStudentID
+	} else {
+		req.AssignedColor = "#90C020"
 	}
 
 	if err := validateStudentRequest(&req); err != nil {
@@ -1321,11 +1351,21 @@ func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleLanding(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if err := frontend.Landing().Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func handleLogin(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Handle Login]"
 	if user, loggedIn := auth.UserFromRequest(r, conf.Conf()); loggedIn {
 		if auth.SessionUserValid(r.Context(), dbRO.GetQueries(), user) {
-			HttpRedirect(w, r, "/")
+			HttpRedirect(w, r, "/dashboard")
 			return
 		}
 		auth.ClearSession(w)
@@ -1391,7 +1431,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	HttpRedirect(w, r, "/")
+	HttpRedirect(w, r, "/dashboard")
 }
 
 const passwordResetTokenTTL = 30 * time.Minute
@@ -1451,7 +1491,7 @@ func handleForgotPassword(w http.ResponseWriter, r *http.Request) {
 
 	if user, loggedIn := auth.UserFromRequest(r, conf.Conf()); loggedIn {
 		if auth.SessionUserValid(ctx, dbRO.GetQueries(), user) {
-			HttpRedirect(w, r, "/")
+			HttpRedirect(w, r, "/dashboard")
 			return
 		}
 		auth.ClearSession(w)
@@ -1550,7 +1590,7 @@ func handleResetPassword(w http.ResponseWriter, r *http.Request) {
 
 	if user, loggedIn := auth.UserFromRequest(r, conf.Conf()); loggedIn {
 		if auth.SessionUserValid(ctx, dbRO.GetQueries(), user) {
-			HttpRedirect(w, r, "/")
+			HttpRedirect(w, r, "/dashboard")
 			return
 		}
 		auth.ClearSession(w)
