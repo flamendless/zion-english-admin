@@ -50,7 +50,7 @@ templ SystemLogs(data SystemLogData) {
 				@HubHeader("Logs", "", "", false)
 			}
 
-			@ListFilterForm(data.FilterPath, data.Query, "", "", "", data.Module, data.StartDate, data.EndDate, false, false, true, true, false)
+			@ListFilterForm(data.FilterPath, data.Query, "", "", "", "", data.Module, data.StartDate, data.EndDate, false, false, true, true, false)
 
 			if len(data.Logs) > 0 {
 				<div class="table-wrapper">

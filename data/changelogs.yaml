@@ -9,6 +9,22 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.08.17.1"
+    date: "2026-08-17"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Superusers can delete pending teacher registrations from the teachers list; deleted teachers remain visible with a deleted status."
+        commit: "19b142b"
+    improvements: []
+    bug_fixes:
+      - text: "Fixed the teachers list status filter showing student and class status options instead of pending and approved."
+      - text: "Fixed an issue where approving, un-approving, or deleting a teacher reset the list to page one and cleared your filters."
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
   - version: "2026.08.17"
     date: "2026-08-17"
     released: true

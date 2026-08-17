@@ -41,6 +41,24 @@ func TestIsBlank(t *testing.T) {
 	}
 }
 
+func TestNormalizeEmail(t *testing.T) {
+	tests := []struct {
+		in   string
+		want string
+	}{
+		{"", ""},
+		{"  Foo@Bar.COM  ", "foo@bar.com"},
+		{"teacher@example.com", "teacher@example.com"},
+	}
+
+	for _, tt := range tests {
+		got := NormalizeEmail(tt.in)
+		if got != tt.want {
+			t.Fatalf("NormalizeEmail(%q) = %q, want %q", tt.in, got, tt.want)
+		}
+	}
+}
+
 func TestComposePersonName(t *testing.T) {
 	tests := []struct {
 		first  string

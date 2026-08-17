@@ -100,7 +100,7 @@ func handleScheduleCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	insertAuditLog(ctx, "schedule", fmt.Sprintf("scheduled class for student id %d (teacher id %d, date %s)", req.StudentID, req.TeacherID, req.ScheduledDate))
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("scheduled class for student id %d (teacher id %d, date %s)", req.StudentID, req.TeacherID, req.ScheduledDate))
 
 	if _, err := fmt.Fprint(w, "Class scheduled successfully!\n"); err != nil {
 		sendErrorLog(w, err.Error())
@@ -251,7 +251,7 @@ func handleCancelScheduledClass(w http.ResponseWriter, r *http.Request, schedule
 		return
 	}
 
-	insertAuditLog(ctx, "schedule", fmt.Sprintf("cancelled scheduled class id %d (student id %d, date %s)", scheduleID, existing.StudentID, existing.ScheduledDate))
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("cancelled scheduled class id %d (student id %d, date %s)", scheduleID, existing.StudentID, existing.ScheduledDate))
 
 	if _, err := fmt.Fprint(w, "Class cancelled.\n"); err != nil {
 		sendErrorLog(w, err.Error())
@@ -326,7 +326,7 @@ func handleRescheduleScheduledClass(w http.ResponseWriter, r *http.Request, sche
 		return
 	}
 
-	insertAuditLog(ctx, "schedule", fmt.Sprintf("rescheduled class id %d from %s to %s", scheduleID, existing.ScheduledDate, newDate))
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("rescheduled class id %d from %s to %s", scheduleID, existing.ScheduledDate, newDate))
 
 	if _, err := fmt.Fprint(w, "Class rescheduled.\n"); err != nil {
 		sendErrorLog(w, err.Error())

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"zion-english/frontend"
+	"zion-english/internal/auth"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/utils"
 )
@@ -250,7 +251,7 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		return
 	}
 
-	insertAuditLog(ctx, "teachers", fmt.Sprintf("updated teacher '%s' (id %d)", req.Name, teacherID))
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "teachers", fmt.Sprintf("updated teacher '%s' (id %d)", req.Name, teacherID))
 
 	if _, err := fmt.Fprint(w, "Teacher updated successfully!\n"); err != nil {
 		sendErrorLog(w, err.Error())

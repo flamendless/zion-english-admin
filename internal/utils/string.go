@@ -24,6 +24,10 @@ func IsBlank(s string) bool {
 	return strings.TrimSpace(s) == ""
 }
 
+func NormalizeEmail(email string) string {
+	return strings.ToLower(strings.TrimSpace(email))
+}
+
 // ProfileNameEditable reports whether a teacher may set this name field on their profile.
 // It checks the raw stored database value only; display placeholders such as "-" are never used.
 func ProfileNameEditable(stored string) bool {

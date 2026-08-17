@@ -34,168 +34,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func requireFloat64(n string) (float64, error) {
-	if n == "" {
-		return 0, errors.New("missing numeric value")
-	}
-	v, err := strconv.ParseFloat(n, 64)
-	if err != nil {
-		return 0, fmt.Errorf("invalid number: %s", n)
-	}
-	return v, nil
-}
-
-func requireInt64(n string) (int64, error) {
-	if n == "" {
-		return 0, errors.New("missing integer value")
-	}
-	v, err := strconv.ParseInt(n, 10, 64)
-	if err != nil {
-		return 0, fmt.Errorf("invalid integer: %s", n)
-	}
-	return v, nil
-}
-
-func clientIP(r *http.Request) string {
-	if forwarded := r.Header.Get("X-Forwarded-For"); forwarded != "" {
-		if ip, _, ok := strings.Cut(forwarded, ","); ok {
-			return strings.TrimSpace(ip)
-		}
-		return strings.TrimSpace(forwarded)
-	}
-	host, _, err := net.SplitHostPort(r.RemoteAddr)
-	if err != nil {
-		return r.RemoteAddr
-	}
-	return host
-}
-
-func getOrCreateUserAgentID(ctx context.Context, db database.Service, userAgentStr string) int64 {
-	if userAgentStr == "" {
-		return 0
-	}
-
-	uaInfo := utils.ParseUserAgent(userAgentStr)
-	if uaInfo.Browser == "" {
-		return 0
-	}
-
-	id, err := db.GetQueries().UpsertUserAgent(ctx, queries.UpsertUserAgentParams{
-		UserAgent:      userAgentStr,
-		Browser:        uaInfo.Browser,
-		BrowserVersion: uaInfo.BrowserVersion,
-		Os:             uaInfo.OS,
-		Device:         uaInfo.Device,
-	})
-	if err != nil {
-		return 0
-	}
-	return id
-}
-
-func setSuccessFlash(w http.ResponseWriter, msg string) {
-	cfg := conf.Conf()
-	cookie := &http.Cookie{
-		Name:     "success_flash",
-		Value:    url.QueryEscape(msg),
-		Path:     cfg.BasePath,
-		SameSite: http.SameSiteStrictMode,
-	}
-	if cfg.IsProd() {
-		cookie.Secure = true
-	}
-	http.SetCookie(w, cookie)
-}
-
-func readFlashCookie(w http.ResponseWriter, r *http.Request, name string) string {
-	cookie, err := r.Cookie(name)
-	if err != nil || cookie.Value == "" {
-		return ""
-	}
-
-	msg, err := url.QueryUnescape(cookie.Value)
-	if err != nil {
-		msg = cookie.Value
-	}
-
-	cfg := conf.Conf()
-	clearCookie := &http.Cookie{
-		Name:     name,
-		Value:    "",
-		Path:     cfg.BasePath,
-		MaxAge:   -1,
-		SameSite: http.SameSiteStrictMode,
-	}
-	if cfg.IsProd() {
-		clearCookie.Secure = true
-	}
-	http.SetCookie(w, clearCookie)
-
-	return msg
-}
-
-func normalizeEmail(email string) string {
-	return strings.ToLower(strings.TrimSpace(email))
-}
-
-func insertAuditLog(ctx context.Context, module, message string) {
-	insertAuditLogAs(ctx, auth.GetUser(ctx), module, message)
-}
-
-func insertAuditLogAs(ctx context.Context, actor auth.User, module, message string) {
-	var createdBy sql.NullInt64
-	if actor.ID > 0 {
-		createdBy = sql.NullInt64{Int64: actor.ID, Valid: true}
-	}
-	if err := dbRW.GetQueries().InsertLog(ctx, queries.InsertLogParams{
-		Module:        module,
-		Message:       message,
-		CreatedBy:     createdBy,
-		CreatedByName: sql.NullString{String: actor.Name, Valid: actor.Name != ""},
-	}); err != nil {
-		logs.Log().Info("system logs", zap.Error(err))
-	}
-}
-
-func HttpError(w http.ResponseWriter, msg string, code int) {
-	cfg := conf.Conf()
-	cookie := &http.Cookie{
-		Name:     "error_flash",
-		Value:    url.QueryEscape(msg),
-		Path:     cfg.BasePath,
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-	}
-	if cfg.IsProd() {
-		cookie.Secure = true
-	}
-	http.SetCookie(w, cookie)
-	http.Error(w, msg, code)
-}
-
-func securityHeaders(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("X-Content-Type-Options", "nosniff")
-		w.Header().Set("X-Frame-Options", "DENY")
-		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
-		w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:")
-		next.ServeHTTP(w, r)
-	})
-}
-
-func HttpRedirect(w http.ResponseWriter, r *http.Request, url string) {
-	target := utils.URL(url)
-	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Redirect", target)
-		w.WriteHeader(http.StatusFound)
-		return
-	}
-	http.Redirect(w, r, target, http.StatusFound)
-}
-
-func redirectToPortal(w http.ResponseWriter, r *http.Request) {
-	HttpRedirect(w, r, "/")
-}
+var webFlags WebFlags
+var dbRW database.Service
+var dbRO database.Service
 
 type WebFlags struct {
 	port    string
@@ -204,18 +45,8 @@ type WebFlags struct {
 	address string
 }
 
-var webFlags WebFlags
-
-var dbRW database.Service
-var dbRO database.Service
-
-func init() {
-	f := cmdWeb.Flags
-	f().StringVarP(&webFlags.port, "port", "p", "8080", "Port to run web server on")
-	f().StringVarP(&webFlags.baseURL, "url", "b", "zion-english-admin", "Base URL")
-	f().BoolVar(&webFlags.https, "https", false, "Enable HTTPS")
-	f().StringVar(&webFlags.address, "address", "", "Domain address for Let's Encrypt certificates (e.g., flamendless.xyz)")
-	rootCmd.AddCommand(cmdWeb)
+type requestLogs struct {
+	messages []string
 }
 
 var cmdWeb = &cobra.Command{
@@ -383,8 +214,164 @@ var cmdWeb = &cobra.Command{
 	},
 }
 
-type requestLogs struct {
-	messages []string
+func init() {
+	f := cmdWeb.Flags
+	f().StringVarP(&webFlags.port, "port", "p", "8080", "Port to run web server on")
+	f().StringVarP(&webFlags.baseURL, "url", "b", "zion-english-admin", "Base URL")
+	f().BoolVar(&webFlags.https, "https", false, "Enable HTTPS")
+	f().StringVar(&webFlags.address, "address", "", "Domain address for Let's Encrypt certificates (e.g., flamendless.xyz)")
+	rootCmd.AddCommand(cmdWeb)
+}
+
+func requireFloat64(n string) (float64, error) {
+	if n == "" {
+		return 0, errors.New("missing numeric value")
+	}
+	v, err := strconv.ParseFloat(n, 64)
+	if err != nil {
+		return 0, fmt.Errorf("invalid number: %s", n)
+	}
+	return v, nil
+}
+
+func requireInt64(n string) (int64, error) {
+	if n == "" {
+		return 0, errors.New("missing integer value")
+	}
+	v, err := strconv.ParseInt(n, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("invalid integer: %s", n)
+	}
+	return v, nil
+}
+
+func clientIP(r *http.Request) string {
+	if forwarded := r.Header.Get("X-Forwarded-For"); forwarded != "" {
+		if ip, _, ok := strings.Cut(forwarded, ","); ok {
+			return strings.TrimSpace(ip)
+		}
+		return strings.TrimSpace(forwarded)
+	}
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		return r.RemoteAddr
+	}
+	return host
+}
+
+func getOrCreateUserAgentID(ctx context.Context, db database.Service, userAgentStr string) int64 {
+	if userAgentStr == "" {
+		return 0
+	}
+
+	uaInfo := utils.ParseUserAgent(userAgentStr)
+	if uaInfo.Browser == "" {
+		return 0
+	}
+
+	id, err := db.GetQueries().UpsertUserAgent(ctx, queries.UpsertUserAgentParams{
+		UserAgent:      userAgentStr,
+		Browser:        uaInfo.Browser,
+		BrowserVersion: uaInfo.BrowserVersion,
+		Os:             uaInfo.OS,
+		Device:         uaInfo.Device,
+	})
+	if err != nil {
+		return 0
+	}
+	return id
+}
+
+func setSuccessFlash(w http.ResponseWriter, msg string) {
+	cfg := conf.Conf()
+	cookie := &http.Cookie{
+		Name:     "success_flash",
+		Value:    url.QueryEscape(msg),
+		Path:     cfg.BasePath,
+		SameSite: http.SameSiteStrictMode,
+	}
+	if cfg.IsProd() {
+		cookie.Secure = true
+	}
+	http.SetCookie(w, cookie)
+}
+
+func readFlashCookie(w http.ResponseWriter, r *http.Request, name string) string {
+	cookie, err := r.Cookie(name)
+	if err != nil || cookie.Value == "" {
+		return ""
+	}
+
+	msg, err := url.QueryUnescape(cookie.Value)
+	if err != nil {
+		msg = cookie.Value
+	}
+
+	cfg := conf.Conf()
+	clearCookie := &http.Cookie{
+		Name:     name,
+		Value:    "",
+		Path:     cfg.BasePath,
+		MaxAge:   -1,
+		SameSite: http.SameSiteStrictMode,
+	}
+	if cfg.IsProd() {
+		clearCookie.Secure = true
+	}
+	http.SetCookie(w, clearCookie)
+
+	return msg
+}
+
+func insertAuditLogAs(ctx context.Context, actor auth.User, module, message string) {
+	var createdBy sql.NullInt64
+	if actor.ID > 0 {
+		createdBy = sql.NullInt64{Int64: actor.ID, Valid: true}
+	}
+	if err := dbRW.GetQueries().InsertLog(ctx, queries.InsertLogParams{
+		Module:        module,
+		Message:       message,
+		CreatedBy:     createdBy,
+		CreatedByName: sql.NullString{String: actor.Name, Valid: actor.Name != ""},
+	}); err != nil {
+		logs.Log().Info("system logs", zap.Error(err))
+	}
+}
+
+func HttpError(w http.ResponseWriter, msg string, code int) {
+	cfg := conf.Conf()
+	cookie := &http.Cookie{
+		Name:     "error_flash",
+		Value:    url.QueryEscape(msg),
+		Path:     cfg.BasePath,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	}
+	if cfg.IsProd() {
+		cookie.Secure = true
+	}
+	http.SetCookie(w, cookie)
+	http.Error(w, msg, code)
+}
+
+func securityHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-Frame-Options", "DENY")
+		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
+		w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:")
+		next.ServeHTTP(w, r)
+	})
+}
+
+func HttpRedirect(w http.ResponseWriter, r *http.Request, url string) {
+	target := utils.URL(url)
+	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Set("HX-Redirect", target)
+		w.WriteHeader(http.StatusFound)
+		return
+	}
+	http.Redirect(w, r, target, http.StatusFound)
 }
 
 func (l *requestLogs) add(msg string) {
@@ -874,7 +861,7 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 
 	rl.add(fmt.Sprintf("Successfully registered student: %s", req.Name))
 
-	insertAuditLog(r.Context(), "students", fmt.Sprintf("registered student '%s' (teacher ids %s)", req.Name, strings.Join(teacherIDStrs, ",")))
+	insertAuditLogAs(r.Context(), auth.GetUser(r.Context()), "students", fmt.Sprintf("registered student '%s' (teacher ids %s)", req.Name, strings.Join(teacherIDStrs, ",")))
 
 	if _, err := fmt.Fprintf(w, "Student '%s' registered successfully\n", req.Name); err != nil {
 		sendErrorLog(w, err.Error())
@@ -1096,7 +1083,7 @@ func parseTeacherForm(r *http.Request, includePassword bool) (models.TeacherRegi
 		Address:        strings.TrimSpace(r.FormValue("address")),
 		JoiningDate:    r.FormValue("joiningDate"),
 		MobileNumber:   strings.TrimSpace(r.FormValue("mobileNumber")),
-		Email:          normalizeEmail(r.FormValue("email")),
+		Email:          utils.NormalizeEmail(r.FormValue("email")),
 		Certifications: r.FormValue("certifications"),
 		AssignedColor:  r.FormValue("assignedColor"),
 		RatePerClass:   ratePerClass,
@@ -1275,7 +1262,7 @@ func handleTeacherDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	insertAuditLog(ctx, "teachers", fmt.Sprintf("deleted teacher '%s' (id %d)", existing.Name, teacherID))
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "teachers", fmt.Sprintf("deleted teacher '%s' (id %d)", existing.Name, teacherID))
 	setSuccessFlash(w, "Teacher deleted successfully.")
 	HttpRedirect(w, r, "/teachers")
 }
@@ -1325,7 +1312,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	const logtag = "[Handle Login]"
 	if user, loggedIn := auth.UserFromRequest(r, conf.Conf()); loggedIn {
 		if auth.SessionUserValid(r.Context(), dbRO.GetQueries(), user) {
-			redirectToPortal(w, r)
+			HttpRedirect(w, r, "/")
 			return
 		}
 		auth.ClearSession(w)
@@ -1356,7 +1343,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	email := normalizeEmail(r.FormValue("email"))
+	email := utils.NormalizeEmail(r.FormValue("email"))
 	password := r.FormValue("password")
 	if email == "" || password == "" {
 		auth.RecordLoginFailure(ip)
@@ -1451,7 +1438,7 @@ func handleForgotPassword(w http.ResponseWriter, r *http.Request) {
 
 	if user, loggedIn := auth.UserFromRequest(r, conf.Conf()); loggedIn {
 		if auth.SessionUserValid(ctx, dbRO.GetQueries(), user) {
-			redirectToPortal(w, r)
+			HttpRedirect(w, r, "/")
 			return
 		}
 		auth.ClearSession(w)
@@ -1477,7 +1464,7 @@ func handleForgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	email := normalizeEmail(r.FormValue("email"))
+	email := utils.NormalizeEmail(r.FormValue("email"))
 	if email == "" {
 		if err := frontend.ForgotPasswordError("Email is required").Render(ctx, w); err != nil {
 			HttpError(w, err.Error(), http.StatusInternalServerError)
@@ -1549,7 +1536,7 @@ func handleResetPassword(w http.ResponseWriter, r *http.Request) {
 
 	if user, loggedIn := auth.UserFromRequest(r, conf.Conf()); loggedIn {
 		if auth.SessionUserValid(ctx, dbRO.GetQueries(), user) {
-			redirectToPortal(w, r)
+			HttpRedirect(w, r, "/")
 			return
 		}
 		auth.ClearSession(w)
@@ -1581,7 +1568,7 @@ func handleResetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token := r.FormValue("token")
-	email := normalizeEmail(r.FormValue("email"))
+	email := utils.NormalizeEmail(r.FormValue("email"))
 	password := r.FormValue("password")
 	confirmPassword := r.FormValue("confirmPassword")
 

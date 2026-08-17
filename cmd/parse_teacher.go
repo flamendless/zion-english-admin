@@ -26,35 +26,6 @@ type ParseTeacherFlags struct {
 
 var parseTeacherFlags ParseTeacherFlags
 
-func init() {
-	f := cmdParseTeacher.Flags
-	f().StringVarP(&parseTeacherFlags.filepath, "filepath", "f", "", "Filepath to process (csv)")
-	f().StringVarP(&parseTeacherFlags.output, "output", "o", "", "Output path")
-	f().StringVarP(&parseTeacherFlags.startDate, "startDate", "s", "", "Start date in file to process (format: 'January 2, 2006' or 'January 02, 2006')")
-	f().StringVarP(&parseTeacherFlags.endDate, "endDate", "e", "", "End date in file to process (format: 'January 2, 2006' or 'January 02, 2006')")
-	f().StringVarP(&parseTeacherFlags.nameCol, "nameCol", "n", "A", "Column for name (e.g., A, B, C)")
-	f().StringVarP(&parseTeacherFlags.durationCol, "durationCol", "d", "B", "Column for duration/time (e.g., A, B, C)")
-	f().StringVarP(&parseTeacherFlags.rateCol, "rateCol", "r", "C", "Column for rate (e.g., A, B, C)")
-	f().StringVarP(&parseTeacherFlags.statusCol, "statusCol", "t", "G", "Column for status (e.g., A, B, C)")
-	f().StringVarP(&parseTeacherFlags.startTimeCol, "startTimeCol", "", "", "Column for start time (e.g., A, B, C) - optional")
-	f().StringVarP(&parseTeacherFlags.endTimeCol, "endTimeCol", "", "", "Column for end time (e.g., A, B, C) - optional")
-	f().StringVarP(&parseTeacherFlags.linkCol, "linkCol", "", "", "Column for Google link (e.g., A, B, C) - optional")
-	if err := cmdParseTeacher.MarkFlagRequired("filepath"); err != nil {
-		panic(err)
-	}
-	if err := cmdParseTeacher.MarkFlagRequired("output"); err != nil {
-		panic(err)
-	}
-	if err := cmdParseTeacher.MarkFlagRequired("startDate"); err != nil {
-		panic(err)
-	}
-	if err := cmdParseTeacher.MarkFlagRequired("endDate"); err != nil {
-		panic(err)
-	}
-
-	rootCmd.AddCommand(cmdParseTeacher)
-}
-
 var cmdParseTeacher = &cobra.Command{
 	Use:   "parse_teacher",
 	Short: "Parse teacher",
@@ -158,4 +129,33 @@ var cmdParseTeacher = &cobra.Command{
 			panic(err)
 		}
 	},
+}
+
+func init() {
+	f := cmdParseTeacher.Flags
+	f().StringVarP(&parseTeacherFlags.filepath, "filepath", "f", "", "Filepath to process (csv)")
+	f().StringVarP(&parseTeacherFlags.output, "output", "o", "", "Output path")
+	f().StringVarP(&parseTeacherFlags.startDate, "startDate", "s", "", "Start date in file to process (format: 'January 2, 2006' or 'January 02, 2006')")
+	f().StringVarP(&parseTeacherFlags.endDate, "endDate", "e", "", "End date in file to process (format: 'January 2, 2006' or 'January 02, 2006')")
+	f().StringVarP(&parseTeacherFlags.nameCol, "nameCol", "n", "A", "Column for name (e.g., A, B, C)")
+	f().StringVarP(&parseTeacherFlags.durationCol, "durationCol", "d", "B", "Column for duration/time (e.g., A, B, C)")
+	f().StringVarP(&parseTeacherFlags.rateCol, "rateCol", "r", "C", "Column for rate (e.g., A, B, C)")
+	f().StringVarP(&parseTeacherFlags.statusCol, "statusCol", "t", "G", "Column for status (e.g., A, B, C)")
+	f().StringVarP(&parseTeacherFlags.startTimeCol, "startTimeCol", "", "", "Column for start time (e.g., A, B, C) - optional")
+	f().StringVarP(&parseTeacherFlags.endTimeCol, "endTimeCol", "", "", "Column for end time (e.g., A, B, C) - optional")
+	f().StringVarP(&parseTeacherFlags.linkCol, "linkCol", "", "", "Column for Google link (e.g., A, B, C) - optional")
+	if err := cmdParseTeacher.MarkFlagRequired("filepath"); err != nil {
+		panic(err)
+	}
+	if err := cmdParseTeacher.MarkFlagRequired("output"); err != nil {
+		panic(err)
+	}
+	if err := cmdParseTeacher.MarkFlagRequired("startDate"); err != nil {
+		panic(err)
+	}
+	if err := cmdParseTeacher.MarkFlagRequired("endDate"); err != nil {
+		panic(err)
+	}
+
+	rootCmd.AddCommand(cmdParseTeacher)
 }

@@ -71,7 +71,7 @@ templ ProcessingLogs(data ProcessingLogData) {
 				<a href={ utils.URL("/process") } class="add-btn">Back to Process</a>
 			</div>
 
-			@ListFilterForm(data.FilterPath, data.Query, "", "", "", "", data.StartDate, data.EndDate, false, false, false, true, false)
+			@ListFilterForm(data.FilterPath, data.Query, "", "", "", "", "", data.StartDate, data.EndDate, false, false, false, true, false)
 
 			if len(data.Logs) > 0 {
 				<div class="table-wrapper">

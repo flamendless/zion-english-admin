@@ -153,7 +153,7 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 
 	updated, err := dbRW.GetQueries().GetClassRecordByID(ctx, recordID)
 	if err == nil {
-		insertAuditLog(ctx, "classes", formatClassRecordAudit(existing, updated))
+		insertAuditLogAs(ctx, auth.GetUser(ctx), "classes", formatClassRecordAudit(existing, updated))
 	}
 
 	if _, err := fmt.Fprint(w, "Class updated successfully!\n"); err != nil {
@@ -418,10 +418,10 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 			sendErrorLog(w, err.Error())
 			return
 		}
-		insertAuditLog(ctx, "schedule", fmt.Sprintf("marked scheduled class id %d as %s", scheduleID, req.Status))
+		insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("marked scheduled class id %d as %s", scheduleID, req.Status))
 	}
 
-	insertAuditLog(ctx, "classes", fmt.Sprintf("recorded class for student id %d (teacher id %d, date %s, status %s)", req.StudentID, req.TeacherID, req.Date, req.Status))
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "classes", fmt.Sprintf("recorded class for student id %d (teacher id %d, date %s, status %s)", req.StudentID, req.TeacherID, req.Date, req.Status))
 
 	if _, err := fmt.Fprint(w, "Class recorded successfully!\n"); err != nil {
 		sendErrorLog(w, err.Error())

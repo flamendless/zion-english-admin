@@ -31,7 +31,7 @@ templ MyStudents(data MyStudentsData) {
 			@HeaderSimple()
 			@HubHeader("My Students", "", "", false)
 
-			@ListFilterForm(data.FilterPath, data.Query, data.Status, "", "", "", "", "", false, false, false, false, true)
+			@ListFilterForm(data.FilterPath, data.Query, data.Status, "student", "", "", "", "", "", false, false, false, false, true)
 
 			if len(data.Students) > 0 {
 				<div class="table-wrapper">

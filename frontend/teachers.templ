@@ -144,7 +144,7 @@ templ Teachers(data TeacherData) {
 			@HeaderSimple()
 			@HubHeader("Teachers", "New Teacher", utils.URL("/teachers/register"), true)
 
-			@ListFilterForm(data.FilterPath, data.Query, data.Status, "", data.Email, "", "", "", false, true, false, false, true)
+			@ListFilterForm(data.FilterPath, data.Query, data.Status, "teacher", "", data.Email, "", "", "", false, true, false, false, true)
 
 			if len(data.Teachers) > 0 {
 				<div class="table-wrapper">

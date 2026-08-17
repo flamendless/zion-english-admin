@@ -2,9 +2,11 @@ package cmd
 
 import (
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"zion-english/internal/conf"
+	"zion-english/internal/utils"
 )
 
 func extractPathID(r *http.Request, segment, suffix string) (int64, bool) {
@@ -41,4 +43,16 @@ func listQueryParams(r *http.Request) map[string]string {
 		"startDate": r.URL.Query().Get("startDate"),
 		"endDate":   r.URL.Query().Get("endDate"),
 	}
+}
+
+func HttpRedirectToListPage(w http.ResponseWriter, r *http.Request, listPath string) {
+	target := listPath
+	if r.Header.Get("HX-Request") == "true" {
+		if current := r.Header.Get("HX-Current-URL"); current != "" {
+			if u, err := url.Parse(current); err == nil && u.Path == utils.URL(listPath) && u.RawQuery != "" {
+				target = listPath + "?" + u.RawQuery
+			}
+		}
+	}
+	HttpRedirect(w, r, target)
 }

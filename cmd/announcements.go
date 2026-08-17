@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"zion-english/frontend"
 	"zion-english/internal/announcements"
+	"zion-english/internal/auth"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/utils"
 )
@@ -147,7 +148,7 @@ func handleAnnouncementCreate(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	insertAuditLog(ctx, "announcements", fmt.Sprintf("Created announcement #%d: %s", id, req.Title))
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "announcements", fmt.Sprintf("Created announcement #%d: %s", id, req.Title))
 	setSuccessFlash(w, "Announcement created successfully")
 	HttpRedirect(w, r, "/announcements")
 }
@@ -251,7 +252,7 @@ func handleAnnouncementUpdate(w http.ResponseWriter, r *http.Request, announceme
 		return
 	}
 
-	insertAuditLog(ctx, "announcements", fmt.Sprintf("Updated announcement #%d: %s", announcementID, req.Title))
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "announcements", fmt.Sprintf("Updated announcement #%d: %s", announcementID, req.Title))
 	setSuccessFlash(w, "Announcement updated successfully")
 	HttpRedirect(w, r, "/announcements")
 }
@@ -274,7 +275,7 @@ func handleAnnouncementDelete(w http.ResponseWriter, r *http.Request, announceme
 		return
 	}
 
-	insertAuditLog(ctx, "announcements", fmt.Sprintf("Deleted announcement #%d: %s", announcementID, row.Title))
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "announcements", fmt.Sprintf("Deleted announcement #%d: %s", announcementID, row.Title))
 	setSuccessFlash(w, "Announcement deleted successfully")
 	HttpRedirect(w, r, "/announcements")
 }

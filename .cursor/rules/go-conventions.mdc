@@ -18,6 +18,10 @@ import (
 )
 ```
 
+## File Layout
+
+Package-level types and variables go at the top of the file, immediately after imports — before `init()` and functions. Group related `var` declarations together.
+
 ## Naming
 
 - Handlers: `handleHome`, `handleStudentRegister` (`handle` prefix, camelCase)
@@ -75,3 +79,8 @@ Contact: sql.NullString{String: req.Contact, Valid: req.Contact != ""},
 ```go
 w.Header().Set("HX-Redirect", utils.URL("/"))
 ```
+
+## Helpers
+
+- Do not add a wrapper function that only forwards to another call on one line — inline at call sites instead.
+- Reuse `internal/utils` for small shared string/format helpers (e.g. `utils.NormalizeEmail`) rather than duplicating them in `cmd/`.

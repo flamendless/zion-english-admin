@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"zion-english/frontend"
+	"zion-english/internal/auth"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/models"
 	"zion-english/internal/utils"
@@ -261,7 +262,7 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 	}
 
 	updated, _ := dbRW.GetQueries().GetStudentByID(ctx, studentID)
-	insertAuditLog(ctx, "students", formatStudentAudit(existing, updated, teachersBefore, strings.Join(newTeacherIDs, ",")))
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "students", formatStudentAudit(existing, updated, teachersBefore, strings.Join(newTeacherIDs, ",")))
 
 	if _, err := fmt.Fprint(w, "Student updated successfully!\n"); err != nil {
 		sendErrorLog(w, err.Error())
