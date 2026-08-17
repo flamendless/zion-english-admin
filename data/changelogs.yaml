@@ -1,10 +1,7 @@
 unreleased:
   breaking_changes: []
-  new_features:
-    - text: "You can record and edit classes with start and end times instead of entering duration only."
-    - text: "Superusers can view teacher profile details in a quick-view modal from the teachers list."
-  improvements:
-    - text: "A live digital clock appears on the dashboard and page headers."
+  new_features: []
+  improvements: []
   bug_fixes: []
   removed: []
   security: []
@@ -18,7 +15,14 @@ versions:
     breaking_changes: []
     new_features:
       - text: "You can browse release notes on the Changelogs page from the dashboard."
-    improvements: []
+        commit: "b1aa64a"
+      - text: "You can record and edit classes with start and end times instead of entering duration only."
+        commit: "b1aa64a"
+      - text: "Superusers can view teacher profile details in a quick-view modal from the teachers list."
+        commit: "b1aa64a"
+    improvements:
+      - text: "A live digital clock appears on the dashboard and page headers."
+        commit: "b1aa64a"
     bug_fixes: []
     removed: []
     security: []
