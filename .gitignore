@@ -3,4 +3,5 @@ out/
 assets/*.csv
 tmp/
 *DS_STORE
-data
+data/*
+!data/changelogs.yaml

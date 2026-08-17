@@ -125,7 +125,7 @@ func (q *Queries) CountClassRecordsFiltered(ctx context.Context, arg CountClassR
 }
 
 const getClassRecordByID = `-- name: GetClassRecordByID :one
-SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
+SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
        s.name as student_name, t.name as teacher_name
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
@@ -138,6 +138,8 @@ type GetClassRecordByIDRow struct {
 	StudentID       int64
 	TeacherID       int64
 	Date            string
+	StartTime       sql.NullString
+	EndTime         sql.NullString
 	DurationMinutes int64
 	Rate            float64
 	Currency        string
@@ -159,6 +161,8 @@ func (q *Queries) GetClassRecordByID(ctx context.Context, id int64) (GetClassRec
 		&i.StudentID,
 		&i.TeacherID,
 		&i.Date,
+		&i.StartTime,
+		&i.EndTime,
 		&i.DurationMinutes,
 		&i.Rate,
 		&i.Currency,
@@ -248,7 +252,7 @@ func (q *Queries) GetClassRecordsByTeacherAndDateRange(ctx context.Context, arg 
 }
 
 const getClassRecordsFiltered = `-- name: GetClassRecordsFiltered :many
-SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
+SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
        s.name as student_name, t.name as teacher_name
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
@@ -278,6 +282,8 @@ type GetClassRecordsFilteredRow struct {
 	StudentID       int64
 	TeacherID       int64
 	Date            string
+	StartTime       sql.NullString
+	EndTime         sql.NullString
 	DurationMinutes int64
 	Rate            float64
 	Currency        string
@@ -316,6 +322,8 @@ func (q *Queries) GetClassRecordsFiltered(ctx context.Context, arg GetClassRecor
 			&i.StudentID,
 			&i.TeacherID,
 			&i.Date,
+			&i.StartTime,
+			&i.EndTime,
 			&i.DurationMinutes,
 			&i.Rate,
 			&i.Currency,
@@ -367,14 +375,16 @@ func (q *Queries) GetTotalRateByTeacherAndDateRange(ctx context.Context, arg Get
 }
 
 const insertClassRecord = `-- name: InsertClassRecord :exec
-INSERT INTO tbl_class_records (student_id, teacher_id, date, duration_minutes, rate, currency, status, reason, notes, recorded_by_role)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO tbl_class_records (student_id, teacher_id, date, start_time, end_time, duration_minutes, rate, currency, status, reason, notes, recorded_by_role)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 type InsertClassRecordParams struct {
 	StudentID       int64
 	TeacherID       int64
 	Date            string
+	StartTime       sql.NullString
+	EndTime         sql.NullString
 	DurationMinutes int64
 	Rate            float64
 	Currency        string
@@ -389,6 +399,8 @@ func (q *Queries) InsertClassRecord(ctx context.Context, arg InsertClassRecordPa
 		arg.StudentID,
 		arg.TeacherID,
 		arg.Date,
+		arg.StartTime,
+		arg.EndTime,
 		arg.DurationMinutes,
 		arg.Rate,
 		arg.Currency,
@@ -450,7 +462,7 @@ func (q *Queries) SumConductedRateByCurrencyAndDateRange(ctx context.Context, ar
 
 const updateClassRecord = `-- name: UpdateClassRecord :exec
 UPDATE tbl_class_records
-SET student_id = ?, teacher_id = ?, date = ?, duration_minutes = ?, rate = ?, currency = ?, status = ?, reason = ?, notes = ?, updated_at = datetime('now')
+SET student_id = ?, teacher_id = ?, date = ?, start_time = ?, end_time = ?, duration_minutes = ?, rate = ?, currency = ?, status = ?, reason = ?, notes = ?, updated_at = datetime('now')
 WHERE id = ?
 `
 
@@ -458,6 +470,8 @@ type UpdateClassRecordParams struct {
 	StudentID       int64
 	TeacherID       int64
 	Date            string
+	StartTime       sql.NullString
+	EndTime         sql.NullString
 	DurationMinutes int64
 	Rate            float64
 	Currency        string
@@ -472,6 +486,8 @@ func (q *Queries) UpdateClassRecord(ctx context.Context, arg UpdateClassRecordPa
 		arg.StudentID,
 		arg.TeacherID,
 		arg.Date,
+		arg.StartTime,
+		arg.EndTime,
 		arg.DurationMinutes,
 		arg.Rate,
 		arg.Currency,

@@ -44,47 +44,21 @@ templ Home(data DashboardData) {
 
 			<div class="home-welcome">
 				@WelcomeRole()
+				@DigitalClock("hero")
 			</div>
 
 			@DashboardStats(data)
 
 			<h2 class="dashboard-section-title">Quick actions</h2>
 			<div class="cards-grid">
-				if IsNavAccessible(data.Role, "/profile") {
-					@ActionCard("/profile", "My Profile", "View account info and update settings")
-				}
-				if IsNavAccessible(data.Role, "/teachers") {
-					@ActionCard("/teachers", "Teachers", "View and manage teachers")
-				}
-				if IsNavAccessible(data.Role, "/students") {
-					@ActionCard("/students", "Students", "View and manage students")
-				}
-				if IsNavAccessible(data.Role, "/classes") {
-					if data.Role == auth.RoleTeacher {
-						@ActionCard("/classes", "My Classes", "View and record your classes")
+				for _, item := range NavItems(data.Role) {
+					if item.FeatureCard {
+						@ActionCardFeature(item.Path, item.Title, item.Description)
 					} else {
-						@ActionCard("/classes", "Classes", "View and record classes")
+						@ActionCard(item.Path, item.Title, item.Description)
 					}
 				}
-				if IsNavAccessible(data.Role, "/schedule") {
-					<a href={ utils.URL("/schedule") } class="card card-feature">
-						<h2>Class Schedule</h2>
-						<p>View and plan upcoming classes</p>
-					</a>
-				}
-				if IsNavAccessible(data.Role, "/my-students") {
-					@ActionCard("/my-students", "My Students", "View your assigned students")
-				}
-				if IsNavAccessible(data.Role, "/process") {
-					@ActionCard("/process", "Process", "Process CSV files and view logs")
-				}
-				if IsNavAccessible(data.Role, "/logs") {
-					if data.Role == auth.RoleTeacher {
-						@ActionCard("/logs", "My Activity", "View your recent actions")
-					} else {
-						@ActionCard("/logs", "Logs", "View system logs")
-					}
-				}
+				@ActionCard("/changelogs", "Changelogs", "See what's new in the admin tool")
 			</div>
 		</div>
 	</body>
@@ -109,10 +83,10 @@ templ DashboardStats(data DashboardData) {
 			</div>
 		}
 		if data.Role == auth.RoleTeacher {
-			<div class="stat-card">
+			<a href={ utils.URL("/my-students") } class="stat-card stat-card-link">
 				<span class="stat-label">My Students</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.MyStudentCount) }</span>
-			</div>
+			</a>
 			<div class="stat-card stat-card-accent">
 				<span class="stat-label">Scheduled Today</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.ScheduledToday) }</span>

@@ -1,0 +1,37 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+templ TimeInput(id string, label string, value string, readonly bool) {
+	<div class="form-group time-input-wrap">
+		<label for={ id }>{ label }</label>
+		if readonly && value != "" {
+			<input type="time" id={ id } name={ id } step="300" required value={ value } readonly/>
+		} else if value != "" {
+			<input type="time" id={ id } name={ id } step="300" required value={ value }/>
+		} else {
+			<input type="time" id={ id } name={ id } step="300" required/>
+		}
+	</div>
+}
+
+templ TimeRangeFields(startTime string, endTime string, readonly bool) {
+	<div class="time-range-fields">
+		<div class="time-range-group">
+			@TimeInput("start_time", "Start time *", startTime, readonly)
+			@TimeInput("end_time", "End time *", endTime, readonly)
+		</div>
+		<div class="duration-preview" id="durationPreview" aria-live="polite" hidden></div>
+	</div>
+}
+
+templ ScrTimeRangeJS() {
+	<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/time-range.js")) }></script>
+}
+
+templ ScrTimeRangeInit() {
+	<script>
+		if (window.initTimeRangePreview) initTimeRangePreview();
+		if (window.attachTimeRangeFormValidation) attachTimeRangeFormValidation();
+	</script>
+}

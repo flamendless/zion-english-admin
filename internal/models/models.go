@@ -123,6 +123,8 @@ type ClassRecordRequest struct {
 	StudentID       int64   `json:"studentId"`
 	TeacherID       int64   `json:"teacherId"`
 	Date            string  `json:"date"`
+	StartTime       string  `json:"startTime"`
+	EndTime         string  `json:"endTime"`
 	DurationMinutes int64   `json:"durationMinutes"`
 	Rate            float64 `json:"rate"`
 	Currency        string  `json:"currency"`
@@ -144,6 +146,8 @@ type ClassRecordView struct {
 	StudentName     string  `json:"studentName"`
 	TeacherName     string  `json:"teacherName"`
 	Date            string  `json:"date"`
+	StartTime       string  `json:"startTime"`
+	EndTime         string  `json:"endTime"`
 	DurationMinutes int64   `json:"durationMinutes"`
 	Rate            float64 `json:"rate"`
 	Currency        string  `json:"currency"`
@@ -187,6 +191,8 @@ type RecordClassPrefill struct {
 	StudentName     string
 	TeacherName     string
 	Date            string
+	StartTime       string
+	EndTime         string
 	DurationMinutes string
 	Rate            string
 	Currency        string

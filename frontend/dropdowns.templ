@@ -2,6 +2,20 @@ package frontend
 
 import "zion-english/internal/utils"
 
+templ TeacherDropdownWithValue(selectedID string) {
+	<div class="form-group">
+		<label for="teacher">Teacher *</label>
+		<select id="teacher" name="teacher" required
+			hx-get={ utils.URL("/api/teachers?selected=" + selectedID) }
+			hx-trigger="load"
+			hx-swap="innerHTML"
+			hx-target="this"
+		>
+			<option value="">-- Select Teacher --</option>
+		</select>
+	</div>
+}
+
 templ TeacherDropdown() {
 	<div class="form-group">
 		<label for="teacher">Teacher *</label>
@@ -32,6 +46,20 @@ templ TeacherDropdownEx(label string) {
 	</div>
 }
 
+templ TeacherStudentsDropdownWithValue(selectedID string) {
+	<div class="form-group">
+		<label for="student">Student *</label>
+		<select id="student" name="student" required
+			hx-get={ utils.URL("/api/me/students?selected=" + selectedID) }
+			hx-trigger="load"
+			hx-swap="innerHTML"
+			hx-target="this"
+		>
+			<option value="">-- Select Student --</option>
+		</select>
+	</div>
+}
+
 templ TeacherStudentsDropdown() {
 	<div class="form-group">
 		<label for="student">Student *</label>
@@ -42,6 +70,20 @@ templ TeacherStudentsDropdown() {
 			hx-target="this"
 		>
 			//StudentOption
+			<option value="">-- Select Student --</option>
+		</select>
+	</div>
+}
+
+templ StudentDropdownWithValue(selectedID string) {
+	<div class="form-group">
+		<label for="student">Student *</label>
+		<select id="student" name="student" required
+			hx-get={ utils.URL("/api/students?selected=" + selectedID) }
+			hx-trigger="load"
+			hx-swap="innerHTML"
+			hx-target="this"
+		>
 			<option value="">-- Select Student --</option>
 		</select>
 	</div>

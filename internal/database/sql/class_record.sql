@@ -1,6 +1,6 @@
 -- name: InsertClassRecord :exec
-INSERT INTO tbl_class_records (student_id, teacher_id, date, duration_minutes, rate, currency, status, reason, notes, recorded_by_role)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO tbl_class_records (student_id, teacher_id, date, start_time, end_time, duration_minutes, rate, currency, status, reason, notes, recorded_by_role)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 -- name: GetClassRecordsByTeacherAndDateRange :many
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
@@ -17,7 +17,7 @@ FROM tbl_class_records cr
 WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ? AND cr.status = 'conducted';
 
 -- name: GetClassRecordByID :one
-SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
+SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
        s.name as student_name, t.name as teacher_name
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
@@ -26,7 +26,7 @@ WHERE cr.id = ?;
 
 -- name: UpdateClassRecord :exec
 UPDATE tbl_class_records
-SET student_id = ?, teacher_id = ?, date = ?, duration_minutes = ?, rate = ?, currency = ?, status = ?, reason = ?, notes = ?, updated_at = datetime('now')
+SET student_id = ?, teacher_id = ?, date = ?, start_time = ?, end_time = ?, duration_minutes = ?, rate = ?, currency = ?, status = ?, reason = ?, notes = ?, updated_at = datetime('now')
 WHERE id = ?;
 
 -- name: CountClassRecordDuplicate :one
@@ -44,7 +44,7 @@ WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
   AND (? = '' OR s.name LIKE '%' || ? || '%');
 
 -- name: GetClassRecordsFiltered :many
-SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
+SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
        s.name as student_name, t.name as teacher_name
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id

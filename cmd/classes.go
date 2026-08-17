@@ -44,6 +44,7 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 
 	if r.Method == http.MethodGet {
 		w.Header().Set("Content-Type", "text/html")
+		startTime, endTime := classRecordTimesForEdit(existing.StartTime, existing.EndTime, existing.DurationMinutes)
 		frontend.EditClass(frontend.EditClassData{
 			RecordID:        strconv.FormatInt(recordID, 10),
 			IsSuperuser:     role == auth.RoleSuperuser,
@@ -52,6 +53,8 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 			StudentName:     existing.StudentName,
 			TeacherName:     existing.TeacherName,
 			Date:            existing.Date,
+			StartTime:       startTime,
+			EndTime:         endTime,
 			DurationMinutes: existing.DurationMinutes,
 			Rate:            existing.Rate,
 			Currency:        existing.Currency,
@@ -77,11 +80,12 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 		sendErrorLog(w, err.Error())
 		return
 	}
-	duration, err := requireInt64(r.FormValue("duration"))
+	duration, err := classRecordDurationFromForm(r)
 	if err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
+	startTime, endTime := r.FormValue("start_time"), r.FormValue("end_time")
 	rate, err := requireFloat64(r.FormValue("rate"))
 	if err != nil {
 		sendErrorLog(w, err.Error())
@@ -101,6 +105,8 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 		StudentID:       studentID,
 		TeacherID:       teacherID,
 		Date:            r.FormValue("date"),
+		StartTime:       startTime,
+		EndTime:         endTime,
 		DurationMinutes: duration,
 		Rate:            rate,
 		Currency:        r.FormValue("currency"),
@@ -129,6 +135,8 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 		StudentID:       req.StudentID,
 		TeacherID:       req.TeacherID,
 		Date:            req.Date,
+		StartTime:       sql.NullString{String: req.StartTime, Valid: req.StartTime != ""},
+		EndTime:         sql.NullString{String: req.EndTime, Valid: req.EndTime != ""},
 		DurationMinutes: req.DurationMinutes,
 		Rate:            req.Rate,
 		Currency:        req.Currency,
@@ -157,7 +165,7 @@ func parseClassRecordRequest(r *http.Request, user auth.User, role auth.Role, de
 	if err != nil {
 		return models.ClassRecordRequest{}, err
 	}
-	duration, err := requireInt64(r.FormValue("duration"))
+	duration, err := classRecordDurationFromForm(r)
 	if err != nil {
 		return models.ClassRecordRequest{}, err
 	}
@@ -178,6 +186,8 @@ func parseClassRecordRequest(r *http.Request, user auth.User, role auth.Role, de
 		StudentID:       studentID,
 		TeacherID:       teacherID,
 		Date:            r.FormValue("date"),
+		StartTime:       r.FormValue("start_time"),
+		EndTime:         r.FormValue("end_time"),
 		DurationMinutes: duration,
 		Rate:            rate,
 		Currency:        r.FormValue("currency"),
@@ -206,6 +216,8 @@ func classRecordViewFromRow(cr queries.GetClassRecordsFilteredRow) models.ClassR
 		StudentName:     cr.StudentName,
 		TeacherName:     cr.TeacherName,
 		Date:            cr.Date,
+		StartTime:       cr.StartTime.String,
+		EndTime:         cr.EndTime.String,
 		DurationMinutes: cr.DurationMinutes,
 		Rate:            cr.Rate,
 		Currency:        cr.Currency,
@@ -380,6 +392,8 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		StudentID:       req.StudentID,
 		TeacherID:       req.TeacherID,
 		Date:            req.Date,
+		StartTime:       sql.NullString{String: req.StartTime, Valid: req.StartTime != ""},
+		EndTime:         sql.NullString{String: req.EndTime, Valid: req.EndTime != ""},
 		DurationMinutes: req.DurationMinutes,
 		Rate:            req.Rate,
 		Currency:        req.Currency,
@@ -522,6 +536,57 @@ func parseRecordClassPrefill(r *http.Request) models.RecordClassPrefill {
 	prefill.DurationMinutes = strconv.FormatInt(existing.DurationMinutes, 10)
 	prefill.Rate = strconv.FormatFloat(existing.Rate, 'f', -1, 64)
 	prefill.Currency = existing.Currency
+	if existing.StartTime.Valid {
+		prefill.StartTime = existing.StartTime.String
+		prefill.EndTime = utils.EndTimeFromStartAndDuration(prefill.StartTime, existing.DurationMinutes)
+	}
 
 	return prefill
+}
+
+func classRecordDurationFromForm(r *http.Request) (int64, error) {
+	startTime := r.FormValue("start_time")
+	endTime := r.FormValue("end_time")
+	if startTime == "" || endTime == "" {
+		return 0, errors.New("start and end times are required")
+	}
+	duration, err := utils.DurationMinutesFromRange(startTime, endTime)
+	if err != nil {
+		return 0, friendlyTimeRangeError(err)
+	}
+	return duration, nil
+}
+
+func friendlyTimeRangeError(err error) error {
+	switch {
+	case errors.Is(err, utils.ErrEndBeforeStart):
+		return errors.New("end time must be after start time")
+	case errors.Is(err, utils.ErrInvalidStartTime):
+		return errors.New("invalid start time")
+	case errors.Is(err, utils.ErrInvalidEndTime):
+		return errors.New("invalid end time")
+	case errors.Is(err, utils.ErrTimeRequired):
+		return errors.New("start and end times are required")
+	default:
+		return err
+	}
+}
+
+func classRecordDefaultStartTime(durationMinutes int64) string {
+	if durationMinutes >= 12*60 {
+		return "00:00"
+	}
+	return "09:00"
+}
+
+func classRecordTimesForEdit(startTime, endTime sql.NullString, durationMinutes int64) (string, string) {
+	start := classRecordDefaultStartTime(durationMinutes)
+	if startTime.Valid && strings.TrimSpace(startTime.String) != "" {
+		start = startTime.String
+	}
+	end := utils.EndTimeFromStartAndDuration(start, durationMinutes)
+	if endTime.Valid && strings.TrimSpace(endTime.String) != "" {
+		end = endTime.String
+	}
+	return start, end
 }

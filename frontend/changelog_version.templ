@@ -1,0 +1,127 @@
+package frontend
+
+templ ChangelogVersionCard(version ChangelogVersionView) {
+	<style>
+		.changelog-version-card {
+			background: var(--color-surface);
+			border: 1px solid var(--color-border-subtle);
+			border-radius: var(--radius-md);
+			padding: var(--space-5);
+		}
+
+		.changelog-version-card-unreleased {
+			border-color: color-mix(in srgb, var(--color-primary) 40%, var(--color-border-subtle));
+			background: color-mix(in srgb, var(--color-primary) 5%, var(--color-surface));
+		}
+
+		.changelog-version-header {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: baseline;
+			justify-content: space-between;
+			gap: var(--space-3);
+			padding-bottom: var(--space-4);
+			border-bottom: 1px solid var(--color-border-subtle);
+		}
+
+		.changelog-version-title {
+			margin: 0;
+			font-size: 1.25rem;
+			font-weight: 600;
+			color: var(--color-foreground);
+		}
+
+		.changelog-version-date {
+			font-size: 0.85rem;
+			color: var(--color-muted-foreground);
+		}
+
+		.changelog-version-date-unreleased {
+			color: var(--color-primary);
+			font-weight: 500;
+		}
+
+		.changelog-version-body {
+			margin-top: var(--space-5);
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-5);
+		}
+
+		.changelog-section-title {
+			margin: 0;
+			font-size: 0.95rem;
+			font-weight: 600;
+			color: var(--color-foreground);
+		}
+
+		.changelog-entry-list {
+			margin: var(--space-3) 0 0;
+			padding: 0;
+			list-style: none;
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-2);
+		}
+
+		.changelog-entry {
+			display: flex;
+			align-items: flex-start;
+			gap: var(--space-2);
+			font-size: 0.95rem;
+			line-height: 1.5;
+			color: var(--color-muted-foreground);
+		}
+
+		.changelog-entry-bullet {
+			color: var(--color-primary);
+			flex-shrink: 0;
+		}
+
+		.changelog-entry-commit {
+			margin-left: var(--space-1);
+			font-size: 0.8rem;
+			color: var(--color-primary);
+			text-decoration: none;
+		}
+
+		.changelog-entry-commit:hover {
+			text-decoration: underline;
+		}
+	</style>
+	<article class={ "changelog-version-card", templ.KV("changelog-version-card-unreleased", version.Unreleased) }>
+		<div class="changelog-version-header">
+			<h2 class="changelog-version-title">{ version.Label }</h2>
+			if version.DateLabel != "" {
+				<time class={ "changelog-version-date", templ.KV("changelog-version-date-unreleased", version.Unreleased) }>{ version.DateLabel }</time>
+			}
+		</div>
+		<div class="changelog-version-body">
+			for _, section := range version.Sections {
+				<div>
+					<h3 class="changelog-section-title">{ section.Title }</h3>
+					<ul class="changelog-entry-list">
+						for _, entry := range section.Entries {
+							<li class="changelog-entry">
+								<span class="changelog-entry-bullet" aria-hidden="true">•</span>
+								<span>
+									{ entry.Text }
+									if entry.CommitURL != "" {
+										<a
+											href={ entry.CommitURL }
+											class="changelog-entry-commit"
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											({ entry.CommitLabel })
+										</a>
+									}
+								</span>
+							</li>
+						}
+					</ul>
+				</div>
+			}
+		</div>
+	</article>
+}

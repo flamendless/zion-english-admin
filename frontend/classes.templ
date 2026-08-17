@@ -7,9 +7,9 @@ import (
 
 func classesTableColspan(data ClassesData) int {
 	if data.ShowAllTeachers {
-		return 9
+		return 8
 	}
-	return 8
+	return 7
 }
 
 type ClassesData struct {
@@ -75,27 +75,21 @@ templ Classes(data ClassesData) {
 					<input type="text" id="studentSearch" placeholder="Search student name..."/>
 				</div>
 				<button type="button" id="filterBtn">Filter</button>
-				<div class="total-section">
-					Total: <span id="totalRate">0</span> <span id="totalCurrency"></span>
-				</div>
 			</div>
-
-			<div id="paginationTop" class="pagination-bar"></div>
 
 			<div class="table-wrapper">
 			<table id="classesTable" class="table-stack-mobile">
 				<thead>
 					<tr>
+						<th>Date</th>
+						<th>Start Time</th>
+						<th>End Time</th>
 						if data.ShowAllTeachers {
 							<th>Teacher</th>
 						}
-						<th>Student Name</th>
-						<th>Duration (min)</th>
+						<th>Student</th>
 						<th>Rate</th>
 						<th>Status</th>
-						<th>Reason</th>
-						<th>Notes</th>
-						<th>Date</th>
 						<th>Actions</th>
 					</tr>
 				</thead>
@@ -104,7 +98,7 @@ templ Classes(data ClassesData) {
 						if data.LockTeacher || data.ShowAllTeachers {
 							<td colspan={ fmt.Sprintf("%d", classesTableColspan(data)) } class="empty-state">Loading classes...</td>
 						} else {
-							<td colspan="8" class="empty-state">Select a teacher to view classes</td>
+							<td colspan="7" class="empty-state">Select a teacher to view classes</td>
 						}
 					</tr>
 				</tbody>
@@ -115,16 +109,13 @@ templ Classes(data ClassesData) {
 
 		<script>
 			const showAllTeachers = document.querySelector('.container').dataset.showAllTeachers === 'true';
-			const tableColspan = showAllTeachers ? 9 : 8;
+			const tableColspan = showAllTeachers ? 8 : 7;
 			const teacherSelect = document.getElementById('teacher');
 			const datePresetSelect = document.getElementById('datePreset');
 			const filterBtn = document.getElementById('filterBtn');
 			const tableBody = document.getElementById('classesTableBody');
-			const totalRateSpan = document.getElementById('totalRate');
-			const totalCurrencySpan = document.getElementById('totalCurrency');
 			const statusFilter = document.getElementById('statusFilter');
 			const studentSearch = document.getElementById('studentSearch');
-			const paginationTop = document.getElementById('paginationTop');
 			const paginationBottom = document.getElementById('paginationBottom');
 
 			let currentPage = 1;
@@ -181,7 +172,6 @@ templ Classes(data ClassesData) {
 				} else {
 					html += '<span class="pagination-btn disabled">Next</span>';
 				}
-				paginationTop.innerHTML = html;
 				paginationBottom.innerHTML = html;
 				document.querySelectorAll('.pagination-btn[data-page]').forEach(btn => {
 					btn.addEventListener('click', () => {
@@ -228,31 +218,33 @@ templ Classes(data ClassesData) {
 							const row = document.createElement('tr');
 							if (record.status === 'cancelled') {
 								row.classList.add('row-cancelled');
+							} else if (record.status === 'rescheduled') {
+								row.classList.add('row-rescheduled');
 							}
 							const editHref = buildURL('/classes/' + record.id + '/edit');
-							const columnLabels = [];
+							const columnLabels = ['Date', 'Start Time', 'End Time'];
 							if (showAllTeachers) {
 								columnLabels.push('Teacher');
 							}
-							columnLabels.push('Student Name', 'Duration (min)', 'Rate', 'Status', 'Reason', 'Notes', 'Date');
-							const cells = [];
+							columnLabels.push('Student', 'Rate', 'Status');
+							const cells = [
+								record.date,
+								record.startTime || '-',
+								record.endTime || '-',
+							];
 							if (showAllTeachers) {
 								cells.push(record.teacherName);
 							}
 							cells.push(
 								record.studentName,
-								String(record.durationMinutes),
 								record.rate + ' ' + record.currency,
 								record.status,
-								record.reason || '-',
-								record.notes || '-',
-								record.date,
 							);
 							cells.forEach((text, index) => {
 								const cell = document.createElement('td');
 								cell.textContent = text;
 								cell.dataset.label = columnLabels[index];
-								const statusIndex = showAllTeachers ? 4 : 3;
+								const statusIndex = showAllTeachers ? 6 : 5;
 								if (index === statusIndex) {
 									cell.className = 'status-' + record.status;
 								}
@@ -273,12 +265,6 @@ templ Classes(data ClassesData) {
 						});
 					}
 
-					totalRateSpan.textContent = data.totalRate || 0;
-					if (showAllTeachers) {
-						totalCurrencySpan.textContent = '';
-					} else {
-						totalCurrencySpan.textContent = data.records && data.records.length > 0 ? data.records[0].currency : '';
-					}
 					if (data.page) {
 						renderPagination(data.page);
 					}

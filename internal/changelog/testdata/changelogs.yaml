@@ -1,0 +1,38 @@
+unreleased:
+  breaking_changes: []
+  new_features:
+    - text: "Unreleased feature for tests."
+      commit: "abc1234"
+  improvements: []
+  bug_fixes: []
+  removed: []
+  security: []
+  deprecated: []
+  internal: []
+
+versions:
+  - version: "2026.08.13"
+    date: "2026-08-13"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Released feature for tests."
+        commit: "def5678"
+    improvements: []
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
+  - version: "2026.07.15"
+    date: "2026-07-15"
+    released: false
+    breaking_changes: []
+    new_features: []
+    improvements: []
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []

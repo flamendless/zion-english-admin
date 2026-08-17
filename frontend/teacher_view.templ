@@ -1,0 +1,191 @@
+package frontend
+
+import "fmt"
+
+type TeacherViewData struct {
+	ID             string
+	Name           string
+	Email          string
+	FirstName      string
+	MiddleName     string
+	LastName       string
+	Birthdate      string
+	Address        string
+	JoiningDate    string
+	MobileNumber   string
+	Certifications string
+	AssignedColor  string
+	RatePerClass   float64
+	Currency       string
+	DriveUrl       string
+	Sex            string
+	Status         string
+	Avatar         AvatarProps
+}
+
+templ TeacherViewModal(data TeacherViewData) {
+	<div class="modal-overlay" id="teacherViewModal" role="presentation">
+		<div class="modal-dialog modal-dialog-profile" role="dialog" aria-modal="true" aria-labelledby="teacherViewTitle">
+			<div class="modal-header">
+				<h3 id="teacherViewTitle">Teacher profile</h3>
+				<button type="button" class="modal-close teacher-view-close" aria-label="Close" onclick="window.closeTeacherViewModal()">&times;</button>
+			</div>
+			<div class="modal-body teacher-view-body">
+				@TeacherViewProfileStyles()
+				<div class="profile-layout teacher-view-layout">
+					<div class="profile-card">
+						<div class="profile-identity">
+							@Avatar(data.Avatar)
+							<h2>{ data.Name }</h2>
+							<span class="profile-role">teacher</span>
+							<p class="profile-email">{ data.Email }</p>
+						</div>
+					</div>
+					<div class="profile-card">
+						<div class="profile-tablist" role="tablist" aria-label="Teacher profile sections">
+							<button type="button" class="profile-tab is-active" role="tab" aria-selected="true" data-profile-tab="personal" onclick="window.switchTeacherProfileTab('personal')">Personal</button>
+							<button type="button" class="profile-tab" role="tab" aria-selected="false" data-profile-tab="contact" onclick="window.switchTeacherProfileTab('contact')">Contact &amp; work</button>
+						</div>
+						<div class="profile-tab-panel is-active" role="tabpanel" data-profile-panel="personal">
+							<h2>Personal information</h2>
+							<div class="profile-details">
+								@ProfileDetailField("First name", data.FirstName)
+								@ProfileDetailField("Middle name", displayOrDash(data.MiddleName))
+								@ProfileDetailField("Last name", data.LastName)
+								@ProfileDetailField("Status", data.Status)
+								@ProfileDetailField("Birthdate", data.Birthdate)
+								@ProfileDetailField("Date joined", data.JoiningDate)
+								@ProfileDetailField("Address", data.Address)
+								@ProfileDetailField("Sex", displayOrDash(data.Sex))
+							</div>
+						</div>
+						<div class="profile-tab-panel" role="tabpanel" data-profile-panel="contact">
+							<h2>Contact & work</h2>
+							<div class="profile-details">
+								@ProfileDetailField("Email", data.Email)
+								@ProfileDetailField("Mobile number", data.MobileNumber)
+								@ProfileDetailField("Rate per class", fmt.Sprintf("%.2f %s", data.RatePerClass, data.Currency))
+								@ProfileDetailField("Certifications", displayOrDash(data.Certifications))
+								<div class="profile-detail">
+									<span class="profile-detail-label">Google Sheet</span>
+									<span class="profile-detail-value">
+										@displayURL(data.DriveUrl)
+									</span>
+								</div>
+								<div class="profile-detail">
+									<span class="profile-detail-label">Assigned color</span>
+									<span class="profile-detail-value">
+										<div class="color-cell">
+											<div class="color-box" style={ "background-color: " + data.AssignedColor }></div>
+											<span>{ data.AssignedColor }</span>
+										</div>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+templ ProfileDetailField(label, value string) {
+	<div class="profile-detail">
+		<span class="profile-detail-label">{ label }</span>
+		<span class="profile-detail-value">{ value }</span>
+	</div>
+}
+
+templ TeacherViewProfileStyles() {
+	<style>
+		.teacher-view-body {
+			padding: var(--space-4);
+		}
+
+		.teacher-view-layout {
+			display: grid;
+			gap: var(--space-4);
+		}
+
+		@media (min-width: 768px) {
+			.teacher-view-layout {
+				grid-template-columns: 220px 1fr;
+				align-items: start;
+			}
+		}
+
+		.teacher-view-body .profile-card {
+			background: var(--color-muted);
+			border: 1px solid var(--color-border-subtle);
+			border-radius: var(--radius-lg);
+			padding: var(--space-4);
+		}
+
+		.teacher-view-body .profile-card h2 {
+			margin-bottom: var(--space-4);
+			font-size: 1.125rem;
+		}
+
+		.teacher-view-body .profile-identity {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			text-align: center;
+			gap: var(--space-3);
+		}
+
+		.teacher-view-body .profile-identity h2 {
+			margin: 0;
+			font-size: 1rem;
+		}
+
+		.teacher-view-body .profile-role {
+			display: inline-block;
+			padding: 4px 12px;
+			border-radius: var(--radius-full);
+			background: var(--color-primary-light);
+			color: var(--color-primary-hover);
+			font-size: 0.8125rem;
+			font-weight: 600;
+			text-transform: capitalize;
+		}
+
+		.teacher-view-body .profile-email {
+			color: var(--color-muted-foreground);
+			font-size: 0.875rem;
+			word-break: break-all;
+		}
+
+		.teacher-view-body .profile-details {
+			display: grid;
+			gap: var(--space-4);
+		}
+
+		@media (min-width: 640px) {
+			.teacher-view-body .profile-details {
+				grid-template-columns: 1fr 1fr;
+			}
+		}
+
+		.teacher-view-body .profile-detail {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-1);
+		}
+
+		.teacher-view-body .profile-detail-label {
+			font-size: 0.75rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+			color: var(--color-muted-foreground);
+		}
+
+		.teacher-view-body .profile-detail-value {
+			font-size: 0.9375rem;
+			color: var(--color-foreground);
+			word-break: break-word;
+		}
+	</style>
+}

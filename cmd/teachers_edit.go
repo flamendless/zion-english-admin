@@ -28,7 +28,56 @@ func handleTeachersPath(w http.ResponseWriter, r *http.Request) {
 		handleTeacherEdit(w, r, id)
 		return
 	}
+	if id, ok := extractPathID(r, "teachers", "/view"); ok {
+		handleTeacherView(w, r, id)
+		return
+	}
 	HttpError(w, "Not found", http.StatusNotFound)
+}
+
+func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx := r.Context()
+	row, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, teacherID)
+	if err != nil {
+		HttpError(w, "Teacher not found", http.StatusNotFound)
+		return
+	}
+
+	certifications := ""
+	if row.Certifications.Valid {
+		certifications = row.Certifications.String
+	}
+	sex := ""
+	if row.Sex.Valid {
+		sex = row.Sex.String
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	frontend.TeacherViewModal(frontend.TeacherViewData{
+		ID:             strconv.FormatInt(teacherID, 10),
+		Name:           row.Name,
+		Email:          row.Email,
+		FirstName:      row.FirstName,
+		MiddleName:     row.MiddleName,
+		LastName:       row.LastName,
+		Birthdate:      row.Birthdate,
+		Address:        row.Address,
+		JoiningDate:    row.JoiningDate,
+		MobileNumber:   row.MobileNumber,
+		Certifications: certifications,
+		AssignedColor:  row.AssignedColor,
+		RatePerClass:   row.RatePerClass,
+		Currency:       row.Currency,
+		DriveUrl:       row.DriveUrl,
+		Sex:            sex,
+		Status:         row.Status,
+		Avatar:         buildTeacherAvatarProps(row),
+	}).Render(ctx, w)
 }
 
 func handleTeachers(w http.ResponseWriter, r *http.Request) {

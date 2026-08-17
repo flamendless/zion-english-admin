@@ -28,7 +28,14 @@ templ ActionCard(url string, h2 string, desc string) {
 	</a>
 }
 
-templ TeacherOptions(teachers []models.TeacherAPIResponse) {
+templ ActionCardFeature(url string, h2 string, desc string) {
+	<a href={ utils.URL(url) } class="card card-feature">
+		<h2>{ h2 }</h2>
+		<p>{ desc }</p>
+	</a>
+}
+
+templ TeacherOptions(teachers []models.TeacherAPIResponse, selectedID string) {
 	<option value="">-- Select Teacher --</option>
 	for _, t := range teachers {
 		<option
@@ -38,16 +45,22 @@ templ TeacherOptions(teachers []models.TeacherAPIResponse) {
 			data-name={ t.Name }
 			data-driveurl={ t.DriveUrl }
 			data-template={ t.Template }
+			selected?={ selectedID != "" && fmt.Sprintf("%d", t.ID) == selectedID }
 		>
 			{ t.Name }
 		</option>
 	}
 }
 
-templ StudentOptions(students []models.StudentAPIResponse) {
+templ StudentOptions(students []models.StudentAPIResponse, selectedID string) {
 	<option value="">-- Select Student --</option>
 	for _, s := range students {
-		<option value={ fmt.Sprintf("%d", s.ID) } data-rate={ fmt.Sprintf("%.2f", s.RatePerClass) } data-currency={ s.Currency }>{ s.Name }</option>
+		<option
+			value={ fmt.Sprintf("%d", s.ID) }
+			data-rate={ fmt.Sprintf("%.2f", s.RatePerClass) }
+			data-currency={ s.Currency }
+			selected?={ selectedID != "" && fmt.Sprintf("%d", s.ID) == selectedID }
+		>{ s.Name }</option>
 	}
 }
 
@@ -114,6 +127,10 @@ templ NavLink(url string, id string, text string) {
 }
 
 templ DriveURLInput() {
+	@DriveURLInputWithValue("")
+}
+
+templ DriveURLInputWithValue(value string) {
 	<div class="form-group">
 		<label for="driveUrl">Google Sheet URL *</label>
 		<p class="field-hint">Link to your Google Sheet that you use for tracking classes</p>
@@ -122,6 +139,7 @@ templ DriveURLInput() {
 			id="driveUrl"
 			name="driveUrl"
 			required
+			value={ value }
 			placeholder="https://docs.google.com/spreadsheets/..."
 		/>
 		<div class="error-message" id="driveUrlError">Google Sheet URL is required</div>
@@ -133,6 +151,19 @@ templ DateInput(id string, text string) {
 		<label for={ id }>{ text }</label>
 		<input type="date" id={ id } name={ id } required/>
 		{ children... }
+	</div>
+}
+
+templ ClassDateField(value string, readonly bool) {
+	<div class="form-group">
+		<label for="date">Date *</label>
+		if readonly && value != "" {
+			<input type="date" id="date" name="date" value={ value } required readonly/>
+		} else if value != "" {
+			<input type="date" id="date" name="date" value={ value } required/>
+		} else {
+			<input type="date" id="date" name="date" value={ time.Now().Format("2006-01-02") } required/>
+		}
 	</div>
 }
 

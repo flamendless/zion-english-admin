@@ -365,7 +365,7 @@ func parseScheduledClassRequest(r *http.Request, user auth.User, role auth.Role)
 	endTime := r.FormValue("end_time")
 	duration, err := utils.DurationMinutesFromRange(startTime, endTime)
 	if err != nil {
-		return models.ScheduledClassRequest{}, err
+		return models.ScheduledClassRequest{}, friendlyTimeRangeError(err)
 	}
 	rate, err := requireFloat64(r.FormValue("rate"))
 	if err != nil {

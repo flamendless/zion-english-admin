@@ -1,0 +1,142 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+type ChangelogsData struct {
+	Title          string
+	Subtitle       string
+	Empty          bool
+	EmptyMessage   string
+	CurrentLabel   string
+	CurrentVersion string
+	CurrentURL     string
+	Versions       []ChangelogVersionView
+}
+
+type ChangelogVersionView struct {
+	Label      string
+	DateLabel  string
+	Unreleased bool
+	Sections   []ChangelogSectionView
+}
+
+type ChangelogSectionView struct {
+	Title   string
+	Entries []ChangelogEntryView
+}
+
+type ChangelogEntryView struct {
+	Text        string
+	CommitURL   string
+	CommitLabel string
+}
+
+templ Changelogs(data ChangelogsData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Changelogs - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		<style>
+			.changelogs-hero {
+				margin-bottom: var(--space-6);
+			}
+
+			.changelogs-subtitle {
+				margin-top: var(--space-2);
+				color: var(--color-muted-foreground);
+				font-size: 1rem;
+				line-height: 1.5;
+				max-width: 42rem;
+			}
+
+			.changelogs-deployed {
+				display: inline-flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: var(--space-2);
+				margin-top: var(--space-4);
+				padding: var(--space-3) var(--space-4);
+				border: 1px solid var(--color-border-subtle);
+				border-radius: var(--radius-md);
+				background: var(--color-surface);
+			}
+
+			.changelogs-deployed-label {
+				font-size: 0.75rem;
+				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.04em;
+				color: var(--color-muted-foreground);
+			}
+
+			.changelogs-deployed-value {
+				font-size: 0.95rem;
+				font-weight: 600;
+				color: var(--color-foreground);
+			}
+
+			.changelogs-deployed-link {
+				font-size: 0.95rem;
+				font-weight: 600;
+				color: var(--color-primary);
+				text-decoration: none;
+			}
+
+			.changelogs-deployed-link:hover {
+				text-decoration: underline;
+			}
+
+			.changelogs-empty {
+				color: var(--color-muted-foreground);
+				font-size: 1rem;
+			}
+
+			.changelogs-list {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-6);
+				max-width: 48rem;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@HubHeader("Changelogs", "", "", false)
+
+			<div class="changelogs-hero">
+				<p class="changelogs-subtitle">{ data.Subtitle }</p>
+				<div class="changelogs-deployed">
+					<span class="changelogs-deployed-label">{ data.CurrentLabel }</span>
+					if data.CurrentURL != "" {
+						<a
+							href={ data.CurrentURL }
+							class="changelogs-deployed-link"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{ data.CurrentVersion }
+						</a>
+					} else {
+						<span class="changelogs-deployed-value">{ data.CurrentVersion }</span>
+					}
+				</div>
+			</div>
+
+			if data.Empty {
+				<p class="changelogs-empty">{ data.EmptyMessage }</p>
+			} else {
+				<div class="changelogs-list">
+					for _, version := range data.Versions {
+						@ChangelogVersionCard(version)
+					}
+				</div>
+			}
+		</div>
+	</body>
+	</html>
+}

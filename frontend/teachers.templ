@@ -1,7 +1,6 @@
 package frontend
 
 import (
-	"fmt"
 	"zion-english/internal/utils"
 )
 
@@ -80,15 +79,50 @@ templ Teachers(data TeacherData) {
 		<title>Teachers - Zion English Admin Tool</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
+		@AvatarStyles()
 		<script>
-			function copyCellText(btn) {
-				const text = btn.dataset.copy;
-				if (!text) return;
-				navigator.clipboard.writeText(text).then(function () {
-					btn.classList.add('copied');
-					setTimeout(function () { btn.classList.remove('copied'); }, 1500);
+			window.closeTeacherViewModal = function () {
+				const host = document.getElementById('teacherViewModalHost');
+				if (host) host.innerHTML = '';
+				document.body.classList.remove('modal-open');
+			};
+
+			window.switchTeacherProfileTab = function (targetTab) {
+				const root = document.getElementById('teacherViewModal');
+				if (!root || !targetTab) return;
+				root.querySelectorAll('[data-profile-tab]').forEach(function (t) {
+					const active = t.getAttribute('data-profile-tab') === targetTab;
+					t.classList.toggle('is-active', active);
+					t.setAttribute('aria-selected', active ? 'true' : 'false');
 				});
-			}
+				root.querySelectorAll('[data-profile-panel]').forEach(function (panel) {
+					const active = panel.getAttribute('data-profile-panel') === targetTab;
+					panel.classList.toggle('is-active', active);
+				});
+			};
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id !== 'teacherViewModalHost') return;
+				document.body.classList.add('modal-open');
+				const overlay = evt.detail.target.querySelector('#teacherViewModal');
+				const closeBtn = overlay && overlay.querySelector('.teacher-view-close');
+				if (closeBtn) closeBtn.focus();
+			});
+
+			document.body.addEventListener('click', function (e) {
+				if (e.target.closest('.teacher-view-close')) {
+					window.closeTeacherViewModal();
+					return;
+				}
+				const overlay = e.target.closest('#teacherViewModal');
+				if (overlay && e.target === overlay) window.closeTeacherViewModal();
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key === 'Escape' && document.getElementById('teacherViewModal')) {
+					window.closeTeacherViewModal();
+				}
+			});
 		</script>
 	</head>
 	<body>
@@ -103,38 +137,37 @@ templ Teachers(data TeacherData) {
 					<table id="teachersTable" class="table-stack-mobile">
 						<thead>
 							<tr>
-								<th>#</th>
 								<th>Name</th>
 								<th>Status</th>
 								<th>Email</th>
 								<th>Mobile Number</th>
-								<th>Google Sheet URL</th>
-								<th>Sex</th>
-								<th>Address</th>
-								<th>Certifications</th>
-								<th>Birthdate</th>
-								<th>Joining Date</th>
-								<th>Rates Per Class</th>
 								<th>Actions</th>
 							</tr>
 						</thead>
 						<tbody>
-							for i, teacher := range data.Teachers {
+							for _, teacher := range data.Teachers {
 								<tr class={ getTeacherRowClass(teacher.Status) }>
-									<td class="num-cell" data-label="#">{ fmt.Sprintf("%d", i+1) }</td>
-									<td data-label="Name">{ teacher.Name }</td>
+									<td data-label="Name">
+										<button
+											type="button"
+											class="name-link"
+											hx-get={ utils.URL("/teachers/" + teacher.ID + "/view") }
+											hx-target="#teacherViewModalHost"
+											hx-swap="innerHTML"
+										>{ teacher.Name }</button>
+									</td>
 									<td class={ getTeacherStatusClass(teacher.Status) } data-label="Status">{ teacher.Status }</td>
 									<td class="email-cell" data-label="Email">{ getDisplayValue(teacher.Email) }</td>
 									<td data-label="Mobile">{ getDisplayValue(teacher.MobileNumber) }</td>
-									<td data-label="Sheet URL">@displayURL(teacher.DriveUrl)</td>
-									<td data-label="Sex">{ getDisplayValue(teacher.Sex) }</td>
-									<td data-label="Address">@CopyableTextCell(teacher.Address)</td>
-									<td data-label="Certifications">@CopyableTextCell(teacher.Certifications)</td>
-									<td class="date-cell" data-label="Birthdate">{ getDisplayValue(teacher.Birthdate) }</td>
-									<td class="date-cell" data-label="Joined">{ teacher.JoiningDate }</td>
-									<td class="rate-cell" data-label="Rate">{ formatRate(teacher.RatePerClass, teacher.Currency) }</td>
 									<td data-label="Actions">
 										<div class="table-actions">
+											<button
+												type="button"
+												class="view-btn"
+												hx-get={ utils.URL("/teachers/" + teacher.ID + "/view") }
+												hx-target="#teacherViewModalHost"
+												hx-swap="innerHTML"
+											>View</button>
 											<a href={ utils.URL("/teachers/" + teacher.ID + "/edit") } class="edit-btn">Edit</a>
 											if teacher.Status == "pending" {
 												<button
@@ -167,6 +200,7 @@ templ Teachers(data TeacherData) {
 					<p>No teachers found.</p>
 				</div>
 			}
+			<div id="teacherViewModalHost"></div>
 		</div>
 	</body>
 	</html>

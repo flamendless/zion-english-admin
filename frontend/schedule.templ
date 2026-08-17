@@ -21,6 +21,7 @@ templ Schedule(data ScheduleData) {
 		<title>Class Schedule - Zion English Admin</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
+		@ScrTimeRangeJS()
 	</head>
 	<body>
 		<div
@@ -192,7 +193,6 @@ templ Schedule(data ScheduleData) {
 			const modalSubmitBtn = document.getElementById('modalSubmitBtn');
 			const startTimeInput = document.getElementById('start_time');
 			const endTimeInput = document.getElementById('end_time');
-			const durationPreview = document.getElementById('durationPreview');
 
 			function getFormStudentEl() {
 				if (lockTeacher) {
@@ -286,13 +286,6 @@ templ Schedule(data ScheduleData) {
 				return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
 			}
 
-			function formatDurationLabel(minutes) {
-				if (minutes < 60) return minutes + ' min';
-				const h = Math.floor(minutes / 60);
-				const m = minutes % 60;
-				return m === 0 ? h + ' hr' : h + ' hr ' + m + ' min';
-			}
-
 			function recordField(record, camel, snake) {
 				if (record[camel] !== undefined && record[camel] !== null && record[camel] !== '') {
 					return record[camel];
@@ -332,27 +325,6 @@ templ Schedule(data ScheduleData) {
 					const bStart = parseTimeToMinutes(normalizeTime(recordField(b, 'startTime', 'start_time'))) ?? 9999;
 					return aStart - bStart;
 				});
-			}
-
-			function updateDurationPreview() {
-				if (!durationPreview || !startTimeInput || !endTimeInput) return;
-				const start = parseTimeToMinutes(startTimeInput.value);
-				const end = parseTimeToMinutes(endTimeInput.value);
-				if (start === null || end === null) {
-					durationPreview.textContent = '';
-					durationPreview.hidden = true;
-					durationPreview.classList.remove('is-invalid');
-					return;
-				}
-				durationPreview.hidden = false;
-				const diff = end - start;
-				if (diff <= 0) {
-					durationPreview.textContent = 'End time must be after start time';
-					durationPreview.classList.add('is-invalid');
-					return;
-				}
-				durationPreview.textContent = 'Duration: ' + formatDurationLabel(diff);
-				durationPreview.classList.remove('is-invalid');
 			}
 
 			function setCalendarLoading(active) {
@@ -693,7 +665,7 @@ templ Schedule(data ScheduleData) {
 				if (!lockTeacher) {
 					loadStudentsForTeacher('');
 				}
-				updateDurationPreview();
+				updateTimeRangePreview();
 				showFormMessage('', false);
 				if (modalSubmitBtn) {
 					modalSubmitBtn.disabled = false;
@@ -790,8 +762,12 @@ templ Schedule(data ScheduleData) {
 				trapModalFocus(e);
 			});
 
-			if (startTimeInput) startTimeInput.addEventListener('change', updateDurationPreview);
-			if (endTimeInput) endTimeInput.addEventListener('change', updateDurationPreview);
+			function updateTimeRangePreview() {
+				if (window.initTimeRangePreview) initTimeRangePreview();
+			}
+
+			if (startTimeInput) startTimeInput.addEventListener('change', updateTimeRangePreview);
+			if (endTimeInput) endTimeInput.addEventListener('change', updateTimeRangePreview);
 
 			if (scheduleModalForm) {
 				scheduleModalForm.addEventListener('change', (e) => {
@@ -839,6 +815,13 @@ templ Schedule(data ScheduleData) {
 						else endTimeInput.focus();
 						return;
 					}
+					if (window.validateTimeRange) {
+						const rangeCheck = validateTimeRange();
+						if (!rangeCheck.ok) {
+							showFormMessage(rangeCheck.message, true);
+							return;
+						}
+					}
 					const rateEl = document.getElementById('rate');
 					if (!rateEl || rateEl.value <= 0) {
 						showFormMessage('Please enter a valid rate', true);
@@ -870,7 +853,7 @@ templ Schedule(data ScheduleData) {
 							loadStudentsForTeacher('');
 						}
 						if (scheduledDateInput) scheduledDateInput.value = activeDate;
-						updateDurationPreview();
+						if (window.initTimeRangePreview) initTimeRangePreview();
 						await refreshCalendar();
 						renderDayClasses(activeDate);
 					} catch (err) {
@@ -886,28 +869,20 @@ templ Schedule(data ScheduleData) {
 			}
 
 			refreshCalendar();
-			updateDurationPreview();
+			updateTimeRangePreview();
+			if (window.attachTimeRangeFormValidation) attachTimeRangeFormValidation();
 			wireTeacherStudentDropdown();
 			if (!lockTeacher) {
 				loadStudentsForTeacher('');
 			}
 		</script>
+		@ScrTimeRangeInit()
 	</body>
 	</html>
 }
 
 templ ScheduleModalFields() {
-	<div class="time-range-group">
-		<div class="form-group time-input-wrap">
-			<label for="start_time">Start time *</label>
-			<input type="time" id="start_time" name="start_time" step="300" required/>
-		</div>
-		<div class="form-group time-input-wrap">
-			<label for="end_time">End time *</label>
-			<input type="time" id="end_time" name="end_time" step="300" required/>
-		</div>
-	</div>
-	<div class="duration-preview" id="durationPreview" aria-live="polite" hidden></div>
+	@TimeRangeFields("", "", false)
 	<div class="form-row">
 		@CurrencyDropdown()
 		<div class="form-group">

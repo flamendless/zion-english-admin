@@ -15,51 +15,22 @@ templ WelcomeRole() {
 
 templ Header(loggedIn bool, role auth.Role) {
 	<div class="header-section">
-		<h1>
-			<a href={ utils.URL("/") }>
-				<img src={ utils.URL("/static/logo.png") } alt="Zion English" class="header-logo"/>
-			</a>
-		</h1>
+		<div class="header-top">
+			<h1>
+				<a href={ utils.URL("/") }>
+					<img src={ utils.URL("/static/logo.png") } alt="Zion English" class="header-logo"/>
+				</a>
+			</h1>
+			@DigitalClock("compact")
+		</div>
 		if loggedIn {
 			@WelcomeRole()
 		}
 		<div class="header-bottom">
 			<div class="header-left">
 				<div class="nav-links">
-					if IsNavAccessible(role, "/profile") {
-						@NavLink("/profile", "profileLink", "My Profile")
-					}
-					if IsNavAccessible(role, "/students") {
-						@NavLink("/students", "studentsLink", "Students")
-					}
-					if IsNavAccessible(role, "/students/register") {
-						@NavLink("/students/register", "registerStudentLink", "+Student")
-					}
-					if IsNavAccessible(role, "/teachers") {
-						@NavLink("/teachers", "teachersLink", "Teachers")
-					}
-					if IsNavAccessible(role, "/teachers/register") {
-						@NavLink("/teachers/register", "registerTeacherLink", "+Teacher")
-					}
-					if IsNavAccessible(role, "/classes") {
-						if role == auth.RoleTeacher {
-							@NavLink("/classes", "classesLink", "My Classes")
-						} else {
-							@NavLink("/classes", "classesLink", "Classes")
-						}
-					}
-					if IsNavAccessible(role, "/schedule") {
-						@NavLink("/schedule", "scheduleLink", "Class Schedule")
-					}
-					if IsNavAccessible(role, "/classes/record") {
-						@NavLink("/classes/record", "recordClassLink", "+Class")
-					}
-					if IsNavAccessible(role, "/logs") {
-						if role == auth.RoleTeacher {
-							@NavLink("/logs", "logsLink", "Activity")
-						} else {
-							@NavLink("/logs", "logsLink", "Logs")
-						}
+					for _, item := range NavItems(role) {
+						@NavLink(item.Path, item.LinkID, item.Title)
 					}
 				</div>
 			</div>

@@ -280,6 +280,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/schedule", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleSchedule))
 		authMux.HandleFunc(basePath+"/my-students", auth.RequireRole(auth.RoleTeacher)(handleMyStudents))
 		authMux.HandleFunc(basePath+"/logs", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleSystemLogs))
+		authMux.HandleFunc(basePath+"/changelogs", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleChangelogs))
 		authMux.HandleFunc(basePath+"/process-logs", auth.RequireRole(auth.RoleSuperuser)(handleLogs))
 		authMux.HandleFunc(basePath+"/process", auth.RequireRole(auth.RoleSuperuser)(handleProcessPage))
 		authMux.HandleFunc(basePath+"/download/processed", auth.RequireRole(auth.RoleSuperuser)(handleDownload))
@@ -313,6 +314,7 @@ var cmdWeb = &cobra.Command{
 		// protected routes
 		rootMux.Handle(basePath, authHandler)
 		rootMux.Handle(basePath+"/logs", authHandler)
+		rootMux.Handle(basePath+"/changelogs", authHandler)
 		rootMux.Handle(basePath+"/process-logs", authHandler)
 		rootMux.Handle(basePath+"/process", authHandler)
 		rootMux.Handle(basePath+"/download/processed", authHandler)
@@ -321,6 +323,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/students", authHandler)
 		rootMux.Handle(basePath+"/students/", authHandler)
 		rootMux.Handle(basePath+"/teachers", authHandler)
+		rootMux.Handle(basePath+"/teachers/", authHandler)
 		rootMux.Handle(basePath+"/teachers/approve", authHandler)
 		rootMux.Handle(basePath+"/teachers/unapprove", authHandler)
 		rootMux.Handle(basePath+"/classes", authHandler)
@@ -1282,7 +1285,7 @@ func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
 			Template:     template,
 		})
 	}
-	if err := frontend.TeacherOptions(teacherResponses).Render(r.Context(), w); err != nil {
+	if err := frontend.TeacherOptions(teacherResponses, r.URL.Query().Get("selected")).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -1709,7 +1712,9 @@ func handleGetStudents(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	if err := frontend.StudentOptions(studentResponses).Render(ctx, w); err != nil {
+	selectedID := r.URL.Query().Get("selected")
+
+	if err := frontend.StudentOptions(studentResponses, selectedID).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -1743,7 +1748,7 @@ func handleGetMyStudents(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	if err := frontend.StudentOptions(studentResponses).Render(r.Context(), w); err != nil {
+	if err := frontend.StudentOptions(studentResponses, r.URL.Query().Get("selected")).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

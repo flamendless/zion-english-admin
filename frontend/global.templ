@@ -141,6 +141,7 @@ templ GlobalIncludes() {
 		input[type="email"],
 		input[type="tel"],
 		input[type="password"],
+		input[type="url"],
 		select,
 		textarea {
 			width: 100%;
@@ -161,6 +162,7 @@ templ GlobalIncludes() {
 		input[type="email"]:focus,
 		input[type="tel"]:focus,
 		input[type="password"]:focus,
+		input[type="url"]:focus,
 		select:focus,
 		textarea:focus {
 			outline: none;
@@ -178,6 +180,7 @@ templ GlobalIncludes() {
 		}
 
 		input:disabled,
+		input[readonly],
 		select:disabled {
 			background-color: var(--color-muted);
 			cursor: not-allowed;
@@ -444,6 +447,13 @@ templ GlobalIncludes() {
 			gap: var(--space-3);
 		}
 
+		.header-top {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: var(--space-4);
+		}
+
 		.header-section h3 {
 			color: var(--color-muted-foreground);
 			font-weight: 400;
@@ -523,6 +533,25 @@ templ GlobalIncludes() {
 
 		.made-by a:hover {
 			text-decoration: underline;
+		}
+
+		.digital-clock {
+			font-family: 'Fira Code', monospace;
+			font-variant-numeric: tabular-nums;
+			color: var(--color-muted-foreground);
+		}
+
+		.digital-clock--hero {
+			display: block;
+			margin-top: var(--space-2);
+			font-size: clamp(1.75rem, 4vw, 2.25rem);
+			letter-spacing: 0.05em;
+		}
+
+		.digital-clock--compact {
+			flex-shrink: 0;
+			font-size: 1rem;
+			text-align: right;
 		}
 
 		/* ============================= */
@@ -926,6 +955,10 @@ templ GlobalIncludes() {
 			background-color: var(--color-error-bg) !important;
 		}
 
+		.row-rescheduled {
+			background-color: var(--color-warning-bg) !important;
+		}
+
 		/* ============================= */
 		/* Teachers page                 */
 		/* ============================= */
@@ -987,6 +1020,7 @@ templ GlobalIncludes() {
 		}
 
 		.table-actions .edit-btn,
+		.table-actions .view-btn,
 		.table-actions .approve-btn,
 		.table-actions .unapprove-btn {
 			margin-top: 0;
@@ -1172,6 +1206,12 @@ templ GlobalIncludes() {
 		.stat-card:hover {
 			border-color: var(--color-border);
 			box-shadow: var(--shadow-sm);
+		}
+
+		a.stat-card {
+			text-decoration: none;
+			color: inherit;
+			cursor: pointer;
 		}
 
 		.stat-card-accent {
@@ -1494,6 +1534,10 @@ templ GlobalIncludes() {
 			width: min(100%, 40rem);
 		}
 
+		.modal-dialog-profile {
+			width: min(100%, 56rem);
+		}
+
 		@keyframes modal-dialog-in {
 			from {
 				opacity: 0;
@@ -1580,6 +1624,49 @@ templ GlobalIncludes() {
 
 		.modal-footer .btn {
 			min-width: 9rem;
+		}
+
+		/* Teacher view modal tabs */
+		#teacherViewModal .profile-tablist {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--space-2);
+			margin-bottom: var(--space-4);
+			border-bottom: 1px solid var(--color-border-subtle);
+			padding-bottom: var(--space-2);
+		}
+
+		#teacherViewModal .profile-tab {
+			margin: 0;
+			margin-top: 0;
+			padding: var(--space-2) var(--space-3);
+			border: none;
+			border-radius: var(--radius-sm);
+			background: transparent;
+			color: var(--color-muted-foreground);
+			font-size: 0.875rem;
+			font-weight: 500;
+			width: auto;
+			display: inline-block;
+			cursor: pointer;
+		}
+
+		#teacherViewModal .profile-tab:hover {
+			background: var(--color-surface);
+			color: var(--color-foreground);
+		}
+
+		#teacherViewModal .profile-tab.is-active {
+			background: var(--color-primary-light);
+			color: var(--color-primary-hover);
+		}
+
+		#teacherViewModal .profile-tab-panel {
+			display: none;
+		}
+
+		#teacherViewModal .profile-tab-panel.is-active {
+			display: block;
 		}
 
 		.cancel-confirm-panel {
@@ -1908,11 +1995,17 @@ templ GlobalIncludes() {
 			gap: var(--space-4);
 		}
 
+		.time-range-fields {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-4);
+		}
+
 		.time-range-group {
 			display: grid;
 			grid-template-columns: 1fr 1fr;
-			gap: var(--space-3);
-			align-items: end;
+			gap: var(--space-4);
+			align-items: start;
 		}
 
 		.time-range-separator {
@@ -1936,6 +2029,7 @@ templ GlobalIncludes() {
 			display: inline-flex;
 			align-items: center;
 			gap: var(--space-2);
+			margin-bottom: var(--space-4);
 			padding: 0.5rem 0.75rem;
 			background: var(--color-primary-light);
 			border: 1px solid var(--color-border);
@@ -2015,6 +2109,39 @@ templ GlobalIncludes() {
 			border: 1px solid var(--color-border);
 			text-decoration: none;
 			font-size: 0.85rem;
+		}
+
+		.view-btn {
+			display: inline-block;
+			padding: var(--space-1) var(--space-3);
+			border-radius: var(--radius-sm);
+			background: var(--color-primary-light);
+			border: 1px solid color-mix(in srgb, var(--color-primary) 35%, transparent);
+			color: var(--color-primary-hover);
+			font-size: 0.85rem;
+			cursor: pointer;
+		}
+
+		.view-btn:hover {
+			background: color-mix(in srgb, var(--color-primary-light) 80%, var(--color-primary));
+		}
+
+		.name-link {
+			margin: 0;
+			padding: 0;
+			border: none;
+			background: none;
+			color: var(--color-accent);
+			font: inherit;
+			font-weight: 500;
+			text-align: left;
+			cursor: pointer;
+			text-decoration: underline;
+			text-underline-offset: 2px;
+		}
+
+		.name-link:hover {
+			color: var(--color-accent-hover);
 		}
 
 		.checkbox-group {
@@ -2195,6 +2322,7 @@ templ GlobalIncludes() {
 			}
 
 			.table-stack-mobile .table-actions .edit-btn,
+			.table-stack-mobile .table-actions .view-btn,
 			.table-stack-mobile .table-actions .approve-btn,
 			.table-stack-mobile .table-actions .unapprove-btn {
 				width: 100%;
@@ -2288,13 +2416,18 @@ templ GlobalIncludes() {
 			.calendar-nav-btn,
 			.calendar-today-btn,
 			.modal-close,
-			.action-btn {
+			.action-btn,
+			#teacherViewModal .profile-tab {
 				width: auto;
 				margin-top: 0;
 			}
 
 			.header-section {
 				align-items: flex-start;
+			}
+
+			.digital-clock--compact {
+				font-size: 0.875rem;
 			}
 
 			.header-bottom {
@@ -2552,6 +2685,7 @@ templ GlobalIncludes() {
 	}
 	@ScrHTMX()
 	@ScrHyperscript()
+	@ScrClock()
 	@SuccessBannerHandlers()
 	@ErrorBannerHandlers()
 }

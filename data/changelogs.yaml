@@ -1,0 +1,250 @@
+unreleased:
+  breaking_changes: []
+  new_features:
+    - text: "You can record and edit classes with start and end times instead of entering duration only."
+    - text: "Superusers can view teacher profile details in a quick-view modal from the teachers list."
+  improvements:
+    - text: "A live digital clock appears on the dashboard and page headers."
+  bug_fixes: []
+  removed: []
+  security: []
+  deprecated: []
+  internal: []
+
+versions:
+  - version: "2026.08.17"
+    date: "2026-08-17"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "You can browse release notes on the Changelogs page from the dashboard."
+    improvements: []
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
+  - version: "2026.08.15"
+    date: "2026-08-15"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "You can plan and view upcoming classes on the Class Schedule page."
+        commit: "76f51b3"
+      - text: "Teachers can view and update their profile, mobile number, and password."
+        commit: "f37aab6"
+      - text: "The dashboard shows role-specific overview stats and quick-action cards."
+        commit: "aee12ba"
+      - text: "Superusers can edit class, student, and teacher records from dedicated edit pages."
+        commit: "aee12ba"
+      - text: "Teachers have a My Students page to see students assigned to them."
+        commit: "aee12ba"
+    improvements:
+      - text: "Admin tables now use pagination for easier browsing of long lists."
+        commit: "aee12ba"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
+  - version: "2026.08.03"
+    date: "2026-08-03"
+    released: true
+    breaking_changes: []
+    new_features: []
+    improvements:
+      - text: "Raised the teacher self-registration limit."
+        commit: "7043df5"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
+  - version: "2026.08.01"
+    date: "2026-08-01"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "You can link related students when registering a new student."
+        commit: "bd25b70"
+      - text: "Teacher registration collects first, middle, and last name separately."
+        commit: "7719e2b"
+    improvements:
+      - text: "Refreshed UI styling across login, dashboard, and admin pages."
+        commit: "7c4507c"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal:
+      - text: "Added deployment script for SSH-based releases."
+        commit: "a46d31c"
+
+  - version: "2026.06.20"
+    date: "2026-06-20"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Teachers can reset their password using a forgot-password email flow."
+        commit: "2c5e1a9"
+    improvements:
+      - text: "Updated the teachers table with approval status and clearer columns."
+        commit: "673981a"
+      - text: "Removed assigned-color row highlighting from teacher lists."
+        commit: "f3b4991"
+    bug_fixes:
+      - text: "Fixed an issue where superuser actions were not recorded in system logs."
+        commit: "e1a66fd"
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
+  - version: "2026.06.17"
+    date: "2026-06-17"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Superusers can approve or unapprove pending teacher accounts."
+        commit: "b3682ce"
+    improvements:
+      - text: "Improved login flow and general UI polish."
+        commit: "9e438bc"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
+  - version: "2026.04.02"
+    date: "2026-04-02"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Superusers can browse system activity logs; teachers can view their own recent actions."
+        commit: "1744be4"
+    improvements: []
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
+  - version: "2026.04.01"
+    date: "2026-04-01"
+    released: true
+    breaking_changes: []
+    new_features: []
+    improvements:
+      - text: "Teachers are listed in alphabetical order by name."
+        commit: "407728b"
+      - text: "The process page auto-fills a teacher's Google Drive URL when you select them."
+        commit: "1b17bfd"
+      - text: "The process page remembers and reuses column templates per teacher."
+        commit: "26fff57"
+    bug_fixes:
+      - text: "Fixed name validation to accept a wider range of valid names."
+        commit: "a26285e"
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
+  - version: "2026.03.17"
+    date: "2026-03-17"
+    released: true
+    breaking_changes: []
+    new_features: []
+    improvements: []
+    bug_fixes:
+      - text: "Fixed an edge case when processing CSV class records."
+        commit: "e0276b4"
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
+  - version: "2026.03.16"
+    date: "2026-03-16"
+    released: true
+    breaking_changes: []
+    new_features: []
+    improvements:
+      - text: "The record-class form uses teacher and student dropdowns instead of manual IDs."
+        commit: "875b95d"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
+  - version: "2026.03.14"
+    date: "2026-03-14"
+    released: true
+    breaking_changes: []
+    new_features: []
+    improvements:
+      - text: "The process page uses HTMX for smoother CSV uploads and result feedback."
+        commit: "b8da847"
+      - text: "The process page pre-selects the teacher and date range from your last run."
+        commit: "09d4bdd"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
+  - version: "2026.03.11"
+    date: "2026-03-11"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Access logs track admin tool usage."
+        commit: "69f0e81"
+    improvements:
+      - text: "Student and teacher registration forms use HTMX for faster submissions."
+        commit: "9593702"
+      - text: "Login and registration forms are responsive on mobile devices."
+        commit: "4aa9568"
+      - text: "You can show or hide your password on login and teacher registration."
+        commit: "e7b9640"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
+  - version: "2026.03.05"
+    date: "2026-03-05"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "You can view, filter, and record class sessions from the Classes hub."
+        commit: "0364583"
+      - text: "Forms show a clear error banner when something goes wrong."
+        commit: "934362c"
+    improvements:
+      - text: "Record class form no longer relies on custom JavaScript for validation."
+        commit: "fa318ad"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
+  - version: "2026.03.03"
+    date: "2026-03-03"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Role-based login for superusers and teachers with separate access levels."
+        commit: "837d4ea"
+    improvements: []
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
