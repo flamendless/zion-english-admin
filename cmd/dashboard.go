@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -237,9 +238,9 @@ func handleLogoutWithAccess(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	if user, ok := auth.UserFromRequest(r, conf.Conf()); ok {
 		if user.Role == auth.RoleSuperuser {
-			insertAuditLogAs(ctx, user, "auth", "logged out")
+			insertAuditLogAs(ctx, user, "auth", fmt.Sprintf("logged out (%s)", user.Email))
 		} else if user.Role == auth.RoleTeacher && user.ID > 0 {
-			insertAuditLogAs(ctx, user, "auth", "logged out")
+			insertAuditLogAs(ctx, user, "auth", fmt.Sprintf("logged out (%s)", user.Email))
 			accessID, err := dbRW.GetQueries().GetLatestOpenAccessByTeacherID(ctx, user.ID)
 			if err == nil && accessID > 0 {
 				if _, err := dbRW.GetQueries().UpdateAccessLogout(ctx, accessID); err != nil {

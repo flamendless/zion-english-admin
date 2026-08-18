@@ -1418,7 +1418,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	switch user.Role {
 	case auth.RoleSuperuser, auth.RoleTeacher:
-		insertAuditLogAs(r.Context(), user, "auth", "logged in")
+		insertAuditLogAs(r.Context(), user, "auth", fmt.Sprintf("logged in (%s)", user.Email))
 	}
 
 	if ua := r.UserAgent(); ua != "" && user.Role == auth.RoleTeacher && user.ID != 0 {
