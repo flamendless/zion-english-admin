@@ -9,6 +9,36 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.08.19"
+    date: "2026-08-19"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Superusers can generate and download teacher payroll XLSX reports for a date range from the new Reports page."
+        commit: "37cd3c7"
+      - text: "You can preview a teacher's class summary and earnings in a quick-view modal before downloading a report."
+        commit: "37cd3c7"
+      - text: "A new Reports & Generation guide walks superusers through reviewing summaries and exporting reports."
+        commit: "37cd3c7"
+    improvements:
+      - text: "The students list shows each student's assigned teacher and highlights inactive students."
+        commit: "913f0bb"
+      - text: "Teacher profile pictures appear as avatars on the class schedule."
+        commit: "913f0bb"
+      - text: "When editing an announcement, you can discard changes or keep a start date that is already in the past."
+        commit: "913f0bb"
+      - text: "Guide cards show whether a guide is for teachers or superusers."
+        commit: "37cd3c7"
+      - text: "System activity logs now include the user's email address for easier auditing."
+        commit: "fbc0d4a"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal:
+      - text: "Added assign_student_colors CLI command for bulk student color assignment in XLSX exports."
+        commit: "913f0bb"
+
   - version: "2026.08.17.4"
     date: "2026-08-17"
     released: true
