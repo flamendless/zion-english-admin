@@ -166,12 +166,21 @@ type ScheduledClassRequest struct {
 	Currency        string  `json:"currency"`
 }
 
+type AvatarView struct {
+	Initials      string `json:"initials"`
+	AssignedColor string `json:"assignedColor"`
+	HasPicture    bool   `json:"hasPicture"`
+	PictureURL    string `json:"pictureURL"`
+	Alt           string `json:"alt"`
+}
+
 type ScheduledClassView struct {
 	ID              int64   `json:"id"`
 	StudentID       int64   `json:"studentId"`
 	TeacherID       int64   `json:"teacherId"`
 	StudentName     string  `json:"studentName"`
 	TeacherName     string  `json:"teacherName"`
+	TeacherAvatar   AvatarView `json:"teacherAvatar"`
 	ScheduledDate   string  `json:"scheduledDate"`
 	StartTime       string  `json:"startTime"`
 	EndTime         string  `json:"endTime"`

@@ -107,6 +107,17 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		relationshipsByStudent[rel.StudentID] = append(relationshipsByStudent[rel.StudentID], rel)
 	}
 
+	teacherAssignments, err := dbRO.GetQueries().GetAllStudentTeacherNames(ctx)
+	if err != nil {
+		HttpError(w, fmt.Sprintf("Failed to fetch teacher assignments: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	teachersByStudent := make(map[int64][]string)
+	for _, assignment := range teacherAssignments {
+		teachersByStudent[assignment.StudentID] = append(teachersByStudent[assignment.StudentID], assignment.TeacherName)
+	}
+
 	viewStudents := make([]frontend.StudentItem, len(students))
 	for i, s := range students {
 		viewStudents[i] = frontend.StudentItem{
@@ -118,6 +129,7 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 			ParentName:       s.ParentName.String,
 			AssignedColor:    s.AssignedColor,
 			Status:           s.Status,
+			TeacherDisplay:   strings.Join(teachersByStudent[s.ID], ", "),
 			RelatedToDisplay: formatStudentRelationships(relationshipsByStudent[s.ID]),
 			CreatedAt:        s.CreatedAt.Time.Format("2006-01-02 15:04:05"),
 			UpdatedAt:        s.UpdatedAt.Time.Format("2006-01-02 15:04:05"),

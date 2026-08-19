@@ -21,6 +21,7 @@ templ Schedule(data ScheduleData) {
 		<title>Class Schedule - Zion English Admin</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
+		@AvatarStyles()
 		@ScrTimeRangeJS()
 	</head>
 	<body>
@@ -511,6 +512,27 @@ templ Schedule(data ScheduleData) {
 				return buildURL('/classes/record?' + params.toString());
 			}
 
+			function createTeacherAvatar(avatar) {
+				const el = document.createElement('div');
+				el.className = 'avatar avatar-sm day-class-avatar';
+				el.style.backgroundColor = (avatar && avatar.assignedColor) || '#B9D283';
+				el.setAttribute('aria-label', (avatar && avatar.alt) || 'Teacher avatar');
+				if (avatar && avatar.hasPicture && avatar.pictureURL) {
+					const img = document.createElement('img');
+					img.src = avatar.pictureURL;
+					img.alt = avatar.alt || '';
+					img.className = 'avatar-image';
+					el.appendChild(img);
+				} else {
+					const span = document.createElement('span');
+					span.className = 'avatar-initials';
+					span.setAttribute('aria-hidden', 'true');
+					span.textContent = (avatar && avatar.initials) || '?';
+					el.appendChild(span);
+				}
+				return el;
+			}
+
 			function renderClassList(container, records, emptyMessage) {
 				if (!container) return;
 				container.innerHTML = '';
@@ -531,9 +553,14 @@ templ Schedule(data ScheduleData) {
 					const info = document.createElement('div');
 					info.className = 'day-class-info';
 
+					const header = document.createElement('div');
+					header.className = 'day-class-header';
+					header.appendChild(createTeacherAvatar(record.teacherAvatar));
+
 					const title = document.createElement('strong');
-					title.textContent = showAllTeachers ? record.studentName + ' · ' + record.teacherName : record.studentName;
-					info.appendChild(title);
+					title.textContent = record.teacherName + ' - ' + record.studentName;
+					header.appendChild(title);
+					info.appendChild(header);
 
 					const time = document.createElement('span');
 					time.className = 'day-class-time';

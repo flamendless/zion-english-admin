@@ -44,3 +44,10 @@ FROM tbl_teachers t
 INNER JOIN tbl_teachers_students_m2m m2m ON t.id = m2m.teacher_id
 WHERE m2m.student_id = ?
 ORDER BY t.name ASC;
+
+-- name: GetAllStudentTeacherNames :many
+SELECT m2m.student_id, t.name as teacher_name
+FROM tbl_teachers_students_m2m m2m
+INNER JOIN tbl_teachers t ON t.id = m2m.teacher_id
+WHERE t.deleted = 0
+ORDER BY m2m.student_id ASC, t.name ASC;

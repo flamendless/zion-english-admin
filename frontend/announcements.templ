@@ -48,6 +48,13 @@ type AnnouncementFormData struct {
 	CTAURL      string
 }
 
+func (d AnnouncementFormData) StartDateMin() string {
+	if d.IsEdit && d.StartDate != "" && d.StartDate < d.Today {
+		return d.StartDate
+	}
+	return d.Today
+}
+
 func announcementLevelLabel(level string) string {
 	switch level {
 	case announcements.LevelWarning:
@@ -294,7 +301,7 @@ templ AnnouncementForm(data AnnouncementFormData) {
 									id="start_date"
 									name="start_date"
 									required
-									min={ data.Today }
+									min={ data.StartDateMin() }
 									value={ data.StartDate }
 								/>
 							</div>
@@ -348,6 +355,9 @@ templ AnnouncementForm(data AnnouncementFormData) {
 
 					<div class="announcement-form-actions">
 						<button type="submit" class="announcement-submit-btn">{ announcementSubmitLabel(data) }</button>
+						if data.IsEdit {
+							<a href={ utils.URL("/announcements") } class="add-btn add-btn-secondary announcement-discard-btn">Discard changes</a>
+						}
 					</div>
 				</form>
 
@@ -947,7 +957,20 @@ templ AnnouncementPageStyles() {
 		}
 
 		.announcement-form-actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-3);
 			padding-top: var(--space-2);
+		}
+		.announcement-form-actions button,
+		.announcement-form-actions .add-btn {
+			margin-top: 0;
+			padding: 10px 20px;
+			font-size: 14px;
+			font-weight: 500;
+			line-height: 1.25;
+			box-sizing: border-box;
 		}
 		.announcement-submit-btn {
 			min-width: 180px;

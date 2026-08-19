@@ -8,24 +8,6 @@ import (
 
 type XLSXWriter struct{}
 
-var lightColors = []string{
-	"FFE6E6", // light red
-	"E6F3FF", // light blue
-	"E6FFE6", // light green
-	"FFF9E6", // light yellow
-	"F0E6FF", // light purple
-	"FFE6CC", // light orange
-	"FFE6F0", // light pink
-	"E6FFFF", // light cyan
-	"F5F5F5", // light gray
-	"E6F5FF", // light sky blue
-	"FFF0E6", // light peach
-	"F0FFE6", // light lime
-	"FFE6F5", // light rose
-	"E6E6FF", // light lavender
-	"FFFFE6", // light cream
-}
-
 func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colIndices ColumnIndices, name string) error {
 	f := excelize.NewFile()
 	defer func() {
@@ -100,7 +82,7 @@ func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colI
 
 	// Assign colors sequentially to ensure different colors for consecutive names
 	for i, name := range uniqueNames {
-		nameColorMap[name] = lightColors[i%len(lightColors)]
+		nameColorMap[name] = StudentColor(i)
 	}
 
 	for _, rec := range records {

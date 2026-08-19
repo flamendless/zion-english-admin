@@ -81,13 +81,8 @@ func ValidateRequest(req Request, isUpdate bool) error {
 		return ErrEndDatePast
 	}
 
-	if isUpdate && req.OriginalStart != "" {
-		if req.OriginalStart < today {
-			// Already started — keep original start even if in the past.
-		} else if startDay < today {
-			return ErrStartDatePast
-		}
-	} else if startDay < today {
+	startUnchanged := isUpdate && req.OriginalStart != "" && req.StartDate == req.OriginalStart
+	if !startUnchanged && startDay < today {
 		return ErrStartDatePast
 	}
 

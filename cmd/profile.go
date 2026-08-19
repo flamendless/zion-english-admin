@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 	"zion-english/frontend"
@@ -45,6 +46,13 @@ func teacherAvatarURL(hasPicture bool) string {
 		return ""
 	}
 	return utils.URL("/profile/picture")
+}
+
+func teacherPictureURL(teacherID int64, hasPicture bool) string {
+	if !hasPicture {
+		return ""
+	}
+	return utils.URL(fmt.Sprintf("/api/teacher-picture?id=%d", teacherID))
 }
 
 func buildTeacherAvatarProps(row queries.GetTeacherProfileByIDRow) frontend.AvatarProps {
@@ -541,6 +549,35 @@ func handleProfilePicture(w http.ResponseWriter, r *http.Request) {
 	}
 
 	row, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, user.ID)
+	if err != nil || !row.ProfilePicture.Valid || row.ProfilePicture.String == "" {
+		HttpError(w, "Profile picture not found", http.StatusNotFound)
+		return
+	}
+
+	path := avatarFilePath(row.ProfilePicture.String)
+	if _, err := os.Stat(path); err != nil {
+		HttpError(w, "Profile picture not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Cache-Control", fmt.Sprintf("private, max-age=%d", avatarCacheMaxAge))
+	http.ServeFile(w, r, path)
+}
+
+func handleTeacherPicture(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	teacherID, err := strconv.ParseInt(r.URL.Query().Get("id"), 10, 64)
+	if err != nil || teacherID <= 0 {
+		HttpError(w, "Invalid teacher ID", http.StatusBadRequest)
+		return
+	}
+
+	ctx := r.Context()
+	row, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, teacherID)
 	if err != nil || !row.ProfilePicture.Valid || row.ProfilePicture.String == "" {
 		HttpError(w, "Profile picture not found", http.StatusNotFound)
 		return

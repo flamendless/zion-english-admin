@@ -963,6 +963,10 @@ templ GlobalIncludes() {
 		/* Teachers page                 */
 		/* ============================= */
 
+		.student-inactive {
+			background-color: var(--color-warning-bg) !important;
+		}
+
 		.teacher-pending {
 			background-color: var(--color-warning-bg) !important;
 		}
@@ -1744,9 +1748,21 @@ templ GlobalIncludes() {
 			min-width: 0;
 		}
 
+		.day-class-header {
+			display: flex;
+			align-items: center;
+			gap: var(--space-2);
+			min-width: 0;
+		}
+
+		.day-class-avatar {
+			flex-shrink: 0;
+		}
+
 		.day-class-info strong {
 			font-size: 0.9375rem;
 			line-height: 1.3;
+			min-width: 0;
 		}
 
 		.day-class-info span {

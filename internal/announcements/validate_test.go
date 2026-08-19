@@ -23,6 +23,11 @@ func dayAfterTomorrowString() string {
 	return now.AddDate(0, 0, 2).Format(constants.DateLayout)
 }
 
+func yesterdayString() string {
+	now := time.Now().In(constants.LocationPHT)
+	return now.AddDate(0, 0, -1).Format(constants.DateLayout)
+}
+
 func TestValidateRequestCreate(t *testing.T) {
 	today := todayString()
 	tomorrow := tomorrowString()
@@ -162,6 +167,59 @@ func TestValidateRequestCreate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := announcements.ValidateRequest(tt.req, false)
+			if tt.wantErr != nil {
+				if err != tt.wantErr {
+					t.Fatalf("expected %v, got %v", tt.wantErr, err)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+		})
+	}
+}
+
+func TestValidateRequestUpdate(t *testing.T) {
+	today := todayString()
+	tomorrow := tomorrowString()
+	yesterday := yesterdayString()
+
+	tests := []struct {
+		name    string
+		req     announcements.Request
+		wantErr error
+	}{
+		{
+			name: "unchanged past start date",
+			req: announcements.Request{
+				Title:         "Test",
+				Description:   "Details",
+				Level:         announcements.LevelInfo,
+				StartDate:     yesterday,
+				EndDate:       tomorrow,
+				OriginalStart: yesterday,
+				VisibleToAll:  true,
+			},
+		},
+		{
+			name: "changed start to past",
+			req: announcements.Request{
+				Title:         "Test",
+				Description:   "Details",
+				Level:         announcements.LevelInfo,
+				StartDate:     yesterday,
+				EndDate:       tomorrow,
+				OriginalStart: today,
+				VisibleToAll:  true,
+			},
+			wantErr: announcements.ErrStartDatePast,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := announcements.ValidateRequest(tt.req, true)
 			if tt.wantErr != nil {
 				if err != tt.wantErr {
 					t.Fatalf("expected %v, got %v", tt.wantErr, err)

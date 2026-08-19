@@ -446,6 +446,21 @@ func validateScheduledClassRequest(req *models.ScheduledClassRequest) error {
 	return nil
 }
 
+func scheduledClassTeacherAvatar(sc queries.GetScheduledClassesFilteredRow) models.AvatarView {
+	hasPicture := sc.TeacherProfilePicture.Valid && sc.TeacherProfilePicture.String != ""
+	assignedColor := sc.TeacherAssignedColor
+	if assignedColor == "" {
+		assignedColor = "#B9D283"
+	}
+	return models.AvatarView{
+		Initials:      utils.PersonInitials(sc.TeacherFirstName, sc.TeacherMiddleName, sc.TeacherLastName, sc.TeacherName),
+		AssignedColor: assignedColor,
+		HasPicture:    hasPicture,
+		PictureURL:    teacherPictureURL(sc.TeacherID, hasPicture),
+		Alt:           sc.TeacherName + " avatar",
+	}
+}
+
 func scheduledClassViewFromRow(sc queries.GetScheduledClassesFilteredRow) models.ScheduledClassView {
 	startTime := ""
 	if sc.StartTime.Valid {
@@ -461,6 +476,7 @@ func scheduledClassViewFromRow(sc queries.GetScheduledClassesFilteredRow) models
 		TeacherID:       sc.TeacherID,
 		StudentName:     sc.StudentName,
 		TeacherName:     sc.TeacherName,
+		TeacherAvatar:   scheduledClassTeacherAvatar(sc),
 		ScheduledDate:   sc.ScheduledDate,
 		StartTime:       startTime,
 		EndTime:         utils.EndTimeFromStartAndDuration(startTime, sc.DurationMinutes),

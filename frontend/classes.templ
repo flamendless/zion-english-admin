@@ -46,10 +46,16 @@ templ Classes(data ClassesData) {
 
 			<div class="toolbar">
 				if data.ShowAllTeachers {
-					<input type="hidden" id="teacher" value="0"/>
 					<div class="form-group">
-						<label>Teacher</label>
-						<input type="text" value="All teachers" disabled/>
+						<label for="teacher">Teacher</label>
+						<select id="teacher"
+							hx-get={ utils.URL("/api/teachers") }
+							hx-trigger="load"
+							hx-swap="innerHTML"
+							hx-target="this"
+						>
+							<option value="">All teachers</option>
+						</select>
 					</div>
 				} else if data.LockTeacher {
 					<input type="hidden" id="teacher" value={ data.TeacherID }/>
@@ -60,6 +66,10 @@ templ Classes(data ClassesData) {
 				} else {
 					@TeacherDropdown()
 				}
+				<div class="form-group">
+					<label for="studentSearch">Student</label>
+					<input type="text" id="studentSearch" placeholder="Search student name..."/>
+				</div>
 				@DatePreset(true)
 				<div class="form-group">
 					<label for="statusFilter">Status</label>
@@ -69,10 +79,6 @@ templ Classes(data ClassesData) {
 						<option value="cancelled">Cancelled</option>
 						<option value="rescheduled">Rescheduled</option>
 					</select>
-				</div>
-				<div class="form-group">
-					<label for="studentSearch">Student</label>
-					<input type="text" id="studentSearch" placeholder="Search student name..."/>
 				</div>
 				<button type="button" id="filterBtn">Filter</button>
 			</div>
@@ -281,7 +287,7 @@ templ Classes(data ClassesData) {
 			});
 
 			teacherSelect.addEventListener('change', () => {
-				if (!teacherSelect.value || !datePresetSelect.dataset.startDate) {
+				if ((!teacherSelect.value && !showAllTeachers) || !datePresetSelect.dataset.startDate) {
 					return;
 				}
 				currentPage = 1;

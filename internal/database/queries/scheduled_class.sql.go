@@ -155,7 +155,9 @@ func (q *Queries) GetScheduledClassByID(ctx context.Context, id int64) (GetSched
 
 const getScheduledClassesFiltered = `-- name: GetScheduledClassesFiltered :many
 SELECT sc.id, sc.student_id, sc.teacher_id, sc.scheduled_date, sc.start_time, sc.duration_minutes, sc.rate, sc.currency, sc.status, sc.reason, sc.created_by_role, sc.created_at, sc.updated_at,
-       s.name as student_name, t.name as teacher_name
+       s.name as student_name, t.name as teacher_name,
+       t.first_name as teacher_first_name, t.middle_name as teacher_middle_name, t.last_name as teacher_last_name,
+       t.assigned_color as teacher_assigned_color, t.profile_picture as teacher_profile_picture
 FROM tbl_scheduled_classes sc
 JOIN tbl_students s ON sc.student_id = s.id
 JOIN tbl_teachers t ON sc.teacher_id = t.id
@@ -180,21 +182,26 @@ type GetScheduledClassesFilteredParams struct {
 }
 
 type GetScheduledClassesFilteredRow struct {
-	ID              int64
-	StudentID       int64
-	TeacherID       int64
-	ScheduledDate   string
-	StartTime       sql.NullString
-	DurationMinutes int64
-	Rate            float64
-	Currency        string
-	Status          string
-	Reason          sql.NullString
-	CreatedByRole   string
-	CreatedAt       string
-	UpdatedAt       string
-	StudentName     string
-	TeacherName     string
+	ID                    int64
+	StudentID             int64
+	TeacherID             int64
+	ScheduledDate         string
+	StartTime             sql.NullString
+	DurationMinutes       int64
+	Rate                  float64
+	Currency              string
+	Status                string
+	Reason                sql.NullString
+	CreatedByRole         string
+	CreatedAt             string
+	UpdatedAt             string
+	StudentName           string
+	TeacherName           string
+	TeacherFirstName      string
+	TeacherMiddleName     string
+	TeacherLastName       string
+	TeacherAssignedColor  string
+	TeacherProfilePicture sql.NullString
 }
 
 func (q *Queries) GetScheduledClassesFiltered(ctx context.Context, arg GetScheduledClassesFilteredParams) ([]GetScheduledClassesFilteredRow, error) {
@@ -233,6 +240,11 @@ func (q *Queries) GetScheduledClassesFiltered(ctx context.Context, arg GetSchedu
 			&i.UpdatedAt,
 			&i.StudentName,
 			&i.TeacherName,
+			&i.TeacherFirstName,
+			&i.TeacherMiddleName,
+			&i.TeacherLastName,
+			&i.TeacherAssignedColor,
+			&i.TeacherProfilePicture,
 		); err != nil {
 			return nil, err
 		}

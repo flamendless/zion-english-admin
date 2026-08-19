@@ -62,6 +62,42 @@ func (q *Queries) DeleteTeacherStudentLinksByStudentID(ctx context.Context, stud
 	return err
 }
 
+const getAllStudentTeacherNames = `-- name: GetAllStudentTeacherNames :many
+SELECT m2m.student_id, t.name as teacher_name
+FROM tbl_teachers_students_m2m m2m
+INNER JOIN tbl_teachers t ON t.id = m2m.teacher_id
+WHERE t.deleted = 0
+ORDER BY m2m.student_id ASC, t.name ASC
+`
+
+type GetAllStudentTeacherNamesRow struct {
+	StudentID   int64
+	TeacherName string
+}
+
+func (q *Queries) GetAllStudentTeacherNames(ctx context.Context) ([]GetAllStudentTeacherNamesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllStudentTeacherNames)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllStudentTeacherNamesRow
+	for rows.Next() {
+		var i GetAllStudentTeacherNamesRow
+		if err := rows.Scan(&i.StudentID, &i.TeacherName); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getStudentsByTeacherID = `-- name: GetStudentsByTeacherID :many
 SELECT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
 FROM tbl_students s
