@@ -109,6 +109,9 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/guides", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGuides))
 		authMux.HandleFunc(basePath+"/process-logs", auth.RequireRole(auth.RoleSuperuser)(handleLogs))
 		authMux.HandleFunc(basePath+"/process", auth.RequireRole(auth.RoleSuperuser)(handleProcessPage))
+		authMux.HandleFunc(basePath+"/reports/", auth.RequireRole(auth.RoleSuperuser)(handleReportsPath))
+		authMux.HandleFunc(basePath+"/reports", auth.RequireRole(auth.RoleSuperuser)(handleReports))
+		authMux.HandleFunc(basePath+"/api/reports", auth.RequireRole(auth.RoleSuperuser)(handleGetReports))
 		authMux.HandleFunc(basePath+"/download/processed", auth.RequireRole(auth.RoleSuperuser)(handleDownload))
 		authMux.HandleFunc(basePath+"/profile", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleProfile))
 		authMux.HandleFunc(basePath+"/profile/mobile", auth.RequireRole(auth.RoleTeacher)(handleProfileMobile))
@@ -155,6 +158,9 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/guides/", authHandler)
 		rootMux.Handle(basePath+"/process-logs", authHandler)
 		rootMux.Handle(basePath+"/process", authHandler)
+		rootMux.Handle(basePath+"/reports", authHandler)
+		rootMux.Handle(basePath+"/reports/", authHandler)
+		rootMux.Handle(basePath+"/api/reports", authHandler)
 		rootMux.Handle(basePath+"/download/processed", authHandler)
 		rootMux.Handle(basePath+"/role", authHandler)
 		rootMux.Handle(basePath+"/refresh", authHandler)
@@ -182,7 +188,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/announcements", authHandler)
 		rootMux.Handle(basePath+"/announcements/", authHandler)
 
-		handler := securityHeaders(rootMux)
+		handler := logRequests(securityHeaders(rootMux))
 
 		port := webFlags.port
 		if !cmd.Flags().Changed("port") {
@@ -346,6 +352,37 @@ func HttpError(w http.ResponseWriter, msg string, code int) {
 	}
 	http.SetCookie(w, cookie)
 	http.Error(w, msg, code)
+}
+
+type statusResponseWriter struct {
+	http.ResponseWriter
+	status int
+}
+
+func (w *statusResponseWriter) WriteHeader(code int) {
+	w.status = code
+	w.ResponseWriter.WriteHeader(code)
+}
+
+func logRequests(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		wrapped := &statusResponseWriter{ResponseWriter: w, status: http.StatusOK}
+		next.ServeHTTP(wrapped, r)
+
+		fields := []zap.Field{
+			zap.String("method", r.Method),
+			zap.String("path", r.URL.Path),
+			zap.Int("status", wrapped.status),
+			zap.Duration("duration", time.Since(start)),
+			zap.String("remote", clientIP(r)),
+		}
+		if query := r.URL.RawQuery; query != "" {
+			fields = append(fields, zap.String("query", query))
+		}
+
+		logs.Log().Info("request", fields...)
+	})
 }
 
 func securityHeaders(next http.Handler) http.Handler {
@@ -613,6 +650,8 @@ func handleDownload(w http.ResponseWriter, r *http.Request) {
 		sendErrorLog(w, "file not found")
 		return
 	}
+
+	auditReportDownload(r.Context(), cleanPath)
 
 	w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename))

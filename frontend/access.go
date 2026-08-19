@@ -27,6 +27,7 @@ var navItemDefs = []navItemDef{
 	{Path: "/classes", LinkID: "classesLink", Title: "Classes", TeacherTitle: "My Classes", Description: "View and record classes", TeacherDesc: "View and record your classes"},
 	{Path: "/schedule", LinkID: "scheduleLink", Title: "Class Schedule", Description: "View and plan upcoming classes", FeatureCard: true},
 	{Path: "/my-students", LinkID: "myStudentsLink", Title: "My Students", Description: "View your assigned students"},
+	{Path: "/reports", LinkID: "reportsLink", Title: "Reports", Description: "View teacher payroll reports by cutoff period"},
 	{Path: "/process", LinkID: "processLink", Title: "Process", Description: "Process CSV files and view logs"},
 	{Path: "/logs", LinkID: "logsLink", Title: "Logs", TeacherTitle: "My Activity", Description: "View system logs", TeacherDesc: "View your recent actions"},
 }

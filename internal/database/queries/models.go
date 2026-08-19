@@ -102,6 +102,17 @@ type TblRecord struct {
 	CreatedAt       sql.NullTime
 }
 
+type TblReportGeneration struct {
+	ID          int64
+	TeacherID   int64
+	StartDate   string
+	EndDate     string
+	ContentHash string
+	OutputPath  string
+	RecordCount int64
+	GeneratedAt string
+}
+
 type TblScheduledClass struct {
 	ID              int64
 	StudentID       int64

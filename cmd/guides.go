@@ -22,7 +22,13 @@ func handleGuides(w http.ResponseWriter, r *http.Request) {
 				Slug:        "getting-started",
 				Title:       "Getting Started",
 				Description: "Learn the basics: profile, students, classes, schedule, and editing records.",
-				Audience:    "For teachers",
+				Access:      "teacher",
+			},
+			{
+				Slug:        "reports-and-generation",
+				Title:       "Reports & Generation",
+				Description: "Review teacher payroll summaries, preview class records, and export XLSX reports.",
+				Access:      "superuser",
 			},
 		},
 	}
@@ -42,6 +48,8 @@ func handleGuidesPath(w http.ResponseWriter, r *http.Request) {
 	switch slug {
 	case "getting-started":
 		handleGuideGettingStarted(w, r)
+	case "reports-and-generation":
+		handleGuideReportsGeneration(w, r)
 	default:
 		HttpError(w, "Not found", http.StatusNotFound)
 	}
@@ -55,6 +63,17 @@ func handleGuideGettingStarted(w http.ResponseWriter, r *http.Request) {
 
 	if err := frontend.GuideGettingStarted().Render(r.Context(), w); err != nil {
 		logs.Log().Error("failed to render getting started guide", zap.Error(err))
+	}
+}
+
+func handleGuideReportsGeneration(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := frontend.GuideReportsGeneration().Render(r.Context(), w); err != nil {
+		logs.Log().Error("failed to render reports and generation guide", zap.Error(err))
 	}
 }
 

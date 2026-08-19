@@ -22,6 +22,7 @@ func Execute() {
 			"Metrics",
 			zap.Duration("execution time", time.Since(start)),
 		)
+		logs.Sync()
 	}()
 	if err := rootCmd.Execute(); err != nil {
 		logs.Log().Error("error", zap.Error(err))

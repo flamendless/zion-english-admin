@@ -240,11 +240,12 @@ templ GlobalIncludes() {
 			outline-offset: 2px;
 		}
 
-		button:disabled, .btn:disabled {
+		button:disabled, .btn:disabled, .btn.is-disabled {
 			background-color: var(--color-muted);
 			color: var(--color-muted-foreground);
 			cursor: not-allowed;
 			opacity: 0.6;
+			pointer-events: none;
 		}
 
 		button:active:not(:disabled):not(.password-toggle), .btn:active:not(:disabled) {
@@ -1031,8 +1032,28 @@ templ GlobalIncludes() {
 		.table-actions .view-btn,
 		.table-actions .approve-btn,
 		.table-actions .unapprove-btn,
-		.table-actions .delete-btn {
+		.table-actions .delete-btn,
+		.table-actions .btn {
 			margin-top: 0;
+		}
+
+		.table-actions .view-btn,
+		.table-actions .btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			line-height: 1.25;
+			vertical-align: middle;
+		}
+
+		.table-actions .view-btn {
+			padding: 5px 12px;
+			font-size: 0.8125rem;
+		}
+
+		.download-report-wrap {
+			display: inline-flex;
+			align-items: center;
 		}
 
 		/* ============================= */
@@ -2434,7 +2455,8 @@ templ GlobalIncludes() {
 			.table-stack-mobile .table-actions .view-btn,
 			.table-stack-mobile .table-actions .approve-btn,
 			.table-stack-mobile .table-actions .unapprove-btn,
-			.table-stack-mobile .table-actions .delete-btn {
+			.table-stack-mobile .table-actions .delete-btn,
+			.table-stack-mobile .table-actions .btn {
 				width: 100%;
 				text-align: center;
 				padding: 10px 14px;

@@ -6,7 +6,7 @@ type GuideEntry struct {
 	Slug        string
 	Title       string
 	Description string
-	Audience    string
+	Access      string
 }
 
 type GuidesData struct {
@@ -52,14 +52,20 @@ templ Guides(data GuidesData) {
 templ GuideCard(guide GuideEntry) {
 	<a
 		href={ utils.URL("/guides/" + guide.Slug) }
-		class="guide-card"
+		class={ "guide-card guide-card--" + guide.Access }
 		role="listitem"
 	>
+		<span class={ "guide-card-ribbon guide-card-ribbon--" + guide.Access } aria-hidden="true">
+			if guide.Access == "superuser" {
+				SUPERUSER
+			} else {
+				TEACHER
+			}
+		</span>
 		<span class="guide-card-icon" aria-hidden="true">
 			@GuideBookIcon()
 		</span>
 		<span class="guide-card-body">
-			<span class="guide-card-audience">{ guide.Audience }</span>
 			<span class="guide-card-title">{ guide.Title }</span>
 			<span class="guide-card-desc">{ guide.Description }</span>
 		</span>
@@ -101,6 +107,7 @@ templ GuideGettingStarted() {
 			<div class="guide-content">
 				@GuideBetaCallout()
 				@GuideSection(
+					"my-profile",
 					"My Profile",
 					utils.URL("/profile"),
 					"Update your name, mobile number, or password.",
@@ -114,6 +121,7 @@ templ GuideGettingStarted() {
 					},
 				)
 				@GuideSection(
+					"student-registration",
 					"Student Registration",
 					utils.URL("/students/register"),
 					"Register your assigned students with names that match your Google Sheets exactly.",
@@ -127,6 +135,7 @@ templ GuideGettingStarted() {
 					},
 				)
 				@GuideSection(
+					"class-schedule",
 					"Class Schedule",
 					utils.URL("/schedule"),
 					"Plan classes ahead and conduct or cancel scheduled sessions.",
@@ -139,6 +148,7 @@ templ GuideGettingStarted() {
 					},
 				)
 				@GuideSection(
+					"my-classes",
 					"My Classes",
 					utils.URL("/classes"),
 					"View your class history and record new classes.",
@@ -152,6 +162,7 @@ templ GuideGettingStarted() {
 					},
 				)
 				@GuideSection(
+					"editing-classes",
 					"Editing classes",
 					utils.URL("/classes"),
 					"Update details for a class you already recorded.",
@@ -171,6 +182,98 @@ templ GuideGettingStarted() {
 				</a>
 			</div>
 		</div>
+		@GuideAnchorScript()
+	</body>
+	</html>
+}
+
+templ GuideReportsGeneration() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Reports &amp; Generation - Guides - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@GuideStyles()
+	</head>
+	<body>
+		<div class="container guides-page">
+			@HeaderSimple()
+
+			<nav class="guides-breadcrumb" aria-label="Breadcrumb">
+				<a href={ utils.URL("/guides") } class="guides-breadcrumb-link">Guides</a>
+				<span class="guides-breadcrumb-sep" aria-hidden="true">/</span>
+				<span class="guides-breadcrumb-current" aria-current="page">Reports &amp; Generation</span>
+			</nav>
+
+			@HubHeader("Reports &amp; Generation", "", "", false)
+
+			<div class="guides-hero">
+				<p class="guides-subtitle">
+					How superusers review teacher payroll summaries, preview class records for a cutoff period, and generate downloadable XLSX reports.
+				</p>
+			</div>
+
+			<div class="guide-content">
+				@GuideSection(
+					"reports-overview",
+					"Reports overview",
+					utils.URL("/reports"),
+					"Open the Reports page to see every teacher's class totals and earnings for a date range.",
+					[]string{
+						"Open Reports from the dashboard or navigation.",
+						"The table lists each teacher with conducted/total classes and earnings broken down by currency.",
+						"Use the actions on each row to view details, generate an XLSX file, or download a report that is already ready.",
+					},
+				)
+				@GuideSection(
+					"date-range-and-search",
+					"Date range and search",
+					utils.URL("/reports"),
+					"Filter the report list to the payroll cutoff you need.",
+					[]string{
+						"Choose a date preset from the dropdown (for example, this month or last month).",
+						"Optionally type in the search box to narrow results by teacher or student name.",
+						"Click Filter to refresh the table with the selected range and search term.",
+					},
+				)
+				@GuideSection(
+					"view-report",
+					"View a teacher report",
+					utils.URL("/reports"),
+					"Preview a teacher's classes and earnings before exporting.",
+					[]string{
+						"Click View on the teacher's row.",
+						"The modal shows the teacher name, cutoff period, total earnings, and a status summary (conducted, rescheduled, cancelled).",
+						"Scroll through the class list to verify dates, students, rates, times, and statuses.",
+						"Close the modal with the X button, Escape, or by clicking outside the dialog.",
+					},
+				)
+				@GuideSection(
+					"generate-and-download",
+					"Generate and download XLSX",
+					utils.URL("/reports"),
+					"Build a spreadsheet from recorded classes and download it for payroll.",
+					[]string{
+						"Click Generate report on the teacher's row for the selected date range.",
+						"When generation finishes, Download XLSX becomes available for that row.",
+						"If class records have not changed since the last export, the system skips regeneration and keeps the existing file.",
+						"Click Regenerate after teachers update class records if you need a fresh XLSX.",
+						"The downloaded file uses the same format as the Process pipeline output.",
+					},
+				)
+			</div>
+
+			<div class="guides-footer-nav">
+				<a href={ utils.URL("/guides") } class="guides-back-link">
+					@GuideBackIcon()
+					All guides
+				</a>
+			</div>
+		</div>
+		@GuideAnchorScript()
 	</body>
 	</html>
 }
@@ -191,9 +294,14 @@ templ GuideBetaCallout() {
 	</div>
 }
 
-templ GuideSection(title string, href string, summary string, steps []string) {
-	<section class="guide-section">
+templ GuideSection(anchor string, title string, href string, summary string, steps []string) {
+	<section class="guide-section" id={ anchor }>
 		<h2 class="guide-section-title">
+			<a
+				href={ "#" + anchor }
+				class="guide-section-anchor"
+				aria-label={ "Link to " + title }
+			>#</a>
 			<a
 				href={ href }
 				class="guide-section-link"
@@ -213,6 +321,35 @@ templ GuideSection(title string, href string, summary string, steps []string) {
 			}
 		</ol>
 	</section>
+}
+
+templ GuideAnchorScript() {
+	<script>
+		(function () {
+			function syncAnchoredSection() {
+				document.querySelectorAll('.guide-section.is-anchored').forEach(function (section) {
+					section.classList.remove('is-anchored');
+				});
+
+				var hash = window.location.hash;
+				if (!hash || hash.length < 2) {
+					return;
+				}
+
+				var section = document.querySelector(hash);
+				if (section && section.classList.contains('guide-section')) {
+					section.classList.add('is-anchored');
+				}
+			}
+
+			window.addEventListener('hashchange', syncAnchoredSection);
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', syncAnchoredSection);
+			} else {
+				syncAnchoredSection();
+			}
+		})();
+	</script>
 }
 
 templ GuideStyles() {
@@ -258,6 +395,8 @@ templ GuideStyles() {
 			text-decoration: none;
 			color: inherit;
 			cursor: pointer;
+			position: relative;
+			overflow: hidden;
 			transition:
 				border-color var(--transition-fast),
 				box-shadow var(--transition-fast),
@@ -295,12 +434,29 @@ templ GuideStyles() {
 			min-width: 0;
 		}
 
-		.guide-card-audience {
-			font-size: 0.75rem;
-			font-weight: 600;
+		.guide-card-ribbon {
+			position: absolute;
+			top: 14px;
+			right: -34px;
+			width: 120px;
+			padding: var(--space-1) 0;
+			font-size: 0.6875rem;
+			font-weight: 700;
+			text-align: center;
 			text-transform: uppercase;
-			letter-spacing: 0.04em;
-			color: var(--color-muted-foreground);
+			letter-spacing: 0.06em;
+			transform: rotate(45deg);
+			box-shadow: var(--shadow-sm);
+		}
+
+		.guide-card-ribbon--teacher {
+			background: var(--color-primary-light);
+			color: var(--color-primary-hover);
+		}
+
+		.guide-card-ribbon--superuser {
+			background: var(--color-warning-bg);
+			color: #7A4E00;
 		}
 
 		.guide-card-title {
@@ -427,12 +583,52 @@ templ GuideStyles() {
 			border-radius: var(--radius-lg);
 			background: var(--color-surface);
 			box-shadow: var(--shadow-sm);
+			scroll-margin-top: var(--space-8);
+			transition:
+				border-color var(--transition-base),
+				box-shadow var(--transition-base);
+		}
+
+		.guide-section:target,
+		.guide-section.is-anchored {
+			border-color: var(--color-primary-hover);
+			box-shadow:
+				var(--shadow-md),
+				0 0 0 3px var(--color-primary-light);
 		}
 
 		.guide-section-title {
 			margin: 0;
 			font-size: 1.25rem;
 			line-height: 1.35;
+			display: flex;
+			align-items: center;
+			gap: var(--space-2);
+			flex-wrap: wrap;
+		}
+
+		.guide-section-anchor {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 1.25rem;
+			color: var(--color-muted-foreground);
+			text-decoration: none;
+			font-weight: 600;
+			opacity: 0.55;
+			transition: color var(--transition-fast), opacity var(--transition-fast);
+		}
+
+		.guide-section:hover .guide-section-anchor,
+		.guide-section-anchor:focus-visible {
+			color: var(--color-primary-hover);
+			opacity: 1;
+		}
+
+		.guide-section-anchor:focus-visible {
+			outline: 2px solid var(--color-ring);
+			outline-offset: 2px;
+			border-radius: var(--radius-sm);
 		}
 
 		.guide-section-link {

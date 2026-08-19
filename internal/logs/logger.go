@@ -14,22 +14,15 @@ var loggerOnce sync.Once
 var logger *zap.Logger
 
 func InitLog() {
-	var config zap.Config
-
-	config = zap.NewDevelopmentConfig()
+	config := zap.NewDevelopmentConfig()
 	config.Level.SetLevel(zapcore.Level(0))
 	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 
 	newLogger, err := config.Build()
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
-	defer func() {
-		err := newLogger.Sync()
-		if err != nil && !errors.Is(err, syscall.ENOTTY) {
-			fmt.Println(err)
-		}
-	}()
 
 	logger = newLogger
 }
@@ -39,4 +32,14 @@ func Log() *zap.Logger {
 		InitLog()
 	})
 	return logger
+}
+
+func Sync() {
+	if logger == nil {
+		return
+	}
+	err := logger.Sync()
+	if err != nil && !errors.Is(err, syscall.ENOTTY) {
+		fmt.Println(err)
+	}
 }

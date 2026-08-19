@@ -1,0 +1,179 @@
+package frontend
+
+import "fmt"
+
+type ReportClassItem struct {
+	Date        string
+	StudentName string
+	Rate        string
+	TimeRange   string
+	Status      string
+}
+
+type ReportViewData struct {
+	TeacherID        string
+	TeacherName      string
+	CutoffLabel      string
+	TotalEarnings    []CurrencyTotal
+	ConductedCount   int64
+	RescheduledCount int64
+	CancelledCount   int64
+	Classes          []ReportClassItem
+	Avatar           AvatarProps
+}
+
+templ ReportViewModal(data ReportViewData) {
+	<div class="modal-overlay" id="reportViewModal" role="presentation">
+		<div class="modal-dialog modal-dialog-report" role="dialog" aria-modal="true" aria-labelledby="reportViewTitle">
+			<div class="modal-header">
+				<h3 id="reportViewTitle">Teacher report</h3>
+				<button type="button" class="modal-close report-view-close" aria-label="Close" onclick="window.closeReportViewModal()">&times;</button>
+			</div>
+			<div class="modal-body report-view-body">
+				@ReportViewStyles()
+				<div class="report-view-identity">
+					@Avatar(data.Avatar)
+					<div>
+						<h2>{ data.TeacherName }</h2>
+						<p class="report-cutoff-label">{ data.CutoffLabel }</p>
+						if len(data.TotalEarnings) > 0 {
+							<p class="report-total-earnings">
+								Total earnings:
+								for i, earning := range data.TotalEarnings {
+									if i > 0 {
+										<br/>
+									}
+									{ fmt.Sprintf("%.2f %s", earning.Total, earning.Currency) }
+								}
+							</p>
+						} else {
+							<p class="report-total-earnings">Total earnings: -</p>
+						}
+					</div>
+				</div>
+				<div class="report-summary">
+					<span class="report-summary-chip report-summary-conducted">
+						<strong>{ data.ConductedCount }</strong> conducted
+					</span>
+					<span class="report-summary-chip report-summary-rescheduled">
+						<strong>{ data.RescheduledCount }</strong> rescheduled
+					</span>
+					<span class="report-summary-chip report-summary-cancelled">
+						<strong>{ data.CancelledCount }</strong> cancelled
+					</span>
+				</div>
+				if len(data.Classes) > 0 {
+					<div class="table-wrapper">
+						<table class="table-stack-mobile report-classes-table">
+							<thead>
+								<tr>
+									<th>Date</th>
+									<th>Student</th>
+									<th>Rate</th>
+									<th>Time</th>
+									<th>Status</th>
+								</tr>
+							</thead>
+							<tbody>
+								for _, class := range data.Classes {
+									<tr>
+										<td data-label="Date">{ class.Date }</td>
+										<td data-label="Student">{ class.StudentName }</td>
+										<td data-label="Rate">{ class.Rate }</td>
+										<td data-label="Time">{ class.TimeRange }</td>
+										<td data-label="Status" class={ "status-" + class.Status }>{ class.Status }</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					</div>
+				} else {
+					<p class="empty-state">No classes in this cutoff period.</p>
+				}
+			</div>
+		</div>
+	</div>
+}
+
+templ ReportViewStyles() {
+	<style>
+		.modal-dialog-report {
+			max-width: 960px;
+			width: calc(100% - 2rem);
+		}
+
+		.report-view-body {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-4);
+		}
+
+		.report-view-identity {
+			display: flex;
+			align-items: center;
+			gap: var(--space-4);
+		}
+
+		.report-view-identity h2 {
+			margin: 0 0 var(--space-1);
+			font-size: 1.25rem;
+		}
+
+		.report-cutoff-label {
+			margin: 0;
+			color: var(--color-muted-foreground);
+			font-size: 0.875rem;
+		}
+
+		.report-total-earnings {
+			margin: var(--space-1) 0 0;
+			color: var(--color-foreground);
+			font-size: 0.875rem;
+			font-weight: 600;
+		}
+
+		.report-summary {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--space-2);
+		}
+
+		.report-summary-chip {
+			display: inline-flex;
+			align-items: center;
+			gap: var(--space-1);
+			padding: 6px 12px;
+			border-radius: var(--radius-full);
+			font-size: 0.8125rem;
+			background: var(--color-muted);
+			border: 1px solid var(--color-border-subtle);
+		}
+
+		.report-summary-conducted {
+			color: var(--color-success);
+		}
+
+		.report-summary-rescheduled {
+			color: var(--color-warning);
+		}
+
+		.report-summary-cancelled {
+			color: var(--color-destructive);
+		}
+
+		.report-classes-table td.status-cancelled {
+			color: var(--color-destructive);
+			font-weight: 600;
+		}
+
+		.report-classes-table td.status-rescheduled {
+			color: var(--color-warning);
+			font-weight: 600;
+		}
+
+		.report-classes-table td.status-conducted {
+			color: var(--color-success);
+			font-weight: 600;
+		}
+	</style>
+}
