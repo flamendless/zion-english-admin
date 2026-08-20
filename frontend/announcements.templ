@@ -688,6 +688,54 @@ templ AnnouncementBannerStyles() {
 			background: rgba(240, 96, 96, 0.18);
 			color: var(--color-destructive);
 		}
+
+		@media (max-width: 768px) {
+			.announcement-banner {
+				flex-direction: column;
+				align-items: flex-start;
+				gap: var(--space-2);
+				padding: var(--space-3);
+			}
+
+			.home-welcome .announcement-banner {
+				align-items: center;
+				text-align: center;
+			}
+
+			.announcement-banner__icon {
+				width: 32px;
+				height: 32px;
+			}
+
+			.announcement-banner__icon svg {
+				width: 18px;
+				height: 18px;
+			}
+
+			.announcement-banner__content {
+				width: 100%;
+			}
+
+			.home-welcome .announcement-banner__content {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.announcement-banner__title {
+				font-size: 0.8125rem;
+				margin-bottom: 0;
+			}
+
+			.announcement-banner__description {
+				font-size: 0.75rem;
+			}
+
+			.announcement-banner__cta {
+				font-size: 0.75rem;
+				padding: 5px 12px;
+			}
+		}
 	</style>
 }
 

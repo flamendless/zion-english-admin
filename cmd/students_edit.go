@@ -58,7 +58,61 @@ func handleStudentsPath(w http.ResponseWriter, r *http.Request) {
 		handleStudentEdit(w, r, id)
 		return
 	}
+	if id, ok := extractPathID(r, "students", "/view"); ok {
+		handleStudentView(w, r, id)
+		return
+	}
 	HttpError(w, "Not found", http.StatusNotFound)
+}
+
+func studentEditStudentData(ctx context.Context, studentID int64, readonly bool) (frontend.EditStudentData, error) {
+	existing, err := dbRO.GetQueries().GetStudentByID(ctx, studentID)
+	if err != nil {
+		return frontend.EditStudentData{}, err
+	}
+
+	assignedTeachers, err := dbRO.GetQueries().GetTeachersByStudentID(ctx, studentID)
+	if err != nil {
+		return frontend.EditStudentData{}, err
+	}
+
+	teacherIDs := make([]string, len(assignedTeachers))
+	teacherNames := make([]string, len(assignedTeachers))
+	for i, t := range assignedTeachers {
+		teacherIDs[i] = strconv.FormatInt(t.ID, 10)
+		teacherNames[i] = t.Name
+	}
+
+	return frontend.EditStudentData{
+		ID:            strconv.FormatInt(studentID, 10),
+		Readonly:      readonly,
+		Name:          existing.Name,
+		Currency:      existing.Currency,
+		Contact:       existing.Contact.String,
+		RatePerClass:  existing.RatePerClass,
+		ParentName:    existing.ParentName.String,
+		AssignedColor: existing.AssignedColor,
+		Status:        existing.Status,
+		TeacherIDs:    teacherIDs,
+		TeacherNames:  teacherNames,
+	}, nil
+}
+
+func handleStudentView(w http.ResponseWriter, r *http.Request, studentID int64) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx := r.Context()
+	data, err := studentEditStudentData(ctx, studentID, true)
+	if err != nil {
+		HttpError(w, "Student not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	frontend.EditStudent(data).Render(ctx, w)
 }
 
 func handleStudents(w http.ResponseWriter, r *http.Request) {
@@ -131,8 +185,8 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 			Status:           s.Status,
 			TeacherDisplay:   strings.Join(teachersByStudent[s.ID], ", "),
 			RelatedToDisplay: formatStudentRelationships(relationshipsByStudent[s.ID]),
-			CreatedAt:        s.CreatedAt.Time.Format("2006-01-02 15:04:05"),
-			UpdatedAt:        s.UpdatedAt.Time.Format("2006-01-02 15:04:05"),
+			CreatedAt:        utils.FormatNullDateTimeSecondsPHT(s.CreatedAt),
+			UpdatedAt:        utils.FormatNullDateTimeSecondsPHT(s.UpdatedAt),
 		}
 	}
 
@@ -170,23 +224,14 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 	}
 
 	if r.Method == http.MethodGet {
-		teacherIDs := make([]string, len(assignedTeachers))
-		for i, t := range assignedTeachers {
-			teacherIDs[i] = strconv.FormatInt(t.ID, 10)
+		data, err := studentEditStudentData(ctx, studentID, false)
+		if err != nil {
+			HttpError(w, "Student not found", http.StatusNotFound)
+			return
 		}
 
 		w.Header().Set("Content-Type", "text/html")
-		frontend.EditStudent(frontend.EditStudentData{
-			ID:            strconv.FormatInt(studentID, 10),
-			Name:          existing.Name,
-			Currency:      existing.Currency,
-			Contact:       existing.Contact.String,
-			RatePerClass:  existing.RatePerClass,
-			ParentName:    existing.ParentName.String,
-			AssignedColor: existing.AssignedColor,
-			Status:        existing.Status,
-			TeacherIDs:    teacherIDs,
-		}).Render(ctx, w)
+		frontend.EditStudent(data).Render(ctx, w)
 		return
 	}
 

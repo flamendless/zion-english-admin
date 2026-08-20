@@ -122,7 +122,17 @@ func Header(loggedIn bool, role auth.Role) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"header-bottom\"><div class=\"header-left\"><div class=\"nav-links\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"header-bottom\"><div class=\"header-left\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if loggedIn {
+			templ_7745c5c3_Err = HeaderAvatarPlaceholder().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"nav-links\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -132,7 +142,7 @@ func Header(loggedIn bool, role auth.Role) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></div><div class=\"header-right\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div><div class=\"header-right\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -147,11 +157,7 @@ func Header(loggedIn bool, role auth.Role) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = Flam().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -211,7 +217,7 @@ func SuccessBanner() templ.Component {
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div id=\"successBanner\" class=\"success-banner\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div id=\"successBanner\" class=\"success-banner\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -240,19 +246,19 @@ func SuccessBannerScript(message string) templ.Component {
 			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<script>\n\t\t(function() {\n\t\t\tconst msg = ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<script>\n\t\t(function() {\n\t\t\tconst msg = ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Var9, templ_7745c5c3_Err := templruntime.ScriptContentOutsideStringLiteral(message)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 65, Col: 25}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 67, Col: 25}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, ";\n\t\t\tif (typeof showSuccessBanner === 'function') {\n\t\t\t\tshowSuccessBanner(msg);\n\t\t\t} else {\n\t\t\t\tconst banner = document.getElementById('successBanner');\n\t\t\t\tif (banner) {\n\t\t\t\t\tbanner.textContent = msg;\n\t\t\t\t\tbanner.classList.add('show');\n\t\t\t\t\tsetTimeout(() => {\n\t\t\t\t\t\tbanner.classList.remove('show');\n\t\t\t\t\t}, 3000);\n\t\t\t\t}\n\t\t\t}\n\t\t})();\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, ";\n\t\t\tif (typeof showSuccessBanner === 'function') {\n\t\t\t\tshowSuccessBanner(msg);\n\t\t\t} else {\n\t\t\t\tconst banner = document.getElementById('successBanner');\n\t\t\t\tif (banner) {\n\t\t\t\t\tbanner.textContent = msg;\n\t\t\t\t\tbanner.classList.add('show');\n\t\t\t\t\tsetTimeout(() => {\n\t\t\t\t\t\tbanner.classList.remove('show');\n\t\t\t\t\t}, 3000);\n\t\t\t\t}\n\t\t\t}\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -281,7 +287,7 @@ func SuccessBannerHandlers() templ.Component {
 			templ_7745c5c3_Var10 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<script>\n\t\tfunction showSuccessBanner(message) {\n\t\t\tconst banner = document.getElementById('successBanner');\n\t\t\tif (banner) {\n\t\t\t\tbanner.textContent = message;\n\t\t\t\tbanner.classList.add('show');\n\t\t\t\tsetTimeout(() => {\n\t\t\t\t\tbanner.classList.remove('show');\n\t\t\t\t}, 3000);\n\t\t\t}\n\t\t}\n\n\t\t(function() {\n\t\t\tfunction readSuccessFlash() {\n\t\t\t\tconst banner = document.getElementById('successBanner');\n\t\t\t\tconst cookiePath = document.getElementById('errorBanner')?.dataset.basePath || '/';\n\t\t\t\tconst match = document.cookie.match(/success_flash=([^;]+)/);\n\t\t\t\tif (match && banner) {\n\t\t\t\t\tshowSuccessBanner(decodeURIComponent(match[1].replace(/\\+/g, ' ')));\n\t\t\t\t\tdocument.cookie = 'success_flash=; Max-Age=0; path=' + encodeURIComponent(cookiePath);\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tif (document.readyState === 'loading') {\n\t\t\t\tdocument.addEventListener('DOMContentLoaded', readSuccessFlash);\n\t\t\t} else {\n\t\t\t\treadSuccessFlash();\n\t\t\t}\n\t\t})();\n\n\t\tdocument.addEventListener('htmx:afterRequest', function(evt) {\n\t\t\tif (evt.detail.successful) {\n\t\t\t\tconst xhr = evt.detail.xhr;\n\t\t\t\tconst responseText = xhr.responseText;\n\t\t\t\tif (responseText.includes('successfully')) {\n\t\t\t\t\tshowSuccessBanner('Operation completed successfully!');\n\t\t\t\t}\n\t\t\t}\n\t\t});\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<script>\n\t\tfunction showSuccessBanner(message) {\n\t\t\tconst banner = document.getElementById('successBanner');\n\t\t\tif (banner) {\n\t\t\t\tbanner.textContent = message;\n\t\t\t\tbanner.classList.add('show');\n\t\t\t\tsetTimeout(() => {\n\t\t\t\t\tbanner.classList.remove('show');\n\t\t\t\t}, 3000);\n\t\t\t}\n\t\t}\n\n\t\t(function() {\n\t\t\tfunction readSuccessFlash() {\n\t\t\t\tconst banner = document.getElementById('successBanner');\n\t\t\t\tconst cookiePath = document.getElementById('errorBanner')?.dataset.basePath || '/';\n\t\t\t\tconst match = document.cookie.match(/success_flash=([^;]+)/);\n\t\t\t\tif (match && banner) {\n\t\t\t\t\tshowSuccessBanner(decodeURIComponent(match[1].replace(/\\+/g, ' ')));\n\t\t\t\t\tdocument.cookie = 'success_flash=; Max-Age=0; path=' + encodeURIComponent(cookiePath);\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tif (document.readyState === 'loading') {\n\t\t\t\tdocument.addEventListener('DOMContentLoaded', readSuccessFlash);\n\t\t\t} else {\n\t\t\t\treadSuccessFlash();\n\t\t\t}\n\t\t})();\n\n\t\tdocument.addEventListener('htmx:afterRequest', function(evt) {\n\t\t\tif (evt.detail.successful) {\n\t\t\t\tconst xhr = evt.detail.xhr;\n\t\t\t\tconst responseText = xhr.responseText;\n\t\t\t\tif (responseText.includes('successfully')) {\n\t\t\t\t\tshowSuccessBanner('Operation completed successfully!');\n\t\t\t\t}\n\t\t\t}\n\t\t});\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -310,20 +316,20 @@ func ErrorBanner() templ.Component {
 			templ_7745c5c3_Var11 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div id=\"errorBanner\" class=\"error-banner\" data-base-path=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div id=\"errorBanner\" class=\"error-banner\" data-base-path=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.BasePath())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 126, Col: 77}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 128, Col: 77}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -352,7 +358,7 @@ func ErrorBannerScript(message string) templ.Component {
 			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<script>\n\t\t(function() {\n\t\t\tconst banner = document.getElementById('errorBanner');\n\t\t\tif (banner) {\n\t\t\t\tbanner.textContent = $message$;\n\t\t\t\tbanner.classList.add('show');\n\t\t\t\tsetTimeout(() => {\n\t\t\t\t\tbanner.classList.remove('show');\n\t\t\t\t}, 5000);\n\t\t\t}\n\t\t})();\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<script>\n\t\t(function() {\n\t\t\tconst banner = document.getElementById('errorBanner');\n\t\t\tif (banner) {\n\t\t\t\tbanner.textContent = $message$;\n\t\t\t\tbanner.classList.add('show');\n\t\t\t\tsetTimeout(() => {\n\t\t\t\t\tbanner.classList.remove('show');\n\t\t\t\t}, 5000);\n\t\t\t}\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -381,7 +387,7 @@ func ErrorBannerHandlers() templ.Component {
 			templ_7745c5c3_Var14 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<script>\n\t\tfunction showErrorBanner(message) {\n\t\t\tconst banner = document.getElementById('errorBanner');\n\t\t\tif (banner) {\n\t\t\t\tbanner.textContent = message;\n\t\t\t\tbanner.classList.add('show');\n\t\t\t\tsetTimeout(() => {\n\t\t\t\t\tbanner.classList.remove('show');\n\t\t\t\t}, 5000);\n\t\t\t}\n\t\t}\n\n\t\t(function() {\n\t\t\tconst banner = document.getElementById('errorBanner');\n\t\t\tconst cookiePath = banner?.dataset.basePath || '/';\n\t\t\tconst match = document.cookie.match(/error_flash=([^;]+)/);\n\t\t\tif (match) {\n\t\t\t\tshowErrorBanner(decodeURIComponent(match[1].replace(/\\+/g, ' ')));\n\t\t\t\tdocument.cookie = 'error_flash=; Max-Age=0; path=' + encodeURIComponent(cookiePath);\n\t\t\t}\n\t\t})();\n\n\t\tdocument.addEventListener('htmx:responseError', function(evt) {\n\t\t\tconst xhr = evt.detail.xhr;\n\t\t\tconst message = xhr.responseText || 'An error occurred';\n\t\t\tshowErrorBanner(message);\n\t\t});\n\n\t\tdocument.addEventListener('htmx:sendError', function(evt) {\n\t\t\tshowErrorBanner('Network error. Please check your connection.');\n\t\t});\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<script>\n\t\tfunction showErrorBanner(message) {\n\t\t\tconst banner = document.getElementById('errorBanner');\n\t\t\tif (banner) {\n\t\t\t\tbanner.textContent = message;\n\t\t\t\tbanner.classList.add('show');\n\t\t\t\tsetTimeout(() => {\n\t\t\t\t\tbanner.classList.remove('show');\n\t\t\t\t}, 5000);\n\t\t\t}\n\t\t}\n\n\t\t(function() {\n\t\t\tconst banner = document.getElementById('errorBanner');\n\t\t\tconst cookiePath = banner?.dataset.basePath || '/';\n\t\t\tconst match = document.cookie.match(/error_flash=([^;]+)/);\n\t\t\tif (match) {\n\t\t\t\tshowErrorBanner(decodeURIComponent(match[1].replace(/\\+/g, ' ')));\n\t\t\t\tdocument.cookie = 'error_flash=; Max-Age=0; path=' + encodeURIComponent(cookiePath);\n\t\t\t}\n\t\t})();\n\n\t\tdocument.addEventListener('htmx:responseError', function(evt) {\n\t\t\tconst xhr = evt.detail.xhr;\n\t\t\tconst message = xhr.responseText || 'An error occurred';\n\t\t\tshowErrorBanner(message);\n\t\t});\n\n\t\tdocument.addEventListener('htmx:sendError', function(evt) {\n\t\t\tshowErrorBanner('Network error. Please check your connection.');\n\t\t});\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

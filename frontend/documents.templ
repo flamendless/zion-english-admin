@@ -1,0 +1,486 @@
+package frontend
+
+import "strings"
+import "zion-english/internal/utils"
+
+type DocumentItem struct {
+	ID         string
+	Filename   string
+	Extension  string
+	Type       string
+	FileSize   string
+	Status     string
+	UploadedAt string
+	UploadedBy string
+	ViewURL    string
+	CanReview  bool
+}
+
+func documentRowClass(status string) string {
+	switch status {
+	case "submitted":
+		return "document-row-submitted"
+	case "approved":
+		return "document-row-approved"
+	case "rejected":
+		return "document-row-rejected"
+	default:
+		return ""
+	}
+}
+
+func documentTypeLabel(docType string) string {
+	switch docType {
+	case "avatar":
+		return "Avatar"
+	case "document":
+		return "Document"
+	default:
+		return docType
+	}
+}
+
+func documentStatusLabel(status string) string {
+	return strings.ToUpper(status[:1]) + status[1:]
+}
+
+templ DocumentTypePill(docType string) {
+	<span class={ "document-pill document-pill--" + docType }>{ documentTypeLabel(docType) }</span>
+}
+
+templ DocumentStatusPill(status string) {
+	<span class={ "document-status-pill document-status-pill--" + status }>{ documentStatusLabel(status) }</span>
+}
+
+templ DocumentsTable(items []DocumentItem, showUploader bool, showActions bool) {
+	if len(items) == 0 {
+		<div class="documents-empty">
+			<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+				<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+				<polyline points="14 2 14 8 20 8"></polyline>
+			</svg>
+			<p>No documents uploaded yet.</p>
+			if !showUploader && !showActions {
+				<p class="documents-empty-hint">Upload your profile photo and valid ID from <a href={ utils.URL("/profile") }>My Profile</a>.</p>
+			}
+		</div>
+	} else {
+		<div class="table-wrapper documents-table-wrapper">
+			<table class="documents-table table-stack-mobile">
+				<thead>
+					<tr>
+						<th>Filename</th>
+						<th>Extension</th>
+						<th>Type</th>
+						<th>File size</th>
+						<th>Status</th>
+						if showUploader {
+							<th>Uploaded by</th>
+						}
+						<th>Uploaded at</th>
+						if showActions {
+							<th>Actions</th>
+						}
+					</tr>
+				</thead>
+				<tbody>
+					for _, item := range items {
+						<tr class={ documentRowClass(item.Status) }>
+							<td data-label="Filename">
+								<a href={ item.ViewURL } class="documents-filename documents-filename-link" title={ item.Filename } target="_blank" rel="noopener noreferrer">{ item.Filename }</a>
+							</td>
+							<td data-label="Extension">
+								<code class="documents-ext">.{ item.Extension }</code>
+							</td>
+							<td data-label="Type">
+								@DocumentTypePill(item.Type)
+							</td>
+							<td data-label="File size">{ item.FileSize }</td>
+							<td data-label="Status">
+								@DocumentStatusPill(item.Status)
+							</td>
+							if showUploader {
+								<td data-label="Uploaded by">{ item.UploadedBy }</td>
+							}
+							<td data-label="Uploaded at">{ item.UploadedAt }</td>
+							if showActions {
+								<td data-label="Actions">
+									<div class="table-actions documents-actions">
+										<a href={ item.ViewURL } class="view-btn" target="_blank" rel="noopener noreferrer">View</a>
+										if item.CanReview {
+											<form method="POST" action={ utils.URL("/documents/" + item.ID + "/approve") } class="table-action-form">
+												<button type="submit" class="approve-btn">Approve</button>
+											</form>
+											<form method="POST" action={ utils.URL("/documents/" + item.ID + "/reject") } class="table-action-form" onsubmit="return confirm('Reject this document? The teacher will be able to upload a new one.');">
+												<button type="submit" class="delete-btn">Reject</button>
+											</form>
+										}
+									</div>
+								</td>
+							}
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	}
+}
+
+templ DocumentsCard(title string, description string, items []DocumentItem, showUploader bool, showActions bool) {
+	<section class="documents-card">
+		<div class="documents-card-header">
+			<div>
+				<h2>{ title }</h2>
+				if description != "" {
+					<p class="documents-card-desc">{ description }</p>
+				}
+			</div>
+		</div>
+		@DocumentsTable(items, showUploader, showActions)
+	</section>
+}
+
+templ DocumentsStyles() {
+	<style>
+		.documents-page-desc {
+			margin-bottom: var(--space-6);
+			color: var(--color-muted-foreground);
+			font-size: 0.9375rem;
+		}
+
+		.documents-card {
+			background: var(--color-muted);
+			border: 1px solid var(--color-border-subtle);
+			border-radius: var(--radius-lg);
+			padding: var(--space-6);
+			margin-top: var(--space-6);
+		}
+
+		.documents-card-header {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			gap: var(--space-4);
+			margin-bottom: var(--space-4);
+		}
+
+		.documents-card h2 {
+			margin: 0;
+			font-size: 1.125rem;
+		}
+
+		.documents-card-desc {
+			margin-top: var(--space-2);
+			color: var(--color-muted-foreground);
+			font-size: 0.875rem;
+		}
+
+		.documents-table-wrapper {
+			margin-top: var(--space-2);
+		}
+
+		.documents-table .documents-filename {
+			display: inline-block;
+			max-width: 220px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			vertical-align: bottom;
+		}
+
+		.documents-filename-link {
+			color: var(--color-accent);
+			text-decoration: none;
+		}
+
+		.documents-filename-link:hover {
+			color: var(--color-accent-hover);
+			text-decoration: underline;
+		}
+
+		.documents-ext {
+			font-family: 'Fira Code', monospace;
+			font-size: 0.8125rem;
+			background: var(--color-surface);
+			padding: 2px 8px;
+			border-radius: var(--radius-sm);
+			border: 1px solid var(--color-border-subtle);
+		}
+
+		.document-pill,
+		.document-status-pill {
+			display: inline-flex;
+			align-items: center;
+			padding: 3px 10px;
+			border-radius: var(--radius-full);
+			font-size: 0.75rem;
+			font-weight: 600;
+			text-transform: capitalize;
+			white-space: nowrap;
+		}
+
+		.document-pill--avatar {
+			background: var(--color-info-bg);
+			color: #0C4A6E;
+		}
+
+		.document-pill--document {
+			background: var(--color-primary-light);
+			color: var(--color-primary-hover);
+		}
+
+		.document-status-pill--submitted {
+			background: var(--color-warning-bg);
+			color: #7A4E00;
+		}
+
+		.document-status-pill--approved {
+			background: var(--color-success-bg);
+			color: var(--color-success);
+		}
+
+		.document-status-pill--rejected {
+			background: var(--color-error-bg);
+			color: var(--color-destructive);
+		}
+
+		.document-row-submitted {
+			background-color: var(--color-warning-bg) !important;
+		}
+
+		.document-row-approved {
+			background-color: var(--color-success-bg) !important;
+		}
+
+		.document-row-rejected {
+			background-color: var(--color-error-bg) !important;
+		}
+
+		.documents-empty {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			gap: var(--space-3);
+			padding: var(--space-8) var(--space-4);
+			text-align: center;
+			color: var(--color-muted-foreground);
+		}
+
+		.documents-empty svg {
+			color: var(--color-border);
+		}
+
+		.documents-empty-hint {
+			font-size: 0.875rem;
+		}
+
+		.documents-actions {
+			flex-wrap: wrap;
+		}
+
+		.upload-zone {
+			border: 2px dashed var(--color-border);
+			border-radius: var(--radius-md);
+			padding: var(--space-4);
+			background: var(--color-surface);
+			transition: border-color var(--transition-fast), background-color var(--transition-fast);
+		}
+
+		.upload-zone:focus-within {
+			border-color: var(--color-primary);
+			background: var(--color-primary-light);
+		}
+
+		.upload-zone-label {
+			display: flex;
+			align-items: center;
+			gap: var(--space-3);
+			cursor: pointer;
+			font-weight: 500;
+			font-size: 0.875rem;
+		}
+
+		.upload-zone-icon {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 40px;
+			height: 40px;
+			border-radius: var(--radius-md);
+			background: var(--color-info-bg);
+			color: var(--color-accent);
+			flex-shrink: 0;
+		}
+
+		.upload-zone input[type="file"] {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			padding: 0;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			border: 0;
+		}
+
+		.upload-zone-meta {
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+			min-width: 0;
+		}
+
+		.upload-zone-hint {
+			font-size: 0.75rem;
+			color: var(--color-muted-foreground);
+			font-weight: 400;
+		}
+
+		.upload-filename {
+			margin-top: var(--space-2);
+			font-size: 0.8125rem;
+			color: var(--color-foreground);
+			word-break: break-all;
+		}
+
+		.upload-locked-notice {
+			display: flex;
+			align-items: flex-start;
+			gap: var(--space-2);
+			padding: var(--space-3) var(--space-4);
+			margin-bottom: var(--space-4);
+			border-radius: var(--radius-md);
+			background: var(--color-info-bg);
+			border: 1px solid color-mix(in srgb, var(--color-info) 25%, transparent);
+			font-size: 0.875rem;
+		}
+
+		.upload-locked-notice svg {
+			flex-shrink: 0;
+			margin-top: 2px;
+			color: var(--color-info);
+		}
+	</style>
+}
+
+type DocumentsPageData struct {
+	Title        string
+	Description  string
+	Documents    []DocumentItem
+	ShowUploader bool
+	ShowActions  bool
+}
+
+templ DocumentsPage(data DocumentsPageData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>{ data.Title } - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@DocumentsStyles()
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@SuccessBanner()
+			@ErrorBanner()
+			@HubHeader(data.Title, "", "", false)
+			if data.Description != "" {
+				<p class="documents-page-desc">{ data.Description }</p>
+			}
+			@DocumentsTable(data.Documents, data.ShowUploader, data.ShowActions)
+		</div>
+		@SuccessBannerHandlers()
+		@ErrorBannerHandlers()
+	</body>
+	</html>
+}
+
+templ ProfilePictureUpload(data ProfileData) {
+	if !data.IsSuperuser {
+		<form
+			class="profile-upload-form"
+			method="POST"
+			action={ utils.URL("/profile/avatar") }
+			enctype="multipart/form-data"
+		>
+			<label class="upload-zone-label" for="avatar">Profile picture</label>
+			<div class="upload-zone">
+				<label class="upload-zone-label" for="avatar">
+					<span class="upload-zone-icon" aria-hidden="true">
+						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+							<circle cx="12" cy="7" r="4"></circle>
+						</svg>
+					</span>
+					<span class="upload-zone-meta">
+						<span>Choose a photo</span>
+						<span class="upload-zone-hint">JPEG or PNG, up to 2 MB</span>
+					</span>
+					<input type="file" id="avatar" name="avatar" accept="image/jpeg,image/png" onchange="this.form.querySelector('.upload-filename').textContent = this.files[0] ? this.files[0].name : ''"/>
+				</label>
+				<p class="upload-filename" aria-live="polite"></p>
+			</div>
+			<div class="profile-form-actions">
+				<button type="submit">Upload photo</button>
+			</div>
+		</form>
+	}
+}
+
+templ ProfileDocumentUpload(data ProfileData) {
+	if !data.IsSuperuser {
+		<div class="profile-card profile-section">
+			<h2>Valid ID document</h2>
+			<p class="profile-section-desc">Submit a government-issued ID for verification. Accepted formats: PNG, JPEG, JPG, or PDF (max 5 MB).</p>
+			if !data.CanUploadDocument {
+				<div class="upload-locked-notice" role="status">
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<circle cx="12" cy="12" r="10"></circle>
+						<line x1="12" y1="8" x2="12" y2="12"></line>
+						<line x1="12" y1="16" x2="12.01" y2="16"></line>
+					</svg>
+					<span>You already have a submitted or approved ID on file. You cannot upload again unless it is rejected by an administrator.</span>
+				</div>
+			}
+			<form
+				method="POST"
+				action={ utils.URL("/profile/document") }
+				enctype="multipart/form-data"
+				onsubmit="return confirm('Once submitted, you will not be able to upload a new ID unless your current submission is rejected. Continue?');"
+			>
+				<div class="upload-zone">
+					<label class="upload-zone-label" for="document">
+						<span class="upload-zone-icon" aria-hidden="true">
+							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+								<polyline points="14 2 14 8 20 8"></polyline>
+							</svg>
+						</span>
+						<span class="upload-zone-meta">
+							<span>Choose ID document</span>
+							<span class="upload-zone-hint">PNG, JPEG, JPG, or PDF — max 5 MB</span>
+						</span>
+						<input
+							type="file"
+							id="document"
+							name="document"
+							accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf"
+							required
+							disabled?={ !data.CanUploadDocument }
+							onchange="this.form.querySelector('.upload-filename').textContent = this.files[0] ? this.files[0].name : ''"
+						/>
+					</label>
+					<p class="upload-filename" aria-live="polite"></p>
+				</div>
+				<div class="profile-form-actions">
+					<button type="submit" disabled?={ !data.CanUploadDocument }>Submit document</button>
+				</div>
+			</form>
+		</div>
+	}
+}

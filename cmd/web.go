@@ -117,10 +117,14 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/profile/mobile", auth.RequireRole(auth.RoleTeacher)(handleProfileMobile))
 		authMux.HandleFunc(basePath+"/profile/names", auth.RequireRole(auth.RoleTeacher)(handleProfileNames))
 		authMux.HandleFunc(basePath+"/profile/password", auth.RequireRole(auth.RoleTeacher)(handleProfilePassword))
-		// Profile picture upload disabled for now.
-		// authMux.HandleFunc(basePath+"/profile/avatar", auth.RequireRole(auth.RoleTeacher)(handleProfileAvatar))
-		// authMux.HandleFunc(basePath+"/profile/picture", auth.RequireRole(auth.RoleTeacher)(handleProfilePicture))
+		authMux.HandleFunc(basePath+"/profile/avatar", auth.RequireRole(auth.RoleTeacher)(handleProfileAvatar))
+		authMux.HandleFunc(basePath+"/profile/picture", auth.RequireRole(auth.RoleTeacher)(handleProfilePicture))
+		authMux.HandleFunc(basePath+"/profile/document", auth.RequireRole(auth.RoleTeacher)(handleProfileDocument))
+		documentsRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)
+		authMux.HandleFunc(basePath+"/documents", documentsRole(handleDocuments))
+		authMux.HandleFunc(basePath+"/documents/", documentsRole(handleDocumentsPath))
 		authMux.HandleFunc(basePath+"/role", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetRole))
+		authMux.HandleFunc(basePath+"/header-avatar", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleHeaderAvatar))
 		authMux.HandleFunc(basePath+"/refresh", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleRefreshPage))
 		authMux.HandleFunc(basePath+"/api/teachers", auth.RequireRole(auth.RoleSuperuser)(handleGetTeachers))
 		authMux.HandleFunc(basePath+"/api/teacher-row", auth.RequireRole(auth.RoleSuperuser)(handleGetTeacherRow))
@@ -144,6 +148,10 @@ var cmdWeb = &cobra.Command{
 		})
 		rootMux.HandleFunc(basePath, handleLanding)
 		rootMux.HandleFunc(basePath+"/", func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path != basePath+"/" {
+				http.NotFound(w, r)
+				return
+			}
 			http.Redirect(w, r, basePath, http.StatusMovedPermanently)
 		})
 		rootMux.Handle(basePath+"/auth/", publicMux)
@@ -163,6 +171,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/api/reports", authHandler)
 		rootMux.Handle(basePath+"/download/processed", authHandler)
 		rootMux.Handle(basePath+"/role", authHandler)
+		rootMux.Handle(basePath+"/header-avatar", authHandler)
 		rootMux.Handle(basePath+"/refresh", authHandler)
 		rootMux.Handle(basePath+"/students", authHandler)
 		rootMux.Handle(basePath+"/students/", authHandler)
@@ -177,6 +186,8 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/my-students", authHandler)
 		rootMux.Handle(basePath+"/profile", authHandler)
 		rootMux.Handle(basePath+"/profile/", authHandler)
+		rootMux.Handle(basePath+"/documents", authHandler)
+		rootMux.Handle(basePath+"/documents/", authHandler)
 		rootMux.Handle(basePath+"/api/teachers", authHandler)
 		rootMux.Handle(basePath+"/api/teacher-row", authHandler)
 		rootMux.Handle(basePath+"/api/students", authHandler)

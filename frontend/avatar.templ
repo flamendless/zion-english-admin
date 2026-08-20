@@ -55,6 +55,12 @@ templ AvatarStyles() {
 			font-size: 0.875rem;
 		}
 
+		.avatar-nav {
+			width: 72px;
+			height: 72px;
+			font-size: 1.125rem;
+		}
+
 		.avatar-lg {
 			width: 96px;
 			height: 96px;
@@ -78,6 +84,16 @@ templ AvatarStyles() {
 			line-height: 1;
 			letter-spacing: 0.02em;
 		}
+
+		.header-avatar-link {
+			display: inline-flex;
+			text-decoration: none;
+			line-height: 0;
+		}
+
+		.header-avatar-link:hover .avatar {
+			box-shadow: var(--shadow-md);
+		}
 	</style>
 }
 
@@ -88,7 +104,16 @@ templ ProfileAvatar(props AvatarProps) {
 
 templ HeaderAvatar(props AvatarProps) {
 	@AvatarStyles()
-	<a href={ utils.URL("/profile") } class="header-avatar-link" title="My profile">
+	<a href={ utils.URL("/dashboard") } class="header-avatar-link" title="Dashboard">
 		@Avatar(props)
 	</a>
+}
+
+templ HeaderAvatarPlaceholder() {
+	<div
+		class="header-avatar-slot"
+		hx-get={ utils.URL("/header-avatar") }
+		hx-trigger="load once"
+		hx-swap="outerHTML"
+	></div>
 }

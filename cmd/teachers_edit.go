@@ -136,7 +136,7 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 			Sex:            t.Sex.String,
 			Status:         t.Status,
 			Deleted:        t.Deleted != 0,
-			CreatedAt:      t.CreatedAt.Time.Format("2006-01-02 15:04:05"),
+			CreatedAt:      utils.FormatNullDateTimeSecondsPHT(t.CreatedAt),
 		}
 	}
 

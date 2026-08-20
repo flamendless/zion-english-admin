@@ -7,6 +7,7 @@ import (
 
 type EditClassData struct {
 	RecordID        string
+	Readonly        bool
 	IsSuperuser     bool
 	StudentID       string
 	TeacherID       string
@@ -29,7 +30,11 @@ templ EditClass(data EditClassData) {
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Edit Class - Zion English Admin</title>
+		if data.Readonly {
+			<title>View Class - Zion English Admin</title>
+		} else {
+			<title>Edit Class - Zion English Admin</title>
+		}
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
 		@ScrTimeRangeJS()
@@ -40,7 +45,36 @@ templ EditClass(data EditClassData) {
 			@SuccessBanner()
 			@ErrorBanner()
 
-			if data.IsSuperuser {
+			if data.Readonly {
+				if data.IsSuperuser {
+					<div class="form-readonly">
+						<div class="form-row">
+							<div class="form-group">
+								<label>Teacher</label>
+								<input type="text" value={ data.TeacherName } disabled/>
+							</div>
+							<div class="form-group">
+								<label>Student</label>
+								<input type="text" value={ data.StudentName } disabled/>
+							</div>
+							@ClassDateField(data.Date, true)
+						</div>
+						@EditClassFields(data, true)
+					</div>
+				} else {
+					<div class="form-readonly">
+						<div class="form-row">
+							<div class="form-group">
+								<label>Student</label>
+								<input type="text" value={ data.StudentName } disabled/>
+							</div>
+							@ClassDateField(data.Date, true)
+						</div>
+						@EditClassFields(data, true)
+					</div>
+				}
+				<p><a href={ utils.URL("/classes") } class="btn">Back to Classes</a></p>
+			} else if data.IsSuperuser {
 				<form
 					hx-post={ utils.URL("/classes/" + data.RecordID + "/edit") }
 					hx-swap="innerHTML"
@@ -67,7 +101,7 @@ templ EditClass(data EditClassData) {
 						@StudentDropdownWithValue(data.StudentID)
 						@ClassDateField(data.Date, false)
 					</div>
-					@EditClassFields(data)
+					@EditClassFields(data, false)
 				</form>
 			} else {
 				<form
@@ -96,63 +130,94 @@ templ EditClass(data EditClassData) {
 						@TeacherStudentsDropdownWithValue(data.StudentID)
 						@ClassDateField(data.Date, false)
 					</div>
-					@EditClassFields(data)
+					@EditClassFields(data, false)
 				</form>
 			}
 
-			<div class="logs-section">
-				<h3>Logs and Errors</h3>
-				<div id="logOutput">Waiting for submission...</div>
-			</div>
+			if !data.Readonly {
+				<div class="logs-section">
+					<h3>Logs and Errors</h3>
+					<div id="logOutput">Waiting for submission...</div>
+				</div>
+			}
 		</div>
 		@ScrTimeRangeInit()
 	</body>
 	</html>
 }
 
-templ EditClassFields(data EditClassData) {
-	@TimeRangeFields(data.StartTime, data.EndTime, false)
+templ EditClassFields(data EditClassData, readonly bool) {
+	@TimeRangeFields(data.StartTime, data.EndTime, readonly)
 
-	<div class="form-row">
-		@CurrencyDropdownWithValue(data.Currency)
+	if readonly {
+		<div class="form-row">
+			<div class="form-group">
+				<label for="currency">Currency</label>
+				<input type="text" id="currency" value={ data.Currency } disabled/>
+			</div>
+			<div class="form-group">
+				<label for="rate">Rate</label>
+				<input type="text" id="rate" value={ formatFloat(data.Rate) } disabled/>
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group">
+				<label for="status">Status</label>
+				<input type="text" id="status" value={ data.Status } disabled/>
+			</div>
+			if data.Status != "conducted" {
+				<div class="form-group">
+					<label for="reason">Reason</label>
+					<input type="text" id="reason" value={ data.Reason } disabled/>
+				</div>
+			}
+		</div>
 		<div class="form-group">
-			<label for="rate">Rate *</label>
-			<input type="number" id="rate" name="rate" required min="0" step="0.01" value={ formatFloat(data.Rate) }/>
+			<label for="notes">Notes</label>
+			<textarea id="notes" rows="4" readonly>{ data.Notes }</textarea>
 		</div>
-	</div>
-	<div
-		class="form-row"
-		_="
-			on change from #status
-				if #status.value is 'conducted'
-					add @hidden to #reasonGroup
-					remove @required from #reason
-					set #reason.value to ''
-				else
-					remove @hidden from #reasonGroup
-					add @required to #reason
+	} else {
+		<div class="form-row">
+			@CurrencyDropdownWithValue(data.Currency)
+			<div class="form-group">
+				<label for="rate">Rate *</label>
+				<input type="number" id="rate" name="rate" required min="0" step="0.01" value={ formatFloat(data.Rate) }/>
+			</div>
+		</div>
+		<div
+			class="form-row"
+			_="
+				on change from #status
+					if #status.value is 'conducted'
+						add @hidden to #reasonGroup
+						remove @required from #reason
+						set #reason.value to ''
+					else
+						remove @hidden from #reasonGroup
+						add @required to #reason
+					end
 				end
-			end
-		"
-	>
-		@ClassStatusDropdownWithValue(data.Status)
-		<div class="form-group" id="reasonGroup" hidden?={ data.Status == "conducted" }>
-			<label for="reason">Reason *</label>
-			<input
-				type="text"
-				id="reason"
-				name="reason"
-				value={ data.Reason }
-				placeholder="Reason for cancellation/reschedule"
-				required?={ data.Status != "conducted" }
-			/>
+			"
+		>
+			@ClassStatusDropdownWithValue(data.Status)
+			<div class="form-group" id="reasonGroup" hidden?={ data.Status == "conducted" }>
+				<label for="reason">Reason *</label>
+				<input
+					type="text"
+					id="reason"
+					name="reason"
+					value={ data.Reason }
+					placeholder="Reason for cancellation/reschedule"
+					required?={ data.Status != "conducted" }
+				/>
+			</div>
 		</div>
-	</div>
-	<div class="form-group">
-		<label for="notes">Notes</label>
-		<textarea id="notes" name="notes" rows="4" placeholder="Lesson notes...">{ data.Notes }</textarea>
-	</div>
-	<button type="submit">Save Changes</button>
+		<div class="form-group">
+			<label for="notes">Notes</label>
+			<textarea id="notes" name="notes" rows="4" placeholder="Lesson notes...">{ data.Notes }</textarea>
+		</div>
+		<button type="submit">Save Changes</button>
+	}
 }
 
 func formatFloat(v float64) string {

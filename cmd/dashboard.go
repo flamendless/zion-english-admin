@@ -9,6 +9,7 @@ import (
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/conf"
+	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
 	"zion-english/internal/utils"
@@ -42,12 +43,21 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	role := auth.GetRole(r.Context())
+	user := auth.GetUser(ctx)
 	data := frontend.DashboardData{Role: role}
+
+	avatar, err := buildHeaderAvatarProps(ctx, user, role)
+	if err != nil {
+		logs.Log().Error("build dashboard avatar", zap.Error(err))
+	} else {
+		data.Avatar = avatar
+	}
 
 	weekStart, weekEnd := weekRange()
 	monthStart, monthEnd := monthRange()
 
-	if role == auth.RoleSuperuser {
+	switch role {
+	case auth.RoleSuperuser:
 		statusCounts, err := dbRO.GetQueries().CountStudentsByStatus(ctx)
 		if err == nil {
 			for _, row := range statusCounts {
@@ -62,6 +72,10 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		pending, err := dbRO.GetQueries().CountTeachersByStatus(ctx, "pending")
 		if err == nil {
 			data.PendingTeachers = pending
+		}
+		pendingDocs, err := dbRO.GetQueries().CountTeacherDocumentsByStatus(ctx, string(constants.TeacherDocumentStatusSubmitted))
+		if err == nil {
+			data.PendingDocuments = pendingDocs
 		}
 		classCounts, err := dbRO.GetQueries().CountClassRecordsByStatusAndDateRange(ctx, queries.CountClassRecordsByStatusAndDateRangeParams{
 			Date:      weekStart,
@@ -96,7 +110,7 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 				})
 			}
 		}
-	} else if role == auth.RoleTeacher {
+	case auth.RoleTeacher:
 		user := auth.GetUser(ctx)
 		count, err := dbRO.GetQueries().CountStudentsByTeacherID(ctx, user.ID)
 		if err == nil {
@@ -135,7 +149,7 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 				})
 			}
 		}
-		today := time.Now().Format("2006-01-02")
+		today := utils.TodayPHT()
 		scheduledToday, err := dbRO.GetQueries().CountScheduledClassesByStatusAndDate(ctx, queries.CountScheduledClassesByStatusAndDateParams{
 			ScheduledDate: today,
 			Status:        "scheduled",

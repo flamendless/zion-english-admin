@@ -175,5 +175,28 @@ templ ReportViewStyles() {
 			color: var(--color-success);
 			font-weight: 600;
 		}
+
+		@media (max-width: 768px) {
+			.modal-dialog-report {
+				width: calc(100% - 1rem);
+				max-height: 92vh;
+			}
+
+			.report-view-identity {
+				flex-direction: column;
+				align-items: flex-start;
+				gap: var(--space-3);
+			}
+
+			.report-summary {
+				flex-direction: column;
+			}
+
+			.report-summary-chip {
+				width: 100%;
+				justify-content: center;
+				box-sizing: border-box;
+			}
+		}
 	</style>
 }

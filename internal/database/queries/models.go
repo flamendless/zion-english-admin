@@ -178,6 +178,20 @@ type TblTeacher struct {
 	DeletedAt         sql.NullTime
 }
 
+type TblTeacherDocument struct {
+	ID               int64
+	TeacherID        int64
+	Type             string
+	OriginalFilename string
+	StoredFilename   string
+	FileExtension    string
+	FileSize         int64
+	Status           string
+	UploadedAt       sql.NullTime
+	ReviewedAt       sql.NullTime
+	ReviewedBy       sql.NullInt64
+}
+
 type TblTeachersStudentsM2m struct {
 	TeacherID int64
 	StudentID int64

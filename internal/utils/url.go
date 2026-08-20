@@ -1,14 +1,17 @@
 package utils
 
 import (
+	"strings"
+
 	"zion-english/internal/conf"
 )
 
 func URL(path string) string {
-	if conf.Conf().IsProd() {
+	base := strings.TrimSuffix(conf.Conf().BasePath, "/")
+	if base == "" || base == "/" {
 		return path
 	}
-	return "/zion-english-admin" + path
+	return base + path
 }
 
 func BasePath() string {

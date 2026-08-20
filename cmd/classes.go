@@ -23,7 +23,68 @@ func handleClassesPath(w http.ResponseWriter, r *http.Request) {
 		handleClassEdit(w, r, id)
 		return
 	}
+	if id, ok := extractPathID(r, "classes", "/view"); ok {
+		handleClassView(w, r, id)
+		return
+	}
 	HttpError(w, "Not found", http.StatusNotFound)
+}
+
+func classEditClassData(ctx context.Context, recordID int64, readonly bool) (frontend.EditClassData, error) {
+	user := auth.GetUser(ctx)
+	role := auth.GetRole(ctx)
+
+	existing, err := dbRO.GetQueries().GetClassRecordByID(ctx, recordID)
+	if err != nil {
+		return frontend.EditClassData{}, err
+	}
+
+	rules := classrules.ClassRecordRules{DB: dbRO.GetQueries()}
+	if err := rules.ValidateEditAccess(existing.TeacherID, user); err != nil {
+		return frontend.EditClassData{}, err
+	}
+
+	startTime, endTime := classRecordTimesForEdit(existing.StartTime, existing.EndTime, existing.DurationMinutes)
+	return frontend.EditClassData{
+		RecordID:        strconv.FormatInt(recordID, 10),
+		Readonly:        readonly,
+		IsSuperuser:     role == auth.RoleSuperuser,
+		StudentID:       strconv.FormatInt(existing.StudentID, 10),
+		TeacherID:       strconv.FormatInt(existing.TeacherID, 10),
+		StudentName:     existing.StudentName,
+		TeacherName:     existing.TeacherName,
+		Date:            existing.Date,
+		StartTime:       startTime,
+		EndTime:         endTime,
+		DurationMinutes: existing.DurationMinutes,
+		Rate:            existing.Rate,
+		Currency:        existing.Currency,
+		Status:          existing.Status,
+		Reason:          existing.Reason.String,
+		Notes:           existing.Notes.String,
+	}, nil
+}
+
+func handleClassView(w http.ResponseWriter, r *http.Request, recordID int64) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx := r.Context()
+	if _, err := dbRO.GetQueries().GetClassRecordByID(ctx, recordID); err != nil {
+		HttpError(w, "Class record not found", http.StatusNotFound)
+		return
+	}
+
+	data, err := classEditClassData(ctx, recordID, true)
+	if err != nil {
+		HttpError(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	frontend.EditClass(data).Render(ctx, w)
 }
 
 func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
@@ -44,25 +105,13 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 	}
 
 	if r.Method == http.MethodGet {
+		data, err := classEditClassData(ctx, recordID, false)
+		if err != nil {
+			HttpError(w, "Class record not found", http.StatusNotFound)
+			return
+		}
 		w.Header().Set("Content-Type", "text/html")
-		startTime, endTime := classRecordTimesForEdit(existing.StartTime, existing.EndTime, existing.DurationMinutes)
-		frontend.EditClass(frontend.EditClassData{
-			RecordID:        strconv.FormatInt(recordID, 10),
-			IsSuperuser:     role == auth.RoleSuperuser,
-			StudentID:       strconv.FormatInt(existing.StudentID, 10),
-			TeacherID:       strconv.FormatInt(existing.TeacherID, 10),
-			StudentName:     existing.StudentName,
-			TeacherName:     existing.TeacherName,
-			Date:            existing.Date,
-			StartTime:       startTime,
-			EndTime:         endTime,
-			DurationMinutes: existing.DurationMinutes,
-			Rate:            existing.Rate,
-			Currency:        existing.Currency,
-			Status:          existing.Status,
-			Reason:          existing.Reason.String,
-			Notes:           existing.Notes.String,
-		}).Render(ctx, w)
+		frontend.EditClass(data).Render(ctx, w)
 		return
 	}
 

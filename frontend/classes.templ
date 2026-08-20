@@ -227,6 +227,7 @@ templ Classes(data ClassesData) {
 							} else if (record.status === 'rescheduled') {
 								row.classList.add('row-rescheduled');
 							}
+							const viewHref = buildURL('/classes/' + record.id + '/view');
 							const editHref = buildURL('/classes/' + record.id + '/edit');
 							const columnLabels = ['Date', 'Start Time', 'End Time'];
 							if (showAllTeachers) {
@@ -260,6 +261,11 @@ templ Classes(data ClassesData) {
 							actionCell.dataset.label = 'Actions';
 							const actionsWrap = document.createElement('div');
 							actionsWrap.className = 'table-actions';
+							const viewLink = document.createElement('a');
+							viewLink.href = viewHref;
+							viewLink.className = 'view-btn';
+							viewLink.textContent = 'View';
+							actionsWrap.appendChild(viewLink);
 							const editLink = document.createElement('a');
 							editLink.href = editHref;
 							editLink.className = 'edit-btn';

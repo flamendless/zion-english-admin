@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"database/sql"
 	"strings"
 	"time"
 
@@ -9,6 +10,28 @@ import (
 
 func DatePHT(t time.Time) string {
 	return t.In(constants.LocationPHT).Format(constants.DateLayout)
+}
+
+func DateTimePHT(t time.Time) string {
+	return t.In(constants.LocationPHT).Format(constants.DateTimeLayout)
+}
+
+func DateTimeSecondsPHT(t time.Time) string {
+	return t.In(constants.LocationPHT).Format(constants.DateTimeSecondsLayout)
+}
+
+func FormatNullDateTimePHT(t sql.NullTime) string {
+	if !t.Valid {
+		return "-"
+	}
+	return DateTimePHT(t.Time)
+}
+
+func FormatNullDateTimeSecondsPHT(t sql.NullTime) string {
+	if !t.Valid {
+		return ""
+	}
+	return DateTimeSecondsPHT(t.Time)
 }
 
 func TodayPHT() string {

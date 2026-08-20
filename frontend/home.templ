@@ -11,9 +11,11 @@ type CurrencyTotal struct {
 
 type DashboardData struct {
 	Role                   auth.Role
+	Avatar                 AvatarProps
 	ActiveStudents         int64
 	InactiveStudents       int64
 	PendingTeachers        int64
+	PendingDocuments       int64
 	MyStudentCount         int64
 	ClassesConductedWeek   int64
 	ClassesCancelledWeek   int64
@@ -38,8 +40,8 @@ templ Home(data DashboardData) {
 				<img src={utils.URL("/static/logo.png")} alt="Zion English" class="home-logo">
 			</div>
 			<span class="home-top-bar">
+				@HeaderAvatar(data.Avatar)
 				@Logout()
-				@Flam()
 			</span>
 
 			<div class="home-welcome">
@@ -87,6 +89,10 @@ templ DashboardStats(data DashboardData) {
 			<div class="stat-card">
 				<span class="stat-label">Pending Teachers</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.PendingTeachers) }</span>
+			</div>
+			<div class="stat-card">
+				<span class="stat-label">Pending Documents</span>
+				<span class="stat-value">{ fmt.Sprintf("%d", data.PendingDocuments) }</span>
 			</div>
 		}
 		if data.Role == auth.RoleTeacher {

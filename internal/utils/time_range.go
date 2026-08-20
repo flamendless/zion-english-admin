@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"zion-english/internal/constants"
 )
 
 var (
@@ -20,7 +22,7 @@ func ParseTimeHM(value string) (time.Time, error) {
 	if value == "" {
 		return time.Time{}, ErrTimeRequired
 	}
-	for _, layout := range []string{"15:04:05", "15:04"} {
+	for _, layout := range []string{constants.TimeHMSecondsLayout, constants.TimeHMLayout} {
 		if t, err := time.Parse(layout, value); err == nil {
 			return t, nil
 		}

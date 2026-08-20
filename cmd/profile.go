@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -81,6 +82,44 @@ func buildSuperuserAvatarProps(user auth.User) frontend.AvatarProps {
 	}
 }
 
+func buildHeaderAvatarProps(ctx context.Context, user auth.User, role auth.Role) (frontend.AvatarProps, error) {
+	if role == auth.RoleSuperuser {
+		props := buildSuperuserAvatarProps(user)
+		props.Size = "nav"
+		return props, nil
+	}
+
+	row, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, user.ID)
+	if err != nil {
+		return frontend.AvatarProps{}, err
+	}
+	props := buildTeacherAvatarProps(row)
+	props.Size = "nav"
+	return props, nil
+}
+
+func handleHeaderAvatar(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx := r.Context()
+	user := auth.GetUser(ctx)
+	role := auth.GetRole(ctx)
+	props, err := buildHeaderAvatarProps(ctx, user, role)
+	if err != nil {
+		logs.Log().Error("build header avatar", zap.Error(err))
+		HttpError(w, "Failed to load avatar", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	if err := frontend.HeaderAvatar(props).Render(ctx, w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func handleProfile(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -119,6 +158,11 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 
 	canChangeMobile, mobileDays := utils.SensitiveChangeAllowed(row.MobileChangedAt, now)
 	canChangePassword, passwordDays := utils.SensitiveChangeAllowed(row.PasswordChangedAt, now)
+	blockingDocs, err := dbRO.GetQueries().HasBlockingTeacherDocument(ctx, user.ID)
+	if err != nil {
+		logs.Log().Error("check blocking teacher document", zap.Error(err))
+		blockingDocs = 0
+	}
 
 	certifications := ""
 	if row.Certifications.Valid {
@@ -162,6 +206,7 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 		CanEditFirstName:      utils.ProfileNameEditable(row.FirstName),
 		CanEditMiddleName:     utils.ProfileNameEditable(row.MiddleName),
 		CanEditLastName:       utils.ProfileNameEditable(row.LastName),
+		CanUploadDocument:     blockingDocs == 0,
 	}
 
 	if err := frontend.Profile(data).Render(ctx, w); err != nil {
@@ -528,6 +573,10 @@ func handleProfileAvatar(w http.ResponseWriter, r *http.Request) {
 		setErrorFlash(w, "Failed to update profile picture")
 		HttpRedirect(w, r, "/profile")
 		return
+	}
+
+	if err := logAvatarDocument(ctx, user.ID, header.Filename, filename, ext, header.Size); err != nil {
+		logs.Log().Error("log avatar document", zap.Error(err))
 	}
 
 	insertAuditLogAs(ctx, user, "profile", fmt.Sprintf("updated profile picture for teacher '%s'", user.Name))

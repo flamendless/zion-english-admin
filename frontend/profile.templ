@@ -33,6 +33,7 @@ type ProfileData struct {
 	CanEditFirstName     bool
 	CanEditMiddleName    bool
 	CanEditLastName      bool
+	CanUploadDocument    bool
 }
 
 templ Profile(data ProfileData) {
@@ -45,6 +46,7 @@ templ Profile(data ProfileData) {
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
 		@AvatarStyles()
+		@DocumentsStyles()
 		<style>
 			.profile-layout {
 				display: grid;
@@ -215,8 +217,8 @@ templ Profile(data ProfileData) {
 						<p class="profile-email">{ data.Email }</p>
 					</div>
 
-					// Profile picture upload disabled for now.
-					// @ProfilePictureUpload(data)
+					// Profile picture upload
+					@ProfilePictureUpload(data)
 				</div>
 
 				<div>
@@ -426,6 +428,8 @@ templ Profile(data ProfileData) {
 							</form>
 						</div>
 					}
+
+					@ProfileDocumentUpload(data)
 				</div>
 			</div>
 		</div>
@@ -472,24 +476,5 @@ func ProfileRoleLabel(role auth.Role) string {
 		return "teacher"
 	default:
 		return string(role)
-	}
-}
-
-// Profile picture upload disabled for now — re-enable with routes in cmd/web.go.
-templ ProfilePictureUpload(data ProfileData) {
-	if !data.IsSuperuser {
-		<form
-			class="profile-upload-form"
-			method="POST"
-			action={ utils.URL("/profile/avatar") }
-			enctype="multipart/form-data"
-		>
-			<label for="avatar">Profile picture</label>
-			<input type="file" id="avatar" name="avatar" accept="image/jpeg,image/png"/>
-			<p class="profile-upload-hint">JPEG or PNG, up to 2 MB. Shows your initials when no photo is set.</p>
-			<div class="profile-form-actions">
-				<button type="submit">Upload photo</button>
-			</div>
-		</form>
 	}
 }

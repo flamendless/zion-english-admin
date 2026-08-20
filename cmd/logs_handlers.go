@@ -177,13 +177,6 @@ func systemLogItemsFromTeacherRows(rows []queries.GetLogsByCreatedByFilteredRow)
 	return viewLogs
 }
 
-func formatNullTime(t sql.NullTime) string {
-	if !t.Valid {
-		return ""
-	}
-	return t.Time.Format("2006-01-02 15:04:05")
-}
-
 func nullTimeFromDate(s string) sql.NullTime {
 	t, err := utils.ParseDatePHT(s)
 	if err != nil || t == nil {
@@ -251,7 +244,7 @@ func handleLogs(w http.ResponseWriter, r *http.Request) {
 			UserAgent:      l.Useragent.String,
 			OutputPath:     l.OutputPath.String,
 			Errors:         l.Errors.String,
-			CreatedAt:      formatNullTime(l.CreatedAt),
+			CreatedAt:      utils.FormatNullDateTimeSecondsPHT(l.CreatedAt),
 		}
 	}
 

@@ -82,5 +82,19 @@ w.Header().Set("HX-Redirect", utils.URL("/"))
 
 ## Helpers
 
-- Do not add a wrapper function that only forwards to another call on one line — inline at call sites instead.
-- Reuse `internal/utils` for small shared string/format helpers (e.g. `utils.NormalizeEmail`) rather than duplicating them in `cmd/`.
+- **No one-line forwarders** — do not add a local function whose body is only `return otherFn(...)`. Call `otherFn` at the site instead. This applies to `cmd/` wrappers around `utils.*`, DB queries, and formatters (e.g. avoid `formatNullTime(t) { return utils.FormatNullDateTimeSecondsPHT(t) }`).
+- Reuse `internal/utils` for shared string/format helpers (e.g. `utils.NormalizeEmail`, `utils.FormatNullDateTimePHT`) rather than re-wrapping them in `cmd/`.
+- Small helpers are fine when they add real logic (branching, param assembly, validation) or deduplicate non-trivial blocks used in multiple places.
+
+## Dates & Times (PHT)
+
+All user-facing dates and datetimes are shown in **Philippines time** (`Asia/Manila`).
+
+- Layout constants live in `internal/constants/timezone.go` — never use raw Go layout strings (`"2006-01-02"`, `"15:04"`, etc.) in handlers or templates.
+- Format for display via `internal/utils/datetime.go`:
+  - `utils.DatePHT`, `utils.DateTimePHT`, `utils.DateTimeSecondsPHT`
+  - `utils.FormatNullDateTimePHT`, `utils.FormatNullDateTimeSecondsPHT` for `sql.NullTime`
+  - `utils.TodayPHT`, `utils.ParseDatePHT`, `utils.NormalizeDatePHT` for calendar dates
+- Use `constants.LocationPHT` with `time.ParseInLocation` when parsing user input as PHT.
+- DB storage may remain UTC; convert with `.In(constants.LocationPHT)` only at the display boundary.
+- Internal logs, processor exports, and API wire formats may use layout constants without PHT conversion when not shown to users.

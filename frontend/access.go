@@ -22,6 +22,7 @@ type navItemDef struct {
 
 var navItemDefs = []navItemDef{
 	{Path: "/profile", LinkID: "profileLink", Title: "My Profile", Description: "View account info and update settings"},
+	{Path: "/documents", LinkID: "documentsLink", Title: "Documents", TeacherTitle: "My Documents", Description: "Review teacher uploads and ID documents", TeacherDesc: "View your uploaded profile photos and ID documents"},
 	{Path: "/teachers", LinkID: "teachersLink", Title: "Teachers", Description: "View and manage teachers"},
 	{Path: "/students", LinkID: "studentsLink", Title: "Students", Description: "View and manage students"},
 	{Path: "/classes", LinkID: "classesLink", Title: "Classes", TeacherTitle: "My Classes", Description: "View and record classes", TeacherDesc: "View and record your classes"},
@@ -74,7 +75,7 @@ func IsNavAccessible(role auth.Role, path string) bool {
 		return false
 	case "/students/register":
 		return true
-	case "/classes", "/classes/record", "/schedule", "/profile", "/logs", "/my-students":
+	case "/classes", "/classes/record", "/schedule", "/profile", "/logs", "/my-students", "/documents":
 		return true
 	default:
 		return false
