@@ -9,6 +9,34 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.08.20"
+    date: "2026-08-20"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Teachers can upload and change their profile picture from My Profile."
+        commit: "2175057"
+      - text: "Teachers can submit a valid ID document from My Profile for superuser review."
+        commit: "2175057"
+      - text: "Teachers have a My Documents page to view uploaded profile photos and ID documents and their review status."
+        commit: "2175057"
+      - text: "Superusers can review, approve, or reject teacher document uploads from the Documents page."
+        commit: "2175057"
+    improvements:
+      - text: "The superuser dashboard shows how many teacher documents are pending review."
+        commit: "2175057"
+      - text: "You can open read-only views for classes and students from their list pages."
+        commit: "2175057"
+      - text: "Your profile avatar appears in the page header and on the dashboard welcome section."
+        commit: "2175057"
+      - text: "Announcement banners are easier to read on mobile screens."
+        commit: "2175057"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
   - version: "2026.08.19"
     date: "2026-08-19"
     released: true
