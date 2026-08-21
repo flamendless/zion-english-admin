@@ -21,6 +21,7 @@ type TeacherData struct {
 type TeacherItem struct {
 	ID             string
 	Name           string
+	Avatar         AvatarProps
 	Birthdate      string
 	Address        string
 	JoiningDate    string
@@ -93,6 +94,13 @@ templ Teachers(data TeacherData) {
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
 		@AvatarStyles()
+		<style>
+			.teacher-name-cell {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+			}
+		</style>
 		<script>
 			window.closeTeacherViewModal = function () {
 				const host = document.getElementById('teacherViewModalHost');
@@ -161,13 +169,16 @@ templ Teachers(data TeacherData) {
 							for _, teacher := range data.Teachers {
 								<tr class={ getTeacherRowClass(teacher.Status, teacher.Deleted) }>
 									<td data-label="Name">
-										<button
-											type="button"
-											class="name-link"
-											hx-get={ utils.URL("/teachers/" + teacher.ID + "/view") }
-											hx-target="#teacherViewModalHost"
-											hx-swap="innerHTML"
-										>{ teacher.Name }</button>
+										<div class="teacher-name-cell">
+											@Avatar(teacher.Avatar)
+											<button
+												type="button"
+												class="name-link"
+												hx-get={ utils.URL("/teachers/" + teacher.ID + "/view") }
+												hx-target="#teacherViewModalHost"
+												hx-swap="innerHTML"
+											>{ teacher.Name }</button>
+										</div>
 									</td>
 									<td class={ getTeacherStatusClass(teacher.Status, teacher.Deleted) } data-label="Status">{ getTeacherDisplayStatus(teacher.Status, teacher.Deleted) }</td>
 									<td class="email-cell" data-label="Email">{ getDisplayValue(teacher.Email) }</td>

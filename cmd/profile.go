@@ -72,6 +72,21 @@ func buildTeacherAvatarProps(row queries.GetTeacherProfileByIDRow) frontend.Avat
 	}
 }
 
+func buildTeacherListAvatarProps(teacherID int64, name, firstName, middleName, lastName, assignedColor string, profilePicture sql.NullString) frontend.AvatarProps {
+	hasPicture := profilePicture.Valid && profilePicture.String != ""
+	if assignedColor == "" {
+		assignedColor = "#B9D283"
+	}
+	return frontend.AvatarProps{
+		Size:          "sm",
+		Initials:      utils.PersonInitials(firstName, middleName, lastName, name),
+		AssignedColor: assignedColor,
+		PictureURL:    teacherPictureURL(teacherID, hasPicture),
+		HasPicture:    hasPicture,
+		Alt:           name + " avatar",
+	}
+}
+
 func buildSuperuserAvatarProps(user auth.User) frontend.AvatarProps {
 	return frontend.AvatarProps{
 		Size:          "xl",

@@ -1048,6 +1048,7 @@ templ GlobalIncludes() {
 		.table-actions .approve-btn,
 		.table-actions .unapprove-btn,
 		.table-actions .delete-btn,
+		.table-actions .warning-btn,
 		.table-actions .btn {
 			margin-top: 0;
 		}
@@ -2193,6 +2194,25 @@ templ GlobalIncludes() {
 			border-color: var(--color-destructive);
 		}
 
+		.warning-btn {
+			display: inline-block;
+			padding: var(--space-1) var(--space-3);
+			border-radius: var(--radius-sm);
+			background: var(--color-warning-bg);
+			border: 1px solid color-mix(in srgb, var(--color-warning) 35%, transparent);
+			color: #7A4E00;
+			font-size: 0.85rem;
+			font-family: inherit;
+			font-weight: 500;
+			cursor: pointer;
+			transition: background-color var(--transition-fast), border-color var(--transition-fast);
+		}
+
+		.warning-btn:hover {
+			background: color-mix(in srgb, var(--color-warning-bg) 70%, var(--color-warning));
+			border-color: var(--color-warning);
+		}
+
 		.table-action-form {
 			display: inline-flex;
 			margin: 0;
@@ -2550,6 +2570,7 @@ templ GlobalIncludes() {
 			.table-stack-mobile .table-actions .approve-btn,
 			.table-stack-mobile .table-actions .unapprove-btn,
 			.table-stack-mobile .table-actions .delete-btn,
+			.table-stack-mobile .table-actions .warning-btn,
 			.table-stack-mobile .table-actions .btn,
 			.table-stack-mobile .table-actions .download-report-wrap,
 			.table-stack-mobile .table-actions .download-report-wrap > a {
@@ -2566,7 +2587,8 @@ templ GlobalIncludes() {
 				width: 100%;
 			}
 
-			.table-stack-mobile .table-action-form .delete-btn {
+			.table-stack-mobile .table-action-form .delete-btn,
+			.table-stack-mobile .table-action-form .warning-btn {
 				width: 100%;
 			}
 

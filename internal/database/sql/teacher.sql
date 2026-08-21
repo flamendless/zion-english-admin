@@ -95,7 +95,7 @@ WHERE (? = '' OR name LIKE '%' || ? || '%' OR email LIKE '%' || ? || '%')
   );
 
 -- name: GetTeachersFiltered :many
-SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted, deleted_at
+SELECT id, name, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted, deleted_at, profile_picture
 FROM tbl_teachers
 WHERE (? = '' OR name LIKE '%' || ? || '%' OR email LIKE '%' || ? || '%')
   AND (

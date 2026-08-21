@@ -25,6 +25,15 @@ func (q *Queries) CountTeacherDocumentsByStatus(ctx context.Context, status stri
 	return count, err
 }
 
+const deleteTeacherDocument = `-- name: DeleteTeacherDocument :exec
+DELETE FROM tbl_teacher_documents WHERE id = ?
+`
+
+func (q *Queries) DeleteTeacherDocument(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteTeacherDocument, id)
+	return err
+}
+
 const getAllTeacherDocuments = `-- name: GetAllTeacherDocuments :many
 SELECT
     d.id,

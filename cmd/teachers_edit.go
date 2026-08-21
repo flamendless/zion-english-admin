@@ -137,6 +137,9 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 			Status:         t.Status,
 			Deleted:        t.Deleted != 0,
 			CreatedAt:      utils.FormatNullDateTimeSecondsPHT(t.CreatedAt),
+			Avatar: buildTeacherListAvatarProps(
+				t.ID, t.Name, t.FirstName, t.MiddleName, t.LastName, t.AssignedColor, t.ProfilePicture,
+			),
 		}
 	}
 

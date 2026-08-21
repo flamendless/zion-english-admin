@@ -482,7 +482,7 @@ func (q *Queries) GetTeacherProfileByID(ctx context.Context, id int64) (GetTeach
 }
 
 const getTeachersFiltered = `-- name: GetTeachersFiltered :many
-SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted, deleted_at
+SELECT id, name, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted, deleted_at, profile_picture
 FROM tbl_teachers
 WHERE (? = '' OR name LIKE '%' || ? || '%' OR email LIKE '%' || ? || '%')
   AND (
@@ -510,6 +510,9 @@ type GetTeachersFilteredParams struct {
 type GetTeachersFilteredRow struct {
 	ID             int64
 	Name           string
+	FirstName      string
+	MiddleName     string
+	LastName       string
 	Birthdate      string
 	Address        string
 	JoiningDate    string
@@ -528,6 +531,7 @@ type GetTeachersFilteredRow struct {
 	Status         string
 	Deleted        int64
 	DeletedAt      sql.NullTime
+	ProfilePicture sql.NullString
 }
 
 func (q *Queries) GetTeachersFiltered(ctx context.Context, arg GetTeachersFilteredParams) ([]GetTeachersFilteredRow, error) {
@@ -553,6 +557,9 @@ func (q *Queries) GetTeachersFiltered(ctx context.Context, arg GetTeachersFilter
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
+			&i.FirstName,
+			&i.MiddleName,
+			&i.LastName,
 			&i.Birthdate,
 			&i.Address,
 			&i.JoiningDate,
@@ -571,6 +578,7 @@ func (q *Queries) GetTeachersFiltered(ctx context.Context, arg GetTeachersFilter
 			&i.Status,
 			&i.Deleted,
 			&i.DeletedAt,
+			&i.ProfilePicture,
 		); err != nil {
 			return nil, err
 		}

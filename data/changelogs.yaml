@@ -9,6 +9,20 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.08.21"
+    date: "2026-08-21"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Superusers can permanently delete teacher documents from the Documents page; deleting a profile photo also clears the teacher's avatar."
+    improvements:
+      - text: "Teacher profile avatars now appear next to each teacher's name on the teachers list."
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
   - version: "2026.08.20"
     date: "2026-08-20"
     released: true

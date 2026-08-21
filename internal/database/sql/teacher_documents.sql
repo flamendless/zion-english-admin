@@ -75,3 +75,6 @@ FROM tbl_teacher_documents d
 INNER JOIN tbl_teachers t ON t.id = d.teacher_id
 WHERE t.deleted = 0
   AND d.status = ?;
+
+-- name: DeleteTeacherDocument :exec
+DELETE FROM tbl_teacher_documents WHERE id = ?;

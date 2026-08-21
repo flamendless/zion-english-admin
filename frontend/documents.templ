@@ -115,6 +115,9 @@ templ DocumentsTable(items []DocumentItem, showUploader bool, showActions bool) 
 												<button type="submit" class="delete-btn">Reject</button>
 											</form>
 										}
+										<form method="POST" action={ utils.URL("/documents/" + item.ID + "/delete") } class="table-action-form" onsubmit="return confirm('Permanently delete this document? The file will be removed and cannot be recovered.');">
+											<button type="submit" class="warning-btn">Delete</button>
+										</form>
 									</div>
 								</td>
 							}

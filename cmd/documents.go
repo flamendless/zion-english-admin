@@ -143,6 +143,10 @@ func handleDocumentsPath(w http.ResponseWriter, r *http.Request) {
 		handleDocumentReview(w, r, id, string(constants.TeacherDocumentStatusRejected), "rejected")
 		return
 	}
+	if id, ok := extractPathID(r, "documents", "/delete"); ok {
+		handleDocumentDelete(w, r, id)
+		return
+	}
 	HttpError(w, "Not found", http.StatusNotFound)
 }
 
@@ -310,6 +314,55 @@ func handleDocumentReview(w http.ResponseWriter, r *http.Request, documentID int
 
 	insertAuditLogAs(ctx, user, "teachers", fmt.Sprintf("%s document '%s' (id %d)", actionLabel, row.OriginalFilename, documentID))
 	setSuccessFlash(w, fmt.Sprintf("Document %s successfully.", actionLabel))
+	HttpRedirect(w, r, "/documents")
+}
+
+func handleDocumentDelete(w http.ResponseWriter, r *http.Request, documentID int64) {
+	if r.Method != http.MethodPost {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx := r.Context()
+	user := auth.GetUser(ctx)
+	if auth.GetRole(ctx) != auth.RoleSuperuser {
+		HttpError(w, "Access denied", http.StatusForbidden)
+		return
+	}
+
+	row, err := dbRO.GetQueries().GetTeacherDocumentByID(ctx, documentID)
+	if err != nil {
+		setErrorFlash(w, "Document not found")
+		HttpRedirect(w, r, "/documents")
+		return
+	}
+
+	if err := dbRW.GetQueries().DeleteTeacherDocument(ctx, documentID); err != nil {
+		logs.Log().Error("delete teacher document", zap.Error(err), zap.Int64("document_id", documentID))
+		setErrorFlash(w, "Failed to delete document")
+		HttpRedirect(w, r, "/documents")
+		return
+	}
+
+	if row.Type == string(constants.TeacherDocumentTypeAvatar) {
+		profile, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, row.TeacherID)
+		if err == nil && profile.ProfilePicture.Valid && profile.ProfilePicture.String == row.StoredFilename {
+			if err := dbRW.GetQueries().UpdateTeacherProfilePicture(ctx, queries.UpdateTeacherProfilePictureParams{
+				ProfilePicture: sql.NullString{Valid: false},
+				ID:             row.TeacherID,
+			}); err != nil {
+				logs.Log().Error("clear teacher profile picture after document delete", zap.Error(err), zap.Int64("teacher_id", row.TeacherID))
+			}
+		}
+	}
+
+	filePath := documentStoragePath(row)
+	if err := os.Remove(filePath); err != nil && !os.IsNotExist(err) {
+		logs.Log().Error("remove document file", zap.Error(err), zap.String("path", filePath))
+	}
+
+	insertAuditLogAs(ctx, user, "teachers", fmt.Sprintf("deleted document '%s' (id %d)", row.OriginalFilename, documentID))
+	setSuccessFlash(w, "Document deleted successfully.")
 	HttpRedirect(w, r, "/documents")
 }
 
