@@ -30,7 +30,7 @@ templ Schedule(data ScheduleData) {
 			.day-class-overdue-banner {
 				display: inline-block;
 				align-self: flex-start;
-				margin-bottom: var(--space-2);
+				margin-top: var(--space-1);
 				padding: 0.15rem 0.5rem;
 				border-radius: var(--radius-full);
 				background: var(--color-destructive);
@@ -613,13 +613,6 @@ templ Schedule(data ScheduleData) {
 					const li = document.createElement('li');
 					li.className = 'day-class-item' + (overdue ? ' is-overdue' : '');
 
-					if (overdue) {
-						const banner = document.createElement('div');
-						banner.className = 'day-class-overdue-banner';
-						banner.textContent = 'Overdue';
-						li.appendChild(banner);
-					}
-
 					const info = document.createElement('div');
 					info.className = 'day-class-info';
 
@@ -641,6 +634,13 @@ templ Schedule(data ScheduleData) {
 					rate.className = 'day-class-rate';
 					rate.textContent = record.rate + ' ' + record.currency;
 					info.appendChild(rate);
+
+					if (overdue) {
+						const banner = document.createElement('div');
+						banner.className = 'day-class-overdue-banner';
+						banner.textContent = 'Overdue';
+						info.appendChild(banner);
+					}
 
 					li.appendChild(info);
 
