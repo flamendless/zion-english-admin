@@ -1,0 +1,299 @@
+package frontend
+
+import (
+	"strconv"
+	"zion-english/internal/utils"
+)
+
+type NotificationItem struct {
+	ID        string
+	From      string
+	To        string
+	Message   string
+	CreatedAt string
+	Read      bool
+}
+
+type NotificationPanelData struct {
+	Items       []NotificationItem
+	UnreadCount int64
+}
+
+type NotificationListData struct {
+	Items          []NotificationItem
+	UnreadOnly     bool
+	PageNumber     int
+	PageTotalPages int
+	PageTotal      int64
+	PrevURL        string
+	NextURL        string
+	HasPrev        bool
+	HasNext        bool
+	FilterPath     string
+}
+
+templ NotificationBell() {
+	<div class="notification-bell-wrap">
+		<button
+			type="button"
+			class="notification-bell"
+			id="notificationBellBtn"
+			aria-label="Notifications"
+			aria-expanded="false"
+			aria-controls="notificationPanelHost"
+			hx-get={ utils.URL("/notifications/panel") }
+			hx-target="#notificationPanelHost"
+			hx-swap="innerHTML"
+		>
+			<svg class="notification-bell-svg" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+				<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+				<path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+			</svg>
+		</button>
+		<span
+			class="notification-badge-host"
+			hx-get={ utils.URL("/notifications/unread-count") }
+			hx-trigger="load once, notificationUpdated from:body"
+			hx-swap="innerHTML"
+		></span>
+		<div id="notificationPanelHost" class="notification-panel-host"></div>
+	</div>
+	@NotificationBellScript()
+}
+
+templ NotificationBadge(count int64) {
+	if count > 0 {
+		<span class="notification-badge" aria-label={ "Unread notifications: " + badgeCountLabel(count) }>{ badgeCountLabel(count) }</span>
+	}
+}
+
+func badgeCountLabel(count int64) string {
+	if count > 99 {
+		return "99+"
+	}
+	return strconv.FormatInt(count, 10)
+}
+
+templ NotificationPanel(data NotificationPanelData) {
+	<div class="notification-panel" id="notificationPanel" role="dialog" aria-label="Notifications">
+		<div class="notification-panel-header">
+			<h3>Notifications</h3>
+			if data.UnreadCount > 0 {
+				<button
+					type="button"
+					class="notification-mark-all"
+					hx-post={ utils.URL("/notifications/read-all?panel=1") }
+					hx-target="#notificationPanelHost"
+					hx-swap="innerHTML"
+				>Mark all read</button>
+			}
+		</div>
+		if len(data.Items) > 0 {
+			<ul class="notification-panel-list">
+				for _, item := range data.Items {
+					@NotificationPanelItem(item)
+				}
+			</ul>
+		} else {
+			<p class="notification-panel-empty">No notifications yet.</p>
+		}
+		<div class="notification-panel-footer">
+			<a href={ utils.URL("/notifications") } class="notification-view-all">View All Notifications</a>
+		</div>
+	</div>
+}
+
+templ NotificationPanelItem(item NotificationItem) {
+	<li class={ notificationItemClass(item.Read, true) }>
+		<div class="notification-item-body">
+			<p class="notification-item-message">{ item.Message }</p>
+			<p class="notification-item-meta">
+				<span>From { item.From }</span>
+				<span>{ item.CreatedAt }</span>
+			</p>
+		</div>
+		if !item.Read {
+			<button
+				type="button"
+				class="notification-mark-read"
+				aria-label="Mark as read"
+				hx-post={ utils.URL("/notifications/" + item.ID + "/read?panel=1") }
+				hx-target="#notificationPanelHost"
+				hx-swap="innerHTML"
+			>Mark read</button>
+		}
+	</li>
+}
+
+templ Notifications(data NotificationListData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Notifications - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@HubHeader("Notifications", "", "", false)
+
+			<div class="notification-filter-bar">
+				<a
+					href={ utils.URL("/notifications") }
+					class={ notificationFilterClass(!data.UnreadOnly) }
+				>All</a>
+				<a
+					href={ utils.URL("/notifications?filter=unread") }
+					class={ notificationFilterClass(data.UnreadOnly) }
+				>Unread</a>
+				if data.UnreadOnly && data.PageTotal > 0 {
+					<button
+						type="button"
+						class="notification-mark-all-page"
+						hx-post={ utils.URL("/notifications/read-all") }
+						hx-swap="none"
+					>Mark all read</button>
+				}
+			</div>
+
+			if len(data.Items) > 0 {
+				<div class="table-wrapper">
+					<table class="table-stack-mobile notification-table">
+						<thead>
+							<tr>
+								<th>Message</th>
+								<th>From</th>
+								<th>Date</th>
+								<th>Status</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							for _, item := range data.Items {
+								@NotificationListRow(item)
+							}
+						</tbody>
+					</table>
+				</div>
+				@PaginationBar(data.HasPrev, data.PrevURL, data.HasNext, data.NextURL, data.PageNumber, data.PageTotalPages, data.PageTotal)
+			} else {
+				<div class="empty-state">
+					<p>No notifications found.</p>
+				</div>
+			}
+		</div>
+	</body>
+	</html>
+}
+
+templ NotificationListRow(item NotificationItem) {
+	<tr class={ notificationItemClass(item.Read, false) } id={ "notification-" + item.ID }>
+		<td data-label="Message" class="notification-message-cell">{ item.Message }</td>
+		<td data-label="From">{ item.From }</td>
+		<td data-label="Date">{ item.CreatedAt }</td>
+		<td data-label="Status">
+			if item.Read {
+				<span class="notification-status-read">Read</span>
+			} else {
+				<span class="notification-status-unread">Unread</span>
+			}
+		</td>
+		<td data-label="Actions" class="notification-actions-cell">
+			if !item.Read {
+				<div class="table-actions">
+					<button
+						type="button"
+						class="view-btn"
+						hx-post={ utils.URL("/notifications/" + item.ID + "/read") }
+						hx-target={ "#notification-" + item.ID }
+						hx-swap="outerHTML"
+					>Mark read</button>
+				</div>
+			} else {
+				<span class="notification-no-action">—</span>
+			}
+		</td>
+	</tr>
+}
+
+func notificationItemClass(read bool, panel bool) string {
+	if read {
+		if panel {
+			return "notification-panel-item is-read"
+		}
+		return "notification-list-item is-read"
+	}
+	if panel {
+		return "notification-panel-item is-unread"
+	}
+	return "notification-list-item is-unread"
+}
+
+func notificationFilterClass(active bool) string {
+	if active {
+		return "notification-filter-link is-active"
+	}
+	return "notification-filter-link"
+}
+
+templ NotificationBellScript() {
+	<script>
+		(function () {
+			function refreshNotificationBadges() {
+				if (typeof htmx !== 'undefined') {
+					htmx.trigger(document.body, 'notificationUpdated');
+				}
+			}
+
+			function updateBellAriaLabel() {
+				const btn = document.getElementById('notificationBellBtn');
+				if (!btn) return;
+				const badge = btn.parentElement?.querySelector('.notification-badge');
+				const count = badge ? badge.textContent.trim() : '';
+				btn.setAttribute('aria-label', count ? 'Notifications, ' + count + ' unread' : 'Notifications');
+			}
+
+			function closeNotificationPanel() {
+				const host = document.getElementById('notificationPanelHost');
+				if (host) host.innerHTML = '';
+				const btn = document.getElementById('notificationBellBtn');
+				if (btn) btn.setAttribute('aria-expanded', 'false');
+			}
+
+			window.closeNotificationPanel = closeNotificationPanel;
+			window.refreshNotificationBadges = refreshNotificationBadges;
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.classList && evt.detail.target.classList.contains('notification-badge-host')) {
+					updateBellAriaLabel();
+					return;
+				}
+				if (evt.detail.target.id !== 'notificationPanelHost') return;
+				const btn = document.getElementById('notificationBellBtn');
+				if (btn) btn.setAttribute('aria-expanded', 'true');
+				refreshNotificationBadges();
+				const panel = document.getElementById('notificationPanel');
+				if (panel) {
+					const first = panel.querySelector('button, a');
+					if (first) first.focus();
+				}
+			});
+
+			document.addEventListener('click', function (e) {
+				const host = document.getElementById('notificationPanelHost');
+				if (!host || !host.innerHTML.trim()) return;
+				if (e.target.closest('.notification-bell-wrap')) return;
+				closeNotificationPanel();
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key === 'Escape' && document.getElementById('notificationPanel')) {
+					closeNotificationPanel();
+				}
+			});
+		})();
+	</script>
+}

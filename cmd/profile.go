@@ -18,6 +18,7 @@ import (
 	"time"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
+	"zion-english/internal/notifications"
 	"zion-english/internal/conf"
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
@@ -301,6 +302,7 @@ func handleProfileMobile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	insertAuditLogAs(ctx, user, "profile", fmt.Sprintf("updated mobile number for teacher '%s'", user.Name))
+	notifySuperuser(ctx, user, notifications.KindProfileUpdated, fmt.Sprintf("Teacher '%s' updated their mobile number", user.Name), "")
 	setSuccessFlash(w, "Mobile number updated successfully.")
 	HttpRedirect(w, r, "/profile")
 }
@@ -409,6 +411,7 @@ func handleProfileNames(w http.ResponseWriter, r *http.Request) {
 	}
 
 	insertAuditLogAs(ctx, user, "profile", fmt.Sprintf("updated name for teacher '%s'", name))
+	notifySuperuser(ctx, user, notifications.KindProfileUpdated, fmt.Sprintf("Teacher '%s' updated their name", name), "")
 	setSuccessFlash(w, "Name updated successfully.")
 	HttpRedirect(w, r, "/profile")
 }
@@ -503,6 +506,7 @@ func handleProfilePassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	insertAuditLogAs(ctx, user, "profile", fmt.Sprintf("updated password for teacher '%s'", user.Name))
+	notifySuperuser(ctx, user, notifications.KindProfileUpdated, fmt.Sprintf("Teacher '%s' updated their password", user.Name), "")
 	setSuccessFlash(w, "Password updated successfully.")
 	HttpRedirect(w, r, "/profile")
 }
@@ -596,6 +600,7 @@ func handleProfileAvatar(w http.ResponseWriter, r *http.Request) {
 	}
 
 	insertAuditLogAs(ctx, user, "profile", fmt.Sprintf("updated profile picture for teacher '%s'", user.Name))
+	notifySuperuser(ctx, user, notifications.KindProfileUpdated, fmt.Sprintf("Teacher '%s' updated their profile picture", user.Name), "")
 	setSuccessFlash(w, "Profile picture updated successfully.")
 	HttpRedirect(w, r, "/profile")
 }

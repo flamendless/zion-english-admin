@@ -5,6 +5,7 @@ import (
 	"crypto/subtle"
 	"encoding/base64"
 	"net/http"
+	"strings"
 	"time"
 	"zion-english/internal/conf"
 )
@@ -12,6 +13,7 @@ import (
 const csrfCookieName = "csrf_token"
 const csrfHeaderName = "X-CSRF-Token"
 const csrfFormField = "csrf_token"
+const csrfMultipartMaxBytes = 5 << 20
 
 func csrfCookiePath(cfg *conf.Config) string {
 	path := cfg.BasePath
@@ -64,17 +66,30 @@ func ValidateCSRF(r *http.Request) bool {
 		return false
 	}
 
-	token := r.Header.Get(csrfHeaderName)
-	if token == "" {
-		if err := r.ParseForm(); err == nil {
-			token = r.FormValue(csrfFormField)
-		}
-	}
+	token := csrfTokenFromRequest(r)
 	if token == "" {
 		return false
 	}
 
 	return subtle.ConstantTimeCompare([]byte(cookie.Value), []byte(token)) == 1
+}
+
+func csrfTokenFromRequest(r *http.Request) string {
+	if token := r.Header.Get(csrfHeaderName); token != "" {
+		return token
+	}
+
+	if strings.HasPrefix(r.Header.Get("Content-Type"), "multipart/form-data") {
+		if err := r.ParseMultipartForm(csrfMultipartMaxBytes); err != nil {
+			return ""
+		}
+		return r.FormValue(csrfFormField)
+	}
+
+	if err := r.ParseForm(); err != nil {
+		return ""
+	}
+	return r.FormValue(csrfFormField)
 }
 
 func CSRFMiddleware(cfg *conf.Config, next http.Handler) http.Handler {

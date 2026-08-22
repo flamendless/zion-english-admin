@@ -66,6 +66,20 @@ type TblLog struct {
 	CreatedByName sql.NullString
 }
 
+type TblNotification struct {
+	ID            int64
+	FromTeacherID interface{}
+	FromName      string
+	ToTeacherID   interface{}
+	ToName        string
+	Message       string
+	Kind          string
+	DedupeKey     interface{}
+	Read          int64
+	ReadAt        interface{}
+	CreatedAt     string
+}
+
 type TblPasswordResetEvent struct {
 	ID         int64
 	Email      string

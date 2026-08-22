@@ -9,6 +9,24 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.08.23"
+    date: "2026-08-23"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "In-app notifications keep you informed — use the bell in the header for recent alerts or open the full Notifications page to browse, filter, and mark items read."
+      - text: "You receive notifications for key events such as class and schedule changes, student assignments, document reviews, teacher approvals, and profile updates."
+      - text: "Teachers and superusers get automatic alerts when a scheduled class passes without a recorded session."
+    improvements: []
+    bug_fixes:
+      - text: "Fixed a visual layout issue on class schedule cards."
+        commit: "f37f6a8"
+    removed: []
+    security:
+      - text: "CSRF protection now works correctly on file upload forms."
+    deprecated: []
+    internal: []
+
   - version: "2026.08.22.1"
     date: "2026-08-22"
     released: true

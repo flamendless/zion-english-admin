@@ -24,6 +24,7 @@ import (
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
 	"zion-english/internal/models"
+	"zion-english/internal/notifications"
 	"zion-english/internal/processor"
 	"zion-english/internal/sheet"
 	"zion-english/internal/utils"
@@ -68,6 +69,7 @@ var cmdWeb = &cobra.Command{
 
 		dbRW = database.New(database.DB_MODE_RW)
 		dbRO = database.New(database.DB_MODE_RO)
+		initNotifyService()
 
 		basePath := "/" + strings.TrimPrefix(webFlags.baseURL, "/")
 		cfg.BasePath = basePath
@@ -140,6 +142,12 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/announcements", auth.RequireRole(auth.RoleSuperuser)(handleAnnouncements))
 		authMux.HandleFunc(basePath+"/announcements/register", auth.RequireRole(auth.RoleSuperuser)(handleAnnouncementRegister))
 		authMux.HandleFunc(basePath+"/announcements/", auth.RequireRole(auth.RoleSuperuser)(handleAnnouncementsPath))
+		notificationsRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)
+		authMux.HandleFunc(basePath+"/notifications", notificationsRole(handleNotifications))
+		authMux.HandleFunc(basePath+"/notifications/panel", notificationsRole(handleNotificationsPanel))
+		authMux.HandleFunc(basePath+"/notifications/unread-count", notificationsRole(handleNotificationsUnreadCount))
+		authMux.HandleFunc(basePath+"/notifications/read-all", notificationsRole(handleNotificationsReadAll))
+		authMux.HandleFunc(basePath+"/notifications/", notificationsRole(handleNotificationsPath))
 
 		authHandler := auth.Middleware(cfg, dbRO.GetQueries(), auth.CSRFMiddleware(cfg, announcements.Middleware(dbRO.GetQueries(), authMux)))
 
@@ -204,6 +212,8 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/api/me/students", authHandler)
 		rootMux.Handle(basePath+"/announcements", authHandler)
 		rootMux.Handle(basePath+"/announcements/", authHandler)
+		rootMux.Handle(basePath+"/notifications", authHandler)
+		rootMux.Handle(basePath+"/notifications/", authHandler)
 
 		handler := logRequests(securityHeaders(rootMux))
 
@@ -933,6 +943,8 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	rl.add(fmt.Sprintf("Successfully registered student: %s", req.Name))
 
 	insertAuditLogAs(r.Context(), auth.GetUser(r.Context()), "students", fmt.Sprintf("registered student '%s' (teacher ids %s)", req.Name, strings.Join(teacherIDStrs, ",")))
+	notifyTeachers(r.Context(), teacherIDs, teacherNamesMap(r.Context(), teacherIDs), auth.GetUser(r.Context()), notifications.KindStudentRegistered,
+		fmt.Sprintf("New student '%s' was assigned to you", req.Name))
 
 	if _, err := fmt.Fprintf(w, "Student '%s' registered successfully\n", req.Name); err != nil {
 		sendErrorLog(w, err.Error())
@@ -1129,6 +1141,10 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	insertAuditLogAs(r.Context(), auditActor, "teachers", fmt.Sprintf("registered teacher '%s' (status %s)", req.Name, teacherStatus))
+	if !isSuperuser {
+		notifySuperuser(r.Context(), auditActor, notifications.KindTeacherRegistered,
+			fmt.Sprintf("New teacher '%s' registered (status %s)", req.Name, teacherStatus), "")
+	}
 
 	if isSuperuser {
 		if _, err := fmt.Fprintf(w, "Teacher '%s' registered successfully\n", req.Name); err != nil {
@@ -1289,6 +1305,8 @@ func handleTeacherApprove(w http.ResponseWriter, r *http.Request) {
 	}
 
 	insertAuditLogAs(ctx, auth.GetUser(ctx), "teachers", fmt.Sprintf("approved teacher '%s' (id %d)", utils.ComposePersonName(existing.FirstName, existing.MiddleName, existing.LastName), teacherID))
+	notifyTeacher(ctx, teacherID, utils.ComposePersonName(existing.FirstName, existing.MiddleName, existing.LastName), auth.GetUser(ctx), notifications.KindTeacherApproved,
+		"Your teacher account has been approved", "")
 	setSuccessFlash(w, "Teacher approved successfully.")
 	HttpRedirect(w, r, "/teachers")
 }

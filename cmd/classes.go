@@ -15,6 +15,7 @@ import (
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/models"
+	"zion-english/internal/notifications"
 	"zion-english/internal/utils"
 )
 
@@ -203,6 +204,9 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 	updated, err := dbRW.GetQueries().GetClassRecordByID(ctx, recordID)
 	if err == nil {
 		insertAuditLogAs(ctx, auth.GetUser(ctx), "classes", formatClassRecordAudit(existing, updated))
+		actor := auth.GetUser(ctx)
+		notifyCrossParty(ctx, actor, updated.TeacherID, teacherNameByID(ctx, updated.TeacherID), notifications.KindClassUpdated,
+			fmt.Sprintf("Class record updated for student on %s (status %s)", updated.Date, updated.Status))
 	}
 
 	if _, err := fmt.Fprint(w, "Class updated successfully!\n"); err != nil {
@@ -471,6 +475,9 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 	}
 
 	insertAuditLogAs(ctx, auth.GetUser(ctx), "classes", fmt.Sprintf("recorded class for student id %d (teacher id %d, date %s, status %s)", req.StudentID, req.TeacherID, req.Date, req.Status))
+	actor := auth.GetUser(ctx)
+	notifyCrossParty(ctx, actor, req.TeacherID, teacherNameByID(ctx, req.TeacherID), notifications.KindClassRecorded,
+		fmt.Sprintf("Class recorded for student on %s (status %s)", req.Date, req.Status))
 
 	if _, err := fmt.Fprint(w, "Class recorded successfully!\n"); err != nil {
 		sendErrorLog(w, err.Error())

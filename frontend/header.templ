@@ -30,7 +30,10 @@ templ Header(loggedIn bool, role auth.Role) {
 		<div class="header-bottom">
 			<div class="header-left">
 				if loggedIn {
-					@HeaderAvatarPlaceholder()
+					<div class="header-account-tools">
+						@HeaderAvatarPlaceholder()
+						@NotificationBell()
+					</div>
 				}
 				<div class="nav-links">
 					for _, item := range NavItems(role) {

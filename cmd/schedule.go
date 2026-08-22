@@ -15,6 +15,7 @@ import (
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/models"
+	"zion-english/internal/notifications"
 	"zion-english/internal/utils"
 )
 
@@ -102,6 +103,9 @@ func handleScheduleCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("scheduled class for student id %d (teacher id %d, date %s)", req.StudentID, req.TeacherID, req.ScheduledDate))
+	actor := auth.GetUser(ctx)
+	notifyCrossParty(ctx, actor, req.TeacherID, teacherNameByID(ctx, req.TeacherID), notifications.KindScheduleChanged,
+		fmt.Sprintf("Class scheduled for %s", req.ScheduledDate))
 
 	if _, err := fmt.Fprint(w, "Class scheduled successfully!\n"); err != nil {
 		sendErrorLog(w, err.Error())
@@ -253,6 +257,9 @@ func handleCancelScheduledClass(w http.ResponseWriter, r *http.Request, schedule
 	}
 
 	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("cancelled scheduled class id %d (student id %d, date %s)", scheduleID, existing.StudentID, existing.ScheduledDate))
+	actor := auth.GetUser(ctx)
+	notifyCrossParty(ctx, actor, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
+		fmt.Sprintf("Scheduled class on %s was cancelled", existing.ScheduledDate))
 
 	if _, err := fmt.Fprint(w, "Class cancelled.\n"); err != nil {
 		sendErrorLog(w, err.Error())
@@ -334,6 +341,9 @@ func handleRescheduleScheduledClass(w http.ResponseWriter, r *http.Request, sche
 	}
 
 	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("rescheduled class id %d from %s to %s", scheduleID, existing.ScheduledDate, newDate))
+	actor := auth.GetUser(ctx)
+	notifyCrossParty(ctx, actor, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
+		fmt.Sprintf("Scheduled class moved from %s to %s", existing.ScheduledDate, newDate))
 
 	if _, err := fmt.Fprint(w, "Class rescheduled.\n"); err != nil {
 		sendErrorLog(w, err.Error())

@@ -19,6 +19,7 @@ import (
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/constants"
+	"zion-english/internal/notifications"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
 	"zion-english/internal/utils"
@@ -241,6 +242,8 @@ func handleProfileDocument(w http.ResponseWriter, r *http.Request) {
 	}
 
 	insertAuditLogAs(ctx, user, "profile", fmt.Sprintf("submitted ID document for teacher '%s'", user.Name))
+	notifySuperuser(ctx, user, notifications.KindDocumentSubmitted,
+		fmt.Sprintf("Teacher '%s' submitted ID document '%s'", user.Name, filepath.Base(header.Filename)), "")
 	setSuccessFlash(w, "ID document submitted successfully. It will be reviewed by an administrator.")
 	HttpRedirect(w, r, "/profile")
 }
@@ -313,6 +316,9 @@ func handleDocumentReview(w http.ResponseWriter, r *http.Request, documentID int
 	}
 
 	insertAuditLogAs(ctx, user, "teachers", fmt.Sprintf("%s document '%s' (id %d)", actionLabel, row.OriginalFilename, documentID))
+	teacherName := teacherNameByID(ctx, row.TeacherID)
+	notifyTeacher(ctx, row.TeacherID, teacherName, user, notifications.KindDocumentReviewed,
+		fmt.Sprintf("Your document '%s' was %s", row.OriginalFilename, strings.ToLower(actionLabel)), "")
 	setSuccessFlash(w, fmt.Sprintf("Document %s successfully.", actionLabel))
 	HttpRedirect(w, r, "/documents")
 }

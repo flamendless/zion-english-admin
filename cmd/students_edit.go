@@ -395,6 +395,11 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 
 	updated, _ := dbRW.GetQueries().GetStudentByID(ctx, studentID)
 	insertAuditLogAs(ctx, auth.GetUser(ctx), "students", formatStudentAudit(existing, updated, teachersBefore, strings.Join(newTeacherIDs, ",")))
+	beforeIDs := make([]int64, 0, len(assignedTeachers))
+	for _, t := range assignedTeachers {
+		beforeIDs = append(beforeIDs, t.ID)
+	}
+	notifyNewlyAssignedTeachers(ctx, auth.GetUser(ctx), req.Name, beforeIDs, teacherIDs)
 
 	if _, err := fmt.Fprint(w, "Student updated successfully!\n"); err != nil {
 		sendErrorLog(w, err.Error())

@@ -40,10 +40,13 @@ templ Home(data DashboardData) {
 			<div class="home-title">
 				<img src={utils.URL("/static/logo.png")} alt="Zion English" class="home-logo">
 			</div>
-			<span class="home-top-bar">
-				@HeaderAvatar(data.Avatar)
+			<div class="home-top-bar">
+				<div class="home-top-bar-left">
+					@HeaderAvatar(data.Avatar)
+					@NotificationBell()
+				</div>
 				@Logout()
-			</span>
+			</div>
 
 			<div class="home-welcome">
 				@WelcomeRole()

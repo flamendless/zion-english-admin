@@ -9,6 +9,7 @@ import (
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/database/queries"
+	"zion-english/internal/notifications"
 	"zion-english/internal/processor"
 	"zion-english/internal/utils"
 )
@@ -278,6 +279,9 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		return
 	}
 	insertAuditLogAs(ctx, auth.GetUser(ctx), "teachers", formatTeacherAudit(existing, updated))
+	teacherName := utils.ComposePersonName(updated.FirstName, updated.MiddleName, updated.LastName)
+	notifyTeacher(ctx, teacherID, teacherName, auth.GetUser(ctx), notifications.KindProfileUpdated,
+		"Your profile was updated by an administrator", "")
 
 	if _, err := fmt.Fprint(w, "Teacher updated successfully!\n"); err != nil {
 		sendErrorLog(w, err.Error())
