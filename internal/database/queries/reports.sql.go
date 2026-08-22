@@ -165,7 +165,7 @@ func (q *Queries) GetReportGeneration(ctx context.Context, arg GetReportGenerati
 
 const getReportGenerationByOutputBasename = `-- name: GetReportGenerationByOutputBasename :one
 SELECT rg.id, rg.teacher_id, rg.start_date, rg.end_date, rg.content_hash, rg.output_path, rg.record_count, rg.generated_at,
-       t.name AS teacher_name
+       trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name
 FROM tbl_report_generations rg
 JOIN tbl_teachers t ON rg.teacher_id = t.id
 WHERE rg.output_path = ?
@@ -252,7 +252,7 @@ WHERE cr.date >= ? AND cr.date <= ?
   AND t.status = 'approved' AND t.deleted = 0
   AND (
     ? = ''
-    OR t.name LIKE '%' || ? || '%'
+    OR trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) LIKE '%' || ? || '%'
     OR EXISTS (
       SELECT 1 FROM tbl_class_records cr2
       JOIN tbl_students s ON cr2.student_id = s.id
@@ -314,7 +314,12 @@ func (q *Queries) GetReportTeacherEarnings(ctx context.Context, arg GetReportTea
 const getReportTeacherSummaries = `-- name: GetReportTeacherSummaries :many
 SELECT
     t.id AS teacher_id,
-    t.name AS teacher_name,
+    trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
+    t.first_name AS teacher_first_name,
+    t.middle_name AS teacher_middle_name,
+    t.last_name AS teacher_last_name,
+    t.assigned_color AS teacher_assigned_color,
+    t.profile_picture AS teacher_profile_picture,
     COUNT(cr.id) AS total_classes,
     COALESCE(SUM(CASE WHEN cr.status = 'conducted' THEN 1 ELSE 0 END), 0) AS conducted_classes
 FROM tbl_teachers t
@@ -323,7 +328,7 @@ LEFT JOIN tbl_class_records cr ON cr.teacher_id = t.id
 WHERE t.status = 'approved' AND t.deleted = 0
   AND (
     ? = ''
-    OR t.name LIKE '%' || ? || '%'
+    OR trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) LIKE '%' || ? || '%'
     OR EXISTS (
       SELECT 1 FROM tbl_class_records cr2
       JOIN tbl_students s ON cr2.student_id = s.id
@@ -332,8 +337,8 @@ WHERE t.status = 'approved' AND t.deleted = 0
         AND s.name LIKE '%' || ? || '%'
     )
   )
-GROUP BY t.id, t.name
-ORDER BY t.name ASC
+GROUP BY t.id, t.first_name, t.middle_name, t.last_name, t.assigned_color, t.profile_picture
+ORDER BY t.last_name ASC, t.first_name ASC, t.middle_name ASC
 `
 
 type GetReportTeacherSummariesParams struct {
@@ -347,10 +352,15 @@ type GetReportTeacherSummariesParams struct {
 }
 
 type GetReportTeacherSummariesRow struct {
-	TeacherID        int64
-	TeacherName      string
-	TotalClasses     int64
-	ConductedClasses interface{}
+	TeacherID             int64
+	TeacherName           string
+	TeacherFirstName      string
+	TeacherMiddleName     string
+	TeacherLastName       string
+	TeacherAssignedColor  string
+	TeacherProfilePicture sql.NullString
+	TotalClasses          int64
+	ConductedClasses      interface{}
 }
 
 func (q *Queries) GetReportTeacherSummaries(ctx context.Context, arg GetReportTeacherSummariesParams) ([]GetReportTeacherSummariesRow, error) {
@@ -373,6 +383,11 @@ func (q *Queries) GetReportTeacherSummaries(ctx context.Context, arg GetReportTe
 		if err := rows.Scan(
 			&i.TeacherID,
 			&i.TeacherName,
+			&i.TeacherFirstName,
+			&i.TeacherMiddleName,
+			&i.TeacherLastName,
+			&i.TeacherAssignedColor,
+			&i.TeacherProfilePicture,
 			&i.TotalClasses,
 			&i.ConductedClasses,
 		); err != nil {
@@ -393,7 +408,8 @@ const getTeacherReportClassRecords = `-- name: GetTeacherReportClassRecords :man
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time,
        cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes,
        cr.created_at, cr.updated_at, cr.recorded_by_role,
-       s.name AS student_name, t.name AS teacher_name
+       s.name AS student_name,
+       trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id

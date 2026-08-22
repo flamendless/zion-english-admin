@@ -60,15 +60,19 @@ func handleAnnouncements(w http.ResponseWriter, r *http.Request) {
 				audience = "Selected teachers"
 			}
 		}
+		isDeleted := row.Status == announcements.StatusDeleted
 		items = append(items, frontend.AnnouncementListItem{
-			ID:          strconv.FormatInt(row.ID, 10),
-			Title:       row.Title,
-			Level:       row.Level,
-			StartDate:   row.StartDate,
-			EndDate:     row.EndDate,
-			Audience:    audience,
-			Status:      announcementStatus(today, row.StartDate, row.EndDate),
-			StatusClass: announcementStatusClass(today, row.StartDate, row.EndDate),
+			ID:                     strconv.FormatInt(row.ID, 10),
+			Title:                  row.Title,
+			Level:                  row.Level,
+			StartDate:              row.StartDate,
+			EndDate:                row.EndDate,
+			Audience:               audience,
+			Schedule:               announcementSchedule(today, row.StartDate, row.EndDate),
+			ScheduleClass:          announcementScheduleClass(today, row.StartDate, row.EndDate),
+			PublicationStatus:      announcementPublicationStatus(row.Status),
+			PublicationStatusClass: announcementPublicationStatusClass(row.Status),
+			IsDeleted:              isDeleted,
 		})
 	}
 
@@ -101,6 +105,7 @@ func handleAnnouncementRegister(w http.ResponseWriter, r *http.Request) {
 			Today:     utils.TodayPHT(),
 			VisibleTo: "all",
 			Level:     announcements.LevelInfo,
+			Status:    announcements.StatusDraft,
 			Teachers:  teachers,
 		})
 	case http.MethodPost:
@@ -113,13 +118,15 @@ func handleAnnouncementRegister(w http.ResponseWriter, r *http.Request) {
 func handleAnnouncementCreate(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	if err := r.ParseForm(); err != nil {
-		HttpError(w, "Invalid form data", http.StatusBadRequest)
+		setErrorFlash(w, "Invalid form data")
+		HttpRedirect(w, r, "/announcements/register")
 		return
 	}
 
 	req := parseAnnouncementRequest(r)
 	if err := announcements.ValidateRequest(req, false); err != nil {
-		HttpError(w, err.Error(), http.StatusBadRequest)
+		setErrorFlash(w, err.Error())
+		HttpRedirect(w, r, "/announcements/register")
 		return
 	}
 
@@ -137,15 +144,18 @@ func handleAnnouncementCreate(w http.ResponseWriter, r *http.Request) {
 		VisibleToAll: visibleToAll,
 		CtaLabel:     req.CTALabel,
 		CtaUrl:       req.CTAURL,
+		Status:       req.Status,
 	})
 	if err != nil {
-		HttpError(w, fmt.Sprintf("Failed to create announcement: %v", err), http.StatusInternalServerError)
+		setErrorFlash(w, fmt.Sprintf("Failed to create announcement: %v", err))
+		HttpRedirect(w, r, "/announcements/register")
 		return
 	}
 
 	if !req.VisibleToAll {
 		if err := announcements.ReplaceTeacherLinks(ctx, dbRW.GetQueries(), id, req.TeacherIDs); err != nil {
-			HttpError(w, fmt.Sprintf("Failed to save teacher visibility: %v", err), http.StatusInternalServerError)
+			setErrorFlash(w, fmt.Sprintf("Failed to save teacher visibility: %v", err))
+			HttpRedirect(w, r, "/announcements/register")
 			return
 		}
 	}
@@ -161,6 +171,10 @@ func handleAnnouncementEdit(w http.ResponseWriter, r *http.Request, announcement
 		ctx := r.Context()
 		row, err := dbRO.GetQueries().GetAnnouncementByID(ctx, announcementID)
 		if err != nil {
+			HttpError(w, "Announcement not found", http.StatusNotFound)
+			return
+		}
+		if row.Status == announcements.StatusDeleted {
 			HttpError(w, "Announcement not found", http.StatusNotFound)
 			return
 		}
@@ -187,6 +201,11 @@ func handleAnnouncementEdit(w http.ResponseWriter, r *http.Request, announcement
 			return
 		}
 
+		formStatus := row.Status
+		if !announcements.ValidFormStatus(formStatus) {
+			formStatus = announcements.StatusDraft
+		}
+
 		renderAnnouncementForm(w, r, frontend.AnnouncementFormData{
 			ID:          strconv.FormatInt(announcementID, 10),
 			Title:       row.Title,
@@ -200,6 +219,7 @@ func handleAnnouncementEdit(w http.ResponseWriter, r *http.Request, announcement
 			IsEdit:      true,
 			CTALabel:    row.CtaLabel,
 			CTAURL:      row.CtaUrl,
+			Status:      formStatus,
 		})
 	case http.MethodPost:
 		handleAnnouncementUpdate(w, r, announcementID)
@@ -210,21 +230,31 @@ func handleAnnouncementEdit(w http.ResponseWriter, r *http.Request, announcement
 
 func handleAnnouncementUpdate(w http.ResponseWriter, r *http.Request, announcementID int64) {
 	ctx := r.Context()
+	editPath := fmt.Sprintf("/announcements/%d/edit", announcementID)
+
 	existing, err := dbRO.GetQueries().GetAnnouncementByID(ctx, announcementID)
 	if err != nil {
-		HttpError(w, "Announcement not found", http.StatusNotFound)
+		setErrorFlash(w, "Announcement not found")
+		HttpRedirect(w, r, "/announcements")
+		return
+	}
+	if existing.Status == announcements.StatusDeleted {
+		setErrorFlash(w, "Announcement not found")
+		HttpRedirect(w, r, "/announcements")
 		return
 	}
 
 	if err := r.ParseForm(); err != nil {
-		HttpError(w, "Invalid form data", http.StatusBadRequest)
+		setErrorFlash(w, "Invalid form data")
+		HttpRedirect(w, r, editPath)
 		return
 	}
 
 	req := parseAnnouncementRequest(r)
 	req.OriginalStart = existing.StartDate
 	if err := announcements.ValidateRequest(req, true); err != nil {
-		HttpError(w, err.Error(), http.StatusBadRequest)
+		setErrorFlash(w, err.Error())
+		HttpRedirect(w, r, editPath)
 		return
 	}
 
@@ -242,19 +272,23 @@ func handleAnnouncementUpdate(w http.ResponseWriter, r *http.Request, announceme
 		VisibleToAll: visibleToAll,
 		CtaLabel:     req.CTALabel,
 		CtaUrl:       req.CTAURL,
+		Status:       req.Status,
 		ID:           announcementID,
 	}); err != nil {
-		HttpError(w, fmt.Sprintf("Failed to update announcement: %v", err), http.StatusInternalServerError)
+		setErrorFlash(w, fmt.Sprintf("Failed to update announcement: %v", err))
+		HttpRedirect(w, r, editPath)
 		return
 	}
 
 	if req.VisibleToAll {
 		if err := dbRW.GetQueries().DeleteAnnouncementTeacherLinks(ctx, announcementID); err != nil {
-			HttpError(w, fmt.Sprintf("Failed to update visibility: %v", err), http.StatusInternalServerError)
+			setErrorFlash(w, fmt.Sprintf("Failed to update visibility: %v", err))
+			HttpRedirect(w, r, editPath)
 			return
 		}
 	} else if err := announcements.ReplaceTeacherLinks(ctx, dbRW.GetQueries(), announcementID, req.TeacherIDs); err != nil {
-		HttpError(w, fmt.Sprintf("Failed to save teacher visibility: %v", err), http.StatusInternalServerError)
+		setErrorFlash(w, fmt.Sprintf("Failed to save teacher visibility: %v", err))
+		HttpRedirect(w, r, editPath)
 		return
 	}
 
@@ -275,9 +309,15 @@ func handleAnnouncementDelete(w http.ResponseWriter, r *http.Request, announceme
 		HttpError(w, "Announcement not found", http.StatusNotFound)
 		return
 	}
+	if row.Status == announcements.StatusDeleted {
+		setErrorFlash(w, "Announcement is already deleted")
+		HttpRedirect(w, r, "/announcements")
+		return
+	}
 
 	if err := dbRW.GetQueries().DeleteAnnouncement(ctx, announcementID); err != nil {
-		HttpError(w, fmt.Sprintf("Failed to delete announcement: %v", err), http.StatusInternalServerError)
+		setErrorFlash(w, fmt.Sprintf("Failed to delete announcement: %v", err))
+		HttpRedirect(w, r, "/announcements")
 		return
 	}
 
@@ -292,6 +332,10 @@ func parseAnnouncementRequest(r *http.Request) announcements.Request {
 	if !visibleToAll {
 		teacherIDs, _ = parseAssignedTeacherIDs(r.Context(), dbRO.GetQueries(), r.Form["teachers"])
 	}
+	status := r.FormValue("status")
+	if status == "" {
+		status = announcements.StatusDraft
+	}
 	return announcements.Request{
 		Title:        r.FormValue("title"),
 		Description:  r.FormValue("description"),
@@ -302,6 +346,7 @@ func parseAnnouncementRequest(r *http.Request) announcements.Request {
 		TeacherIDs:   teacherIDs,
 		CTALabel:     r.FormValue("cta_label"),
 		CTAURL:       r.FormValue("cta_url"),
+		Status:       status,
 	}
 }
 
@@ -319,7 +364,7 @@ func loadAnnouncementTeacherOptions(ctx context.Context, selected []string) ([]f
 		id := strconv.FormatInt(t.ID, 10)
 		options = append(options, frontend.AnnouncementTeacherOption{
 			ID:       id,
-			Name:     t.Name,
+			Name:     utils.ComposePersonName(t.FirstName, t.MiddleName, t.LastName),
 			Selected: selectedSet[id],
 		})
 	}
@@ -333,7 +378,7 @@ func renderAnnouncementForm(w http.ResponseWriter, r *http.Request, data fronten
 	}
 }
 
-func announcementStatus(today, start, end string) string {
+func announcementSchedule(today, start, end string) string {
 	if today < start {
 		return "Upcoming"
 	}
@@ -343,11 +388,33 @@ func announcementStatus(today, start, end string) string {
 	return "Active"
 }
 
-func announcementStatusClass(today, start, end string) string {
-	switch announcementStatus(today, start, end) {
+func announcementScheduleClass(today, start, end string) string {
+	switch announcementSchedule(today, start, end) {
 	case "Active":
 		return "status-active"
 	case "Upcoming":
+		return "status-pending"
+	default:
+		return "status-inactive"
+	}
+}
+
+func announcementPublicationStatus(status string) string {
+	switch status {
+	case announcements.StatusPublished:
+		return "Published"
+	case announcements.StatusDeleted:
+		return "Deleted"
+	default:
+		return "Draft"
+	}
+}
+
+func announcementPublicationStatusClass(status string) string {
+	switch status {
+	case announcements.StatusPublished:
+		return "status-active"
+	case announcements.StatusDraft:
 		return "status-pending"
 	default:
 		return "status-inactive"

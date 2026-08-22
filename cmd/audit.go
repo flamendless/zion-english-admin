@@ -9,6 +9,7 @@ import (
 	"zion-english/internal/auth"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
+	"zion-english/internal/utils"
 	"go.uber.org/zap"
 )
 
@@ -69,13 +70,70 @@ func formatClassRecordAudit(before, after queries.GetClassRecordByIDRow) string 
 	return fmt.Sprintf("updated class record id %d: %s", after.ID, strings.Join(parts, ", "))
 }
 
-func formatStudentAudit(before queries.TblStudent, after queries.TblStudent, teachersBefore, teachersAfter string) string {
+func formatTeacherAudit(before, after queries.GetTeacherFullByIDRow) string {
+	var parts []string
+	if before.FirstName != after.FirstName {
+		parts = append(parts, fmt.Sprintf("first name '%s' -> '%s'", before.FirstName, after.FirstName))
+	}
+	if before.MiddleName != after.MiddleName {
+		parts = append(parts, fmt.Sprintf("middle name '%s' -> '%s'", before.MiddleName, after.MiddleName))
+	}
+	if before.LastName != after.LastName {
+		parts = append(parts, fmt.Sprintf("last name '%s' -> '%s'", before.LastName, after.LastName))
+	}
+	if before.Birthdate != after.Birthdate {
+		parts = append(parts, fmt.Sprintf("birthdate '%s' -> '%s'", before.Birthdate, after.Birthdate))
+	}
+	if before.Address != after.Address {
+		parts = append(parts, fmt.Sprintf("address '%s' -> '%s'", before.Address, after.Address))
+	}
+	if before.JoiningDate != after.JoiningDate {
+		parts = append(parts, fmt.Sprintf("joining date '%s' -> '%s'", before.JoiningDate, after.JoiningDate))
+	}
+	if before.MobileNumber != after.MobileNumber {
+		parts = append(parts, fmt.Sprintf("mobile '%s' -> '%s'", before.MobileNumber, after.MobileNumber))
+	}
+	if before.Email != after.Email {
+		parts = append(parts, fmt.Sprintf("email '%s' -> '%s'", before.Email, after.Email))
+	}
+	if before.Certifications.String != after.Certifications.String {
+		parts = append(parts, fmt.Sprintf("certifications '%s' -> '%s'", auditStr(before.Certifications), auditStr(after.Certifications)))
+	}
+	if before.AssignedColor != after.AssignedColor {
+		parts = append(parts, fmt.Sprintf("assigned color '%s' -> '%s'", before.AssignedColor, after.AssignedColor))
+	}
+	if before.RatePerClass != after.RatePerClass {
+		parts = append(parts, fmt.Sprintf("rate %.2f -> %.2f", before.RatePerClass, after.RatePerClass))
+	}
+	if before.Currency != after.Currency {
+		parts = append(parts, fmt.Sprintf("currency '%s' -> '%s'", before.Currency, after.Currency))
+	}
+	if before.DriveUrl != after.DriveUrl {
+		parts = append(parts, fmt.Sprintf("drive url '%s' -> '%s'", before.DriveUrl, after.DriveUrl))
+	}
+	if before.Sex.String != after.Sex.String {
+		parts = append(parts, fmt.Sprintf("sex '%s' -> '%s'", auditStr(before.Sex), auditStr(after.Sex)))
+	}
+	if before.Template.String != after.Template.String {
+		parts = append(parts, fmt.Sprintf("template '%s' -> '%s'", auditStr(before.Template), auditStr(after.Template)))
+	}
+	teacherName := utils.ComposePersonName(after.FirstName, after.MiddleName, after.LastName)
+	if len(parts) == 0 {
+		return fmt.Sprintf("updated teacher '%s' (id %d) (no field changes)", teacherName, after.ID)
+	}
+	return fmt.Sprintf("updated teacher '%s' (id %d): %s", teacherName, after.ID, strings.Join(parts, ", "))
+}
+
+func formatStudentAudit(before, after queries.GetStudentByIDRow, teachersBefore, teachersAfter string) string {
 	var parts []string
 	if before.Name != after.Name {
 		parts = append(parts, fmt.Sprintf("name '%s' -> '%s'", before.Name, after.Name))
 	}
 	if before.Status != after.Status {
 		parts = append(parts, fmt.Sprintf("status '%s' -> '%s'", before.Status, after.Status))
+	}
+	if before.InactiveReason.String != after.InactiveReason.String {
+		parts = append(parts, fmt.Sprintf("inactive reason '%s' -> '%s'", auditStr(before.InactiveReason), auditStr(after.InactiveReason)))
 	}
 	if before.RatePerClass != after.RatePerClass {
 		parts = append(parts, fmt.Sprintf("rate %.2f -> %.2f", before.RatePerClass, after.RatePerClass))

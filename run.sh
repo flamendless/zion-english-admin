@@ -74,6 +74,10 @@ gensql() {
 	go tool sqlc generate
 }
 
+test() {
+	go test ./...
+}
+
 if [ "$#" -eq 0 ]; then
 	echo "First use: chmod +x ${0}"
 	echo "Usage: ${0}"
@@ -82,6 +86,7 @@ if [ "$#" -eq 0 ]; then
 	echo "    prod"
 	echo "    gentempl"
 	echo "    gensql"
+	echo "    test"
 else
 	echo "Running ${1}"
 	time "$1" "$@"

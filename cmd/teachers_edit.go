@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/database/queries"
+	"zion-english/internal/processor"
 	"zion-english/internal/utils"
 )
 
@@ -59,10 +61,11 @@ func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		sex = row.Sex.String
 	}
 
+	teacherName := utils.ComposePersonName(row.FirstName, row.MiddleName, row.LastName)
 	w.Header().Set("Content-Type", "text/html")
 	frontend.TeacherViewModal(frontend.TeacherViewData{
 		ID:             strconv.FormatInt(teacherID, 10),
-		Name:           row.Name,
+		Name:           teacherName,
 		Email:          row.Email,
 		FirstName:      row.FirstName,
 		MiddleName:     row.MiddleName,
@@ -120,9 +123,10 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 
 	viewTeachers := make([]frontend.TeacherItem, len(teachers))
 	for i, t := range teachers {
+		teacherName := utils.ComposePersonName(t.FirstName, t.MiddleName, t.LastName)
 		viewTeachers[i] = frontend.TeacherItem{
 			ID:             strconv.FormatInt(t.ID, 10),
-			Name:           t.Name,
+			Name:           teacherName,
 			Birthdate:      t.Birthdate,
 			Address:        t.Address,
 			JoiningDate:    t.JoiningDate,
@@ -138,7 +142,7 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 			Deleted:        t.Deleted != 0,
 			CreatedAt:      utils.FormatNullDateTimeSecondsPHT(t.CreatedAt),
 			Avatar: buildTeacherListAvatarProps(
-				t.ID, t.Name, t.FirstName, t.MiddleName, t.LastName, t.AssignedColor, t.ProfilePicture,
+				t.ID, t.FirstName, t.MiddleName, t.LastName, t.AssignedColor, t.ProfilePicture,
 			),
 		}
 	}
@@ -174,6 +178,10 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 	}
 
 	if r.Method == http.MethodGet {
+		template := ""
+		if existing.Template.Valid {
+			template = existing.Template.String
+		}
 		w.Header().Set("Content-Type", "text/html")
 		frontend.EditTeacher(frontend.EditTeacherData{
 			ID:             strconv.FormatInt(teacherID, 10),
@@ -191,6 +199,7 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 			Currency:       existing.Currency,
 			DriveUrl:       existing.DriveUrl,
 			Sex:            existing.Sex.String,
+			Template:       template,
 		}).Render(ctx, w)
 		return
 	}
@@ -216,6 +225,12 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		return
 	}
 
+	template := strings.TrimSpace(r.FormValue("template"))
+	if err := processor.ValidateSheetTemplate(template); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
 	mobileCount, err := dbRO.GetQueries().GetTeacherCountByMobileExcludingID(ctx, queries.GetTeacherCountByMobileExcludingIDParams{
 		MobileNumber: req.MobileNumber,
 		ID:           teacherID,
@@ -235,7 +250,6 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 	}
 
 	err = dbRW.GetQueries().UpdateTeacherBySuperuser(ctx, queries.UpdateTeacherBySuperuserParams{
-		Name:           req.Name,
 		FirstName:      req.FirstName,
 		MiddleName:     req.MiddleName,
 		LastName:       req.LastName,
@@ -250,6 +264,7 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		Currency:       req.Currency,
 		DriveUrl:       req.DriveUrl,
 		Sex:            sql.NullString{String: req.Sex, Valid: req.Sex != ""},
+		Template:       sql.NullString{String: template, Valid: template != ""},
 		ID:             teacherID,
 	})
 	if err != nil {
@@ -257,7 +272,12 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		return
 	}
 
-	insertAuditLogAs(ctx, auth.GetUser(ctx), "teachers", fmt.Sprintf("updated teacher '%s' (id %d)", req.Name, teacherID))
+	updated, err := dbRO.GetQueries().GetTeacherFullByID(ctx, teacherID)
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "teachers", formatTeacherAudit(existing, updated))
 
 	if _, err := fmt.Fprint(w, "Teacher updated successfully!\n"); err != nil {
 		sendErrorLog(w, err.Error())

@@ -24,6 +24,7 @@ var (
 	ErrCTAURLRequired      = errors.New("CTA URL is required when CTA label is set")
 	ErrCTALabelTooLong     = errors.New("CTA label must be 60 characters or fewer")
 	ErrInvalidCTAURL       = errors.New("CTA URL must be http(s):// or an internal path starting with /")
+	ErrInvalidStatus       = errors.New("invalid announcement status")
 )
 
 const maxCTALabelLen = 60
@@ -39,6 +40,7 @@ type Request struct {
 	OriginalStart string
 	CTALabel      string
 	CTAURL        string
+	Status        string
 }
 
 func ValidateRequest(req Request, isUpdate bool) error {
@@ -53,6 +55,9 @@ func ValidateRequest(req Request, isUpdate bool) error {
 	}
 	if !ValidLevel(req.Level) {
 		return ErrInvalidLevel
+	}
+	if !ValidFormStatus(req.Status) {
+		return ErrInvalidStatus
 	}
 	if req.StartDate == "" {
 		return ErrStartDateRequired

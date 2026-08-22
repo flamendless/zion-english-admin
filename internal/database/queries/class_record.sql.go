@@ -126,7 +126,8 @@ func (q *Queries) CountClassRecordsFiltered(ctx context.Context, arg CountClassR
 
 const getClassRecordByID = `-- name: GetClassRecordByID :one
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
-       s.name as student_name, t.name as teacher_name
+       s.name as student_name,
+       trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
@@ -180,7 +181,8 @@ func (q *Queries) GetClassRecordByID(ctx context.Context, id int64) (GetClassRec
 
 const getClassRecordsByTeacherAndDateRange = `-- name: GetClassRecordsByTeacherAndDateRange :many
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
-       s.name as student_name, t.name as teacher_name
+       s.name as student_name,
+       trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
@@ -253,7 +255,8 @@ func (q *Queries) GetClassRecordsByTeacherAndDateRange(ctx context.Context, arg 
 
 const getClassRecordsFiltered = `-- name: GetClassRecordsFiltered :many
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
-       s.name as student_name, t.name as teacher_name
+       s.name as student_name,
+       trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id

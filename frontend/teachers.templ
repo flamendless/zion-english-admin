@@ -158,6 +158,7 @@ templ Teachers(data TeacherData) {
 					<table id="teachersTable" class="table-stack-mobile">
 						<thead>
 							<tr>
+								<th class="avatar-col">Avatar</th>
 								<th>Name</th>
 								<th>Status</th>
 								<th>Email</th>
@@ -168,17 +169,17 @@ templ Teachers(data TeacherData) {
 						<tbody>
 							for _, teacher := range data.Teachers {
 								<tr class={ getTeacherRowClass(teacher.Status, teacher.Deleted) }>
+									<td class="avatar-col" data-label="Avatar">
+										@Avatar(teacher.Avatar)
+									</td>
 									<td data-label="Name">
-										<div class="teacher-name-cell">
-											@Avatar(teacher.Avatar)
-											<button
-												type="button"
-												class="name-link"
-												hx-get={ utils.URL("/teachers/" + teacher.ID + "/view") }
-												hx-target="#teacherViewModalHost"
-												hx-swap="innerHTML"
-											>{ teacher.Name }</button>
-										</div>
+										<button
+											type="button"
+											class="name-link"
+											hx-get={ utils.URL("/teachers/" + teacher.ID + "/view") }
+											hx-target="#teacherViewModalHost"
+											hx-swap="innerHTML"
+										>{ teacher.Name }</button>
 									</td>
 									<td class={ getTeacherStatusClass(teacher.Status, teacher.Deleted) } data-label="Status">{ getTeacherDisplayStatus(teacher.Status, teacher.Deleted) }</td>
 									<td class="email-cell" data-label="Email">{ getDisplayValue(teacher.Email) }</td>

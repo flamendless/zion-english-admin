@@ -18,6 +18,7 @@ type EditTeacherData struct {
 	Currency       string
 	DriveUrl       string
 	Sex            string
+	Template       string
 }
 
 templ EditTeacher(data EditTeacherData) {
@@ -67,6 +68,18 @@ templ EditTeacher(data EditTeacherData) {
 					</div>
 				</div>
 				@DriveURLInputWithValue(data.DriveUrl)
+				<div class="form-group">
+					<label for="template">Sheet Column Template</label>
+					<p class="field-hint">Comma-separated Excel columns for name, duration, rate, and status (used by Process)</p>
+					<select id="template" name="template">
+						<option value="" selected?={ data.Template == "" }>-- No template --</option>
+						<option value="A,B,C,G" selected?={ data.Template == "A,B,C,G" }>A,B,C,G</option>
+						<option value="A,C,D,H" selected?={ data.Template == "A,C,D,H" }>A,C,D,H</option>
+						if data.Template != "" && data.Template != "A,B,C,G" && data.Template != "A,C,D,H" {
+							<option value={ data.Template } selected>{ data.Template }</option>
+						}
+					</select>
+				</div>
 				<div class="form-row">
 					<div class="form-group">
 						<label for="birthdate">Birthdate *</label>

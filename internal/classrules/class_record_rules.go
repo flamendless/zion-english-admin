@@ -16,7 +16,7 @@ var (
 )
 
 type classRecordDB interface {
-	GetStudentByID(ctx context.Context, id int64) (queries.TblStudent, error)
+	GetStudentByID(ctx context.Context, id int64) (queries.GetStudentByIDRow, error)
 	CountClassRecordDuplicate(ctx context.Context, arg queries.CountClassRecordDuplicateParams) (int64, error)
 	IsStudentAssignedToTeacher(ctx context.Context, arg queries.IsStudentAssignedToTeacherParams) (int64, error)
 }

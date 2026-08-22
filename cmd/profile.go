@@ -62,28 +62,30 @@ func buildTeacherAvatarProps(row queries.GetTeacherProfileByIDRow) frontend.Avat
 	if assignedColor == "" {
 		assignedColor = "#B9D283"
 	}
+	displayName := utils.ComposePersonName(row.FirstName, row.MiddleName, row.LastName)
 	return frontend.AvatarProps{
 		Size:          "xl",
-		Initials:      utils.PersonInitials(row.FirstName, row.MiddleName, row.LastName, row.Name),
+		Initials:      utils.PersonInitials(row.FirstName, row.MiddleName, row.LastName, displayName),
 		AssignedColor: assignedColor,
 		PictureURL:    teacherAvatarURL(hasPicture),
 		HasPicture:    hasPicture,
-		Alt:           row.Name + " avatar",
+		Alt:           displayName + " avatar",
 	}
 }
 
-func buildTeacherListAvatarProps(teacherID int64, name, firstName, middleName, lastName, assignedColor string, profilePicture sql.NullString) frontend.AvatarProps {
+func buildTeacherListAvatarProps(teacherID int64, firstName, middleName, lastName, assignedColor string, profilePicture sql.NullString) frontend.AvatarProps {
 	hasPicture := profilePicture.Valid && profilePicture.String != ""
 	if assignedColor == "" {
 		assignedColor = "#B9D283"
 	}
+	displayName := utils.ComposePersonName(firstName, middleName, lastName)
 	return frontend.AvatarProps{
 		Size:          "sm",
-		Initials:      utils.PersonInitials(firstName, middleName, lastName, name),
+		Initials:      utils.PersonInitials(firstName, middleName, lastName, displayName),
 		AssignedColor: assignedColor,
 		PictureURL:    teacherPictureURL(teacherID, hasPicture),
 		HasPicture:    hasPicture,
-		Alt:           name + " avatar",
+		Alt:           displayName + " avatar",
 	}
 }
 
@@ -195,7 +197,7 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 
 	data := frontend.ProfileData{
 		IsSuperuser:           false,
-		Name:                  row.Name,
+		Name:                  utils.ComposePersonName(row.FirstName, row.MiddleName, row.LastName),
 		Email:                 row.Email,
 		Role:                  frontend.ProfileRoleLabel(role),
 		FirstName:             row.FirstName,
@@ -395,7 +397,6 @@ func handleProfileNames(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := dbRW.GetQueries().UpdateTeacherNames(ctx, queries.UpdateTeacherNamesParams{
-		Name:       name,
 		FirstName:  newFirst,
 		MiddleName: newMiddle,
 		LastName:   newLast,

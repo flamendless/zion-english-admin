@@ -33,7 +33,7 @@ func (q *Queries) CountTeachersByStatus(ctx context.Context, status string) (int
 const countTeachersFiltered = `-- name: CountTeachersFiltered :one
 SELECT COUNT(*) as count
 FROM tbl_teachers
-WHERE (? = '' OR name LIKE '%' || ? || '%' OR email LIKE '%' || ? || '%')
+WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || middle_name ELSE '' END || CASE WHEN last_name != '' THEN ' ' || last_name ELSE '' END) LIKE '%' || ? || '%' OR email LIKE '%' || ? || '%')
   AND (
     ? = ''
     OR (? = 'deleted' AND deleted = 1)
@@ -69,15 +69,17 @@ func (q *Queries) CountTeachersFiltered(ctx context.Context, arg CountTeachersFi
 }
 
 const getAllTeachers = `-- name: GetAllTeachers :many
-SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
+SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
 FROM tbl_teachers
 WHERE deleted = 0
-ORDER BY CASE WHEN deleted = 1 THEN 2 WHEN status = 'pending' THEN 0 ELSE 1 END, name ASC
+ORDER BY CASE WHEN deleted = 1 THEN 2 WHEN status = 'pending' THEN 0 ELSE 1 END, last_name ASC, first_name ASC, middle_name ASC
 `
 
 type GetAllTeachersRow struct {
 	ID             int64
-	Name           string
+	FirstName      string
+	MiddleName     string
+	LastName       string
 	Birthdate      string
 	Address        string
 	JoiningDate    string
@@ -107,7 +109,9 @@ func (q *Queries) GetAllTeachers(ctx context.Context) ([]GetAllTeachersRow, erro
 		var i GetAllTeachersRow
 		if err := rows.Scan(
 			&i.ID,
-			&i.Name,
+			&i.FirstName,
+			&i.MiddleName,
+			&i.LastName,
 			&i.Birthdate,
 			&i.Address,
 			&i.JoiningDate,
@@ -139,15 +143,17 @@ func (q *Queries) GetAllTeachers(ctx context.Context) ([]GetAllTeachersRow, erro
 }
 
 const getApprovedTeachers = `-- name: GetApprovedTeachers :many
-SELECT id, name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
+SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
 FROM tbl_teachers
 WHERE status = 'approved' AND deleted = 0
-ORDER BY name ASC
+ORDER BY last_name ASC, first_name ASC, middle_name ASC
 `
 
 type GetApprovedTeachersRow struct {
 	ID             int64
-	Name           string
+	FirstName      string
+	MiddleName     string
+	LastName       string
 	Birthdate      string
 	Address        string
 	JoiningDate    string
@@ -177,7 +183,9 @@ func (q *Queries) GetApprovedTeachers(ctx context.Context) ([]GetApprovedTeacher
 		var i GetApprovedTeachersRow
 		if err := rows.Scan(
 			&i.ID,
-			&i.Name,
+			&i.FirstName,
+			&i.MiddleName,
+			&i.LastName,
 			&i.Birthdate,
 			&i.Address,
 			&i.JoiningDate,
@@ -209,15 +217,17 @@ func (q *Queries) GetApprovedTeachers(ctx context.Context) ([]GetApprovedTeacher
 }
 
 const getTeacherByEmail = `-- name: GetTeacherByEmail :one
-SELECT id, name, email, password, status FROM tbl_teachers WHERE email = ? AND deleted = 0
+SELECT id, first_name, middle_name, last_name, email, password, status FROM tbl_teachers WHERE email = ? AND deleted = 0
 `
 
 type GetTeacherByEmailRow struct {
-	ID       int64
-	Name     string
-	Email    string
-	Password string
-	Status   string
+	ID         int64
+	FirstName  string
+	MiddleName string
+	LastName   string
+	Email      string
+	Password   string
+	Status     string
 }
 
 func (q *Queries) GetTeacherByEmail(ctx context.Context, email string) (GetTeacherByEmailRow, error) {
@@ -225,7 +235,9 @@ func (q *Queries) GetTeacherByEmail(ctx context.Context, email string) (GetTeach
 	var i GetTeacherByEmailRow
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
+		&i.FirstName,
+		&i.MiddleName,
+		&i.LastName,
 		&i.Email,
 		&i.Password,
 		&i.Status,
@@ -234,12 +246,11 @@ func (q *Queries) GetTeacherByEmail(ctx context.Context, email string) (GetTeach
 }
 
 const getTeacherByID = `-- name: GetTeacherByID :one
-SELECT id, name, template, status FROM tbl_teachers WHERE id = ?
+SELECT id, template, status FROM tbl_teachers WHERE id = ?
 `
 
 type GetTeacherByIDRow struct {
 	ID       int64
-	Name     string
 	Template sql.NullString
 	Status   string
 }
@@ -247,25 +258,22 @@ type GetTeacherByIDRow struct {
 func (q *Queries) GetTeacherByID(ctx context.Context, id int64) (GetTeacherByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getTeacherByID, id)
 	var i GetTeacherByIDRow
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Template,
-		&i.Status,
-	)
+	err := row.Scan(&i.ID, &i.Template, &i.Status)
 	return i, err
 }
 
 const getTeacherByMobile = `-- name: GetTeacherByMobile :one
-SELECT id, name, email, password, status FROM tbl_teachers WHERE mobile_number = ? AND deleted = 0
+SELECT id, first_name, middle_name, last_name, email, password, status FROM tbl_teachers WHERE mobile_number = ? AND deleted = 0
 `
 
 type GetTeacherByMobileRow struct {
-	ID       int64
-	Name     string
-	Email    string
-	Password string
-	Status   string
+	ID         int64
+	FirstName  string
+	MiddleName string
+	LastName   string
+	Email      string
+	Password   string
+	Status     string
 }
 
 func (q *Queries) GetTeacherByMobile(ctx context.Context, mobileNumber string) (GetTeacherByMobileRow, error) {
@@ -273,7 +281,9 @@ func (q *Queries) GetTeacherByMobile(ctx context.Context, mobileNumber string) (
 	var i GetTeacherByMobileRow
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
+		&i.FirstName,
+		&i.MiddleName,
+		&i.LastName,
 		&i.Email,
 		&i.Password,
 		&i.Status,
@@ -336,14 +346,13 @@ func (q *Queries) GetTeacherCountByMobileExcludingID(ctx context.Context, arg Ge
 }
 
 const getTeacherFullByID = `-- name: GetTeacherFullByID :one
-SELECT id, name, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted
+SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted
 FROM tbl_teachers
 WHERE id = ?
 `
 
 type GetTeacherFullByIDRow struct {
 	ID             int64
-	Name           string
 	FirstName      string
 	MiddleName     string
 	LastName       string
@@ -371,7 +380,6 @@ func (q *Queries) GetTeacherFullByID(ctx context.Context, id int64) (GetTeacherF
 	var i GetTeacherFullByIDRow
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
 		&i.FirstName,
 		&i.MiddleName,
 		&i.LastName,
@@ -396,17 +404,6 @@ func (q *Queries) GetTeacherFullByID(ctx context.Context, id int64) (GetTeacherF
 	return i, err
 }
 
-const getTeacherIDByName = `-- name: GetTeacherIDByName :one
-SELECT id FROM tbl_teachers WHERE name = ?
-`
-
-func (q *Queries) GetTeacherIDByName(ctx context.Context, name string) (int64, error) {
-	row := q.db.QueryRowContext(ctx, getTeacherIDByName, name)
-	var id int64
-	err := row.Scan(&id)
-	return id, err
-}
-
 const getTeacherPasswordByID = `-- name: GetTeacherPasswordByID :one
 SELECT password FROM tbl_teachers WHERE id = ?
 `
@@ -419,14 +416,13 @@ func (q *Queries) GetTeacherPasswordByID(ctx context.Context, id int64) (string,
 }
 
 const getTeacherProfileByID = `-- name: GetTeacherProfileByID :one
-SELECT id, name, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, template, status, profile_picture, password_changed_at, mobile_changed_at, created_at, updated_at
+SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, template, status, profile_picture, password_changed_at, mobile_changed_at, created_at, updated_at
 FROM tbl_teachers
 WHERE id = ?
 `
 
 type GetTeacherProfileByIDRow struct {
 	ID                int64
-	Name              string
 	FirstName         string
 	MiddleName        string
 	LastName          string
@@ -455,7 +451,6 @@ func (q *Queries) GetTeacherProfileByID(ctx context.Context, id int64) (GetTeach
 	var i GetTeacherProfileByIDRow
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
 		&i.FirstName,
 		&i.MiddleName,
 		&i.LastName,
@@ -482,15 +477,15 @@ func (q *Queries) GetTeacherProfileByID(ctx context.Context, id int64) (GetTeach
 }
 
 const getTeachersFiltered = `-- name: GetTeachersFiltered :many
-SELECT id, name, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted, deleted_at, profile_picture
+SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted, deleted_at, profile_picture
 FROM tbl_teachers
-WHERE (? = '' OR name LIKE '%' || ? || '%' OR email LIKE '%' || ? || '%')
+WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || middle_name ELSE '' END || CASE WHEN last_name != '' THEN ' ' || last_name ELSE '' END) LIKE '%' || ? || '%' OR email LIKE '%' || ? || '%')
   AND (
     ? = ''
     OR (? = 'deleted' AND deleted = 1)
     OR (? != 'deleted' AND ? != '' AND status = ? AND deleted = 0)
   )
-ORDER BY CASE WHEN deleted = 1 THEN 2 WHEN status = 'pending' THEN 0 ELSE 1 END, name ASC
+ORDER BY CASE WHEN deleted = 1 THEN 2 WHEN status = 'pending' THEN 0 ELSE 1 END, last_name ASC, first_name ASC, middle_name ASC
 LIMIT ? OFFSET ?
 `
 
@@ -509,7 +504,6 @@ type GetTeachersFilteredParams struct {
 
 type GetTeachersFilteredRow struct {
 	ID             int64
-	Name           string
 	FirstName      string
 	MiddleName     string
 	LastName       string
@@ -556,7 +550,6 @@ func (q *Queries) GetTeachersFiltered(ctx context.Context, arg GetTeachersFilter
 		var i GetTeachersFilteredRow
 		if err := rows.Scan(
 			&i.ID,
-			&i.Name,
 			&i.FirstName,
 			&i.MiddleName,
 			&i.LastName,
@@ -594,12 +587,11 @@ func (q *Queries) GetTeachersFiltered(ctx context.Context, arg GetTeachersFilter
 }
 
 const insertTeacher = `-- name: InsertTeacher :exec
-INSERT INTO tbl_teachers (name, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, status)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO tbl_teachers (first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, status)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 type InsertTeacherParams struct {
-	Name           string
 	FirstName      string
 	MiddleName     string
 	LastName       string
@@ -620,7 +612,6 @@ type InsertTeacherParams struct {
 
 func (q *Queries) InsertTeacher(ctx context.Context, arg InsertTeacherParams) error {
 	_, err := q.db.ExecContext(ctx, insertTeacher,
-		arg.Name,
 		arg.FirstName,
 		arg.MiddleName,
 		arg.LastName,
@@ -661,14 +652,13 @@ func (q *Queries) UnapproveTeacher(ctx context.Context, id int64) error {
 
 const updateTeacherBySuperuser = `-- name: UpdateTeacherBySuperuser :exec
 UPDATE tbl_teachers
-SET name = ?, first_name = ?, middle_name = ?, last_name = ?, birthdate = ?, address = ?, joining_date = ?,
+SET first_name = ?, middle_name = ?, last_name = ?, birthdate = ?, address = ?, joining_date = ?,
     mobile_number = ?, email = ?, certifications = ?, assigned_color = ?, rate_per_class = ?, currency = ?,
-    drive_url = ?, sex = ?, updated_at = datetime('now')
+    drive_url = ?, sex = ?, template = ?, updated_at = datetime('now')
 WHERE id = ?
 `
 
 type UpdateTeacherBySuperuserParams struct {
-	Name           string
 	FirstName      string
 	MiddleName     string
 	LastName       string
@@ -683,12 +673,12 @@ type UpdateTeacherBySuperuserParams struct {
 	Currency       string
 	DriveUrl       string
 	Sex            sql.NullString
+	Template       sql.NullString
 	ID             int64
 }
 
 func (q *Queries) UpdateTeacherBySuperuser(ctx context.Context, arg UpdateTeacherBySuperuserParams) error {
 	_, err := q.db.ExecContext(ctx, updateTeacherBySuperuser,
-		arg.Name,
 		arg.FirstName,
 		arg.MiddleName,
 		arg.LastName,
@@ -703,6 +693,7 @@ func (q *Queries) UpdateTeacherBySuperuser(ctx context.Context, arg UpdateTeache
 		arg.Currency,
 		arg.DriveUrl,
 		arg.Sex,
+		arg.Template,
 		arg.ID,
 	)
 	return err
@@ -724,12 +715,11 @@ func (q *Queries) UpdateTeacherMobile(ctx context.Context, arg UpdateTeacherMobi
 
 const updateTeacherNames = `-- name: UpdateTeacherNames :exec
 UPDATE tbl_teachers
-SET name = ?, first_name = ?, middle_name = ?, last_name = ?, updated_at = CURRENT_TIMESTAMP
+SET first_name = ?, middle_name = ?, last_name = ?, updated_at = CURRENT_TIMESTAMP
 WHERE id = ?
 `
 
 type UpdateTeacherNamesParams struct {
-	Name       string
 	FirstName  string
 	MiddleName string
 	LastName   string
@@ -738,7 +728,6 @@ type UpdateTeacherNamesParams struct {
 
 func (q *Queries) UpdateTeacherNames(ctx context.Context, arg UpdateTeacherNamesParams) error {
 	_, err := q.db.ExecContext(ctx, updateTeacherNames,
-		arg.Name,
 		arg.FirstName,
 		arg.MiddleName,
 		arg.LastName,

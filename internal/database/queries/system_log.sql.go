@@ -87,7 +87,7 @@ func (q *Queries) CountLogsByCreatedByFiltered(ctx context.Context, arg CountLog
 
 const getAllLogs = `-- name: GetAllLogs :many
 SELECT l.id, l.module, l.message, l.created_by, l.created_at,
-    COALESCE(t.name, l.created_by_name, '') as created_by_name
+    COALESCE(trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END), l.created_by_name, '') as created_by_name
 FROM tbl_logs l
 LEFT JOIN tbl_teachers t ON l.created_by = t.id
 ORDER BY l.created_at DESC
@@ -134,7 +134,7 @@ func (q *Queries) GetAllLogs(ctx context.Context) ([]GetAllLogsRow, error) {
 
 const getAllLogsFiltered = `-- name: GetAllLogsFiltered :many
 SELECT l.id, l.module, l.message, l.created_by, l.created_at,
-    COALESCE(t.name, l.created_by_name, '') as created_by_name
+    COALESCE(trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END), l.created_by_name, '') as created_by_name
 FROM tbl_logs l
 LEFT JOIN tbl_teachers t ON l.created_by = t.id
 WHERE (? = '' OR l.module = ?)
@@ -210,7 +210,7 @@ func (q *Queries) GetAllLogsFiltered(ctx context.Context, arg GetAllLogsFiltered
 
 const getLogsByCreatedBy = `-- name: GetLogsByCreatedBy :many
 SELECT l.id, l.module, l.message, l.created_by, l.created_at,
-    COALESCE(t.name, l.created_by_name, '') as created_by_name
+    COALESCE(trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END), l.created_by_name, '') as created_by_name
 FROM tbl_logs l
 LEFT JOIN tbl_teachers t ON l.created_by = t.id
 WHERE l.created_by = ?
@@ -258,7 +258,7 @@ func (q *Queries) GetLogsByCreatedBy(ctx context.Context, createdBy sql.NullInt6
 
 const getLogsByCreatedByFiltered = `-- name: GetLogsByCreatedByFiltered :many
 SELECT l.id, l.module, l.message, l.created_by, l.created_at,
-    COALESCE(t.name, l.created_by_name, '') as created_by_name
+    COALESCE(trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END), l.created_by_name, '') as created_by_name
 FROM tbl_logs l
 LEFT JOIN tbl_teachers t ON l.created_by = t.id
 WHERE l.created_by = ?

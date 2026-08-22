@@ -32,7 +32,9 @@ func (q *Queries) CountTeachersByAnnouncementID(ctx context.Context, announcemen
 }
 
 const deleteAnnouncement = `-- name: DeleteAnnouncement :exec
-DELETE FROM tbl_announcements WHERE id = ?
+UPDATE tbl_announcements
+SET status = 'deleted', updated_at = datetime('now')
+WHERE id = ? AND status != 'deleted'
 `
 
 func (q *Queries) DeleteAnnouncement(ctx context.Context, id int64) error {
@@ -50,9 +52,10 @@ func (q *Queries) DeleteAnnouncementTeacherLinks(ctx context.Context, announceme
 }
 
 const getActiveAnnouncementsAll = `-- name: GetActiveAnnouncementsAll :many
-SELECT id, title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url, created_at, updated_at
+SELECT id, title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url, status, created_at, updated_at
 FROM tbl_announcements
 WHERE date(?) BETWEEN start_date AND end_date
+AND status = 'published'
 ORDER BY
     CASE level WHEN 'critical' THEN 0 WHEN 'warning' THEN 1 ELSE 2 END,
     start_date ASC,
@@ -69,6 +72,7 @@ type GetActiveAnnouncementsAllRow struct {
 	VisibleToAll int64
 	CtaLabel     string
 	CtaUrl       string
+	Status       string
 	CreatedAt    string
 	UpdatedAt    string
 }
@@ -92,6 +96,7 @@ func (q *Queries) GetActiveAnnouncementsAll(ctx context.Context, date interface{
 			&i.VisibleToAll,
 			&i.CtaLabel,
 			&i.CtaUrl,
+			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -109,9 +114,10 @@ func (q *Queries) GetActiveAnnouncementsAll(ctx context.Context, date interface{
 }
 
 const getActiveAnnouncementsForTeacher = `-- name: GetActiveAnnouncementsForTeacher :many
-SELECT a.id, a.title, a.description, a.level, a.start_date, a.end_date, a.visible_to_all, a.cta_label, a.cta_url, a.created_at, a.updated_at
+SELECT a.id, a.title, a.description, a.level, a.start_date, a.end_date, a.visible_to_all, a.cta_label, a.cta_url, a.status, a.created_at, a.updated_at
 FROM tbl_announcements a
 WHERE date(?) BETWEEN a.start_date AND a.end_date
+AND a.status = 'published'
 AND (
     a.visible_to_all = 1
     OR EXISTS (
@@ -140,6 +146,7 @@ type GetActiveAnnouncementsForTeacherRow struct {
 	VisibleToAll int64
 	CtaLabel     string
 	CtaUrl       string
+	Status       string
 	CreatedAt    string
 	UpdatedAt    string
 }
@@ -163,6 +170,7 @@ func (q *Queries) GetActiveAnnouncementsForTeacher(ctx context.Context, arg GetA
 			&i.VisibleToAll,
 			&i.CtaLabel,
 			&i.CtaUrl,
+			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -180,7 +188,7 @@ func (q *Queries) GetActiveAnnouncementsForTeacher(ctx context.Context, arg GetA
 }
 
 const getAnnouncementByID = `-- name: GetAnnouncementByID :one
-SELECT id, title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url, created_at, updated_at
+SELECT id, title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url, status, created_at, updated_at
 FROM tbl_announcements
 WHERE id = ?
 `
@@ -195,6 +203,7 @@ type GetAnnouncementByIDRow struct {
 	VisibleToAll int64
 	CtaLabel     string
 	CtaUrl       string
+	Status       string
 	CreatedAt    string
 	UpdatedAt    string
 }
@@ -212,6 +221,7 @@ func (q *Queries) GetAnnouncementByID(ctx context.Context, id int64) (GetAnnounc
 		&i.VisibleToAll,
 		&i.CtaLabel,
 		&i.CtaUrl,
+		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -219,7 +229,7 @@ func (q *Queries) GetAnnouncementByID(ctx context.Context, id int64) (GetAnnounc
 }
 
 const getAnnouncementsPaged = `-- name: GetAnnouncementsPaged :many
-SELECT id, title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url, created_at, updated_at
+SELECT id, title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url, status, created_at, updated_at
 FROM tbl_announcements
 ORDER BY start_date DESC, id DESC
 LIMIT ? OFFSET ?
@@ -240,6 +250,7 @@ type GetAnnouncementsPagedRow struct {
 	VisibleToAll int64
 	CtaLabel     string
 	CtaUrl       string
+	Status       string
 	CreatedAt    string
 	UpdatedAt    string
 }
@@ -263,6 +274,7 @@ func (q *Queries) GetAnnouncementsPaged(ctx context.Context, arg GetAnnouncement
 			&i.VisibleToAll,
 			&i.CtaLabel,
 			&i.CtaUrl,
+			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -307,8 +319,8 @@ func (q *Queries) GetTeacherIDsByAnnouncementID(ctx context.Context, announcemen
 }
 
 const insertAnnouncement = `-- name: InsertAnnouncement :one
-INSERT INTO tbl_announcements (title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO tbl_announcements (title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url, status)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 RETURNING id
 `
 
@@ -321,6 +333,7 @@ type InsertAnnouncementParams struct {
 	VisibleToAll int64
 	CtaLabel     string
 	CtaUrl       string
+	Status       string
 }
 
 func (q *Queries) InsertAnnouncement(ctx context.Context, arg InsertAnnouncementParams) (int64, error) {
@@ -333,6 +346,7 @@ func (q *Queries) InsertAnnouncement(ctx context.Context, arg InsertAnnouncement
 		arg.VisibleToAll,
 		arg.CtaLabel,
 		arg.CtaUrl,
+		arg.Status,
 	)
 	var id int64
 	err := row.Scan(&id)
@@ -355,7 +369,7 @@ func (q *Queries) InsertAnnouncementTeacherM2M(ctx context.Context, arg InsertAn
 
 const updateAnnouncement = `-- name: UpdateAnnouncement :exec
 UPDATE tbl_announcements
-SET title = ?, description = ?, level = ?, start_date = ?, end_date = ?, visible_to_all = ?, cta_label = ?, cta_url = ?, updated_at = datetime('now')
+SET title = ?, description = ?, level = ?, start_date = ?, end_date = ?, visible_to_all = ?, cta_label = ?, cta_url = ?, status = ?, updated_at = datetime('now')
 WHERE id = ?
 `
 
@@ -368,6 +382,7 @@ type UpdateAnnouncementParams struct {
 	VisibleToAll int64
 	CtaLabel     string
 	CtaUrl       string
+	Status       string
 	ID           int64
 }
 
@@ -381,6 +396,7 @@ func (q *Queries) UpdateAnnouncement(ctx context.Context, arg UpdateAnnouncement
 		arg.VisibleToAll,
 		arg.CtaLabel,
 		arg.CtaUrl,
+		arg.Status,
 		arg.ID,
 	)
 	return err

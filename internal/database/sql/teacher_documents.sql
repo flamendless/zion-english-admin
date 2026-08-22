@@ -24,7 +24,7 @@ ORDER BY uploaded_at DESC;
 SELECT
     d.id,
     d.teacher_id,
-    t.name AS teacher_name,
+    trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
     d.type,
     d.original_filename,
     d.stored_filename,

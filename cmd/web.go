@@ -81,6 +81,7 @@ var cmdWeb = &cobra.Command{
 		publicMux.HandleFunc(basePath+"/auth/forgot-password", handleForgotPassword)
 		publicMux.HandleFunc(basePath+"/auth/forgot-password/reset", handleResetPassword)
 		publicMux.HandleFunc(basePath+"/teachers/register", handleTeacherRegister)
+		publicMux.HandleFunc(basePath+"/health", handleHealth)
 
 		publicMux.Handle(
 			basePath+"/static/",
@@ -138,7 +139,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/announcements/register", auth.RequireRole(auth.RoleSuperuser)(handleAnnouncementRegister))
 		authMux.HandleFunc(basePath+"/announcements/", auth.RequireRole(auth.RoleSuperuser)(handleAnnouncementsPath))
 
-		authHandler := auth.Middleware(cfg, dbRO.GetQueries(), announcements.Middleware(dbRO.GetQueries(), authMux))
+		authHandler := auth.Middleware(cfg, dbRO.GetQueries(), auth.CSRFMiddleware(cfg, announcements.Middleware(dbRO.GetQueries(), authMux)))
 
 		rootMux := http.NewServeMux()
 
@@ -157,6 +158,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/auth/", publicMux)
 		rootMux.Handle(basePath+"/static/", publicMux)
 		rootMux.Handle(basePath+"/teachers/register", publicMux)
+		rootMux.Handle(basePath+"/health", publicMux)
 
 		// protected routes
 		rootMux.Handle(basePath+"/dashboard", authHandler)
@@ -818,6 +820,7 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		req.Contact = r.FormValue("contact")
 		req.ParentName = r.FormValue("parentName")
 		req.AssignedColor = r.FormValue("assignedColor")
+		req.InactiveReason = r.FormValue("inactiveReason")
 		req.Relationship = r.FormValue("relationship")
 		req.RelatedStudentID = relatedStudentID
 	} else {
@@ -864,13 +867,14 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	qtx := dbRW.GetQueries().WithTx(tx)
 
 	err = qtx.InsertStudent(r.Context(), queries.InsertStudentParams{
-		Name:          req.Name,
-		Currency:      req.Currency,
-		Contact:       sql.NullString{String: req.Contact, Valid: req.Contact != ""},
-		RatePerClass:  req.RatePerClass,
-		ParentName:    sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
-		AssignedColor: req.AssignedColor,
-		Status:        req.Status,
+		Name:           req.Name,
+		Currency:       req.Currency,
+		Contact:        sql.NullString{String: req.Contact, Valid: req.Contact != ""},
+		RatePerClass:   req.RatePerClass,
+		ParentName:     sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
+		AssignedColor:  req.AssignedColor,
+		Status:         req.Status,
+		InactiveReason: sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
 	})
 	if err != nil {
 		sendErrorLog(w, "Failed to register student")
@@ -958,6 +962,14 @@ func validateStudentRequest(req *models.StudentRegisterRequest) error {
 
 	if !constants.ValidStudentStatus(req.Status) {
 		return errors.New("invalid status. Must be active or inactive")
+	}
+
+	req.InactiveReason = strings.TrimSpace(req.InactiveReason)
+	if req.Status == "inactive" && req.InactiveReason == "" {
+		return errors.New("inactive reason is required when status is inactive")
+	}
+	if req.Status == "active" {
+		req.InactiveReason = ""
 	}
 
 	return nil
@@ -1076,7 +1088,6 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = dbRW.GetQueries().InsertTeacher(r.Context(), queries.InsertTeacherParams{
-		Name:           req.Name,
 		FirstName:      req.FirstName,
 		MiddleName:     req.MiddleName,
 		LastName:       req.LastName,
@@ -1273,7 +1284,7 @@ func handleTeacherApprove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	insertAuditLogAs(ctx, auth.GetUser(ctx), "teachers", fmt.Sprintf("approved teacher '%s' (id %d)", existing.Name, teacherID))
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "teachers", fmt.Sprintf("approved teacher '%s' (id %d)", utils.ComposePersonName(existing.FirstName, existing.MiddleName, existing.LastName), teacherID))
 	setSuccessFlash(w, "Teacher approved successfully.")
 	HttpRedirect(w, r, "/teachers")
 }
@@ -1315,7 +1326,7 @@ func handleTeacherUnapprove(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	insertAuditLogAs(ctx, auth.GetUser(ctx), "teachers", fmt.Sprintf("unapproved teacher '%s' (id %d)", existing.Name, teacherID))
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "teachers", fmt.Sprintf("unapproved teacher '%s' (id %d)", utils.ComposePersonName(existing.FirstName, existing.MiddleName, existing.LastName), teacherID))
 	setSuccessFlash(w, "Teacher set to pending.")
 	HttpRedirect(w, r, "/teachers")
 }
@@ -1357,7 +1368,7 @@ func handleTeacherDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	insertAuditLogAs(ctx, auth.GetUser(ctx), "teachers", fmt.Sprintf("deleted teacher '%s' (id %d)", existing.Name, teacherID))
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "teachers", fmt.Sprintf("deleted teacher '%s' (id %d)", utils.ComposePersonName(existing.FirstName, existing.MiddleName, existing.LastName), teacherID))
 	setSuccessFlash(w, "Teacher deleted successfully.")
 	HttpRedirect(w, r, "/teachers")
 }
@@ -1391,7 +1402,7 @@ func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
 		}
 		teacherResponses = append(teacherResponses, models.TeacherAPIResponse{
 			ID:           t.ID,
-			Name:         t.Name,
+			Name:         utils.ComposePersonName(t.FirstName, t.MiddleName, t.LastName),
 			DriveUrl:     t.DriveUrl,
 			RatePerClass: t.RatePerClass,
 			Template:     template,
@@ -1632,7 +1643,7 @@ func handleForgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	insertAuditLogAs(ctx, auth.User{ID: teacher.ID, Name: teacher.Name}, "auth", fmt.Sprintf("requested password reset for '%s'", email))
+	insertAuditLogAs(ctx, auth.User{ID: teacher.ID, Name: utils.ComposePersonName(teacher.FirstName, teacher.MiddleName, teacher.LastName)}, "auth", fmt.Sprintf("requested password reset for '%s'", email))
 	HttpRedirect(w, r, "/auth/forgot-password/reset?token="+url.QueryEscape(resetToken))
 }
 
@@ -1728,7 +1739,7 @@ func handleResetPassword(w http.ResponseWriter, r *http.Request) {
 
 	resetActor := auth.User{ID: row.TeacherID.Int64}
 	if teacher, err := dbRO.GetQueries().GetTeacherFullByID(ctx, row.TeacherID.Int64); err == nil {
-		resetActor.Name = teacher.Name
+		resetActor.Name = utils.ComposePersonName(teacher.FirstName, teacher.MiddleName, teacher.LastName)
 	}
 	insertAuditLogAs(ctx, resetActor, "auth", fmt.Sprintf("completed password reset for '%s'", email))
 
@@ -1805,8 +1816,7 @@ func handleGetStudents(w http.ResponseWriter, r *http.Request) {
 		teacherIDStr = r.URL.Query().Get("teacherId")
 	}
 
-	var students []queries.TblStudent
-	var err error
+	var studentResponses []models.StudentAPIResponse
 	if teacherIDStr != "" {
 		teacherID, parseErr := strconv.ParseInt(teacherIDStr, 10, 64)
 		if parseErr != nil || teacherID <= 0 {
@@ -1821,25 +1831,36 @@ func handleGetStudents(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-		students, err = dbRO.GetQueries().GetStudentsByTeacherID(ctx, teacherID)
+		students, err := dbRO.GetQueries().GetStudentsByTeacherID(ctx, teacherID)
+		if err != nil {
+			HttpError(w, "Failed to fetch students", http.StatusInternalServerError)
+			return
+		}
+		for _, s := range students {
+			studentResponses = append(studentResponses, models.StudentAPIResponse{
+				ID:           s.ID,
+				Name:         s.Name,
+				Currency:     s.Currency,
+				RatePerClass: s.RatePerClass,
+			})
+		}
 	} else {
-		students, err = dbRO.GetQueries().GetActiveStudents(ctx)
-	}
-	if err != nil {
-		HttpError(w, "Failed to fetch students", http.StatusInternalServerError)
-		return
+		students, err := dbRO.GetQueries().GetActiveStudents(ctx)
+		if err != nil {
+			HttpError(w, "Failed to fetch students", http.StatusInternalServerError)
+			return
+		}
+		for _, s := range students {
+			studentResponses = append(studentResponses, models.StudentAPIResponse{
+				ID:           s.ID,
+				Name:         s.Name,
+				Currency:     s.Currency,
+				RatePerClass: s.RatePerClass,
+			})
+		}
 	}
 
 	w.Header().Set("Content-Type", "text/html")
-	var studentResponses []models.StudentAPIResponse
-	for _, s := range students {
-		studentResponses = append(studentResponses, models.StudentAPIResponse{
-			ID:           s.ID,
-			Name:         s.Name,
-			Currency:     s.Currency,
-			RatePerClass: s.RatePerClass,
-		})
-	}
 
 	selectedID := r.URL.Query().Get("selected")
 

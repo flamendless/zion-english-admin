@@ -22,6 +22,51 @@ templ Schedule(data ScheduleData) {
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
 		@AvatarStyles()
+		<style>
+			.day-class-item.is-overdue {
+				border-color: var(--color-destructive);
+				background: var(--color-error-bg);
+			}
+			.day-class-overdue-banner {
+				display: inline-block;
+				align-self: flex-start;
+				margin-bottom: var(--space-2);
+				padding: 0.15rem 0.5rem;
+				border-radius: var(--radius-full);
+				background: var(--color-destructive);
+				color: var(--color-on-primary);
+				font-size: 0.75rem;
+				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.03em;
+			}
+			@media (max-width: 640px) {
+				.schedule-page .schedule-layout {
+					gap: var(--space-4);
+				}
+				.schedule-page .day-class-item {
+					flex-direction: column;
+					align-items: stretch;
+				}
+				.schedule-page .day-class-actions {
+					display: grid;
+					grid-template-columns: 1fr 1fr;
+					gap: var(--space-2);
+					width: 100%;
+				}
+				.schedule-page .day-class-actions .btn {
+					width: 100%;
+					justify-content: center;
+					text-align: center;
+				}
+				.schedule-page .schedule-modal-form .form-row {
+					flex-direction: column;
+				}
+				.schedule-page .calendar-header {
+					flex-wrap: wrap;
+				}
+			}
+		</style>
 		@ScrTimeRangeJS()
 	</head>
 	<body>
@@ -533,6 +578,23 @@ templ Schedule(data ScheduleData) {
 				return el;
 			}
 
+			function isScheduleOverdue(record) {
+				if (record.status !== 'scheduled') return false;
+				const dateStr = recordField(record, 'scheduledDate', 'scheduled_date');
+				if (!dateStr) return false;
+
+				const start = normalizeTime(recordField(record, 'startTime', 'start_time'));
+				const durationMinutes = Number(recordField(record, 'durationMinutes', 'duration_minutes')) || 0;
+				const [y, m, d] = dateStr.split('-').map(Number);
+				let endAt = new Date(y, m - 1, d, 23, 59, 59, 999);
+				if (start) {
+					const [hh, mm] = start.split(':').map(Number);
+					const totalMinutes = hh * 60 + mm + durationMinutes;
+					endAt = new Date(y, m - 1, d, Math.floor(totalMinutes / 60) % 24, totalMinutes % 60, 0, 0);
+				}
+				return new Date() > endAt;
+			}
+
 			function renderClassList(container, records, emptyMessage) {
 				if (!container) return;
 				container.innerHTML = '';
@@ -547,8 +609,16 @@ templ Schedule(data ScheduleData) {
 				const list = document.createElement('ul');
 				list.className = 'day-classes-items';
 				sortByStartTime(records).forEach(record => {
+					const overdue = isScheduleOverdue(record);
 					const li = document.createElement('li');
-					li.className = 'day-class-item';
+					li.className = 'day-class-item' + (overdue ? ' is-overdue' : '');
+
+					if (overdue) {
+						const banner = document.createElement('div');
+						banner.className = 'day-class-overdue-banner';
+						banner.textContent = 'Overdue';
+						li.appendChild(banner);
+					}
 
 					const info = document.createElement('div');
 					info.className = 'day-class-info';
@@ -796,7 +866,7 @@ templ Schedule(data ScheduleData) {
 					try {
 						const response = await fetch(buildURL('/schedule'), {
 							method: 'POST',
-							headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+							headers: Object.assign({ 'Content-Type': 'application/x-www-form-urlencoded' }, window.getCSRFHeaders ? window.getCSRFHeaders() : {}),
 							body: formData.toString(),
 						});
 						const text = await response.text();

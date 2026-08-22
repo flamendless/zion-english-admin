@@ -22,6 +22,7 @@ type DashboardData struct {
 	ClassesRescheduledWeek int64
 	ScheduledToday         int64
 	MonthlyTotals          []CurrencyTotal
+	CutoffTotals           []CurrencyTotal
 }
 
 templ Home(data DashboardData) {
@@ -104,6 +105,12 @@ templ DashboardStats(data DashboardData) {
 				<span class="stat-label">Scheduled Today</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.ScheduledToday) }</span>
 			</div>
+			for _, ct := range data.CutoffTotals {
+				<div class="stat-card stat-card-accent">
+					<span class="stat-label">Earnings This Cutoff ({ ct.Currency })</span>
+					<span class="stat-value">{ fmt.Sprintf("%.2f", ct.Total) }</span>
+				</div>
+			}
 		}
 		<div class="stat-card">
 			<span class="stat-label">Classes This Week</span>

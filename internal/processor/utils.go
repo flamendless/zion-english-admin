@@ -15,6 +15,26 @@ func ColumnLetterToIndex(col string) int {
 	return int(col[0] - 'A')
 }
 
+var ErrInvalidSheetTemplate = errors.New("template must be four comma-separated Excel column letters (e.g. A,B,C,G)")
+
+func ValidateSheetTemplate(template string) error {
+	template = strings.TrimSpace(template)
+	if template == "" {
+		return nil
+	}
+	parts := strings.Split(template, ",")
+	if len(parts) != 4 {
+		return ErrInvalidSheetTemplate
+	}
+	for _, part := range parts {
+		part = strings.ToUpper(strings.TrimSpace(part))
+		if len(part) != 1 || part[0] < 'A' || part[0] > 'Z' {
+			return ErrInvalidSheetTemplate
+		}
+	}
+	return nil
+}
+
 func ParseDateString(dateStr string) (*time.Time, error) {
 	return ParseDateStringWithYear(dateStr, 0)
 }

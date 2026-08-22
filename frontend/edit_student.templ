@@ -2,18 +2,26 @@ package frontend
 
 import "zion-english/internal/utils"
 
+type StudentRelationshipItem struct {
+	RelatedStudentID   string
+	RelatedStudentName string
+	Relationship       string
+}
+
 type EditStudentData struct {
-	ID            string
-	Readonly      bool
-	Name          string
-	Currency      string
-	Contact       string
-	RatePerClass  float64
-	ParentName    string
-	AssignedColor string
-	Status        string
-	TeacherIDs    []string
-	TeacherNames  []string
+	ID             string
+	Readonly       bool
+	Name           string
+	Currency       string
+	Contact        string
+	RatePerClass   float64
+	ParentName     string
+	AssignedColor  string
+	Status         string
+	InactiveReason string
+	TeacherIDs     []string
+	TeacherNames   []string
+	Relationships  []StudentRelationshipItem
 }
 
 templ EditStudent(data EditStudentData) {
@@ -29,6 +37,29 @@ templ EditStudent(data EditStudentData) {
 		}
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
+		<style>
+			.relationship-list {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-2);
+				margin-bottom: var(--space-3);
+			}
+			.relationship-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: var(--space-3);
+				padding: var(--space-2) var(--space-3);
+				background: var(--color-muted);
+				border-radius: var(--radius-md);
+			}
+			.inactive-reason-group {
+				display: none;
+			}
+			.inactive-reason-group.is-visible {
+				display: block;
+			}
+		</style>
 	</head>
 	<body>
 		<div class="container">
@@ -52,6 +83,12 @@ templ EditStudent(data EditStudentData) {
 							<input type="text" id="status" value={ data.Status } disabled/>
 						</div>
 					</div>
+					if data.Status == "inactive" && data.InactiveReason != "" {
+						<div class="form-group">
+							<label for="inactiveReason">Inactive Reason</label>
+							<input type="text" id="inactiveReason" value={ data.InactiveReason } disabled/>
+						</div>
+					}
 					<div class="form-group">
 						<label for="contact">Contact</label>
 						<input type="text" id="contact" value={ data.Contact } disabled/>
@@ -64,6 +101,14 @@ templ EditStudent(data EditStudentData) {
 						<label for="parentName">Parent's Name</label>
 						<input type="text" id="parentName" value={ data.ParentName } disabled/>
 					</div>
+					if len(data.Relationships) > 0 {
+						<div class="form-group">
+							<label>Related To</label>
+							for _, rel := range data.Relationships {
+								<input type="text" value={ formatStudentRelationshipLabel(rel) } disabled/>
+							}
+						</div>
+					}
 					<div class="form-group">
 						<label>Assigned Teachers</label>
 						for _, name := range data.TeacherNames {
@@ -77,7 +122,12 @@ templ EditStudent(data EditStudentData) {
 				</div>
 				<p><a href={ utils.URL("/students") } class="btn">Back to Students</a></p>
 			} else {
-				<form hx-post={ utils.URL("/students/" + data.ID + "/edit") } hx-swap="innerHTML" hx-target="#logOutput">
+				<form
+					id="editStudentForm"
+					hx-post={ utils.URL("/students/" + data.ID + "/edit") }
+					hx-swap="innerHTML"
+					hx-target="#logOutput"
+				>
 					<div class="form-group">
 						<label for="name">Student Name *</label>
 						<input type="text" id="name" name="name" required value={ data.Name }/>
@@ -85,6 +135,10 @@ templ EditStudent(data EditStudentData) {
 					<div class="form-row">
 						@CurrencyDropdownWithValue(data.Currency)
 						@StudentStatusDropdownWithValue(data.Status)
+					</div>
+					<div id="inactiveReasonGroup" class={ inactiveReasonGroupClass(data.Status) }>
+						<label for="inactiveReason">Inactive Reason *</label>
+						<input type="text" id="inactiveReason" name="inactiveReason" value={ data.InactiveReason } placeholder="Why is this student inactive?"/>
 					</div>
 					<div class="form-group">
 						<label for="contact">Contact</label>
@@ -103,11 +157,65 @@ templ EditStudent(data EditStudentData) {
 						<label for="assignedColor">Assigned Color *</label>
 						<input type="color" id="assignedColor" name="assignedColor" required value={ data.AssignedColor }/>
 					</div>
+					<div class="form-group">
+						<label>Related Students</label>
+						if len(data.Relationships) > 0 {
+							<div class="relationship-list">
+								for _, rel := range data.Relationships {
+									<label class="relationship-row">
+										<span>{ formatStudentRelationshipLabel(rel) }</span>
+										<span>
+											<input type="checkbox" name="removeRelationship" value={ rel.RelatedStudentID }/>
+											Remove
+										</span>
+									</label>
+								}
+							</div>
+						} else {
+							<p class="field-hint">No related students yet.</p>
+						}
+						<div class="form-row">
+							<div class="form-group">
+								<label for="relationship">Relationship</label>
+								<input type="text" id="relationship" name="relationship" placeholder="siblings"/>
+							</div>
+							@StudentSearchbox()
+						</div>
+					</div>
 					<button type="submit">Save Changes</button>
 				</form>
 				<div id="logOutput"></div>
+				<script>
+					(function () {
+						const statusEl = document.getElementById('status');
+						const reasonGroup = document.getElementById('inactiveReasonGroup');
+						const reasonEl = document.getElementById('inactiveReason');
+						if (!statusEl || !reasonGroup) return;
+						function syncInactiveReason() {
+							const inactive = statusEl.value === 'inactive';
+							reasonGroup.classList.toggle('is-visible', inactive);
+							if (reasonEl) reasonEl.required = inactive;
+						}
+						statusEl.addEventListener('change', syncInactiveReason);
+						syncInactiveReason();
+					})();
+				</script>
 			}
 		</div>
 	</body>
 	</html>
+}
+
+func formatStudentRelationshipLabel(rel StudentRelationshipItem) string {
+	if rel.Relationship != "" {
+		return rel.Relationship + " → " + rel.RelatedStudentName
+	}
+	return rel.RelatedStudentName
+}
+
+func inactiveReasonGroupClass(status string) string {
+	if status == "inactive" {
+		return "form-group inactive-reason-group is-visible"
+	}
+	return "form-group inactive-reason-group"
 }

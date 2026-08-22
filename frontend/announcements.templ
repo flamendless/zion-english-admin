@@ -6,14 +6,17 @@ import (
 )
 
 type AnnouncementListItem struct {
-	ID          string
-	Title       string
-	Level       string
-	StartDate   string
-	EndDate     string
-	Audience    string
-	Status      string
-	StatusClass string
+	ID                     string
+	Title                  string
+	Level                  string
+	StartDate              string
+	EndDate                string
+	Audience               string
+	Schedule               string
+	ScheduleClass          string
+	PublicationStatus      string
+	PublicationStatusClass string
+	IsDeleted              bool
 }
 
 type AnnouncementListData struct {
@@ -46,6 +49,7 @@ type AnnouncementFormData struct {
 	IsEdit      bool
 	CTALabel    string
 	CTAURL      string
+	Status      string
 }
 
 func (d AnnouncementFormData) StartDateMin() string {
@@ -64,6 +68,13 @@ func announcementLevelLabel(level string) string {
 	default:
 		return "Info"
 	}
+}
+
+func getAnnouncementRowClass(isDeleted bool) string {
+	if isDeleted {
+		return "announcement-deleted"
+	}
+	return ""
 }
 
 templ AnnouncementBanners() {
@@ -156,7 +167,7 @@ templ Announcements(data AnnouncementListData) {
 						</thead>
 						<tbody>
 							for _, item := range data.Announcements {
-								<tr>
+								<tr class={ getAnnouncementRowClass(item.IsDeleted) }>
 									<td data-label="Title">
 										<span class="announcement-list-title">{ item.Title }</span>
 									</td>
@@ -167,18 +178,21 @@ templ Announcements(data AnnouncementListData) {
 									</td>
 									<td data-label="Schedule">
 										<span class="announcement-schedule">{ item.StartDate } → { item.EndDate }</span>
+										<span class={ "announcement-window-status " + item.ScheduleClass }>{ item.Schedule }</span>
 									</td>
 									<td data-label="Audience">{ item.Audience }</td>
 									<td data-label="Status">
-										<span class={ item.StatusClass }>{ item.Status }</span>
+										<span class={ item.PublicationStatusClass }>{ item.PublicationStatus }</span>
 									</td>
 									<td data-label="Actions">
-										<div class="table-actions">
-											<a href={ utils.URL("/announcements/" + item.ID + "/edit") } class="edit-btn">Edit</a>
-											<form method="POST" action={ utils.URL("/announcements/" + item.ID + "/delete") } class="table-action-form" onsubmit="return confirm('Delete this announcement?');">
-												<button type="submit" class="delete-btn">Delete</button>
-											</form>
-										</div>
+										if !item.IsDeleted {
+											<div class="table-actions">
+												<a href={ utils.URL("/announcements/" + item.ID + "/edit") } class="edit-btn">Edit</a>
+												<form method="POST" action={ utils.URL("/announcements/" + item.ID + "/delete") } class="table-action-form" onsubmit="return confirm('Delete this announcement?');">
+													<button type="submit" class="delete-btn">Delete</button>
+												</form>
+											</div>
+										}
 									</td>
 								</tr>
 							}
@@ -278,6 +292,37 @@ templ AnnouncementForm(data AnnouncementFormData) {
 								data-preview-target="cta_url"
 							/>
 							<p class="field-hint">Optional. Both fields required to show a button on the banner.</p>
+						</div>
+					</section>
+
+					<section class="announcement-form-section" aria-labelledby="announcementStatusHeading">
+						<h3 id="announcementStatusHeading" class="announcement-form-section-title">Status</h3>
+						<p class="field-hint">Draft announcements are saved but not shown in banners.</p>
+						<div class="announcement-visibility-options">
+							<label class="announcement-visibility-card">
+								<input
+									type="radio"
+									name="status"
+									value={ announcements.StatusDraft }
+									checked?={ data.Status != announcements.StatusPublished }
+								/>
+								<span class="announcement-visibility-card__body">
+									<span class="announcement-visibility-card__title">Draft</span>
+									<span class="announcement-visibility-card__desc">Hidden from banners until published</span>
+								</span>
+							</label>
+							<label class="announcement-visibility-card">
+								<input
+									type="radio"
+									name="status"
+									value={ announcements.StatusPublished }
+									checked?={ data.Status == announcements.StatusPublished }
+								/>
+								<span class="announcement-visibility-card__body">
+									<span class="announcement-visibility-card__title">Published</span>
+									<span class="announcement-visibility-card__desc">Visible in banners when within the schedule</span>
+								</span>
+							</label>
 						</div>
 					</section>
 
@@ -762,6 +807,23 @@ templ AnnouncementPageStyles() {
 			font-family: 'Fira Code', monospace;
 			font-size: 0.8125rem;
 			color: var(--color-muted-foreground);
+			display: block;
+		}
+
+		.announcement-window-status {
+			display: inline-block;
+			margin-top: var(--space-1);
+			font-family: 'Fira Sans', sans-serif;
+			font-size: 0.75rem;
+			font-weight: 600;
+		}
+
+		.announcement-deleted {
+			opacity: 0.55;
+		}
+
+		.announcement-deleted .announcement-list-title {
+			text-decoration: line-through;
 		}
 
 		.announcement-empty {

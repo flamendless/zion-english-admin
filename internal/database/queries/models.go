@@ -30,6 +30,7 @@ type TblAnnouncement struct {
 	UpdatedAt    string
 	CtaLabel     string
 	CtaUrl       string
+	Status       string
 }
 
 type TblAnnouncementsTeachersM2m struct {
@@ -130,16 +131,17 @@ type TblScheduledClass struct {
 }
 
 type TblStudent struct {
-	ID            int64
-	Name          string
-	Currency      string
-	Contact       sql.NullString
-	RatePerClass  float64
-	ParentName    sql.NullString
-	AssignedColor string
-	Status        string
-	CreatedAt     sql.NullTime
-	UpdatedAt     sql.NullTime
+	ID             int64
+	Name           string
+	Currency       string
+	Contact        sql.NullString
+	RatePerClass   float64
+	ParentName     sql.NullString
+	AssignedColor  string
+	Status         string
+	CreatedAt      sql.NullTime
+	UpdatedAt      sql.NullTime
+	InactiveReason sql.NullString
 }
 
 type TblStudentRelationship struct {
@@ -151,7 +153,6 @@ type TblStudentRelationship struct {
 
 type TblTeacher struct {
 	ID                int64
-	Name              string
 	FirstName         string
 	MiddleName        string
 	LastName          string

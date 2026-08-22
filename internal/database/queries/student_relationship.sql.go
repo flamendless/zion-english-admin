@@ -10,6 +10,30 @@ import (
 	"database/sql"
 )
 
+const deleteStudentRelationship = `-- name: DeleteStudentRelationship :exec
+DELETE FROM tbl_student_relationships
+WHERE student_id = ? AND related_student_id = ?
+`
+
+type DeleteStudentRelationshipParams struct {
+	StudentID        int64
+	RelatedStudentID int64
+}
+
+func (q *Queries) DeleteStudentRelationship(ctx context.Context, arg DeleteStudentRelationshipParams) error {
+	_, err := q.db.ExecContext(ctx, deleteStudentRelationship, arg.StudentID, arg.RelatedStudentID)
+	return err
+}
+
+const deleteStudentRelationshipsByStudentID = `-- name: DeleteStudentRelationshipsByStudentID :exec
+DELETE FROM tbl_student_relationships WHERE student_id = ?
+`
+
+func (q *Queries) DeleteStudentRelationshipsByStudentID(ctx context.Context, studentID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteStudentRelationshipsByStudentID, studentID)
+	return err
+}
+
 const getAllStudentRelationships = `-- name: GetAllStudentRelationships :many
 SELECT sr.student_id, sr.relationship, rs.name AS related_student_name
 FROM tbl_student_relationships sr
@@ -47,7 +71,7 @@ func (q *Queries) GetAllStudentRelationships(ctx context.Context) ([]GetAllStude
 }
 
 const getRelationshipsByStudentID = `-- name: GetRelationshipsByStudentID :many
-SELECT sr.student_id, sr.relationship, rs.name AS related_student_name
+SELECT sr.student_id, sr.related_student_id, sr.relationship, rs.name AS related_student_name
 FROM tbl_student_relationships sr
 INNER JOIN tbl_students rs ON sr.related_student_id = rs.id
 WHERE sr.student_id = ?
@@ -56,6 +80,7 @@ ORDER BY rs.name ASC
 
 type GetRelationshipsByStudentIDRow struct {
 	StudentID          int64
+	RelatedStudentID   int64
 	Relationship       sql.NullString
 	RelatedStudentName string
 }
@@ -69,7 +94,12 @@ func (q *Queries) GetRelationshipsByStudentID(ctx context.Context, studentID int
 	var items []GetRelationshipsByStudentIDRow
 	for rows.Next() {
 		var i GetRelationshipsByStudentIDRow
-		if err := rows.Scan(&i.StudentID, &i.Relationship, &i.RelatedStudentName); err != nil {
+		if err := rows.Scan(
+			&i.StudentID,
+			&i.RelatedStudentID,
+			&i.Relationship,
+			&i.RelatedStudentName,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

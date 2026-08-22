@@ -17,7 +17,9 @@ func GetAllTeachers(db Service) ([]Teacher, error) {
 	for i, r := range rows {
 		teachers[i] = Teacher{
 			ID:             r.ID,
-			Name:           r.Name,
+			FirstName:      r.FirstName,
+			MiddleName:     r.MiddleName,
+			LastName:       r.LastName,
 			Birthdate:      r.Birthdate,
 			Address:        r.Address,
 			JoiningDate:    r.JoiningDate,

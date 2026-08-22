@@ -22,7 +22,7 @@ func (m *mockScheduleDB) CountScheduledDuplicate(ctx context.Context, arg querie
 func TestValidateDuplicateScheduled(t *testing.T) {
 	rules := classrules.ScheduledClassRules{DB: &mockScheduleDB{
 		mockDB: mockDB{
-			student:  queries.TblStudent{ID: 1, Status: "active"},
+			student:  queries.GetStudentByIDRow{ID: 1, Status: "active"},
 			assigned: 1,
 		},
 		scheduledDup: 1,

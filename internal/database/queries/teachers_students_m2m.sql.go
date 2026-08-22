@@ -63,11 +63,12 @@ func (q *Queries) DeleteTeacherStudentLinksByStudentID(ctx context.Context, stud
 }
 
 const getAllStudentTeacherNames = `-- name: GetAllStudentTeacherNames :many
-SELECT m2m.student_id, t.name as teacher_name
+SELECT m2m.student_id,
+       trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_teachers_students_m2m m2m
 INNER JOIN tbl_teachers t ON t.id = m2m.teacher_id
 WHERE t.deleted = 0
-ORDER BY m2m.student_id ASC, t.name ASC
+ORDER BY m2m.student_id ASC, t.last_name ASC, t.first_name ASC, t.middle_name ASC
 `
 
 type GetAllStudentTeacherNamesRow struct {
@@ -106,15 +107,28 @@ WHERE m2m.teacher_id = ?
 ORDER BY s.name ASC
 `
 
-func (q *Queries) GetStudentsByTeacherID(ctx context.Context, teacherID int64) ([]TblStudent, error) {
+type GetStudentsByTeacherIDRow struct {
+	ID            int64
+	Name          string
+	Currency      string
+	Contact       sql.NullString
+	RatePerClass  float64
+	ParentName    sql.NullString
+	AssignedColor string
+	Status        string
+	CreatedAt     sql.NullTime
+	UpdatedAt     sql.NullTime
+}
+
+func (q *Queries) GetStudentsByTeacherID(ctx context.Context, teacherID int64) ([]GetStudentsByTeacherIDRow, error) {
 	rows, err := q.db.QueryContext(ctx, getStudentsByTeacherID, teacherID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TblStudent
+	var items []GetStudentsByTeacherIDRow
 	for rows.Next() {
-		var i TblStudent
+		var i GetStudentsByTeacherIDRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
@@ -161,7 +175,20 @@ type GetStudentsByTeacherIDFilteredParams struct {
 	Offset    int64
 }
 
-func (q *Queries) GetStudentsByTeacherIDFiltered(ctx context.Context, arg GetStudentsByTeacherIDFilteredParams) ([]TblStudent, error) {
+type GetStudentsByTeacherIDFilteredRow struct {
+	ID            int64
+	Name          string
+	Currency      string
+	Contact       sql.NullString
+	RatePerClass  float64
+	ParentName    sql.NullString
+	AssignedColor string
+	Status        string
+	CreatedAt     sql.NullTime
+	UpdatedAt     sql.NullTime
+}
+
+func (q *Queries) GetStudentsByTeacherIDFiltered(ctx context.Context, arg GetStudentsByTeacherIDFilteredParams) ([]GetStudentsByTeacherIDFilteredRow, error) {
 	rows, err := q.db.QueryContext(ctx, getStudentsByTeacherIDFiltered,
 		arg.TeacherID,
 		arg.Column2,
@@ -175,9 +202,9 @@ func (q *Queries) GetStudentsByTeacherIDFiltered(ctx context.Context, arg GetStu
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TblStudent
+	var items []GetStudentsByTeacherIDFilteredRow
 	for rows.Next() {
-		var i TblStudent
+		var i GetStudentsByTeacherIDFilteredRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
@@ -204,16 +231,18 @@ func (q *Queries) GetStudentsByTeacherIDFiltered(ctx context.Context, arg GetStu
 }
 
 const getTeachersByStudentID = `-- name: GetTeachersByStudentID :many
-SELECT t.id, t.name, t.birthdate, t.address, t.joining_date, t.mobile_number, t.email, t.certifications, t.assigned_color, t.rate_per_class, t.currency, t.drive_url, t.sex, t.password, t.created_at, t.updated_at
+SELECT t.id, t.first_name, t.middle_name, t.last_name, t.birthdate, t.address, t.joining_date, t.mobile_number, t.email, t.certifications, t.assigned_color, t.rate_per_class, t.currency, t.drive_url, t.sex, t.password, t.created_at, t.updated_at
 FROM tbl_teachers t
 INNER JOIN tbl_teachers_students_m2m m2m ON t.id = m2m.teacher_id
 WHERE m2m.student_id = ?
-ORDER BY t.name ASC
+ORDER BY t.last_name ASC, t.first_name ASC, t.middle_name ASC
 `
 
 type GetTeachersByStudentIDRow struct {
 	ID             int64
-	Name           string
+	FirstName      string
+	MiddleName     string
+	LastName       string
 	Birthdate      string
 	Address        string
 	JoiningDate    string
@@ -241,7 +270,9 @@ func (q *Queries) GetTeachersByStudentID(ctx context.Context, studentID int64) (
 		var i GetTeachersByStudentIDRow
 		if err := rows.Scan(
 			&i.ID,
-			&i.Name,
+			&i.FirstName,
+			&i.MiddleName,
+			&i.LastName,
 			&i.Birthdate,
 			&i.Address,
 			&i.JoiningDate,

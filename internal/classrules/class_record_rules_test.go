@@ -11,7 +11,7 @@ import (
 )
 
 type mockDB struct {
-	student      queries.TblStudent
+	student      queries.GetStudentByIDRow
 	studentErr   error
 	duplicate    int64
 	duplicateErr error
@@ -19,7 +19,7 @@ type mockDB struct {
 	assignedErr  error
 }
 
-func (m *mockDB) GetStudentByID(ctx context.Context, id int64) (queries.TblStudent, error) {
+func (m *mockDB) GetStudentByID(ctx context.Context, id int64) (queries.GetStudentByIDRow, error) {
 	return m.student, m.studentErr
 }
 
@@ -33,7 +33,7 @@ func (m *mockDB) IsStudentAssignedToTeacher(ctx context.Context, arg queries.IsS
 
 func TestValidateInactiveStudent(t *testing.T) {
 	rules := classrules.ClassRecordRules{DB: &mockDB{
-		student: queries.TblStudent{ID: 1, Status: "inactive"},
+		student: queries.GetStudentByIDRow{ID: 1, Status: "inactive"},
 	}}
 	err := rules.Validate(context.Background(), auth.User{Role: auth.RoleSuperuser}, classrules.ClassRecordInput{
 		StudentID: 1, TeacherID: 2, Date: "2026-01-01", DurationMinutes: 60,
@@ -45,7 +45,7 @@ func TestValidateInactiveStudent(t *testing.T) {
 
 func TestValidateDuplicateClass(t *testing.T) {
 	rules := classrules.ClassRecordRules{DB: &mockDB{
-		student:   queries.TblStudent{ID: 1, Status: "active"},
+		student:   queries.GetStudentByIDRow{ID: 1, Status: "active"},
 		duplicate: 1,
 	}}
 	err := rules.Validate(context.Background(), auth.User{Role: auth.RoleSuperuser}, classrules.ClassRecordInput{
@@ -58,7 +58,7 @@ func TestValidateDuplicateClass(t *testing.T) {
 
 func TestValidateTeacherAssignment(t *testing.T) {
 	rules := classrules.ClassRecordRules{DB: &mockDB{
-		student: queries.TblStudent{ID: 1, Status: "active"},
+		student: queries.GetStudentByIDRow{ID: 1, Status: "active"},
 	}}
 	err := rules.Validate(context.Background(), auth.User{ID: 5, Role: auth.RoleTeacher}, classrules.ClassRecordInput{
 		StudentID: 1, TeacherID: 5, Date: "2026-01-01", DurationMinutes: 60,

@@ -1,13 +1,13 @@
 -- name: GetAllLogs :many
 SELECT l.id, l.module, l.message, l.created_by, l.created_at,
-    COALESCE(t.name, l.created_by_name, '') as created_by_name
+    COALESCE(trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END), l.created_by_name, '') as created_by_name
 FROM tbl_logs l
 LEFT JOIN tbl_teachers t ON l.created_by = t.id
 ORDER BY l.created_at DESC;
 
 -- name: GetLogsByCreatedBy :many
 SELECT l.id, l.module, l.message, l.created_by, l.created_at,
-    COALESCE(t.name, l.created_by_name, '') as created_by_name
+    COALESCE(trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END), l.created_by_name, '') as created_by_name
 FROM tbl_logs l
 LEFT JOIN tbl_teachers t ON l.created_by = t.id
 WHERE l.created_by = ?
@@ -23,7 +23,7 @@ WHERE (? = '' OR l.module = ?)
 
 -- name: GetAllLogsFiltered :many
 SELECT l.id, l.module, l.message, l.created_by, l.created_at,
-    COALESCE(t.name, l.created_by_name, '') as created_by_name
+    COALESCE(trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END), l.created_by_name, '') as created_by_name
 FROM tbl_logs l
 LEFT JOIN tbl_teachers t ON l.created_by = t.id
 WHERE (? = '' OR l.module = ?)
@@ -44,7 +44,7 @@ WHERE l.created_by = ?
 
 -- name: GetLogsByCreatedByFiltered :many
 SELECT l.id, l.module, l.message, l.created_by, l.created_at,
-    COALESCE(t.name, l.created_by_name, '') as created_by_name
+    COALESCE(trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END), l.created_by_name, '') as created_by_name
 FROM tbl_logs l
 LEFT JOIN tbl_teachers t ON l.created_by = t.id
 WHERE l.created_by = ?

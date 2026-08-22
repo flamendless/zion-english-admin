@@ -116,6 +116,24 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 			data.MyStudentCount = count
 		}
+		cutoffStart, cutoffEnd := utils.ActiveCutoffDates()
+		if cutoffStart != "" && cutoffEnd != "" {
+			cutoffRates, err := dbRO.GetQueries().SumConductedRateByCurrencyAndDateRange(ctx, queries.SumConductedRateByCurrencyAndDateRangeParams{
+				Date:      cutoffStart,
+				Date_2:    cutoffEnd,
+				Column3:   user.ID,
+				TeacherID: user.ID,
+			})
+			if err == nil {
+				for _, row := range cutoffRates {
+					total, _ := row.TotalRate.(float64)
+					data.CutoffTotals = append(data.CutoffTotals, frontend.CurrencyTotal{
+						Currency: row.Currency,
+						Total:    total,
+					})
+				}
+			}
+		}
 		classCounts, err := dbRO.GetQueries().CountClassRecordsByStatusAndDateRange(ctx, queries.CountClassRecordsByStatusAndDateRangeParams{
 			Date:      weekStart,
 			Date_2:    weekEnd,

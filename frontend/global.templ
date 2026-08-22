@@ -1043,6 +1043,19 @@ templ GlobalIncludes() {
 			gap: var(--space-2);
 		}
 
+		.avatar-col {
+			width: 3.5rem;
+			text-align: center;
+		}
+
+		.inactive-reason-group {
+			display: none;
+		}
+
+		.inactive-reason-group.is-visible {
+			display: block;
+		}
+
 		.table-actions .edit-btn,
 		.table-actions .view-btn,
 		.table-actions .approve-btn,
@@ -2967,5 +2980,6 @@ templ GlobalIncludes() {
 	@ScrHyperscript()
 	@ScrClock()
 	@SuccessBannerHandlers()
+	@CsrfHandlers()
 	@ErrorBannerHandlers()
 }

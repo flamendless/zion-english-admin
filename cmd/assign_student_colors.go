@@ -32,7 +32,7 @@ var cmdAssignStudentColors = &cobra.Command{
 		dbRW := database.New(database.DB_MODE_RW)
 		ctx := context.Background()
 
-		students, err := dbRW.GetQueries().GetAllStudents(ctx)
+		students, err := database.GetAllStudents(dbRW)
 		if err != nil {
 			panic(err)
 		}
@@ -76,14 +76,15 @@ var cmdAssignStudentColors = &cobra.Command{
 			}
 
 			if err := dbRW.GetQueries().UpdateStudent(ctx, queries.UpdateStudentParams{
-				Name:          s.Name,
-				Currency:      s.Currency,
-				Contact:       s.Contact,
-				RatePerClass:  s.RatePerClass,
-				ParentName:    s.ParentName,
-				AssignedColor: newColor,
-				Status:        s.Status,
-				ID:            s.ID,
+				Name:           s.Name,
+				Currency:       s.Currency,
+				Contact:        s.Contact,
+				RatePerClass:   s.RatePerClass,
+				ParentName:     s.ParentName,
+				AssignedColor:  newColor,
+				Status:         s.Status,
+				InactiveReason: s.InactiveReason,
+				ID:             s.ID,
 			}); err != nil {
 				panic(err)
 			}

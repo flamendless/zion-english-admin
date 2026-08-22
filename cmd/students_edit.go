@@ -80,22 +80,90 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 	teacherNames := make([]string, len(assignedTeachers))
 	for i, t := range assignedTeachers {
 		teacherIDs[i] = strconv.FormatInt(t.ID, 10)
-		teacherNames[i] = t.Name
+		teacherNames[i] = utils.ComposePersonName(t.FirstName, t.MiddleName, t.LastName)
+	}
+
+	relationships, err := dbRO.GetQueries().GetRelationshipsByStudentID(ctx, studentID)
+	if err != nil {
+		return frontend.EditStudentData{}, err
+	}
+
+	relItems := make([]frontend.StudentRelationshipItem, len(relationships))
+	for i, rel := range relationships {
+		relationship := ""
+		if rel.Relationship.Valid {
+			relationship = rel.Relationship.String
+		}
+		relItems[i] = frontend.StudentRelationshipItem{
+			RelatedStudentID:   strconv.FormatInt(rel.RelatedStudentID, 10),
+			RelatedStudentName: rel.RelatedStudentName,
+			Relationship:       relationship,
+		}
+	}
+
+	inactiveReason := ""
+	if existing.InactiveReason.Valid {
+		inactiveReason = existing.InactiveReason.String
 	}
 
 	return frontend.EditStudentData{
-		ID:            strconv.FormatInt(studentID, 10),
-		Readonly:      readonly,
-		Name:          existing.Name,
-		Currency:      existing.Currency,
-		Contact:       existing.Contact.String,
-		RatePerClass:  existing.RatePerClass,
-		ParentName:    existing.ParentName.String,
-		AssignedColor: existing.AssignedColor,
-		Status:        existing.Status,
-		TeacherIDs:    teacherIDs,
-		TeacherNames:  teacherNames,
+		ID:             strconv.FormatInt(studentID, 10),
+		Readonly:       readonly,
+		Name:           existing.Name,
+		Currency:       existing.Currency,
+		Contact:        existing.Contact.String,
+		RatePerClass:   existing.RatePerClass,
+		ParentName:     existing.ParentName.String,
+		AssignedColor:  existing.AssignedColor,
+		Status:         existing.Status,
+		InactiveReason: inactiveReason,
+		TeacherIDs:     teacherIDs,
+		TeacherNames:   teacherNames,
+		Relationships:  relItems,
 	}, nil
+}
+
+func saveStudentRelationships(ctx context.Context, studentID int64, r *http.Request) error {
+	for _, relatedIDStr := range r.Form["removeRelationship"] {
+		relatedID, err := strconv.ParseInt(relatedIDStr, 10, 64)
+		if err != nil || relatedID <= 0 {
+			continue
+		}
+		if err := dbRW.GetQueries().DeleteStudentRelationship(ctx, queries.DeleteStudentRelationshipParams{
+			StudentID:        studentID,
+			RelatedStudentID: relatedID,
+		}); err != nil {
+			return err
+		}
+	}
+
+	relatedStudentID := int64(0)
+	if relatedStudentValue := strings.TrimSpace(r.FormValue("relatedStudentId")); relatedStudentValue != "" {
+		var err error
+		relatedStudentID, err = strconv.ParseInt(relatedStudentValue, 10, 64)
+		if err != nil || relatedStudentID <= 0 {
+			return errors.New("invalid related student")
+		}
+	}
+
+	if relatedStudentID == 0 {
+		return nil
+	}
+
+	if relatedStudentID == studentID {
+		return errors.New("a student cannot be related to themselves")
+	}
+
+	if _, err := dbRO.GetQueries().GetStudentByID(ctx, relatedStudentID); err != nil {
+		return errors.New("related student not found")
+	}
+
+	relationship := strings.TrimSpace(r.FormValue("relationship"))
+	return dbRW.GetQueries().InsertStudentRelationship(ctx, queries.InsertStudentRelationshipParams{
+		StudentID:        studentID,
+		RelatedStudentID: relatedStudentID,
+		Relationship:     sql.NullString{String: relationship, Valid: relationship != ""},
+	})
 }
 
 func handleStudentView(w http.ResponseWriter, r *http.Request, studentID int64) {
@@ -258,13 +326,14 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 	}
 
 	req := models.StudentRegisterRequest{
-		Name:          r.FormValue("name"),
-		Currency:      r.FormValue("currency"),
-		Contact:       r.FormValue("contact"),
-		RatePerClass:  ratePerClass,
-		ParentName:    r.FormValue("parentName"),
-		AssignedColor: r.FormValue("assignedColor"),
-		Status:        r.FormValue("status"),
+		Name:           r.FormValue("name"),
+		Currency:       r.FormValue("currency"),
+		Contact:        r.FormValue("contact"),
+		RatePerClass:   ratePerClass,
+		ParentName:     r.FormValue("parentName"),
+		AssignedColor:  r.FormValue("assignedColor"),
+		Status:         r.FormValue("status"),
+		InactiveReason: r.FormValue("inactiveReason"),
 	}
 	if err := validateStudentRequest(&req); err != nil {
 		sendErrorLog(w, err.Error())
@@ -287,16 +356,22 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 	teachersBefore := teacherIDsString(assignedTeachers)
 
 	err = dbRW.GetQueries().UpdateStudent(ctx, queries.UpdateStudentParams{
-		Name:          req.Name,
-		Currency:      req.Currency,
-		Contact:       sql.NullString{String: req.Contact, Valid: req.Contact != ""},
-		RatePerClass:  req.RatePerClass,
-		ParentName:    sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
-		AssignedColor: req.AssignedColor,
-		Status:        req.Status,
-		ID:            studentID,
+		Name:           req.Name,
+		Currency:       req.Currency,
+		Contact:        sql.NullString{String: req.Contact, Valid: req.Contact != ""},
+		RatePerClass:   req.RatePerClass,
+		ParentName:     sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
+		AssignedColor:  req.AssignedColor,
+		Status:         req.Status,
+		InactiveReason: sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
+		ID:             studentID,
 	})
 	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	if err := saveStudentRelationships(ctx, studentID, r); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}

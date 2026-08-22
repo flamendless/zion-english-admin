@@ -28,6 +28,18 @@ func yesterdayString() string {
 	return now.AddDate(0, 0, -1).Format(constants.DateLayout)
 }
 
+func validAnnouncementReq() announcements.Request {
+	return announcements.Request{
+		Title:        "Test",
+		Description:  "Details",
+		Level:        announcements.LevelInfo,
+		StartDate:    todayString(),
+		EndDate:      tomorrowString(),
+		VisibleToAll: true,
+		Status:       announcements.StatusDraft,
+	}
+}
+
 func TestValidateRequestCreate(t *testing.T) {
 	today := todayString()
 	tomorrow := tomorrowString()
@@ -47,97 +59,86 @@ func TestValidateRequestCreate(t *testing.T) {
 				StartDate:    today,
 				EndDate:      tomorrow,
 				VisibleToAll: true,
+				Status:       announcements.StatusDraft,
 			},
 		},
 		{
 			name: "missing title",
-			req: announcements.Request{
-				Description:  "Details",
-				Level:        announcements.LevelInfo,
-				StartDate:    today,
-				EndDate:      tomorrow,
-				VisibleToAll: true,
-			},
+			req: func() announcements.Request {
+				req := validAnnouncementReq()
+				req.Title = ""
+				return req
+			}(),
 			wantErr: announcements.ErrTitleRequired,
 		},
 		{
 			name: "past start date",
-			req: announcements.Request{
-				Title:        "Test",
-				Description:  "Details",
-				Level:        announcements.LevelInfo,
-				StartDate:    "2020-01-01",
-				EndDate:      tomorrow,
-				VisibleToAll: true,
-			},
+			req: func() announcements.Request {
+				req := validAnnouncementReq()
+				req.StartDate = "2020-01-01"
+				return req
+			}(),
 			wantErr: announcements.ErrStartDatePast,
 		},
 		{
 			name: "end before start",
-			req: announcements.Request{
-				Title:        "Test",
-				Description:  "Details",
-				Level:        announcements.LevelInfo,
-				StartDate:    dayAfter,
-				EndDate:      tomorrow,
-				VisibleToAll: true,
-			},
+			req: func() announcements.Request {
+				req := validAnnouncementReq()
+				req.StartDate = dayAfter
+				req.EndDate = tomorrow
+				return req
+			}(),
 			wantErr: announcements.ErrEndBeforeStart,
 		},
 		{
 			name: "selected teachers required",
-			req: announcements.Request{
-				Title:        "Test",
-				Description:  "Details",
-				Level:        announcements.LevelWarning,
-				StartDate:    today,
-				EndDate:      tomorrow,
-				VisibleToAll: false,
-			},
+			req: func() announcements.Request {
+				req := validAnnouncementReq()
+				req.Level = announcements.LevelWarning
+				req.VisibleToAll = false
+				return req
+			}(),
 			wantErr: announcements.ErrTeachersRequired,
 		},
 		{
 			name: "cta label without url",
-			req: announcements.Request{
-				Title:        "Test",
-				Description:  "Details",
-				Level:        announcements.LevelInfo,
-				StartDate:    today,
-				EndDate:      tomorrow,
-				VisibleToAll: true,
-				CTALabel:     "Learn more",
-			},
+			req: func() announcements.Request {
+				req := validAnnouncementReq()
+				req.CTALabel = "Learn more"
+				return req
+			}(),
 			wantErr: announcements.ErrCTAURLRequired,
 		},
 		{
 			name: "cta url without label",
-			req: announcements.Request{
-				Title:        "Test",
-				Description:  "Details",
-				Level:        announcements.LevelInfo,
-				StartDate:    today,
-				EndDate:      tomorrow,
-				VisibleToAll: true,
-				CTAURL:       "https://example.com",
-			},
+			req: func() announcements.Request {
+				req := validAnnouncementReq()
+				req.CTAURL = "https://example.com"
+				return req
+			}(),
 			wantErr: announcements.ErrCTALabelRequired,
 		},
 		{
 			name: "invalid cta url",
-			req: announcements.Request{
-				Title:        "Test",
-				Description:  "Details",
-				Level:        announcements.LevelInfo,
-				StartDate:    today,
-				EndDate:      tomorrow,
-				VisibleToAll: true,
-				CTALabel:     "Go",
-				CTAURL:       "javascript:alert(1)",
-			},
+			req: func() announcements.Request {
+				req := validAnnouncementReq()
+				req.CTALabel = "Go"
+				req.CTAURL = "javascript:alert(1)"
+				return req
+			}(),
 			wantErr: announcements.ErrInvalidCTAURL,
 		},
 		{
 			name: "valid cta external url",
+			req: func() announcements.Request {
+				req := validAnnouncementReq()
+				req.CTALabel = "Learn more"
+				req.CTAURL = "https://example.com"
+				return req
+			}(),
+		},
+		{
+			name: "invalid status",
 			req: announcements.Request{
 				Title:        "Test",
 				Description:  "Details",
@@ -145,22 +146,30 @@ func TestValidateRequestCreate(t *testing.T) {
 				StartDate:    today,
 				EndDate:      tomorrow,
 				VisibleToAll: true,
-				CTALabel:     "Learn more",
-				CTAURL:       "https://example.com",
+				Status:       announcements.StatusDeleted,
+			},
+			wantErr: announcements.ErrInvalidStatus,
+		},
+		{
+			name: "valid published",
+			req: announcements.Request{
+				Title:        "Test",
+				Description:  "Details",
+				Level:        announcements.LevelInfo,
+				StartDate:    today,
+				EndDate:      tomorrow,
+				VisibleToAll: true,
+				Status:       announcements.StatusPublished,
 			},
 		},
 		{
 			name: "valid cta internal path",
-			req: announcements.Request{
-				Title:        "Test",
-				Description:  "Details",
-				Level:        announcements.LevelInfo,
-				StartDate:    today,
-				EndDate:      tomorrow,
-				VisibleToAll: true,
-				CTALabel:     "View students",
-				CTAURL:       "/students",
-			},
+			req: func() announcements.Request {
+				req := validAnnouncementReq()
+				req.CTALabel = "View students"
+				req.CTAURL = "/students"
+				return req
+			}(),
 		},
 	}
 
@@ -200,6 +209,7 @@ func TestValidateRequestUpdate(t *testing.T) {
 				EndDate:       tomorrow,
 				OriginalStart: yesterday,
 				VisibleToAll:  true,
+				Status:        announcements.StatusDraft,
 			},
 		},
 		{
@@ -212,6 +222,7 @@ func TestValidateRequestUpdate(t *testing.T) {
 				EndDate:       tomorrow,
 				OriginalStart: today,
 				VisibleToAll:  true,
+				Status:        announcements.StatusDraft,
 			},
 			wantErr: announcements.ErrStartDatePast,
 		},

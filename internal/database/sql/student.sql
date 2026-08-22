@@ -1,6 +1,6 @@
 -- name: InsertStudent :exec
-INSERT INTO tbl_students (name, currency, contact, rate_per_class, parent_name, assigned_color, status)
-VALUES (?, ?, ?, ?, ?, ?, ?);
+INSERT INTO tbl_students (name, currency, contact, rate_per_class, parent_name, assigned_color, status, inactive_reason)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
 -- name: GetStudentByName :one
 SELECT COUNT(*) as count FROM tbl_students WHERE name = ?;
@@ -12,28 +12,28 @@ SELECT id FROM tbl_students WHERE name = ?;
 SELECT COUNT(*) as count FROM tbl_students WHERE name = ? AND id != ?;
 
 -- name: GetAllStudents :many
-SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, created_at, updated_at
+SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, inactive_reason, created_at, updated_at
 FROM tbl_students
 ORDER BY created_at DESC;
 
 -- name: GetActiveStudents :many
-SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, created_at, updated_at
+SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, inactive_reason, created_at, updated_at
 FROM tbl_students
 WHERE status = 'active'
 ORDER BY name ASC;
 
 -- name: GetStudentByID :one
-SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, created_at, updated_at
+SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, inactive_reason, created_at, updated_at
 FROM tbl_students
 WHERE id = ?;
 
 -- name: UpdateStudent :exec
 UPDATE tbl_students
-SET name = ?, currency = ?, contact = ?, rate_per_class = ?, parent_name = ?, assigned_color = ?, status = ?, updated_at = datetime('now')
+SET name = ?, currency = ?, contact = ?, rate_per_class = ?, parent_name = ?, assigned_color = ?, status = ?, inactive_reason = ?, updated_at = datetime('now')
 WHERE id = ?;
 
 -- name: SearchStudentsByName :many
-SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, created_at, updated_at
+SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, inactive_reason, created_at, updated_at
 FROM tbl_students
 WHERE name LIKE '%' || ? || '%'
 ORDER BY name ASC
@@ -48,7 +48,7 @@ WHERE (? = '' OR s.name LIKE '%' || ? || '%')
   AND (? = 0 OR m2m.teacher_id = ?);
 
 -- name: GetStudentsFiltered :many
-SELECT DISTINCT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
+SELECT DISTINCT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.inactive_reason, s.created_at, s.updated_at
 FROM tbl_students s
 LEFT JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE (? = '' OR s.name LIKE '%' || ? || '%')

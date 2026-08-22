@@ -31,6 +31,7 @@ type reportEarningJSON struct {
 type reportRowJSON struct {
 	TeacherID        string              `json:"teacherId"`
 	TeacherName      string              `json:"teacherName"`
+	TeacherAvatar    frontend.AvatarProps `json:"teacherAvatar"`
 	ConductedClasses int64               `json:"conductedClasses"`
 	TotalClasses     int64               `json:"totalClasses"`
 	Earnings         []reportEarningJSON `json:"earnings"`
@@ -143,6 +144,7 @@ func handleGetReports(w http.ResponseWriter, r *http.Request) {
 		item := reportRowJSON{
 			TeacherID:        strconv.FormatInt(summary.TeacherID, 10),
 			TeacherName:      summary.TeacherName,
+			TeacherAvatar:    buildReportSummaryAvatarProps(summary),
 			ConductedClasses: sqlNumericToInt64(summary.ConductedClasses),
 			TotalClasses:     summary.TotalClasses,
 			Earnings:         earningsByTeacher[summary.TeacherID],
@@ -251,9 +253,10 @@ func handleReportView(w http.ResponseWriter, r *http.Request, teacherID int64) {
 	}
 
 	w.Header().Set("Content-Type", "text/html")
+	teacherName := utils.ComposePersonName(profile.FirstName, profile.MiddleName, profile.LastName)
 	frontend.ReportViewModal(frontend.ReportViewData{
 		TeacherID:        strconv.FormatInt(teacherID, 10),
-		TeacherName:      profile.Name,
+		TeacherName:      teacherName,
 		CutoffLabel:      formatReportCutoffLabel(startDate, endDate),
 		TotalEarnings:    totalEarnings,
 		ConductedCount:   conducted,
@@ -335,7 +338,8 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 	}
 
 	processorRecords := classRecordsToProcessor(records)
-	safeName := utils.SanitizeFilename(profile.Name)
+	teacherName := utils.ComposePersonName(profile.FirstName, profile.MiddleName, profile.LastName)
+	safeName := utils.SanitizeFilename(teacherName)
 	filename := fmt.Sprintf("%s_report_%s.xlsx", safeName, utils.RandomString(8))
 	outputPath := filepath.Join("tmp", filename)
 
@@ -348,7 +352,7 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 		EndTime:   0,
 		Link:      -1,
 	}
-	if err := processor.SaveRecords(processorRecords, outputPath, colIndices, profile.Name); err != nil {
+	if err := processor.SaveRecords(processorRecords, outputPath, colIndices, teacherName); err != nil {
 		logs.Log().Error("save report xlsx", zap.Error(err))
 		sendErrorLog(w, "failed to generate report")
 		return
@@ -374,7 +378,7 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 	user := auth.GetUser(ctx)
 	insertAuditLogAs(ctx, user, "reports", fmt.Sprintf(
 		"generated report for teacher '%s' (%s to %s): %d records, %s",
-		profile.Name, startDate, endDate, len(records), filename,
+		teacherName, startDate, endDate, len(records), filename,
 	))
 
 	writeReportGenerateResponse(w, reportGenerateResponse{
@@ -530,13 +534,30 @@ func buildReportTeacherAvatarProps(teacherID int64, row queries.GetTeacherProfil
 	if assignedColor == "" {
 		assignedColor = "#B9D283"
 	}
+	displayName := utils.ComposePersonName(row.FirstName, row.MiddleName, row.LastName)
 	return frontend.AvatarProps{
 		Size:          "lg",
-		Initials:      utils.PersonInitials(row.FirstName, row.MiddleName, row.LastName, row.Name),
+		Initials:      utils.PersonInitials(row.FirstName, row.MiddleName, row.LastName, displayName),
 		AssignedColor: assignedColor,
 		PictureURL:    teacherPictureURL(teacherID, hasPicture),
 		HasPicture:    hasPicture,
-		Alt:           row.Name + " avatar",
+		Alt:           displayName + " avatar",
+	}
+}
+
+func buildReportSummaryAvatarProps(summary queries.GetReportTeacherSummariesRow) frontend.AvatarProps {
+	hasPicture := summary.TeacherProfilePicture.Valid && summary.TeacherProfilePicture.String != ""
+	assignedColor := summary.TeacherAssignedColor
+	if assignedColor == "" {
+		assignedColor = "#B9D283"
+	}
+	return frontend.AvatarProps{
+		Size:          "sm",
+		Initials:      utils.PersonInitials(summary.TeacherFirstName, summary.TeacherMiddleName, summary.TeacherLastName, summary.TeacherName),
+		AssignedColor: assignedColor,
+		PictureURL:    teacherPictureURL(summary.TeacherID, hasPicture),
+		HasPicture:    hasPicture,
+		Alt:           summary.TeacherName + " avatar",
 	}
 }
 

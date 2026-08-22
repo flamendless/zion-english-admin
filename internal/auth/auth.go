@@ -173,7 +173,7 @@ func Login(w http.ResponseWriter, r *http.Request, cfg *conf.Config, dbRO *queri
 
 		user = User{
 			ID:    teacher.ID,
-			Name:  teacher.Name,
+			Name:  utils.ComposePersonName(teacher.FirstName, teacher.MiddleName, teacher.LastName),
 			Email: teacher.Email,
 			Role:  RoleTeacher,
 		}

@@ -36,6 +36,13 @@ templ RegisterStudent(data RegisterStudentData) {
 				</div>
 
 				if data.IsSuperuser {
+					<div id="registerInactiveReasonGroup" class="form-group inactive-reason-group">
+						<label for="inactiveReason">Inactive Reason</label>
+						<input type="text" id="inactiveReason" name="inactiveReason" placeholder="Why is this student inactive?"/>
+					</div>
+				}
+
+				if data.IsSuperuser {
 					<div class="form-group">
 						<label for="contact">Contact</label>
 						<input type="text" id="contact" name="contact"
@@ -87,6 +94,28 @@ templ RegisterStudent(data RegisterStudentData) {
 
 				<button type="submit" id="submitBtn" hx-indicator="Registering student...">Register Student</button>
 			</form>
+
+			if data.IsSuperuser {
+				<script>
+					(function () {
+						const statusEl = document.getElementById('status');
+						const reasonGroup = document.getElementById('registerInactiveReasonGroup');
+						const reasonEl = document.getElementById('inactiveReason');
+						if (!statusEl || !reasonGroup) return;
+						function syncInactiveReason() {
+							const inactive = statusEl.value === 'inactive';
+							reasonGroup.classList.toggle('is-visible', inactive);
+							if (reasonEl) reasonEl.required = inactive;
+						}
+						statusEl.addEventListener('change', syncInactiveReason);
+						syncInactiveReason();
+					})();
+				</script>
+				<style>
+					.inactive-reason-group { display: none; }
+					.inactive-reason-group.is-visible { display: block; }
+				</style>
+			}
 
 			<div class="logs-section">
 				<h3>Logs and Errors</h3>
