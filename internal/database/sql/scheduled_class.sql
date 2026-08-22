@@ -56,3 +56,17 @@ SELECT COUNT(*) as count
 FROM tbl_scheduled_classes
 WHERE scheduled_date = ? AND status = ?
   AND (? = 0 OR teacher_id = ?);
+
+-- name: GetScheduledClassesByTeacherOnDate :many
+SELECT id, start_time, duration_minutes
+FROM tbl_scheduled_classes
+WHERE teacher_id = ? AND scheduled_date = ? AND status = 'scheduled'
+  AND start_time IS NOT NULL AND trim(start_time) != ''
+  AND (? = 0 OR id != ?);
+
+-- name: GetScheduledClassesByStudentOnDate :many
+SELECT id, start_time, duration_minutes
+FROM tbl_scheduled_classes
+WHERE student_id = ? AND scheduled_date = ? AND status = 'scheduled'
+  AND start_time IS NOT NULL AND trim(start_time) != ''
+  AND (? = 0 OR id != ?);

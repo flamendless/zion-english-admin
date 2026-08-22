@@ -9,6 +9,50 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.08.22.1"
+    date: "2026-08-22"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Superusers can open the Analytics page for utilization, cancellation trends, weekly breakdowns, no-shows, and student retention insights."
+      - text: "Teachers can open My Analytics to view utilization, cancellation rates, and attendance for their classes."
+    improvements:
+      - text: "Creating or rescheduling a class with a start time now blocks overlapping schedules for the same teacher or student."
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal:
+      - text: "Added dbbackup.sh for SQLite database backups to local storage or object storage via rclone."
+
+  - version: "2026.08.22"
+    date: "2026-08-22"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "You can save announcements as drafts; draft announcements are hidden from banners until published."
+        commit: "e3d8040"
+      - text: "When registering or editing a student as inactive, you must provide an inactive reason."
+        commit: "e3d8040"
+    improvements:
+      - text: "The announcements list shows publication status (Draft, Published, or Deleted)."
+        commit: "e3d8040"
+      - text: "Your teacher dashboard shows earnings for the current payroll cutoff period."
+        commit: "e3d8040"
+      - text: "The Reports page defaults to the current payroll cutoff and shows teacher avatars in the list."
+        commit: "e3d8040"
+      - text: "System activity logs now include detailed before-and-after summaries when records are updated."
+        commit: "e3d8040"
+    bug_fixes: []
+    removed: []
+    security:
+      - text: "Added CSRF protection for authenticated forms and HTMX requests to reduce cross-site request forgery risk."
+        commit: "e3d8040"
+    deprecated: []
+    internal:
+      - text: "Added a /health endpoint for deployment health checks."
+        commit: "e3d8040"
+
   - version: "2026.08.21"
     date: "2026-08-21"
     released: true

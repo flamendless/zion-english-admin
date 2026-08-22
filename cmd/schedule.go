@@ -73,6 +73,7 @@ func handleScheduleCreate(w http.ResponseWriter, r *http.Request) {
 		StudentID:       req.StudentID,
 		TeacherID:       req.TeacherID,
 		Date:            req.ScheduledDate,
+		StartTime:       req.StartTime,
 		DurationMinutes: req.DurationMinutes,
 	}); err != nil {
 		sendErrorLog(w, err.Error())
@@ -297,11 +298,17 @@ func handleRescheduleScheduledClass(w http.ResponseWriter, r *http.Request, sche
 	newTime := r.FormValue("start_time")
 	reason := r.FormValue("reason")
 
+	effectiveStart := normalizeScheduleStartTime(newTime)
+	if effectiveStart == "" && existing.StartTime.Valid {
+		effectiveStart = existing.StartTime.String
+	}
+
 	if err := rules.Validate(ctx, user, classrules.ScheduledClassInput{
 		ScheduleID:      scheduleID,
 		StudentID:       existing.StudentID,
 		TeacherID:       existing.TeacherID,
 		Date:            newDate,
+		StartTime:       effectiveStart,
 		DurationMinutes: existing.DurationMinutes,
 	}); err != nil {
 		sendErrorLog(w, err.Error())

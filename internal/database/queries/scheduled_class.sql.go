@@ -154,6 +154,104 @@ func (q *Queries) GetScheduledClassByID(ctx context.Context, id int64) (GetSched
 	return i, err
 }
 
+const getScheduledClassesByStudentOnDate = `-- name: GetScheduledClassesByStudentOnDate :many
+SELECT id, start_time, duration_minutes
+FROM tbl_scheduled_classes
+WHERE student_id = ? AND scheduled_date = ? AND status = 'scheduled'
+  AND start_time IS NOT NULL AND trim(start_time) != ''
+  AND (? = 0 OR id != ?)
+`
+
+type GetScheduledClassesByStudentOnDateParams struct {
+	StudentID     int64
+	ScheduledDate string
+	Column3       interface{}
+	ID            int64
+}
+
+type GetScheduledClassesByStudentOnDateRow struct {
+	ID              int64
+	StartTime       sql.NullString
+	DurationMinutes int64
+}
+
+func (q *Queries) GetScheduledClassesByStudentOnDate(ctx context.Context, arg GetScheduledClassesByStudentOnDateParams) ([]GetScheduledClassesByStudentOnDateRow, error) {
+	rows, err := q.db.QueryContext(ctx, getScheduledClassesByStudentOnDate,
+		arg.StudentID,
+		arg.ScheduledDate,
+		arg.Column3,
+		arg.ID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetScheduledClassesByStudentOnDateRow
+	for rows.Next() {
+		var i GetScheduledClassesByStudentOnDateRow
+		if err := rows.Scan(&i.ID, &i.StartTime, &i.DurationMinutes); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getScheduledClassesByTeacherOnDate = `-- name: GetScheduledClassesByTeacherOnDate :many
+SELECT id, start_time, duration_minutes
+FROM tbl_scheduled_classes
+WHERE teacher_id = ? AND scheduled_date = ? AND status = 'scheduled'
+  AND start_time IS NOT NULL AND trim(start_time) != ''
+  AND (? = 0 OR id != ?)
+`
+
+type GetScheduledClassesByTeacherOnDateParams struct {
+	TeacherID     int64
+	ScheduledDate string
+	Column3       interface{}
+	ID            int64
+}
+
+type GetScheduledClassesByTeacherOnDateRow struct {
+	ID              int64
+	StartTime       sql.NullString
+	DurationMinutes int64
+}
+
+func (q *Queries) GetScheduledClassesByTeacherOnDate(ctx context.Context, arg GetScheduledClassesByTeacherOnDateParams) ([]GetScheduledClassesByTeacherOnDateRow, error) {
+	rows, err := q.db.QueryContext(ctx, getScheduledClassesByTeacherOnDate,
+		arg.TeacherID,
+		arg.ScheduledDate,
+		arg.Column3,
+		arg.ID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetScheduledClassesByTeacherOnDateRow
+	for rows.Next() {
+		var i GetScheduledClassesByTeacherOnDateRow
+		if err := rows.Scan(&i.ID, &i.StartTime, &i.DurationMinutes); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getScheduledClassesFiltered = `-- name: GetScheduledClassesFiltered :many
 SELECT sc.id, sc.student_id, sc.teacher_id, sc.scheduled_date, sc.start_time, sc.duration_minutes, sc.rate, sc.currency, sc.status, sc.reason, sc.created_by_role, sc.created_at, sc.updated_at,
        s.name as student_name,

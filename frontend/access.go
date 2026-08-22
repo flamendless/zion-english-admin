@@ -29,6 +29,7 @@ var navItemDefs = []navItemDef{
 	{Path: "/schedule", LinkID: "scheduleLink", Title: "Class Schedule", Description: "View and plan upcoming classes", FeatureCard: true},
 	{Path: "/my-students", LinkID: "myStudentsLink", Title: "My Students", Description: "View your assigned students"},
 	{Path: "/reports", LinkID: "reportsLink", Title: "Reports", Description: "View teacher payroll reports by cutoff period"},
+	{Path: "/analytics", LinkID: "analyticsLink", Title: "Analytics", TeacherTitle: "My Analytics", Description: "Attendance, utilization, and student retention insights", TeacherDesc: "View attendance and utilization for your classes"},
 	{Path: "/process", LinkID: "processLink", Title: "Process", Description: "Process CSV files and view logs"},
 	{Path: "/logs", LinkID: "logsLink", Title: "Logs", TeacherTitle: "My Activity", Description: "View system logs", TeacherDesc: "View your recent actions"},
 }
@@ -75,7 +76,7 @@ func IsNavAccessible(role auth.Role, path string) bool {
 		return false
 	case "/students/register":
 		return true
-	case "/classes", "/classes/record", "/schedule", "/profile", "/logs", "/my-students", "/documents":
+	case "/classes", "/classes/record", "/schedule", "/profile", "/logs", "/my-students", "/documents", "/analytics":
 		return true
 	default:
 		return false

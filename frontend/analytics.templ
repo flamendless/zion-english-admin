@@ -1,0 +1,431 @@
+package frontend
+
+import "zion-english/internal/utils"
+import "fmt"
+
+type AnalyticsData struct {
+	IsSuperuser bool
+	TeacherID   string
+	TeacherName string
+}
+
+templ Analytics(data AnalyticsData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		if data.IsSuperuser {
+			<title>Analytics - Zion English Admin Tool</title>
+		} else {
+			<title>My Analytics - Zion English Admin Tool</title>
+		}
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		<style>
+			.analytics-section {
+				margin-bottom: var(--space-8);
+			}
+			.analytics-section h2 {
+				margin-bottom: var(--space-3);
+				font-size: 1.1rem;
+			}
+			.analytics-hint {
+				font-size: 0.85rem;
+				color: var(--color-muted-foreground);
+				margin-bottom: var(--space-4);
+			}
+			.analytics-summary {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+				gap: var(--space-4);
+				margin-bottom: var(--space-6);
+			}
+			.analytics-summary .stat-card {
+				min-height: 5.5rem;
+			}
+			.rate-pill {
+				display: inline-block;
+				padding: 0.1rem 0.45rem;
+				border-radius: var(--radius-sm);
+				font-size: 0.8rem;
+				font-variant-numeric: tabular-nums;
+				background: var(--color-surface-muted);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container analytics-page" data-is-superuser={ fmt.Sprintf("%t", data.IsSuperuser) }>
+			@HeaderSimple()
+			@SuccessBanner()
+			if data.IsSuperuser {
+				@HubHeader("Analytics", "", "", false)
+			} else {
+				@HubHeader("My Analytics", "", "", false)
+			}
+
+			<div class="toolbar">
+				@DatePreset(true)
+				<button type="button" id="filterBtn">Filter</button>
+			</div>
+
+			<div id="analyticsLoading" class="empty-state">Loading analytics...</div>
+			<div id="analyticsContent" hidden>
+
+				<div class="analytics-summary" id="summaryCards"></div>
+
+				<div class="analytics-section">
+					<h2>Weekly Trend</h2>
+					<div class="table-wrapper">
+						<table class="table-stack-mobile" id="weeklyTable">
+							<thead>
+								<tr>
+									<th>Week</th>
+									<th>Conducted</th>
+									<th>Cancelled</th>
+									<th>Rescheduled</th>
+									<th>Cancellation Rate</th>
+								</tr>
+							</thead>
+							<tbody id="weeklyTableBody"></tbody>
+						</table>
+					</div>
+				</div>
+
+				if data.IsSuperuser {
+					<div class="analytics-section" id="teacherSection">
+						<h2>By Teacher</h2>
+						<div class="table-wrapper">
+							<table class="table-stack-mobile" id="teacherTable">
+								<thead>
+									<tr>
+										<th>Teacher</th>
+										<th>Conducted</th>
+										<th>Cancelled</th>
+										<th>Rescheduled</th>
+										<th>Cancellation Rate</th>
+										<th>Utilization</th>
+										<th>No-Shows</th>
+									</tr>
+								</thead>
+								<tbody id="teacherTableBody"></tbody>
+							</table>
+						</div>
+					</div>
+				}
+
+				<div class="analytics-section">
+					<h2>By Student</h2>
+					<div class="table-wrapper">
+						<table class="table-stack-mobile" id="studentTable">
+							<thead>
+								<tr>
+									<th>Student</th>
+									<th>Conducted</th>
+									<th>Cancelled</th>
+									<th>Rescheduled</th>
+									<th>Cancellation Rate</th>
+								</tr>
+							</thead>
+							<tbody id="studentTableBody"></tbody>
+						</table>
+					</div>
+				</div>
+
+				<div class="analytics-section">
+					<h2>No-Shows</h2>
+					<p class="analytics-hint">Scheduled classes still marked scheduled after their date (never recorded or updated).</p>
+					<div class="table-wrapper">
+						<table class="table-stack-mobile" id="noShowTable">
+							<thead>
+								<tr>
+									<th>Date</th>
+									<th>Student</th>
+									if data.IsSuperuser {
+										<th>Teacher</th>
+									}
+									<th>Duration</th>
+									<th>Days Overdue</th>
+								</tr>
+							</thead>
+							<tbody id="noShowTableBody"></tbody>
+						</table>
+					</div>
+				</div>
+
+				<div class="analytics-section">
+					<h2>Student Retention</h2>
+					<p class="analytics-hint">Churn dates use the student&rsquo;s last update time as a proxy when status changed to inactive.</p>
+					<div class="analytics-summary" id="retentionCards"></div>
+
+					<h3>Inactive Reasons</h3>
+					<div class="table-wrapper">
+						<table class="table-stack-mobile" id="reasonsTable">
+							<thead>
+								<tr>
+									<th>Reason</th>
+									<th>Count</th>
+								</tr>
+							</thead>
+							<tbody id="reasonsTableBody"></tbody>
+						</table>
+					</div>
+
+					<h3 style="margin-top: var(--space-6);">Churned in Period</h3>
+					<div class="table-wrapper">
+						<table class="table-stack-mobile" id="churnedTable">
+							<thead>
+								<tr>
+									<th>Student</th>
+									<th>Reason</th>
+									<th>Tenure (days)</th>
+									<th>Churned At</th>
+								</tr>
+							</thead>
+							<tbody id="churnedTableBody"></tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			const pageRoot = document.querySelector('.analytics-page');
+			const isSuperuser = pageRoot && pageRoot.dataset.isSuperuser === 'true';
+			const datePresetSelect = document.getElementById('datePreset');
+			const filterBtn = document.getElementById('filterBtn');
+			const analyticsLoading = document.getElementById('analyticsLoading');
+			const analyticsContent = document.getElementById('analyticsContent');
+
+			function getBaseURL() {
+				const pathname = window.location.pathname;
+				const cleanPath = pathname.replace(/\/$/, '');
+				const parts = cleanPath.split('/').filter(p => p !== '');
+				if (parts.length === 0 || cleanPath.endsWith('.html')) {
+					if (cleanPath.includes('/zion-english-admin')) {
+						return '/zion-english-admin';
+					}
+					return '';
+				}
+				if (parts.length === 1) {
+					return '/' + parts[0];
+				}
+				return '/' + parts.slice(0, -1).join('/');
+			}
+
+			const baseURL = getBaseURL();
+
+			function buildURL(path) {
+				return baseURL + path;
+			}
+
+			function setDateRangeFromPreset(value) {
+				if (!value) {
+					delete datePresetSelect.dataset.startDate;
+					delete datePresetSelect.dataset.endDate;
+					return;
+				}
+				const parts = value.split('|');
+				if (parts.length !== 2) return;
+				datePresetSelect.dataset.startDate = parts[0];
+				datePresetSelect.dataset.endDate = parts[1];
+			}
+
+			datePresetSelect.addEventListener('change', () => {
+				setDateRangeFromPreset(datePresetSelect.value);
+			});
+			setDateRangeFromPreset(datePresetSelect.value);
+
+			function escapeHTML(value) {
+				const div = document.createElement('div');
+				div.textContent = value == null ? '' : String(value);
+				return div.innerHTML;
+			}
+
+			function formatPct(value) {
+				return Number(value || 0).toFixed(2) + '%';
+			}
+
+			function formatMinutes(minutes) {
+				const hrs = Math.floor(minutes / 60);
+				const mins = minutes % 60;
+				if (hrs > 0) {
+					return hrs + 'h ' + mins + 'm';
+				}
+				return mins + 'm';
+			}
+
+			function renderSummary(summary) {
+				const cards = [
+					{ label: 'Utilization', value: formatPct(summary.utilizationPct), sub: formatMinutes(summary.conductedMinutes) + ' / ' + formatMinutes(summary.scheduledMinutes) },
+					{ label: 'Cancellation Rate', value: formatPct(summary.cancellationRate), sub: summary.cancelled + ' cancelled' },
+					{ label: 'Conducted', value: summary.conducted, sub: summary.rescheduled + ' rescheduled' },
+					{ label: 'No-Shows', value: summary.noShowCount, sub: 'past due scheduled' }
+				];
+				document.getElementById('summaryCards').innerHTML = cards.map(function (card) {
+					return '<div class="stat-card"><span class="stat-label">' + escapeHTML(card.label) +
+						'</span><span class="stat-value">' + escapeHTML(card.value) +
+						'</span><span class="stat-sub">' + escapeHTML(card.sub) + '</span></div>';
+				}).join('');
+			}
+
+			function renderRetention(retention) {
+				const cards = [
+					{ label: 'Active Students', value: retention.activeCount },
+					{ label: 'Inactive Students', value: retention.inactiveCount },
+					{ label: 'Churned in Period', value: retention.churnedInPeriod },
+					{ label: 'Median Tenure', value: retention.medianTenureDays + ' days', sub: 'inactive students in period' }
+				];
+				document.getElementById('retentionCards').innerHTML = cards.map(function (card) {
+					const sub = card.sub ? '<span class="stat-sub">' + escapeHTML(card.sub) + '</span>' : '';
+					return '<div class="stat-card"><span class="stat-label">' + escapeHTML(card.label) +
+						'</span><span class="stat-value">' + escapeHTML(card.value) + '</span>' + sub + '</div>';
+				}).join('');
+			}
+
+			function renderTableBody(tbody, rows, emptyMessage) {
+				if (!rows || rows.length === 0) {
+					tbody.innerHTML = '<tr><td colspan="20" class="empty-state">' + escapeHTML(emptyMessage) + '</td></tr>';
+					return;
+				}
+				tbody.innerHTML = rows;
+			}
+
+			function renderWeekly(rows) {
+				const tbody = document.getElementById('weeklyTableBody');
+				if (!rows || rows.length === 0) {
+					renderTableBody(tbody, null, 'No class records in this period.');
+					return;
+				}
+				renderTableBody(tbody, rows.map(function (row) {
+					return '<tr><td data-label="Week">' + escapeHTML(row.weekLabel) +
+						'</td><td data-label="Conducted">' + row.conducted +
+						'</td><td data-label="Cancelled">' + row.cancelled +
+						'</td><td data-label="Rescheduled">' + row.rescheduled +
+						'</td><td data-label="Cancellation Rate"><span class="rate-pill">' + formatPct(row.cancellationRate) + '</span></td></tr>';
+				}).join(''));
+			}
+
+			function renderTeachers(rows) {
+				if (!isSuperuser) return;
+				const tbody = document.getElementById('teacherTableBody');
+				if (!rows || rows.length === 0) {
+					renderTableBody(tbody, null, 'No teacher data in this period.');
+					return;
+				}
+				renderTableBody(tbody, rows.map(function (row) {
+					return '<tr><td data-label="Teacher">' + escapeHTML(row.teacherName) +
+						'</td><td data-label="Conducted">' + row.conducted +
+						'</td><td data-label="Cancelled">' + row.cancelled +
+						'</td><td data-label="Rescheduled">' + row.rescheduled +
+						'</td><td data-label="Cancellation Rate"><span class="rate-pill">' + formatPct(row.cancellationRate) + '</span></td>' +
+						'<td data-label="Utilization">' + formatPct(row.utilizationPct) +
+						'</td><td data-label="No-Shows">' + row.noShowCount + '</td></tr>';
+				}).join(''));
+			}
+
+			function renderStudents(rows) {
+				const tbody = document.getElementById('studentTableBody');
+				if (!rows || rows.length === 0) {
+					renderTableBody(tbody, null, 'No student data in this period.');
+					return;
+				}
+				renderTableBody(tbody, rows.map(function (row) {
+					return '<tr><td data-label="Student">' + escapeHTML(row.studentName) +
+						'</td><td data-label="Conducted">' + row.conducted +
+						'</td><td data-label="Cancelled">' + row.cancelled +
+						'</td><td data-label="Rescheduled">' + row.rescheduled +
+						'</td><td data-label="Cancellation Rate"><span class="rate-pill">' + formatPct(row.cancellationRate) + '</span></td></tr>';
+				}).join(''));
+			}
+
+			function renderNoShows(rows) {
+				const tbody = document.getElementById('noShowTable');
+				const colCount = isSuperuser ? 5 : 4;
+				if (!rows || rows.length === 0) {
+					document.getElementById('noShowTableBody').innerHTML = '<tr><td colspan="' + colCount + '" class="empty-state">No no-shows in this period.</td></tr>';
+					return;
+				}
+				document.getElementById('noShowTableBody').innerHTML = rows.map(function (row) {
+					let html = '<tr><td data-label="Date">' + escapeHTML(row.scheduledDate) +
+						'</td><td data-label="Student">' + escapeHTML(row.studentName) + '</td>';
+					if (isSuperuser) {
+						html += '<td data-label="Teacher">' + escapeHTML(row.teacherName) + '</td>';
+					}
+					html += '<td data-label="Duration">' + row.durationMinutes + ' min</td>' +
+						'<td data-label="Days Overdue">' + row.daysOverdue + '</td></tr>';
+					return html;
+				}).join('');
+			}
+
+			function renderReasons(rows) {
+				const tbody = document.getElementById('reasonsTableBody');
+				if (!rows || rows.length === 0) {
+					renderTableBody(tbody, null, 'No inactive students.');
+					return;
+				}
+				renderTableBody(tbody, rows.map(function (row) {
+					return '<tr><td data-label="Reason">' + escapeHTML(row.reason) +
+						'</td><td data-label="Count">' + row.count + '</td></tr>';
+				}).join(''));
+			}
+
+			function renderChurned(rows) {
+				const tbody = document.getElementById('churnedTableBody');
+				if (!rows || rows.length === 0) {
+					renderTableBody(tbody, null, 'No students churned in this period.');
+					return;
+				}
+				renderTableBody(tbody, rows.map(function (row) {
+					return '<tr><td data-label="Student">' + escapeHTML(row.studentName) +
+						'</td><td data-label="Reason">' + escapeHTML(row.inactiveReason || '(not specified)') +
+						'</td><td data-label="Tenure (days)">' + row.tenureDays +
+						'</td><td data-label="Churned At">' + escapeHTML(row.churnedAt || '-') + '</td></tr>';
+				}).join(''));
+			}
+
+			async function loadAnalytics() {
+				const startDate = datePresetSelect.dataset.startDate;
+				const endDate = datePresetSelect.dataset.endDate;
+				if (!startDate || !endDate) {
+					analyticsLoading.textContent = 'Select a date range.';
+					analyticsContent.hidden = true;
+					return;
+				}
+
+				analyticsLoading.hidden = false;
+				analyticsLoading.textContent = 'Loading analytics...';
+				analyticsContent.hidden = true;
+
+				const params = new URLSearchParams({ startDate: startDate, endDate: endDate });
+
+				try {
+					const response = await fetch(buildURL('/api/analytics?' + params.toString()), {
+						headers: window.getCSRFHeaders ? window.getCSRFHeaders() : {}
+					});
+					if (!response.ok) {
+						throw new Error('Failed to load analytics');
+					}
+					const data = await response.json();
+					renderSummary(data.summary);
+					renderWeekly(data.weekly);
+					renderTeachers(data.byTeacher);
+					renderStudents(data.byStudent);
+					renderNoShows(data.noShows);
+					renderRetention(data.retention);
+					renderReasons(data.inactiveReasons);
+					renderChurned(data.churnedStudents);
+					analyticsLoading.hidden = true;
+					analyticsContent.hidden = false;
+				} catch (err) {
+					analyticsLoading.textContent = 'Error loading analytics.';
+					analyticsContent.hidden = true;
+				}
+			}
+
+			filterBtn.addEventListener('click', loadAnalytics);
+			loadAnalytics();
+		</script>
+	</body>
+	</html>
+}

@@ -42,3 +42,22 @@ func TestEndTimeFromStartAndDuration(t *testing.T) {
 		t.Fatalf("expected 10:00, got %s", got)
 	}
 }
+
+func TestMinutesSinceMidnight(t *testing.T) {
+	got, err := MinutesSinceMidnight("09:15")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != 555 {
+		t.Fatalf("expected 555, got %d", got)
+	}
+}
+
+func TestTimeRangesOverlapMinutes(t *testing.T) {
+	if !TimeRangesOverlapMinutes(600, 60, 630, 60) {
+		t.Fatal("expected overlapping ranges")
+	}
+	if TimeRangesOverlapMinutes(600, 60, 660, 60) {
+		t.Fatal("expected back-to-back ranges not to overlap")
+	}
+}

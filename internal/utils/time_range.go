@@ -48,6 +48,18 @@ func DurationMinutesFromRange(start, end string) (int64, error) {
 	return int64(endMins - startMins), nil
 }
 
+func MinutesSinceMidnight(value string) (int64, error) {
+	t, err := ParseTimeHM(value)
+	if err != nil {
+		return 0, err
+	}
+	return int64(t.Hour()*60 + t.Minute()), nil
+}
+
+func TimeRangesOverlapMinutes(start1, duration1, start2, duration2 int64) bool {
+	return start1 < start2+duration2 && start2 < start1+duration1
+}
+
 func EndTimeFromStartAndDuration(start string, durationMinutes int64) string {
 	startT, err := ParseTimeHM(start)
 	if err != nil || durationMinutes <= 0 {
