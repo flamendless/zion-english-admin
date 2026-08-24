@@ -83,7 +83,7 @@ func setSessionCookie(w http.ResponseWriter, cfg *conf.Config, value string, exp
 		Value:    value,
 		Path:     cfg.BasePath,
 		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteLaxMode,
 		Expires:  expires,
 	}
 	if maxAge != 0 {
@@ -93,6 +93,24 @@ func setSessionCookie(w http.ResponseWriter, cfg *conf.Config, value string, exp
 		cookie.Secure = true
 	}
 	http.SetCookie(w, cookie)
+}
+
+// RefreshSessionCookie re-issues the session cookie from the current request.
+// Call before external OAuth redirects so browsers pick up SameSite=Lax on existing sessions.
+func RefreshSessionCookie(w http.ResponseWriter, r *http.Request, cfg *conf.Config) {
+	cookie, err := r.Cookie("session_token")
+	if err != nil || cookie.Value == "" {
+		return
+	}
+	claims, err := parseClaims(cookie.Value, cfg)
+	if err != nil {
+		return
+	}
+	expires := time.Now().Add(24 * time.Hour)
+	if claims.ExpiresAt != nil {
+		expires = claims.ExpiresAt.Time
+	}
+	setSessionCookie(w, cfg, cookie.Value, expires, 0)
 }
 
 func Middleware(cfg *conf.Config, dbRO *queries.Queries, next http.Handler) http.Handler {

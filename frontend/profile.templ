@@ -34,6 +34,12 @@ type ProfileData struct {
 	CanEditMiddleName    bool
 	CanEditLastName      bool
 	CanUploadDocument    bool
+	ZoomConfigured       bool
+	ZoomConnected        bool
+	ZoomConnectURL       string
+	ZoomDisconnectURL    string
+	ZoomGuideURL         string
+	ZoomStatusMessage    string
 }
 
 templ Profile(data ProfileData) {
@@ -195,6 +201,139 @@ templ Profile(data ProfileData) {
 				color: var(--color-foreground);
 				font-size: 0.875rem;
 			}
+
+			.integration-list {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-2);
+			}
+
+			.integration-row {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				padding: var(--space-3) var(--space-4);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-md);
+				background: var(--color-surface);
+			}
+
+			.integration-row-brand {
+				display: flex;
+				align-items: flex-start;
+				gap: var(--space-3);
+				flex: 1;
+				min-width: 0;
+			}
+
+			.integration-logo-wrap {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 10px 12px;
+				border-radius: var(--radius-md);
+				background: #E8F1FF;
+				flex-shrink: 0;
+			}
+
+			.integration-logo {
+				width: 56px;
+				height: auto;
+				display: block;
+			}
+
+			.integration-info {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+				min-width: 0;
+			}
+
+			.integration-name {
+				font-size: 0.9375rem;
+				font-weight: 600;
+				color: var(--color-foreground);
+				line-height: 1.3;
+			}
+
+			.integration-desc {
+				font-size: 0.8125rem;
+				color: var(--color-muted-foreground);
+				line-height: 1.45;
+			}
+
+			.integration-row-meta {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				flex-shrink: 0;
+			}
+
+			.integration-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				padding: 4px 10px;
+				border-radius: var(--radius-full);
+				font-size: 0.75rem;
+				font-weight: 600;
+				line-height: 1.2;
+				white-space: nowrap;
+			}
+
+			.integration-badge-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: var(--radius-full);
+				flex-shrink: 0;
+			}
+
+			.integration-badge--connected {
+				background: var(--color-success-bg);
+				color: var(--color-success);
+			}
+
+			.integration-badge--connected .integration-badge-dot {
+				background: var(--color-success);
+			}
+
+			.integration-badge--disconnected {
+				background: var(--color-muted);
+				color: var(--color-muted-foreground);
+			}
+
+			.integration-badge--disconnected .integration-badge-dot {
+				background: var(--color-muted-foreground);
+			}
+
+			.integration-row-action {
+				display: flex;
+				align-items: center;
+			}
+
+			.integration-row-action form {
+				display: flex;
+				align-items: center;
+				margin: 0;
+			}
+
+			.integration-row-action .btn {
+				margin-top: 0;
+				white-space: nowrap;
+			}
+
+			@media (max-width: 520px) {
+				.integration-row {
+					flex-wrap: wrap;
+					align-items: flex-start;
+				}
+
+				.integration-row-meta {
+					width: 100%;
+					justify-content: space-between;
+					padding-left: calc(80px + var(--space-3));
+				}
+			}
 		</style>
 	</head>
 	<body>
@@ -292,6 +431,7 @@ templ Profile(data ProfileData) {
 					</div>
 
 					if !data.IsSuperuser {
+						@ProfileZoomIntegrations(data)
 						if data.CanEditFirstName || data.CanEditMiddleName || data.CanEditLastName {
 							<div class="profile-card profile-section">
 								<h2>Name</h2>
@@ -449,6 +589,69 @@ templ CooldownNotice(daysRemaining int, fieldLabel string) {
 			You can change your { fieldLabel } again in { fmt.Sprintf("%d", daysRemaining) } day(s).
 		</span>
 	</div>
+}
+
+templ ProfileZoomIntegrations(data ProfileData) {
+	if data.ZoomConfigured {
+		<div class="profile-card profile-section">
+			<h2>Integrations</h2>
+			if data.ZoomStatusMessage != "" {
+				<div class="form-warning" role="status">{ data.ZoomStatusMessage }</div>
+			}
+			<div class="integration-list">
+				<div class="integration-row">
+					<div class="integration-row-brand">
+						<div class="integration-logo-wrap">
+							<img
+								class="integration-logo"
+								src={ utils.URL("/static/zoom-logo.svg") }
+								width="56"
+								height="14"
+								alt=""
+							/>
+						</div>
+						<div class="integration-info">
+							<span class="integration-name">Zoom</span>
+							<p class="integration-desc">
+								Connect your Zoom account so scheduled classes up to 40 minutes receive a meeting room automatically.
+								<a href={ data.ZoomGuideURL }>Click here for guide</a>.
+							</p>
+						</div>
+					</div>
+					<div class="integration-row-meta">
+						if data.ZoomConnected {
+							@IntegrationStatusBadge(true)
+						} else {
+							@IntegrationStatusBadge(false)
+						}
+						<div class="integration-row-action">
+							if data.ZoomConnected {
+								<form method="POST" action={ data.ZoomDisconnectURL }>
+									<button type="submit" class="btn btn-secondary btn-sm">Disconnect</button>
+								</form>
+							} else {
+								<a href={ data.ZoomConnectURL } class="btn btn-sm">Connect</a>
+							}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+}
+
+templ IntegrationStatusBadge(connected bool) {
+	if connected {
+		<span class="integration-badge integration-badge--connected">
+			<span class="integration-badge-dot" aria-hidden="true"></span>
+			Connected
+		</span>
+	} else {
+		<span class="integration-badge integration-badge--disconnected">
+			<span class="integration-badge-dot" aria-hidden="true"></span>
+			Not connected
+		</span>
+	}
 }
 
 func displayProfileName(stored string, editable bool) string {

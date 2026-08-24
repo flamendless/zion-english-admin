@@ -14,6 +14,7 @@ import (
 	"zion-english/internal/classrules"
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
+	"zion-english/internal/meetings"
 	"zion-english/internal/models"
 	"zion-english/internal/notifications"
 	"zion-english/internal/utils"
@@ -86,7 +87,23 @@ func handleScheduleCreate(w http.ResponseWriter, r *http.Request) {
 		startTime = sql.NullString{String: req.StartTime, Valid: true}
 	}
 
-	err = dbRW.GetQueries().InsertScheduledClass(ctx, queries.InsertScheduledClassParams{
+	if meetings.SupportsAutoRoom(req.DurationMinutes) {
+		if meetingSvc == nil {
+			sendErrorLog(w, meetings.ErrZoomNotConfigured.Error())
+			return
+		}
+		connected, err := meetingSvc.IsTeacherConnected(ctx, req.TeacherID, meetings.ServiceZoom)
+		if err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+		if !connected {
+			sendErrorLog(w, meetings.ErrZoomNotConnected.Error())
+			return
+		}
+	}
+
+	scheduleID, err := dbRW.GetQueries().InsertScheduledClass(ctx, queries.InsertScheduledClassParams{
 		StudentID:       req.StudentID,
 		TeacherID:       req.TeacherID,
 		ScheduledDate:   req.ScheduledDate,
@@ -100,6 +117,26 @@ func handleScheduleCreate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		sendErrorLog(w, err.Error())
 		return
+	}
+
+	if meetings.SupportsAutoRoom(req.DurationMinutes) {
+		student, studentErr := dbRO.GetQueries().GetStudentByID(ctx, req.StudentID)
+		studentName := "student"
+		if studentErr == nil {
+			studentName = student.Name
+		}
+		if err := meetingSvc.SyncRoomForSchedule(ctx, meetings.ScheduledClassMeetingInput{
+			ScheduleID:      scheduleID,
+			TeacherID:       req.TeacherID,
+			StudentName:     studentName,
+			ScheduledDate:   req.ScheduledDate,
+			StartTime:       req.StartTime,
+			DurationMinutes: req.DurationMinutes,
+		}); err != nil {
+			_ = dbRW.GetQueries().DeleteScheduledClassByID(ctx, scheduleID)
+			sendErrorLog(w, "Failed to create Zoom meeting: "+err.Error())
+			return
+		}
 	}
 
 	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("scheduled class for student id %d (teacher id %d, date %s)", req.StudentID, req.TeacherID, req.ScheduledDate))
@@ -198,8 +235,25 @@ func handleGetScheduledClasses(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var response []models.ScheduledClassView
+	classIDs := make([]int64, 0, len(records))
 	for _, sc := range records {
-		response = append(response, scheduledClassViewFromRow(sc))
+		classIDs = append(classIDs, sc.ID)
+	}
+	roomMap := map[int64]meetings.ClassMeetingView{}
+	if meetingSvc != nil && len(classIDs) > 0 {
+		rooms, roomErr := meetingSvc.GetRoomsByClassIDs(ctx, classIDs)
+		if roomErr == nil {
+			roomMap = rooms
+		}
+	}
+	for _, sc := range records {
+		view := scheduledClassViewFromRow(sc)
+		if room, ok := roomMap[sc.ID]; ok {
+			view.RoomURL = room.RoomURL
+			view.RoomPasscode = room.Passcode
+			view.MeetingService = room.Service
+		}
+		response = append(response, view)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -245,6 +299,10 @@ func handleCancelScheduledClass(w http.ResponseWriter, r *http.Request, schedule
 		return
 	}
 	reason := r.FormValue("reason")
+
+	if meetingSvc != nil {
+		_ = meetingSvc.DeleteRoomForSchedule(ctx, scheduleID, existing.TeacherID)
+	}
 
 	err = dbRW.GetQueries().UpdateScheduledClassStatus(ctx, queries.UpdateScheduledClassStatusParams{
 		Status:   "cancelled",
@@ -338,6 +396,25 @@ func handleRescheduleScheduledClass(w http.ResponseWriter, r *http.Request, sche
 	if err != nil {
 		sendErrorLog(w, err.Error())
 		return
+	}
+
+	if meetingSvc != nil {
+		student, studentErr := dbRO.GetQueries().GetStudentByID(ctx, existing.StudentID)
+		studentName := "student"
+		if studentErr == nil {
+			studentName = student.Name
+		}
+		if err := meetingSvc.SyncRoomForSchedule(ctx, meetings.ScheduledClassMeetingInput{
+			ScheduleID:      scheduleID,
+			TeacherID:       existing.TeacherID,
+			StudentName:     studentName,
+			ScheduledDate:   newDate,
+			StartTime:       effectiveStart,
+			DurationMinutes: existing.DurationMinutes,
+		}); err != nil {
+			sendErrorLog(w, "Class rescheduled but Zoom meeting update failed: "+err.Error())
+			return
+		}
 	}
 
 	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("rescheduled class id %d from %s to %s", scheduleID, existing.ScheduledDate, newDate))

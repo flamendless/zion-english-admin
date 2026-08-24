@@ -226,9 +226,36 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 		CanEditLastName:       utils.ProfileNameEditable(row.LastName),
 		CanUploadDocument:     blockingDocs == 0,
 	}
+	zoomConnected, zoomConfigured := profileZoomStatus(ctx, user.ID)
+	data.ZoomConfigured = zoomConfigured
+	data.ZoomConnected = zoomConnected
+	data.ZoomConnectURL = utils.URL("/profile/zoom/connect")
+	data.ZoomDisconnectURL = utils.URL("/profile/zoom/disconnect")
+	data.ZoomGuideURL = utils.URL("/guides/connect-zoom")
+	data.ZoomStatusMessage = profileZoomFlashMessage(r.URL.Query())
 
 	if err := frontend.Profile(data).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func profileZoomFlashMessage(query url.Values) string {
+	if query.Get("zoom_connected") == "1" {
+		return "Zoom account connected successfully."
+	}
+	switch query.Get("zoom_error") {
+	case "invalid_state":
+		return "Zoom connection failed: invalid session. Please try again."
+	case "missing_code":
+		return "Zoom connection failed: authorization was not completed."
+	case "exchange_failed":
+		return "Zoom connection failed: could not exchange authorization code."
+	case "save_failed":
+		return "Zoom connection failed: could not save account."
+	case "":
+		return ""
+	default:
+		return "Zoom connection failed: " + query.Get("zoom_error")
 	}
 }
 

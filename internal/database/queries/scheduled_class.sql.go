@@ -359,9 +359,10 @@ func (q *Queries) GetScheduledClassesFiltered(ctx context.Context, arg GetSchedu
 	return items, nil
 }
 
-const insertScheduledClass = `-- name: InsertScheduledClass :exec
+const insertScheduledClass = `-- name: InsertScheduledClass :one
 INSERT INTO tbl_scheduled_classes (student_id, teacher_id, scheduled_date, start_time, duration_minutes, rate, currency, status, reason, created_by_role)
 VALUES (?, ?, ?, ?, ?, ?, ?, 'scheduled', ?, ?)
+RETURNING id
 `
 
 type InsertScheduledClassParams struct {
@@ -376,8 +377,8 @@ type InsertScheduledClassParams struct {
 	CreatedByRole   string
 }
 
-func (q *Queries) InsertScheduledClass(ctx context.Context, arg InsertScheduledClassParams) error {
-	_, err := q.db.ExecContext(ctx, insertScheduledClass,
+func (q *Queries) InsertScheduledClass(ctx context.Context, arg InsertScheduledClassParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, insertScheduledClass,
 		arg.StudentID,
 		arg.TeacherID,
 		arg.ScheduledDate,
@@ -388,7 +389,9 @@ func (q *Queries) InsertScheduledClass(ctx context.Context, arg InsertScheduledC
 		arg.Reason,
 		arg.CreatedByRole,
 	)
-	return err
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
 const rescheduleScheduledClass = `-- name: RescheduleScheduledClass :exec

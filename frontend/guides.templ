@@ -278,6 +278,127 @@ templ GuideReportsGeneration() {
 	</html>
 }
 
+templ GuideConnectZoom() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Connect Zoom - Guides - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@GuideStyles()
+	</head>
+	<body>
+		<div class="container guides-page">
+			@HeaderSimple()
+
+			<nav class="guides-breadcrumb" aria-label="Breadcrumb">
+				<a href={ utils.URL("/guides") } class="guides-breadcrumb-link">Guides</a>
+				<span class="guides-breadcrumb-sep" aria-hidden="true">/</span>
+				<span class="guides-breadcrumb-current" aria-current="page">Connect Zoom</span>
+			</nav>
+
+			@HubHeader("Connect Zoom", "", "", false)
+
+			<div class="guides-hero">
+				<p class="guides-subtitle">
+					Link your Zoom account once so the admin tool can create meeting rooms for scheduled classes up to 40 minutes.
+				</p>
+			</div>
+
+			<div class="guide-content">
+				@GuideSection(
+					"why-connect-zoom",
+					"Why connect Zoom?",
+					utils.URL("/profile"),
+					"One-time setup that enables automatic meeting links for short scheduled classes.",
+					[]string{
+						"Connect your own Zoom Basic account from My Profile.",
+						"After connecting, classes up to 40 minutes receive a Zoom meeting link automatically when you schedule them.",
+						"Scheduling classes up to 40 minutes requires a connected Zoom account.",
+					},
+				)
+				@GuideSection(
+					"before-you-start",
+					"Before you start",
+					utils.URL("/profile"),
+					"You need a Zoom account you can sign into.",
+					[]string{
+						"Use your own Zoom account (Basic is fine).",
+						"Sign in with the same email you use for Zoom.",
+					},
+				)
+				@GuideSection(
+					"connect-your-account",
+					"Connect your account",
+					utils.URL("/profile"),
+					"Authorize the admin tool from your profile page.",
+					[]string{
+						"Open My Profile from the dashboard or navigation.",
+						"Scroll to Integrations and click Connect Zoom.",
+						"Sign in to Zoom if prompted and approve access.",
+						"Return to the profile page and confirm the Zoom badge shows Connected.",
+					},
+				)
+				@GuideSection(
+					"schedule-with-zoom",
+					"Schedule a class with Zoom",
+					utils.URL("/schedule"),
+					"Automatic meeting links appear on class cards for classes up to 40 minutes.",
+					[]string{
+						"Open Class Schedule and add a class as usual.",
+						"For classes up to 40 minutes, a meeting link and passcode appear on the class card after scheduling.",
+						"Use Open to launch Zoom in a new tab, or Copy to share the link with your student externally.",
+					},
+				)
+				@GuideSection(
+					"forty-minute-limit",
+					"40-minute limit",
+					utils.URL("/schedule"),
+					"Zoom Basic accounts limit hosted meetings to 40 minutes.",
+					[]string{
+						"If your class is longer than 40 minutes, the schedule form shows a warning.",
+						"No automatic Zoom room is created for those classes.",
+						"Create your Zoom meeting manually in Zoom and share the link with your student.",
+					},
+				)
+				@GuideSection(
+					"disconnect-reconnect",
+					"Disconnect or reconnect",
+					utils.URL("/profile"),
+					"Manage your Zoom connection from My Profile.",
+					[]string{
+						"Click Disconnect Zoom in Integrations if you need to remove access.",
+						"Scheduling classes up to 40 minutes is blocked until you reconnect.",
+						"Reconnect if you switch Zoom accounts.",
+					},
+				)
+				@GuideSection(
+					"troubleshooting",
+					"Troubleshooting",
+					utils.URL("/profile"),
+					"Common issues when connecting or scheduling with Zoom.",
+					[]string{
+						"If Connect Zoom is missing, ask your administrator to configure Zoom for the system.",
+						"If scheduling fails, confirm Zoom shows Connected on your profile.",
+						"If Zoom is down, try again later or schedule a class longer than 40 minutes without an automatic room.",
+					},
+				)
+			</div>
+
+			<div class="guides-footer-nav">
+				<a href={ utils.URL("/guides") } class="guides-back-link">
+					@GuideBackIcon()
+					All guides
+				</a>
+			</div>
+		</div>
+		@GuideAnchorScript()
+	</body>
+	</html>
+}
+
 templ GuideBetaCallout() {
 	<div class="guide-beta-card" role="note" aria-label="Beta testing instructions">
 		<span class="guide-beta-ribbon" aria-hidden="true">BETA</span>

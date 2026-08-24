@@ -25,6 +25,12 @@ func handleGuides(w http.ResponseWriter, r *http.Request) {
 				Access:      "teacher",
 			},
 			{
+				Slug:        "connect-zoom",
+				Title:       "Connect Zoom",
+				Description: "Link your Zoom account so scheduled classes get a meeting room automatically.",
+				Access:      "teacher",
+			},
+			{
 				Slug:        "reports-and-generation",
 				Title:       "Reports & Generation",
 				Description: "Review teacher payroll summaries, preview class records, and export XLSX reports.",
@@ -48,6 +54,8 @@ func handleGuidesPath(w http.ResponseWriter, r *http.Request) {
 	switch slug {
 	case "getting-started":
 		handleGuideGettingStarted(w, r)
+	case "connect-zoom":
+		handleGuideConnectZoom(w, r)
 	case "reports-and-generation":
 		handleGuideReportsGeneration(w, r)
 	default:
@@ -63,6 +71,17 @@ func handleGuideGettingStarted(w http.ResponseWriter, r *http.Request) {
 
 	if err := frontend.GuideGettingStarted().Render(r.Context(), w); err != nil {
 		logs.Log().Error("failed to render getting started guide", zap.Error(err))
+	}
+}
+
+func handleGuideConnectZoom(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := frontend.GuideConnectZoom().Render(r.Context(), w); err != nil {
+		logs.Log().Error("failed to render connect zoom guide", zap.Error(err))
 	}
 }
 

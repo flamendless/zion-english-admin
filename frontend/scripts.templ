@@ -13,3 +13,16 @@ templ ScrHyperscript() {
 templ ScrClock() {
 	<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/clock.js")) }></script>
 }
+
+templ ScrClipboardHelpers() {
+	<script>
+		window.copyCellText = function (button) {
+			var value = button.getAttribute('data-copy');
+			if (!value || !navigator.clipboard) return;
+			navigator.clipboard.writeText(value).then(function () {
+				button.classList.add('copied');
+				setTimeout(function () { button.classList.remove('copied'); }, 1500);
+			});
+		};
+	</script>
+}

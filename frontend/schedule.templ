@@ -223,6 +223,95 @@ templ Schedule(data ScheduleData) {
 			const modalSubmitBtn = document.getElementById('modalSubmitBtn');
 			const startTimeInput = document.getElementById('start_time');
 			const endTimeInput = document.getElementById('end_time');
+			const ZOOM_MAX_AUTO_MINUTES = 40;
+			const ZOOM_MANUAL_WARNING = 'Classes longer than 40 minutes cannot receive an automatic Zoom meeting room on a Basic account. Please create your Zoom meeting manually and share the link with your student.';
+
+			function durationFromForm() {
+				const start = parseTimeToMinutes(startTimeInput ? startTimeInput.value : '');
+				const end = parseTimeToMinutes(endTimeInput ? endTimeInput.value : '');
+				if (start === null || end === null || end <= start) return null;
+				return end - start;
+			}
+
+			function updateScheduleZoomWarning() {
+				const el = document.getElementById('zoomDurationWarning');
+				if (!el) return;
+				const duration = durationFromForm();
+				if (duration !== null && duration > ZOOM_MAX_AUTO_MINUTES) {
+					el.textContent = ZOOM_MANUAL_WARNING;
+					el.hidden = false;
+				} else {
+					el.hidden = true;
+					el.textContent = '';
+				}
+			}
+
+			function createCopyButton(value, label) {
+				const button = document.createElement('button');
+				button.type = 'button';
+				button.className = 'copy-btn';
+				button.dataset.copy = value;
+				button.title = label;
+				button.setAttribute('aria-label', label);
+				button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+				button.addEventListener('click', function () { window.copyCellText(button); });
+				return button;
+			}
+
+			function createOpenLink(url) {
+				const link = document.createElement('a');
+				link.href = url;
+				link.target = '_blank';
+				link.rel = 'noopener noreferrer';
+				link.className = 'open-btn';
+				link.title = 'Open meeting in new tab';
+				link.setAttribute('aria-label', 'Open meeting in new tab');
+				link.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>';
+				return link;
+			}
+
+			function createMeetingLinkCell(url) {
+				const cell = document.createElement('div');
+				cell.className = 'meeting-link-cell copyable-cell';
+				const text = document.createElement('span');
+				text.className = 'copyable-text';
+				text.title = url;
+				text.textContent = url;
+				cell.appendChild(text);
+				cell.appendChild(createOpenLink(url));
+				cell.appendChild(createCopyButton(url, 'Copy to clipboard'));
+				return cell;
+			}
+
+			function appendMeetingInfo(info, record) {
+				const roomURL = recordField(record, 'roomUrl', 'room_url');
+				const passcode = recordField(record, 'roomPasscode', 'room_passcode');
+				const durationMinutes = Number(recordField(record, 'durationMinutes', 'duration_minutes')) || 0;
+				const meetingWrap = document.createElement('div');
+				meetingWrap.className = 'day-class-meeting';
+				if (roomURL) {
+					meetingWrap.appendChild(createMeetingLinkCell(roomURL));
+					if (passcode) {
+						const passcodeRow = document.createElement('div');
+						passcodeRow.className = 'meeting-passcode meeting-link-cell';
+						const passcodeText = document.createElement('span');
+						passcodeText.className = 'copyable-text';
+						passcodeText.textContent = 'Passcode: ' + passcode;
+						passcodeRow.appendChild(passcodeText);
+						passcodeRow.appendChild(createCopyButton(passcode, 'Copy passcode'));
+						meetingWrap.appendChild(passcodeRow);
+					}
+					info.appendChild(meetingWrap);
+					return;
+				}
+				if (durationMinutes > ZOOM_MAX_AUTO_MINUTES) {
+					const warning = document.createElement('div');
+					warning.className = 'day-class-meeting-warning';
+					warning.textContent = ZOOM_MANUAL_WARNING;
+					meetingWrap.appendChild(warning);
+					info.appendChild(meetingWrap);
+				}
+			}
 
 			function getFormStudentEl() {
 				if (lockTeacher) {
@@ -642,6 +731,8 @@ templ Schedule(data ScheduleData) {
 						info.appendChild(banner);
 					}
 
+					appendMeetingInfo(info, record);
+
 					li.appendChild(info);
 
 					const actions = document.createElement('div');
@@ -899,6 +990,15 @@ templ Schedule(data ScheduleData) {
 
 			refreshCalendar();
 			updateTimeRangePreview();
+			updateScheduleZoomWarning();
+			if (startTimeInput) {
+				startTimeInput.addEventListener('change', updateScheduleZoomWarning);
+				startTimeInput.addEventListener('input', updateScheduleZoomWarning);
+			}
+			if (endTimeInput) {
+				endTimeInput.addEventListener('change', updateScheduleZoomWarning);
+				endTimeInput.addEventListener('input', updateScheduleZoomWarning);
+			}
 			if (window.attachTimeRangeFormValidation) attachTimeRangeFormValidation();
 			wireTeacherStudentDropdown();
 			if (!lockTeacher) {
@@ -912,6 +1012,7 @@ templ Schedule(data ScheduleData) {
 
 templ ScheduleModalFields() {
 	@TimeRangeFields("", "", false)
+	<div id="zoomDurationWarning" class="form-warning" role="status" hidden></div>
 	<div class="form-row">
 		@CurrencyDropdown()
 		<div class="form-group">

@@ -70,6 +70,7 @@ var cmdWeb = &cobra.Command{
 		dbRW = database.New(database.DB_MODE_RW)
 		dbRO = database.New(database.DB_MODE_RO)
 		initNotifyService()
+		initMeetingService()
 
 		basePath := "/" + strings.TrimPrefix(webFlags.baseURL, "/")
 		cfg.BasePath = basePath
@@ -125,6 +126,9 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/profile/avatar", auth.RequireRole(auth.RoleTeacher)(handleProfileAvatar))
 		authMux.HandleFunc(basePath+"/profile/picture", auth.RequireRole(auth.RoleTeacher)(handleProfilePicture))
 		authMux.HandleFunc(basePath+"/profile/document", auth.RequireRole(auth.RoleTeacher)(handleProfileDocument))
+		authMux.HandleFunc(basePath+"/profile/zoom/connect", auth.RequireRole(auth.RoleTeacher)(handleZoomConnect))
+		authMux.HandleFunc(basePath+"/profile/zoom/callback", auth.RequireRole(auth.RoleTeacher)(handleZoomCallback))
+		authMux.HandleFunc(basePath+"/profile/zoom/disconnect", auth.RequireRole(auth.RoleTeacher)(handleZoomDisconnect))
 		documentsRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)
 		authMux.HandleFunc(basePath+"/documents", documentsRole(handleDocuments))
 		authMux.HandleFunc(basePath+"/documents/", documentsRole(handleDocumentsPath))

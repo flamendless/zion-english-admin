@@ -1,6 +1,7 @@
--- name: InsertScheduledClass :exec
+-- name: InsertScheduledClass :one
 INSERT INTO tbl_scheduled_classes (student_id, teacher_id, scheduled_date, start_time, duration_minutes, rate, currency, status, reason, created_by_role)
-VALUES (?, ?, ?, ?, ?, ?, ?, 'scheduled', ?, ?);
+VALUES (?, ?, ?, ?, ?, ?, ?, 'scheduled', ?, ?)
+RETURNING id;
 
 -- name: GetScheduledClassByID :one
 SELECT sc.id, sc.student_id, sc.teacher_id, sc.scheduled_date, sc.start_time, sc.duration_minutes, sc.rate, sc.currency, sc.status, sc.reason, sc.created_by_role, sc.created_at, sc.updated_at,

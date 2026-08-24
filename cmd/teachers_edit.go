@@ -63,6 +63,7 @@ func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) 
 	}
 
 	teacherName := utils.ComposePersonName(row.FirstName, row.MiddleName, row.LastName)
+	zoomConnected, zoomConfigured := profileZoomStatus(ctx, teacherID)
 	w.Header().Set("Content-Type", "text/html")
 	frontend.TeacherViewModal(frontend.TeacherViewData{
 		ID:             strconv.FormatInt(teacherID, 10),
@@ -83,6 +84,8 @@ func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		Sex:            sex,
 		Status:         row.Status,
 		Avatar:         buildTeacherAvatarProps(row),
+		ZoomConfigured: zoomConfigured,
+		ZoomConnected:  zoomConnected,
 	}).Render(ctx, w)
 }
 

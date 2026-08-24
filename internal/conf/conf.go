@@ -13,6 +13,17 @@ const (
 	EnvPseudoProd = "pseudo_prod"
 )
 
+type ZoomConfig struct {
+	ClientID     string `env:"ZOOM_CLIENT_ID"`
+	ClientSecret string `env:"ZOOM_CLIENT_SECRET"`
+	RedirectURI  string `env:"ZOOM_REDIRECT_URI"`
+}
+
+type MeetingConfig struct {
+	Service string     `env:"MEETING_SERVICE" env-default:"zoom"`
+	Zoom    ZoomConfig
+}
+
 type Config struct {
 	BasePath          string
 	AppEnv            string `env:"APP_ENV" env-required:""`
@@ -20,6 +31,7 @@ type Config struct {
 	SuperuserUsername string `env:"SUPERUSER_USERNAME" env-required:""`
 	SuperuserPassword string `env:"SUPERUSER_PASSWORD" env-required:""`
 	Secret            string `env:"SECRET" env-required:""`
+	Meeting           MeetingConfig
 }
 
 var cfg *Config

@@ -1309,7 +1309,61 @@ templ GlobalIncludes() {
 			color: var(--color-success);
 		}
 
-		.num-cell {
+		.open-btn {
+			flex-shrink: 0;
+			background: none;
+			border: none;
+			padding: 4px;
+			margin: 0;
+			cursor: pointer;
+			color: var(--color-muted-foreground);
+			border-radius: var(--radius-sm);
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			text-decoration: none;
+			transition: background-color var(--transition-fast), color var(--transition-fast);
+		}
+
+		.open-btn:hover {
+			background-color: var(--color-info-bg);
+			color: var(--color-accent);
+		}
+
+		.form-warning {
+			margin-top: var(--space-3);
+			padding: var(--space-3) var(--space-4);
+			border-radius: var(--radius-md);
+			background: var(--color-warning-bg);
+			color: var(--color-foreground);
+			font-size: 0.875rem;
+			line-height: 1.5;
+			border: 1px solid color-mix(in srgb, var(--color-warning) 35%, transparent);
+		}
+
+		.day-class-meeting {
+			margin-top: var(--space-2);
+		}
+
+		.day-class-meeting-warning {
+			margin-top: var(--space-2);
+			font-size: 0.8125rem;
+			line-height: 1.45;
+			color: var(--color-muted-foreground);
+		}
+
+		.meeting-link-cell {
+			display: flex;
+			align-items: center;
+			gap: var(--space-2);
+			max-width: 100%;
+		}
+
+		.meeting-passcode {
+			margin-top: var(--space-1);
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+		}
 			width: 48px;
 			text-align: center;
 			color: var(--color-muted-foreground);
@@ -3281,4 +3335,5 @@ templ GlobalIncludes() {
 	@SuccessBannerHandlers()
 	@CsrfHandlers()
 	@ErrorBannerHandlers()
+	@ScrClipboardHelpers()
 }

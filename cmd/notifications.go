@@ -126,7 +126,7 @@ func handleNotificationRead(w http.ResponseWriter, r *http.Request, id int64) {
 		}
 		return
 	}
-	HttpRedirect(w, r, utils.URL("/notifications"))
+	HttpRedirect(w, r, "/notifications")
 }
 
 func handleNotificationsReadAll(w http.ResponseWriter, r *http.Request) {
@@ -151,7 +151,7 @@ func handleNotificationsReadAll(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("HX-Redirect", utils.URL("/notifications"))
 		return
 	}
-	HttpRedirect(w, r, utils.URL("/notifications"))
+	HttpRedirect(w, r, "/notifications")
 }
 
 func renderNotificationsPanel(w http.ResponseWriter, r *http.Request) {

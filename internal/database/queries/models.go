@@ -39,6 +39,18 @@ type TblAnnouncementsTeachersM2m struct {
 	CreatedAt      string
 }
 
+type TblClassMeetingRoom struct {
+	ID           int64
+	ClassID      int64
+	Service      string
+	RoomID       string
+	RoomUrl      string
+	RoomPasscode interface{}
+	CreatedAt    string
+	UpdatedAt    string
+	DeletedAt    interface{}
+}
+
 type TblClassRecord struct {
 	ID              int64
 	StudentID       int64
@@ -205,6 +217,18 @@ type TblTeacherDocument struct {
 	UploadedAt       sql.NullTime
 	ReviewedAt       sql.NullTime
 	ReviewedBy       sql.NullInt64
+}
+
+type TblTeacherMeetingAccount struct {
+	ID             int64
+	TeacherID      int64
+	Service        string
+	ExternalUserID string
+	AccessToken    string
+	RefreshToken   string
+	TokenExpiresAt interface{}
+	ConnectedAt    string
+	UpdatedAt      string
 }
 
 type TblTeachersStudentsM2m struct {
