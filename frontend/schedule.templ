@@ -40,6 +40,108 @@ templ Schedule(data ScheduleData) {
 				text-transform: uppercase;
 				letter-spacing: 0.03em;
 			}
+			.schedule-page .zoom-meeting-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 44px;
+				height: 44px;
+				padding: var(--space-2);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-md);
+				background: var(--color-surface);
+				cursor: pointer;
+				transition: background-color var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+			}
+			.schedule-page .zoom-meeting-btn:hover {
+				background: var(--color-info-bg);
+				border-color: color-mix(in srgb, #0B5CFF 35%, var(--color-border));
+				box-shadow: var(--shadow-sm);
+			}
+			.schedule-page .zoom-meeting-btn:focus-visible {
+				outline: 2px solid var(--color-ring);
+				outline-offset: 2px;
+			}
+			.schedule-page .zoom-meeting-btn img {
+				display: block;
+				width: 24px;
+				height: 24px;
+			}
+			.modal-overlay-zoom {
+				z-index: 1100;
+			}
+			.modal-dialog-zoom {
+				width: min(100%, 28rem);
+			}
+			.modal-header-zoom {
+				justify-content: flex-end;
+				border-bottom: none;
+				padding-bottom: 0;
+			}
+			.zoom-meeting-sr-title {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				padding: 0;
+				margin: -1px;
+				overflow: hidden;
+				clip: rect(0, 0, 0, 0);
+				white-space: nowrap;
+				border: 0;
+			}
+			.zoom-meeting-body {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: var(--space-5);
+				padding: 0 var(--space-5) var(--space-5);
+			}
+			.zoom-meeting-logo {
+				width: 48px;
+				height: 48px;
+			}
+			.zoom-meeting-field {
+				width: 100%;
+			}
+			.zoom-meeting-label {
+				display: block;
+				font-size: 0.8125rem;
+				font-weight: 600;
+				color: var(--color-muted-foreground);
+				margin-bottom: var(--space-2);
+				text-transform: uppercase;
+				letter-spacing: 0.04em;
+			}
+			.zoom-meeting-row {
+				display: flex;
+				align-items: center;
+				gap: var(--space-2);
+				padding: var(--space-3);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-md);
+				background: var(--color-muted);
+			}
+			.zoom-meeting-url {
+				flex: 1;
+				min-width: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				color: var(--color-accent);
+				text-decoration: none;
+				font-size: 0.875rem;
+			}
+			.zoom-meeting-url:hover {
+				text-decoration: underline;
+			}
+			.zoom-meeting-passcode {
+				flex: 1;
+				min-width: 0;
+				font-size: 0.9375rem;
+				font-weight: 500;
+				letter-spacing: 0.06em;
+				font-family: 'Fira Code', monospace;
+			}
 			@media (max-width: 640px) {
 				.schedule-page .schedule-layout {
 					gap: var(--space-4);
@@ -76,6 +178,7 @@ templ Schedule(data ScheduleData) {
 			data-lock-teacher={ fmt.Sprintf("%t", data.LockTeacher) }
 			data-teacher-id={ data.TeacherID }
 			data-teacher-name={ data.TeacherName }
+			data-zoom-logo-url={ utils.URL("/static/zoom-logo.svg") }
 		>
 			@HeaderSimple()
 			@SuccessBanner()
@@ -198,6 +301,32 @@ templ Schedule(data ScheduleData) {
 					</div>
 				</div>
 			</div>
+
+			<div class="modal-overlay modal-overlay-zoom" id="zoomMeetingModal" hidden>
+				<div class="modal-dialog modal-dialog-zoom" role="dialog" aria-modal="true" aria-labelledby="zoomMeetingTitle">
+					<div class="modal-header modal-header-zoom">
+						<h3 id="zoomMeetingTitle" class="zoom-meeting-sr-title">Zoom meeting</h3>
+						<button type="button" class="modal-close" id="zoomMeetingCloseBtn" aria-label="Close">&times;</button>
+					</div>
+					<div class="modal-body zoom-meeting-body">
+						<img
+							src={ utils.URL("/static/zoom-logo.svg") }
+							class="zoom-meeting-logo"
+							width="48"
+							height="48"
+							alt="Zoom"
+						/>
+						<div class="zoom-meeting-field">
+							<span class="zoom-meeting-label">Meeting link</span>
+							<div class="zoom-meeting-row" id="zoomMeetingUrlRow"></div>
+						</div>
+						<div class="zoom-meeting-field" id="zoomPasscodeField" hidden>
+							<span class="zoom-meeting-label">Passcode</span>
+							<div class="zoom-meeting-row" id="zoomMeetingPasscodeRow"></div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<script>
@@ -223,8 +352,15 @@ templ Schedule(data ScheduleData) {
 			const modalSubmitBtn = document.getElementById('modalSubmitBtn');
 			const startTimeInput = document.getElementById('start_time');
 			const endTimeInput = document.getElementById('end_time');
+			const zoomMeetingModal = document.getElementById('zoomMeetingModal');
+			const zoomMeetingCloseBtn = document.getElementById('zoomMeetingCloseBtn');
+			const zoomMeetingUrlRow = document.getElementById('zoomMeetingUrlRow');
+			const zoomPasscodeField = document.getElementById('zoomPasscodeField');
+			const zoomMeetingPasscodeRow = document.getElementById('zoomMeetingPasscodeRow');
+			const ZOOM_LOGO_URL = pageRoot ? pageRoot.dataset.zoomLogoUrl : '';
 			const ZOOM_MAX_AUTO_MINUTES = 40;
 			const ZOOM_MANUAL_WARNING = 'Classes longer than 40 minutes cannot receive an automatic Zoom meeting room on a Basic account. Please create your Zoom meeting manually and share the link with your student.';
+			let zoomMeetingTriggerEl = null;
 
 			function durationFromForm() {
 				const start = parseTimeToMinutes(startTimeInput ? startTimeInput.value : '');
@@ -270,17 +406,94 @@ templ Schedule(data ScheduleData) {
 				return link;
 			}
 
-			function createMeetingLinkCell(url) {
-				const cell = document.createElement('div');
-				cell.className = 'meeting-link-cell copyable-cell';
-				const text = document.createElement('span');
-				text.className = 'copyable-text';
-				text.title = url;
-				text.textContent = url;
-				cell.appendChild(text);
-				cell.appendChild(createOpenLink(url));
-				cell.appendChild(createCopyButton(url, 'Copy to clipboard'));
-				return cell;
+			function createZoomMeetingButton(roomURL, passcode) {
+				const button = document.createElement('button');
+				button.type = 'button';
+				button.className = 'zoom-meeting-btn';
+				button.title = 'View Zoom meeting details';
+				button.setAttribute('aria-label', 'View Zoom meeting details');
+				const img = document.createElement('img');
+				img.src = ZOOM_LOGO_URL;
+				img.alt = '';
+				img.width = 24;
+				img.height = 24;
+				img.setAttribute('aria-hidden', 'true');
+				button.appendChild(img);
+				button.addEventListener('click', function () {
+					openZoomMeetingModal(roomURL, passcode);
+				});
+				return button;
+			}
+
+			function populateZoomMeetingUrlRow(url) {
+				if (!zoomMeetingUrlRow) return;
+				zoomMeetingUrlRow.innerHTML = '';
+				const link = document.createElement('a');
+				link.href = url;
+				link.target = '_blank';
+				link.rel = 'noopener noreferrer';
+				link.className = 'zoom-meeting-url copyable-text';
+				link.title = url;
+				link.textContent = url;
+				zoomMeetingUrlRow.appendChild(link);
+				zoomMeetingUrlRow.appendChild(createOpenLink(url));
+				zoomMeetingUrlRow.appendChild(createCopyButton(url, 'Copy meeting link'));
+			}
+
+			function populateZoomMeetingPasscodeRow(passcode) {
+				if (!zoomMeetingPasscodeRow || !zoomPasscodeField) return;
+				if (!passcode) {
+					zoomPasscodeField.hidden = true;
+					zoomMeetingPasscodeRow.innerHTML = '';
+					return;
+				}
+				zoomPasscodeField.hidden = false;
+				zoomMeetingPasscodeRow.innerHTML = '';
+				const passcodeText = document.createElement('span');
+				passcodeText.className = 'copyable-text zoom-meeting-passcode';
+				passcodeText.textContent = passcode;
+				zoomMeetingPasscodeRow.appendChild(passcodeText);
+				zoomMeetingPasscodeRow.appendChild(createCopyButton(passcode, 'Copy passcode'));
+			}
+
+			function getZoomModalFocusables() {
+				if (!zoomMeetingModal) return [];
+				return Array.from(zoomMeetingModal.querySelectorAll(
+					'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+				)).filter(el => !el.hidden && el.offsetParent !== null);
+			}
+
+			function trapZoomModalFocus(e) {
+				if (!zoomMeetingModal || zoomMeetingModal.hidden || e.key !== 'Tab') return;
+				const focusables = getZoomModalFocusables();
+				if (!focusables.length) return;
+				const first = focusables[0];
+				const last = focusables[focusables.length - 1];
+				if (e.shiftKey && document.activeElement === first) {
+					e.preventDefault();
+					last.focus();
+				} else if (!e.shiftKey && document.activeElement === last) {
+					e.preventDefault();
+					first.focus();
+				}
+			}
+
+			function openZoomMeetingModal(roomURL, passcode) {
+				populateZoomMeetingUrlRow(roomURL);
+				populateZoomMeetingPasscodeRow(passcode);
+				zoomMeetingTriggerEl = document.activeElement;
+				if (zoomMeetingModal) zoomMeetingModal.hidden = false;
+				requestAnimationFrame(function () {
+					if (zoomMeetingCloseBtn) zoomMeetingCloseBtn.focus();
+				});
+			}
+
+			function closeZoomMeetingModal() {
+				if (zoomMeetingModal) zoomMeetingModal.hidden = true;
+				if (zoomMeetingTriggerEl && typeof zoomMeetingTriggerEl.focus === 'function') {
+					zoomMeetingTriggerEl.focus();
+				}
+				zoomMeetingTriggerEl = null;
 			}
 
 			function appendMeetingInfo(info, record) {
@@ -290,17 +503,7 @@ templ Schedule(data ScheduleData) {
 				const meetingWrap = document.createElement('div');
 				meetingWrap.className = 'day-class-meeting';
 				if (roomURL) {
-					meetingWrap.appendChild(createMeetingLinkCell(roomURL));
-					if (passcode) {
-						const passcodeRow = document.createElement('div');
-						passcodeRow.className = 'meeting-passcode meeting-link-cell';
-						const passcodeText = document.createElement('span');
-						passcodeText.className = 'copyable-text';
-						passcodeText.textContent = 'Passcode: ' + passcode;
-						passcodeRow.appendChild(passcodeText);
-						passcodeRow.appendChild(createCopyButton(passcode, 'Copy passcode'));
-						meetingWrap.appendChild(passcodeRow);
-					}
+					meetingWrap.appendChild(createZoomMeetingButton(roomURL, passcode));
 					info.appendChild(meetingWrap);
 					return;
 				}
@@ -468,6 +671,7 @@ templ Schedule(data ScheduleData) {
 
 			function trapModalFocus(e) {
 				if (!scheduleModal || scheduleModal.hidden || e.key !== 'Tab') return;
+				if (zoomMeetingModal && !zoomMeetingModal.hidden) return;
 				const focusables = getModalFocusables();
 				if (!focusables.length) return;
 				const first = focusables[0];
@@ -875,10 +1079,23 @@ templ Schedule(data ScheduleData) {
 					if (e.target === scheduleModal) closeModal();
 				});
 			}
+			if (zoomMeetingCloseBtn) zoomMeetingCloseBtn.addEventListener('click', closeZoomMeetingModal);
+			if (zoomMeetingModal) {
+				zoomMeetingModal.addEventListener('click', (e) => {
+					if (e.target === zoomMeetingModal) closeZoomMeetingModal();
+				});
+			}
 			document.addEventListener('keydown', (e) => {
-				if (e.key === 'Escape' && scheduleModal && !scheduleModal.hidden) {
-					closeModal();
+				if (e.key === 'Escape') {
+					if (zoomMeetingModal && !zoomMeetingModal.hidden) {
+						closeZoomMeetingModal();
+						return;
+					}
+					if (scheduleModal && !scheduleModal.hidden) {
+						closeModal();
+					}
 				}
+				trapZoomModalFocus(e);
 				trapModalFocus(e);
 			});
 
