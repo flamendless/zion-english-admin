@@ -16,6 +16,7 @@ func initMeetingService() {
 			ClientID:     cfg.Meeting.Zoom.ClientID,
 			ClientSecret: cfg.Meeting.Zoom.ClientSecret,
 			RedirectURI:  cfg.Meeting.Zoom.RedirectURI,
+			AuthorizeURL: cfg.Meeting.Zoom.AuthorizeURL,
 		},
 	})
 }

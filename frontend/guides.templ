@@ -382,7 +382,22 @@ templ GuideConnectZoom() {
 					[]string{
 						"If Connect Zoom is missing, ask your administrator to configure Zoom for the system.",
 						"If scheduling fails, confirm Zoom shows Connected on your profile.",
+						"If connection fails for your Zoom account but works for the administrator, the Zoom app may still be in development-only mode — your administrator must use Production credentials and request Beta Test sharing or publish the app.",
 						"If Zoom is down, try again later or schedule a class longer than 40 minutes without an automatic room.",
+					},
+				)
+				@GuideSection(
+					"admin-zoom-setup",
+					"Administrator: Zoom Marketplace setup",
+					utils.URL("/profile"),
+					"Required so teachers on their own Zoom accounts can connect (not only the developer account).",
+					[]string{
+						"In Zoom Marketplace, open the app under the Production tab (not Development).",
+						"Set OAuth redirect URL and allow list to your callback URL, e.g. https://your-domain/zion-english-admin/profile/zoom/callback.",
+						"Enable only these scopes: user:read:user, meeting:write:meeting, meeting:update:meeting, meeting:delete:meeting.",
+						"Copy Production Client ID and Secret into server ZOOM_CLIENT_ID and ZOOM_CLIENT_SECRET; set ZOOM_REDIRECT_URI to the same callback URL.",
+						"Under Beta Test, complete requirements and submit Request to Share so external Zoom accounts can authorize (or publish the app for full production).",
+						"Optional: paste the Marketplace beta authorization URL into ZOOM_AUTHORIZE_URL on the server if the default Connect flow still fails after approval.",
 					},
 				)
 			</div>

@@ -24,6 +24,7 @@ type ZoomConfig struct {
 	ClientID     string
 	ClientSecret string
 	RedirectURI  string
+	AuthorizeURL string
 }
 
 type ZoomProvider struct {
@@ -51,9 +52,20 @@ func (p *ZoomProvider) Service() string {
 // AuthorizeURL builds the Zoom OAuth consent URL. Required scopes must be enabled on the
 // Marketplace app (not passed here — Zoom rejects authorize URLs with scope query params):
 // user:read:user, meeting:write:meeting, meeting:update:meeting, meeting:delete:meeting.
+// When AuthorizeURL is set (e.g. Marketplace Production beta share URL), state is appended to it.
 func (p *ZoomProvider) AuthorizeURL(state string) (string, error) {
 	if p.cfg.ClientID == "" || p.cfg.RedirectURI == "" {
 		return "", ErrZoomNotConfigured
+	}
+	if p.cfg.AuthorizeURL != "" {
+		u, err := url.Parse(p.cfg.AuthorizeURL)
+		if err != nil {
+			return "", fmt.Errorf("invalid zoom authorize url: %w", err)
+		}
+		q := u.Query()
+		q.Set("state", state)
+		u.RawQuery = q.Encode()
+		return u.String(), nil
 	}
 	values := url.Values{}
 	values.Set("response_type", "code")

@@ -17,6 +17,7 @@ type ZoomConfig struct {
 	ClientID     string `env:"ZOOM_CLIENT_ID"`
 	ClientSecret string `env:"ZOOM_CLIENT_SECRET"`
 	RedirectURI  string `env:"ZOOM_REDIRECT_URI"`
+	AuthorizeURL string `env:"ZOOM_AUTHORIZE_URL"`
 }
 
 type MeetingConfig struct {
