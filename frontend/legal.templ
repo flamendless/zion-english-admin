@@ -45,6 +45,96 @@ templ LegalPage(title string, effectiveDate string) {
 	</html>
 }
 
+templ LegalInfoPage(title string) {
+	<!DOCTYPE html>
+	<html lang="en" class="landing-html">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>{ title } — Zion English</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		<link rel="preconnect" href="https://fonts.googleapis.com"/>
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+		<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet"/>
+		@LandingStyles()
+		@LegalStyles()
+	</head>
+	<body class="landing-page legal-page">
+		<div class="landing-bg" aria-hidden="true">
+			<div class="landing-orb landing-orb--green"></div>
+			<div class="landing-orb landing-orb--blue"></div>
+		</div>
+
+		<header class="landing-nav">
+			<a href={ utils.URL("/") } class="landing-nav__brand">
+				<img src={ utils.URL("/static/logo.png") } alt="Zion English" class="landing-nav__logo"/>
+				<span>Zion English</span>
+			</a>
+			<nav class="landing-nav__links" aria-label="Primary">
+				<a href={ utils.URL("/auth/login") } class="landing-btn landing-btn--primary landing-btn--sm">Sign in</a>
+			</nav>
+		</header>
+
+		<main class="legal-main">
+			<article class="legal-content">
+				<h1>{ title }</h1>
+				{ children... }
+			</article>
+		</main>
+
+		@LandingFooter()
+	</body>
+	</html>
+}
+
+templ LegalDocPage(title string, subtitle string) {
+	<!DOCTYPE html>
+	<html lang="en" class="landing-html">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>{ title } — Zion English</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		<link rel="preconnect" href="https://fonts.googleapis.com"/>
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+		<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet"/>
+		@LandingStyles()
+		@LegalStyles()
+		@GuideThemeVars()
+		@GuideStyles()
+	</head>
+	<body class="landing-page legal-page">
+		<div class="landing-bg" aria-hidden="true">
+			<div class="landing-orb landing-orb--green"></div>
+			<div class="landing-orb landing-orb--blue"></div>
+		</div>
+
+		<header class="landing-nav">
+			<a href={ utils.URL("/") } class="landing-nav__brand">
+				<img src={ utils.URL("/static/logo.png") } alt="Zion English" class="landing-nav__logo"/>
+				<span>Zion English</span>
+			</a>
+			<nav class="landing-nav__links" aria-label="Primary">
+				<a href={ utils.URL("/auth/login") } class="landing-btn landing-btn--primary landing-btn--sm">Sign in</a>
+			</nav>
+		</header>
+
+		<main class="legal-main">
+			<article class="legal-content legal-content--doc">
+				<h1>{ title }</h1>
+				<p class="legal-doc-subtitle">{ subtitle }</p>
+				<div class="guide-content">
+					{ children... }
+				</div>
+			</article>
+		</main>
+
+		@LandingFooter()
+		@GuideAnchorScript()
+	</body>
+	</html>
+}
+
 templ PrivacyPolicy() {
 	@LegalPage("Privacy Policy", "August 25, 2026") {
 		<section>
@@ -271,6 +361,17 @@ templ LegalStyles() {
 			background: rgba(45, 45, 45, 0.06);
 			padding: 2px 6px;
 			border-radius: 4px;
+		}
+
+		.legal-content--doc {
+			max-width: 52rem;
+		}
+
+		.legal-doc-subtitle {
+			color: var(--lp-muted);
+			font-size: 1rem;
+			line-height: 1.65;
+			margin: 0 0 28px;
 		}
 	</style>
 }

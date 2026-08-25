@@ -25,3 +25,23 @@ func handleTerms(w http.ResponseWriter, r *http.Request) {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
+func handleSupport(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if err := frontend.Support().Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func handleDocsConnectZoom(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if err := frontend.DocsConnectZoom().Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}

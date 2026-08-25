@@ -308,98 +308,7 @@ templ GuideConnectZoom() {
 			</div>
 
 			<div class="guide-content">
-				@GuideSection(
-					"why-connect-zoom",
-					"Why connect Zoom?",
-					utils.URL("/profile"),
-					"One-time setup that enables automatic meeting links for short scheduled classes.",
-					[]string{
-						"Connect your own Zoom Basic account from My Profile.",
-						"After connecting, classes up to 40 minutes receive a Zoom meeting link automatically when you schedule them.",
-						"Scheduling classes up to 40 minutes requires a connected Zoom account.",
-					},
-				)
-				@GuideSection(
-					"before-you-start",
-					"Before you start",
-					utils.URL("/profile"),
-					"You need a Zoom account you can sign into.",
-					[]string{
-						"Use your own Zoom account (Basic is fine).",
-						"Sign in with the same email you use for Zoom.",
-					},
-				)
-				@GuideSection(
-					"connect-your-account",
-					"Connect your account",
-					utils.URL("/profile"),
-					"Authorize the admin tool from your profile page.",
-					[]string{
-						"Open My Profile from the dashboard or navigation.",
-						"Scroll to Integrations and click Connect Zoom.",
-						"Sign in to Zoom if prompted and approve access.",
-						"Return to the profile page and confirm the Zoom badge shows Connected.",
-					},
-				)
-				@GuideSection(
-					"schedule-with-zoom",
-					"Schedule a class with Zoom",
-					utils.URL("/schedule"),
-					"Automatic meeting links appear on class cards for classes up to 40 minutes.",
-					[]string{
-						"Open Class Schedule and add a class as usual.",
-						"For classes up to 40 minutes, a Zoom button appears on the class card after scheduling.",
-						"Click the Zoom button to open meeting details, then use Open to launch Zoom or Copy to share the link and passcode with your student.",
-					},
-				)
-				@GuideSection(
-					"forty-minute-limit",
-					"40-minute limit",
-					utils.URL("/schedule"),
-					"Zoom Basic accounts limit hosted meetings to 40 minutes.",
-					[]string{
-						"If your class is longer than 40 minutes, the schedule form shows a warning.",
-						"No automatic Zoom room is created for those classes.",
-						"Create your Zoom meeting manually in Zoom and share the link with your student.",
-					},
-				)
-				@GuideSection(
-					"disconnect-reconnect",
-					"Disconnect or reconnect",
-					utils.URL("/profile"),
-					"Manage your Zoom connection from My Profile.",
-					[]string{
-						"Click Disconnect Zoom in Integrations if you need to remove access.",
-						"Scheduling classes up to 40 minutes is blocked until you reconnect.",
-						"Reconnect if you switch Zoom accounts.",
-					},
-				)
-				@GuideSection(
-					"troubleshooting",
-					"Troubleshooting",
-					utils.URL("/profile"),
-					"Common issues when connecting or scheduling with Zoom.",
-					[]string{
-						"If Connect Zoom is missing, ask your administrator to configure Zoom for the system.",
-						"If scheduling fails, confirm Zoom shows Connected on your profile.",
-						"If connection fails for your Zoom account but works for the administrator, the Zoom app may still be in development-only mode — your administrator must use Production credentials and request Beta Test sharing or publish the app.",
-						"If Zoom is down, try again later or schedule a class longer than 40 minutes without an automatic room.",
-					},
-				)
-				@GuideSection(
-					"admin-zoom-setup",
-					"Administrator: Zoom Marketplace setup",
-					utils.URL("/profile"),
-					"Required so teachers on their own Zoom accounts can connect (not only the developer account).",
-					[]string{
-						"In Zoom Marketplace, open the app under the Production tab (not Development).",
-						"Set OAuth redirect URL and allow list to your callback URL, e.g. https://your-domain/zion-english-admin/profile/zoom/callback.",
-						"Enable only these scopes: user:read:user, meeting:write:meeting, meeting:update:meeting, meeting:delete:meeting.",
-						"Copy Production Client ID and Secret into server ZOOM_CLIENT_ID and ZOOM_CLIENT_SECRET; set ZOOM_REDIRECT_URI to the same callback URL.",
-						"Under Beta Test, complete requirements and submit Request to Share so external Zoom accounts can authorize (or publish the app for full production).",
-						"Optional: paste the Marketplace beta authorization URL into ZOOM_AUTHORIZE_URL on the server if the default Connect flow still fails after approval.",
-					},
-				)
+				@GuideConnectZoomSections()
 			</div>
 
 			<div class="guides-footer-nav">
@@ -412,6 +321,112 @@ templ GuideConnectZoom() {
 		@GuideAnchorScript()
 	</body>
 	</html>
+}
+
+templ DocsConnectZoom() {
+	@LegalDocPage(
+		"Connect Zoom",
+		"Link your Zoom account once so the admin tool can create meeting rooms for scheduled classes up to 40 minutes.",
+	) {
+		@GuideConnectZoomSections()
+	}
+}
+
+templ GuideConnectZoomSections() {
+	@GuideSection(
+		"why-connect-zoom",
+		"Why connect Zoom?",
+		utils.URL("/profile"),
+		"One-time setup that enables automatic meeting links for short scheduled classes.",
+		[]string{
+			"Connect your own Zoom Basic account from My Profile.",
+			"After connecting, classes up to 40 minutes receive a Zoom meeting link automatically when you schedule them.",
+			"Scheduling classes up to 40 minutes requires a connected Zoom account.",
+		},
+	)
+	@GuideSection(
+		"before-you-start",
+		"Before you start",
+		utils.URL("/profile"),
+		"You need a Zoom account you can sign into.",
+		[]string{
+			"Use your own Zoom account (Basic is fine).",
+			"Sign in with the same email you use for Zoom.",
+		},
+	)
+	@GuideSection(
+		"connect-your-account",
+		"Connect your account",
+		utils.URL("/profile"),
+		"Authorize the admin tool from your profile page.",
+		[]string{
+			"Open My Profile from the dashboard or navigation.",
+			"Scroll to Integrations and click Connect Zoom.",
+			"Sign in to Zoom if prompted and approve access.",
+			"Return to the profile page and confirm the Zoom badge shows Connected.",
+		},
+	)
+	@GuideSection(
+		"schedule-with-zoom",
+		"Schedule a class with Zoom",
+		utils.URL("/schedule"),
+		"Automatic meeting links appear on class cards for classes up to 40 minutes.",
+		[]string{
+			"Open Class Schedule and add a class as usual.",
+			"For classes up to 40 minutes, a Zoom button appears on the class card after scheduling.",
+			"Click the Zoom button to open meeting details, then use Open to launch Zoom or Copy to share the link and passcode with your student.",
+		},
+	)
+	@GuideSection(
+		"forty-minute-limit",
+		"40-minute limit",
+		utils.URL("/schedule"),
+		"Zoom Basic accounts limit hosted meetings to 40 minutes.",
+		[]string{
+			"If your class is longer than 40 minutes, the schedule form shows a warning.",
+			"No automatic Zoom room is created for those classes.",
+			"Create your Zoom meeting manually in Zoom and share the link with your student.",
+		},
+	)
+	@GuideSection(
+		"disconnect-reconnect",
+		"Disconnect or reconnect",
+		utils.URL("/profile"),
+		"Manage your Zoom connection from My Profile.",
+		[]string{
+			"Click Disconnect Zoom in Integrations if you need to remove access.",
+			"Scheduling classes up to 40 minutes is blocked until you reconnect.",
+			"Reconnect if you switch Zoom accounts.",
+		},
+	)
+	@GuideSection(
+		"troubleshooting",
+		"Troubleshooting",
+		utils.URL("/profile"),
+		"Common issues when connecting or scheduling with Zoom.",
+		[]string{
+			"If Connect Zoom is missing, ask your administrator to configure Zoom for the system.",
+			"If scheduling fails, confirm Zoom shows Connected on your profile.",
+			"If connection fails for your Zoom account but works for the administrator, the Zoom app may still be in development-only mode — your administrator must use Production credentials and request Beta Test sharing or publish the app.",
+			"If Zoom is down, try again later or schedule a class longer than 40 minutes without an automatic room.",
+		},
+	)
+	@GuideSection(
+		"admin-zoom-setup",
+		"Administrator: Zoom Marketplace setup",
+		utils.URL("/profile"),
+		"Required so teachers on their own Zoom accounts can connect (not only the developer account).",
+		[]string{
+			"In Zoom Marketplace, open the app under the Production tab (not Development).",
+			"Set OAuth redirect URL and allow list to your callback URL, e.g. https://your-domain/zion-english-admin/profile/zoom/callback.",
+			"Set Support URL to your public support page, e.g. https://your-domain/zion-english-admin/support.",
+			"Set Documentation URL to this page, e.g. https://your-domain/zion-english-admin/docs/connect-zoom.",
+			"Enable only these scopes: user:read:user, meeting:write:meeting, meeting:update:meeting, meeting:delete:meeting.",
+			"Copy Production Client ID and Secret into server ZOOM_CLIENT_ID and ZOOM_CLIENT_SECRET; set ZOOM_REDIRECT_URI to the same callback URL.",
+			"Copy the authorization URL from Marketplace (Local Test or Beta Test) into server ZOOM_AUTHORIZE_URL — Connect Zoom uses this URL.",
+			"Under Beta Test, complete requirements and submit Request to Share so external Zoom accounts can authorize (or publish the app for full production).",
+		},
+	)
 }
 
 templ GuideBetaCallout() {
@@ -486,6 +501,31 @@ templ GuideAnchorScript() {
 			}
 		})();
 	</script>
+}
+
+templ GuideThemeVars() {
+	<style>
+		:root {
+			--color-primary: #90C020;
+			--color-primary-hover: #7A9F18;
+			--color-muted-foreground: #6B6560;
+			--color-border-subtle: #F0EDE6;
+			--color-surface: #FFFFFF;
+			--color-foreground: #2D2D2D;
+			--color-ring: #90C020;
+			--radius-lg: 12px;
+			--shadow-sm: 0 1px 2px rgba(45, 45, 45, 0.06);
+			--shadow-md: 0 4px 12px rgba(45, 45, 45, 0.08);
+			--transition-fast: 150ms ease;
+			--space-2: 8px;
+			--space-3: 12px;
+			--space-4: 16px;
+			--space-5: 20px;
+			--space-6: 24px;
+			--space-8: 32px;
+			--space-10: 40px;
+		}
+	</style>
 }
 
 templ GuideStyles() {

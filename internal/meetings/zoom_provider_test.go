@@ -5,23 +5,7 @@ import (
 	"testing"
 )
 
-func TestZoomProviderAuthorizeURLDefault(t *testing.T) {
-	p := NewZoomProvider(ZoomConfig{
-		ClientID:     "client-id",
-		ClientSecret: "secret",
-		RedirectURI:  "https://example.com/callback",
-	})
-	got, err := p.AuthorizeURL("test-state")
-	if err != nil {
-		t.Fatal(err)
-	}
-	want := "https://zoom.us/oauth/authorize?client_id=client-id&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&response_type=code&state=test-state"
-	if got != want {
-		t.Fatalf("got %q want %q", got, want)
-	}
-}
-
-func TestZoomProviderAuthorizeURLBetaOverride(t *testing.T) {
+func TestZoomProviderAuthorizeURL(t *testing.T) {
 	p := NewZoomProvider(ZoomConfig{
 		ClientID:     "client-id",
 		ClientSecret: "secret",
@@ -36,5 +20,32 @@ func TestZoomProviderAuthorizeURLBetaOverride(t *testing.T) {
 		if !strings.Contains(got, part) {
 			t.Fatalf("authorize url missing %q: %s", part, got)
 		}
+	}
+}
+
+func TestZoomProviderAuthorizeURLMissing(t *testing.T) {
+	p := NewZoomProvider(ZoomConfig{
+		ClientID:     "client-id",
+		ClientSecret: "secret",
+		RedirectURI:  "https://example.com/callback",
+	})
+	_, err := p.AuthorizeURL("test-state")
+	if err != ErrZoomAuthorizeURLNotSet {
+		t.Fatalf("got %v want %v", err, ErrZoomAuthorizeURLNotSet)
+	}
+}
+
+func TestZoomProviderIsConfiguredRequiresAuthorizeURL(t *testing.T) {
+	p := NewZoomProvider(ZoomConfig{
+		ClientID:     "client-id",
+		ClientSecret: "secret",
+		RedirectURI:  "https://example.com/callback",
+	})
+	if p.IsConfigured() {
+		t.Fatal("expected not configured without authorize url")
+	}
+	p.cfg.AuthorizeURL = "https://zoom.us/oauth/authorize?response_type=code"
+	if !p.IsConfigured() {
+		t.Fatal("expected configured with authorize url")
 	}
 }

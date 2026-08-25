@@ -15,9 +15,8 @@ import (
 )
 
 const (
-	zoomOAuthAuthorizeURL = "https://zoom.us/oauth/authorize"
-	zoomOAuthTokenURL     = "https://zoom.us/oauth/token"
-	zoomAPIBaseURL        = "https://api.zoom.us/v2"
+	zoomOAuthTokenURL = "https://zoom.us/oauth/token"
+	zoomAPIBaseURL    = "https://api.zoom.us/v2"
 )
 
 type ZoomConfig struct {
@@ -42,37 +41,31 @@ func NewZoomProvider(cfg ZoomConfig) *ZoomProvider {
 }
 
 func (p *ZoomProvider) IsConfigured() bool {
-	return p.cfg.ClientID != "" && p.cfg.ClientSecret != "" && p.cfg.RedirectURI != ""
+	return p.cfg.ClientID != "" && p.cfg.ClientSecret != "" && p.cfg.RedirectURI != "" && p.cfg.AuthorizeURL != ""
 }
 
 func (p *ZoomProvider) Service() string {
 	return ServiceZoom
 }
 
-// AuthorizeURL builds the Zoom OAuth consent URL. Required scopes must be enabled on the
-// Marketplace app (not passed here — Zoom rejects authorize URLs with scope query params):
+// AuthorizeURL redirects teachers to the Zoom Marketplace authorization URL (ZOOM_AUTHORIZE_URL)
+// with an appended state parameter. Required scopes must be enabled on the app:
 // user:read:user, meeting:write:meeting, meeting:update:meeting, meeting:delete:meeting.
-// When AuthorizeURL is set (e.g. Marketplace Production beta share URL), state is appended to it.
 func (p *ZoomProvider) AuthorizeURL(state string) (string, error) {
 	if p.cfg.ClientID == "" || p.cfg.RedirectURI == "" {
 		return "", ErrZoomNotConfigured
 	}
-	if p.cfg.AuthorizeURL != "" {
-		u, err := url.Parse(p.cfg.AuthorizeURL)
-		if err != nil {
-			return "", fmt.Errorf("invalid zoom authorize url: %w", err)
-		}
-		q := u.Query()
-		q.Set("state", state)
-		u.RawQuery = q.Encode()
-		return u.String(), nil
+	if p.cfg.AuthorizeURL == "" {
+		return "", ErrZoomAuthorizeURLNotSet
 	}
-	values := url.Values{}
-	values.Set("response_type", "code")
-	values.Set("client_id", p.cfg.ClientID)
-	values.Set("redirect_uri", p.cfg.RedirectURI)
-	values.Set("state", state)
-	return zoomOAuthAuthorizeURL + "?" + values.Encode(), nil
+	u, err := url.Parse(p.cfg.AuthorizeURL)
+	if err != nil {
+		return "", fmt.Errorf("invalid zoom authorize url: %w", err)
+	}
+	q := u.Query()
+	q.Set("state", state)
+	u.RawQuery = q.Encode()
+	return u.String(), nil
 }
 
 type zoomTokenResponse struct {

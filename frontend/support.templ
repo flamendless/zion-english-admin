@@ -1,0 +1,42 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+templ Support() {
+	@LegalInfoPage("Support") {
+		<section>
+			<h2>Help with the admin portal</h2>
+			<p>
+				The Zion English Admin Portal is for authorized teachers and administrators. If you need help signing in, connecting Zoom, or using day-to-day features, start with the documentation below or contact InnovaTech.
+			</p>
+		</section>
+		<section>
+			<h2>Documentation</h2>
+			<p>Step-by-step guides for common tasks:</p>
+			<ul>
+				<li>
+					<a href={ utils.URL("/docs/connect-zoom") }>Connect Zoom</a>
+					— link your Zoom account so scheduled classes up to 40 minutes receive automatic meeting links.
+				</li>
+			</ul>
+			<p>
+				After signing in, more guides are available from the dashboard under
+				<a href={ utils.URL("/guides") }>Guides</a>.
+			</p>
+		</section>
+		<section>
+			<h2>Contact</h2>
+			<p>
+				For technical support, privacy questions, or account access issues, email InnovaTech at
+				<a href="mailto:itservices.innovatech@gmail.com">itservices.innovatech@gmail.com</a>.
+			</p>
+		</section>
+		<section>
+			<h2>Sign in</h2>
+			<p>
+				Authorized users can
+				<a href={ utils.URL("/auth/login") }>sign in to the admin portal</a>.
+			</p>
+		</section>
+	}
+}

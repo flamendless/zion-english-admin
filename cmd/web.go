@@ -164,6 +164,8 @@ var cmdWeb = &cobra.Command{
 		rootMux.HandleFunc(basePath, handleLanding)
 		rootMux.HandleFunc(basePath+"/privacy", handlePrivacy)
 		rootMux.HandleFunc(basePath+"/terms", handleTerms)
+		rootMux.HandleFunc(basePath+"/support", handleSupport)
+		rootMux.HandleFunc(basePath+"/docs/connect-zoom", handleDocsConnectZoom)
 		rootMux.HandleFunc(basePath+"/", func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path != basePath+"/" {
 				http.NotFound(w, r)
