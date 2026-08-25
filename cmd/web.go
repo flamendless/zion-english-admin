@@ -838,10 +838,10 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		Currency:     r.FormValue("currency"),
 		RatePerClass: ratePerClass,
 		Status:       r.FormValue("status"),
+		ParentName:   r.FormValue("parentName"),
 	}
 	if isSuperuser {
 		req.Contact = r.FormValue("contact")
-		req.ParentName = r.FormValue("parentName")
 		req.AssignedColor = r.FormValue("assignedColor")
 		req.InactiveReason = r.FormValue("inactiveReason")
 		req.Relationship = r.FormValue("relationship")
@@ -856,17 +856,6 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rl.add(fmt.Sprintf("Registering student: %s", req.Name))
-
-	existingCount, err := dbRW.GetQueries().GetStudentByName(r.Context(), req.Name)
-	if err != nil {
-		sendErrorLog(w, fmt.Sprintf("Database error: %v", err))
-		return
-	}
-
-	if existingCount > 0 {
-		sendErrorLog(w, "A student with this name already exists")
-		return
-	}
 
 	if req.AssignedColor == "" {
 		req.AssignedColor = "#B9D283"
@@ -889,7 +878,7 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 
 	qtx := dbRW.GetQueries().WithTx(tx)
 
-	err = qtx.InsertStudent(r.Context(), queries.InsertStudentParams{
+	studentID, err := qtx.InsertStudent(r.Context(), queries.InsertStudentParams{
 		Name:           req.Name,
 		Currency:       req.Currency,
 		Contact:        sql.NullString{String: req.Contact, Valid: req.Contact != ""},
@@ -901,12 +890,6 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		sendErrorLog(w, "Failed to register student")
-		return
-	}
-
-	studentID, err := qtx.GetStudentIDByName(r.Context(), req.Name)
-	if err != nil {
-		sendErrorLog(w, "Failed to get student ID")
 		return
 	}
 

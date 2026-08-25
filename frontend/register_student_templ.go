@@ -113,12 +113,12 @@ func RegisterStudent(data RegisterStudentData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"form-group\"><label for=\"ratePerClass\">Rate Per Class *</label> <input type=\"number\" id=\"ratePerClass\" name=\"ratePerClass\" required step=\"0.01\" min=\"0\" placeholder=\"0.00\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"form-group\"><label for=\"ratePerClass\">Rate Per Class *</label> <input type=\"number\" id=\"ratePerClass\" name=\"ratePerClass\" required step=\"0.01\" min=\"0\" placeholder=\"0.00\"></div><div class=\"form-group\"><label for=\"parentName\">Parent's Name</label> <input type=\"text\" id=\"parentName\" name=\"parentName\" placeholder=\"Enter parent's name\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.IsSuperuser {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"form-group\"><label for=\"parentName\">Parent's Name</label> <input type=\"text\" id=\"parentName\" name=\"parentName\" placeholder=\"Enter parent's name\"></div><div class=\"form-group\"><label>Related To</label><div class=\"form-row\"><div class=\"form-group\"><label for=\"relationship\">Relationship</label> <input type=\"text\" id=\"relationship\" name=\"relationship\" placeholder=\"siblings\"></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"form-group\"><label>Related To</label><div class=\"form-row\"><div class=\"form-group\"><label for=\"relationship\">Relationship</label> <input type=\"text\" id=\"relationship\" name=\"relationship\" placeholder=\"siblings\"></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

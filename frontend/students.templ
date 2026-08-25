@@ -70,6 +70,7 @@ templ Students(data StudentData) {
 						<thead>
 							<tr>
 								<th>Name</th>
+								<th>Parent</th>
 								<th>Teacher</th>
 								<th>Rate Per Class</th>
 								<th>Related To</th>
@@ -81,6 +82,7 @@ templ Students(data StudentData) {
 							for _, student := range data.Students {
 								<tr class={ getStudentRowClass(student.Status) }>
 									<td data-label="Name">{ student.Name }</td>
+									<td data-label="Parent">{ getDisplayValue(student.ParentName) }</td>
 									<td data-label="Teacher">{ getDisplayValue(student.TeacherDisplay) }</td>
 									<td class="rate-cell" data-label="Rate">{ formatRate(student.RatePerClass, student.Currency) }</td>
 									<td data-label="Related To">{ getDisplayValue(student.RelatedToDisplay) }</td>

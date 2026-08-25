@@ -226,44 +226,6 @@ func (q *Queries) GetStudentByID(ctx context.Context, id int64) (GetStudentByIDR
 	return i, err
 }
 
-const getStudentByName = `-- name: GetStudentByName :one
-SELECT COUNT(*) as count FROM tbl_students WHERE name = ?
-`
-
-func (q *Queries) GetStudentByName(ctx context.Context, name string) (int64, error) {
-	row := q.db.QueryRowContext(ctx, getStudentByName, name)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
-const getStudentByNameExcludingID = `-- name: GetStudentByNameExcludingID :one
-SELECT COUNT(*) as count FROM tbl_students WHERE name = ? AND id != ?
-`
-
-type GetStudentByNameExcludingIDParams struct {
-	Name string
-	ID   int64
-}
-
-func (q *Queries) GetStudentByNameExcludingID(ctx context.Context, arg GetStudentByNameExcludingIDParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, getStudentByNameExcludingID, arg.Name, arg.ID)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
-const getStudentIDByName = `-- name: GetStudentIDByName :one
-SELECT id FROM tbl_students WHERE name = ?
-`
-
-func (q *Queries) GetStudentIDByName(ctx context.Context, name string) (int64, error) {
-	row := q.db.QueryRowContext(ctx, getStudentIDByName, name)
-	var id int64
-	err := row.Scan(&id)
-	return id, err
-}
-
 const getStudentsFiltered = `-- name: GetStudentsFiltered :many
 SELECT DISTINCT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.inactive_reason, s.created_at, s.updated_at
 FROM tbl_students s
@@ -344,9 +306,10 @@ func (q *Queries) GetStudentsFiltered(ctx context.Context, arg GetStudentsFilter
 	return items, nil
 }
 
-const insertStudent = `-- name: InsertStudent :exec
+const insertStudent = `-- name: InsertStudent :one
 INSERT INTO tbl_students (name, currency, contact, rate_per_class, parent_name, assigned_color, status, inactive_reason)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+RETURNING id
 `
 
 type InsertStudentParams struct {
@@ -360,8 +323,8 @@ type InsertStudentParams struct {
 	InactiveReason sql.NullString
 }
 
-func (q *Queries) InsertStudent(ctx context.Context, arg InsertStudentParams) error {
-	_, err := q.db.ExecContext(ctx, insertStudent,
+func (q *Queries) InsertStudent(ctx context.Context, arg InsertStudentParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, insertStudent,
 		arg.Name,
 		arg.Currency,
 		arg.Contact,
@@ -371,7 +334,9 @@ func (q *Queries) InsertStudent(ctx context.Context, arg InsertStudentParams) er
 		arg.Status,
 		arg.InactiveReason,
 	)
-	return err
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
 const searchStudentsByName = `-- name: SearchStudentsByName :many

@@ -1,15 +1,7 @@
--- name: InsertStudent :exec
+-- name: InsertStudent :one
 INSERT INTO tbl_students (name, currency, contact, rate_per_class, parent_name, assigned_color, status, inactive_reason)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-
--- name: GetStudentByName :one
-SELECT COUNT(*) as count FROM tbl_students WHERE name = ?;
-
--- name: GetStudentIDByName :one
-SELECT id FROM tbl_students WHERE name = ?;
-
--- name: GetStudentByNameExcludingID :one
-SELECT COUNT(*) as count FROM tbl_students WHERE name = ? AND id != ?;
+VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+RETURNING id;
 
 -- name: GetAllStudents :many
 SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, inactive_reason, created_at, updated_at

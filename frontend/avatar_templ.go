@@ -11,12 +11,12 @@ import templruntime "github.com/a-h/templ/runtime"
 import "zion-english/internal/utils"
 
 type AvatarProps struct {
-	Size          string
-	Initials      string
-	AssignedColor string
-	PictureURL    string
-	HasPicture    bool
-	Alt           string
+	Size          string `json:"size"`
+	Initials      string `json:"initials"`
+	AssignedColor string `json:"assignedColor"`
+	PictureURL    string `json:"pictureURL"`
+	HasPicture    bool   `json:"hasPicture"`
+	Alt           string `json:"alt"`
 }
 
 func Avatar(props AvatarProps) templ.Component {

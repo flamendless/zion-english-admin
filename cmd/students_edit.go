@@ -340,19 +340,6 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		return
 	}
 
-	dup, err := dbRO.GetQueries().GetStudentByNameExcludingID(ctx, queries.GetStudentByNameExcludingIDParams{
-		Name: req.Name,
-		ID:   studentID,
-	})
-	if err != nil {
-		sendErrorLog(w, err.Error())
-		return
-	}
-	if dup > 0 {
-		sendErrorLog(w, "a student with this name already exists")
-		return
-	}
-
 	teachersBefore := teacherIDsString(assignedTeachers)
 
 	err = dbRW.GetQueries().UpdateStudent(ctx, queries.UpdateStudentParams{

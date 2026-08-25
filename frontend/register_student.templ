@@ -56,13 +56,13 @@ templ RegisterStudent(data RegisterStudentData) {
 					       step="0.01" min="0" placeholder="0.00">
 				</div>
 
-				if data.IsSuperuser {
-					<div class="form-group">
-						<label for="parentName">Parent's Name</label>
-						<input type="text" id="parentName" name="parentName"
-						       placeholder="Enter parent's name">
-					</div>
+				<div class="form-group">
+					<label for="parentName">Parent's Name</label>
+					<input type="text" id="parentName" name="parentName"
+					       placeholder="Enter parent's name">
+				</div>
 
+				if data.IsSuperuser {
 					<div class="form-group">
 						<label>Related To</label>
 						<div class="form-row">
