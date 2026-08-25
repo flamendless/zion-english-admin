@@ -85,6 +85,7 @@ var cmdWeb = &cobra.Command{
 		publicMux.HandleFunc(basePath+"/auth/forgot-password/reset", handleResetPassword)
 		publicMux.HandleFunc(basePath+"/teachers/register", handleTeacherRegister)
 		publicMux.HandleFunc(basePath+"/health", handleHealth)
+		publicMux.HandleFunc(basePath+"/profile/zoom/callback", handleZoomCallback)
 
 		publicMux.Handle(
 			basePath+"/static/",
@@ -127,7 +128,6 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/profile/picture", auth.RequireRole(auth.RoleTeacher)(handleProfilePicture))
 		authMux.HandleFunc(basePath+"/profile/document", auth.RequireRole(auth.RoleTeacher)(handleProfileDocument))
 		authMux.HandleFunc(basePath+"/profile/zoom/connect", auth.RequireRole(auth.RoleTeacher)(handleZoomConnect))
-		authMux.HandleFunc(basePath+"/profile/zoom/callback", auth.RequireRole(auth.RoleTeacher)(handleZoomCallback))
 		authMux.HandleFunc(basePath+"/profile/zoom/disconnect", auth.RequireRole(auth.RoleTeacher)(handleZoomDisconnect))
 		documentsRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)
 		authMux.HandleFunc(basePath+"/documents", documentsRole(handleDocuments))
@@ -175,6 +175,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/static/", publicMux)
 		rootMux.Handle(basePath+"/teachers/register", publicMux)
 		rootMux.Handle(basePath+"/health", publicMux)
+		rootMux.Handle(basePath+"/profile/zoom/callback", publicMux)
 
 		// protected routes
 		rootMux.Handle(basePath+"/dashboard", authHandler)

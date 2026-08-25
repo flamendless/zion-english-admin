@@ -9,6 +9,32 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.08.25"
+    date: "2026-08-25"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Teachers can connect a Zoom account from My Profile so scheduled classes up to 40 minutes receive automatic meeting links."
+        commit: "ab3f788"
+      - text: "The public landing page now includes Privacy Policy and Terms of Use pages, plus a Support contact link in the footer."
+        commit: "801d478"
+    improvements:
+      - text: "Class schedule cards show Zoom meeting details with buttons to open or copy the link and passcode when a room is linked."
+        commit: "3ec17fd"
+      - text: "A new Connect Zoom guide explains how to link your account and schedule classes with meeting links."
+        commit: "ab3f788"
+      - text: "Disconnecting Zoom redirects back to My Profile with a confirmation message."
+        commit: "801d478"
+    bug_fixes:
+      - text: "Fixed an issue where Zoom connection failed because the OAuth authorize URL included invalid scope parameters."
+        commit: "801d478"
+      - text: "Scheduling or rescheduling a class no longer fails when Zoom room sync fails; the class is still saved."
+        commit: "801d478"
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+
   - version: "2026.08.23"
     date: "2026-08-23"
     released: true

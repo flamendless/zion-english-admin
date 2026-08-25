@@ -64,9 +64,8 @@ func handleZoomCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx := r.Context()
-	user := auth.GetUser(ctx)
 	cfg := conf.Conf()
+	ctx := r.Context()
 
 	if errMsg := r.URL.Query().Get("error"); errMsg != "" {
 		clearZoomOAuthStateCookie(w, cfg)
@@ -80,7 +79,8 @@ func handleZoomCallback(w http.ResponseWriter, r *http.Request) {
 		HttpRedirect(w, r, "/profile?zoom_error=invalid_state")
 		return
 	}
-	if !validateZoomOAuthState(cfg.Secret, state, user.ID) {
+	teacherID, ok := parseZoomOAuthState(cfg.Secret, state)
+	if !ok {
 		clearZoomOAuthStateCookie(w, cfg)
 		HttpRedirect(w, r, "/profile?zoom_error=invalid_state")
 		return
@@ -100,13 +100,13 @@ func handleZoomCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	account.Service = meetings.ServiceZoom
-	if err := meetingSvc.SaveOAuthAccount(ctx, user.ID, account, expiresAt); err != nil {
+	if err := meetingSvc.SaveOAuthAccount(ctx, teacherID, account, expiresAt); err != nil {
 		logs.Log().Error("save zoom account failed", zap.Error(err))
 		HttpRedirect(w, r, "/profile?zoom_error=save_failed")
 		return
 	}
 
-	insertAuditLogAs(ctx, user, "profile", "connected zoom account")
+	insertAuditLogAs(ctx, auth.User{ID: teacherID, Role: auth.RoleTeacher}, "profile", "connected zoom account")
 	HttpRedirect(w, r, "/profile?zoom_connected=1")
 }
 
@@ -150,28 +150,31 @@ func newZoomOAuthState(secret string, teacherID int64) (string, error) {
 	return base64.RawURLEncoding.EncodeToString([]byte(payload + "|" + sig)), nil
 }
 
-func validateZoomOAuthState(secret, state string, teacherID int64) bool {
+func parseZoomOAuthState(secret, state string) (int64, bool) {
 	raw, err := base64.RawURLEncoding.DecodeString(state)
 	if err != nil {
-		return false
+		return 0, false
 	}
 	parts := strings.Split(string(raw), "|")
 	if len(parts) != 4 {
-		return false
+		return 0, false
 	}
 	id, err := strconv.ParseInt(parts[0], 10, 64)
-	if err != nil || id != teacherID {
-		return false
+	if err != nil || id <= 0 {
+		return 0, false
 	}
 	expiry, err := strconv.ParseInt(parts[1], 10, 64)
 	if err != nil || time.Now().UTC().Unix() > expiry {
-		return false
+		return 0, false
 	}
 	payload := strings.Join(parts[:3], "|")
 	mac := hmac.New(sha256.New, []byte(secret))
 	mac.Write([]byte(payload))
 	expected := hex.EncodeToString(mac.Sum(nil))
-	return hmac.Equal([]byte(expected), []byte(parts[3]))
+	if !hmac.Equal([]byte(expected), []byte(parts[3])) {
+		return 0, false
+	}
+	return id, true
 }
 
 func setZoomOAuthStateCookie(w http.ResponseWriter, cfg *conf.Config, state string) {
