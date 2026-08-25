@@ -141,6 +141,12 @@ func formatStudentAudit(before, after queries.GetStudentByIDRow, teachersBefore,
 	if before.Currency != after.Currency {
 		parts = append(parts, fmt.Sprintf("currency '%s' -> '%s'", before.Currency, after.Currency))
 	}
+	if before.ParentName.String != after.ParentName.String {
+		parts = append(parts, fmt.Sprintf("parent name '%s' -> '%s'", auditStr(before.ParentName), auditStr(after.ParentName)))
+	}
+	if before.AssignedColor != after.AssignedColor {
+		parts = append(parts, fmt.Sprintf("assigned color '%s' -> '%s'", before.AssignedColor, after.AssignedColor))
+	}
 	if teachersBefore != teachersAfter {
 		parts = append(parts, fmt.Sprintf("teachers [%s] -> [%s]", teachersBefore, teachersAfter))
 	}

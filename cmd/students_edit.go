@@ -42,6 +42,20 @@ func parseAssignedTeacherIDs(ctx context.Context, q *queries.Queries, raw []stri
 	return ids, nil
 }
 
+func requireStudentAssignedToTeacher(ctx context.Context, teacherID, studentID int64) error {
+	assigned, err := dbRO.GetQueries().IsStudentAssignedToTeacher(ctx, queries.IsStudentAssignedToTeacherParams{
+		TeacherID: teacherID,
+		StudentID: studentID,
+	})
+	if err != nil {
+		return err
+	}
+	if assigned == 0 {
+		return errors.New("student is not assigned to this teacher")
+	}
+	return nil
+}
+
 func studentFilterParams(q, status string, teacherID int64) queries.CountStudentsFilteredParams {
 	return queries.CountStudentsFilteredParams{
 		Column1:   q,
@@ -172,12 +186,18 @@ func handleStudentView(w http.ResponseWriter, r *http.Request, studentID int64) 
 		return
 	}
 
+	if auth.GetRole(r.Context()) != auth.RoleSuperuser {
+		HttpError(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
 	ctx := r.Context()
 	data, err := studentEditStudentData(ctx, studentID, true)
 	if err != nil {
 		HttpError(w, "Student not found", http.StatusNotFound)
 		return
 	}
+	data.IsSuperuser = true
 
 	w.Header().Set("Content-Type", "text/html")
 	frontend.EditStudent(data).Render(ctx, w)
@@ -278,6 +298,9 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 
 func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) {
 	ctx := r.Context()
+	user := auth.GetUser(ctx)
+	role := auth.GetRole(ctx)
+	isSuperuser := role == auth.RoleSuperuser
 
 	existing, err := dbRO.GetQueries().GetStudentByID(ctx, studentID)
 	if err != nil {
@@ -291,12 +314,24 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		return
 	}
 
+	if !isSuperuser {
+		if user.ID == 0 {
+			HttpError(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		if err := requireStudentAssignedToTeacher(ctx, user.ID, studentID); err != nil {
+			HttpError(w, err.Error(), http.StatusForbidden)
+			return
+		}
+	}
+
 	if r.Method == http.MethodGet {
 		data, err := studentEditStudentData(ctx, studentID, false)
 		if err != nil {
 			HttpError(w, "Student not found", http.StatusNotFound)
 			return
 		}
+		data.IsSuperuser = isSuperuser
 
 		w.Header().Set("Content-Type", "text/html")
 		frontend.EditStudent(data).Render(ctx, w)
@@ -319,38 +354,110 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		return
 	}
 
-	teacherIDs, err := parseAssignedTeacherIDs(ctx, dbRO.GetQueries(), r.Form["teachers"])
-	if err != nil {
-		sendErrorLog(w, err.Error())
+	teachersBefore := teacherIDsString(assignedTeachers)
+
+	if isSuperuser {
+		teacherIDs, err := parseAssignedTeacherIDs(ctx, dbRO.GetQueries(), r.Form["teachers"])
+		if err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+
+		req := models.StudentRegisterRequest{
+			Name:           r.FormValue("name"),
+			Currency:       r.FormValue("currency"),
+			Contact:        r.FormValue("contact"),
+			RatePerClass:   ratePerClass,
+			ParentName:     r.FormValue("parentName"),
+			AssignedColor:  r.FormValue("assignedColor"),
+			Status:         r.FormValue("status"),
+			InactiveReason: r.FormValue("inactiveReason"),
+		}
+		if err := validateStudentRequest(&req); err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+
+		err = dbRW.GetQueries().UpdateStudent(ctx, queries.UpdateStudentParams{
+			Name:           req.Name,
+			Currency:       req.Currency,
+			Contact:        sql.NullString{String: req.Contact, Valid: req.Contact != ""},
+			RatePerClass:   req.RatePerClass,
+			ParentName:     sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
+			AssignedColor:  req.AssignedColor,
+			Status:         req.Status,
+			InactiveReason: sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
+			ID:             studentID,
+		})
+		if err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+
+		if err := saveStudentRelationships(ctx, studentID, r); err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+
+		if err := dbRW.GetQueries().DeleteTeacherStudentLinksByStudentID(ctx, studentID); err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+
+		var newTeacherIDs []string
+		for _, tid := range teacherIDs {
+			if err := dbRW.GetQueries().InsertTeacherStudentM2M(ctx, queries.InsertTeacherStudentM2MParams{
+				TeacherID: tid,
+				StudentID: studentID,
+			}); err != nil {
+				sendErrorLog(w, err.Error())
+				return
+			}
+			newTeacherIDs = append(newTeacherIDs, strconv.FormatInt(tid, 10))
+		}
+
+		updated, _ := dbRW.GetQueries().GetStudentByID(ctx, studentID)
+		insertAuditLogAs(ctx, user, "students", formatStudentAudit(existing, updated, teachersBefore, strings.Join(newTeacherIDs, ",")))
+		beforeIDs := make([]int64, 0, len(assignedTeachers))
+		for _, t := range assignedTeachers {
+			beforeIDs = append(beforeIDs, t.ID)
+		}
+		notifyNewlyAssignedTeachers(ctx, user, req.Name, beforeIDs, teacherIDs)
+
+		if _, err := fmt.Fprint(w, "Student updated successfully!\n"); err != nil {
+			sendErrorLog(w, err.Error())
+		}
 		return
+	}
+
+	inactiveReason := ""
+	if existing.InactiveReason.Valid {
+		inactiveReason = existing.InactiveReason.String
 	}
 
 	req := models.StudentRegisterRequest{
 		Name:           r.FormValue("name"),
 		Currency:       r.FormValue("currency"),
-		Contact:        r.FormValue("contact"),
 		RatePerClass:   ratePerClass,
 		ParentName:     r.FormValue("parentName"),
 		AssignedColor:  r.FormValue("assignedColor"),
-		Status:         r.FormValue("status"),
-		InactiveReason: r.FormValue("inactiveReason"),
+		Status:         existing.Status,
+		InactiveReason: inactiveReason,
 	}
 	if err := validateStudentRequest(&req); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
 
-	teachersBefore := teacherIDsString(assignedTeachers)
-
 	err = dbRW.GetQueries().UpdateStudent(ctx, queries.UpdateStudentParams{
 		Name:           req.Name,
 		Currency:       req.Currency,
-		Contact:        sql.NullString{String: req.Contact, Valid: req.Contact != ""},
+		Contact:        existing.Contact,
 		RatePerClass:   req.RatePerClass,
 		ParentName:     sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
 		AssignedColor:  req.AssignedColor,
-		Status:         req.Status,
-		InactiveReason: sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
+		Status:         existing.Status,
+		InactiveReason: existing.InactiveReason,
 		ID:             studentID,
 	})
 	if err != nil {
@@ -358,35 +465,8 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		return
 	}
 
-	if err := saveStudentRelationships(ctx, studentID, r); err != nil {
-		sendErrorLog(w, err.Error())
-		return
-	}
-
-	if err := dbRW.GetQueries().DeleteTeacherStudentLinksByStudentID(ctx, studentID); err != nil {
-		sendErrorLog(w, err.Error())
-		return
-	}
-
-	var newTeacherIDs []string
-	for _, tid := range teacherIDs {
-		if err := dbRW.GetQueries().InsertTeacherStudentM2M(ctx, queries.InsertTeacherStudentM2MParams{
-			TeacherID: tid,
-			StudentID: studentID,
-		}); err != nil {
-			sendErrorLog(w, err.Error())
-			return
-		}
-		newTeacherIDs = append(newTeacherIDs, strconv.FormatInt(tid, 10))
-	}
-
 	updated, _ := dbRW.GetQueries().GetStudentByID(ctx, studentID)
-	insertAuditLogAs(ctx, auth.GetUser(ctx), "students", formatStudentAudit(existing, updated, teachersBefore, strings.Join(newTeacherIDs, ",")))
-	beforeIDs := make([]int64, 0, len(assignedTeachers))
-	for _, t := range assignedTeachers {
-		beforeIDs = append(beforeIDs, t.ID)
-	}
-	notifyNewlyAssignedTeachers(ctx, auth.GetUser(ctx), req.Name, beforeIDs, teacherIDs)
+	insertAuditLogAs(ctx, user, "students", formatStudentAudit(existing, updated, teachersBefore, teachersBefore))
 
 	if _, err := fmt.Fprint(w, "Student updated successfully!\n"); err != nil {
 		sendErrorLog(w, err.Error())
