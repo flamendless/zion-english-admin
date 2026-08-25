@@ -14,10 +14,13 @@ import (
 	"zion-english/internal/classrules"
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
+	"zion-english/internal/logs"
 	"zion-english/internal/meetings"
 	"zion-english/internal/models"
 	"zion-english/internal/notifications"
 	"zion-english/internal/utils"
+
+	"go.uber.org/zap"
 )
 
 func handleSchedulePath(w http.ResponseWriter, r *http.Request) {
@@ -87,22 +90,6 @@ func handleScheduleCreate(w http.ResponseWriter, r *http.Request) {
 		startTime = sql.NullString{String: req.StartTime, Valid: true}
 	}
 
-	if meetings.SupportsAutoRoom(req.DurationMinutes) {
-		if meetingSvc == nil {
-			sendErrorLog(w, meetings.ErrZoomNotConfigured.Error())
-			return
-		}
-		connected, err := meetingSvc.IsTeacherConnected(ctx, req.TeacherID, meetings.ServiceZoom)
-		if err != nil {
-			sendErrorLog(w, err.Error())
-			return
-		}
-		if !connected {
-			sendErrorLog(w, meetings.ErrZoomNotConnected.Error())
-			return
-		}
-	}
-
 	scheduleID, err := dbRW.GetQueries().InsertScheduledClass(ctx, queries.InsertScheduledClassParams{
 		StudentID:       req.StudentID,
 		TeacherID:       req.TeacherID,
@@ -119,7 +106,7 @@ func handleScheduleCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if meetings.SupportsAutoRoom(req.DurationMinutes) {
+	if meetingSvc != nil && meetings.SupportsAutoRoom(req.DurationMinutes) {
 		student, studentErr := dbRO.GetQueries().GetStudentByID(ctx, req.StudentID)
 		studentName := "student"
 		if studentErr == nil {
@@ -133,9 +120,11 @@ func handleScheduleCreate(w http.ResponseWriter, r *http.Request) {
 			StartTime:       req.StartTime,
 			DurationMinutes: req.DurationMinutes,
 		}); err != nil {
-			_ = dbRW.GetQueries().DeleteScheduledClassByID(ctx, scheduleID)
-			sendErrorLog(w, "Failed to create Zoom meeting: "+err.Error())
-			return
+			logs.Log().Warn("zoom room sync failed after schedule create",
+				zap.Error(err),
+				zap.Int64("schedule_id", scheduleID),
+				zap.Int64("teacher_id", req.TeacherID),
+			)
 		}
 	}
 
@@ -412,8 +401,11 @@ func handleRescheduleScheduledClass(w http.ResponseWriter, r *http.Request, sche
 			StartTime:       effectiveStart,
 			DurationMinutes: existing.DurationMinutes,
 		}); err != nil {
-			sendErrorLog(w, "Class rescheduled but Zoom meeting update failed: "+err.Error())
-			return
+			logs.Log().Warn("zoom room sync failed after reschedule",
+				zap.Error(err),
+				zap.Int64("schedule_id", scheduleID),
+				zap.Int64("teacher_id", existing.TeacherID),
+			)
 		}
 	}
 

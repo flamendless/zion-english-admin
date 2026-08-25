@@ -18,7 +18,6 @@ const (
 	zoomOAuthAuthorizeURL = "https://zoom.us/oauth/authorize"
 	zoomOAuthTokenURL     = "https://zoom.us/oauth/token"
 	zoomAPIBaseURL        = "https://api.zoom.us/v2"
-	zoomOAuthScopes       = "user:read:user meeting:write:meeting meeting:update:meeting meeting:delete:meeting"
 )
 
 type ZoomConfig struct {
@@ -49,6 +48,9 @@ func (p *ZoomProvider) Service() string {
 	return ServiceZoom
 }
 
+// AuthorizeURL builds the Zoom OAuth consent URL. Required scopes must be enabled on the
+// Marketplace app (not passed here — Zoom rejects authorize URLs with scope query params):
+// user:read:user, meeting:write:meeting, meeting:update:meeting, meeting:delete:meeting.
 func (p *ZoomProvider) AuthorizeURL(state string) (string, error) {
 	if p.cfg.ClientID == "" || p.cfg.RedirectURI == "" {
 		return "", ErrZoomNotConfigured
@@ -58,7 +60,6 @@ func (p *ZoomProvider) AuthorizeURL(state string) (string, error) {
 	values.Set("client_id", p.cfg.ClientID)
 	values.Set("redirect_uri", p.cfg.RedirectURI)
 	values.Set("state", state)
-	values.Set("scope", zoomOAuthScopes)
 	return zoomOAuthAuthorizeURL + "?" + values.Encode(), nil
 }
 

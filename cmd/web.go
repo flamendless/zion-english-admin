@@ -162,6 +162,8 @@ var cmdWeb = &cobra.Command{
 			http.Redirect(w, r, basePath, http.StatusFound)
 		})
 		rootMux.HandleFunc(basePath, handleLanding)
+		rootMux.HandleFunc(basePath+"/privacy", handlePrivacy)
+		rootMux.HandleFunc(basePath+"/terms", handleTerms)
 		rootMux.HandleFunc(basePath+"/", func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path != basePath+"/" {
 				http.NotFound(w, r)

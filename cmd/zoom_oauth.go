@@ -126,9 +126,7 @@ func handleZoomDisconnect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	insertAuditLogAs(ctx, user, "profile", "disconnected zoom account")
-	if _, err := fmt.Fprint(w, "Zoom disconnected.\n"); err != nil {
-		sendErrorLog(w, err.Error())
-	}
+	HttpRedirect(w, r, "/profile?zoom_disconnected=1")
 }
 
 func teacherZoomConnected(ctx context.Context, teacherID int64) bool {

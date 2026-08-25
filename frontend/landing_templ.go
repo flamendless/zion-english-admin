@@ -157,46 +157,11 @@ func Landing() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"landing-btn landing-btn--primary\">Sign in</a></div></div></section></main><footer class=\"landing-footer reveal\" data-reveal=\"fade-up\"><div class=\"landing-footer__inner\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"landing-btn landing-btn--primary\">Sign in</a></div></div></section></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var8 templ.SafeURL
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 123, Col: 28}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"landing-footer__brand\"><img src=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var9 string
-		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/logo.png"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 124, Col: 45}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" alt=\"Zion English\" class=\"landing-footer__logo\"></a><div class=\"landing-footer__partner\"><div class=\"landing-footer__meta\"><p class=\"landing-footer__credit\">made by <a href=\"https://innova-tech.services\" target=\"_blank\" rel=\"noopener noreferrer\">InnovaTech</a></p><div class=\"landing-footer__links\"><a href=\"https://innova-tech.services\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"landing-footer__link\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5a17.92 17.92 0 0 1-8.716-2.247m0 0A8.966 8.966 0 0 1 3 12c0-1.264.26-2.47.732-3.565\"></path></svg> Website</a> <a href=\"https://www.facebook.com/profile.php?id=61584134420643\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"landing-footer__link\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"currentColor\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z\"></path></svg> Facebook</a></div></div><a href=\"https://innova-tech.services\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"landing-footer__partner-logo\"><img src=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var10 string
-		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/innovatech-logo.png"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 148, Col: 57}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" alt=\"InnovaTech\" class=\"landing-footer__partner-logo-img\"></a></div></div></footer>")
+		templ_7745c5c3_Err = LandingFooter().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -204,7 +169,101 @@ func Landing() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</body></html>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func LandingFooter() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var8 == nil {
+			templ_7745c5c3_Var8 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<footer class=\"landing-footer reveal\" data-reveal=\"fade-up\"><div class=\"landing-footer__inner\"><a href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var9 templ.SafeURL
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 131, Col: 27}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" class=\"landing-footer__brand\"><img src=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var10 string
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/logo.png"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 132, Col: 44}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" alt=\"Zion English\" class=\"landing-footer__logo\"></a><nav class=\"landing-footer__legal\" aria-label=\"Legal\"><a href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var11 templ.SafeURL
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/privacy"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 135, Col: 35}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" class=\"landing-footer__legal-link\">Privacy Policy</a> <a href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var12 templ.SafeURL
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/terms"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 136, Col: 33}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" class=\"landing-footer__legal-link\">Terms of Use</a> <a href=\"mailto:itservices.innovatech@gmail.com\" class=\"landing-footer__legal-link\">Support</a></nav><div class=\"landing-footer__partner\"><div class=\"landing-footer__meta\"><p class=\"landing-footer__credit\">made by <a href=\"https://innova-tech.services\" target=\"_blank\" rel=\"noopener noreferrer\">InnovaTech</a></p><div class=\"landing-footer__links\"><a href=\"https://innova-tech.services\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"landing-footer__link\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5a17.92 17.92 0 0 1-8.716-2.247m0 0A8.966 8.966 0 0 1 3 12c0-1.264.26-2.47.732-3.565\"></path></svg> Website</a> <a href=\"https://www.facebook.com/profile.php?id=61584134420643\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"landing-footer__link\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"currentColor\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z\"></path></svg> Facebook</a></div></div><a href=\"https://innova-tech.services\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"landing-footer__partner-logo\"><img src=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var13 string
+		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/innovatech-logo.png"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 161, Col: 56}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" alt=\"InnovaTech\" class=\"landing-footer__partner-logo-img\"></a></div></div></footer>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -228,77 +287,77 @@ func LandingFeatureCard(icon string, title string, desc string, delay int) templ
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var11 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var11 == nil {
-			templ_7745c5c3_Var11 = templ.NopComponent
+		templ_7745c5c3_Var14 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var14 == nil {
+			templ_7745c5c3_Var14 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<article class=\"landing-feature reveal\" data-reveal=\"fade-up\" data-delay=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<article class=\"landing-feature reveal\" data-reveal=\"fade-up\" data-delay=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var12 string
-		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(delay)
+		var templ_7745c5c3_Var15 string
+		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(delay)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 160, Col: 81}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 169, Col: 81}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\"><div class=\"landing-feature__icon\" aria-hidden=\"true\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\"><div class=\"landing-feature__icon\" aria-hidden=\"true\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		switch icon {
 		case "students":
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z\"></path></svg>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z\"></path></svg>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		case "calendar":
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5\"></path></svg>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5\"></path></svg>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		case "sheet":
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z\"></path></svg>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z\"></path></svg>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		default:
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z\"></path></svg>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z\"></path></svg>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</div><h3>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div><h3>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var13 string
-		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(title)
+		var templ_7745c5c3_Var16 string
+		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 181, Col: 13}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 190, Col: 13}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</h3><p>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var14 string
-		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(desc)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 182, Col: 11}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</h3><p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</p></article>")
+		var templ_7745c5c3_Var17 string
+		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(desc)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 191, Col: 11}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</p></article>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -322,12 +381,12 @@ func LandingStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var15 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var15 == nil {
-			templ_7745c5c3_Var15 = templ.NopComponent
+		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var18 == nil {
+			templ_7745c5c3_Var18 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<style>\r\n\t\t.landing-html {\r\n\t\t\tscroll-behavior: smooth;\r\n\t\t}\r\n\r\n\t\t.landing-page {\r\n\t\t\t--lp-primary: #90C020;\r\n\t\t\t--lp-primary-dark: #7A9F18;\r\n\t\t\t--lp-secondary: #20A0E0;\r\n\t\t\t--lp-tertiary: #F06060;\r\n\t\t\t--lp-amber: #F0B030;\r\n\t\t\t--lp-bg: #FAFAF7;\r\n\t\t\t--lp-fg: #2D2D2D;\r\n\t\t\t--lp-muted: #6B6560;\r\n\t\t\t--lp-glass: rgba(255, 255, 255, 0.55);\r\n\t\t\t--lp-glass-border: rgba(255, 255, 255, 0.65);\r\n\t\t\t--lp-shadow: 0 8px 32px rgba(45, 45, 45, 0.08);\r\n\r\n\t\t\tmin-height: 100vh;\r\n\t\t\tfont-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\r\n\t\t\tcolor: var(--lp-fg);\r\n\t\t\tbackground: var(--lp-bg);\r\n\t\t\toverflow-x: hidden;\r\n\t\t\tposition: relative;\r\n\t\t}\r\n\r\n\t\t/* Landing page always plays reveal animations, regardless of OS motion settings. */\r\n\t\t@media (prefers-reduced-motion: reduce) {\r\n\t\t\t.landing-page *,\r\n\t\t\t.landing-page *::before,\r\n\t\t\t.landing-page *::after {\r\n\t\t\t\tanimation-duration: revert !important;\r\n\t\t\t\tanimation-iteration-count: revert !important;\r\n\t\t\t\ttransition-duration: revert !important;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t.landing-page h1,\r\n\t\t.landing-page h2,\r\n\t\t.landing-page h3 {\r\n\t\t\tfont-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tline-height: 1.2;\r\n\t\t}\r\n\r\n\t\t.landing-bg {\r\n\t\t\tposition: fixed;\r\n\t\t\tinset: 0;\r\n\t\t\tz-index: 0;\r\n\t\t\tpointer-events: none;\r\n\t\t\toverflow: hidden;\r\n\t\t}\r\n\r\n\t\t.landing-orb {\r\n\t\t\tposition: absolute;\r\n\t\t\tborder-radius: 50%;\r\n\t\t\tfilter: blur(80px);\r\n\t\t\topacity: 0.45;\r\n\t\t\tanimation: landing-float 18s ease-in-out infinite;\r\n\t\t}\r\n\r\n\t\t.landing-orb--green {\r\n\t\t\twidth: 420px;\r\n\t\t\theight: 420px;\r\n\t\t\tbackground: var(--lp-primary);\r\n\t\t\ttop: -120px;\r\n\t\t\tright: -80px;\r\n\t\t}\r\n\r\n\t\t.landing-orb--blue {\r\n\t\t\twidth: 360px;\r\n\t\t\theight: 360px;\r\n\t\t\tbackground: var(--lp-secondary);\r\n\t\t\tbottom: 10%;\r\n\t\t\tleft: -100px;\r\n\t\t\tanimation-delay: -6s;\r\n\t\t}\r\n\r\n\t\t.landing-orb--coral {\r\n\t\t\twidth: 280px;\r\n\t\t\theight: 280px;\r\n\t\t\tbackground: var(--lp-tertiary);\r\n\t\t\ttop: 40%;\r\n\t\t\tright: 15%;\r\n\t\t\tanimation-delay: -12s;\r\n\t\t}\r\n\r\n\t\t.landing-orb--amber {\r\n\t\t\twidth: 200px;\r\n\t\t\theight: 200px;\r\n\t\t\tbackground: var(--lp-amber);\r\n\t\t\tbottom: -60px;\r\n\t\t\tright: 30%;\r\n\t\t\tanimation-delay: -3s;\r\n\t\t}\r\n\r\n\t\t@keyframes landing-float {\r\n\t\t\t0%, 100% { transform: translate(0, 0) scale(1); }\r\n\t\t\t33% { transform: translate(24px, -18px) scale(1.04); }\r\n\t\t\t66% { transform: translate(-16px, 12px) scale(0.96); }\r\n\t\t}\r\n\r\n\t\t.landing-nav {\r\n\t\t\tposition: relative;\r\n\t\t\tz-index: 10;\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: 24px;\r\n\t\t\tmax-width: 1120px;\r\n\t\t\tmargin: 0 auto;\r\n\t\t\tpadding: 24px 24px 0;\r\n\t\t}\r\n\r\n\t\t.landing-nav__brand {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: 12px;\r\n\t\t\ttext-decoration: none;\r\n\t\t\tcolor: var(--lp-fg);\r\n\t\t\tfont-family: 'Poppins', sans-serif;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tfont-size: 1.05rem;\r\n\t\t}\r\n\r\n\t\t.landing-nav__logo {\r\n\t\t\theight: 40px;\r\n\t\t\twidth: auto;\r\n\t\t}\r\n\r\n\t\t.landing-nav__links {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: 20px;\r\n\t\t}\r\n\r\n\t\t.landing-nav__link {\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\ttext-decoration: none;\r\n\t\t\tfont-size: 0.95rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\ttransition: color 200ms ease;\r\n\t\t}\r\n\r\n\t\t.landing-nav__link:hover {\r\n\t\t\tcolor: var(--lp-fg);\r\n\t\t}\r\n\r\n\t\t.landing-btn {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\tpadding: 14px 28px;\r\n\t\t\tborder-radius: 10px;\r\n\t\t\tfont-family: 'Poppins', sans-serif;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tfont-size: 0.95rem;\r\n\t\t\ttext-decoration: none;\r\n\t\t\tcursor: pointer;\r\n\t\t\tborder: 1px solid transparent;\r\n\t\t\ttransition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease, color 200ms ease, border-color 200ms ease;\r\n\t\t}\r\n\r\n\t\t.landing-btn:hover {\r\n\t\t\ttransform: translateY(-2px);\r\n\t\t}\r\n\r\n\t\t.landing-btn--sm {\r\n\t\t\tpadding: 10px 20px;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.landing-btn--primary {\r\n\t\t\tbackground: var(--lp-primary);\r\n\t\t\tcolor: #fff;\r\n\t\t\tbox-shadow: 0 4px 14px rgba(144, 192, 32, 0.35);\r\n\t\t}\r\n\r\n\t\t.landing-btn--primary:hover {\r\n\t\t\tbackground: var(--lp-primary-dark);\r\n\t\t\tbox-shadow: 0 6px 20px rgba(144, 192, 32, 0.4);\r\n\t\t}\r\n\r\n\t\t.landing-btn--ghost {\r\n\t\t\tbackground: var(--lp-glass);\r\n\t\t\tbackdrop-filter: blur(12px);\r\n\t\t\t-webkit-backdrop-filter: blur(12px);\r\n\t\t\tborder-color: var(--lp-glass-border);\r\n\t\t\tcolor: var(--lp-fg);\r\n\t\t}\r\n\r\n\t\t.landing-btn--ghost:hover {\r\n\t\t\tbackground: rgba(255, 255, 255, 0.75);\r\n\t\t}\r\n\r\n\t\t.landing-btn--outline {\r\n\t\t\tbackground: transparent;\r\n\t\t\tborder-color: rgba(45, 45, 45, 0.2);\r\n\t\t\tcolor: var(--lp-fg);\r\n\t\t}\r\n\r\n\t\t.landing-btn--outline:hover {\r\n\t\t\tborder-color: var(--lp-primary);\r\n\t\t\tcolor: var(--lp-primary-dark);\r\n\t\t}\r\n\r\n\t\t.landing-hero {\r\n\t\t\tposition: relative;\r\n\t\t\tz-index: 1;\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: 1fr 1fr;\r\n\t\t\tgap: 48px;\r\n\t\t\talign-items: center;\r\n\t\t\tmax-width: 1120px;\r\n\t\t\tmargin: 0 auto;\r\n\t\t\tpadding: 72px 24px 96px;\r\n\t\t}\r\n\r\n\t\t.landing-eyebrow {\r\n\t\t\tdisplay: inline-block;\r\n\t\t\tfont-size: 0.8rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tletter-spacing: 0.08em;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tcolor: var(--lp-primary-dark);\r\n\t\t\tmargin-bottom: 16px;\r\n\t\t}\r\n\r\n\t\t.landing-hero__title {\r\n\t\t\tfont-size: clamp(2.25rem, 5vw, 3.25rem);\r\n\t\t\tmargin-bottom: 20px;\r\n\t\t\tletter-spacing: -0.02em;\r\n\t\t}\r\n\r\n\t\t.landing-hero__subtitle {\r\n\t\t\tfont-size: 1.125rem;\r\n\t\t\tline-height: 1.7;\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tmax-width: 520px;\r\n\t\t\tmargin-bottom: 32px;\r\n\t\t}\r\n\r\n\t\t.landing-hero__actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: 14px;\r\n\t\t}\r\n\r\n\t\t.landing-glass {\r\n\t\t\tbackground: var(--lp-glass);\r\n\t\t\tbackdrop-filter: blur(16px);\r\n\t\t\t-webkit-backdrop-filter: blur(16px);\r\n\t\t\tborder: 1px solid var(--lp-glass-border);\r\n\t\t\tborder-radius: 20px;\r\n\t\t\tbox-shadow: var(--lp-shadow);\r\n\t\t}\r\n\r\n\t\t.landing-glass--hero {\r\n\t\t\tpadding: 28px;\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: 16px;\r\n\t\t}\r\n\r\n\t\t.landing-stat {\r\n\t\t\tpadding: 18px 20px;\r\n\t\t\tborder-radius: 12px;\r\n\t\t\tbackground: rgba(255, 255, 255, 0.5);\r\n\t\t\tborder: 1px solid rgba(255, 255, 255, 0.6);\r\n\t\t}\r\n\r\n\t\t.landing-stat--accent {\r\n\t\t\tbackground: rgba(144, 192, 32, 0.12);\r\n\t\t\tborder-color: rgba(144, 192, 32, 0.25);\r\n\t\t}\r\n\r\n\t\t.landing-stat__value {\r\n\t\t\tdisplay: block;\r\n\t\t\tfont-family: 'Poppins', sans-serif;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tfont-size: 1.05rem;\r\n\t\t\tmargin-bottom: 4px;\r\n\t\t}\r\n\r\n\t\t.landing-stat__label {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tline-height: 1.5;\r\n\t\t}\r\n\r\n\t\t.landing-features {\r\n\t\t\tposition: relative;\r\n\t\t\tz-index: 1;\r\n\t\t\tmax-width: 1120px;\r\n\t\t\tmargin: 0 auto;\r\n\t\t\tpadding: 0 24px 96px;\r\n\t\t}\r\n\r\n\t\t.landing-section-header {\r\n\t\t\ttext-align: center;\r\n\t\t\tmax-width: 640px;\r\n\t\t\tmargin: 0 auto 56px;\r\n\t\t}\r\n\r\n\t\t.landing-section-header h2 {\r\n\t\t\tfont-size: clamp(1.75rem, 4vw, 2.5rem);\r\n\t\t\tmargin-bottom: 16px;\r\n\t\t\tletter-spacing: -0.02em;\r\n\t\t}\r\n\r\n\t\t.landing-section-header__desc {\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tfont-size: 1.05rem;\r\n\t\t\tline-height: 1.6;\r\n\t\t}\r\n\r\n\t\t.landing-features__grid {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: repeat(2, 1fr);\r\n\t\t\tgap: 24px;\r\n\t\t}\r\n\r\n\t\t.landing-feature {\r\n\t\t\tpadding: 32px;\r\n\t\t\tborder-radius: 16px;\r\n\t\t\tbackground: var(--lp-glass);\r\n\t\t\tbackdrop-filter: blur(14px);\r\n\t\t\t-webkit-backdrop-filter: blur(14px);\r\n\t\t\tborder: 1px solid var(--lp-glass-border);\r\n\t\t\tbox-shadow: var(--lp-shadow);\r\n\t\t\ttransition: transform 250ms ease, box-shadow 250ms ease;\r\n\t\t}\r\n\r\n\t\t.landing-feature:hover {\r\n\t\t\ttransform: translateY(-4px);\r\n\t\t\tbox-shadow: 0 12px 40px rgba(45, 45, 45, 0.1);\r\n\t\t}\r\n\r\n\t\t.landing-feature__icon {\r\n\t\t\twidth: 48px;\r\n\t\t\theight: 48px;\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\tborder-radius: 12px;\r\n\t\t\tbackground: rgba(144, 192, 32, 0.15);\r\n\t\t\tcolor: var(--lp-primary-dark);\r\n\t\t\tmargin-bottom: 20px;\r\n\t\t}\r\n\r\n\t\t.landing-feature__icon svg {\r\n\t\t\twidth: 24px;\r\n\t\t\theight: 24px;\r\n\t\t}\r\n\r\n\t\t.landing-feature h3 {\r\n\t\t\tfont-size: 1.15rem;\r\n\t\t\tmargin-bottom: 10px;\r\n\t\t}\r\n\r\n\t\t.landing-feature p {\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tline-height: 1.65;\r\n\t\t\tfont-size: 0.95rem;\r\n\t\t}\r\n\r\n\t\t.landing-cta {\r\n\t\t\tposition: relative;\r\n\t\t\tz-index: 1;\r\n\t\t\tmax-width: 800px;\r\n\t\t\tmargin: 0 auto;\r\n\t\t\tpadding: 0 24px 96px;\r\n\t\t}\r\n\r\n\t\t.landing-glass--cta {\r\n\t\t\tpadding: 56px 48px;\r\n\t\t\ttext-align: center;\r\n\t\t}\r\n\r\n\t\t.landing-glass--cta h2 {\r\n\t\t\tfont-size: clamp(1.5rem, 3vw, 2rem);\r\n\t\t\tmargin-bottom: 12px;\r\n\t\t}\r\n\r\n\t\t.landing-glass--cta p {\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tline-height: 1.65;\r\n\t\t\tmax-width: 520px;\r\n\t\t\tmargin: 0 auto 28px;\r\n\t\t}\r\n\r\n\t\t.landing-cta__actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: 14px;\r\n\t\t\tjustify-content: center;\r\n\t\t}\r\n\r\n\t\t.landing-footer {\r\n\t\t\tposition: relative;\r\n\t\t\tz-index: 1;\r\n\t\t\tpadding: 32px 24px 40px;\r\n\t\t\tborder-top: 1px solid rgba(45, 45, 45, 0.08);\r\n\t\t}\r\n\r\n\t\t.landing-footer__inner {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: 24px;\r\n\t\t\tmax-width: 1120px;\r\n\t\t\tmargin: 0 auto;\r\n\t\t}\r\n\r\n\t\t.landing-footer__brand {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.landing-footer__logo {\r\n\t\t\theight: 36px;\r\n\t\t\twidth: auto;\r\n\t\t}\r\n\r\n\t\t.landing-footer__partner {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: 20px;\r\n\t\t}\r\n\r\n\t\t.landing-footer__meta {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: flex-end;\r\n\t\t\tgap: 10px;\r\n\t\t}\r\n\r\n\t\t.landing-footer__credit {\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tmargin: 0;\r\n\t\t}\r\n\r\n\t\t.landing-footer__credit a {\r\n\t\t\tcolor: var(--lp-fg);\r\n\t\t\tfont-weight: 600;\r\n\t\t\ttext-decoration: none;\r\n\t\t\ttransition: color 200ms ease;\r\n\t\t}\r\n\r\n\t\t.landing-footer__credit a:hover {\r\n\t\t\tcolor: var(--lp-primary-dark);\r\n\t\t}\r\n\r\n\t\t.landing-footer__links {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: 16px;\r\n\t\t}\r\n\r\n\t\t.landing-footer__link {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: 6px;\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\ttext-decoration: none;\r\n\t\t\ttransition: color 200ms ease;\r\n\t\t}\r\n\r\n\t\t.landing-footer__link svg {\r\n\t\t\twidth: 16px;\r\n\t\t\theight: 16px;\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.landing-footer__link:hover {\r\n\t\t\tcolor: var(--lp-primary-dark);\r\n\t\t}\r\n\r\n\t\t.landing-footer__partner-logo {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tflex-shrink: 0;\r\n\t\t\topacity: 0.92;\r\n\t\t\ttransition: opacity 200ms ease;\r\n\t\t}\r\n\r\n\t\t.landing-footer__partner-logo:hover {\r\n\t\t\topacity: 1;\r\n\t\t}\r\n\r\n\t\t.landing-footer__partner-logo-img {\r\n\t\t\theight: 40px;\r\n\t\t\twidth: auto;\r\n\t\t\tdisplay: block;\r\n\t\t}\r\n\r\n\t\t/* Reveal animations */\r\n\t\t.reveal {\r\n\t\t\topacity: 0;\r\n\t\t\ttransition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),\r\n\t\t\t            transform 700ms cubic-bezier(0.22, 1, 0.36, 1);\r\n\t\t\twill-change: opacity, transform;\r\n\t\t}\r\n\r\n\t\t.reveal[data-reveal=\"fade-up\"] {\r\n\t\t\ttransform: translateY(32px);\r\n\t\t}\r\n\r\n\t\t.reveal[data-reveal=\"fade-down\"] {\r\n\t\t\ttransform: translateY(-24px);\r\n\t\t}\r\n\r\n\t\t.reveal[data-reveal=\"fade-left\"] {\r\n\t\t\ttransform: translateX(40px);\r\n\t\t}\r\n\r\n\t\t.reveal[data-reveal=\"scale-up\"] {\r\n\t\t\ttransform: scale(0.94);\r\n\t\t}\r\n\r\n\t\t.reveal.is-visible {\r\n\t\t\topacity: 1;\r\n\t\t\ttransform: none;\r\n\t\t}\r\n\r\n\t\t@media (max-width: 900px) {\r\n\t\t\t.landing-hero {\r\n\t\t\t\tgrid-template-columns: 1fr;\r\n\t\t\t\tpadding-top: 48px;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-hero__panel {\r\n\t\t\t\torder: -1;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-features__grid {\r\n\t\t\t\tgrid-template-columns: 1fr;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-nav__links .landing-nav__link:first-child {\r\n\t\t\t\tdisplay: none;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t@media (max-width: 480px) {\r\n\t\t\t.landing-nav {\r\n\t\t\t\tpadding-top: 16px;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-nav__brand span {\r\n\t\t\t\tdisplay: none;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-hero__actions,\r\n\t\t\t.landing-cta__actions {\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\twidth: 100%;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-btn {\r\n\t\t\t\twidth: 100%;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-glass--cta {\r\n\t\t\t\tpadding: 40px 24px;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-footer__inner {\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-footer__partner {\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t\twidth: 100%;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-footer__meta {\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t}\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<style>\r\n\t\t.landing-html {\r\n\t\t\tscroll-behavior: smooth;\r\n\t\t}\r\n\r\n\t\t.landing-page {\r\n\t\t\t--lp-primary: #90C020;\r\n\t\t\t--lp-primary-dark: #7A9F18;\r\n\t\t\t--lp-secondary: #20A0E0;\r\n\t\t\t--lp-tertiary: #F06060;\r\n\t\t\t--lp-amber: #F0B030;\r\n\t\t\t--lp-bg: #FAFAF7;\r\n\t\t\t--lp-fg: #2D2D2D;\r\n\t\t\t--lp-muted: #6B6560;\r\n\t\t\t--lp-glass: rgba(255, 255, 255, 0.55);\r\n\t\t\t--lp-glass-border: rgba(255, 255, 255, 0.65);\r\n\t\t\t--lp-shadow: 0 8px 32px rgba(45, 45, 45, 0.08);\r\n\r\n\t\t\tmin-height: 100vh;\r\n\t\t\tfont-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\r\n\t\t\tcolor: var(--lp-fg);\r\n\t\t\tbackground: var(--lp-bg);\r\n\t\t\toverflow-x: hidden;\r\n\t\t\tposition: relative;\r\n\t\t}\r\n\r\n\t\t/* Landing page always plays reveal animations, regardless of OS motion settings. */\r\n\t\t@media (prefers-reduced-motion: reduce) {\r\n\t\t\t.landing-page *,\r\n\t\t\t.landing-page *::before,\r\n\t\t\t.landing-page *::after {\r\n\t\t\t\tanimation-duration: revert !important;\r\n\t\t\t\tanimation-iteration-count: revert !important;\r\n\t\t\t\ttransition-duration: revert !important;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t.landing-page h1,\r\n\t\t.landing-page h2,\r\n\t\t.landing-page h3 {\r\n\t\t\tfont-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tline-height: 1.2;\r\n\t\t}\r\n\r\n\t\t.landing-bg {\r\n\t\t\tposition: fixed;\r\n\t\t\tinset: 0;\r\n\t\t\tz-index: 0;\r\n\t\t\tpointer-events: none;\r\n\t\t\toverflow: hidden;\r\n\t\t}\r\n\r\n\t\t.landing-orb {\r\n\t\t\tposition: absolute;\r\n\t\t\tborder-radius: 50%;\r\n\t\t\tfilter: blur(80px);\r\n\t\t\topacity: 0.45;\r\n\t\t\tanimation: landing-float 18s ease-in-out infinite;\r\n\t\t}\r\n\r\n\t\t.landing-orb--green {\r\n\t\t\twidth: 420px;\r\n\t\t\theight: 420px;\r\n\t\t\tbackground: var(--lp-primary);\r\n\t\t\ttop: -120px;\r\n\t\t\tright: -80px;\r\n\t\t}\r\n\r\n\t\t.landing-orb--blue {\r\n\t\t\twidth: 360px;\r\n\t\t\theight: 360px;\r\n\t\t\tbackground: var(--lp-secondary);\r\n\t\t\tbottom: 10%;\r\n\t\t\tleft: -100px;\r\n\t\t\tanimation-delay: -6s;\r\n\t\t}\r\n\r\n\t\t.landing-orb--coral {\r\n\t\t\twidth: 280px;\r\n\t\t\theight: 280px;\r\n\t\t\tbackground: var(--lp-tertiary);\r\n\t\t\ttop: 40%;\r\n\t\t\tright: 15%;\r\n\t\t\tanimation-delay: -12s;\r\n\t\t}\r\n\r\n\t\t.landing-orb--amber {\r\n\t\t\twidth: 200px;\r\n\t\t\theight: 200px;\r\n\t\t\tbackground: var(--lp-amber);\r\n\t\t\tbottom: -60px;\r\n\t\t\tright: 30%;\r\n\t\t\tanimation-delay: -3s;\r\n\t\t}\r\n\r\n\t\t@keyframes landing-float {\r\n\t\t\t0%, 100% { transform: translate(0, 0) scale(1); }\r\n\t\t\t33% { transform: translate(24px, -18px) scale(1.04); }\r\n\t\t\t66% { transform: translate(-16px, 12px) scale(0.96); }\r\n\t\t}\r\n\r\n\t\t.landing-nav {\r\n\t\t\tposition: relative;\r\n\t\t\tz-index: 10;\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: 24px;\r\n\t\t\tmax-width: 1120px;\r\n\t\t\tmargin: 0 auto;\r\n\t\t\tpadding: 24px 24px 0;\r\n\t\t}\r\n\r\n\t\t.landing-nav__brand {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: 12px;\r\n\t\t\ttext-decoration: none;\r\n\t\t\tcolor: var(--lp-fg);\r\n\t\t\tfont-family: 'Poppins', sans-serif;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tfont-size: 1.05rem;\r\n\t\t}\r\n\r\n\t\t.landing-nav__logo {\r\n\t\t\theight: 40px;\r\n\t\t\twidth: auto;\r\n\t\t}\r\n\r\n\t\t.landing-nav__links {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: 20px;\r\n\t\t}\r\n\r\n\t\t.landing-nav__link {\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\ttext-decoration: none;\r\n\t\t\tfont-size: 0.95rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\ttransition: color 200ms ease;\r\n\t\t}\r\n\r\n\t\t.landing-nav__link:hover {\r\n\t\t\tcolor: var(--lp-fg);\r\n\t\t}\r\n\r\n\t\t.landing-btn {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\tpadding: 14px 28px;\r\n\t\t\tborder-radius: 10px;\r\n\t\t\tfont-family: 'Poppins', sans-serif;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tfont-size: 0.95rem;\r\n\t\t\ttext-decoration: none;\r\n\t\t\tcursor: pointer;\r\n\t\t\tborder: 1px solid transparent;\r\n\t\t\ttransition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease, color 200ms ease, border-color 200ms ease;\r\n\t\t}\r\n\r\n\t\t.landing-btn:hover {\r\n\t\t\ttransform: translateY(-2px);\r\n\t\t}\r\n\r\n\t\t.landing-btn--sm {\r\n\t\t\tpadding: 10px 20px;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.landing-btn--primary {\r\n\t\t\tbackground: var(--lp-primary);\r\n\t\t\tcolor: #fff;\r\n\t\t\tbox-shadow: 0 4px 14px rgba(144, 192, 32, 0.35);\r\n\t\t}\r\n\r\n\t\t.landing-btn--primary:hover {\r\n\t\t\tbackground: var(--lp-primary-dark);\r\n\t\t\tbox-shadow: 0 6px 20px rgba(144, 192, 32, 0.4);\r\n\t\t}\r\n\r\n\t\t.landing-btn--ghost {\r\n\t\t\tbackground: var(--lp-glass);\r\n\t\t\tbackdrop-filter: blur(12px);\r\n\t\t\t-webkit-backdrop-filter: blur(12px);\r\n\t\t\tborder-color: var(--lp-glass-border);\r\n\t\t\tcolor: var(--lp-fg);\r\n\t\t}\r\n\r\n\t\t.landing-btn--ghost:hover {\r\n\t\t\tbackground: rgba(255, 255, 255, 0.75);\r\n\t\t}\r\n\r\n\t\t.landing-btn--outline {\r\n\t\t\tbackground: transparent;\r\n\t\t\tborder-color: rgba(45, 45, 45, 0.2);\r\n\t\t\tcolor: var(--lp-fg);\r\n\t\t}\r\n\r\n\t\t.landing-btn--outline:hover {\r\n\t\t\tborder-color: var(--lp-primary);\r\n\t\t\tcolor: var(--lp-primary-dark);\r\n\t\t}\r\n\r\n\t\t.landing-hero {\r\n\t\t\tposition: relative;\r\n\t\t\tz-index: 1;\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: 1fr 1fr;\r\n\t\t\tgap: 48px;\r\n\t\t\talign-items: center;\r\n\t\t\tmax-width: 1120px;\r\n\t\t\tmargin: 0 auto;\r\n\t\t\tpadding: 72px 24px 96px;\r\n\t\t}\r\n\r\n\t\t.landing-eyebrow {\r\n\t\t\tdisplay: inline-block;\r\n\t\t\tfont-size: 0.8rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tletter-spacing: 0.08em;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tcolor: var(--lp-primary-dark);\r\n\t\t\tmargin-bottom: 16px;\r\n\t\t}\r\n\r\n\t\t.landing-hero__title {\r\n\t\t\tfont-size: clamp(2.25rem, 5vw, 3.25rem);\r\n\t\t\tmargin-bottom: 20px;\r\n\t\t\tletter-spacing: -0.02em;\r\n\t\t}\r\n\r\n\t\t.landing-hero__subtitle {\r\n\t\t\tfont-size: 1.125rem;\r\n\t\t\tline-height: 1.7;\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tmax-width: 520px;\r\n\t\t\tmargin-bottom: 32px;\r\n\t\t}\r\n\r\n\t\t.landing-hero__actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: 14px;\r\n\t\t}\r\n\r\n\t\t.landing-glass {\r\n\t\t\tbackground: var(--lp-glass);\r\n\t\t\tbackdrop-filter: blur(16px);\r\n\t\t\t-webkit-backdrop-filter: blur(16px);\r\n\t\t\tborder: 1px solid var(--lp-glass-border);\r\n\t\t\tborder-radius: 20px;\r\n\t\t\tbox-shadow: var(--lp-shadow);\r\n\t\t}\r\n\r\n\t\t.landing-glass--hero {\r\n\t\t\tpadding: 28px;\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: 16px;\r\n\t\t}\r\n\r\n\t\t.landing-stat {\r\n\t\t\tpadding: 18px 20px;\r\n\t\t\tborder-radius: 12px;\r\n\t\t\tbackground: rgba(255, 255, 255, 0.5);\r\n\t\t\tborder: 1px solid rgba(255, 255, 255, 0.6);\r\n\t\t}\r\n\r\n\t\t.landing-stat--accent {\r\n\t\t\tbackground: rgba(144, 192, 32, 0.12);\r\n\t\t\tborder-color: rgba(144, 192, 32, 0.25);\r\n\t\t}\r\n\r\n\t\t.landing-stat__value {\r\n\t\t\tdisplay: block;\r\n\t\t\tfont-family: 'Poppins', sans-serif;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tfont-size: 1.05rem;\r\n\t\t\tmargin-bottom: 4px;\r\n\t\t}\r\n\r\n\t\t.landing-stat__label {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tline-height: 1.5;\r\n\t\t}\r\n\r\n\t\t.landing-features {\r\n\t\t\tposition: relative;\r\n\t\t\tz-index: 1;\r\n\t\t\tmax-width: 1120px;\r\n\t\t\tmargin: 0 auto;\r\n\t\t\tpadding: 0 24px 96px;\r\n\t\t}\r\n\r\n\t\t.landing-section-header {\r\n\t\t\ttext-align: center;\r\n\t\t\tmax-width: 640px;\r\n\t\t\tmargin: 0 auto 56px;\r\n\t\t}\r\n\r\n\t\t.landing-section-header h2 {\r\n\t\t\tfont-size: clamp(1.75rem, 4vw, 2.5rem);\r\n\t\t\tmargin-bottom: 16px;\r\n\t\t\tletter-spacing: -0.02em;\r\n\t\t}\r\n\r\n\t\t.landing-section-header__desc {\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tfont-size: 1.05rem;\r\n\t\t\tline-height: 1.6;\r\n\t\t}\r\n\r\n\t\t.landing-features__grid {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: repeat(2, 1fr);\r\n\t\t\tgap: 24px;\r\n\t\t}\r\n\r\n\t\t.landing-feature {\r\n\t\t\tpadding: 32px;\r\n\t\t\tborder-radius: 16px;\r\n\t\t\tbackground: var(--lp-glass);\r\n\t\t\tbackdrop-filter: blur(14px);\r\n\t\t\t-webkit-backdrop-filter: blur(14px);\r\n\t\t\tborder: 1px solid var(--lp-glass-border);\r\n\t\t\tbox-shadow: var(--lp-shadow);\r\n\t\t\ttransition: transform 250ms ease, box-shadow 250ms ease;\r\n\t\t}\r\n\r\n\t\t.landing-feature:hover {\r\n\t\t\ttransform: translateY(-4px);\r\n\t\t\tbox-shadow: 0 12px 40px rgba(45, 45, 45, 0.1);\r\n\t\t}\r\n\r\n\t\t.landing-feature__icon {\r\n\t\t\twidth: 48px;\r\n\t\t\theight: 48px;\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\tborder-radius: 12px;\r\n\t\t\tbackground: rgba(144, 192, 32, 0.15);\r\n\t\t\tcolor: var(--lp-primary-dark);\r\n\t\t\tmargin-bottom: 20px;\r\n\t\t}\r\n\r\n\t\t.landing-feature__icon svg {\r\n\t\t\twidth: 24px;\r\n\t\t\theight: 24px;\r\n\t\t}\r\n\r\n\t\t.landing-feature h3 {\r\n\t\t\tfont-size: 1.15rem;\r\n\t\t\tmargin-bottom: 10px;\r\n\t\t}\r\n\r\n\t\t.landing-feature p {\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tline-height: 1.65;\r\n\t\t\tfont-size: 0.95rem;\r\n\t\t}\r\n\r\n\t\t.landing-cta {\r\n\t\t\tposition: relative;\r\n\t\t\tz-index: 1;\r\n\t\t\tmax-width: 800px;\r\n\t\t\tmargin: 0 auto;\r\n\t\t\tpadding: 0 24px 96px;\r\n\t\t}\r\n\r\n\t\t.landing-glass--cta {\r\n\t\t\tpadding: 56px 48px;\r\n\t\t\ttext-align: center;\r\n\t\t}\r\n\r\n\t\t.landing-glass--cta h2 {\r\n\t\t\tfont-size: clamp(1.5rem, 3vw, 2rem);\r\n\t\t\tmargin-bottom: 12px;\r\n\t\t}\r\n\r\n\t\t.landing-glass--cta p {\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tline-height: 1.65;\r\n\t\t\tmax-width: 520px;\r\n\t\t\tmargin: 0 auto 28px;\r\n\t\t}\r\n\r\n\t\t.landing-cta__actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: 14px;\r\n\t\t\tjustify-content: center;\r\n\t\t}\r\n\r\n\t\t.landing-footer {\r\n\t\t\tposition: relative;\r\n\t\t\tz-index: 1;\r\n\t\t\tpadding: 32px 24px 40px;\r\n\t\t\tborder-top: 1px solid rgba(45, 45, 45, 0.08);\r\n\t\t}\r\n\r\n\t\t.landing-footer__inner {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: 24px;\r\n\t\t\tmax-width: 1120px;\r\n\t\t\tmargin: 0 auto;\r\n\t\t}\r\n\r\n\t\t.landing-footer__brand {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.landing-footer__logo {\r\n\t\t\theight: 36px;\r\n\t\t\twidth: auto;\r\n\t\t}\r\n\r\n\t\t.landing-footer__partner {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: 20px;\r\n\t\t}\r\n\r\n\t\t.landing-footer__meta {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: flex-end;\r\n\t\t\tgap: 10px;\r\n\t\t}\r\n\r\n\t\t.landing-footer__credit {\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tmargin: 0;\r\n\t\t}\r\n\r\n\t\t.landing-footer__credit a {\r\n\t\t\tcolor: var(--lp-fg);\r\n\t\t\tfont-weight: 600;\r\n\t\t\ttext-decoration: none;\r\n\t\t\ttransition: color 200ms ease;\r\n\t\t}\r\n\r\n\t\t.landing-footer__credit a:hover {\r\n\t\t\tcolor: var(--lp-primary-dark);\r\n\t\t}\r\n\r\n\t\t.landing-footer__legal {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: 8px 16px;\r\n\t\t}\r\n\r\n\t\t.landing-footer__legal-link {\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\ttext-decoration: none;\r\n\t\t\ttransition: color 200ms ease;\r\n\t\t}\r\n\r\n\t\t.landing-footer__legal-link:hover {\r\n\t\t\tcolor: var(--lp-fg);\r\n\t\t}\r\n\r\n\t\t.landing-footer__links {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: 16px;\r\n\t\t}\r\n\r\n\t\t.landing-footer__link {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: 6px;\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\ttext-decoration: none;\r\n\t\t\ttransition: color 200ms ease;\r\n\t\t}\r\n\r\n\t\t.landing-footer__link svg {\r\n\t\t\twidth: 16px;\r\n\t\t\theight: 16px;\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.landing-footer__link:hover {\r\n\t\t\tcolor: var(--lp-primary-dark);\r\n\t\t}\r\n\r\n\t\t.landing-footer__partner-logo {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tflex-shrink: 0;\r\n\t\t\topacity: 0.92;\r\n\t\t\ttransition: opacity 200ms ease;\r\n\t\t}\r\n\r\n\t\t.landing-footer__partner-logo:hover {\r\n\t\t\topacity: 1;\r\n\t\t}\r\n\r\n\t\t.landing-footer__partner-logo-img {\r\n\t\t\theight: 40px;\r\n\t\t\twidth: auto;\r\n\t\t\tdisplay: block;\r\n\t\t}\r\n\r\n\t\t/* Reveal animations */\r\n\t\t.reveal {\r\n\t\t\topacity: 0;\r\n\t\t\ttransition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),\r\n\t\t\t            transform 700ms cubic-bezier(0.22, 1, 0.36, 1);\r\n\t\t\twill-change: opacity, transform;\r\n\t\t}\r\n\r\n\t\t.reveal[data-reveal=\"fade-up\"] {\r\n\t\t\ttransform: translateY(32px);\r\n\t\t}\r\n\r\n\t\t.reveal[data-reveal=\"fade-down\"] {\r\n\t\t\ttransform: translateY(-24px);\r\n\t\t}\r\n\r\n\t\t.reveal[data-reveal=\"fade-left\"] {\r\n\t\t\ttransform: translateX(40px);\r\n\t\t}\r\n\r\n\t\t.reveal[data-reveal=\"scale-up\"] {\r\n\t\t\ttransform: scale(0.94);\r\n\t\t}\r\n\r\n\t\t.reveal.is-visible {\r\n\t\t\topacity: 1;\r\n\t\t\ttransform: none;\r\n\t\t}\r\n\r\n\t\t@media (max-width: 900px) {\r\n\t\t\t.landing-hero {\r\n\t\t\t\tgrid-template-columns: 1fr;\r\n\t\t\t\tpadding-top: 48px;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-hero__panel {\r\n\t\t\t\torder: -1;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-features__grid {\r\n\t\t\t\tgrid-template-columns: 1fr;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-nav__links .landing-nav__link:first-child {\r\n\t\t\t\tdisplay: none;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t@media (max-width: 480px) {\r\n\t\t\t.landing-nav {\r\n\t\t\t\tpadding-top: 16px;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-nav__brand span {\r\n\t\t\t\tdisplay: none;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-hero__actions,\r\n\t\t\t.landing-cta__actions {\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\twidth: 100%;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-btn {\r\n\t\t\t\twidth: 100%;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-glass--cta {\r\n\t\t\t\tpadding: 40px 24px;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-footer__inner {\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-footer__legal {\r\n\t\t\t\torder: 2;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-footer__partner {\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t\twidth: 100%;\r\n\t\t\t}\r\n\r\n\t\t\t.landing-footer__meta {\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t}\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -351,12 +410,12 @@ func LandingRevealScript() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var16 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var16 == nil {
-			templ_7745c5c3_Var16 = templ.NopComponent
+		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var19 == nil {
+			templ_7745c5c3_Var19 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<script>\r\n\t\t(function () {\r\n\t\t\tvar reveals = document.querySelectorAll('.reveal');\r\n\t\t\tif (!reveals.length) return;\r\n\r\n\t\t\tvar observer = new IntersectionObserver(function (entries) {\r\n\t\t\t\tentries.forEach(function (entry) {\r\n\t\t\t\t\tif (!entry.isIntersecting) return;\r\n\t\t\t\t\tvar el = entry.target;\r\n\t\t\t\t\tvar delay = parseInt(el.getAttribute('data-delay') || '0', 10);\r\n\t\t\t\t\tsetTimeout(function () {\r\n\t\t\t\t\t\tel.classList.add('is-visible');\r\n\t\t\t\t\t}, delay);\r\n\t\t\t\t\tobserver.unobserve(el);\r\n\t\t\t\t});\r\n\t\t\t}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });\r\n\r\n\t\t\treveals.forEach(function (el) { observer.observe(el); });\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<script>\r\n\t\t(function () {\r\n\t\t\tvar reveals = document.querySelectorAll('.reveal');\r\n\t\t\tif (!reveals.length) return;\r\n\r\n\t\t\tvar observer = new IntersectionObserver(function (entries) {\r\n\t\t\t\tentries.forEach(function (entry) {\r\n\t\t\t\t\tif (!entry.isIntersecting) return;\r\n\t\t\t\t\tvar el = entry.target;\r\n\t\t\t\t\tvar delay = parseInt(el.getAttribute('data-delay') || '0', 10);\r\n\t\t\t\t\tsetTimeout(function () {\r\n\t\t\t\t\t\tel.classList.add('is-visible');\r\n\t\t\t\t\t}, delay);\r\n\t\t\t\t\tobserver.unobserve(el);\r\n\t\t\t\t});\r\n\t\t\t}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });\r\n\r\n\t\t\treveals.forEach(function (el) { observer.observe(el); });\r\n\t\t})();\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

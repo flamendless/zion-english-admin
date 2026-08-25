@@ -243,6 +243,9 @@ func profileZoomFlashMessage(query url.Values) string {
 	if query.Get("zoom_connected") == "1" {
 		return "Zoom account connected successfully."
 	}
+	if query.Get("zoom_disconnected") == "1" {
+		return "Zoom account disconnected."
+	}
 	switch query.Get("zoom_error") {
 	case "invalid_state":
 		return "Zoom connection failed: invalid session. Please try again."
