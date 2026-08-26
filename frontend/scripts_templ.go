@@ -136,7 +136,7 @@ func ScrClock() templ.Component {
 	})
 }
 
-func ScrIconActions() templ.Component {
+func ScrClipboardHelpers() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -157,36 +157,7 @@ func ScrIconActions() templ.Component {
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<script>\n\t\twindow.scheduleActionIcons = {\n\t\t\tconduct: '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polyline points=\"20 6 9 17 4 12\"></polyline></svg>',\n\t\t\tcancel: '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line></svg>',\n\t\t\tedit: '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 20h9\"></path><path d=\"M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z\"></path></svg>'\n\t\t};\n\n\t\twindow.createIconActionLink = function (href, label, kind) {\n\t\t\tconst link = document.createElement('a');\n\t\t\tlink.href = href;\n\t\t\tlink.className = 'icon-action-btn icon-action-btn--' + kind;\n\t\t\tlink.title = label;\n\t\t\tlink.setAttribute('aria-label', label);\n\t\t\tlink.innerHTML = window.scheduleActionIcons[kind] || '';\n\t\t\treturn link;\n\t\t};\n\n\t\twindow.buildRecordClassURLFromView = function (baseURL, record, status) {\n\t\t\tconst params = new URLSearchParams({\n\t\t\t\tfromSchedule: String(record.id),\n\t\t\t\tstudent: String(record.studentId),\n\t\t\t\tteacher: String(record.teacherId),\n\t\t\t\tdate: record.date,\n\t\t\t\tduration: String(record.durationMinutes),\n\t\t\t\trate: String(record.rate),\n\t\t\t\tcurrency: record.currency,\n\t\t\t\tstatus: status,\n\t\t\t});\n\t\t\treturn baseURL + '/classes/record?' + params.toString();\n\t\t};\n\n\t\twindow.appendScheduledClassActions = function (container, baseURL, record) {\n\t\t\tif (!container || !record) return;\n\t\t\tconst conduct = window.createIconActionLink(\n\t\t\t\twindow.buildRecordClassURLFromView(baseURL, record, 'conducted'),\n\t\t\t\t'Conduct',\n\t\t\t\t'conduct'\n\t\t\t);\n\t\t\tconst cancelLink = window.createIconActionLink(\n\t\t\t\twindow.buildRecordClassURLFromView(baseURL, record, 'cancelled'),\n\t\t\t\t'Cancel',\n\t\t\t\t'cancel'\n\t\t\t);\n\t\t\tconst editLink = window.createIconActionLink(\n\t\t\t\tbaseURL + '/schedule/' + record.id + '/edit',\n\t\t\t\t'Edit',\n\t\t\t\t'edit'\n\t\t\t);\n\t\t\tcontainer.appendChild(conduct);\n\t\t\tcontainer.appendChild(editLink);\n\t\t\tcontainer.appendChild(cancelLink);\n\t\t};\n\t</script>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		return nil
-	})
-}
-
-func ScrClipboardHelpers() templ.Component {
-	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
-			return templ_7745c5c3_CtxErr
-		}
-		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-		if !templ_7745c5c3_IsBuffer {
-			defer func() {
-				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err == nil {
-					templ_7745c5c3_Err = templ_7745c5c3_BufErr
-				}
-			}()
-		}
-		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var8 == nil {
-			templ_7745c5c3_Var8 = templ.NopComponent
-		}
-		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<script>\n\t\twindow.copyCellText = function (button) {\n\t\t\tvar value = button.getAttribute('data-copy');\n\t\t\tif (!value || !navigator.clipboard) return;\n\t\t\tnavigator.clipboard.writeText(value).then(function () {\n\t\t\t\tbutton.classList.add('copied');\n\t\t\t\tsetTimeout(function () { button.classList.remove('copied'); }, 1500);\n\t\t\t});\n\t\t};\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<script>\n\t\twindow.copyCellText = function (button) {\n\t\t\tvar value = button.getAttribute('data-copy');\n\t\t\tif (!value || !navigator.clipboard) return;\n\t\t\tnavigator.clipboard.writeText(value).then(function () {\n\t\t\t\tbutton.classList.add('copied');\n\t\t\t\tsetTimeout(function () { button.classList.remove('copied'); }, 1500);\n\t\t\t});\n\t\t};\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

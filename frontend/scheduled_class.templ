@@ -1,0 +1,76 @@
+package frontend
+
+import (
+	"strconv"
+	"zion-english/internal/utils"
+)
+
+templ ScheduledClassActions(item ScheduledClassItemData) {
+	@IconActionLink(RecordClassURLFromSchedule(item.ID, item.StudentID, item.TeacherID, item.ScheduledDate, item.DurationMinutes, item.Rate, item.Currency, "conducted"), "Conduct", IconKindConduct)
+	@IconActionLink(utils.URL("/schedule/"+strconvFormatInt64(item.ID)+"/edit"), "Edit", IconKindEdit)
+	@IconActionLink(RecordClassURLFromSchedule(item.ID, item.StudentID, item.TeacherID, item.ScheduledDate, item.DurationMinutes, item.Rate, item.Currency, "cancelled"), "Cancel", IconKindCancel)
+}
+
+templ ScheduledClassMeeting(item ScheduledClassItemData, zoomLogoURL string) {
+	if item.RoomURL != "" {
+		<div class="day-class-meeting">
+			<button
+				type="button"
+				class="zoom-meeting-btn"
+				data-room-url={ item.RoomURL }
+				data-passcode={ item.RoomPasscode }
+				title="View Zoom meeting details"
+				aria-label="View Zoom meeting details"
+			>
+				<img src={ zoomLogoURL } alt="" width="24" height="24" aria-hidden="true"/>
+			</button>
+		</div>
+	} else if item.ShowZoomWarning {
+		<div class="day-class-meeting">
+			<div class="day-class-meeting-warning">{ ZoomManualWarning }</div>
+		</div>
+	}
+}
+
+templ ScheduledClassListItem(item ScheduledClassItemData, zoomLogoURL string) {
+	<li class={ scheduledClassItemClass(item.Overdue) }>
+		<div class="day-class-info">
+			<div class="day-class-header">
+				@Avatar(item.TeacherAvatar)
+				<strong>{ item.TeacherName } - { item.StudentName }</strong>
+			</div>
+			<span class="day-class-time">{ item.TimeRange }</span>
+			<span class="day-class-rate">{ FormatScheduledClassRate(item.Rate, item.Currency) }</span>
+			if item.Overdue {
+				<div class="day-class-overdue-banner">Overdue</div>
+			}
+			@ScheduledClassMeeting(item, zoomLogoURL)
+		</div>
+		<div class="day-class-actions">
+			@ScheduledClassActions(item)
+		</div>
+	</li>
+}
+
+templ ScheduledClassList(items []ScheduledClassItemData, emptyMessage string, zoomLogoURL string) {
+	if len(items) == 0 {
+		<p class="day-classes-empty">{ emptyMessage }</p>
+	} else {
+		<ul class="day-classes-items">
+			for _, item := range items {
+				@ScheduledClassListItem(item, zoomLogoURL)
+			}
+		</ul>
+	}
+}
+
+func scheduledClassItemClass(overdue bool) string {
+	if overdue {
+		return "day-class-item is-overdue"
+	}
+	return "day-class-item"
+}
+
+func strconvFormatInt64(v int64) string {
+	return strconv.FormatInt(v, 10)
+}

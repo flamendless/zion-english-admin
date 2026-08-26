@@ -43,6 +43,28 @@ templ Students(data StudentData) {
 | `@HeaderSimple()` | `header.templ` |
 | `@TeacherDropdown()` | `dropdowns.templ` |
 | `@ScrHTMX()` | `scripts.templ` |
+| `@IconActionLink()` / `@IconActionButton()` | `icons.templ` — use `IconKind` constants, not string literals |
+
+## Icon actions
+
+Action icon kinds are typed as `IconKind` in [`icon_kind.go`](icon_kind.go). Use `@IconActionLink`, `@IconActionButton`, and `@IconActionSubmit` with `IconKind` constants — never build action buttons in client-side JavaScript.
+
+## SSR over client-side DOM building
+
+Prefer server-side rendering with templ components and HTMX partial fetches over complex inline JavaScript.
+
+**Do:**
+- Render rows, lists, buttons, and icons in `.templ` (`@IconActionLink`, `@IconActionButton`, row/list components)
+- Load dynamic UI via `hx-get` / `hx-post` to handlers that return HTML fragments (see `handleGetTeacherRow`, `/schedule/partials/list`, `/classes/partials/rows`, `/reports/partials/rows`)
+- Map DB/API data to view structs in handlers; keep templates declarative
+- Keep page JS minimal: calendar navigation, modal open/close/focus, delegated clicks on `data-*` attributes
+
+**Avoid:**
+- `fetch` + `JSON.parse` + `innerHTML` / `createElement` to assemble table rows or action buttons
+- Embedding HTML/SVG in JSON for client-side assembly
+- Global JS helpers that duplicate templ components (`createIconActionLink`, `window.actionIcons`, etc.)
+
+**When JSON is still OK:** lightweight read-only data for widgets that genuinely need client-side state (e.g. calendar date→count summaries), not for markup that templ can render.
 
 ## URLs
 

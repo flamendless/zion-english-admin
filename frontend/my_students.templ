@@ -62,7 +62,7 @@ templ MyStudents(data MyStudentsData) {
 									</td>
 									<td data-label="Actions">
 										<div class="table-actions">
-											<a href={ utils.URL("/students/" + s.ID + "/edit") } class="edit-btn">Edit</a>
+											@IconActionLink(utils.URL("/students/" + s.ID + "/edit"), "Edit", IconKindEdit)
 										</div>
 									</td>
 								</tr>

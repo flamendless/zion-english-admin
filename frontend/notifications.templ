@@ -113,14 +113,11 @@ templ NotificationPanelItem(item NotificationItem) {
 			</p>
 		</div>
 		if !item.Read {
-			<button
-				type="button"
-				class="notification-mark-read"
-				aria-label="Mark as read"
-				hx-post={ utils.URL("/notifications/" + item.ID + "/read?panel=1") }
-				hx-target="#notificationPanelHost"
-				hx-swap="innerHTML"
-			>Mark read</button>
+			@IconActionButton("Mark as read", IconKindMarkRead, templ.Attributes{
+				"hx-post":   utils.URL("/notifications/" + item.ID + "/read?panel=1"),
+				"hx-target": "#notificationPanelHost",
+				"hx-swap":   "innerHTML",
+			})
 		}
 	</li>
 }
@@ -204,13 +201,11 @@ templ NotificationListRow(item NotificationItem) {
 		<td data-label="Actions" class="notification-actions-cell">
 			if !item.Read {
 				<div class="table-actions">
-					<button
-						type="button"
-						class="view-btn"
-						hx-post={ utils.URL("/notifications/" + item.ID + "/read") }
-						hx-target={ "#notification-" + item.ID }
-						hx-swap="outerHTML"
-					>Mark read</button>
+					@IconActionButton("Mark read", IconKindMarkRead, templ.Attributes{
+						"hx-post":   utils.URL("/notifications/" + item.ID + "/read"),
+						"hx-target": "#notification-" + item.ID,
+						"hx-swap":   "outerHTML",
+					})
 				</div>
 			} else {
 				<span class="notification-no-action">—</span>

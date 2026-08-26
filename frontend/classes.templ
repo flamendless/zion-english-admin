@@ -44,11 +44,11 @@ templ Classes(data ClassesData) {
 				@HubHeader("Classes", "Record Class", utils.URL("/classes/record"), true)
 			}
 
-			<div class="toolbar">
+			<div class="toolbar" id="classesToolbar">
 				if data.ShowAllTeachers {
 					<div class="form-group">
 						<label for="teacher">Teacher</label>
-						<select id="teacher"
+						<select id="teacher" name="teacherId"
 							hx-get={ utils.URL("/api/teachers") }
 							hx-trigger="load"
 							hx-swap="innerHTML"
@@ -58,7 +58,7 @@ templ Classes(data ClassesData) {
 						</select>
 					</div>
 				} else if data.LockTeacher {
-					<input type="hidden" id="teacher" value={ data.TeacherID }/>
+					<input type="hidden" id="teacher" name="teacherId" value={ data.TeacherID }/>
 					<div class="form-group">
 						<label>Teacher</label>
 						<input type="text" value={ data.TeacherName } disabled/>
@@ -68,12 +68,12 @@ templ Classes(data ClassesData) {
 				}
 				<div class="form-group">
 					<label for="studentSearch">Student</label>
-					<input type="text" id="studentSearch" placeholder="Search student name..."/>
+					<input type="text" id="studentSearch" name="q" placeholder="Search student name..."/>
 				</div>
 				@DatePreset(true)
 				<div class="form-group">
 					<label for="statusFilter">Status</label>
-					<select id="statusFilter">
+					<select id="statusFilter" name="status">
 						<option value="">All</option>
 						<option value="scheduled">Scheduled</option>
 						<option value="conducted">Conducted</option>
@@ -81,7 +81,15 @@ templ Classes(data ClassesData) {
 						<option value="rescheduled">Rescheduled</option>
 					</select>
 				</div>
-				<button type="button" id="filterBtn">Filter</button>
+				<input type="hidden" id="classesPage" name="page" value="1"/>
+				<button
+					type="button"
+					id="filterBtn"
+					hx-get={ utils.URL("/classes/partials/rows") }
+					hx-include="#classesToolbar"
+					hx-target="#classesTableBody"
+					hx-swap="innerHTML"
+				>Filter</button>
 			</div>
 
 			<div class="table-wrapper">
@@ -100,7 +108,13 @@ templ Classes(data ClassesData) {
 						<th>Actions</th>
 					</tr>
 				</thead>
-				<tbody id="classesTableBody">
+				<tbody
+					id="classesTableBody"
+					hx-get={ utils.URL("/classes/partials/rows") }
+					hx-include="#classesToolbar"
+					hx-trigger="load"
+					hx-swap="innerHTML"
+				>
 					<tr>
 						if data.LockTeacher || data.ShowAllTeachers {
 							<td colspan={ fmt.Sprintf("%d", classesTableColspan(data)) } class="empty-state">Loading classes...</td>
@@ -115,40 +129,10 @@ templ Classes(data ClassesData) {
 		</div>
 
 		<script>
-			const showAllTeachers = document.querySelector('.container').dataset.showAllTeachers === 'true';
-			const tableColspan = showAllTeachers ? 8 : 7;
-			const teacherSelect = document.getElementById('teacher');
 			const datePresetSelect = document.getElementById('datePreset');
 			const filterBtn = document.getElementById('filterBtn');
-			const tableBody = document.getElementById('classesTableBody');
-			const statusFilter = document.getElementById('statusFilter');
-			const studentSearch = document.getElementById('studentSearch');
-			const paginationBottom = document.getElementById('paginationBottom');
-
-			let currentPage = 1;
-			const pageSize = 25;
-
-			function getBaseURL() {
-				const pathname = window.location.pathname;
-				const cleanPath = pathname.replace(/\/$/, '');
-				const parts = cleanPath.split('/').filter(p => p !== '');
-				if (parts.length === 0 || cleanPath.endsWith('.html')) {
-					if (cleanPath.includes('/zion-english-admin')) {
-						return '/zion-english-admin';
-					}
-					return '';
-				}
-				if (parts.length === 1) {
-					return '/' + parts[0];
-				}
-				return '/' + parts.slice(0, -1).join('/');
-			}
-
-			const baseURL = getBaseURL();
-
-			function buildURL(path) {
-				return baseURL + path;
-			}
+			const classesPage = document.getElementById('classesPage');
+			const teacherSelect = document.getElementById('teacher');
 
 			function setDateRangeFromPreset(value) {
 				if (!value) {
@@ -166,160 +150,36 @@ templ Classes(data ClassesData) {
 				setDateRangeFromPreset(datePresetSelect.value);
 			});
 
-			function renderPagination(page) {
-				let html = '';
-				if (page.number > 1) {
-					html += '<button type="button" class="pagination-btn" data-page="' + (page.number - 1) + '">Previous</button>';
-				} else {
-					html += '<span class="pagination-btn disabled">Previous</span>';
-				}
-				html += '<span class="pagination-info">Page ' + page.number + ' of ' + page.totalPages + ' (' + page.total + ' total)</span>';
-				if (page.number < page.totalPages) {
-					html += '<button type="button" class="pagination-btn" data-page="' + (page.number + 1) + '">Next</button>';
-				} else {
-					html += '<span class="pagination-btn disabled">Next</span>';
-				}
-				paginationBottom.innerHTML = html;
-				document.querySelectorAll('.pagination-btn[data-page]').forEach(btn => {
-					btn.addEventListener('click', () => {
-						currentPage = parseInt(btn.dataset.page, 10);
-						loadRecords();
-					});
+			filterBtn.addEventListener('click', () => {
+				if (classesPage) classesPage.value = '1';
+			});
+
+			if (teacherSelect) {
+				teacherSelect.addEventListener('change', () => {
+					if (classesPage) classesPage.value = '1';
+					if (datePresetSelect.value) {
+						setDateRangeFromPreset(datePresetSelect.value);
+						if (typeof htmx !== 'undefined') {
+							htmx.trigger('#classesTableBody', 'load');
+						}
+					}
 				});
 			}
 
-			async function loadRecords() {
-				const teacherId = teacherSelect.value;
-				const startDate = datePresetSelect.dataset.startDate;
-				const endDate = datePresetSelect.dataset.endDate;
-				const status = statusFilter.value;
-				const q = studentSearch.value.trim();
-
-				if (!teacherId && !showAllTeachers) {
-					alert('Please select a teacher');
-					return;
-				}
-				if (!startDate || !endDate) {
-					alert('Please select a date range');
-					return;
-				}
-
+			document.body.addEventListener('click', function (e) {
+				const pageBtn = e.target.closest('#paginationBottom .pagination-btn[hx-get]');
+				if (!pageBtn || !classesPage) return;
+				const vals = pageBtn.getAttribute('hx-vals');
+				if (!vals) return;
 				try {
-					const params = new URLSearchParams({
-						teacherId, startDate, endDate,
-						page: String(currentPage),
-						pageSize: String(pageSize),
-					});
-					if (status) params.set('status', status);
-					if (q) params.set('q', q);
-
-					const response = await fetch(buildURL(`/api/class-records?${params}`));
-					const data = await response.json();
-
-					tableBody.innerHTML = '';
-
-					if (!data.records || data.records.length === 0) {
-						tableBody.innerHTML = '<tr><td colspan="' + tableColspan + '" class="empty-state">No classes found for the selected criteria</td></tr>';
-					} else {
-						data.records.forEach(record => {
-							const row = document.createElement('tr');
-							const isScheduled = record.source === 'scheduled';
-							if (record.status === 'cancelled') {
-								row.classList.add('row-cancelled');
-							} else if (record.status === 'rescheduled') {
-								row.classList.add('row-rescheduled');
-							} else if (isScheduled) {
-								row.classList.add('row-scheduled');
-							}
-							const viewHref = buildURL('/classes/' + record.id + '/view');
-							const editHref = buildURL('/classes/' + record.id + '/edit');
-							const columnLabels = ['Date', 'Start Time', 'End Time'];
-							if (showAllTeachers) {
-								columnLabels.push('Teacher');
-							}
-							columnLabels.push('Student', 'Rate', 'Status');
-							const cells = [
-								record.date,
-								record.startTime || '-',
-								record.endTime || '-',
-							];
-							if (showAllTeachers) {
-								cells.push(record.teacherName);
-							}
-							cells.push(
-								record.studentName,
-								record.rate + ' ' + record.currency,
-								record.status,
-							);
-							cells.forEach((text, index) => {
-								const cell = document.createElement('td');
-								cell.textContent = text;
-								cell.dataset.label = columnLabels[index];
-								const statusIndex = showAllTeachers ? 6 : 5;
-								if (index === statusIndex) {
-									cell.className = 'status-' + record.status;
-								}
-								row.appendChild(cell);
-							});
-							const actionCell = document.createElement('td');
-							actionCell.dataset.label = 'Actions';
-							const actionsWrap = document.createElement('div');
-							actionsWrap.className = 'table-actions';
-							if (isScheduled) {
-								if (window.appendScheduledClassActions) {
-									window.appendScheduledClassActions(actionsWrap, baseURL, record);
-								}
-							} else {
-								const viewLink = document.createElement('a');
-								viewLink.href = viewHref;
-								viewLink.className = 'view-btn';
-								viewLink.textContent = 'View';
-								actionsWrap.appendChild(viewLink);
-								const editLink = document.createElement('a');
-								editLink.href = editHref;
-								editLink.className = 'edit-btn';
-								editLink.textContent = 'Edit';
-								actionsWrap.appendChild(editLink);
-							}
-							actionCell.appendChild(actionsWrap);
-							row.appendChild(actionCell);
-							tableBody.appendChild(row);
-						});
-					}
-
-					if (data.page) {
-						renderPagination(data.page);
-					}
-				} catch (error) {
-					console.error('Failed to load class records:', error);
-					showErrorBanner(error.message);
-					tableBody.innerHTML = '<tr><td colspan="' + tableColspan + '" class="empty-state">Error loading classes</td></tr>';
-				}
-			}
-
-			filterBtn.addEventListener('click', () => {
-				currentPage = 1;
-				loadRecords();
+					const parsed = JSON.parse(vals.replace(/'/g, '"'));
+					if (parsed.page) classesPage.value = String(parsed.page);
+				} catch (err) { /* ignore */ }
 			});
 
-			teacherSelect.addEventListener('change', () => {
-				if ((!teacherSelect.value && !showAllTeachers) || !datePresetSelect.dataset.startDate) {
-					return;
-				}
-				currentPage = 1;
-				loadRecords();
-			});
-
-			function initPage() {
-				if (datePresetSelect.value) {
-					setDateRangeFromPreset(datePresetSelect.value);
-				}
-				if ((teacherSelect.value || showAllTeachers) && datePresetSelect.dataset.startDate) {
-					loadRecords();
-				}
+			if (datePresetSelect.value) {
+				setDateRangeFromPreset(datePresetSelect.value);
 			}
-
-			initPage();
 		</script>
 	</body>
 	</html>

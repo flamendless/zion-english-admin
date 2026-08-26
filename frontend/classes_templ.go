@@ -124,12 +124,12 @@ func Classes(data ClassesData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"toolbar\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"toolbar\" id=\"classesToolbar\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.ShowAllTeachers {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"form-group\"><label for=\"teacher\">Teacher</label> <select id=\"teacher\" hx-get=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"form-group\"><label for=\"teacher\">Teacher</label> <select id=\"teacher\" name=\"teacherId\" hx-get=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -147,14 +147,14 @@ func Classes(data ClassesData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else if data.LockTeacher {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<input type=\"hidden\" id=\"teacher\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<input type=\"hidden\" id=\"teacher\" name=\"teacherId\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 61, Col: 61}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 61, Col: 78}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 			if templ_7745c5c3_Err != nil {
@@ -183,7 +183,7 @@ func Classes(data ClassesData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"form-group\"><label for=\"studentSearch\">Student</label> <input type=\"text\" id=\"studentSearch\" placeholder=\"Search student name...\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"form-group\"><label for=\"studentSearch\">Student</label> <input type=\"text\" id=\"studentSearch\" name=\"q\" placeholder=\"Search student name...\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -191,45 +191,71 @@ func Classes(data ClassesData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"form-group\"><label for=\"statusFilter\">Status</label> <select id=\"statusFilter\"><option value=\"\">All</option> <option value=\"scheduled\">Scheduled</option> <option value=\"conducted\">Conducted</option> <option value=\"cancelled\">Cancelled</option> <option value=\"rescheduled\">Rescheduled</option></select></div><button type=\"button\" id=\"filterBtn\">Filter</button></div><div class=\"table-wrapper\"><table id=\"classesTable\" class=\"table-stack-mobile\"><thead><tr><th>Date</th><th>Start Time</th><th>End Time</th>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"form-group\"><label for=\"statusFilter\">Status</label> <select id=\"statusFilter\" name=\"status\"><option value=\"\">All</option> <option value=\"scheduled\">Scheduled</option> <option value=\"conducted\">Conducted</option> <option value=\"cancelled\">Cancelled</option> <option value=\"rescheduled\">Rescheduled</option></select></div><input type=\"hidden\" id=\"classesPage\" name=\"page\" value=\"1\"> <button type=\"button\" id=\"filterBtn\" hx-get=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var7 string
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/classes/partials/rows"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 88, Col: 49}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" hx-include=\"#classesToolbar\" hx-target=\"#classesTableBody\" hx-swap=\"innerHTML\">Filter</button></div><div class=\"table-wrapper\"><table id=\"classesTable\" class=\"table-stack-mobile\"><thead><tr><th>Date</th><th>Start Time</th><th>End Time</th>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.ShowAllTeachers {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<th>Teacher</th>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<th>Teacher</th>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<th>Student</th><th>Rate</th><th>Status</th><th>Actions</th></tr></thead> <tbody id=\"classesTableBody\"><tr>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<th>Student</th><th>Rate</th><th>Status</th><th>Actions</th></tr></thead> <tbody id=\"classesTableBody\" hx-get=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/classes/partials/rows"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 113, Col: 49}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" hx-include=\"#classesToolbar\" hx-trigger=\"load\" hx-swap=\"innerHTML\"><tr>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.LockTeacher || data.ShowAllTeachers {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<td colspan=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<td colspan=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var7 string
-			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", classesTableColspan(data)))
+			var templ_7745c5c3_Var9 string
+			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", classesTableColspan(data)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 106, Col: 65}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 120, Col: 65}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" class=\"empty-state\">Loading classes...</td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"empty-state\">Loading classes...</td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<td colspan=\"7\" class=\"empty-state\">Select a teacher to view classes</td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<td colspan=\"7\" class=\"empty-state\">Select a teacher to view classes</td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</tr></tbody></table></div><div id=\"paginationBottom\" class=\"pagination-bar\"></div></div><script>\n\t\t\tconst showAllTeachers = document.querySelector('.container').dataset.showAllTeachers === 'true';\n\t\t\tconst tableColspan = showAllTeachers ? 8 : 7;\n\t\t\tconst teacherSelect = document.getElementById('teacher');\n\t\t\tconst datePresetSelect = document.getElementById('datePreset');\n\t\t\tconst filterBtn = document.getElementById('filterBtn');\n\t\t\tconst tableBody = document.getElementById('classesTableBody');\n\t\t\tconst statusFilter = document.getElementById('statusFilter');\n\t\t\tconst studentSearch = document.getElementById('studentSearch');\n\t\t\tconst paginationBottom = document.getElementById('paginationBottom');\n\n\t\t\tlet currentPage = 1;\n\t\t\tconst pageSize = 25;\n\n\t\t\tfunction getBaseURL() {\n\t\t\t\tconst pathname = window.location.pathname;\n\t\t\t\tconst cleanPath = pathname.replace(/\\/$/, '');\n\t\t\t\tconst parts = cleanPath.split('/').filter(p => p !== '');\n\t\t\t\tif (parts.length === 0 || cleanPath.endsWith('.html')) {\n\t\t\t\t\tif (cleanPath.includes('/zion-english-admin')) {\n\t\t\t\t\t\treturn '/zion-english-admin';\n\t\t\t\t\t}\n\t\t\t\t\treturn '';\n\t\t\t\t}\n\t\t\t\tif (parts.length === 1) {\n\t\t\t\t\treturn '/' + parts[0];\n\t\t\t\t}\n\t\t\t\treturn '/' + parts.slice(0, -1).join('/');\n\t\t\t}\n\n\t\t\tconst baseURL = getBaseURL();\n\n\t\t\tfunction buildURL(path) {\n\t\t\t\treturn baseURL + path;\n\t\t\t}\n\n\t\t\tfunction setDateRangeFromPreset(value) {\n\t\t\t\tif (!value) {\n\t\t\t\t\tdelete datePresetSelect.dataset.startDate;\n\t\t\t\t\tdelete datePresetSelect.dataset.endDate;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst parts = value.split('|');\n\t\t\t\tif (parts.length !== 2) return;\n\t\t\t\tdatePresetSelect.dataset.startDate = parts[0];\n\t\t\t\tdatePresetSelect.dataset.endDate = parts[1];\n\t\t\t}\n\n\t\t\tdatePresetSelect.addEventListener('change', () => {\n\t\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\n\t\t\t});\n\n\t\t\tfunction renderPagination(page) {\n\t\t\t\tlet html = '';\n\t\t\t\tif (page.number > 1) {\n\t\t\t\t\thtml += '<button type=\"button\" class=\"pagination-btn\" data-page=\"' + (page.number - 1) + '\">Previous</button>';\n\t\t\t\t} else {\n\t\t\t\t\thtml += '<span class=\"pagination-btn disabled\">Previous</span>';\n\t\t\t\t}\n\t\t\t\thtml += '<span class=\"pagination-info\">Page ' + page.number + ' of ' + page.totalPages + ' (' + page.total + ' total)</span>';\n\t\t\t\tif (page.number < page.totalPages) {\n\t\t\t\t\thtml += '<button type=\"button\" class=\"pagination-btn\" data-page=\"' + (page.number + 1) + '\">Next</button>';\n\t\t\t\t} else {\n\t\t\t\t\thtml += '<span class=\"pagination-btn disabled\">Next</span>';\n\t\t\t\t}\n\t\t\t\tpaginationBottom.innerHTML = html;\n\t\t\t\tdocument.querySelectorAll('.pagination-btn[data-page]').forEach(btn => {\n\t\t\t\t\tbtn.addEventListener('click', () => {\n\t\t\t\t\t\tcurrentPage = parseInt(btn.dataset.page, 10);\n\t\t\t\t\t\tloadRecords();\n\t\t\t\t\t});\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tasync function loadRecords() {\n\t\t\t\tconst teacherId = teacherSelect.value;\n\t\t\t\tconst startDate = datePresetSelect.dataset.startDate;\n\t\t\t\tconst endDate = datePresetSelect.dataset.endDate;\n\t\t\t\tconst status = statusFilter.value;\n\t\t\t\tconst q = studentSearch.value.trim();\n\n\t\t\t\tif (!teacherId && !showAllTeachers) {\n\t\t\t\t\talert('Please select a teacher');\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (!startDate || !endDate) {\n\t\t\t\t\talert('Please select a date range');\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\ttry {\n\t\t\t\t\tconst params = new URLSearchParams({\n\t\t\t\t\t\tteacherId, startDate, endDate,\n\t\t\t\t\t\tpage: String(currentPage),\n\t\t\t\t\t\tpageSize: String(pageSize),\n\t\t\t\t\t});\n\t\t\t\t\tif (status) params.set('status', status);\n\t\t\t\t\tif (q) params.set('q', q);\n\n\t\t\t\t\tconst response = await fetch(buildURL(`/api/class-records?${params}`));\n\t\t\t\t\tconst data = await response.json();\n\n\t\t\t\t\ttableBody.innerHTML = '';\n\n\t\t\t\t\tif (!data.records || data.records.length === 0) {\n\t\t\t\t\t\ttableBody.innerHTML = '<tr><td colspan=\"' + tableColspan + '\" class=\"empty-state\">No classes found for the selected criteria</td></tr>';\n\t\t\t\t\t} else {\n\t\t\t\t\t\tdata.records.forEach(record => {\n\t\t\t\t\t\t\tconst row = document.createElement('tr');\n\t\t\t\t\t\t\tconst isScheduled = record.source === 'scheduled';\n\t\t\t\t\t\t\tif (record.status === 'cancelled') {\n\t\t\t\t\t\t\t\trow.classList.add('row-cancelled');\n\t\t\t\t\t\t\t} else if (record.status === 'rescheduled') {\n\t\t\t\t\t\t\t\trow.classList.add('row-rescheduled');\n\t\t\t\t\t\t\t} else if (isScheduled) {\n\t\t\t\t\t\t\t\trow.classList.add('row-scheduled');\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\tconst viewHref = buildURL('/classes/' + record.id + '/view');\n\t\t\t\t\t\t\tconst editHref = buildURL('/classes/' + record.id + '/edit');\n\t\t\t\t\t\t\tconst columnLabels = ['Date', 'Start Time', 'End Time'];\n\t\t\t\t\t\t\tif (showAllTeachers) {\n\t\t\t\t\t\t\t\tcolumnLabels.push('Teacher');\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\tcolumnLabels.push('Student', 'Rate', 'Status');\n\t\t\t\t\t\t\tconst cells = [\n\t\t\t\t\t\t\t\trecord.date,\n\t\t\t\t\t\t\t\trecord.startTime || '-',\n\t\t\t\t\t\t\t\trecord.endTime || '-',\n\t\t\t\t\t\t\t];\n\t\t\t\t\t\t\tif (showAllTeachers) {\n\t\t\t\t\t\t\t\tcells.push(record.teacherName);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\tcells.push(\n\t\t\t\t\t\t\t\trecord.studentName,\n\t\t\t\t\t\t\t\trecord.rate + ' ' + record.currency,\n\t\t\t\t\t\t\t\trecord.status,\n\t\t\t\t\t\t\t);\n\t\t\t\t\t\t\tcells.forEach((text, index) => {\n\t\t\t\t\t\t\t\tconst cell = document.createElement('td');\n\t\t\t\t\t\t\t\tcell.textContent = text;\n\t\t\t\t\t\t\t\tcell.dataset.label = columnLabels[index];\n\t\t\t\t\t\t\t\tconst statusIndex = showAllTeachers ? 6 : 5;\n\t\t\t\t\t\t\t\tif (index === statusIndex) {\n\t\t\t\t\t\t\t\t\tcell.className = 'status-' + record.status;\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\trow.appendChild(cell);\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\tconst actionCell = document.createElement('td');\n\t\t\t\t\t\t\tactionCell.dataset.label = 'Actions';\n\t\t\t\t\t\t\tconst actionsWrap = document.createElement('div');\n\t\t\t\t\t\t\tactionsWrap.className = 'table-actions';\n\t\t\t\t\t\t\tif (isScheduled) {\n\t\t\t\t\t\t\t\tif (window.appendScheduledClassActions) {\n\t\t\t\t\t\t\t\t\twindow.appendScheduledClassActions(actionsWrap, baseURL, record);\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\tconst viewLink = document.createElement('a');\n\t\t\t\t\t\t\t\tviewLink.href = viewHref;\n\t\t\t\t\t\t\t\tviewLink.className = 'view-btn';\n\t\t\t\t\t\t\t\tviewLink.textContent = 'View';\n\t\t\t\t\t\t\t\tactionsWrap.appendChild(viewLink);\n\t\t\t\t\t\t\t\tconst editLink = document.createElement('a');\n\t\t\t\t\t\t\t\teditLink.href = editHref;\n\t\t\t\t\t\t\t\teditLink.className = 'edit-btn';\n\t\t\t\t\t\t\t\teditLink.textContent = 'Edit';\n\t\t\t\t\t\t\t\tactionsWrap.appendChild(editLink);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\tactionCell.appendChild(actionsWrap);\n\t\t\t\t\t\t\trow.appendChild(actionCell);\n\t\t\t\t\t\t\ttableBody.appendChild(row);\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\n\t\t\t\t\tif (data.page) {\n\t\t\t\t\t\trenderPagination(data.page);\n\t\t\t\t\t}\n\t\t\t\t} catch (error) {\n\t\t\t\t\tconsole.error('Failed to load class records:', error);\n\t\t\t\t\tshowErrorBanner(error.message);\n\t\t\t\t\ttableBody.innerHTML = '<tr><td colspan=\"' + tableColspan + '\" class=\"empty-state\">Error loading classes</td></tr>';\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tfilterBtn.addEventListener('click', () => {\n\t\t\t\tcurrentPage = 1;\n\t\t\t\tloadRecords();\n\t\t\t});\n\n\t\t\tteacherSelect.addEventListener('change', () => {\n\t\t\t\tif ((!teacherSelect.value && !showAllTeachers) || !datePresetSelect.dataset.startDate) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tcurrentPage = 1;\n\t\t\t\tloadRecords();\n\t\t\t});\n\n\t\t\tfunction initPage() {\n\t\t\t\tif (datePresetSelect.value) {\n\t\t\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\n\t\t\t\t}\n\t\t\t\tif ((teacherSelect.value || showAllTeachers) && datePresetSelect.dataset.startDate) {\n\t\t\t\t\tloadRecords();\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tinitPage();\n\t\t</script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</tr></tbody></table></div><div id=\"paginationBottom\" class=\"pagination-bar\"></div></div><script>\n\t\t\tconst datePresetSelect = document.getElementById('datePreset');\n\t\t\tconst filterBtn = document.getElementById('filterBtn');\n\t\t\tconst classesPage = document.getElementById('classesPage');\n\t\t\tconst teacherSelect = document.getElementById('teacher');\n\n\t\t\tfunction setDateRangeFromPreset(value) {\n\t\t\t\tif (!value) {\n\t\t\t\t\tdelete datePresetSelect.dataset.startDate;\n\t\t\t\t\tdelete datePresetSelect.dataset.endDate;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst parts = value.split('|');\n\t\t\t\tif (parts.length !== 2) return;\n\t\t\t\tdatePresetSelect.dataset.startDate = parts[0];\n\t\t\t\tdatePresetSelect.dataset.endDate = parts[1];\n\t\t\t}\n\n\t\t\tdatePresetSelect.addEventListener('change', () => {\n\t\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\n\t\t\t});\n\n\t\t\tfilterBtn.addEventListener('click', () => {\n\t\t\t\tif (classesPage) classesPage.value = '1';\n\t\t\t});\n\n\t\t\tif (teacherSelect) {\n\t\t\t\tteacherSelect.addEventListener('change', () => {\n\t\t\t\t\tif (classesPage) classesPage.value = '1';\n\t\t\t\t\tif (datePresetSelect.value) {\n\t\t\t\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\t\t\thtmx.trigger('#classesTableBody', 'load');\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tconst pageBtn = e.target.closest('#paginationBottom .pagination-btn[hx-get]');\n\t\t\t\tif (!pageBtn || !classesPage) return;\n\t\t\t\tconst vals = pageBtn.getAttribute('hx-vals');\n\t\t\t\tif (!vals) return;\n\t\t\t\ttry {\n\t\t\t\t\tconst parsed = JSON.parse(vals.replace(/'/g, '\"'));\n\t\t\t\t\tif (parsed.page) classesPage.value = String(parsed.page);\n\t\t\t\t} catch (err) { /* ignore */ }\n\t\t\t});\n\n\t\t\tif (datePresetSelect.value) {\n\t\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\n\t\t\t}\n\t\t</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

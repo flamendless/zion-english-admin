@@ -89,8 +89,8 @@ templ Students(data StudentData) {
 									<td class={ getStatusClass(student.Status) } data-label="Status">{ student.Status }</td>
 									<td data-label="Actions">
 										<div class="table-actions">
-											<a href={ utils.URL("/students/" + student.ID + "/view") } class="view-btn">View</a>
-											<a href={ utils.URL("/students/" + student.ID + "/edit") } class="edit-btn">Edit</a>
+											@IconActionLink(utils.URL("/students/" + student.ID + "/view"), "View", IconKindView)
+											@IconActionLink(utils.URL("/students/" + student.ID + "/edit"), "Edit", IconKindEdit)
 										</div>
 									</td>
 								</tr>

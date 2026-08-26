@@ -1,318 +1,140 @@
-package frontend
-
-import "zion-english/internal/utils"
-
-templ Reports() {
-	<!DOCTYPE html>
-	<html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Reports - Zion English Admin Tool</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
-		@AvatarStyles()
-		<style>
-			.reports-teacher-cell {
-				display: flex;
-				align-items: center;
-				gap: var(--space-3);
-			}
-			.avatar-col {
-				width: 3.5rem;
-			}
-		</style>
-		<script>
-			window.closeReportViewModal = function () {
-				const host = document.getElementById('reportViewModalHost');
-				if (host) host.innerHTML = '';
-				document.body.classList.remove('modal-open');
-			};
-
-			document.body.addEventListener('htmx:afterSwap', function (evt) {
-				if (evt.detail.target.id !== 'reportViewModalHost') return;
-				document.body.classList.add('modal-open');
-				const overlay = evt.detail.target.querySelector('#reportViewModal');
-				const closeBtn = overlay && overlay.querySelector('.report-view-close');
-				if (closeBtn) closeBtn.focus();
-			});
-
-			document.body.addEventListener('click', function (e) {
-				if (e.target.closest('.report-view-close')) {
-					window.closeReportViewModal();
-					return;
-				}
-				const overlay = e.target.closest('#reportViewModal');
-				if (overlay && e.target === overlay) window.closeReportViewModal();
-			});
-
-			document.addEventListener('keydown', function (e) {
-				if (e.key === 'Escape' && document.getElementById('reportViewModal')) {
-					window.closeReportViewModal();
-				}
-			});
-		</script>
-	</head>
-	<body>
-		<div class="container">
-			@HeaderSimple()
-			@SuccessBanner()
-			@HubHeader("Reports", "", "", false)
-
-			<div class="toolbar">
-				<div class="form-group">
-					<label for="reportSearch">Search</label>
-					<input type="text" id="reportSearch" placeholder="Search teacher or student name..."/>
-				</div>
-				@DatePreset(true)
-				<button type="button" id="filterBtn">Filter</button>
-			</div>
-
-			<div class="table-wrapper">
-				<table id="reportsTable" class="table-stack-mobile">
-					<thead>
-						<tr>
-							<th class="avatar-col">Avatar</th>
-							<th>Teacher</th>
-							<th>Total Classes</th>
-							<th>Total Rate/Earnings</th>
-							<th>Actions</th>
-						</tr>
-					</thead>
-					<tbody id="reportsTableBody">
-						<tr>
-							<td colspan="5" class="empty-state">Loading reports...</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-
-			<div id="reportViewModalHost"></div>
-		</div>
-
-		<script>
-			const datePresetSelect = document.getElementById('datePreset');
-			const filterBtn = document.getElementById('filterBtn');
-			const reportSearch = document.getElementById('reportSearch');
-			const tableBody = document.getElementById('reportsTableBody');
-
-			function getBaseURL() {
-				const pathname = window.location.pathname;
-				const cleanPath = pathname.replace(/\/$/, '');
-				const parts = cleanPath.split('/').filter(p => p !== '');
-				if (parts.length === 0 || cleanPath.endsWith('.html')) {
-					if (cleanPath.includes('/zion-english-admin')) {
-						return '/zion-english-admin';
-					}
-					return '';
-				}
-				if (parts.length === 1) {
-					return '/' + parts[0];
-				}
-				return '/' + parts.slice(0, -1).join('/');
-			}
-
-			const baseURL = getBaseURL();
-
-			function buildURL(path) {
-				return baseURL + path;
-			}
-
-			function setDateRangeFromPreset(value) {
-				if (!value) {
-					delete datePresetSelect.dataset.startDate;
-					delete datePresetSelect.dataset.endDate;
-					return;
-				}
-				const parts = value.split('|');
-				if (parts.length !== 2) return;
-				datePresetSelect.dataset.startDate = parts[0];
-				datePresetSelect.dataset.endDate = parts[1];
-			}
-
-			datePresetSelect.addEventListener('change', () => {
-				setDateRangeFromPreset(datePresetSelect.value);
-			});
-
-			setDateRangeFromPreset(datePresetSelect.value);
-
-			function escapeHTML(value) {
-				const div = document.createElement('div');
-				div.textContent = value;
-				return div.innerHTML;
-			}
-
-			function formatEarnings(earnings) {
-				if (!earnings || earnings.length === 0) {
-					return '-';
-				}
-				return earnings.map(function (item) {
-					return item.total.toLocaleString(undefined, {
-						minimumFractionDigits: 2,
-						maximumFractionDigits: 2
-					}) + ' ' + item.currency;
-				}).join('<br>');
-			}
-
-			const downloadDisabledTooltip = 'Generate a report first to enable download';
-
-			function setDownloadLink(link, ready, filename) {
-				const wrap = link.closest('.download-report-wrap');
-				if (ready && filename) {
-					link.href = buildURL('/download/processed?filename=' + encodeURIComponent(filename));
-					link.classList.remove('is-disabled');
-					link.removeAttribute('aria-disabled');
-					if (wrap) wrap.removeAttribute('title');
-				} else {
-					link.href = '#';
-					link.classList.add('is-disabled');
-					link.setAttribute('aria-disabled', 'true');
-					if (wrap) wrap.setAttribute('title', downloadDisabledTooltip);
-				}
-			}
-
-			function renderTeacherAvatar(avatar) {
-				if (!avatar) return '';
-				const color = escapeHTML(avatar.assignedColor || '#B9D283');
-				const alt = escapeHTML(avatar.alt || 'Teacher avatar');
-				if (avatar.hasPicture && avatar.pictureURL) {
-					return '<div class="avatar avatar-sm" style="background-color:' + color + '" aria-label="' + alt + '">' +
-						'<img src="' + escapeHTML(avatar.pictureURL) + '" alt="' + alt + '" class="avatar-image">' +
-						'</div>';
-				}
-				return '<div class="avatar avatar-sm" style="background-color:' + color + '" aria-label="' + alt + '">' +
-					'<span class="avatar-initials" aria-hidden="true">' + escapeHTML(avatar.initials || '?') + '</span>' +
-					'</div>';
-			}
-
-			function renderReports(rows) {
-				if (!rows || rows.length === 0) {
-					tableBody.innerHTML = '<tr><td colspan="5" class="empty-state">No teachers found.</td></tr>';
-					return;
-				}
-
-				let html = '';
-				rows.forEach(function (row) {
-					const teacherId = escapeHTML(row.teacherId);
-					const teacherName = escapeHTML(row.teacherName);
-					const avatarHTML = renderTeacherAvatar(row.teacherAvatar);
-					const classesLabel = row.conductedClasses + '/' + row.totalClasses;
-					const earnings = formatEarnings(row.earnings);
-					const generateLabel = row.downloadReady ? 'Regenerate' : 'Generate report';
-					const downloadClass = row.downloadReady ? 'btn btn-secondary btn-sm' : 'btn btn-secondary btn-sm is-disabled';
-
-					html += '<tr data-teacher-id="' + teacherId + '">';
-					html += '<td class="avatar-col" data-label="Avatar">' + avatarHTML + '</td>';
-					html += '<td data-label="Teacher"><div class="reports-teacher-cell"><span>' + teacherName + '</span></div></td>';
-					html += '<td data-label="Total Classes">' + classesLabel + '</td>';
-					html += '<td data-label="Total Rate/Earnings">' + earnings + '</td>';
-					html += '<td data-label="Actions"><div class="table-actions">';
-					html += '<button type="button" class="btn btn-sm generate-report-btn">' + generateLabel + '</button>';
-					html += '<span class="download-report-wrap"' + (row.downloadReady ? '' : ' title="' + downloadDisabledTooltip + '"') + '>';
-					html += '<a class="' + downloadClass + ' download-report-btn"';
-					if (!row.downloadReady) {
-						html += ' aria-disabled="true" href="#"';
-					} else {
-						html += ' href="' + buildURL('/download/processed?filename=' + encodeURIComponent(row.filename)) + '"';
-					}
-					html += '>Download XLSX</a></span>';
-					html += '<button type="button" class="view-btn view-report-btn">View</button>';
-					html += '</div></td></tr>';
-				});
-				tableBody.innerHTML = html;
-			}
-
-			async function loadReports() {
-				const startDate = datePresetSelect.dataset.startDate;
-				const endDate = datePresetSelect.dataset.endDate;
-				if (!startDate || !endDate) {
-					tableBody.innerHTML = '<tr><td colspan="5" class="empty-state">Select a date range.</td></tr>';
-					return;
-				}
-
-				tableBody.innerHTML = '<tr><td colspan="5" class="empty-state">Loading reports...</td></tr>';
-
-				const params = new URLSearchParams({
-					startDate: startDate,
-					endDate: endDate,
-					q: reportSearch.value.trim()
-				});
-
-				try {
-					const response = await fetch(buildURL('/api/reports?' + params.toString()), {
-						headers: window.getCSRFHeaders ? window.getCSRFHeaders() : {}
-					});
-					if (!response.ok) {
-						throw new Error('Failed to load reports');
-					}
-					const rows = await response.json();
-					renderReports(rows);
-				} catch (err) {
-					tableBody.innerHTML = '<tr><td colspan="5" class="empty-state">Error loading reports.</td></tr>';
-				}
-			}
-
-			tableBody.addEventListener('click', async function (e) {
-				const generateBtn = e.target.closest('.generate-report-btn');
-				const viewBtn = e.target.closest('.view-report-btn');
-				const row = e.target.closest('tr[data-teacher-id]');
-				if (!row) return;
-
-				const teacherId = row.dataset.teacherId;
-				const startDate = datePresetSelect.dataset.startDate;
-				const endDate = datePresetSelect.dataset.endDate;
-
-				if (viewBtn) {
-					const params = new URLSearchParams({ startDate: startDate, endDate: endDate });
-					htmx.ajax('GET', buildURL('/reports/' + teacherId + '/view?' + params.toString()), {
-						target: '#reportViewModalHost',
-						swap: 'innerHTML'
-					});
-					return;
-				}
-
-				if (!generateBtn || generateBtn.disabled) return;
-
-				generateBtn.disabled = true;
-				generateBtn.classList.add('is-loading');
-
-				const downloadLink = row.querySelector('.download-report-btn');
-				const body = new URLSearchParams({ startDate: startDate, endDate: endDate });
-
-				try {
-					const response = await fetch(buildURL('/reports/' + teacherId + '/generate'), {
-						method: 'POST',
-						headers: Object.assign({ 'Content-Type': 'application/x-www-form-urlencoded' }, window.getCSRFHeaders ? window.getCSRFHeaders() : {}),
-						body: body.toString()
-					});
-					const text = await response.text();
-					if (!response.ok) {
-						throw new Error(text || 'Failed to generate report');
-					}
-					const result = JSON.parse(text);
-					setDownloadLink(downloadLink, true, result.filename);
-					generateBtn.textContent = 'Regenerate';
-					if (result.skipped && typeof showSuccessBanner === 'function') {
-						showSuccessBanner('Report is up to date — skipped generation');
-					}
-				} catch (err) {
-					alert(err.message || 'Failed to generate report');
-				} finally {
-					generateBtn.disabled = false;
-					generateBtn.classList.remove('is-loading');
-				}
-			});
-
-			filterBtn.addEventListener('click', loadReports);
-			reportSearch.addEventListener('keydown', function (e) {
-				if (e.key === 'Enter') {
-					e.preventDefault();
-					loadReports();
-				}
-			});
-
-			loadReports();
-		</script>
-	</body>
-	</html>
-}
+package frontend
+
+import "zion-english/internal/utils"
+
+templ Reports() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Reports - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@AvatarStyles()
+		<style>
+			.reports-teacher-cell {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+			}
+			.avatar-col {
+				width: 3.5rem;
+			}
+		</style>
+		<script>
+			window.closeReportViewModal = function () {
+				const host = document.getElementById('reportViewModalHost');
+				if (host) host.innerHTML = '';
+				document.body.classList.remove('modal-open');
+			};
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id !== 'reportViewModalHost') return;
+				document.body.classList.add('modal-open');
+				const overlay = evt.detail.target.querySelector('#reportViewModal');
+				const closeBtn = overlay && overlay.querySelector('.report-view-close');
+				if (closeBtn) closeBtn.focus();
+			});
+
+			document.body.addEventListener('click', function (e) {
+				if (e.target.closest('.report-view-close')) {
+					window.closeReportViewModal();
+					return;
+				}
+				const overlay = e.target.closest('#reportViewModal');
+				if (overlay && e.target === overlay) window.closeReportViewModal();
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key === 'Escape' && document.getElementById('reportViewModal')) {
+					window.closeReportViewModal();
+				}
+			});
+		</script>
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@SuccessBanner()
+			@HubHeader("Reports", "", "", false)
+
+			<div class="toolbar" id="reportsToolbar">
+				<div class="form-group">
+					<label for="reportSearch">Search</label>
+					<input type="text" id="reportSearch" name="q" placeholder="Search teacher or student name..."/>
+				</div>
+				@DatePreset(true)
+				<button
+					type="button"
+					id="filterBtn"
+					hx-get={ utils.URL("/reports/partials/rows") }
+					hx-include="#reportsToolbar"
+					hx-target="#reportsTableBody"
+					hx-swap="innerHTML"
+				>Filter</button>
+			</div>
+
+			<div class="table-wrapper">
+				<table id="reportsTable" class="table-stack-mobile">
+					<thead>
+						<tr>
+							<th class="avatar-col">Avatar</th>
+							<th>Teacher</th>
+							<th>Total Classes</th>
+							<th>Total Rate/Earnings</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody
+						id="reportsTableBody"
+						hx-get={ utils.URL("/reports/partials/rows") }
+						hx-include="#reportsToolbar"
+						hx-trigger="load"
+						hx-swap="innerHTML"
+					>
+						<tr>
+							<td colspan="5" class="empty-state">Loading reports...</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div id="reportViewModalHost"></div>
+		</div>
+
+		<script>
+			const datePresetSelect = document.getElementById('datePreset');
+			const reportSearch = document.getElementById('reportSearch');
+
+			function setDateRangeFromPreset(value) {
+				if (!value) {
+					delete datePresetSelect.dataset.startDate;
+					delete datePresetSelect.dataset.endDate;
+					return;
+				}
+				const parts = value.split('|');
+				if (parts.length !== 2) return;
+				datePresetSelect.dataset.startDate = parts[0];
+				datePresetSelect.dataset.endDate = parts[1];
+			}
+
+			datePresetSelect.addEventListener('change', () => {
+				setDateRangeFromPreset(datePresetSelect.value);
+			});
+
+			setDateRangeFromPreset(datePresetSelect.value);
+
+			reportSearch.addEventListener('keydown', function (e) {
+				if (e.key === 'Enter') {
+					e.preventDefault();
+					if (typeof htmx !== 'undefined') {
+						htmx.trigger('#reportsTableBody', 'load');
+					}
+				}
+			});
+		</script>
+	</body>
+	</html>
+}
+

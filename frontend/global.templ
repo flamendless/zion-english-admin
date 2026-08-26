@@ -691,13 +691,6 @@ templ GlobalIncludes() {
 
 		.notification-mark-read {
 			flex-shrink: 0;
-			white-space: nowrap;
-			border: none;
-			background: none;
-			color: var(--color-primary);
-			font-size: 0.75rem;
-			cursor: pointer;
-			padding: var(--space-1) 0;
 			justify-self: end;
 		}
 
@@ -1425,8 +1418,15 @@ templ GlobalIncludes() {
 			background: var(--color-surface);
 			color: var(--color-foreground);
 			text-decoration: none;
+			font-family: inherit;
 			cursor: pointer;
 			transition: background-color var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+		}
+
+		.icon-action-btn svg {
+			display: block;
+			flex-shrink: 0;
+			stroke: currentColor;
 		}
 
 		.icon-action-btn:hover {
@@ -1464,8 +1464,98 @@ templ GlobalIncludes() {
 			color: var(--color-accent);
 		}
 
+		.icon-action-btn--view,
+		.icon-action-btn--mark-read {
+			color: var(--color-primary-hover);
+			border-color: color-mix(in srgb, var(--color-primary) 35%, var(--color-border));
+		}
+
+		.icon-action-btn--view:hover,
+		.icon-action-btn--mark-read:hover {
+			background: var(--color-primary-light);
+			border-color: var(--color-primary);
+		}
+
+		.icon-action-btn--approve {
+			color: var(--color-success);
+			border-color: color-mix(in srgb, var(--color-success) 35%, var(--color-border));
+		}
+
+		.icon-action-btn--approve:hover {
+			background: var(--color-success-bg);
+			border-color: var(--color-success);
+		}
+
+		.icon-action-btn--delete,
+		.icon-action-btn--reject {
+			color: var(--color-destructive);
+			border-color: color-mix(in srgb, var(--color-destructive) 35%, var(--color-border));
+		}
+
+		.icon-action-btn--delete:hover,
+		.icon-action-btn--reject:hover {
+			background: var(--color-error-bg);
+			border-color: var(--color-destructive);
+		}
+
+		.icon-action-btn--unapprove,
+		.icon-action-btn--warning {
+			color: #7A4E00;
+			border-color: color-mix(in srgb, var(--color-warning) 35%, var(--color-border));
+		}
+
+		.icon-action-btn--unapprove:hover,
+		.icon-action-btn--warning:hover {
+			background: var(--color-warning-bg);
+			border-color: var(--color-warning);
+		}
+
+		.icon-action-btn.is-disabled {
+			opacity: 0.45;
+			cursor: not-allowed;
+			pointer-events: none;
+		}
+
+		[data-tooltip] {
+			position: relative;
+		}
+
+		[data-tooltip]::after {
+			content: attr(data-tooltip);
+			position: absolute;
+			bottom: calc(100% + 6px);
+			left: 50%;
+			transform: translateX(-50%);
+			padding: 0.35rem 0.55rem;
+			border-radius: var(--radius-sm);
+			background: var(--color-foreground);
+			color: var(--color-surface);
+			font-size: 0.75rem;
+			font-weight: 500;
+			line-height: 1.2;
+			white-space: nowrap;
+			opacity: 0;
+			visibility: hidden;
+			pointer-events: none;
+			z-index: 200;
+			transition: opacity var(--transition-fast), visibility var(--transition-fast);
+		}
+
+		[data-tooltip]:hover::after,
+		[data-tooltip]:focus-visible::after {
+			opacity: 1;
+			visibility: visible;
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			[data-tooltip]::after {
+				transition: none;
+			}
+		}
+
 		.table-actions .icon-action-btn {
 			margin-top: 0;
+			flex-shrink: 0;
 		}
 
 		.day-class-actions .icon-action-btn {
@@ -2985,36 +3075,23 @@ templ GlobalIncludes() {
 
 			.table-stack-mobile .table-actions {
 				display: flex;
-				flex-direction: column;
-				align-items: stretch;
+				flex-direction: row;
+				flex-wrap: wrap;
+				align-items: center;
+				justify-content: flex-end;
 				gap: var(--space-2);
 			}
 
-			.table-stack-mobile .table-actions .edit-btn,
-			.table-stack-mobile .table-actions .view-btn,
-			.table-stack-mobile .table-actions .approve-btn,
-			.table-stack-mobile .table-actions .unapprove-btn,
-			.table-stack-mobile .table-actions .delete-btn,
-			.table-stack-mobile .table-actions .warning-btn,
-			.table-stack-mobile .table-actions .btn,
-			.table-stack-mobile .table-actions .download-report-wrap,
-			.table-stack-mobile .table-actions .download-report-wrap > a {
-				width: 100%;
-				text-align: center;
-				padding: 10px 14px;
-				font-size: 0.875rem;
+			.table-stack-mobile .table-actions .icon-action-btn {
+				min-width: 44px;
 				min-height: 44px;
-				box-sizing: border-box;
+				width: 44px;
+				height: 44px;
+				flex-shrink: 0;
 			}
 
 			.table-stack-mobile .table-action-form {
-				display: block;
-				width: 100%;
-			}
-
-			.table-stack-mobile .table-action-form .delete-btn,
-			.table-stack-mobile .table-action-form .warning-btn {
-				width: 100%;
+				display: inline-flex;
 			}
 
 			.table-stack-mobile .error-cell {
@@ -3395,5 +3472,4 @@ templ GlobalIncludes() {
 	@CsrfHandlers()
 	@ErrorBannerHandlers()
 	@ScrClipboardHelpers()
-	@ScrIconActions()
 }

@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -26,25 +25,6 @@ import (
 type reportEarningJSON struct {
 	Currency string  `json:"currency"`
 	Total    float64 `json:"total"`
-}
-
-type reportRowJSON struct {
-	TeacherID        string              `json:"teacherId"`
-	TeacherName      string              `json:"teacherName"`
-	TeacherAvatar    frontend.AvatarProps `json:"teacherAvatar"`
-	ConductedClasses int64               `json:"conductedClasses"`
-	TotalClasses     int64               `json:"totalClasses"`
-	Earnings         []reportEarningJSON `json:"earnings"`
-	DownloadReady    bool                `json:"downloadReady"`
-	Filename         string              `json:"filename"`
-	ReportUpToDate   bool                `json:"reportUpToDate"`
-	GeneratedAt      string              `json:"generatedAt"`
-}
-
-type reportGenerateResponse struct {
-	Skipped  bool     `json:"skipped"`
-	Filename string   `json:"filename"`
-	Logs     []string `json:"logs"`
 }
 
 func handleReportsPath(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +50,7 @@ func handleReports(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func handleGetReports(w http.ResponseWriter, r *http.Request) {
+func handleReportsPartial(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -82,20 +62,35 @@ func handleGetReports(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx := r.Context()
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	rows, err := loadReportRows(r.Context(), startDate, endDate, q)
+	if err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	emptyMsg := "No teachers found."
+	if startDate == "" || endDate == "" {
+		emptyMsg = "Select a date range."
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	if err := frontend.ReportsTableBody(rows, startDate, endDate, emptyMsg).Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func loadReportRows(ctx context.Context, startDate, endDate, q string) ([]frontend.ReportRowData, error) {
 	searchParams := reportSearchParams(q, startDate, endDate)
 
 	summaries, err := dbRO.GetQueries().GetReportTeacherSummaries(ctx, searchParams)
 	if err != nil {
-		HttpError(w, "Failed to load report summaries", http.StatusInternalServerError)
-		return
+		return nil, fmt.Errorf("failed to load report summaries")
 	}
 
 	earningsRows, err := dbRO.GetQueries().GetReportTeacherEarnings(ctx, reportEarningsParams(q, startDate, endDate))
 	if err != nil {
-		HttpError(w, "Failed to load report earnings", http.StatusInternalServerError)
-		return
+		return nil, fmt.Errorf("failed to load report earnings")
 	}
 
 	earningsByTeacher := map[int64][]reportEarningJSON{}
@@ -111,8 +106,7 @@ func handleGetReports(w http.ResponseWriter, r *http.Request) {
 		Date_2: endDate,
 	})
 	if err != nil {
-		HttpError(w, "Failed to load report fingerprints", http.StatusInternalServerError)
-		return
+		return nil, fmt.Errorf("failed to load report fingerprints")
 	}
 
 	hashesByTeacher := map[int64]string{}
@@ -121,8 +115,8 @@ func handleGetReports(w http.ResponseWriter, r *http.Request) {
 		fpRow := fingerprintRowFromRange(row)
 		rowsByTeacher[row.TeacherID] = append(rowsByTeacher[row.TeacherID], fpRow)
 	}
-	for teacherID, rows := range rowsByTeacher {
-		hashesByTeacher[teacherID] = reports.Fingerprint(rows)
+	for teacherID, fpRows := range rowsByTeacher {
+		hashesByTeacher[teacherID] = reports.Fingerprint(fpRows)
 	}
 
 	cachedRows, err := dbRO.GetQueries().GetReportGenerationsForRange(ctx, queries.GetReportGenerationsForRangeParams{
@@ -130,8 +124,7 @@ func handleGetReports(w http.ResponseWriter, r *http.Request) {
 		EndDate:   endDate,
 	})
 	if err != nil {
-		HttpError(w, "Failed to load cached reports", http.StatusInternalServerError)
-		return
+		return nil, fmt.Errorf("failed to load cached reports")
 	}
 
 	cacheByTeacher := map[int64]queries.TblReportGeneration{}
@@ -139,35 +132,71 @@ func handleGetReports(w http.ResponseWriter, r *http.Request) {
 		cacheByTeacher[row.TeacherID] = row
 	}
 
-	response := make([]reportRowJSON, 0, len(summaries))
+	response := make([]frontend.ReportRowData, 0, len(summaries))
 	for _, summary := range summaries {
-		item := reportRowJSON{
+		item := frontend.ReportRowData{
 			TeacherID:        strconv.FormatInt(summary.TeacherID, 10),
 			TeacherName:      summary.TeacherName,
 			TeacherAvatar:    buildReportSummaryAvatarProps(summary),
 			ConductedClasses: sqlNumericToInt64(summary.ConductedClasses),
 			TotalClasses:     summary.TotalClasses,
-			Earnings:         earningsByTeacher[summary.TeacherID],
-		}
-		if item.Earnings == nil {
-			item.Earnings = []reportEarningJSON{}
+			Earnings:         reportEarningsToFrontend(earningsByTeacher[summary.TeacherID]),
 		}
 
 		currentHash := hashesByTeacher[summary.TeacherID]
 		if cache, ok := cacheByTeacher[summary.TeacherID]; ok && cache.ContentHash == currentHash {
 			if filename, ok := reportCacheFilename(cache.OutputPath); ok {
 				item.DownloadReady = true
-				item.ReportUpToDate = true
 				item.Filename = filename
-				item.GeneratedAt = cache.GeneratedAt
 			}
 		}
 
 		response = append(response, item)
 	}
+	return response, nil
+}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+func loadReportRow(ctx context.Context, teacherID int64, startDate, endDate string) (frontend.ReportRowData, error) {
+	rows, err := loadReportRows(ctx, startDate, endDate, "")
+	if err != nil {
+		return frontend.ReportRowData{}, err
+	}
+	id := strconv.FormatInt(teacherID, 10)
+	for _, row := range rows {
+		if row.TeacherID == id {
+			return row, nil
+		}
+	}
+	return frontend.ReportRowData{}, errors.New("teacher not found in report summaries")
+}
+
+func reportEarningsToFrontend(earnings []reportEarningJSON) []frontend.ReportEarningData {
+	if len(earnings) == 0 {
+		return []frontend.ReportEarningData{}
+	}
+	out := make([]frontend.ReportEarningData, 0, len(earnings))
+	for _, e := range earnings {
+		out = append(out, frontend.ReportEarningData{
+			Currency: e.Currency,
+			Total:    e.Total,
+		})
+	}
+	return out
+}
+
+func renderReportGenerateRow(w http.ResponseWriter, r *http.Request, teacherID int64, startDate, endDate string, skipped bool) {
+	row, err := loadReportRow(r.Context(), teacherID, startDate, endDate)
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+	if skipped {
+		w.Header().Set("HX-Trigger", `{"showSuccessBanner":"Report is up to date — skipped generation"}`)
+	}
+	w.Header().Set("Content-Type", "text/html")
+	if err := frontend.ReportTableRow(row, startDate, endDate).Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func handleReportView(w http.ResponseWriter, r *http.Request, teacherID int64) {
@@ -327,12 +356,8 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 		EndDate:   endDate,
 	})
 	if cacheErr == nil && cache.ContentHash == currentHash {
-		if filename, ok := reportCacheFilename(cache.OutputPath); ok {
-			writeReportGenerateResponse(w, reportGenerateResponse{
-				Skipped:  true,
-				Filename: filename,
-				Logs:     []string{"Report is up to date — skipped generation"},
-			})
+		if _, ok := reportCacheFilename(cache.OutputPath); ok {
+			renderReportGenerateRow(w, r, teacherID, startDate, endDate, true)
 			return
 		}
 	}
@@ -381,14 +406,7 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 		teacherName, startDate, endDate, len(records), filename,
 	))
 
-	writeReportGenerateResponse(w, reportGenerateResponse{
-		Skipped:  false,
-		Filename: filename,
-		Logs: []string{
-			fmt.Sprintf("Processed %d records", len(records)),
-			"Saved output to: " + outputPath,
-		},
-	})
+	renderReportGenerateRow(w, r, teacherID, startDate, endDate, false)
 }
 
 func reportSearchParams(q, startDate, endDate string) queries.GetReportTeacherSummariesParams {
@@ -405,15 +423,7 @@ func reportSearchParams(q, startDate, endDate string) queries.GetReportTeacherSu
 }
 
 func requireReportDateRange(r *http.Request) (string, string, error) {
-	startDate := strings.TrimSpace(r.URL.Query().Get("startDate"))
-	endDate := strings.TrimSpace(r.URL.Query().Get("endDate"))
-	if startDate == "" || endDate == "" {
-		return "", "", errors.New("start and end dates are required")
-	}
-	if startDate > endDate {
-		return "", "", errors.New("end date must be after start date")
-	}
-	return startDate, endDate, nil
+	return parseListDateRange(r)
 }
 
 func fingerprintRowFromRange(row queries.GetClassRecordFingerprintRowsForRangeRow) reports.FingerprintRow {
@@ -603,13 +613,6 @@ func sqlNumericToFloat64(value interface{}) float64 {
 		}
 	}
 	return 0
-}
-
-func writeReportGenerateResponse(w http.ResponseWriter, payload reportGenerateResponse) {
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(payload); err != nil {
-		HttpError(w, err.Error(), http.StatusInternalServerError)
-	}
 }
 
 func auditReportDownload(ctx context.Context, filename string) {

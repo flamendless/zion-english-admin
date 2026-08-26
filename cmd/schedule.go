@@ -170,12 +170,15 @@ func scheduledClassesListParams(teacherID int64, startDate, endDate, statusFilte
 	}
 }
 
-func handleGetScheduledClasses(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
+type scheduledClassesQuery struct {
+	teacherID    int64
+	startDate    string
+	endDate      string
+	statusFilter string
+	nameFilter   string
+}
 
+func parseScheduledClassesQuery(r *http.Request) (scheduledClassesQuery, error) {
 	teacherIDStr := r.URL.Query().Get("teacherId")
 	startDate := r.URL.Query().Get("startDate")
 	endDate := r.URL.Query().Get("endDate")
@@ -183,51 +186,44 @@ func handleGetScheduledClasses(w http.ResponseWriter, r *http.Request) {
 	nameFilter := r.URL.Query().Get("q")
 
 	if startDate == "" || endDate == "" {
-		HttpError(w, "Missing required parameters", http.StatusBadRequest)
-		return
+		return scheduledClassesQuery{}, errors.New("missing required parameters")
 	}
 
 	role := auth.GetRole(r.Context())
 	var teacherID int64
-	if teacherIDStr == "" {
+	if teacherIDStr == "" || teacherIDStr == "0" {
 		if role != auth.RoleSuperuser {
-			HttpError(w, "Missing required parameters", http.StatusBadRequest)
-			return
+			return scheduledClassesQuery{}, errors.New("missing required parameters")
 		}
 	} else {
 		parsedID, err := strconv.ParseInt(teacherIDStr, 10, 64)
 		if err != nil {
-			HttpError(w, "Invalid teacher ID", http.StatusBadRequest)
-			return
+			return scheduledClassesQuery{}, errors.New("invalid teacher ID")
 		}
 		teacherID = parsedID
 		if role == auth.RoleTeacher {
 			user := auth.GetUser(r.Context())
 			if teacherID != user.ID {
-				HttpError(w, "Forbidden", http.StatusForbidden)
-				return
+				return scheduledClassesQuery{}, errors.New("forbidden")
 			}
 		}
 	}
 
-	page := utils.ParsePageQuery(r)
-	ctx := r.Context()
+	return scheduledClassesQuery{
+		teacherID:    teacherID,
+		startDate:    startDate,
+		endDate:      endDate,
+		statusFilter: statusFilter,
+		nameFilter:   nameFilter,
+	}, nil
+}
 
-	countParams := scheduledClassesCountParams(teacherID, startDate, endDate, statusFilter, nameFilter)
-	total, err := dbRO.GetQueries().CountScheduledClassesFiltered(ctx, countParams)
+func fetchScheduledClassViews(ctx context.Context, q scheduledClassesQuery, limit, offset int64) ([]models.ScheduledClassView, error) {
+	records, err := dbRO.GetQueries().GetScheduledClassesFiltered(ctx, scheduledClassesListParams(q.teacherID, q.startDate, q.endDate, q.statusFilter, q.nameFilter, limit, offset))
 	if err != nil {
-		HttpError(w, "Failed to count scheduled classes", http.StatusInternalServerError)
-		return
-	}
-	page.Total = total
-
-	records, err := dbRO.GetQueries().GetScheduledClassesFiltered(ctx, scheduledClassesListParams(teacherID, startDate, endDate, statusFilter, nameFilter, int64(page.Size), int64(page.Offset())))
-	if err != nil {
-		HttpError(w, "Failed to fetch scheduled classes", http.StatusInternalServerError)
-		return
+		return nil, err
 	}
 
-	var response []models.ScheduledClassView
 	classIDs := make([]int64, 0, len(records))
 	for _, sc := range records {
 		classIDs = append(classIDs, sc.ID)
@@ -239,6 +235,8 @@ func handleGetScheduledClasses(w http.ResponseWriter, r *http.Request) {
 			roomMap = rooms
 		}
 	}
+
+	response := make([]models.ScheduledClassView, 0, len(records))
 	for _, sc := range records {
 		view := scheduledClassViewFromRow(sc)
 		if room, ok := roomMap[sc.ID]; ok {
@@ -247,6 +245,84 @@ func handleGetScheduledClasses(w http.ResponseWriter, r *http.Request) {
 			view.MeetingService = room.Service
 		}
 		response = append(response, view)
+	}
+	return response, nil
+}
+
+func handleScheduleListPartial(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	q, err := parseScheduledClassesQuery(r)
+	if err != nil {
+		if err.Error() == "forbidden" {
+			HttpError(w, err.Error(), http.StatusForbidden)
+			return
+		}
+		HttpError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	views, err := fetchScheduledClassViews(r.Context(), q, 500, 0)
+	if err != nil {
+		HttpError(w, "Failed to fetch scheduled classes", http.StatusInternalServerError)
+		return
+	}
+
+	items := frontend.ScheduledClassItemsFromViews(views)
+	emptyMsg := "No classes scheduled for this day."
+	if q.startDate == q.endDate && q.startDate == utils.TodayPHT() {
+		emptyMsg = "No classes scheduled for today."
+	}
+	role := auth.GetRole(r.Context())
+	if role == auth.RoleSuperuser && q.teacherID == 0 {
+		teacherParam := strings.TrimSpace(r.URL.Query().Get("teacherId"))
+		if teacherParam == "" || teacherParam == "0" {
+			if q.startDate == utils.TodayPHT() && q.startDate == q.endDate {
+				emptyMsg = "Select a teacher to view today's schedule."
+			}
+		}
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	if err := frontend.ScheduledClassList(items, emptyMsg, utils.URL("/static/zoom-logo.svg")).Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func handleGetScheduledClasses(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	q, err := parseScheduledClassesQuery(r)
+	if err != nil {
+		if err.Error() == "forbidden" {
+			HttpError(w, err.Error(), http.StatusForbidden)
+			return
+		}
+		HttpError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	page := utils.ParsePageQuery(r)
+	ctx := r.Context()
+
+	countParams := scheduledClassesCountParams(q.teacherID, q.startDate, q.endDate, q.statusFilter, q.nameFilter)
+	total, err := dbRO.GetQueries().CountScheduledClassesFiltered(ctx, countParams)
+	if err != nil {
+		HttpError(w, "Failed to count scheduled classes", http.StatusInternalServerError)
+		return
+	}
+	page.Total = total
+
+	response, err := fetchScheduledClassViews(ctx, q, int64(page.Size), int64(page.Offset()))
+	if err != nil {
+		HttpError(w, "Failed to fetch scheduled classes", http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")

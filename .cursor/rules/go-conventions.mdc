@@ -30,6 +30,26 @@ Package-level types and variables go at the top of the file, immediately after i
 - DB mode constants: `DB_MODE_RO`, `DB_MODE_RW`
 - Tables: `tbl_teachers`, `tbl_students` (migration prefix)
 
+## Typed constants (enums)
+
+Prefer typed string constants over bare string literals for fixed sets of values (status, role, icon kind, document type, etc.). This gives compile-time checking and a single source of truth.
+
+```go
+type IconKind string
+
+const (
+	IconKindView IconKind = "view"
+	IconKindEdit IconKind = "edit"
+)
+```
+
+- Define enums in the owning package (`internal/auth.Role`, `frontend.IconKind`, `constants.TeacherDocumentType`).
+- Pass enum types through function and templ component parameters instead of `string` when the value set is closed.
+- Compare with enum constants, not literals (`kind == IconKindEdit`, not `kind == "edit"`).
+- For wire formats (JSON, DB, HTML attributes), convert at the boundary: `string(IconKindView)`.
+- In inline `<script>` blocks inside `.templ`, use literal wire-value strings (e.g. `'view'`) that match `string(IconKindView)` — templ does not evaluate Go inside raw script text.
+- Bare strings are fine for one-off user-facing text, log messages, and truly open-ended values.
+
 ## Handler Pattern (cmd/web.go)
 
 1. Check HTTP method → `HttpError(w, "Method not allowed", 405)`

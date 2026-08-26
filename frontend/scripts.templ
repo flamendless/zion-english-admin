@@ -14,62 +14,6 @@ templ ScrClock() {
 	<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/clock.js")) }></script>
 }
 
-templ ScrIconActions() {
-	<script>
-		window.scheduleActionIcons = {
-			conduct: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>',
-			cancel: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
-			edit: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>'
-		};
-
-		window.createIconActionLink = function (href, label, kind) {
-			const link = document.createElement('a');
-			link.href = href;
-			link.className = 'icon-action-btn icon-action-btn--' + kind;
-			link.title = label;
-			link.setAttribute('aria-label', label);
-			link.innerHTML = window.scheduleActionIcons[kind] || '';
-			return link;
-		};
-
-		window.buildRecordClassURLFromView = function (baseURL, record, status) {
-			const params = new URLSearchParams({
-				fromSchedule: String(record.id),
-				student: String(record.studentId),
-				teacher: String(record.teacherId),
-				date: record.date,
-				duration: String(record.durationMinutes),
-				rate: String(record.rate),
-				currency: record.currency,
-				status: status,
-			});
-			return baseURL + '/classes/record?' + params.toString();
-		};
-
-		window.appendScheduledClassActions = function (container, baseURL, record) {
-			if (!container || !record) return;
-			const conduct = window.createIconActionLink(
-				window.buildRecordClassURLFromView(baseURL, record, 'conducted'),
-				'Conduct',
-				'conduct'
-			);
-			const cancelLink = window.createIconActionLink(
-				window.buildRecordClassURLFromView(baseURL, record, 'cancelled'),
-				'Cancel',
-				'cancel'
-			);
-			const editLink = window.createIconActionLink(
-				baseURL + '/schedule/' + record.id + '/edit',
-				'Edit',
-				'edit'
-			);
-			container.appendChild(conduct);
-			container.appendChild(editLink);
-			container.appendChild(cancelLink);
-		};
-	</script>
-}
-
 templ ScrClipboardHelpers() {
 	<script>
 		window.copyCellText = function (button) {

@@ -186,40 +186,32 @@ templ Teachers(data TeacherData) {
 									<td data-label="Mobile">{ getDisplayValue(teacher.MobileNumber) }</td>
 									<td data-label="Actions">
 										<div class="table-actions">
-											<button
-												type="button"
-												class="view-btn"
-												hx-get={ utils.URL("/teachers/" + teacher.ID + "/view") }
-												hx-target="#teacherViewModalHost"
-												hx-swap="innerHTML"
-											>View</button>
+											@IconActionButton("View", IconKindView, templ.Attributes{
+												"hx-get":    utils.URL("/teachers/" + teacher.ID + "/view"),
+												"hx-target": "#teacherViewModalHost",
+												"hx-swap":   "innerHTML",
+											})
 											if !teacher.Deleted {
-												<a href={ utils.URL("/teachers/" + teacher.ID + "/edit") } class="edit-btn">Edit</a>
+												@IconActionLink(utils.URL("/teachers/" + teacher.ID + "/edit"), "Edit", IconKindEdit)
 												if teacher.Status == "pending" {
-													<button
-														type="button"
-														class="approve-btn"
-														hx-post={ utils.URL("/teachers/approve") }
-														hx-vals={ `{"id": "` + teacher.ID + `"}` }
-														hx-swap="none"
-													>Approve</button>
-													<button
-														type="button"
-														class="delete-btn"
-														hx-post={ utils.URL("/teachers/delete") }
-														hx-vals={ `{"id": "` + teacher.ID + `"}` }
-														hx-confirm="Delete this teacher?"
-														hx-swap="none"
-													>Delete</button>
+													@IconActionButton("Approve", IconKindApprove, templ.Attributes{
+														"hx-post":  utils.URL("/teachers/approve"),
+														"hx-vals":  `{"id": "` + teacher.ID + `"}`,
+														"hx-swap":  "none",
+													})
+													@IconActionButton("Delete", IconKindDelete, templ.Attributes{
+														"hx-post":     utils.URL("/teachers/delete"),
+														"hx-vals":     `{"id": "` + teacher.ID + `"}`,
+														"hx-confirm":  "Delete this teacher?",
+														"hx-swap":     "none",
+													})
 												}
 												if teacher.Status == "approved" {
-													<button
-														type="button"
-														class="unapprove-btn"
-														hx-post={ utils.URL("/teachers/unapprove") }
-														hx-vals={ `{"id": "` + teacher.ID + `"}` }
-														hx-swap="none"
-													>Un-approve</button>
+													@IconActionButton("Un-approve", IconKindUnapprove, templ.Attributes{
+														"hx-post": utils.URL("/teachers/unapprove"),
+														"hx-vals": `{"id": "` + teacher.ID + `"}`,
+														"hx-swap": "none",
+													})
 												}
 											}
 										</div>

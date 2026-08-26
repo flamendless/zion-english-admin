@@ -192,13 +192,13 @@ templ Schedule(data ScheduleData) {
 
 			<div class="schedule-toolbar">
 				if data.ShowAllTeachers {
-					<input type="hidden" id="listTeacher" value="0"/>
+					<input type="hidden" id="listTeacher" name="teacherId" value="0"/>
 					<div class="form-group">
 						<label>Teacher</label>
 						<input type="text" value="All teachers" disabled/>
 					</div>
 				} else if data.LockTeacher {
-					<input type="hidden" id="listTeacher" value={ data.TeacherID }/>
+					<input type="hidden" id="listTeacher" name="teacherId" value={ data.TeacherID }/>
 					<div class="form-group">
 						<label>Teacher</label>
 						<input type="text" value={ data.TeacherName } disabled/>
@@ -206,7 +206,7 @@ templ Schedule(data ScheduleData) {
 				} else {
 					<div class="form-group">
 						<label for="listTeacher">Teacher</label>
-						<select id="listTeacher"
+						<select id="listTeacher" name="teacherId"
 							hx-get={ utils.URL("/api/teachers") }
 							hx-trigger="load"
 							hx-swap="innerHTML"
@@ -218,11 +218,25 @@ templ Schedule(data ScheduleData) {
 				}
 			</div>
 
+			<input type="hidden" id="todayListStart" name="startDate" value=""/>
+			<input type="hidden" id="todayListEnd" name="endDate" value=""/>
+			<input type="hidden" id="todayListStatus" name="status" value="scheduled"/>
+			<input type="hidden" id="dayListStart" name="startDate" value=""/>
+			<input type="hidden" id="dayListEnd" name="endDate" value=""/>
+			<input type="hidden" id="dayListStatus" name="status" value="scheduled"/>
+
 			<div class="schedule-layout">
 				<aside class="schedule-section schedule-today-section" aria-labelledby="todayHeading">
 					<h3 id="todayHeading">Today's Classes</h3>
 					<p class="schedule-today-date" id="todayDateLabel"></p>
-					<div id="todayScheduleList" class="day-classes-list">
+					<div
+						id="todayScheduleList"
+						class="day-classes-list"
+						hx-get={ utils.URL("/schedule/partials/list") }
+						hx-include="#listTeacher, #todayListStart, #todayListEnd, #todayListStatus"
+						hx-trigger="scheduleRefresh from:body"
+						hx-swap="innerHTML"
+					>
 						<p class="day-classes-empty">Loading today's schedule...</p>
 					</div>
 				</aside>
@@ -273,7 +287,14 @@ templ Schedule(data ScheduleData) {
 					<div class="modal-body">
 						<section class="modal-section" aria-labelledby="dayClassesHeading">
 							<h4 class="modal-section-title" id="dayClassesHeading">Scheduled classes</h4>
-							<div id="dayClassesList" class="day-classes-list"></div>
+							<div
+								id="dayClassesList"
+								class="day-classes-list"
+								hx-get={ utils.URL("/schedule/partials/list") }
+								hx-include="#listTeacher, #dayListStart, #dayListEnd, #dayListStatus"
+								hx-trigger="scheduleDayOpen from:body"
+								hx-swap="innerHTML"
+							></div>
 						</section>
 						<div id="modalFormOutput" class="form-message" role="alert" aria-live="assertive"></div>
 						if data.LockTeacher {
@@ -411,25 +432,6 @@ templ Schedule(data ScheduleData) {
 				return link;
 			}
 
-			function createZoomMeetingButton(roomURL, passcode) {
-				const button = document.createElement('button');
-				button.type = 'button';
-				button.className = 'zoom-meeting-btn';
-				button.title = 'View Zoom meeting details';
-				button.setAttribute('aria-label', 'View Zoom meeting details');
-				const img = document.createElement('img');
-				img.src = ZOOM_LOGO_URL;
-				img.alt = '';
-				img.width = 24;
-				img.height = 24;
-				img.setAttribute('aria-hidden', 'true');
-				button.appendChild(img);
-				button.addEventListener('click', function () {
-					openZoomMeetingModal(roomURL, passcode);
-				});
-				return button;
-			}
-
 			function populateZoomMeetingUrlRow(url) {
 				if (!zoomMeetingUrlRow) return;
 				zoomMeetingUrlRow.innerHTML = '';
@@ -501,26 +503,6 @@ templ Schedule(data ScheduleData) {
 				zoomMeetingTriggerEl = null;
 			}
 
-			function appendMeetingInfo(info, record) {
-				const roomURL = recordField(record, 'roomUrl', 'room_url');
-				const passcode = recordField(record, 'roomPasscode', 'room_passcode');
-				const durationMinutes = Number(recordField(record, 'durationMinutes', 'duration_minutes')) || 0;
-				const meetingWrap = document.createElement('div');
-				meetingWrap.className = 'day-class-meeting';
-				if (roomURL) {
-					meetingWrap.appendChild(createZoomMeetingButton(roomURL, passcode));
-					info.appendChild(meetingWrap);
-					return;
-				}
-				if (durationMinutes > ZOOM_MAX_AUTO_MINUTES) {
-					const warning = document.createElement('div');
-					warning.className = 'day-class-meeting-warning';
-					warning.textContent = ZOOM_MANUAL_WARNING;
-					meetingWrap.appendChild(warning);
-					info.appendChild(meetingWrap);
-				}
-			}
-
 			function getFormStudentEl() {
 				if (lockTeacher) {
 					return scheduleModalForm ? scheduleModalForm.querySelector('[name="student"]') : document.getElementById('student');
@@ -569,7 +551,6 @@ templ Schedule(data ScheduleData) {
 			let activeDate = '';
 			let monthRecordsByDate = {};
 			let monthRecordsFlat = [];
-			let todayRecords = [];
 			let modalTriggerEl = null;
 			let calendarLoadingCount = 0;
 
@@ -612,45 +593,32 @@ templ Schedule(data ScheduleData) {
 				return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
 			}
 
-			function recordField(record, camel, snake) {
-				if (record[camel] !== undefined && record[camel] !== null && record[camel] !== '') {
-					return record[camel];
+			function canLoadCalendar() {
+				const teacherId = getTeacherId();
+				return showAllTeachers || lockTeacher || (teacherId !== '' && teacherId !== null);
+			}
+
+			const todayListStart = document.getElementById('todayListStart');
+			const todayListEnd = document.getElementById('todayListEnd');
+			const dayListStart = document.getElementById('dayListStart');
+			const dayListEnd = document.getElementById('dayListEnd');
+
+			function refreshTodayList() {
+				const todayStr = formatDate(new Date());
+				if (todayDateLabel) {
+					todayDateLabel.textContent = formatDisplayDate(todayStr);
 				}
-				return record[snake] || '';
-			}
-
-			function normalizeTime(value) {
-				if (!value) return '';
-				const text = String(value);
-				const match = text.match(/(\d{1,2}):(\d{2})/);
-				if (!match) return '';
-				return String(match[1]).padStart(2, '0') + ':' + match[2];
-			}
-
-			function formatTimeRange(record) {
-				const start = normalizeTime(recordField(record, 'startTime', 'start_time'));
-				let end = normalizeTime(recordField(record, 'endTime', 'end_time'));
-				const durationMinutes = Number(recordField(record, 'durationMinutes', 'duration_minutes')) || 0;
-				if (!end && start && durationMinutes) {
-					const startMins = parseTimeToMinutes(start);
-					if (startMins !== null) {
-						const total = startMins + durationMinutes;
-						const h = Math.floor(total / 60) % 24;
-						const m = total % 60;
-						end = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+				if (!canLoadCalendar()) {
+					if (todayScheduleList) {
+						todayScheduleList.innerHTML = '<p class="day-classes-empty">Select a teacher to view today\'s schedule.</p>';
 					}
+					return;
 				}
-				if (start && end) return start + ' – ' + end;
-				if (start) return start;
-				return 'Time not set';
-			}
-
-			function sortByStartTime(records) {
-				return records.slice().sort((a, b) => {
-					const aStart = parseTimeToMinutes(normalizeTime(recordField(a, 'startTime', 'start_time'))) ?? 9999;
-					const bStart = parseTimeToMinutes(normalizeTime(recordField(b, 'startTime', 'start_time'))) ?? 9999;
-					return aStart - bStart;
-				});
+				if (todayListStart) todayListStart.value = todayStr;
+				if (todayListEnd) todayListEnd.value = todayStr;
+				if (typeof htmx !== 'undefined') {
+					htmx.trigger(todayScheduleList, 'scheduleRefresh');
+				}
 			}
 
 			function setCalendarLoading(active) {
@@ -691,47 +659,6 @@ templ Schedule(data ScheduleData) {
 			}
 			function getTeacherId() {
 				return listTeacher ? listTeacher.value : '';
-			}
-
-			function canLoadCalendar() {
-				const teacherId = getTeacherId();
-				return showAllTeachers || lockTeacher || (teacherId !== '' && teacherId !== null);
-			}
-
-			async function loadTodayData() {
-				const todayStr = formatDate(new Date());
-				if (todayDateLabel) {
-					todayDateLabel.textContent = formatDisplayDate(todayStr);
-				}
-
-				if (!canLoadCalendar()) {
-					todayRecords = [];
-					renderTodayList();
-					return;
-				}
-
-				const params = new URLSearchParams({
-					teacherId: getTeacherId() || '0',
-					startDate: todayStr,
-					endDate: todayStr,
-					page: '1',
-					pageSize: '100',
-					status: 'scheduled',
-				});
-
-				setCalendarLoading(true);
-				try {
-					const response = await fetch(buildURL('/api/scheduled-classes?' + params.toString()));
-					const data = await response.json();
-					if (!response.ok) throw new Error(data.message || 'Failed to load today\'s schedule');
-					todayRecords = data.records || [];
-				} catch (err) {
-					console.error(err);
-					todayRecords = [];
-				} finally {
-					setCalendarLoading(false);
-				}
-				renderTodayList();
 			}
 
 			async function loadMonthData() {
@@ -841,153 +768,16 @@ templ Schedule(data ScheduleData) {
 				}
 			}
 
-			function buildRecordClassURL(record, status) {
-				const params = new URLSearchParams({
-					fromSchedule: String(record.id),
-					student: String(record.studentId),
-					teacher: String(record.teacherId),
-					date: record.scheduledDate,
-					duration: String(record.durationMinutes),
-					rate: String(record.rate),
-					currency: record.currency,
-					status: status,
-				});
-				return buildURL('/classes/record?' + params.toString());
-			}
-
-			function createTeacherAvatar(avatar) {
-				const el = document.createElement('div');
-				el.className = 'avatar avatar-sm day-class-avatar';
-				el.style.backgroundColor = (avatar && avatar.assignedColor) || '#B9D283';
-				el.setAttribute('aria-label', (avatar && avatar.alt) || 'Teacher avatar');
-				if (avatar && avatar.hasPicture && avatar.pictureURL) {
-					const img = document.createElement('img');
-					img.src = avatar.pictureURL;
-					img.alt = avatar.alt || '';
-					img.className = 'avatar-image';
-					el.appendChild(img);
-				} else {
-					const span = document.createElement('span');
-					span.className = 'avatar-initials';
-					span.setAttribute('aria-hidden', 'true');
-					span.textContent = (avatar && avatar.initials) || '?';
-					el.appendChild(span);
-				}
-				return el;
-			}
-
-			function isScheduleOverdue(record) {
-				if (record.status !== 'scheduled') return false;
-				const dateStr = recordField(record, 'scheduledDate', 'scheduled_date');
-				if (!dateStr) return false;
-
-				const start = normalizeTime(recordField(record, 'startTime', 'start_time'));
-				const durationMinutes = Number(recordField(record, 'durationMinutes', 'duration_minutes')) || 0;
-				const [y, m, d] = dateStr.split('-').map(Number);
-				let endAt = new Date(y, m - 1, d, 23, 59, 59, 999);
-				if (start) {
-					const [hh, mm] = start.split(':').map(Number);
-					const totalMinutes = hh * 60 + mm + durationMinutes;
-					endAt = new Date(y, m - 1, d, Math.floor(totalMinutes / 60) % 24, totalMinutes % 60, 0, 0);
-				}
-				return new Date() > endAt;
-			}
-
-			function renderClassList(container, records, emptyMessage) {
-				if (!container) return;
-				container.innerHTML = '';
-				if (!records.length) {
-					const empty = document.createElement('p');
-					empty.className = 'day-classes-empty';
-					empty.textContent = emptyMessage;
-					container.appendChild(empty);
-					return;
-				}
-
-				const list = document.createElement('ul');
-				list.className = 'day-classes-items';
-				sortByStartTime(records).forEach(record => {
-					const overdue = isScheduleOverdue(record);
-					const li = document.createElement('li');
-					li.className = 'day-class-item' + (overdue ? ' is-overdue' : '');
-
-					const info = document.createElement('div');
-					info.className = 'day-class-info';
-
-					const header = document.createElement('div');
-					header.className = 'day-class-header';
-					header.appendChild(createTeacherAvatar(record.teacherAvatar));
-
-					const title = document.createElement('strong');
-					title.textContent = record.teacherName + ' - ' + record.studentName;
-					header.appendChild(title);
-					info.appendChild(header);
-
-					const time = document.createElement('span');
-					time.className = 'day-class-time';
-					time.textContent = formatTimeRange(record);
-					info.appendChild(time);
-
-					const rate = document.createElement('span');
-					rate.className = 'day-class-rate';
-					rate.textContent = record.rate + ' ' + record.currency;
-					info.appendChild(rate);
-
-					if (overdue) {
-						const banner = document.createElement('div');
-						banner.className = 'day-class-overdue-banner';
-						banner.textContent = 'Overdue';
-						info.appendChild(banner);
-					}
-
-					appendMeetingInfo(info, record);
-
-					li.appendChild(info);
-
-					const actions = document.createElement('div');
-					actions.className = 'day-class-actions';
-
-					if (window.appendScheduledClassActions) {
-						window.appendScheduledClassActions(actions, baseURL, {
-							id: record.id,
-							studentId: record.studentId,
-							teacherId: record.teacherId,
-							date: record.scheduledDate,
-							durationMinutes: record.durationMinutes,
-							rate: record.rate,
-							currency: record.currency,
-						});
-					}
-
-					li.appendChild(actions);
-					list.appendChild(li);
-				});
-				container.appendChild(list);
-			}
-
-			function renderTodayList() {
-				renderClassList(
-					todayScheduleList,
-					todayRecords,
-					canLoadCalendar() ? 'No classes scheduled for today.' : 'Select a teacher to view today\'s schedule.'
-				);
-			}
-
-			function renderDayClasses(dateStr) {
-				const records = monthRecordsByDate[dateStr] || [];
-				renderClassList(
-					dayClassesList,
-					records,
-					'No classes scheduled for this day.'
-				);
-			}
-
 			function openDayModal(dateStr) {
 				activeDate = dateStr;
 				if (scheduledDateInput) scheduledDateInput.value = dateStr;
 				if (modalDateTitle) modalDateTitle.textContent = formatDisplayDate(dateStr);
 				showFormMessage('', false);
-				renderDayClasses(dateStr);
+				if (dayListStart) dayListStart.value = dateStr;
+				if (dayListEnd) dayListEnd.value = dateStr;
+				if (typeof htmx !== 'undefined') {
+					htmx.trigger(document.body, 'scheduleDayOpen');
+				}
 				renderCalendar();
 
 				const todayStr = formatDate(new Date());
@@ -1026,7 +816,8 @@ templ Schedule(data ScheduleData) {
 			}
 
 			async function refreshCalendar() {
-				await Promise.all([loadMonthData(), loadTodayData()]);
+				await loadMonthData();
+				refreshTodayList();
 				renderCalendar();
 			}
 
@@ -1197,7 +988,6 @@ templ Schedule(data ScheduleData) {
 						if (scheduledDateInput) scheduledDateInput.value = activeDate;
 						if (window.initTimeRangePreview) initTimeRangePreview();
 						await refreshCalendar();
-						renderDayClasses(activeDate);
 					} catch (err) {
 						showFormMessage(err.message, true);
 						showErrorBanner(err.message);
@@ -1209,6 +999,13 @@ templ Schedule(data ScheduleData) {
 					}
 				});
 			}
+
+			document.addEventListener('click', function (e) {
+				const zoomBtn = e.target.closest('.zoom-meeting-btn[data-room-url]');
+				if (zoomBtn) {
+					openZoomMeetingModal(zoomBtn.dataset.roomUrl, zoomBtn.dataset.passcode || '');
+				}
+			});
 
 			refreshCalendar();
 			updateTimeRangePreview();

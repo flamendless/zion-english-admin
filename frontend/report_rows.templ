@@ -1,0 +1,70 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/utils"
+)
+
+templ ReportTableRow(row ReportRowData, startDate string, endDate string) {
+	<tr data-teacher-id={ row.TeacherID }>
+		<td class="avatar-col" data-label="Avatar">
+			@Avatar(row.TeacherAvatar)
+		</td>
+		<td data-label="Teacher">
+			<div class="reports-teacher-cell">
+				<span>{ row.TeacherName }</span>
+			</div>
+		</td>
+		<td data-label="Total Classes">{ row.ClassesLabel() }</td>
+		<td data-label="Total Rate/Earnings">
+			@templ.Raw(row.EarningsHTML())
+		</td>
+		<td data-label="Actions">
+			<div class="table-actions">
+				@IconActionButton(row.GenerateLabel(), row.GenerateKind(), templ.Attributes{
+					"hx-post":   utils.URL("/reports/" + row.TeacherID + "/generate"),
+					"hx-vals":   fmt.Sprintf(`js:{startDate: document.getElementById('datePreset').dataset.startDate, endDate: document.getElementById('datePreset').dataset.endDate}`),
+					"hx-target": "closest tr",
+					"hx-swap":   "outerHTML",
+				})
+				<span
+					class="download-report-wrap"
+					if !row.DownloadReady {
+						data-tooltip={ downloadDisabledTooltip }
+					}
+				>
+					if row.DownloadReady {
+						@IconActionLink(row.DownloadURL(), "Download XLSX", IconKindDownload)
+					} else {
+						<a
+							class="icon-action-btn icon-action-btn--download download-report-btn is-disabled"
+							href="#"
+							data-tooltip="Download XLSX"
+							aria-label="Download XLSX"
+							aria-disabled="true"
+						>
+							@IconSVG(IconKindDownload)
+						</a>
+					}
+				</span>
+				@IconActionButton("View", IconKindView, templ.Attributes{
+					"hx-get":    utils.URL("/reports/" + row.TeacherID + "/view?startDate=" + startDate + "&endDate=" + endDate),
+					"hx-target": "#reportViewModalHost",
+					"hx-swap":   "innerHTML",
+				})
+			</div>
+		</td>
+	</tr>
+}
+
+templ ReportsTableBody(rows []ReportRowData, startDate string, endDate string, emptyMessage string) {
+	if len(rows) == 0 {
+		<tr>
+			<td colspan="5" class="empty-state">{ emptyMessage }</td>
+		</tr>
+	} else {
+		for _, row := range rows {
+			@ReportTableRow(row, startDate, endDate)
+		}
+	}
+}

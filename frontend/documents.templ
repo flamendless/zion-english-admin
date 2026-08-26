@@ -106,17 +106,17 @@ templ DocumentsTable(items []DocumentItem, showUploader bool, showActions bool) 
 							if showActions {
 								<td data-label="Actions">
 									<div class="table-actions documents-actions">
-										<a href={ item.ViewURL } class="view-btn" target="_blank" rel="noopener noreferrer">View</a>
+										@IconActionLinkExternal(item.ViewURL, "View", IconKindExternal)
 										if item.CanReview {
 											<form method="POST" action={ utils.URL("/documents/" + item.ID + "/approve") } class="table-action-form">
-												<button type="submit" class="approve-btn">Approve</button>
+												@IconActionSubmit("Approve", IconKindApprove)
 											</form>
 											<form method="POST" action={ utils.URL("/documents/" + item.ID + "/reject") } class="table-action-form" onsubmit="return confirm('Reject this document? The teacher will be able to upload a new one.');">
-												<button type="submit" class="delete-btn">Reject</button>
+												@IconActionSubmit("Reject", IconKindReject)
 											</form>
 										}
 										<form method="POST" action={ utils.URL("/documents/" + item.ID + "/delete") } class="table-action-form" onsubmit="return confirm('Permanently delete this document? The file will be removed and cannot be recovered.');">
-											<button type="submit" class="warning-btn">Delete</button>
+											@IconActionSubmit("Delete", IconKindWarning)
 										</form>
 									</div>
 								</td>

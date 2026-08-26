@@ -1,0 +1,48 @@
+package frontend
+
+import (
+	"fmt"
+)
+
+templ ClassRecordRow(record ClassRecordRowData, showTeacher bool) {
+	<tr class={ record.RowClass() }>
+		<td data-label="Date">{ record.Date }</td>
+		<td data-label="Start Time">{ record.StartTimeDisplay() }</td>
+		<td data-label="End Time">{ record.EndTimeDisplay() }</td>
+		if showTeacher {
+			<td data-label="Teacher">{ record.TeacherName }</td>
+		}
+		<td data-label="Student">{ record.StudentName }</td>
+		<td data-label="Rate">{ record.RateLabel() }</td>
+		<td data-label="Status" class={ "status-" + record.Status }>{ record.Status }</td>
+		<td data-label="Actions">
+			<div class="table-actions">
+				if record.IsScheduled() {
+					@ScheduledClassActions(record.ScheduledItemData())
+				} else {
+					@IconActionLink(record.ViewURL(), "View", IconKindView)
+					@IconActionLink(record.EditURL(), "Edit", IconKindEdit)
+				}
+			</div>
+		</td>
+	</tr>
+}
+
+templ ClassRecordTableRows(records []ClassRecordRowData, showTeacher bool, emptyColspan int, emptyMessage string) {
+	if len(records) == 0 {
+		<tr>
+			<td colspan={ fmt.Sprintf("%d", emptyColspan) } class="empty-state">{ emptyMessage }</td>
+		</tr>
+	} else {
+		for _, record := range records {
+			@ClassRecordRow(record, showTeacher)
+		}
+	}
+}
+
+templ ClassRecordsPartial(records []ClassRecordRowData, showTeacher bool, emptyColspan int, emptyMessage string, page PaginationData, partialsURL string, includeSelector string) {
+	@ClassRecordTableRows(records, showTeacher, emptyColspan, emptyMessage)
+	<div id="paginationBottom" hx-swap-oob="innerHTML">
+		@PaginationBarHTMX(partialsURL, includeSelector, page)
+	</div>
+}

@@ -9,6 +9,27 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.08.27"
+    date: "2026-08-27"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Teachers can edit scheduled classes from the schedule and classes pages."
+        commit: "5d19363"
+      - text: "Teachers can edit student details from My Students."
+        commit: "e001b83"
+      - text: "A Support page links to guides, and guides and legal pages have been refreshed."
+        commit: "e016f8f"
+    improvements:
+      - text: "You can register multiple students with the same name."
+        commit: "66a1bd6"
+      - text: "Zoom connect supports a custom authorization URL for Marketplace production apps."
+        commit: "8aecb53"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
   - version: "2026.08.25"
     date: "2026-08-25"
     released: true

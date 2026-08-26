@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -407,85 +406,110 @@ func totalRateParams(teacherID int64, startDate, endDate string) queries.GetTota
 	}
 }
 
-func handleGetClassRecords(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
+type classRecordsQuery struct {
+	teacherID    int64
+	startDate    string
+	endDate      string
+	statusFilter string
+	nameFilter   string
+	showAll      bool
+}
+
+func parseClassRecordsQuery(r *http.Request) (classRecordsQuery, error) {
+	startDate, endDate, err := parseListDateRange(r)
+	if err != nil {
+		return classRecordsQuery{}, err
 	}
 
-	teacherIDStr := r.URL.Query().Get("teacherId")
-	startDate := r.URL.Query().Get("startDate")
-	endDate := r.URL.Query().Get("endDate")
+	teacherIDStr := strings.TrimSpace(r.URL.Query().Get("teacherId"))
+	if teacherIDStr == "" {
+		teacherIDStr = strings.TrimSpace(r.URL.Query().Get("teacher"))
+	}
 	statusFilter := r.URL.Query().Get("status")
 	nameFilter := r.URL.Query().Get("q")
 
-	if startDate == "" || endDate == "" {
-		HttpError(w, "Missing required parameters", http.StatusBadRequest)
-		return
-	}
-
 	role := auth.GetRole(r.Context())
 	var teacherID int64
+	showAll := false
 	if teacherIDStr == "" {
 		if role != auth.RoleSuperuser {
-			HttpError(w, "Missing required parameters", http.StatusBadRequest)
-			return
+			return classRecordsQuery{}, errors.New("missing required parameters")
 		}
+		showAll = true
 	} else {
 		parsedID, err := strconv.ParseInt(teacherIDStr, 10, 64)
 		if err != nil {
-			HttpError(w, "Invalid teacher ID", http.StatusBadRequest)
-			return
+			return classRecordsQuery{}, errors.New("invalid teacher ID")
 		}
 		teacherID = parsedID
 		if role == auth.RoleTeacher {
 			user := auth.GetUser(r.Context())
 			if teacherID != user.ID {
-				HttpError(w, "Forbidden", http.StatusForbidden)
-				return
+				return classRecordsQuery{}, errors.New("forbidden")
 			}
 		}
+	}
+
+	return classRecordsQuery{
+		teacherID:    teacherID,
+		startDate:    startDate,
+		endDate:      endDate,
+		statusFilter: statusFilter,
+		nameFilter:   nameFilter,
+		showAll:      showAll,
+	}, nil
+}
+
+func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	q, err := parseClassRecordsQuery(r)
+	if err != nil {
+		if err.Error() == "forbidden" {
+			HttpError(w, err.Error(), http.StatusForbidden)
+			return
+		}
+		HttpError(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	page := utils.ParsePageQuery(r)
 	ctx := r.Context()
 
-	countParams := classesListCountParams(teacherID, startDate, endDate, statusFilter, nameFilter)
-	total, err := dbRO.GetQueries().CountClassesListFiltered(ctx, countParams)
+	total, err := dbRO.GetQueries().CountClassesListFiltered(ctx, classesListCountParams(q.teacherID, q.startDate, q.endDate, q.statusFilter, q.nameFilter))
 	if err != nil {
 		HttpError(w, "Failed to count class records", http.StatusInternalServerError)
 		return
 	}
 	page.Total = total
 
-	records, err := dbRO.GetQueries().GetClassesListFiltered(ctx, classesListListParams(teacherID, startDate, endDate, statusFilter, nameFilter, int64(page.Size), int64(page.Offset())))
+	records, err := dbRO.GetQueries().GetClassesListFiltered(ctx, classesListListParams(q.teacherID, q.startDate, q.endDate, q.statusFilter, q.nameFilter, int64(page.Size), int64(page.Offset())))
 	if err != nil {
 		HttpError(w, "Failed to fetch class records", http.StatusInternalServerError)
 		return
 	}
 
-	totalRate, err := dbRO.GetQueries().GetTotalRateByTeacherAndDateRange(ctx, totalRateParams(teacherID, startDate, endDate))
-	if err != nil {
-		HttpError(w, "Failed to fetch total rate", http.StatusInternalServerError)
-		return
-	}
-
-	var response []models.ClassRecordView
+	views := make([]models.ClassRecordView, 0, len(records))
 	for _, cr := range records {
-		response = append(response, classesListViewFromRow(cr))
+		views = append(views, classesListViewFromRow(cr))
 	}
+	rows := frontend.ClassRecordRowFromViews(views)
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"records":   response,
-		"totalRate": totalRate,
-		"page": map[string]interface{}{
-			"number":     page.Number,
-			"size":       page.Size,
-			"total":      page.Total,
-			"totalPages": page.TotalPages(),
-		},
-	})
+	colspan := 7
+	if q.showAll {
+		colspan = 8
+	}
+	pagination := frontend.BuildPaginationData(page.Number, page.Size, total)
+	partialsURL := utils.URL("/classes/partials/rows")
+	includeSelector := "#classesToolbar"
+
+	w.Header().Set("Content-Type", "text/html")
+	if err := frontend.ClassRecordsPartial(rows, q.showAll, colspan, "No classes found for the selected criteria", pagination, partialsURL, includeSelector).Render(ctx, w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func handleClassRecord(w http.ResponseWriter, r *http.Request) {

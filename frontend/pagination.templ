@@ -1,6 +1,9 @@
 package frontend
 
-import "zion-english/internal/utils"
+import (
+	"fmt"
+	"zion-english/internal/utils"
+)
 
 templ HubHeader(title string, actionLabel string, actionHref string, showAction bool) {
 	<div class="hub-header">
@@ -21,6 +24,38 @@ templ PaginationBar(hasPrev bool, prevURL string, hasNext bool, nextURL string, 
 		<span class="pagination-info">Page { pageNum } of { totalPages } ({ total } total)</span>
 		if hasNext {
 			<a href={ nextURL } class="pagination-btn">Next</a>
+		} else {
+			<span class="pagination-btn disabled">Next</span>
+		}
+	</div>
+}
+
+templ PaginationBarHTMX(loadURL string, includeSelector string, page PaginationData) {
+	<div class="pagination-bar">
+		if page.HasPrev {
+			<button
+				type="button"
+				class="pagination-btn"
+				hx-get={ loadURL }
+				hx-include={ includeSelector }
+				hx-vals={ fmt.Sprintf(`{"page": %d}`, page.PrevPage) }
+				hx-target="#classesTableBody"
+				hx-swap="innerHTML"
+			>Previous</button>
+		} else {
+			<span class="pagination-btn disabled">Previous</span>
+		}
+		<span class="pagination-info">Page { page.Number } of { page.TotalPages } ({ page.Total } total)</span>
+		if page.HasNext {
+			<button
+				type="button"
+				class="pagination-btn"
+				hx-get={ loadURL }
+				hx-include={ includeSelector }
+				hx-vals={ fmt.Sprintf(`{"page": %d}`, page.NextPage) }
+				hx-target="#classesTableBody"
+				hx-swap="innerHTML"
+			>Next</button>
 		} else {
 			<span class="pagination-btn disabled">Next</span>
 		}
