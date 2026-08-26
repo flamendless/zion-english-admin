@@ -24,6 +24,10 @@ import (
 )
 
 func handleSchedulePath(w http.ResponseWriter, r *http.Request) {
+	if id, ok := extractPathID(r, "schedule", "/edit"); ok {
+		handleScheduledClassEdit(w, r, id)
+		return
+	}
 	if id, ok := extractPathID(r, "schedule", "/cancel"); ok {
 		handleCancelScheduledClass(w, r, id)
 		return
@@ -419,6 +423,158 @@ func handleRescheduleScheduledClass(w http.ResponseWriter, r *http.Request, sche
 	}
 }
 
+func editScheduleData(ctx context.Context, scheduleID int64, lockTeacher, isSuperuser bool) (frontend.EditScheduleData, error) {
+	existing, err := dbRO.GetQueries().GetScheduledClassByID(ctx, scheduleID)
+	if err != nil {
+		return frontend.EditScheduleData{}, err
+	}
+
+	rules := classrules.ScheduledClassRules{DB: dbRO.GetQueries()}
+	if err := rules.ValidateAccess(existing.TeacherID, auth.GetUser(ctx)); err != nil {
+		return frontend.EditScheduleData{}, err
+	}
+
+	startTime := ""
+	if existing.StartTime.Valid {
+		startTime = existing.StartTime.String
+	}
+
+	return frontend.EditScheduleData{
+		ScheduleID:  strconv.FormatInt(scheduleID, 10),
+		LockTeacher: lockTeacher,
+		IsSuperuser: isSuperuser,
+		TeacherID:   strconv.FormatInt(existing.TeacherID, 10),
+		TeacherName: existing.TeacherName,
+		StudentID:   strconv.FormatInt(existing.StudentID, 10),
+		Date:        existing.ScheduledDate,
+		StartTime:   startTime,
+		EndTime:     utils.EndTimeFromStartAndDuration(startTime, existing.DurationMinutes),
+		Rate:        existing.Rate,
+		Currency:    existing.Currency,
+	}, nil
+}
+
+func handleScheduledClassEdit(w http.ResponseWriter, r *http.Request, scheduleID int64) {
+	ctx := r.Context()
+	user := auth.GetUser(ctx)
+	role := auth.GetRole(ctx)
+	lockTeacher := role == auth.RoleTeacher
+	isSuperuser := role == auth.RoleSuperuser
+
+	existing, err := dbRO.GetQueries().GetScheduledClassByID(ctx, scheduleID)
+	if err != nil {
+		HttpError(w, "Scheduled class not found", http.StatusNotFound)
+		return
+	}
+
+	rules := classrules.ScheduledClassRules{DB: dbRO.GetQueries()}
+	if err := rules.ValidateAccess(existing.TeacherID, user); err != nil {
+		HttpError(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	if existing.Status != "scheduled" {
+		HttpError(w, "only scheduled classes can be edited", http.StatusBadRequest)
+		return
+	}
+
+	if r.Method == http.MethodGet {
+		data, err := editScheduleData(ctx, scheduleID, lockTeacher, isSuperuser)
+		if err != nil {
+			HttpError(w, err.Error(), http.StatusForbidden)
+			return
+		}
+		w.Header().Set("Content-Type", "text/html")
+		frontend.EditSchedule(data).Render(ctx, w)
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
+		return
+	}
+
+	studentID, err := formInt64(r, "schedule_student", "student")
+	if err != nil {
+		sendErrorLog(w, "student is required")
+		return
+	}
+	rate, err := requireFloat64(r.FormValue("rate"))
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+	currency := r.FormValue("currency")
+	if err := validateScheduledClassRateCurrency(rate, currency); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	startTime := ""
+	if existing.StartTime.Valid {
+		startTime = existing.StartTime.String
+	}
+
+	if err := rules.Validate(ctx, user, classrules.ScheduledClassInput{
+		ScheduleID:      scheduleID,
+		StudentID:       studentID,
+		TeacherID:       existing.TeacherID,
+		Date:            existing.ScheduledDate,
+		StartTime:       startTime,
+		DurationMinutes: existing.DurationMinutes,
+	}); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	err = dbRW.GetQueries().UpdateScheduledClassDetails(ctx, queries.UpdateScheduledClassDetailsParams{
+		StudentID: studentID,
+		Rate:      rate,
+		Currency:  currency,
+		ID:        scheduleID,
+	})
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	if studentID != existing.StudentID && meetingSvc != nil {
+		student, studentErr := dbRO.GetQueries().GetStudentByID(ctx, studentID)
+		studentName := "student"
+		if studentErr == nil {
+			studentName = student.Name
+		}
+		if err := meetingSvc.SyncRoomForSchedule(ctx, meetings.ScheduledClassMeetingInput{
+			ScheduleID:      scheduleID,
+			TeacherID:       existing.TeacherID,
+			StudentName:     studentName,
+			ScheduledDate:   existing.ScheduledDate,
+			StartTime:       startTime,
+			DurationMinutes: existing.DurationMinutes,
+		}); err != nil {
+			logs.Log().Warn("zoom room sync failed after schedule edit",
+				zap.Error(err),
+				zap.Int64("schedule_id", scheduleID),
+				zap.Int64("teacher_id", existing.TeacherID),
+			)
+		}
+	}
+
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("updated scheduled class id %d (student id %d, rate %.2f %s)", scheduleID, studentID, rate, currency))
+	actor := auth.GetUser(ctx)
+	notifyCrossParty(ctx, actor, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
+		fmt.Sprintf("Scheduled class on %s was updated", existing.ScheduledDate))
+
+	if _, err := fmt.Fprint(w, "Scheduled class updated successfully!\n"); err != nil {
+		sendErrorLog(w, err.Error())
+	}
+}
+
 func markScheduledClassConducted(ctx context.Context, scheduleID int64, req models.ClassRecordRequest) error {
 	existing, err := dbRO.GetQueries().GetScheduledClassByID(ctx, scheduleID)
 	if err != nil {
@@ -496,6 +652,19 @@ func formInt64(r *http.Request, names ...string) (int64, error) {
 		}
 	}
 	return 0, errors.New("missing integer value")
+}
+
+func validateScheduledClassRateCurrency(rate float64, currency string) error {
+	if rate <= 0 {
+		return errors.New("rate must be greater than zero")
+	}
+	if currency == "" {
+		return errors.New("currency is required")
+	}
+	if !constants.ValidCurrency(currency) {
+		return errors.New("invalid currency. Must be KRW, CAD, YEN, or PHP")
+	}
+	return nil
 }
 
 func validateScheduledClassRequest(req *models.ScheduledClassRequest) error {

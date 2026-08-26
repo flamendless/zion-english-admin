@@ -1,0 +1,109 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/utils"
+)
+
+type EditScheduleData struct {
+	ScheduleID  string
+	LockTeacher bool
+	IsSuperuser bool
+	TeacherID   string
+	TeacherName string
+	StudentID   string
+	Date        string
+	StartTime   string
+	EndTime     string
+	Rate        float64
+	Currency    string
+}
+
+templ EditSchedule(data EditScheduleData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Edit Scheduled Class - Zion English Admin</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@SuccessBanner()
+			@ErrorBanner()
+
+			<h2>Edit Scheduled Class</h2>
+			<p><a href={ utils.URL("/schedule") } class="btn btn-secondary">Back to Schedule</a></p>
+
+			<form
+				hx-post={ utils.URL("/schedule/" + data.ScheduleID + "/edit") }
+				hx-swap="innerHTML"
+				hx-target="#logOutput"
+			>
+				<div class="form-readonly form-row">
+					<div class="form-group">
+						<label>Teacher</label>
+						<input type="text" value={ data.TeacherName } disabled/>
+					</div>
+					<div class="form-group">
+						<label>Date</label>
+						<input type="text" value={ data.Date } disabled/>
+					</div>
+					<div class="form-group">
+						<label>Time</label>
+						<input type="text" value={ formatScheduleTimeRange(data.StartTime, data.EndTime) } disabled/>
+					</div>
+				</div>
+				<div class="form-row">
+					if data.LockTeacher {
+						@TeacherStudentsDropdownWithValue(data.StudentID)
+					} else {
+						@ScheduleEditStudentDropdown(data.TeacherID, data.StudentID)
+					}
+				</div>
+				<div class="form-row">
+					@CurrencyDropdownWithValue(data.Currency)
+					<div class="form-group">
+						<label for="rate">Rate *</label>
+						<input type="number" id="rate" name="rate" required min="0" step="0.01" value={ formatFloat(data.Rate) }/>
+					</div>
+				</div>
+				<button type="submit" class="btn">Save Changes</button>
+			</form>
+
+			<div class="logs-section">
+				<h3>Logs and Errors</h3>
+				<div id="logOutput">Waiting for submission...</div>
+			</div>
+		</div>
+		<script>
+			const studentSelect = document.getElementById('student') || document.getElementById('schedule_student');
+			if (studentSelect) {
+				studentSelect.addEventListener('change', () => {
+					const opt = studentSelect.options[studentSelect.selectedIndex];
+					if (!opt || !opt.value) return;
+					const rate = opt.getAttribute('data-rate');
+					const currency = opt.getAttribute('data-currency');
+					const rateEl = document.getElementById('rate');
+					const currencyEl = document.getElementById('currency');
+					if (rate && rateEl) rateEl.value = rate;
+					if (currency && currencyEl) currencyEl.value = currency;
+				});
+			}
+		</script>
+	</body>
+	</html>
+}
+
+func formatScheduleTimeRange(start, end string) string {
+	if start == "" && end == "" {
+		return "-"
+	}
+	if end == "" {
+		return start
+	}
+	return fmt.Sprintf("%s – %s", start, end)
+}

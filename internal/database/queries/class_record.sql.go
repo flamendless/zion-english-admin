@@ -124,6 +124,73 @@ func (q *Queries) CountClassRecordsFiltered(ctx context.Context, arg CountClassR
 	return count, err
 }
 
+const countClassesListFiltered = `-- name: CountClassesListFiltered :one
+SELECT (
+    SELECT COUNT(*) as count
+    FROM tbl_class_records cr
+    JOIN tbl_students s ON cr.student_id = s.id
+    WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
+      AND (? = '' OR ? != 'scheduled')
+      AND (? = '' OR cr.status = ?)
+      AND (? = '' OR s.name LIKE '%' || ? || '%')
+) + (
+    SELECT COUNT(*) as count
+    FROM tbl_scheduled_classes sc
+    JOIN tbl_students s ON sc.student_id = s.id
+    WHERE (? = 0 OR sc.teacher_id = ?) AND sc.scheduled_date >= ? AND sc.scheduled_date <= ?
+      AND sc.status = 'scheduled'
+      AND (? = '' OR ? = 'scheduled')
+      AND (? = '' OR s.name LIKE '%' || ? || '%')
+) AS count
+`
+
+type CountClassesListFilteredParams struct {
+	Column1         interface{}
+	TeacherID       int64
+	Date            string
+	Date_2          string
+	Column5         interface{}
+	Column6         interface{}
+	Column7         interface{}
+	Status          string
+	Column9         interface{}
+	Column10        sql.NullString
+	Column11        interface{}
+	TeacherID_2     int64
+	ScheduledDate   string
+	ScheduledDate_2 string
+	Column15        interface{}
+	Column16        interface{}
+	Column17        interface{}
+	Column18        sql.NullString
+}
+
+func (q *Queries) CountClassesListFiltered(ctx context.Context, arg CountClassesListFilteredParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countClassesListFiltered,
+		arg.Column1,
+		arg.TeacherID,
+		arg.Date,
+		arg.Date_2,
+		arg.Column5,
+		arg.Column6,
+		arg.Column7,
+		arg.Status,
+		arg.Column9,
+		arg.Column10,
+		arg.Column11,
+		arg.TeacherID_2,
+		arg.ScheduledDate,
+		arg.ScheduledDate_2,
+		arg.Column15,
+		arg.Column16,
+		arg.Column17,
+		arg.Column18,
+	)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getClassRecordByID = `-- name: GetClassRecordByID :one
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
        s.name as student_name,
@@ -336,6 +403,167 @@ func (q *Queries) GetClassRecordsFiltered(ctx context.Context, arg GetClassRecor
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.RecordedByRole,
+			&i.StudentName,
+			&i.TeacherName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getClassesListFiltered = `-- name: GetClassesListFiltered :many
+SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_minutes, rate, currency, status, reason, notes, created_at, student_name, teacher_name FROM (
+    SELECT
+        cr.id,
+        'record' AS source,
+        cr.student_id,
+        cr.teacher_id,
+        cr.date AS date,
+        cr.start_time,
+        cr.end_time,
+        cr.duration_minutes,
+        cr.rate,
+        cr.currency,
+        cr.status,
+        cr.reason,
+        cr.notes,
+        cr.created_at,
+        s.name AS student_name,
+        trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name
+    FROM tbl_class_records cr
+    JOIN tbl_students s ON cr.student_id = s.id
+    JOIN tbl_teachers t ON cr.teacher_id = t.id
+    WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
+      AND (? = '' OR ? != 'scheduled')
+      AND (? = '' OR cr.status = ?)
+      AND (? = '' OR s.name LIKE '%' || ? || '%')
+
+    UNION ALL
+
+    SELECT
+        sc.id,
+        'scheduled' AS source,
+        sc.student_id,
+        sc.teacher_id,
+        sc.scheduled_date AS date,
+        sc.start_time,
+        NULL AS end_time,
+        sc.duration_minutes,
+        sc.rate,
+        sc.currency,
+        sc.status,
+        sc.reason,
+        NULL AS notes,
+        sc.created_at,
+        s.name AS student_name,
+        trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name
+    FROM tbl_scheduled_classes sc
+    JOIN tbl_students s ON sc.student_id = s.id
+    JOIN tbl_teachers t ON sc.teacher_id = t.id
+    WHERE (? = 0 OR sc.teacher_id = ?) AND sc.scheduled_date >= ? AND sc.scheduled_date <= ?
+      AND sc.status = 'scheduled'
+      AND (? = '' OR ? = 'scheduled')
+      AND (? = '' OR s.name LIKE '%' || ? || '%')
+) AS combined
+ORDER BY CASE WHEN combined.date = date('now', 'localtime') THEN 0 ELSE 1 END, combined.date DESC, combined.start_time DESC, combined.created_at DESC
+LIMIT ? OFFSET ?
+`
+
+type GetClassesListFilteredParams struct {
+	Column1         interface{}
+	TeacherID       int64
+	Date            string
+	Date_2          string
+	Column5         interface{}
+	Column6         interface{}
+	Column7         interface{}
+	Status          string
+	Column9         interface{}
+	Column10        sql.NullString
+	Column11        interface{}
+	TeacherID_2     int64
+	ScheduledDate   string
+	ScheduledDate_2 string
+	Column15        interface{}
+	Column16        interface{}
+	Column17        interface{}
+	Column18        sql.NullString
+	Limit           int64
+	Offset          int64
+}
+
+type GetClassesListFilteredRow struct {
+	ID              int64
+	Source          string
+	StudentID       int64
+	TeacherID       int64
+	Date            string
+	StartTime       sql.NullString
+	EndTime         sql.NullString
+	DurationMinutes int64
+	Rate            float64
+	Currency        string
+	Status          string
+	Reason          sql.NullString
+	Notes           sql.NullString
+	CreatedAt       string
+	StudentName     string
+	TeacherName     string
+}
+
+func (q *Queries) GetClassesListFiltered(ctx context.Context, arg GetClassesListFilteredParams) ([]GetClassesListFilteredRow, error) {
+	rows, err := q.db.QueryContext(ctx, getClassesListFiltered,
+		arg.Column1,
+		arg.TeacherID,
+		arg.Date,
+		arg.Date_2,
+		arg.Column5,
+		arg.Column6,
+		arg.Column7,
+		arg.Status,
+		arg.Column9,
+		arg.Column10,
+		arg.Column11,
+		arg.TeacherID_2,
+		arg.ScheduledDate,
+		arg.ScheduledDate_2,
+		arg.Column15,
+		arg.Column16,
+		arg.Column17,
+		arg.Column18,
+		arg.Limit,
+		arg.Offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetClassesListFilteredRow
+	for rows.Next() {
+		var i GetClassesListFilteredRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Source,
+			&i.StudentID,
+			&i.TeacherID,
+			&i.Date,
+			&i.StartTime,
+			&i.EndTime,
+			&i.DurationMinutes,
+			&i.Rate,
+			&i.Currency,
+			&i.Status,
+			&i.Reason,
+			&i.Notes,
+			&i.CreatedAt,
 			&i.StudentName,
 			&i.TeacherName,
 		); err != nil {

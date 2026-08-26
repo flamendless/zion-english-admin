@@ -1413,6 +1413,65 @@ templ GlobalIncludes() {
 			font-size: 0.8125rem;
 		}
 
+		.icon-action-btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 36px;
+			height: 36px;
+			padding: var(--space-1);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-md);
+			background: var(--color-surface);
+			color: var(--color-foreground);
+			text-decoration: none;
+			cursor: pointer;
+			transition: background-color var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+		}
+
+		.icon-action-btn:hover {
+			background: var(--color-info-bg);
+			border-color: color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+			box-shadow: var(--shadow-sm);
+		}
+
+		.icon-action-btn:focus-visible {
+			outline: 2px solid var(--color-ring);
+			outline-offset: 2px;
+		}
+
+		.icon-action-btn--conduct {
+			color: var(--color-success);
+			border-color: color-mix(in srgb, var(--color-success) 35%, var(--color-border));
+		}
+
+		.icon-action-btn--conduct:hover {
+			background: var(--color-success-bg);
+			border-color: var(--color-success);
+		}
+
+		.icon-action-btn--cancel {
+			color: var(--color-destructive);
+			border-color: color-mix(in srgb, var(--color-destructive) 35%, var(--color-border));
+		}
+
+		.icon-action-btn--cancel:hover {
+			background: var(--color-error-bg);
+			border-color: var(--color-destructive);
+		}
+
+		.icon-action-btn--edit {
+			color: var(--color-accent);
+		}
+
+		.table-actions .icon-action-btn {
+			margin-top: 0;
+		}
+
+		.day-class-actions .icon-action-btn {
+			flex-shrink: 0;
+		}
+
 		.download-report-wrap {
 			display: inline-flex;
 			align-items: center;
@@ -2190,8 +2249,8 @@ templ GlobalIncludes() {
 		}
 
 		.schedule-today-section .day-class-actions {
-			flex-direction: column;
-			align-items: stretch;
+			flex-direction: row;
+			align-items: center;
 		}
 
 		.day-class-actions .btn {
@@ -3336,4 +3395,5 @@ templ GlobalIncludes() {
 	@CsrfHandlers()
 	@ErrorBannerHandlers()
 	@ScrClipboardHelpers()
+	@ScrIconActions()
 }

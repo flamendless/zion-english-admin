@@ -151,8 +151,9 @@ templ Schedule(data ScheduleData) {
 					align-items: stretch;
 				}
 				.schedule-page .day-class-actions {
-					display: grid;
-					grid-template-columns: 1fr 1fr;
+					display: flex;
+					flex-direction: row;
+					justify-content: flex-end;
 					gap: var(--space-2);
 					width: 100%;
 				}
@@ -160,6 +161,10 @@ templ Schedule(data ScheduleData) {
 					width: 100%;
 					justify-content: center;
 					text-align: center;
+				}
+				.schedule-page .day-class-actions .icon-action-btn {
+					width: 40px;
+					height: 40px;
 				}
 				.schedule-page .schedule-modal-form .form-row {
 					flex-direction: column;
@@ -942,17 +947,17 @@ templ Schedule(data ScheduleData) {
 					const actions = document.createElement('div');
 					actions.className = 'day-class-actions';
 
-					const conduct = document.createElement('a');
-					conduct.href = buildRecordClassURL(record, 'conducted');
-					conduct.className = 'btn';
-					conduct.textContent = 'Conduct';
-					actions.appendChild(conduct);
-
-					const cancelLink = document.createElement('a');
-					cancelLink.href = buildRecordClassURL(record, 'cancelled');
-					cancelLink.className = 'btn btn-secondary btn-sm';
-					cancelLink.textContent = 'Cancel';
-					actions.appendChild(cancelLink);
+					if (window.appendScheduledClassActions) {
+						window.appendScheduledClassActions(actions, baseURL, {
+							id: record.id,
+							studentId: record.studentId,
+							teacherId: record.teacherId,
+							date: record.scheduledDate,
+							durationMinutes: record.durationMinutes,
+							rate: record.rate,
+							currency: record.currency,
+						});
+					}
 
 					li.appendChild(actions);
 					list.appendChild(li);

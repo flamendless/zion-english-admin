@@ -127,6 +127,20 @@ templ ScheduleModalStudentDropdown() {
 	</div>
 }
 
+templ ScheduleEditStudentDropdown(teacherID string, studentID string) {
+	<div class="form-group">
+		<label for="schedule_student">Student *</label>
+		<select id="schedule_student" name="schedule_student" required
+			hx-get={ utils.URL("/api/students?teacher=" + teacherID + "&selected=" + studentID) }
+			hx-trigger="load"
+			hx-swap="innerHTML"
+			hx-target="this"
+		>
+			<option value="">-- Select Student --</option>
+		</select>
+	</div>
+}
+
 templ StudentSearchbox() {
 	<div class="form-group student-search">
 		<label for="relatedStudentSearch">Existing Student</label>

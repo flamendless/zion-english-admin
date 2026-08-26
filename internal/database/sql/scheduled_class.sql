@@ -22,6 +22,11 @@ UPDATE tbl_scheduled_classes
 SET scheduled_date = ?, start_time = ?, status = 'scheduled', reason = ?, updated_at = datetime('now')
 WHERE id = ?;
 
+-- name: UpdateScheduledClassDetails :exec
+UPDATE tbl_scheduled_classes
+SET student_id = ?, rate = ?, currency = ?, updated_at = datetime('now')
+WHERE id = ?;
+
 -- name: CountScheduledClassesFiltered :one
 SELECT COUNT(*) as count
 FROM tbl_scheduled_classes sc

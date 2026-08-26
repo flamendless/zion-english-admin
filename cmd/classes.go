@@ -279,6 +279,94 @@ func classRecordViewFromRow(cr queries.GetClassRecordsFilteredRow) models.ClassR
 		Reason:          cr.Reason.String,
 		Notes:           cr.Notes.String,
 		CreatedAt:       cr.CreatedAt,
+		Source:          "record",
+	}
+}
+
+func classesListViewFromRow(row queries.GetClassesListFilteredRow) models.ClassRecordView {
+	startTime := ""
+	if row.StartTime.Valid {
+		startTime = row.StartTime.String
+	}
+	endTime := ""
+	if row.EndTime.Valid {
+		endTime = row.EndTime.String
+	} else if startTime != "" {
+		endTime = utils.EndTimeFromStartAndDuration(startTime, row.DurationMinutes)
+	}
+	reason := ""
+	if row.Reason.Valid {
+		reason = row.Reason.String
+	}
+	notes := ""
+	if row.Notes.Valid {
+		notes = row.Notes.String
+	}
+	return models.ClassRecordView{
+		ID:              row.ID,
+		StudentID:       row.StudentID,
+		TeacherID:       row.TeacherID,
+		StudentName:     row.StudentName,
+		TeacherName:     row.TeacherName,
+		Date:            row.Date,
+		StartTime:       startTime,
+		EndTime:         endTime,
+		DurationMinutes: row.DurationMinutes,
+		Rate:            row.Rate,
+		Currency:        row.Currency,
+		Status:          row.Status,
+		Reason:          reason,
+		Notes:           notes,
+		CreatedAt:       row.CreatedAt,
+		Source:          row.Source,
+	}
+}
+
+func classesListCountParams(teacherID int64, startDate, endDate, statusFilter, nameFilter string) queries.CountClassesListFilteredParams {
+	return queries.CountClassesListFilteredParams{
+		Column1:         teacherID,
+		TeacherID:       teacherID,
+		Date:            startDate,
+		Date_2:          endDate,
+		Column5:         statusFilter,
+		Column6:         statusFilter,
+		Column7:         statusFilter,
+		Status:          statusFilter,
+		Column9:         nameFilter,
+		Column10:        sql.NullString{String: nameFilter, Valid: nameFilter != ""},
+		Column11:        teacherID,
+		TeacherID_2:     teacherID,
+		ScheduledDate:   startDate,
+		ScheduledDate_2: endDate,
+		Column15:        statusFilter,
+		Column16:        statusFilter,
+		Column17:        nameFilter,
+		Column18:        sql.NullString{String: nameFilter, Valid: nameFilter != ""},
+	}
+}
+
+func classesListListParams(teacherID int64, startDate, endDate, statusFilter, nameFilter string, limit, offset int64) queries.GetClassesListFilteredParams {
+	return queries.GetClassesListFilteredParams{
+		Column1:         teacherID,
+		TeacherID:       teacherID,
+		Date:            startDate,
+		Date_2:          endDate,
+		Column5:         statusFilter,
+		Column6:         statusFilter,
+		Column7:         statusFilter,
+		Status:          statusFilter,
+		Column9:         nameFilter,
+		Column10:        sql.NullString{String: nameFilter, Valid: nameFilter != ""},
+		Column11:        teacherID,
+		TeacherID_2:     teacherID,
+		ScheduledDate:   startDate,
+		ScheduledDate_2: endDate,
+		Column15:        statusFilter,
+		Column16:        statusFilter,
+		Column17:        nameFilter,
+		Column18:        sql.NullString{String: nameFilter, Valid: nameFilter != ""},
+		Limit:           limit,
+		Offset:          offset,
 	}
 }
 
@@ -362,15 +450,15 @@ func handleGetClassRecords(w http.ResponseWriter, r *http.Request) {
 	page := utils.ParsePageQuery(r)
 	ctx := r.Context()
 
-	countParams := classRecordsCountParams(teacherID, startDate, endDate, statusFilter, nameFilter)
-	total, err := dbRO.GetQueries().CountClassRecordsFiltered(ctx, countParams)
+	countParams := classesListCountParams(teacherID, startDate, endDate, statusFilter, nameFilter)
+	total, err := dbRO.GetQueries().CountClassesListFiltered(ctx, countParams)
 	if err != nil {
 		HttpError(w, "Failed to count class records", http.StatusInternalServerError)
 		return
 	}
 	page.Total = total
 
-	records, err := dbRO.GetQueries().GetClassRecordsFiltered(ctx, classRecordsListParams(teacherID, startDate, endDate, statusFilter, nameFilter, int64(page.Size), int64(page.Offset())))
+	records, err := dbRO.GetQueries().GetClassesListFiltered(ctx, classesListListParams(teacherID, startDate, endDate, statusFilter, nameFilter, int64(page.Size), int64(page.Offset())))
 	if err != nil {
 		HttpError(w, "Failed to fetch class records", http.StatusInternalServerError)
 		return
@@ -384,7 +472,7 @@ func handleGetClassRecords(w http.ResponseWriter, r *http.Request) {
 
 	var response []models.ClassRecordView
 	for _, cr := range records {
-		response = append(response, classRecordViewFromRow(cr))
+		response = append(response, classesListViewFromRow(cr))
 	}
 
 	w.Header().Set("Content-Type", "application/json")

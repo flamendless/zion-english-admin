@@ -75,6 +75,7 @@ templ Classes(data ClassesData) {
 					<label for="statusFilter">Status</label>
 					<select id="statusFilter">
 						<option value="">All</option>
+						<option value="scheduled">Scheduled</option>
 						<option value="conducted">Conducted</option>
 						<option value="cancelled">Cancelled</option>
 						<option value="rescheduled">Rescheduled</option>
@@ -222,10 +223,13 @@ templ Classes(data ClassesData) {
 					} else {
 						data.records.forEach(record => {
 							const row = document.createElement('tr');
+							const isScheduled = record.source === 'scheduled';
 							if (record.status === 'cancelled') {
 								row.classList.add('row-cancelled');
 							} else if (record.status === 'rescheduled') {
 								row.classList.add('row-rescheduled');
+							} else if (isScheduled) {
+								row.classList.add('row-scheduled');
 							}
 							const viewHref = buildURL('/classes/' + record.id + '/view');
 							const editHref = buildURL('/classes/' + record.id + '/edit');
@@ -261,16 +265,22 @@ templ Classes(data ClassesData) {
 							actionCell.dataset.label = 'Actions';
 							const actionsWrap = document.createElement('div');
 							actionsWrap.className = 'table-actions';
-							const viewLink = document.createElement('a');
-							viewLink.href = viewHref;
-							viewLink.className = 'view-btn';
-							viewLink.textContent = 'View';
-							actionsWrap.appendChild(viewLink);
-							const editLink = document.createElement('a');
-							editLink.href = editHref;
-							editLink.className = 'edit-btn';
-							editLink.textContent = 'Edit';
-							actionsWrap.appendChild(editLink);
+							if (isScheduled) {
+								if (window.appendScheduledClassActions) {
+									window.appendScheduledClassActions(actionsWrap, baseURL, record);
+								}
+							} else {
+								const viewLink = document.createElement('a');
+								viewLink.href = viewHref;
+								viewLink.className = 'view-btn';
+								viewLink.textContent = 'View';
+								actionsWrap.appendChild(viewLink);
+								const editLink = document.createElement('a');
+								editLink.href = editHref;
+								editLink.className = 'edit-btn';
+								editLink.textContent = 'Edit';
+								actionsWrap.appendChild(editLink);
+							}
 							actionCell.appendChild(actionsWrap);
 							row.appendChild(actionCell);
 							tableBody.appendChild(row);

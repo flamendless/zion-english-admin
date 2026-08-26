@@ -417,6 +417,29 @@ func (q *Queries) RescheduleScheduledClass(ctx context.Context, arg RescheduleSc
 	return err
 }
 
+const updateScheduledClassDetails = `-- name: UpdateScheduledClassDetails :exec
+UPDATE tbl_scheduled_classes
+SET student_id = ?, rate = ?, currency = ?, updated_at = datetime('now')
+WHERE id = ?
+`
+
+type UpdateScheduledClassDetailsParams struct {
+	StudentID int64
+	Rate      float64
+	Currency  string
+	ID        int64
+}
+
+func (q *Queries) UpdateScheduledClassDetails(ctx context.Context, arg UpdateScheduledClassDetailsParams) error {
+	_, err := q.db.ExecContext(ctx, updateScheduledClassDetails,
+		arg.StudentID,
+		arg.Rate,
+		arg.Currency,
+		arg.ID,
+	)
+	return err
+}
+
 const updateScheduledClassStatus = `-- name: UpdateScheduledClassStatus :exec
 UPDATE tbl_scheduled_classes
 SET status = ?, reason = ?, updated_at = datetime('now')

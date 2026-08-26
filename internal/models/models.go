@@ -155,6 +155,7 @@ type ClassRecordView struct {
 	Reason          string  `json:"reason"`
 	Notes           string  `json:"notes"`
 	CreatedAt       string  `json:"createdAt"`
+	Source          string  `json:"source"`
 }
 
 type ScheduledClassRequest struct {
