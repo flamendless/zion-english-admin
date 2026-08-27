@@ -1866,7 +1866,7 @@ templ GlobalIncludes() {
 			display: grid;
 			grid-template-columns: minmax(260px, 320px) 1fr;
 			gap: var(--space-5);
-			align-items: start;
+			align-items: stretch;
 		}
 
 		.schedule-section-head {
@@ -1915,20 +1915,29 @@ templ GlobalIncludes() {
 		}
 
 		.schedule-today-section {
+			display: flex;
+			flex-direction: column;
 			margin-bottom: 0;
-			max-height: 28rem;
-			overflow-y: auto;
+			min-height: 0;
 		}
 
 		.schedule-today-section h3 {
 			margin: 0 0 var(--space-3);
 			font-size: 1.1rem;
+			flex-shrink: 0;
 		}
 
 		.schedule-today-date {
 			margin: 0 0 var(--space-3);
 			font-size: 0.9rem;
 			color: var(--color-muted-foreground);
+			flex-shrink: 0;
+		}
+
+		.schedule-today-section .day-classes-list {
+			flex: 1;
+			min-height: 0;
+			overflow-y: auto;
 		}
 
 		.schedule-toolbar {
@@ -2335,6 +2344,9 @@ templ GlobalIncludes() {
 			font-size: 0.9375rem;
 			line-height: 1.3;
 			min-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
 		}
 
 		.day-class-info span {
@@ -2357,9 +2369,19 @@ templ GlobalIncludes() {
 			flex-shrink: 0;
 		}
 
+		.schedule-today-section .day-class-item {
+			flex-direction: column;
+			align-items: stretch;
+			gap: var(--space-3);
+		}
+
 		.schedule-today-section .day-class-actions {
 			flex-direction: row;
 			align-items: center;
+			justify-content: flex-end;
+			flex-shrink: 0;
+			padding-top: var(--space-2);
+			border-top: 1px solid var(--color-border-subtle);
 		}
 
 		.day-class-actions .btn {
