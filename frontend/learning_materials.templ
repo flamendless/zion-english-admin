@@ -351,17 +351,26 @@ templ LearningMaterialFormModal(data LearningMaterialFormData) {
 						class="lm-thumb lm-thumb--compact lm-url-preview"
 						hidden?={ data.ThumbnailURL == "" }
 					>
-						if data.ThumbnailURL != "" {
-							<img id="lmUrlPreviewImg" class="lm-thumb-img" src={ data.ThumbnailURL } alt="Link preview" referrerpolicy="no-referrer"/>
-						} else {
-							<img id="lmUrlPreviewImg" class="lm-thumb-img" alt="Link preview" referrerpolicy="no-referrer"/>
-							<div id="lmUrlPreviewPlaceholder" class="lm-thumb-placeholder" aria-hidden="true">
-								@LearningMaterialBookIcon()
-							</div>
-						}
+						<img
+							id="lmUrlPreviewImg"
+							class="lm-thumb-img"
+							alt="Link preview"
+							referrerpolicy="no-referrer"
+							hidden?={ data.ThumbnailURL == "" }
+							if data.ThumbnailURL != "" {
+								src={ data.ThumbnailURL }
+							}
+						/>
+						<div
+							id="lmUrlPreviewPlaceholder"
+							class="lm-thumb-placeholder"
+							hidden?={ data.ThumbnailURL != "" }
+							aria-hidden="true"
+						>
+							@LearningMaterialBookIcon()
+						</div>
 						<span class="lm-url-preview-loading">Fetching preview…</span>
 					</div>
-					<p class="field-hint lm-url-preview-error" hidden>Could not load a preview for this link. You can still save the material.</p>
 					<input type="hidden" id="lmThumbnailURL" class="lm-form-thumbnail-url" name="thumbnail_url" value={ data.ThumbnailURL }/>
 				</div>
 
@@ -488,7 +497,17 @@ func learningMaterialThumbClass(size LearningMaterialThumbSize) string {
 templ LearningMaterialThumbnail(thumbnailURL string, title string, size LearningMaterialThumbSize) {
 	<div class={ learningMaterialThumbClass(size) }>
 		if thumbnailURL != "" {
-			<img src={ thumbnailURL } class="lm-thumb-img" alt={ "Preview for " + title } loading="lazy"/>
+			<img
+				src={ thumbnailURL }
+				class="lm-thumb-img"
+				alt={ "Preview for " + title }
+				loading="lazy"
+				referrerpolicy="no-referrer"
+				onerror="this.hidden=true; const p=this.parentElement.querySelector('.lm-thumb-placeholder'); if(p) p.hidden=false;"
+			/>
+			<div class="lm-thumb-placeholder" hidden aria-hidden="true">
+				@LearningMaterialBookIcon()
+			</div>
 		} else {
 			<div class="lm-thumb-placeholder" aria-hidden="true">
 				@LearningMaterialBookIcon()
@@ -629,9 +648,8 @@ templ LearningMaterialsStyles() {
 			opacity: 0.35;
 		}
 
-		.lm-url-preview-error {
-			margin-top: var(--space-2);
-			color: #B45309;
+		.lm-thumb-img[hidden] {
+			display: none;
 		}
 
 		.lm-card--published {
@@ -1188,7 +1206,6 @@ templ LearningMaterialsScripts() {
 				const preview = form.querySelector('.lm-url-preview');
 				const previewImg = preview ? preview.querySelector('.lm-thumb-img') : null;
 				const thumbHidden = form.querySelector('.lm-form-thumbnail-url');
-				const previewError = form.querySelector('.lm-url-preview-error');
 				if (!urlInput || !preview || !previewImg || !thumbHidden || urlInput.dataset.lmUrlBound === '1') {
 					return;
 				}
@@ -1202,40 +1219,45 @@ templ LearningMaterialsScripts() {
 					preview.classList.toggle('lm-url-preview--loading', loading);
 				}
 
-				function setPreviewError(show) {
-					if (previewError) {
-						previewError.hidden = !show;
-					}
+				function getPreviewPlaceholder() {
+					return preview.querySelector('.lm-thumb-placeholder');
 				}
 
 				function clearPreview() {
 					preview.hidden = true;
 					previewImg.removeAttribute('src');
-					const placeholder = preview.querySelector('.lm-thumb-placeholder');
+					previewImg.hidden = true;
+					const placeholder = getPreviewPlaceholder();
 					if (placeholder) placeholder.hidden = false;
 					thumbHidden.value = '';
 					lastFetchedUrl = '';
 					setPreviewLoading(false);
-					setPreviewError(false);
+				}
+
+				function showFallbackPreview() {
+					preview.hidden = false;
+					previewImg.removeAttribute('src');
+					previewImg.hidden = true;
+					const placeholder = getPreviewPlaceholder();
+					if (placeholder) placeholder.hidden = false;
+					thumbHidden.value = '';
+					setPreviewLoading(false);
 				}
 
 				function showPreview(thumbnailURL) {
 					if (!thumbnailURL) {
-						clearPreview();
+						showFallbackPreview();
 						return;
 					}
 					preview.hidden = false;
-					setPreviewError(false);
+					previewImg.hidden = false;
 					previewImg.referrerPolicy = 'no-referrer';
 					previewImg.onerror = function () {
-						previewImg.removeAttribute('src');
-						const placeholder = preview.querySelector('.lm-thumb-placeholder');
-						if (placeholder) placeholder.hidden = false;
-						setPreviewError(true);
+						showFallbackPreview();
 					};
-					previewImg.src = thumbnailURL;
-					const placeholder = preview.querySelector('.lm-thumb-placeholder');
+					const placeholder = getPreviewPlaceholder();
 					if (placeholder) placeholder.hidden = true;
+					previewImg.src = thumbnailURL;
 				}
 
 				async function fetchPreview(rawURL) {
@@ -1244,17 +1266,21 @@ templ LearningMaterialsScripts() {
 						clearPreview();
 						return;
 					}
-					if (normalized === lastFetchedUrl && thumbHidden.value) {
-						showPreview(thumbHidden.value);
+					if (normalized === lastFetchedUrl) {
+						if (thumbHidden.value) {
+							showPreview(thumbHidden.value);
+						} else {
+							showFallbackPreview();
+						}
 						return;
 					}
 
 					const requestID = ++fetchRequestID;
 					preview.hidden = false;
 					setPreviewLoading(true);
-					setPreviewError(false);
-					const placeholder = preview.querySelector('.lm-thumb-placeholder');
-					if (placeholder) placeholder.hidden = true;
+					previewImg.hidden = true;
+					const placeholder = getPreviewPlaceholder();
+					if (placeholder) placeholder.hidden = false;
 					try {
 						const resp = await fetch(PREVIEW_URL + '?url=' + encodeURIComponent(normalized), {
 							credentials: 'same-origin',
@@ -1263,25 +1289,27 @@ templ LearningMaterialsScripts() {
 							return;
 						}
 						if (!resp.ok) {
-							setPreviewError(true);
+							lastFetchedUrl = normalized;
+							showFallbackPreview();
 							return;
 						}
 						const data = await resp.json();
 						if (requestID !== fetchRequestID) {
 							return;
 						}
+						lastFetchedUrl = normalized;
 						if (data.thumbnail_url) {
-							lastFetchedUrl = normalized;
 							thumbHidden.value = data.thumbnail_url;
 							showPreview(data.thumbnail_url);
 						} else {
-							setPreviewError(true);
+							showFallbackPreview();
 						}
 					} catch (err) {
 						if (requestID !== fetchRequestID) {
 							return;
 						}
-						setPreviewError(true);
+						lastFetchedUrl = normalized;
+						showFallbackPreview();
 					} finally {
 						if (requestID === fetchRequestID) {
 							setPreviewLoading(false);

@@ -395,14 +395,11 @@ func handleLearningMaterialURLPreview(w http.ResponseWriter, r *http.Request) {
 
 	rawURL := strings.TrimSpace(r.URL.Query().Get("url"))
 	thumb, err := learningmaterials.ResolveThumbnailURL(r.Context(), rawURL)
+	w.Header().Set("Content-Type", "application/json")
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		_ = json.NewEncoder(w).Encode(map[string]string{"thumbnail_url": ""})
 		return
 	}
-
-	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(map[string]string{"thumbnail_url": thumb})
 }
 
