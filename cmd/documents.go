@@ -66,9 +66,11 @@ func mapDocumentItems(rows []queries.TblTeacherDocument) []frontend.DocumentItem
 	return items
 }
 
-func mapAllDocumentItems(rows []queries.GetAllTeacherDocumentsFilteredRow) []frontend.DocumentItem {
+func mapAllDocumentItems(ctx context.Context, rows []queries.GetAllTeacherDocumentsFilteredRow) ([]frontend.DocumentItem, error) {
+	teacherIDs := make([]int64, len(rows))
 	items := make([]frontend.DocumentItem, len(rows))
 	for i, row := range rows {
+		teacherIDs[i] = row.TeacherID
 		items[i] = frontend.DocumentItem{
 			ID:         strconv.FormatInt(row.ID, 10),
 			Filename:   row.OriginalFilename,
@@ -90,7 +92,13 @@ func mapAllDocumentItems(rows []queries.GetAllTeacherDocumentsFilteredRow) []fro
 			CanReview:  row.Status == string(constants.TeacherDocumentStatusSubmitted),
 		}
 	}
-	return items
+
+	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueTeacherIDs(teacherIDs))
+	if err != nil {
+		return nil, err
+	}
+	enrichDocumentItemsWithRoleBadges(items, teacherIDs, rolesMap)
+	return items, nil
 }
 
 func handleDocuments(w http.ResponseWriter, r *http.Request) {
@@ -105,7 +113,7 @@ func handleDocuments(w http.ResponseWriter, r *http.Request) {
 	data := frontend.DocumentsPageData{}
 
 	switch role {
-	case auth.RoleSuperuser:
+	case auth.RoleSuperuser, auth.RoleAdmin:
 		data.Title = "Documents"
 		data.Description = "All teacher uploads for review."
 		data.ShowUploader = true
@@ -148,7 +156,7 @@ func handleDocumentsPartial(w http.ResponseWriter, r *http.Request) {
 	)
 
 	switch role {
-	case auth.RoleSuperuser:
+	case auth.RoleSuperuser, auth.RoleAdmin:
 		showUploader = true
 		showActions = true
 		rows, err := dbRO.GetQueries().GetAllTeacherDocumentsFiltered(ctx, documentAllFilterParams(filters))
@@ -157,7 +165,12 @@ func handleDocumentsPartial(w http.ResponseWriter, r *http.Request) {
 			HttpError(w, "Failed to load documents", http.StatusInternalServerError)
 			return
 		}
-		items = mapAllDocumentItems(rows)
+		items, err = mapAllDocumentItems(ctx, rows)
+		if err != nil {
+			logs.Log().Error("load teacher roles for documents", zap.Error(err))
+			HttpError(w, "Failed to load documents", http.StatusInternalServerError)
+			return
+		}
 	case auth.RoleTeacher:
 		isTeacher = true
 		rows, err := dbRO.GetQueries().GetTeacherDocumentsByTeacherIDFiltered(ctx, documentTeacherFilterParams(user.ID, filters))
@@ -383,7 +396,7 @@ func handleDocumentFile(w http.ResponseWriter, r *http.Request, documentID int64
 
 	role := auth.GetRole(ctx)
 	user := auth.GetUser(ctx)
-	if role != auth.RoleSuperuser && user.ID != row.TeacherID {
+	if !auth.HasAdminAccess(role) && user.ID != row.TeacherID {
 		HttpError(w, "Access denied", http.StatusForbidden)
 		return
 	}
@@ -407,7 +420,7 @@ func handleDocumentReview(w http.ResponseWriter, r *http.Request, documentID int
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
-	if auth.GetRole(ctx) != auth.RoleSuperuser {
+	if !auth.HasAdminAccess(auth.GetRole(ctx)) {
 		HttpError(w, "Access denied", http.StatusForbidden)
 		return
 	}
@@ -451,7 +464,7 @@ func handleDocumentDelete(w http.ResponseWriter, r *http.Request, documentID int
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
-	if auth.GetRole(ctx) != auth.RoleSuperuser {
+	if !auth.HasAdminAccess(auth.GetRole(ctx)) {
 		HttpError(w, "Access denied", http.StatusForbidden)
 		return
 	}

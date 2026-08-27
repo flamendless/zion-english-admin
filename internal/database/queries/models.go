@@ -233,6 +233,12 @@ type TblTeacherMeetingAccount struct {
 	UpdatedAt      string
 }
 
+type TblTeacherRole struct {
+	TeacherID int64
+	Role      string
+	CreatedAt string
+}
+
 type TblTeachersStudentsM2m struct {
 	TeacherID int64
 	StudentID int64

@@ -51,6 +51,7 @@ func ScheduledClassItemFromView(v models.ScheduledClassView) ScheduledClassItemD
 			PictureURL:    v.TeacherAvatar.PictureURL,
 			HasPicture:    v.TeacherAvatar.HasPicture,
 			Alt:           v.TeacherAvatar.Alt,
+			RoleBadge:     v.TeacherAvatar.RoleBadge,
 		},
 		ScheduledDate:   v.ScheduledDate,
 		StartTime:       v.StartTime,

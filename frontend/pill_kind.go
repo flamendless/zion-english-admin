@@ -1,6 +1,7 @@
 package frontend
 
 import "strings"
+import "zion-english/internal/constants"
 
 type PillTone string
 
@@ -121,6 +122,21 @@ func NotificationReadPillTone(read bool) PillTone {
 		return PillToneNeutral
 	}
 	return PillTonePrimary
+}
+
+func RoleTagPillClass(role constants.TeacherRole) string {
+	return "role-tag-pill " + pillClass(TeacherRolePillTone(role))
+}
+
+func TeacherRolePillTone(role constants.TeacherRole) PillTone {
+	switch role {
+	case constants.TeacherRoleAdmin:
+		return PillTonePrimary
+	case constants.TeacherRoleDeveloper:
+		return PillToneInfo
+	default:
+		return PillToneNeutral
+	}
 }
 
 func capitalizeStatus(status string) string {

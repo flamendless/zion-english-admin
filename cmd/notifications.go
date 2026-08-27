@@ -180,7 +180,7 @@ func renderNotificationsPanel(w http.ResponseWriter, r *http.Request) {
 }
 
 func getNotificationForUser(ctx context.Context, user auth.User, id int64) (queries.TblNotification, error) {
-	if user.Role == auth.RoleSuperuser {
+	if auth.HasAdminAccess(user.Role) {
 		return dbRO.GetQueries().GetNotificationForSuperuser(ctx, id)
 	}
 	return dbRO.GetQueries().GetNotificationForTeacher(ctx, queries.GetNotificationForTeacherParams{

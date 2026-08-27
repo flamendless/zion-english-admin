@@ -1,5 +1,6 @@
 package frontend
 
+import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 type EditTeacherData struct {
@@ -19,6 +20,9 @@ type EditTeacherData struct {
 	DriveUrl       string
 	Sex            string
 	Template       string
+	CanManageRoles bool
+	Roles          []constants.TeacherRole
+	RoleOptions    []constants.TeacherRole
 }
 
 templ EditTeacher(data EditTeacherData) {
@@ -133,6 +137,14 @@ templ EditTeacher(data EditTeacherData) {
 						</div>
 					</div>
 				</div>
+				if data.CanManageRoles {
+					@TeacherRoleEditor(data.Roles, data.RoleOptions)
+				} else if len(data.Roles) > 0 {
+					<div class="form-group">
+						<label>Roles</label>
+						@RolePills(data.Roles)
+					</div>
+				}
 				<button type="submit">Save Changes</button>
 			</form>
 			<div class="logs-section">

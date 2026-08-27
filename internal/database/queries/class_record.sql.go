@@ -210,7 +210,12 @@ func (q *Queries) CountClassesListFiltered(ctx context.Context, arg CountClasses
 const getClassRecordByID = `-- name: GetClassRecordByID :one
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
 	s.name as student_name,
-	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
+	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name,
+	t.first_name as teacher_first_name,
+	t.middle_name as teacher_middle_name,
+	t.last_name as teacher_last_name,
+	t.assigned_color as teacher_assigned_color,
+	t.profile_picture as teacher_profile_picture
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
@@ -218,23 +223,28 @@ WHERE cr.id = ? AND cr.deleted_at IS NULL
 `
 
 type GetClassRecordByIDRow struct {
-	ID              int64
-	StudentID       int64
-	TeacherID       int64
-	Date            string
-	StartTime       sql.NullString
-	EndTime         sql.NullString
-	DurationMinutes int64
-	Rate            float64
-	Currency        string
-	Status          string
-	Reason          sql.NullString
-	Notes           sql.NullString
-	CreatedAt       string
-	UpdatedAt       string
-	RecordedByRole  string
-	StudentName     string
-	TeacherName     string
+	ID                    int64
+	StudentID             int64
+	TeacherID             int64
+	Date                  string
+	StartTime             sql.NullString
+	EndTime               sql.NullString
+	DurationMinutes       int64
+	Rate                  float64
+	Currency              string
+	Status                string
+	Reason                sql.NullString
+	Notes                 sql.NullString
+	CreatedAt             string
+	UpdatedAt             string
+	RecordedByRole        string
+	StudentName           string
+	TeacherName           string
+	TeacherFirstName      string
+	TeacherMiddleName     string
+	TeacherLastName       string
+	TeacherAssignedColor  string
+	TeacherProfilePicture sql.NullString
 }
 
 func (q *Queries) GetClassRecordByID(ctx context.Context, id int64) (GetClassRecordByIDRow, error) {
@@ -258,6 +268,11 @@ func (q *Queries) GetClassRecordByID(ctx context.Context, id int64) (GetClassRec
 		&i.RecordedByRole,
 		&i.StudentName,
 		&i.TeacherName,
+		&i.TeacherFirstName,
+		&i.TeacherMiddleName,
+		&i.TeacherLastName,
+		&i.TeacherAssignedColor,
+		&i.TeacherProfilePicture,
 	)
 	return i, err
 }
@@ -438,7 +453,7 @@ func (q *Queries) GetClassRecordsFiltered(ctx context.Context, arg GetClassRecor
 }
 
 const getClassesListFiltered = `-- name: GetClassesListFiltered :many
-SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_minutes, rate, currency, status, reason, notes, created_at, student_name, teacher_name FROM (
+SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_minutes, rate, currency, status, reason, notes, created_at, student_name, teacher_name, teacher_first_name, teacher_middle_name, teacher_last_name, teacher_assigned_color, teacher_profile_picture FROM (
 	SELECT
 		cr.id,
 	'record' AS source,
@@ -455,7 +470,12 @@ SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_
 	cr.notes,
 	cr.created_at,
 	s.name AS student_name,
-	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name
+	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
+	t.first_name AS teacher_first_name,
+	t.middle_name AS teacher_middle_name,
+	t.last_name AS teacher_last_name,
+	t.assigned_color AS teacher_assigned_color,
+	t.profile_picture AS teacher_profile_picture
 	FROM tbl_class_records cr
 	JOIN tbl_students s ON cr.student_id = s.id
 	JOIN tbl_teachers t ON cr.teacher_id = t.id
@@ -483,7 +503,12 @@ SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_
 	NULL AS notes,
 	sc.created_at,
 	s.name AS student_name,
-	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name
+	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
+	t.first_name AS teacher_first_name,
+	t.middle_name AS teacher_middle_name,
+	t.last_name AS teacher_last_name,
+	t.assigned_color AS teacher_assigned_color,
+	t.profile_picture AS teacher_profile_picture
 	FROM tbl_scheduled_classes sc
 	JOIN tbl_students s ON sc.student_id = s.id
 	JOIN tbl_teachers t ON sc.teacher_id = t.id
@@ -526,22 +551,27 @@ type GetClassesListFilteredParams struct {
 }
 
 type GetClassesListFilteredRow struct {
-	ID              int64
-	Source          string
-	StudentID       int64
-	TeacherID       int64
-	Date            string
-	StartTime       sql.NullString
-	EndTime         sql.NullString
-	DurationMinutes int64
-	Rate            float64
-	Currency        string
-	Status          string
-	Reason          sql.NullString
-	Notes           sql.NullString
-	CreatedAt       string
-	StudentName     string
-	TeacherName     string
+	ID                    int64
+	Source                string
+	StudentID             int64
+	TeacherID             int64
+	Date                  string
+	StartTime             sql.NullString
+	EndTime               sql.NullString
+	DurationMinutes       int64
+	Rate                  float64
+	Currency              string
+	Status                string
+	Reason                sql.NullString
+	Notes                 sql.NullString
+	CreatedAt             string
+	StudentName           string
+	TeacherName           string
+	TeacherFirstName      string
+	TeacherMiddleName     string
+	TeacherLastName       string
+	TeacherAssignedColor  string
+	TeacherProfilePicture sql.NullString
 }
 
 func (q *Queries) GetClassesListFiltered(ctx context.Context, arg GetClassesListFilteredParams) ([]GetClassesListFilteredRow, error) {
@@ -597,6 +627,11 @@ func (q *Queries) GetClassesListFiltered(ctx context.Context, arg GetClassesList
 			&i.CreatedAt,
 			&i.StudentName,
 			&i.TeacherName,
+			&i.TeacherFirstName,
+			&i.TeacherMiddleName,
+			&i.TeacherLastName,
+			&i.TeacherAssignedColor,
+			&i.TeacherProfilePicture,
 		); err != nil {
 			return nil, err
 		}

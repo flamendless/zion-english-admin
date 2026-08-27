@@ -8,6 +8,7 @@ package queries
 import (
 	"context"
 	"database/sql"
+	"strings"
 )
 
 const countTeacherDocumentsByStatus = `-- name: CountTeacherDocumentsByStatus :one
@@ -223,6 +224,56 @@ func (q *Queries) GetAllTeacherDocumentsFiltered(ctx context.Context, arg GetAll
 			&i.ReviewedAt,
 			&i.ReviewedBy,
 		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getLatestTeacherDocumentStatusesByTeacherIDs = `-- name: GetLatestTeacherDocumentStatusesByTeacherIDs :many
+SELECT
+	teacher_id,
+	status,
+	uploaded_at
+FROM tbl_teacher_documents
+WHERE type = 'document'
+	AND teacher_id IN (/*SLICE:teacher_ids*/?)
+ORDER BY uploaded_at DESC
+`
+
+type GetLatestTeacherDocumentStatusesByTeacherIDsRow struct {
+	TeacherID  int64
+	Status     string
+	UploadedAt sql.NullTime
+}
+
+func (q *Queries) GetLatestTeacherDocumentStatusesByTeacherIDs(ctx context.Context, teacherIds []int64) ([]GetLatestTeacherDocumentStatusesByTeacherIDsRow, error) {
+	query := getLatestTeacherDocumentStatusesByTeacherIDs
+	var queryParams []interface{}
+	if len(teacherIds) > 0 {
+		for _, v := range teacherIds {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:teacher_ids*/?", strings.Repeat(",?", len(teacherIds))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:teacher_ids*/?", "NULL", 1)
+	}
+	rows, err := q.db.QueryContext(ctx, query, queryParams...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetLatestTeacherDocumentStatusesByTeacherIDsRow
+	for rows.Next() {
+		var i GetLatestTeacherDocumentStatusesByTeacherIDsRow
+		if err := rows.Scan(&i.TeacherID, &i.Status, &i.UploadedAt); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

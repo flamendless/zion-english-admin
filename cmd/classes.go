@@ -108,14 +108,19 @@ func classEditClassData(ctx context.Context, recordID int64, readonly bool) (fro
 	}
 
 	startTime, endTime := classRecordTimesForEdit(existing.StartTime, existing.EndTime, existing.DurationMinutes)
+	teacherRoles, err := loadTeacherRoles(ctx, existing.TeacherID)
+	if err != nil {
+		return frontend.EditClassData{}, err
+	}
 	return frontend.EditClassData{
 		RecordID:        strconv.FormatInt(recordID, 10),
 		Readonly:        readonly,
-		IsSuperuser:     role == auth.RoleSuperuser,
+		IsSuperuser:     auth.HasAdminAccess(role),
 		StudentID:       strconv.FormatInt(existing.StudentID, 10),
 		TeacherID:       strconv.FormatInt(existing.TeacherID, 10),
 		StudentName:     existing.StudentName,
 		TeacherName:     existing.TeacherName,
+		TeacherAvatar:   avatarWithTeacherRoles(classRecordTeacherAvatar(existing), teacherRoles),
 		Date:            existing.Date,
 		StartTime:       startTime,
 		EndTime:         endTime,
@@ -147,7 +152,7 @@ func handleClassView(w http.ResponseWriter, r *http.Request, recordID int64) {
 	}
 
 	w.Header().Set("Content-Type", "text/html")
-	frontend.EditClass(data).Render(ctx, w)
+	frontend.ClassViewModal(data).Render(ctx, w)
 }
 
 func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
@@ -206,7 +211,7 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 	}
 
 	teacherID := existing.TeacherID
-	if role == auth.RoleSuperuser {
+	if auth.HasAdminAccess(role) {
 		teacherID, err = requireInt64(r.FormValue("teacher"))
 		if err != nil {
 			sendErrorLog(w, "teacher is required")
@@ -291,7 +296,7 @@ func parseClassRecordRequest(r *http.Request, user auth.User, role auth.Role, de
 	}
 
 	teacherID := defaultTeacherID
-	if role == auth.RoleSuperuser {
+	if auth.HasAdminAccess(role) {
 		teacherID, err = requireInt64(r.FormValue("teacher"))
 		if err != nil {
 			return models.ClassRecordRequest{}, errors.New("teacher is required")
@@ -324,6 +329,17 @@ func applyClassRecordRules(ctx context.Context, user auth.User, req models.Class
 	})
 }
 
+func classRecordTeacherAvatar(cr queries.GetClassRecordByIDRow) frontend.AvatarProps {
+	return buildTeacherListAvatarProps(
+		cr.TeacherID,
+		cr.TeacherFirstName,
+		cr.TeacherMiddleName,
+		cr.TeacherLastName,
+		cr.TeacherAssignedColor,
+		cr.TeacherProfilePicture,
+	)
+}
+
 func classRecordViewFromRow(cr queries.GetClassRecordsFilteredRow) models.ClassRecordView {
 	return models.ClassRecordView{
 		ID:              cr.ID,
@@ -342,6 +358,21 @@ func classRecordViewFromRow(cr queries.GetClassRecordsFilteredRow) models.ClassR
 		Notes:           cr.Notes.String,
 		CreatedAt:       cr.CreatedAt,
 		Source:          "record",
+	}
+}
+
+func classesListTeacherAvatar(row queries.GetClassesListFilteredRow) models.AvatarView {
+	hasPicture := row.TeacherProfilePicture.Valid && row.TeacherProfilePicture.String != ""
+	assignedColor := row.TeacherAssignedColor
+	if assignedColor == "" {
+		assignedColor = "#B9D283"
+	}
+	return models.AvatarView{
+		Initials:      utils.PersonInitials(row.TeacherFirstName, row.TeacherMiddleName, row.TeacherLastName, row.TeacherName),
+		AssignedColor: assignedColor,
+		HasPicture:    hasPicture,
+		PictureURL:    teacherPictureURL(row.TeacherID, hasPicture),
+		Alt:           row.TeacherName + " avatar",
 	}
 }
 
@@ -370,6 +401,7 @@ func classesListViewFromRow(row queries.GetClassesListFilteredRow) models.ClassR
 		TeacherID:       row.TeacherID,
 		StudentName:     row.StudentName,
 		TeacherName:     row.TeacherName,
+		TeacherAvatar:   classesListTeacherAvatar(row),
 		Date:            row.Date,
 		StartTime:       startTime,
 		EndTime:         endTime,
@@ -507,7 +539,7 @@ func parseClassRecordsQuery(r *http.Request) (classRecordsQuery, error) {
 	var teacherID int64
 	showAll := false
 	if teacherIDStr == "" {
-		if role != auth.RoleSuperuser {
+		if !auth.HasAdminAccess(role) {
 			return classRecordsQuery{}, errors.New("missing required parameters")
 		}
 		showAll = true
@@ -568,9 +600,17 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 	}
 
 	views := make([]models.ClassRecordView, 0, len(records))
+	teacherIDs := make([]int64, 0, len(records))
 	for _, cr := range records {
 		views = append(views, classesListViewFromRow(cr))
+		teacherIDs = append(teacherIDs, cr.TeacherID)
 	}
+	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueTeacherIDs(teacherIDs))
+	if err != nil {
+		HttpError(w, "Failed to fetch teacher roles", http.StatusInternalServerError)
+		return
+	}
+	enrichClassRecordViewsWithRoleBadges(views, rolesMap)
 	rows := frontend.ClassRecordRowFromViews(views)
 
 	colspan := 7
@@ -596,7 +636,7 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		prefill := parseRecordClassPrefill(r)
 		w.Header().Set("Content-Type", "text/html")
 		frontend.RecordClass(frontend.RecordClassData{
-			IsSuperuser: role == auth.RoleSuperuser,
+			IsSuperuser: auth.HasAdminAccess(role),
 			Prefill:     prefill,
 		}).Render(ctx, w)
 		return

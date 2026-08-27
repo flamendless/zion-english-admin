@@ -8,7 +8,7 @@ import (
 
 type XLSXWriter struct{}
 
-func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colIndices ColumnIndices, name string) error {
+func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colIndices ColumnIndices, name string, summary *RecordSummary) error {
 	f := excelize.NewFile()
 	defer func() {
 		if err := f.Close(); err != nil {
@@ -25,6 +25,19 @@ func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colI
 		cell, _ := excelize.CoordinatesToCellName(1, rowNum)
 		f.SetCellValue(sheetName, cell, fmt.Sprintf("Teacher Name: %s", name))
 		rowNum++
+		if summary != nil {
+			summaryRows := []string{
+				fmt.Sprintf("Total Classes: %d", summary.TotalClasses),
+				fmt.Sprintf("Total Conducted: %d", summary.TotalConducted),
+				fmt.Sprintf("Total Cancelled: %d", summary.TotalCancelled),
+				fmt.Sprintf("Total Duration: %s", summary.DurationDisplay),
+			}
+			for _, line := range summaryRows {
+				cell, _ = excelize.CoordinatesToCellName(1, rowNum)
+				f.SetCellValue(sheetName, cell, line)
+				rowNum++
+			}
+		}
 		rowNum++
 	}
 

@@ -24,8 +24,6 @@ func documentRowClass(status string) string {
 	switch status {
 	case "submitted":
 		return "document-row-submitted"
-	case "approved":
-		return "document-row-approved"
 	case "rejected":
 		return "document-row-rejected"
 	default:
@@ -290,10 +288,6 @@ templ DocumentsStyles() {
 
 		.document-row-submitted {
 			background-color: var(--color-warning-bg) !important;
-		}
-
-		.document-row-approved {
-			background-color: var(--color-success-bg) !important;
 		}
 
 		.document-row-rejected {

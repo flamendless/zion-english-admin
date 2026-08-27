@@ -44,6 +44,14 @@ templ Students(data StudentData) {
 | `@TeacherDropdown()` | `dropdowns.templ` |
 | `@ScrHTMX()` | `scripts.templ` |
 | `@IconActionLink()` / `@IconActionButton()` | `icons.templ` — use `IconKind` constants, not string literals |
+| `@TeacherNameCell()` | `avatar.templ` — avatar + teacher name; use whenever a teacher name is shown |
+
+## Teacher name display
+
+Whenever a teacher name is shown in the UI, render it with `@TeacherNameCell(name, avatar)` from `avatar.templ` (or a list wrapper like `@EntityViewTeacherList`).
+
+- Populate `AvatarProps` in handlers via `buildTeacherListAvatarProps` (or equivalent) — do not show bare name strings in tables, modals, or detail views.
+- Include `@AvatarStyles()` on pages that render teacher names outside `GlobalIncludes` partials that already load avatar CSS.
 
 ## Icon actions
 

@@ -57,7 +57,7 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 	monthStart, monthEnd := monthRange()
 
 	switch role {
-	case auth.RoleSuperuser:
+	case auth.RoleSuperuser, auth.RoleAdmin:
 		statusCounts, err := dbRO.GetQueries().CountStudentsByStatus(ctx)
 		if err == nil {
 			for _, row := range statusCounts {
@@ -269,7 +269,7 @@ func handleLogoutWithAccess(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	if user, ok := auth.UserFromRequest(r, conf.Conf()); ok {
-		if user.Role == auth.RoleSuperuser {
+		if auth.HasAdminAccess(user.Role) {
 			insertAuditLogAs(ctx, user, "auth", fmt.Sprintf("logged out (%s)", user.Email))
 		} else if user.Role == auth.RoleTeacher && user.ID > 0 {
 			insertAuditLogAs(ctx, user, "auth", fmt.Sprintf("logged out (%s)", user.Email))

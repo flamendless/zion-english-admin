@@ -78,14 +78,14 @@ func SystemUser() auth.User {
 }
 
 func (s *Service) UnreadCount(ctx context.Context, user auth.User) (int64, error) {
-	if user.Role == auth.RoleSuperuser {
+	if auth.HasAdminAccess(user.Role) {
 		return s.q.CountUnreadNotificationsForSuperuser(ctx)
 	}
 	return s.q.CountUnreadNotificationsForTeacher(ctx, user.ID)
 }
 
 func (s *Service) Recent(ctx context.Context, user auth.User) ([]queries.TblNotification, error) {
-	if user.Role == auth.RoleSuperuser {
+	if auth.HasAdminAccess(user.Role) {
 		return s.q.GetRecentNotificationsForSuperuser(ctx, panelLimit)
 	}
 	return s.q.GetRecentNotificationsForTeacher(ctx, queries.GetRecentNotificationsForTeacherParams{
@@ -96,7 +96,7 @@ func (s *Service) Recent(ctx context.Context, user auth.User) ([]queries.TblNoti
 
 func (s *Service) ListPaged(ctx context.Context, user auth.User, unreadOnly bool, limit, offset int64) ([]queries.TblNotification, error) {
 	filter := unreadFilter(unreadOnly)
-	if user.Role == auth.RoleSuperuser {
+	if auth.HasAdminAccess(user.Role) {
 		return s.q.GetNotificationsPagedForSuperuser(ctx, queries.GetNotificationsPagedForSuperuserParams{
 			Column1: filter,
 			Limit:   limit,
@@ -113,7 +113,7 @@ func (s *Service) ListPaged(ctx context.Context, user auth.User, unreadOnly bool
 
 func (s *Service) Count(ctx context.Context, user auth.User, unreadOnly bool) (int64, error) {
 	filter := unreadFilter(unreadOnly)
-	if user.Role == auth.RoleSuperuser {
+	if auth.HasAdminAccess(user.Role) {
 		return s.q.CountNotificationsForSuperuser(ctx, filter)
 	}
 	return s.q.CountNotificationsForTeacher(ctx, queries.CountNotificationsForTeacherParams{
@@ -123,7 +123,7 @@ func (s *Service) Count(ctx context.Context, user auth.User, unreadOnly bool) (i
 }
 
 func (s *Service) MarkRead(ctx context.Context, user auth.User, id int64) error {
-	if user.Role == auth.RoleSuperuser {
+	if auth.HasAdminAccess(user.Role) {
 		return s.q.MarkNotificationReadForSuperuser(ctx, id)
 	}
 	return s.q.MarkNotificationReadForTeacher(ctx, queries.MarkNotificationReadForTeacherParams{
@@ -133,7 +133,7 @@ func (s *Service) MarkRead(ctx context.Context, user auth.User, id int64) error 
 }
 
 func (s *Service) MarkAllRead(ctx context.Context, user auth.User) error {
-	if user.Role == auth.RoleSuperuser {
+	if auth.HasAdminAccess(user.Role) {
 		return s.q.MarkAllNotificationsReadForSuperuser(ctx)
 	}
 	return s.q.MarkAllNotificationsReadForTeacher(ctx, user.ID)

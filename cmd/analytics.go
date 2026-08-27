@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -111,7 +112,7 @@ func handleAnalytics(w http.ResponseWriter, r *http.Request) {
 
 	data := frontend.AnalyticsData{}
 	role := auth.GetRole(r.Context())
-	if role == auth.RoleSuperuser {
+	if auth.HasAdminAccess(role) {
 		data.IsSuperuser = true
 	} else {
 		user := auth.GetUser(r.Context())
@@ -149,7 +150,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	q := dbRO.GetQueries()
-	isSuperuser := auth.GetRole(ctx) == auth.RoleSuperuser
+	isSuperuser := auth.HasAdminAccess(auth.GetRole(ctx))
 
 	summaryRow, err := q.GetAnalyticsSummary(ctx, analyticsSummaryParams(startDate, endDate, teacherID))
 	if err != nil {
@@ -270,7 +271,9 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	resp.NoShows = make([]analyticsNoShowJSON, 0, len(noShowRows))
+	noShowTeacherIDs := make([]int64, 0, len(noShowRows))
 	for _, row := range noShowRows {
+		noShowTeacherIDs = append(noShowTeacherIDs, row.TeacherID)
 		resp.NoShows = append(resp.NoShows, analyticsNoShowJSON{
 			ID:              strconv.FormatInt(row.ID, 10),
 			ScheduledDate:   row.ScheduledDate,
@@ -338,10 +341,45 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 		MedianTenureDays: medianInt64(tenures),
 	}
 
+	if err := enrichAnalyticsResponseWithRoleBadges(ctx, &resp, noShowTeacherIDs); err != nil {
+		logs.Log().Error("analytics teacher roles", zap.Error(err))
+		HttpError(w, "Failed to load analytics", http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(resp); err != nil {
 		logs.Log().Error("encode analytics", zap.Error(err))
 	}
+}
+
+func enrichAnalyticsResponseWithRoleBadges(ctx context.Context, resp *analyticsResponseJSON, noShowTeacherIDs []int64) error {
+	teacherIDs := make([]int64, 0, len(resp.ByTeacher)+len(noShowTeacherIDs))
+	for _, row := range resp.ByTeacher {
+		id, err := strconv.ParseInt(row.TeacherID, 10, 64)
+		if err != nil {
+			continue
+		}
+		teacherIDs = append(teacherIDs, id)
+	}
+	teacherIDs = append(teacherIDs, noShowTeacherIDs...)
+
+	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueTeacherIDs(teacherIDs))
+	if err != nil {
+		return err
+	}
+
+	for i := range resp.ByTeacher {
+		id, err := strconv.ParseInt(resp.ByTeacher[i].TeacherID, 10, 64)
+		if err != nil {
+			continue
+		}
+		resp.ByTeacher[i].TeacherAvatar = avatarViewWithTeacherRoles(resp.ByTeacher[i].TeacherAvatar, rolesMap[id])
+	}
+	for i, teacherID := range noShowTeacherIDs {
+		resp.NoShows[i].TeacherAvatar = avatarViewWithTeacherRoles(resp.NoShows[i].TeacherAvatar, rolesMap[teacherID])
+	}
+	return nil
 }
 
 func analyticsTeacherID(r *http.Request) (int64, error) {

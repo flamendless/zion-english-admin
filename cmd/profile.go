@@ -102,7 +102,7 @@ func buildSuperuserAvatarProps(user auth.User) frontend.AvatarProps {
 
 func buildHeaderAvatarProps(ctx context.Context, user auth.User, role auth.Role) (frontend.AvatarProps, error) {
 	if role == auth.RoleSuperuser {
-		props := buildSuperuserAvatarProps(user)
+		props := frontend.WithSuperuserBadge(buildSuperuserAvatarProps(user))
 		props.Size = "nav"
 		return props, nil
 	}
@@ -113,7 +113,12 @@ func buildHeaderAvatarProps(ctx context.Context, user auth.User, role auth.Role)
 	}
 	props := buildTeacherAvatarProps(row)
 	props.Size = "nav"
-	return props, nil
+
+	roleStrings, err := loadTeacherRoles(ctx, user.ID)
+	if err != nil {
+		return frontend.AvatarProps{}, err
+	}
+	return avatarWithTeacherRoles(props, roleStrings), nil
 }
 
 func handleHeaderAvatar(w http.ResponseWriter, r *http.Request) {
@@ -154,8 +159,7 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 			IsSuperuser: true,
 			Name:        user.Name,
 			Email:       user.Email,
-			Role:        frontend.ProfileRoleLabel(role),
-			Avatar:      buildSuperuserAvatarProps(user),
+			Avatar:      frontend.WithSuperuserBadge(buildSuperuserAvatarProps(user)),
 		}
 		if err := frontend.Profile(data).Render(ctx, w); err != nil {
 			HttpError(w, err.Error(), http.StatusInternalServerError)
@@ -196,11 +200,18 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 	}
 	_ = template
 
+	roleStrings, err := loadTeacherRoles(ctx, user.ID)
+	if err != nil {
+		logs.Log().Error("get teacher roles", zap.Error(err))
+		HttpError(w, "Failed to load profile", http.StatusInternalServerError)
+		return
+	}
+
 	data := frontend.ProfileData{
 		IsSuperuser:           false,
 		Name:                  utils.ComposePersonName(row.FirstName, row.MiddleName, row.LastName),
 		Email:                 row.Email,
-		Role:                  frontend.ProfileRoleLabel(role),
+		Roles:                 roleStrings,
 		FirstName:             row.FirstName,
 		MiddleName:            row.MiddleName,
 		LastName:              row.LastName,
@@ -216,7 +227,7 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 		Sex:                   sex,
 		Status:                row.Status,
 		HasProfilePicture:     row.ProfilePicture.Valid && row.ProfilePicture.String != "",
-		Avatar:                buildTeacherAvatarProps(row),
+		Avatar:                avatarWithTeacherRoles(buildTeacherAvatarProps(row), roleStrings),
 		CanChangeMobile:       canChangeMobile,
 		MobileDaysRemaining:   mobileDays,
 		CanChangePassword:     canChangePassword,

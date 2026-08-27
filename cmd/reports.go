@@ -132,12 +132,24 @@ func loadReportRows(ctx context.Context, startDate, endDate, q string) ([]fronte
 		cacheByTeacher[row.TeacherID] = row
 	}
 
+	teacherIDs := make([]int64, len(summaries))
+	for i, summary := range summaries {
+		teacherIDs[i] = summary.TeacherID
+	}
+	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueTeacherIDs(teacherIDs))
+	if err != nil {
+		return nil, fmt.Errorf("failed to load teacher roles")
+	}
+
 	response := make([]frontend.ReportRowData, 0, len(summaries))
 	for _, summary := range summaries {
 		item := frontend.ReportRowData{
 			TeacherID:        strconv.FormatInt(summary.TeacherID, 10),
 			TeacherName:      summary.TeacherName,
-			TeacherAvatar:    buildReportSummaryAvatarProps(summary),
+			TeacherAvatar: avatarWithTeacherRoles(
+				buildReportSummaryAvatarProps(summary),
+				rolesMap[summary.TeacherID],
+			),
 			ConductedClasses: sqlNumericToInt64(summary.ConductedClasses),
 			TotalClasses:     summary.TotalClasses,
 			Earnings:         reportEarningsToFrontend(earningsByTeacher[summary.TeacherID]),
@@ -283,6 +295,11 @@ func handleReportView(w http.ResponseWriter, r *http.Request, teacherID int64) {
 
 	w.Header().Set("Content-Type", "text/html")
 	teacherName := utils.ComposePersonName(profile.FirstName, profile.MiddleName, profile.LastName)
+	teacherRoles, err := loadTeacherRoles(ctx, teacherID)
+	if err != nil {
+		HttpError(w, "Failed to load teacher roles", http.StatusInternalServerError)
+		return
+	}
 	frontend.ReportViewModal(frontend.ReportViewData{
 		TeacherID:        strconv.FormatInt(teacherID, 10),
 		TeacherName:      teacherName,
@@ -292,7 +309,7 @@ func handleReportView(w http.ResponseWriter, r *http.Request, teacherID int64) {
 		RescheduledCount: rescheduled,
 		CancelledCount:   cancelled,
 		Classes:          classes,
-		Avatar:           buildReportTeacherAvatarProps(teacherID, profile),
+		Avatar:           avatarWithTeacherRoles(buildReportTeacherAvatarProps(teacherID, profile), teacherRoles),
 	}).Render(ctx, w)
 }
 
@@ -377,7 +394,7 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 		EndTime:   0,
 		Link:      -1,
 	}
-	if err := processor.SaveRecords(processorRecords, outputPath, colIndices, teacherName); err != nil {
+	if err := processor.SaveReportRecords(processorRecords, outputPath, colIndices, teacherName); err != nil {
 		logs.Log().Error("save report xlsx", zap.Error(err))
 		sendErrorLog(w, "failed to generate report")
 		return

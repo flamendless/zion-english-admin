@@ -204,7 +204,7 @@ func parseScheduledClassesQuery(r *http.Request) (scheduledClassesQuery, error) 
 	role := auth.GetRole(r.Context())
 	var teacherID int64
 	if teacherIDStr == "" || teacherIDStr == "0" {
-		if role != auth.RoleSuperuser {
+		if !auth.HasAdminAccess(role) {
 			return scheduledClassesQuery{}, errors.New("missing required parameters")
 		}
 	} else {
@@ -249,6 +249,7 @@ func fetchScheduledClassViews(ctx context.Context, q scheduledClassesQuery, limi
 	}
 
 	response := make([]models.ScheduledClassView, 0, len(records))
+	teacherIDs := make([]int64, 0, len(records))
 	for _, sc := range records {
 		view := scheduledClassViewFromRow(sc)
 		if room, ok := roomMap[sc.ID]; ok {
@@ -257,7 +258,14 @@ func fetchScheduledClassViews(ctx context.Context, q scheduledClassesQuery, limi
 			view.MeetingService = room.Service
 		}
 		response = append(response, view)
+		teacherIDs = append(teacherIDs, sc.TeacherID)
 	}
+
+	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueTeacherIDs(teacherIDs))
+	if err != nil {
+		return nil, err
+	}
+	enrichScheduledClassViewsWithRoleBadges(response, rolesMap)
 	return response, nil
 }
 
@@ -289,7 +297,7 @@ func handleScheduleListPartial(w http.ResponseWriter, r *http.Request) {
 		emptyMsg = "No classes scheduled for today."
 	}
 	role := auth.GetRole(r.Context())
-	if role == auth.RoleSuperuser && q.teacherID == 0 {
+	if auth.HasAdminAccess(role) && q.teacherID == 0 {
 		teacherParam := strings.TrimSpace(r.URL.Query().Get("teacherId"))
 		if teacherParam == "" || teacherParam == "0" {
 			if q.startDate == utils.TodayPHT() && q.startDate == q.endDate {
@@ -764,7 +772,7 @@ func handleScheduledClassEditModal(w http.ResponseWriter, r *http.Request, sched
 		return
 	}
 
-	data, err := editScheduleData(ctx, scheduleID, role == auth.RoleTeacher, role == auth.RoleSuperuser)
+	data, err := editScheduleData(ctx, scheduleID, role == auth.RoleTeacher, auth.HasAdminAccess(role))
 	if err != nil {
 		HttpError(w, err.Error(), http.StatusForbidden)
 		return
@@ -934,7 +942,7 @@ func parseScheduledClassRequest(r *http.Request, user auth.User, role auth.Role)
 	}
 
 	teacherID := user.ID
-	if role == auth.RoleSuperuser {
+	if auth.HasAdminAccess(role) {
 		teacherID, err = formInt64(r, "schedule_teacher", "teacher")
 		if err != nil {
 			return models.ScheduledClassRequest{}, errors.New("teacher is required")

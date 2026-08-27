@@ -162,7 +162,7 @@ func Home(data DashboardData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if data.Role == auth.RoleSuperuser && item.Path == "/schedule" {
+			if auth.HasAdminAccess(data.Role) && item.Path == "/schedule" {
 				templ_7745c5c3_Err = ActionCard("/announcements", "Announcements", "Create and manage system-wide banners").Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -206,7 +206,7 @@ func DashboardStats(data DashboardData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if data.Role == auth.RoleSuperuser {
+		if auth.HasAdminAccess(data.Role) {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"stat-card\"><span class=\"stat-label\">Active Students</span> <span class=\"stat-value\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

@@ -9,7 +9,8 @@ import (
 
 type CSVWriter struct{}
 
-func (w *CSVWriter) WriteRecords(records []ClassRecord, outputPath string, colIndices ColumnIndices, name string) error {
+func (w *CSVWriter) WriteRecords(records []ClassRecord, outputPath string, colIndices ColumnIndices, name string, summary *RecordSummary) error {
+	_ = summary
 	outputFile, err := os.Create(outputPath)
 	if err != nil {
 		return err
@@ -89,5 +90,5 @@ func (w *CSVWriter) WriteRecords(records []ClassRecord, outputPath string, colIn
 
 func SaveRecordsToCSV(records []ClassRecord, outputPath string, colIndices ColumnIndices) error {
 	writer := &CSVWriter{}
-	return writer.WriteRecords(records, outputPath, colIndices, "")
+	return writer.WriteRecords(records, outputPath, colIndices, "", nil)
 }

@@ -1,0 +1,90 @@
+package frontend
+
+import "fmt"
+
+templ StudentViewModal(data EditStudentData) {
+	<div class="modal-overlay" id="studentViewModal" role="presentation">
+		<div class="modal-dialog modal-dialog-profile modal-dialog-entity" role="dialog" aria-modal="true" aria-labelledby="studentViewTitle">
+			<div class="modal-header">
+				<h3 id="studentViewTitle">Student details</h3>
+				<button type="button" class="modal-close student-view-close" aria-label="Close" onclick="window.closeStudentViewModal()">&times;</button>
+			</div>
+			<div class="modal-body entity-view-body student-view-body">
+				@EntityViewModalStyles()
+				@AvatarStyles()
+				<div class="entity-view-layout entity-view-layout--split">
+					<div class="entity-view-card">
+						<div class="entity-view-identity">
+							<div class="entity-view-color-swatch" style={ "background-color: " + data.AssignedColor } aria-hidden="true"></div>
+							<h2>{ data.Name }</h2>
+							@StatusPill(capitalizeStatus(data.Status), StudentStatusPillTone(data.Status), true)
+							<div class="entity-view-rate-block">
+								<div class="entity-view-rate-highlight">
+									<span class="entity-view-rate-highlight-amount">{ fmt.Sprintf("%.2f", data.RatePerClass) }</span>
+									<span class="entity-view-rate-highlight-currency">{ data.Currency }</span>
+								</div>
+								<span class="entity-view-rate-caption">per class</span>
+							</div>
+						</div>
+					</div>
+					<div class="entity-view-card">
+						@EntityViewSection("Contact") {
+							<div class="profile-details">
+								@ProfileDetailField("Parent", displayOrDash(data.ParentName))
+								@ProfileDetailField("Contact", displayOrDash(data.Contact))
+							</div>
+						}
+						if data.Status == "inactive" && data.InactiveReason != "" {
+							@EntityViewSection("Status") {
+								@EntityViewNotePanel("Inactive reason", data.InactiveReason, "warning")
+							}
+						}
+						if len(data.Teachers) > 0 {
+							@EntityViewSection("Teachers") {
+								@EntityViewTeacherList(data.Teachers)
+							}
+						}
+						if len(data.Relationships) > 0 {
+							@EntityViewSection("Related to") {
+								@EntityViewRelationshipList(data.Relationships)
+							}
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+templ StudentViewModalScripts() {
+	<script>
+		window.closeStudentViewModal = function () {
+			const host = document.getElementById('studentViewModalHost');
+			if (host) host.innerHTML = '';
+			document.body.classList.remove('modal-open');
+		};
+
+		document.body.addEventListener('htmx:afterSwap', function (evt) {
+			if (evt.detail.target.id !== 'studentViewModalHost') return;
+			document.body.classList.add('modal-open');
+			const overlay = evt.detail.target.querySelector('#studentViewModal');
+			const closeBtn = overlay && overlay.querySelector('.student-view-close');
+			if (closeBtn) closeBtn.focus();
+		});
+
+		document.body.addEventListener('click', function (e) {
+			if (e.target.closest('.student-view-close')) {
+				window.closeStudentViewModal();
+				return;
+			}
+			const overlay = e.target.closest('#studentViewModal');
+			if (overlay && e.target === overlay) window.closeStudentViewModal();
+		});
+
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape' && document.getElementById('studentViewModal')) {
+				window.closeStudentViewModal();
+			}
+		});
+	</script>
+}

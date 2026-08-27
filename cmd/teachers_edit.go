@@ -1,16 +1,20 @@
 package cmd
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
+	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/notifications"
 	"zion-english/internal/processor"
+	"zion-english/internal/teachers"
 	"zion-english/internal/utils"
 )
 
@@ -26,6 +30,47 @@ func teacherFilterParams(q, status string) queries.CountTeachersFilteredParams {
 		Column7: status,
 		Status:  status,
 	}
+}
+
+func loadTeacherRoles(ctx context.Context, teacherID int64) ([]constants.TeacherRole, error) {
+	rows, err := dbRO.GetQueries().GetTeacherRolesByTeacherID(ctx, teacherID)
+	if err != nil {
+		return nil, err
+	}
+	return teachers.StringsToRoles(rows), nil
+}
+
+func teacherHasAdminRole(roles []constants.TeacherRole) bool {
+	return slices.Contains(roles, constants.TeacherRoleAdmin)
+}
+
+func availableRoleOptions(assigned []constants.TeacherRole) []constants.TeacherRole {
+	assignedSet := make(map[constants.TeacherRole]struct{}, len(assigned))
+	for _, role := range assigned {
+		assignedSet[role] = struct{}{}
+	}
+	options := make([]constants.TeacherRole, 0, len(constants.AllTeacherRoles()))
+	for _, role := range constants.AllTeacherRoles() {
+		if _, ok := assignedSet[role]; !ok {
+			options = append(options, role)
+		}
+	}
+	return options
+}
+
+func syncTeacherRoles(ctx context.Context, q *queries.Queries, teacherID int64, roles []constants.TeacherRole) error {
+	if err := q.DeleteTeacherRolesByTeacherID(ctx, teacherID); err != nil {
+		return err
+	}
+	for _, role := range roles {
+		if err := q.InsertTeacherRole(ctx, queries.InsertTeacherRoleParams{
+			TeacherID: teacherID,
+			Role:      string(role),
+		}); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func handleTeachersPath(w http.ResponseWriter, r *http.Request) {
@@ -62,6 +107,12 @@ func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		sex = row.Sex.String
 	}
 
+	roleStrings, err := loadTeacherRoles(ctx, teacherID)
+	if err != nil {
+		HttpError(w, "Failed to load teacher roles", http.StatusInternalServerError)
+		return
+	}
+
 	teacherName := utils.ComposePersonName(row.FirstName, row.MiddleName, row.LastName)
 	zoomConnected, zoomConfigured := profileZoomStatus(ctx, teacherID)
 	w.Header().Set("Content-Type", "text/html")
@@ -83,7 +134,8 @@ func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		DriveUrl:       row.DriveUrl,
 		Sex:            sex,
 		Status:         row.Status,
-		Avatar:         buildTeacherAvatarProps(row),
+		Roles:          roleStrings,
+		Avatar:         avatarWithTeacherRoles(buildTeacherAvatarProps(row), roleStrings),
 		ZoomConfigured: zoomConfigured,
 		ZoomConnected:  zoomConnected,
 	}).Render(ctx, w)
@@ -125,6 +177,35 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	teacherIDs := make([]int64, len(teachers))
+	for i, t := range teachers {
+		teacherIDs[i] = t.ID
+	}
+
+	docsStatusByTeacher := make(map[int64]string)
+	rolesByTeacher := make(map[int64][]constants.TeacherRole)
+	if len(teacherIDs) > 0 {
+		docRows, err := dbRO.GetQueries().GetLatestTeacherDocumentStatusesByTeacherIDs(ctx, teacherIDs)
+		if err != nil {
+			HttpError(w, fmt.Sprintf("Failed to fetch teacher document status: %v", err), http.StatusInternalServerError)
+			return
+		}
+		for _, row := range docRows {
+			if _, ok := docsStatusByTeacher[row.TeacherID]; !ok {
+				docsStatusByTeacher[row.TeacherID] = row.Status
+			}
+		}
+
+		roleRows, err := dbRO.GetQueries().GetTeacherRolesByTeacherIDs(ctx, teacherIDs)
+		if err != nil {
+			HttpError(w, fmt.Sprintf("Failed to fetch teacher roles: %v", err), http.StatusInternalServerError)
+			return
+		}
+		for _, row := range roleRows {
+			rolesByTeacher[row.TeacherID] = append(rolesByTeacher[row.TeacherID], constants.TeacherRole(row.Role))
+		}
+	}
+
 	viewTeachers := make([]frontend.TeacherItem, len(teachers))
 	for i, t := range teachers {
 		teacherName := utils.ComposePersonName(t.FirstName, t.MiddleName, t.LastName)
@@ -143,11 +224,13 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 			DriveUrl:       t.DriveUrl,
 			Sex:            t.Sex.String,
 			Status:         t.Status,
+			DocsStatus:     docsStatusByTeacher[t.ID],
+			Roles:          rolesByTeacher[t.ID],
 			Deleted:        t.Deleted != 0,
 			CreatedAt:      utils.FormatNullDateTimeSecondsPHT(t.CreatedAt),
-			Avatar: buildTeacherListAvatarProps(
+			Avatar: avatarWithTeacherRoles(buildTeacherListAvatarProps(
 				t.ID, t.FirstName, t.MiddleName, t.LastName, t.AssignedColor, t.ProfilePicture,
-			),
+			), rolesByTeacher[t.ID]),
 		}
 	}
 
@@ -170,6 +253,7 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 
 func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) {
 	ctx := r.Context()
+	actorRole := auth.GetRole(ctx)
 
 	existing, err := dbRO.GetQueries().GetTeacherFullByID(ctx, teacherID)
 	if err != nil {
@@ -180,6 +264,14 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		HttpError(w, "Teacher not found", http.StatusNotFound)
 		return
 	}
+
+	existingRoles, err := loadTeacherRoles(ctx, teacherID)
+	if err != nil {
+		HttpError(w, "Failed to load teacher roles", http.StatusInternalServerError)
+		return
+	}
+	targetHasAdmin := teacherHasAdminRole(existingRoles)
+	canManageRoles := teachers.CanManageTeacherRoles(string(actorRole), targetHasAdmin)
 
 	if r.Method == http.MethodGet {
 		template := ""
@@ -204,6 +296,9 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 			DriveUrl:       existing.DriveUrl,
 			Sex:            existing.Sex.String,
 			Template:       template,
+			CanManageRoles: canManageRoles,
+			Roles:          existingRoles,
+			RoleOptions:    availableRoleOptions(existingRoles),
 		}).Render(ctx, w)
 		return
 	}
@@ -253,7 +348,29 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		return
 	}
 
-	err = dbRW.GetQueries().UpdateTeacherBySuperuser(ctx, queries.UpdateTeacherBySuperuserParams{
+	var submittedRoles []constants.TeacherRole
+	if canManageRoles {
+		submittedRoles, err = teachers.ParseTeacherRoles(r.Form["roles"])
+		if err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+		if err := teachers.ValidateRoleAssignment(string(actorRole), targetHasAdmin, submittedRoles); err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+	}
+
+	tx, err := dbRW.GetDB().BeginTx(ctx, nil)
+	if err != nil {
+		sendErrorLog(w, "Failed to start transaction")
+		return
+	}
+	defer tx.Rollback()
+
+	qtx := dbRW.GetQueries().WithTx(tx)
+
+	err = qtx.UpdateTeacherBySuperuser(ctx, queries.UpdateTeacherBySuperuserParams{
 		FirstName:      req.FirstName,
 		MiddleName:     req.MiddleName,
 		LastName:       req.LastName,
@@ -276,12 +393,30 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		return
 	}
 
+	if canManageRoles {
+		if err := syncTeacherRoles(ctx, qtx, teacherID, submittedRoles); err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
 	updated, err := dbRO.GetQueries().GetTeacherFullByID(ctx, teacherID)
 	if err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
-	insertAuditLogAs(ctx, auth.GetUser(ctx), "teachers", formatTeacherAudit(existing, updated))
+	auditMessage := formatTeacherAudit(existing, updated)
+	if canManageRoles {
+		if roleDiff := teachers.FormatRoleDiff(existingRoles, submittedRoles); roleDiff != "" {
+			auditMessage += "; roles: " + roleDiff
+		}
+	}
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "teachers", auditMessage)
 	teacherName := utils.ComposePersonName(updated.FirstName, updated.MiddleName, updated.LastName)
 	notifyTeacher(ctx, teacherID, teacherName, auth.GetUser(ctx), notifications.KindProfileUpdated,
 		"Your profile was updated by an administrator", "")

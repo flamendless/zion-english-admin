@@ -49,6 +49,27 @@ templ Students(data StudentData) {
 		<title>Students - Zion English Admin Tool</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
+		@StudentViewModalScripts()
+		<style>
+			.rate-value {
+				display: inline-flex;
+				align-items: baseline;
+				gap: var(--space-1);
+				font-variant-numeric: tabular-nums;
+			}
+
+			.rate-amount {
+				font-weight: 600;
+				color: var(--color-foreground);
+			}
+
+			.rate-currency {
+				font-size: 0.8125rem;
+				font-weight: 500;
+				color: var(--color-muted-foreground);
+				letter-spacing: 0.02em;
+			}
+		</style>
 	</head>
 	<body>
 		<div class="container">
@@ -77,14 +98,23 @@ templ Students(data StudentData) {
 									<td data-label="Name">{ student.Name }</td>
 									<td data-label="Parent">{ getDisplayValue(student.ParentName) }</td>
 									<td data-label="Teacher">{ getDisplayValue(student.TeacherDisplay) }</td>
-									<td class="rate-cell" data-label="Rate">{ formatRate(student.RatePerClass, student.Currency) }</td>
+									<td class="rate-cell" data-label="Rate">
+										<span class="rate-value">
+											<span class="rate-amount">{ fmt.Sprintf("%.2f", student.RatePerClass) }</span>
+											<span class="rate-currency">{ student.Currency }</span>
+										</span>
+									</td>
 									<td data-label="Related To">{ getDisplayValue(student.RelatedToDisplay) }</td>
 									<td data-label="Status">
 										@StatusPill(capitalizeStatus(student.Status), StudentStatusPillTone(student.Status), false)
 									</td>
 									<td data-label="Actions">
 										<div class="table-actions">
-											@IconActionLink(utils.URL("/students/" + student.ID + "/view"), "View", IconKindView)
+											@IconActionButton("View", IconKindView, templ.Attributes{
+												"hx-get":    utils.URL("/students/" + student.ID + "/view"),
+												"hx-target": "#studentViewModalHost",
+												"hx-swap":   "innerHTML",
+											})
 											@IconActionLink(utils.URL("/students/" + student.ID + "/edit"), "Edit", IconKindEdit)
 										</div>
 									</td>
@@ -99,11 +129,8 @@ templ Students(data StudentData) {
 					<p>No students found.</p>
 				</div>
 			}
+			<div id="studentViewModalHost"></div>
 		</div>
 	</body>
 	</html>
-}
-
-func formatRate(rate float64, currency string) string {
-	return fmt.Sprintf("%.2f %s", rate, currency)
 }

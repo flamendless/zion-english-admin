@@ -1,6 +1,7 @@
 package frontend
 
 import "fmt"
+import "zion-english/internal/constants"
 
 type TeacherViewData struct {
 	ID             string
@@ -20,6 +21,7 @@ type TeacherViewData struct {
 	DriveUrl       string
 	Sex            string
 	Status         string
+	Roles          []constants.TeacherRole
 	Avatar         AvatarProps
 	ZoomConfigured bool
 	ZoomConnected  bool
@@ -39,7 +41,6 @@ templ TeacherViewModal(data TeacherViewData) {
 						<div class="profile-identity">
 							@Avatar(data.Avatar)
 							<h2>{ data.Name }</h2>
-							@Pill("teacher", PillTonePrimary)
 							<p class="profile-email">{ data.Email }</p>
 						</div>
 					</div>

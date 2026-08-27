@@ -33,6 +33,25 @@ templ Classes(data ClassesData) {
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
 		@ScrTimeRangeJS()
+		@AvatarStyles()
+		<style>
+			.time-range-cell {
+				white-space: nowrap;
+				font-variant-numeric: tabular-nums;
+			}
+
+			.note-reason-cell {
+				max-width: 200px;
+			}
+
+			.note-reason-text {
+				display: block;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+		</style>
+		@ClassViewModalScripts()
 	</head>
 	<body>
 		<div class="container" data-show-all-teachers={ fmt.Sprintf("%t", data.ShowAllTeachers) }>
@@ -89,14 +108,14 @@ templ Classes(data ClassesData) {
 				<thead>
 					<tr>
 						<th>Date</th>
-						<th>Start Time</th>
-						<th>End Time</th>
+						<th>Time</th>
 						if data.ShowAllTeachers {
 							<th>Teacher</th>
 						}
 						<th>Student</th>
 						<th>Rate</th>
 						<th>Status</th>
+						<th>Note / Reason</th>
 						<th>Actions</th>
 					</tr>
 				</thead>
@@ -120,6 +139,7 @@ templ Classes(data ClassesData) {
 			<div id="paginationBottom" class="pagination-bar"></div>
 			@DeleteClassModal()
 			@ScheduledClassModals()
+			<div id="classViewModalHost"></div>
 		</div>
 
 		<script>

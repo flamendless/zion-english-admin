@@ -39,7 +39,7 @@ func Middleware(db *queries.Queries, next http.Handler) http.Handler {
 		today := utils.TodayPHT()
 		var banners []Banner
 
-		if user.Role == auth.RoleSuperuser {
+		if auth.HasAdminAccess(user.Role) {
 			rows, err := db.GetActiveAnnouncementsAll(ctx, today)
 			if err == nil {
 				banners = mapAllRows(rows)

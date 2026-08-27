@@ -95,7 +95,7 @@ func ReportTableRow(row ReportRowData, startDate string, endDate string) templ.C
 		}
 		templ_7745c5c3_Err = IconActionButton(row.GenerateLabel(), row.GenerateKind(), templ.Attributes{
 			"hx-post":   utils.URL("/reports/" + row.TeacherID + "/generate"),
-			"hx-vals":   fmt.Sprintf(`js:{startDate: document.getElementById('datePreset').dataset.startDate, endDate: document.getElementById('datePreset').dataset.endDate}`),
+			"hx-vals":   fmt.Sprintf(`{"startDate":"%s","endDate":"%s"}`, startDate, endDate),
 			"hx-target": "closest tr",
 			"hx-swap":   "outerHTML",
 		}).Render(ctx, templ_7745c5c3_Buffer)

@@ -90,11 +90,29 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 		return frontend.EditStudentData{}, err
 	}
 
+	teacherIDsForRoles := make([]int64, len(assignedTeachers))
+	for i, t := range assignedTeachers {
+		teacherIDsForRoles[i] = t.ID
+	}
+	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueTeacherIDs(teacherIDsForRoles))
+	if err != nil {
+		return frontend.EditStudentData{}, err
+	}
+
 	teacherIDs := make([]string, len(assignedTeachers))
 	teacherNames := make([]string, len(assignedTeachers))
+	teachers := make([]frontend.TeacherListItem, len(assignedTeachers))
 	for i, t := range assignedTeachers {
+		name := utils.ComposePersonName(t.FirstName, t.MiddleName, t.LastName)
 		teacherIDs[i] = strconv.FormatInt(t.ID, 10)
-		teacherNames[i] = utils.ComposePersonName(t.FirstName, t.MiddleName, t.LastName)
+		teacherNames[i] = name
+		teachers[i] = frontend.TeacherListItem{
+			Name: name,
+			Avatar: avatarWithTeacherRoles(
+				buildTeacherListAvatarProps(t.ID, t.FirstName, t.MiddleName, t.LastName, t.AssignedColor, t.ProfilePicture),
+				rolesMap[t.ID],
+			),
+		}
 	}
 
 	relationships, err := dbRO.GetQueries().GetRelationshipsByStudentID(ctx, studentID)
@@ -133,6 +151,7 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 		InactiveReason: inactiveReason,
 		TeacherIDs:     teacherIDs,
 		TeacherNames:   teacherNames,
+		Teachers:       teachers,
 		Relationships:  relItems,
 	}, nil
 }
@@ -186,7 +205,7 @@ func handleStudentView(w http.ResponseWriter, r *http.Request, studentID int64) 
 		return
 	}
 
-	if auth.GetRole(r.Context()) != auth.RoleSuperuser {
+	if !auth.HasAdminAccess(auth.GetRole(r.Context())) {
 		HttpError(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -200,7 +219,7 @@ func handleStudentView(w http.ResponseWriter, r *http.Request, studentID int64) 
 	data.IsSuperuser = true
 
 	w.Header().Set("Content-Type", "text/html")
-	frontend.EditStudent(data).Render(ctx, w)
+	frontend.StudentViewModal(data).Render(ctx, w)
 }
 
 func handleStudents(w http.ResponseWriter, r *http.Request) {
@@ -300,7 +319,7 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	role := auth.GetRole(ctx)
-	isSuperuser := role == auth.RoleSuperuser
+	isSuperuser := auth.HasAdminAccess(role)
 
 	existing, err := dbRO.GetQueries().GetStudentByID(ctx, studentID)
 	if err != nil {

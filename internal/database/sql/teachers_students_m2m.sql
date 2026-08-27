@@ -39,7 +39,7 @@ FROM tbl_teachers_students_m2m
 WHERE teacher_id = ?;
 
 -- name: GetTeachersByStudentID :many
-SELECT t.id, t.first_name, t.middle_name, t.last_name, t.birthdate, t.address, t.joining_date, t.mobile_number, t.email, t.certifications, t.assigned_color, t.rate_per_class, t.currency, t.drive_url, t.sex, t.password, t.created_at, t.updated_at
+SELECT t.id, t.first_name, t.middle_name, t.last_name, t.birthdate, t.address, t.joining_date, t.mobile_number, t.email, t.certifications, t.assigned_color, t.rate_per_class, t.currency, t.drive_url, t.sex, t.password, t.created_at, t.updated_at, t.profile_picture
 FROM tbl_teachers t
 INNER JOIN tbl_teachers_students_m2m m2m ON t.id = m2m.teacher_id
 WHERE m2m.student_id = ?

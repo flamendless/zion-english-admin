@@ -7,15 +7,19 @@ import (
 templ ClassRecordRow(record ClassRecordRowData, showTeacher bool) {
 	<tr class={ record.RowClass() }>
 		<td data-label="Date">{ record.Date }</td>
-		<td data-label="Start Time">{ record.StartTimeDisplay() }</td>
-		<td data-label="End Time">{ record.EndTimeDisplay() }</td>
+		<td class="time-range-cell" data-label="Time">{ record.TimeRangeDisplay() }</td>
 		if showTeacher {
-			<td data-label="Teacher">{ record.TeacherName }</td>
+			<td data-label="Teacher">
+				@TeacherNameCell(record.TeacherName, record.TeacherAvatar)
+			</td>
 		}
 		<td data-label="Student">{ record.StudentName }</td>
 		<td data-label="Rate">{ record.RateLabel() }</td>
 		<td data-label="Status">
 			@StatusPill(capitalizeStatus(record.Status), ClassStatusPillTone(record.Status), false)
+		</td>
+		<td class="note-reason-cell" data-label="Note / Reason">
+			<span class="note-reason-text" title={ record.NoteOrReasonDisplay() }>{ getDisplayValue(record.NoteOrReasonDisplay()) }</span>
 		</td>
 		<td data-label="Actions">
 			<div class="table-actions">
@@ -24,7 +28,11 @@ templ ClassRecordRow(record ClassRecordRowData, showTeacher bool) {
 				} else if record.IsScheduled() {
 					@ScheduledClassActions(record.ScheduledItemData())
 				} else {
-					@IconActionLink(record.ViewURL(), "View", IconKindView)
+					@IconActionButton("View", IconKindView, templ.Attributes{
+						"hx-get":    record.ViewURL(),
+						"hx-target": "#classViewModalHost",
+						"hx-swap":   "innerHTML",
+					})
 					@IconActionLink(record.EditURL(), "Edit", IconKindEdit)
 					@IconActionTrigger("Delete", IconKindDelete, templ.Attributes{
 						"data-delete-url": record.DeleteURL(),

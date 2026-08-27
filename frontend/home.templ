@@ -67,7 +67,7 @@ templ Home(data DashboardData) {
 					if item.Path == "/profile" {
 						@ActionCard("/guides", "Guides", "Step-by-step help for using the admin tool")
 					}
-					if data.Role == auth.RoleSuperuser && item.Path == "/schedule" {
+					if auth.HasAdminAccess(data.Role) && item.Path == "/schedule" {
 						@ActionCard("/announcements", "Announcements", "Create and manage system-wide banners")
 					}
 				}
@@ -81,7 +81,7 @@ templ Home(data DashboardData) {
 templ DashboardStats(data DashboardData) {
 	<h2 class="dashboard-section-title">Overview</h2>
 	<div class="dashboard-stats">
-		if data.Role == auth.RoleSuperuser {
+		if auth.HasAdminAccess(data.Role) {
 			<div class="stat-card">
 				<span class="stat-label">Active Students</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.ActiveStudents) }</span>

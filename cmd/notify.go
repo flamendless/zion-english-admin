@@ -39,7 +39,7 @@ func notifyCrossParty(ctx context.Context, actor auth.User, teacherID int64, tea
 		notifySuperuser(ctx, actor, kind, message, "")
 		return
 	}
-	if actor.Role == auth.RoleSuperuser && teacherID > 0 {
+	if auth.HasAdminAccess(actor.Role) && teacherID > 0 {
 		notifyTeacher(ctx, teacherID, teacherName, actor, kind, message, "")
 	}
 }

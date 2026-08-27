@@ -8,6 +8,7 @@ package frontend
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 type EditTeacherData struct {
@@ -27,6 +28,9 @@ type EditTeacherData struct {
 	DriveUrl       string
 	Sex            string
 	Template       string
+	CanManageRoles bool
+	Roles          []constants.TeacherRole
+	RoleOptions    []constants.TeacherRole
 }
 
 func EditTeacher(data EditTeacherData) templ.Component {
@@ -57,7 +61,7 @@ func EditTeacher(data EditTeacherData) templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 31, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 35, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -94,7 +98,7 @@ func EditTeacher(data EditTeacherData) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/teachers/" + data.ID + "/edit"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 45, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 49, Col: 62}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 		if templ_7745c5c3_Err != nil {
@@ -107,7 +111,7 @@ func EditTeacher(data EditTeacherData) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.FirstName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 49, Col: 159}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 53, Col: 159}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 		if templ_7745c5c3_Err != nil {
@@ -120,7 +124,7 @@ func EditTeacher(data EditTeacherData) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.MiddleName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 53, Col: 82}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 57, Col: 82}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 		if templ_7745c5c3_Err != nil {
@@ -133,7 +137,7 @@ func EditTeacher(data EditTeacherData) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.LastName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 57, Col: 155}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 61, Col: 155}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 		if templ_7745c5c3_Err != nil {
@@ -219,7 +223,7 @@ func EditTeacher(data EditTeacherData) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Template)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 79, Col: 36}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 83, Col: 36}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 			if templ_7745c5c3_Err != nil {
@@ -232,7 +236,7 @@ func EditTeacher(data EditTeacherData) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(data.Template)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 79, Col: 63}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 83, Col: 63}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -250,7 +254,7 @@ func EditTeacher(data EditTeacherData) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Birthdate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 86, Col: 88}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 90, Col: 88}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 		if templ_7745c5c3_Err != nil {
@@ -263,7 +267,7 @@ func EditTeacher(data EditTeacherData) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.JoiningDate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 90, Col: 85}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 94, Col: 85}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 		if templ_7745c5c3_Err != nil {
@@ -276,7 +280,7 @@ func EditTeacher(data EditTeacherData) templ.Component {
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Address)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 95, Col: 81}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 99, Col: 81}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 		if templ_7745c5c3_Err != nil {
@@ -289,7 +293,7 @@ func EditTeacher(data EditTeacherData) templ.Component {
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.MobileNumber)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 100, Col: 131}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 104, Col: 131}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 		if templ_7745c5c3_Err != nil {
@@ -302,7 +306,7 @@ func EditTeacher(data EditTeacherData) templ.Component {
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 104, Col: 98}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 108, Col: 98}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
 		if templ_7745c5c3_Err != nil {
@@ -315,7 +319,7 @@ func EditTeacher(data EditTeacherData) templ.Component {
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Certifications)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 109, Col: 93}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 113, Col: 93}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
 		if templ_7745c5c3_Err != nil {
@@ -336,7 +340,7 @@ func EditTeacher(data EditTeacherData) templ.Component {
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(formatFloat(data.RatePerClass))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 115, Col: 132}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 119, Col: 132}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
 		if templ_7745c5c3_Err != nil {
@@ -349,7 +353,7 @@ func EditTeacher(data EditTeacherData) templ.Component {
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.AssignedColor)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 125, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 129, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
 		if templ_7745c5c3_Err != nil {
@@ -362,13 +366,36 @@ func EditTeacher(data EditTeacherData) templ.Component {
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color: " + data.AssignedColor)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 132, Col: 101}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_teacher.templ`, Line: 136, Col: 101}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\"></div></div></div></div><button type=\"submit\">Save Changes</button></form><div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\"></div></div></div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.CanManageRoles {
+			templ_7745c5c3_Err = TeacherRoleEditor(data.Roles, data.RoleOptions).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else if len(data.Roles) > 0 {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<div class=\"form-group\"><label>Roles</label>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = RolePills(data.Roles).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<button type=\"submit\">Save Changes</button></form><div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

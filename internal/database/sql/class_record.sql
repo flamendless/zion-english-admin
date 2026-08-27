@@ -22,7 +22,12 @@ WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ? AND cr.stat
 -- name: GetClassRecordByID :one
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
 	s.name as student_name,
-	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
+	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name,
+	t.first_name as teacher_first_name,
+	t.middle_name as teacher_middle_name,
+	t.last_name as teacher_last_name,
+	t.assigned_color as teacher_assigned_color,
+	t.profile_picture as teacher_profile_picture
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
@@ -106,7 +111,12 @@ SELECT * FROM (
 	cr.notes,
 	cr.created_at,
 	s.name AS student_name,
-	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name
+	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
+	t.first_name AS teacher_first_name,
+	t.middle_name AS teacher_middle_name,
+	t.last_name AS teacher_last_name,
+	t.assigned_color AS teacher_assigned_color,
+	t.profile_picture AS teacher_profile_picture
 	FROM tbl_class_records cr
 	JOIN tbl_students s ON cr.student_id = s.id
 	JOIN tbl_teachers t ON cr.teacher_id = t.id
@@ -134,7 +144,12 @@ SELECT * FROM (
 	NULL AS notes,
 	sc.created_at,
 	s.name AS student_name,
-	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name
+	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
+	t.first_name AS teacher_first_name,
+	t.middle_name AS teacher_middle_name,
+	t.last_name AS teacher_last_name,
+	t.assigned_color AS teacher_assigned_color,
+	t.profile_picture AS teacher_profile_picture
 	FROM tbl_scheduled_classes sc
 	JOIN tbl_students s ON sc.student_id = s.id
 	JOIN tbl_teachers t ON sc.teacher_id = t.id

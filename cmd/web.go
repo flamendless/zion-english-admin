@@ -93,62 +93,62 @@ var cmdWeb = &cobra.Command{
 		)
 
 		authMux := http.NewServeMux()
-		authMux.HandleFunc(basePath+"/dashboard", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleHome))
-		authMux.HandleFunc(basePath+"/students", auth.RequireRole(auth.RoleSuperuser)(handleStudents))
-		authMux.HandleFunc(basePath+"/students/register", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleStudentRegister))
-		authMux.HandleFunc(basePath+"/teachers", auth.RequireRole(auth.RoleSuperuser)(handleTeachers))
-		authMux.HandleFunc(basePath+"/teachers/approve", auth.RequireRole(auth.RoleSuperuser)(handleTeacherApprove))
-		authMux.HandleFunc(basePath+"/teachers/unapprove", auth.RequireRole(auth.RoleSuperuser)(handleTeacherUnapprove))
-		authMux.HandleFunc(basePath+"/teachers/delete", auth.RequireRole(auth.RoleSuperuser)(handleTeacherDelete))
-		authMux.HandleFunc(basePath+"/students/", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleStudentsPath))
-		authMux.HandleFunc(basePath+"/teachers/", auth.RequireRole(auth.RoleSuperuser)(handleTeachersPath))
-		authMux.HandleFunc(basePath+"/classes/partials/rows", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClassRecordsPartial))
-		authMux.HandleFunc(basePath+"/classes/", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClassesPath))
-		authMux.HandleFunc(basePath+"/classes/record", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClassRecord))
-		authMux.HandleFunc(basePath+"/classes", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleClasses))
-		authMux.HandleFunc(basePath+"/schedule/partials/list", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleScheduleListPartial))
-		authMux.HandleFunc(basePath+"/schedule/", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleSchedulePath))
-		authMux.HandleFunc(basePath+"/schedule", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleSchedule))
+		authMux.HandleFunc(basePath+"/dashboard", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleHome))
+		authMux.HandleFunc(basePath+"/students", auth.RequireRole(auth.AdminAccessRoles()...)(handleStudents))
+		authMux.HandleFunc(basePath+"/students/register", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleStudentRegister))
+		authMux.HandleFunc(basePath+"/teachers", auth.RequireRole(auth.AdminAccessRoles()...)(handleTeachers))
+		authMux.HandleFunc(basePath+"/teachers/approve", auth.RequireRole(auth.AdminAccessRoles()...)(handleTeacherApprove))
+		authMux.HandleFunc(basePath+"/teachers/unapprove", auth.RequireRole(auth.AdminAccessRoles()...)(handleTeacherUnapprove))
+		authMux.HandleFunc(basePath+"/teachers/delete", auth.RequireRole(auth.AdminAccessRoles()...)(handleTeacherDelete))
+		authMux.HandleFunc(basePath+"/students/", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleStudentsPath))
+		authMux.HandleFunc(basePath+"/teachers/", auth.RequireRole(auth.AdminAccessRoles()...)(handleTeachersPath))
+		authMux.HandleFunc(basePath+"/classes/partials/rows", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleClassRecordsPartial))
+		authMux.HandleFunc(basePath+"/classes/", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleClassesPath))
+		authMux.HandleFunc(basePath+"/classes/record", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleClassRecord))
+		authMux.HandleFunc(basePath+"/classes", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleClasses))
+		authMux.HandleFunc(basePath+"/schedule/partials/list", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleScheduleListPartial))
+		authMux.HandleFunc(basePath+"/schedule/", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleSchedulePath))
+		authMux.HandleFunc(basePath+"/schedule", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleSchedule))
 		authMux.HandleFunc(basePath+"/my-students", auth.RequireRole(auth.RoleTeacher)(handleMyStudents))
-		authMux.HandleFunc(basePath+"/logs", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleSystemLogs))
-		authMux.HandleFunc(basePath+"/changelogs", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleChangelogs))
-		authMux.HandleFunc(basePath+"/guides/", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGuidesPath))
-		authMux.HandleFunc(basePath+"/guides", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGuides))
-		authMux.HandleFunc(basePath+"/process-logs", auth.RequireRole(auth.RoleSuperuser)(handleLogs))
-		authMux.HandleFunc(basePath+"/process", auth.RequireRole(auth.RoleSuperuser)(handleProcessPage))
-		authMux.HandleFunc(basePath+"/reports/partials/rows", auth.RequireRole(auth.RoleSuperuser)(handleReportsPartial))
-		authMux.HandleFunc(basePath+"/reports/", auth.RequireRole(auth.RoleSuperuser)(handleReportsPath))
-		authMux.HandleFunc(basePath+"/reports", auth.RequireRole(auth.RoleSuperuser)(handleReports))
-		authMux.HandleFunc(basePath+"/analytics", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleAnalytics))
-		authMux.HandleFunc(basePath+"/api/analytics", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetAnalytics))
-		authMux.HandleFunc(basePath+"/download/processed", auth.RequireRole(auth.RoleSuperuser)(handleDownload))
-		authMux.HandleFunc(basePath+"/profile", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleProfile))
-		authMux.HandleFunc(basePath+"/profile/mobile", auth.RequireRole(auth.RoleTeacher)(handleProfileMobile))
-		authMux.HandleFunc(basePath+"/profile/names", auth.RequireRole(auth.RoleTeacher)(handleProfileNames))
-		authMux.HandleFunc(basePath+"/profile/password", auth.RequireRole(auth.RoleTeacher)(handleProfilePassword))
-		authMux.HandleFunc(basePath+"/profile/avatar", auth.RequireRole(auth.RoleTeacher)(handleProfileAvatar))
-		authMux.HandleFunc(basePath+"/profile/picture", auth.RequireRole(auth.RoleTeacher)(handleProfilePicture))
-		authMux.HandleFunc(basePath+"/profile/document", auth.RequireRole(auth.RoleTeacher)(handleProfileDocument))
-		authMux.HandleFunc(basePath+"/profile/zoom/connect", auth.RequireRole(auth.RoleTeacher)(handleZoomConnect))
-		authMux.HandleFunc(basePath+"/profile/zoom/disconnect", auth.RequireRole(auth.RoleTeacher)(handleZoomDisconnect))
-		documentsRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)
+		authMux.HandleFunc(basePath+"/logs", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleSystemLogs))
+		authMux.HandleFunc(basePath+"/changelogs", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleChangelogs))
+		authMux.HandleFunc(basePath+"/guides/", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleGuidesPath))
+		authMux.HandleFunc(basePath+"/guides", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleGuides))
+		authMux.HandleFunc(basePath+"/process-logs", auth.RequireRole(auth.AdminAccessRoles()...)(handleLogs))
+		authMux.HandleFunc(basePath+"/process", auth.RequireRole(auth.AdminAccessRoles()...)(handleProcessPage))
+		authMux.HandleFunc(basePath+"/reports/partials/rows", auth.RequireRole(auth.AdminAccessRoles()...)(handleReportsPartial))
+		authMux.HandleFunc(basePath+"/reports/", auth.RequireRole(auth.AdminAccessRoles()...)(handleReportsPath))
+		authMux.HandleFunc(basePath+"/reports", auth.RequireRole(auth.AdminAccessRoles()...)(handleReports))
+		authMux.HandleFunc(basePath+"/analytics", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleAnalytics))
+		authMux.HandleFunc(basePath+"/api/analytics", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleGetAnalytics))
+		authMux.HandleFunc(basePath+"/download/processed", auth.RequireRole(auth.AdminAccessRoles()...)(handleDownload))
+		authMux.HandleFunc(basePath+"/profile", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleProfile))
+		authMux.HandleFunc(basePath+"/profile/mobile", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleProfileMobile))
+		authMux.HandleFunc(basePath+"/profile/names", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleProfileNames))
+		authMux.HandleFunc(basePath+"/profile/password", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleProfilePassword))
+		authMux.HandleFunc(basePath+"/profile/avatar", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleProfileAvatar))
+		authMux.HandleFunc(basePath+"/profile/picture", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleProfilePicture))
+		authMux.HandleFunc(basePath+"/profile/document", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleProfileDocument))
+		authMux.HandleFunc(basePath+"/profile/zoom/connect", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleZoomConnect))
+		authMux.HandleFunc(basePath+"/profile/zoom/disconnect", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleZoomDisconnect))
+		documentsRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)
 		authMux.HandleFunc(basePath+"/documents/partials/rows", documentsRole(handleDocumentsPartial))
 		authMux.HandleFunc(basePath+"/documents", documentsRole(handleDocuments))
 		authMux.HandleFunc(basePath+"/documents/", documentsRole(handleDocumentsPath))
-		authMux.HandleFunc(basePath+"/role", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetRole))
-		authMux.HandleFunc(basePath+"/header-avatar", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleHeaderAvatar))
-		authMux.HandleFunc(basePath+"/refresh", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleRefreshPage))
-		authMux.HandleFunc(basePath+"/api/teachers", auth.RequireRole(auth.RoleSuperuser)(handleGetTeachers))
-		authMux.HandleFunc(basePath+"/api/teacher-row", auth.RequireRole(auth.RoleSuperuser)(handleGetTeacherRow))
-		authMux.HandleFunc(basePath+"/api/students", auth.RequireRole(auth.RoleSuperuser)(handleGetStudents))
-		authMux.HandleFunc(basePath+"/api/students/search", auth.RequireRole(auth.RoleSuperuser)(handleSearchStudents))
-		authMux.HandleFunc(basePath+"/api/me/students", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetMyStudents))
-		authMux.HandleFunc(basePath+"/api/scheduled-classes", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetScheduledClasses))
-		authMux.HandleFunc(basePath+"/api/teacher-picture", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleTeacherPicture))
-		authMux.HandleFunc(basePath+"/announcements", auth.RequireRole(auth.RoleSuperuser)(handleAnnouncements))
-		authMux.HandleFunc(basePath+"/announcements/register", auth.RequireRole(auth.RoleSuperuser)(handleAnnouncementRegister))
-		authMux.HandleFunc(basePath+"/announcements/", auth.RequireRole(auth.RoleSuperuser)(handleAnnouncementsPath))
-		notificationsRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)
+		authMux.HandleFunc(basePath+"/role", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleGetRole))
+		authMux.HandleFunc(basePath+"/header-avatar", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleHeaderAvatar))
+		authMux.HandleFunc(basePath+"/refresh", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleRefreshPage))
+		authMux.HandleFunc(basePath+"/api/teachers", auth.RequireRole(auth.AdminAccessRoles()...)(handleGetTeachers))
+		authMux.HandleFunc(basePath+"/api/teacher-row", auth.RequireRole(auth.AdminAccessRoles()...)(handleGetTeacherRow))
+		authMux.HandleFunc(basePath+"/api/students", auth.RequireRole(auth.AdminAccessRoles()...)(handleGetStudents))
+		authMux.HandleFunc(basePath+"/api/students/search", auth.RequireRole(auth.AdminAccessRoles()...)(handleSearchStudents))
+		authMux.HandleFunc(basePath+"/api/me/students", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleGetMyStudents))
+		authMux.HandleFunc(basePath+"/api/scheduled-classes", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleGetScheduledClasses))
+		authMux.HandleFunc(basePath+"/api/teacher-picture", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleTeacherPicture))
+		authMux.HandleFunc(basePath+"/announcements", auth.RequireRole(auth.AdminAccessRoles()...)(handleAnnouncements))
+		authMux.HandleFunc(basePath+"/announcements/register", auth.RequireRole(auth.AdminAccessRoles()...)(handleAnnouncementRegister))
+		authMux.HandleFunc(basePath+"/announcements/", auth.RequireRole(auth.AdminAccessRoles()...)(handleAnnouncementsPath))
+		notificationsRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)
 		authMux.HandleFunc(basePath+"/notifications", notificationsRole(handleNotifications))
 		authMux.HandleFunc(basePath+"/notifications/panel", notificationsRole(handleNotificationsPanel))
 		authMux.HandleFunc(basePath+"/notifications/unread-count", notificationsRole(handleNotificationsUnreadCount))
@@ -777,7 +777,7 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	role := auth.GetRole(ctx)
-	isSuperuser := role == auth.RoleSuperuser
+	isSuperuser := auth.HasAdminAccess(role)
 
 	if r.Method == http.MethodGet {
 		w.Header().Set("Content-Type", "text/html")
@@ -1007,7 +1007,7 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	isSuperuser := role == auth.RoleSuperuser
+	isSuperuser := auth.HasAdminAccess(role)
 
 	if r.Method == http.MethodGet {
 		if err := frontend.RegisterTeacher(isSuperuser, role).Render(r.Context(), w); err != nil {
@@ -1117,6 +1117,19 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		Status:         teacherStatus,
 	})
 	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	insertedTeacher, err := dbRW.GetQueries().GetTeacherByEmail(r.Context(), req.Email)
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+	if err := dbRW.GetQueries().InsertTeacherRole(r.Context(), queries.InsertTeacherRoleParams{
+		TeacherID: insertedTeacher.ID,
+		Role:      string(constants.TeacherRoleTeacher),
+	}); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
@@ -1497,11 +1510,11 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	auth.ResetLoginFailures(ip)
 
 	switch user.Role {
-	case auth.RoleSuperuser, auth.RoleTeacher:
+	case auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher:
 		insertAuditLogAs(r.Context(), user, "auth", fmt.Sprintf("logged in (%s)", user.Email))
 	}
 
-	if ua := r.UserAgent(); ua != "" && user.Role == auth.RoleTeacher && user.ID != 0 {
+	if ua := r.UserAgent(); ua != "" && (user.Role == auth.RoleTeacher || user.Role == auth.RoleAdmin) && user.ID != 0 {
 		useragentID := getOrCreateUserAgentID(r.Context(), dbRW, ua)
 		if _, err := dbRW.GetQueries().CreateAccess(r.Context(), queries.CreateAccessParams{
 			TeacherID:   user.ID,
@@ -1776,6 +1789,9 @@ func handleGetRole(w http.ResponseWriter, r *http.Request) {
 	switch role {
 	case auth.RoleSuperuser:
 		greetings = "Welcome, superuser!"
+	case auth.RoleAdmin:
+		user := auth.GetUser(ctx)
+		greetings = fmt.Sprintf("Welcome, admin %s!", user.Name)
 	case auth.RoleTeacher:
 		user := auth.GetUser(ctx)
 		greetings = fmt.Sprintf("Welcome, teacher %s!", user.Name)

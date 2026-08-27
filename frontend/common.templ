@@ -12,6 +12,10 @@ func getDisplayValue(value string) string {
 	return "-"
 }
 
+func formatRate(rate float64, currency string) string {
+	return fmt.Sprintf("%.2f %s", rate, currency)
+}
+
 var onceScrPassword = templ.NewOnceHandle()
 
 templ Flam() {

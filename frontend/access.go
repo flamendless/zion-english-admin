@@ -64,7 +64,7 @@ func IsNavAccessible(role auth.Role, path string) bool {
 		return false
 	}
 
-	if role == auth.RoleSuperuser {
+	if auth.HasAdminAccess(role) {
 		if path == "/my-students" {
 			return false
 		}

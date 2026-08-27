@@ -1,0 +1,189 @@
+package frontend
+
+import "zion-english/internal/constants"
+
+templ RolePillStyles() {
+	<style>
+		.role-tags {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--space-2);
+			margin-bottom: var(--space-3);
+		}
+		.role-tags--readonly {
+			margin-bottom: 0;
+		}
+		.role-tag-pill {
+			display: inline-flex;
+			align-items: center;
+			gap: 2px;
+			padding: 3px 4px 3px 10px;
+		}
+		.role-tag-pill:not(:has(.role-tag-remove)) {
+			padding-right: 10px;
+		}
+		.role-tag-label {
+			line-height: 1.2;
+		}
+		.role-tag-remove {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 1.125rem;
+			height: 1.125rem;
+			padding: 0;
+			margin: 0;
+			border: none;
+			border-radius: 999px;
+			background: transparent;
+			color: inherit;
+			cursor: pointer;
+			font-size: 0.875rem;
+			line-height: 1;
+			opacity: 0.75;
+			flex-shrink: 0;
+		}
+		.role-tag-remove:hover {
+			opacity: 1;
+			background: rgba(0, 0, 0, 0.08);
+		}
+		.role-tags .pill--neutral {
+			background: var(--color-surface);
+			border: 1px solid var(--color-border);
+			color: var(--color-foreground);
+		}
+		.role-tags-add {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--space-2);
+			align-items: center;
+		}
+	</style>
+}
+
+templ RolePills(roles []constants.TeacherRole) {
+	@RolePillStyles()
+	<div class="role-tags role-tags--readonly">
+		for _, role := range roles {
+			@Pill(string(role), TeacherRolePillTone(role))
+		}
+	</div>
+}
+
+templ TeacherRoleEditor(roles []constants.TeacherRole, roleOptions []constants.TeacherRole) {
+	@RolePillStyles()
+	<div class="form-group">
+		<label>Roles</label>
+		<p class="field-hint">Assign access roles for this teacher. The teacher role is required.</p>
+		<div id="teacherRoleTags" class="role-tags">
+			for _, role := range roles {
+				@RemovableRolePill(role)
+			}
+		</div>
+		if len(roleOptions) > 0 {
+			<div class="role-tags-add">
+				<select id="teacherRoleAdd" aria-label="Role to add">
+					for _, option := range roleOptions {
+						<option value={ string(option) }>{ string(option) }</option>
+					}
+				</select>
+				<button type="button" id="teacherRoleAddBtn">Add role</button>
+			</div>
+		}
+		<script>
+			(function () {
+				const tags = document.getElementById('teacherRoleTags');
+				if (!tags) return;
+
+				const addSelect = document.getElementById('teacherRoleAdd');
+				const addBtn = document.getElementById('teacherRoleAddBtn');
+				const addPanel = document.querySelector('.role-tags-add');
+
+				function escapeHTML(value) {
+					return String(value)
+						.replaceAll('&', '&amp;')
+						.replaceAll('<', '&lt;')
+						.replaceAll('>', '&gt;')
+						.replaceAll('"', '&quot;');
+				}
+
+				function roleTagPillClass(role) {
+					switch (role) {
+						case 'admin':
+							return 'role-tag-pill pill pill--primary';
+						case 'developer':
+							return 'role-tag-pill pill pill--info';
+						default:
+							return 'role-tag-pill pill pill--neutral';
+					}
+				}
+
+				function restoreRoleOption(role) {
+					if (!addSelect || !role) return;
+					if (Array.from(addSelect.options).some(function (opt) { return opt.value === role; })) {
+						return;
+					}
+					const option = document.createElement('option');
+					option.value = role;
+					option.textContent = role;
+					addSelect.appendChild(option);
+					if (addPanel) {
+						addPanel.style.display = '';
+					}
+				}
+
+				function removeRolePill(pill) {
+					if (!pill) return;
+					const role = pill.dataset.role;
+					pill.remove();
+					restoreRoleOption(role);
+				}
+
+				function createPill(role) {
+					const removable = role !== 'teacher';
+					const pill = document.createElement('span');
+					pill.className = roleTagPillClass(role);
+					pill.dataset.role = role;
+					pill.innerHTML =
+						'<span class="role-tag-label">' + escapeHTML(role) + '</span>' +
+						(removable
+							? '<button type="button" class="role-tag-remove" aria-label="Remove ' + escapeHTML(role) + ' role">&times;</button>'
+							: '') +
+						'<input type="hidden" name="roles" value="' + escapeHTML(role) + '">';
+					return pill;
+				}
+
+				if (addBtn && addSelect) {
+					addBtn.addEventListener('click', function () {
+						const role = addSelect.value;
+						if (!role) return;
+						if (tags.querySelector('[data-role="' + role + '"]')) return;
+						tags.appendChild(createPill(role));
+						const option = addSelect.querySelector('option[value="' + role + '"]');
+						if (option) option.remove();
+						if (addSelect.options.length === 0 && addPanel) {
+							addPanel.style.display = 'none';
+						}
+					});
+				}
+
+				tags.addEventListener('click', function (event) {
+					const button = event.target.closest('.role-tag-remove');
+					if (!button) return;
+					event.preventDefault();
+					removeRolePill(button.closest('.role-tag-pill'));
+				});
+			})();
+		</script>
+	</div>
+}
+
+templ RemovableRolePill(role constants.TeacherRole) {
+	<span class={ RoleTagPillClass(role) } data-role={ string(role) }>
+		<span class="role-tag-label">{ string(role) }</span>
+		if role != constants.TeacherRoleTeacher {
+			<button type="button" class="role-tag-remove" aria-label={ "Remove " + string(role) + " role" }>&times;</button>
+		}
+		<input type="hidden" name="roles" value={ string(role) }/>
+	</span>
+}

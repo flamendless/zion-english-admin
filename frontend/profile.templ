@@ -2,14 +2,14 @@ package frontend
 
 import "fmt"
 import "strings"
-import "zion-english/internal/auth"
+import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 type ProfileData struct {
 	IsSuperuser          bool
 	Name                 string
 	Email                string
-	Role                 string
+	Roles                []constants.TeacherRole
 	FirstName            string
 	MiddleName           string
 	LastName             string
@@ -304,7 +304,6 @@ templ Profile(data ProfileData) {
 					<div class="profile-identity">
 						@Avatar(data.Avatar)
 						<h2>{ data.Name }</h2>
-						@Pill(data.Role, PillTonePrimary)
 						<p class="profile-email">{ data.Email }</p>
 					</div>
 
@@ -615,15 +614,4 @@ func displayOrDash(value string) string {
 		return "-"
 	}
 	return value
-}
-
-func ProfileRoleLabel(role auth.Role) string {
-	switch role {
-	case auth.RoleSuperuser:
-		return "superuser"
-	case auth.RoleTeacher:
-		return "teacher"
-	default:
-		return string(role)
-	}
 }

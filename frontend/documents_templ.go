@@ -32,8 +32,6 @@ func documentRowClass(status string) string {
 	switch status {
 	case "submitted":
 		return "document-row-submitted"
-	case "approved":
-		return "document-row-approved"
 	case "rejected":
 		return "document-row-rejected"
 	default:
@@ -189,7 +187,7 @@ func DocumentsToolbar(showTeacherFilter bool) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/documents/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 106, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 104, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 		if templ_7745c5c3_Err != nil {
@@ -249,7 +247,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 		var templ_7745c5c3_Var8 templ.SafeURL
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(item.ViewURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 117, Col: 25}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 115, Col: 25}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -262,7 +260,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.Filename)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 117, Col: 100}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 115, Col: 100}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 		if templ_7745c5c3_Err != nil {
@@ -275,7 +273,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(item.Filename)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 117, Col: 160}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 115, Col: 160}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -288,7 +286,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(item.Extension)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 120, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 118, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -309,7 +307,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(item.FileSize)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 125, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 123, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -343,7 +341,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 			var templ_7745c5c3_Var13 string
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(item.UploadedBy)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 133, Col: 28}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 131, Col: 28}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
@@ -361,7 +359,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(item.UploadedAt)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 137, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 135, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -388,7 +386,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 				var templ_7745c5c3_Var15 templ.SafeURL
 				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/documents/" + item.ID + "/approve"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 143, Col: 82}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 141, Col: 82}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 				if templ_7745c5c3_Err != nil {
@@ -409,7 +407,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 				var templ_7745c5c3_Var16 templ.SafeURL
 				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/documents/" + item.ID + "/reject"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 146, Col: 81}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 144, Col: 81}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 				if templ_7745c5c3_Err != nil {
@@ -435,7 +433,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 			var templ_7745c5c3_Var17 templ.SafeURL
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/documents/" + item.ID + "/delete"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 150, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 148, Col: 80}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
@@ -491,7 +489,7 @@ func DocumentsTableBody(items []DocumentItem, showUploader bool, showActions boo
 			var templ_7745c5c3_Var19 string
 			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", documentsTableColspan(showUploader, showActions)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 162, Col: 84}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 160, Col: 84}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var19)
 			if templ_7745c5c3_Err != nil {
@@ -504,7 +502,7 @@ func DocumentsTableBody(items []DocumentItem, showUploader bool, showActions boo
 			var templ_7745c5c3_Var20 string
 			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(emptyMessage)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 162, Col: 121}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 160, Col: 121}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {
@@ -574,7 +572,7 @@ func DocumentsTable(showUploader bool, showActions bool) templ.Component {
 		var templ_7745c5c3_Var22 string
 		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/documents/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 192, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 190, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var22)
 		if templ_7745c5c3_Err != nil {
@@ -587,7 +585,7 @@ func DocumentsTable(showUploader bool, showActions bool) templ.Component {
 		var templ_7745c5c3_Var23 string
 		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", documentsTableColspan(showUploader, showActions)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 198, Col: 86}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 196, Col: 86}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
 		if templ_7745c5c3_Err != nil {
@@ -629,7 +627,7 @@ func DocumentsCard(title string, description string, showUploader bool, showActi
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 209, Col: 15}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 207, Col: 15}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {
@@ -647,7 +645,7 @@ func DocumentsCard(title string, description string, showUploader bool, showActi
 			var templ_7745c5c3_Var26 string
 			templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 211, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 209, Col: 49}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 			if templ_7745c5c3_Err != nil {
@@ -699,7 +697,7 @@ func DocumentsStyles() templ.Component {
 			templ_7745c5c3_Var27 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "<style>\r\n\t\t.documents-page-desc {\r\n\t\t\tmargin-bottom: var(--space-6);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t}\r\n\r\n\t\t.documents-card {\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tpadding: var(--space-6);\r\n\t\t\tmargin-top: var(--space-6);\r\n\t\t}\r\n\r\n\t\t.documents-card-header {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: var(--space-4);\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.documents-card h2 {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 1.125rem;\r\n\t\t}\r\n\r\n\t\t.documents-card-desc {\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.documents-table-wrapper {\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.documents-uploader-cell {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmin-width: 0;\r\n\t\t}\r\n\r\n\t\t.documents-table .documents-filename {\r\n\t\t\tdisplay: inline;\r\n\t\t\tword-break: break-all;\r\n\t\t\toverflow-wrap: anywhere;\r\n\t\t}\r\n\r\n\t\t.documents-filename-link {\r\n\t\t\tcolor: var(--color-accent);\r\n\t\t\ttext-decoration: none;\r\n\t\t}\r\n\r\n\t\t.documents-filename-link:hover {\r\n\t\t\tcolor: var(--color-accent-hover);\r\n\t\t\ttext-decoration: underline;\r\n\t\t}\r\n\r\n\t\t.documents-ext {\r\n\t\t\tfont-family: 'Fira Code', monospace;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tpadding: 2px 8px;\r\n\t\t\tborder-radius: var(--radius-sm);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.document-row-submitted {\r\n\t\t\tbackground-color: var(--color-warning-bg) !important;\r\n\t\t}\r\n\r\n\t\t.document-row-approved {\r\n\t\t\tbackground-color: var(--color-success-bg) !important;\r\n\t\t}\r\n\r\n\t\t.document-row-rejected {\r\n\t\t\tbackground-color: var(--color-error-bg) !important;\r\n\t\t}\r\n\r\n\t\t.documents-empty {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-8) var(--space-4);\r\n\t\t\ttext-align: center;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.documents-empty svg {\r\n\t\t\tcolor: var(--color-border);\r\n\t\t}\r\n\r\n\t\t.documents-empty-hint {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.upload-zone {\r\n\t\t\tborder: 2px dashed var(--color-border);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\ttransition: border-color var(--transition-fast), background-color var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.upload-zone:focus-within {\r\n\t\t\tborder-color: var(--color-primary);\r\n\t\t\tbackground: var(--color-primary-light);\r\n\t\t}\r\n\r\n\t\t.upload-zone-label {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tcursor: pointer;\r\n\t\t\tfont-weight: 500;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.upload-zone-icon {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 40px;\r\n\t\t\theight: 40px;\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-info-bg);\r\n\t\t\tcolor: var(--color-accent);\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.upload-zone input[type=\"file\"] {\r\n\t\t\tposition: absolute;\r\n\t\t\twidth: 1px;\r\n\t\t\theight: 1px;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: -1px;\r\n\t\t\toverflow: hidden;\r\n\t\t\tclip: rect(0, 0, 0, 0);\r\n\t\t\tborder: 0;\r\n\t\t}\r\n\r\n\t\t.upload-zone-meta {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: 2px;\r\n\t\t\tmin-width: 0;\r\n\t\t}\r\n\r\n\t\t.upload-zone-hint {\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-weight: 400;\r\n\t\t}\r\n\r\n\t\t.upload-filename {\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tword-break: break-all;\r\n\t\t}\r\n\r\n\t\t.upload-locked-notice {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tpadding: var(--space-3) var(--space-4);\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-info-bg);\r\n\t\t\tborder: 1px solid color-mix(in srgb, var(--color-info) 25%, transparent);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.upload-locked-notice svg {\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tmargin-top: 2px;\r\n\t\t\tcolor: var(--color-info);\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "<style>\r\n\t\t.documents-page-desc {\r\n\t\t\tmargin-bottom: var(--space-6);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t}\r\n\r\n\t\t.documents-card {\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tpadding: var(--space-6);\r\n\t\t\tmargin-top: var(--space-6);\r\n\t\t}\r\n\r\n\t\t.documents-card-header {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: var(--space-4);\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.documents-card h2 {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 1.125rem;\r\n\t\t}\r\n\r\n\t\t.documents-card-desc {\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.documents-table-wrapper {\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.documents-uploader-cell {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmin-width: 0;\r\n\t\t}\r\n\r\n\t\t.documents-table .documents-filename {\r\n\t\t\tdisplay: inline;\r\n\t\t\tword-break: break-all;\r\n\t\t\toverflow-wrap: anywhere;\r\n\t\t}\r\n\r\n\t\t.documents-filename-link {\r\n\t\t\tcolor: var(--color-accent);\r\n\t\t\ttext-decoration: none;\r\n\t\t}\r\n\r\n\t\t.documents-filename-link:hover {\r\n\t\t\tcolor: var(--color-accent-hover);\r\n\t\t\ttext-decoration: underline;\r\n\t\t}\r\n\r\n\t\t.documents-ext {\r\n\t\t\tfont-family: 'Fira Code', monospace;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tpadding: 2px 8px;\r\n\t\t\tborder-radius: var(--radius-sm);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.document-row-submitted {\r\n\t\t\tbackground-color: var(--color-warning-bg) !important;\r\n\t\t}\r\n\r\n\t\t.document-row-rejected {\r\n\t\t\tbackground-color: var(--color-error-bg) !important;\r\n\t\t}\r\n\r\n\t\t.documents-empty {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-8) var(--space-4);\r\n\t\t\ttext-align: center;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.documents-empty svg {\r\n\t\t\tcolor: var(--color-border);\r\n\t\t}\r\n\r\n\t\t.documents-empty-hint {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.upload-zone {\r\n\t\t\tborder: 2px dashed var(--color-border);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\ttransition: border-color var(--transition-fast), background-color var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.upload-zone:focus-within {\r\n\t\t\tborder-color: var(--color-primary);\r\n\t\t\tbackground: var(--color-primary-light);\r\n\t\t}\r\n\r\n\t\t.upload-zone-label {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tcursor: pointer;\r\n\t\t\tfont-weight: 500;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.upload-zone-icon {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 40px;\r\n\t\t\theight: 40px;\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-info-bg);\r\n\t\t\tcolor: var(--color-accent);\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.upload-zone input[type=\"file\"] {\r\n\t\t\tposition: absolute;\r\n\t\t\twidth: 1px;\r\n\t\t\theight: 1px;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: -1px;\r\n\t\t\toverflow: hidden;\r\n\t\t\tclip: rect(0, 0, 0, 0);\r\n\t\t\tborder: 0;\r\n\t\t}\r\n\r\n\t\t.upload-zone-meta {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: 2px;\r\n\t\t\tmin-width: 0;\r\n\t\t}\r\n\r\n\t\t.upload-zone-hint {\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-weight: 400;\r\n\t\t}\r\n\r\n\t\t.upload-filename {\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tword-break: break-all;\r\n\t\t}\r\n\r\n\t\t.upload-locked-notice {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tpadding: var(--space-3) var(--space-4);\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-info-bg);\r\n\t\t\tborder: 1px solid color-mix(in srgb, var(--color-info) 25%, transparent);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.upload-locked-notice svg {\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tmargin-top: 2px;\r\n\t\t\tcolor: var(--color-info);\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -743,7 +741,7 @@ func DocumentsPage(data DocumentsPageData) templ.Component {
 		var templ_7745c5c3_Var29 string
 		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(data.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 421, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 415, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 		if templ_7745c5c3_Err != nil {
@@ -756,7 +754,7 @@ func DocumentsPage(data DocumentsPageData) templ.Component {
 		var templ_7745c5c3_Var30 templ.SafeURL
 		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 422, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 416, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 		if templ_7745c5c3_Err != nil {
@@ -806,7 +804,7 @@ func DocumentsPage(data DocumentsPageData) templ.Component {
 			var templ_7745c5c3_Var31 string
 			templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 434, Col: 53}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 428, Col: 53}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 			if templ_7745c5c3_Err != nil {
@@ -874,7 +872,7 @@ func ProfilePictureUpload(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var33 templ.SafeURL
 			templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/avatar"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 463, Col: 40}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 457, Col: 40}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 			if templ_7745c5c3_Err != nil {
@@ -928,7 +926,7 @@ func ProfileDocumentUpload(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var35 templ.SafeURL
 			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/document"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 507, Col: 43}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 501, Col: 43}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 			if templ_7745c5c3_Err != nil {

@@ -11,6 +11,7 @@ import (
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
+	"zion-english/internal/teachers"
 	"zion-english/internal/utils"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -71,7 +72,7 @@ func parseClaims(tokenString string, cfg *conf.Config) (*Claims, error) {
 	if err != nil || !token.Valid {
 		return nil, errors.New("invalid token")
 	}
-	if claims.Role != RoleTeacher && claims.Role != RoleSuperuser {
+	if claims.Role != RoleTeacher && claims.Role != RoleAdmin && claims.Role != RoleSuperuser {
 		return nil, errors.New("invalid role")
 	}
 	return claims, nil
@@ -130,7 +131,7 @@ func Middleware(cfg *conf.Config, dbRO *queries.Queries, next http.Handler) http
 			return
 		}
 
-		if claims.Role == RoleTeacher {
+		if claims.Role == RoleTeacher || claims.Role == RoleAdmin {
 			if claims.UserID == 0 {
 				logs.Log().Error(logtag, zap.String("reason", "teacher token missing user id"))
 				invalidateSession(w, r)
@@ -189,11 +190,17 @@ func Login(w http.ResponseWriter, r *http.Request, cfg *conf.Config, dbRO *queri
 			return User{}, ErrTeacherPendingApproval
 		}
 
+		roleRows, err := dbRO.GetTeacherRolesByTeacherID(r.Context(), teacher.ID)
+		if err != nil {
+			return User{}, err
+		}
+		loginRole := resolveLoginRole(teachers.StringsToRoles(roleRows))
+
 		user = User{
 			ID:    teacher.ID,
 			Name:  utils.ComposePersonName(teacher.FirstName, teacher.MiddleName, teacher.LastName),
 			Email: teacher.Email,
-			Role:  RoleTeacher,
+			Role:  loginRole,
 		}
 	}
 
@@ -254,7 +261,7 @@ func SessionUserValid(ctx context.Context, dbRO *queries.Queries, user User) boo
 	switch user.Role {
 	case RoleSuperuser:
 		return true
-	case RoleTeacher:
+	case RoleTeacher, RoleAdmin:
 		if user.ID == 0 {
 			return false
 		}
@@ -285,6 +292,13 @@ func invalidateSession(w http.ResponseWriter, r *http.Request) {
 
 func accessDenied(w http.ResponseWriter, r *http.Request) {
 	redirectToLogin(w, r)
+}
+
+func resolveLoginRole(roles []constants.TeacherRole) Role {
+	if teachers.HasRole(roles, constants.TeacherRoleAdmin) {
+		return RoleAdmin
+	}
+	return RoleTeacher
 }
 
 func RequireRole(allowed ...Role) func(http.HandlerFunc) http.HandlerFunc {

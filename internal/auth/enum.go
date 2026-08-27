@@ -6,8 +6,17 @@ type Role string
 
 const (
 	RoleTeacher   Role = "teacher"
+	RoleAdmin     Role = "admin"
 	RoleSuperuser Role = "superuser"
 )
+
+func AdminAccessRoles() []Role {
+	return []Role{RoleSuperuser, RoleAdmin}
+}
+
+func HasAdminAccess(role Role) bool {
+	return role == RoleSuperuser || role == RoleAdmin
+}
 
 type User struct {
 	ID    int64

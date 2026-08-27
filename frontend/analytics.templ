@@ -254,6 +254,18 @@ templ Analytics(data AnalyticsData) {
 				return mins + 'm';
 			}
 
+			function roleBadgeClass(label) {
+				switch (label) {
+					case 'admin':
+					case 'superuser':
+						return 'pill pill--primary';
+					case 'developer':
+						return 'pill pill--info';
+					default:
+						return 'pill pill--neutral';
+				}
+			}
+
 			function renderAvatarHTML(avatar) {
 				if (!avatar) {
 					return '';
@@ -266,7 +278,12 @@ templ Analytics(data AnalyticsData) {
 				} else {
 					inner = '<span class="avatar-initials" aria-hidden="true">' + escapeHTML(avatar.initials || '') + '</span>';
 				}
-				return '<div class="avatar avatar-sm" style="' + style + '" aria-label="' + escapeHTML(avatar.alt || '') + '">' + inner + '</div>';
+				const circle = '<div class="avatar avatar-sm" style="' + style + '" aria-label="' + escapeHTML(avatar.alt || '') + '">' + inner + '</div>';
+				if (avatar.roleBadge) {
+					return '<div class="avatar-with-role">' + circle +
+						'<span class="avatar-role-badge ' + roleBadgeClass(avatar.roleBadge) + '">' + escapeHTML(avatar.roleBadge) + '</span></div>';
+				}
+				return circle;
 			}
 
 			function renderTeacherCell(name, avatar) {

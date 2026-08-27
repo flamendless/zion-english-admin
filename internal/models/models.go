@@ -152,10 +152,11 @@ type ClassRecordView struct {
 	Rate            float64 `json:"rate"`
 	Currency        string  `json:"currency"`
 	Status          string  `json:"status"`
-	Reason          string  `json:"reason"`
-	Notes           string  `json:"notes"`
-	CreatedAt       string  `json:"createdAt"`
-	Source          string  `json:"source"`
+	Reason          string     `json:"reason"`
+	Notes           string     `json:"notes"`
+	TeacherAvatar   AvatarView `json:"teacherAvatar"`
+	CreatedAt       string     `json:"createdAt"`
+	Source          string     `json:"source"`
 }
 
 type ScheduledClassRequest struct {
@@ -174,6 +175,7 @@ type AvatarView struct {
 	HasPicture    bool   `json:"hasPicture"`
 	PictureURL    string `json:"pictureURL"`
 	Alt           string `json:"alt"`
+	RoleBadge     string `json:"roleBadge,omitempty"`
 }
 
 type ScheduledClassView struct {

@@ -9,9 +9,22 @@ type AvatarProps struct {
 	PictureURL    string `json:"pictureURL"`
 	HasPicture    bool   `json:"hasPicture"`
 	Alt           string `json:"alt"`
+	RoleBadge     string `json:"roleBadge,omitempty"`
 }
 
-templ Avatar(props AvatarProps) {
+type TeacherListItem struct {
+	Name   string
+	Avatar AvatarProps
+}
+
+templ TeacherNameCell(name string, avatar AvatarProps) {
+	<div class="teacher-name-cell">
+		@Avatar(avatar)
+		<span class="teacher-name-cell-text">{ name }</span>
+	</div>
+}
+
+templ avatarCircle(props AvatarProps) {
 	<div
 		class={ "avatar avatar-" + props.Size }
 		style={ templ.SafeCSS("background-color: " + props.AssignedColor + ";") }
@@ -23,6 +36,17 @@ templ Avatar(props AvatarProps) {
 			<span class="avatar-initials" aria-hidden="true">{ props.Initials }</span>
 		}
 	</div>
+}
+
+templ Avatar(props AvatarProps) {
+	if props.RoleBadge != "" {
+		<div class="avatar-with-role">
+			@avatarCircle(props)
+			<span class={ "avatar-role-badge " + pillClass(AvatarRoleBadgeTone(props.RoleBadge)) }>{ props.RoleBadge }</span>
+		</div>
+	} else {
+		@avatarCircle(props)
+	}
 }
 
 templ AvatarStyles() {
@@ -93,6 +117,61 @@ templ AvatarStyles() {
 
 		.header-avatar-link:hover .avatar {
 			box-shadow: var(--shadow-md);
+		}
+
+		.teacher-name-cell {
+			display: flex;
+			align-items: center;
+			gap: var(--space-2);
+			min-width: 0;
+		}
+
+		.teacher-name-cell .avatar-with-role,
+		.analytics-teacher-cell .avatar-with-role,
+		.reports-teacher-cell .avatar-with-role,
+		.documents-uploader-cell .avatar-with-role,
+		.day-class-header .avatar-with-role {
+			margin-bottom: 0;
+			flex-shrink: 0;
+			margin-inline-end: var(--space-3);
+		}
+
+		.teacher-name-cell-text {
+			min-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.avatar-with-role {
+			position: relative;
+			display: inline-block;
+			margin-bottom: var(--space-3);
+		}
+
+		.avatar-role-badge {
+			position: absolute;
+			bottom: 0;
+			left: 50%;
+			transform: translate(-50%, 50%);
+			z-index: 1;
+			font-size: 0.625rem;
+			padding: 2px 8px;
+			white-space: nowrap;
+			box-shadow: var(--shadow-sm);
+			text-transform: lowercase;
+		}
+
+		.avatar-with-role:has(.avatar-sm) .avatar-role-badge,
+		.avatar-with-role:has(.avatar-nav) .avatar-role-badge {
+			font-size: 0.5625rem;
+			padding: 1px 6px;
+		}
+
+		.avatar-with-role .avatar-role-badge.pill--neutral {
+			background: var(--color-surface);
+			border: 1px solid var(--color-border);
+			color: var(--color-foreground);
 		}
 	</style>
 }

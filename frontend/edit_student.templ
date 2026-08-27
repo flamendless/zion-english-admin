@@ -22,6 +22,7 @@ type EditStudentData struct {
 	InactiveReason string
 	TeacherIDs     []string
 	TeacherNames   []string
+	Teachers       []TeacherListItem
 	Relationships  []StudentRelationshipItem
 }
 
@@ -38,6 +39,7 @@ templ EditStudent(data EditStudentData) {
 		}
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
+		@AvatarStyles()
 		<style>
 			.relationship-list {
 				display: flex;
@@ -112,9 +114,13 @@ templ EditStudent(data EditStudentData) {
 					}
 					<div class="form-group">
 						<label>Assigned Teachers</label>
-						for _, name := range data.TeacherNames {
-							<input type="text" value={ name } disabled/>
-						}
+						<div class="entity-view-teacher-list">
+							for _, teacher := range data.Teachers {
+								<div class="entity-view-teacher-item">
+									@TeacherNameCell(teacher.Name, teacher.Avatar)
+								</div>
+							}
+						</div>
 					</div>
 					<div class="form-group">
 						<label for="assignedColor">Assigned Color</label>

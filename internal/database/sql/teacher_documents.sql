@@ -135,3 +135,13 @@ WHERE t.deleted = 0
 
 -- name: DeleteTeacherDocument :exec
 DELETE FROM tbl_teacher_documents WHERE id = ?;
+
+-- name: GetLatestTeacherDocumentStatusesByTeacherIDs :many
+SELECT
+	teacher_id,
+	status,
+	uploaded_at
+FROM tbl_teacher_documents
+WHERE type = 'document'
+	AND teacher_id IN (sqlc.slice('teacher_ids'))
+ORDER BY uploaded_at DESC;

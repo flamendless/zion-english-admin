@@ -1,0 +1,86 @@
+package frontend
+
+templ ClassViewModal(data EditClassData) {
+	<div class="modal-overlay" id="classViewModal" role="presentation">
+		<div class="modal-dialog modal-dialog-profile modal-dialog-entity" role="dialog" aria-modal="true" aria-labelledby="classViewTitle">
+			<div class="modal-header">
+				<h3 id="classViewTitle">Class details</h3>
+				<button type="button" class="modal-close class-view-close" aria-label="Close" onclick="window.closeClassViewModal()">&times;</button>
+			</div>
+			<div class="modal-body entity-view-body class-view-body">
+				@EntityViewModalStyles()
+				@AvatarStyles()
+				<div class={ "entity-view-hero " + classStatusAccentClass(data.Status) }>
+					<div class="entity-view-hero-main">
+						<p class="entity-view-eyebrow">Class record</p>
+						<h2>{ data.StudentName }</h2>
+						<div class="entity-view-meta-row">
+							@EntityViewMetaChip("Date", data.Date)
+							@EntityViewMetaChip("Time", data.TimeRangeLabel())
+						</div>
+					</div>
+					@StatusPill(capitalizeStatus(data.Status), ClassStatusPillTone(data.Status), true)
+				</div>
+				<div class="entity-view-stats">
+					@EntityViewRateStat(data.Rate, data.Currency)
+					@EntityViewStatCard("Duration", formatDurationMinutes(data.DurationMinutes))
+					if data.IsSuperuser {
+						@EntityViewTeacherStat(TeacherListItem{
+							Name:   data.TeacherName,
+							Avatar: data.TeacherAvatar,
+						})
+					}
+				</div>
+				if (data.Status != "conducted" && data.Reason != "") || data.Notes != "" {
+					<div class="entity-view-card">
+						<div class="entity-view-section-body">
+							if data.Status != "conducted" && data.Reason != "" {
+								@EntityViewNotePanel("Reason", data.Reason, "warning")
+							}
+							if data.Notes != "" {
+								@EntityViewNotePanel("Notes", data.Notes, "info")
+							}
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+}
+
+func (data EditClassData) TimeRangeLabel() string {
+	return FormatScheduledClassTimeRange(data.StartTime, data.EndTime, data.DurationMinutes)
+}
+
+templ ClassViewModalScripts() {
+	<script>
+		window.closeClassViewModal = function () {
+			const host = document.getElementById('classViewModalHost');
+			if (host) host.innerHTML = '';
+			document.body.classList.remove('modal-open');
+		};
+
+		document.body.addEventListener('htmx:afterSwap', function (evt) {
+			if (evt.detail.target.id !== 'classViewModalHost') return;
+			document.body.classList.add('modal-open');
+			const overlay = evt.detail.target.querySelector('#classViewModal');
+			const closeBtn = overlay && overlay.querySelector('.class-view-close');
+			if (closeBtn) closeBtn.focus();
+		});
+
+		document.body.addEventListener('click', function (e) {
+			if (e.target.closest('.class-view-close')) {
+				window.closeClassViewModal();
+				return;
+			}
+			const overlay = e.target.closest('#classViewModal');
+			if (overlay && e.target === overlay) window.closeClassViewModal();
+		});
+
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape' && document.getElementById('classViewModal')) {
+				window.closeClassViewModal();
+			}
+		});
+	</script>
+}

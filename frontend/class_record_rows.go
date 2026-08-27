@@ -13,6 +13,7 @@ type ClassRecordRowData struct {
 	TeacherID       int64
 	StudentName     string
 	TeacherName     string
+	TeacherAvatar   AvatarProps
 	Date            string
 	StartTime       string
 	EndTime         string
@@ -20,6 +21,8 @@ type ClassRecordRowData struct {
 	Rate            float64
 	Currency        string
 	Status          string
+	Reason          string
+	Notes           string
 	Source          string
 }
 
@@ -30,6 +33,15 @@ func ClassRecordRowFromView(v models.ClassRecordView) ClassRecordRowData {
 		TeacherID:       v.TeacherID,
 		StudentName:     v.StudentName,
 		TeacherName:     v.TeacherName,
+		TeacherAvatar: AvatarProps{
+			Size:          "sm",
+			Initials:      v.TeacherAvatar.Initials,
+			AssignedColor: v.TeacherAvatar.AssignedColor,
+			PictureURL:    v.TeacherAvatar.PictureURL,
+			HasPicture:    v.TeacherAvatar.HasPicture,
+			Alt:           v.TeacherAvatar.Alt,
+			RoleBadge:     v.TeacherAvatar.RoleBadge,
+		},
 		Date:            v.Date,
 		StartTime:       v.StartTime,
 		EndTime:         v.EndTime,
@@ -37,6 +49,8 @@ func ClassRecordRowFromView(v models.ClassRecordView) ClassRecordRowData {
 		Rate:            v.Rate,
 		Currency:        v.Currency,
 		Status:          v.Status,
+		Reason:          v.Reason,
+		Notes:           v.Notes,
 		Source:          v.Source,
 	}
 }
@@ -88,6 +102,19 @@ func (r ClassRecordRowData) EndTimeDisplay() string {
 		return "-"
 	}
 	return r.EndTime
+}
+
+func (r ClassRecordRowData) TimeRangeDisplay() string {
+	return FormatScheduledClassTimeRange(r.StartTime, r.EndTime, r.DurationMinutes)
+}
+
+func (r ClassRecordRowData) NoteOrReasonDisplay() string {
+	switch r.Status {
+	case "conducted":
+		return r.Notes
+	default:
+		return r.Reason
+	}
 }
 
 func (r ClassRecordRowData) ScheduledItemData() ScheduledClassItemData {

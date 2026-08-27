@@ -88,20 +88,32 @@ func Classes(data ClassesData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</head><body><div class=\"container\" data-show-all-teachers=\"")
+		templ_7745c5c3_Err = AvatarStyles().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<style>\n\t\t\t.time-range-cell {\n\t\t\t\twhite-space: nowrap;\n\t\t\t\tfont-variant-numeric: tabular-nums;\n\t\t\t}\n\n\t\t\t.note-reason-cell {\n\t\t\t\tmax-width: 200px;\n\t\t\t}\n\n\t\t\t.note-reason-text {\n\t\t\t\tdisplay: block;\n\t\t\t\toverflow: hidden;\n\t\t\t\ttext-overflow: ellipsis;\n\t\t\t\twhite-space: nowrap;\n\t\t\t}\n\t\t</style>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ClassViewModalScripts().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</head><body><div class=\"container\" data-show-all-teachers=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%t", data.ShowAllTeachers))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 38, Col: 89}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 57, Col: 89}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -128,56 +140,56 @@ func Classes(data ClassesData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"toolbar\" id=\"classesToolbar\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"toolbar\" id=\"classesToolbar\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.ShowAllTeachers {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"form-group\"><label for=\"teacher\">Teacher</label> <select id=\"teacher\" name=\"teacherId\" hx-get=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"form-group\"><label for=\"teacher\">Teacher</label> <select id=\"teacher\" name=\"teacherId\" hx-get=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/api/teachers"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 53, Col: 42}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 72, Col: 42}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" hx-trigger=\"load\" hx-swap=\"innerHTML\" hx-target=\"this\"><option value=\"\">All teachers</option></select></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" hx-trigger=\"load\" hx-swap=\"innerHTML\" hx-target=\"this\"><option value=\"\">All teachers</option></select></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else if data.LockTeacher {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<input type=\"hidden\" id=\"teacher\" name=\"teacherId\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<input type=\"hidden\" id=\"teacher\" name=\"teacherId\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 62, Col: 78}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 81, Col: 78}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\"><div class=\"form-group\"><label>Teacher</label> <input type=\"text\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\"><div class=\"form-group\"><label>Teacher</label> <input type=\"text\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 65, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 84, Col: 49}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" disabled></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" disabled></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -187,7 +199,7 @@ func Classes(data ClassesData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"form-group\"><label for=\"studentSearch\">Student</label> <input type=\"text\" id=\"studentSearch\" name=\"q\" placeholder=\"Search student name...\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"form-group\"><label for=\"studentSearch\">Student</label> <input type=\"text\" id=\"studentSearch\" name=\"q\" placeholder=\"Search student name...\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -199,71 +211,71 @@ func Classes(data ClassesData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<input type=\"hidden\" id=\"classesPage\" name=\"page\" value=\"1\"> <button type=\"button\" id=\"filterBtn\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<input type=\"hidden\" id=\"classesPage\" name=\"page\" value=\"1\"> <button type=\"button\" id=\"filterBtn\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/classes/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 80, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 99, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" hx-include=\"#classesToolbar\" hx-target=\"#classesTableBody\" hx-swap=\"innerHTML\">Filter</button></div><div class=\"table-wrapper\"><table id=\"classesTable\" class=\"table-stack-mobile\"><thead><tr><th>Date</th><th>Start Time</th><th>End Time</th>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" hx-include=\"#classesToolbar\" hx-target=\"#classesTableBody\" hx-swap=\"innerHTML\">Filter</button></div><div class=\"table-wrapper\"><table id=\"classesTable\" class=\"table-stack-mobile\"><thead><tr><th>Date</th><th>Time</th>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.ShowAllTeachers {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<th>Teacher</th>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<th>Teacher</th>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<th>Student</th><th>Rate</th><th>Status</th><th>Actions</th></tr></thead> <tbody id=\"classesTableBody\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<th>Student</th><th>Rate</th><th>Status</th><th>Note / Reason</th><th>Actions</th></tr></thead> <tbody id=\"classesTableBody\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/classes/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 105, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 124, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" hx-include=\"#classesToolbar\" hx-trigger=\"load\" hx-swap=\"innerHTML\"><tr>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" hx-include=\"#classesToolbar\" hx-trigger=\"load\" hx-swap=\"innerHTML\"><tr>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.LockTeacher || data.ShowAllTeachers {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<td colspan=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<td colspan=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", classesTableColspan(data)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 112, Col: 65}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 131, Col: 65}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"empty-state\">Loading classes...</td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" class=\"empty-state\">Loading classes...</td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<td colspan=\"7\" class=\"empty-state\">Select a teacher to view classes</td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<td colspan=\"7\" class=\"empty-state\">Select a teacher to view classes</td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</tr></tbody></table></div><div id=\"paginationBottom\" class=\"pagination-bar\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</tr></tbody></table></div><div id=\"paginationBottom\" class=\"pagination-bar\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -275,7 +287,7 @@ func Classes(data ClassesData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</div><script>\n\t\t\tconst datePresetSelect = document.getElementById('datePreset');\n\t\t\tconst filterBtn = document.getElementById('filterBtn');\n\t\t\tconst classesPage = document.getElementById('classesPage');\n\t\t\tconst teacherSelect = document.getElementById('teacher');\n\n\t\t\tfunction setDateRangeFromPreset(value) {\n\t\t\t\tif (!value) {\n\t\t\t\t\tdelete datePresetSelect.dataset.startDate;\n\t\t\t\t\tdelete datePresetSelect.dataset.endDate;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst parts = value.split('|');\n\t\t\t\tif (parts.length !== 2) return;\n\t\t\t\tdatePresetSelect.dataset.startDate = parts[0];\n\t\t\t\tdatePresetSelect.dataset.endDate = parts[1];\n\t\t\t}\n\n\t\t\tdatePresetSelect.addEventListener('change', () => {\n\t\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\n\t\t\t});\n\n\t\t\tfilterBtn.addEventListener('click', () => {\n\t\t\t\tif (classesPage) classesPage.value = '1';\n\t\t\t});\n\n\t\t\tif (teacherSelect) {\n\t\t\t\tteacherSelect.addEventListener('change', () => {\n\t\t\t\t\tif (classesPage) classesPage.value = '1';\n\t\t\t\t\tif (datePresetSelect.value) {\n\t\t\t\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\t\t\thtmx.trigger('#classesTableBody', 'load');\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tconst pageBtn = e.target.closest('#paginationBottom .pagination-btn[hx-get]');\n\t\t\t\tif (!pageBtn || !classesPage) return;\n\t\t\t\tconst vals = pageBtn.getAttribute('hx-vals');\n\t\t\t\tif (!vals) return;\n\t\t\t\ttry {\n\t\t\t\t\tconst parsed = JSON.parse(vals.replace(/'/g, '\"'));\n\t\t\t\t\tif (parsed.page) classesPage.value = String(parsed.page);\n\t\t\t\t} catch (err) { /* ignore */ }\n\t\t\t});\n\n\t\t\tif (datePresetSelect.value) {\n\t\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\n\t\t\t}\n\t\t</script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<div id=\"classViewModalHost\"></div></div><script>\n\t\t\tconst datePresetSelect = document.getElementById('datePreset');\n\t\t\tconst filterBtn = document.getElementById('filterBtn');\n\t\t\tconst classesPage = document.getElementById('classesPage');\n\t\t\tconst teacherSelect = document.getElementById('teacher');\n\n\t\t\tfunction setDateRangeFromPreset(value) {\n\t\t\t\tif (!value) {\n\t\t\t\t\tdelete datePresetSelect.dataset.startDate;\n\t\t\t\t\tdelete datePresetSelect.dataset.endDate;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst parts = value.split('|');\n\t\t\t\tif (parts.length !== 2) return;\n\t\t\t\tdatePresetSelect.dataset.startDate = parts[0];\n\t\t\t\tdatePresetSelect.dataset.endDate = parts[1];\n\t\t\t}\n\n\t\t\tdatePresetSelect.addEventListener('change', () => {\n\t\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\n\t\t\t});\n\n\t\t\tfilterBtn.addEventListener('click', () => {\n\t\t\t\tif (classesPage) classesPage.value = '1';\n\t\t\t});\n\n\t\t\tif (teacherSelect) {\n\t\t\t\tteacherSelect.addEventListener('change', () => {\n\t\t\t\t\tif (classesPage) classesPage.value = '1';\n\t\t\t\t\tif (datePresetSelect.value) {\n\t\t\t\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\t\t\thtmx.trigger('#classesTableBody', 'load');\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tconst pageBtn = e.target.closest('#paginationBottom .pagination-btn[hx-get]');\n\t\t\t\tif (!pageBtn || !classesPage) return;\n\t\t\t\tconst vals = pageBtn.getAttribute('hx-vals');\n\t\t\t\tif (!vals) return;\n\t\t\t\ttry {\n\t\t\t\t\tconst parsed = JSON.parse(vals.replace(/'/g, '\"'));\n\t\t\t\t\tif (parsed.page) classesPage.value = String(parsed.page);\n\t\t\t\t} catch (err) { /* ignore */ }\n\t\t\t});\n\n\t\t\tif (datePresetSelect.value) {\n\t\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\n\t\t\t}\n\t\t</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
