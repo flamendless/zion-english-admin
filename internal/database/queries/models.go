@@ -71,15 +71,17 @@ type TblClassRecord struct {
 }
 
 type TblLearningMaterial struct {
-	ID          int64
-	OwnerID     int64
-	Description string
-	Url         string
-	Access      string
-	Status      string
-	CreatedAt   string
-	UpdatedAt   string
-	DeletedAt   sql.NullString
+	ID           int64
+	OwnerID      int64
+	Description  string
+	Url          string
+	Access       string
+	Status       string
+	CreatedAt    string
+	UpdatedAt    string
+	DeletedAt    sql.NullString
+	Title        string
+	ThumbnailUrl string
 }
 
 type TblLearningMaterialTag struct {

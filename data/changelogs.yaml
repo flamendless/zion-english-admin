@@ -9,6 +9,29 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.08.27.2"
+    date: "2026-08-27"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "You can browse and share teaching resources in the new Learning Library, with tags, links, and public or private access."
+        commit: "6c36db3"
+      - text: "Superusers can assign an Admin role to teachers, giving them access to admin tools such as students, teachers, reports, and payroll processing."
+        commit: "9794cb2"
+    improvements:
+      - text: "Conducting, cancelling, and deleting classes from the schedule now use confirmation modals instead of inline forms."
+        commit: "fe69d0d"
+      - text: "Teacher avatars and names appear more consistently across analytics, documents, classes, and announcements."
+        commit: "c6e6326"
+      - text: "Reports show teacher role badges on avatars in the list and quick-view modal."
+        commit: "9794cb2"
+    bug_fixes:
+      - text: "Fixed a layout issue on class schedule cards."
+        commit: "27c176c"
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
   - version: "2026.08.27.1"
     date: "2026-08-27"
     released: true

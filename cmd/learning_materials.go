@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -15,6 +16,19 @@ import (
 	"zion-english/internal/utils"
 )
 
+type learningMaterialRow struct {
+	ID           int64
+	OwnerID      int64
+	Title        string
+	Description  string
+	Url          string
+	ThumbnailUrl string
+	Access       string
+	Status       string
+	CreatedAt    string
+	UpdatedAt    string
+}
+
 func handleLearningMaterials(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -25,7 +39,7 @@ func handleLearningMaterials(w http.ResponseWriter, r *http.Request) {
 	user := auth.GetUser(ctx)
 	page := utils.ParsePageQuery(r)
 
-	var rows []queries.TblLearningMaterial
+	var rows []learningMaterialRow
 	var err error
 	if user.Role == auth.RoleSuperuser {
 		page.Total, err = dbRO.GetQueries().CountLearningMaterialsForSuperuser(ctx)
@@ -33,25 +47,31 @@ func handleLearningMaterials(w http.ResponseWriter, r *http.Request) {
 			HttpError(w, fmt.Sprintf("Failed to count materials: %v", err), http.StatusInternalServerError)
 			return
 		}
-		rows, err = dbRO.GetQueries().GetLearningMaterialsPagedForSuperuser(ctx, queries.GetLearningMaterialsPagedForSuperuserParams{
+		superRows, err := dbRO.GetQueries().GetLearningMaterialsPagedForSuperuser(ctx, queries.GetLearningMaterialsPagedForSuperuserParams{
 			Limit:  int64(page.Size),
 			Offset: int64(page.Offset()),
 		})
+		if err != nil {
+			HttpError(w, fmt.Sprintf("Failed to load materials: %v", err), http.StatusInternalServerError)
+			return
+		}
+		rows = mapLearningMaterialSuperuserRows(superRows)
 	} else {
 		page.Total, err = dbRO.GetQueries().CountLearningMaterialsForUser(ctx, user.ID)
 		if err != nil {
 			HttpError(w, fmt.Sprintf("Failed to count materials: %v", err), http.StatusInternalServerError)
 			return
 		}
-		rows, err = dbRO.GetQueries().GetLearningMaterialsPagedForUser(ctx, queries.GetLearningMaterialsPagedForUserParams{
+		userRows, err := dbRO.GetQueries().GetLearningMaterialsPagedForUser(ctx, queries.GetLearningMaterialsPagedForUserParams{
 			OwnerID: user.ID,
 			Limit:   int64(page.Size),
 			Offset:  int64(page.Offset()),
 		})
-	}
-	if err != nil {
-		HttpError(w, fmt.Sprintf("Failed to load materials: %v", err), http.StatusInternalServerError)
-		return
+		if err != nil {
+			HttpError(w, fmt.Sprintf("Failed to load materials: %v", err), http.StatusInternalServerError)
+			return
+		}
+		rows = mapLearningMaterialUserRows(userRows)
 	}
 
 	items, err := buildLearningMaterialListItems(ctx, rows, user)
@@ -128,11 +148,13 @@ func handleLearningMaterialCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id, err := dbRW.GetQueries().InsertLearningMaterial(ctx, queries.InsertLearningMaterialParams{
-		OwnerID:     ownerID,
-		Description: strings.TrimSpace(req.Description),
-		Url:         strings.TrimSpace(req.URL),
-		Access:      req.Access,
-		Status:      req.Status,
+		OwnerID:      ownerID,
+		Title:        strings.TrimSpace(req.Title),
+		Description:  strings.TrimSpace(req.Description),
+		Url:          strings.TrimSpace(req.URL),
+		ThumbnailUrl: resolveLearningMaterialThumbnail(ctx, req),
+		Access:       req.Access,
+		Status:       req.Status,
 	})
 	if err != nil {
 		setErrorFlash(w, fmt.Sprintf("Failed to create material: %v", err))
@@ -164,7 +186,7 @@ func handleLearningMaterialView(w http.ResponseWriter, r *http.Request, material
 		HttpError(w, "Learning material not found", http.StatusNotFound)
 		return
 	}
-	if !learningmaterials.CanView(user, material) {
+	if !learningmaterials.CanView(user, material.OwnerID, material.Status, material.Access) {
 		HttpError(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -174,20 +196,26 @@ func handleLearningMaterialView(w http.ResponseWriter, r *http.Request, material
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	ownerAvatar, err := resolveLearningMaterialOwnerAvatar(ctx, material.OwnerID)
+	if err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	data := frontend.LearningMaterialViewData{
-		ID:          strconv.FormatInt(materialID, 10),
-		Description: material.Description,
-		URL:         material.Url,
-		Access:      material.Access,
+		ID:           strconv.FormatInt(materialID, 10),
+		Title:        material.Title,
+		Description:  material.Description,
+		URL:          material.Url,
+		ThumbnailURL: material.ThumbnailUrl,
+		Access:       material.Access,
 		Status:      material.Status,
 		OwnerName:   ownerName,
+		OwnerAvatar: ownerAvatar,
 		CreatedAt:   material.CreatedAt,
 		UpdatedAt:   material.UpdatedAt,
 		DeletedAt:   material.DeletedAt.String,
 		Tags:        mapLearningMaterialTags(tags),
-		CanEdit:     learningmaterials.CanEdit(user, material),
-		CanDelete:   learningmaterials.CanDelete(user),
 	}
 
 	if err := frontend.LearningMaterialViewModal(data).Render(ctx, w); err != nil {
@@ -209,7 +237,7 @@ func handleLearningMaterialEdit(w http.ResponseWriter, r *http.Request, material
 		}
 		return
 	}
-	if !learningmaterials.CanEdit(user, material) {
+	if !learningmaterials.CanEdit(user, material.OwnerID, material.Status) {
 		if r.Method == http.MethodGet {
 			HttpError(w, "Forbidden", http.StatusForbidden)
 		} else {
@@ -234,13 +262,17 @@ func handleLearningMaterialEdit(w http.ResponseWriter, r *http.Request, material
 
 		data := frontend.LearningMaterialFormData{
 			ID:           strconv.FormatInt(materialID, 10),
+			Title:        material.Title,
 			Description:  material.Description,
 			URL:          material.Url,
+			ThumbnailURL: material.ThumbnailUrl,
 			Access:       material.Access,
 			Status:       material.Status,
 			SelectedTags: mapLearningMaterialTags(tags),
 			ExistingTags: mapLearningMaterialTags(existingTags),
 			IsEdit:       true,
+			IsDeleted:    material.Status == learningmaterials.StatusDeleted,
+			CanDelete:    learningmaterials.CanDelete(user),
 		}
 		if err := frontend.LearningMaterialFormModal(data).Render(ctx, w); err != nil {
 			HttpError(w, err.Error(), http.StatusInternalServerError)
@@ -252,17 +284,24 @@ func handleLearningMaterialEdit(w http.ResponseWriter, r *http.Request, material
 			return
 		}
 		req := parseLearningMaterialRequest(r)
-		if err := learningmaterials.ValidateRequest(req); err != nil {
+		if err := learningmaterials.ValidateEditRequest(req); err != nil {
 			setErrorFlash(w, err.Error())
 			HttpRedirect(w, r, "/learning-materials")
 			return
 		}
+		if req.Status == learningmaterials.StatusDeleted && !learningmaterials.CanDelete(user) {
+			setErrorFlash(w, "You do not have permission to delete this material")
+			HttpRedirect(w, r, "/learning-materials")
+			return
+		}
 		if err := dbRW.GetQueries().UpdateLearningMaterial(ctx, queries.UpdateLearningMaterialParams{
-			Description: strings.TrimSpace(req.Description),
-			Url:         strings.TrimSpace(req.URL),
-			Access:      req.Access,
-			Status:      req.Status,
-			ID:          materialID,
+			Title:        strings.TrimSpace(req.Title),
+			Description:  strings.TrimSpace(req.Description),
+			Url:          strings.TrimSpace(req.URL),
+			ThumbnailUrl: resolveLearningMaterialThumbnail(ctx, req),
+			Access:       req.Access,
+			Status:       req.Status,
+			ID:           materialID,
 		}); err != nil {
 			setErrorFlash(w, fmt.Sprintf("Failed to update material: %v", err))
 			HttpRedirect(w, r, "/learning-materials")
@@ -326,27 +365,98 @@ func parseLearningMaterialRequest(r *http.Request) learningmaterials.Request {
 		access = learningmaterials.AccessPublic
 	}
 	return learningmaterials.Request{
-		Description: r.FormValue("description"),
-		URL:         r.FormValue("url"),
-		Access:      access,
-		Status:      status,
-		TagLabels:   r.Form["tags"],
+		Title:        r.FormValue("title"),
+		Description:  r.FormValue("description"),
+		URL:          r.FormValue("url"),
+		ThumbnailURL: r.FormValue("thumbnail_url"),
+		Access:       access,
+		Status:       status,
+		TagLabels:    r.Form["tags"],
 	}
 }
 
-func loadLearningMaterialWithTags(ctx context.Context, materialID int64) (queries.TblLearningMaterial, []queries.TblLearningMaterialTag, error) {
+func resolveLearningMaterialThumbnail(ctx context.Context, req learningmaterials.Request) string {
+	thumb := learningmaterials.NormalizeThumbnailURL(req.ThumbnailURL)
+	if thumb != "" {
+		return thumb
+	}
+	fetched, err := learningmaterials.ResolveThumbnailURL(ctx, req.URL)
+	if err != nil || fetched == "" {
+		return ""
+	}
+	return fetched
+}
+
+func handleLearningMaterialURLPreview(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	rawURL := strings.TrimSpace(r.URL.Query().Get("url"))
+	thumb, err := learningmaterials.ResolveThumbnailURL(r.Context(), rawURL)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(map[string]string{"thumbnail_url": thumb})
+}
+
+func loadLearningMaterialWithTags(ctx context.Context, materialID int64) (queries.GetLearningMaterialByIDRow, []queries.TblLearningMaterialTag, error) {
 	material, err := dbRO.GetQueries().GetLearningMaterialByID(ctx, materialID)
 	if err != nil {
-		return queries.TblLearningMaterial{}, nil, err
+		return queries.GetLearningMaterialByIDRow{}, nil, err
 	}
 	tags, err := dbRO.GetQueries().GetTagsByMaterialID(ctx, materialID)
 	if err != nil {
-		return queries.TblLearningMaterial{}, nil, err
+		return queries.GetLearningMaterialByIDRow{}, nil, err
 	}
 	return material, tags, nil
 }
 
-func buildLearningMaterialListItems(ctx context.Context, rows []queries.TblLearningMaterial, user auth.User) ([]frontend.LearningMaterialListItem, error) {
+func mapLearningMaterialSuperuserRows(rows []queries.GetLearningMaterialsPagedForSuperuserRow) []learningMaterialRow {
+	out := make([]learningMaterialRow, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, learningMaterialRow{
+			ID:           row.ID,
+			OwnerID:      row.OwnerID,
+			Title:        row.Title,
+			Description:  row.Description,
+			Url:          row.Url,
+			ThumbnailUrl: row.ThumbnailUrl,
+			Access:       row.Access,
+			Status:       row.Status,
+			CreatedAt:    row.CreatedAt,
+			UpdatedAt:    row.UpdatedAt,
+		})
+	}
+	return out
+}
+
+func mapLearningMaterialUserRows(rows []queries.GetLearningMaterialsPagedForUserRow) []learningMaterialRow {
+	out := make([]learningMaterialRow, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, learningMaterialRow{
+			ID:           row.ID,
+			OwnerID:      row.OwnerID,
+			Title:        row.Title,
+			Description:  row.Description,
+			Url:          row.Url,
+			ThumbnailUrl: row.ThumbnailUrl,
+			Access:       row.Access,
+			Status:       row.Status,
+			CreatedAt:    row.CreatedAt,
+			UpdatedAt:    row.UpdatedAt,
+		})
+	}
+	return out
+}
+
+func buildLearningMaterialListItems(ctx context.Context, rows []learningMaterialRow, user auth.User) ([]frontend.LearningMaterialListItem, error) {
 	if len(rows) == 0 {
 		return nil, nil
 	}
@@ -378,22 +488,34 @@ func buildLearningMaterialListItems(ctx context.Context, rows []queries.TblLearn
 		return nil, err
 	}
 
+	ownerAvatars, err := resolveLearningMaterialOwnerAvatars(ctx, ownerIDs)
+	if err != nil {
+		return nil, err
+	}
+
 	items := make([]frontend.LearningMaterialListItem, 0, len(rows))
 	for _, row := range rows {
 		ownerName := "Superuser"
+		ownerAvatar := buildLearningMaterialSuperuserAvatarProps()
 		if row.OwnerID > 0 {
 			ownerName = ownerNames[row.OwnerID]
 			if ownerName == "" {
 				ownerName = "Unknown"
 			}
+			if avatar, ok := ownerAvatars[row.OwnerID]; ok {
+				ownerAvatar = avatar
+			}
 		}
 		items = append(items, frontend.LearningMaterialListItem{
 			ID:                strconv.FormatInt(row.ID, 10),
+			Title:             row.Title,
 			Description:       row.Description,
 			URL:               row.Url,
+			ThumbnailURL:      row.ThumbnailUrl,
 			Access:            row.Access,
 			Status:            row.Status,
 			OwnerName:         ownerName,
+			OwnerAvatar:       ownerAvatar,
 			CreatedAt:         row.CreatedAt,
 			UpdatedAt:         row.UpdatedAt,
 			Tags:              tagsByMaterial[row.ID],
@@ -402,8 +524,7 @@ func buildLearningMaterialListItems(ctx context.Context, rows []queries.TblLearn
 			AccessLabel:       learningMaterialAccessLabel(row.Access),
 			AccessTone:        learningMaterialAccessTone(row.Access),
 			IsDeleted:         row.Status == learningmaterials.StatusDeleted,
-			CanEdit:           learningmaterials.CanEdit(user, row),
-			CanDelete:         learningmaterials.CanDelete(user),
+			CanEdit:           learningmaterials.CanEdit(user, row.OwnerID, row.Status),
 		})
 	}
 	return items, nil
@@ -436,6 +557,51 @@ func resolveLearningMaterialOwnerNames(ctx context.Context, ownerIDs []int64) (m
 		names[id] = name
 	}
 	return names, nil
+}
+
+func buildLearningMaterialSuperuserAvatarProps() frontend.AvatarProps {
+	return frontend.AvatarProps{
+		Size:          "sm",
+		Initials:      "SU",
+		AssignedColor: "#90C020",
+		HasPicture:    false,
+		Alt:           "Superuser avatar",
+	}
+}
+
+func resolveLearningMaterialOwnerAvatars(ctx context.Context, ownerIDs []int64) (map[int64]frontend.AvatarProps, error) {
+	avatars := make(map[int64]frontend.AvatarProps, len(ownerIDs))
+	for _, id := range ownerIDs {
+		if _, ok := avatars[id]; ok {
+			continue
+		}
+		avatar, err := resolveLearningMaterialOwnerAvatar(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		avatars[id] = avatar
+	}
+	return avatars, nil
+}
+
+func resolveLearningMaterialOwnerAvatar(ctx context.Context, ownerID int64) (frontend.AvatarProps, error) {
+	if ownerID == 0 {
+		return buildLearningMaterialSuperuserAvatarProps(), nil
+	}
+	row, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, ownerID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return frontend.AvatarProps{
+				Size:          "sm",
+				Initials:      "?",
+				AssignedColor: "#B9D283",
+				HasPicture:    false,
+				Alt:           "Unknown avatar",
+			}, nil
+		}
+		return frontend.AvatarProps{}, fmt.Errorf("failed to load owner avatar: %w", err)
+	}
+	return buildTeacherListAvatarProps(row.ID, row.FirstName, row.MiddleName, row.LastName, row.AssignedColor, row.ProfilePicture), nil
 }
 
 func mapLearningMaterialTags(tags []queries.TblLearningMaterialTag) []frontend.LearningMaterialTag {

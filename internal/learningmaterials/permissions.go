@@ -1,31 +1,25 @@
 package learningmaterials
 
-import (
-	"zion-english/internal/auth"
-	"zion-english/internal/database/queries"
-)
+import "zion-english/internal/auth"
 
-func CanView(user auth.User, material queries.TblLearningMaterial) bool {
+func CanView(user auth.User, ownerID int64, status, access string) bool {
 	if user.Role == auth.RoleSuperuser {
 		return true
 	}
-	if material.Status == StatusDeleted {
-		return false
-	}
-	if material.OwnerID == user.ID {
+	if ownerID == user.ID {
 		return true
 	}
-	return material.Status == StatusPublished && material.Access == AccessPublic
+	if status == StatusDeleted {
+		return false
+	}
+	return status == StatusPublished && access == AccessPublic
 }
 
-func CanEdit(user auth.User, material queries.TblLearningMaterial) bool {
-	if material.Status == StatusDeleted {
-		return false
-	}
+func CanEdit(user auth.User, ownerID int64, status string) bool {
 	if user.Role == auth.RoleSuperuser {
 		return true
 	}
-	return material.OwnerID == user.ID && user.ID != 0
+	return ownerID == user.ID && user.ID != 0
 }
 
 func CanDelete(user auth.User) bool {

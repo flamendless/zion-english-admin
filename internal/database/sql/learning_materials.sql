@@ -29,14 +29,31 @@ FROM tbl_learning_material_tags
 ORDER BY label ASC;
 
 -- name: InsertLearningMaterial :one
-INSERT INTO tbl_learning_materials (owner_id, description, url, access, status)
-VALUES (?, ?, ?, ?, ?)
+INSERT INTO tbl_learning_materials (owner_id, title, description, url, thumbnail_url, access, status)
+VALUES (?, ?, ?, ?, ?, ?, ?)
 RETURNING id;
 
 -- name: UpdateLearningMaterial :exec
 UPDATE tbl_learning_materials
-SET description = ?, url = ?, access = ?, status = ?, updated_at = datetime('now')
-WHERE id = ?;
+SET
+	title = sqlc.arg(title),
+	description = sqlc.arg(description),
+	url = sqlc.arg(url),
+	thumbnail_url = sqlc.arg(thumbnail_url),
+	access = sqlc.arg(access),
+	status = sqlc.arg(status),
+	deleted_at = CASE
+		WHEN sqlc.arg(status) = 'deleted' AND deleted_at IS NULL THEN datetime('now')
+		WHEN sqlc.arg(status) = 'draft' OR sqlc.arg(status) = 'published' THEN NULL
+		ELSE deleted_at
+	END,
+	updated_at = datetime('now')
+WHERE id = sqlc.arg(id);
+
+-- name: ClearLearningMaterialDeleted :exec
+UPDATE tbl_learning_materials
+SET deleted_at = NULL, updated_at = datetime('now')
+WHERE id = ? AND status != 'deleted' AND deleted_at IS NOT NULL;
 
 -- name: DeleteLearningMaterial :exec
 UPDATE tbl_learning_materials
@@ -44,7 +61,7 @@ SET status = 'deleted', deleted_at = datetime('now'), updated_at = datetime('now
 WHERE id = ? AND status != 'deleted';
 
 -- name: GetLearningMaterialByID :one
-SELECT id, owner_id, description, url, access, status, created_at, updated_at, deleted_at
+SELECT id, owner_id, title, description, url, thumbnail_url, access, status, created_at, updated_at, deleted_at
 FROM tbl_learning_materials
 WHERE id = ?;
 
@@ -52,7 +69,7 @@ WHERE id = ?;
 SELECT COUNT(*) FROM tbl_learning_materials;
 
 -- name: GetLearningMaterialsPagedForSuperuser :many
-SELECT id, owner_id, description, url, access, status, created_at, updated_at, deleted_at
+SELECT id, owner_id, title, description, url, thumbnail_url, access, status, created_at, updated_at, deleted_at
 FROM tbl_learning_materials
 ORDER BY created_at DESC, id DESC
 LIMIT ? OFFSET ?;
@@ -60,19 +77,21 @@ LIMIT ? OFFSET ?;
 -- name: CountLearningMaterialsForUser :one
 SELECT COUNT(*)
 FROM tbl_learning_materials m
-WHERE m.status != 'deleted'
-	AND (
-		m.owner_id = ?
-		OR (m.status = 'published' AND m.access = 'public')
+WHERE m.owner_id = ?
+	OR (
+		m.status = 'published'
+		AND m.access = 'public'
+		AND m.status != 'deleted'
 	);
 
 -- name: GetLearningMaterialsPagedForUser :many
-SELECT id, owner_id, description, url, access, status, created_at, updated_at, deleted_at
+SELECT id, owner_id, title, description, url, thumbnail_url, access, status, created_at, updated_at, deleted_at
 FROM tbl_learning_materials m
-WHERE m.status != 'deleted'
-	AND (
-		m.owner_id = ?
-		OR (m.status = 'published' AND m.access = 'public')
+WHERE m.owner_id = ?
+	OR (
+		m.status = 'published'
+		AND m.access = 'public'
+		AND m.status != 'deleted'
 	)
 ORDER BY m.created_at DESC, m.id DESC
 LIMIT ? OFFSET ?;

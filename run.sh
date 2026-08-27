@@ -33,9 +33,9 @@ serve() {
 	local -; set -x;
 
 	if "${ISWSL}"; then
-		cmd.exe /c "start ${BROWSER} http://localhost:${PORT}/zion-english-admin"
+		cmd.exe /c "start ${BROWSER} http://localhost:${PORT}/zion-english-admin/dashboard"
 	elif "${ISMAC}"; then
-		open -a ${BROWSER} "http://localhost:${PORT}/zion-english-admin"
+		open -a ${BROWSER} "http://localhost:${PORT}/zion-english-admin/dashboard"
 	fi
 
 	go run . web

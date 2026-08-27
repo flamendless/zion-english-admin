@@ -17,6 +17,7 @@ func TestNormalizeTagLabels(t *testing.T) {
 
 func TestValidateRequest(t *testing.T) {
 	err := ValidateRequest(Request{
+		Title:       "Grammar worksheet",
 		Description: "A useful worksheet",
 		URL:         "https://example.com/resource",
 		Access:      AccessPublic,
@@ -28,6 +29,7 @@ func TestValidateRequest(t *testing.T) {
 	}
 
 	err = ValidateRequest(Request{
+		Title:       "Missing tags",
 		Description: "Missing tags",
 		URL:         "https://example.com/resource",
 		Access:      AccessPublic,

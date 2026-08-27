@@ -1,7 +1,6 @@
 package frontend
 
 import (
-	"encoding/json"
 	"strings"
 	"zion-english/internal/learningmaterials"
 	"zion-english/internal/utils"
@@ -15,11 +14,14 @@ type LearningMaterialTag struct {
 
 type LearningMaterialListItem struct {
 	ID                string
+	Title             string
 	Description       string
 	URL               string
+	ThumbnailURL      string
 	Access            string
 	Status            string
 	OwnerName         string
+	OwnerAvatar       AvatarProps
 	CreatedAt         string
 	UpdatedAt         string
 	Tags              []LearningMaterialTag
@@ -29,7 +31,6 @@ type LearningMaterialListItem struct {
 	AccessTone        PillTone
 	IsDeleted         bool
 	CanEdit           bool
-	CanDelete         bool
 }
 
 type LearningMaterialsData struct {
@@ -47,28 +48,33 @@ type LearningMaterialsData struct {
 
 type LearningMaterialFormData struct {
 	ID           string
+	Title        string
 	Description  string
 	URL          string
+	ThumbnailURL string
 	Access       string
 	Status       string
 	SelectedTags []LearningMaterialTag
 	ExistingTags []LearningMaterialTag
 	IsEdit       bool
+	IsDeleted    bool
+	CanDelete    bool
 }
 
 type LearningMaterialViewData struct {
-	ID          string
-	Description string
-	URL         string
-	Access      string
+	ID           string
+	Title        string
+	Description  string
+	URL          string
+	ThumbnailURL string
+	Access       string
 	Status      string
 	OwnerName   string
+	OwnerAvatar AvatarProps
 	CreatedAt   string
 	UpdatedAt   string
 	DeletedAt   string
 	Tags        []LearningMaterialTag
-	CanEdit     bool
-	CanDelete   bool
 }
 
 func learningMaterialFormAction(data LearningMaterialFormData) string {
@@ -100,11 +106,15 @@ func learningMaterialDescriptionPreview(desc string) string {
 	return desc[:117] + "..."
 }
 
-func learningMaterialRowClass(isDeleted bool) string {
-	if isDeleted {
-		return "lm-card--deleted"
+func learningMaterialCardClass(status string) string {
+	switch status {
+	case learningmaterials.StatusPublished:
+		return "lm-card lm-card--published"
+	case learningmaterials.StatusDeleted:
+		return "lm-card lm-card--deleted"
+	default:
+		return "lm-card lm-card--draft"
 	}
-	return ""
 }
 
 templ LearningMaterials(data LearningMaterialsData) {
@@ -116,6 +126,7 @@ templ LearningMaterials(data LearningMaterialsData) {
 		<title>Learning Library - Zion English Admin</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
+		@AvatarStyles()
 		@LearningMaterialsStyles()
 	</head>
 	<body>
@@ -173,33 +184,19 @@ templ LearningMaterials(data LearningMaterialsData) {
 }
 
 templ LearningMaterialCard(item LearningMaterialListItem) {
-	<article class={ "lm-card " + learningMaterialRowClass(item.IsDeleted) } role="listitem">
-		<div class="lm-card-top">
-			<div class="lm-card-badges">
-				@StatusPill(item.PublicationStatus, item.PublicationTone, false)
-				@StatusPill(item.AccessLabel, item.AccessTone, false)
-			</div>
-			<div class="lm-card-actions">
-				@IconActionButton("View", IconKindView, templ.Attributes{
-					"hx-get":    utils.URL("/learning-materials/" + item.ID + "/view"),
-					"hx-target": "#lmViewModalHost",
-					"hx-swap":   "innerHTML",
-				})
-				if item.CanEdit && !item.IsDeleted {
-					@IconActionButton("Edit", IconKindEdit, templ.Attributes{
-						"hx-get":    utils.URL("/learning-materials/" + item.ID + "/edit"),
-						"hx-target": "#lmEditModalHost",
-						"hx-swap":   "innerHTML",
-					})
-				}
-				if item.CanDelete && !item.IsDeleted {
-					<form method="POST" action={ utils.URL("/learning-materials/" + item.ID + "/delete") } class="table-action-form" onsubmit="return confirm('Delete this learning material?');">
-						@IconActionSubmit("Delete", IconKindDelete)
-					</form>
-				}
-			</div>
-		</div>
+	<article class={ learningMaterialCardClass(item.Status) } role="listitem">
+		@LearningMaterialThumbnail(item.ThumbnailURL, item.Title, LearningMaterialThumbSizeDefault)
+		<h3 class="lm-card-title">{ item.Title }</h3>
 		<p class="lm-card-description">{ learningMaterialDescriptionPreview(item.Description) }</p>
+		<div class="lm-card-url">
+			<a href={ item.URL } class="lm-card-url-text" target="_blank" rel="noopener noreferrer">
+				{ item.URL }
+			</a>
+		</div>
+		<div class="lm-card-badges">
+			@StatusPill(item.PublicationStatus, item.PublicationTone, false)
+			@StatusPill(item.AccessLabel, item.AccessTone, false)
+		</div>
 		if len(item.Tags) > 0 {
 			<div class="lm-tag-list" aria-label="Tags">
 				for _, tag := range item.Tags {
@@ -207,15 +204,31 @@ templ LearningMaterialCard(item LearningMaterialListItem) {
 				}
 			</div>
 		}
-		<div class="lm-card-meta">
-			<span class="lm-card-owner">{ item.OwnerName }</span>
-			<span class="lm-card-date">{ item.UpdatedAt }</span>
+		<div class="lm-card-footer">
+			<div class="lm-card-owner">
+				@TeacherNameCell(item.OwnerName, item.OwnerAvatar)
+			</div>
+			<div class="lm-card-actions">
+				@IconActionLinkExternal(item.URL, "Open link", IconKindExternal)
+				@IconActionButton("View", IconKindView, templ.Attributes{
+					"hx-get":    utils.URL("/learning-materials/" + item.ID + "/view"),
+					"hx-target": "#lmViewModalHost",
+					"hx-swap":   "innerHTML",
+				})
+				if item.CanEdit {
+					@IconActionButton("Edit", IconKindEdit, templ.Attributes{
+						"hx-get":    utils.URL("/learning-materials/" + item.ID + "/edit"),
+						"hx-target": "#lmEditModalHost",
+						"hx-swap":   "innerHTML",
+					})
+				}
+			</div>
 		</div>
 	</article>
 }
 
 templ LearningMaterialTagPill(tag LearningMaterialTag) {
-	<span class="lm-tag-pill" style={ "background-color: " + tag.Color + "33; border-color: " + tag.Color + "66; color: #2D2D2D;" }>
+	<span class="lm-tag-pill" style={ "background-color: " + tag.Color + "33; color: #2D2D2D;" }>
 		{ tag.Label }
 	</span>
 }
@@ -224,14 +237,11 @@ templ LearningMaterialViewModal(data LearningMaterialViewData) {
 	<div class="modal-overlay" id="lmViewModal" role="presentation">
 		<div class="modal-dialog modal-dialog-entity lm-modal" role="dialog" aria-modal="true" aria-labelledby="lmViewTitle">
 			<div class="modal-header">
-				<h3 id="lmViewTitle">Learning material</h3>
+				<h3 id="lmViewTitle">{ data.Title }</h3>
 				<button type="button" class="modal-close lm-view-close" aria-label="Close">&times;</button>
 			</div>
 			<div class="modal-body lm-view-body">
-				<div class="lm-view-badges">
-					@StatusPill(learningMaterialViewStatusLabel(data.Status), learningMaterialViewStatusTone(data.Status), false)
-					@StatusPill(learningMaterialViewAccessLabel(data.Access), learningMaterialViewAccessTone(data.Access), false)
-				</div>
+				@LearningMaterialThumbnail(data.ThumbnailURL, data.Title, LearningMaterialThumbSizeCompact)
 				<div class="lm-view-section">
 					<h4 class="lm-view-label">Description</h4>
 					<p class="lm-view-text">{ data.Description }</p>
@@ -239,6 +249,13 @@ templ LearningMaterialViewModal(data LearningMaterialViewData) {
 				<div class="lm-view-section">
 					<h4 class="lm-view-label">URL</h4>
 					<a href={ data.URL } class="lm-view-link" target="_blank" rel="noopener noreferrer">{ data.URL }</a>
+				</div>
+				<div class="lm-view-section">
+					<h4 class="lm-view-label">Status</h4>
+					<div class="lm-view-badges">
+						@StatusPill(learningMaterialViewStatusLabel(data.Status), learningMaterialViewStatusTone(data.Status), false)
+						@StatusPill(learningMaterialViewAccessLabel(data.Access), learningMaterialViewAccessTone(data.Access), false)
+					</div>
 				</div>
 				if len(data.Tags) > 0 {
 					<div class="lm-view-section">
@@ -250,8 +267,8 @@ templ LearningMaterialViewModal(data LearningMaterialViewData) {
 						</div>
 					</div>
 				}
-				<div class="lm-view-meta-grid">
-					@LearningMaterialMetaItem("Owner", data.OwnerName)
+				<div class="lm-view-meta">
+					@LearningMaterialMetaOwner(data.OwnerName, data.OwnerAvatar)
 					@LearningMaterialMetaItem("Created", data.CreatedAt)
 					@LearningMaterialMetaItem("Updated", data.UpdatedAt)
 					if data.DeletedAt != "" {
@@ -260,21 +277,9 @@ templ LearningMaterialViewModal(data LearningMaterialViewData) {
 				</div>
 			</div>
 			<div class="modal-footer lm-view-footer">
-				if data.CanEdit {
-					<button
-						type="button"
-						class="add-btn lm-edit-from-view"
-						hx-get={ utils.URL("/learning-materials/" + data.ID + "/edit") }
-						hx-target="#lmEditModalHost"
-						hx-swap="innerHTML"
-					>Edit</button>
-				}
-				if data.CanDelete && data.Status != learningmaterials.StatusDeleted {
-					<form method="POST" action={ utils.URL("/learning-materials/" + data.ID + "/delete") } class="table-action-form" onsubmit="return confirm('Delete this learning material?');">
-						<button type="submit" class="btn btn-danger">Delete</button>
-					</form>
-				}
-				<a href={ data.URL } class="add-btn add-btn-secondary" target="_blank" rel="noopener noreferrer">Open link</a>
+				<div class="lm-view-footer-actions">
+					@IconActionLinkExternal(data.URL, "Open link", IconKindExternal)
+				</div>
 			</div>
 		</div>
 	</div>
@@ -284,6 +289,13 @@ templ LearningMaterialMetaItem(label string, value string) {
 	<div class="lm-meta-item">
 		<span class="lm-meta-label">{ label }</span>
 		<span class="lm-meta-value">{ value }</span>
+	</div>
+}
+
+templ LearningMaterialMetaOwner(name string, avatar AvatarProps) {
+	<div class="lm-meta-item lm-meta-item--owner">
+		<span class="lm-meta-label">Owner</span>
+		@TeacherNameCell(name, avatar)
 	</div>
 }
 
@@ -301,6 +313,18 @@ templ LearningMaterialFormModal(data LearningMaterialFormData) {
 				class="modal-body lm-form-body"
 			>
 				<div class="form-group">
+					<label for="lmTitle">Title *</label>
+					<input
+						type="text"
+						id="lmTitle"
+						name="title"
+						required
+						maxlength="64"
+						value={ data.Title }
+						placeholder="Short name for this resource"
+					/>
+				</div>
+				<div class="form-group">
 					<label for="lmDescription">Description *</label>
 					<textarea
 						id="lmDescription"
@@ -316,11 +340,29 @@ templ LearningMaterialFormModal(data LearningMaterialFormData) {
 					<input
 						type="url"
 						id="lmURL"
+						class="lm-form-url"
 						name="url"
 						required
 						value={ data.URL }
 						placeholder="https://..."
 					/>
+					<div
+						id="lmUrlPreview"
+						class="lm-thumb lm-thumb--compact lm-url-preview"
+						hidden?={ data.ThumbnailURL == "" }
+					>
+						if data.ThumbnailURL != "" {
+							<img id="lmUrlPreviewImg" class="lm-thumb-img" src={ data.ThumbnailURL } alt="Link preview" referrerpolicy="no-referrer"/>
+						} else {
+							<img id="lmUrlPreviewImg" class="lm-thumb-img" alt="Link preview" referrerpolicy="no-referrer"/>
+							<div id="lmUrlPreviewPlaceholder" class="lm-thumb-placeholder" aria-hidden="true">
+								@LearningMaterialBookIcon()
+							</div>
+						}
+						<span class="lm-url-preview-loading">Fetching preview…</span>
+					</div>
+					<p class="field-hint lm-url-preview-error" hidden>Could not load a preview for this link. You can still save the material.</p>
+					<input type="hidden" id="lmThumbnailURL" class="lm-form-thumbnail-url" name="thumbnail_url" value={ data.ThumbnailURL }/>
 				</div>
 
 				<div class="form-group">
@@ -344,23 +386,17 @@ templ LearningMaterialFormModal(data LearningMaterialFormData) {
 				</div>
 
 				<div class="form-group">
-					<label>Status *</label>
-					<div class="lm-option-cards" role="radiogroup" aria-label="Publication status">
-						<label class="lm-option-card">
-							<input type="radio" name="status" value={ learningmaterials.StatusDraft } checked?={ data.Status != learningmaterials.StatusPublished }/>
-							<span class="lm-option-card__body">
-								<span class="lm-option-card__title">Draft</span>
-								<span class="lm-option-card__desc">Saved but hidden from others</span>
-							</span>
-						</label>
-						<label class="lm-option-card">
-							<input type="radio" name="status" value={ learningmaterials.StatusPublished } checked?={ data.Status == learningmaterials.StatusPublished }/>
-							<span class="lm-option-card__body">
-								<span class="lm-option-card__title">Published</span>
-								<span class="lm-option-card__desc">Visible based on access rules</span>
-							</span>
-						</label>
-					</div>
+					<label for="lmStatus">Status *</label>
+					if data.IsDeleted {
+						<p class="field-hint">This material is deleted. Choose Draft or Published to restore it.</p>
+					}
+					<select id="lmStatus" name="status" required>
+						<option value={ learningmaterials.StatusDraft } selected?={ data.Status != learningmaterials.StatusPublished && data.Status != learningmaterials.StatusDeleted }>Draft</option>
+						<option value={ learningmaterials.StatusPublished } selected?={ data.Status == learningmaterials.StatusPublished }>Published</option>
+						if data.IsEdit && data.CanDelete {
+							<option value={ learningmaterials.StatusDeleted } selected?={ data.Status == learningmaterials.StatusDeleted }>Deleted</option>
+						}
+					</select>
 				</div>
 
 				<div class="form-group">
@@ -381,28 +417,22 @@ templ LearningMaterialFormModal(data LearningMaterialFormData) {
 							}
 						</datalist>
 					</div>
-					<p class="field-hint">Tags are stored in lowercase. Pick from suggestions or create new ones.</p>
+					<p class="field-hint lm-tag-limit-warning" hidden>Maximum of 7 tags reached. Remove a tag to add another.</p>
+					<p class="field-hint">Tags are stored in lowercase. Type a tag and press Enter.</p>
 					for _, tag := range data.SelectedTags {
 						<input type="hidden" name="tags" value={ tag.Label }/>
 					}
-					<div class="lm-suggested-tags" id="lmSuggestedTags" hidden?={ len(data.ExistingTags) == 0 }>
-						<span class="lm-suggested-label">Suggestions:</span>
-						for _, tag := range data.ExistingTags {
-							<button type="button" class="lm-suggested-tag" data-tag={ tag.Label } style={ "border-color: " + tag.Color + "66; background: " + tag.Color + "22;" }>
-								{ tag.Label }
-							</button>
-						}
-					</div>
 				</div>
 
 				<div class="modal-footer lm-form-footer">
-					<button type="button" class="btn lm-form-close">Cancel</button>
-					<button type="submit" class="add-btn lm-submit-btn">{ learningMaterialSubmitLabel(data) }</button>
+					<div class="lm-form-footer-actions">
+						<button type="button" class="btn btn-secondary lm-form-close">Cancel</button>
+						<button type="submit" class="add-btn lm-submit-btn">{ learningMaterialSubmitLabel(data) }</button>
+					</div>
 				</div>
 			</form>
 		</div>
 	</div>
-	@LearningMaterialFormInitScript(data.SelectedTags)
 }
 
 func learningMaterialViewStatusLabel(status string) string {
@@ -439,6 +469,32 @@ func learningMaterialViewAccessTone(access string) PillTone {
 		return PillToneWarning
 	}
 	return PillToneInfo
+}
+
+type LearningMaterialThumbSize string
+
+const (
+	LearningMaterialThumbSizeDefault LearningMaterialThumbSize = "default"
+	LearningMaterialThumbSizeCompact LearningMaterialThumbSize = "compact"
+)
+
+func learningMaterialThumbClass(size LearningMaterialThumbSize) string {
+	if size == LearningMaterialThumbSizeCompact {
+		return "lm-thumb lm-thumb--compact"
+	}
+	return "lm-thumb"
+}
+
+templ LearningMaterialThumbnail(thumbnailURL string, title string, size LearningMaterialThumbSize) {
+	<div class={ learningMaterialThumbClass(size) }>
+		if thumbnailURL != "" {
+			<img src={ thumbnailURL } class="lm-thumb-img" alt={ "Preview for " + title } loading="lazy"/>
+		} else {
+			<div class="lm-thumb-placeholder" aria-hidden="true">
+				@LearningMaterialBookIcon()
+			</div>
+		}
+	</div>
 }
 
 templ LearningMaterialBookIcon() {
@@ -494,32 +550,117 @@ templ LearningMaterialsStyles() {
 			flex-direction: column;
 			gap: var(--space-3);
 			padding: var(--space-5);
-			border: 1px solid var(--color-border-subtle);
+			border: 2px solid var(--color-border-subtle);
 			border-radius: var(--radius-lg);
-			background: linear-gradient(180deg, var(--color-surface) 0%, #F7FCFA 100%);
+			background: transparent;
 			box-shadow: var(--shadow-sm);
 			transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 		}
 
+		.lm-thumb {
+			width: 100%;
+			aspect-ratio: 16 / 9;
+			border-radius: var(--radius-md);
+			overflow: hidden;
+			background: linear-gradient(180deg, #F0FDFA 0%, #E6FFFA 100%);
+			border: 1px solid var(--color-border-subtle);
+		}
+
+		.lm-thumb--compact {
+			width: 100%;
+			max-width: 168px;
+			aspect-ratio: 16 / 9;
+		}
+
+		.lm-thumb-img {
+			display: block;
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		.lm-thumb-placeholder {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			height: 100%;
+			color: #0D9488;
+		}
+
+		.lm-url-preview {
+			position: relative;
+			margin-top: var(--space-2);
+			overflow: hidden;
+		}
+
+		.lm-url-preview .lm-thumb-placeholder {
+			position: absolute;
+			inset: 0;
+		}
+
+		.lm-url-preview .lm-thumb-img:not([src]) {
+			opacity: 0;
+			position: absolute;
+			inset: 0;
+		}
+
+		.lm-url-preview .lm-thumb-img[src] {
+			position: relative;
+			z-index: 1;
+		}
+
+		.lm-url-preview-loading {
+			position: absolute;
+			inset: 0;
+			display: none;
+			align-items: center;
+			justify-content: center;
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+			background: rgba(255, 255, 255, 0.85);
+		}
+
+		.lm-url-preview--loading .lm-url-preview-loading {
+			display: flex;
+		}
+
+		.lm-url-preview--loading .lm-url-preview-img {
+			opacity: 0.35;
+		}
+
+		.lm-url-preview-error {
+			margin-top: var(--space-2);
+			color: #B45309;
+		}
+
+		.lm-card--published {
+			border-color: #22C55E;
+		}
+
+		.lm-card--draft {
+			border-color: #FACC15;
+		}
+
+		.lm-card--deleted {
+			border-color: #EF4444;
+		}
+
 		.lm-card:hover {
-			border-color: #5EEAD4;
 			box-shadow: var(--shadow-md);
 			transform: translateY(-2px);
 		}
 
-		.lm-card--deleted {
-			opacity: 0.55;
+		.lm-card--published:hover {
+			border-color: #16A34A;
 		}
 
-		.lm-card--deleted .lm-card-description {
-			text-decoration: line-through;
+		.lm-card--draft:hover {
+			border-color: #EAB308;
 		}
 
-		.lm-card-top {
-			display: flex;
-			align-items: flex-start;
-			justify-content: space-between;
-			gap: var(--space-3);
+		.lm-card--deleted:hover {
+			border-color: #DC2626;
 		}
 
 		.lm-card-badges {
@@ -528,18 +669,70 @@ templ LearningMaterialsStyles() {
 			gap: var(--space-2);
 		}
 
+		.lm-card-footer {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: var(--space-3);
+			margin-top: auto;
+			padding-top: var(--space-3);
+			border-top: 1px solid var(--color-border-subtle);
+		}
+
+		.lm-card-owner {
+			flex: 1;
+			min-width: 0;
+		}
+
+		.lm-card-owner .teacher-name-cell-text {
+			font-size: 0.8125rem;
+			font-weight: 500;
+			color: var(--color-muted-foreground);
+		}
+
 		.lm-card-actions {
 			display: flex;
 			align-items: center;
+			justify-content: flex-end;
 			gap: var(--space-1);
 			flex-shrink: 0;
+		}
+
+		.lm-card-title {
+			margin: 0;
+			font-size: 1rem;
+			font-weight: 600;
+			line-height: 1.4;
+			color: var(--color-foreground);
+		}
+
+		.lm-card-url {
+			display: flex;
+			align-items: flex-start;
+			gap: var(--space-2);
+			min-width: 0;
+		}
+
+		.lm-card-url-text {
+			flex: 1;
+			min-width: 0;
+			font-size: 0.8125rem;
+			font-family: 'Fira Code', monospace;
+			color: #0D9488;
+			text-decoration: none;
+			line-height: 1.5;
+			overflow-wrap: anywhere;
+			word-break: break-word;
+		}
+
+		.lm-card-url-text:hover {
+			text-decoration: underline;
 		}
 
 		.lm-card-description {
 			font-size: 0.9375rem;
 			line-height: 1.55;
 			color: var(--color-foreground);
-			flex: 1;
 		}
 
 		.lm-tag-list {
@@ -553,31 +746,11 @@ templ LearningMaterialsStyles() {
 			align-items: center;
 			padding: 4px 10px;
 			border-radius: var(--radius-full);
-			border: 1px solid transparent;
+			border: 1px solid #000;
 			font-size: 0.75rem;
 			font-weight: 600;
 			line-height: 1.2;
 			text-transform: lowercase;
-		}
-
-		.lm-card-meta {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			gap: var(--space-2);
-			padding-top: var(--space-2);
-			border-top: 1px solid var(--color-border-subtle);
-			font-size: 0.8125rem;
-			color: var(--color-muted-foreground);
-		}
-
-		.lm-card-owner {
-			font-weight: 500;
-		}
-
-		.lm-card-date {
-			font-family: 'Fira Code', monospace;
-			font-size: 0.75rem;
 		}
 
 		.lm-empty {
@@ -647,9 +820,9 @@ templ LearningMaterialsStyles() {
 			font-size: 0.875rem;
 		}
 
-		.lm-view-meta-grid {
-			display: grid;
-			grid-template-columns: repeat(2, minmax(0, 1fr));
+		.lm-view-meta {
+			display: flex;
+			flex-direction: column;
 			gap: var(--space-3);
 			padding: var(--space-4);
 			border-radius: var(--radius-md);
@@ -674,12 +847,51 @@ templ LearningMaterialsStyles() {
 			font-size: 0.875rem;
 		}
 
+		.lm-meta-item--owner .teacher-name-cell-text {
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--color-foreground);
+		}
+
 		.lm-view-footer,
 		.lm-form-footer {
 			display: flex;
 			flex-wrap: wrap;
 			align-items: center;
 			gap: var(--space-3);
+		}
+
+		.lm-form-footer {
+			justify-content: flex-end;
+		}
+
+		.lm-form-footer-actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-3);
+		}
+
+		.lm-view-footer {
+			padding: var(--space-2) var(--space-4) var(--space-4);
+			border-top: 1px solid var(--color-border-subtle);
+		}
+
+		.lm-view-footer-actions {
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			gap: var(--space-1);
+			width: 100%;
+		}
+
+		.lm-view-footer button,
+		.lm-view-footer .btn,
+		.lm-view-footer .add-btn,
+		.lm-form-footer button,
+		.lm-form-footer .btn,
+		.lm-form-footer .add-btn {
+			margin-top: 0;
 		}
 
 		.lm-option-cards {
@@ -735,14 +947,13 @@ templ LearningMaterialsStyles() {
 
 		.lm-tag-input-wrap {
 			display: flex;
-			flex-wrap: wrap;
-			align-items: center;
+			flex-direction: column;
+			align-items: stretch;
 			gap: var(--space-2);
 			padding: var(--space-2) var(--space-3);
 			border: 1px solid var(--color-border);
 			border-radius: var(--radius-md);
 			background: var(--color-surface);
-			min-height: 44px;
 			transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 		}
 
@@ -755,6 +966,7 @@ templ LearningMaterialsStyles() {
 			display: flex;
 			flex-wrap: wrap;
 			gap: var(--space-2);
+			width: 100%;
 		}
 
 		.lm-tag-chip {
@@ -764,7 +976,7 @@ templ LearningMaterialsStyles() {
 			padding: 4px 8px 4px 10px;
 			border-radius: var(--radius-full);
 			background: #E6FFFA;
-			border: 1px solid #99F6E4;
+			border: 1px solid #000;
 			font-size: 0.8125rem;
 			font-weight: 500;
 			text-transform: lowercase;
@@ -774,26 +986,30 @@ templ LearningMaterialsStyles() {
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
-			width: 18px;
-			height: 18px;
+			width: 1.125rem;
+			height: 1.125rem;
+			padding: 0;
+			margin: 0;
 			border: none;
 			border-radius: var(--radius-full);
 			background: transparent;
+			background-color: transparent;
 			color: var(--color-muted-foreground);
 			cursor: pointer;
-			font-size: 1rem;
+			font-size: 0.875rem;
+			font-weight: 400;
 			line-height: 1;
-			padding: 0;
+			flex-shrink: 0;
 		}
 
 		.lm-tag-chip-remove:hover {
 			background: rgba(0, 0, 0, 0.06);
+			background-color: rgba(0, 0, 0, 0.06);
 			color: var(--color-foreground);
 		}
 
 		.lm-tag-text-input {
-			flex: 1;
-			min-width: 120px;
+			width: 100%;
 			border: none;
 			outline: none;
 			font-size: 0.9375rem;
@@ -801,34 +1017,14 @@ templ LearningMaterialsStyles() {
 			padding: var(--space-1) 0;
 		}
 
-		.lm-suggested-tags {
-			display: flex;
-			flex-wrap: wrap;
-			align-items: center;
-			gap: var(--space-2);
-			margin-top: var(--space-2);
-		}
-
-		.lm-suggested-label {
-			font-size: 0.75rem;
-			font-weight: 600;
+		.lm-tag-text-input:disabled {
+			cursor: not-allowed;
 			color: var(--color-muted-foreground);
 		}
 
-		.lm-suggested-tag {
-			border: 1px solid var(--color-border);
-			border-radius: var(--radius-full);
-			padding: 4px 10px;
-			font-size: 0.75rem;
+		.lm-tag-limit-warning {
+			color: #B45309;
 			font-weight: 500;
-			cursor: pointer;
-			text-transform: lowercase;
-			transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-		}
-
-		.lm-suggested-tag:hover {
-			transform: translateY(-1px);
-			box-shadow: var(--shadow-sm);
 		}
 
 		.lm-submit-btn {
@@ -856,20 +1052,6 @@ templ LearningMaterialsStyles() {
 	</style>
 }
 
-templ LearningMaterialFormInitScript(selectedTags []LearningMaterialTag) {
-	<script>
-		window.__lmInitialTags = { tagLabelsJSONArray(selectedTags) };
-	</script>
-}
-
-func tagLabelsJSON(tags []LearningMaterialTag) []string {
-	labels := make([]string, 0, len(tags))
-	for _, tag := range tags {
-		labels = append(labels, tag.Label)
-	}
-	return labels
-}
-
 func learningMaterialModalID(data LearningMaterialFormData) string {
 	if data.IsEdit {
 		return "lmEditModal"
@@ -877,41 +1059,49 @@ func learningMaterialModalID(data LearningMaterialFormData) string {
 	return "lmFormModal"
 }
 
-func tagLabelsJSONArray(tags []LearningMaterialTag) string {
-	labels := tagLabelsJSON(tags)
-	b, err := json.Marshal(labels)
-	if err != nil {
-		return "[]"
-	}
-	return string(b)
-}
-
 templ LearningMaterialsScripts() {
+	@templ.JSONScript("lmPreviewURL", utils.URL("/learning-materials/preview"))
 	<script>
 		(function () {
 			const MAX_TAGS = 7;
 			const MIN_TAGS = 1;
+			const previewURLScript = document.getElementById('lmPreviewURL');
+			const PREVIEW_URL = previewURLScript ? JSON.parse(previewURLScript.textContent) : '/learning-materials/preview';
 			let activeModal = null;
 
 			function normalizeTag(value) {
 				return (value || '').trim().toLowerCase();
 			}
 
-			function getActiveForm() {
-				return activeModal ? activeModal.querySelector('form') : document.getElementById('lmMaterialForm');
+			function getFormSelectedTags(form) {
+				if (!form) return null;
+				if (!form._lmSelectedTags) {
+					form._lmSelectedTags = new Set();
+				}
+				return form._lmSelectedTags;
 			}
 
-			function getActiveTagInput() {
-				return activeModal ? activeModal.querySelector('#lmTagInput') : document.getElementById('lmTagInput');
+			function updateTagLimitUI(form) {
+				const selectedTags = getFormSelectedTags(form);
+				if (!selectedTags) return;
+				const tagInput = form.querySelector('.lm-tag-text-input');
+				const warning = form.querySelector('.lm-tag-limit-warning');
+				const atMax = selectedTags.size >= MAX_TAGS;
+				if (tagInput) {
+					tagInput.disabled = atMax;
+					if (atMax) {
+						tagInput.value = '';
+					}
+				}
+				if (warning) {
+					warning.hidden = !atMax;
+				}
 			}
 
-			function getActiveTagChips() {
-				return activeModal ? activeModal.querySelector('#lmTagChips') : document.getElementById('lmTagChips');
-			}
-
-			function renderTagChips(selectedTags) {
-				const tagChips = getActiveTagChips();
-				if (!tagChips) return;
+			function renderTagChips(form) {
+				const selectedTags = getFormSelectedTags(form);
+				const tagChips = form.querySelector('.lm-tag-chips');
+				if (!tagChips || !selectedTags) return;
 				tagChips.innerHTML = '';
 				selectedTags.forEach(function (tag) {
 					const chip = document.createElement('span');
@@ -920,16 +1110,17 @@ templ LearningMaterialsScripts() {
 					const removeBtn = chip.querySelector('.lm-tag-chip-remove');
 					removeBtn.addEventListener('click', function () {
 						selectedTags.delete(tag);
-						syncHiddenTagInputs(selectedTags);
-						renderTagChips(selectedTags);
+						syncHiddenTagInputs(form);
+						renderTagChips(form);
 					});
 					tagChips.appendChild(chip);
 				});
+				updateTagLimitUI(form);
 			}
 
-			function syncHiddenTagInputs(selectedTags) {
-				const form = getActiveForm();
-				if (!form) return;
+			function syncHiddenTagInputs(form) {
+				const selectedTags = getFormSelectedTags(form);
+				if (!selectedTags) return;
 				form.querySelectorAll('input[name="tags"]').forEach(function (el) { el.remove(); });
 				selectedTags.forEach(function (tag) {
 					const input = document.createElement('input');
@@ -940,76 +1131,207 @@ templ LearningMaterialsScripts() {
 				});
 			}
 
-			function bindTagInput(selectedTags) {
-				const tagInput = getActiveTagInput();
+			function bindTagInput(form) {
+				const tagInput = form.querySelector('.lm-tag-text-input');
 				if (!tagInput || tagInput.dataset.lmBound === '1') return;
 				tagInput.dataset.lmBound = '1';
 
 				tagInput.addEventListener('keydown', function (e) {
+					const selectedTags = getFormSelectedTags(form);
+					if (!selectedTags || selectedTags.size >= MAX_TAGS) {
+						if (e.key === 'Enter' || e.key === ',') {
+							e.preventDefault();
+						}
+						return;
+					}
 					if (e.key === 'Enter' || e.key === ',') {
 						e.preventDefault();
-						if (addTag(tagInput.value, selectedTags)) {
+						if (addTag(tagInput.value, form)) {
 							tagInput.value = '';
 						}
 					} else if (e.key === 'Backspace' && tagInput.value === '' && selectedTags.size > 0) {
 						const tags = Array.from(selectedTags);
 						selectedTags.delete(tags[tags.length - 1]);
-						syncHiddenTagInputs(selectedTags);
-						renderTagChips(selectedTags);
+						syncHiddenTagInputs(form);
+						renderTagChips(form);
 					}
 				});
 
 				tagInput.addEventListener('blur', function () {
-					if (tagInput.value.trim()) {
-						if (addTag(tagInput.value, selectedTags)) {
-							tagInput.value = '';
-						}
+					const selectedTags = getFormSelectedTags(form);
+					if (!selectedTags || selectedTags.size >= MAX_TAGS || !tagInput.value.trim()) {
+						return;
+					}
+					if (addTag(tagInput.value, form)) {
+						tagInput.value = '';
 					}
 				});
 			}
 
-			function bindSuggestedTags(selectedTags, root) {
-				(root || document).querySelectorAll('.lm-suggested-tag').forEach(function (btn) {
-					if (btn.dataset.lmBound === '1') return;
-					btn.dataset.lmBound = '1';
-					btn.addEventListener('click', function () {
-						addTag(btn.getAttribute('data-tag'), selectedTags);
-					});
-				});
-			}
-
-			function addTag(raw, selectedTags) {
+			function addTag(raw, form) {
+				const selectedTags = getFormSelectedTags(form);
+				if (!selectedTags) return false;
 				const tag = normalizeTag(raw);
 				if (!tag) return false;
 				if (selectedTags.has(tag)) return false;
 				if (selectedTags.size >= MAX_TAGS) {
-					alert('Maximum of ' + MAX_TAGS + ' tags allowed.');
 					return false;
 				}
 				selectedTags.add(tag);
-				syncHiddenTagInputs(selectedTags);
-				renderTagChips(selectedTags);
+				syncHiddenTagInputs(form);
+				renderTagChips(form);
 				return true;
+			}
+
+			function bindUrlPreview(form) {
+				const urlInput = form.querySelector('.lm-form-url');
+				const preview = form.querySelector('.lm-url-preview');
+				const previewImg = preview ? preview.querySelector('.lm-thumb-img') : null;
+				const thumbHidden = form.querySelector('.lm-form-thumbnail-url');
+				const previewError = form.querySelector('.lm-url-preview-error');
+				if (!urlInput || !preview || !previewImg || !thumbHidden || urlInput.dataset.lmUrlBound === '1') {
+					return;
+				}
+				urlInput.dataset.lmUrlBound = '1';
+
+				let debounceTimer = null;
+				let fetchRequestID = 0;
+				let lastFetchedUrl = '';
+
+				function setPreviewLoading(loading) {
+					preview.classList.toggle('lm-url-preview--loading', loading);
+				}
+
+				function setPreviewError(show) {
+					if (previewError) {
+						previewError.hidden = !show;
+					}
+				}
+
+				function clearPreview() {
+					preview.hidden = true;
+					previewImg.removeAttribute('src');
+					const placeholder = preview.querySelector('.lm-thumb-placeholder');
+					if (placeholder) placeholder.hidden = false;
+					thumbHidden.value = '';
+					lastFetchedUrl = '';
+					setPreviewLoading(false);
+					setPreviewError(false);
+				}
+
+				function showPreview(thumbnailURL) {
+					if (!thumbnailURL) {
+						clearPreview();
+						return;
+					}
+					preview.hidden = false;
+					setPreviewError(false);
+					previewImg.referrerPolicy = 'no-referrer';
+					previewImg.onerror = function () {
+						previewImg.removeAttribute('src');
+						const placeholder = preview.querySelector('.lm-thumb-placeholder');
+						if (placeholder) placeholder.hidden = false;
+						setPreviewError(true);
+					};
+					previewImg.src = thumbnailURL;
+					const placeholder = preview.querySelector('.lm-thumb-placeholder');
+					if (placeholder) placeholder.hidden = true;
+				}
+
+				async function fetchPreview(rawURL) {
+					const normalized = (rawURL || '').trim();
+					if (!normalized || !/^https?:\/\//i.test(normalized)) {
+						clearPreview();
+						return;
+					}
+					if (normalized === lastFetchedUrl && thumbHidden.value) {
+						showPreview(thumbHidden.value);
+						return;
+					}
+
+					const requestID = ++fetchRequestID;
+					preview.hidden = false;
+					setPreviewLoading(true);
+					setPreviewError(false);
+					const placeholder = preview.querySelector('.lm-thumb-placeholder');
+					if (placeholder) placeholder.hidden = true;
+					try {
+						const resp = await fetch(PREVIEW_URL + '?url=' + encodeURIComponent(normalized), {
+							credentials: 'same-origin',
+						});
+						if (requestID !== fetchRequestID) {
+							return;
+						}
+						if (!resp.ok) {
+							setPreviewError(true);
+							return;
+						}
+						const data = await resp.json();
+						if (requestID !== fetchRequestID) {
+							return;
+						}
+						if (data.thumbnail_url) {
+							lastFetchedUrl = normalized;
+							thumbHidden.value = data.thumbnail_url;
+							showPreview(data.thumbnail_url);
+						} else {
+							setPreviewError(true);
+						}
+					} catch (err) {
+						if (requestID !== fetchRequestID) {
+							return;
+						}
+						setPreviewError(true);
+					} finally {
+						if (requestID === fetchRequestID) {
+							setPreviewLoading(false);
+						}
+					}
+				}
+
+				function schedulePreview() {
+					clearTimeout(debounceTimer);
+					debounceTimer = setTimeout(function () {
+						fetchPreview(urlInput.value);
+					}, 400);
+				}
+
+				urlInput.addEventListener('input', schedulePreview);
+				urlInput.addEventListener('paste', function () {
+					setTimeout(function () {
+						fetchPreview(urlInput.value);
+					}, 0);
+				});
+
+				if (thumbHidden.value && urlInput.value.trim()) {
+					lastFetchedUrl = urlInput.value.trim();
+					showPreview(thumbHidden.value);
+				}
 			}
 
 			function initModalForm(modal, initialTags) {
 				activeModal = modal;
-				const selectedTags = new Set(initialTags || []);
-				syncHiddenTagInputs(selectedTags);
-				renderTagChips(selectedTags);
-				bindTagInput(selectedTags);
-				bindSuggestedTags(selectedTags, modal);
+				const form = modal.querySelector('form');
+				if (!form) return;
 
-				const form = getActiveForm();
-				if (form && form.dataset.lmSubmitBound !== '1') {
+				const selectedTags = new Set(initialTags || []);
+				form._lmSelectedTags = selectedTags;
+				syncHiddenTagInputs(form);
+				renderTagChips(form);
+				bindTagInput(form);
+				bindUrlPreview(form);
+
+				if (form.dataset.lmSubmitBound !== '1') {
 					form.dataset.lmSubmitBound = '1';
 					form.addEventListener('submit', function (e) {
-						const tagInput = getActiveTagInput();
-						if (tagInput && tagInput.value.trim()) {
-							addTag(tagInput.value, selectedTags);
+						const tags = getFormSelectedTags(form);
+						const tagInput = form.querySelector('.lm-tag-text-input');
+						if (tagInput && tagInput.value.trim() && tags.size < MAX_TAGS) {
+							addTag(tagInput.value, form);
 							tagInput.value = '';
 						}
-						if (selectedTags.size < MIN_TAGS || selectedTags.size > MAX_TAGS) {
+						syncHiddenTagInputs(form);
+						if (tags.size < MIN_TAGS || tags.size > MAX_TAGS) {
 							e.preventDefault();
 							alert('Please add between ' + MIN_TAGS + ' and ' + MAX_TAGS + ' tags.');
 						}
@@ -1062,10 +1384,6 @@ templ LearningMaterialsScripts() {
 					window.closeLearningMaterialViewModal();
 					return;
 				}
-				if (e.target.closest('.lm-edit-from-view')) {
-					window.closeLearningMaterialViewModal();
-					return;
-				}
 				const viewOverlay = e.target.closest('#lmViewModal');
 				if (viewOverlay && e.target === viewOverlay) {
 					window.closeLearningMaterialViewModal();
@@ -1112,7 +1430,7 @@ templ LearningMaterialsScripts() {
 
 			const createModal = document.getElementById('lmFormModal');
 			if (createModal) {
-				initModalForm(createModal, window.__lmInitialTags || []);
+				initModalForm(createModal, []);
 			}
 		})();
 	</script>

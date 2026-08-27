@@ -149,6 +149,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/announcements/register", auth.RequireRole(auth.AdminAccessRoles()...)(handleAnnouncementRegister))
 		authMux.HandleFunc(basePath+"/announcements/", auth.RequireRole(auth.AdminAccessRoles()...)(handleAnnouncementsPath))
 		lmRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)
+		authMux.HandleFunc(basePath+"/learning-materials/preview", lmRole(handleLearningMaterialURLPreview))
 		authMux.HandleFunc(basePath+"/learning-materials/create", lmRole(handleLearningMaterialCreate))
 		authMux.HandleFunc(basePath+"/learning-materials/", lmRole(handleLearningMaterialsPath))
 		authMux.HandleFunc(basePath+"/learning-materials", lmRole(handleLearningMaterials))
@@ -228,6 +229,8 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/api/me/students", authHandler)
 		rootMux.Handle(basePath+"/announcements", authHandler)
 		rootMux.Handle(basePath+"/announcements/", authHandler)
+		rootMux.Handle(basePath+"/learning-materials", authHandler)
+		rootMux.Handle(basePath+"/learning-materials/", authHandler)
 		rootMux.Handle(basePath+"/notifications", authHandler)
 		rootMux.Handle(basePath+"/notifications/", authHandler)
 
