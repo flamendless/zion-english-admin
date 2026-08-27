@@ -93,6 +93,7 @@ func (r ClassRecordRowData) ScheduledItemData() ScheduledClassItemData {
 		DurationMinutes: r.DurationMinutes,
 		Rate:            r.Rate,
 		Currency:        r.Currency,
+		DeleteFrom:      "classes",
 	}
 }
 
@@ -108,6 +109,13 @@ func (r ClassRecordRowData) EditURL() string {
 		return utils.URL("/schedule/" + fmt.Sprintf("%d", r.ID) + "/edit")
 	}
 	return utils.URL("/classes/" + fmt.Sprintf("%d", r.ID) + "/edit")
+}
+
+func (r ClassRecordRowData) DeleteURL() string {
+	if r.IsScheduled() {
+		return ScheduledClassDeleteURL(r.ID)
+	}
+	return ClassRecordDeleteURL(r.ID)
 }
 
 type PaginationData struct {

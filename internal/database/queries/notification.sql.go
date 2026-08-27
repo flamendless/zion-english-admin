@@ -78,6 +78,7 @@ FROM tbl_scheduled_classes sc
 JOIN tbl_students s ON s.id = sc.student_id
 JOIN tbl_teachers t ON t.id = sc.teacher_id
 WHERE sc.status = 'scheduled'
+  AND sc.deleted_at IS NULL
   AND datetime(sc.scheduled_date || ' ' || COALESCE(sc.start_time, '00:00'), '+' || sc.duration_minutes || ' minutes') < ?
 `
 

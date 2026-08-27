@@ -67,6 +67,7 @@ type TblClassRecord struct {
 	Notes           sql.NullString
 	StartTime       sql.NullString
 	EndTime         sql.NullString
+	DeletedAt       sql.NullString
 }
 
 type TblLog struct {
@@ -154,6 +155,7 @@ type TblScheduledClass struct {
 	CreatedByRole   string
 	CreatedAt       string
 	UpdatedAt       string
+	DeletedAt       sql.NullString
 }
 
 type TblStudent struct {

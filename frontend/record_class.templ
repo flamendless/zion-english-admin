@@ -54,7 +54,7 @@ templ RecordClass(data RecordClassData) {
 								alert('Invalid rate')
 								halt
 							end
-							if #status.value is not 'conducted' and #reason.value is ''
+							if #status.value is not 'conducted' and #reason.value.trim() is ''
 								alert('Reason is required for cancelled or rescheduled classes')
 								halt
 							end
@@ -111,7 +111,7 @@ templ RecordClass(data RecordClassData) {
 								alert('Invalid rate')
 								halt
 							end
-							if #status.value is not 'conducted' and #reason.value is ''
+							if #status.value is not 'conducted' and #reason.value.trim() is ''
 								alert('Reason is required for cancelled or rescheduled classes')
 								halt
 							end

@@ -6,9 +6,15 @@ import (
 )
 
 templ ScheduledClassActions(item ScheduledClassItemData) {
-	@IconActionLink(RecordClassURLFromSchedule(item.ID, item.StudentID, item.TeacherID, item.ScheduledDate, item.DurationMinutes, item.Rate, item.Currency, "conducted"), "Conduct", IconKindConduct)
-	@IconActionLink(utils.URL("/schedule/"+strconvFormatInt64(item.ID)+"/edit"), "Edit", IconKindEdit)
-	@IconActionLink(RecordClassURLFromSchedule(item.ID, item.StudentID, item.TeacherID, item.ScheduledDate, item.DurationMinutes, item.Rate, item.Currency, "cancelled"), "Cancel", IconKindCancel)
+	<div class="scheduled-class-actions">
+		@IconActionLink(RecordClassURLFromSchedule(item.ID, item.StudentID, item.TeacherID, item.ScheduledDate, item.DurationMinutes, item.Rate, item.Currency, "conducted"), "Conduct", IconKindConduct)
+		@IconActionLink(utils.URL("/schedule/"+strconvFormatInt64(item.ID)+"/edit"), "Edit", IconKindEdit)
+		@IconActionLink(RecordClassURLFromSchedule(item.ID, item.StudentID, item.TeacherID, item.ScheduledDate, item.DurationMinutes, item.Rate, item.Currency, "cancelled"), "Cancel", IconKindCancel)
+		@IconActionTrigger("Delete", IconKindDelete, templ.Attributes{
+			"data-delete-url": ScheduledClassDeleteURL(item.ID),
+			"data-delete-from": item.DeleteFrom,
+		})
+	</div>
 }
 
 templ ScheduledClassMeeting(item ScheduledClassItemData, zoomLogoURL string) {

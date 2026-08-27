@@ -27,7 +27,71 @@ func handleClassesPath(w http.ResponseWriter, r *http.Request) {
 		handleClassView(w, r, id)
 		return
 	}
+	if id, ok := extractPathID(r, "classes", "/delete"); ok {
+		handleDeleteClassRecord(w, r, id)
+		return
+	}
 	HttpError(w, "Not found", http.StatusNotFound)
+}
+
+func validateDeletionReason(reason string) error {
+	if utils.IsBlank(reason) {
+		return errors.New("reason is required for deletion")
+	}
+	return nil
+}
+
+func validateClassReason(reason string) error {
+	if utils.IsBlank(reason) {
+		return errors.New("reason is required")
+	}
+	return nil
+}
+
+func handleDeleteClassRecord(w http.ResponseWriter, r *http.Request, recordID int64) {
+	if r.Method != http.MethodPost {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
+		return
+	}
+
+	reason := strings.TrimSpace(r.FormValue("reason"))
+	if err := validateDeletionReason(reason); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	ctx := r.Context()
+	user := auth.GetUser(ctx)
+
+	existing, err := dbRO.GetQueries().GetClassRecordByID(ctx, recordID)
+	if err != nil {
+		HttpError(w, "Class record not found", http.StatusNotFound)
+		return
+	}
+
+	rules := classrules.ClassRecordRules{DB: dbRO.GetQueries()}
+	if err := rules.ValidateEditAccess(existing.TeacherID, user); err != nil {
+		HttpError(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	err = dbRW.GetQueries().SoftDeleteClassRecord(ctx, queries.SoftDeleteClassRecordParams{
+		Reason: sql.NullString{String: reason, Valid: true},
+		ID:     recordID,
+	})
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	insertAuditLogAs(ctx, user, "classes", fmt.Sprintf("deleted class record id %d (student id %d, date %s, reason: %s)", recordID, existing.StudentID, existing.Date, reason))
+	setSuccessFlash(w, "Class deleted successfully.")
+	HttpRedirect(w, r, "/classes")
 }
 
 func classEditClassData(ctx context.Context, recordID int64, readonly bool) (frontend.EditClassData, error) {

@@ -14,6 +14,7 @@ const countScheduledClassesByStatusAndDate = `-- name: CountScheduledClassesBySt
 SELECT COUNT(*) as count
 FROM tbl_scheduled_classes
 WHERE scheduled_date = ? AND status = ?
+  AND deleted_at IS NULL
   AND (? = 0 OR teacher_id = ?)
 `
 
@@ -41,6 +42,7 @@ SELECT COUNT(*) as count
 FROM tbl_scheduled_classes sc
 JOIN tbl_students s ON sc.student_id = s.id
 WHERE (? = 0 OR sc.teacher_id = ?) AND sc.scheduled_date >= ? AND sc.scheduled_date <= ?
+  AND sc.deleted_at IS NULL
   AND (? = '' OR sc.status = ?)
   AND (? = '' OR s.name LIKE '%' || ? || '%')
 `
@@ -77,6 +79,7 @@ SELECT COUNT(*) as count
 FROM tbl_scheduled_classes
 WHERE student_id = ? AND teacher_id = ? AND scheduled_date = ? AND duration_minutes = ?
   AND status = 'scheduled'
+  AND deleted_at IS NULL
   AND (? = 0 OR id != ?)
 `
 
@@ -110,7 +113,7 @@ SELECT sc.id, sc.student_id, sc.teacher_id, sc.scheduled_date, sc.start_time, sc
 FROM tbl_scheduled_classes sc
 JOIN tbl_students s ON sc.student_id = s.id
 JOIN tbl_teachers t ON sc.teacher_id = t.id
-WHERE sc.id = ?
+WHERE sc.id = ? AND sc.deleted_at IS NULL
 `
 
 type GetScheduledClassByIDRow struct {
@@ -158,6 +161,7 @@ const getScheduledClassesByStudentOnDate = `-- name: GetScheduledClassesByStuden
 SELECT id, start_time, duration_minutes
 FROM tbl_scheduled_classes
 WHERE student_id = ? AND scheduled_date = ? AND status = 'scheduled'
+  AND deleted_at IS NULL
   AND start_time IS NOT NULL AND trim(start_time) != ''
   AND (? = 0 OR id != ?)
 `
@@ -207,6 +211,7 @@ const getScheduledClassesByTeacherOnDate = `-- name: GetScheduledClassesByTeache
 SELECT id, start_time, duration_minutes
 FROM tbl_scheduled_classes
 WHERE teacher_id = ? AND scheduled_date = ? AND status = 'scheduled'
+  AND deleted_at IS NULL
   AND start_time IS NOT NULL AND trim(start_time) != ''
   AND (? = 0 OR id != ?)
 `
@@ -262,6 +267,7 @@ FROM tbl_scheduled_classes sc
 JOIN tbl_students s ON sc.student_id = s.id
 JOIN tbl_teachers t ON sc.teacher_id = t.id
 WHERE (? = 0 OR sc.teacher_id = ?) AND sc.scheduled_date >= ? AND sc.scheduled_date <= ?
+  AND sc.deleted_at IS NULL
   AND (? = '' OR sc.status = ?)
   AND (? = '' OR s.name LIKE '%' || ? || '%')
 ORDER BY CASE WHEN sc.scheduled_date = date('now', 'localtime') THEN 0 ELSE 1 END, sc.scheduled_date ASC, sc.start_time ASC, sc.created_at ASC
@@ -397,7 +403,7 @@ func (q *Queries) InsertScheduledClass(ctx context.Context, arg InsertScheduledC
 const rescheduleScheduledClass = `-- name: RescheduleScheduledClass :exec
 UPDATE tbl_scheduled_classes
 SET scheduled_date = ?, start_time = ?, status = 'scheduled', reason = ?, updated_at = datetime('now')
-WHERE id = ?
+WHERE id = ? AND deleted_at IS NULL
 `
 
 type RescheduleScheduledClassParams struct {
@@ -417,10 +423,26 @@ func (q *Queries) RescheduleScheduledClass(ctx context.Context, arg RescheduleSc
 	return err
 }
 
+const softDeleteScheduledClass = `-- name: SoftDeleteScheduledClass :exec
+UPDATE tbl_scheduled_classes
+SET reason = ?, deleted_at = datetime('now'), updated_at = datetime('now')
+WHERE id = ? AND deleted_at IS NULL
+`
+
+type SoftDeleteScheduledClassParams struct {
+	Reason sql.NullString
+	ID     int64
+}
+
+func (q *Queries) SoftDeleteScheduledClass(ctx context.Context, arg SoftDeleteScheduledClassParams) error {
+	_, err := q.db.ExecContext(ctx, softDeleteScheduledClass, arg.Reason, arg.ID)
+	return err
+}
+
 const updateScheduledClassDetails = `-- name: UpdateScheduledClassDetails :exec
 UPDATE tbl_scheduled_classes
 SET student_id = ?, rate = ?, currency = ?, updated_at = datetime('now')
-WHERE id = ?
+WHERE id = ? AND deleted_at IS NULL
 `
 
 type UpdateScheduledClassDetailsParams struct {
@@ -443,7 +465,7 @@ func (q *Queries) UpdateScheduledClassDetails(ctx context.Context, arg UpdateSch
 const updateScheduledClassStatus = `-- name: UpdateScheduledClassStatus :exec
 UPDATE tbl_scheduled_classes
 SET status = ?, reason = ?, updated_at = datetime('now')
-WHERE id = ?
+WHERE id = ? AND deleted_at IS NULL
 `
 
 type UpdateScheduledClassStatusParams struct {

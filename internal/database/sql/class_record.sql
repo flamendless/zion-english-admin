@@ -10,12 +10,14 @@ FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ?
+  AND cr.deleted_at IS NULL
 ORDER BY cr.created_at DESC;
 
 -- name: GetTotalRateByTeacherAndDateRange :one
 SELECT COALESCE(SUM(cr.rate), 0) as total_rate
 FROM tbl_class_records cr
-WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ? AND cr.status = 'conducted';
+WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ? AND cr.status = 'conducted'
+  AND cr.deleted_at IS NULL;
 
 -- name: GetClassRecordByID :one
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
@@ -24,17 +26,23 @@ SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time,
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
-WHERE cr.id = ?;
+WHERE cr.id = ? AND cr.deleted_at IS NULL;
 
 -- name: UpdateClassRecord :exec
 UPDATE tbl_class_records
 SET student_id = ?, teacher_id = ?, date = ?, start_time = ?, end_time = ?, duration_minutes = ?, rate = ?, currency = ?, status = ?, reason = ?, notes = ?, updated_at = datetime('now')
-WHERE id = ?;
+WHERE id = ? AND deleted_at IS NULL;
+
+-- name: SoftDeleteClassRecord :exec
+UPDATE tbl_class_records
+SET reason = ?, deleted_at = datetime('now'), updated_at = datetime('now')
+WHERE id = ? AND deleted_at IS NULL;
 
 -- name: CountClassRecordDuplicate :one
 SELECT COUNT(*) as count
 FROM tbl_class_records
 WHERE student_id = ? AND teacher_id = ? AND date = ? AND duration_minutes = ?
+  AND deleted_at IS NULL
   AND (? = 0 OR id != ?);
 
 -- name: CountClassRecordsFiltered :one
@@ -42,6 +50,7 @@ SELECT COUNT(*) as count
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
+  AND cr.deleted_at IS NULL
   AND (? = '' OR cr.status = ?)
   AND (? = '' OR s.name LIKE '%' || ? || '%');
 
@@ -53,6 +62,7 @@ FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
+  AND cr.deleted_at IS NULL
   AND (? = '' OR cr.status = ?)
   AND (? = '' OR s.name LIKE '%' || ? || '%')
 ORDER BY CASE WHEN cr.date = date('now', 'localtime') THEN 0 ELSE 1 END, cr.date DESC, cr.created_at DESC
@@ -64,6 +74,7 @@ SELECT (
     FROM tbl_class_records cr
     JOIN tbl_students s ON cr.student_id = s.id
     WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
+      AND cr.deleted_at IS NULL
       AND (? = '' OR ? != 'scheduled')
       AND (? = '' OR cr.status = ?)
       AND (? = '' OR s.name LIKE '%' || ? || '%')
@@ -73,6 +84,7 @@ SELECT (
     JOIN tbl_students s ON sc.student_id = s.id
     WHERE (? = 0 OR sc.teacher_id = ?) AND sc.scheduled_date >= ? AND sc.scheduled_date <= ?
       AND sc.status = 'scheduled'
+      AND sc.deleted_at IS NULL
       AND (? = '' OR ? = 'scheduled')
       AND (? = '' OR s.name LIKE '%' || ? || '%')
 ) AS count;
@@ -100,6 +112,7 @@ SELECT * FROM (
     JOIN tbl_students s ON cr.student_id = s.id
     JOIN tbl_teachers t ON cr.teacher_id = t.id
     WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
+      AND cr.deleted_at IS NULL
       AND (? = '' OR ? != 'scheduled')
       AND (? = '' OR cr.status = ?)
       AND (? = '' OR s.name LIKE '%' || ? || '%')
@@ -128,6 +141,7 @@ SELECT * FROM (
     JOIN tbl_teachers t ON sc.teacher_id = t.id
     WHERE (? = 0 OR sc.teacher_id = ?) AND sc.scheduled_date >= ? AND sc.scheduled_date <= ?
       AND sc.status = 'scheduled'
+      AND sc.deleted_at IS NULL
       AND (? = '' OR ? = 'scheduled')
       AND (? = '' OR s.name LIKE '%' || ? || '%')
 ) AS combined
@@ -138,6 +152,7 @@ LIMIT ? OFFSET ?;
 SELECT cr.status, COUNT(*) as count
 FROM tbl_class_records cr
 WHERE cr.date >= ? AND cr.date <= ?
+  AND cr.deleted_at IS NULL
   AND (? = 0 OR cr.teacher_id = ?)
 GROUP BY cr.status;
 
@@ -145,5 +160,6 @@ GROUP BY cr.status;
 SELECT cr.currency, COALESCE(SUM(cr.rate), 0) as total_rate
 FROM tbl_class_records cr
 WHERE cr.date >= ? AND cr.date <= ? AND cr.status = 'conducted'
+  AND cr.deleted_at IS NULL
   AND (? = 0 OR cr.teacher_id = ?)
 GROUP BY cr.currency;

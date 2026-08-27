@@ -36,6 +36,7 @@ type ScheduledClassItemData struct {
 	TimeRange       string
 	Overdue         bool
 	ShowZoomWarning bool
+	DeleteFrom      string
 }
 
 func ScheduledClassItemFromView(v models.ScheduledClassView) ScheduledClassItemData {
@@ -64,6 +65,7 @@ func ScheduledClassItemFromView(v models.ScheduledClassView) ScheduledClassItemD
 		RoomPasscode:    v.RoomPasscode,
 		TimeRange:       FormatScheduledClassTimeRange(v.StartTime, v.EndTime, v.DurationMinutes),
 		ShowZoomWarning: v.RoomURL == "" && v.DurationMinutes > ZoomMaxAutoMinutes,
+		DeleteFrom:      "schedule",
 	}
 	item.Overdue = IsScheduledClassOverdue(item)
 	return item

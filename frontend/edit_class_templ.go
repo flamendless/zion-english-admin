@@ -223,7 +223,7 @@ func EditClass(data EditClassData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" hx-swap=\"innerHTML\" hx-target=\"#logOutput\" _=\"\r\n\t\t\t\t\t\ton submit\r\n\t\t\t\t\t\t\tif #start_time.value is ''\r\n\t\t\t\t\t\t\t\talert('Please set start time')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\t\tif #end_time.value is ''\r\n\t\t\t\t\t\t\t\talert('Please set end time')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\t\tif #status.value is not 'conducted' and #reason.value is ''\r\n\t\t\t\t\t\t\t\talert('Reason is required for cancelled or rescheduled classes')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\tend\r\n\t\t\t\t\t\"><div class=\"form-row\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" hx-swap=\"innerHTML\" hx-target=\"#logOutput\" _=\"\r\n\t\t\t\t\t\ton submit\r\n\t\t\t\t\t\t\tif #start_time.value is ''\r\n\t\t\t\t\t\t\t\talert('Please set start time')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\t\tif #end_time.value is ''\r\n\t\t\t\t\t\t\t\talert('Please set end time')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\t\tif #status.value is not 'conducted' and #reason.value.trim() is ''\r\n\t\t\t\t\t\t\t\talert('Reason is required for cancelled or rescheduled classes')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\tend\r\n\t\t\t\t\t\"><div class=\"form-row\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -265,7 +265,7 @@ func EditClass(data EditClassData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\" hx-swap=\"innerHTML\" hx-target=\"#logOutput\" _=\"\r\n\t\t\t\t\t\ton submit\r\n\t\t\t\t\t\t\tif #start_time.value is ''\r\n\t\t\t\t\t\t\t\talert('Please set start time')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\t\tif #end_time.value is ''\r\n\t\t\t\t\t\t\t\talert('Please set end time')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\t\tif #status.value is not 'conducted' and #reason.value is ''\r\n\t\t\t\t\t\t\t\talert('Reason is required for cancelled or rescheduled classes')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\tend\r\n\t\t\t\t\t\"><input type=\"hidden\" name=\"teacher\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\" hx-swap=\"innerHTML\" hx-target=\"#logOutput\" _=\"\r\n\t\t\t\t\t\ton submit\r\n\t\t\t\t\t\t\tif #start_time.value is ''\r\n\t\t\t\t\t\t\t\talert('Please set start time')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\t\tif #end_time.value is ''\r\n\t\t\t\t\t\t\t\talert('Please set end time')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\t\tif #status.value is not 'conducted' and #reason.value.trim() is ''\r\n\t\t\t\t\t\t\t\talert('Reason is required for cancelled or rescheduled classes')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\tend\r\n\t\t\t\t\t\"><input type=\"hidden\" name=\"teacher\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

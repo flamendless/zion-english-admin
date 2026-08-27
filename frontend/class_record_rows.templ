@@ -22,6 +22,10 @@ templ ClassRecordRow(record ClassRecordRowData, showTeacher bool) {
 				} else {
 					@IconActionLink(record.ViewURL(), "View", IconKindView)
 					@IconActionLink(record.EditURL(), "Edit", IconKindEdit)
+					@IconActionTrigger("Delete", IconKindDelete, templ.Attributes{
+						"data-delete-url": record.DeleteURL(),
+						"data-delete-from": "classes",
+					})
 				}
 			</div>
 		</td>

@@ -13,6 +13,7 @@ var (
 	ErrStudentNotAssigned = errors.New("student is not assigned to this teacher")
 	ErrStudentNotFound    = errors.New("student not found")
 	ErrTeacherNotOwner    = errors.New("you can only edit your own class records")
+	ErrAlreadyDeleted     = errors.New("this class has already been deleted")
 )
 
 type classRecordDB interface {

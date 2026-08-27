@@ -148,6 +148,19 @@ templ IconActionButton(label string, kind IconKind, attrs templ.Attributes) {
 	</button>
 }
 
+templ IconActionTrigger(label string, kind IconKind, attrs templ.Attributes) {
+	<a
+		href="#"
+		class={ iconActionClass(kind) }
+		role="button"
+		data-tooltip={ label }
+		aria-label={ label }
+		{ attrs... }
+	>
+		@IconSVG(kind)
+	</a>
+}
+
 templ IconActionSubmit(label string, kind IconKind) {
 	<button type="submit" class={ iconActionClass(kind) } data-tooltip={ label } aria-label={ label }>
 		@IconSVG(kind)

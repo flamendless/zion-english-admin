@@ -20,6 +20,7 @@ SELECT
 FROM tbl_students s
 LEFT JOIN tbl_class_records cr ON cr.student_id = s.id
     AND cr.date >= ? AND cr.date <= ?
+    AND cr.deleted_at IS NULL
     AND (? = 0 OR cr.teacher_id = ?)
 WHERE (? = 0 OR EXISTS (
     SELECT 1 FROM tbl_teachers_students_m2m m
@@ -95,12 +96,14 @@ SELECT
         FROM tbl_scheduled_classes sc
         WHERE sc.teacher_id = t.id
           AND sc.scheduled_date >= ? AND sc.scheduled_date <= ?
+          AND sc.deleted_at IS NULL
     ), 0) AS scheduled_minutes,
     COALESCE((
         SELECT SUM(cr2.duration_minutes)
         FROM tbl_class_records cr2
         WHERE cr2.teacher_id = t.id
           AND cr2.date >= ? AND cr2.date <= ?
+          AND cr2.deleted_at IS NULL
           AND cr2.status = 'conducted'
     ), 0) AS conducted_minutes,
     COALESCE((
@@ -108,12 +111,14 @@ SELECT
         FROM tbl_scheduled_classes sc2
         WHERE sc2.teacher_id = t.id
           AND sc2.status = 'scheduled'
+          AND sc2.deleted_at IS NULL
           AND sc2.scheduled_date < date('now', 'localtime')
           AND sc2.scheduled_date >= ? AND sc2.scheduled_date <= ?
     ), 0) AS no_show_count
 FROM tbl_teachers t
 LEFT JOIN tbl_class_records cr ON cr.teacher_id = t.id
     AND cr.date >= ? AND cr.date <= ?
+    AND cr.deleted_at IS NULL
 WHERE t.status = 'approved' AND t.deleted = 0
   AND (? = 0 OR t.id = ?)
 GROUP BY t.id, t.first_name, t.middle_name, t.last_name
@@ -316,6 +321,7 @@ FROM tbl_scheduled_classes sc
 JOIN tbl_students s ON sc.student_id = s.id
 JOIN tbl_teachers t ON sc.teacher_id = t.id
 WHERE sc.status = 'scheduled'
+  AND sc.deleted_at IS NULL
   AND sc.scheduled_date < date('now', 'localtime')
   AND sc.scheduled_date >= ? AND sc.scheduled_date <= ?
   AND (? = 0 OR sc.teacher_id = ?)
@@ -447,24 +453,28 @@ SELECT
         SELECT SUM(CASE WHEN cr.status = 'conducted' THEN 1 ELSE 0 END)
         FROM tbl_class_records cr
         WHERE cr.date >= ? AND cr.date <= ?
+          AND cr.deleted_at IS NULL
           AND (? = 0 OR cr.teacher_id = ?)
     ), 0) AS conducted,
     COALESCE((
         SELECT SUM(CASE WHEN cr.status = 'cancelled' THEN 1 ELSE 0 END)
         FROM tbl_class_records cr
         WHERE cr.date >= ? AND cr.date <= ?
+          AND cr.deleted_at IS NULL
           AND (? = 0 OR cr.teacher_id = ?)
     ), 0) AS cancelled,
     COALESCE((
         SELECT SUM(CASE WHEN cr.status = 'rescheduled' THEN 1 ELSE 0 END)
         FROM tbl_class_records cr
         WHERE cr.date >= ? AND cr.date <= ?
+          AND cr.deleted_at IS NULL
           AND (? = 0 OR cr.teacher_id = ?)
     ), 0) AS rescheduled,
     COALESCE((
         SELECT SUM(sc.duration_minutes)
         FROM tbl_scheduled_classes sc
         WHERE sc.scheduled_date >= ? AND sc.scheduled_date <= ?
+          AND sc.deleted_at IS NULL
           AND (? = 0 OR sc.teacher_id = ?)
     ), 0) AS scheduled_minutes,
     COALESCE((
@@ -472,12 +482,14 @@ SELECT
         FROM tbl_class_records cr
         WHERE cr.date >= ? AND cr.date <= ?
           AND cr.status = 'conducted'
+          AND cr.deleted_at IS NULL
           AND (? = 0 OR cr.teacher_id = ?)
     ), 0) AS conducted_minutes,
     COALESCE((
         SELECT COUNT(*)
         FROM tbl_scheduled_classes sc
         WHERE sc.status = 'scheduled'
+          AND sc.deleted_at IS NULL
           AND sc.scheduled_date < date('now', 'localtime')
           AND sc.scheduled_date >= ? AND sc.scheduled_date <= ?
           AND (? = 0 OR sc.teacher_id = ?)
@@ -567,6 +579,7 @@ SELECT
     COALESCE(SUM(CASE WHEN cr.status = 'rescheduled' THEN 1 ELSE 0 END), 0) AS rescheduled
 FROM tbl_class_records cr
 WHERE cr.date >= ? AND cr.date <= ?
+  AND cr.deleted_at IS NULL
   AND (? = 0 OR cr.teacher_id = ?)
 GROUP BY week_label
 ORDER BY week_label ASC

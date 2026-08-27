@@ -1,0 +1,126 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/utils"
+)
+
+templ DeleteClassModal() {
+	<div class="modal-overlay" id="deleteClassModal" hidden role="presentation">
+		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="deleteClassModalTitle">
+			<div class="modal-header">
+				<h3 id="deleteClassModalTitle">Delete Class</h3>
+				<button type="button" class="modal-close delete-class-modal-close" aria-label="Close">&times;</button>
+			</div>
+			<form
+				id="deleteClassForm"
+				method="POST"
+				class="modal-body"
+				hx-swap="none"
+			>
+				<p id="deleteClassModalMessage">This will remove the class from your lists. The record is kept for audit.</p>
+				<input type="hidden" id="deleteClassFrom" name="from" value="classes"/>
+				<div class="form-group">
+					<label for="deleteClassReason">Reason *</label>
+					<input
+						type="text"
+						id="deleteClassReason"
+						name="reason"
+						required
+						placeholder="Reason for deletion"
+					/>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn delete-class-modal-close">Cancel</button>
+					<button type="submit" class="btn btn-danger" id="deleteClassSubmitBtn">Delete</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<script>
+		(function () {
+			const modal = document.getElementById('deleteClassModal');
+			const form = document.getElementById('deleteClassForm');
+			const reasonInput = document.getElementById('deleteClassReason');
+			const fromInput = document.getElementById('deleteClassFrom');
+			if (!modal || !form || !reasonInput || !fromInput) return;
+
+			window.openDeleteClassModal = function (deleteURL, from) {
+				form.action = deleteURL;
+				form.setAttribute('hx-post', deleteURL);
+				if (typeof htmx !== 'undefined') {
+					htmx.process(form);
+				}
+				fromInput.value = from || 'classes';
+				reasonInput.value = '';
+				modal.hidden = false;
+				document.body.classList.add('modal-open');
+				reasonInput.focus();
+			};
+
+			window.closeDeleteClassModal = function () {
+				modal.hidden = true;
+				document.body.classList.remove('modal-open');
+				reasonInput.value = '';
+			};
+
+			form.addEventListener('submit', function (e) {
+				if (!reasonInput.value.trim()) {
+					e.preventDefault();
+					alert('Reason is required for deletion');
+					return;
+				}
+				reasonInput.value = reasonInput.value.trim();
+			});
+
+			document.body.addEventListener('click', function (e) {
+				if (e.target.closest('[data-delete-url]')) {
+					e.preventDefault();
+					const btn = e.target.closest('[data-delete-url]');
+					const url = btn.getAttribute('data-delete-url');
+					const from = btn.getAttribute('data-delete-from') || 'classes';
+					if (url) window.openDeleteClassModal(url, from);
+					return;
+				}
+				if (e.target.closest('.delete-class-modal-close')) {
+					window.closeDeleteClassModal();
+					return;
+				}
+				if (e.target === modal) {
+					window.closeDeleteClassModal();
+				}
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key === 'Escape' && !modal.hidden) {
+					window.closeDeleteClassModal();
+				}
+			});
+
+			document.body.addEventListener('htmx:afterRequest', function (evt) {
+				if (evt.detail.elt !== form) return;
+				if (evt.detail.successful) {
+					window.closeDeleteClassModal();
+				}
+			});
+		})();
+	</script>
+	<style>
+		.btn-danger {
+			background: var(--color-danger, #c0392b);
+			color: #fff;
+			border-color: var(--color-danger, #c0392b);
+		}
+		.btn-danger:hover {
+			filter: brightness(0.92);
+		}
+	</style>
+}
+
+func ClassRecordDeleteURL(id int64) string {
+	return utils.URL("/classes/" + fmt.Sprintf("%d", id) + "/delete")
+}
+
+func ScheduledClassDeleteURL(id int64) string {
+	return utils.URL("/schedule/" + fmt.Sprintf("%d", id) + "/delete")
+}

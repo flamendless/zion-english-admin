@@ -89,7 +89,7 @@ templ EditClass(data EditClassData) {
 								alert('Please set end time')
 								halt
 							end
-							if #status.value is not 'conducted' and #reason.value is ''
+							if #status.value is not 'conducted' and #reason.value.trim() is ''
 								alert('Reason is required for cancelled or rescheduled classes')
 								halt
 							end
@@ -118,7 +118,7 @@ templ EditClass(data EditClassData) {
 								alert('Please set end time')
 								halt
 							end
-							if #status.value is not 'conducted' and #reason.value is ''
+							if #status.value is not 'conducted' and #reason.value.trim() is ''
 								alert('Reason is required for cancelled or rescheduled classes')
 								halt
 							end

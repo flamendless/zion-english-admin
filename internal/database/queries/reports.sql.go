@@ -15,6 +15,7 @@ SELECT cr.id, cr.student_id, cr.date, cr.start_time, cr.end_time,
        cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.updated_at
 FROM tbl_class_records cr
 WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ?
+  AND cr.deleted_at IS NULL
 ORDER BY cr.id ASC
 `
 
@@ -77,6 +78,7 @@ SELECT cr.id, cr.teacher_id, cr.student_id, cr.date, cr.start_time, cr.end_time,
 FROM tbl_class_records cr
 JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE cr.date >= ? AND cr.date <= ?
+  AND cr.deleted_at IS NULL
   AND t.status = 'approved' AND t.deleted = 0
 ORDER BY cr.teacher_id ASC, cr.id ASC
 `
@@ -249,6 +251,7 @@ FROM tbl_class_records cr
 JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE cr.date >= ? AND cr.date <= ?
   AND cr.status = 'conducted'
+  AND cr.deleted_at IS NULL
   AND t.status = 'approved' AND t.deleted = 0
   AND (
     ? = ''
@@ -258,6 +261,7 @@ WHERE cr.date >= ? AND cr.date <= ?
       JOIN tbl_students s ON cr2.student_id = s.id
       WHERE cr2.teacher_id = t.id
         AND cr2.date >= ? AND cr2.date <= ?
+        AND cr2.deleted_at IS NULL
         AND s.name LIKE '%' || ? || '%'
     )
   )
@@ -325,6 +329,7 @@ SELECT
 FROM tbl_teachers t
 LEFT JOIN tbl_class_records cr ON cr.teacher_id = t.id
     AND cr.date >= ? AND cr.date <= ?
+    AND cr.deleted_at IS NULL
 WHERE t.status = 'approved' AND t.deleted = 0
   AND (
     ? = ''
@@ -334,6 +339,7 @@ WHERE t.status = 'approved' AND t.deleted = 0
       JOIN tbl_students s ON cr2.student_id = s.id
       WHERE cr2.teacher_id = t.id
         AND cr2.date >= ? AND cr2.date <= ?
+        AND cr2.deleted_at IS NULL
         AND s.name LIKE '%' || ? || '%'
     )
   )
@@ -414,6 +420,7 @@ FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ?
+  AND cr.deleted_at IS NULL
 ORDER BY cr.date ASC, s.name ASC, cr.rate ASC, cr.start_time ASC
 `
 

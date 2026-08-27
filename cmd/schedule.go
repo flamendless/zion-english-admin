@@ -36,6 +36,10 @@ func handleSchedulePath(w http.ResponseWriter, r *http.Request) {
 		handleRescheduleScheduledClass(w, r, id)
 		return
 	}
+	if id, ok := extractPathID(r, "schedule", "/delete"); ok {
+		handleDeleteScheduledClass(w, r, id)
+		return
+	}
 	HttpError(w, "Not found", http.StatusNotFound)
 }
 
@@ -367,7 +371,11 @@ func handleCancelScheduledClass(w http.ResponseWriter, r *http.Request, schedule
 		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
 		return
 	}
-	reason := r.FormValue("reason")
+	reason := strings.TrimSpace(r.FormValue("reason"))
+	if err := validateClassReason(reason); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
 
 	if meetingSvc != nil {
 		_ = meetingSvc.DeleteRoomForSchedule(ctx, scheduleID, existing.TeacherID)
@@ -375,7 +383,7 @@ func handleCancelScheduledClass(w http.ResponseWriter, r *http.Request, schedule
 
 	err = dbRW.GetQueries().UpdateScheduledClassStatus(ctx, queries.UpdateScheduledClassStatusParams{
 		Status:   "cancelled",
-		Reason:   sql.NullString{String: reason, Valid: reason != ""},
+		Reason:   sql.NullString{String: reason, Valid: true},
 		ID:       scheduleID,
 	})
 	if err != nil {
@@ -430,7 +438,11 @@ func handleRescheduleScheduledClass(w http.ResponseWriter, r *http.Request, sche
 		return
 	}
 	newTime := r.FormValue("start_time")
-	reason := r.FormValue("reason")
+	reason := strings.TrimSpace(r.FormValue("reason"))
+	if err := validateClassReason(reason); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
 
 	effectiveStart := normalizeScheduleStartTime(newTime)
 	if effectiveStart == "" && existing.StartTime.Valid {
@@ -459,7 +471,7 @@ func handleRescheduleScheduledClass(w http.ResponseWriter, r *http.Request, sche
 	err = dbRW.GetQueries().RescheduleScheduledClass(ctx, queries.RescheduleScheduledClassParams{
 		ScheduledDate: newDate,
 		StartTime:     startTime,
-		Reason:        sql.NullString{String: reason, Valid: reason != ""},
+		Reason:        sql.NullString{String: reason, Valid: true},
 		ID:            scheduleID,
 	})
 	if err != nil {
@@ -497,6 +509,72 @@ func handleRescheduleScheduledClass(w http.ResponseWriter, r *http.Request, sche
 	if _, err := fmt.Fprint(w, "Class rescheduled.\n"); err != nil {
 		sendErrorLog(w, err.Error())
 	}
+}
+
+func handleDeleteScheduledClass(w http.ResponseWriter, r *http.Request, scheduleID int64) {
+	if r.Method != http.MethodPost {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
+		return
+	}
+
+	reason := strings.TrimSpace(r.FormValue("reason"))
+	if err := validateDeletionReason(reason); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	ctx := r.Context()
+	user := auth.GetUser(ctx)
+
+	existing, err := dbRO.GetQueries().GetScheduledClassByID(ctx, scheduleID)
+	if err != nil {
+		HttpError(w, "Scheduled class not found", http.StatusNotFound)
+		return
+	}
+
+	rules := classrules.ScheduledClassRules{DB: dbRO.GetQueries()}
+	if err := rules.ValidateAccess(existing.TeacherID, user); err != nil {
+		HttpError(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	if existing.Status != "scheduled" {
+		sendErrorLog(w, "only scheduled classes can be deleted")
+		return
+	}
+
+	if meetingSvc != nil {
+		_ = meetingSvc.DeleteRoomForSchedule(ctx, scheduleID, existing.TeacherID)
+	}
+
+	err = dbRW.GetQueries().SoftDeleteScheduledClass(ctx, queries.SoftDeleteScheduledClassParams{
+		Reason: sql.NullString{String: reason, Valid: true},
+		ID:     scheduleID,
+	})
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("deleted scheduled class id %d (student id %d, date %s, reason: %s)", scheduleID, existing.StudentID, existing.ScheduledDate, reason))
+	notifyCrossParty(ctx, user, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
+		fmt.Sprintf("Scheduled class on %s was deleted", existing.ScheduledDate))
+
+	from := r.FormValue("from")
+	setSuccessFlash(w, "Scheduled class deleted successfully.")
+	if from == "schedule" {
+		w.Header().Set("HX-Trigger", "scheduleDayOpen")
+		if _, err := fmt.Fprint(w, "Scheduled class deleted.\n"); err != nil {
+			sendErrorLog(w, err.Error())
+		}
+		return
+	}
+	HttpRedirect(w, r, "/classes")
 }
 
 func editScheduleData(ctx context.Context, scheduleID int64, lockTeacher, isSuperuser bool) (frontend.EditScheduleData, error) {
