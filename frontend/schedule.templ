@@ -21,6 +21,7 @@ templ Schedule(data ScheduleData) {
 		<title>Class Schedule - Zion English Admin</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
+		@ScrTimeRangeJS()
 		@AvatarStyles()
 		<style>
 			.day-class-item.is-overdue {
@@ -354,6 +355,7 @@ templ Schedule(data ScheduleData) {
 				</div>
 			</div>
 			@DeleteClassModal()
+			@ScheduledClassModals()
 		</div>
 
 		<script>
@@ -821,6 +823,7 @@ templ Schedule(data ScheduleData) {
 				refreshTodayList();
 				renderCalendar();
 			}
+			window.refreshCalendar = refreshCalendar;
 
 			async function loadStudentsForTeacher(teacherId) {
 				const studentEl = getFormStudentEl();

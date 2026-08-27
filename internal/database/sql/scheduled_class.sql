@@ -27,6 +27,11 @@ UPDATE tbl_scheduled_classes
 SET student_id = ?, rate = ?, currency = ?, updated_at = datetime('now')
 WHERE id = ? AND deleted_at IS NULL;
 
+-- name: UpdateScheduledClassSchedule :exec
+UPDATE tbl_scheduled_classes
+SET student_id = ?, scheduled_date = ?, start_time = ?, duration_minutes = ?, updated_at = datetime('now')
+WHERE id = ? AND deleted_at IS NULL;
+
 -- name: SoftDeleteScheduledClass :exec
 UPDATE tbl_scheduled_classes
 SET reason = ?, deleted_at = datetime('now'), updated_at = datetime('now')

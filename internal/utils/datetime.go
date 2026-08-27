@@ -64,3 +64,21 @@ func NormalizeDatePHT(value string) string {
 	}
 	return DatePHT(*t)
 }
+
+func IsDateTimeInPastPHT(date, startTime string) bool {
+	date = strings.TrimSpace(date)
+	startTime = strings.TrimSpace(startTime)
+	if date == "" || startTime == "" {
+		return false
+	}
+	day, err := time.ParseInLocation(constants.DateLayout, date, constants.LocationPHT)
+	if err != nil {
+		return false
+	}
+	hm, err := ParseTimeHM(startTime)
+	if err != nil {
+		return false
+	}
+	dt := time.Date(day.Year(), day.Month(), day.Day(), hm.Hour(), hm.Minute(), 0, 0, constants.LocationPHT)
+	return dt.Before(time.Now().In(constants.LocationPHT))
+}

@@ -1,0 +1,509 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/utils"
+)
+
+templ ScheduledClassModals() {
+	@ConductClassModal()
+	@CancelClassModal()
+	@EditScheduledClassModal()
+	@ScheduledClassModalsScript()
+}
+
+templ ScheduledClassDetailCard(cardID string) {
+	<div class="scheduled-class-detail-card" id={ cardID } aria-label="Class details">
+		<div class="scheduled-class-detail-header">
+			<span class="scheduled-class-detail-student" data-field="student"></span>
+			<span class="scheduled-class-detail-teacher">
+				with <span data-field="teacher"></span>
+			</span>
+		</div>
+		<dl class="scheduled-class-detail-meta">
+			<div class="scheduled-class-detail-row">
+				<dt>Date</dt>
+				<dd data-field="date"></dd>
+			</div>
+			<div class="scheduled-class-detail-row">
+				<dt>Time</dt>
+				<dd data-field="time"></dd>
+			</div>
+			<div class="scheduled-class-detail-row">
+				<dt>Rate</dt>
+				<dd data-field="rate"></dd>
+			</div>
+		</dl>
+	</div>
+}
+
+templ ConductClassModal() {
+	<div class="modal-overlay" id="conductClassModal" hidden role="presentation">
+		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="conductClassModalTitle">
+			<div class="modal-header">
+				<h3 id="conductClassModalTitle">Conduct Class</h3>
+				<button type="button" class="modal-close scheduled-class-modal-close" aria-label="Close">&times;</button>
+			</div>
+			<form
+				id="conductClassForm"
+				method="POST"
+				class="modal-body scheduled-class-action-modal"
+				hx-swap="none"
+			>
+				<p class="scheduled-class-modal-lead">Record this session as conducted. Class details are fixed from the schedule.</p>
+				@ScheduledClassDetailCard("conductClassModalDetails")
+				<input type="hidden" id="conductClassFrom" name="from" value="schedule"/>
+				<div class="scheduled-class-modal-fields">
+					<div class="form-group">
+						<label for="conductClassNotes">Notes</label>
+						<textarea id="conductClassNotes" name="notes" rows="3" placeholder="Optional notes about this class"></textarea>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn scheduled-class-modal-close">Cancel</button>
+					<button type="submit" class="btn" id="conductClassSubmitBtn">Conduct</button>
+				</div>
+			</form>
+		</div>
+	</div>
+}
+
+templ CancelClassModal() {
+	<div class="modal-overlay" id="cancelClassModal" hidden role="presentation">
+		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="cancelClassModalTitle">
+			<div class="modal-header">
+				<h3 id="cancelClassModalTitle">Cancel Class</h3>
+				<button type="button" class="modal-close scheduled-class-modal-close" aria-label="Close">&times;</button>
+			</div>
+			<form
+				id="cancelClassForm"
+				method="POST"
+				class="modal-body scheduled-class-action-modal"
+				hx-swap="none"
+			>
+				<p class="scheduled-class-modal-lead">This will mark the class as cancelled and keep a record for your history.</p>
+				@ScheduledClassDetailCard("cancelClassModalDetails")
+				<input type="hidden" id="cancelClassFrom" name="from" value="schedule"/>
+				<div class="scheduled-class-modal-fields">
+					<div class="form-group">
+						<label for="cancelClassReason">Reason *</label>
+						<input
+							type="text"
+							id="cancelClassReason"
+							name="reason"
+							required
+							placeholder="Reason for cancellation"
+						/>
+					</div>
+					<div class="form-group">
+						<label for="cancelClassNotes">Notes</label>
+						<textarea id="cancelClassNotes" name="notes" rows="3" placeholder="Optional notes"></textarea>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn scheduled-class-modal-close">Cancel</button>
+					<button type="submit" class="btn btn-danger" id="cancelClassSubmitBtn">Cancel Class</button>
+				</div>
+			</form>
+		</div>
+	</div>
+}
+
+templ EditScheduledClassModal() {
+	<div class="modal-overlay" id="editScheduledClassModal" hidden role="presentation">
+		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="editScheduledClassModalTitle">
+			<div class="modal-header">
+				<h3 id="editScheduledClassModalTitle">Edit Scheduled Class</h3>
+				<button type="button" class="modal-close scheduled-class-modal-close" aria-label="Close">&times;</button>
+			</div>
+			<div id="editScheduledClassModalBody" class="modal-body">
+				<p class="modal-loading">Loading...</p>
+			</div>
+		</div>
+	</div>
+}
+
+templ EditScheduledClassModalForm(data EditScheduleData) {
+	<form
+		id="editScheduledClassForm"
+		class="scheduled-class-modal-form"
+		method="POST"
+		hx-post={ utils.URL(fmt.Sprintf("/schedule/%s/edit", data.ScheduleID)) }
+		hx-swap="none"
+		data-today-pht={ data.TodayPHT }
+		data-original-date={ data.Date }
+		data-original-start={ data.StartTime }
+		_="
+			on submit
+				set origDate to my @data-original-date
+				set origStart to my @data-original-start
+				set newDate to #date.value
+				set newStart to #start_time.value
+				if newDate is not origDate or newStart is not origStart
+					set today to my @data-today-pht
+					if newDate < today
+						alert('Date and time cannot be in the past')
+						halt
+					end
+					if newDate is today and newStart is not ''
+						set now to new Date()
+						set parts to newStart.split(':')
+						if parts.length is 2
+							set sel to new Date()
+							set sel.setHours(parseInt(parts[0]), parseInt(parts[1]), 0, 0)
+							if sel < now
+								alert('Date and time cannot be in the past')
+								halt
+							end
+						end
+					end
+				end
+				if #start_time.value is ''
+					alert('Please set start time')
+					halt
+				end
+				if #end_time.value is ''
+					alert('Please set end time')
+					halt
+				end
+			end
+		"
+	>
+		<input type="hidden" id="editScheduledClassFrom" name="from" value={ data.From }/>
+		<div class="form-group">
+			<label>Teacher</label>
+			<input type="text" value={ data.TeacherName } disabled/>
+		</div>
+		if data.LockTeacher {
+			@TeacherStudentsDropdownWithValue(data.StudentID)
+		} else {
+			@ScheduleEditStudentDropdown(data.TeacherID, data.StudentID)
+		}
+		@ClassDateField(data.Date, false)
+		@TimeRangeFields(data.StartTime, data.EndTime, false)
+		<div class="modal-footer">
+			<button type="button" class="btn scheduled-class-modal-close">Cancel</button>
+			<button type="submit" class="btn" id="editScheduledClassSubmitBtn">Save Changes</button>
+		</div>
+	</form>
+	@ScrTimeRangeInit()
+}
+
+templ ScheduledClassModalsScript() {
+	<script>
+		(function () {
+			const conductModal = document.getElementById('conductClassModal');
+			const conductForm = document.getElementById('conductClassForm');
+			const conductDetails = document.getElementById('conductClassModalDetails');
+			const conductNotes = document.getElementById('conductClassNotes');
+			const conductFrom = document.getElementById('conductClassFrom');
+
+			const cancelModal = document.getElementById('cancelClassModal');
+			const cancelForm = document.getElementById('cancelClassForm');
+			const cancelDetails = document.getElementById('cancelClassModalDetails');
+			const cancelReason = document.getElementById('cancelClassReason');
+			const cancelNotes = document.getElementById('cancelClassNotes');
+			const cancelFrom = document.getElementById('cancelClassFrom');
+
+			const editModal = document.getElementById('editScheduledClassModal');
+			const editBody = document.getElementById('editScheduledClassModalBody');
+
+			function setFormPost(form, url) {
+				form.action = url;
+				form.setAttribute('hx-post', url);
+				if (typeof htmx !== 'undefined') {
+					htmx.process(form);
+				}
+			}
+
+			function fillScheduledClassDetails(container, trigger) {
+				if (!container || !trigger) return;
+				const fields = {
+					student: trigger.getAttribute('data-student-name') || '—',
+					teacher: trigger.getAttribute('data-teacher-name') || '—',
+					date: trigger.getAttribute('data-scheduled-date') || '—',
+					time: trigger.getAttribute('data-time-range') || '—',
+					rate: trigger.getAttribute('data-rate-label') || '—',
+				};
+				container.querySelectorAll('[data-field]').forEach(function (el) {
+					const key = el.getAttribute('data-field');
+					if (key && fields[key] !== undefined) {
+						el.textContent = fields[key];
+					}
+				});
+			}
+
+			function openModal(modal) {
+				modal.hidden = false;
+				document.body.classList.add('modal-open');
+			}
+
+			window.closeScheduledClassModals = function () {
+				if (conductModal) conductModal.hidden = true;
+				if (cancelModal) cancelModal.hidden = true;
+				if (editModal) editModal.hidden = true;
+				document.body.classList.remove('modal-open');
+				if (conductNotes) conductNotes.value = '';
+				if (cancelReason) cancelReason.value = '';
+				if (cancelNotes) cancelNotes.value = '';
+				if (editBody) editBody.innerHTML = '<p class="modal-loading">Loading...</p>';
+			};
+
+			window.openConductClassModal = function (url, trigger, from) {
+				if (!conductModal || !conductForm) return;
+				setFormPost(conductForm, url);
+				fillScheduledClassDetails(conductDetails, trigger);
+				if (conductFrom) conductFrom.value = from || 'schedule';
+				if (conductNotes) conductNotes.value = '';
+				openModal(conductModal);
+				if (conductNotes) conductNotes.focus();
+			};
+
+			window.openCancelClassModal = function (url, trigger, from) {
+				if (!cancelModal || !cancelForm) return;
+				setFormPost(cancelForm, url);
+				fillScheduledClassDetails(cancelDetails, trigger);
+				if (cancelFrom) cancelFrom.value = from || 'schedule';
+				if (cancelReason) cancelReason.value = '';
+				if (cancelNotes) cancelNotes.value = '';
+				openModal(cancelModal);
+				if (cancelReason) cancelReason.focus();
+			};
+
+			window.openEditScheduledClassModal = function (url, from) {
+				if (!editModal || !editBody) return;
+				openModal(editModal);
+				if (typeof htmx !== 'undefined') {
+					htmx.ajax('GET', url, { target: '#editScheduledClassModalBody', swap: 'innerHTML' });
+				}
+				window._editScheduledClassFrom = from || 'schedule';
+			};
+
+			document.body.addEventListener('click', function (e) {
+				const conductBtn = e.target.closest('[data-conduct-url]');
+				if (conductBtn) {
+					e.preventDefault();
+					window.openConductClassModal(
+						conductBtn.getAttribute('data-conduct-url'),
+						conductBtn,
+						conductBtn.getAttribute('data-action-from') || 'schedule'
+					);
+					return;
+				}
+				const cancelBtn = e.target.closest('[data-cancel-url]');
+				if (cancelBtn) {
+					e.preventDefault();
+					window.openCancelClassModal(
+						cancelBtn.getAttribute('data-cancel-url'),
+						cancelBtn,
+						cancelBtn.getAttribute('data-action-from') || 'schedule'
+					);
+					return;
+				}
+				const editBtn = e.target.closest('[data-edit-url]');
+				if (editBtn) {
+					e.preventDefault();
+					window.openEditScheduledClassModal(
+						editBtn.getAttribute('data-edit-url'),
+						editBtn.getAttribute('data-action-from') || 'schedule'
+					);
+					return;
+				}
+				if (e.target.closest('.scheduled-class-modal-close')) {
+					window.closeScheduledClassModals();
+					return;
+				}
+				if (e.target === conductModal || e.target === cancelModal || e.target === editModal) {
+					window.closeScheduledClassModals();
+				}
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key !== 'Escape') return;
+				if (conductModal && !conductModal.hidden) window.closeScheduledClassModals();
+				else if (cancelModal && !cancelModal.hidden) window.closeScheduledClassModals();
+				else if (editModal && !editModal.hidden) window.closeScheduledClassModals();
+			});
+
+			if (conductForm) {
+				conductForm.addEventListener('submit', function () {
+					if (conductNotes) conductNotes.value = conductNotes.value.trim();
+				});
+			}
+
+			if (cancelForm) {
+				cancelForm.addEventListener('submit', function (e) {
+					if (!cancelReason || !cancelReason.value.trim()) {
+						e.preventDefault();
+						alert('Reason is required for cancellation');
+						return;
+					}
+					cancelReason.value = cancelReason.value.trim();
+					if (cancelNotes) cancelNotes.value = cancelNotes.value.trim();
+				});
+			}
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target !== editBody) return;
+				if (window.initTimeRangePreview) window.initTimeRangePreview();
+				if (window.attachTimeRangeFormValidation) window.attachTimeRangeFormValidation();
+				const fromInput = document.getElementById('editScheduledClassFrom');
+				if (fromInput && window._editScheduledClassFrom) {
+					fromInput.value = window._editScheduledClassFrom;
+				}
+				const studentSelect = document.getElementById('student') || document.getElementById('schedule_student');
+				if (studentSelect) studentSelect.focus();
+			});
+
+			function handleModalSuccess(form) {
+				window.closeScheduledClassModals();
+				if (typeof showSuccessBanner === 'function') {
+					showSuccessBanner('Saved successfully');
+				}
+			}
+
+			document.body.addEventListener('htmx:afterRequest', function (evt) {
+				const form = evt.detail.elt;
+				if (!evt.detail.successful) return;
+				if (form === conductForm || form === cancelForm || form === document.getElementById('editScheduledClassForm')) {
+					handleModalSuccess(form);
+				}
+			});
+
+			document.body.addEventListener('classesRefresh', function () {
+				const filterBtn = document.getElementById('filterBtn');
+				if (filterBtn) filterBtn.click();
+			});
+
+			document.body.addEventListener('refreshScheduleCalendar', function () {
+				if (typeof refreshCalendar === 'function') refreshCalendar();
+			});
+		})();
+	</script>
+	<style>
+		.scheduled-class-action-modal {
+			gap: var(--space-4);
+		}
+
+		.scheduled-class-modal-lead {
+			margin: 0;
+			font-size: 0.9rem;
+			line-height: 1.5;
+			color: var(--color-muted-foreground);
+		}
+
+		.scheduled-class-detail-card {
+			padding: var(--space-4);
+			border: 1px solid var(--color-border-subtle);
+			border-radius: var(--radius-md);
+			background: var(--color-muted);
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-4);
+		}
+
+		.scheduled-class-detail-header {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-1);
+		}
+
+		.scheduled-class-detail-student {
+			font-size: 1.05rem;
+			font-weight: 600;
+			color: var(--color-foreground);
+			line-height: 1.3;
+		}
+
+		.scheduled-class-detail-teacher {
+			font-size: 0.875rem;
+			color: var(--color-muted-foreground);
+		}
+
+		.scheduled-class-detail-meta {
+			margin: 0;
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: var(--space-3);
+		}
+
+		.scheduled-class-detail-row {
+			display: flex;
+			align-items: baseline;
+			justify-content: space-between;
+			gap: var(--space-4);
+			padding-top: var(--space-3);
+			border-top: 1px solid var(--color-border-subtle);
+		}
+
+		.scheduled-class-detail-row:first-child {
+			padding-top: 0;
+			border-top: none;
+		}
+
+		.scheduled-class-detail-row dt {
+			margin: 0;
+			font-size: 0.75rem;
+			font-weight: 600;
+			letter-spacing: 0.04em;
+			text-transform: uppercase;
+			color: var(--color-muted-foreground);
+			flex-shrink: 0;
+		}
+
+		.scheduled-class-detail-row dd {
+			margin: 0;
+			font-size: 0.95rem;
+			font-weight: 500;
+			color: var(--color-foreground);
+			text-align: right;
+		}
+
+		.scheduled-class-modal-fields {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-4);
+		}
+
+		.scheduled-class-modal-form {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-4);
+		}
+
+		.scheduled-class-modal-form .form-group,
+		.scheduled-class-modal-form .time-range-fields,
+		.scheduled-class-modal-form .time-input-wrap {
+			width: 100%;
+			max-width: none;
+		}
+
+		.scheduled-class-modal-form .time-range-group {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-4);
+			grid-template-columns: none;
+		}
+
+		.scheduled-class-modal-form .modal-footer {
+			margin-top: var(--space-2);
+			padding-top: var(--space-4);
+			border-top: 1px solid var(--color-border-subtle);
+		}
+
+		.modal-loading {
+			color: var(--color-muted-foreground);
+			margin: 0;
+		}
+
+		.btn-danger {
+			background: var(--color-danger, #c0392b);
+			color: #fff;
+			border-color: var(--color-danger, #c0392b);
+		}
+
+		.btn-danger:hover {
+			filter: brightness(0.92);
+		}
+	</style>
+}

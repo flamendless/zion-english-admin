@@ -32,6 +32,7 @@ templ Classes(data ClassesData) {
 		}
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
+		@ScrTimeRangeJS()
 	</head>
 	<body>
 		<div class="container" data-show-all-teachers={ fmt.Sprintf("%t", data.ShowAllTeachers) }>
@@ -127,6 +128,7 @@ templ Classes(data ClassesData) {
 			</div>
 			<div id="paginationBottom" class="pagination-bar"></div>
 			@DeleteClassModal()
+			@ScheduledClassModals()
 		</div>
 
 		<script>

@@ -462,6 +462,31 @@ func (q *Queries) UpdateScheduledClassDetails(ctx context.Context, arg UpdateSch
 	return err
 }
 
+const updateScheduledClassSchedule = `-- name: UpdateScheduledClassSchedule :exec
+UPDATE tbl_scheduled_classes
+SET student_id = ?, scheduled_date = ?, start_time = ?, duration_minutes = ?, updated_at = datetime('now')
+WHERE id = ? AND deleted_at IS NULL
+`
+
+type UpdateScheduledClassScheduleParams struct {
+	StudentID       int64
+	ScheduledDate   string
+	StartTime       sql.NullString
+	DurationMinutes int64
+	ID              int64
+}
+
+func (q *Queries) UpdateScheduledClassSchedule(ctx context.Context, arg UpdateScheduledClassScheduleParams) error {
+	_, err := q.db.ExecContext(ctx, updateScheduledClassSchedule,
+		arg.StudentID,
+		arg.ScheduledDate,
+		arg.StartTime,
+		arg.DurationMinutes,
+		arg.ID,
+	)
+	return err
+}
+
 const updateScheduledClassStatus = `-- name: UpdateScheduledClassStatus :exec
 UPDATE tbl_scheduled_classes
 SET status = ?, reason = ?, updated_at = datetime('now')

@@ -9,6 +9,21 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.08.27.1"
+    date: "2026-08-27"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "You can delete recorded classes and scheduled classes with a reason; deleted records are hidden from lists but kept for audit."
+        commit: "4151ae8"
+    improvements:
+      - text: "View, edit, and delete actions across schedule, classes, reports, and other lists now use consistent icon buttons."
+        commit: "fdf7475"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
   - version: "2026.08.27"
     date: "2026-08-27"
     released: true

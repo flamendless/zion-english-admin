@@ -85,16 +85,22 @@ func (r ClassRecordRowData) EndTimeDisplay() string {
 }
 
 func (r ClassRecordRowData) ScheduledItemData() ScheduledClassItemData {
-	return ScheduledClassItemData{
+	item := ScheduledClassItemData{
 		ID:              r.ID,
 		StudentID:       r.StudentID,
 		TeacherID:       r.TeacherID,
+		StudentName:     r.StudentName,
+		TeacherName:     r.TeacherName,
 		ScheduledDate:   r.Date,
+		StartTime:       r.StartTime,
+		EndTime:         r.EndTime,
 		DurationMinutes: r.DurationMinutes,
 		Rate:            r.Rate,
 		Currency:        r.Currency,
 		DeleteFrom:      "classes",
 	}
+	item.TimeRange = FormatScheduledClassTimeRange(item.StartTime, item.EndTime, item.DurationMinutes)
+	return item
 }
 
 func (r ClassRecordRowData) ViewURL() string {

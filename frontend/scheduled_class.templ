@@ -2,14 +2,31 @@ package frontend
 
 import (
 	"strconv"
-	"zion-english/internal/utils"
 )
-
 templ ScheduledClassActions(item ScheduledClassItemData) {
 	<div class="scheduled-class-actions">
-		@IconActionLink(RecordClassURLFromSchedule(item.ID, item.StudentID, item.TeacherID, item.ScheduledDate, item.DurationMinutes, item.Rate, item.Currency, "conducted"), "Conduct", IconKindConduct)
-		@IconActionLink(utils.URL("/schedule/"+strconvFormatInt64(item.ID)+"/edit"), "Edit", IconKindEdit)
-		@IconActionLink(RecordClassURLFromSchedule(item.ID, item.StudentID, item.TeacherID, item.ScheduledDate, item.DurationMinutes, item.Rate, item.Currency, "cancelled"), "Cancel", IconKindCancel)
+		@IconActionTrigger("Conduct", IconKindConduct, templ.Attributes{
+			"data-conduct-url": ScheduledClassConductURL(item.ID),
+			"data-teacher-name": item.TeacherName,
+			"data-student-name": item.StudentName,
+			"data-scheduled-date": FormatScheduledClassDateDisplay(item.ScheduledDate),
+			"data-time-range": item.TimeRange,
+			"data-rate-label": FormatScheduledClassRate(item.Rate, item.Currency),
+			"data-action-from": item.DeleteFrom,
+		})
+		@IconActionTrigger("Edit", IconKindEdit, templ.Attributes{
+			"data-edit-url": ScheduledClassEditModalURL(item.ID),
+			"data-action-from": item.DeleteFrom,
+		})
+		@IconActionTrigger("Cancel", IconKindCancel, templ.Attributes{
+			"data-cancel-url": ScheduledClassCancelURL(item.ID),
+			"data-teacher-name": item.TeacherName,
+			"data-student-name": item.StudentName,
+			"data-scheduled-date": FormatScheduledClassDateDisplay(item.ScheduledDate),
+			"data-time-range": item.TimeRange,
+			"data-rate-label": FormatScheduledClassRate(item.Rate, item.Currency),
+			"data-action-from": item.DeleteFrom,
+		})
 		@IconActionTrigger("Delete", IconKindDelete, templ.Attributes{
 			"data-delete-url": ScheduledClassDeleteURL(item.ID),
 			"data-delete-from": item.DeleteFrom,

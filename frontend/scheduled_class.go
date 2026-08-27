@@ -2,9 +2,7 @@ package frontend
 
 import (
 	"fmt"
-	"net/url"
 	"sort"
-	"strconv"
 	"time"
 
 	"zion-english/internal/constants"
@@ -142,18 +140,27 @@ func IsScheduledClassOverdue(item ScheduledClassItemData) bool {
 	return time.Now().In(constants.LocationPHT).After(endAt)
 }
 
-func RecordClassURLFromSchedule(id, studentID, teacherID int64, date string, durationMinutes int64, rate float64, currency, status string) string {
-	params := url.Values{
-		"fromSchedule": {strconv.FormatInt(id, 10)},
-		"student":      {strconv.FormatInt(studentID, 10)},
-		"teacher":      {strconv.FormatInt(teacherID, 10)},
-		"date":         {date},
-		"duration":     {strconv.FormatInt(durationMinutes, 10)},
-		"rate":         {strconv.FormatFloat(rate, 'f', -1, 64)},
-		"currency":     {currency},
-		"status":       {status},
+func FormatScheduledClassDateDisplay(date string) string {
+	if date == "" {
+		return "—"
 	}
-	return utils.URL("/classes/record?" + params.Encode())
+	t, err := time.ParseInLocation(constants.DateLayout, date, constants.LocationPHT)
+	if err != nil {
+		return date
+	}
+	return t.Format("Monday, Jan 2, 2006")
+}
+
+func ScheduledClassConductURL(id int64) string {
+	return utils.URL(fmt.Sprintf("/schedule/%d/conduct", id))
+}
+
+func ScheduledClassCancelURL(id int64) string {
+	return utils.URL(fmt.Sprintf("/schedule/%d/cancel", id))
+}
+
+func ScheduledClassEditModalURL(id int64) string {
+	return utils.URL(fmt.Sprintf("/schedule/%d/edit/modal", id))
 }
 
 func FormatScheduledClassRate(rate float64, currency string) string {

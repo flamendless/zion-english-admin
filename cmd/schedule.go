@@ -24,6 +24,14 @@ import (
 )
 
 func handleSchedulePath(w http.ResponseWriter, r *http.Request) {
+	if id, ok := extractPathID(r, "schedule", "/edit/modal"); ok {
+		handleScheduledClassEditModal(w, r, id)
+		return
+	}
+	if id, ok := extractPathID(r, "schedule", "/conduct"); ok {
+		handleConductScheduledClass(w, r, id)
+		return
+	}
 	if id, ok := extractPathID(r, "schedule", "/edit"); ok {
 		handleScheduledClassEdit(w, r, id)
 		return
@@ -376,29 +384,24 @@ func handleCancelScheduledClass(w http.ResponseWriter, r *http.Request, schedule
 		sendErrorLog(w, err.Error())
 		return
 	}
+	notes := strings.TrimSpace(r.FormValue("notes"))
 
 	if meetingSvc != nil {
 		_ = meetingSvc.DeleteRoomForSchedule(ctx, scheduleID, existing.TeacherID)
 	}
 
-	err = dbRW.GetQueries().UpdateScheduledClassStatus(ctx, queries.UpdateScheduledClassStatusParams{
-		Status:   "cancelled",
-		Reason:   sql.NullString{String: reason, Valid: true},
-		ID:       scheduleID,
-	})
-	if err != nil {
+	if err := insertClassRecordFromSchedule(ctx, user, existing, scheduleID, "cancelled", reason, notes); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
 
+	insertAuditLogAs(ctx, user, "classes", fmt.Sprintf("recorded class for student id %d (teacher id %d, date %s, status cancelled)", existing.StudentID, existing.TeacherID, existing.ScheduledDate))
 	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("cancelled scheduled class id %d (student id %d, date %s)", scheduleID, existing.StudentID, existing.ScheduledDate))
 	actor := auth.GetUser(ctx)
 	notifyCrossParty(ctx, actor, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
 		fmt.Sprintf("Scheduled class on %s was cancelled", existing.ScheduledDate))
 
-	if _, err := fmt.Fprint(w, "Class cancelled.\n"); err != nil {
-		sendErrorLog(w, err.Error())
-	}
+	respondScheduledClassAction(w, r.FormValue("from"), "Class cancelled.")
 }
 
 func handleRescheduleScheduledClass(w http.ResponseWriter, r *http.Request, scheduleID int64) {
@@ -611,9 +614,6 @@ func editScheduleData(ctx context.Context, scheduleID int64, lockTeacher, isSupe
 func handleScheduledClassEdit(w http.ResponseWriter, r *http.Request, scheduleID int64) {
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
-	role := auth.GetRole(ctx)
-	lockTeacher := role == auth.RoleTeacher
-	isSuperuser := role == auth.RoleSuperuser
 
 	existing, err := dbRO.GetQueries().GetScheduledClassByID(ctx, scheduleID)
 	if err != nil {
@@ -633,13 +633,7 @@ func handleScheduledClassEdit(w http.ResponseWriter, r *http.Request, scheduleID
 	}
 
 	if r.Method == http.MethodGet {
-		data, err := editScheduleData(ctx, scheduleID, lockTeacher, isSuperuser)
-		if err != nil {
-			HttpError(w, err.Error(), http.StatusForbidden)
-			return
-		}
-		w.Header().Set("Content-Type", "text/html")
-		frontend.EditSchedule(data).Render(ctx, w)
+		HttpRedirect(w, r, "/schedule")
 		return
 	}
 
@@ -658,46 +652,71 @@ func handleScheduledClassEdit(w http.ResponseWriter, r *http.Request, scheduleID
 		sendErrorLog(w, "student is required")
 		return
 	}
-	rate, err := requireFloat64(r.FormValue("rate"))
-	if err != nil {
-		sendErrorLog(w, err.Error())
+
+	newDate := r.FormValue("scheduled_date")
+	if newDate == "" {
+		newDate = r.FormValue("date")
+	}
+	if newDate == "" {
+		sendErrorLog(w, "date is required")
 		return
 	}
-	currency := r.FormValue("currency")
-	if err := validateScheduledClassRateCurrency(rate, currency); err != nil {
-		sendErrorLog(w, err.Error())
+	if _, err := utils.ParseDatePHT(newDate); err != nil {
+		sendErrorLog(w, "invalid date format")
 		return
 	}
 
-	startTime := ""
+	startTime := normalizeScheduleStartTime(r.FormValue("start_time"))
+	endTime := r.FormValue("end_time")
+	duration, err := utils.DurationMinutesFromRange(startTime, endTime)
+	if err != nil {
+		sendErrorLog(w, friendlyTimeRangeError(err).Error())
+		return
+	}
+
+	existingStart := ""
 	if existing.StartTime.Valid {
-		startTime = existing.StartTime.String
+		existingStart = existing.StartTime.String
+	}
+	if err := validateScheduleDateTimeChange(existing.ScheduledDate, existingStart, newDate, startTime); err != nil {
+		sendErrorLog(w, err.Error())
+		return
 	}
 
 	if err := rules.Validate(ctx, user, classrules.ScheduledClassInput{
 		ScheduleID:      scheduleID,
 		StudentID:       studentID,
 		TeacherID:       existing.TeacherID,
-		Date:            existing.ScheduledDate,
+		Date:            newDate,
 		StartTime:       startTime,
-		DurationMinutes: existing.DurationMinutes,
+		DurationMinutes: duration,
 	}); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
 
-	err = dbRW.GetQueries().UpdateScheduledClassDetails(ctx, queries.UpdateScheduledClassDetailsParams{
-		StudentID: studentID,
-		Rate:      rate,
-		Currency:  currency,
-		ID:        scheduleID,
+	var startTimeNull sql.NullString
+	if startTime != "" {
+		startTimeNull = sql.NullString{String: startTime, Valid: true}
+	}
+
+	err = dbRW.GetQueries().UpdateScheduledClassSchedule(ctx, queries.UpdateScheduledClassScheduleParams{
+		StudentID:       studentID,
+		ScheduledDate:   newDate,
+		StartTime:       startTimeNull,
+		DurationMinutes: duration,
+		ID:              scheduleID,
 	})
 	if err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
 
-	if studentID != existing.StudentID && meetingSvc != nil {
+	scheduleChanged := studentID != existing.StudentID ||
+		newDate != existing.ScheduledDate ||
+		startTime != existingStart ||
+		duration != existing.DurationMinutes
+	if scheduleChanged && meetingSvc != nil {
 		student, studentErr := dbRO.GetQueries().GetStudentByID(ctx, studentID)
 		studentName := "student"
 		if studentErr == nil {
@@ -707,9 +726,9 @@ func handleScheduledClassEdit(w http.ResponseWriter, r *http.Request, scheduleID
 			ScheduleID:      scheduleID,
 			TeacherID:       existing.TeacherID,
 			StudentName:     studentName,
-			ScheduledDate:   existing.ScheduledDate,
+			ScheduledDate:   newDate,
 			StartTime:       startTime,
-			DurationMinutes: existing.DurationMinutes,
+			DurationMinutes: duration,
 		}); err != nil {
 			logs.Log().Warn("zoom room sync failed after schedule edit",
 				zap.Error(err),
@@ -719,12 +738,167 @@ func handleScheduledClassEdit(w http.ResponseWriter, r *http.Request, scheduleID
 		}
 	}
 
-	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("updated scheduled class id %d (student id %d, rate %.2f %s)", scheduleID, studentID, rate, currency))
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("updated scheduled class id %d (student id %d, date %s)", scheduleID, studentID, newDate))
 	actor := auth.GetUser(ctx)
 	notifyCrossParty(ctx, actor, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
-		fmt.Sprintf("Scheduled class on %s was updated", existing.ScheduledDate))
+		fmt.Sprintf("Scheduled class on %s was updated", newDate))
 
-	if _, err := fmt.Fprint(w, "Scheduled class updated successfully!\n"); err != nil {
+	respondScheduledClassAction(w, r.FormValue("from"), "Scheduled class updated successfully!")
+}
+
+func handleScheduledClassEditModal(w http.ResponseWriter, r *http.Request, scheduleID int64) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx := r.Context()
+	user := auth.GetUser(ctx)
+	role := auth.GetRole(ctx)
+
+	existing, err := dbRO.GetQueries().GetScheduledClassByID(ctx, scheduleID)
+	if err != nil {
+		HttpError(w, "Scheduled class not found", http.StatusNotFound)
+		return
+	}
+
+	rules := classrules.ScheduledClassRules{DB: dbRO.GetQueries()}
+	if err := rules.ValidateAccess(existing.TeacherID, user); err != nil {
+		HttpError(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	if existing.Status != "scheduled" {
+		HttpError(w, "only scheduled classes can be edited", http.StatusBadRequest)
+		return
+	}
+
+	data, err := editScheduleData(ctx, scheduleID, role == auth.RoleTeacher, role == auth.RoleSuperuser)
+	if err != nil {
+		HttpError(w, err.Error(), http.StatusForbidden)
+		return
+	}
+	data.TodayPHT = utils.TodayPHT()
+	data.From = r.URL.Query().Get("from")
+
+	w.Header().Set("Content-Type", "text/html")
+	frontend.EditScheduledClassModalForm(data).Render(ctx, w)
+}
+
+func handleConductScheduledClass(w http.ResponseWriter, r *http.Request, scheduleID int64) {
+	if r.Method != http.MethodPost {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx := r.Context()
+	user := auth.GetUser(ctx)
+
+	existing, err := dbRO.GetQueries().GetScheduledClassByID(ctx, scheduleID)
+	if err != nil {
+		HttpError(w, "Scheduled class not found", http.StatusNotFound)
+		return
+	}
+
+	rules := classrules.ScheduledClassRules{DB: dbRO.GetQueries()}
+	if err := rules.ValidateAccess(existing.TeacherID, user); err != nil {
+		HttpError(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	if existing.Status != "scheduled" {
+		sendErrorLog(w, "only scheduled classes can be conducted")
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
+		return
+	}
+	notes := strings.TrimSpace(r.FormValue("notes"))
+
+	if err := insertClassRecordFromSchedule(ctx, user, existing, scheduleID, "conducted", "", notes); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("marked scheduled class id %d as conducted", scheduleID))
+	insertAuditLogAs(ctx, user, "classes", fmt.Sprintf("recorded class for student id %d (teacher id %d, date %s, status conducted)", existing.StudentID, existing.TeacherID, existing.ScheduledDate))
+	notifyCrossParty(ctx, user, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindClassRecorded,
+		fmt.Sprintf("Class recorded for student on %s (status conducted)", existing.ScheduledDate))
+
+	respondScheduledClassAction(w, r.FormValue("from"), "Class conducted successfully!")
+}
+
+func classRecordRequestFromSchedule(existing queries.GetScheduledClassByIDRow, status, reason, notes string) models.ClassRecordRequest {
+	startTime := ""
+	if existing.StartTime.Valid {
+		startTime = existing.StartTime.String
+	}
+	endTime := utils.EndTimeFromStartAndDuration(startTime, existing.DurationMinutes)
+	return models.ClassRecordRequest{
+		StudentID:       existing.StudentID,
+		TeacherID:       existing.TeacherID,
+		Date:            existing.ScheduledDate,
+		StartTime:       startTime,
+		EndTime:         endTime,
+		DurationMinutes: existing.DurationMinutes,
+		Rate:            existing.Rate,
+		Currency:        existing.Currency,
+		Status:          status,
+		Reason:          reason,
+		Notes:           notes,
+	}
+}
+
+func insertClassRecordFromSchedule(ctx context.Context, user auth.User, existing queries.GetScheduledClassByIDRow, scheduleID int64, status, reason, notes string) error {
+	req := classRecordRequestFromSchedule(existing, status, reason, notes)
+	if err := validateClassRecordRequest(&req); err != nil {
+		return err
+	}
+	if err := applyClassRecordRules(ctx, user, req, 0); err != nil {
+		return err
+	}
+
+	err := dbRW.GetQueries().InsertClassRecord(ctx, queries.InsertClassRecordParams{
+		StudentID:       req.StudentID,
+		TeacherID:       req.TeacherID,
+		Date:            req.Date,
+		StartTime:       sql.NullString{String: req.StartTime, Valid: req.StartTime != ""},
+		EndTime:         sql.NullString{String: req.EndTime, Valid: req.EndTime != ""},
+		DurationMinutes: req.DurationMinutes,
+		Rate:            req.Rate,
+		Currency:        req.Currency,
+		Status:          req.Status,
+		Reason:          sql.NullString{String: req.Reason, Valid: req.Reason != ""},
+		Notes:           sql.NullString{String: req.Notes, Valid: req.Notes != ""},
+		RecordedByRole:  string(user.Role),
+	})
+	if err != nil {
+		return err
+	}
+
+	return markScheduledClassConducted(ctx, scheduleID, req)
+}
+
+func validateScheduleDateTimeChange(existingDate, existingStart, newDate, newStart string) error {
+	if newDate == existingDate && normalizeScheduleStartTime(newStart) == normalizeScheduleStartTime(existingStart) {
+		return nil
+	}
+	if utils.IsDateTimeInPastPHT(newDate, newStart) {
+		return errors.New("date and time cannot be in the past")
+	}
+	return nil
+}
+
+func respondScheduledClassAction(w http.ResponseWriter, from, message string) {
+	setSuccessFlash(w, message)
+	if from == "schedule" {
+		w.Header().Set("HX-Trigger", `{"scheduleDayOpen":null,"refreshScheduleCalendar":null}`)
+	} else {
+		w.Header().Set("HX-Trigger", "classesRefresh")
+	}
+	if _, err := fmt.Fprint(w, message+"\n"); err != nil {
 		sendErrorLog(w, err.Error())
 	}
 }
