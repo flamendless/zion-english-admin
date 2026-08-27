@@ -90,8 +90,7 @@ func handleDeleteClassRecord(w http.ResponseWriter, r *http.Request, recordID in
 	}
 
 	insertAuditLogAs(ctx, user, "classes", fmt.Sprintf("deleted class record id %d (student id %d, date %s, reason: %s)", recordID, existing.StudentID, existing.Date, reason))
-	setSuccessFlash(w, "Class deleted successfully.")
-	HttpRedirect(w, r, "/classes")
+	respondScheduledClassAction(w, r.FormValue("from"), "Class deleted successfully.")
 }
 
 func classEditClassData(ctx context.Context, recordID int64, readonly bool) (frontend.EditClassData, error) {
@@ -394,17 +393,23 @@ func classesListCountParams(teacherID int64, startDate, endDate, statusFilter, n
 		Column5:         statusFilter,
 		Column6:         statusFilter,
 		Column7:         statusFilter,
+		Column8:         statusFilter,
+		Column9:         statusFilter,
+		Column10:        statusFilter,
 		Status:          statusFilter,
-		Column9:         nameFilter,
-		Column10:        sql.NullString{String: nameFilter, Valid: nameFilter != ""},
-		Column11:        teacherID,
+		Column12:        nameFilter,
+		Column13:        sql.NullString{String: nameFilter, Valid: nameFilter != ""},
+		Column14:        teacherID,
 		TeacherID_2:     teacherID,
 		ScheduledDate:   startDate,
 		ScheduledDate_2: endDate,
-		Column15:        statusFilter,
-		Column16:        statusFilter,
-		Column17:        nameFilter,
-		Column18:        sql.NullString{String: nameFilter, Valid: nameFilter != ""},
+		Column18:        statusFilter,
+		Column19:        statusFilter,
+		Column20:        statusFilter,
+		Column21:        statusFilter,
+		Column22:        statusFilter,
+		Column23:        nameFilter,
+		Column24:        sql.NullString{String: nameFilter, Valid: nameFilter != ""},
 	}
 }
 
@@ -417,17 +422,23 @@ func classesListListParams(teacherID int64, startDate, endDate, statusFilter, na
 		Column5:         statusFilter,
 		Column6:         statusFilter,
 		Column7:         statusFilter,
+		Column8:         statusFilter,
+		Column9:         statusFilter,
+		Column10:        statusFilter,
 		Status:          statusFilter,
-		Column9:         nameFilter,
-		Column10:        sql.NullString{String: nameFilter, Valid: nameFilter != ""},
-		Column11:        teacherID,
+		Column12:        nameFilter,
+		Column13:        sql.NullString{String: nameFilter, Valid: nameFilter != ""},
+		Column14:        teacherID,
 		TeacherID_2:     teacherID,
 		ScheduledDate:   startDate,
 		ScheduledDate_2: endDate,
-		Column15:        statusFilter,
-		Column16:        statusFilter,
-		Column17:        nameFilter,
-		Column18:        sql.NullString{String: nameFilter, Valid: nameFilter != ""},
+		Column18:        statusFilter,
+		Column19:        statusFilter,
+		Column20:        statusFilter,
+		Column21:        statusFilter,
+		Column22:        statusFilter,
+		Column23:        nameFilter,
+		Column24:        sql.NullString{String: nameFilter, Valid: nameFilter != ""},
 		Limit:           limit,
 		Offset:          offset,
 	}

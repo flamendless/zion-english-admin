@@ -72,16 +72,7 @@ templ Classes(data ClassesData) {
 					<input type="text" id="studentSearch" name="q" placeholder="Search student name..."/>
 				</div>
 				@DatePreset(true)
-				<div class="form-group">
-					<label for="statusFilter">Status</label>
-					<select id="statusFilter" name="status">
-						<option value="">All</option>
-						<option value="scheduled">Scheduled</option>
-						<option value="conducted">Conducted</option>
-						<option value="cancelled">Cancelled</option>
-						<option value="rescheduled">Rescheduled</option>
-					</select>
-				</div>
+				@ClassesStatusFilterDropdown()
 				<input type="hidden" id="classesPage" name="page" value="1"/>
 				<button
 					type="button"

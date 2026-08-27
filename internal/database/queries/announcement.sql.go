@@ -57,9 +57,9 @@ FROM tbl_announcements
 WHERE date(?) BETWEEN start_date AND end_date
 AND status = 'published'
 ORDER BY
-    CASE level WHEN 'critical' THEN 0 WHEN 'warning' THEN 1 ELSE 2 END,
-    start_date ASC,
-    id ASC
+	CASE level WHEN 'critical' THEN 0 WHEN 'warning' THEN 1 ELSE 2 END,
+	start_date ASC,
+	id ASC
 `
 
 type GetActiveAnnouncementsAllRow struct {
@@ -119,16 +119,16 @@ FROM tbl_announcements a
 WHERE date(?) BETWEEN a.start_date AND a.end_date
 AND a.status = 'published'
 AND (
-    a.visible_to_all = 1
-    OR EXISTS (
-        SELECT 1 FROM tbl_announcements_teachers_m2m m
-        WHERE m.announcement_id = a.id AND m.teacher_id = ?
-    )
+	a.visible_to_all = 1
+	OR EXISTS (
+		SELECT 1 FROM tbl_announcements_teachers_m2m m
+		WHERE m.announcement_id = a.id AND m.teacher_id = ?
+	)
 )
 ORDER BY
-    CASE a.level WHEN 'critical' THEN 0 WHEN 'warning' THEN 1 ELSE 2 END,
-    a.start_date ASC,
-    a.id ASC
+	CASE a.level WHEN 'critical' THEN 0 WHEN 'warning' THEN 1 ELSE 2 END,
+	a.start_date ASC,
+	a.id ASC
 `
 
 type GetActiveAnnouncementsForTeacherParams struct {

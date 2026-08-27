@@ -1,22 +1,23 @@
 package frontend
 
 import (
+	"strings"
 	"zion-english/internal/announcements"
 	"zion-english/internal/utils"
 )
 
 type AnnouncementListItem struct {
-	ID                     string
-	Title                  string
-	Level                  string
-	StartDate              string
-	EndDate                string
-	Audience               string
-	Schedule               string
-	ScheduleClass          string
-	PublicationStatus      string
-	PublicationStatusClass string
-	IsDeleted              bool
+	ID                string
+	Title             string
+	Level             string
+	StartDate         string
+	EndDate           string
+	Audience          string
+	Schedule          string
+	ScheduleTone      PillTone
+	PublicationStatus string
+	PublicationTone   PillTone
+	IsDeleted         bool
 }
 
 type AnnouncementListData struct {
@@ -68,6 +69,10 @@ func announcementLevelLabel(level string) string {
 	default:
 		return "Info"
 	}
+}
+
+func announcementLevelPillLabel(level string) string {
+	return strings.ToUpper(announcementLevelLabel(level))
 }
 
 func getAnnouncementRowClass(isDeleted bool) string {
@@ -172,17 +177,15 @@ templ Announcements(data AnnouncementListData) {
 										<span class="announcement-list-title">{ item.Title }</span>
 									</td>
 									<td data-label="Level">
-										<span class={ "announcement-level-pill announcement-level-pill--" + item.Level }>
-											{ announcementLevelLabel(item.Level) }
-										</span>
+										@Pill(announcementLevelPillLabel(item.Level), AnnouncementLevelPillTone(item.Level))
 									</td>
 									<td data-label="Schedule">
 										<span class="announcement-schedule">{ item.StartDate } → { item.EndDate }</span>
-										<span class={ "announcement-window-status " + item.ScheduleClass }>{ item.Schedule }</span>
+										@StatusPill(item.Schedule, item.ScheduleTone, false)
 									</td>
 									<td data-label="Audience">{ item.Audience }</td>
 									<td data-label="Status">
-										<span class={ item.PublicationStatusClass }>{ item.PublicationStatus }</span>
+										@StatusPill(item.PublicationStatus, item.PublicationTone, false)
 									</td>
 									<td data-label="Actions">
 										if !item.IsDeleted {
@@ -790,19 +793,6 @@ templ AnnouncementPageStyles() {
 			font-weight: 500;
 		}
 
-		.announcement-level-pill {
-			display: inline-block;
-			padding: 2px 10px;
-			border-radius: var(--radius-full);
-			font-size: 0.75rem;
-			font-weight: 600;
-			text-transform: uppercase;
-			letter-spacing: 0.03em;
-		}
-		.announcement-level-pill--info { background: var(--color-info-bg); color: #0C4A6E; }
-		.announcement-level-pill--warning { background: var(--color-warning-bg); color: #7A4E00; }
-		.announcement-level-pill--critical { background: var(--color-error-bg); color: #7F1D1D; }
-
 		.announcement-schedule {
 			font-family: 'Fira Code', monospace;
 			font-size: 0.8125rem;
@@ -810,12 +800,8 @@ templ AnnouncementPageStyles() {
 			display: block;
 		}
 
-		.announcement-window-status {
-			display: inline-block;
+		.announcement-schedule + .status-pill {
 			margin-top: var(--space-1);
-			font-family: 'Fira Sans', sans-serif;
-			font-size: 0.75rem;
-			font-weight: 600;
 		}
 
 		.announcement-deleted {

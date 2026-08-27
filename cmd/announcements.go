@@ -62,17 +62,17 @@ func handleAnnouncements(w http.ResponseWriter, r *http.Request) {
 		}
 		isDeleted := row.Status == announcements.StatusDeleted
 		items = append(items, frontend.AnnouncementListItem{
-			ID:                     strconv.FormatInt(row.ID, 10),
-			Title:                  row.Title,
-			Level:                  row.Level,
-			StartDate:              row.StartDate,
-			EndDate:                row.EndDate,
-			Audience:               audience,
-			Schedule:               announcementSchedule(today, row.StartDate, row.EndDate),
-			ScheduleClass:          announcementScheduleClass(today, row.StartDate, row.EndDate),
-			PublicationStatus:      announcementPublicationStatus(row.Status),
-			PublicationStatusClass: announcementPublicationStatusClass(row.Status),
-			IsDeleted:              isDeleted,
+			ID:                strconv.FormatInt(row.ID, 10),
+			Title:             row.Title,
+			Level:             row.Level,
+			StartDate:         row.StartDate,
+			EndDate:           row.EndDate,
+			Audience:          audience,
+			Schedule:          announcementSchedule(today, row.StartDate, row.EndDate),
+			ScheduleTone:      announcementScheduleTone(today, row.StartDate, row.EndDate),
+			PublicationStatus: announcementPublicationStatus(row.Status),
+			PublicationTone:   announcementPublicationTone(row.Status),
+			IsDeleted:         isDeleted,
 		})
 	}
 
@@ -388,15 +388,8 @@ func announcementSchedule(today, start, end string) string {
 	return "Active"
 }
 
-func announcementScheduleClass(today, start, end string) string {
-	switch announcementSchedule(today, start, end) {
-	case "Active":
-		return "status-active"
-	case "Upcoming":
-		return "status-pending"
-	default:
-		return "status-inactive"
-	}
+func announcementScheduleTone(today, start, end string) frontend.PillTone {
+	return frontend.AnnouncementSchedulePillTone(announcementSchedule(today, start, end))
 }
 
 func announcementPublicationStatus(status string) string {
@@ -410,13 +403,6 @@ func announcementPublicationStatus(status string) string {
 	}
 }
 
-func announcementPublicationStatusClass(status string) string {
-	switch status {
-	case announcements.StatusPublished:
-		return "status-active"
-	case announcements.StatusDraft:
-		return "status-pending"
-	default:
-		return "status-inactive"
-	}
+func announcementPublicationTone(status string) frontend.PillTone {
+	return frontend.AnnouncementPublicationPillTone(status)
 }

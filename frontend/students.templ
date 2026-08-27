@@ -33,13 +33,6 @@ type StudentItem struct {
 	UpdatedAt        string
 }
 
-func getStatusClass(status string) string {
-	if status == "active" {
-		return "status-active"
-	}
-	return "status-inactive"
-}
-
 func getStudentRowClass(status string) string {
 	if status == "inactive" {
 		return "student-inactive"
@@ -86,7 +79,9 @@ templ Students(data StudentData) {
 									<td data-label="Teacher">{ getDisplayValue(student.TeacherDisplay) }</td>
 									<td class="rate-cell" data-label="Rate">{ formatRate(student.RatePerClass, student.Currency) }</td>
 									<td data-label="Related To">{ getDisplayValue(student.RelatedToDisplay) }</td>
-									<td class={ getStatusClass(student.Status) } data-label="Status">{ student.Status }</td>
+									<td data-label="Status">
+										@StatusPill(capitalizeStatus(student.Status), StudentStatusPillTone(student.Status), false)
+									</td>
 									<td data-label="Actions">
 										<div class="table-actions">
 											@IconActionLink(utils.URL("/students/" + student.ID + "/view"), "View", IconKindView)

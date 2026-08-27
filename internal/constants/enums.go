@@ -14,7 +14,12 @@ func ValidStudentStatus(status string) bool {
 }
 
 func ValidClassStatus(status string) bool {
-	return status == "conducted" || status == "cancelled" || status == "rescheduled"
+	switch ClassStatus(status) {
+	case ClassStatusConducted, ClassStatusCancelled, ClassStatusRescheduled:
+		return true
+	default:
+		return false
+	}
 }
 
 func ValidSex(sex string) bool {

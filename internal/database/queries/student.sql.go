@@ -49,8 +49,8 @@ SELECT COUNT(DISTINCT s.id) as count
 FROM tbl_students s
 LEFT JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE (? = '' OR s.name LIKE '%' || ? || '%')
-  AND (? = '' OR s.status = ?)
-  AND (? = 0 OR m2m.teacher_id = ?)
+	AND (? = '' OR s.status = ?)
+	AND (? = 0 OR m2m.teacher_id = ?)
 `
 
 type CountStudentsFilteredParams struct {
@@ -231,8 +231,8 @@ SELECT DISTINCT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_
 FROM tbl_students s
 LEFT JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE (? = '' OR s.name LIKE '%' || ? || '%')
-  AND (? = '' OR s.status = ?)
-  AND (? = 0 OR m2m.teacher_id = ?)
+	AND (? = '' OR s.status = ?)
+	AND (? = 0 OR m2m.teacher_id = ?)
 ORDER BY s.created_at DESC
 LIMIT ? OFFSET ?
 `

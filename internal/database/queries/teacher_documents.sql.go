@@ -15,7 +15,7 @@ SELECT COUNT(*) AS count
 FROM tbl_teacher_documents d
 INNER JOIN tbl_teachers t ON t.id = d.teacher_id
 WHERE t.deleted = 0
-  AND d.status = ?
+	AND d.status = ?
 `
 
 func (q *Queries) CountTeacherDocumentsByStatus(ctx context.Context, status string) (int64, error) {
@@ -36,18 +36,23 @@ func (q *Queries) DeleteTeacherDocument(ctx context.Context, id int64) error {
 
 const getAllTeacherDocuments = `-- name: GetAllTeacherDocuments :many
 SELECT
-    d.id,
-    d.teacher_id,
-    trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
-    d.type,
-    d.original_filename,
-    d.stored_filename,
-    d.file_extension,
-    d.file_size,
-    d.status,
-    d.uploaded_at,
-    d.reviewed_at,
-    d.reviewed_by
+	d.id,
+	d.teacher_id,
+	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
+	t.first_name AS teacher_first_name,
+	t.middle_name AS teacher_middle_name,
+	t.last_name AS teacher_last_name,
+	t.profile_picture AS teacher_profile_picture,
+	t.assigned_color AS teacher_assigned_color,
+	d.type,
+	d.original_filename,
+	d.stored_filename,
+	d.file_extension,
+	d.file_size,
+	d.status,
+	d.uploaded_at,
+	d.reviewed_at,
+	d.reviewed_by
 FROM tbl_teacher_documents d
 INNER JOIN tbl_teachers t ON t.id = d.teacher_id
 WHERE t.deleted = 0
@@ -55,18 +60,23 @@ ORDER BY d.uploaded_at DESC
 `
 
 type GetAllTeacherDocumentsRow struct {
-	ID               int64
-	TeacherID        int64
-	TeacherName      string
-	Type             string
-	OriginalFilename string
-	StoredFilename   string
-	FileExtension    string
-	FileSize         int64
-	Status           string
-	UploadedAt       sql.NullTime
-	ReviewedAt       sql.NullTime
-	ReviewedBy       sql.NullInt64
+	ID                    int64
+	TeacherID             int64
+	TeacherName           string
+	TeacherFirstName      string
+	TeacherMiddleName     string
+	TeacherLastName       string
+	TeacherProfilePicture sql.NullString
+	TeacherAssignedColor  string
+	Type                  string
+	OriginalFilename      string
+	StoredFilename        string
+	FileExtension         string
+	FileSize              int64
+	Status                string
+	UploadedAt            sql.NullTime
+	ReviewedAt            sql.NullTime
+	ReviewedBy            sql.NullInt64
 }
 
 func (q *Queries) GetAllTeacherDocuments(ctx context.Context) ([]GetAllTeacherDocumentsRow, error) {
@@ -82,6 +92,127 @@ func (q *Queries) GetAllTeacherDocuments(ctx context.Context) ([]GetAllTeacherDo
 			&i.ID,
 			&i.TeacherID,
 			&i.TeacherName,
+			&i.TeacherFirstName,
+			&i.TeacherMiddleName,
+			&i.TeacherLastName,
+			&i.TeacherProfilePicture,
+			&i.TeacherAssignedColor,
+			&i.Type,
+			&i.OriginalFilename,
+			&i.StoredFilename,
+			&i.FileExtension,
+			&i.FileSize,
+			&i.Status,
+			&i.UploadedAt,
+			&i.ReviewedAt,
+			&i.ReviewedBy,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllTeacherDocumentsFiltered = `-- name: GetAllTeacherDocumentsFiltered :many
+SELECT
+	d.id,
+	d.teacher_id,
+	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
+	t.first_name AS teacher_first_name,
+	t.middle_name AS teacher_middle_name,
+	t.last_name AS teacher_last_name,
+	t.profile_picture AS teacher_profile_picture,
+	t.assigned_color AS teacher_assigned_color,
+	d.type,
+	d.original_filename,
+	d.stored_filename,
+	d.file_extension,
+	d.file_size,
+	d.status,
+	d.uploaded_at,
+	d.reviewed_at,
+	d.reviewed_by
+FROM tbl_teacher_documents d
+INNER JOIN tbl_teachers t ON t.id = d.teacher_id
+WHERE t.deleted = 0
+	AND (? = '' OR d.type = ?)
+	AND (? = '' OR d.status = ?)
+	AND (? = 0 OR d.teacher_id = ?)
+	AND (
+	? = ''
+	OR d.original_filename LIKE '%' || ? || '%'
+	OR trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) LIKE '%' || ? || '%'
+	)
+ORDER BY d.uploaded_at DESC
+`
+
+type GetAllTeacherDocumentsFilteredParams struct {
+	Column1   interface{}
+	Type      string
+	Column3   interface{}
+	Status    string
+	Column5   interface{}
+	TeacherID int64
+	Column7   interface{}
+	Column8   sql.NullString
+	Column9   sql.NullString
+}
+
+type GetAllTeacherDocumentsFilteredRow struct {
+	ID                    int64
+	TeacherID             int64
+	TeacherName           string
+	TeacherFirstName      string
+	TeacherMiddleName     string
+	TeacherLastName       string
+	TeacherProfilePicture sql.NullString
+	TeacherAssignedColor  string
+	Type                  string
+	OriginalFilename      string
+	StoredFilename        string
+	FileExtension         string
+	FileSize              int64
+	Status                string
+	UploadedAt            sql.NullTime
+	ReviewedAt            sql.NullTime
+	ReviewedBy            sql.NullInt64
+}
+
+func (q *Queries) GetAllTeacherDocumentsFiltered(ctx context.Context, arg GetAllTeacherDocumentsFilteredParams) ([]GetAllTeacherDocumentsFilteredRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllTeacherDocumentsFiltered,
+		arg.Column1,
+		arg.Type,
+		arg.Column3,
+		arg.Status,
+		arg.Column5,
+		arg.TeacherID,
+		arg.Column7,
+		arg.Column8,
+		arg.Column9,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllTeacherDocumentsFilteredRow
+	for rows.Next() {
+		var i GetAllTeacherDocumentsFilteredRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.TeacherID,
+			&i.TeacherName,
+			&i.TeacherFirstName,
+			&i.TeacherMiddleName,
+			&i.TeacherLastName,
+			&i.TeacherProfilePicture,
+			&i.TeacherAssignedColor,
 			&i.Type,
 			&i.OriginalFilename,
 			&i.StoredFilename,
@@ -107,17 +238,17 @@ func (q *Queries) GetAllTeacherDocuments(ctx context.Context) ([]GetAllTeacherDo
 
 const getTeacherDocumentByID = `-- name: GetTeacherDocumentByID :one
 SELECT
-    id,
-    teacher_id,
-    type,
-    original_filename,
-    stored_filename,
-    file_extension,
-    file_size,
-    status,
-    uploaded_at,
-    reviewed_at,
-    reviewed_by
+	id,
+	teacher_id,
+	type,
+	original_filename,
+	stored_filename,
+	file_extension,
+	file_size,
+	status,
+	uploaded_at,
+	reviewed_at,
+	reviewed_by
 FROM tbl_teacher_documents
 WHERE id = ?
 `
@@ -143,17 +274,17 @@ func (q *Queries) GetTeacherDocumentByID(ctx context.Context, id int64) (TblTeac
 
 const getTeacherDocumentsByTeacherID = `-- name: GetTeacherDocumentsByTeacherID :many
 SELECT
-    id,
-    teacher_id,
-    type,
-    original_filename,
-    stored_filename,
-    file_extension,
-    file_size,
-    status,
-    uploaded_at,
-    reviewed_at,
-    reviewed_by
+	id,
+	teacher_id,
+	type,
+	original_filename,
+	stored_filename,
+	file_extension,
+	file_size,
+	status,
+	uploaded_at,
+	reviewed_at,
+	reviewed_by
 FROM tbl_teacher_documents
 WHERE teacher_id = ?
 ORDER BY uploaded_at DESC
@@ -194,12 +325,86 @@ func (q *Queries) GetTeacherDocumentsByTeacherID(ctx context.Context, teacherID 
 	return items, nil
 }
 
+const getTeacherDocumentsByTeacherIDFiltered = `-- name: GetTeacherDocumentsByTeacherIDFiltered :many
+SELECT
+	id,
+	teacher_id,
+	type,
+	original_filename,
+	stored_filename,
+	file_extension,
+	file_size,
+	status,
+	uploaded_at,
+	reviewed_at,
+	reviewed_by
+FROM tbl_teacher_documents
+WHERE teacher_id = ?
+	AND (? = '' OR type = ?)
+	AND (? = '' OR status = ?)
+	AND (? = '' OR original_filename LIKE '%' || ? || '%')
+ORDER BY uploaded_at DESC
+`
+
+type GetTeacherDocumentsByTeacherIDFilteredParams struct {
+	TeacherID int64
+	Column2   interface{}
+	Type      string
+	Column4   interface{}
+	Status    string
+	Column6   interface{}
+	Column7   sql.NullString
+}
+
+func (q *Queries) GetTeacherDocumentsByTeacherIDFiltered(ctx context.Context, arg GetTeacherDocumentsByTeacherIDFilteredParams) ([]TblTeacherDocument, error) {
+	rows, err := q.db.QueryContext(ctx, getTeacherDocumentsByTeacherIDFiltered,
+		arg.TeacherID,
+		arg.Column2,
+		arg.Type,
+		arg.Column4,
+		arg.Status,
+		arg.Column6,
+		arg.Column7,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TblTeacherDocument
+	for rows.Next() {
+		var i TblTeacherDocument
+		if err := rows.Scan(
+			&i.ID,
+			&i.TeacherID,
+			&i.Type,
+			&i.OriginalFilename,
+			&i.StoredFilename,
+			&i.FileExtension,
+			&i.FileSize,
+			&i.Status,
+			&i.UploadedAt,
+			&i.ReviewedAt,
+			&i.ReviewedBy,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const hasBlockingTeacherDocument = `-- name: HasBlockingTeacherDocument :one
 SELECT COUNT(*) AS count
 FROM tbl_teacher_documents
 WHERE teacher_id = ?
-  AND type = 'document'
-  AND status IN ('submitted', 'approved')
+	AND type = 'document'
+	AND status IN ('submitted', 'approved')
 `
 
 func (q *Queries) HasBlockingTeacherDocument(ctx context.Context, teacherID int64) (int64, error) {
@@ -211,7 +416,7 @@ func (q *Queries) HasBlockingTeacherDocument(ctx context.Context, teacherID int6
 
 const insertTeacherDocument = `-- name: InsertTeacherDocument :exec
 INSERT INTO tbl_teacher_documents (
-    teacher_id, type, original_filename, stored_filename, file_extension, file_size, status
+	teacher_id, type, original_filename, stored_filename, file_extension, file_size, status
 ) VALUES (?, ?, ?, ?, ?, ?, ?)
 `
 
@@ -241,8 +446,8 @@ func (q *Queries) InsertTeacherDocument(ctx context.Context, arg InsertTeacherDo
 const updateTeacherDocumentStatus = `-- name: UpdateTeacherDocumentStatus :exec
 UPDATE tbl_teacher_documents
 SET status = ?,
-    reviewed_at = CURRENT_TIMESTAMP,
-    reviewed_by = ?
+	reviewed_at = CURRENT_TIMESTAMP,
+	reviewed_by = ?
 WHERE id = ?
 `
 

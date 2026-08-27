@@ -14,8 +14,8 @@ const countProcessingLogsFiltered = `-- name: CountProcessingLogsFiltered :one
 SELECT COUNT(*) as count
 FROM tbl_processing_logs
 WHERE (? = '' OR name LIKE '%' || ? || '%')
-  AND (? = '' OR created_at >= ?)
-  AND (? = '' OR created_at <= ?)
+	AND (? = '' OR created_at >= ?)
+	AND (? = '' OR created_at <= ?)
 `
 
 type CountProcessingLogsFilteredParams struct {
@@ -43,7 +43,7 @@ func (q *Queries) CountProcessingLogsFiltered(ctx context.Context, arg CountProc
 
 const getAllProcessingLogs = `-- name: GetAllProcessingLogs :many
 SELECT id, google_drive_url, name, template, start_date, end_date,
-       excluded_rows, useragent, output_path, errors, created_at
+	excluded_rows, useragent, output_path, errors, created_at
 FROM tbl_processing_logs
 ORDER BY created_at DESC
 `
@@ -85,7 +85,7 @@ func (q *Queries) GetAllProcessingLogs(ctx context.Context) ([]TblProcessingLog,
 
 const getProcessingLogByID = `-- name: GetProcessingLogByID :one
 SELECT id, google_drive_url, name, template, start_date, end_date,
-       excluded_rows, useragent, output_path, errors, created_at
+	excluded_rows, useragent, output_path, errors, created_at
 FROM tbl_processing_logs
 WHERE id = ?
 `
@@ -111,11 +111,11 @@ func (q *Queries) GetProcessingLogByID(ctx context.Context, id int64) (TblProces
 
 const getProcessingLogsFiltered = `-- name: GetProcessingLogsFiltered :many
 SELECT id, google_drive_url, name, template, start_date, end_date,
-       excluded_rows, useragent, output_path, errors, created_at
+	excluded_rows, useragent, output_path, errors, created_at
 FROM tbl_processing_logs
 WHERE (? = '' OR name LIKE '%' || ? || '%')
-  AND (? = '' OR created_at >= ?)
-  AND (? = '' OR created_at <= ?)
+	AND (? = '' OR created_at >= ?)
+	AND (? = '' OR created_at <= ?)
 ORDER BY created_at DESC
 LIMIT ? OFFSET ?
 `
@@ -177,8 +177,8 @@ func (q *Queries) GetProcessingLogsFiltered(ctx context.Context, arg GetProcessi
 
 const insertProcessingLog = `-- name: InsertProcessingLog :exec
 INSERT INTO tbl_processing_logs (
-    google_drive_url, name, template, start_date, end_date,
-    excluded_rows, useragent, output_path, errors
+	google_drive_url, name, template, start_date, end_date,
+	excluded_rows, useragent, output_path, errors
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 

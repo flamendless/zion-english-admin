@@ -1,11 +1,11 @@
 -- +goose Up
 CREATE TABLE IF NOT EXISTS tbl_teachers_students_m2m (
-    teacher_id INTEGER NOT NULL,
-    student_id INTEGER NOT NULL,
-    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-    PRIMARY KEY (teacher_id, student_id),
-    FOREIGN KEY (teacher_id) REFERENCES tbl_teachers(id) ON DELETE CASCADE,
-    FOREIGN KEY (student_id) REFERENCES tbl_students(id) ON DELETE CASCADE
+	teacher_id INTEGER NOT NULL,
+	student_id INTEGER NOT NULL,
+	created_at TEXT NOT NULL DEFAULT (datetime('now')),
+	PRIMARY KEY (teacher_id, student_id),
+	FOREIGN KEY (teacher_id) REFERENCES tbl_teachers(id) ON DELETE CASCADE,
+	FOREIGN KEY (student_id) REFERENCES tbl_students(id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_teachers_students_m2m_teacher_id ON tbl_teachers_students_m2m(teacher_id);

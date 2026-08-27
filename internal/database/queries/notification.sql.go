@@ -13,7 +13,7 @@ import (
 const countNotificationsForSuperuser = `-- name: CountNotificationsForSuperuser :one
 SELECT COUNT(*) FROM tbl_notifications
 WHERE to_teacher_id IS NULL
-  AND (? = 0 OR read = 0)
+	AND (? = 0 OR read = 0)
 `
 
 func (q *Queries) CountNotificationsForSuperuser(ctx context.Context, dollar_1 interface{}) (int64, error) {
@@ -26,7 +26,7 @@ func (q *Queries) CountNotificationsForSuperuser(ctx context.Context, dollar_1 i
 const countNotificationsForTeacher = `-- name: CountNotificationsForTeacher :one
 SELECT COUNT(*) FROM tbl_notifications
 WHERE to_teacher_id = ?
-  AND (? = 0 OR read = 0)
+	AND (? = 0 OR read = 0)
 `
 
 type CountNotificationsForTeacherParams struct {
@@ -67,19 +67,19 @@ func (q *Queries) CountUnreadNotificationsForTeacher(ctx context.Context, toTeac
 
 const getMissedScheduledClasses = `-- name: GetMissedScheduledClasses :many
 SELECT
-    sc.id,
-    sc.teacher_id,
-    sc.scheduled_date,
-    sc.start_time,
-    sc.duration_minutes,
-    s.name AS student_name,
-    trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name
+	sc.id,
+	sc.teacher_id,
+	sc.scheduled_date,
+	sc.start_time,
+	sc.duration_minutes,
+	s.name AS student_name,
+	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name
 FROM tbl_scheduled_classes sc
 JOIN tbl_students s ON s.id = sc.student_id
 JOIN tbl_teachers t ON t.id = sc.teacher_id
 WHERE sc.status = 'scheduled'
-  AND sc.deleted_at IS NULL
-  AND datetime(sc.scheduled_date || ' ' || COALESCE(sc.start_time, '00:00'), '+' || sc.duration_minutes || ' minutes') < ?
+	AND sc.deleted_at IS NULL
+	AND datetime(sc.scheduled_date || ' ' || COALESCE(sc.start_time, '00:00'), '+' || sc.duration_minutes || ' minutes') < ?
 `
 
 type GetMissedScheduledClassesRow struct {
@@ -182,7 +182,7 @@ const getNotificationsPagedForSuperuser = `-- name: GetNotificationsPagedForSupe
 SELECT id, from_teacher_id, from_name, to_teacher_id, to_name, message, kind, dedupe_key, read, read_at, created_at
 FROM tbl_notifications
 WHERE to_teacher_id IS NULL
-  AND (? = 0 OR read = 0)
+	AND (? = 0 OR read = 0)
 ORDER BY created_at DESC, id DESC
 LIMIT ? OFFSET ?
 `
@@ -232,7 +232,7 @@ const getNotificationsPagedForTeacher = `-- name: GetNotificationsPagedForTeache
 SELECT id, from_teacher_id, from_name, to_teacher_id, to_name, message, kind, dedupe_key, read, read_at, created_at
 FROM tbl_notifications
 WHERE to_teacher_id = ?
-  AND (? = 0 OR read = 0)
+	AND (? = 0 OR read = 0)
 ORDER BY created_at DESC, id DESC
 LIMIT ? OFFSET ?
 `
@@ -377,17 +377,17 @@ func (q *Queries) GetRecentNotificationsForTeacher(ctx context.Context, arg GetR
 
 const insertNotification = `-- name: InsertNotification :exec
 INSERT OR IGNORE INTO tbl_notifications (
-    from_teacher_id,
-    from_name,
-    to_teacher_id,
-    to_name,
-    message,
-    kind,
-    dedupe_key,
-    read,
-    created_at
+	from_teacher_id,
+	from_name,
+	to_teacher_id,
+	to_name,
+	message,
+	kind,
+	dedupe_key,
+	read,
+	created_at
 ) VALUES (
-    ?, ?, ?, ?, ?, ?, ?, 0, datetime('now')
+	?, ?, ?, ?, ?, ?, ?, 0, datetime('now')
 )
 `
 

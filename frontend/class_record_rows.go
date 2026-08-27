@@ -53,8 +53,14 @@ func (r ClassRecordRowData) IsScheduled() bool {
 	return r.Source == "scheduled"
 }
 
+func (r ClassRecordRowData) IsDeleted() bool {
+	return r.Status == "deleted"
+}
+
 func (r ClassRecordRowData) RowClass() string {
 	switch {
+	case r.IsDeleted():
+		return "row-deleted"
 	case r.Status == "cancelled":
 		return "row-cancelled"
 	case r.Status == "rescheduled":

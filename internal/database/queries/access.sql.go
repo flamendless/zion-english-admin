@@ -11,17 +11,17 @@ import (
 
 const createAccess = `-- name: CreateAccess :one
 INSERT INTO tbl_accesses (
-    teacher_id,
-    login_at,
-    useragent_id,
-    created_at,
-    updated_at
+	teacher_id,
+	login_at,
+	useragent_id,
+	created_at,
+	updated_at
 ) VALUES (
-    ?,
-    datetime('now'),
-    ?,
-    datetime('now'),
-    datetime('now')
+	?,
+	datetime('now'),
+	?,
+	datetime('now'),
+	datetime('now')
 ) RETURNING id
 `
 
@@ -39,13 +39,13 @@ func (q *Queries) CreateAccess(ctx context.Context, arg CreateAccessParams) (int
 
 const getAccessByID = `-- name: GetAccessByID :one
 SELECT
-    id,
-    teacher_id,
-    login_at,
-    logout_at,
-    useragent_id,
-    created_at,
-    updated_at
+	id,
+	teacher_id,
+	login_at,
+	logout_at,
+	useragent_id,
+	created_at,
+	updated_at
 FROM tbl_accesses
 WHERE id = ?
 LIMIT 1
@@ -83,14 +83,14 @@ func (q *Queries) GetLatestOpenAccessByTeacherID(ctx context.Context, teacherID 
 
 const getUserAgentByID = `-- name: GetUserAgentByID :one
 SELECT
-    id,
-    user_agent,
-    browser,
-    browser_version,
-    os,
-    device,
-    created_at,
-    updated_at
+	id,
+	user_agent,
+	browser,
+	browser_version,
+	os,
+	device,
+	created_at,
+	updated_at
 FROM tbl_useragents
 WHERE id = ?
 LIMIT 1
@@ -114,14 +114,14 @@ func (q *Queries) GetUserAgentByID(ctx context.Context, id int64) (TblUseragent,
 
 const getUserAgentByUserAgent = `-- name: GetUserAgentByUserAgent :one
 SELECT
-    id,
-    user_agent,
-    browser,
-    browser_version,
-    os,
-    device,
-    created_at,
-    updated_at
+	id,
+	user_agent,
+	browser,
+	browser_version,
+	os,
+	device,
+	created_at,
+	updated_at
 FROM tbl_useragents
 WHERE user_agent = ?
 LIMIT 1
@@ -146,10 +146,10 @@ func (q *Queries) GetUserAgentByUserAgent(ctx context.Context, userAgent string)
 const updateAccessLogout = `-- name: UpdateAccessLogout :one
 UPDATE tbl_accesses
 SET
-    logout_at = datetime('now'),
-    updated_at = datetime('now')
+	logout_at = datetime('now'),
+	updated_at = datetime('now')
 WHERE
-    id = ?
+	id = ?
 RETURNING id
 `
 
@@ -161,28 +161,28 @@ func (q *Queries) UpdateAccessLogout(ctx context.Context, id int64) (int64, erro
 
 const upsertUserAgent = `-- name: UpsertUserAgent :one
 INSERT INTO tbl_useragents (
-    user_agent,
-    browser,
-    browser_version,
-    os,
-    device,
-    created_at,
-    updated_at
+	user_agent,
+	browser,
+	browser_version,
+	os,
+	device,
+	created_at,
+	updated_at
 ) VALUES (
-    ?,
-    ?,
-    ?,
-    ?,
-    ?,
-    datetime('now'),
-    datetime('now')
+	?,
+	?,
+	?,
+	?,
+	?,
+	datetime('now'),
+	datetime('now')
 )
 ON CONFLICT(user_agent) DO UPDATE SET
-    browser = excluded.browser,
-    browser_version = excluded.browser_version,
-    os = excluded.os,
-    device = excluded.device,
-    updated_at = datetime('now')
+	browser = excluded.browser,
+	browser_version = excluded.browser_version,
+	os = excluded.os,
+	device = excluded.device,
+	updated_at = datetime('now')
 RETURNING id
 `
 

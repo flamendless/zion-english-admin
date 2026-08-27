@@ -3,7 +3,7 @@
 ALTER TABLE tbl_class_records ADD COLUMN notes TEXT;
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_class_records_unique_session
-    ON tbl_class_records (student_id, teacher_id, date, duration_minutes);
+	ON tbl_class_records (student_id, teacher_id, date, duration_minutes);
 
 CREATE INDEX IF NOT EXISTS idx_students_status ON tbl_students(status);
 CREATE INDEX IF NOT EXISTS idx_students_name ON tbl_students(name);

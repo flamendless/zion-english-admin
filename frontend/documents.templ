@@ -1,19 +1,23 @@
 package frontend
 
-import "strings"
-import "zion-english/internal/utils"
+import (
+	"fmt"
+	"strings"
+	"zion-english/internal/utils"
+)
 
 type DocumentItem struct {
-	ID         string
-	Filename   string
-	Extension  string
-	Type       string
-	FileSize   string
-	Status     string
-	UploadedAt string
-	UploadedBy string
-	ViewURL    string
-	CanReview  bool
+	ID               string
+	Filename         string
+	Extension        string
+	Type             string
+	FileSize         string
+	Status           string
+	UploadedAt       string
+	UploadedBy       string
+	UploadedByAvatar AvatarProps
+	ViewURL          string
+	CanReview        bool
 }
 
 func documentRowClass(status string) string {
@@ -41,95 +45,164 @@ func documentTypeLabel(docType string) string {
 }
 
 func documentStatusLabel(status string) string {
+	if status == "" {
+		return ""
+	}
 	return strings.ToUpper(status[:1]) + status[1:]
 }
 
-templ DocumentTypePill(docType string) {
-	<span class={ "document-pill document-pill--" + docType }>{ documentTypeLabel(docType) }</span>
+func documentsTableColspan(showUploader bool, showActions bool) int {
+	colspan := 6
+	if showUploader {
+		colspan++
+	}
+	if showActions {
+		colspan++
+	}
+	return colspan
 }
 
-templ DocumentStatusPill(status string) {
-	<span class={ "document-status-pill document-status-pill--" + status }>{ documentStatusLabel(status) }</span>
+templ DocumentTypeFilterDropdown() {
+	<div class="form-group">
+		<label for="documentType">Type</label>
+		<select id="documentType" name="type">
+			<option value="">All</option>
+			<option value="avatar">Avatar</option>
+			<option value="document">Document</option>
+		</select>
+	</div>
 }
 
-templ DocumentsTable(items []DocumentItem, showUploader bool, showActions bool) {
-	if len(items) == 0 {
-		<div class="documents-empty">
-			<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-				<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-				<polyline points="14 2 14 8 20 8"></polyline>
-			</svg>
-			<p>No documents uploaded yet.</p>
-			if !showUploader && !showActions {
-				<p class="documents-empty-hint">Upload your profile photo and valid ID from <a href={ utils.URL("/profile") }>My Profile</a>.</p>
+templ DocumentStatusFilterDropdown() {
+	<div class="form-group">
+		<label for="documentStatus">Status</label>
+		<select id="documentStatus" name="status">
+			<option value="">All</option>
+			<option value="submitted">Submitted</option>
+			<option value="approved">Approved</option>
+			<option value="rejected">Rejected</option>
+		</select>
+	</div>
+}
+
+templ DocumentsToolbar(showTeacherFilter bool) {
+	<div class="toolbar" id="documentsToolbar">
+		<div class="form-group">
+			<label for="documentSearch">Search</label>
+			if showTeacherFilter {
+				<input type="text" id="documentSearch" name="q" placeholder="Filename or teacher name..."/>
+			} else {
+				<input type="text" id="documentSearch" name="q" placeholder="Filename..."/>
 			}
 		</div>
-	} else {
-		<div class="table-wrapper documents-table-wrapper">
-			<table class="documents-table table-stack-mobile">
-				<thead>
-					<tr>
-						<th>Filename</th>
-						<th>Extension</th>
-						<th>Type</th>
-						<th>File size</th>
-						<th>Status</th>
-						if showUploader {
-							<th>Uploaded by</th>
-						}
-						<th>Uploaded at</th>
-						if showActions {
-							<th>Actions</th>
-						}
-					</tr>
-				</thead>
-				<tbody>
-					for _, item := range items {
-						<tr class={ documentRowClass(item.Status) }>
-							<td data-label="Filename">
-								<a href={ item.ViewURL } class="documents-filename documents-filename-link" title={ item.Filename } target="_blank" rel="noopener noreferrer">{ item.Filename }</a>
-							</td>
-							<td data-label="Extension">
-								<code class="documents-ext">.{ item.Extension }</code>
-							</td>
-							<td data-label="Type">
-								@DocumentTypePill(item.Type)
-							</td>
-							<td data-label="File size">{ item.FileSize }</td>
-							<td data-label="Status">
-								@DocumentStatusPill(item.Status)
-							</td>
-							if showUploader {
-								<td data-label="Uploaded by">{ item.UploadedBy }</td>
-							}
-							<td data-label="Uploaded at">{ item.UploadedAt }</td>
-							if showActions {
-								<td data-label="Actions">
-									<div class="table-actions documents-actions">
-										@IconActionLinkExternal(item.ViewURL, "View", IconKindExternal)
-										if item.CanReview {
-											<form method="POST" action={ utils.URL("/documents/" + item.ID + "/approve") } class="table-action-form">
-												@IconActionSubmit("Approve", IconKindApprove)
-											</form>
-											<form method="POST" action={ utils.URL("/documents/" + item.ID + "/reject") } class="table-action-form" onsubmit="return confirm('Reject this document? The teacher will be able to upload a new one.');">
-												@IconActionSubmit("Reject", IconKindReject)
-											</form>
-										}
-										<form method="POST" action={ utils.URL("/documents/" + item.ID + "/delete") } class="table-action-form" onsubmit="return confirm('Permanently delete this document? The file will be removed and cannot be recovered.');">
-											@IconActionSubmit("Delete", IconKindWarning)
-										</form>
-									</div>
-								</td>
-							}
-						</tr>
+		@DocumentTypeFilterDropdown()
+		@DocumentStatusFilterDropdown()
+		if showTeacherFilter {
+			@TeacherFilterDropdown("")
+		}
+		<button
+			type="button"
+			id="documentsFilterBtn"
+			hx-get={ utils.URL("/documents/partials/rows") }
+			hx-include="#documentsToolbar"
+			hx-target="#documentsTableBody"
+			hx-swap="innerHTML"
+		>Filter</button>
+	</div>
+}
+
+templ DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) {
+	<tr class={ documentRowClass(item.Status) }>
+		<td data-label="Filename">
+			<a href={ item.ViewURL } class="documents-filename documents-filename-link" title={ item.Filename } target="_blank" rel="noopener noreferrer">{ item.Filename }</a>
+		</td>
+		<td data-label="Extension">
+			<code class="documents-ext">.{ item.Extension }</code>
+		</td>
+		<td data-label="Type">
+			@Pill(documentTypeLabel(item.Type), PillToneInfo)
+		</td>
+		<td data-label="File size">{ item.FileSize }</td>
+		<td data-label="Status">
+			@StatusPill(documentStatusLabel(item.Status), DocumentStatusPillTone(item.Status), true)
+		</td>
+		if showUploader {
+			<td data-label="Uploaded by">
+				<div class="documents-uploader-cell">
+					@Avatar(item.UploadedByAvatar)
+					<span>{ item.UploadedBy }</span>
+				</div>
+			</td>
+		}
+		<td data-label="Uploaded at">{ item.UploadedAt }</td>
+		if showActions {
+			<td data-label="Actions">
+				<div class="table-actions">
+					@IconActionLinkExternal(item.ViewURL, "View", IconKindExternal)
+					if item.CanReview {
+						<form method="POST" action={ utils.URL("/documents/" + item.ID + "/approve") } class="table-action-form">
+							@IconActionSubmit("Approve", IconKindApprove)
+						</form>
+						<form method="POST" action={ utils.URL("/documents/" + item.ID + "/reject") } class="table-action-form" onsubmit="return confirm('Reject this document? The teacher will be able to upload a new one.');">
+							@IconActionSubmit("Reject", IconKindReject)
+						</form>
 					}
-				</tbody>
-			</table>
-		</div>
+					<form method="POST" action={ utils.URL("/documents/" + item.ID + "/delete") } class="table-action-form" onsubmit="return confirm('Permanently delete this document? The file will be removed and cannot be recovered.');">
+						@IconActionSubmit("Delete", IconKindWarning)
+					</form>
+				</div>
+			</td>
+		}
+	</tr>
+}
+
+templ DocumentsTableBody(items []DocumentItem, showUploader bool, showActions bool, emptyMessage string) {
+	if len(items) == 0 {
+		<tr>
+			<td colspan={ fmt.Sprintf("%d", documentsTableColspan(showUploader, showActions)) } class="empty-state">{ emptyMessage }</td>
+		</tr>
+	} else {
+		for _, item := range items {
+			@DocumentTableRow(item, showUploader, showActions)
+		}
 	}
 }
 
-templ DocumentsCard(title string, description string, items []DocumentItem, showUploader bool, showActions bool) {
+templ DocumentsTable(showUploader bool, showActions bool) {
+	<div class="table-wrapper documents-table-wrapper">
+		<table class="documents-table table-stack-mobile">
+			<thead>
+				<tr>
+					<th>Filename</th>
+					<th>Extension</th>
+					<th>Type</th>
+					<th>File size</th>
+					<th>Status</th>
+					if showUploader {
+						<th>Uploaded by</th>
+					}
+					<th>Uploaded at</th>
+					if showActions {
+						<th>Actions</th>
+					}
+				</tr>
+			</thead>
+			<tbody
+				id="documentsTableBody"
+				hx-get={ utils.URL("/documents/partials/rows") }
+				hx-include="#documentsToolbar"
+				hx-trigger="load"
+				hx-swap="innerHTML"
+			>
+				<tr>
+					<td colspan={ fmt.Sprintf("%d", documentsTableColspan(showUploader, showActions)) } class="empty-state">Loading documents...</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+}
+
+templ DocumentsCard(title string, description string, showUploader bool, showActions bool, showTeacherFilter bool) {
 	<section class="documents-card">
 		<div class="documents-card-header">
 			<div>
@@ -139,7 +212,8 @@ templ DocumentsCard(title string, description string, items []DocumentItem, show
 				}
 			</div>
 		</div>
-		@DocumentsTable(items, showUploader, showActions)
+		@DocumentsToolbar(showTeacherFilter)
+		@DocumentsTable(showUploader, showActions)
 	</section>
 }
 
@@ -182,13 +256,17 @@ templ DocumentsStyles() {
 			margin-top: var(--space-2);
 		}
 
+		.documents-uploader-cell {
+			display: flex;
+			align-items: center;
+			gap: var(--space-2);
+			min-width: 0;
+		}
+
 		.documents-table .documents-filename {
-			display: inline-block;
-			max-width: 220px;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			vertical-align: bottom;
+			display: inline;
+			word-break: break-all;
+			overflow-wrap: anywhere;
 		}
 
 		.documents-filename-link {
@@ -208,43 +286,6 @@ templ DocumentsStyles() {
 			padding: 2px 8px;
 			border-radius: var(--radius-sm);
 			border: 1px solid var(--color-border-subtle);
-		}
-
-		.document-pill,
-		.document-status-pill {
-			display: inline-flex;
-			align-items: center;
-			padding: 3px 10px;
-			border-radius: var(--radius-full);
-			font-size: 0.75rem;
-			font-weight: 600;
-			text-transform: capitalize;
-			white-space: nowrap;
-		}
-
-		.document-pill--avatar {
-			background: var(--color-info-bg);
-			color: #0C4A6E;
-		}
-
-		.document-pill--document {
-			background: var(--color-primary-light);
-			color: var(--color-primary-hover);
-		}
-
-		.document-status-pill--submitted {
-			background: var(--color-warning-bg);
-			color: #7A4E00;
-		}
-
-		.document-status-pill--approved {
-			background: var(--color-success-bg);
-			color: var(--color-success);
-		}
-
-		.document-status-pill--rejected {
-			background: var(--color-error-bg);
-			color: var(--color-destructive);
 		}
 
 		.document-row-submitted {
@@ -276,10 +317,6 @@ templ DocumentsStyles() {
 
 		.documents-empty-hint {
 			font-size: 0.875rem;
-		}
-
-		.documents-actions {
-			flex-wrap: wrap;
 		}
 
 		.upload-zone {
@@ -368,11 +405,11 @@ templ DocumentsStyles() {
 }
 
 type DocumentsPageData struct {
-	Title        string
-	Description  string
-	Documents    []DocumentItem
-	ShowUploader bool
-	ShowActions  bool
+	Title             string
+	Description       string
+	ShowUploader      bool
+	ShowActions       bool
+	ShowTeacherFilter bool
 }
 
 templ DocumentsPage(data DocumentsPageData) {
@@ -384,6 +421,7 @@ templ DocumentsPage(data DocumentsPageData) {
 		<title>{ data.Title } - Zion English Admin Tool</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
+		@AvatarStyles()
 		@DocumentsStyles()
 	</head>
 	<body>
@@ -395,10 +433,24 @@ templ DocumentsPage(data DocumentsPageData) {
 			if data.Description != "" {
 				<p class="documents-page-desc">{ data.Description }</p>
 			}
-			@DocumentsTable(data.Documents, data.ShowUploader, data.ShowActions)
+			@DocumentsToolbar(data.ShowTeacherFilter)
+			@DocumentsTable(data.ShowUploader, data.ShowActions)
 		</div>
 		@SuccessBannerHandlers()
 		@ErrorBannerHandlers()
+		<script>
+			const documentSearch = document.getElementById('documentSearch');
+			if (documentSearch) {
+				documentSearch.addEventListener('keydown', function (e) {
+					if (e.key === 'Enter') {
+						e.preventDefault();
+						if (typeof htmx !== 'undefined') {
+							htmx.trigger('#documentsTableBody', 'load');
+						}
+					}
+				});
+			}
+		</script>
 	</body>
 	</html>
 }

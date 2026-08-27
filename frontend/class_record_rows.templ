@@ -14,10 +14,14 @@ templ ClassRecordRow(record ClassRecordRowData, showTeacher bool) {
 		}
 		<td data-label="Student">{ record.StudentName }</td>
 		<td data-label="Rate">{ record.RateLabel() }</td>
-		<td data-label="Status" class={ "status-" + record.Status }>{ record.Status }</td>
+		<td data-label="Status">
+			@StatusPill(capitalizeStatus(record.Status), ClassStatusPillTone(record.Status), false)
+		</td>
 		<td data-label="Actions">
 			<div class="table-actions">
-				if record.IsScheduled() {
+				if record.IsDeleted() {
+					<span>—</span>
+				} else if record.IsScheduled() {
 					@ScheduledClassActions(record.ScheduledItemData())
 				} else {
 					@IconActionLink(record.ViewURL(), "View", IconKindView)

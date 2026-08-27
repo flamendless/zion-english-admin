@@ -90,17 +90,6 @@ templ Profile(data ProfileData) {
 				margin: 0;
 			}
 
-			.profile-role {
-				display: inline-block;
-				padding: 4px 12px;
-				border-radius: var(--radius-full);
-				background: var(--color-primary-light);
-				color: var(--color-primary-hover);
-				font-size: 0.8125rem;
-				font-weight: 600;
-				text-transform: capitalize;
-			}
-
 			.profile-email {
 				color: var(--color-muted-foreground);
 				font-size: 0.875rem;
@@ -269,43 +258,6 @@ templ Profile(data ProfileData) {
 				flex-shrink: 0;
 			}
 
-			.integration-badge {
-				display: inline-flex;
-				align-items: center;
-				gap: 6px;
-				padding: 4px 10px;
-				border-radius: var(--radius-full);
-				font-size: 0.75rem;
-				font-weight: 600;
-				line-height: 1.2;
-				white-space: nowrap;
-			}
-
-			.integration-badge-dot {
-				width: 6px;
-				height: 6px;
-				border-radius: var(--radius-full);
-				flex-shrink: 0;
-			}
-
-			.integration-badge--connected {
-				background: var(--color-success-bg);
-				color: var(--color-success);
-			}
-
-			.integration-badge--connected .integration-badge-dot {
-				background: var(--color-success);
-			}
-
-			.integration-badge--disconnected {
-				background: var(--color-muted);
-				color: var(--color-muted-foreground);
-			}
-
-			.integration-badge--disconnected .integration-badge-dot {
-				background: var(--color-muted-foreground);
-			}
-
 			.integration-row-action {
 				display: flex;
 				align-items: center;
@@ -352,7 +304,7 @@ templ Profile(data ProfileData) {
 					<div class="profile-identity">
 						@Avatar(data.Avatar)
 						<h2>{ data.Name }</h2>
-						<span class="profile-role">{ data.Role }</span>
+						@Pill(data.Role, PillTonePrimary)
 						<p class="profile-email">{ data.Email }</p>
 					</div>
 
@@ -642,15 +594,9 @@ templ ProfileZoomIntegrations(data ProfileData) {
 
 templ IntegrationStatusBadge(connected bool) {
 	if connected {
-		<span class="integration-badge integration-badge--connected">
-			<span class="integration-badge-dot" aria-hidden="true"></span>
-			Connected
-		</span>
+		@StatusPill("Connected", PillToneSuccess, true)
 	} else {
-		<span class="integration-badge integration-badge--disconnected">
-			<span class="integration-badge-dot" aria-hidden="true"></span>
-			Not connected
-		</span>
+		@StatusPill("Not connected", PillToneNeutral, true)
 	}
 }
 

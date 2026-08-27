@@ -28,17 +28,10 @@ templ Schedule(data ScheduleData) {
 				border-color: var(--color-destructive);
 				background: var(--color-error-bg);
 			}
-			.day-class-overdue-banner {
-				display: inline-block;
-				align-self: flex-start;
-				margin-top: var(--space-1);
-				padding: 0.15rem 0.5rem;
-				border-radius: var(--radius-full);
+			.day-class-item.is-overdue .status-pill--error {
 				background: var(--color-destructive);
 				color: var(--color-on-primary);
-				font-size: 0.75rem;
-				font-weight: 600;
-				text-transform: uppercase;
+				align-self: flex-start;
 				letter-spacing: 0.03em;
 			}
 			.schedule-page .zoom-meeting-btn {
@@ -152,10 +145,8 @@ templ Schedule(data ScheduleData) {
 					align-items: stretch;
 				}
 				.schedule-page .day-class-actions {
-					display: flex;
 					flex-direction: row;
 					justify-content: flex-end;
-					gap: var(--space-2);
 					width: 100%;
 				}
 				.schedule-page .day-class-actions .btn {
@@ -751,7 +742,7 @@ templ Schedule(data ScheduleData) {
 					if (count > 0) {
 						btn.classList.add('has-scheduled');
 						const badge = document.createElement('span');
-						badge.className = 'calendar-day-badge';
+						badge.className = 'badge-count badge-count--primary';
 						badge.textContent = String(count);
 						btn.appendChild(badge);
 					} else {

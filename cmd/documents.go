@@ -66,7 +66,7 @@ func mapDocumentItems(rows []queries.TblTeacherDocument) []frontend.DocumentItem
 	return items
 }
 
-func mapAllDocumentItems(rows []queries.GetAllTeacherDocumentsRow) []frontend.DocumentItem {
+func mapAllDocumentItems(rows []queries.GetAllTeacherDocumentsFilteredRow) []frontend.DocumentItem {
 	items := make([]frontend.DocumentItem, len(rows))
 	for i, row := range rows {
 		items[i] = frontend.DocumentItem{
@@ -78,6 +78,14 @@ func mapAllDocumentItems(rows []queries.GetAllTeacherDocumentsRow) []frontend.Do
 			Status:     row.Status,
 			UploadedAt: utils.FormatNullDateTimePHT(row.UploadedAt),
 			UploadedBy: row.TeacherName,
+			UploadedByAvatar: buildTeacherListAvatarProps(
+				row.TeacherID,
+				row.TeacherFirstName,
+				row.TeacherMiddleName,
+				row.TeacherLastName,
+				row.TeacherAssignedColor,
+				row.TeacherProfilePicture,
+			),
 			ViewURL:    utils.URL(fmt.Sprintf("/documents/%d/file", row.ID)),
 			CanReview:  row.Status == string(constants.TeacherDocumentStatusSubmitted),
 		}
@@ -93,7 +101,6 @@ func handleDocuments(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	role := auth.GetRole(ctx)
-	user := auth.GetUser(ctx)
 
 	data := frontend.DocumentsPageData{}
 
@@ -103,23 +110,10 @@ func handleDocuments(w http.ResponseWriter, r *http.Request) {
 		data.Description = "All teacher uploads for review."
 		data.ShowUploader = true
 		data.ShowActions = true
-		rows, err := dbRO.GetQueries().GetAllTeacherDocuments(ctx)
-		if err != nil {
-			logs.Log().Error("get all teacher documents", zap.Error(err))
-			HttpError(w, "Failed to load documents", http.StatusInternalServerError)
-			return
-		}
-		data.Documents = mapAllDocumentItems(rows)
+		data.ShowTeacherFilter = true
 	case auth.RoleTeacher:
 		data.Title = "My Documents"
 		data.Description = "Your uploaded profile photos and ID documents."
-		rows, err := dbRO.GetQueries().GetTeacherDocumentsByTeacherID(ctx, user.ID)
-		if err != nil {
-			logs.Log().Error("get teacher documents", zap.Error(err))
-			HttpError(w, "Failed to load documents", http.StatusInternalServerError)
-			return
-		}
-		data.Documents = mapDocumentItems(rows)
 	default:
 		HttpError(w, "Access denied", http.StatusForbidden)
 		return
@@ -129,6 +123,132 @@ func handleDocuments(w http.ResponseWriter, r *http.Request) {
 	if err := frontend.DocumentsPage(data).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func handleDocumentsPartial(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx := r.Context()
+	role := auth.GetRole(ctx)
+	user := auth.GetUser(ctx)
+	filters, err := parseDocumentFilters(r)
+	if err != nil {
+		HttpError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	var (
+		items        []frontend.DocumentItem
+		showUploader bool
+		showActions  bool
+		isTeacher    bool
+	)
+
+	switch role {
+	case auth.RoleSuperuser:
+		showUploader = true
+		showActions = true
+		rows, err := dbRO.GetQueries().GetAllTeacherDocumentsFiltered(ctx, documentAllFilterParams(filters))
+		if err != nil {
+			logs.Log().Error("get filtered teacher documents", zap.Error(err))
+			HttpError(w, "Failed to load documents", http.StatusInternalServerError)
+			return
+		}
+		items = mapAllDocumentItems(rows)
+	case auth.RoleTeacher:
+		isTeacher = true
+		rows, err := dbRO.GetQueries().GetTeacherDocumentsByTeacherIDFiltered(ctx, documentTeacherFilterParams(user.ID, filters))
+		if err != nil {
+			logs.Log().Error("get filtered teacher documents", zap.Error(err))
+			HttpError(w, "Failed to load documents", http.StatusInternalServerError)
+			return
+		}
+		items = mapDocumentItems(rows)
+	default:
+		HttpError(w, "Access denied", http.StatusForbidden)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	if err := frontend.DocumentsTableBody(items, showUploader, showActions, documentsEmptyMessage(filters, isTeacher)).Render(ctx, w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+type documentFilters struct {
+	Query     string
+	Type      string
+	Status    string
+	TeacherID int64
+}
+
+func (f documentFilters) active() bool {
+	return f.Query != "" || f.Type != "" || f.Status != "" || f.TeacherID != 0
+}
+
+func parseDocumentFilters(r *http.Request) (documentFilters, error) {
+	filters := documentFilters{
+		Query:  strings.TrimSpace(r.URL.Query().Get("q")),
+		Type:   strings.TrimSpace(r.URL.Query().Get("type")),
+		Status: strings.TrimSpace(r.URL.Query().Get("status")),
+	}
+	if filters.Type != "" && !constants.ValidTeacherDocumentType(filters.Type) {
+		return documentFilters{}, errors.New("invalid document type")
+	}
+	if filters.Status != "" && !constants.ValidTeacherDocumentStatus(filters.Status) {
+		return documentFilters{}, errors.New("invalid document status")
+	}
+	teacherIDStr := strings.TrimSpace(r.URL.Query().Get("teacherId"))
+	if teacherIDStr != "" {
+		teacherID, err := strconv.ParseInt(teacherIDStr, 10, 64)
+		if err != nil {
+			return documentFilters{}, errors.New("invalid teacher ID")
+		}
+		filters.TeacherID = teacherID
+	}
+	return filters, nil
+}
+
+func documentAllFilterParams(filters documentFilters) queries.GetAllTeacherDocumentsFilteredParams {
+	teacherID := filters.TeacherID
+	query := filters.Query
+	return queries.GetAllTeacherDocumentsFilteredParams{
+		Column1:   filters.Type,
+		Type:      filters.Type,
+		Column3:   filters.Status,
+		Status:    filters.Status,
+		Column5:   teacherID,
+		TeacherID: teacherID,
+		Column7:   query,
+		Column8:   sql.NullString{String: query, Valid: true},
+		Column9:   sql.NullString{String: query, Valid: true},
+	}
+}
+
+func documentTeacherFilterParams(teacherID int64, filters documentFilters) queries.GetTeacherDocumentsByTeacherIDFilteredParams {
+	query := filters.Query
+	return queries.GetTeacherDocumentsByTeacherIDFilteredParams{
+		TeacherID: teacherID,
+		Column2:   filters.Type,
+		Type:      filters.Type,
+		Column4:   filters.Status,
+		Status:    filters.Status,
+		Column6:   query,
+		Column7:   sql.NullString{String: query, Valid: true},
+	}
+}
+
+func documentsEmptyMessage(filters documentFilters, isTeacher bool) string {
+	if filters.active() {
+		return "No documents match your filters."
+	}
+	if isTeacher {
+		return "No documents uploaded yet. Upload your profile photo and valid ID from My Profile."
+	}
+	return "No documents uploaded yet."
 }
 
 func handleDocumentsPath(w http.ResponseWriter, r *http.Request) {

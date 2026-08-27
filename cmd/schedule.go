@@ -568,16 +568,7 @@ func handleDeleteScheduledClass(w http.ResponseWriter, r *http.Request, schedule
 	notifyCrossParty(ctx, user, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
 		fmt.Sprintf("Scheduled class on %s was deleted", existing.ScheduledDate))
 
-	from := r.FormValue("from")
-	setSuccessFlash(w, "Scheduled class deleted successfully.")
-	if from == "schedule" {
-		w.Header().Set("HX-Trigger", "scheduleDayOpen")
-		if _, err := fmt.Fprint(w, "Scheduled class deleted.\n"); err != nil {
-			sendErrorLog(w, err.Error())
-		}
-		return
-	}
-	HttpRedirect(w, r, "/classes")
+	respondScheduledClassAction(w, r.FormValue("from"), "Scheduled class deleted successfully.")
 }
 
 func editScheduleData(ctx context.Context, scheduleID int64, lockTeacher, isSuperuser bool) (frontend.EditScheduleData, error) {

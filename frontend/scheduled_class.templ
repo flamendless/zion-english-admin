@@ -65,7 +65,7 @@ templ ScheduledClassListItem(item ScheduledClassItemData, zoomLogoURL string) {
 			<span class="day-class-time">{ item.TimeRange }</span>
 			<span class="day-class-rate">{ FormatScheduledClassRate(item.Rate, item.Currency) }</span>
 			if item.Overdue {
-				<div class="day-class-overdue-banner">Overdue</div>
+				@StatusPill("OVERDUE", PillToneError, false)
 			}
 			@ScheduledClassMeeting(item, zoomLogoURL)
 		</div>

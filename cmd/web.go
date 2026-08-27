@@ -132,6 +132,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/profile/zoom/connect", auth.RequireRole(auth.RoleTeacher)(handleZoomConnect))
 		authMux.HandleFunc(basePath+"/profile/zoom/disconnect", auth.RequireRole(auth.RoleTeacher)(handleZoomDisconnect))
 		documentsRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)
+		authMux.HandleFunc(basePath+"/documents/partials/rows", documentsRole(handleDocumentsPartial))
 		authMux.HandleFunc(basePath+"/documents", documentsRole(handleDocuments))
 		authMux.HandleFunc(basePath+"/documents/", documentsRole(handleDocumentsPath))
 		authMux.HandleFunc(basePath+"/role", auth.RequireRole(auth.RoleSuperuser, auth.RoleTeacher)(handleGetRole))

@@ -22,6 +22,7 @@ templ Analytics(data AnalyticsData) {
 		}
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
+		@AvatarStyles()
 		<style>
 			.analytics-section {
 				margin-bottom: var(--space-8);
@@ -44,13 +45,11 @@ templ Analytics(data AnalyticsData) {
 			.analytics-summary .stat-card {
 				min-height: 5.5rem;
 			}
-			.rate-pill {
-				display: inline-block;
-				padding: 0.1rem 0.45rem;
-				border-radius: var(--radius-sm);
-				font-size: 0.8rem;
-				font-variant-numeric: tabular-nums;
-				background: var(--color-surface-muted);
+			.analytics-teacher-cell {
+				display: flex;
+				align-items: center;
+				gap: var(--space-2);
+				min-width: 0;
 			}
 		</style>
 	</head>
@@ -255,6 +254,25 @@ templ Analytics(data AnalyticsData) {
 				return mins + 'm';
 			}
 
+			function renderAvatarHTML(avatar) {
+				if (!avatar) {
+					return '';
+				}
+				const color = avatar.assignedColor || '#B9D283';
+				const style = 'background-color: ' + escapeHTML(color) + ';';
+				let inner;
+				if (avatar.hasPicture && avatar.pictureURL) {
+					inner = '<img src="' + escapeHTML(avatar.pictureURL) + '" alt="' + escapeHTML(avatar.alt || '') + '" class="avatar-image">';
+				} else {
+					inner = '<span class="avatar-initials" aria-hidden="true">' + escapeHTML(avatar.initials || '') + '</span>';
+				}
+				return '<div class="avatar avatar-sm" style="' + style + '" aria-label="' + escapeHTML(avatar.alt || '') + '">' + inner + '</div>';
+			}
+
+			function renderTeacherCell(name, avatar) {
+				return '<div class="analytics-teacher-cell">' + renderAvatarHTML(avatar) + '<span>' + escapeHTML(name) + '</span></div>';
+			}
+
 			function renderSummary(summary) {
 				const cards = [
 					{ label: 'Utilization', value: formatPct(summary.utilizationPct), sub: formatMinutes(summary.conductedMinutes) + ' / ' + formatMinutes(summary.scheduledMinutes) },
@@ -302,7 +320,7 @@ templ Analytics(data AnalyticsData) {
 						'</td><td data-label="Conducted">' + row.conducted +
 						'</td><td data-label="Cancelled">' + row.cancelled +
 						'</td><td data-label="Rescheduled">' + row.rescheduled +
-						'</td><td data-label="Cancellation Rate"><span class="rate-pill">' + formatPct(row.cancellationRate) + '</span></td></tr>';
+						'</td><td data-label="Cancellation Rate"><span class="pill pill--neutral pill--tabular">' + formatPct(row.cancellationRate) + '</span></td></tr>';
 				}).join(''));
 			}
 
@@ -314,11 +332,11 @@ templ Analytics(data AnalyticsData) {
 					return;
 				}
 				renderTableBody(tbody, rows.map(function (row) {
-					return '<tr><td data-label="Teacher">' + escapeHTML(row.teacherName) +
+					return '<tr><td data-label="Teacher">' + renderTeacherCell(row.teacherName, row.teacherAvatar) +
 						'</td><td data-label="Conducted">' + row.conducted +
 						'</td><td data-label="Cancelled">' + row.cancelled +
 						'</td><td data-label="Rescheduled">' + row.rescheduled +
-						'</td><td data-label="Cancellation Rate"><span class="rate-pill">' + formatPct(row.cancellationRate) + '</span></td>' +
+						'</td><td data-label="Cancellation Rate"><span class="pill pill--neutral pill--tabular">' + formatPct(row.cancellationRate) + '</span></td>' +
 						'<td data-label="Utilization">' + formatPct(row.utilizationPct) +
 						'</td><td data-label="No-Shows">' + row.noShowCount + '</td></tr>';
 				}).join(''));
@@ -335,7 +353,7 @@ templ Analytics(data AnalyticsData) {
 						'</td><td data-label="Conducted">' + row.conducted +
 						'</td><td data-label="Cancelled">' + row.cancelled +
 						'</td><td data-label="Rescheduled">' + row.rescheduled +
-						'</td><td data-label="Cancellation Rate"><span class="rate-pill">' + formatPct(row.cancellationRate) + '</span></td></tr>';
+						'</td><td data-label="Cancellation Rate"><span class="pill pill--neutral pill--tabular">' + formatPct(row.cancellationRate) + '</span></td></tr>';
 				}).join(''));
 			}
 
@@ -350,7 +368,7 @@ templ Analytics(data AnalyticsData) {
 					let html = '<tr><td data-label="Date">' + escapeHTML(row.scheduledDate) +
 						'</td><td data-label="Student">' + escapeHTML(row.studentName) + '</td>';
 					if (isSuperuser) {
-						html += '<td data-label="Teacher">' + escapeHTML(row.teacherName) + '</td>';
+						html += '<td data-label="Teacher">' + renderTeacherCell(row.teacherName, row.teacherAvatar) + '</td>';
 					}
 					html += '<td data-label="Duration">' + row.durationMinutes + ' min</td>' +
 						'<td data-label="Days Overdue">' + row.daysOverdue + '</td></tr>';

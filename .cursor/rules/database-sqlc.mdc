@@ -7,6 +7,33 @@ alwaysApply: true
 
 SQLite with dual connections: `dbRO` (reads), `dbRW` (writes). WAL mode enabled.
 
+## SQL Formatting
+
+Use **tabs** for indentation in all `.sql` files (`internal/database/sql/`, `migrations/sqlite3/`). One tab per indent level:
+
+- `4` spaces (columns, lists) → 1 tab
+- `2` spaces (`AND` / `OR` continuations) → 1 tab
+- Wrapped SELECT/INSERT lines after a trailing comma → 1 tab
+- Deeper nesting (`6`/`8`/`10`/`12` spaces) → 2/3 tabs
+
+Do not use leading spaces for indentation.
+
+```sql
+-- name: GetAllTeacherDocumentsFiltered :many
+SELECT
+	d.id,
+	d.teacher_id
+FROM tbl_teacher_documents d
+INNER JOIN tbl_teachers t ON t.id = d.teacher_id
+WHERE t.deleted = 0
+	AND (? = '' OR d.type = ?)
+	AND (
+	? = ''
+	OR d.original_filename LIKE '%' || ? || '%'
+	)
+ORDER BY d.uploaded_at DESC;
+```
+
 ## Adding a Query
 
 1. Add SQL to `internal/database/sql/<domain>.sql`

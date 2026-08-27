@@ -23,8 +23,8 @@ func TestValidStudentStatus(t *testing.T) {
 }
 
 func TestValidClassStatus(t *testing.T) {
-	for _, s := range []string{"conducted", "cancelled", "rescheduled"} {
-		if !ValidClassStatus(s) {
+	for _, s := range ClassStatuses {
+		if !ValidClassStatus(string(s)) {
 			t.Fatalf("ValidClassStatus(%q) = false, want true", s)
 		}
 	}

@@ -1,140 +1,137 @@
-package frontend
-
-import "zion-english/internal/utils"
-
-templ Reports() {
-	<!DOCTYPE html>
-	<html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Reports - Zion English Admin Tool</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
-		@AvatarStyles()
-		<style>
-			.reports-teacher-cell {
-				display: flex;
-				align-items: center;
-				gap: var(--space-3);
-			}
-			.avatar-col {
-				width: 3.5rem;
-			}
-		</style>
-		<script>
-			window.closeReportViewModal = function () {
-				const host = document.getElementById('reportViewModalHost');
-				if (host) host.innerHTML = '';
-				document.body.classList.remove('modal-open');
-			};
-
-			document.body.addEventListener('htmx:afterSwap', function (evt) {
-				if (evt.detail.target.id !== 'reportViewModalHost') return;
-				document.body.classList.add('modal-open');
-				const overlay = evt.detail.target.querySelector('#reportViewModal');
-				const closeBtn = overlay && overlay.querySelector('.report-view-close');
-				if (closeBtn) closeBtn.focus();
-			});
-
-			document.body.addEventListener('click', function (e) {
-				if (e.target.closest('.report-view-close')) {
-					window.closeReportViewModal();
-					return;
-				}
-				const overlay = e.target.closest('#reportViewModal');
-				if (overlay && e.target === overlay) window.closeReportViewModal();
-			});
-
-			document.addEventListener('keydown', function (e) {
-				if (e.key === 'Escape' && document.getElementById('reportViewModal')) {
-					window.closeReportViewModal();
-				}
-			});
-		</script>
-	</head>
-	<body>
-		<div class="container">
-			@HeaderSimple()
-			@SuccessBanner()
-			@HubHeader("Reports", "", "", false)
-
-			<div class="toolbar" id="reportsToolbar">
-				<div class="form-group">
-					<label for="reportSearch">Search</label>
-					<input type="text" id="reportSearch" name="q" placeholder="Search teacher or student name..."/>
-				</div>
-				@DatePreset(true)
-				<button
-					type="button"
-					id="filterBtn"
-					hx-get={ utils.URL("/reports/partials/rows") }
-					hx-include="#reportsToolbar"
-					hx-target="#reportsTableBody"
-					hx-swap="innerHTML"
-				>Filter</button>
-			</div>
-
-			<div class="table-wrapper">
-				<table id="reportsTable" class="table-stack-mobile">
-					<thead>
-						<tr>
-							<th class="avatar-col">Avatar</th>
-							<th>Teacher</th>
-							<th>Total Classes</th>
-							<th>Total Rate/Earnings</th>
-							<th>Actions</th>
-						</tr>
-					</thead>
-					<tbody
-						id="reportsTableBody"
-						hx-get={ utils.URL("/reports/partials/rows") }
-						hx-include="#reportsToolbar"
-						hx-trigger="load"
-						hx-swap="innerHTML"
-					>
-						<tr>
-							<td colspan="5" class="empty-state">Loading reports...</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-
-			<div id="reportViewModalHost"></div>
-		</div>
-
-		<script>
-			const datePresetSelect = document.getElementById('datePreset');
-			const reportSearch = document.getElementById('reportSearch');
-
-			function setDateRangeFromPreset(value) {
-				if (!value) {
-					delete datePresetSelect.dataset.startDate;
-					delete datePresetSelect.dataset.endDate;
-					return;
-				}
-				const parts = value.split('|');
-				if (parts.length !== 2) return;
-				datePresetSelect.dataset.startDate = parts[0];
-				datePresetSelect.dataset.endDate = parts[1];
-			}
-
-			datePresetSelect.addEventListener('change', () => {
-				setDateRangeFromPreset(datePresetSelect.value);
-			});
-
-			setDateRangeFromPreset(datePresetSelect.value);
-
-			reportSearch.addEventListener('keydown', function (e) {
-				if (e.key === 'Enter') {
-					e.preventDefault();
-					if (typeof htmx !== 'undefined') {
-						htmx.trigger('#reportsTableBody', 'load');
-					}
-				}
-			});
-		</script>
-	</body>
-	</html>
-}
-
+package frontend
+
+import "zion-english/internal/utils"
+
+templ Reports() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Reports - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@AvatarStyles()
+		<style>
+			.reports-teacher-cell {
+				display: flex;
+				align-items: center;
+				gap: var(--space-2);
+				min-width: 0;
+			}
+		</style>
+		<script>
+			window.closeReportViewModal = function () {
+				const host = document.getElementById('reportViewModalHost');
+				if (host) host.innerHTML = '';
+				document.body.classList.remove('modal-open');
+			};
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id !== 'reportViewModalHost') return;
+				document.body.classList.add('modal-open');
+				const overlay = evt.detail.target.querySelector('#reportViewModal');
+				const closeBtn = overlay && overlay.querySelector('.report-view-close');
+				if (closeBtn) closeBtn.focus();
+			});
+
+			document.body.addEventListener('click', function (e) {
+				if (e.target.closest('.report-view-close')) {
+					window.closeReportViewModal();
+					return;
+				}
+				const overlay = e.target.closest('#reportViewModal');
+				if (overlay && e.target === overlay) window.closeReportViewModal();
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key === 'Escape' && document.getElementById('reportViewModal')) {
+					window.closeReportViewModal();
+				}
+			});
+		</script>
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@SuccessBanner()
+			@HubHeader("Reports", "", "", false)
+
+			<div class="toolbar" id="reportsToolbar">
+				<div class="form-group">
+					<label for="reportSearch">Search</label>
+					<input type="text" id="reportSearch" name="q" placeholder="Search teacher or student name..."/>
+				</div>
+				@DatePreset(true)
+				<button
+					type="button"
+					id="filterBtn"
+					hx-get={ utils.URL("/reports/partials/rows") }
+					hx-include="#reportsToolbar"
+					hx-target="#reportsTableBody"
+					hx-swap="innerHTML"
+				>Filter</button>
+			</div>
+
+			<div class="table-wrapper">
+				<table id="reportsTable" class="table-stack-mobile">
+					<thead>
+						<tr>
+							<th>Teacher</th>
+							<th>Total Classes</th>
+							<th>Total Rate/Earnings</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody
+						id="reportsTableBody"
+						hx-get={ utils.URL("/reports/partials/rows") }
+						hx-include="#reportsToolbar"
+						hx-trigger="load"
+						hx-swap="innerHTML"
+					>
+						<tr>
+							<td colspan="4" class="empty-state">Loading reports...</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div id="reportViewModalHost"></div>
+		</div>
+
+		<script>
+			const datePresetSelect = document.getElementById('datePreset');
+			const reportSearch = document.getElementById('reportSearch');
+
+			function setDateRangeFromPreset(value) {
+				if (!value) {
+					delete datePresetSelect.dataset.startDate;
+					delete datePresetSelect.dataset.endDate;
+					return;
+				}
+				const parts = value.split('|');
+				if (parts.length !== 2) return;
+				datePresetSelect.dataset.startDate = parts[0];
+				datePresetSelect.dataset.endDate = parts[1];
+			}
+
+			datePresetSelect.addEventListener('change', () => {
+				setDateRangeFromPreset(datePresetSelect.value);
+			});
+
+			setDateRangeFromPreset(datePresetSelect.value);
+
+			reportSearch.addEventListener('keydown', function (e) {
+				if (e.key === 'Enter') {
+					e.preventDefault();
+					if (typeof htmx !== 'undefined') {
+						htmx.trigger('#reportsTableBody', 'load');
+					}
+				}
+			});
+		</script>
+	</body>
+	</html>
+}
+

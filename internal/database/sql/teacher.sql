@@ -77,29 +77,29 @@ UPDATE tbl_teachers SET profile_picture = ?, updated_at = CURRENT_TIMESTAMP WHER
 -- name: UpdateTeacherBySuperuser :exec
 UPDATE tbl_teachers
 SET first_name = ?, middle_name = ?, last_name = ?, birthdate = ?, address = ?, joining_date = ?,
-    mobile_number = ?, email = ?, certifications = ?, assigned_color = ?, rate_per_class = ?, currency = ?,
-    drive_url = ?, sex = ?, template = ?, updated_at = datetime('now')
+	mobile_number = ?, email = ?, certifications = ?, assigned_color = ?, rate_per_class = ?, currency = ?,
+	drive_url = ?, sex = ?, template = ?, updated_at = datetime('now')
 WHERE id = ?;
 
 -- name: CountTeachersFiltered :one
 SELECT COUNT(*) as count
 FROM tbl_teachers
 WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || middle_name ELSE '' END || CASE WHEN last_name != '' THEN ' ' || last_name ELSE '' END) LIKE '%' || ? || '%' OR email LIKE '%' || ? || '%')
-  AND (
-    ? = ''
-    OR (? = 'deleted' AND deleted = 1)
-    OR (? != 'deleted' AND ? != '' AND status = ? AND deleted = 0)
-  );
+	AND (
+	? = ''
+	OR (? = 'deleted' AND deleted = 1)
+	OR (? != 'deleted' AND ? != '' AND status = ? AND deleted = 0)
+	);
 
 -- name: GetTeachersFiltered :many
 SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted, deleted_at, profile_picture
 FROM tbl_teachers
 WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || middle_name ELSE '' END || CASE WHEN last_name != '' THEN ' ' || last_name ELSE '' END) LIKE '%' || ? || '%' OR email LIKE '%' || ? || '%')
-  AND (
-    ? = ''
-    OR (? = 'deleted' AND deleted = 1)
-    OR (? != 'deleted' AND ? != '' AND status = ? AND deleted = 0)
-  )
+	AND (
+	? = ''
+	OR (? = 'deleted' AND deleted = 1)
+	OR (? != 'deleted' AND ? != '' AND status = ? AND deleted = 0)
+	)
 ORDER BY CASE WHEN deleted = 1 THEN 2 WHEN status = 'pending' THEN 0 ELSE 1 END, last_name ASC, first_name ASC, middle_name ASC
 LIMIT ? OFFSET ?;
 

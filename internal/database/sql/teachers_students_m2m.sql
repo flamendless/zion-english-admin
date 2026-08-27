@@ -20,16 +20,16 @@ SELECT COUNT(*) as count
 FROM tbl_students s
 INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?
-  AND (? = '' OR s.name LIKE '%' || ? || '%')
-  AND (? = '' OR s.status = ?);
+	AND (? = '' OR s.name LIKE '%' || ? || '%')
+	AND (? = '' OR s.status = ?);
 
 -- name: GetStudentsByTeacherIDFiltered :many
 SELECT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
 FROM tbl_students s
 INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?
-  AND (? = '' OR s.name LIKE '%' || ? || '%')
-  AND (? = '' OR s.status = ?)
+	AND (? = '' OR s.name LIKE '%' || ? || '%')
+	AND (? = '' OR s.status = ?)
 ORDER BY s.name ASC
 LIMIT ? OFFSET ?;
 
@@ -47,7 +47,7 @@ ORDER BY t.last_name ASC, t.first_name ASC, t.middle_name ASC;
 
 -- name: GetAllStudentTeacherNames :many
 SELECT m2m.student_id,
-       trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
+	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_teachers_students_m2m m2m
 INNER JOIN tbl_teachers t ON t.id = m2m.teacher_id
 WHERE t.deleted = 0

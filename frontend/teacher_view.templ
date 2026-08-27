@@ -39,7 +39,7 @@ templ TeacherViewModal(data TeacherViewData) {
 						<div class="profile-identity">
 							@Avatar(data.Avatar)
 							<h2>{ data.Name }</h2>
-							<span class="profile-role">teacher</span>
+							@Pill("teacher", PillTonePrimary)
 							<p class="profile-email">{ data.Email }</p>
 						</div>
 					</div>
@@ -72,11 +72,7 @@ templ TeacherViewModal(data TeacherViewData) {
 									<div class="profile-detail">
 										<span class="profile-detail-label">Zoom</span>
 										<span class="profile-detail-value">
-											if data.ZoomConnected {
-												<span class="status-badge status-active">Connected</span>
-											} else {
-												<span class="status-badge status-inactive">Not connected</span>
-											}
+											@IntegrationStatusBadge(data.ZoomConnected)
 										</span>
 									</div>
 								}
@@ -152,17 +148,6 @@ templ TeacherViewProfileStyles() {
 		.teacher-view-body .profile-identity h2 {
 			margin: 0;
 			font-size: 1rem;
-		}
-
-		.teacher-view-body .profile-role {
-			display: inline-block;
-			padding: 4px 12px;
-			border-radius: var(--radius-full);
-			background: var(--color-primary-light);
-			color: var(--color-primary-hover);
-			font-size: 0.8125rem;
-			font-weight: 600;
-			text-transform: capitalize;
 		}
 
 		.teacher-view-body .profile-email {

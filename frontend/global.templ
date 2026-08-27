@@ -562,21 +562,35 @@ templ GlobalIncludes() {
 			pointer-events: none;
 		}
 
-		.notification-badge {
+		.badge-count {
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
 			min-width: 17px;
 			height: 17px;
 			padding: 0 4px;
-			border-radius: 999px;
-			border: 2px solid var(--color-surface);
-			background: var(--color-destructive);
-			color: #fff;
+			border-radius: var(--radius-full);
 			font-size: 0.625rem;
 			font-weight: 700;
 			line-height: 1;
+			white-space: nowrap;
+		}
+
+		.badge-count--destructive {
+			border: 2px solid var(--color-surface);
+			background: var(--color-destructive);
+			color: #fff;
 			box-shadow: var(--shadow-sm);
+		}
+
+		.badge-count--primary {
+			padding: 0.15rem 0.4rem;
+			min-width: auto;
+			height: auto;
+			font-size: 0.7rem;
+			font-weight: 600;
+			background: var(--color-primary);
+			color: var(--color-on-primary);
 		}
 
 		.notification-panel-host {
@@ -737,15 +751,6 @@ templ GlobalIncludes() {
 
 		.notification-list-item.is-unread td {
 			font-weight: 600;
-		}
-
-		.notification-status-unread {
-			color: var(--color-primary);
-			font-weight: 600;
-		}
-
-		.notification-status-read {
-			color: var(--color-muted-foreground);
 		}
 
 		.notification-table .notification-message-cell {
@@ -972,39 +977,96 @@ templ GlobalIncludes() {
 		}
 
 		/* ============================= */
-		/* Status badges                 */
+		/* Pills & status pills          */
 		/* ============================= */
 
-		.status-active,
-		.status-conducted {
-			color: var(--color-success);
+		.pill,
+		.status-pill {
+			display: inline-flex;
+			align-items: center;
+			padding: 3px 10px;
+			border-radius: var(--radius-full);
+			font-size: 0.75rem;
 			font-weight: 600;
+			line-height: 1.2;
+			white-space: nowrap;
 		}
 
-		.status-inactive,
-		.status-cancelled {
+		.status-pill {
+			gap: 6px;
+			padding: 4px 10px;
+		}
+
+		.status-pill-dot {
+			width: 6px;
+			height: 6px;
+			border-radius: var(--radius-full);
+			flex-shrink: 0;
+		}
+
+		.pill--info,
+		.status-pill--info {
+			background: var(--color-info-bg);
+			color: #0C4A6E;
+		}
+
+		.status-pill--info .status-pill-dot {
+			background: #0C4A6E;
+		}
+
+		.pill--success,
+		.status-pill--success {
+			background: var(--color-success-bg);
+			color: var(--color-success);
+		}
+
+		.status-pill--success .status-pill-dot {
+			background: var(--color-success);
+		}
+
+		.pill--warning,
+		.status-pill--warning {
+			background: var(--color-warning-bg);
+			color: #7A4E00;
+		}
+
+		.status-pill--warning .status-pill-dot {
+			background: #7A4E00;
+		}
+
+		.pill--error,
+		.status-pill--error {
+			background: var(--color-error-bg);
 			color: var(--color-destructive);
-			font-weight: 600;
 		}
 
-		.status-rescheduled {
-			color: var(--color-warning);
-			font-weight: 600;
+		.status-pill--error .status-pill-dot {
+			background: var(--color-destructive);
 		}
 
-		.status-scheduled {
-			color: var(--color-accent);
-			font-weight: 600;
+		.pill--neutral,
+		.status-pill--neutral {
+			background: var(--color-muted);
+			color: var(--color-muted-foreground);
 		}
 
-		.status-pending {
-			color: var(--color-warning);
-			font-weight: 600;
+		.status-pill--neutral .status-pill-dot {
+			background: var(--color-muted-foreground);
 		}
 
-		.status-approved {
-			color: var(--color-success);
-			font-weight: 600;
+		.pill--primary,
+		.status-pill--primary {
+			background: var(--color-primary-light);
+			color: var(--color-primary-hover);
+		}
+
+		.status-pill--primary .status-pill-dot {
+			background: var(--color-primary-hover);
+		}
+
+		.pill--neutral.pill--tabular,
+		.pill--primary.pill--tabular {
+			font-variant-numeric: tabular-nums;
 		}
 
 		/* ============================= */
@@ -1247,6 +1309,11 @@ templ GlobalIncludes() {
 			background-color: var(--color-warning-bg) !important;
 		}
 
+		.row-deleted {
+			background-color: var(--color-muted) !important;
+			opacity: 0.85;
+		}
+
 		/* ============================= */
 		/* Teachers page                 */
 		/* ============================= */
@@ -1357,16 +1424,14 @@ templ GlobalIncludes() {
 			font-size: 0.8125rem;
 			color: var(--color-muted-foreground);
 		}
-			width: 48px;
-			text-align: center;
-			color: var(--color-muted-foreground);
-		}
 
-		.table-actions {
+		.table-actions,
+		.scheduled-class-actions,
+		.day-class-actions {
 			display: flex;
 			flex-wrap: wrap;
 			align-items: center;
-			gap: var(--space-2);
+			gap: var(--space-3);
 		}
 
 		.avatar-col {
@@ -1571,13 +1636,6 @@ templ GlobalIncludes() {
 		.day-class-actions .icon-action-btn {
 			margin-top: 0;
 			flex-shrink: 0;
-		}
-
-		.scheduled-class-actions {
-			display: flex;
-			flex-wrap: wrap;
-			align-items: center;
-			gap: var(--space-2);
 		}
 
 		.download-report-wrap {
@@ -2006,15 +2064,8 @@ templ GlobalIncludes() {
 			line-height: 1.2;
 		}
 
-		.calendar-day-badge {
+		.calendar-day .badge-count {
 			margin-top: 0.25rem;
-			font-size: 0.7rem;
-			font-weight: 600;
-			line-height: 1;
-			padding: 0.15rem 0.4rem;
-			border-radius: 999px;
-			background: var(--color-primary);
-			color: var(--color-on-primary);
 		}
 
 		.calendar-day.has-scheduled {
@@ -2362,10 +2413,7 @@ templ GlobalIncludes() {
 		}
 
 		.day-class-actions {
-			display: flex;
 			flex-wrap: nowrap;
-			align-items: center;
-			gap: var(--space-2);
 			flex-shrink: 0;
 		}
 
@@ -3115,12 +3163,8 @@ templ GlobalIncludes() {
 			}
 
 			.table-stack-mobile .table-actions {
-				display: flex;
 				flex-direction: row;
-				flex-wrap: wrap;
-				align-items: center;
 				justify-content: flex-end;
-				gap: var(--space-2);
 			}
 
 			.table-stack-mobile .table-actions .icon-action-btn {
@@ -3408,7 +3452,7 @@ templ GlobalIncludes() {
 				font-size: 0.85rem;
 			}
 
-			.calendar-day-badge {
+			.calendar-day .badge-count {
 				font-size: 0.65rem;
 				padding: 0.1rem 0.3rem;
 			}

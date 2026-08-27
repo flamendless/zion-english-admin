@@ -54,7 +54,9 @@ templ MyStudents(data MyStudentsData) {
 									<td data-label="Contact">{ getDisplayValue(s.Contact) }</td>
 									<td data-label="Parent">{ getDisplayValue(s.ParentName) }</td>
 									<td class="rate-cell" data-label="Rate">{ formatRate(s.RatePerClass, s.Currency) }</td>
-									<td class={ getStatusClass(s.Status) } data-label="Status">{ s.Status }</td>
+									<td data-label="Status">
+										@StatusPill(capitalizeStatus(s.Status), StudentStatusPillTone(s.Status), false)
+									</td>
 									<td data-label="Color">
 										<div class="color-cell">
 											<div class="color-box" style={ "background-color: " + s.AssignedColor }></div>

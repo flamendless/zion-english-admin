@@ -7,11 +7,9 @@ import (
 
 templ ReportTableRow(row ReportRowData, startDate string, endDate string) {
 	<tr data-teacher-id={ row.TeacherID }>
-		<td class="avatar-col" data-label="Avatar">
-			@Avatar(row.TeacherAvatar)
-		</td>
 		<td data-label="Teacher">
 			<div class="reports-teacher-cell">
+				@Avatar(row.TeacherAvatar)
 				<span>{ row.TeacherName }</span>
 			</div>
 		</td>
@@ -60,7 +58,7 @@ templ ReportTableRow(row ReportRowData, startDate string, endDate string) {
 templ ReportsTableBody(rows []ReportRowData, startDate string, endDate string, emptyMessage string) {
 	if len(rows) == 0 {
 		<tr>
-			<td colspan="5" class="empty-state">{ emptyMessage }</td>
+			<td colspan="4" class="empty-state">{ emptyMessage }</td>
 		</tr>
 	} else {
 		for _, row := range rows {

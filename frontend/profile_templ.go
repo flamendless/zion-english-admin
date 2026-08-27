@@ -100,7 +100,7 @@ func Profile(data ProfileData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<style>\r\n\t\t\t.profile-layout {\r\n\t\t\t\tdisplay: grid;\r\n\t\t\t\tgap: var(--space-6);\r\n\t\t\t}\r\n\r\n\t\t\t@media (min-width: 900px) {\r\n\t\t\t\t.profile-layout {\r\n\t\t\t\t\tgrid-template-columns: 280px 1fr;\r\n\t\t\t\t\talign-items: start;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\t.profile-card {\r\n\t\t\t\tbackground: var(--color-muted);\r\n\t\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\t\tpadding: var(--space-6);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-card h2 {\r\n\t\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\t\tfont-size: 1.125rem;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-identity {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\ttext-align: center;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-identity h2 {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-role {\r\n\t\t\t\tdisplay: inline-block;\r\n\t\t\t\tpadding: 4px 12px;\r\n\t\t\t\tborder-radius: var(--radius-full);\r\n\t\t\t\tbackground: var(--color-primary-light);\r\n\t\t\t\tcolor: var(--color-primary-hover);\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\ttext-transform: capitalize;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-email {\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\tword-break: break-all;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-form {\r\n\t\t\t\tmargin-top: var(--space-4);\r\n\t\t\t\twidth: 100%;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-form input[type=\"file\"] {\r\n\t\t\t\twidth: 100%;\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\tpadding: var(--space-2);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-hint {\r\n\t\t\t\tmargin-top: var(--space-2);\r\n\t\t\t\tfont-size: 0.75rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-details {\r\n\t\t\t\tdisplay: grid;\r\n\t\t\t\tgap: var(--space-4);\r\n\t\t\t}\r\n\r\n\t\t\t@media (min-width: 640px) {\r\n\t\t\t\t.profile-details {\r\n\t\t\t\t\tgrid-template-columns: 1fr 1fr;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\t.profile-detail {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-1);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-detail-label {\r\n\t\t\t\tfont-size: 0.75rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\ttext-transform: uppercase;\r\n\t\t\t\tletter-spacing: 0.04em;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-detail-value {\r\n\t\t\t\tfont-size: 0.9375rem;\r\n\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\tword-break: break-word;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-section {\r\n\t\t\t\tmargin-top: var(--space-6);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-section + .profile-section {\r\n\t\t\t\tpadding-top: var(--space-6);\r\n\t\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-section-desc {\r\n\t\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t}\r\n\r\n\t\t\t.cooldown-notice {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tpadding: var(--space-3) var(--space-4);\r\n\t\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-warning-bg);\r\n\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\tborder: 1px solid color-mix(in srgb, var(--color-warning) 35%, transparent);\r\n\t\t\t}\r\n\r\n\t\t\t.cooldown-notice svg {\r\n\t\t\t\tflex-shrink: 0;\r\n\t\t\t\tmargin-top: 2px;\r\n\t\t\t\tcolor: var(--color-warning);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-form-actions {\r\n\t\t\t\tmargin-top: var(--space-4);\r\n\t\t\t}\r\n\r\n\t\t\t.superuser-note {\r\n\t\t\t\tpadding: var(--space-4);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-info-bg);\r\n\t\t\t\tborder: 1px solid color-mix(in srgb, var(--color-info) 25%, transparent);\r\n\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-list {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t\tpadding: var(--space-3) var(--space-4);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-brand {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t\tflex: 1;\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-logo-wrap {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tjustify-content: center;\r\n\t\t\t\tpadding: 10px 12px;\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: #E8F1FF;\r\n\t\t\t\tflex-shrink: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-logo {\r\n\t\t\t\twidth: 56px;\r\n\t\t\t\theight: auto;\r\n\t\t\t\tdisplay: block;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-info {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: 2px;\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-name {\r\n\t\t\t\tfont-size: 0.9375rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\tline-height: 1.3;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-desc {\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tline-height: 1.45;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-meta {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t\tflex-shrink: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-badge {\r\n\t\t\t\tdisplay: inline-flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: 6px;\r\n\t\t\t\tpadding: 4px 10px;\r\n\t\t\t\tborder-radius: var(--radius-full);\r\n\t\t\t\tfont-size: 0.75rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tline-height: 1.2;\r\n\t\t\t\twhite-space: nowrap;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-badge-dot {\r\n\t\t\t\twidth: 6px;\r\n\t\t\t\theight: 6px;\r\n\t\t\t\tborder-radius: var(--radius-full);\r\n\t\t\t\tflex-shrink: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-badge--connected {\r\n\t\t\t\tbackground: var(--color-success-bg);\r\n\t\t\t\tcolor: var(--color-success);\r\n\t\t\t}\r\n\r\n\t\t\t.integration-badge--connected .integration-badge-dot {\r\n\t\t\t\tbackground: var(--color-success);\r\n\t\t\t}\r\n\r\n\t\t\t.integration-badge--disconnected {\r\n\t\t\t\tbackground: var(--color-muted);\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t}\r\n\r\n\t\t\t.integration-badge--disconnected .integration-badge-dot {\r\n\t\t\t\tbackground: var(--color-muted-foreground);\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-action {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-action form {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tmargin: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-action .btn {\r\n\t\t\t\tmargin-top: 0;\r\n\t\t\t\twhite-space: nowrap;\r\n\t\t\t}\r\n\r\n\t\t\t@media (max-width: 520px) {\r\n\t\t\t\t.integration-row {\r\n\t\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\t\talign-items: flex-start;\r\n\t\t\t\t}\r\n\r\n\t\t\t\t.integration-row-meta {\r\n\t\t\t\t\twidth: 100%;\r\n\t\t\t\t\tjustify-content: space-between;\r\n\t\t\t\t\tpadding-left: calc(80px + var(--space-3));\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t</style></head><body><div class=\"container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<style>\r\n\t\t\t.profile-layout {\r\n\t\t\t\tdisplay: grid;\r\n\t\t\t\tgap: var(--space-6);\r\n\t\t\t}\r\n\r\n\t\t\t@media (min-width: 900px) {\r\n\t\t\t\t.profile-layout {\r\n\t\t\t\t\tgrid-template-columns: 280px 1fr;\r\n\t\t\t\t\talign-items: start;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\t.profile-card {\r\n\t\t\t\tbackground: var(--color-muted);\r\n\t\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\t\tpadding: var(--space-6);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-card h2 {\r\n\t\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\t\tfont-size: 1.125rem;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-identity {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\ttext-align: center;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-identity h2 {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-email {\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\tword-break: break-all;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-form {\r\n\t\t\t\tmargin-top: var(--space-4);\r\n\t\t\t\twidth: 100%;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-form input[type=\"file\"] {\r\n\t\t\t\twidth: 100%;\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\tpadding: var(--space-2);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-hint {\r\n\t\t\t\tmargin-top: var(--space-2);\r\n\t\t\t\tfont-size: 0.75rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-details {\r\n\t\t\t\tdisplay: grid;\r\n\t\t\t\tgap: var(--space-4);\r\n\t\t\t}\r\n\r\n\t\t\t@media (min-width: 640px) {\r\n\t\t\t\t.profile-details {\r\n\t\t\t\t\tgrid-template-columns: 1fr 1fr;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\t.profile-detail {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-1);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-detail-label {\r\n\t\t\t\tfont-size: 0.75rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\ttext-transform: uppercase;\r\n\t\t\t\tletter-spacing: 0.04em;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-detail-value {\r\n\t\t\t\tfont-size: 0.9375rem;\r\n\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\tword-break: break-word;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-section {\r\n\t\t\t\tmargin-top: var(--space-6);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-section + .profile-section {\r\n\t\t\t\tpadding-top: var(--space-6);\r\n\t\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-section-desc {\r\n\t\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t}\r\n\r\n\t\t\t.cooldown-notice {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tpadding: var(--space-3) var(--space-4);\r\n\t\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-warning-bg);\r\n\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\tborder: 1px solid color-mix(in srgb, var(--color-warning) 35%, transparent);\r\n\t\t\t}\r\n\r\n\t\t\t.cooldown-notice svg {\r\n\t\t\t\tflex-shrink: 0;\r\n\t\t\t\tmargin-top: 2px;\r\n\t\t\t\tcolor: var(--color-warning);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-form-actions {\r\n\t\t\t\tmargin-top: var(--space-4);\r\n\t\t\t}\r\n\r\n\t\t\t.superuser-note {\r\n\t\t\t\tpadding: var(--space-4);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-info-bg);\r\n\t\t\t\tborder: 1px solid color-mix(in srgb, var(--color-info) 25%, transparent);\r\n\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-list {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t\tpadding: var(--space-3) var(--space-4);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-brand {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t\tflex: 1;\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-logo-wrap {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tjustify-content: center;\r\n\t\t\t\tpadding: 10px 12px;\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: #E8F1FF;\r\n\t\t\t\tflex-shrink: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-logo {\r\n\t\t\t\twidth: 56px;\r\n\t\t\t\theight: auto;\r\n\t\t\t\tdisplay: block;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-info {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: 2px;\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-name {\r\n\t\t\t\tfont-size: 0.9375rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\tline-height: 1.3;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-desc {\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tline-height: 1.45;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-meta {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t\tflex-shrink: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-action {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-action form {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tmargin: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-action .btn {\r\n\t\t\t\tmargin-top: 0;\r\n\t\t\t\twhite-space: nowrap;\r\n\t\t\t}\r\n\r\n\t\t\t@media (max-width: 520px) {\r\n\t\t\t\t.integration-row {\r\n\t\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\t\talign-items: flex-start;\r\n\t\t\t\t}\r\n\r\n\t\t\t\t.integration-row-meta {\r\n\t\t\t\t\twidth: 100%;\r\n\t\t\t\t\tjustify-content: space-between;\r\n\t\t\t\t\tpadding-left: calc(80px + var(--space-3));\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t</style></head><body><div class=\"container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -131,35 +131,30 @@ func Profile(data ProfileData) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 354, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 306, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</h2><span class=\"profile-role\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</h2>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = Pill(data.Role, PillTonePrimary).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<p class=\"profile-email\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(data.Role)
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(data.Email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 355, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 308, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</span><p class=\"profile-email\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(data.Email)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 356, Col: 43}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -190,12 +185,12 @@ func Profile(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var6 string
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(displayProfileName(data.FirstName, data.CanEditFirstName))
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(displayProfileName(data.FirstName, data.CanEditFirstName))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 375, Col: 103}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 327, Col: 103}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -203,12 +198,12 @@ func Profile(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var7 string
-			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(displayProfileName(data.MiddleName, data.CanEditMiddleName))
+			var templ_7745c5c3_Var6 string
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(displayProfileName(data.MiddleName, data.CanEditMiddleName))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 379, Col: 105}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 331, Col: 105}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -216,12 +211,12 @@ func Profile(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var8 string
-			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(displayProfileName(data.LastName, data.CanEditLastName))
+			var templ_7745c5c3_Var7 string
+			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(displayProfileName(data.LastName, data.CanEditLastName))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 383, Col: 101}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 335, Col: 101}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -229,12 +224,12 @@ func Profile(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var9 string
-			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(data.Status)
+			var templ_7745c5c3_Var8 string
+			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(data.Status)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 387, Col: 57}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 339, Col: 57}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -242,12 +237,12 @@ func Profile(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var10 string
-			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(data.Birthdate)
+			var templ_7745c5c3_Var9 string
+			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(data.Birthdate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 391, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 343, Col: 60}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -255,12 +250,12 @@ func Profile(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var11 string
-			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(data.JoiningDate)
+			var templ_7745c5c3_Var10 string
+			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(data.JoiningDate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 395, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 347, Col: 62}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -268,12 +263,12 @@ func Profile(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var12 string
-			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(data.Address)
+			var templ_7745c5c3_Var11 string
+			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(data.Address)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 399, Col: 58}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 351, Col: 58}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -281,12 +276,12 @@ func Profile(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var13 string
-			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(displayOrDash(data.Sex))
+			var templ_7745c5c3_Var12 string
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(displayOrDash(data.Sex))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 403, Col: 69}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 355, Col: 69}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -294,12 +289,12 @@ func Profile(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var14 string
-			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.2f %s", data.RatePerClass, data.Currency))
+			var templ_7745c5c3_Var13 string
+			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.2f %s", data.RatePerClass, data.Currency))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 407, Col: 102}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 359, Col: 102}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -307,12 +302,12 @@ func Profile(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var15 string
-			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(displayOrDash(data.Certifications))
+			var templ_7745c5c3_Var14 string
+			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(displayOrDash(data.Certifications))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 411, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 363, Col: 80}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -333,12 +328,12 @@ func Profile(data ProfileData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var16 string
-		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(data.Email)
+		var templ_7745c5c3_Var15 string
+		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(data.Email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 422, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 374, Col: 55}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -351,12 +346,12 @@ func Profile(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var17 string
-			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(data.MobileNumber)
+			var templ_7745c5c3_Var16 string
+			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(data.MobileNumber)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 427, Col: 63}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 379, Col: 63}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -383,12 +378,12 @@ func Profile(data ProfileData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var18 templ.SafeURL
-				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/names"))
+				var templ_7745c5c3_Var17 templ.SafeURL
+				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/names"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 439, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 391, Col: 64}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -433,12 +428,12 @@ func Profile(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var19 templ.SafeURL
-			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/mobile"))
+			var templ_7745c5c3_Var18 templ.SafeURL
+			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/mobile"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 495, Col: 64}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 447, Col: 64}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -446,12 +441,12 @@ func Profile(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var20 string
-			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.MobileNumber)
+			var templ_7745c5c3_Var19 string
+			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.MobileNumber)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 504, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 456, Col: 35}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var20)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var19)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -489,12 +484,12 @@ func Profile(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var21 templ.SafeURL
-			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/password"))
+			var templ_7745c5c3_Var20 templ.SafeURL
+			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/password"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 522, Col: 66}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 474, Col: 66}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -607,21 +602,21 @@ func CooldownNotice(daysRemaining int, fieldLabel string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var22 == nil {
-			templ_7745c5c3_Var22 = templ.NopComponent
+		templ_7745c5c3_Var21 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var21 == nil {
+			templ_7745c5c3_Var21 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "<div class=\"cooldown-notice\" role=\"status\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle> <polyline points=\"12 6 12 12 16 14\"></polyline></svg> <span>You can change your ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var23 string
-		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(fieldLabel)
+		var templ_7745c5c3_Var22 string
+		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(fieldLabel)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 589, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 541, Col: 35}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -629,12 +624,12 @@ func CooldownNotice(daysRemaining int, fieldLabel string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var24 string
-		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", daysRemaining))
+		var templ_7745c5c3_Var23 string
+		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", daysRemaining))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 589, Col: 81}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 541, Col: 81}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -662,9 +657,9 @@ func ProfileZoomIntegrations(data ProfileData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var25 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var25 == nil {
-			templ_7745c5c3_Var25 = templ.NopComponent
+		templ_7745c5c3_Var24 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var24 == nil {
+			templ_7745c5c3_Var24 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		if data.ZoomConfigured {
@@ -677,12 +672,12 @@ func ProfileZoomIntegrations(data ProfileData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var26 string
-				templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(data.ZoomStatusMessage)
+				var templ_7745c5c3_Var25 string
+				templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(data.ZoomStatusMessage)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 599, Col: 68}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 551, Col: 68}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -695,12 +690,12 @@ func ProfileZoomIntegrations(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var27 string
-			templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/zoom-logo.svg"))
+			var templ_7745c5c3_Var26 string
+			templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/zoom-logo.svg"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 607, Col: 48}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 559, Col: 48}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -708,12 +703,12 @@ func ProfileZoomIntegrations(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var28 templ.SafeURL
-			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinURLErrs(data.ZoomGuideURL)
+			var templ_7745c5c3_Var27 templ.SafeURL
+			templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinURLErrs(data.ZoomGuideURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 617, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 569, Col: 35}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -741,12 +736,12 @@ func ProfileZoomIntegrations(data ProfileData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var29 templ.SafeURL
-				templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinURLErrs(data.ZoomDisconnectURL)
+				var templ_7745c5c3_Var28 templ.SafeURL
+				templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinURLErrs(data.ZoomDisconnectURL)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 629, Col: 59}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 581, Col: 59}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -759,12 +754,12 @@ func ProfileZoomIntegrations(data ProfileData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var30 templ.SafeURL
-				templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinURLErrs(data.ZoomConnectURL)
+				var templ_7745c5c3_Var29 templ.SafeURL
+				templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinURLErrs(data.ZoomConnectURL)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 633, Col: 37}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 585, Col: 37}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -798,18 +793,18 @@ func IntegrationStatusBadge(connected bool) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var31 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var31 == nil {
-			templ_7745c5c3_Var31 = templ.NopComponent
+		templ_7745c5c3_Var30 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var30 == nil {
+			templ_7745c5c3_Var30 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		if connected {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "<span class=\"integration-badge integration-badge--connected\"><span class=\"integration-badge-dot\" aria-hidden=\"true\"></span> Connected</span>")
+			templ_7745c5c3_Err = StatusPill("Connected", PillToneSuccess, true).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "<span class=\"integration-badge integration-badge--disconnected\"><span class=\"integration-badge-dot\" aria-hidden=\"true\"></span> Not connected</span>")
+			templ_7745c5c3_Err = StatusPill("Not connected", PillToneNeutral, true).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

@@ -1,0 +1,29 @@
+package frontend
+
+import "strconv"
+
+templ Pill(label string, tone PillTone) {
+	<span class={ pillClass(tone) }>{ label }</span>
+}
+
+templ StatusPill(label string, tone PillTone, withDot bool) {
+	<span class={ statusPillClass(tone) }>
+		if withDot {
+			<span class="status-pill-dot" aria-hidden="true"></span>
+		}
+		{ label }
+	</span>
+}
+
+templ CountBadge(count int64, tone BadgeTone, ariaLabel string) {
+	if count > 0 {
+		<span class={ badgeCountClass(tone) } aria-label={ ariaLabel }>{ badgeCountLabel(count) }</span>
+	}
+}
+
+func badgeCountLabel(count int64) string {
+	if count > 99 {
+		return "99+"
+	}
+	return strconv.FormatInt(count, 10)
+}

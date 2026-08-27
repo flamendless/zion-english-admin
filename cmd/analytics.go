@@ -13,6 +13,7 @@ import (
 	"zion-english/internal/auth"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
+	"zion-english/internal/models"
 	"zion-english/internal/utils"
 
 	"go.uber.org/zap"
@@ -30,9 +31,10 @@ type analyticsSummaryJSON struct {
 }
 
 type analyticsTeacherRowJSON struct {
-	TeacherID        string  `json:"teacherId"`
-	TeacherName      string  `json:"teacherName"`
-	Conducted        int64   `json:"conducted"`
+	TeacherID        string            `json:"teacherId"`
+	TeacherName      string            `json:"teacherName"`
+	TeacherAvatar    models.AvatarView `json:"teacherAvatar"`
+	Conducted        int64             `json:"conducted"`
 	Cancelled        int64   `json:"cancelled"`
 	Rescheduled      int64   `json:"rescheduled"`
 	CancellationRate float64 `json:"cancellationRate"`
@@ -60,13 +62,14 @@ type analyticsWeeklyRowJSON struct {
 }
 
 type analyticsNoShowJSON struct {
-	ID              string `json:"id"`
-	ScheduledDate   string `json:"scheduledDate"`
-	StartTime       string `json:"startTime"`
-	DurationMinutes int64  `json:"durationMinutes"`
-	StudentName     string `json:"studentName"`
-	TeacherName     string `json:"teacherName"`
-	DaysOverdue     int64  `json:"daysOverdue"`
+	ID              string            `json:"id"`
+	ScheduledDate   string            `json:"scheduledDate"`
+	StartTime       string            `json:"startTime"`
+	DurationMinutes int64             `json:"durationMinutes"`
+	StudentName     string            `json:"studentName"`
+	TeacherName     string            `json:"teacherName"`
+	TeacherAvatar   models.AvatarView `json:"teacherAvatar"`
+	DaysOverdue     int64             `json:"daysOverdue"`
 }
 
 type analyticsInactiveReasonJSON struct {
@@ -192,6 +195,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 			resp.ByTeacher = append(resp.ByTeacher, analyticsTeacherRowJSON{
 				TeacherID:        strconv.FormatInt(row.TeacherID, 10),
 				TeacherName:      row.TeacherName,
+				TeacherAvatar:    analyticsTeacherAvatar(row.TeacherID, row.TeacherFirstName, row.TeacherMiddleName, row.TeacherLastName, row.TeacherName, row.TeacherAssignedColor, row.TeacherProfilePicture),
 				Conducted:        tConducted,
 				Cancelled:        tCancelled,
 				Rescheduled:      tRescheduled,
@@ -269,11 +273,12 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 	for _, row := range noShowRows {
 		resp.NoShows = append(resp.NoShows, analyticsNoShowJSON{
 			ID:              strconv.FormatInt(row.ID, 10),
-			ScheduledDate:     row.ScheduledDate,
+			ScheduledDate:   row.ScheduledDate,
 			StartTime:       row.StartTime.String,
 			DurationMinutes: row.DurationMinutes,
 			StudentName:     row.StudentName,
 			TeacherName:     row.TeacherName,
+			TeacherAvatar:   analyticsTeacherAvatar(row.TeacherID, row.TeacherFirstName, row.TeacherMiddleName, row.TeacherLastName, row.TeacherName, row.TeacherAssignedColor, row.TeacherProfilePicture),
 			DaysOverdue:     row.DaysOverdue,
 		})
 	}
@@ -471,6 +476,20 @@ func medianInt64(values []int64) int64 {
 		return (sorted[mid-1] + sorted[mid]) / 2
 	}
 	return sorted[mid]
+}
+
+func analyticsTeacherAvatar(teacherID int64, firstName, middleName, lastName, teacherName, assignedColor string, profilePicture sql.NullString) models.AvatarView {
+	hasPicture := profilePicture.Valid && profilePicture.String != ""
+	if assignedColor == "" {
+		assignedColor = "#B9D283"
+	}
+	return models.AvatarView{
+		Initials:      utils.PersonInitials(firstName, middleName, lastName, teacherName),
+		AssignedColor: assignedColor,
+		HasPicture:    hasPicture,
+		PictureURL:    teacherPictureURL(teacherID, hasPicture),
+		Alt:           teacherName + " avatar",
+	}
 }
 
 func sqlNumericToString(value interface{}) string {
