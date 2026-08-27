@@ -70,6 +70,31 @@ type TblClassRecord struct {
 	DeletedAt       sql.NullString
 }
 
+type TblLearningMaterial struct {
+	ID          int64
+	OwnerID     int64
+	Description string
+	Url         string
+	Access      string
+	Status      string
+	CreatedAt   string
+	UpdatedAt   string
+	DeletedAt   sql.NullString
+}
+
+type TblLearningMaterialTag struct {
+	ID        int64
+	Label     string
+	Color     string
+	CreatedAt string
+}
+
+type TblLearningMaterialsTagsM2m struct {
+	MaterialID int64
+	TagID      int64
+	CreatedAt  string
+}
+
 type TblLog struct {
 	ID            int64
 	Module        string
