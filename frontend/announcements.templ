@@ -270,7 +270,7 @@ templ AnnouncementForm(data AnnouncementFormData) {
 								placeholder="Additional details shown below the title"
 								data-preview-target="description"
 							>{ data.Description }</textarea>
-							<p class="field-hint">Keep it concise — this appears in the persistent banner across all pages.</p>
+							<p class="field-hint">Keep it concise. This appears in the persistent banner across all pages.</p>
 						</div>
 						<div class="form-group">
 							<label for="cta_label">CTA label</label>
@@ -335,7 +335,7 @@ templ AnnouncementForm(data AnnouncementFormData) {
 						<div class="announcement-level-picker" role="radiogroup" aria-label="Announcement level">
 							@AnnouncementLevelOption(announcements.LevelInfo, "Info", "General updates and reminders", data.Level)
 							@AnnouncementLevelOption(announcements.LevelWarning, "Warning", "Important changes teachers should know", data.Level)
-							@AnnouncementLevelOption(announcements.LevelCritical, "Critical", "Urgent — schedule or system issues", data.Level)
+							@AnnouncementLevelOption(announcements.LevelCritical, "Critical", "Urgent: schedule or system issues", data.Level)
 						</div>
 					</section>
 

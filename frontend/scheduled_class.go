@@ -145,7 +145,7 @@ func IsScheduledClassOverdue(item ScheduledClassItemData) bool {
 
 func FormatScheduledClassDateDisplay(date string) string {
 	if date == "" {
-		return "—"
+		return "-"
 	}
 	t, err := time.ParseInLocation(constants.DateLayout, date, constants.LocationPHT)
 	if err != nil {
@@ -180,7 +180,7 @@ func scheduledClassDetailAttrs(item ScheduledClassItemData) templ.Attributes {
 		"data-teacher-name":   item.TeacherName,
 		"data-scheduled-date": FormatScheduledClassDateDisplay(item.ScheduledDate),
 		"data-time-range":     item.TimeRange,
-		"data-rate":           formatRateAmount(item.Rate),
+		"data-rate":           formatRateAmount(item.Rate, item.Currency),
 		"data-currency":       item.Currency,
 		"data-teacher-initials":      item.TeacherAvatar.Initials,
 		"data-teacher-color":         item.TeacherAvatar.AssignedColor,

@@ -3,7 +3,7 @@
 The color parser required a parenthesized name in the Quick Reference row
 (`#2563EB (name)`) and a bolded label in the color tables (`**Primary Blue**`),
 neither of which the bundled starter template uses. As a result the base hex
-came back `undefined` and `adjustBrightness(undefined)` threw a TypeError —
+came back `undefined` and `adjustBrightness(undefined)` threw a TypeError:
 i.e. the script crashed on its own documented happy path. This test runs the
 sync against the bundled starter template and asserts it completes and writes
 the expected base colors. It is pytest-based so the existing pytest CI runs it.

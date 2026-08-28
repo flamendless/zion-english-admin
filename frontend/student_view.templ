@@ -1,6 +1,6 @@
 package frontend
 
-import "fmt"
+import "zion-english/internal/utils"
 
 templ StudentViewModal(data EditStudentData) {
 	<div class="modal-overlay" id="studentViewModal" role="presentation">
@@ -20,7 +20,7 @@ templ StudentViewModal(data EditStudentData) {
 							@StatusPill(capitalizeStatus(data.Status), StudentStatusPillTone(data.Status), true)
 							<div class="entity-view-rate-block">
 								<div class="entity-view-rate-highlight">
-									<span class="entity-view-rate-highlight-amount">{ fmt.Sprintf("%.2f", data.RatePerClass) }</span>
+									<span class="entity-view-rate-highlight-amount">{ utils.FormatCurrencyAmountFixed(data.RatePerClass, data.Currency) }</span>
 									<span class="entity-view-rate-highlight-currency">{ data.Currency }</span>
 								</div>
 								<span class="entity-view-rate-caption">per class</span>

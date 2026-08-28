@@ -7,7 +7,7 @@ templ Pill(label string, tone PillTone) {
 
 templ RatePill(rate float64, currency string) {
 	<span class={ pillClass(PillToneInfo) + " rate-pill" } aria-label={ ratePillAriaLabel(rate, currency) }>
-		<span class="rate-pill-amount">{ formatRateAmount(rate) }</span>
+		<span class="rate-pill-amount">{ formatRateAmount(rate, currency) }</span>
 		<span class="rate-pill-currency">{ currency }</span>
 	</span>
 }

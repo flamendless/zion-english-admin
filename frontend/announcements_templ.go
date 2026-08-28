@@ -721,7 +721,7 @@ func AnnouncementForm(data AnnouncementFormData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</textarea><p class=\"field-hint\">Keep it concise — this appears in the persistent banner across all pages.</p></div><div class=\"form-group\"><label for=\"cta_label\">CTA label</label> <input type=\"text\" id=\"cta_label\" name=\"cta_label\" maxlength=\"60\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</textarea><p class=\"field-hint\">Keep it concise. This appears in the persistent banner across all pages.</p></div><div class=\"form-group\"><label for=\"cta_label\">CTA label</label> <input type=\"text\" id=\"cta_label\" name=\"cta_label\" maxlength=\"60\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -805,7 +805,7 @@ func AnnouncementForm(data AnnouncementFormData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = AnnouncementLevelOption(announcements.LevelCritical, "Critical", "Urgent — schedule or system issues", data.Level).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = AnnouncementLevelOption(announcements.LevelCritical, "Critical", "Urgent: schedule or system issues", data.Level).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

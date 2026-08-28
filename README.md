@@ -32,14 +32,14 @@ Admin portal for Zion English teachers and administrators. Manage students, clas
 
 ## Features
 
-- **Student management** — Register students, assign teachers, and track status and contact details
-- **Scheduling & classes** — View schedules, record class outcomes, and track weekly totals
-- **Sheet processing** — Import class data from Google Drive spreadsheets and export payroll-ready files
-- **Role-based access** — Teachers manage their students and classes; superusers manage the full organization
-- **Announcements** — Broadcast info, warning, and critical banners to all or selected teachers
-- **Guides** — Step-by-step help for everyday admin tasks
-- **Audit logs** — System and processing logs for accountability
+- **Student management:** Register students, assign teachers, and track status and contact details
+- **Scheduling & classes:** View schedules, record class outcomes, and track weekly totals
+- **Sheet processing:** Import class data from Google Drive spreadsheets and export payroll-ready files
+- **Role-based access:** Teachers manage their students and classes; superusers manage the full organization
+- **Announcements:** Broadcast info, warning, and critical banners to all or selected teachers
+- **Guides:** Step-by-step help for everyday admin tasks
+- **Audit logs:** System and processing logs for accountability
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).

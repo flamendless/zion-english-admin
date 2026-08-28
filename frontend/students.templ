@@ -1,6 +1,5 @@
 package frontend
 
-import "fmt"
 import "zion-english/internal/utils"
 
 type StudentData struct {
@@ -100,7 +99,7 @@ templ Students(data StudentData) {
 									<td data-label="Teacher">{ getDisplayValue(student.TeacherDisplay) }</td>
 									<td class="rate-cell" data-label="Rate">
 										<span class="rate-value">
-											<span class="rate-amount">{ fmt.Sprintf("%.2f", student.RatePerClass) }</span>
+											<span class="rate-amount">{ utils.FormatCurrencyAmountFixed(student.RatePerClass, student.Currency) }</span>
 											<span class="rate-currency">{ student.Currency }</span>
 										</span>
 									</td>

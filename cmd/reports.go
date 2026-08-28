@@ -204,7 +204,7 @@ func renderReportGenerateRow(w http.ResponseWriter, r *http.Request, teacherID i
 		return
 	}
 	if skipped {
-		w.Header().Set("HX-Trigger", `{"showSuccessBanner":"Report is up to date — skipped generation"}`)
+		w.Header().Set("HX-Trigger", `{"showSuccessBanner":"Report is up to date; skipped generation"}`)
 	}
 	w.Header().Set("Content-Type", "text/html")
 	if err := frontend.ReportTableRow(row, startDate, endDate).Render(r.Context(), w); err != nil {
@@ -269,7 +269,7 @@ func handleReportView(w http.ResponseWriter, r *http.Request, teacherID int64) {
 		classes = append(classes, frontend.ReportClassItem{
 			Date:        record.Date,
 			StudentName: record.StudentName,
-			Rate:        fmt.Sprintf("%.2f %s", record.Rate, record.Currency),
+			Rate:        utils.FormatCurrency(record.Rate, record.Currency),
 			TimeRange:   formatReportTimeRange(record.StartTime, record.EndTime),
 			Status:      record.Status,
 		})

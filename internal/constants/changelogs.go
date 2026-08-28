@@ -2,7 +2,7 @@ package constants
 
 const (
 	ChangelogsPageTitle    = "Changelogs"
-	ChangelogsPageSubtitle = "See what changed in the Zion English admin tool — new features, improvements, and fixes by release."
+	ChangelogsPageSubtitle = "See what changed in the Zion English admin tool: new features, improvements, and fixes by release."
 	ChangelogsEmptyMessage = "No released versions yet. Check back after the next update."
 
 	ChangelogsCurrentVersionLabel = "Currently deployed"

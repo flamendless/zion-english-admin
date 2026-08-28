@@ -24,7 +24,7 @@ templ ClassRecordRow(record ClassRecordRowData, showTeacher bool) {
 		<td data-label="Actions">
 			<div class="table-actions">
 				if record.IsDeleted() {
-					<span>—</span>
+					<span>-</span>
 				} else if record.IsScheduled() {
 					@ScheduledClassActions(record.ScheduledItemData())
 				} else {

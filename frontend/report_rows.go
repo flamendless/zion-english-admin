@@ -49,7 +49,7 @@ func (r ReportRowData) EarningsHTML() string {
 	}
 	parts := make([]string, 0, len(r.Earnings))
 	for _, item := range r.Earnings {
-		parts = append(parts, fmt.Sprintf("%.2f %s", item.Total, item.Currency))
+		parts = append(parts, utils.FormatCurrency(item.Total, item.Currency))
 	}
 	return strings.Join(parts, "<br>")
 }

@@ -140,7 +140,7 @@ func (s *Service) SyncRoomForSchedule(ctx context.Context, input ScheduledClassM
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
-	topic := fmt.Sprintf("Zion English — %s", input.StudentName)
+	topic := fmt.Sprintf("Zion English - %s", input.StudentName)
 	if err == sql.ErrNoRows {
 		room, err := provider.CreateRoom(ctx, account, CreateRoomRequest{
 			Topic:           topic,

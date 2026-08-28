@@ -355,7 +355,7 @@ templ Profile(data ProfileData) {
 								</div>
 								<div class="profile-detail">
 									<span class="profile-detail-label">Rate per class</span>
-									<span class="profile-detail-value">{ fmt.Sprintf("%.2f %s", data.RatePerClass, data.Currency) }</span>
+									<span class="profile-detail-value">{ utils.FormatCurrency(data.RatePerClass, data.Currency) }</span>
 								</div>
 								<div class="profile-detail">
 									<span class="profile-detail-label">Certifications</span>

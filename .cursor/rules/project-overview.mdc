@@ -17,7 +17,7 @@ Go 1.26 admin tool. Module: `zion-english`. Entry: `main.go` → `cmd.Execute()`
 | `static/` | Assets (logo, favicon, htmx, hyperscript) |
 | `migrations/sqlite3/` | Goose migrations (schema source of truth) |
 | `internal/database/sql/` | Hand-written sqlc queries |
-| `internal/database/queries/` | Generated sqlc code — never edit |
+| `internal/database/queries/` | Generated sqlc code: never edit |
 | `data/` | SQLite DB (`data/zion.db`) |
 | `tmp/` | Runtime temp files (CSV downloads, XLSX output) |
 
@@ -41,5 +41,5 @@ Local URL: `http://localhost:8080/zion-english-admin` (prod uses bare paths via 
 
 ## Do Not Edit
 
-- `internal/database/queries/*` — regenerate with sqlc
-- `frontend/*_templ.go` — regenerate with templ
+- `internal/database/queries/*`: regenerate with sqlc
+- `frontend/*_templ.go`: regenerate with templ

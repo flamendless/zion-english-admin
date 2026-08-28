@@ -76,7 +76,7 @@ templ DeleteClassModal() {
 
 			function fillTeacherCell(el, trigger) {
 				if (!el || !trigger) return;
-				const name = trigger.getAttribute('data-teacher-name') || '—';
+				const name = trigger.getAttribute('data-teacher-name') || '-';
 				const initials = trigger.getAttribute('data-teacher-initials') || '';
 				const color = trigger.getAttribute('data-teacher-color') || '#B9D283';
 				const pictureURL = trigger.getAttribute('data-teacher-picture-url') || '';
@@ -112,13 +112,13 @@ templ DeleteClassModal() {
 				const dateEl = container.querySelector('[data-field="date"]');
 				const timeEl = container.querySelector('[data-field="time"]');
 				const rateEl = container.querySelector('[data-field="rate"]');
-				if (studentEl) studentEl.textContent = trigger.getAttribute('data-student-name') || '—';
+				if (studentEl) studentEl.textContent = trigger.getAttribute('data-student-name') || '-';
 				fillTeacherCell(teacherCell, trigger);
-				if (dateEl) dateEl.textContent = trigger.getAttribute('data-scheduled-date') || '—';
-				fillTimePill(timeEl, trigger.getAttribute('data-time-range') || '—');
+				if (dateEl) dateEl.textContent = trigger.getAttribute('data-scheduled-date') || '-';
+				fillTimePill(timeEl, trigger.getAttribute('data-time-range') || '-');
 				fillRatePill(
 					rateEl,
-					trigger.getAttribute('data-rate') || '—',
+					trigger.getAttribute('data-rate') || '-',
 					trigger.getAttribute('data-currency') || ''
 				);
 			}

@@ -7,7 +7,7 @@ alwaysApply: true
 
 ## Imports
 
-Stdlib, then third-party, then `zion-english/...` — no blank lines between groups:
+Stdlib, then third-party, then `zion-english/...`: no blank lines between groups:
 
 ```go
 import (
@@ -20,12 +20,12 @@ import (
 
 ## File Layout
 
-Package-level types and variables go at the top of the file, immediately after imports — before `init()` and functions. Group related `var` declarations together.
+Package-level types and variables go at the top of the file, immediately after imports: before `init()` and functions. Group related `var` declarations together.
 
 ## Naming
 
 - Handlers: `handleHome`, `handleStudentRegister` (`handle` prefix, camelCase)
-- HTTP helpers: `HttpError`, `HttpRedirect` (PascalCase — project convention)
+- HTTP helpers: `HttpError`, `HttpRedirect` (PascalCase: project convention)
 - Validation: `validateProcessRequest`, `validateStudentRequest`
 - DB mode constants: `DB_MODE_RO`, `DB_MODE_RW`
 - Tables: `tbl_teachers`, `tbl_students` (migration prefix)
@@ -47,7 +47,7 @@ const (
 - Pass enum types through function and templ component parameters instead of `string` when the value set is closed.
 - Compare with enum constants, not literals (`kind == IconKindEdit`, not `kind == "edit"`).
 - For wire formats (JSON, DB, HTML attributes), convert at the boundary: `string(IconKindView)`.
-- In inline `<script>` blocks inside `.templ`, use literal wire-value strings (e.g. `'view'`) that match `string(IconKindView)` — templ does not evaluate Go inside raw script text.
+- In inline `<script>` blocks inside `.templ`, use literal wire-value strings (e.g. `'view'`) that match `string(IconKindView)`: templ does not evaluate Go inside raw script text.
 - Bare strings are fine for one-off user-facing text, log messages, and truly open-ended values.
 
 ## Handler Pattern (cmd/web.go)
@@ -102,7 +102,7 @@ w.Header().Set("HX-Redirect", utils.URL("/"))
 
 ## Helpers
 
-- **No one-line forwarders** — do not add a local function whose body is only `return otherFn(...)`. Call `otherFn` at the site instead. This applies to `cmd/` wrappers around `utils.*`, DB queries, and formatters (e.g. avoid `formatNullTime(t) { return utils.FormatNullDateTimeSecondsPHT(t) }`).
+- **No one-line forwarders**: do not add a local function whose body is only `return otherFn(...)`. Call `otherFn` at the site instead. This applies to `cmd/` wrappers around `utils.*`, DB queries, and formatters (e.g. avoid `formatNullTime(t) { return utils.FormatNullDateTimeSecondsPHT(t) }`).
 - Reuse `internal/utils` for shared string/format helpers (e.g. `utils.NormalizeEmail`, `utils.FormatNullDateTimePHT`) rather than re-wrapping them in `cmd/`.
 - Small helpers are fine when they add real logic (branching, param assembly, validation) or deduplicate non-trivial blocks used in multiple places.
 
@@ -110,7 +110,7 @@ w.Header().Set("HX-Redirect", utils.URL("/"))
 
 All user-facing dates and datetimes are shown in **Philippines time** (`Asia/Manila`).
 
-- Layout constants live in `internal/constants/timezone.go` — never use raw Go layout strings (`"2006-01-02"`, `"15:04"`, etc.) in handlers or templates.
+- Layout constants live in `internal/constants/timezone.go`: never use raw Go layout strings (`"2006-01-02"`, `"15:04"`, etc.) in handlers or templates.
 - Format for display via `internal/utils/datetime.go`:
   - `utils.DatePHT`, `utils.DateTimePHT`, `utils.DateTimeSecondsPHT`
   - `utils.FormatNullDateTimePHT`, `utils.FormatNullDateTimeSecondsPHT` for `sql.NullTime`

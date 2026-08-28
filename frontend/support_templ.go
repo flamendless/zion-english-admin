@@ -56,7 +56,7 @@ func Support() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\">Connect Zoom</a> — link your Zoom account so scheduled classes up to 40 minutes receive automatic meeting links.</li></ul><p>After signing in, more guides are available from the dashboard under <a href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\">Connect Zoom</a>: link your Zoom account so scheduled classes up to 40 minutes receive automatic meeting links.</li></ul><p>After signing in, more guides are available from the dashboard under <a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

@@ -111,7 +111,7 @@ templ DashboardStats(data DashboardData) {
 			for _, ct := range data.CutoffTotals {
 				<div class="stat-card stat-card-accent">
 					<span class="stat-label">Earnings This Cutoff ({ ct.Currency })</span>
-					<span class="stat-value">{ fmt.Sprintf("%.2f", ct.Total) }</span>
+					<span class="stat-value">{ utils.FormatCurrencyAmountFixed(ct.Total, ct.Currency) }</span>
 				</div>
 			}
 		}
@@ -123,7 +123,7 @@ templ DashboardStats(data DashboardData) {
 		for _, mt := range data.MonthlyTotals {
 			<div class="stat-card">
 				<span class="stat-label">Month ({ mt.Currency })</span>
-				<span class="stat-value">{ fmt.Sprintf("%.2f", mt.Total) }</span>
+				<span class="stat-value">{ utils.FormatCurrencyAmountFixed(mt.Total, mt.Currency) }</span>
 			</div>
 		}
 	</div>

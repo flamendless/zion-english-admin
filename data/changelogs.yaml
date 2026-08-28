@@ -116,7 +116,7 @@ versions:
     released: true
     breaking_changes: []
     new_features:
-      - text: "In-app notifications keep you informed — use the bell in the header for recent alerts or open the full Notifications page to browse, filter, and mark items read."
+      - text: "In-app notifications keep you informed. Use the bell in the header for recent alerts or open the full Notifications page to browse, filter, and mark items read."
       - text: "You receive notifications for key events such as class and schedule changes, student assignments, document reviews, teacher approvals, and profile updates."
       - text: "Teachers and superusers get automatic alerts when a scheduled class passes without a recorded session."
     improvements: []

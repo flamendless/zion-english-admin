@@ -114,7 +114,7 @@ templ GuideGettingStarted() {
 					[]string{
 						"Open My Profile from the dashboard or navigation.",
 						"Scroll to the Name section.",
-						"Enter your first, middle (optional), and last name correctly — each field can only be set once.",
+						"Enter your first, middle (optional), and last name correctly. Each field can only be set once.",
 						"Click Update name.",
 						"Scroll to the Mobile number section, enter your new number, and click Update mobile number. Changes are limited to once every 7 days.",
 						"Scroll to the Password section, enter your current password and a new strong password, then click Update password. Password changes are also limited to once every 7 days.",
@@ -130,7 +130,7 @@ templ GuideGettingStarted() {
 						"Enter the student name using the exact casing as in your Google Sheet (e.g. Kim Min-Ji, not kim min-ji). This is critical for matching records during processing.",
 						"Select currency and status (active or inactive).",
 						"Enter the rate per class and click Register Student.",
-						"You are automatically assigned as the student's teacher — no teacher picker is shown.",
+						"You are automatically assigned as the student's teacher, so no teacher picker is shown.",
 						"Confirm the new student appears in My Students before scheduling or recording classes.",
 					},
 				)
@@ -408,7 +408,7 @@ templ GuideConnectZoomSections() {
 		[]string{
 			"If Connect Zoom is missing, ask your administrator to configure Zoom for the system.",
 			"If scheduling fails, confirm Zoom shows Connected on your profile.",
-			"If connection fails for your Zoom account but works for the administrator, the Zoom app may still be in development-only mode — your administrator must use Production credentials and request Beta Test sharing or publish the app.",
+			"If connection fails for your Zoom account but works for the administrator, the Zoom app may still be in development-only mode. Your administrator must use Production credentials and request Beta Test sharing or publish the app.",
 			"If Zoom is down, try again later or schedule a class longer than 40 minutes without an automatic room.",
 		},
 	)
@@ -424,7 +424,7 @@ templ GuideConnectZoomSections() {
 			"Set Documentation URL to this page, e.g. https://your-domain/zion-english-admin/docs/connect-zoom.",
 			"Enable only these scopes: user:read:user, meeting:write:meeting, meeting:update:meeting, meeting:delete:meeting.",
 			"Copy Production Client ID and Secret into server ZOOM_CLIENT_ID and ZOOM_CLIENT_SECRET; set ZOOM_REDIRECT_URI to the same callback URL.",
-			"Copy the authorization URL from Marketplace (Local Test or Beta Test) into server ZOOM_AUTHORIZE_URL — Connect Zoom uses this URL.",
+			"Copy the authorization URL from Marketplace (Local Test or Beta Test) into server ZOOM_AUTHORIZE_URL. Connect Zoom uses this URL.",
 			"Under Beta Test, complete requirements and submit Request to Share so external Zoom accounts can authorize (or publish the app for full production).",
 		},
 	)

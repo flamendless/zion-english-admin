@@ -8,8 +8,8 @@ package frontend
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "fmt"
 import "zion-english/internal/constants"
+import "zion-english/internal/utils"
 
 type TeacherViewData struct {
 	ID             string
@@ -146,7 +146,7 @@ func TeacherViewModal(data TeacherViewData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = ProfileDetailField("Rate per class", fmt.Sprintf("%.2f %s", data.RatePerClass, data.Currency)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ProfileDetailField("Rate per class", utils.FormatCurrency(data.RatePerClass, data.Currency)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

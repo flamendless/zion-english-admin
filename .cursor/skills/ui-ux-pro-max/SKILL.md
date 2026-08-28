@@ -8,7 +8,7 @@ Comprehensive design guide for web, mobile, and desktop applications. Contains 6
 
 # Prerequisites
 
-The bundled scripts require Python 3 (standard library only — no third-party packages, no network access). Check if it is available:
+The bundled scripts require Python 3 (standard library only: no third-party packages, no network access). Check if it is available:
 
 ```bash
 python3 --version || python --version
@@ -76,8 +76,8 @@ python3 skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persi
 ```
 
 This creates:
-- `design-system/MASTER.md` — Global Source of Truth with all design rules
-- `design-system/pages/` — Folder for page-specific overrides
+- `design-system/MASTER.md`: Global Source of Truth with all design rules
+- `design-system/pages/`: Folder for page-specific overrides
 
 **With page-specific override:**
 ```bash
@@ -85,7 +85,7 @@ python3 skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persi
 ```
 
 This also creates:
-- `design-system/pages/dashboard.md` — Page-specific deviations from Master
+- `design-system/pages/dashboard.md`: Page-specific deviations from Master
 
 **How hierarchical retrieval works:**
 1. When building a specific page (e.g., "Checkout"), first check `design-system/pages/checkout.md`
@@ -116,7 +116,7 @@ python3 skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system --varia
 | `--density` | Spacious (24-96px spacing scale) | Standard (16-64px, current default) | Dense/dashboard (8-32px spacing scale) |
 
 - `--motion` attaches a ready-to-use GSAP snippet (with framework notes, Do/Don't, and performance notes) pulled from `--domain gsap`, matched to the resolved tier (Subtle/Standard/Complex).
-- `--density` overrides the `--space-*` CSS variable table in the ASCII/markdown/MASTER.md output — use it for dashboards (high) vs. marketing pages (low) without hand-editing tokens.
+- `--density` overrides the `--space-*` CSS variable table in the ASCII/markdown/MASTER.md output: use it for dashboards (high) vs. marketing pages (low) without hand-editing tokens.
 - Leaving a dial unset keeps that part of the output exactly as it was before (no behavior change).
 
 **Example:**
@@ -247,7 +247,7 @@ python3 skills/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system 
 
 ### Query Strategy
 
-- Use **multi-dimensional keywords** — combine product + industry + tone + density: `"entertainment social vibrant content-dense"` not just `"app"`
+- Use **multi-dimensional keywords**: combine product + industry + tone + density: `"entertainment social vibrant content-dense"` not just `"app"`
 - Try different keywords for the same need: `"playful neon"` → `"vibrant dark"` → `"content-first minimal"`
 - Use `--design-system` first for full recommendations, then `--domain` to deep-dive any dimension you're unsure about
 - Add `--stack <stack>` for implementation-specific guidance when the target stack is known

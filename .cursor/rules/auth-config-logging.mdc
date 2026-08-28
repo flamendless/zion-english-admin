@@ -13,8 +13,8 @@ Singleton via `conf.Conf()`. Required env: `APP_ENV` (`local`|`prod`), `SECRET`,
 
 Roles: `RoleSuperuser`, `RoleTeacher`. JWT in `session_token` HttpOnly cookie.
 
-- `auth.Middleware(cfg, dbRO, handler)` — parses JWT, injects user into context
-- `auth.RequireRole(roles...)(handler)` — role gate per route
+- `auth.Middleware(cfg, dbRO, handler)`: parses JWT, injects user into context
+- `auth.RequireRole(roles...)(handler)`: role gate per route
 - Context: `auth.GetUser(ctx)`, `auth.GetRole(ctx)`
 - Routes: `publicMux` (login, process, API) vs `authMux` (home, students, teachers, logs)
 
@@ -26,9 +26,9 @@ Roles: `RoleSuperuser`, `RoleTeacher`. JWT in `session_token` HttpOnly cookie.
 
 ## Processor Pipeline
 
-1. `sheet.DownloadDriveSheet(url, path)` — curl CSV from Google Drive
-2. `processor.ProcessCSVFile(...)` — parse rows into `ClassRecord`
-3. `processor.SaveRecords(...)` — write XLSX
+1. `sheet.DownloadDriveSheet(url, path)`: curl CSV from Google Drive
+2. `processor.ProcessCSVFile(...)`: parse rows into `ClassRecord`
+3. `processor.SaveRecords(...)`: write XLSX
 
 Column mapping stored per teacher in `tbl_teachers.template` (comma-separated Excel letters).
 

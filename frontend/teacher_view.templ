@@ -1,7 +1,7 @@
 package frontend
 
-import "fmt"
 import "zion-english/internal/constants"
+import "zion-english/internal/utils"
 
 type TeacherViewData struct {
 	ID             string
@@ -67,7 +67,7 @@ templ TeacherViewModal(data TeacherViewData) {
 							<div class="profile-details">
 								@ProfileDetailField("Email", data.Email)
 								@ProfileDetailField("Mobile number", data.MobileNumber)
-								@ProfileDetailField("Rate per class", fmt.Sprintf("%.2f %s", data.RatePerClass, data.Currency))
+								@ProfileDetailField("Rate per class", utils.FormatCurrency(data.RatePerClass, data.Currency))
 								@ProfileDetailField("Certifications", displayOrDash(data.Certifications))
 								if data.ZoomConfigured {
 									<div class="profile-detail">

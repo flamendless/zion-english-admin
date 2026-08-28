@@ -43,18 +43,18 @@ templ Students(data StudentData) {
 | `@HeaderSimple()` | `header.templ` |
 | `@TeacherDropdown()` | `dropdowns.templ` |
 | `@ScrHTMX()` | `scripts.templ` |
-| `@IconActionLink()` / `@IconActionButton()` | `icons.templ` — use `IconKind` constants, not string literals |
-| `@Pill()` / `@StatusPill()` | `pills.templ` — use `PillTone` constants, not string literals |
-| `@RatePill()` | `pills.templ` — use for class rate displays (scheduled cards, class tables, modal detail cards) |
-| `@TimeRangePill()` | `pills.templ` — use for scheduled class time ranges in cards and lists |
-| `@TeacherNameCell()` | `avatar.templ` — avatar + teacher name; use whenever a teacher name is shown |
+| `@IconActionLink()` / `@IconActionButton()` | `icons.templ`: use `IconKind` constants, not string literals |
+| `@Pill()` / `@StatusPill()` | `pills.templ`: use `PillTone` constants, not string literals |
+| `@RatePill()` | `pills.templ`: use for class rate displays (scheduled cards, class tables, modal detail cards) |
+| `@TimeRangePill()` | `pills.templ`: use for scheduled class time ranges in cards and lists |
+| `@TeacherNameCell()` | `avatar.templ`: avatar + teacher name; use whenever a teacher name is shown |
 
 ## Pills
 
 Use `@Pill` and `@StatusPill` from `pills.templ` for status and label badges. All pills share a black border via `--pill-border: 1px solid #000` in `global.templ` (applied to `.pill` and `.status-pill`).
 
-- Do not override pill borders with softer `var(--color-border)` unless a design explicitly requires an exception — the default `--pill-border` already uses `var(--color-border)`.
-- Custom pill-shaped UI (e.g. `.lm-tag-pill`, `.class-lm-readonly-pill`, `.class-lm-chip`) must use `border: var(--pill-border)` — do not hardcode border colors.
+- Do not override pill borders with softer `var(--color-border)` unless a design explicitly requires an exception: the default `--pill-border` already uses `var(--color-border)`.
+- Custom pill-shaped UI (e.g. `.lm-tag-pill`, `.class-lm-readonly-pill`, `.class-lm-chip`) must use `border: var(--pill-border)`: do not hardcode border colors.
 - Prefer extending `.pill` / `.status-pill` classes over inventing one-off pill styles.
 
 ## Rate pills
@@ -71,12 +71,12 @@ Modal footer **Cancel** / dismiss buttons must use `btn btn-secondary` (same as 
 
 Whenever a teacher name is shown in the UI, render it with `@TeacherNameCell(name, avatar)` from `avatar.templ` (or a list wrapper like `@EntityViewTeacherList`).
 
-- Populate `AvatarProps` in handlers via `buildTeacherListAvatarProps` (or equivalent) — do not show bare name strings in tables, modals, or detail views.
+- Populate `AvatarProps` in handlers via `buildTeacherListAvatarProps` (or equivalent): do not show bare name strings in tables, modals, or detail views.
 - Include `@AvatarStyles()` on pages that render teacher names outside `GlobalIncludes` partials that already load avatar CSS.
 
 ## Icon actions
 
-Action icon kinds are typed as `IconKind` in [`icon_kind.go`](icon_kind.go). Use `@IconActionLink`, `@IconActionButton`, and `@IconActionSubmit` with `IconKind` constants — never build action buttons in client-side JavaScript.
+Action icon kinds are typed as `IconKind` in [`icon_kind.go`](icon_kind.go). Use `@IconActionLink`, `@IconActionButton`, and `@IconActionSubmit` with `IconKind` constants: never build action buttons in client-side JavaScript.
 
 ## SSR over client-side DOM building
 
@@ -97,7 +97,7 @@ Prefer server-side rendering with templ components and HTMX partial fetches over
 
 ## URLs
 
-Always use `utils.URL("/path")` — prepends `/zion-english-admin` in local dev.
+Always use `utils.URL("/path")`: prepends `/zion-english-admin` in local dev.
 
 ## HTMX Forms
 
@@ -113,7 +113,7 @@ CSS variables in `:root` (`global.templ`). Page-specific styles in inline `<styl
 
 ## Design system
 
-Admin UI uses **cool slate neutrals** with a **Zion green primary** (`#90C020`). Avoid warm beige, cream, or yellow-brown tones on surfaces and borders — not on the brand green.
+Admin UI uses **cool slate neutrals** with a **Zion green primary** (`#90C020`). Avoid warm beige, cream, or yellow-brown tones on surfaces and borders: not on the brand green.
 
 ### Color tokens (`global.templ` `:root`)
 
@@ -131,7 +131,7 @@ Admin UI uses **cool slate neutrals** with a **Zion green primary** (`#90C020`).
 | `--color-warning` / `--color-warning-bg` | Pending / rescheduled status |
 | `--color-destructive` | Delete, cancel-class, errors |
 
-Default assigned colors: `constants.DefaultAssignedColor` (`#90C020`) and `constants.DefaultTeacherAssignedColor` (`#B9D283`). Use these constants — do not hardcode hex in handlers or templates.
+Default assigned colors: `constants.DefaultAssignedColor` (`#90C020`) and `constants.DefaultTeacherAssignedColor` (`#B9D283`). Use these constants: do not hardcode hex in handlers or templates.
 
 ### Pills
 
@@ -145,7 +145,7 @@ Default assigned colors: `constants.DefaultAssignedColor` (`#90C020`) and `const
 - Overlay: cool slate scrim (`rgba(15, 23, 42, 0.5)`)
 - Dialog: white surface, `--color-border`, `--shadow-lg`
 - Dismiss: `btn btn-secondary`; primary/destructive: `btn` / `btn-danger`
-- Scheduled-class detail summary: `@ScheduledClassDetailCard` — white card with green-tinted header gradient; date/time/rate in a 3-column meta grid (stacks on mobile). Styles live in `global.templ`, not per-modal `<style>` blocks.
+- Scheduled-class detail summary: `@ScheduledClassDetailCard`: white card with green-tinted header gradient; date/time/rate in a 3-column meta grid (stacks on mobile). Styles live in `global.templ`, not per-modal `<style>` blocks.
 
 ### Do not
 
@@ -184,4 +184,4 @@ Use the same reset as `.lm-tag-chip-remove` in `learning_materials.templ`:
 
 Parent chip/tag container: `display: inline-flex; align-items: center; gap: …`.
 
-When adding a new chip UI, copy this pattern — do not rely on bare `button { padding: 0 }` alone.
+When adding a new chip UI, copy this pattern: do not rely on bare `button { padding: 0 }` alone.
