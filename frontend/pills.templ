@@ -1,9 +1,21 @@
 package frontend
 
 import "strconv"
-
 templ Pill(label string, tone PillTone) {
 	<span class={ pillClass(tone) }>{ label }</span>
+}
+
+templ RatePill(rate float64, currency string) {
+	<span class={ pillClass(PillToneInfo) + " rate-pill" } aria-label={ ratePillAriaLabel(rate, currency) }>
+		<span class="rate-pill-amount">{ formatRateAmount(rate) }</span>
+		<span class="rate-pill-currency">{ currency }</span>
+	</span>
+}
+
+templ TimeRangePill(timeRange string) {
+	<span class="time-range-pill" aria-label={ "Time: " + timeRange }>
+		@Pill(timeRange, PillTonePrimary)
+	</span>
 }
 
 templ StatusPill(label string, tone PillTone, withDot bool) {

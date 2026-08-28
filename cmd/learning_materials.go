@@ -11,6 +11,7 @@ import (
 	"strings"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
+	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/learningmaterials"
 	"zion-english/internal/utils"
@@ -560,7 +561,7 @@ func buildLearningMaterialSuperuserAvatarProps() frontend.AvatarProps {
 	return frontend.AvatarProps{
 		Size:          "sm",
 		Initials:      "SU",
-		AssignedColor: "#90C020",
+		AssignedColor: constants.DefaultAssignedColor,
 		HasPicture:    false,
 		Alt:           "Superuser avatar",
 	}
@@ -591,7 +592,7 @@ func resolveLearningMaterialOwnerAvatar(ctx context.Context, ownerID int64) (fro
 			return frontend.AvatarProps{
 				Size:          "sm",
 				Initials:      "?",
-				AssignedColor: "#B9D283",
+				AssignedColor: constants.DefaultTeacherAssignedColor,
 				HasPicture:    false,
 				Alt:           "Unknown avatar",
 			}, nil

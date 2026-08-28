@@ -45,15 +45,27 @@ templ Students(data StudentData) {
 | `@ScrHTMX()` | `scripts.templ` |
 | `@IconActionLink()` / `@IconActionButton()` | `icons.templ` — use `IconKind` constants, not string literals |
 | `@Pill()` / `@StatusPill()` | `pills.templ` — use `PillTone` constants, not string literals |
+| `@RatePill()` | `pills.templ` — use for class rate displays (scheduled cards, class tables, modal detail cards) |
+| `@TimeRangePill()` | `pills.templ` — use for scheduled class time ranges in cards and lists |
 | `@TeacherNameCell()` | `avatar.templ` — avatar + teacher name; use whenever a teacher name is shown |
 
 ## Pills
 
 Use `@Pill` and `@StatusPill` from `pills.templ` for status and label badges. All pills share a black border via `--pill-border: 1px solid #000` in `global.templ` (applied to `.pill` and `.status-pill`).
 
-- Do not override pill borders with softer `var(--color-border)` unless a design explicitly requires an exception.
+- Do not override pill borders with softer `var(--color-border)` unless a design explicitly requires an exception — the default `--pill-border` already uses `var(--color-border)`.
 - Custom pill-shaped UI (e.g. `.lm-tag-pill`, `.class-lm-readonly-pill`, `.class-lm-chip`) must use `border: var(--pill-border)` — do not hardcode border colors.
 - Prefer extending `.pill` / `.status-pill` classes over inventing one-off pill styles.
+
+## Rate pills
+
+Use `@RatePill(rate, currency)` from `pills.templ` whenever a class rate is shown in the UI (scheduled class cards, class tables, modal detail cards). Do not render rates as plain text.
+
+Use `@TimeRangePill(timeRange)` for scheduled class time ranges in cards and compact list layouts. Group time, rate, and status pills in a shared flex row (`.day-class-pills`) when they appear together on scheduled class cards.
+
+## Modal dismiss actions
+
+Modal footer **Cancel** / dismiss buttons must use `btn btn-secondary` (same as learning-material form modals). Primary/destructive actions keep `btn` or `btn-danger`.
 
 ## Teacher name display
 
@@ -98,6 +110,48 @@ Dropdowns load via HTMX on page load: `hx-get`, `hx-trigger="load"`, `hx-target=
 ## CSS
 
 CSS variables in `:root` (`global.templ`). Page-specific styles in inline `<style>` blocks.
+
+## Design system
+
+Admin UI uses **cool slate neutrals** with a **Zion green primary** (`#90C020`). Avoid warm beige, cream, or yellow-brown tones on surfaces and borders — not on the brand green.
+
+### Color tokens (`global.templ` `:root`)
+
+| Token | Role |
+|-------|------|
+| `--color-primary` / `--color-primary-hover` | Primary buttons, time pills, focus ring (Zion green) |
+| `--color-primary-light` | Subtle green-tinted headers (e.g. modal detail cards) |
+| `--color-background` | Page background (cool gray, not cream) |
+| `--color-surface` | Cards, modals, inputs |
+| `--color-muted` | Secondary surfaces, table stripes |
+| `--color-muted-foreground` | Labels, hints, meta text |
+| `--color-border` / `--color-border-subtle` | Borders and dividers |
+| `--color-success` / `--color-success-bg` | Conducted / active status |
+| `--color-info` / `--color-info-bg` | Rate pills, informational badges |
+| `--color-warning` / `--color-warning-bg` | Pending / rescheduled status |
+| `--color-destructive` | Delete, cancel-class, errors |
+
+Default assigned colors: `constants.DefaultAssignedColor` (`#90C020`) and `constants.DefaultTeacherAssignedColor` (`#B9D283`). Use these constants — do not hardcode hex in handlers or templates.
+
+### Pills
+
+- **Time** → `@TimeRangePill` (`PillTonePrimary`, green tint)
+- **Rate** → `@RatePill` (`PillToneInfo`, sky tint)
+- **Status** → `@StatusPill` with domain-specific `PillTone`
+- Pill border: `var(--pill-border)` (matches `--color-border`, not hardcoded black)
+
+### Modals
+
+- Overlay: cool slate scrim (`rgba(15, 23, 42, 0.5)`)
+- Dialog: white surface, `--color-border`, `--shadow-lg`
+- Dismiss: `btn btn-secondary`; primary/destructive: `btn` / `btn-danger`
+- Scheduled-class detail summary: `@ScheduledClassDetailCard` — white card with green-tinted header gradient; date/time/rate in a 3-column meta grid (stacks on mobile). Styles live in `global.templ`, not per-modal `<style>` blocks.
+
+### Do not
+
+- Use `background: var(--color-muted)` for primary content cards when a clean white surface is intended
+- Hardcode hex colors in templates/handlers when a semantic token or `constants` value exists
+- Duplicate global button/pill/modal styles in feature-specific `<style>` blocks
 
 ### Inline chip remove buttons
 

@@ -129,9 +129,14 @@ templ AvatarStyles() {
 		.teacher-name-cell .avatar-with-role,
 		.analytics-teacher-cell .avatar-with-role,
 		.reports-teacher-cell .avatar-with-role,
-		.documents-uploader-cell .avatar-with-role,
-		.day-class-header .avatar-with-role {
+		.documents-uploader-cell .avatar-with-role {
 			margin-bottom: 0;
+			flex-shrink: 0;
+			margin-inline-end: var(--space-3);
+		}
+
+		.day-class-header .avatar-with-role {
+			margin-bottom: var(--space-4);
 			flex-shrink: 0;
 			margin-inline-end: var(--space-3);
 		}

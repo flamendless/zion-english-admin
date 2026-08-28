@@ -9,6 +9,23 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.08.28"
+    date: "2026-08-28"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "You can attach learning materials from the Learning Library when scheduling, recording, or editing a class; linked materials appear on class detail views."
+        commit: "120fc43"
+    improvements:
+      - text: "Learning Library materials now have titles and show in-app link previews with thumbnails when you add or browse resources."
+        commit: "f57e24d"
+      - text: "Link previews fall back gracefully when a site does not provide standard preview metadata."
+        commit: "a737fa8"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
   - version: "2026.08.27.2"
     date: "2026-08-27"
     released: true

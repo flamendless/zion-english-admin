@@ -8,6 +8,7 @@ package frontend
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 type RegisterStudentData struct {
@@ -42,7 +43,7 @@ func RegisterStudent(data RegisterStudentData) templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/register_student.templ`, Line: 16, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/register_student.templ`, Line: 17, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -79,7 +80,7 @@ func RegisterStudent(data RegisterStudentData) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/students/register"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/register_student.templ`, Line: 25, Col: 68}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/register_student.templ`, Line: 26, Col: 68}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 		if templ_7745c5c3_Err != nil {
@@ -134,22 +135,48 @@ func RegisterStudent(data RegisterStudentData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, " <div class=\"form-group\"><label for=\"assignedColor\">Assigned Color *</label><div class=\"color-group\"><input type=\"color\" id=\"assignedColor\" name=\"assignedColor\" required value=\"#90C020\" _=\"\n\t\t\t\t\t\t\t\t\ton input\n\t\t\t\t\t\t\t\t\t\tset #colorPreview.style.backgroundColor to me.value\n\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\"><div class=\"color-preview\" id=\"colorPreview\" style=\"background-color: #90C020;\"></div></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, " <div class=\"form-group\"><label for=\"assignedColor\">Assigned Color *</label><div class=\"color-group\"><input type=\"color\" id=\"assignedColor\" name=\"assignedColor\" required value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(constants.DefaultAssignedColor)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/register_student.templ`, Line: 85, Col: 52}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" _=\"\n\t\t\t\t\t\t\t\t\ton input\n\t\t\t\t\t\t\t\t\t\tset #colorPreview.style.backgroundColor to me.value\n\t\t\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\t\t\"><div class=\"color-preview\" id=\"colorPreview\" style=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color: " + constants.DefaultAssignedColor)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/register_student.templ`, Line: 91, Col: 113}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\"></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<button type=\"submit\" id=\"submitBtn\" hx-indicator=\"Registering student...\">Register Student</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<button type=\"submit\" id=\"submitBtn\" hx-indicator=\"Registering student...\">Register Student</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.IsSuperuser {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<script>\n\t\t\t\t\t(function () {\n\t\t\t\t\t\tconst statusEl = document.getElementById('status');\n\t\t\t\t\t\tconst reasonGroup = document.getElementById('registerInactiveReasonGroup');\n\t\t\t\t\t\tconst reasonEl = document.getElementById('inactiveReason');\n\t\t\t\t\t\tif (!statusEl || !reasonGroup) return;\n\t\t\t\t\t\tfunction syncInactiveReason() {\n\t\t\t\t\t\t\tconst inactive = statusEl.value === 'inactive';\n\t\t\t\t\t\t\treasonGroup.classList.toggle('is-visible', inactive);\n\t\t\t\t\t\t\tif (reasonEl) reasonEl.required = inactive;\n\t\t\t\t\t\t}\n\t\t\t\t\t\tstatusEl.addEventListener('change', syncInactiveReason);\n\t\t\t\t\t\tsyncInactiveReason();\n\t\t\t\t\t})();\n\t\t\t\t</script> <style>\n\t\t\t\t\t.inactive-reason-group { display: none; }\n\t\t\t\t\t.inactive-reason-group.is-visible { display: block; }\n\t\t\t\t</style>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<script>\n\t\t\t\t\t(function () {\n\t\t\t\t\t\tconst statusEl = document.getElementById('status');\n\t\t\t\t\t\tconst reasonGroup = document.getElementById('registerInactiveReasonGroup');\n\t\t\t\t\t\tconst reasonEl = document.getElementById('inactiveReason');\n\t\t\t\t\t\tif (!statusEl || !reasonGroup) return;\n\t\t\t\t\t\tfunction syncInactiveReason() {\n\t\t\t\t\t\t\tconst inactive = statusEl.value === 'inactive';\n\t\t\t\t\t\t\treasonGroup.classList.toggle('is-visible', inactive);\n\t\t\t\t\t\t\tif (reasonEl) reasonEl.required = inactive;\n\t\t\t\t\t\t}\n\t\t\t\t\t\tstatusEl.addEventListener('change', syncInactiveReason);\n\t\t\t\t\t\tsyncInactiveReason();\n\t\t\t\t\t})();\n\t\t\t\t</script> <style>\n\t\t\t\t\t.inactive-reason-group { display: none; }\n\t\t\t\t\t.inactive-reason-group.is-visible { display: block; }\n\t\t\t\t</style>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

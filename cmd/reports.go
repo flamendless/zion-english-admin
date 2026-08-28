@@ -13,6 +13,7 @@ import (
 	"time"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
+	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
 	"zion-english/internal/processor"
@@ -559,7 +560,7 @@ func buildReportTeacherAvatarProps(teacherID int64, row queries.GetTeacherProfil
 	hasPicture := row.ProfilePicture.Valid && row.ProfilePicture.String != ""
 	assignedColor := row.AssignedColor
 	if assignedColor == "" {
-		assignedColor = "#B9D283"
+		assignedColor = constants.DefaultTeacherAssignedColor
 	}
 	displayName := utils.ComposePersonName(row.FirstName, row.MiddleName, row.LastName)
 	return frontend.AvatarProps{
@@ -576,7 +577,7 @@ func buildReportSummaryAvatarProps(summary queries.GetReportTeacherSummariesRow)
 	hasPicture := summary.TeacherProfilePicture.Valid && summary.TeacherProfilePicture.String != ""
 	assignedColor := summary.TeacherAssignedColor
 	if assignedColor == "" {
-		assignedColor = "#B9D283"
+		assignedColor = constants.DefaultTeacherAssignedColor
 	}
 	return frontend.AvatarProps{
 		Size:          "sm",

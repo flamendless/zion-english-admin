@@ -375,7 +375,7 @@ func classesListTeacherAvatar(row queries.GetClassesListFilteredRow) models.Avat
 	hasPicture := row.TeacherProfilePicture.Valid && row.TeacherProfilePicture.String != ""
 	assignedColor := row.TeacherAssignedColor
 	if assignedColor == "" {
-		assignedColor = "#B9D283"
+		assignedColor = constants.DefaultTeacherAssignedColor
 	}
 	return models.AvatarView{
 		Initials:      utils.PersonInitials(row.TeacherFirstName, row.TeacherMiddleName, row.TeacherLastName, row.TeacherName),

@@ -15,23 +15,26 @@ templ DeleteClassModal() {
 			<form
 				id="deleteClassForm"
 				method="POST"
-				class="modal-body"
+				class="modal-body scheduled-class-action-modal"
 				hx-swap="none"
 			>
-				<p id="deleteClassModalMessage">This will remove the class from your lists. The record is kept for audit.</p>
+				<p id="deleteClassModalMessage" class="scheduled-class-modal-lead">This will remove the class from your lists. The record is kept for audit.</p>
+				@ScheduledClassDetailCard("deleteClassModalDetails", true)
 				<input type="hidden" id="deleteClassFrom" name="from" value="classes"/>
-				<div class="form-group">
-					<label for="deleteClassReason">Reason *</label>
-					<input
-						type="text"
-						id="deleteClassReason"
-						name="reason"
-						required
-						placeholder="Reason for deletion"
-					/>
+				<div class="scheduled-class-modal-fields">
+					<div class="form-group">
+						<label for="deleteClassReason">Reason *</label>
+						<input
+							type="text"
+							id="deleteClassReason"
+							name="reason"
+							required
+							placeholder="Reason for deletion"
+						/>
+					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn delete-class-modal-close">Cancel</button>
+					<button type="button" class="btn btn-secondary delete-class-modal-close">Cancel</button>
 					<button type="submit" class="btn btn-danger" id="deleteClassSubmitBtn">Delete</button>
 				</div>
 			</form>
@@ -43,9 +46,89 @@ templ DeleteClassModal() {
 			const form = document.getElementById('deleteClassForm');
 			const reasonInput = document.getElementById('deleteClassReason');
 			const fromInput = document.getElementById('deleteClassFrom');
+			const details = document.getElementById('deleteClassModalDetails');
 			if (!modal || !form || !reasonInput || !fromInput) return;
 
-			window.openDeleteClassModal = function (deleteURL, from) {
+			function escapeHtml(value) {
+				return String(value || '')
+					.replace(/&/g, '&amp;')
+					.replace(/</g, '&lt;')
+					.replace(/>/g, '&gt;')
+					.replace(/"/g, '&quot;');
+			}
+
+			function fillTimePill(el, timeRange) {
+				if (!el) return;
+				el.innerHTML =
+					'<span class="time-range-pill" aria-label="Time: ' + escapeHtml(timeRange) + '">' +
+					'<span class="pill pill--primary">' + escapeHtml(timeRange) + '</span>' +
+					'</span>';
+			}
+
+			function fillRatePill(el, rate, currency) {
+				if (!el) return;
+				el.innerHTML =
+					'<span class="pill pill--info rate-pill" aria-label="' + escapeHtml(rate + ' ' + currency) + '">' +
+					'<span class="rate-pill-amount">' + escapeHtml(rate) + '</span>' +
+					'<span class="rate-pill-currency">' + escapeHtml(currency) + '</span>' +
+					'</span>';
+			}
+
+			function fillTeacherCell(el, trigger) {
+				if (!el || !trigger) return;
+				const name = trigger.getAttribute('data-teacher-name') || '—';
+				const initials = trigger.getAttribute('data-teacher-initials') || '';
+				const color = trigger.getAttribute('data-teacher-color') || '#B9D283';
+				const pictureURL = trigger.getAttribute('data-teacher-picture-url') || '';
+				const hasPicture = trigger.getAttribute('data-teacher-has-picture') === 'true';
+				const alt = trigger.getAttribute('data-teacher-alt') || (name + ' avatar');
+				const roleBadge = trigger.getAttribute('data-teacher-role-badge') || '';
+				const roleBadgeClass = trigger.getAttribute('data-teacher-role-badge-class') || 'pill pill--neutral';
+				const avatarContent = hasPicture && pictureURL
+					? '<img src="' + escapeHtml(pictureURL) + '" alt="' + escapeHtml(alt) + '" class="avatar-image"/>'
+					: '<span class="avatar-initials" aria-hidden="true">' + escapeHtml(initials) + '</span>';
+				let avatarHTML =
+					'<div class="avatar avatar-sm" style="background-color: ' + escapeHtml(color) + ';" aria-label="' + escapeHtml(alt) + '">' +
+					avatarContent +
+					'</div>';
+				if (roleBadge) {
+					avatarHTML =
+						'<div class="avatar-with-role">' +
+						avatarHTML +
+						'<span class="avatar-role-badge ' + escapeHtml(roleBadgeClass) + '">' + escapeHtml(roleBadge) + '</span>' +
+						'</div>';
+				}
+				el.innerHTML =
+					'<div class="teacher-name-cell">' +
+					avatarHTML +
+					'<span class="teacher-name-cell-text">' + escapeHtml(name) + '</span>' +
+					'</div>';
+			}
+
+			function fillScheduledClassDetails(container, trigger) {
+				if (!container || !trigger) return;
+				const studentEl = container.querySelector('[data-field="student"]');
+				const teacherCell = container.querySelector('[data-field="teacher-cell"]');
+				const dateEl = container.querySelector('[data-field="date"]');
+				const timeEl = container.querySelector('[data-field="time"]');
+				const rateEl = container.querySelector('[data-field="rate"]');
+				if (studentEl) studentEl.textContent = trigger.getAttribute('data-student-name') || '—';
+				fillTeacherCell(teacherCell, trigger);
+				if (dateEl) dateEl.textContent = trigger.getAttribute('data-scheduled-date') || '—';
+				fillTimePill(timeEl, trigger.getAttribute('data-time-range') || '—');
+				fillRatePill(
+					rateEl,
+					trigger.getAttribute('data-rate') || '—',
+					trigger.getAttribute('data-currency') || ''
+				);
+			}
+
+			function setDeleteDetailsVisible(visible) {
+				if (!details) return;
+				details.hidden = !visible;
+			}
+
+			window.openDeleteClassModal = function (deleteURL, from, trigger) {
 				form.action = deleteURL;
 				form.setAttribute('hx-post', deleteURL);
 				if (typeof htmx !== 'undefined') {
@@ -53,6 +136,12 @@ templ DeleteClassModal() {
 				}
 				fromInput.value = from || 'classes';
 				reasonInput.value = '';
+				if (trigger && trigger.getAttribute('data-student-name')) {
+					fillScheduledClassDetails(details, trigger);
+					setDeleteDetailsVisible(true);
+				} else {
+					setDeleteDetailsVisible(false);
+				}
 				modal.hidden = false;
 				document.body.classList.add('modal-open');
 				reasonInput.focus();
@@ -62,6 +151,7 @@ templ DeleteClassModal() {
 				modal.hidden = true;
 				document.body.classList.remove('modal-open');
 				reasonInput.value = '';
+				setDeleteDetailsVisible(false);
 			};
 
 			form.addEventListener('submit', function (e) {
@@ -79,7 +169,7 @@ templ DeleteClassModal() {
 					const btn = e.target.closest('[data-delete-url]');
 					const url = btn.getAttribute('data-delete-url');
 					const from = btn.getAttribute('data-delete-from') || 'classes';
-					if (url) window.openDeleteClassModal(url, from);
+					if (url) window.openDeleteClassModal(url, from, btn);
 					return;
 				}
 				if (e.target.closest('.delete-class-modal-close')) {
@@ -105,16 +195,6 @@ templ DeleteClassModal() {
 			});
 		})();
 	</script>
-	<style>
-		.btn-danger {
-			background: var(--color-danger, #c0392b);
-			color: #fff;
-			border-color: var(--color-danger, #c0392b);
-		}
-		.btn-danger:hover {
-			filter: brightness(0.92);
-		}
-	</style>
 }
 
 func ClassRecordDeleteURL(id int64) string {

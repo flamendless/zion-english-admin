@@ -24,7 +24,7 @@ templ ClassViewModal(data EditClassData) {
 							@ClassViewMetaPill("Date", data.Date, PillToneInfo)
 							@ClassViewMetaPill("Time", data.TimeRangeLabel(), PillTonePrimary)
 							@ClassViewMetaPill("Duration", formatDurationMinutes(data.DurationMinutes), PillToneWarning)
-							@ClassViewMetaPill("Rate", formatRate(data.Rate, data.Currency), PillToneSuccess)
+							@ClassViewRateMetaPill(data.Rate, data.Currency)
 						</div>
 					</div>
 					@StatusPill(capitalizeStatus(data.Status), ClassStatusPillTone(data.Status), true)
@@ -64,6 +64,12 @@ templ ClassViewMetaPill(kind, value string, tone PillTone) {
 	</span>
 }
 
+templ ClassViewRateMetaPill(rate float64, currency string) {
+	<span class="class-view-meta-pill class-view-meta-pill--rate" aria-label={ "Rate: " + formatRate(rate, currency) } title="Rate">
+		@RatePill(rate, currency)
+	</span>
+}
+
 templ ClassViewModalStyles() {
 	<style>
 		.class-view-body .entity-view-hero-main {
@@ -95,6 +101,13 @@ templ ClassViewModalStyles() {
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
+		}
+
+		.class-view-meta-pill--rate .rate-pill {
+			width: 100%;
+			justify-content: center;
+			padding: 6px 8px;
+			font-size: 0.75rem;
 		}
 
 		.class-view-note {

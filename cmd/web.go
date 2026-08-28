@@ -859,7 +859,7 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		req.Relationship = r.FormValue("relationship")
 		req.RelatedStudentID = relatedStudentID
 	} else {
-		req.AssignedColor = "#90C020"
+		req.AssignedColor = constants.DefaultAssignedColor
 	}
 
 	if err := validateStudentRequest(&req); err != nil {
@@ -870,7 +870,7 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	rl.add(fmt.Sprintf("Registering student: %s", req.Name))
 
 	if req.AssignedColor == "" {
-		req.AssignedColor = "#B9D283"
+		req.AssignedColor = constants.DefaultTeacherAssignedColor
 	}
 
 	if req.RelatedStudentID > 0 {
@@ -1099,7 +1099,7 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.AssignedColor == "" {
-		req.AssignedColor = "#B9D283"
+		req.AssignedColor = constants.DefaultTeacherAssignedColor
 	}
 
 	teacherStatus := string(constants.TeacherStatusPending)

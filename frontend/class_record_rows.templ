@@ -14,7 +14,7 @@ templ ClassRecordRow(record ClassRecordRowData, showTeacher bool) {
 			</td>
 		}
 		<td data-label="Student">{ record.StudentName }</td>
-		<td data-label="Rate">{ record.RateLabel() }</td>
+		<td data-label="Rate">@RatePill(record.Rate, record.Currency)</td>
 		<td data-label="Status">
 			@StatusPill(capitalizeStatus(record.Status), ClassStatusPillTone(record.Status), false)
 		</td>

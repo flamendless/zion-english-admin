@@ -1,5 +1,6 @@
 package frontend
 
+import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 type RegisterStudentData struct {
@@ -81,13 +82,13 @@ templ RegisterStudent(data RegisterStudentData) {
 						<label for="assignedColor">Assigned Color *</label>
 						<div class="color-group">
 							<input type="color" id="assignedColor" name="assignedColor" required
-							       value="#90C020"
+							       value={ constants.DefaultAssignedColor }
 								_="
 									on input
 										set #colorPreview.style.backgroundColor to me.value
 									end
 								">
-							<div class="color-preview" id="colorPreview" style="background-color: #90C020;"></div>
+							<div class="color-preview" id="colorPreview" style={ "background-color: " + constants.DefaultAssignedColor }></div>
 						</div>
 					</div>
 				}

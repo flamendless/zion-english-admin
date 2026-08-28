@@ -28,6 +28,10 @@ func handleSchedulePath(w http.ResponseWriter, r *http.Request) {
 		handleScheduledClassEditModal(w, r, id)
 		return
 	}
+	if id, ok := extractPathID(r, "schedule", "/view"); ok {
+		handleScheduledClassView(w, r, id)
+		return
+	}
 	if id, ok := extractPathID(r, "schedule", "/conduct"); ok {
 		handleConductScheduledClass(w, r, id)
 		return
@@ -800,6 +804,90 @@ func handleScheduledClassEditModal(w http.ResponseWriter, r *http.Request, sched
 	frontend.EditScheduledClassModalForm(data).Render(ctx, w)
 }
 
+func handleScheduledClassView(w http.ResponseWriter, r *http.Request, scheduleID int64) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx := r.Context()
+	data, err := scheduledClassViewData(ctx, scheduleID)
+	if err != nil {
+		HttpError(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	frontend.ClassViewModal(data).Render(ctx, w)
+}
+
+func scheduledClassViewData(ctx context.Context, scheduleID int64) (frontend.EditClassData, error) {
+	existing, err := dbRO.GetQueries().GetScheduledClassByID(ctx, scheduleID)
+	if err != nil {
+		return frontend.EditClassData{}, err
+	}
+
+	rules := classrules.ScheduledClassRules{DB: dbRO.GetQueries()}
+	if err := rules.ValidateAccess(existing.TeacherID, auth.GetUser(ctx)); err != nil {
+		return frontend.EditClassData{}, err
+	}
+
+	teacher, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, existing.TeacherID)
+	if err != nil {
+		return frontend.EditClassData{}, err
+	}
+
+	teacherRoles, err := loadTeacherRoles(ctx, existing.TeacherID)
+	if err != nil {
+		return frontend.EditClassData{}, err
+	}
+
+	materials, err := loadScheduledClassLearningMaterialLinks(ctx, scheduleID)
+	if err != nil {
+		return frontend.EditClassData{}, err
+	}
+
+	startTime := ""
+	if existing.StartTime.Valid {
+		startTime = existing.StartTime.String
+	}
+	reason := ""
+	if existing.Reason.Valid {
+		reason = existing.Reason.String
+	}
+
+	role := auth.GetRole(ctx)
+	return frontend.EditClassData{
+		RecordID:        strconv.FormatInt(scheduleID, 10),
+		Readonly:        true,
+		IsSuperuser:     auth.HasAdminAccess(role),
+		StudentID:       strconv.FormatInt(existing.StudentID, 10),
+		TeacherID:       strconv.FormatInt(existing.TeacherID, 10),
+		StudentName:     existing.StudentName,
+		TeacherName:     existing.TeacherName,
+		TeacherAvatar: avatarWithTeacherRoles(
+			buildTeacherListAvatarProps(
+				teacher.ID,
+				teacher.FirstName,
+				teacher.MiddleName,
+				teacher.LastName,
+				teacher.AssignedColor,
+				teacher.ProfilePicture,
+			),
+			teacherRoles,
+		),
+		Date:              existing.ScheduledDate,
+		StartTime:         startTime,
+		EndTime:           utils.EndTimeFromStartAndDuration(startTime, existing.DurationMinutes),
+		DurationMinutes:   existing.DurationMinutes,
+		Rate:              existing.Rate,
+		Currency:          existing.Currency,
+		Status:            "scheduled",
+		Reason:            reason,
+		LearningMaterials: materials,
+	}, nil
+}
+
 func handleConductScheduledClass(w http.ResponseWriter, r *http.Request, scheduleID int64) {
 	if r.Method != http.MethodPost {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -1052,7 +1140,7 @@ func scheduledClassTeacherAvatar(sc queries.GetScheduledClassesFilteredRow) mode
 	hasPicture := sc.TeacherProfilePicture.Valid && sc.TeacherProfilePicture.String != ""
 	assignedColor := sc.TeacherAssignedColor
 	if assignedColor == "" {
-		assignedColor = "#B9D283"
+		assignedColor = constants.DefaultTeacherAssignedColor
 	}
 	return models.AvatarView{
 		Initials:      utils.PersonInitials(sc.TeacherFirstName, sc.TeacherMiddleName, sc.TeacherLastName, sc.TeacherName),

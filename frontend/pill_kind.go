@@ -145,3 +145,7 @@ func capitalizeStatus(status string) string {
 	}
 	return strings.ToUpper(status[:1]) + status[1:]
 }
+
+func ratePillAriaLabel(rate float64, currency string) string {
+	return formatRate(rate, currency)
+}

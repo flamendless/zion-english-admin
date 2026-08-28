@@ -13,7 +13,11 @@ func getDisplayValue(value string) string {
 }
 
 func formatRate(rate float64, currency string) string {
-	return fmt.Sprintf("%.2f %s", rate, currency)
+	return fmt.Sprintf("%s %s", formatRateAmount(rate), currency)
+}
+
+func formatRateAmount(rate float64) string {
+	return fmt.Sprintf("%g", rate)
 }
 
 var onceScrPassword = templ.NewOnceHandle()

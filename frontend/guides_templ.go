@@ -1159,7 +1159,7 @@ func GuideThemeVars() templ.Component {
 			templ_7745c5c3_Var36 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "<style>\r\n\t\t:root {\r\n\t\t\t--color-primary: #90C020;\r\n\t\t\t--color-primary-hover: #7A9F18;\r\n\t\t\t--color-muted-foreground: #6B6560;\r\n\t\t\t--color-border-subtle: #F0EDE6;\r\n\t\t\t--color-surface: #FFFFFF;\r\n\t\t\t--color-foreground: #2D2D2D;\r\n\t\t\t--color-ring: #90C020;\r\n\t\t\t--radius-lg: 12px;\r\n\t\t\t--shadow-sm: 0 1px 2px rgba(45, 45, 45, 0.06);\r\n\t\t\t--shadow-md: 0 4px 12px rgba(45, 45, 45, 0.08);\r\n\t\t\t--transition-fast: 150ms ease;\r\n\t\t\t--space-2: 8px;\r\n\t\t\t--space-3: 12px;\r\n\t\t\t--space-4: 16px;\r\n\t\t\t--space-5: 20px;\r\n\t\t\t--space-6: 24px;\r\n\t\t\t--space-8: 32px;\r\n\t\t\t--space-10: 40px;\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "<style>\r\n\t\t:root {\r\n\t\t\t--color-primary: #90C020;\r\n\t\t\t--color-primary-hover: #7A9F18;\r\n\t\t\t--color-muted-foreground: #64748B;\r\n\t\t\t--color-border-subtle: #F1F5F9;\r\n\t\t\t--color-surface: #FFFFFF;\r\n\t\t\t--color-foreground: #0F172A;\r\n\t\t\t--color-ring: #90C020;\r\n\t\t\t--radius-lg: 12px;\r\n\t\t\t--shadow-sm: 0 1px 2px rgba(45, 45, 45, 0.06);\r\n\t\t\t--shadow-md: 0 4px 12px rgba(45, 45, 45, 0.08);\r\n\t\t\t--transition-fast: 150ms ease;\r\n\t\t\t--space-2: 8px;\r\n\t\t\t--space-3: 12px;\r\n\t\t\t--space-4: 16px;\r\n\t\t\t--space-5: 20px;\r\n\t\t\t--space-6: 24px;\r\n\t\t\t--space-8: 32px;\r\n\t\t\t--space-10: 40px;\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

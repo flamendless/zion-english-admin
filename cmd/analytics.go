@@ -12,6 +12,7 @@ import (
 	"strings"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
+	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
 	"zion-english/internal/models"
@@ -519,7 +520,7 @@ func medianInt64(values []int64) int64 {
 func analyticsTeacherAvatar(teacherID int64, firstName, middleName, lastName, teacherName, assignedColor string, profilePicture sql.NullString) models.AvatarView {
 	hasPicture := profilePicture.Valid && profilePicture.String != ""
 	if assignedColor == "" {
-		assignedColor = "#B9D283"
+		assignedColor = constants.DefaultTeacherAssignedColor
 	}
 	return models.AvatarView{
 		Initials:      utils.PersonInitials(firstName, middleName, lastName, teacherName),

@@ -3,8 +3,10 @@ package frontend
 import (
 	"fmt"
 	"sort"
+	"strconv"
 	"time"
 
+	"github.com/a-h/templ"
 	"zion-english/internal/constants"
 	"zion-english/internal/models"
 	"zion-english/internal/utils"
@@ -156,6 +158,10 @@ func ScheduledClassConductURL(id int64) string {
 	return utils.URL(fmt.Sprintf("/schedule/%d/conduct", id))
 }
 
+func ScheduledClassViewURL(id int64) string {
+	return utils.URL(fmt.Sprintf("/schedule/%d/view", id))
+}
+
 func ScheduledClassCancelURL(id int64) string {
 	return utils.URL(fmt.Sprintf("/schedule/%d/cancel", id))
 }
@@ -165,5 +171,26 @@ func ScheduledClassEditModalURL(id int64) string {
 }
 
 func FormatScheduledClassRate(rate float64, currency string) string {
-	return fmt.Sprintf("%g %s", rate, currency)
+	return formatRate(rate, currency)
+}
+
+func scheduledClassDetailAttrs(item ScheduledClassItemData) templ.Attributes {
+	attrs := templ.Attributes{
+		"data-student-name":   item.StudentName,
+		"data-teacher-name":   item.TeacherName,
+		"data-scheduled-date": FormatScheduledClassDateDisplay(item.ScheduledDate),
+		"data-time-range":     item.TimeRange,
+		"data-rate":           formatRateAmount(item.Rate),
+		"data-currency":       item.Currency,
+		"data-teacher-initials":      item.TeacherAvatar.Initials,
+		"data-teacher-color":         item.TeacherAvatar.AssignedColor,
+		"data-teacher-picture-url":   item.TeacherAvatar.PictureURL,
+		"data-teacher-has-picture":   strconv.FormatBool(item.TeacherAvatar.HasPicture),
+		"data-teacher-alt":           item.TeacherAvatar.Alt,
+	}
+	if item.TeacherAvatar.RoleBadge != "" {
+		attrs["data-teacher-role-badge"] = item.TeacherAvatar.RoleBadge
+		attrs["data-teacher-role-badge-class"] = pillClass(AvatarRoleBadgeTone(item.TeacherAvatar.RoleBadge))
+	}
+	return attrs
 }

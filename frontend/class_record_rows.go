@@ -124,6 +124,7 @@ func (r ClassRecordRowData) ScheduledItemData() ScheduledClassItemData {
 		TeacherID:       r.TeacherID,
 		StudentName:     r.StudentName,
 		TeacherName:     r.TeacherName,
+		TeacherAvatar:   r.TeacherAvatar,
 		ScheduledDate:   r.Date,
 		StartTime:       r.StartTime,
 		EndTime:         r.EndTime,
@@ -138,7 +139,7 @@ func (r ClassRecordRowData) ScheduledItemData() ScheduledClassItemData {
 
 func (r ClassRecordRowData) ViewURL() string {
 	if r.IsScheduled() {
-		return utils.URL("/schedule/" + fmt.Sprintf("%d", r.ID) + "/edit")
+		return ScheduledClassViewURL(r.ID)
 	}
 	return utils.URL("/classes/" + fmt.Sprintf("%d", r.ID) + "/view")
 }
