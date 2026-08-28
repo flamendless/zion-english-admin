@@ -3,6 +3,7 @@ package frontend
 import (
 	"fmt"
 
+	"zion-english/internal/constants"
 	"zion-english/internal/models"
 	"zion-english/internal/utils"
 )
@@ -20,10 +21,10 @@ type ClassRecordRowData struct {
 	DurationMinutes int64
 	Rate            float64
 	Currency        string
-	Status          string
+	Status          constants.ClassListFilterStatus
 	Reason          string
 	Notes           string
-	Source          string
+	Source          ClassRecordSource
 }
 
 func ClassRecordRowFromView(v models.ClassRecordView) ClassRecordRowData {
@@ -48,10 +49,10 @@ func ClassRecordRowFromView(v models.ClassRecordView) ClassRecordRowData {
 		DurationMinutes: v.DurationMinutes,
 		Rate:            v.Rate,
 		Currency:        v.Currency,
-		Status:          v.Status,
+		Status:          constants.ClassListFilterStatus(v.Status),
 		Reason:          v.Reason,
 		Notes:           v.Notes,
-		Source:          v.Source,
+		Source:          ClassRecordSource(v.Source),
 	}
 }
 
@@ -64,20 +65,20 @@ func ClassRecordRowFromViews(views []models.ClassRecordView) []ClassRecordRowDat
 }
 
 func (r ClassRecordRowData) IsScheduled() bool {
-	return r.Source == "scheduled"
+	return r.Source == ClassRecordSourceScheduled
 }
 
 func (r ClassRecordRowData) IsDeleted() bool {
-	return r.Status == "deleted"
+	return r.Status == constants.ClassListFilterDeleted
 }
 
 func (r ClassRecordRowData) RowClass() string {
 	switch {
 	case r.IsDeleted():
 		return "row-deleted"
-	case r.Status == "cancelled":
+	case r.Status == constants.ClassListFilterCancelled:
 		return "row-cancelled"
-	case r.Status == "rescheduled":
+	case r.Status == constants.ClassListFilterRescheduled:
 		return "row-rescheduled"
 	case r.IsScheduled():
 		return "row-scheduled"
@@ -110,7 +111,7 @@ func (r ClassRecordRowData) TimeRangeDisplay() string {
 
 func (r ClassRecordRowData) NoteOrReasonDisplay() string {
 	switch r.Status {
-	case "conducted":
+	case constants.ClassListFilterConducted:
 		return r.Notes
 	default:
 		return r.Reason
@@ -124,14 +125,13 @@ func (r ClassRecordRowData) ScheduledItemData() ScheduledClassItemData {
 		TeacherID:       r.TeacherID,
 		StudentName:     r.StudentName,
 		TeacherName:     r.TeacherName,
-		TeacherAvatar:   r.TeacherAvatar,
 		ScheduledDate:   r.Date,
 		StartTime:       r.StartTime,
 		EndTime:         r.EndTime,
 		DurationMinutes: r.DurationMinutes,
 		Rate:            r.Rate,
 		Currency:        r.Currency,
-		DeleteFrom:      "classes",
+		DeleteFrom:      ClassActionContextClasses,
 	}
 	item.TimeRange = FormatScheduledClassTimeRange(item.StartTime, item.EndTime, item.DurationMinutes)
 	return item
@@ -139,7 +139,7 @@ func (r ClassRecordRowData) ScheduledItemData() ScheduledClassItemData {
 
 func (r ClassRecordRowData) ViewURL() string {
 	if r.IsScheduled() {
-		return ScheduledClassViewURL(r.ID)
+		return utils.URL("/schedule/" + fmt.Sprintf("%d", r.ID) + "/edit")
 	}
 	return utils.URL("/classes/" + fmt.Sprintf("%d", r.ID) + "/view")
 }

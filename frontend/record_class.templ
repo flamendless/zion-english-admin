@@ -1,5 +1,6 @@
 package frontend
 
+import "zion-english/internal/constants"
 import "zion-english/internal/models"
 import "zion-english/internal/utils"
 
@@ -189,18 +190,18 @@ templ RecordClassFields(prefill models.RecordClassPrefill, learningMaterials []C
 		"
 	>
 		if prefill.HasPrefill && prefill.Status != "" {
-			@ClassStatusDropdownWithValue(prefill.Status)
+			@ClassStatusDropdownWithValue(constants.ClassListFilterStatus(prefill.Status))
 		} else {
 			@ClassStatusDropdown()
 		}
-		<div class="form-group" id="reasonGroup" hidden?={ prefill.Status == "" || prefill.Status == "conducted" }>
+		<div class="form-group" id="reasonGroup" hidden?={ prefill.Status == "" || prefill.Status == constants.ClassStatusConducted }>
 			<label for="reason">Reason *</label>
 			<input
 				type="text"
 				id="reason"
 				name="reason"
 				placeholder="Reason for cancellation/reschedule"
-				required?={ prefill.Status != "" && prefill.Status != "conducted" }
+				required?={ prefill.Status != "" && prefill.Status != constants.ClassStatusConducted }
 			/>
 		</div>
 	</div>

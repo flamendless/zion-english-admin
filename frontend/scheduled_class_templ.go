@@ -47,28 +47,28 @@ func ScheduledClassActions(item ScheduledClassItemData) templ.Component {
 		}
 		templ_7745c5c3_Err = IconActionTrigger("Conduct", IconKindConduct, mergeTemplAttrs(scheduledClassDetailAttrs(item), templ.Attributes{
 			"data-conduct-url": ScheduledClassConductURL(item.ID),
-			"data-action-from": item.DeleteFrom,
+			"data-action-from": string(item.DeleteFrom),
 		})).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = IconActionTrigger("Edit", IconKindEdit, templ.Attributes{
 			"data-edit-url":    ScheduledClassEditModalURL(item.ID),
-			"data-action-from": item.DeleteFrom,
+			"data-action-from": string(item.DeleteFrom),
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = IconActionTrigger("Cancel", IconKindCancel, mergeTemplAttrs(scheduledClassDetailAttrs(item), templ.Attributes{
 			"data-cancel-url":  ScheduledClassCancelURL(item.ID),
-			"data-action-from": item.DeleteFrom,
+			"data-action-from": string(item.DeleteFrom),
 		})).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = IconActionTrigger("Delete", IconKindDelete, mergeTemplAttrs(scheduledClassDetailAttrs(item), templ.Attributes{
 			"data-delete-url":  ScheduledClassDeleteURL(item.ID),
-			"data-delete-from": item.DeleteFrom,
+			"data-delete-from": string(item.DeleteFrom),
 		})).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

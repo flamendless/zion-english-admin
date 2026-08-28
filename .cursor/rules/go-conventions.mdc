@@ -49,6 +49,7 @@ const (
 - For wire formats (JSON, DB, HTML attributes), convert at the boundary: `string(IconKindView)`.
 - In inline `<script>` blocks inside `.templ`, use literal wire-value strings (e.g. `'view'`) that match `string(IconKindView)`: templ does not evaluate Go inside raw script text.
 - Bare strings are fine for one-off user-facing text, log messages, and truly open-ended values.
+- **Statuses first:** any field named `Status`, `DocsStatus`, `PublicationStatus`, or similar closed-set domain value should use a typed enum end-to-end (constants → `frontend.*` view struct → templ → pill/helper). Convert to `string` only at DB, JSON, and HTML attribute boundaries. `internal/models` wire DTOs may stay `string`; cast when mapping into `frontend` structs.
 
 ## Handler Pattern (cmd/web.go)
 

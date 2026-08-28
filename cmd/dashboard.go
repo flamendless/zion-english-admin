@@ -240,7 +240,7 @@ func handleMyStudents(w http.ResponseWriter, r *http.Request) {
 			RatePerClass:  s.RatePerClass,
 			ParentName:    s.ParentName.String,
 			AssignedColor: s.AssignedColor,
-			Status:        s.Status,
+			Status:        constants.StudentStatus(s.Status),
 		}
 	}
 
@@ -249,7 +249,7 @@ func handleMyStudents(w http.ResponseWriter, r *http.Request) {
 	frontend.MyStudents(frontend.MyStudentsData{
 		Students:       viewStudents,
 		Query:          q,
-		Status:         status,
+		Status:         constants.StudentStatus(status),
 		PageNumber:     page.Number,
 		PageTotalPages: page.TotalPages(),
 		PageTotal:      page.Total,

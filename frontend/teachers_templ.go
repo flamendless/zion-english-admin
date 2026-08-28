@@ -16,7 +16,7 @@ import (
 type TeacherData struct {
 	Teachers       []TeacherItem
 	Query          string
-	Status         string
+	Status         constants.TeacherFilterStatus
 	PageNumber     int
 	PageTotalPages int
 	PageTotal      int64
@@ -42,31 +42,31 @@ type TeacherItem struct {
 	Currency       string
 	DriveUrl       string
 	Sex            string
-	Status         string
-	DocsStatus     string
+	Status         constants.TeacherStatus
+	DocsStatus     constants.TeacherDocumentStatus
 	Roles          []constants.TeacherRole
 	Deleted        bool
 	CreatedAt      string
 }
 
-func getTeacherRowClass(status string, deleted bool) string {
+func getTeacherRowClass(status constants.TeacherStatus, deleted bool) string {
 	if deleted {
 		return "teacher-deleted"
 	}
-	if status == "pending" {
+	if status == constants.TeacherStatusPending {
 		return "teacher-pending"
 	}
-	if status == "approved" {
+	if status == constants.TeacherStatusApproved {
 		return "teacher-approved"
 	}
 	return ""
 }
 
-func getTeacherDisplayStatus(status string, deleted bool) string {
+func getTeacherDisplayStatus(status constants.TeacherStatus, deleted bool) string {
 	if deleted {
-		return "deleted"
+		return constants.TeacherDisplayStatusDeleted
 	}
-	return status
+	return string(status)
 }
 
 func CopyableTextCell(value string) templ.Component {
@@ -202,7 +202,7 @@ func Teachers(data TeacherData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = ListFilterForm(data.FilterPath, data.Query, data.Status, "teacher", "", "", "", "", "", false, false, false, false, true).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindTeacher, "", "", "", "", "", false, false, false, false, true).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -292,7 +292,7 @@ func Teachers(data TeacherData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				if teacher.DocsStatus != "" {
-					templ_7745c5c3_Err = StatusPill(documentStatusLabel(teacher.DocsStatus), DocumentStatusPillTone(teacher.DocsStatus), false).Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = StatusPill(teacher.DocsStatus.Label(), DocumentStatusPillTone(teacher.DocsStatus), false).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -349,7 +349,7 @@ func Teachers(data TeacherData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					if teacher.Status == "pending" {
+					if teacher.Status == constants.TeacherStatusPending {
 						templ_7745c5c3_Err = IconActionButton("Approve", IconKindApprove, templ.Attributes{
 							"hx-post": utils.URL("/teachers/approve"),
 							"hx-vals": `{"id": "` + teacher.ID + `"}`,
@@ -376,7 +376,7 @@ func Teachers(data TeacherData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					if teacher.Status == "approved" {
+					if teacher.Status == constants.TeacherStatusApproved {
 						templ_7745c5c3_Err = IconActionButton("Un-approve", IconKindUnapprove, templ.Attributes{
 							"hx-post": utils.URL("/teachers/unapprove"),
 							"hx-vals": `{"id": "` + teacher.ID + `"}`,

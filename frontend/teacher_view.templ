@@ -20,7 +20,7 @@ type TeacherViewData struct {
 	Currency       string
 	DriveUrl       string
 	Sex            string
-	Status         string
+	Status         constants.TeacherStatus
 	Roles          []constants.TeacherRole
 	Avatar         AvatarProps
 	ZoomConfigured bool
@@ -55,7 +55,7 @@ templ TeacherViewModal(data TeacherViewData) {
 								@ProfileDetailField("First name", data.FirstName)
 								@ProfileDetailField("Middle name", displayOrDash(data.MiddleName))
 								@ProfileDetailField("Last name", data.LastName)
-								@ProfileDetailField("Status", data.Status)
+								@ProfileDetailField("Status", string(data.Status))
 								@ProfileDetailField("Birthdate", data.Birthdate)
 								@ProfileDetailField("Date joined", data.JoiningDate)
 								@ProfileDetailField("Address", data.Address)

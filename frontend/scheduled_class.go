@@ -30,13 +30,13 @@ type ScheduledClassItemData struct {
 	DurationMinutes int64
 	Rate            float64
 	Currency        string
-	Status          string
+	Status          constants.ScheduledClassStatus
 	RoomURL         string
 	RoomPasscode    string
 	TimeRange       string
 	Overdue         bool
 	ShowZoomWarning bool
-	DeleteFrom      string
+	DeleteFrom      ClassActionContext
 }
 
 func ScheduledClassItemFromView(v models.ScheduledClassView) ScheduledClassItemData {
@@ -61,12 +61,12 @@ func ScheduledClassItemFromView(v models.ScheduledClassView) ScheduledClassItemD
 		DurationMinutes: v.DurationMinutes,
 		Rate:            v.Rate,
 		Currency:        v.Currency,
-		Status:          v.Status,
+		Status:          constants.ScheduledClassStatus(v.Status),
 		RoomURL:         v.RoomURL,
 		RoomPasscode:    v.RoomPasscode,
 		TimeRange:       FormatScheduledClassTimeRange(v.StartTime, v.EndTime, v.DurationMinutes),
 		ShowZoomWarning: v.RoomURL == "" && v.DurationMinutes > ZoomMaxAutoMinutes,
-		DeleteFrom:      "schedule",
+		DeleteFrom:      ClassActionContextSchedule,
 	}
 	item.Overdue = IsScheduledClassOverdue(item)
 	return item
@@ -118,7 +118,7 @@ func normalizeDisplayTime(value string) string {
 }
 
 func IsScheduledClassOverdue(item ScheduledClassItemData) bool {
-	if item.Status != "scheduled" {
+	if item.Status != constants.ScheduledClassStatusScheduled {
 		return false
 	}
 	if item.ScheduledDate == "" {

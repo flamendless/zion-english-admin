@@ -271,7 +271,7 @@ func handleReportView(w http.ResponseWriter, r *http.Request, teacherID int64) {
 			StudentName: record.StudentName,
 			Rate:        utils.FormatCurrency(record.Rate, record.Currency),
 			TimeRange:   formatReportTimeRange(record.StartTime, record.EndTime),
-			Status:      record.Status,
+			Status:      constants.ClassStatus(record.Status),
 		})
 	}
 

@@ -35,6 +35,18 @@ templ Students(data StudentData) {
 - Display structs (`StudentData`, `StudentItem`) → define in `.templ` file
 - Form/API DTOs → `internal/models`; handlers map between them
 
+## Typed enums in templates
+
+Prefer typed enums over `string` for closed value sets (status, docs status, source, action context, filter kind, pill tone).
+
+- **View struct fields:** `Status`, `DocsStatus`, `Source`, `DeleteFrom`, and similar closed-set fields on `frontend.*` structs use types from `internal/constants` or `frontend` (e.g. `constants.StudentStatus`, `constants.ClassListFilterStatus`, `frontend.ClassActionContext`). Not `string`.
+- **Handler boundary:** `cmd/` handlers convert `string` → enum when building view structs (`constants.StudentStatus(row.Status)`). Convert enum → `string` only for HTML attributes, form values, and DB/JSON writes.
+- **Templ comparisons:** use enum constants (`data.Status == constants.ClassListFilterConducted`), not literals (`"conducted"`).
+- **Dropdowns / filters:** build `<option>` lists from `[]StatusOption` slices in `class_status.go` (see `StudentStatusOptions`, `TeacherFilterStatusOptions`). Do not duplicate hardcoded `<option value="...">` rows.
+- **Components:** `@EntityViewNotePanel` takes `PillTone`, not raw `"warning"` / `"info"`. Pill helpers in `pill_kind.go` accept typed status enums.
+- **Reference:** `learning_materials.templ` and `TeacherItem.Roles []constants.TeacherRole` show the target pattern.
+- **Exception:** raw wire-value strings in `<script>` blocks only (templ does not evaluate Go inside script text).
+
 ## Shared Components
 
 | Component | File |

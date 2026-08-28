@@ -1,6 +1,7 @@
 package frontend
 
 import "fmt"
+import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 func formatDurationMinutes(minutes int64) string {
@@ -13,13 +14,13 @@ func formatDurationMinutes(minutes int64) string {
 	return fmt.Sprintf("%d min", minutes)
 }
 
-func classStatusAccentClass(status string) string {
+func classStatusAccentClass(status constants.ClassListFilterStatus) string {
 	switch status {
-	case "conducted":
+	case constants.ClassListFilterConducted:
 		return "entity-view-hero--success"
-	case "cancelled", "deleted":
+	case constants.ClassListFilterCancelled, constants.ClassListFilterDeleted:
 		return "entity-view-hero--error"
-	case "rescheduled":
+	case constants.ClassListFilterRescheduled:
 		return "entity-view-hero--warning"
 	default:
 		return "entity-view-hero--neutral"
@@ -49,8 +50,8 @@ templ EntityViewSection(title string) {
 	</section>
 }
 
-templ EntityViewNotePanel(title, content, tone string) {
-	<div class={ "entity-view-note entity-view-note--" + tone }>
+templ EntityViewNotePanel(title, content string, tone PillTone) {
+	<div class={ "entity-view-note entity-view-note--" + string(tone) }>
 		<span class="entity-view-note-title">{ title }</span>
 		<p class="entity-view-note-content">{ content }</p>
 	</div>

@@ -1,11 +1,12 @@
 package frontend
 
+import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 type MyStudentsData struct {
 	Students       []StudentItem
 	Query          string
-	Status         string
+	Status         constants.StudentStatus
 	PageNumber     int
 	PageTotalPages int
 	PageTotal      int64
@@ -31,7 +32,7 @@ templ MyStudents(data MyStudentsData) {
 			@HeaderSimple()
 			@HubHeader("My Students", "Register Student", utils.URL("/students/register"), true)
 
-			@ListFilterForm(data.FilterPath, data.Query, data.Status, "student", "", "", "", "", "", false, false, false, false, true)
+			@ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindStudent, "", "", "", "", "", false, false, false, false, true)
 
 			if len(data.Students) > 0 {
 				<div class="table-wrapper">

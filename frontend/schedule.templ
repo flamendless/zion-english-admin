@@ -2,6 +2,7 @@ package frontend
 
 import (
 	"fmt"
+	"zion-english/internal/constants"
 	"zion-english/internal/utils"
 )
 
@@ -211,10 +212,10 @@ templ Schedule(data ScheduleData) {
 
 			<input type="hidden" id="todayListStart" name="startDate" value=""/>
 			<input type="hidden" id="todayListEnd" name="endDate" value=""/>
-			<input type="hidden" id="todayListStatus" name="status" value="scheduled"/>
+			<input type="hidden" id="todayListStatus" name="status" value={ string(constants.ScheduledClassStatusScheduled) }/>
 			<input type="hidden" id="dayListStart" name="startDate" value=""/>
 			<input type="hidden" id="dayListEnd" name="endDate" value=""/>
-			<input type="hidden" id="dayListStatus" name="status" value="scheduled"/>
+			<input type="hidden" id="dayListStatus" name="status" value={ string(constants.ScheduledClassStatusScheduled) }/>
 
 			<div class="schedule-layout">
 				<aside class="schedule-section schedule-today-section" aria-labelledby="todayHeading">

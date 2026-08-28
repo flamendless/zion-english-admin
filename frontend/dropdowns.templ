@@ -1,6 +1,7 @@
 package frontend
 
 import "zion-english/internal/utils"
+import "zion-english/internal/constants"
 
 templ TeacherDropdownWithValue(selectedID string) {
 	<div class="form-group">
@@ -184,23 +185,24 @@ templ ClassesStatusFilterDropdown() {
 	</div>
 }
 
-templ ClassStatusDropdownWithValue(selected string) {
+templ ClassStatusDropdownWithValue(selected constants.ClassListFilterStatus) {
 	<div class="form-group">
 		<label for="status">Status *</label>
 		<select id="status" name="status" required>
 			for _, opt := range ClassRecordStatusOptions {
-				<option value={ opt.Value } selected?={ selected == opt.Value }>{ opt.Label }</option>
+				<option value={ opt.Value } selected?={ string(selected) == opt.Value }>{ opt.Label }</option>
 			}
 		</select>
 	</div>
 }
 
-templ StudentStatusDropdownWithValue(selected string) {
+templ StudentStatusDropdownWithValue(selected constants.StudentStatus) {
 	<div class="form-group">
 		<label for="status">Status *</label>
 		<select id="status" name="status" required>
-			<option value="active" selected?={ selected == "active" }>Active</option>
-			<option value="inactive" selected?={ selected == "inactive" }>Inactive</option>
+			for _, opt := range StudentStatusOptions {
+				<option value={ opt.Value } selected?={ string(selected) == opt.Value }>{ opt.Label }</option>
+			}
 		</select>
 	</div>
 }
@@ -233,8 +235,9 @@ templ StudentStatusDropdown() {
 	<div class="form-group">
 		<label for="status">Status *</label>
 		<select id="status" name="status" required>
-			<option value="active">Active</option>
-			<option value="inactive">Inactive</option>
+			for _, opt := range StudentStatusOptions {
+				<option value={ opt.Value }>{ opt.Label }</option>
+			}
 		</select>
 	</div>
 }

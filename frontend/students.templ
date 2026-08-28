@@ -1,11 +1,14 @@
 package frontend
 
-import "zion-english/internal/utils"
+import (
+	"zion-english/internal/constants"
+	"zion-english/internal/utils"
+)
 
 type StudentData struct {
 	Students       []StudentItem
 	Query          string
-	Status         string
+	Status         constants.StudentStatus
 	TeacherID      string
 	PageNumber     int
 	PageTotalPages int
@@ -25,15 +28,15 @@ type StudentItem struct {
 	RatePerClass     float64
 	ParentName       string
 	AssignedColor    string
-	Status           string
+	Status           constants.StudentStatus
 	TeacherDisplay   string
 	RelatedToDisplay string
 	CreatedAt        string
 	UpdatedAt        string
 }
 
-func getStudentRowClass(status string) string {
-	if status == "inactive" {
+func getStudentRowClass(status constants.StudentStatus) string {
+	if status == constants.StudentStatusInactive {
 		return "student-inactive"
 	}
 	return ""
@@ -75,7 +78,7 @@ templ Students(data StudentData) {
 			@HeaderSimple()
 			@HubHeader("Students", "New Student", utils.URL("/students/register"), true)
 
-			@ListFilterForm(data.FilterPath, data.Query, data.Status, "student", data.TeacherID, "", "", "", "", true, false, false, false, true)
+			@ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindStudent, data.TeacherID, "", "", "", "", true, false, false, false, true)
 
 			if len(data.Students) > 0 {
 				<div class="table-wrapper">

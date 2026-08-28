@@ -1,5 +1,7 @@
 package models
 
+import "zion-english/internal/constants"
+
 type ProcessRequest struct {
 	TeacherID    string `json:"teacherID"`
 	DriveURL     string `json:"driveUrl"`
@@ -211,6 +213,6 @@ type RecordClassPrefill struct {
 	DurationMinutes string
 	Rate            string
 	Currency        string
-	Status          string
+	Status          constants.ClassStatus
 	HasPrefill      bool
 }

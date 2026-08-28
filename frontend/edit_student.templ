@@ -1,6 +1,9 @@
 package frontend
 
-import "zion-english/internal/utils"
+import (
+	"zion-english/internal/constants"
+	"zion-english/internal/utils"
+)
 
 type StudentRelationshipItem struct {
 	RelatedStudentID   string
@@ -18,7 +21,7 @@ type EditStudentData struct {
 	RatePerClass   float64
 	ParentName     string
 	AssignedColor  string
-	Status         string
+	Status         constants.StudentStatus
 	InactiveReason string
 	TeacherIDs     []string
 	TeacherNames   []string
@@ -83,10 +86,10 @@ templ EditStudent(data EditStudentData) {
 						</div>
 						<div class="form-group">
 							<label for="status">Status</label>
-							<input type="text" id="status" value={ data.Status } disabled/>
+							<input type="text" id="status" value={ string(data.Status) } disabled/>
 						</div>
 					</div>
-					if data.Status == "inactive" && data.InactiveReason != "" {
+					if data.Status == constants.StudentStatusInactive && data.InactiveReason != "" {
 						<div class="form-group">
 							<label for="inactiveReason">Inactive Reason</label>
 							<input type="text" id="inactiveReason" value={ data.InactiveReason } disabled/>
@@ -250,8 +253,8 @@ func formatStudentRelationshipLabel(rel StudentRelationshipItem) string {
 	return rel.RelatedStudentName
 }
 
-func inactiveReasonGroupClass(status string) string {
-	if status == "inactive" {
+func inactiveReasonGroupClass(status constants.StudentStatus) string {
+	if status == constants.StudentStatusInactive {
 		return "form-group inactive-reason-group is-visible"
 	}
 	return "form-group inactive-reason-group"

@@ -131,7 +131,7 @@ func classEditClassData(ctx context.Context, recordID int64, readonly bool) (fro
 		DurationMinutes: existing.DurationMinutes,
 		Rate:            existing.Rate,
 		Currency:        existing.Currency,
-		Status:          existing.Status,
+		Status:          constants.ClassListFilterStatus(existing.Status),
 		Reason:          existing.Reason.String,
 		Notes:           existing.Notes.String,
 		LearningMaterials: materials,
@@ -829,11 +829,11 @@ func parseRecordClassPrefill(r *http.Request) models.RecordClassPrefill {
 		DurationMinutes: q.Get("duration"),
 		Rate:            q.Get("rate"),
 		Currency:        q.Get("currency"),
-		Status:          q.Get("status"),
+		Status:          constants.ClassStatus(q.Get("status")),
 		HasPrefill:      true,
 	}
 	if prefill.Status == "" {
-		prefill.Status = "conducted"
+		prefill.Status = constants.ClassStatusConducted
 	}
 
 	scheduleID, err := strconv.ParseInt(fromSchedule, 10, 64)

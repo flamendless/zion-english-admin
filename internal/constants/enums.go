@@ -9,10 +9,6 @@ func ValidCurrency(currency string) bool {
 	}
 }
 
-func ValidStudentStatus(status string) bool {
-	return status == "active" || status == "inactive"
-}
-
 func ValidClassStatus(status string) bool {
 	switch ClassStatus(status) {
 	case ClassStatusConducted, ClassStatusCancelled, ClassStatusRescheduled:

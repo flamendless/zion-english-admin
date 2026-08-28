@@ -28,7 +28,7 @@ type TeacherViewData struct {
 	Currency       string
 	DriveUrl       string
 	Sex            string
-	Status         string
+	Status         constants.TeacherStatus
 	Roles          []constants.TeacherRole
 	Avatar         AvatarProps
 	ZoomConfigured bool
@@ -114,7 +114,7 @@ func TeacherViewModal(data TeacherViewData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = ProfileDetailField("Status", data.Status).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ProfileDetailField("Status", string(data.Status)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -1,7 +1,10 @@
 package frontend
 
-import "strings"
-import "zion-english/internal/constants"
+import (
+	"strings"
+
+	"zion-english/internal/constants"
+)
 
 type PillTone string
 
@@ -33,49 +36,53 @@ func badgeCountClass(tone BadgeTone) string {
 	return "badge-count badge-count--" + string(tone)
 }
 
-func StudentStatusPillTone(status string) PillTone {
-	if status == "active" {
+func StudentStatusPillTone(status constants.StudentStatus) PillTone {
+	if status == constants.StudentStatusActive {
 		return PillToneSuccess
 	}
 	return PillToneError
 }
 
-func TeacherStatusPillTone(status string, deleted bool) PillTone {
+func TeacherStatusPillTone(status constants.TeacherStatus, deleted bool) PillTone {
 	if deleted {
 		return PillToneNeutral
 	}
 	switch status {
-	case "approved":
+	case constants.TeacherStatusApproved:
 		return PillToneSuccess
-	case "pending":
+	case constants.TeacherStatusPending:
 		return PillToneWarning
 	default:
 		return PillToneError
 	}
 }
 
-func ClassStatusPillTone(status string) PillTone {
+func ClassStatusPillTone(status constants.ClassListFilterStatus) PillTone {
 	switch status {
-	case "conducted":
+	case constants.ClassListFilterConducted:
 		return PillToneSuccess
-	case "cancelled":
+	case constants.ClassListFilterCancelled:
 		return PillToneError
-	case "rescheduled":
+	case constants.ClassListFilterRescheduled:
 		return PillToneWarning
-	case "scheduled":
+	case constants.ClassListFilterScheduled:
 		return PillTonePrimary
 	default:
 		return PillToneNeutral
 	}
 }
 
-func DocumentStatusPillTone(status string) PillTone {
+func ClassRecordStatusPillTone(status constants.ClassStatus) PillTone {
+	return ClassStatusPillTone(constants.ClassListFilterStatus(status))
+}
+
+func DocumentStatusPillTone(status constants.TeacherDocumentStatus) PillTone {
 	switch status {
-	case "submitted":
+	case constants.TeacherDocumentStatusSubmitted:
 		return PillToneWarning
-	case "approved":
+	case constants.TeacherDocumentStatusApproved:
 		return PillToneSuccess
-	case "rejected":
+	case constants.TeacherDocumentStatusRejected:
 		return PillToneError
 	default:
 		return PillToneNeutral
@@ -139,11 +146,12 @@ func TeacherRolePillTone(role constants.TeacherRole) PillTone {
 	}
 }
 
-func capitalizeStatus(status string) string {
+func capitalizeStatus[S ~string](status S) string {
 	if status == "" {
 		return ""
 	}
-	return strings.ToUpper(status[:1]) + status[1:]
+	s := string(status)
+	return strings.ToUpper(s[:1]) + s[1:]
 }
 
 func ratePillAriaLabel(rate float64, currency string) string {

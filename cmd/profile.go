@@ -225,7 +225,7 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 		Currency:              row.Currency,
 		DriveUrl:              row.DriveUrl,
 		Sex:                   sex,
-		Status:                row.Status,
+		Status:                constants.TeacherStatus(row.Status),
 		HasProfilePicture:     row.ProfilePicture.Valid && row.ProfilePicture.String != "",
 		Avatar:                avatarWithTeacherRoles(buildTeacherAvatarProps(row), roleStrings),
 		CanChangeMobile:       canChangeMobile,

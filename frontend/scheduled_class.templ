@@ -12,19 +12,19 @@ templ ScheduledClassActions(item ScheduledClassItemData) {
 		})
 		@IconActionTrigger("Conduct", IconKindConduct, mergeTemplAttrs(scheduledClassDetailAttrs(item), templ.Attributes{
 			"data-conduct-url": ScheduledClassConductURL(item.ID),
-			"data-action-from": item.DeleteFrom,
+			"data-action-from": string(item.DeleteFrom),
 		}))
 		@IconActionTrigger("Edit", IconKindEdit, templ.Attributes{
 			"data-edit-url":    ScheduledClassEditModalURL(item.ID),
-			"data-action-from": item.DeleteFrom,
+			"data-action-from": string(item.DeleteFrom),
 		})
 		@IconActionTrigger("Cancel", IconKindCancel, mergeTemplAttrs(scheduledClassDetailAttrs(item), templ.Attributes{
 			"data-cancel-url":  ScheduledClassCancelURL(item.ID),
-			"data-action-from": item.DeleteFrom,
+			"data-action-from": string(item.DeleteFrom),
 		}))
 		@IconActionTrigger("Delete", IconKindDelete, mergeTemplAttrs(scheduledClassDetailAttrs(item), templ.Attributes{
 			"data-delete-url":  ScheduledClassDeleteURL(item.ID),
-			"data-delete-from": item.DeleteFrom,
+			"data-delete-from": string(item.DeleteFrom),
 		}))
 	</div>
 }

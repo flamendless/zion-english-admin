@@ -1,5 +1,6 @@
 package frontend
 
+import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 templ StudentViewModal(data EditStudentData) {
@@ -34,9 +35,9 @@ templ StudentViewModal(data EditStudentData) {
 								@ProfileDetailField("Contact", displayOrDash(data.Contact))
 							</div>
 						}
-						if data.Status == "inactive" && data.InactiveReason != "" {
+						if data.Status == constants.StudentStatusInactive && data.InactiveReason != "" {
 							@EntityViewSection("Status") {
-								@EntityViewNotePanel("Inactive reason", data.InactiveReason, "warning")
+								@EntityViewNotePanel("Inactive reason", data.InactiveReason, PillToneWarning)
 							}
 						}
 						if len(data.Teachers) > 0 {

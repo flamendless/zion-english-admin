@@ -2,6 +2,7 @@ package frontend
 
 import (
 	"fmt"
+	"zion-english/internal/constants"
 	"zion-english/internal/utils"
 )
 
@@ -20,7 +21,7 @@ type EditClassData struct {
 	DurationMinutes int64
 	Rate            float64
 	Currency        string
-	Status          string
+	Status          constants.ClassListFilterStatus
 	Reason            string
 	Notes             string
 	LearningMaterials []ClassLearningMaterialLink
@@ -169,9 +170,9 @@ templ EditClassFields(data EditClassData, readonly bool) {
 		<div class="form-row">
 			<div class="form-group">
 				<label for="status">Status</label>
-				<input type="text" id="status" value={ data.Status } disabled/>
+				<input type="text" id="status" value={ string(data.Status) } disabled/>
 			</div>
-			if data.Status != "conducted" {
+			if data.Status != constants.ClassListFilterConducted {
 				<div class="form-group">
 					<label for="reason">Reason</label>
 					<input type="text" id="reason" value={ data.Reason } disabled/>
@@ -207,7 +208,7 @@ templ EditClassFields(data EditClassData, readonly bool) {
 			"
 		>
 			@ClassStatusDropdownWithValue(data.Status)
-			<div class="form-group" id="reasonGroup" hidden?={ data.Status == "conducted" }>
+			<div class="form-group" id="reasonGroup" hidden?={ data.Status == constants.ClassListFilterConducted }>
 				<label for="reason">Reason *</label>
 				<input
 					type="text"
@@ -215,7 +216,7 @@ templ EditClassFields(data EditClassData, readonly bool) {
 					name="reason"
 					value={ data.Reason }
 					placeholder="Reason for cancellation/reschedule"
-					required?={ data.Status != "conducted" }
+					required?={ data.Status != constants.ClassListFilterConducted }
 				/>
 			</div>
 		</div>

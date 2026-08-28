@@ -24,6 +24,25 @@ const (
 	TeacherDocumentStatusRejected  TeacherDocumentStatus = "rejected"
 )
 
+var TeacherDocumentStatuses = []TeacherDocumentStatus{
+	TeacherDocumentStatusSubmitted,
+	TeacherDocumentStatusApproved,
+	TeacherDocumentStatusRejected,
+}
+
+func (s TeacherDocumentStatus) Label() string {
+	switch s {
+	case TeacherDocumentStatusSubmitted:
+		return "Submitted"
+	case TeacherDocumentStatusApproved:
+		return "Approved"
+	case TeacherDocumentStatusRejected:
+		return "Rejected"
+	default:
+		return string(s)
+	}
+}
+
 func ValidTeacherDocumentStatus(value string) bool {
 	switch TeacherDocumentStatus(value) {
 	case TeacherDocumentStatusSubmitted, TeacherDocumentStatusApproved, TeacherDocumentStatusRejected:

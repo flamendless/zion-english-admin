@@ -62,14 +62,14 @@ templ PaginationBarHTMX(loadURL string, includeSelector string, page PaginationD
 	</div>
 }
 
-func listSearchPlaceholder(statusType string) string {
-	if statusType == "teacher" {
+func listSearchPlaceholder(statusType ListFilterKind) string {
+	if statusType == ListFilterKindTeacher {
 		return "Name or email..."
 	}
 	return "Name..."
 }
 
-templ ListFilterForm(actionPath string, query string, status string, statusType string, teacherID string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool, showStatus bool) {
+templ ListFilterForm(actionPath string, query string, status string, statusType ListFilterKind, teacherID string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool, showStatus bool) {
 	<form class="list-toolbar" method="GET" action={ actionPath }>
 		<div class="form-group">
 			<label for="q">Search</label>
@@ -80,17 +80,18 @@ templ ListFilterForm(actionPath string, query string, status string, statusType 
 				<label for="status">Status</label>
 				<select id="status" name="status">
 					<option value="">All</option>
-					if statusType == "teacher" {
-						<option value="pending" selected?={ status == "pending" }>Pending</option>
-						<option value="approved" selected?={ status == "approved" }>Approved</option>
-						<option value="deleted" selected?={ status == "deleted" }>Deleted</option>
-					} else if statusType == "class" {
-						<option value="conducted" selected?={ status == "conducted" }>Conducted</option>
-						<option value="cancelled" selected?={ status == "cancelled" }>Cancelled</option>
-						<option value="rescheduled" selected?={ status == "rescheduled" }>Rescheduled</option>
+					if statusType == ListFilterKindTeacher {
+						for _, opt := range TeacherFilterStatusOptions {
+							<option value={ opt.Value } selected?={ status == opt.Value }>{ opt.Label }</option>
+						}
+					} else if statusType == ListFilterKindClass {
+						for _, opt := range ClassRecordFilterStatusOptions {
+							<option value={ opt.Value } selected?={ status == opt.Value }>{ opt.Label }</option>
+						}
 					} else {
-						<option value="active" selected?={ status == "active" }>Active</option>
-						<option value="inactive" selected?={ status == "inactive" }>Inactive</option>
+						for _, opt := range StudentStatusOptions {
+							<option value={ opt.Value } selected?={ status == opt.Value }>{ opt.Label }</option>
+						}
 					}
 				</select>
 			</div>
@@ -145,4 +146,3 @@ templ TeacherFilterDropdown(selectedID string) {
 		</select>
 	</div>
 }
-

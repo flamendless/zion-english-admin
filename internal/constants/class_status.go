@@ -14,6 +14,19 @@ var ClassStatuses = []ClassStatus{
 	ClassStatusRescheduled,
 }
 
+func (s ClassStatus) Label() string {
+	switch s {
+	case ClassStatusConducted:
+		return "Conducted"
+	case ClassStatusCancelled:
+		return "Cancelled"
+	case ClassStatusRescheduled:
+		return "Rescheduled"
+	default:
+		return string(s)
+	}
+}
+
 type ClassListFilterStatus string
 
 const (
@@ -30,4 +43,21 @@ var ClassListFilterStatuses = []ClassListFilterStatus{
 	ClassListFilterCancelled,
 	ClassListFilterRescheduled,
 	ClassListFilterDeleted,
+}
+
+func (s ClassListFilterStatus) Label() string {
+	switch s {
+	case ClassListFilterScheduled:
+		return "Scheduled"
+	case ClassListFilterConducted:
+		return "Conducted"
+	case ClassListFilterCancelled:
+		return "Cancelled"
+	case ClassListFilterRescheduled:
+		return "Rescheduled"
+	case ClassListFilterDeleted:
+		return "Deleted"
+	default:
+		return string(s)
+	}
 }

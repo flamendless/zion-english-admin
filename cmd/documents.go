@@ -56,7 +56,7 @@ func mapDocumentItems(rows []queries.TblTeacherDocument) []frontend.DocumentItem
 			Extension:  row.FileExtension,
 			Type:       row.Type,
 			FileSize:   utils.FormatFileSize(row.FileSize),
-			Status:     row.Status,
+			Status:     constants.TeacherDocumentStatus(row.Status),
 			UploadedAt: utils.FormatNullDateTimePHT(row.UploadedAt),
 			UploadedBy: "",
 			ViewURL:    utils.URL(fmt.Sprintf("/documents/%d/file", row.ID)),
@@ -77,7 +77,7 @@ func mapAllDocumentItems(ctx context.Context, rows []queries.GetAllTeacherDocume
 			Extension:  row.FileExtension,
 			Type:       row.Type,
 			FileSize:   utils.FormatFileSize(row.FileSize),
-			Status:     row.Status,
+			Status:     constants.TeacherDocumentStatus(row.Status),
 			UploadedAt: utils.FormatNullDateTimePHT(row.UploadedAt),
 			UploadedBy: row.TeacherName,
 			UploadedByAvatar: buildTeacherListAvatarProps(

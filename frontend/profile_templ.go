@@ -31,7 +31,7 @@ type ProfileData struct {
 	Currency              string
 	DriveUrl              string
 	Sex                   string
-	Status                string
+	Status                constants.TeacherStatus
 	HasProfilePicture     bool
 	Avatar                AvatarProps
 	CanChangeMobile       bool

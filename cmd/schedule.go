@@ -882,7 +882,7 @@ func scheduledClassViewData(ctx context.Context, scheduleID int64) (frontend.Edi
 		DurationMinutes:   existing.DurationMinutes,
 		Rate:              existing.Rate,
 		Currency:          existing.Currency,
-		Status:            "scheduled",
+		Status:            constants.ClassListFilterScheduled,
 		Reason:            reason,
 		LearningMaterials: materials,
 	}, nil

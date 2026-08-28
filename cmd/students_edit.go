@@ -10,6 +10,7 @@ import (
 	"strings"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
+	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/models"
 	"zion-english/internal/utils"
@@ -147,7 +148,7 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 		RatePerClass:   existing.RatePerClass,
 		ParentName:     existing.ParentName.String,
 		AssignedColor:  existing.AssignedColor,
-		Status:         existing.Status,
+		Status:         constants.StudentStatus(existing.Status),
 		InactiveReason: inactiveReason,
 		TeacherIDs:     teacherIDs,
 		TeacherNames:   teacherNames,
@@ -289,7 +290,7 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 			RatePerClass:     s.RatePerClass,
 			ParentName:       s.ParentName.String,
 			AssignedColor:    s.AssignedColor,
-			Status:           s.Status,
+			Status:           constants.StudentStatus(s.Status),
 			TeacherDisplay:   strings.Join(teachersByStudent[s.ID], ", "),
 			RelatedToDisplay: formatStudentRelationships(relationshipsByStudent[s.ID]),
 			CreatedAt:        utils.FormatNullDateTimeSecondsPHT(s.CreatedAt),
@@ -302,7 +303,7 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 	frontend.Students(frontend.StudentData{
 		Students:       viewStudents,
 		Query:          q,
-		Status:         status,
+		Status:         constants.StudentStatus(status),
 		TeacherID:      strconv.FormatInt(teacherID, 10),
 		PageNumber:     page.Number,
 		PageTotalPages: page.TotalPages(),
