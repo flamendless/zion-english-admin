@@ -43,13 +43,6 @@ func avatarFilePath(filename string) string {
 	return filepath.Join(avatarDir, filepath.Base(filename))
 }
 
-func teacherAvatarURL(hasPicture bool) string {
-	if !hasPicture {
-		return ""
-	}
-	return utils.URL("/profile/picture")
-}
-
 func teacherPictureURL(teacherID int64, hasPicture bool) string {
 	if !hasPicture {
 		return ""
@@ -68,7 +61,7 @@ func buildTeacherAvatarProps(row queries.GetTeacherProfileByIDRow) frontend.Avat
 		Size:          "xl",
 		Initials:      utils.PersonInitials(row.FirstName, row.MiddleName, row.LastName, displayName),
 		AssignedColor: assignedColor,
-		PictureURL:    teacherAvatarURL(hasPicture),
+		PictureURL:    teacherPictureURL(row.ID, hasPicture),
 		HasPicture:    hasPicture,
 		Alt:           displayName + " avatar",
 	}
