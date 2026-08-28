@@ -6,6 +6,7 @@ package queries
 
 import (
 	"database/sql"
+	"time"
 )
 
 type TblAccess struct {
@@ -68,6 +69,12 @@ type TblClassRecord struct {
 	StartTime       sql.NullString
 	EndTime         sql.NullString
 	DeletedAt       sql.NullString
+}
+
+type TblClassRecordLearningMaterial struct {
+	ClassRecordID int64
+	MaterialID    int64
+	CreatedAt     time.Time
 }
 
 type TblLearningMaterial struct {
@@ -183,6 +190,12 @@ type TblScheduledClass struct {
 	CreatedAt       string
 	UpdatedAt       string
 	DeletedAt       sql.NullString
+}
+
+type TblScheduledClassLearningMaterial struct {
+	ScheduledClassID int64
+	MaterialID       int64
+	CreatedAt        time.Time
 }
 
 type TblStudent struct {

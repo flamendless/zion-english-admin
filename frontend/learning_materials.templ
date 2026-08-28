@@ -86,9 +86,9 @@ func learningMaterialFormAction(data LearningMaterialFormData) string {
 
 func learningMaterialFormTitle(data LearningMaterialFormData) string {
 	if data.IsEdit {
-		return "Edit learning material"
+		return "Edit Learning Material"
 	}
-	return "Add learning material"
+	return "Add Learning Material"
 }
 
 func learningMaterialSubmitLabel(data LearningMaterialFormData) string {
@@ -179,6 +179,7 @@ templ LearningMaterials(data LearningMaterialsData) {
 		})
 
 		@LearningMaterialsScripts()
+		@LearningMaterialViewModalScripts()
 	</body>
 	</html>
 }
@@ -764,11 +765,12 @@ templ LearningMaterialsStyles() {
 			align-items: center;
 			padding: 4px 10px;
 			border-radius: var(--radius-full);
-			border: 1px solid #000;
+			border: var(--pill-border);
 			font-size: 0.75rem;
 			font-weight: 600;
 			line-height: 1.2;
 			text-transform: lowercase;
+			box-sizing: border-box;
 		}
 
 		.lm-empty {
@@ -994,10 +996,11 @@ templ LearningMaterialsStyles() {
 			padding: 4px 8px 4px 10px;
 			border-radius: var(--radius-full);
 			background: #E6FFFA;
-			border: 1px solid #000;
+			border: var(--pill-border);
 			font-size: 0.8125rem;
 			font-weight: 500;
 			text-transform: lowercase;
+			box-sizing: border-box;
 		}
 
 		.lm-tag-chip-remove {
@@ -1075,6 +1078,220 @@ func learningMaterialModalID(data LearningMaterialFormData) string {
 		return "lmEditModal"
 	}
 	return "lmFormModal"
+}
+
+templ LearningMaterialViewModalStyles() {
+	<style>
+		#lmViewModalHost .modal-overlay {
+			z-index: 1100;
+		}
+
+		.lm-thumb {
+			width: 100%;
+			aspect-ratio: 16 / 9;
+			border-radius: var(--radius-md);
+			overflow: hidden;
+			background: linear-gradient(180deg, #F0FDFA 0%, #E6FFFA 100%);
+			border: 1px solid var(--color-border-subtle);
+		}
+
+		.lm-thumb--compact {
+			width: 100%;
+			max-width: 168px;
+			aspect-ratio: 16 / 9;
+		}
+
+		.lm-thumb-img {
+			display: block;
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		.lm-thumb-placeholder {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			height: 100%;
+			color: #0D9488;
+		}
+
+		.lm-thumb-img[hidden] {
+			display: none;
+		}
+
+		.lm-tag-list {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--space-2);
+		}
+
+		.lm-tag-pill {
+			display: inline-flex;
+			align-items: center;
+			padding: 4px 10px;
+			border-radius: var(--radius-full);
+			border: var(--pill-border);
+			font-size: 0.75rem;
+			font-weight: 600;
+			line-height: 1.2;
+			text-transform: lowercase;
+			box-sizing: border-box;
+		}
+
+		.lm-modal {
+			max-width: 560px;
+		}
+
+		.lm-view-body {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-4);
+		}
+
+		.lm-view-badges {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--space-2);
+		}
+
+		.lm-view-section {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-2);
+		}
+
+		.lm-view-label {
+			font-size: 0.8125rem;
+			font-weight: 600;
+			color: var(--color-muted-foreground);
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+		}
+
+		.lm-view-text {
+			font-size: 0.9375rem;
+			line-height: 1.6;
+			white-space: pre-wrap;
+		}
+
+		.lm-view-link {
+			word-break: break-all;
+			font-size: 0.875rem;
+		}
+
+		.lm-view-meta {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-3);
+			padding: var(--space-4);
+			border-radius: var(--radius-md);
+			background: var(--color-muted);
+		}
+
+		.lm-meta-item {
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+		}
+
+		.lm-meta-label {
+			font-size: 0.75rem;
+			color: var(--color-muted-foreground);
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+		}
+
+		.lm-meta-value {
+			font-size: 0.875rem;
+		}
+
+		.lm-meta-item--owner .teacher-name-cell-text {
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--color-foreground);
+		}
+
+		.lm-view-footer {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-3);
+			padding: var(--space-2) var(--space-4) var(--space-4);
+			border-top: 1px solid var(--color-border-subtle);
+		}
+
+		.lm-view-footer-actions {
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			gap: var(--space-1);
+			width: 100%;
+		}
+
+		.lm-view-footer button,
+		.lm-view-footer .btn,
+		.lm-view-footer .add-btn {
+			margin-top: 0;
+		}
+	</style>
+}
+
+templ LearningMaterialViewModalScripts() {
+	<script>
+		(function () {
+			if (window._lmViewModalBound) return;
+			window._lmViewModalBound = true;
+
+			function hasOpenModalLayer() {
+				return !!(
+					document.getElementById('classViewModal') ||
+					document.getElementById('lmEditModal') ||
+					document.getElementById('lmFormModal') ||
+					document.getElementById('lmViewModal')
+				);
+			}
+
+			window.closeLearningMaterialViewModal = function () {
+				const host = document.getElementById('lmViewModalHost');
+				if (host) host.innerHTML = '';
+				if (!hasOpenModalLayer()) {
+					document.body.classList.remove('modal-open');
+				}
+			};
+
+			document.body.addEventListener('click', function (e) {
+				if (e.target.closest('.lm-view-close')) {
+					window.closeLearningMaterialViewModal();
+					return;
+				}
+				const viewOverlay = e.target.closest('#lmViewModal');
+				if (viewOverlay && e.target === viewOverlay) {
+					window.closeLearningMaterialViewModal();
+				}
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key !== 'Escape' || !document.getElementById('lmViewModal')) return;
+				window.closeLearningMaterialViewModal();
+			});
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id !== 'lmViewModalHost') return;
+				document.body.classList.add('modal-open');
+				const closeBtn = evt.detail.target.querySelector('.lm-view-close');
+				if (closeBtn) closeBtn.focus();
+			});
+		})();
+	</script>
+}
+
+templ LearningMaterialViewModalSupport() {
+	<div id="lmViewModalHost"></div>
+	@LearningMaterialViewModalStyles()
+	@LearningMaterialViewModalScripts()
 }
 
 templ LearningMaterialsScripts() {
@@ -1384,12 +1601,6 @@ templ LearningMaterialsScripts() {
 				activeModal = null;
 			};
 
-			window.closeLearningMaterialViewModal = function () {
-				const host = document.getElementById('lmViewModalHost');
-				if (host) host.innerHTML = '';
-				document.body.classList.remove('modal-open');
-			};
-
 			window.closeLearningMaterialEditModal = function () {
 				const host = document.getElementById('lmEditModalHost');
 				if (host) host.innerHTML = '';
@@ -1408,15 +1619,6 @@ templ LearningMaterialsScripts() {
 					window.closeLearningMaterialEditModal();
 					return;
 				}
-				if (e.target.closest('.lm-view-close')) {
-					window.closeLearningMaterialViewModal();
-					return;
-				}
-				const viewOverlay = e.target.closest('#lmViewModal');
-				if (viewOverlay && e.target === viewOverlay) {
-					window.closeLearningMaterialViewModal();
-					return;
-				}
 				const formOverlay = e.target.closest('#lmFormModal');
 				if (formOverlay && e.target === formOverlay) {
 					window.closeLearningMaterialFormModal();
@@ -1430,17 +1632,11 @@ templ LearningMaterialsScripts() {
 
 			document.addEventListener('keydown', function (e) {
 				if (e.key !== 'Escape') return;
-				window.closeLearningMaterialViewModal();
 				window.closeLearningMaterialEditModal();
 				window.closeLearningMaterialFormModal();
 			});
 
 			document.body.addEventListener('htmx:afterSwap', function (evt) {
-				if (evt.detail.target.id === 'lmViewModalHost') {
-					document.body.classList.add('modal-open');
-					const closeBtn = evt.detail.target.querySelector('.lm-view-close');
-					if (closeBtn) closeBtn.focus();
-				}
 				if (evt.detail.target.id === 'lmEditModalHost') {
 					document.body.classList.add('modal-open');
 					const editModal = evt.detail.target.querySelector('#lmEditModal');

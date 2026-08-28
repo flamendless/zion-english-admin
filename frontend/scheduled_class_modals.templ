@@ -13,7 +13,7 @@ templ ScheduledClassModals() {
 }
 
 templ ScheduledClassDetailCard(cardID string) {
-	<div class="scheduled-class-detail-card" id={ cardID } aria-label="Class details">
+	<div class="scheduled-class-detail-card" id={ cardID } aria-label="Class Details">
 		<div class="scheduled-class-detail-header">
 			<span class="scheduled-class-detail-student" data-field="student"></span>
 			<span class="scheduled-class-detail-teacher">
@@ -181,6 +181,7 @@ templ EditScheduledClassModalForm(data EditScheduleData) {
 		}
 		@ClassDateField(data.Date, false)
 		@TimeRangeFields(data.StartTime, data.EndTime, false)
+		@ClassLearningMaterialPicker(data.LearningMaterials)
 		<div class="modal-footer">
 			<button type="button" class="btn scheduled-class-modal-close">Cancel</button>
 			<button type="submit" class="btn" id="editScheduledClassSubmitBtn">Save Changes</button>

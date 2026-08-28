@@ -4,33 +4,36 @@ templ ClassViewModal(data EditClassData) {
 	<div class="modal-overlay" id="classViewModal" role="presentation">
 		<div class="modal-dialog modal-dialog-profile modal-dialog-entity" role="dialog" aria-modal="true" aria-labelledby="classViewTitle">
 			<div class="modal-header">
-				<h3 id="classViewTitle">Class details</h3>
+				<h3 id="classViewTitle">Class Details</h3>
 				<button type="button" class="modal-close class-view-close" aria-label="Close" onclick="window.closeClassViewModal()">&times;</button>
 			</div>
 			<div class="modal-body entity-view-body class-view-body">
 				@EntityViewModalStyles()
 				@AvatarStyles()
+				@ClassViewModalStyles()
 				<div class={ "entity-view-hero " + classStatusAccentClass(data.Status) }>
 					<div class="entity-view-hero-main">
-						<p class="entity-view-eyebrow">Class record</p>
+						<p class="entity-view-eyebrow">Student Name</p>
 						<h2>{ data.StudentName }</h2>
-						<div class="entity-view-meta-row">
-							@EntityViewMetaChip("Date", data.Date)
-							@EntityViewMetaChip("Time", data.TimeRangeLabel())
+						if data.IsSuperuser {
+							<div class="entity-view-hero-teacher">
+								@TeacherNameCell(data.TeacherName, data.TeacherAvatar)
+							</div>
+						}
+						<div class="class-view-meta-row">
+							@ClassViewMetaPill("Date", data.Date, PillToneInfo)
+							@ClassViewMetaPill("Time", data.TimeRangeLabel(), PillTonePrimary)
+							@ClassViewMetaPill("Duration", formatDurationMinutes(data.DurationMinutes), PillToneWarning)
+							@ClassViewMetaPill("Rate", formatRate(data.Rate, data.Currency), PillToneSuccess)
 						</div>
 					</div>
 					@StatusPill(capitalizeStatus(data.Status), ClassStatusPillTone(data.Status), true)
 				</div>
-				<div class="entity-view-stats">
-					@EntityViewRateStat(data.Rate, data.Currency)
-					@EntityViewStatCard("Duration", formatDurationMinutes(data.DurationMinutes))
-					if data.IsSuperuser {
-						@EntityViewTeacherStat(TeacherListItem{
-							Name:   data.TeacherName,
-							Avatar: data.TeacherAvatar,
-						})
-					}
-				</div>
+				if len(data.LearningMaterials) > 0 {
+					<div class="entity-view-card">
+						@ClassLearningMaterialReadonlyList(data.LearningMaterials)
+					</div>
+				}
 				if (data.Status != "conducted" && data.Reason != "") || data.Notes != "" {
 					<div class="entity-view-card">
 						<div class="entity-view-section-body">
@@ -38,7 +41,10 @@ templ ClassViewModal(data EditClassData) {
 								@EntityViewNotePanel("Reason", data.Reason, "warning")
 							}
 							if data.Notes != "" {
-								@EntityViewNotePanel("Notes", data.Notes, "info")
+								<div class="class-view-note">
+									<span class="entity-view-note-title">Notes</span>
+									<p class="entity-view-note-content">{ data.Notes }</p>
+								</div>
 							}
 						</div>
 					</div>
@@ -50,6 +56,53 @@ templ ClassViewModal(data EditClassData) {
 
 func (data EditClassData) TimeRangeLabel() string {
 	return FormatScheduledClassTimeRange(data.StartTime, data.EndTime, data.DurationMinutes)
+}
+
+templ ClassViewMetaPill(kind, value string, tone PillTone) {
+	<span class="class-view-meta-pill" aria-label={ kind + ": " + value } title={ kind }>
+		@Pill(value, tone)
+	</span>
+}
+
+templ ClassViewModalStyles() {
+	<style>
+		.class-view-body .entity-view-hero-main {
+			min-width: 0;
+			flex: 1;
+		}
+
+		.class-view-meta-row {
+			display: flex;
+			flex-wrap: nowrap;
+			gap: var(--space-1);
+			width: 100%;
+			max-width: 100%;
+		}
+
+		.class-view-meta-pill {
+			flex: 1 1 0;
+			min-width: 0;
+			display: flex;
+		}
+
+		.class-view-meta-pill .pill {
+			width: 100%;
+			justify-content: center;
+			padding: 6px 8px;
+			font-size: 0.75rem;
+			line-height: 1.3;
+			font-variant-numeric: tabular-nums;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.class-view-note {
+			padding: 0;
+			border: none;
+			background: none;
+		}
+	</style>
 }
 
 templ ClassViewModalScripts() {
@@ -78,9 +131,9 @@ templ ClassViewModalScripts() {
 		});
 
 		document.addEventListener('keydown', function (e) {
-			if (e.key === 'Escape' && document.getElementById('classViewModal')) {
-				window.closeClassViewModal();
-			}
+			if (e.key !== 'Escape' || !document.getElementById('classViewModal')) return;
+			if (document.getElementById('lmViewModal')) return;
+			window.closeClassViewModal();
 		});
 	</script>
 }

@@ -52,6 +52,7 @@ templ Classes(data ClassesData) {
 			}
 		</style>
 		@ClassViewModalScripts()
+		@LearningMaterialViewModalStyles()
 	</head>
 	<body>
 		<div class="container" data-show-all-teachers={ fmt.Sprintf("%t", data.ShowAllTeachers) }>
@@ -140,7 +141,10 @@ templ Classes(data ClassesData) {
 			@DeleteClassModal()
 			@ScheduledClassModals()
 			<div id="classViewModalHost"></div>
+			<div id="lmViewModalHost"></div>
 		</div>
+
+		@LearningMaterialViewModalScripts()
 
 		<script>
 			const datePresetSelect = document.getElementById('datePreset');

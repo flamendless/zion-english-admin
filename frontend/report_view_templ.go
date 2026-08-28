@@ -51,7 +51,7 @@ func ReportViewModal(data ReportViewData) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"modal-overlay\" id=\"reportViewModal\" role=\"presentation\"><div class=\"modal-dialog modal-dialog-report\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"reportViewTitle\"><div class=\"modal-header\"><h3 id=\"reportViewTitle\">Teacher report</h3><button type=\"button\" class=\"modal-close report-view-close\" aria-label=\"Close\" onclick=\"window.closeReportViewModal()\">&times;</button></div><div class=\"modal-body report-view-body\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"modal-overlay\" id=\"reportViewModal\" role=\"presentation\"><div class=\"modal-dialog modal-dialog-report\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"reportViewTitle\"><div class=\"modal-header\"><h3 id=\"reportViewTitle\">Teacher Report</h3><button type=\"button\" class=\"modal-close report-view-close\" aria-label=\"Close\" onclick=\"window.closeReportViewModal()\">&times;</button></div><div class=\"modal-body report-view-body\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

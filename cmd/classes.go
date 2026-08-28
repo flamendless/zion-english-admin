@@ -112,6 +112,10 @@ func classEditClassData(ctx context.Context, recordID int64, readonly bool) (fro
 	if err != nil {
 		return frontend.EditClassData{}, err
 	}
+	materials, err := loadClassRecordLearningMaterialLinks(ctx, recordID)
+	if err != nil {
+		return frontend.EditClassData{}, err
+	}
 	return frontend.EditClassData{
 		RecordID:        strconv.FormatInt(recordID, 10),
 		Readonly:        readonly,
@@ -130,6 +134,7 @@ func classEditClassData(ctx context.Context, recordID int64, readonly bool) (fro
 		Status:          existing.Status,
 		Reason:          existing.Reason.String,
 		Notes:           existing.Notes.String,
+		LearningMaterials: materials,
 	}, nil
 }
 
@@ -264,6 +269,11 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 		ID:              recordID,
 	})
 	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	if err := saveClassRecordLearningMaterials(ctx, user, recordID, parseLearningMaterialIDs(r)); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
@@ -634,10 +644,16 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
 		prefill := parseRecordClassPrefill(r)
+		learningMaterials, err := recordClassLearningMaterials(ctx, prefill)
+		if err != nil {
+			HttpError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		w.Header().Set("Content-Type", "text/html")
 		frontend.RecordClass(frontend.RecordClassData{
-			IsSuperuser: auth.HasAdminAccess(role),
-			Prefill:     prefill,
+			IsSuperuser:         auth.HasAdminAccess(role),
+			Prefill:             prefill,
+			LearningMaterials:   learningMaterials,
 		}).Render(ctx, w)
 		return
 	}
@@ -669,7 +685,7 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = dbRW.GetQueries().InsertClassRecord(ctx, queries.InsertClassRecordParams{
+	recordID, err := dbRW.GetQueries().InsertClassRecord(ctx, queries.InsertClassRecordParams{
 		StudentID:       req.StudentID,
 		TeacherID:       req.TeacherID,
 		Date:            req.Date,
@@ -684,6 +700,22 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		RecordedByRole:  string(user.Role),
 	})
 	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	materialIDs := parseLearningMaterialIDs(r)
+	if len(materialIDs) == 0 {
+		if fromSchedule := r.FormValue("fromSchedule"); fromSchedule != "" {
+			scheduleID, parseErr := strconv.ParseInt(fromSchedule, 10, 64)
+			if parseErr == nil && scheduleID > 0 {
+				if copyErr := copyScheduledClassLearningMaterials(ctx, dbRW.GetQueries(), scheduleID, recordID); copyErr != nil {
+					sendErrorLog(w, copyErr.Error())
+					return
+				}
+			}
+		}
+	} else if err := saveClassRecordLearningMaterials(ctx, user, recordID, materialIDs); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
@@ -769,6 +801,17 @@ func validateClassRecordRequest(req *models.ClassRecordRequest) error {
 		return errors.New("reason is required for cancelled or rescheduled classes")
 	}
 	return nil
+}
+
+func recordClassLearningMaterials(ctx context.Context, prefill models.RecordClassPrefill) ([]frontend.ClassLearningMaterialLink, error) {
+	if !prefill.HasPrefill || prefill.FromSchedule == "" {
+		return nil, nil
+	}
+	scheduleID, err := strconv.ParseInt(prefill.FromSchedule, 10, 64)
+	if err != nil || scheduleID <= 0 {
+		return nil, nil
+	}
+	return loadScheduledClassLearningMaterialLinks(ctx, scheduleID)
 }
 
 func parseRecordClassPrefill(r *http.Request) models.RecordClassPrefill {

@@ -1,6 +1,7 @@
--- name: InsertClassRecord :exec
+-- name: InsertClassRecord :one
 INSERT INTO tbl_class_records (student_id, teacher_id, date, start_time, end_time, duration_minutes, rate, currency, status, reason, notes, recorded_by_role)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+RETURNING id;
 
 -- name: GetClassRecordsByTeacherAndDateRange :many
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,

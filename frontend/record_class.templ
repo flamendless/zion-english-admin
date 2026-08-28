@@ -4,8 +4,9 @@ import "zion-english/internal/models"
 import "zion-english/internal/utils"
 
 type RecordClassData struct {
-	IsSuperuser bool
-	Prefill     models.RecordClassPrefill
+	IsSuperuser       bool
+	Prefill           models.RecordClassPrefill
+	LearningMaterials []ClassLearningMaterialLink
 }
 
 templ RecordClass(data RecordClassData) {
@@ -84,7 +85,7 @@ templ RecordClass(data RecordClassData) {
 						</div>
 					}
 
-					@RecordClassFields(data.Prefill)
+					@RecordClassFields(data.Prefill, data.LearningMaterials)
 				</form>
 			} else {
 				<form
@@ -135,7 +136,7 @@ templ RecordClass(data RecordClassData) {
 						</div>
 					}
 
-					@RecordClassFields(data.Prefill)
+					@RecordClassFields(data.Prefill, data.LearningMaterials)
 				</form>
 			}
 
@@ -149,7 +150,7 @@ templ RecordClass(data RecordClassData) {
 	</html>
 }
 
-templ RecordClassFields(prefill models.RecordClassPrefill) {
+templ RecordClassFields(prefill models.RecordClassPrefill, learningMaterials []ClassLearningMaterialLink) {
 	if prefill.HasPrefill && prefill.StartTime != "" {
 		@TimeRangeFields(prefill.StartTime, prefill.EndTime, true)
 	} else {
@@ -203,6 +204,8 @@ templ RecordClassFields(prefill models.RecordClassPrefill) {
 			/>
 		</div>
 	</div>
+
+	@ClassLearningMaterialPicker(learningMaterials)
 
 	<div class="form-group">
 		<label for="notes">Notes</label>

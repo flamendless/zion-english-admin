@@ -88,7 +88,7 @@ func ScheduledClassDetailCard(cardID string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" aria-label=\"Class details\"><div class=\"scheduled-class-detail-header\"><span class=\"scheduled-class-detail-student\" data-field=\"student\"></span> <span class=\"scheduled-class-detail-teacher\">with <span data-field=\"teacher\"></span></span></div><dl class=\"scheduled-class-detail-meta\"><div class=\"scheduled-class-detail-row\"><dt>Date</dt><dd data-field=\"date\"></dd></div><div class=\"scheduled-class-detail-row\"><dt>Time</dt><dd data-field=\"time\"></dd></div><div class=\"scheduled-class-detail-row\"><dt>Rate</dt><dd data-field=\"rate\"></dd></div></dl></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" aria-label=\"Class Details\"><div class=\"scheduled-class-detail-header\"><span class=\"scheduled-class-detail-student\" data-field=\"student\"></span> <span class=\"scheduled-class-detail-teacher\">with <span data-field=\"teacher\"></span></span></div><dl class=\"scheduled-class-detail-meta\"><div class=\"scheduled-class-detail-row\"><dt>Date</dt><dd data-field=\"date\"></dd></div><div class=\"scheduled-class-detail-row\"><dt>Time</dt><dd data-field=\"time\"></dd></div><div class=\"scheduled-class-detail-row\"><dt>Rate</dt><dd data-field=\"rate\"></dd></div></dl></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -318,6 +318,10 @@ func EditScheduledClassModalForm(data EditScheduleData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = TimeRangeFields(data.StartTime, data.EndTime, false).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ClassLearningMaterialPicker(data.LearningMaterials).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

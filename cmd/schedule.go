@@ -122,6 +122,11 @@ func handleScheduleCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := saveScheduledClassLearningMaterials(ctx, user, scheduleID, parseLearningMaterialIDs(r)); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
 	if meetingSvc != nil && meetings.SupportsAutoRoom(req.DurationMinutes) {
 		student, studentErr := dbRO.GetQueries().GetStudentByID(ctx, req.StudentID)
 		studentName := "student"
@@ -595,6 +600,11 @@ func editScheduleData(ctx context.Context, scheduleID int64, lockTeacher, isSupe
 		startTime = existing.StartTime.String
 	}
 
+	materials, err := loadScheduledClassLearningMaterialLinks(ctx, scheduleID)
+	if err != nil {
+		return frontend.EditScheduleData{}, err
+	}
+
 	return frontend.EditScheduleData{
 		ScheduleID:  strconv.FormatInt(scheduleID, 10),
 		LockTeacher: lockTeacher,
@@ -605,8 +615,9 @@ func editScheduleData(ctx context.Context, scheduleID int64, lockTeacher, isSupe
 		Date:        existing.ScheduledDate,
 		StartTime:   startTime,
 		EndTime:     utils.EndTimeFromStartAndDuration(startTime, existing.DurationMinutes),
-		Rate:        existing.Rate,
-		Currency:    existing.Currency,
+		Rate:              existing.Rate,
+		Currency:          existing.Currency,
+		LearningMaterials: materials,
 	}, nil
 }
 
@@ -737,6 +748,11 @@ func handleScheduledClassEdit(w http.ResponseWriter, r *http.Request, scheduleID
 		}
 	}
 
+	if err := saveScheduledClassLearningMaterials(ctx, user, scheduleID, parseLearningMaterialIDs(r)); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
 	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("updated scheduled class id %d (student id %d, date %s)", scheduleID, studentID, newDate))
 	actor := auth.GetUser(ctx)
 	notifyCrossParty(ctx, actor, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
@@ -859,7 +875,7 @@ func insertClassRecordFromSchedule(ctx context.Context, user auth.User, existing
 		return err
 	}
 
-	err := dbRW.GetQueries().InsertClassRecord(ctx, queries.InsertClassRecordParams{
+	recordID, err := dbRW.GetQueries().InsertClassRecord(ctx, queries.InsertClassRecordParams{
 		StudentID:       req.StudentID,
 		TeacherID:       req.TeacherID,
 		Date:            req.Date,
@@ -874,6 +890,10 @@ func insertClassRecordFromSchedule(ctx context.Context, user auth.User, existing
 		RecordedByRole:  string(user.Role),
 	})
 	if err != nil {
+		return err
+	}
+
+	if err := copyScheduledClassLearningMaterials(ctx, dbRW.GetQueries(), scheduleID, recordID); err != nil {
 		return err
 	}
 

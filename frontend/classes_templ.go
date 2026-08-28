@@ -100,6 +100,10 @@ func Classes(data ClassesData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = LearningMaterialViewModalStyles().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</head><body><div class=\"container\" data-show-all-teachers=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -107,7 +111,7 @@ func Classes(data ClassesData) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%t", data.ShowAllTeachers))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 57, Col: 89}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 58, Col: 89}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 		if templ_7745c5c3_Err != nil {
@@ -152,7 +156,7 @@ func Classes(data ClassesData) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/api/teachers"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 72, Col: 42}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 73, Col: 42}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 			if templ_7745c5c3_Err != nil {
@@ -170,7 +174,7 @@ func Classes(data ClassesData) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 81, Col: 78}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 82, Col: 78}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 			if templ_7745c5c3_Err != nil {
@@ -183,7 +187,7 @@ func Classes(data ClassesData) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 84, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 85, Col: 49}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 			if templ_7745c5c3_Err != nil {
@@ -218,7 +222,7 @@ func Classes(data ClassesData) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/classes/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 99, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 100, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 		if templ_7745c5c3_Err != nil {
@@ -241,7 +245,7 @@ func Classes(data ClassesData) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/classes/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 124, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 125, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 		if templ_7745c5c3_Err != nil {
@@ -259,7 +263,7 @@ func Classes(data ClassesData) templ.Component {
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", classesTableColspan(data)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 131, Col: 65}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 132, Col: 65}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 			if templ_7745c5c3_Err != nil {
@@ -287,7 +291,15 @@ func Classes(data ClassesData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<div id=\"classViewModalHost\"></div></div><script>\n\t\t\tconst datePresetSelect = document.getElementById('datePreset');\n\t\t\tconst filterBtn = document.getElementById('filterBtn');\n\t\t\tconst classesPage = document.getElementById('classesPage');\n\t\t\tconst teacherSelect = document.getElementById('teacher');\n\n\t\t\tfunction setDateRangeFromPreset(value) {\n\t\t\t\tif (!value) {\n\t\t\t\t\tdelete datePresetSelect.dataset.startDate;\n\t\t\t\t\tdelete datePresetSelect.dataset.endDate;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst parts = value.split('|');\n\t\t\t\tif (parts.length !== 2) return;\n\t\t\t\tdatePresetSelect.dataset.startDate = parts[0];\n\t\t\t\tdatePresetSelect.dataset.endDate = parts[1];\n\t\t\t}\n\n\t\t\tdatePresetSelect.addEventListener('change', () => {\n\t\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\n\t\t\t});\n\n\t\t\tfilterBtn.addEventListener('click', () => {\n\t\t\t\tif (classesPage) classesPage.value = '1';\n\t\t\t});\n\n\t\t\tif (teacherSelect) {\n\t\t\t\tteacherSelect.addEventListener('change', () => {\n\t\t\t\t\tif (classesPage) classesPage.value = '1';\n\t\t\t\t\tif (datePresetSelect.value) {\n\t\t\t\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\t\t\thtmx.trigger('#classesTableBody', 'load');\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tconst pageBtn = e.target.closest('#paginationBottom .pagination-btn[hx-get]');\n\t\t\t\tif (!pageBtn || !classesPage) return;\n\t\t\t\tconst vals = pageBtn.getAttribute('hx-vals');\n\t\t\t\tif (!vals) return;\n\t\t\t\ttry {\n\t\t\t\t\tconst parsed = JSON.parse(vals.replace(/'/g, '\"'));\n\t\t\t\t\tif (parsed.page) classesPage.value = String(parsed.page);\n\t\t\t\t} catch (err) { /* ignore */ }\n\t\t\t});\n\n\t\t\tif (datePresetSelect.value) {\n\t\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\n\t\t\t}\n\t\t</script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<div id=\"classViewModalHost\"></div><div id=\"lmViewModalHost\"></div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = LearningMaterialViewModalScripts().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<script>\n\t\t\tconst datePresetSelect = document.getElementById('datePreset');\n\t\t\tconst filterBtn = document.getElementById('filterBtn');\n\t\t\tconst classesPage = document.getElementById('classesPage');\n\t\t\tconst teacherSelect = document.getElementById('teacher');\n\n\t\t\tfunction setDateRangeFromPreset(value) {\n\t\t\t\tif (!value) {\n\t\t\t\t\tdelete datePresetSelect.dataset.startDate;\n\t\t\t\t\tdelete datePresetSelect.dataset.endDate;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst parts = value.split('|');\n\t\t\t\tif (parts.length !== 2) return;\n\t\t\t\tdatePresetSelect.dataset.startDate = parts[0];\n\t\t\t\tdatePresetSelect.dataset.endDate = parts[1];\n\t\t\t}\n\n\t\t\tdatePresetSelect.addEventListener('change', () => {\n\t\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\n\t\t\t});\n\n\t\t\tfilterBtn.addEventListener('click', () => {\n\t\t\t\tif (classesPage) classesPage.value = '1';\n\t\t\t});\n\n\t\t\tif (teacherSelect) {\n\t\t\t\tteacherSelect.addEventListener('change', () => {\n\t\t\t\t\tif (classesPage) classesPage.value = '1';\n\t\t\t\t\tif (datePresetSelect.value) {\n\t\t\t\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\t\t\thtmx.trigger('#classesTableBody', 'load');\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tconst pageBtn = e.target.closest('#paginationBottom .pagination-btn[hx-get]');\n\t\t\t\tif (!pageBtn || !classesPage) return;\n\t\t\t\tconst vals = pageBtn.getAttribute('hx-vals');\n\t\t\t\tif (!vals) return;\n\t\t\t\ttry {\n\t\t\t\t\tconst parsed = JSON.parse(vals.replace(/'/g, '\"'));\n\t\t\t\t\tif (parsed.page) classesPage.value = String(parsed.page);\n\t\t\t\t} catch (err) { /* ignore */ }\n\t\t\t});\n\n\t\t\tif (datePresetSelect.value) {\n\t\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\n\t\t\t}\n\t\t</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

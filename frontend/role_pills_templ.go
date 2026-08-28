@@ -31,7 +31,7 @@ func RolePillStyles() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<style>\r\n\t\t.role-tags {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmargin-bottom: var(--space-3);\r\n\t\t}\r\n\t\t.role-tags--readonly {\r\n\t\t\tmargin-bottom: 0;\r\n\t\t}\r\n\t\t.role-tag-pill {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: 2px;\r\n\t\t\tpadding: 3px 4px 3px 10px;\r\n\t\t}\r\n\t\t.role-tag-pill:not(:has(.role-tag-remove)) {\r\n\t\t\tpadding-right: 10px;\r\n\t\t}\r\n\t\t.role-tag-label {\r\n\t\t\tline-height: 1.2;\r\n\t\t}\r\n\t\t.role-tag-remove {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 1.125rem;\r\n\t\t\theight: 1.125rem;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: 0;\r\n\t\t\tborder: none;\r\n\t\t\tborder-radius: 999px;\r\n\t\t\tbackground: transparent;\r\n\t\t\tcolor: inherit;\r\n\t\t\tcursor: pointer;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tline-height: 1;\r\n\t\t\topacity: 0.75;\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\t\t.role-tag-remove:hover {\r\n\t\t\topacity: 1;\r\n\t\t\tbackground: rgba(0, 0, 0, 0.08);\r\n\t\t}\r\n\t\t.role-tags .pill--neutral {\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\t\t.role-tags-add {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\talign-items: center;\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<style>\r\n\t\t.role-tags {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmargin-bottom: var(--space-3);\r\n\t\t}\r\n\t\t.role-tags--readonly {\r\n\t\t\tmargin-bottom: 0;\r\n\t\t}\r\n\t\t.role-tag-pill {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: 2px;\r\n\t\t\tpadding: 3px 4px 3px 10px;\r\n\t\t}\r\n\t\t.role-tag-pill:not(:has(.role-tag-remove)) {\r\n\t\t\tpadding-right: 10px;\r\n\t\t}\r\n\t\t.role-tag-label {\r\n\t\t\tline-height: 1.2;\r\n\t\t}\r\n\t\t.role-tag-remove {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 1.125rem;\r\n\t\t\theight: 1.125rem;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: 0;\r\n\t\t\tborder: none;\r\n\t\t\tborder-radius: 999px;\r\n\t\t\tbackground: transparent;\r\n\t\t\tcolor: inherit;\r\n\t\t\tcursor: pointer;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tline-height: 1;\r\n\t\t\topacity: 0.75;\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\t\t.role-tag-remove:hover {\r\n\t\t\topacity: 1;\r\n\t\t\tbackground: rgba(0, 0, 0, 0.08);\r\n\t\t}\r\n\t\t.role-tags .pill--neutral {\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\t\t.role-tags-add {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\talign-items: center;\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -134,7 +134,7 @@ func TeacherRoleEditor(roles []constants.TeacherRole, roleOptions []constants.Te
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(option))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 87, Col: 36}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 86, Col: 36}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 				if templ_7745c5c3_Err != nil {
@@ -147,7 +147,7 @@ func TeacherRoleEditor(roles []constants.TeacherRole, roleOptions []constants.Te
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(string(option))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 87, Col: 55}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 86, Col: 55}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -217,7 +217,7 @@ func RemovableRolePill(role constants.TeacherRole) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(role))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 182, Col: 64}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 181, Col: 64}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 		if templ_7745c5c3_Err != nil {
@@ -230,7 +230,7 @@ func RemovableRolePill(role constants.TeacherRole) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(string(role))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 183, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 182, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -248,7 +248,7 @@ func RemovableRolePill(role constants.TeacherRole) templ.Component {
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue("Remove " + string(role) + " role")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 185, Col: 96}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 184, Col: 96}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 			if templ_7745c5c3_Err != nil {
@@ -266,7 +266,7 @@ func RemovableRolePill(role constants.TeacherRole) templ.Component {
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(role))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 187, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 186, Col: 56}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 		if templ_7745c5c3_Err != nil {

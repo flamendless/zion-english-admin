@@ -44,7 +44,16 @@ templ Students(data StudentData) {
 | `@TeacherDropdown()` | `dropdowns.templ` |
 | `@ScrHTMX()` | `scripts.templ` |
 | `@IconActionLink()` / `@IconActionButton()` | `icons.templ` — use `IconKind` constants, not string literals |
+| `@Pill()` / `@StatusPill()` | `pills.templ` — use `PillTone` constants, not string literals |
 | `@TeacherNameCell()` | `avatar.templ` — avatar + teacher name; use whenever a teacher name is shown |
+
+## Pills
+
+Use `@Pill` and `@StatusPill` from `pills.templ` for status and label badges. All pills share a black border via `--pill-border: 1px solid #000` in `global.templ` (applied to `.pill` and `.status-pill`).
+
+- Do not override pill borders with softer `var(--color-border)` unless a design explicitly requires an exception.
+- Custom pill-shaped UI (e.g. `.lm-tag-pill`, `.class-lm-readonly-pill`, `.class-lm-chip`) must use `border: var(--pill-border)` — do not hardcode border colors.
+- Prefer extending `.pill` / `.status-pill` classes over inventing one-off pill styles.
 
 ## Teacher name display
 
@@ -89,3 +98,36 @@ Dropdowns load via HTMX on page load: `hx-get`, `hx-trigger="load"`, `hx-target=
 ## CSS
 
 CSS variables in `:root` (`global.templ`). Page-specific styles in inline `<style>` blocks.
+
+### Inline chip remove buttons
+
+Global `button` styles in `global.templ` set `margin-top`, padding, `display: inline-block`, and filled backgrounds. Any small remove/close control inside a chip, tag, or pill **must** override those defaults or the × will sit below the label.
+
+Use the same reset as `.lm-tag-chip-remove` in `learning_materials.templ`:
+
+```css
+.chip-remove {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.125rem;
+	height: 1.125rem;
+	padding: 0;
+	margin: 0;
+	margin-top: 0;
+	border: none;
+	border-radius: var(--radius-full);
+	background: transparent;
+	background-color: transparent;
+	flex-shrink: 0;
+	line-height: 1;
+}
+.chip-remove:hover {
+	background: rgba(0, 0, 0, 0.06);
+	background-color: rgba(0, 0, 0, 0.06);
+}
+```
+
+Parent chip/tag container: `display: inline-flex; align-items: center; gap: …`.
+
+When adding a new chip UI, copy this pattern — do not rely on bare `button { padding: 0 }` alone.

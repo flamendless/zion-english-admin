@@ -1,0 +1,342 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+type ClassLearningMaterialLink struct {
+	ID    string
+	Title string
+	URL   string
+}
+
+templ ClassLearningMaterialPicker(links []ClassLearningMaterialLink) {
+	<div class="form-group class-lm-picker">
+		<label for="classLmSearch">Learning Materials</label>
+		<div class="class-lm-search-wrap">
+			<input
+				type="text"
+				id="classLmSearch"
+				name="q"
+				class="class-lm-search"
+				autocomplete="off"
+				placeholder="Search learning material by title..."
+				hx-get={ utils.URL("/api/learning-materials/search") }
+				hx-trigger="input changed delay:300ms"
+				hx-target="next"
+				hx-swap="innerHTML"
+				hx-include="this"
+			/>
+			<div class="class-lm-results"></div>
+		</div>
+		<div class="class-lm-chips" aria-live="polite">
+			for _, link := range links {
+				<span class="class-lm-chip" data-id={ link.ID } data-title={ link.Title }>
+					{ link.Title }
+					<button type="button" class="class-lm-chip-remove" aria-label={ "Remove " + link.Title }>&times;</button>
+				</span>
+				<input type="hidden" name="learning_material_ids" value={ link.ID }/>
+			}
+		</div>
+	</div>
+	@ClassLearningMaterialPickerStyles()
+	@ClassLearningMaterialPickerScript()
+}
+
+templ LearningMaterialSearchResults(items []ClassLearningMaterialLink) {
+	<div class="class-lm-search-results">
+		for _, item := range items {
+			<button
+				type="button"
+				class="class-lm-search-item"
+				data-id={ item.ID }
+				data-title={ item.Title }
+			>
+				{ item.Title }
+			</button>
+		}
+	</div>
+}
+
+templ ClassLearningMaterialReadonlyList(links []ClassLearningMaterialLink) {
+	if len(links) > 0 {
+		<section class="entity-view-lm-section" aria-label="Learning materials">
+			<h4 class="entity-view-section-title">Learning Materials</h4>
+			<div class="class-lm-readonly-pills" role="list">
+				for _, link := range links {
+					<button
+						type="button"
+						class="class-lm-readonly-pill"
+						role="listitem"
+						hx-get={ utils.URL("/learning-materials/" + link.ID + "/view") }
+						hx-target="#lmViewModalHost"
+						hx-swap="innerHTML"
+						aria-label={ "View learning material: " + link.Title }
+					>
+						@ClassLearningMaterialPillIcon()
+						<span class="class-lm-readonly-pill-label">{ link.Title }</span>
+					</button>
+				}
+			</div>
+		</section>
+	}
+	@ClassLearningMaterialReadonlyStyles()
+}
+
+templ ClassLearningMaterialPillIcon() {
+	<svg class="class-lm-readonly-pill-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+		<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+	</svg>
+}
+
+templ ClassLearningMaterialReadonlyStyles() {
+	<style>
+		.entity-view-lm-section {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-3);
+		}
+
+		.class-lm-readonly-pills {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--space-2);
+		}
+
+		.class-lm-readonly-pill {
+			display: inline-flex;
+			align-items: center;
+			gap: var(--space-2);
+			padding: 6px 12px 6px 10px;
+			margin: 0;
+			margin-top: 0;
+			border: var(--pill-border);
+			border-radius: var(--radius-full);
+			background: #E6FFFA;
+			color: #115E59;
+			font-size: 0.8125rem;
+			font-weight: 600;
+			font-family: inherit;
+			line-height: 1.3;
+			cursor: pointer;
+			box-sizing: border-box;
+			transition: background var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+		}
+
+		.class-lm-readonly-pill:hover,
+		.class-lm-readonly-pill:focus-visible {
+			background: #CCFBF1;
+			color: #134E4A;
+			outline: none;
+			box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+		}
+
+		.class-lm-readonly-pill:active {
+			transform: scale(0.98);
+		}
+
+		.class-lm-readonly-pill-icon {
+			flex-shrink: 0;
+			color: #0D9488;
+		}
+
+		.class-lm-readonly-pill-label {
+			max-width: 16rem;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	</style>
+}
+
+templ ClassLearningMaterialPickerStyles() {
+	<style>
+		.class-lm-search-wrap {
+			position: relative;
+		}
+
+		.class-lm-results {
+			position: absolute;
+			top: 100%;
+			left: 0;
+			right: 0;
+			z-index: 40;
+		}
+
+		.class-lm-search-results {
+			margin-top: var(--space-1, 4px);
+			max-height: 220px;
+			overflow-y: auto;
+			background: var(--color-surface, #fff);
+			border: 1px solid var(--color-border, #ddd);
+			border-radius: var(--radius-md, 6px);
+			box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.08));
+		}
+
+		.class-lm-search-item {
+			display: block;
+			width: 100%;
+			padding: 0.6rem 0.75rem;
+			border: none;
+			background: transparent;
+			text-align: left;
+			font-size: 0.9rem;
+			color: var(--color-foreground, #222);
+			cursor: pointer;
+		}
+
+		.class-lm-search-item:hover,
+		.class-lm-search-item:focus {
+			background: var(--color-muted, #f5f5f5);
+			outline: none;
+		}
+
+		.class-lm-chips {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			margin-top: 0.5rem;
+		}
+
+		.class-lm-chip {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.35rem;
+			padding: 0.25rem 0.5rem;
+			border-radius: 999px;
+			border: var(--pill-border);
+			background: var(--color-muted, #f0f0f0);
+			font-size: 0.85rem;
+			color: var(--color-foreground, #222);
+			box-sizing: border-box;
+		}
+
+		.class-lm-chip-remove {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 1.125rem;
+			height: 1.125rem;
+			padding: 0;
+			margin: 0;
+			margin-top: 0;
+			border: none;
+			border-radius: var(--radius-full);
+			background: transparent;
+			background-color: transparent;
+			color: var(--color-muted-foreground);
+			cursor: pointer;
+			font-size: 0.875rem;
+			font-weight: 400;
+			line-height: 1;
+			flex-shrink: 0;
+		}
+
+		.class-lm-chip-remove:hover {
+			background: rgba(0, 0, 0, 0.06);
+			background-color: rgba(0, 0, 0, 0.06);
+			color: var(--color-foreground, #222);
+		}
+	</style>
+}
+
+templ ClassLearningMaterialPickerScript() {
+	<script>
+		(function () {
+			if (window._classLmPickerBound) return;
+			window._classLmPickerBound = true;
+
+			function getPicker(form) {
+				return form ? form.querySelector('.class-lm-picker') : null;
+			}
+
+			function selectedIDs(picker) {
+				const ids = new Set();
+				picker.querySelectorAll('input[name="learning_material_ids"]').forEach(function (input) {
+					if (input.value) ids.add(input.value);
+				});
+				return ids;
+			}
+
+			function syncHiddenInputs(picker) {
+				const chips = picker.querySelector('.class-lm-chips');
+				if (!chips) return;
+				chips.querySelectorAll('input[name="learning_material_ids"]').forEach(function (el) { el.remove(); });
+				chips.querySelectorAll('.class-lm-chip').forEach(function (chip) {
+					const input = document.createElement('input');
+					input.type = 'hidden';
+					input.name = 'learning_material_ids';
+					input.value = chip.getAttribute('data-id') || '';
+					chips.appendChild(input);
+				});
+			}
+
+			function renderChip(picker, id, title) {
+				const chips = picker.querySelector('.class-lm-chips');
+				if (!chips || !id) return;
+				const chip = document.createElement('span');
+				chip.className = 'class-lm-chip';
+				chip.setAttribute('data-id', id);
+				chip.setAttribute('data-title', title);
+				chip.innerHTML = title + '<button type="button" class="class-lm-chip-remove" aria-label="Remove ' + title + '">&times;</button>';
+				chips.appendChild(chip);
+				syncHiddenInputs(picker);
+			}
+
+			function clearPicker(picker) {
+				if (!picker) return;
+				const chips = picker.querySelector('.class-lm-chips');
+				if (chips) chips.innerHTML = '';
+				const search = picker.querySelector('.class-lm-search');
+				if (search) search.value = '';
+				const results = picker.querySelector('.class-lm-results');
+				if (results) results.innerHTML = '';
+			}
+
+			document.body.addEventListener('click', function (e) {
+				const item = e.target.closest('.class-lm-search-item');
+				if (!item) return;
+				const picker = item.closest('.class-lm-picker');
+				if (!picker) return;
+				const id = item.getAttribute('data-id');
+				const title = item.getAttribute('data-title');
+				if (!id || selectedIDs(picker).has(id)) {
+					const results = picker.querySelector('.class-lm-results');
+					if (results) results.innerHTML = '';
+					const search = picker.querySelector('.class-lm-search');
+					if (search) search.value = '';
+					return;
+				}
+				renderChip(picker, id, title);
+				const results = picker.querySelector('.class-lm-results');
+				if (results) results.innerHTML = '';
+				const search = picker.querySelector('.class-lm-search');
+				if (search) {
+					search.value = '';
+					search.focus();
+				}
+			});
+
+			document.body.addEventListener('click', function (e) {
+				const removeBtn = e.target.closest('.class-lm-chip-remove');
+				if (!removeBtn) return;
+				const chip = removeBtn.closest('.class-lm-chip');
+				const picker = chip && chip.closest('.class-lm-picker');
+				if (!chip || !picker) return;
+				chip.remove();
+				syncHiddenInputs(picker);
+			});
+
+			document.body.addEventListener('reset', function (e) {
+				const picker = getPicker(e.target);
+				if (picker) clearPicker(picker);
+			}, true);
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				const picker = evt.detail.target.querySelector && evt.detail.target.querySelector('.class-lm-picker');
+				if (picker && window.initTimeRangePreview) {
+					// no-op; picker chips are server-rendered on edit modal load
+				}
+			});
+		})();
+	</script>
+}

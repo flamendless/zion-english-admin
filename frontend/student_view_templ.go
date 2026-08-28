@@ -31,7 +31,7 @@ func StudentViewModal(data EditStudentData) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"modal-overlay\" id=\"studentViewModal\" role=\"presentation\"><div class=\"modal-dialog modal-dialog-profile modal-dialog-entity\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"studentViewTitle\"><div class=\"modal-header\"><h3 id=\"studentViewTitle\">Student details</h3><button type=\"button\" class=\"modal-close student-view-close\" aria-label=\"Close\" onclick=\"window.closeStudentViewModal()\">&times;</button></div><div class=\"modal-body entity-view-body student-view-body\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"modal-overlay\" id=\"studentViewModal\" role=\"presentation\"><div class=\"modal-dialog modal-dialog-profile modal-dialog-entity\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"studentViewTitle\"><div class=\"modal-header\"><h3 id=\"studentViewTitle\">Student Details</h3><button type=\"button\" class=\"modal-close student-view-close\" aria-label=\"Close\" onclick=\"window.closeStudentViewModal()\">&times;</button></div><div class=\"modal-body entity-view-body student-view-body\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

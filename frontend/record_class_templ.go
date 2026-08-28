@@ -12,8 +12,9 @@ import "zion-english/internal/models"
 import "zion-english/internal/utils"
 
 type RecordClassData struct {
-	IsSuperuser bool
-	Prefill     models.RecordClassPrefill
+	IsSuperuser       bool
+	Prefill           models.RecordClassPrefill
+	LearningMaterials []ClassLearningMaterialLink
 }
 
 func RecordClass(data RecordClassData) templ.Component {
@@ -44,7 +45,7 @@ func RecordClass(data RecordClassData) templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 18, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 19, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -86,7 +87,7 @@ func RecordClass(data RecordClassData) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/classes/record"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 31, Col: 43}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 32, Col: 43}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 			if templ_7745c5c3_Err != nil {
@@ -104,7 +105,7 @@ func RecordClass(data RecordClassData) templ.Component {
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Prefill.FromSchedule)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 65, Col: 98}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 66, Col: 98}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 				if templ_7745c5c3_Err != nil {
@@ -117,7 +118,7 @@ func RecordClass(data RecordClassData) templ.Component {
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Prefill.TeacherID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 66, Col: 85}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 67, Col: 85}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 				if templ_7745c5c3_Err != nil {
@@ -130,7 +131,7 @@ func RecordClass(data RecordClassData) templ.Component {
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Prefill.StudentID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 67, Col: 85}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 68, Col: 85}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 				if templ_7745c5c3_Err != nil {
@@ -143,7 +144,7 @@ func RecordClass(data RecordClassData) templ.Component {
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Prefill.TeacherName)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 71, Col: 59}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 72, Col: 59}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 				if templ_7745c5c3_Err != nil {
@@ -156,7 +157,7 @@ func RecordClass(data RecordClassData) templ.Component {
 				var templ_7745c5c3_Var8 string
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Prefill.StudentName)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 75, Col: 59}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 76, Col: 59}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 				if templ_7745c5c3_Err != nil {
@@ -196,7 +197,7 @@ func RecordClass(data RecordClassData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = RecordClassFields(data.Prefill).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = RecordClassFields(data.Prefill, data.LearningMaterials).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -212,7 +213,7 @@ func RecordClass(data RecordClassData) templ.Component {
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/classes/record"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 92, Col: 43}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 93, Col: 43}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 			if templ_7745c5c3_Err != nil {
@@ -230,7 +231,7 @@ func RecordClass(data RecordClassData) templ.Component {
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Prefill.FromSchedule)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 122, Col: 98}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 123, Col: 98}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 				if templ_7745c5c3_Err != nil {
@@ -243,7 +244,7 @@ func RecordClass(data RecordClassData) templ.Component {
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Prefill.StudentID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 123, Col: 85}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 124, Col: 85}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 				if templ_7745c5c3_Err != nil {
@@ -256,7 +257,7 @@ func RecordClass(data RecordClassData) templ.Component {
 				var templ_7745c5c3_Var12 string
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Prefill.StudentName)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 127, Col: 59}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 128, Col: 59}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 				if templ_7745c5c3_Err != nil {
@@ -292,7 +293,7 @@ func RecordClass(data RecordClassData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = RecordClassFields(data.Prefill).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = RecordClassFields(data.Prefill, data.LearningMaterials).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -317,7 +318,7 @@ func RecordClass(data RecordClassData) templ.Component {
 	})
 }
 
-func RecordClassFields(prefill models.RecordClassPrefill) templ.Component {
+func RecordClassFields(prefill models.RecordClassPrefill, learningMaterials []ClassLearningMaterialLink) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -376,7 +377,7 @@ func RecordClassFields(prefill models.RecordClassPrefill) templ.Component {
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefill.Rate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 168, Col: 96}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_class.templ`, Line: 169, Col: 96}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
 			if templ_7745c5c3_Err != nil {
@@ -427,7 +428,15 @@ func RecordClassFields(prefill models.RecordClassPrefill) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "></div></div><div class=\"form-group\"><label for=\"notes\">Notes</label> <textarea id=\"notes\" name=\"notes\" rows=\"4\" placeholder=\"Lesson notes...\"></textarea></div><button type=\"submit\" id=\"submitBtn\">Record Class</button>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "></div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ClassLearningMaterialPicker(learningMaterials).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<div class=\"form-group\"><label for=\"notes\">Notes</label> <textarea id=\"notes\" name=\"notes\" rows=\"4\" placeholder=\"Lesson notes...\"></textarea></div><button type=\"submit\" id=\"submitBtn\">Record Class</button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

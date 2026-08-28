@@ -323,7 +323,7 @@ templ Schedule(data ScheduleData) {
 			<div class="modal-overlay modal-overlay-zoom" id="zoomMeetingModal" hidden>
 				<div class="modal-dialog modal-dialog-zoom" role="dialog" aria-modal="true" aria-labelledby="zoomMeetingTitle">
 					<div class="modal-header modal-header-zoom">
-						<h3 id="zoomMeetingTitle" class="zoom-meeting-sr-title">Zoom meeting</h3>
+						<h3 id="zoomMeetingTitle" class="zoom-meeting-sr-title">Zoom Meeting</h3>
 						<button type="button" class="modal-close" id="zoomMeetingCloseBtn" aria-label="Close">&times;</button>
 					</div>
 					<div class="modal-body zoom-meeting-body">
@@ -537,6 +537,14 @@ templ Schedule(data ScheduleData) {
 				params.append('end_time', endTimeInput ? endTimeInput.value : '');
 				params.append('rate', rateEl ? rateEl.value : '');
 				params.append('currency', currencyEl ? currencyEl.value : '');
+				const form = document.getElementById('scheduleModalForm');
+				if (form) {
+					form.querySelectorAll('input[name="learning_material_ids"]').forEach(function (input) {
+						if (input.value) {
+							params.append('learning_material_ids', input.value);
+						}
+					});
+				}
 				return params;
 			}
 
@@ -1027,6 +1035,7 @@ templ Schedule(data ScheduleData) {
 templ ScheduleModalFields() {
 	@TimeRangeFields("", "", false)
 	<div id="zoomDurationWarning" class="form-warning" role="status" hidden></div>
+	@ClassLearningMaterialPicker(nil)
 	<div class="form-row">
 		@CurrencyDropdown()
 		<div class="form-group">

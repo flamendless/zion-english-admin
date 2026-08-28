@@ -672,9 +672,10 @@ func (q *Queries) GetTotalRateByTeacherAndDateRange(ctx context.Context, arg Get
 	return total_rate, err
 }
 
-const insertClassRecord = `-- name: InsertClassRecord :exec
+const insertClassRecord = `-- name: InsertClassRecord :one
 INSERT INTO tbl_class_records (student_id, teacher_id, date, start_time, end_time, duration_minutes, rate, currency, status, reason, notes, recorded_by_role)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+RETURNING id
 `
 
 type InsertClassRecordParams struct {
@@ -692,8 +693,8 @@ type InsertClassRecordParams struct {
 	RecordedByRole  string
 }
 
-func (q *Queries) InsertClassRecord(ctx context.Context, arg InsertClassRecordParams) error {
-	_, err := q.db.ExecContext(ctx, insertClassRecord,
+func (q *Queries) InsertClassRecord(ctx context.Context, arg InsertClassRecordParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, insertClassRecord,
 		arg.StudentID,
 		arg.TeacherID,
 		arg.Date,
@@ -707,7 +708,9 @@ func (q *Queries) InsertClassRecord(ctx context.Context, arg InsertClassRecordPa
 		arg.Notes,
 		arg.RecordedByRole,
 	)
-	return err
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
 const softDeleteClassRecord = `-- name: SoftDeleteClassRecord :exec

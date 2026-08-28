@@ -15,10 +15,11 @@ type EditScheduleData struct {
 	Date        string
 	StartTime   string
 	EndTime     string
-	Rate        float64
-	Currency    string
-	TodayPHT    string
-	From        string
+	Rate              float64
+	Currency          string
+	TodayPHT          string
+	From              string
+	LearningMaterials []ClassLearningMaterialLink
 }
 
 templ EditSchedule(data EditScheduleData) {
