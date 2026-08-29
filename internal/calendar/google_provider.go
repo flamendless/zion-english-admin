@@ -18,7 +18,10 @@ import (
 	"zion-english/internal/constants"
 )
 
-const googleCalendarScope = calendar.CalendarScope
+const (
+	googleCalendarScope  = calendar.CalendarScope
+	googleUserEmailScope = "https://www.googleapis.com/auth/userinfo.email"
+)
 
 type GoogleConfig struct {
 	ClientID     string
@@ -53,7 +56,7 @@ func (p *GoogleProvider) oauthConfig() *oauth2.Config {
 		ClientID:     p.cfg.ClientID,
 		ClientSecret: p.cfg.ClientSecret,
 		RedirectURL:  p.cfg.RedirectURI,
-		Scopes:       []string{googleCalendarScope},
+		Scopes:       []string{googleCalendarScope, googleUserEmailScope},
 		Endpoint:     google.Endpoint,
 	}
 }
@@ -66,13 +69,14 @@ func (p *GoogleProvider) AuthorizeURL(state string) (string, error) {
 }
 
 func (p *GoogleProvider) ExchangeCode(ctx context.Context, code string) (AccountRef, time.Time, error) {
+	ctx = context.WithValue(ctx, oauth2.HTTPClient, p.client)
 	token, err := p.oauthConfig().Exchange(ctx, code)
 	if err != nil {
-		return AccountRef{}, time.Time{}, err
+		return AccountRef{}, time.Time{}, fmt.Errorf("token exchange: %w", err)
 	}
 	user, err := p.getUserInfo(ctx, token)
 	if err != nil {
-		return AccountRef{}, time.Time{}, err
+		return AccountRef{}, time.Time{}, fmt.Errorf("user info: %w", err)
 	}
 	externalID := user.Id
 	if externalID == "" {

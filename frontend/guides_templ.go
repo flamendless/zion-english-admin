@@ -1229,7 +1229,7 @@ func GuideConnectGoogleCalendarSections() templ.Component {
 				"In Google Cloud Console, create a project or select an existing one.",
 				"Enable the Google Calendar API under APIs and Services, Library.",
 				"Configure the OAuth consent screen: External user type (unless all teachers are in your Google Workspace), app name Zion English Admin, support email, and authorized domains for production.",
-				"Add scope https://www.googleapis.com/auth/calendar (manage calendars and events).",
+				"Add scopes https://www.googleapis.com/auth/calendar and https://www.googleapis.com/auth/userinfo.email.",
 				"Set Privacy Policy, Terms, Support URL (/support), and Documentation URL (/docs/connect-google-calendar).",
 				"Create an OAuth client ID (Web application). Add authorized JavaScript origins and redirect URIs for local and production, e.g. https://your-domain/zion-english-admin/profile/google-calendar/callback.",
 				"Copy Client ID and Client Secret into server GOOGLE_CALENDAR_CLIENT_ID and GOOGLE_CALENDAR_CLIENT_SECRET.",
