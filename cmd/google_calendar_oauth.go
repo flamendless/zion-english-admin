@@ -101,11 +101,12 @@ func handleGoogleCalendarCallback(w http.ResponseWriter, r *http.Request) {
 
 	account, expiresAt, err := calendarSvc.GoogleProvider().ExchangeCode(ctx, code)
 	if err != nil {
-		logs.Log().Error("google calendar oauth exchange failed", zap.Error(err))
+		logGoogleCalendarOAuthExchangeError(err, teacherID)
 		HttpRedirect(w, r, "/profile?google_calendar_error="+string(constants.IntegrationOAuthErrorExchangeFailed))
 		return
 	}
 	account.Service = calendar.ServiceGoogleCalendar
+	account.ExternalUserID = strconv.FormatInt(teacherID, 10)
 	if err := calendarSvc.ConnectAccount(ctx, teacherID, account, expiresAt); err != nil {
 		logs.Log().Error("save google calendar account failed", zap.Error(err))
 		HttpRedirect(w, r, "/profile?google_calendar_error="+string(constants.IntegrationOAuthErrorSaveFailed))
@@ -210,6 +211,25 @@ func clearGoogleCalendarOAuthStateCookie(w http.ResponseWriter, cfg *conf.Config
 		cookie.Secure = true
 	}
 	http.SetCookie(w, cookie)
+}
+
+func logGoogleCalendarOAuthExchangeError(err error, teacherID int64) {
+	fields := []zap.Field{
+		zap.Error(err),
+		zap.Int64("teacher_id", teacherID),
+	}
+	if calendarSvc != nil && calendarSvc.GoogleProvider() != nil {
+		fields = append(fields, zap.String("redirect_uri", calendarSvc.GoogleProvider().RedirectURI()))
+	}
+	if status, body := calendar.GoogleOAuthRetrieveErrorDetails(err); status > 0 || body != "" {
+		if status > 0 {
+			fields = append(fields, zap.Int("google_status", status))
+		}
+		if body != "" {
+			fields = append(fields, zap.String("google_body", body))
+		}
+	}
+	logs.Log().Error("google calendar oauth exchange failed", fields...)
 }
 
 func profileGoogleCalendarStatus(ctx context.Context, teacherID int64) (connected bool, envConfigured bool, connectionsAllowed bool) {

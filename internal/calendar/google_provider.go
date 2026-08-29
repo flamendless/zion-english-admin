@@ -2,6 +2,7 @@ package calendar
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,7 +13,6 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/calendar/v3"
-	oauth2api "google.golang.org/api/oauth2/v2"
 	"google.golang.org/api/option"
 
 	"zion-english/internal/constants"
@@ -22,6 +22,14 @@ const (
 	googleCalendarScope  = calendar.CalendarScope
 	googleUserEmailScope = "https://www.googleapis.com/auth/userinfo.email"
 )
+
+func normalizeGoogleConfig(cfg GoogleConfig) GoogleConfig {
+	return GoogleConfig{
+		ClientID:     strings.TrimSpace(cfg.ClientID),
+		ClientSecret: strings.TrimSpace(cfg.ClientSecret),
+		RedirectURI:  strings.TrimSpace(cfg.RedirectURI),
+	}
+}
 
 type GoogleConfig struct {
 	ClientID     string
@@ -36,7 +44,7 @@ type GoogleProvider struct {
 
 func NewGoogleProvider(cfg GoogleConfig) *GoogleProvider {
 	return &GoogleProvider{
-		cfg: cfg,
+		cfg: normalizeGoogleConfig(cfg),
 		client: &http.Client{
 			Timeout: 30 * time.Second,
 		},
@@ -49,6 +57,10 @@ func (p *GoogleProvider) IsConfigured() bool {
 
 func (p *GoogleProvider) Service() string {
 	return ServiceGoogleCalendar
+}
+
+func (p *GoogleProvider) RedirectURI() string {
+	return p.cfg.RedirectURI
 }
 
 func (p *GoogleProvider) oauthConfig() *oauth2.Config {
@@ -69,31 +81,31 @@ func (p *GoogleProvider) AuthorizeURL(state string) (string, error) {
 }
 
 func (p *GoogleProvider) ExchangeCode(ctx context.Context, code string) (AccountRef, time.Time, error) {
-	ctx = context.WithValue(ctx, oauth2.HTTPClient, p.client)
+	code = strings.TrimSpace(code)
+	if code == "" {
+		return AccountRef{}, time.Time{}, errors.New("authorization code is required")
+	}
+	ctx = p.oauthContext(ctx)
 	token, err := p.oauthConfig().Exchange(ctx, code)
 	if err != nil {
 		return AccountRef{}, time.Time{}, fmt.Errorf("token exchange: %w", err)
 	}
-	user, err := p.getUserInfo(ctx, token)
-	if err != nil {
-		return AccountRef{}, time.Time{}, fmt.Errorf("user info: %w", err)
-	}
-	externalID := user.Id
-	if externalID == "" {
-		externalID = user.Email
-	}
 	return AccountRef{
-		Service:        ServiceGoogleCalendar,
-		ExternalUserID: externalID,
-		AccessToken:    token.AccessToken,
-		RefreshToken:   token.RefreshToken,
+		Service:      ServiceGoogleCalendar,
+		AccessToken:  token.AccessToken,
+		RefreshToken: token.RefreshToken,
 	}, token.Expiry, nil
+}
+
+func (p *GoogleProvider) oauthContext(ctx context.Context) context.Context {
+	return context.WithValue(ctx, oauth2.HTTPClient, p.client)
 }
 
 func (p *GoogleProvider) RefreshAccessToken(ctx context.Context, refreshToken string) (string, string, time.Time, error) {
 	if refreshToken == "" {
 		return "", "", time.Time{}, fmt.Errorf("refresh token is required")
 	}
+	ctx = p.oauthContext(ctx)
 	token, err := p.oauthConfig().TokenSource(ctx, &oauth2.Token{
 		RefreshToken: refreshToken,
 		Expiry:       time.Now().Add(-time.Hour),
@@ -208,10 +220,12 @@ func (p *GoogleProvider) DeleteEvent(ctx context.Context, account AccountRef, ev
 }
 
 func (p *GoogleProvider) calendarService(ctx context.Context, account AccountRef) (*calendar.Service, error) {
-	return calendar.NewService(ctx, option.WithHTTPClient(p.client), option.WithTokenSource(p.tokenSource(ctx, account)))
+	ctx = p.oauthContext(ctx)
+	return calendar.NewService(ctx, option.WithTokenSource(p.tokenSource(ctx, account)))
 }
 
 func (p *GoogleProvider) tokenSource(ctx context.Context, account AccountRef) oauth2.TokenSource {
+	ctx = p.oauthContext(ctx)
 	return p.oauthConfig().TokenSource(ctx, &oauth2.Token{
 		AccessToken:  account.AccessToken,
 		RefreshToken: account.RefreshToken,
@@ -219,12 +233,15 @@ func (p *GoogleProvider) tokenSource(ctx context.Context, account AccountRef) oa
 	})
 }
 
-func (p *GoogleProvider) getUserInfo(ctx context.Context, token *oauth2.Token) (*oauth2api.Userinfo, error) {
-	svc, err := oauth2api.NewService(ctx, option.WithHTTPClient(p.client), option.WithTokenSource(oauth2.StaticTokenSource(token)))
-	if err != nil {
-		return nil, err
+func GoogleOAuthRetrieveErrorDetails(err error) (status int, body string) {
+	var retrieveErr *oauth2.RetrieveError
+	if !errors.As(err, &retrieveErr) {
+		return 0, ""
 	}
-	return svc.Userinfo.Get().Do()
+	if retrieveErr.Response != nil {
+		status = retrieveErr.Response.StatusCode
+	}
+	return status, strings.TrimSpace(string(retrieveErr.Body))
 }
 
 func calendarEvent(summary, description, start, end string) *calendar.Event {
