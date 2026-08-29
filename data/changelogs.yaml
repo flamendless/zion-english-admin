@@ -15,6 +15,9 @@ versions:
     breaking_changes: []
     new_features:
       - text: "Teachers can connect Google Calendar from My Profile. Scheduled classes with a start time sync automatically to a dedicated Zion English calendar."
+        commit: "c4df8bd"
+      - text: "Superusers can use the Feature Flags page to allow or block new Zoom and Google Calendar connections from My Profile; existing teacher connections stay active when disabled."
+        commit: "c4df8bd"
     improvements: []
     bug_fixes: []
     removed: []
