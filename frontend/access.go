@@ -32,6 +32,7 @@ var navItemDefs = []navItemDef{
 	{Path: "/reports", LinkID: "reportsLink", Title: "Reports", Description: "View teacher payroll reports by cutoff period"},
 	{Path: "/analytics", LinkID: "analyticsLink", Title: "Analytics", TeacherTitle: "My Analytics", Description: "Attendance, utilization, and student retention insights", TeacherDesc: "View attendance and utilization for your classes"},
 	{Path: "/process", LinkID: "processLink", Title: "Process", Description: "Process CSV files and view logs"},
+	{Path: "/feature-flags", LinkID: "featureFlagsLink", Title: "Feature Flags", Description: "Toggle integration connection availability"},
 	{Path: "/logs", LinkID: "logsLink", Title: "Logs", TeacherTitle: "My Activity", Description: "View system logs", TeacherDesc: "View your recent actions"},
 }
 
@@ -68,6 +69,9 @@ func IsNavAccessible(role auth.Role, path string) bool {
 	if auth.HasAdminAccess(role) {
 		if path == "/my-students" {
 			return false
+		}
+		if path == "/feature-flags" {
+			return role == auth.RoleSuperuser
 		}
 		return true
 	}

@@ -40,6 +40,17 @@ type TblAnnouncementsTeachersM2m struct {
 	CreatedAt      string
 }
 
+type TblClassCalendarEvent struct {
+	ID        int64
+	ClassID   int64
+	Service   string
+	EventID   string
+	EventUrl  string
+	CreatedAt string
+	UpdatedAt string
+	DeletedAt interface{}
+}
+
 type TblClassMeetingRoom struct {
 	ID           int64
 	ClassID      int64
@@ -75,6 +86,12 @@ type TblClassRecordLearningMaterial struct {
 	ClassRecordID int64
 	MaterialID    int64
 	CreatedAt     time.Time
+}
+
+type TblFeatureFlag struct {
+	Key       string
+	Enabled   int64
+	UpdatedAt string
 }
 
 type TblLearningMaterial struct {
@@ -271,6 +288,7 @@ type TblTeacherMeetingAccount struct {
 	TokenExpiresAt interface{}
 	ConnectedAt    string
 	UpdatedAt      string
+	ResourceID     string
 }
 
 type TblTeacherRole struct {

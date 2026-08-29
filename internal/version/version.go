@@ -28,6 +28,13 @@ func GitHubCommitURL(commit string) string {
 	return fmt.Sprintf("%s/commit/%s", GitHubRepo, commit)
 }
 
+func (i Info) Summary() string {
+	if i.Tag != "" {
+		return fmt.Sprintf("tag=%s  commit=%s", i.Tag, i.Commit)
+	}
+	return fmt.Sprintf("commit=%s", i.Commit)
+}
+
 func resolveCommit() string {
 	if Commit != "" && Commit != "unknown" {
 		return Commit

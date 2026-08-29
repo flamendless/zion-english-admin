@@ -148,7 +148,7 @@ templ PrivacyPolicy() {
 			<h2>Information We Collect</h2>
 			<p>We collect information necessary to operate the admin portal, including:</p>
 			<ul>
-				<li><strong>Teacher accounts:</strong> name, email address, password (stored hashed), profile details, uploaded documents and avatars, and optional Zoom OAuth tokens when a teacher connects their Zoom account.</li>
+				<li><strong>Teacher accounts:</strong> name, email address, password (stored hashed), profile details, uploaded documents and avatars, and optional Zoom or Google Calendar OAuth tokens when a teacher connects those integrations.</li>
 				<li><strong>Student records:</strong> names, contact details, rates, currency, status (active or inactive), and assigned teachers.</li>
 				<li><strong>Class and schedule data:</strong> class dates, times, duration, status (conducted, cancelled, or rescheduled), and related notes.</li>
 				<li><strong>Sheet processing:</strong> Google Sheet URLs provided by teachers and the class data extracted from those sheets for payroll processing.</li>
@@ -165,6 +165,7 @@ templ PrivacyPolicy() {
 				<li>Manage students, teachers, classes, and schedules.</li>
 				<li>Process class sheets from Google Drive and generate payroll exports.</li>
 				<li>Create Zoom meetings when teachers have connected Zoom and schedule classes that require a meeting room.</li>
+				<li>Create Google Calendar events when teachers have connected Google Calendar and schedule classes with a start time.</li>
 				<li>Maintain audit trails for accountability and troubleshooting.</li>
 				<li>Send in-app announcements and notifications to authorized users.</li>
 			</ul>
@@ -176,6 +177,7 @@ templ PrivacyPolicy() {
 			<ul>
 				<li><strong>Google Drive / Google Sheets:</strong> Teachers provide sheet URLs; class data is downloaded from Google for processing. Use of Google services is subject to Google's privacy policies.</li>
 				<li><strong>Zoom:</strong> Teachers may optionally connect Zoom via OAuth to enable automatic meeting creation. Zoom's use of data is governed by Zoom's privacy policy.</li>
+				<li><strong>Google Calendar:</strong> Teachers may optionally connect Google Calendar via OAuth to sync scheduled classes to a dedicated Zion English calendar. Google's use of data is governed by Google's privacy policy.</li>
 			</ul>
 			<p>We do not sell personal information to third parties.</p>
 		</section>
@@ -263,7 +265,7 @@ templ TermsOfUse() {
 		<section>
 			<h2>Third-Party Services</h2>
 			<p>
-				The portal may integrate with Google Drive/Sheets and Zoom. Your use of those services through the portal is also subject to their respective terms and policies. We are not responsible for third-party service availability or practices.
+				The portal may integrate with Google Drive/Sheets, Google Calendar, and Zoom. Your use of those services through the portal is also subject to their respective terms and policies. We are not responsible for third-party service availability or practices.
 			</p>
 		</section>
 

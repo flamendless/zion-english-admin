@@ -60,6 +60,8 @@ const (
 5. Map DB rows → `frontend.*Item` view structs
 6. Render: `frontend.Page(data).Render(r.Context(), w)`
 
+New handlers also need **both** `authMux` and `rootMux` registration in `cmd/web.go` (see project-overview **New authenticated route checklist**). Missing `rootMux.Handle` is the usual cause of nav links that 404.
+
 ## Error Handling
 
 - Startup/CLI fatal: `panic(err)`

@@ -31,9 +31,10 @@ type ScheduledClassItemData struct {
 	Rate            float64
 	Currency        string
 	Status          constants.ScheduledClassStatus
-	RoomURL         string
-	RoomPasscode    string
-	TimeRange       string
+	RoomURL           string
+	RoomPasscode      string
+	CalendarEventURL  string
+	TimeRange         string
 	Overdue         bool
 	ShowZoomWarning bool
 	DeleteFrom      ClassActionContext
@@ -62,8 +63,9 @@ func ScheduledClassItemFromView(v models.ScheduledClassView) ScheduledClassItemD
 		Rate:            v.Rate,
 		Currency:        v.Currency,
 		Status:          constants.ScheduledClassStatus(v.Status),
-		RoomURL:         v.RoomURL,
-		RoomPasscode:    v.RoomPasscode,
+		RoomURL:          v.RoomURL,
+		RoomPasscode:     v.RoomPasscode,
+		CalendarEventURL: v.CalendarEventURL,
 		TimeRange:       FormatScheduledClassTimeRange(v.StartTime, v.EndTime, v.DurationMinutes),
 		ShowZoomWarning: v.RoomURL == "" && v.DurationMinutes > ZoomMaxAutoMinutes,
 		DeleteFrom:      ClassActionContextSchedule,

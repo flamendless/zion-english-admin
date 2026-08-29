@@ -12,27 +12,31 @@ import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 type TeacherViewData struct {
-	ID             string
-	Name           string
-	Email          string
-	FirstName      string
-	MiddleName     string
-	LastName       string
-	Birthdate      string
-	Address        string
-	JoiningDate    string
-	MobileNumber   string
-	Certifications string
-	AssignedColor  string
-	RatePerClass   float64
-	Currency       string
-	DriveUrl       string
-	Sex            string
-	Status         constants.TeacherStatus
-	Roles          []constants.TeacherRole
-	Avatar         AvatarProps
-	ZoomConfigured bool
-	ZoomConnected  bool
+	ID                               string
+	Name                             string
+	Email                            string
+	FirstName                        string
+	MiddleName                       string
+	LastName                         string
+	Birthdate                        string
+	Address                          string
+	JoiningDate                      string
+	MobileNumber                     string
+	Certifications                   string
+	AssignedColor                    string
+	RatePerClass                     float64
+	Currency                         string
+	DriveUrl                         string
+	Sex                              string
+	Status                           constants.TeacherStatus
+	Roles                            []constants.TeacherRole
+	Avatar                           AvatarProps
+	ZoomConfigured                   bool
+	ZoomConnected                    bool
+	ZoomConnectionsAllowed           bool
+	GoogleCalendarConfigured         bool
+	GoogleCalendarConnected          bool
+	GoogleCalendarConnectionsAllowed bool
 }
 
 func TeacherViewModal(data TeacherViewData) templ.Component {
@@ -79,7 +83,7 @@ func TeacherViewModal(data TeacherViewData) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(data.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 43, Col: 22}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 47, Col: 22}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -92,7 +96,7 @@ func TeacherViewModal(data TeacherViewData) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.Email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 44, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 48, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -154,7 +158,7 @@ func TeacherViewModal(data TeacherViewData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if data.ZoomConfigured {
+		if data.ZoomConfigured && (data.ZoomConnected || data.ZoomConnectionsAllowed) {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"profile-detail\"><span class=\"profile-detail-label\">Zoom</span> <span class=\"profile-detail-value\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -168,7 +172,21 @@ func TeacherViewModal(data TeacherViewData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"profile-detail\"><span class=\"profile-detail-label\">Google Sheet</span> <span class=\"profile-detail-value\">")
+		if data.GoogleCalendarConfigured && (data.GoogleCalendarConnected || data.GoogleCalendarConnectionsAllowed) {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"profile-detail\"><span class=\"profile-detail-label\">Google Calendar</span> <span class=\"profile-detail-value\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = IntegrationStatusBadge(data.GoogleCalendarConnected).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</span></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"profile-detail\"><span class=\"profile-detail-label\">Google Sheet</span> <span class=\"profile-detail-value\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -176,33 +194,33 @@ func TeacherViewModal(data TeacherViewData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</span></div><div class=\"profile-detail\"><span class=\"profile-detail-label\">Assigned color</span> <span class=\"profile-detail-value\"><div class=\"color-cell\"><div class=\"color-box\" style=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</span></div><div class=\"profile-detail\"><span class=\"profile-detail-label\">Assigned color</span> <span class=\"profile-detail-value\"><div class=\"color-cell\"><div class=\"color-box\" style=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color: " + data.AssignedColor)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 90, Col: 83}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 102, Col: 83}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\"></div><span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\"></div><span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(data.AssignedColor)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 91, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 103, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</span></div></span></div></div></div></div></div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</span></div></span></div></div></div></div></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -231,33 +249,33 @@ func ProfileDetailField(label, value string) templ.Component {
 			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"profile-detail\"><span class=\"profile-detail-label\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"profile-detail\"><span class=\"profile-detail-label\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 106, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 118, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</span> <span class=\"profile-detail-value\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</span> <span class=\"profile-detail-value\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 107, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 119, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</span></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</span></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -286,7 +304,7 @@ func TeacherViewProfileStyles() templ.Component {
 			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<style>\r\n\t\t.teacher-view-body {\r\n\t\t\tpadding: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.teacher-view-layout {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t@media (min-width: 768px) {\r\n\t\t\t.teacher-view-layout {\r\n\t\t\t\tgrid-template-columns: 220px 1fr;\r\n\t\t\t\talign-items: start;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-card {\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-card h2 {\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\tfont-size: 1.125rem;\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-identity {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: center;\r\n\t\t\ttext-align: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-identity h2 {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 1rem;\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-email {\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tword-break: break-all;\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-details {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t@media (min-width: 640px) {\r\n\t\t\t.teacher-view-body .profile-details {\r\n\t\t\t\tgrid-template-columns: 1fr 1fr;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-detail {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-1);\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-detail-label {\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-detail-value {\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tword-break: break-word;\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<style>\r\n\t\t.teacher-view-body {\r\n\t\t\tpadding: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.teacher-view-layout {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t@media (min-width: 768px) {\r\n\t\t\t.teacher-view-layout {\r\n\t\t\t\tgrid-template-columns: 220px 1fr;\r\n\t\t\t\talign-items: start;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-card {\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-card h2 {\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\tfont-size: 1.125rem;\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-identity {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: center;\r\n\t\t\ttext-align: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-identity h2 {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 1rem;\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-email {\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tword-break: break-all;\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-details {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t@media (min-width: 640px) {\r\n\t\t\t.teacher-view-body .profile-details {\r\n\t\t\t\tgrid-template-columns: 1fr 1fr;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-detail {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-1);\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-detail-label {\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-detail-value {\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tword-break: break-word;\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

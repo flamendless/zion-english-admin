@@ -230,13 +230,23 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 		CanEditLastName:       utils.ProfileNameEditable(row.LastName),
 		CanUploadDocument:     blockingDocs == 0,
 	}
-	zoomConnected, zoomConfigured := profileZoomStatus(ctx, user.ID)
+	zoomConnected, zoomConfigured, zoomConnectionsAllowed := profileZoomStatus(ctx, user.ID)
 	data.ZoomConfigured = zoomConfigured
 	data.ZoomConnected = zoomConnected
+	data.ZoomConnectionsAllowed = zoomConnectionsAllowed
 	data.ZoomConnectURL = utils.URL("/profile/zoom/connect")
 	data.ZoomDisconnectURL = utils.URL("/profile/zoom/disconnect")
-	data.ZoomGuideURL = utils.URL("/guides/connect-zoom")
+	data.ZoomGuideURL = utils.URL("/guides/" + string(constants.GuideSlugConnectZoom))
 	data.ZoomStatusMessage = profileZoomFlashMessage(r.URL.Query())
+
+	googleCalendarConnected, googleCalendarConfigured, googleCalendarConnectionsAllowed := profileGoogleCalendarStatus(ctx, user.ID)
+	data.GoogleCalendarConfigured = googleCalendarConfigured
+	data.GoogleCalendarConnected = googleCalendarConnected
+	data.GoogleCalendarConnectionsAllowed = googleCalendarConnectionsAllowed
+	data.GoogleCalendarConnectURL = utils.URL("/profile/google-calendar/connect")
+	data.GoogleCalendarDisconnectURL = utils.URL("/profile/google-calendar/disconnect")
+	data.GoogleCalendarGuideURL = utils.URL("/guides/" + string(constants.GuideSlugConnectGoogleCalendar))
+	data.GoogleCalendarStatusMessage = profileGoogleCalendarFlashMessage(r.URL.Query())
 
 	if err := frontend.Profile(data).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
@@ -250,19 +260,42 @@ func profileZoomFlashMessage(query url.Values) string {
 	if query.Get("zoom_disconnected") == "1" {
 		return "Zoom account disconnected."
 	}
-	switch query.Get("zoom_error") {
-	case "invalid_state":
+	switch constants.IntegrationOAuthError(query.Get("zoom_error")) {
+	case constants.IntegrationOAuthErrorInvalidState:
 		return "Zoom connection failed: invalid session. Please try again."
-	case "missing_code":
+	case constants.IntegrationOAuthErrorMissingCode:
 		return "Zoom connection failed: authorization was not completed."
-	case "exchange_failed":
+	case constants.IntegrationOAuthErrorExchangeFailed:
 		return "Zoom connection failed: could not exchange authorization code."
-	case "save_failed":
+	case constants.IntegrationOAuthErrorSaveFailed:
 		return "Zoom connection failed: could not save account."
 	case "":
 		return ""
 	default:
 		return "Zoom connection failed: " + query.Get("zoom_error")
+	}
+}
+
+func profileGoogleCalendarFlashMessage(query url.Values) string {
+	if query.Get("google_calendar_connected") == "1" {
+		return "Google Calendar connected successfully."
+	}
+	if query.Get("google_calendar_disconnected") == "1" {
+		return "Google Calendar disconnected."
+	}
+	switch constants.IntegrationOAuthError(query.Get("google_calendar_error")) {
+	case constants.IntegrationOAuthErrorInvalidState:
+		return "Google Calendar connection failed: invalid session. Please try again."
+	case constants.IntegrationOAuthErrorMissingCode:
+		return "Google Calendar connection failed: authorization was not completed."
+	case constants.IntegrationOAuthErrorExchangeFailed:
+		return "Google Calendar connection failed: could not exchange authorization code."
+	case constants.IntegrationOAuthErrorSaveFailed:
+		return "Google Calendar connection failed: could not save account."
+	case "":
+		return ""
+	default:
+		return "Google Calendar connection failed: " + query.Get("google_calendar_error")
 	}
 }
 

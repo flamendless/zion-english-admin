@@ -11,6 +11,7 @@ import (
 	"strings"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
+	"zion-english/internal/calendar"
 	"zion-english/internal/classrules"
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
@@ -152,6 +153,9 @@ func handleScheduleCreate(w http.ResponseWriter, r *http.Request) {
 			)
 		}
 	}
+	if req.StartTime != "" {
+		syncCalendarForSchedule(ctx, scheduleID, req.TeacherID, req.StudentID, req.ScheduledDate, req.StartTime, req.DurationMinutes, req.Rate, req.Currency, "schedule create")
+	}
 
 	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("scheduled class for student id %d (teacher id %d, date %s)", req.StudentID, req.TeacherID, req.ScheduledDate))
 	actor := auth.GetUser(ctx)
@@ -256,6 +260,13 @@ func fetchScheduledClassViews(ctx context.Context, q scheduledClassesQuery, limi
 			roomMap = rooms
 		}
 	}
+	calendarMap := map[int64]calendar.CalendarEventView{}
+	if calendarSvc != nil && len(classIDs) > 0 {
+		events, calendarErr := calendarSvc.GetEventsByClassIDs(ctx, classIDs)
+		if calendarErr == nil {
+			calendarMap = events
+		}
+	}
 
 	response := make([]models.ScheduledClassView, 0, len(records))
 	teacherIDs := make([]int64, 0, len(records))
@@ -265,6 +276,10 @@ func fetchScheduledClassViews(ctx context.Context, q scheduledClassesQuery, limi
 			view.RoomURL = room.RoomURL
 			view.RoomPasscode = room.Passcode
 			view.MeetingService = room.Service
+		}
+		if event, ok := calendarMap[sc.ID]; ok {
+			view.CalendarEventURL = event.EventURL
+			view.CalendarService = event.Service
 		}
 		response = append(response, view)
 		teacherIDs = append(teacherIDs, sc.TeacherID)
@@ -316,7 +331,7 @@ func handleScheduleListPartial(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html")
-	if err := frontend.ScheduledClassList(items, emptyMsg, utils.URL("/static/zoom-logo.svg")).Render(r.Context(), w); err != nil {
+	if err := frontend.ScheduledClassList(items, emptyMsg, utils.URL("/static/zoom-logo.svg"), utils.URL("/static/google-calendar-logo.svg")).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -405,6 +420,9 @@ func handleCancelScheduledClass(w http.ResponseWriter, r *http.Request, schedule
 
 	if meetingSvc != nil {
 		_ = meetingSvc.DeleteRoomForSchedule(ctx, scheduleID, existing.TeacherID)
+	}
+	if calendarSvc != nil {
+		_ = calendarSvc.DeleteEventForSchedule(ctx, scheduleID, existing.TeacherID)
 	}
 
 	if err := insertClassRecordFromSchedule(ctx, user, existing, scheduleID, "cancelled", reason, notes); err != nil {
@@ -520,6 +538,9 @@ func handleRescheduleScheduledClass(w http.ResponseWriter, r *http.Request, sche
 			)
 		}
 	}
+	if effectiveStart != "" {
+		syncCalendarForSchedule(ctx, scheduleID, existing.TeacherID, existing.StudentID, newDate, effectiveStart, existing.DurationMinutes, existing.Rate, existing.Currency, "reschedule")
+	}
 
 	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("rescheduled class id %d from %s to %s", scheduleID, existing.ScheduledDate, newDate))
 	actor := auth.GetUser(ctx)
@@ -570,6 +591,9 @@ func handleDeleteScheduledClass(w http.ResponseWriter, r *http.Request, schedule
 
 	if meetingSvc != nil {
 		_ = meetingSvc.DeleteRoomForSchedule(ctx, scheduleID, existing.TeacherID)
+	}
+	if calendarSvc != nil {
+		_ = calendarSvc.DeleteEventForSchedule(ctx, scheduleID, existing.TeacherID)
 	}
 
 	err = dbRW.GetQueries().SoftDeleteScheduledClass(ctx, queries.SoftDeleteScheduledClassParams{
@@ -750,6 +774,9 @@ func handleScheduledClassEdit(w http.ResponseWriter, r *http.Request, scheduleID
 				zap.Int64("teacher_id", existing.TeacherID),
 			)
 		}
+	}
+	if scheduleChanged && startTime != "" {
+		syncCalendarForSchedule(ctx, scheduleID, existing.TeacherID, studentID, newDate, startTime, duration, existing.Rate, existing.Currency, "schedule edit")
 	}
 
 	if err := saveScheduledClassLearningMaterials(ctx, user, scheduleID, parseLearningMaterialIDs(r)); err != nil {
@@ -1176,5 +1203,32 @@ func scheduledClassViewFromRow(sc queries.GetScheduledClassesFilteredRow) models
 		Status:          sc.Status,
 		Reason:          reason,
 		CreatedAt:       sc.CreatedAt,
+	}
+}
+
+func syncCalendarForSchedule(ctx context.Context, scheduleID, teacherID, studentID int64, scheduledDate, startTime string, durationMinutes int64, rate float64, currency, action string) {
+	if calendarSvc == nil || strings.TrimSpace(startTime) == "" {
+		return
+	}
+	student, studentErr := dbRO.GetQueries().GetStudentByID(ctx, studentID)
+	studentName := "student"
+	if studentErr == nil {
+		studentName = student.Name
+	}
+	if err := calendarSvc.SyncEventForSchedule(ctx, calendar.ScheduledClassCalendarInput{
+		ScheduleID:      scheduleID,
+		TeacherID:       teacherID,
+		StudentName:     studentName,
+		ScheduledDate:   scheduledDate,
+		StartTime:       startTime,
+		DurationMinutes: durationMinutes,
+		Rate:            rate,
+		Currency:        currency,
+	}); err != nil {
+		logs.Log().Warn("google calendar sync failed after "+action,
+			zap.Error(err),
+			zap.Int64("schedule_id", scheduleID),
+			zap.Int64("teacher_id", teacherID),
+		)
 	}
 }

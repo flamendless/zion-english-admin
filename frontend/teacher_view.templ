@@ -23,8 +23,12 @@ type TeacherViewData struct {
 	Status         constants.TeacherStatus
 	Roles          []constants.TeacherRole
 	Avatar         AvatarProps
-	ZoomConfigured bool
-	ZoomConnected  bool
+	ZoomConfigured                   bool
+	ZoomConnected                    bool
+	ZoomConnectionsAllowed           bool
+	GoogleCalendarConfigured         bool
+	GoogleCalendarConnected          bool
+	GoogleCalendarConnectionsAllowed bool
 }
 
 templ TeacherViewModal(data TeacherViewData) {
@@ -69,11 +73,19 @@ templ TeacherViewModal(data TeacherViewData) {
 								@ProfileDetailField("Mobile number", data.MobileNumber)
 								@ProfileDetailField("Rate per class", utils.FormatCurrency(data.RatePerClass, data.Currency))
 								@ProfileDetailField("Certifications", displayOrDash(data.Certifications))
-								if data.ZoomConfigured {
+								if data.ZoomConfigured && (data.ZoomConnected || data.ZoomConnectionsAllowed) {
 									<div class="profile-detail">
 										<span class="profile-detail-label">Zoom</span>
 										<span class="profile-detail-value">
 											@IntegrationStatusBadge(data.ZoomConnected)
+										</span>
+									</div>
+								}
+								if data.GoogleCalendarConfigured && (data.GoogleCalendarConnected || data.GoogleCalendarConnectionsAllowed) {
+									<div class="profile-detail">
+										<span class="profile-detail-label">Google Calendar</span>
+										<span class="profile-detail-value">
+											@IntegrationStatusBadge(data.GoogleCalendarConnected)
 										</span>
 									</div>
 								}

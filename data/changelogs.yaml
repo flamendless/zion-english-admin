@@ -9,6 +9,18 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.08.29"
+    date: "2026-08-29"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Teachers can connect Google Calendar from My Profile. Scheduled classes with a start time sync automatically to a dedicated Zion English calendar."
+    improvements: []
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
   - version: "2026.08.28"
     date: "2026-08-28"
     released: true

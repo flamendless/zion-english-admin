@@ -45,3 +45,13 @@ func handleDocsConnectZoom(w http.ResponseWriter, r *http.Request) {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
+func handleDocsConnectGoogleCalendar(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if err := frontend.DocsConnectGoogleCalendar().Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}

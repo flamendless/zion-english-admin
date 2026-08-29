@@ -25,7 +25,7 @@ func (q *Queries) DeleteTeacherMeetingAccount(ctx context.Context, arg DeleteTea
 }
 
 const getTeacherMeetingAccount = `-- name: GetTeacherMeetingAccount :one
-SELECT id, teacher_id, service, external_user_id, access_token, refresh_token, token_expires_at, connected_at, updated_at
+SELECT id, teacher_id, service, external_user_id, resource_id, access_token, refresh_token, token_expires_at, connected_at, updated_at
 FROM tbl_teacher_meeting_accounts
 WHERE teacher_id = ? AND service = ?
 `
@@ -35,14 +35,28 @@ type GetTeacherMeetingAccountParams struct {
 	Service   string
 }
 
-func (q *Queries) GetTeacherMeetingAccount(ctx context.Context, arg GetTeacherMeetingAccountParams) (TblTeacherMeetingAccount, error) {
+type GetTeacherMeetingAccountRow struct {
+	ID             int64
+	TeacherID      int64
+	Service        string
+	ExternalUserID string
+	ResourceID     string
+	AccessToken    string
+	RefreshToken   string
+	TokenExpiresAt interface{}
+	ConnectedAt    string
+	UpdatedAt      string
+}
+
+func (q *Queries) GetTeacherMeetingAccount(ctx context.Context, arg GetTeacherMeetingAccountParams) (GetTeacherMeetingAccountRow, error) {
 	row := q.db.QueryRowContext(ctx, getTeacherMeetingAccount, arg.TeacherID, arg.Service)
-	var i TblTeacherMeetingAccount
+	var i GetTeacherMeetingAccountRow
 	err := row.Scan(
 		&i.ID,
 		&i.TeacherID,
 		&i.Service,
 		&i.ExternalUserID,
+		&i.ResourceID,
 		&i.AccessToken,
 		&i.RefreshToken,
 		&i.TokenExpiresAt,
@@ -72,10 +86,11 @@ func (q *Queries) HasTeacherMeetingAccount(ctx context.Context, arg HasTeacherMe
 
 const upsertTeacherMeetingAccount = `-- name: UpsertTeacherMeetingAccount :exec
 INSERT INTO tbl_teacher_meeting_accounts (
-	teacher_id, service, external_user_id, access_token, refresh_token, token_expires_at, connected_at, updated_at
-) VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+	teacher_id, service, external_user_id, resource_id, access_token, refresh_token, token_expires_at, connected_at, updated_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
 ON CONFLICT(teacher_id, service) DO UPDATE SET
 	external_user_id = excluded.external_user_id,
+	resource_id = excluded.resource_id,
 	access_token = excluded.access_token,
 	refresh_token = excluded.refresh_token,
 	token_expires_at = excluded.token_expires_at,
@@ -86,6 +101,7 @@ type UpsertTeacherMeetingAccountParams struct {
 	TeacherID      int64
 	Service        string
 	ExternalUserID string
+	ResourceID     string
 	AccessToken    string
 	RefreshToken   string
 	TokenExpiresAt interface{}
@@ -96,6 +112,7 @@ func (q *Queries) UpsertTeacherMeetingAccount(ctx context.Context, arg UpsertTea
 		arg.TeacherID,
 		arg.Service,
 		arg.ExternalUserID,
+		arg.ResourceID,
 		arg.AccessToken,
 		arg.RefreshToken,
 		arg.TokenExpiresAt,

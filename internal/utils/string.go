@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"math/rand"
 	"path/filepath"
 	"strings"
@@ -22,6 +23,27 @@ func RandomString(length int) string {
 
 func IsBlank(s string) bool {
 	return strings.TrimSpace(s) == ""
+}
+
+func InterfaceToString(v any) string {
+	if v == nil {
+		return ""
+	}
+	switch s := v.(type) {
+	case string:
+		return s
+	case []byte:
+		return string(s)
+	default:
+		return fmt.Sprint(v)
+	}
+}
+
+func NullIfEmptyString(value string) any {
+	if value == "" {
+		return nil
+	}
+	return value
 }
 
 func NormalizeEmail(email string) string {

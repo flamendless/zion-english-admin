@@ -50,7 +50,24 @@ templ ScheduledClassMeeting(item ScheduledClassItemData, zoomLogoURL string) {
 	}
 }
 
-templ ScheduledClassListItem(item ScheduledClassItemData, zoomLogoURL string) {
+templ ScheduledClassCalendarEvent(item ScheduledClassItemData, calendarLogoURL string) {
+	if item.CalendarEventURL != "" {
+		<div class="day-class-meeting">
+			<a
+				href={ item.CalendarEventURL }
+				class="calendar-event-btn"
+				target="_blank"
+				rel="noopener noreferrer"
+				title="Open in Google Calendar"
+				aria-label="Open in Google Calendar"
+			>
+				<img src={ calendarLogoURL } alt="" width="24" height="24" aria-hidden="true"/>
+			</a>
+		</div>
+	}
+}
+
+templ ScheduledClassListItem(item ScheduledClassItemData, zoomLogoURL string, calendarLogoURL string) {
 	<li class={ scheduledClassItemClass(item.Overdue) }>
 		<div class="day-class-info">
 			<div class="day-class-header">
@@ -64,7 +81,10 @@ templ ScheduledClassListItem(item ScheduledClassItemData, zoomLogoURL string) {
 					@StatusPill("OVERDUE", PillToneError, false)
 				}
 			</div>
-			@ScheduledClassMeeting(item, zoomLogoURL)
+			<div class="day-class-integrations">
+				@ScheduledClassMeeting(item, zoomLogoURL)
+				@ScheduledClassCalendarEvent(item, calendarLogoURL)
+			</div>
 		</div>
 		<div class="day-class-actions">
 			@ScheduledClassActions(item)
@@ -72,13 +92,13 @@ templ ScheduledClassListItem(item ScheduledClassItemData, zoomLogoURL string) {
 	</li>
 }
 
-templ ScheduledClassList(items []ScheduledClassItemData, emptyMessage string, zoomLogoURL string) {
+templ ScheduledClassList(items []ScheduledClassItemData, emptyMessage string, zoomLogoURL string, calendarLogoURL string) {
 	if len(items) == 0 {
 		<p class="day-classes-empty">{ emptyMessage }</p>
 	} else {
 		<ul class="day-classes-items">
 			for _, item := range items {
-				@ScheduledClassListItem(item, zoomLogoURL)
+				@ScheduledClassListItem(item, zoomLogoURL, calendarLogoURL)
 			}
 		</ul>
 	}

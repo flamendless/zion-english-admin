@@ -27,6 +27,7 @@ import (
 	"zion-english/internal/notifications"
 	"zion-english/internal/processor"
 	"zion-english/internal/sheet"
+	"zion-english/internal/startup"
 	"zion-english/internal/utils"
 
 	"github.com/google/uuid"
@@ -71,6 +72,7 @@ var cmdWeb = &cobra.Command{
 		dbRO = database.New(database.DB_MODE_RO)
 		initNotifyService()
 		initMeetingService()
+		initCalendarService()
 
 		basePath := "/" + strings.TrimPrefix(webFlags.baseURL, "/")
 		cfg.BasePath = basePath
@@ -86,6 +88,7 @@ var cmdWeb = &cobra.Command{
 		publicMux.HandleFunc(basePath+"/teachers/register", handleTeacherRegister)
 		publicMux.HandleFunc(basePath+"/health", handleHealth)
 		publicMux.HandleFunc(basePath+"/profile/zoom/callback", handleZoomCallback)
+		publicMux.HandleFunc(basePath+"/profile/google-calendar/callback", handleGoogleCalendarCallback)
 
 		publicMux.Handle(
 			basePath+"/static/",
@@ -112,6 +115,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/my-students", auth.RequireRole(auth.RoleTeacher)(handleMyStudents))
 		authMux.HandleFunc(basePath+"/logs", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleSystemLogs))
 		authMux.HandleFunc(basePath+"/changelogs", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleChangelogs))
+		authMux.HandleFunc(basePath+"/feature-flags", auth.RequireRole(auth.RoleSuperuser)(handleFeatureFlags))
 		authMux.HandleFunc(basePath+"/guides/", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleGuidesPath))
 		authMux.HandleFunc(basePath+"/guides", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleGuides))
 		authMux.HandleFunc(basePath+"/process-logs", auth.RequireRole(auth.AdminAccessRoles()...)(handleLogs))
@@ -131,6 +135,8 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/profile/document", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleProfileDocument))
 		authMux.HandleFunc(basePath+"/profile/zoom/connect", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleZoomConnect))
 		authMux.HandleFunc(basePath+"/profile/zoom/disconnect", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleZoomDisconnect))
+		authMux.HandleFunc(basePath+"/profile/google-calendar/connect", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleGoogleCalendarConnect))
+		authMux.HandleFunc(basePath+"/profile/google-calendar/disconnect", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleGoogleCalendarDisconnect))
 		documentsRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)
 		authMux.HandleFunc(basePath+"/documents/partials/rows", documentsRole(handleDocumentsPartial))
 		authMux.HandleFunc(basePath+"/documents", documentsRole(handleDocuments))
@@ -174,6 +180,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.HandleFunc(basePath+"/terms", handleTerms)
 		rootMux.HandleFunc(basePath+"/support", handleSupport)
 		rootMux.HandleFunc(basePath+"/docs/connect-zoom", handleDocsConnectZoom)
+		rootMux.HandleFunc(basePath+"/docs/connect-google-calendar", handleDocsConnectGoogleCalendar)
 		rootMux.HandleFunc(basePath+"/", func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path != basePath+"/" {
 				http.NotFound(w, r)
@@ -186,11 +193,13 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/teachers/register", publicMux)
 		rootMux.Handle(basePath+"/health", publicMux)
 		rootMux.Handle(basePath+"/profile/zoom/callback", publicMux)
+		rootMux.Handle(basePath+"/profile/google-calendar/callback", publicMux)
 
 		// protected routes
 		rootMux.Handle(basePath+"/dashboard", authHandler)
 		rootMux.Handle(basePath+"/logs", authHandler)
 		rootMux.Handle(basePath+"/changelogs", authHandler)
+		rootMux.Handle(basePath+"/feature-flags", authHandler)
 		rootMux.Handle(basePath+"/guides", authHandler)
 		rootMux.Handle(basePath+"/guides/", authHandler)
 		rootMux.Handle(basePath+"/process-logs", authHandler)
@@ -246,12 +255,20 @@ var cmdWeb = &cobra.Command{
 			port = ":" + port
 		}
 
-		logs.Log().Info(
-			"Starting web server",
-			zap.String("port", port),
-			zap.String("base URL", webFlags.baseURL),
-			zap.Bool("https", webFlags.https),
-		)
+		startupOpts := startup.Options{
+			Cfg:        cfg,
+			ListenPort: port,
+			BasePath:   basePath,
+			HTTPS:      webFlags.https,
+			TLSAddress: webFlags.address,
+			Integrations: startup.IntegrationStatus{
+				ZoomConfigured:           meetingSvc != nil && meetingSvc.IsZoomConfigured(),
+				GoogleCalendarConfigured: calendarSvc != nil && calendarSvc.IsConfigured(),
+				MeetingService:           cfg.Meeting.Service,
+			},
+		}
+		startup.LogStartup(startupOpts)
+		startup.LogListening(startupOpts)
 
 		var err error
 		if webFlags.https {
@@ -260,12 +277,6 @@ var cmdWeb = &cobra.Command{
 			}
 			certFile := fmt.Sprintf("/etc/letsencrypt/live/%s/fullchain.pem", webFlags.address)
 			keyFile := fmt.Sprintf("/etc/letsencrypt/live/%s/privkey.pem", webFlags.address)
-			logs.Log().Info(
-				"Starting HTTPS server",
-				zap.String("address", webFlags.address),
-				zap.String("cert", certFile),
-				zap.String("key", keyFile),
-			)
 			err = http.ListenAndServeTLS(port, certFile, keyFile, handler)
 		} else {
 			err = http.ListenAndServe(port, handler)

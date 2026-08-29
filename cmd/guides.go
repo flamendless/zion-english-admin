@@ -5,6 +5,7 @@ import (
 	"strings"
 	"zion-english/frontend"
 	"zion-english/internal/conf"
+	"zion-english/internal/constants"
 	"zion-english/internal/logs"
 
 	"go.uber.org/zap"
@@ -19,19 +20,25 @@ func handleGuides(w http.ResponseWriter, r *http.Request) {
 	data := frontend.GuidesData{
 		Guides: []frontend.GuideEntry{
 			{
-				Slug:        "getting-started",
+				Slug:        constants.GuideSlugGettingStarted,
 				Title:       "Getting Started",
 				Description: "Learn the basics: profile, students, classes, schedule, and editing records.",
 				Access:      "teacher",
 			},
 			{
-				Slug:        "connect-zoom",
+				Slug:        constants.GuideSlugConnectZoom,
 				Title:       "Connect Zoom",
 				Description: "Link your Zoom account so scheduled classes get a meeting room automatically.",
 				Access:      "teacher",
 			},
 			{
-				Slug:        "reports-and-generation",
+				Slug:        constants.GuideSlugConnectGoogleCalendar,
+				Title:       "Connect Google Calendar",
+				Description: "Link Google Calendar so scheduled classes are added to your Zion English calendar automatically.",
+				Access:      "teacher",
+			},
+			{
+				Slug:        constants.GuideSlugReportsAndGeneration,
 				Title:       "Reports & Generation",
 				Description: "Review teacher payroll summaries, preview class records, and export XLSX reports.",
 				Access:      "superuser",
@@ -51,12 +58,14 @@ func handleGuidesPath(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	switch slug {
-	case "getting-started":
+	switch constants.GuideSlug(slug) {
+	case constants.GuideSlugGettingStarted:
 		handleGuideGettingStarted(w, r)
-	case "connect-zoom":
+	case constants.GuideSlugConnectZoom:
 		handleGuideConnectZoom(w, r)
-	case "reports-and-generation":
+	case constants.GuideSlugConnectGoogleCalendar:
+		handleGuideConnectGoogleCalendar(w, r)
+	case constants.GuideSlugReportsAndGeneration:
 		handleGuideReportsGeneration(w, r)
 	default:
 		HttpError(w, "Not found", http.StatusNotFound)
@@ -82,6 +91,17 @@ func handleGuideConnectZoom(w http.ResponseWriter, r *http.Request) {
 
 	if err := frontend.GuideConnectZoom().Render(r.Context(), w); err != nil {
 		logs.Log().Error("failed to render connect zoom guide", zap.Error(err))
+	}
+}
+
+func handleGuideConnectGoogleCalendar(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := frontend.GuideConnectGoogleCalendar().Render(r.Context(), w); err != nil {
+		logs.Log().Error("failed to render connect google calendar guide", zap.Error(err))
 	}
 }
 

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"zion-english/internal/database/queries"
+	"zion-english/internal/utils"
 )
 
 type Config struct {
@@ -80,6 +81,7 @@ func (s *Service) SaveOAuthAccount(ctx context.Context, teacherID int64, account
 		TeacherID:      teacherID,
 		Service:        account.Service,
 		ExternalUserID: account.ExternalUserID,
+		ResourceID:     "",
 		AccessToken:    accessEnc,
 		RefreshToken:   refreshEnc,
 		TokenExpiresAt: expires,
@@ -156,7 +158,7 @@ func (s *Service) SyncRoomForSchedule(ctx context.Context, input ScheduledClassM
 			Service:      room.Service,
 			RoomID:       room.RoomID,
 			RoomUrl:      room.RoomURL,
-			RoomPasscode: stringToNullInterface(room.Passcode),
+			RoomPasscode: utils.NullIfEmptyString(room.Passcode),
 		})
 		return err
 	}
@@ -174,11 +176,11 @@ func (s *Service) SyncRoomForSchedule(ctx context.Context, input ScheduledClassM
 	}
 	passcode := room.Passcode
 	if passcode == "" {
-		passcode = interfaceToString(existing.RoomPasscode)
+		passcode = utils.InterfaceToString(existing.RoomPasscode)
 	}
 	return s.q.UpdateClassMeetingRoom(ctx, queries.UpdateClassMeetingRoomParams{
 		RoomUrl:      roomURL,
-		RoomPasscode: stringToNullInterface(passcode),
+		RoomPasscode: utils.NullIfEmptyString(passcode),
 		ID:           existing.ID,
 	})
 }
@@ -214,7 +216,7 @@ func (s *Service) GetRoomsByClassIDs(ctx context.Context, classIDs []int64) (map
 	for _, row := range rows {
 		result[row.ClassID] = ClassMeetingView{
 			RoomURL:  row.RoomUrl,
-			Passcode: interfaceToString(row.RoomPasscode),
+			Passcode: utils.InterfaceToString(row.RoomPasscode),
 			Service:  row.Service,
 		}
 	}
@@ -250,7 +252,7 @@ func (s *Service) providerAccount(ctx context.Context, teacherID int64, service 
 	return provider, account, nil
 }
 
-func (s *Service) decryptAccount(row queries.TblTeacherMeetingAccount) (AccountRef, error) {
+func (s *Service) decryptAccount(row queries.GetTeacherMeetingAccountRow) (AccountRef, error) {
 	access, err := DecryptToken(s.secret, row.AccessToken)
 	if err != nil {
 		return AccountRef{}, err
@@ -268,8 +270,8 @@ func (s *Service) decryptAccount(row queries.TblTeacherMeetingAccount) (AccountR
 	}, nil
 }
 
-func (s *Service) refreshAccountIfNeeded(ctx context.Context, row queries.TblTeacherMeetingAccount, account AccountRef) (AccountRef, error) {
-	expiresRaw := interfaceToString(row.TokenExpiresAt)
+func (s *Service) refreshAccountIfNeeded(ctx context.Context, row queries.GetTeacherMeetingAccountRow, account AccountRef) (AccountRef, error) {
+	expiresRaw := utils.InterfaceToString(row.TokenExpiresAt)
 	if expiresRaw == "" {
 		return account, nil
 	}

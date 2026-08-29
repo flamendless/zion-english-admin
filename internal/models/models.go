@@ -196,9 +196,11 @@ type ScheduledClassView struct {
 	Status          string  `json:"status"`
 	Reason          string  `json:"reason"`
 	CreatedAt       string  `json:"createdAt"`
-	RoomURL         string  `json:"roomUrl"`
-	RoomPasscode    string  `json:"roomPasscode"`
-	MeetingService  string  `json:"meetingService"`
+	RoomURL          string  `json:"roomUrl"`
+	RoomPasscode     string  `json:"roomPasscode"`
+	MeetingService   string  `json:"meetingService"`
+	CalendarEventURL string  `json:"calendarEventUrl"`
+	CalendarService  string  `json:"calendarService"`
 }
 
 type RecordClassPrefill struct {

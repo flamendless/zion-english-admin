@@ -21,6 +21,34 @@ func TestProfileNameEditable(t *testing.T) {
 	}
 }
 
+func TestInterfaceToString(t *testing.T) {
+	tests := []struct {
+		in   any
+		want string
+	}{
+		{nil, ""},
+		{"token", "token"},
+		{[]byte("token"), "token"},
+		{42, "42"},
+	}
+
+	for _, tt := range tests {
+		got := InterfaceToString(tt.in)
+		if got != tt.want {
+			t.Fatalf("InterfaceToString(%#v) = %q, want %q", tt.in, got, tt.want)
+		}
+	}
+}
+
+func TestNullIfEmptyString(t *testing.T) {
+	if NullIfEmptyString("") != nil {
+		t.Fatal("expected nil for empty string")
+	}
+	if got := NullIfEmptyString("abc"); got != "abc" {
+		t.Fatalf("expected abc, got %#v", got)
+	}
+}
+
 func TestIsBlank(t *testing.T) {
 	tests := []struct {
 		in   string

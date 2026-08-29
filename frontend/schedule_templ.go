@@ -71,7 +71,7 @@ func Schedule(data ScheduleData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<style>\r\n\t\t\t.day-class-item.is-overdue {\r\n\t\t\t\tborder-color: var(--color-destructive);\r\n\t\t\t\tbackground: var(--color-error-bg);\r\n\t\t\t}\r\n\t\t\t.day-class-item.is-overdue .status-pill--error {\r\n\t\t\t\tbackground: var(--color-destructive);\r\n\t\t\t\tcolor: var(--color-on-primary);\r\n\t\t\t\tletter-spacing: 0.03em;\r\n\t\t\t}\r\n\t\t\t.schedule-page .zoom-meeting-btn {\r\n\t\t\t\tdisplay: inline-flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tjustify-content: center;\r\n\t\t\t\twidth: 44px;\r\n\t\t\t\theight: 44px;\r\n\t\t\t\tpadding: var(--space-2);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\tcursor: pointer;\r\n\t\t\t\ttransition: background-color var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);\r\n\t\t\t}\r\n\t\t\t.schedule-page .zoom-meeting-btn:hover {\r\n\t\t\t\tbackground: var(--color-info-bg);\r\n\t\t\t\tborder-color: color-mix(in srgb, #0B5CFF 35%, var(--color-border));\r\n\t\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\t}\r\n\t\t\t.schedule-page .zoom-meeting-btn:focus-visible {\r\n\t\t\t\toutline: 2px solid var(--color-ring);\r\n\t\t\t\toutline-offset: 2px;\r\n\t\t\t}\r\n\t\t\t.schedule-page .zoom-meeting-btn img {\r\n\t\t\t\tdisplay: block;\r\n\t\t\t\twidth: 24px;\r\n\t\t\t\theight: 24px;\r\n\t\t\t}\r\n\t\t\t.modal-overlay-zoom {\r\n\t\t\t\tz-index: 1100;\r\n\t\t\t}\r\n\t\t\t.modal-dialog-zoom {\r\n\t\t\t\twidth: min(100%, 28rem);\r\n\t\t\t}\r\n\t\t\t.modal-header-zoom {\r\n\t\t\t\tjustify-content: flex-end;\r\n\t\t\t\tborder-bottom: none;\r\n\t\t\t\tpadding-bottom: 0;\r\n\t\t\t}\r\n\t\t\t.zoom-meeting-sr-title {\r\n\t\t\t\tposition: absolute;\r\n\t\t\t\twidth: 1px;\r\n\t\t\t\theight: 1px;\r\n\t\t\t\tpadding: 0;\r\n\t\t\t\tmargin: -1px;\r\n\t\t\t\toverflow: hidden;\r\n\t\t\t\tclip: rect(0, 0, 0, 0);\r\n\t\t\t\twhite-space: nowrap;\r\n\t\t\t\tborder: 0;\r\n\t\t\t}\r\n\t\t\t.zoom-meeting-body {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: var(--space-5);\r\n\t\t\t\tpadding: 0 var(--space-5) var(--space-5);\r\n\t\t\t}\r\n\t\t\t.zoom-meeting-logo {\r\n\t\t\t\twidth: 48px;\r\n\t\t\t\theight: 48px;\r\n\t\t\t}\r\n\t\t\t.zoom-meeting-field {\r\n\t\t\t\twidth: 100%;\r\n\t\t\t}\r\n\t\t\t.zoom-meeting-label {\r\n\t\t\t\tdisplay: block;\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tmargin-bottom: var(--space-2);\r\n\t\t\t\ttext-transform: uppercase;\r\n\t\t\t\tletter-spacing: 0.04em;\r\n\t\t\t}\r\n\t\t\t.zoom-meeting-row {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tpadding: var(--space-3);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-muted);\r\n\t\t\t}\r\n\t\t\t.zoom-meeting-url {\r\n\t\t\t\tflex: 1;\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t\toverflow: hidden;\r\n\t\t\t\ttext-overflow: ellipsis;\r\n\t\t\t\twhite-space: nowrap;\r\n\t\t\t\tcolor: var(--color-accent);\r\n\t\t\t\ttext-decoration: none;\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t}\r\n\t\t\t.zoom-meeting-url:hover {\r\n\t\t\t\ttext-decoration: underline;\r\n\t\t\t}\r\n\t\t\t.zoom-meeting-passcode {\r\n\t\t\t\tflex: 1;\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t\tfont-size: 0.9375rem;\r\n\t\t\t\tfont-weight: 500;\r\n\t\t\t\tletter-spacing: 0.06em;\r\n\t\t\t\tfont-family: 'Fira Code', monospace;\r\n\t\t\t}\r\n\t\t\t@media (max-width: 640px) {\r\n\t\t\t\t.schedule-page .schedule-layout {\r\n\t\t\t\t\tgap: var(--space-4);\r\n\t\t\t\t}\r\n\t\t\t\t.schedule-page .day-class-item {\r\n\t\t\t\t\tflex-direction: column;\r\n\t\t\t\t\talign-items: stretch;\r\n\t\t\t\t}\r\n\t\t\t\t.schedule-page .day-class-actions {\r\n\t\t\t\t\tflex-direction: row;\r\n\t\t\t\t\tjustify-content: flex-end;\r\n\t\t\t\t\twidth: 100%;\r\n\t\t\t\t}\r\n\t\t\t\t.schedule-page .day-class-actions .btn {\r\n\t\t\t\t\twidth: 100%;\r\n\t\t\t\t\tjustify-content: center;\r\n\t\t\t\t\ttext-align: center;\r\n\t\t\t\t}\r\n\t\t\t\t.schedule-page .day-class-actions .icon-action-btn {\r\n\t\t\t\t\twidth: 40px;\r\n\t\t\t\t\theight: 40px;\r\n\t\t\t\t}\r\n\t\t\t\t.schedule-page .schedule-modal-form .form-row {\r\n\t\t\t\t\tflex-direction: column;\r\n\t\t\t\t}\r\n\t\t\t\t.schedule-page .calendar-header {\r\n\t\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<style>\r\n\t\t\t.day-class-item.is-overdue {\r\n\t\t\t\tborder-color: var(--color-destructive);\r\n\t\t\t\tbackground: var(--color-error-bg);\r\n\t\t\t}\r\n\t\t\t.day-class-item.is-overdue .status-pill--error {\r\n\t\t\t\tbackground: var(--color-destructive);\r\n\t\t\t\tcolor: var(--color-on-primary);\r\n\t\t\t\tletter-spacing: 0.03em;\r\n\t\t\t}\r\n\t\t\t.schedule-page .zoom-meeting-btn {\r\n\t\t\t\tdisplay: inline-flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tjustify-content: center;\r\n\t\t\t\twidth: 44px;\r\n\t\t\t\theight: 44px;\r\n\t\t\t\tpadding: var(--space-2);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\tcursor: pointer;\r\n\t\t\t\ttransition: background-color var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);\r\n\t\t\t}\r\n\t\t\t.schedule-page .zoom-meeting-btn:hover {\r\n\t\t\t\tbackground: var(--color-info-bg);\r\n\t\t\t\tborder-color: color-mix(in srgb, #0B5CFF 35%, var(--color-border));\r\n\t\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\t}\r\n\t\t\t.schedule-page .zoom-meeting-btn:focus-visible {\r\n\t\t\t\toutline: 2px solid var(--color-ring);\r\n\t\t\t\toutline-offset: 2px;\r\n\t\t\t}\r\n\t\t\t.schedule-page .zoom-meeting-btn img {\r\n\t\t\t\tdisplay: block;\r\n\t\t\t\twidth: 24px;\r\n\t\t\t\theight: 24px;\r\n\t\t\t}\r\n\t\t\t.schedule-page .calendar-event-btn {\r\n\t\t\t\tdisplay: inline-flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tjustify-content: center;\r\n\t\t\t\twidth: 44px;\r\n\t\t\t\theight: 44px;\r\n\t\t\t\tpadding: var(--space-2);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\ttext-decoration: none;\r\n\t\t\t\ttransition: background-color var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);\r\n\t\t\t}\r\n\t\t\t.schedule-page .calendar-event-btn:hover {\r\n\t\t\t\tbackground: var(--color-primary-light);\r\n\t\t\t\tborder-color: color-mix(in srgb, var(--color-primary) 35%, var(--color-border));\r\n\t\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\t}\r\n\t\t\t.schedule-page .calendar-event-btn:focus-visible {\r\n\t\t\t\toutline: 2px solid var(--color-ring);\r\n\t\t\t\toutline-offset: 2px;\r\n\t\t\t}\r\n\t\t\t.schedule-page .calendar-event-btn img {\r\n\t\t\t\tdisplay: block;\r\n\t\t\t\twidth: 24px;\r\n\t\t\t\theight: 24px;\r\n\t\t\t}\r\n\t\t\t.modal-overlay-zoom {\r\n\t\t\t\tz-index: 1100;\r\n\t\t\t}\r\n\t\t\t.modal-dialog-zoom {\r\n\t\t\t\twidth: min(100%, 28rem);\r\n\t\t\t}\r\n\t\t\t.modal-header-zoom {\r\n\t\t\t\tjustify-content: flex-end;\r\n\t\t\t\tborder-bottom: none;\r\n\t\t\t\tpadding-bottom: 0;\r\n\t\t\t}\r\n\t\t\t.zoom-meeting-sr-title {\r\n\t\t\t\tposition: absolute;\r\n\t\t\t\twidth: 1px;\r\n\t\t\t\theight: 1px;\r\n\t\t\t\tpadding: 0;\r\n\t\t\t\tmargin: -1px;\r\n\t\t\t\toverflow: hidden;\r\n\t\t\t\tclip: rect(0, 0, 0, 0);\r\n\t\t\t\twhite-space: nowrap;\r\n\t\t\t\tborder: 0;\r\n\t\t\t}\r\n\t\t\t.zoom-meeting-body {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: var(--space-5);\r\n\t\t\t\tpadding: 0 var(--space-5) var(--space-5);\r\n\t\t\t}\r\n\t\t\t.zoom-meeting-logo {\r\n\t\t\t\twidth: 48px;\r\n\t\t\t\theight: 48px;\r\n\t\t\t}\r\n\t\t\t.zoom-meeting-field {\r\n\t\t\t\twidth: 100%;\r\n\t\t\t}\r\n\t\t\t.zoom-meeting-label {\r\n\t\t\t\tdisplay: block;\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tmargin-bottom: var(--space-2);\r\n\t\t\t\ttext-transform: uppercase;\r\n\t\t\t\tletter-spacing: 0.04em;\r\n\t\t\t}\r\n\t\t\t.zoom-meeting-row {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tpadding: var(--space-3);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-muted);\r\n\t\t\t}\r\n\t\t\t.zoom-meeting-url {\r\n\t\t\t\tflex: 1;\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t\toverflow: hidden;\r\n\t\t\t\ttext-overflow: ellipsis;\r\n\t\t\t\twhite-space: nowrap;\r\n\t\t\t\tcolor: var(--color-accent);\r\n\t\t\t\ttext-decoration: none;\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t}\r\n\t\t\t.zoom-meeting-url:hover {\r\n\t\t\t\ttext-decoration: underline;\r\n\t\t\t}\r\n\t\t\t.zoom-meeting-passcode {\r\n\t\t\t\tflex: 1;\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t\tfont-size: 0.9375rem;\r\n\t\t\t\tfont-weight: 500;\r\n\t\t\t\tletter-spacing: 0.06em;\r\n\t\t\t\tfont-family: 'Fira Code', monospace;\r\n\t\t\t}\r\n\t\t\t@media (max-width: 640px) {\r\n\t\t\t\t.schedule-page .schedule-layout {\r\n\t\t\t\t\tgap: var(--space-4);\r\n\t\t\t\t}\r\n\t\t\t\t.schedule-page .day-class-item {\r\n\t\t\t\t\tflex-direction: column;\r\n\t\t\t\t\talign-items: stretch;\r\n\t\t\t\t}\r\n\t\t\t\t.schedule-page .day-class-actions {\r\n\t\t\t\t\tflex-direction: row;\r\n\t\t\t\t\tjustify-content: flex-end;\r\n\t\t\t\t\twidth: 100%;\r\n\t\t\t\t}\r\n\t\t\t\t.schedule-page .day-class-actions .btn {\r\n\t\t\t\t\twidth: 100%;\r\n\t\t\t\t\tjustify-content: center;\r\n\t\t\t\t\ttext-align: center;\r\n\t\t\t\t}\r\n\t\t\t\t.schedule-page .day-class-actions .icon-action-btn {\r\n\t\t\t\t\twidth: 40px;\r\n\t\t\t\t\theight: 40px;\r\n\t\t\t\t}\r\n\t\t\t\t.schedule-page .schedule-modal-form .form-row {\r\n\t\t\t\t\tflex-direction: column;\r\n\t\t\t\t}\r\n\t\t\t\t.schedule-page .calendar-header {\r\n\t\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -86,7 +86,7 @@ func Schedule(data ScheduleData) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%t", data.ShowAllTeachers))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 174, Col: 67}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 201, Col: 67}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 		if templ_7745c5c3_Err != nil {
@@ -99,7 +99,7 @@ func Schedule(data ScheduleData) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%t", data.LockTeacher))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 175, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 202, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 		if templ_7745c5c3_Err != nil {
@@ -112,7 +112,7 @@ func Schedule(data ScheduleData) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 176, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 203, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 		if templ_7745c5c3_Err != nil {
@@ -125,7 +125,7 @@ func Schedule(data ScheduleData) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 177, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 204, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 		if templ_7745c5c3_Err != nil {
@@ -138,7 +138,7 @@ func Schedule(data ScheduleData) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/zoom-logo.svg"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 178, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 205, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 		if templ_7745c5c3_Err != nil {
@@ -181,7 +181,7 @@ func Schedule(data ScheduleData) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 193, Col: 82}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 220, Col: 82}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 			if templ_7745c5c3_Err != nil {
@@ -194,7 +194,7 @@ func Schedule(data ScheduleData) templ.Component {
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 196, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 223, Col: 49}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 			if templ_7745c5c3_Err != nil {
@@ -212,7 +212,7 @@ func Schedule(data ScheduleData) templ.Component {
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/api/teachers"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 202, Col: 42}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 229, Col: 42}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 			if templ_7745c5c3_Err != nil {
@@ -230,7 +230,7 @@ func Schedule(data ScheduleData) templ.Component {
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.ScheduledClassStatusScheduled))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 215, Col: 114}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 242, Col: 114}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 		if templ_7745c5c3_Err != nil {
@@ -243,7 +243,7 @@ func Schedule(data ScheduleData) templ.Component {
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.ScheduledClassStatusScheduled))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 218, Col: 112}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 245, Col: 112}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 		if templ_7745c5c3_Err != nil {
@@ -256,7 +256,7 @@ func Schedule(data ScheduleData) templ.Component {
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/schedule/partials/list"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 227, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 254, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
 		if templ_7745c5c3_Err != nil {
@@ -269,7 +269,7 @@ func Schedule(data ScheduleData) templ.Component {
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/schedule/partials/list"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 285, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 312, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
 		if templ_7745c5c3_Err != nil {
@@ -287,7 +287,7 @@ func Schedule(data ScheduleData) templ.Component {
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 294, Col: 85}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 321, Col: 85}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
 			if templ_7745c5c3_Err != nil {
@@ -346,7 +346,7 @@ func Schedule(data ScheduleData) templ.Component {
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/zoom-logo.svg"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 331, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule.templ`, Line: 358, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
 		if templ_7745c5c3_Err != nil {

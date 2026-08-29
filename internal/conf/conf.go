@@ -33,6 +33,17 @@ type Config struct {
 	SuperuserPassword string `env:"SUPERUSER_PASSWORD" env-required:""`
 	Secret            string `env:"SECRET" env-required:""`
 	Meeting           MeetingConfig
+	Calendar          CalendarConfig
+}
+
+type GoogleCalendarConfig struct {
+	ClientID     string `env:"GOOGLE_CALENDAR_CLIENT_ID"`
+	ClientSecret string `env:"GOOGLE_CALENDAR_CLIENT_SECRET"`
+	RedirectURI  string `env:"GOOGLE_CALENDAR_REDIRECT_URI"`
+}
+
+type CalendarConfig struct {
+	Google GoogleCalendarConfig
 }
 
 var cfg *Config

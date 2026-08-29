@@ -1,0 +1,19 @@
+---
+description: Keep dev startup banner and structured startup logs in sync with wired services and config
+globs:
+  - internal/startup/**/*.go
+  - internal/conf/display.go
+  - internal/constants/startup.go
+  - cmd/web.go
+alwaysApply: false
+---
+
+When adding or changing features that affect how the server is configured or which integrations are available at boot, update startup output in the same change.
+
+**Config / env** - when adding a new `conf.Config` field or integration that operators need at boot, surface it in `startupConfigLines` and/or `startupIntegrationLines` in `internal/startup/banner.go`. Mask secrets with `conf.MaskSecret`; use `constants.StartupValueUnset` for empty values.
+
+**Integrations** - when adding OAuth or external service wiring (Zoom, Google Calendar, etc.), pass live `IsConfigured()` status from `cmd/web.go` into `startup.IntegrationStatus` and document missing env vars in the integration line helpers.
+
+**Structured logs** - non-local startup logs in `internal/startup/startup.go` mirror the banner (`version`, `http`, `database`, integration booleans). Keep banner and zap fields aligned when adding new startup sections.
+
+**Tests** - extend `internal/startup/banner_test.go` when new banner sections or integration labels are added.

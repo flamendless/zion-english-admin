@@ -34,12 +34,20 @@ type ProfileData struct {
 	CanEditMiddleName    bool
 	CanEditLastName      bool
 	CanUploadDocument    bool
-	ZoomConfigured       bool
-	ZoomConnected        bool
-	ZoomConnectURL       string
-	ZoomDisconnectURL    string
-	ZoomGuideURL         string
-	ZoomStatusMessage    string
+	ZoomConfigured              bool
+	ZoomConnected               bool
+	ZoomConnectionsAllowed      bool
+	ZoomConnectURL              string
+	ZoomDisconnectURL           string
+	ZoomGuideURL                string
+	ZoomStatusMessage           string
+	GoogleCalendarConfigured         bool
+	GoogleCalendarConnected          bool
+	GoogleCalendarConnectionsAllowed bool
+	GoogleCalendarConnectURL         string
+	GoogleCalendarDisconnectURL string
+	GoogleCalendarGuideURL      string
+	GoogleCalendarStatusMessage string
 }
 
 templ Profile(data ProfileData) {
@@ -219,16 +227,19 @@ templ Profile(data ProfileData) {
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				padding: 10px 12px;
+				width: 3.5rem;
+				height: 3.5rem;
+				padding: var(--space-2);
 				border-radius: var(--radius-md);
 				background: #E8F1FF;
 				flex-shrink: 0;
 			}
 
 			.integration-logo {
-				width: 56px;
-				height: auto;
 				display: block;
+				width: 100%;
+				height: 100%;
+				object-fit: contain;
 			}
 
 			.integration-info {
@@ -382,7 +393,7 @@ templ Profile(data ProfileData) {
 					</div>
 
 					if !data.IsSuperuser {
-						@ProfileZoomIntegrations(data)
+						@ProfileIntegrations(data)
 						if data.CanEditFirstName || data.CanEditMiddleName || data.CanEditLastName {
 							<div class="profile-card profile-section">
 								<h2>Name</h2>
@@ -542,53 +553,100 @@ templ CooldownNotice(daysRemaining int, fieldLabel string) {
 	</div>
 }
 
-templ ProfileZoomIntegrations(data ProfileData) {
-	if data.ZoomConfigured {
+templ ProfileIntegrations(data ProfileData) {
+	if (data.ZoomConfigured && (data.ZoomConnected || data.ZoomConnectionsAllowed)) || (data.GoogleCalendarConfigured && (data.GoogleCalendarConnected || data.GoogleCalendarConnectionsAllowed)) {
 		<div class="profile-card profile-section">
 			<h2>Integrations</h2>
 			if data.ZoomStatusMessage != "" {
 				<div class="form-warning" role="status">{ data.ZoomStatusMessage }</div>
 			}
+			if data.GoogleCalendarStatusMessage != "" {
+				<div class="form-warning" role="status">{ data.GoogleCalendarStatusMessage }</div>
+			}
 			<div class="integration-list">
-				<div class="integration-row">
-					<div class="integration-row-brand">
-						<div class="integration-logo-wrap">
-							<img
-								class="integration-logo"
-								src={ utils.URL("/static/zoom-logo.svg") }
-								width="56"
-								height="14"
-								alt=""
-							/>
-						</div>
-						<div class="integration-info">
-							<span class="integration-name">Zoom</span>
-							<p class="integration-desc">
-								Connect your Zoom account so scheduled classes up to 40 minutes receive a meeting room automatically.
-								<a href={ data.ZoomGuideURL }>Click here for guide</a>.
-							</p>
-						</div>
-					</div>
-					<div class="integration-row-meta">
-						if data.ZoomConnected {
-							@IntegrationStatusBadge(true)
-						} else {
-							@IntegrationStatusBadge(false)
-						}
-						<div class="integration-row-action">
-							if data.ZoomConnected {
-								<form method="POST" action={ data.ZoomDisconnectURL }>
-									<button type="submit" class="btn btn-secondary btn-sm">Disconnect</button>
-								</form>
-							} else {
-								<a href={ data.ZoomConnectURL } class="btn btn-sm">Connect</a>
-							}
-						</div>
-					</div>
-				</div>
+				if data.ZoomConfigured && (data.ZoomConnected || data.ZoomConnectionsAllowed) {
+					@ProfileZoomIntegrationRow(data)
+				}
+				if data.GoogleCalendarConfigured && (data.GoogleCalendarConnected || data.GoogleCalendarConnectionsAllowed) {
+					@ProfileGoogleCalendarIntegrationRow(data)
+				}
 			</div>
 		</div>
 	}
+}
+
+templ ProfileZoomIntegrationRow(data ProfileData) {
+	<div class="integration-row">
+		<div class="integration-row-brand">
+			<div class="integration-logo-wrap">
+				<img
+					class="integration-logo"
+					src={ utils.URL("/static/zoom-logo.svg") }
+					alt=""
+				/>
+			</div>
+			<div class="integration-info">
+				<span class="integration-name">Zoom</span>
+				<p class="integration-desc">
+					Connect your Zoom account so scheduled classes up to 40 minutes receive a meeting room automatically.
+					<a href={ data.ZoomGuideURL }>Click here for guide</a>.
+				</p>
+			</div>
+		</div>
+		<div class="integration-row-meta">
+			if data.ZoomConnected {
+				@IntegrationStatusBadge(true)
+			} else {
+				@IntegrationStatusBadge(false)
+			}
+			<div class="integration-row-action">
+				if data.ZoomConnected {
+					<form method="POST" action={ data.ZoomDisconnectURL }>
+						<button type="submit" class="btn btn-secondary btn-sm">Disconnect</button>
+					</form>
+				} else if data.ZoomConnectionsAllowed {
+					<a href={ data.ZoomConnectURL } class="btn btn-sm">Connect</a>
+				}
+			</div>
+		</div>
+	</div>
+}
+
+templ ProfileGoogleCalendarIntegrationRow(data ProfileData) {
+	<div class="integration-row">
+		<div class="integration-row-brand">
+			<div class="integration-logo-wrap">
+				<img
+					class="integration-logo"
+					src={ utils.URL("/static/google-calendar-logo.svg") }
+					alt=""
+				/>
+			</div>
+			<div class="integration-info">
+				<span class="integration-name">Google Calendar</span>
+				<p class="integration-desc">
+					Connect Google Calendar so scheduled classes are added automatically to your Zion English calendar.
+					<a href={ data.GoogleCalendarGuideURL }>Click here for guide</a>.
+				</p>
+			</div>
+		</div>
+		<div class="integration-row-meta">
+			if data.GoogleCalendarConnected {
+				@IntegrationStatusBadge(true)
+			} else {
+				@IntegrationStatusBadge(false)
+			}
+			<div class="integration-row-action">
+				if data.GoogleCalendarConnected {
+					<form method="POST" action={ data.GoogleCalendarDisconnectURL }>
+						<button type="submit" class="btn btn-secondary btn-sm">Disconnect</button>
+					</form>
+				} else if data.GoogleCalendarConnectionsAllowed {
+					<a href={ data.GoogleCalendarConnectURL } class="btn btn-sm">Connect</a>
+				}
+			</div>
+		</div>
+	</div>
 }
 
 templ IntegrationStatusBadge(connected bool) {
