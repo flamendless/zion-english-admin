@@ -27,6 +27,9 @@ type StudentItem struct {
 	Contact          string
 	RatePerClass     float64
 	ParentName       string
+	ParentRate       float64
+	ParentCurrency   string
+	HasParentRate    bool
 	AssignedColor    string
 	Status           constants.StudentStatus
 	TeacherDisplay   string
@@ -89,6 +92,7 @@ templ Students(data StudentData) {
 								<th>Parent</th>
 								<th>Teacher</th>
 								<th>Rate Per Class</th>
+								<th>Parent Rate</th>
 								<th>Related To</th>
 								<th>Status</th>
 								<th>Actions</th>
@@ -105,6 +109,9 @@ templ Students(data StudentData) {
 											<span class="rate-amount">{ utils.FormatCurrencyAmountFixed(student.RatePerClass, student.Currency) }</span>
 											<span class="rate-currency">{ student.Currency }</span>
 										</span>
+									</td>
+									<td class="rate-cell" data-label="Parent Rate">
+										{ formatOptionalParentRate(student.ParentRate, student.ParentCurrency, student.HasParentRate) }
 									</td>
 									<td data-label="Related To">{ getDisplayValue(student.RelatedToDisplay) }</td>
 									<td data-label="Status">

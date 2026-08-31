@@ -33,6 +33,7 @@ templ StudentViewModal(data EditStudentData) {
 							<div class="profile-details">
 								@ProfileDetailField("Parent", displayOrDash(data.ParentName))
 								@ProfileDetailField("Contact", displayOrDash(data.Contact))
+								@ProfileDetailField("Parent rate", formatOptionalParentRate(data.ParentRate, data.ParentCurrency, data.HasParentRate))
 							</div>
 						}
 						if data.Status == constants.StudentStatusInactive && data.InactiveReason != "" {

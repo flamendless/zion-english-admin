@@ -138,6 +138,7 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 	if existing.InactiveReason.Valid {
 		inactiveReason = existing.InactiveReason.String
 	}
+	parentRate, parentCurrency, hasParentRate := studentParentRateView(existing.ParentRate, existing.ParentCurrency)
 
 	return frontend.EditStudentData{
 		ID:             strconv.FormatInt(studentID, 10),
@@ -147,6 +148,9 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 		Contact:        existing.Contact.String,
 		RatePerClass:   existing.RatePerClass,
 		ParentName:     existing.ParentName.String,
+		ParentRate:     parentRate,
+		ParentCurrency: parentCurrency,
+		HasParentRate:  hasParentRate,
 		AssignedColor:  existing.AssignedColor,
 		Status:         constants.StudentStatus(existing.Status),
 		InactiveReason: inactiveReason,
@@ -282,6 +286,7 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 
 	viewStudents := make([]frontend.StudentItem, len(students))
 	for i, s := range students {
+		parentRate, parentCurrency, hasParentRate := studentParentRateView(s.ParentRate, s.ParentCurrency)
 		viewStudents[i] = frontend.StudentItem{
 			ID:               strconv.FormatInt(s.ID, 10),
 			Name:             s.Name,
@@ -289,6 +294,9 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 			Contact:          s.Contact.String,
 			RatePerClass:     s.RatePerClass,
 			ParentName:       s.ParentName.String,
+			ParentRate:       parentRate,
+			ParentCurrency:   parentCurrency,
+			HasParentRate:    hasParentRate,
 			AssignedColor:    s.AssignedColor,
 			Status:           constants.StudentStatus(s.Status),
 			TeacherDisplay:   strings.Join(teachersByStudent[s.ID], ", "),
@@ -398,12 +406,20 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 			return
 		}
 
+		parentRate, parentCurrency, err := parseStudentParentRateFields(r.FormValue("parentRate"), r.FormValue("parentCurrency"))
+		if err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+
 		err = dbRW.GetQueries().UpdateStudent(ctx, queries.UpdateStudentParams{
 			Name:           req.Name,
 			Currency:       req.Currency,
 			Contact:        sql.NullString{String: req.Contact, Valid: req.Contact != ""},
 			RatePerClass:   req.RatePerClass,
 			ParentName:     sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
+			ParentRate:     parentRate,
+			ParentCurrency: parentCurrency,
 			AssignedColor:  req.AssignedColor,
 			Status:         req.Status,
 			InactiveReason: sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
@@ -474,8 +490,10 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		Currency:       req.Currency,
 		Contact:        existing.Contact,
 		RatePerClass:   req.RatePerClass,
-		ParentName:     sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
-		AssignedColor:  req.AssignedColor,
+			ParentName:     sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
+			ParentRate:     existing.ParentRate,
+			ParentCurrency: existing.ParentCurrency,
+			AssignedColor:  req.AssignedColor,
 		Status:         existing.Status,
 		InactiveReason: existing.InactiveReason,
 		ID:             studentID,

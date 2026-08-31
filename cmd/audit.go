@@ -144,6 +144,9 @@ func formatStudentAudit(before, after queries.GetStudentByIDRow, teachersBefore,
 	if before.ParentName.String != after.ParentName.String {
 		parts = append(parts, fmt.Sprintf("parent name '%s' -> '%s'", auditStr(before.ParentName), auditStr(after.ParentName)))
 	}
+	if before.ParentRate.Float64 != after.ParentRate.Float64 || before.ParentRate.Valid != after.ParentRate.Valid {
+		parts = append(parts, fmt.Sprintf("parent rate '%s' -> '%s'", auditParentRate(before.ParentRate, before.ParentCurrency), auditParentRate(after.ParentRate, after.ParentCurrency)))
+	}
 	if before.AssignedColor != after.AssignedColor {
 		parts = append(parts, fmt.Sprintf("assigned color '%s' -> '%s'", before.AssignedColor, after.AssignedColor))
 	}
@@ -154,6 +157,13 @@ func formatStudentAudit(before, after queries.GetStudentByIDRow, teachersBefore,
 		return fmt.Sprintf("updated student '%s' (no field changes)", after.Name)
 	}
 	return fmt.Sprintf("updated student '%s': %s", after.Name, strings.Join(parts, ", "))
+}
+
+func auditParentRate(rate sql.NullFloat64, currency sql.NullString) string {
+	if !rate.Valid || !currency.Valid {
+		return ""
+	}
+	return fmt.Sprintf("%.2f %s", rate.Float64, currency.String)
 }
 
 func teacherIDsString(teachers []queries.GetTeachersByStudentIDRow) string {

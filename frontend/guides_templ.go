@@ -1233,7 +1233,7 @@ func GuideConnectGoogleCalendarSections() templ.Component {
 				"Set Privacy Policy, Terms, Support URL (/support), and Documentation URL (/docs/connect-google-calendar).",
 				"Create an OAuth client ID (Web application). Add authorized JavaScript origins and redirect URIs for local and production, e.g. https://your-domain/zion-english-admin/profile/google-calendar/callback.",
 				"Copy Client ID and Client Secret into server GOOGLE_CALENDAR_CLIENT_ID and GOOGLE_CALENDAR_CLIENT_SECRET.",
-				"Set GOOGLE_CALENDAR_REDIRECT_URI to the exact callback URL registered in Google Cloud Console.",
+				"Set GOOGLE_CALENDAR_REDIRECT_URI to the exact production callback URL registered in Google Cloud Console: https scheme, no trailing slash, same host and path the browser uses after Google redirects (check server logs if unsure).",
 				"While Testing: add teacher Google emails as test users (up to 100). For production use beyond test users, submit the app for Google verification.",
 				"Deploy updated environment variables and restart the server. Verify by connecting from Profile and scheduling a class with a start time.",
 			},

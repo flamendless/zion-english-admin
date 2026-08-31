@@ -227,6 +227,8 @@ type TblStudent struct {
 	CreatedAt      sql.NullTime
 	UpdatedAt      sql.NullTime
 	InactiveReason sql.NullString
+	ParentRate     sql.NullFloat64
+	ParentCurrency sql.NullString
 }
 
 type TblStudentRelationship struct {

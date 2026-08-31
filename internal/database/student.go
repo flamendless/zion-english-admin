@@ -22,6 +22,8 @@ func GetAllStudents(db Service) ([]Student, error) {
 			Contact:        row.Contact,
 			RatePerClass:   row.RatePerClass,
 			ParentName:     row.ParentName,
+			ParentRate:     row.ParentRate,
+			ParentCurrency: row.ParentCurrency,
 			AssignedColor:  row.AssignedColor,
 			Status:         row.Status,
 			InactiveReason: row.InactiveReason,

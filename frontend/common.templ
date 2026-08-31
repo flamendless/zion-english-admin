@@ -20,6 +20,13 @@ func formatRateAmount(rate float64, currency string) string {
 	return utils.FormatCurrencyAmount(rate, currency)
 }
 
+func formatOptionalParentRate(rate float64, currency string, hasRate bool) string {
+	if !hasRate {
+		return "-"
+	}
+	return utils.FormatCurrencyAmountFixed(rate, currency) + " " + currency
+}
+
 var onceScrPassword = templ.NewOnceHandle()
 
 templ Flam() {

@@ -56,6 +56,8 @@ type StudentRegisterRequest struct {
 	Contact          string  `json:"contact"`
 	RatePerClass     float64 `json:"ratePerClass"`
 	ParentName       string  `json:"parentName"`
+	ParentRate       float64 `json:"parentRate,omitempty"`
+	ParentCurrency   string  `json:"parentCurrency,omitempty"`
 	AssignedColor    string  `json:"assignedColor"`
 	Status           string  `json:"status"`
 	InactiveReason   string  `json:"inactiveReason"`

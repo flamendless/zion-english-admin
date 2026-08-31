@@ -77,7 +77,7 @@ func (q *Queries) CountStudentsFiltered(ctx context.Context, arg CountStudentsFi
 }
 
 const getActiveStudents = `-- name: GetActiveStudents :many
-SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, inactive_reason, created_at, updated_at
+SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, created_at, updated_at
 FROM tbl_students
 WHERE status = 'active'
 ORDER BY name ASC
@@ -90,6 +90,8 @@ type GetActiveStudentsRow struct {
 	Contact        sql.NullString
 	RatePerClass   float64
 	ParentName     sql.NullString
+	ParentRate     sql.NullFloat64
+	ParentCurrency sql.NullString
 	AssignedColor  string
 	Status         string
 	InactiveReason sql.NullString
@@ -113,6 +115,8 @@ func (q *Queries) GetActiveStudents(ctx context.Context) ([]GetActiveStudentsRow
 			&i.Contact,
 			&i.RatePerClass,
 			&i.ParentName,
+			&i.ParentRate,
+			&i.ParentCurrency,
 			&i.AssignedColor,
 			&i.Status,
 			&i.InactiveReason,
@@ -133,7 +137,7 @@ func (q *Queries) GetActiveStudents(ctx context.Context) ([]GetActiveStudentsRow
 }
 
 const getAllStudents = `-- name: GetAllStudents :many
-SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, inactive_reason, created_at, updated_at
+SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, created_at, updated_at
 FROM tbl_students
 ORDER BY created_at DESC
 `
@@ -145,6 +149,8 @@ type GetAllStudentsRow struct {
 	Contact        sql.NullString
 	RatePerClass   float64
 	ParentName     sql.NullString
+	ParentRate     sql.NullFloat64
+	ParentCurrency sql.NullString
 	AssignedColor  string
 	Status         string
 	InactiveReason sql.NullString
@@ -168,6 +174,8 @@ func (q *Queries) GetAllStudents(ctx context.Context) ([]GetAllStudentsRow, erro
 			&i.Contact,
 			&i.RatePerClass,
 			&i.ParentName,
+			&i.ParentRate,
+			&i.ParentCurrency,
 			&i.AssignedColor,
 			&i.Status,
 			&i.InactiveReason,
@@ -188,7 +196,7 @@ func (q *Queries) GetAllStudents(ctx context.Context) ([]GetAllStudentsRow, erro
 }
 
 const getStudentByID = `-- name: GetStudentByID :one
-SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, inactive_reason, created_at, updated_at
+SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, created_at, updated_at
 FROM tbl_students
 WHERE id = ?
 `
@@ -200,6 +208,8 @@ type GetStudentByIDRow struct {
 	Contact        sql.NullString
 	RatePerClass   float64
 	ParentName     sql.NullString
+	ParentRate     sql.NullFloat64
+	ParentCurrency sql.NullString
 	AssignedColor  string
 	Status         string
 	InactiveReason sql.NullString
@@ -217,6 +227,8 @@ func (q *Queries) GetStudentByID(ctx context.Context, id int64) (GetStudentByIDR
 		&i.Contact,
 		&i.RatePerClass,
 		&i.ParentName,
+		&i.ParentRate,
+		&i.ParentCurrency,
 		&i.AssignedColor,
 		&i.Status,
 		&i.InactiveReason,
@@ -227,7 +239,7 @@ func (q *Queries) GetStudentByID(ctx context.Context, id int64) (GetStudentByIDR
 }
 
 const getStudentsFiltered = `-- name: GetStudentsFiltered :many
-SELECT DISTINCT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.inactive_reason, s.created_at, s.updated_at
+SELECT DISTINCT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.parent_rate, s.parent_currency, s.assigned_color, s.status, s.inactive_reason, s.created_at, s.updated_at
 FROM tbl_students s
 LEFT JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE (? = '' OR s.name LIKE '%' || ? || '%')
@@ -255,6 +267,8 @@ type GetStudentsFilteredRow struct {
 	Contact        sql.NullString
 	RatePerClass   float64
 	ParentName     sql.NullString
+	ParentRate     sql.NullFloat64
+	ParentCurrency sql.NullString
 	AssignedColor  string
 	Status         string
 	InactiveReason sql.NullString
@@ -287,6 +301,8 @@ func (q *Queries) GetStudentsFiltered(ctx context.Context, arg GetStudentsFilter
 			&i.Contact,
 			&i.RatePerClass,
 			&i.ParentName,
+			&i.ParentRate,
+			&i.ParentCurrency,
 			&i.AssignedColor,
 			&i.Status,
 			&i.InactiveReason,
@@ -307,8 +323,8 @@ func (q *Queries) GetStudentsFiltered(ctx context.Context, arg GetStudentsFilter
 }
 
 const insertStudent = `-- name: InsertStudent :one
-INSERT INTO tbl_students (name, currency, contact, rate_per_class, parent_name, assigned_color, status, inactive_reason)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO tbl_students (name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 RETURNING id
 `
 
@@ -318,6 +334,8 @@ type InsertStudentParams struct {
 	Contact        sql.NullString
 	RatePerClass   float64
 	ParentName     sql.NullString
+	ParentRate     sql.NullFloat64
+	ParentCurrency sql.NullString
 	AssignedColor  string
 	Status         string
 	InactiveReason sql.NullString
@@ -330,6 +348,8 @@ func (q *Queries) InsertStudent(ctx context.Context, arg InsertStudentParams) (i
 		arg.Contact,
 		arg.RatePerClass,
 		arg.ParentName,
+		arg.ParentRate,
+		arg.ParentCurrency,
 		arg.AssignedColor,
 		arg.Status,
 		arg.InactiveReason,
@@ -340,7 +360,7 @@ func (q *Queries) InsertStudent(ctx context.Context, arg InsertStudentParams) (i
 }
 
 const searchStudentsByName = `-- name: SearchStudentsByName :many
-SELECT id, name, currency, contact, rate_per_class, parent_name, assigned_color, status, inactive_reason, created_at, updated_at
+SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, created_at, updated_at
 FROM tbl_students
 WHERE name LIKE '%' || ? || '%'
 ORDER BY name ASC
@@ -354,6 +374,8 @@ type SearchStudentsByNameRow struct {
 	Contact        sql.NullString
 	RatePerClass   float64
 	ParentName     sql.NullString
+	ParentRate     sql.NullFloat64
+	ParentCurrency sql.NullString
 	AssignedColor  string
 	Status         string
 	InactiveReason sql.NullString
@@ -377,6 +399,8 @@ func (q *Queries) SearchStudentsByName(ctx context.Context, dollar_1 sql.NullStr
 			&i.Contact,
 			&i.RatePerClass,
 			&i.ParentName,
+			&i.ParentRate,
+			&i.ParentCurrency,
 			&i.AssignedColor,
 			&i.Status,
 			&i.InactiveReason,
@@ -398,7 +422,7 @@ func (q *Queries) SearchStudentsByName(ctx context.Context, dollar_1 sql.NullStr
 
 const updateStudent = `-- name: UpdateStudent :exec
 UPDATE tbl_students
-SET name = ?, currency = ?, contact = ?, rate_per_class = ?, parent_name = ?, assigned_color = ?, status = ?, inactive_reason = ?, updated_at = datetime('now')
+SET name = ?, currency = ?, contact = ?, rate_per_class = ?, parent_name = ?, parent_rate = ?, parent_currency = ?, assigned_color = ?, status = ?, inactive_reason = ?, updated_at = datetime('now')
 WHERE id = ?
 `
 
@@ -408,6 +432,8 @@ type UpdateStudentParams struct {
 	Contact        sql.NullString
 	RatePerClass   float64
 	ParentName     sql.NullString
+	ParentRate     sql.NullFloat64
+	ParentCurrency sql.NullString
 	AssignedColor  string
 	Status         string
 	InactiveReason sql.NullString
@@ -421,6 +447,8 @@ func (q *Queries) UpdateStudent(ctx context.Context, arg UpdateStudentParams) er
 		arg.Contact,
 		arg.RatePerClass,
 		arg.ParentName,
+		arg.ParentRate,
+		arg.ParentCurrency,
 		arg.AssignedColor,
 		arg.Status,
 		arg.InactiveReason,

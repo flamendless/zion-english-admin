@@ -308,6 +308,38 @@ func requireFloat64(n string) (float64, error) {
 	return v, nil
 }
 
+func parseStudentParentRateFields(rateValue, currency string) (sql.NullFloat64, sql.NullString, error) {
+	rateValue = strings.TrimSpace(rateValue)
+	currency = strings.TrimSpace(currency)
+	if rateValue == "" && currency == "" {
+		return sql.NullFloat64{}, sql.NullString{}, nil
+	}
+	if rateValue == "" {
+		return sql.NullFloat64{}, sql.NullString{}, errors.New("parent rate is required when parent currency is set")
+	}
+	if currency == "" {
+		return sql.NullFloat64{}, sql.NullString{}, errors.New("parent currency is required when parent rate is set")
+	}
+	if !constants.ValidCurrency(currency) {
+		return sql.NullFloat64{}, sql.NullString{}, errors.New("invalid parent currency. Must be KRW, CAD, YEN, or PHP")
+	}
+	rate, err := requireFloat64(rateValue)
+	if err != nil {
+		return sql.NullFloat64{}, sql.NullString{}, errors.New("invalid parent rate")
+	}
+	if rate < 0 {
+		return sql.NullFloat64{}, sql.NullString{}, errors.New("parent rate cannot be negative")
+	}
+	return sql.NullFloat64{Float64: rate, Valid: true}, sql.NullString{String: currency, Valid: true}, nil
+}
+
+func studentParentRateView(rate sql.NullFloat64, currency sql.NullString) (float64, string, bool) {
+	if !rate.Valid || !currency.Valid {
+		return 0, "", false
+	}
+	return rate.Float64, currency.String, true
+}
+
 func requireInt64(n string) (int64, error) {
 	if n == "" {
 		return 0, errors.New("missing integer value")
@@ -878,6 +910,16 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var parentRate sql.NullFloat64
+	var parentCurrency sql.NullString
+	if isSuperuser {
+		parentRate, parentCurrency, err = parseStudentParentRateFields(r.FormValue("parentRate"), r.FormValue("parentCurrency"))
+		if err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+	}
+
 	rl.add(fmt.Sprintf("Registering student: %s", req.Name))
 
 	if req.AssignedColor == "" {
@@ -907,6 +949,8 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		Contact:        sql.NullString{String: req.Contact, Valid: req.Contact != ""},
 		RatePerClass:   req.RatePerClass,
 		ParentName:     sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
+		ParentRate:     parentRate,
+		ParentCurrency: parentCurrency,
 		AssignedColor:  req.AssignedColor,
 		Status:         req.Status,
 		InactiveReason: sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
