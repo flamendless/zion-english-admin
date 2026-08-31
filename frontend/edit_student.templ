@@ -20,6 +20,9 @@ type EditStudentData struct {
 	Contact        string
 	RatePerClass   float64
 	ParentName     string
+	ParentRate     float64
+	ParentCurrency string
+	HasParentRate  bool
 	AssignedColor  string
 	Status         constants.StudentStatus
 	InactiveReason string
@@ -103,6 +106,12 @@ templ EditStudent(data EditStudentData) {
 						<label for="ratePerClass">Rate Per Class</label>
 						<input type="text" id="ratePerClass" value={ formatFloat(data.RatePerClass) } disabled/>
 					</div>
+					<div class="form-row">
+						<div class="form-group">
+							<label for="parentRate">Parent Rate</label>
+							<input type="text" id="parentRate" value={ formatOptionalParentRate(data.ParentRate, data.ParentCurrency, data.HasParentRate) } disabled/>
+						</div>
+					</div>
 					<div class="form-group">
 						<label for="parentName">Parent's Name</label>
 						<input type="text" id="parentName" value={ data.ParentName } disabled/>
@@ -157,6 +166,13 @@ templ EditStudent(data EditStudentData) {
 					<div class="form-group">
 						<label for="ratePerClass">Rate Per Class *</label>
 						<input type="number" id="ratePerClass" name="ratePerClass" required step="0.01" min="0" value={ formatFloat(data.RatePerClass) }/>
+					</div>
+					<div class="form-row">
+						<div class="form-group">
+							<label for="parentRate">Parent Rate</label>
+							<input type="number" id="parentRate" name="parentRate" step="0.01" min="0" value={ formatOptionalFloat(data.ParentRate, data.HasParentRate) } placeholder="0.00"/>
+						</div>
+						@ParentCurrencyDropdownWithValue(data.ParentCurrency)
 					</div>
 					<div class="form-group">
 						<label for="parentName">Parent's Name</label>
@@ -258,4 +274,11 @@ func inactiveReasonGroupClass(status constants.StudentStatus) string {
 		return "form-group inactive-reason-group is-visible"
 	}
 	return "form-group inactive-reason-group"
+}
+
+func formatOptionalFloat(v float64, hasValue bool) string {
+	if !hasValue {
+		return ""
+	}
+	return formatFloat(v)
 }

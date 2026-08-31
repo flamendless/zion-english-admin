@@ -421,7 +421,7 @@ JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
-ORDER BY cr.date ASC, s.name ASC, cr.rate ASC, cr.start_time ASC
+ORDER BY s.name ASC, cr.date ASC, cr.rate ASC, cr.start_time ASC
 `
 
 type GetTeacherReportClassRecordsParams struct {

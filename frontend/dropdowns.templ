@@ -161,6 +161,19 @@ templ StudentSearchbox() {
 	</div>
 }
 
+templ ParentCurrencyDropdownWithValue(selected string) {
+	<div class="form-group">
+		<label for="parentCurrency">Parent Currency</label>
+		<select id="parentCurrency" name="parentCurrency">
+			<option value="" selected?={ selected == "" }>-- None --</option>
+			<option value="KRW" selected?={ selected == "KRW" }>KRW (Korean Won)</option>
+			<option value="CAD" selected?={ selected == "CAD" }>CAD (Canadian Dollar)</option>
+			<option value="YEN" selected?={ selected == "YEN" }>YEN (Japanese Yen)</option>
+			<option value="PHP" selected?={ selected == "PHP" }>PHP (Philippine Peso)</option>
+		</select>
+	</div>
+}
+
 templ CurrencyDropdownWithValue(selected string) {
 	<div class="form-group">
 		<label for="currency">Currency *</label>
