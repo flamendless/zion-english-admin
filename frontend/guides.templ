@@ -574,6 +574,188 @@ templ GuideConnectGoogleCalendarSections() {
 	)
 }
 
+templ GuideFAQ() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>FAQ - Guides - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@GuideStyles()
+	</head>
+	<body>
+		<div class="container guides-page">
+			@HeaderSimple()
+
+			<nav class="guides-breadcrumb" aria-label="Breadcrumb">
+				<a href={ utils.URL("/guides") } class="guides-breadcrumb-link">Guides</a>
+				<span class="guides-breadcrumb-sep" aria-hidden="true">/</span>
+				<span class="guides-breadcrumb-current" aria-current="page">FAQ</span>
+			</nav>
+
+			@HubHeader("FAQ", "", "", false)
+
+			<div class="guides-hero">
+				<p class="guides-subtitle">
+					Quick answers to common questions about scheduling, recording classes, student absences, and earnings.
+				</p>
+			</div>
+
+			<div class="guide-content">
+				@GuideFAQSections()
+			</div>
+
+			<div class="guides-footer-nav">
+				<a href={ utils.URL("/guides") } class="guides-back-link">
+					@GuideBackIcon()
+					All guides
+				</a>
+			</div>
+		</div>
+		@GuideAnchorScript()
+	</body>
+	</html>
+}
+
+templ DocsGuides() {
+	@LegalDocPage(
+		"FAQ",
+		"Quick answers to common questions about scheduling, recording classes, student absences, and earnings in the Zion English Admin Portal.",
+	) {
+		@GuideFAQSections()
+	}
+}
+
+templ GuideFAQSections() {
+	@GuideFAQItem(
+		"scheduled-class-vs-class",
+		"What is the difference between a scheduled class and a class?",
+		"A scheduled class is a lesson you plan ahead on Class Schedule. A class (recorded class) is an entry in My Classes with a final status: conducted, cancelled, or rescheduled.",
+		[]string{
+			"Use Class Schedule to plan upcoming lessons, see today's schedule, and optionally get Zoom or Google Calendar links.",
+			"Use Conduct on a scheduled class when the lesson happened as planned. This creates a conducted class record in My Classes.",
+			"Use Cancel or Reschedule on a scheduled class when the lesson did not happen as planned.",
+			"You can also skip scheduling and use Record Class in My Classes to log a class directly.",
+		},
+	)
+	@GuideFAQItem(
+		"student-absent-or-sick",
+		"What if my student is absent or sick?",
+		"Mark the session as cancelled or rescheduled so your records stay accurate. Only conducted classes count toward earnings.",
+		[]string{
+			"From Class Schedule (today's class): click Cancel, enter a reason such as student absent or student sick, and submit.",
+			"If you will hold the lesson on another day instead, use Reschedule or schedule a new class for the new date.",
+			"From My Classes: click Record Class, set status to cancelled or rescheduled, and enter the reason.",
+			"If you already conducted the class but the student was a no-show, cancel the scheduled entry or record the class as cancelled with an appropriate reason.",
+		},
+	)
+	@GuideFAQItem(
+		"total-earnings",
+		"Where can I see my total earnings?",
+		"Your dashboard shows earnings summaries. My Classes lists each class with its rate.",
+		[]string{
+			"Open the dashboard after signing in. Under Overview, Earnings This Cutoff shows your conducted-class totals for the current payroll period, broken down by currency.",
+			"Month ({currency}) cards on the dashboard show conducted-class totals for the current calendar month.",
+			"Open My Classes and filter by date range to review individual class rates and statuses.",
+			"Only classes with status conducted are included in earnings totals.",
+		},
+	)
+	@GuideFAQItem(
+		"what-counts-toward-earnings",
+		"What counts toward my earnings?",
+		"Only conducted classes are included in earnings. Cancelled and rescheduled classes are tracked for reporting but do not add to your totals.",
+		[]string{
+			"When you Conduct a scheduled class, it is recorded as conducted at the rate shown.",
+			"When recording a class manually, choose conducted only if the lesson took place.",
+			"Check the dashboard or My Classes filters if a total looks lower than expected.",
+		},
+	)
+	@GuideFAQItem(
+		"forgot-to-schedule",
+		"What if I forgot to schedule a class?",
+		"You can record a past or same-day class without scheduling it first.",
+		[]string{
+			"Open My Classes and click Record Class.",
+			"Select the student, date, start and end times, rate, and status.",
+			"Click Record Class to save. The entry appears in your class history like any other recorded class.",
+		},
+	)
+	@GuideFAQItem(
+		"edit-recorded-class",
+		"Can I edit a class after I recorded it?",
+		"Yes. You can update details for classes you already saved.",
+		[]string{
+			"Open My Classes and find the class. Use filters if needed.",
+			"Click Edit on the row to change date, times, status, reason, notes, or other fields.",
+			"Click Save changes. Earnings totals update when status or rate changes.",
+		},
+	)
+	@GuideFAQItem(
+		"no-shows",
+		"What is a no-show?",
+		"A no-show is a scheduled class whose date has passed but was never conducted, cancelled, or rescheduled.",
+		[]string{
+			"Open My Analytics to see no-show entries for your classes.",
+			"Resolve no-shows by conducting the class if it happened, or by cancelling or rescheduling if it did not.",
+			"Keeping scheduled classes up to date helps your analytics and payroll records stay accurate.",
+		},
+	)
+	@GuideFAQItem(
+		"google-sheets-beta",
+		"Do I still need to record classes in Google Sheets?",
+		"During the beta phase, yes. Record classes in the admin tool and continue entering them in your Google Sheet for auditing.",
+		[]string{
+			"Use the admin tool for scheduling, conducting, and class history.",
+			"Keep your Google Sheet updated until Zion English fully transitions off sheet-based auditing.",
+			"Student names in the admin tool must match your sheet casing exactly.",
+		},
+	)
+	@GuideFAQItem(
+		"register-student",
+		"How do I register a new student?",
+		"Register students from My Students so you can schedule and record classes for them.",
+		[]string{
+			"Open My Students and click Register Student.",
+			"Enter the student name with the exact casing used in your Google Sheet.",
+			"Set currency, status, and rate per class, then click Register Student.",
+			"You are automatically assigned as the student's teacher.",
+		},
+	)
+	@GuideFAQItem(
+		"connect-integrations",
+		"How do I connect Zoom or Google Calendar?",
+		"Connect integrations once from My Profile.",
+		[]string{
+			"Open My Profile and scroll to Integrations.",
+			"Click Connect Zoom or Connect Google Calendar and approve access.",
+			"See the Connect Zoom and Connect Google Calendar guides for step-by-step instructions.",
+		},
+	)
+}
+
+templ GuideFAQItem(anchor string, question string, answer string, bullets []string) {
+	<section class="guide-faq-item guide-section" id={ anchor }>
+		<h2 class="guide-faq-question">
+			<a
+				href={ "#" + anchor }
+				class="guide-section-anchor"
+				aria-label={ "Link to " + question }
+			>#</a>
+			{ question }
+		</h2>
+		<p class="guide-faq-answer">{ answer }</p>
+		if len(bullets) > 0 {
+			<ul class="guide-faq-bullets">
+				for _, bullet := range bullets {
+					<li>{ bullet }</li>
+				}
+			</ul>
+		}
+	</section>
+}
+
 templ GuideBetaCallout() {
 	<div class="guide-beta-card" role="note" aria-label="Beta testing instructions">
 		<span class="guide-beta-ribbon" aria-hidden="true">BETA</span>
@@ -1024,6 +1206,38 @@ templ GuideStyles() {
 			outline: 2px solid var(--color-ring);
 			outline-offset: 2px;
 			border-radius: var(--radius-sm);
+		}
+
+		.guide-faq-question {
+			margin: 0;
+			font-size: 1.125rem;
+			line-height: 1.4;
+			display: flex;
+			align-items: flex-start;
+			gap: var(--space-2);
+			flex-wrap: wrap;
+			color: var(--color-foreground);
+		}
+
+		.guide-faq-answer {
+			margin-top: var(--space-3);
+			color: var(--color-foreground);
+			font-size: 0.9375rem;
+			line-height: 1.625;
+		}
+
+		.guide-faq-bullets {
+			margin-top: var(--space-3);
+			padding-left: 1.25rem;
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-2);
+		}
+
+		.guide-faq-bullets li {
+			color: var(--color-muted-foreground);
+			font-size: 0.9375rem;
+			line-height: 1.625;
 		}
 	</style>
 }

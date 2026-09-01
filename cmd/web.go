@@ -181,6 +181,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.HandleFunc(basePath+"/support", handleSupport)
 		rootMux.HandleFunc(basePath+"/docs/connect-zoom", handleDocsConnectZoom)
 		rootMux.HandleFunc(basePath+"/docs/connect-google-calendar", handleDocsConnectGoogleCalendar)
+		rootMux.HandleFunc(basePath+"/docs/guides", handleDocsGuides)
 		rootMux.HandleFunc(basePath+"/", func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path != basePath+"/" {
 				http.NotFound(w, r)
