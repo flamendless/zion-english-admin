@@ -38,6 +38,12 @@ func handleGuides(w http.ResponseWriter, r *http.Request) {
 				Access:      "teacher",
 			},
 			{
+				Slug:        constants.GuideSlugFAQ,
+				Title:       "FAQ",
+				Description: "Answers about scheduled vs recorded classes, absences, earnings, and more.",
+				Access:      "teacher",
+			},
+			{
 				Slug:        constants.GuideSlugReportsAndGeneration,
 				Title:       "Reports & Generation",
 				Description: "Review teacher payroll summaries, preview class records, and export XLSX reports.",
@@ -65,6 +71,8 @@ func handleGuidesPath(w http.ResponseWriter, r *http.Request) {
 		handleGuideConnectZoom(w, r)
 	case constants.GuideSlugConnectGoogleCalendar:
 		handleGuideConnectGoogleCalendar(w, r)
+	case constants.GuideSlugFAQ:
+		handleGuideFAQ(w, r)
 	case constants.GuideSlugReportsAndGeneration:
 		handleGuideReportsGeneration(w, r)
 	default:
@@ -113,6 +121,17 @@ func handleGuideReportsGeneration(w http.ResponseWriter, r *http.Request) {
 
 	if err := frontend.GuideReportsGeneration().Render(r.Context(), w); err != nil {
 		logs.Log().Error("failed to render reports and generation guide", zap.Error(err))
+	}
+}
+
+func handleGuideFAQ(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := frontend.GuideFAQ().Render(r.Context(), w); err != nil {
+		logs.Log().Error("failed to render faq guide", zap.Error(err))
 	}
 }
 

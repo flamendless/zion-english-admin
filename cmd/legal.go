@@ -55,3 +55,13 @@ func handleDocsConnectGoogleCalendar(w http.ResponseWriter, r *http.Request) {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
+func handleDocsGuides(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if err := frontend.DocsGuides().Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}

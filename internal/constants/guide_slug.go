@@ -7,4 +7,5 @@ const (
 	GuideSlugConnectZoom           GuideSlug = "connect-zoom"
 	GuideSlugConnectGoogleCalendar GuideSlug = "connect-google-calendar"
 	GuideSlugReportsAndGeneration  GuideSlug = "reports-and-generation"
+	GuideSlugFAQ                   GuideSlug = "faq"
 )
