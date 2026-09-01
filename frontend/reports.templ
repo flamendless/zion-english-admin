@@ -30,7 +30,7 @@ templ Reports() {
 			document.body.addEventListener('htmx:afterSwap', function (evt) {
 				if (evt.detail.target.id !== 'reportViewModalHost') return;
 				document.body.classList.add('modal-open');
-				const overlay = evt.detail.target.querySelector('#reportViewModal');
+				const overlay = evt.detail.target.querySelector('.modal-overlay');
 				const closeBtn = overlay && overlay.querySelector('.report-view-close');
 				if (closeBtn) closeBtn.focus();
 			});
@@ -45,7 +45,7 @@ templ Reports() {
 			});
 
 			document.addEventListener('keydown', function (e) {
-				if (e.key === 'Escape' && document.getElementById('reportViewModal')) {
+				if (e.key === 'Escape' && document.getElementById('reportViewModalHost')?.innerHTML) {
 					window.closeReportViewModal();
 				}
 			});
@@ -63,6 +63,14 @@ templ Reports() {
 					<input type="text" id="reportSearch" name="q" placeholder="Search teacher or student name..."/>
 				</div>
 				@DatePreset(true)
+				<button
+					type="button"
+					class="btn btn-secondary"
+					hx-get={ utils.URL("/reports/partials/all-teachers") }
+					hx-include="#datePreset"
+					hx-target="#reportViewModalHost"
+					hx-swap="innerHTML"
+				>View all teachers</button>
 				<button
 					type="button"
 					id="filterBtn"
