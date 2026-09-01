@@ -63,8 +63,9 @@ templ Analytics(data AnalyticsData) {
 				@HubHeader("My Analytics", "", "", false)
 			}
 
-			<div class="toolbar">
+			<div class="toolbar" id="analyticsToolbar">
 				@DatePreset(true)
+				@SortControls("", "asc", ListSortKindAnalytics)
 				<button type="button" id="filterBtn">Filter</button>
 			</div>
 
@@ -195,6 +196,31 @@ templ Analytics(data AnalyticsData) {
 			const filterBtn = document.getElementById('filterBtn');
 			const analyticsLoading = document.getElementById('analyticsLoading');
 			const analyticsContent = document.getElementById('analyticsContent');
+			const sortBySelect = document.getElementById('sortBy');
+			const sortOrderInput = document.getElementById('sortOrder');
+			let analyticsCache = null;
+
+			function getAnalyticsSort() {
+				return {
+					by: sortBySelect ? sortBySelect.value : 'name',
+					order: sortOrderInput && sortOrderInput.value === 'desc' ? 'desc' : 'asc'
+				};
+			}
+
+			function compareValues(a, b, order) {
+				if (a === b) return 0;
+				const result = a < b ? -1 : 1;
+				return order === 'desc' ? -result : result;
+			}
+
+			function sortRows(rows, accessors) {
+				const sort = getAnalyticsSort();
+				const accessor = accessors[sort.by];
+				if (!accessor || !rows) return rows || [];
+				return rows.slice().sort(function (left, right) {
+					return compareValues(accessor(left), accessor(right), sort.order);
+				});
+			}
 
 			function getBaseURL() {
 				const pathname = window.location.pathname;
@@ -328,11 +354,17 @@ templ Analytics(data AnalyticsData) {
 
 			function renderWeekly(rows) {
 				const tbody = document.getElementById('weeklyTableBody');
-				if (!rows || rows.length === 0) {
+				const sorted = sortRows(rows, {
+					name: function (row) { return row.weekLabel || ''; },
+					conducted: function (row) { return row.conducted || 0; },
+					cancelled: function (row) { return row.cancelled || 0; },
+					rate: function (row) { return row.cancellationRate || 0; }
+				});
+				if (!sorted || sorted.length === 0) {
 					renderTableBody(tbody, null, 'No class records in this period.');
 					return;
 				}
-				renderTableBody(tbody, rows.map(function (row) {
+				renderTableBody(tbody, sorted.map(function (row) {
 					return '<tr><td data-label="Week">' + escapeHTML(row.weekLabel) +
 						'</td><td data-label="Conducted">' + row.conducted +
 						'</td><td data-label="Cancelled">' + row.cancelled +
@@ -344,11 +376,17 @@ templ Analytics(data AnalyticsData) {
 			function renderTeachers(rows) {
 				if (!isSuperuser) return;
 				const tbody = document.getElementById('teacherTableBody');
-				if (!rows || rows.length === 0) {
+				const sorted = sortRows(rows, {
+					name: function (row) { return row.teacherName || ''; },
+					conducted: function (row) { return row.conducted || 0; },
+					cancelled: function (row) { return row.cancelled || 0; },
+					rate: function (row) { return row.cancellationRate || 0; }
+				});
+				if (!sorted || sorted.length === 0) {
 					renderTableBody(tbody, null, 'No teacher data in this period.');
 					return;
 				}
-				renderTableBody(tbody, rows.map(function (row) {
+				renderTableBody(tbody, sorted.map(function (row) {
 					return '<tr><td data-label="Teacher">' + renderTeacherCell(row.teacherName, row.teacherAvatar) +
 						'</td><td data-label="Conducted">' + row.conducted +
 						'</td><td data-label="Cancelled">' + row.cancelled +
@@ -361,11 +399,17 @@ templ Analytics(data AnalyticsData) {
 
 			function renderStudents(rows) {
 				const tbody = document.getElementById('studentTableBody');
-				if (!rows || rows.length === 0) {
+				const sorted = sortRows(rows, {
+					name: function (row) { return row.studentName || ''; },
+					conducted: function (row) { return row.conducted || 0; },
+					cancelled: function (row) { return row.cancelled || 0; },
+					rate: function (row) { return row.cancellationRate || 0; }
+				});
+				if (!sorted || sorted.length === 0) {
 					renderTableBody(tbody, null, 'No student data in this period.');
 					return;
 				}
-				renderTableBody(tbody, rows.map(function (row) {
+				renderTableBody(tbody, sorted.map(function (row) {
 					return '<tr><td data-label="Student">' + escapeHTML(row.studentName) +
 						'</td><td data-label="Conducted">' + row.conducted +
 						'</td><td data-label="Cancelled">' + row.cancelled +
@@ -419,6 +463,17 @@ templ Analytics(data AnalyticsData) {
 				}).join(''));
 			}
 
+			function renderAnalyticsData(data) {
+				renderSummary(data.summary);
+				renderWeekly(data.weekly);
+				renderTeachers(data.byTeacher);
+				renderStudents(data.byStudent);
+				renderNoShows(data.noShows);
+				renderRetention(data.retention);
+				renderReasons(data.inactiveReasons);
+				renderChurned(data.churnedStudents);
+			}
+
 			async function loadAnalytics() {
 				const startDate = datePresetSelect.dataset.startDate;
 				const endDate = datePresetSelect.dataset.endDate;
@@ -442,14 +497,8 @@ templ Analytics(data AnalyticsData) {
 						throw new Error('Failed to load analytics');
 					}
 					const data = await response.json();
-					renderSummary(data.summary);
-					renderWeekly(data.weekly);
-					renderTeachers(data.byTeacher);
-					renderStudents(data.byStudent);
-					renderNoShows(data.noShows);
-					renderRetention(data.retention);
-					renderReasons(data.inactiveReasons);
-					renderChurned(data.churnedStudents);
+					analyticsCache = data;
+					renderAnalyticsData(data);
 					analyticsLoading.hidden = true;
 					analyticsContent.hidden = false;
 				} catch (err) {
@@ -459,6 +508,11 @@ templ Analytics(data AnalyticsData) {
 			}
 
 			filterBtn.addEventListener('click', loadAnalytics);
+			if (sortBySelect) {
+				sortBySelect.addEventListener('change', function () {
+					if (analyticsCache) renderAnalyticsData(analyticsCache);
+				});
+			}
 			loadAnalytics();
 		</script>
 	</body>

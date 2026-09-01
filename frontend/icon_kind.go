@@ -17,6 +17,8 @@ const (
 	IconKindGenerate   IconKind = "generate"
 	IconKindRegenerate IconKind = "regenerate"
 	IconKindMarkRead   IconKind = "mark-read"
+	IconKindSortAsc    IconKind = "sort-asc"
+	IconKindSortDesc   IconKind = "sort-desc"
 )
 
 func iconActionClass(kind IconKind) string {

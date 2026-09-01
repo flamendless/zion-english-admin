@@ -237,6 +237,7 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("q")
 	status := r.URL.Query().Get("status")
 	teacherID := utils.QueryParamInt64(r, "teacherId")
+	sort := parseListSort(r, frontend.ListSortKindStudent)
 	page := utils.ParsePageQuery(r)
 
 	filter := studentFilterParams(q, status, teacherID)
@@ -247,20 +248,22 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 	}
 	page.Total = total
 
-	students, err := dbRO.GetQueries().GetStudentsFiltered(ctx, queries.GetStudentsFilteredParams{
+	allStudents, err := dbRO.GetQueries().GetStudentsFiltered(ctx, queries.GetStudentsFilteredParams{
 		Column1:   filter.Column1,
 		Column2:   filter.Column2,
 		Column3:   filter.Column3,
 		Status:    filter.Status,
 		Column5:   filter.Column5,
 		TeacherID: filter.TeacherID,
-		Limit:     int64(page.Size),
-		Offset:    int64(page.Offset()),
+		Limit:     total,
+		Offset:    0,
 	})
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to fetch students: %v", err), http.StatusInternalServerError)
 		return
 	}
+	sortStudentRows(allStudents, sort)
+	students := paginateSlice(allStudents, page)
 
 	relationships, err := dbRO.GetQueries().GetAllStudentRelationships(ctx)
 	if err != nil {
@@ -306,13 +309,15 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	params := listQueryParams(r)
+	params := listQueryParamsWithSort(r, frontend.ListSortKindStudent)
 	w.Header().Set("Content-Type", "text/html")
 	frontend.Students(frontend.StudentData{
 		Students:       viewStudents,
 		Query:          q,
 		Status:         constants.StudentStatus(status),
 		TeacherID:      strconv.FormatInt(teacherID, 10),
+		SortBy:         sort.By,
+		SortOrder:      string(sort.Order),
 		PageNumber:     page.Number,
 		PageTotalPages: page.TotalPages(),
 		PageTotal:      page.Total,

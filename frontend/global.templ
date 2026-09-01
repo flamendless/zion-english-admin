@@ -663,6 +663,18 @@ templ GlobalIncludes() {
 			margin-left: auto;
 		}
 
+		.notification-filter-bar .notification-sort-form {
+			display: flex;
+			align-items: flex-end;
+			gap: var(--space-3);
+			margin-left: auto;
+			flex-wrap: wrap;
+		}
+
+		.notification-filter-bar .notification-sort-form .list-toolbar-action {
+			min-width: auto;
+		}
+
 		.notification-panel-list {
 			list-style: none;
 			margin: 0;
@@ -2913,6 +2925,73 @@ templ GlobalIncludes() {
 			visibility: hidden;
 		}
 
+		.sort-by-group {
+			min-width: 130px;
+			flex: 0 1 150px;
+		}
+
+		.sort-order-group {
+			min-width: auto;
+			flex: 0 0 auto;
+		}
+
+		.sort-order-btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 2.5rem;
+			height: 2.5rem;
+			padding: 0;
+			margin: 0;
+			margin-top: 0;
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-md);
+			background: var(--color-surface);
+			color: var(--color-foreground);
+			cursor: pointer;
+			flex-shrink: 0;
+		}
+
+		.sort-order-btn:hover {
+			background: var(--color-muted);
+			border-color: var(--color-border);
+		}
+
+		.sort-order-btn:focus-visible {
+			outline: 2px solid var(--color-primary);
+			outline-offset: 2px;
+		}
+
+		.sort-order-icon {
+			display: none;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.sort-order-icon.is-active {
+			display: inline-flex;
+		}
+
+		.toolbar .sort-by-group,
+		.list-toolbar .sort-by-group {
+			flex: 0 1 150px;
+		}
+
+		.toolbar .sort-order-group,
+		.list-toolbar .sort-order-group {
+			flex: 0 0 auto;
+			min-width: auto;
+		}
+
+		.notification-filter-bar .sort-by-group,
+		.notification-filter-bar .sort-order-group {
+			margin-left: auto;
+		}
+
+		.notification-filter-bar .sort-by-group select {
+			min-width: 120px;
+		}
+
 		.pagination-bar {
 			display: flex;
 			align-items: center;
@@ -3740,4 +3819,5 @@ templ GlobalIncludes() {
 	@CsrfHandlers()
 	@ErrorBannerHandlers()
 	@ScrClipboardHelpers()
+	@SortToggleScript()
 }

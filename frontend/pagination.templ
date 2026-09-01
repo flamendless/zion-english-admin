@@ -69,7 +69,7 @@ func listSearchPlaceholder(statusType ListFilterKind) string {
 	return "Name..."
 }
 
-templ ListFilterForm(actionPath string, query string, status string, statusType ListFilterKind, teacherID string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool, showStatus bool) {
+templ ListFilterForm(actionPath string, query string, status string, statusType ListFilterKind, teacherID string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool, showStatus bool, sortBy string, sortOrder string, sortKind ListSortKind) {
 	<form class="list-toolbar" method="GET" action={ actionPath }>
 		<div class="form-group">
 			<label for="q">Search</label>
@@ -121,6 +121,7 @@ templ ListFilterForm(actionPath string, query string, status string, statusType 
 				<input type="date" id="endDate" name="endDate" value={ endDate }/>
 			</div>
 		}
+		@SortControls(sortBy, sortOrder, sortKind)
 		<div class="form-group list-toolbar-action">
 			<label for="listFilterSubmit">&nbsp;</label>
 			<button type="submit" id="listFilterSubmit">Filter</button>

@@ -91,6 +91,7 @@ templ DocumentsToolbar(showTeacherFilter bool) {
 		if showTeacherFilter {
 			@TeacherFilterDropdown("")
 		}
+		@SortControls("", "desc", ListSortKindDocument)
 		<button
 			type="button"
 			id="documentsFilterBtn"

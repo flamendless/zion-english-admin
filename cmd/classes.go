@@ -593,6 +593,7 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sort := parseListSort(r, frontend.ListSortKindClass)
 	page := utils.ParsePageQuery(r)
 	ctx := r.Context()
 
@@ -603,11 +604,13 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 	}
 	page.Total = total
 
-	records, err := dbRO.GetQueries().GetClassesListFiltered(ctx, classesListListParams(q.teacherID, q.startDate, q.endDate, q.statusFilter, q.nameFilter, int64(page.Size), int64(page.Offset())))
+	allRecords, err := dbRO.GetQueries().GetClassesListFiltered(ctx, classesListListParams(q.teacherID, q.startDate, q.endDate, q.statusFilter, q.nameFilter, total, 0))
 	if err != nil {
 		HttpError(w, "Failed to fetch class records", http.StatusInternalServerError)
 		return
 	}
+	sortClassListRows(allRecords, sort)
+	records := paginateSlice(allRecords, page)
 
 	views := make([]models.ClassRecordView, 0, len(records))
 	teacherIDs := make([]int64, 0, len(records))

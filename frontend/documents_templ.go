@@ -209,6 +209,10 @@ func DocumentsToolbar(showTeacherFilter bool) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
+		templ_7745c5c3_Err = SortControls("", "desc", ListSortKindDocument).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<button type=\"button\" id=\"documentsFilterBtn\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -216,7 +220,7 @@ func DocumentsToolbar(showTeacherFilter bool) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/documents/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 97, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 98, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 		if templ_7745c5c3_Err != nil {
@@ -276,7 +280,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 		var templ_7745c5c3_Var10 templ.SafeURL
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinURLErrs(item.ViewURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 108, Col: 25}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 109, Col: 25}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -289,7 +293,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.Filename)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 108, Col: 100}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 109, Col: 100}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 		if templ_7745c5c3_Err != nil {
@@ -302,7 +306,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(item.Filename)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 108, Col: 160}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 109, Col: 160}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -315,7 +319,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(item.Extension)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 111, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 112, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -336,7 +340,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(item.FileSize)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 116, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 117, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -370,7 +374,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(item.UploadedBy)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 124, Col: 28}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 125, Col: 28}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -388,7 +392,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(item.UploadedAt)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 128, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 129, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
@@ -415,7 +419,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 				var templ_7745c5c3_Var17 templ.SafeURL
 				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/documents/" + item.ID + "/approve"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 134, Col: 82}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 135, Col: 82}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 				if templ_7745c5c3_Err != nil {
@@ -436,7 +440,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 				var templ_7745c5c3_Var18 templ.SafeURL
 				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/documents/" + item.ID + "/reject"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 137, Col: 81}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 138, Col: 81}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 				if templ_7745c5c3_Err != nil {
@@ -462,7 +466,7 @@ func DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) te
 			var templ_7745c5c3_Var19 templ.SafeURL
 			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/documents/" + item.ID + "/delete"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 141, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 142, Col: 80}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 			if templ_7745c5c3_Err != nil {
@@ -518,7 +522,7 @@ func DocumentsTableBody(items []DocumentItem, showUploader bool, showActions boo
 			var templ_7745c5c3_Var21 string
 			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", documentsTableColspan(showUploader, showActions)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 153, Col: 84}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 154, Col: 84}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var21)
 			if templ_7745c5c3_Err != nil {
@@ -531,7 +535,7 @@ func DocumentsTableBody(items []DocumentItem, showUploader bool, showActions boo
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(emptyMessage)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 153, Col: 121}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 154, Col: 121}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
@@ -601,7 +605,7 @@ func DocumentsTable(showUploader bool, showActions bool) templ.Component {
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/documents/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 183, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 184, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
 		if templ_7745c5c3_Err != nil {
@@ -614,7 +618,7 @@ func DocumentsTable(showUploader bool, showActions bool) templ.Component {
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", documentsTableColspan(showUploader, showActions)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 189, Col: 86}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 190, Col: 86}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var25)
 		if templ_7745c5c3_Err != nil {
@@ -656,7 +660,7 @@ func DocumentsCard(title string, description string, showUploader bool, showActi
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 200, Col: 15}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 201, Col: 15}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
@@ -674,7 +678,7 @@ func DocumentsCard(title string, description string, showUploader bool, showActi
 			var templ_7745c5c3_Var28 string
 			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 202, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 203, Col: 49}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 			if templ_7745c5c3_Err != nil {
@@ -770,7 +774,7 @@ func DocumentsPage(data DocumentsPageData) templ.Component {
 		var templ_7745c5c3_Var31 string
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(data.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 408, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 409, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 		if templ_7745c5c3_Err != nil {
@@ -783,7 +787,7 @@ func DocumentsPage(data DocumentsPageData) templ.Component {
 		var templ_7745c5c3_Var32 templ.SafeURL
 		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 409, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 410, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 		if templ_7745c5c3_Err != nil {
@@ -833,7 +837,7 @@ func DocumentsPage(data DocumentsPageData) templ.Component {
 			var templ_7745c5c3_Var33 string
 			templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 421, Col: 53}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 422, Col: 53}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 			if templ_7745c5c3_Err != nil {
@@ -901,7 +905,7 @@ func ProfilePictureUpload(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var35 templ.SafeURL
 			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/avatar"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 450, Col: 40}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 451, Col: 40}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 			if templ_7745c5c3_Err != nil {
@@ -955,7 +959,7 @@ func ProfileDocumentUpload(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var37 templ.SafeURL
 			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/document"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 494, Col: 43}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 495, Col: 43}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 			if templ_7745c5c3_Err != nil {

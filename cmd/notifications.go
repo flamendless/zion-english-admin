@@ -32,6 +32,7 @@ func handleNotifications(w http.ResponseWriter, r *http.Request) {
 	notifySvc.ScanMissedClasses(ctx)
 
 	unreadOnly := r.URL.Query().Get("filter") == "unread"
+	sort := parseListSort(r, frontend.ListSortKindNotification)
 	page := utils.ParsePageQuery(r)
 	total, err := notifySvc.Count(ctx, user, unreadOnly)
 	if err != nil {
@@ -40,17 +41,26 @@ func handleNotifications(w http.ResponseWriter, r *http.Request) {
 	}
 	page.Total = total
 
-	rows, err := notifySvc.ListPaged(ctx, user, unreadOnly, int64(page.Size), int64(page.Offset()))
+	allRows, err := notifySvc.ListPaged(ctx, user, unreadOnly, total, 0)
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to load notifications: %v", err), http.StatusInternalServerError)
 		return
 	}
+	sortNotificationRows(allRows, sort)
+	rows := paginateSlice(allRows, page)
 
 	params := map[string]string{"filter": r.URL.Query().Get("filter")}
+	for k, v := range sort.QueryValues() {
+		if v != "" {
+			params[k] = v
+		}
+	}
 	filterPath := utils.URL("/notifications")
 	data := frontend.NotificationListData{
 		Items:          notificationItems(rows),
 		UnreadOnly:     unreadOnly,
+		SortBy:         sort.By,
+		SortOrder:      string(sort.Order),
 		PageNumber:     page.Number,
 		PageTotalPages: page.TotalPages(),
 		PageTotal:      page.Total,

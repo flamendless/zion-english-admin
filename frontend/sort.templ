@@ -1,0 +1,70 @@
+package frontend
+
+templ SortControls(sortBy string, sortOrder string, kind ListSortKind) {
+	@SortBySelect(sortBy, SortOptionsFor(kind))
+	@SortOrderToggle(sortOrder)
+}
+
+templ SortBySelect(sortBy string, options []SortOption) {
+	<div class="form-group sort-by-group">
+		<label for="sortBy">Sort by</label>
+		<select id="sortBy" name="sortBy">
+			for _, opt := range options {
+				<option value={ opt.Value } selected?={ sortBy == opt.Value }>{ opt.Label }</option>
+			}
+		</select>
+	</div>
+}
+
+templ SortOrderToggle(sortOrder string) {
+	<div class="form-group sort-order-group">
+		<label for="sortOrderToggle">Order</label>
+		<input type="hidden" id="sortOrder" name="sortOrder" value={ sortOrder }/>
+		<button
+			type="button"
+			id="sortOrderToggle"
+			class="sort-order-btn"
+			data-sort-order={ sortOrder }
+			aria-label={ sortOrderAriaLabel(sortOrder) }
+			title={ sortOrderToggleLabel(sortOrder) }
+			onclick="toggleSortOrder(this)"
+		>
+			<span class={ "sort-order-icon sort-order-icon--asc" + sortOrderIconClass(sortOrder, true) } aria-hidden="true">
+				@iconSVGSortAsc()
+			</span>
+			<span class={ "sort-order-icon sort-order-icon--desc" + sortOrderIconClass(sortOrder, false) } aria-hidden="true">
+				@iconSVGSortDesc()
+			</span>
+		</button>
+	</div>
+}
+
+func sortOrderIconClass(sortOrder string, isAsc bool) string {
+	if isAsc && sortOrder == "asc" {
+		return " is-active"
+	}
+	if !isAsc && sortOrder == "desc" {
+		return " is-active"
+	}
+	return ""
+}
+
+templ SortToggleScript() {
+	<script>
+		function toggleSortOrder(btn) {
+			const form = btn.closest('form, .toolbar, .list-toolbar, .notification-filter-bar');
+			const input = form ? form.querySelector('#sortOrder, [name="sortOrder"]') : document.getElementById('sortOrder');
+			if (!input) return;
+			const next = input.value === 'asc' ? 'desc' : 'asc';
+			input.value = next;
+			btn.dataset.sortOrder = next;
+			btn.setAttribute('aria-label', next === 'asc' ? 'Sort ascending (A to Z)' : 'Sort descending (Z to A)');
+			btn.setAttribute('title', next === 'asc' ? 'A to Z' : 'Z to A');
+			btn.querySelectorAll('.sort-order-icon').forEach(function (icon) {
+				icon.classList.remove('is-active');
+			});
+			const active = btn.querySelector('.sort-order-icon--' + next);
+			if (active) active.classList.add('is-active');
+		}
+	</script>
+}

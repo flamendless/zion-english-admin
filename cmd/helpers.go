@@ -35,13 +35,15 @@ func extractPathID(r *http.Request, segment, suffix string) (int64, bool) {
 
 func listQueryParams(r *http.Request) map[string]string {
 	return map[string]string{
-		"q":         r.URL.Query().Get("q"),
-		"status":    r.URL.Query().Get("status"),
-		"teacherId": r.URL.Query().Get("teacherId"),
-		"email":     r.URL.Query().Get("email"),
-		"module":    r.URL.Query().Get("module"),
-		"startDate": r.URL.Query().Get("startDate"),
+		"q":          r.URL.Query().Get("q"),
+		"status":     r.URL.Query().Get("status"),
+		"teacherId":  r.URL.Query().Get("teacherId"),
+		"email":      r.URL.Query().Get("email"),
+		"module":     r.URL.Query().Get("module"),
+		"startDate":  r.URL.Query().Get("startDate"),
 		"endDate":   r.URL.Query().Get("endDate"),
+		"sortBy":     r.URL.Query().Get("sortBy"),
+		"sortOrder":  r.URL.Query().Get("sortOrder"),
 	}
 }
 
