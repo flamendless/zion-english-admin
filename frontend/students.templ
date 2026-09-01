@@ -10,6 +10,8 @@ type StudentData struct {
 	Query          string
 	Status         constants.StudentStatus
 	TeacherID      string
+	SortBy         string
+	SortOrder      string
 	PageNumber     int
 	PageTotalPages int
 	PageTotal      int64
@@ -81,7 +83,7 @@ templ Students(data StudentData) {
 			@HeaderSimple()
 			@HubHeader("Students", "New Student", utils.URL("/students/register"), true)
 
-			@ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindStudent, data.TeacherID, "", "", "", "", true, false, false, false, true)
+			@ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindStudent, data.TeacherID, "", "", "", "", true, false, false, false, true, data.SortBy, data.SortOrder, ListSortKindStudent)
 
 			if len(data.Students) > 0 {
 				<div class="table-wrapper">

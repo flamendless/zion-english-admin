@@ -398,7 +398,7 @@ func listSearchPlaceholder(statusType ListFilterKind) string {
 	return "Name..."
 }
 
-func ListFilterForm(actionPath string, query string, status string, statusType ListFilterKind, teacherID string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool, showStatus bool) templ.Component {
+func ListFilterForm(actionPath string, query string, status string, statusType ListFilterKind, teacherID string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool, showStatus bool, sortBy string, sortOrder string, sortKind ListSortKind) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -678,6 +678,10 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 				return templ_7745c5c3_Err
 			}
 		}
+		templ_7745c5c3_Err = SortControls(sortBy, sortOrder, sortKind).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "<div class=\"form-group list-toolbar-action\"><label for=\"listFilterSubmit\">&nbsp;</label> <button type=\"submit\" id=\"listFilterSubmit\">Filter</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -714,7 +718,7 @@ func TeacherFilterDropdown(selectedID string) templ.Component {
 		var templ_7745c5c3_Var36 string
 		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/api/teachers"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 137, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 138, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var36)
 		if templ_7745c5c3_Err != nil {
@@ -732,7 +736,7 @@ func TeacherFilterDropdown(selectedID string) templ.Component {
 			var templ_7745c5c3_Var37 string
 			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.ResolveAttributeValue(selectedID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 144, Col: 30}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 145, Col: 30}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var37)
 			if templ_7745c5c3_Err != nil {
@@ -745,7 +749,7 @@ func TeacherFilterDropdown(selectedID string) templ.Component {
 			var templ_7745c5c3_Var38 string
 			templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs("Teacher #" + selectedID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 144, Col: 68}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 145, Col: 68}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 			if templ_7745c5c3_Err != nil {

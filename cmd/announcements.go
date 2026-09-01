@@ -31,6 +31,7 @@ func handleAnnouncements(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
+	sort := parseListSort(r, frontend.ListSortKindAnnouncement)
 	page := utils.ParsePageQuery(r)
 	total, err := dbRO.GetQueries().CountAnnouncements(ctx)
 	if err != nil {
@@ -39,14 +40,16 @@ func handleAnnouncements(w http.ResponseWriter, r *http.Request) {
 	}
 	page.Total = total
 
-	rows, err := dbRO.GetQueries().GetAnnouncementsPaged(ctx, queries.GetAnnouncementsPagedParams{
-		Limit:  int64(page.Size),
-		Offset: int64(page.Offset()),
+	allRows, err := dbRO.GetQueries().GetAnnouncementsPaged(ctx, queries.GetAnnouncementsPagedParams{
+		Limit:  total,
+		Offset: 0,
 	})
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to load announcements: %v", err), http.StatusInternalServerError)
 		return
 	}
+	sortAnnouncementRows(allRows, sort)
+	rows := paginateSlice(allRows, page)
 
 	today := utils.TodayPHT()
 	items := make([]frontend.AnnouncementListItem, 0, len(rows))
@@ -77,13 +80,16 @@ func handleAnnouncements(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filterPath := utils.URL("/announcements")
+	params := parseListSort(r, frontend.ListSortKindAnnouncement).QueryValues()
 	data := frontend.AnnouncementListData{
 		Announcements:  items,
+		SortBy:         sort.By,
+		SortOrder:      string(sort.Order),
 		PageNumber:     page.Number,
 		PageTotalPages: page.TotalPages(),
 		PageTotal:      page.Total,
-		PrevURL:        utils.BuildPageURLAt(filterPath, page.Number-1, page.Size, nil),
-		NextURL:        utils.BuildPageURLAt(filterPath, page.Number+1, page.Size, nil),
+		PrevURL:        utils.BuildPageURLAt(filterPath, page.Number-1, page.Size, params),
+		NextURL:        utils.BuildPageURLAt(filterPath, page.Number+1, page.Size, params),
 		HasPrev:        page.HasPrev(),
 		HasNext:        page.HasNext(),
 	}

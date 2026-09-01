@@ -93,6 +93,7 @@ func handleSystemLogs(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	role := auth.GetRole(ctx)
+	sort := parseListSort(r, frontend.ListSortKindSystemLog)
 	page := utils.ParsePageQuery(r)
 	filters := parseLogFilters(r)
 	hideCreatedBy := role == auth.RoleTeacher
@@ -108,11 +109,13 @@ func handleSystemLogs(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		page.Total = total
-		rows, err := dbRO.GetQueries().GetLogsByCreatedByFiltered(ctx, getLogsByTeacherParams(user.ID, filters, int64(page.Size), int64(page.Offset())))
+		allRows, err := dbRO.GetQueries().GetLogsByCreatedByFiltered(ctx, getLogsByTeacherParams(user.ID, filters, total, 0))
 		if err != nil {
 			HttpError(w, fmt.Sprintf("Failed to fetch logs: %v", err), http.StatusInternalServerError)
 			return
 		}
+		sortSystemLogByUserRows(allRows, sort)
+		rows := paginateSlice(allRows, page)
 		viewLogs = systemLogItemsFromTeacherRows(rows)
 	} else {
 		total, err := dbRO.GetQueries().CountAllLogsFiltered(ctx, countAllLogsParams(filters))
@@ -121,15 +124,17 @@ func handleSystemLogs(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		page.Total = total
-		rows, err := dbRO.GetQueries().GetAllLogsFiltered(ctx, getAllLogsParams(filters, int64(page.Size), int64(page.Offset())))
+		allRows, err := dbRO.GetQueries().GetAllLogsFiltered(ctx, getAllLogsParams(filters, total, 0))
 		if err != nil {
 			HttpError(w, fmt.Sprintf("Failed to fetch logs: %v", err), http.StatusInternalServerError)
 			return
 		}
+		sortSystemLogRows(allRows, sort)
+		rows := paginateSlice(allRows, page)
 		viewLogs = systemLogItemsFromAllRows(rows)
 	}
 
-	params := listQueryParams(r)
+	params := listQueryParamsWithSort(r, frontend.ListSortKindSystemLog)
 	w.Header().Set("Content-Type", "text/html")
 	frontend.SystemLogs(frontend.SystemLogData{
 		Logs:           viewLogs,
@@ -138,6 +143,8 @@ func handleSystemLogs(w http.ResponseWriter, r *http.Request) {
 		Module:         filters.module,
 		StartDate:      filters.startDate,
 		EndDate:        filters.endDate,
+		SortBy:         sort.By,
+		SortOrder:      string(sort.Order),
 		PageNumber:     page.Number,
 		PageTotalPages: page.TotalPages(),
 		PageTotal:      page.Total,
@@ -206,6 +213,7 @@ func handleLogs(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("q")
 	startDate := r.URL.Query().Get("startDate")
 	endDate := r.URL.Query().Get("endDate")
+	sort := parseListSort(r, frontend.ListSortKindProcessingLog)
 	page := utils.ParsePageQuery(r)
 	filter := processingLogFilterParams(q, startDate, endDate)
 
@@ -216,20 +224,22 @@ func handleLogs(w http.ResponseWriter, r *http.Request) {
 	}
 	page.Total = total
 
-	logs, err := dbRO.GetQueries().GetProcessingLogsFiltered(ctx, queries.GetProcessingLogsFilteredParams{
+	allLogs, err := dbRO.GetQueries().GetProcessingLogsFiltered(ctx, queries.GetProcessingLogsFilteredParams{
 		Column1:     filter.Column1,
 		Column2:     filter.Column2,
 		Column3:     filter.Column3,
 		CreatedAt:   filter.CreatedAt,
 		Column5:     filter.Column5,
 		CreatedAt_2: filter.CreatedAt_2,
-		Limit:       int64(page.Size),
-		Offset:      int64(page.Offset()),
+		Limit:       total,
+		Offset:      0,
 	})
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to fetch logs: %v", err), http.StatusInternalServerError)
 		return
 	}
+	sortProcessingLogRows(allLogs, sort)
+	logs := paginateSlice(allLogs, page)
 
 	viewLogs := make([]frontend.ProcessingLogItem, len(logs))
 	for i, l := range logs {
@@ -248,13 +258,15 @@ func handleLogs(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	params := listQueryParams(r)
+	params := listQueryParamsWithSort(r, frontend.ListSortKindProcessingLog)
 	w.Header().Set("Content-Type", "text/html")
 	frontend.ProcessingLogs(frontend.ProcessingLogData{
 		Logs:           viewLogs,
 		Query:          q,
 		StartDate:      startDate,
 		EndDate:        endDate,
+		SortBy:         sort.By,
+		SortOrder:      string(sort.Order),
 		PageNumber:     page.Number,
 		PageTotalPages: page.TotalPages(),
 		PageTotal:      page.Total,

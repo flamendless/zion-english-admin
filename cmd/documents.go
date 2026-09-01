@@ -147,6 +147,7 @@ func handleDocumentsPartial(w http.ResponseWriter, r *http.Request) {
 		HttpError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	sort := parseListSort(r, frontend.ListSortKindDocument)
 
 	var (
 		items        []frontend.DocumentItem
@@ -165,6 +166,7 @@ func handleDocumentsPartial(w http.ResponseWriter, r *http.Request) {
 			HttpError(w, "Failed to load documents", http.StatusInternalServerError)
 			return
 		}
+		sortDocumentRows(rows, sort)
 		items, err = mapAllDocumentItems(ctx, rows)
 		if err != nil {
 			logs.Log().Error("load teacher roles for documents", zap.Error(err))
@@ -179,6 +181,7 @@ func handleDocumentsPartial(w http.ResponseWriter, r *http.Request) {
 			HttpError(w, "Failed to load documents", http.StatusInternalServerError)
 			return
 		}
+		sortTeacherDocumentRows(rows, sort)
 		items = mapDocumentItems(rows)
 	default:
 		HttpError(w, "Access denied", http.StatusForbidden)

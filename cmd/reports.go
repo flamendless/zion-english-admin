@@ -77,11 +77,13 @@ func handleReportsPartial(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	sort := parseListSort(r, frontend.ListSortKindReport)
 	rows, err := loadReportRows(r.Context(), startDate, endDate, q)
 	if err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	sortReportRows(rows, sort)
 
 	emptyMsg := "No teachers found."
 	if startDate == "" || endDate == "" {
@@ -111,6 +113,7 @@ func handleReportsAllTeachers(w http.ResponseWriter, r *http.Request) {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	sortReportRows(rows, parseListSort(r, frontend.ListSortKindReport))
 
 	modalRows := make([]frontend.ReportAllTeachersRow, 0, len(rows))
 	for _, row := range rows {
