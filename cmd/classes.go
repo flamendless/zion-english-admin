@@ -775,6 +775,13 @@ func handleClasses(w http.ResponseWriter, r *http.Request) {
 	HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 }
 
+func normalizeClassRecordRate(req *models.ClassRecordRequest) {
+	switch constants.ClassStatus(req.Status) {
+	case constants.ClassStatusCancelled, constants.ClassStatusRescheduled:
+		req.Rate = 0
+	}
+}
+
 func validateClassRecordRequest(req *models.ClassRecordRequest) error {
 	if req.StudentID == 0 {
 		return errors.New("student is required")
@@ -788,7 +795,11 @@ func validateClassRecordRequest(req *models.ClassRecordRequest) error {
 	if req.DurationMinutes <= 0 {
 		return errors.New("duration must be greater than zero")
 	}
-	if req.Rate <= 0 {
+	normalizeClassRecordRate(req)
+	if req.Rate < 0 {
+		return errors.New("rate cannot be negative")
+	}
+	if constants.ClassStatus(req.Status) == constants.ClassStatusConducted && req.Rate <= 0 {
 		return errors.New("rate must be greater than zero")
 	}
 	if req.Currency == "" {
