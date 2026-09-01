@@ -81,6 +81,50 @@ func handleReportsPartial(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleReportsAllTeachers(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	startDate, endDate, err := requireReportDateRange(r)
+	if err != nil {
+		HttpError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	rows, err := loadReportRows(r.Context(), startDate, endDate, "")
+	if err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	modalRows := make([]frontend.ReportAllTeachersRow, 0, len(rows))
+	for _, row := range rows {
+		modalRows = append(modalRows, frontend.ReportAllTeachersRow{
+			TeacherName:      row.TeacherName,
+			TeacherAvatar:    row.TeacherAvatar,
+			ConductedClasses: row.ConductedClasses,
+			TotalClasses:     row.TotalClasses,
+			Earnings:         row.Earnings,
+		})
+	}
+
+	emptyMsg := "No teachers found."
+	if startDate == "" || endDate == "" {
+		emptyMsg = "Select a date range."
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	if err := frontend.ReportAllTeachersModal(frontend.ReportAllTeachersData{
+		CutoffLabel: formatReportCutoffLabel(startDate, endDate),
+		Rows:        modalRows,
+		EmptyMsg:    emptyMsg,
+	}).Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func loadReportRows(ctx context.Context, startDate, endDate, q string) ([]frontend.ReportRowData, error) {
 	searchParams := reportSearchParams(q, startDate, endDate)
 

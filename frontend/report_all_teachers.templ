@@ -1,0 +1,69 @@
+package frontend
+
+templ ReportAllTeachersModal(data ReportAllTeachersData) {
+	<div class="modal-overlay" id="reportAllTeachersModal" role="presentation">
+		<div class="modal-dialog modal-dialog-report" role="dialog" aria-modal="true" aria-labelledby="reportAllTeachersTitle">
+			<div class="modal-header">
+				<div>
+					<h3 id="reportAllTeachersTitle">All Teachers</h3>
+					if data.CutoffLabel != "" {
+						<p class="report-all-teachers-cutoff">{ data.CutoffLabel }</p>
+					}
+				</div>
+				<button type="button" class="modal-close report-view-close" aria-label="Close" onclick="window.closeReportViewModal()">&times;</button>
+			</div>
+			<div class="modal-body report-all-teachers-body">
+				@ReportAllTeachersStyles()
+				if len(data.Rows) == 0 {
+					<p class="empty-state">{ data.EmptyMsg }</p>
+				} else {
+					<div class="table-wrapper">
+						<table class="table-stack-mobile report-all-teachers-table">
+							<thead>
+								<tr>
+									<th>Teacher</th>
+									<th>Total Earnings</th>
+									<th>Total Classes</th>
+								</tr>
+							</thead>
+							<tbody>
+								for _, row := range data.Rows {
+									<tr>
+										<td data-label="Teacher">
+											@TeacherNameCell(row.TeacherName, row.TeacherAvatar)
+										</td>
+										<td data-label="Total Earnings">
+											@templ.Raw(row.EarningsHTML())
+										</td>
+										<td data-label="Total Classes">{ row.ClassesLabel() }</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+}
+
+templ ReportAllTeachersStyles() {
+	<style>
+		.report-all-teachers-cutoff {
+			margin: var(--space-1) 0 0;
+			color: var(--color-muted-foreground);
+			font-size: 0.875rem;
+			font-weight: 400;
+		}
+
+		.report-all-teachers-body {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-4);
+		}
+
+		.report-all-teachers-table .teacher-name-cell {
+			min-width: 0;
+		}
+	</style>
+}
