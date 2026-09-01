@@ -62,12 +62,26 @@ templ Reports() {
 					<label for="reportSearch">Search</label>
 					<input type="text" id="reportSearch" name="q" placeholder="Search teacher or student name..."/>
 				</div>
+				<div class="form-group">
+					<label for="reportMonth">Month</label>
+					<input
+						type="month"
+						id="reportMonth"
+						name="month"
+						value={ utils.CurrentMonthPHT() }
+						hx-get={ utils.URL("/reports/partials/date-preset") }
+						hx-target="#datePresetGroup"
+						hx-swap="outerHTML"
+						hx-include="this"
+						hx-trigger="change"
+					/>
+				</div>
 				@DatePreset(true)
 				<button
 					type="button"
 					class="btn btn-secondary"
 					hx-get={ utils.URL("/reports/partials/all-teachers") }
-					hx-include="#datePreset"
+					hx-include="#reportsToolbar"
 					hx-target="#reportViewModalHost"
 					hx-swap="innerHTML"
 				>View all teachers</button>
@@ -109,26 +123,39 @@ templ Reports() {
 		</div>
 
 		<script>
-			const datePresetSelect = document.getElementById('datePreset');
 			const reportSearch = document.getElementById('reportSearch');
 
-			function setDateRangeFromPreset(value) {
-				if (!value) {
-					delete datePresetSelect.dataset.startDate;
-					delete datePresetSelect.dataset.endDate;
+			function setDateRangeFromPreset(select) {
+				if (!select) return;
+				if (!select.value) {
+					delete select.dataset.startDate;
+					delete select.dataset.endDate;
 					return;
 				}
-				const parts = value.split('|');
+				const parts = select.value.split('|');
 				if (parts.length !== 2) return;
-				datePresetSelect.dataset.startDate = parts[0];
-				datePresetSelect.dataset.endDate = parts[1];
+				select.dataset.startDate = parts[0];
+				select.dataset.endDate = parts[1];
 			}
 
-			datePresetSelect.addEventListener('change', () => {
-				setDateRangeFromPreset(datePresetSelect.value);
-			});
+			function bindDatePresetSelect() {
+				const datePresetSelect = document.getElementById('datePreset');
+				if (!datePresetSelect) return;
+				setDateRangeFromPreset(datePresetSelect);
+				datePresetSelect.addEventListener('change', () => {
+					setDateRangeFromPreset(datePresetSelect);
+				});
+			}
 
-			setDateRangeFromPreset(datePresetSelect.value);
+			bindDatePresetSelect();
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id !== 'datePresetGroup') return;
+				bindDatePresetSelect();
+				if (typeof htmx !== 'undefined') {
+					htmx.trigger('#reportsTableBody', 'load');
+				}
+			});
 
 			reportSearch.addEventListener('keydown', function (e) {
 				if (e.key === 'Enter') {

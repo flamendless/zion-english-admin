@@ -115,31 +115,15 @@ templ StudentSearchResults(students []models.StudentAPIResponse) {
 	</div>
 }
 
-func currentCutoffRange() (firstCutoff string, secondCutoff string, activeCutoff string) {
-	now := time.Now()
-	year, month, day := now.Date()
-	lastOfMonth := time.Date(year, month, 1, 0, 0, 0, 0, time.Local).AddDate(0, 1, -1).Day()
-
-	a := time.Date(year, month, 1, 0, 0, 0, 0, time.Local).Format("2006-01-02")
-	b := time.Date(year, month, 15, 0, 0, 0, 0, time.Local).Format("2006-01-02")
-	c := time.Date(year, month, 16, 0, 0, 0, 0, time.Local).Format("2006-01-02")
-	d := time.Date(year, month, lastOfMonth, 0, 0, 0, 0, time.Local).Format("2006-01-02")
-
-	firstCutoff = fmt.Sprintf("%s|%s", a, b)
-	secondCutoff = fmt.Sprintf("%s|%s", c, d)
-	if day <= 15 {
-		activeCutoff = firstCutoff
-	} else {
-		activeCutoff = secondCutoff
-	}
-	return firstCutoff, secondCutoff, activeCutoff
+templ DatePreset(selectCurrentCutoff bool) {
+	@DatePresetForMonth(utils.CurrentMonthPHT(), selectCurrentCutoff)
 }
 
-templ DatePreset(selectCurrentCutoff bool) {
+templ DatePresetForMonth(monthValue string, selectCurrentCutoff bool) {
 	{{
-		firstCutoff, secondCutoff, activeCutoff := currentCutoffRange()
+		firstCutoff, secondCutoff, activeCutoff, _ := cutoffPresetForMonth(monthValue, selectCurrentCutoff)
 	}}
-	<div class="form-group">
+	<div class="form-group" id="datePresetGroup">
 		<label for="datePreset">Date Range</label>
 		<select id="datePreset" name="datePreset">
 			if !selectCurrentCutoff {

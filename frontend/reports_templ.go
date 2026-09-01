@@ -72,7 +72,33 @@ func Reports() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"toolbar\" id=\"reportsToolbar\"><div class=\"form-group\"><label for=\"reportSearch\">Search</label> <input type=\"text\" id=\"reportSearch\" name=\"q\" placeholder=\"Search teacher or student name...\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"toolbar\" id=\"reportsToolbar\"><div class=\"form-group\"><label for=\"reportSearch\">Search</label> <input type=\"text\" id=\"reportSearch\" name=\"q\" placeholder=\"Search teacher or student name...\"></div><div class=\"form-group\"><label for=\"reportMonth\">Month</label> <input type=\"month\" id=\"reportMonth\" name=\"month\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var3 string
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.CurrentMonthPHT())
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 71, Col: 37}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-get=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var4 string
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/partials/date-preset"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 72, Col: 57}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" hx-target=\"#datePresetGroup\" hx-swap=\"outerHTML\" hx-include=\"this\" hx-trigger=\"change\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -80,46 +106,46 @@ func Reports() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<button type=\"button\" class=\"btn btn-secondary\" hx-get=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/partials/all-teachers"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 69, Col: 57}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" hx-include=\"#datePreset\" hx-target=\"#reportViewModalHost\" hx-swap=\"innerHTML\">View all teachers</button> <button type=\"button\" id=\"filterBtn\" hx-get=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/partials/rows"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 77, Col: 49}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" hx-include=\"#reportsToolbar\" hx-target=\"#reportsTableBody\" hx-swap=\"innerHTML\">Filter</button></div><div class=\"table-wrapper\"><table id=\"reportsTable\" class=\"table-stack-mobile\"><thead><tr><th>Teacher</th><th>Total Classes</th><th>Total Rate/Earnings</th><th>Actions</th></tr></thead> <tbody id=\"reportsTableBody\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<button type=\"button\" class=\"btn btn-secondary\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/partials/rows"))
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/partials/all-teachers"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 96, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 83, Col: 57}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" hx-include=\"#reportsToolbar\" hx-trigger=\"load\" hx-swap=\"innerHTML\"><tr><td colspan=\"4\" class=\"empty-state\">Loading reports...</td></tr></tbody></table></div><div id=\"reportViewModalHost\"></div></div><script>\r\n\t\t\tconst datePresetSelect = document.getElementById('datePreset');\r\n\t\t\tconst reportSearch = document.getElementById('reportSearch');\r\n\r\n\t\t\tfunction setDateRangeFromPreset(value) {\r\n\t\t\t\tif (!value) {\r\n\t\t\t\t\tdelete datePresetSelect.dataset.startDate;\r\n\t\t\t\t\tdelete datePresetSelect.dataset.endDate;\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst parts = value.split('|');\r\n\t\t\t\tif (parts.length !== 2) return;\r\n\t\t\t\tdatePresetSelect.dataset.startDate = parts[0];\r\n\t\t\t\tdatePresetSelect.dataset.endDate = parts[1];\r\n\t\t\t}\r\n\r\n\t\t\tdatePresetSelect.addEventListener('change', () => {\r\n\t\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\r\n\t\t\t});\r\n\r\n\t\t\tsetDateRangeFromPreset(datePresetSelect.value);\r\n\r\n\t\t\treportSearch.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key === 'Enter') {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\tif (typeof htmx !== 'undefined') {\r\n\t\t\t\t\t\thtmx.trigger('#reportsTableBody', 'load');\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t});\r\n\t\t</script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" hx-include=\"#reportsToolbar\" hx-target=\"#reportViewModalHost\" hx-swap=\"innerHTML\">View all teachers</button> <button type=\"button\" id=\"filterBtn\" hx-get=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/partials/rows"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 91, Col: 49}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-include=\"#reportsToolbar\" hx-target=\"#reportsTableBody\" hx-swap=\"innerHTML\">Filter</button></div><div class=\"table-wrapper\"><table id=\"reportsTable\" class=\"table-stack-mobile\"><thead><tr><th>Teacher</th><th>Total Classes</th><th>Total Rate/Earnings</th><th>Actions</th></tr></thead> <tbody id=\"reportsTableBody\" hx-get=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var7 string
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/partials/rows"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 110, Col: 50}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" hx-include=\"#reportsToolbar\" hx-trigger=\"load\" hx-swap=\"innerHTML\"><tr><td colspan=\"4\" class=\"empty-state\">Loading reports...</td></tr></tbody></table></div><div id=\"reportViewModalHost\"></div></div><script>\r\n\t\t\tconst reportSearch = document.getElementById('reportSearch');\r\n\r\n\t\t\tfunction setDateRangeFromPreset(select) {\r\n\t\t\t\tif (!select) return;\r\n\t\t\t\tif (!select.value) {\r\n\t\t\t\t\tdelete select.dataset.startDate;\r\n\t\t\t\t\tdelete select.dataset.endDate;\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst parts = select.value.split('|');\r\n\t\t\t\tif (parts.length !== 2) return;\r\n\t\t\t\tselect.dataset.startDate = parts[0];\r\n\t\t\t\tselect.dataset.endDate = parts[1];\r\n\t\t\t}\r\n\r\n\t\t\tfunction bindDatePresetSelect() {\r\n\t\t\t\tconst datePresetSelect = document.getElementById('datePreset');\r\n\t\t\t\tif (!datePresetSelect) return;\r\n\t\t\t\tsetDateRangeFromPreset(datePresetSelect);\r\n\t\t\t\tdatePresetSelect.addEventListener('change', () => {\r\n\t\t\t\t\tsetDateRangeFromPreset(datePresetSelect);\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tbindDatePresetSelect();\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tif (evt.detail.target.id !== 'datePresetGroup') return;\r\n\t\t\t\tbindDatePresetSelect();\r\n\t\t\t\tif (typeof htmx !== 'undefined') {\r\n\t\t\t\t\thtmx.trigger('#reportsTableBody', 'load');\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\treportSearch.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key === 'Enter') {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\tif (typeof htmx !== 'undefined') {\r\n\t\t\t\t\t\thtmx.trigger('#reportsTableBody', 'load');\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t});\r\n\t\t</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
