@@ -50,6 +50,20 @@ templ ActionCardFeature(url string, h2 string, desc string) {
 	</a>
 }
 
+templ ActionCardOpensModal(h2 string, desc string, feature bool) {
+	if feature {
+		<button type="button" class="card card-feature" data-open-record-classes-modal>
+			<h2>{ h2 }</h2>
+			<p>{ desc }</p>
+		</button>
+	} else {
+		<button type="button" class="card" data-open-record-classes-modal>
+			<h2>{ h2 }</h2>
+			<p>{ desc }</p>
+		</button>
+	}
+}
+
 templ TeacherOptions(teachers []models.TeacherAPIResponse, selectedID string) {
 	<option value="">-- Select Teacher --</option>
 	for _, t := range teachers {

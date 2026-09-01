@@ -1,0 +1,173 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+templ RecordClassesChoiceModal() {
+	<div class="modal-overlay" id="recordClassesChoiceModal" hidden role="presentation">
+		<div class="modal-dialog modal-dialog-choice" role="dialog" aria-modal="true" aria-labelledby="recordClassesChoiceTitle">
+			<div class="modal-header">
+				<h3 id="recordClassesChoiceTitle">Record classes</h3>
+				<button type="button" class="modal-close record-classes-choice-close" aria-label="Close">&times;</button>
+			</div>
+			<div class="modal-body record-classes-choice-body">
+				<p class="record-classes-choice-lead">Choose how you want to add a class.</p>
+				<div class="choice-option-cards">
+					<a href={ utils.URL("/schedule/record") } class="choice-option-card">
+						<span class="choice-option-card__body">
+							<span class="choice-option-card__title">Schedule a class for later</span>
+							<span class="choice-option-card__desc">Plan an upcoming lesson on your calendar. Zoom and Google Calendar links can be added automatically for eligible sessions.</span>
+						</span>
+					</a>
+					<a href={ utils.URL("/classes/record") } class="choice-option-card">
+						<span class="choice-option-card__body">
+							<span class="choice-option-card__title">Record a conducted class</span>
+							<span class="choice-option-card__desc">Log a lesson that already happened, or mark a session as cancelled or rescheduled for your records and earnings.</span>
+						</span>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<style>
+		.modal-dialog-choice {
+			width: min(100%, 40rem);
+		}
+
+		.record-classes-choice-body {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-4);
+		}
+
+		.record-classes-choice-lead {
+			color: var(--color-muted-foreground);
+			font-size: 0.9375rem;
+			line-height: 1.5;
+		}
+
+		.choice-option-cards {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: var(--space-3);
+		}
+
+		.choice-option-card {
+			display: flex;
+			align-items: flex-start;
+			padding: var(--space-4);
+			border: 2px solid var(--color-border);
+			border-radius: var(--radius-md);
+			background: var(--color-surface);
+			text-decoration: none;
+			color: inherit;
+			cursor: pointer;
+			transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+		}
+
+		.choice-option-card:hover {
+			border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border));
+			background: var(--color-primary-light);
+			box-shadow: var(--shadow-sm);
+			transform: translateY(-1px);
+			text-decoration: none;
+		}
+
+		.choice-option-card:focus-visible {
+			outline: 2px solid var(--color-ring);
+			outline-offset: 2px;
+		}
+
+		.choice-option-card__title {
+			display: block;
+			font-weight: 600;
+			font-size: 0.9375rem;
+			color: var(--color-foreground);
+		}
+
+		.choice-option-card__desc {
+			display: block;
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+			margin-top: var(--space-2);
+			line-height: 1.45;
+		}
+
+		@media (max-width: 640px) {
+			.choice-option-cards {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+	<script>
+		(function () {
+			const modal = document.getElementById('recordClassesChoiceModal');
+			if (!modal) return;
+
+			let triggerEl = null;
+
+			function getFocusables() {
+				return Array.from(modal.querySelectorAll(
+					'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+				)).filter((el) => !el.hidden && el.offsetParent !== null);
+			}
+
+			function trapFocus(e) {
+				if (modal.hidden || e.key !== 'Tab') return;
+				const focusables = getFocusables();
+				if (!focusables.length) return;
+				const first = focusables[0];
+				const last = focusables[focusables.length - 1];
+				if (e.shiftKey && document.activeElement === first) {
+					e.preventDefault();
+					last.focus();
+				} else if (!e.shiftKey && document.activeElement === last) {
+					e.preventDefault();
+					first.focus();
+				}
+			}
+
+			function openModal(trigger) {
+				triggerEl = trigger || document.activeElement;
+				modal.hidden = false;
+				document.body.classList.add('modal-open');
+				requestAnimationFrame(() => {
+					const firstCard = modal.querySelector('.choice-option-card');
+					if (firstCard) firstCard.focus();
+				});
+			}
+
+			function closeModal() {
+				modal.hidden = true;
+				document.body.classList.remove('modal-open');
+				if (triggerEl && typeof triggerEl.focus === 'function') {
+					triggerEl.focus();
+				}
+				triggerEl = null;
+			}
+
+			document.addEventListener('click', (e) => {
+				const trigger = e.target.closest('[data-open-record-classes-modal]');
+				if (trigger) {
+					e.preventDefault();
+					openModal(trigger);
+				}
+			});
+
+			modal.querySelectorAll('.record-classes-choice-close').forEach((btn) => {
+				btn.addEventListener('click', closeModal);
+			});
+
+			modal.addEventListener('click', (e) => {
+				if (e.target === modal) closeModal();
+			});
+
+			document.addEventListener('keydown', (e) => {
+				if (e.key === 'Escape' && !modal.hidden) {
+					e.preventDefault();
+					closeModal();
+				}
+				trapFocus(e);
+			});
+		})();
+	</script>
+}
