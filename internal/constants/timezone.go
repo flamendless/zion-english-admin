@@ -3,6 +3,7 @@ package constants
 import "time"
 
 const (
+	MonthLayout           = "2006-01"
 	DateLayout            = "2006-01-02"
 	DateTimeLayout        = "2006-01-02 15:04"
 	DateTimeSecondsLayout = "2006-01-02 15:04:05"

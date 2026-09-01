@@ -51,6 +51,19 @@ func handleReports(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleReportsDatePresetPartial(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	month := strings.TrimSpace(r.URL.Query().Get("month"))
+	w.Header().Set("Content-Type", "text/html")
+	if err := frontend.DatePresetForMonth(month, true).Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func handleReportsPartial(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
