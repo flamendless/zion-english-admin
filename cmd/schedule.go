@@ -78,6 +78,31 @@ func handleSchedule(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleScheduleRecord(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		data := frontend.ScheduleRecordData{
+			TodayPHT: utils.TodayPHT(),
+		}
+		role := auth.GetRole(r.Context())
+		data.IsSuperuser = auth.HasAdminAccess(role)
+		if role == auth.RoleTeacher {
+			user := auth.GetUser(r.Context())
+			data.LockTeacher = true
+			data.TeacherID = strconv.FormatInt(user.ID, 10)
+			data.TeacherName = user.Name
+		}
+		w.Header().Set("Content-Type", "text/html")
+		if err := frontend.ScheduleRecord(data).Render(r.Context(), w); err != nil {
+			HttpError(w, err.Error(), http.StatusInternalServerError)
+		}
+	case http.MethodPost:
+		handleScheduleCreate(w, r)
+	default:
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
 func handleScheduleCreate(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user := auth.GetUser(ctx)

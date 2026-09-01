@@ -1,0 +1,238 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/utils"
+)
+
+type ScheduleRecordData struct {
+	IsSuperuser bool
+	LockTeacher bool
+	TeacherID   string
+	TeacherName string
+	TodayPHT    string
+}
+
+templ ScheduleRecord(data ScheduleRecordData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Schedule a Class - Zion English Admin</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@ScrTimeRangeJS()
+	</head>
+	<body>
+		<div class="container schedule-record-page" data-lock-teacher={ fmt.Sprintf("%t", data.LockTeacher) }>
+			@HeaderSimple()
+			@SuccessBanner()
+			@ErrorBanner()
+
+			<h2>Schedule a Class</h2>
+			<p class="field-hint schedule-record-intro">Plan a lesson for a future date. You can view and manage it later from Class Schedule.</p>
+
+			if data.LockTeacher {
+				<form
+					id="scheduleRecordForm"
+					hx-post={ utils.URL("/schedule/record") }
+					hx-swap="innerHTML"
+					hx-target="#logOutput"
+					hx-indicator="#scheduleSubmitBtn"
+					_="
+						on submit
+							if #student.value is ''
+								alert('Please select a student')
+								halt
+							end
+							if #scheduled_date.value is ''
+								alert('Please set a date')
+								halt
+							end
+							if #start_time.value is ''
+								alert('Please set start time')
+								halt
+							end
+							if #end_time.value is ''
+								alert('Please set end time')
+								halt
+							end
+							if #rate.value < 0
+								alert('Invalid rate')
+								halt
+							end
+						end
+					"
+				>
+					<input type="hidden" id="modal_teacher" name="teacher" value={ data.TeacherID }/>
+					<div class="form-row">
+						<div class="form-group">
+							<label>Teacher</label>
+							<input type="text" value={ data.TeacherName } disabled/>
+						</div>
+						@TeacherStudentsDropdown()
+						@ScheduledDateField(data.TodayPHT)
+					</div>
+					@ScheduleModalFields()
+					<button type="submit" class="btn" id="scheduleSubmitBtn">Schedule Class</button>
+				</form>
+			} else {
+				<form
+					id="scheduleRecordForm"
+					hx-post={ utils.URL("/schedule/record") }
+					hx-swap="innerHTML"
+					hx-target="#logOutput"
+					hx-indicator="#scheduleSubmitBtn"
+					_="
+						on submit
+							if #schedule_teacher.value is ''
+								alert('Please select a teacher')
+								halt
+							end
+							if #schedule_student.value is ''
+								alert('Please select a student')
+								halt
+							end
+							if #scheduled_date.value is ''
+								alert('Please set a date')
+								halt
+							end
+							if #start_time.value is ''
+								alert('Please set start time')
+								halt
+							end
+							if #end_time.value is ''
+								alert('Please set end time')
+								halt
+							end
+							if #rate.value < 0
+								alert('Invalid rate')
+								halt
+							end
+						end
+					"
+				>
+					<div class="form-row">
+						@ScheduleModalTeacherDropdown()
+						@ScheduleModalStudentDropdown()
+						@ScheduledDateField(data.TodayPHT)
+					</div>
+					@ScheduleModalFields()
+					<button type="submit" class="btn" id="scheduleSubmitBtn">Schedule Class</button>
+				</form>
+			}
+
+			<div class="logs-section">
+				<h3>Logs and Errors</h3>
+				<div id="logOutput">Waiting for submission...</div>
+			</div>
+		</div>
+		<style>
+			.schedule-record-intro {
+				max-width: 36rem;
+				margin-bottom: var(--space-4);
+			}
+		</style>
+		<script>
+			(function () {
+				const pageRoot = document.querySelector('.schedule-record-page');
+				const lockTeacher = pageRoot && pageRoot.dataset.lockTeacher === 'true';
+				const ZOOM_MAX_AUTO_MINUTES = 40;
+				const ZOOM_MANUAL_WARNING = 'Classes longer than 40 minutes cannot receive an automatic Zoom meeting room on a Basic account. Please create your Zoom meeting manually and share the link with your student.';
+
+				function getTeacherEl() {
+					return lockTeacher
+						? document.getElementById('modal_teacher')
+						: document.getElementById('schedule_teacher');
+				}
+
+				function getStudentEl() {
+					return lockTeacher
+						? document.getElementById('student')
+						: document.getElementById('schedule_student');
+				}
+
+				function durationFromForm() {
+					const startInput = document.getElementById('start_time');
+					const endInput = document.getElementById('end_time');
+					const start = parseTimeToMinutes(startInput ? startInput.value : '');
+					const end = parseTimeToMinutes(endInput ? endInput.value : '');
+					if (start === null || end === null || end <= start) return null;
+					return end - start;
+				}
+
+				function updateScheduleZoomWarning() {
+					const el = document.getElementById('zoomDurationWarning');
+					if (!el) return;
+					const duration = durationFromForm();
+					if (duration !== null && duration > ZOOM_MAX_AUTO_MINUTES) {
+						el.textContent = ZOOM_MANUAL_WARNING;
+						el.hidden = false;
+					} else {
+						el.hidden = true;
+						el.textContent = '';
+					}
+				}
+
+				async function loadStudentsForTeacher(teacherId) {
+					const studentEl = getStudentEl();
+					if (!studentEl || lockTeacher) return;
+					if (!teacherId) {
+						studentEl.innerHTML = '<option value="">-- Select teacher first --</option>';
+						studentEl.value = '';
+						return;
+					}
+					try {
+						const response = await fetch(buildURL('/api/students?teacher=' + encodeURIComponent(teacherId)));
+						const html = await response.text();
+						if (!response.ok) throw new Error(html);
+						studentEl.innerHTML = html;
+						studentEl.value = '';
+					} catch (err) {
+						if (typeof showErrorBanner === 'function') {
+							showErrorBanner(err.message || 'Failed to load students');
+						}
+						studentEl.innerHTML = '<option value="">-- Select teacher first --</option>';
+						studentEl.value = '';
+					}
+				}
+
+				const teacherEl = getTeacherEl();
+				if (teacherEl && !lockTeacher) {
+					teacherEl.addEventListener('change', () => {
+						loadStudentsForTeacher(teacherEl.value);
+					});
+					loadStudentsForTeacher('');
+				}
+
+				const studentEl = getStudentEl();
+				if (studentEl) {
+					studentEl.addEventListener('change', () => {
+						const opt = studentEl.options[studentEl.selectedIndex];
+						if (!opt || !opt.value) return;
+						const rate = opt.getAttribute('data-rate');
+						const currency = opt.getAttribute('data-currency');
+						const rateEl = document.getElementById('rate');
+						const currencyEl = document.getElementById('currency');
+						if (rate && rateEl) rateEl.value = rate;
+						if (currency && currencyEl) currencyEl.value = currency;
+					});
+				}
+
+				document.getElementById('start_time')?.addEventListener('change', updateScheduleZoomWarning);
+				document.getElementById('end_time')?.addEventListener('change', updateScheduleZoomWarning);
+				updateScheduleZoomWarning();
+			})();
+		</script>
+		@ScrTimeRangeInit()
+	</body>
+	</html>
+}
+
+templ ScheduledDateField(todayPHT string) {
+	<div class="form-group">
+		<label for="scheduled_date">Date *</label>
+		<input type="date" id="scheduled_date" name="scheduled_date" value={ todayPHT } required min={ todayPHT }/>
+	</div>
+}

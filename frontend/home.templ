@@ -59,20 +59,26 @@ templ Home(data DashboardData) {
 			<h2 class="dashboard-section-title">Quick actions</h2>
 			<div class="cards-grid">
 				for _, item := range NavItems(data.Role) {
-					if item.FeatureCard {
-						@ActionCardFeature(item.Path, item.Title, item.Description)
-					} else {
-						@ActionCard(item.Path, item.Title, item.Description)
+					if item.Path != "/classes" && item.Path != "/schedule" {
+						if item.FeatureCard {
+							@ActionCardFeature(item.Path, item.Title, item.Description)
+						} else {
+							@ActionCard(item.Path, item.Title, item.Description)
+						}
+						if item.Path == "/profile" {
+							@ActionCard("/guides", "Guides", "Step-by-step help for using the admin tool")
+						}
 					}
-					if item.Path == "/profile" {
-						@ActionCard("/guides", "Guides", "Step-by-step help for using the admin tool")
-					}
-					if auth.HasAdminAccess(data.Role) && item.Path == "/schedule" {
-						@ActionCard("/announcements", "Announcements", "Create and manage system-wide banners")
-					}
+				}
+				if IsNavAccessible(data.Role, "/classes") && IsNavAccessible(data.Role, "/schedule") {
+					@ActionCardOpensModal("Record Classes", "Schedule upcoming lessons or record classes you already taught", true)
+				}
+				if auth.HasAdminAccess(data.Role) {
+					@ActionCard("/announcements", "Announcements", "Create and manage system-wide banners")
 				}
 				@ActionCard("/changelogs", "Changelogs", "See what's new in the admin tool")
 			</div>
+			@RecordClassesChoiceModal()
 		</div>
 	</body>
 	</html>
