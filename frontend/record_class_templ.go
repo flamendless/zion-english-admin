@@ -394,7 +394,7 @@ func RecordClassFields(prefill models.RecordClassPrefill, learningMaterials []Cl
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</div></div><div class=\"form-row\" _=\"\n\t\t\ton change from #status\n\t\t\t\tif #status.value is 'conducted'\n\t\t\t\t\tadd @hidden to #reasonGroup\n\t\t\t\t\tremove @required from #reason\n\t\t\t\t\tset #reason.value to ''\n\t\t\t\telse\n\t\t\t\t\tremove @hidden from #reasonGroup\n\t\t\t\t\tadd @required to #reason\n\t\t\t\tend\n\t\t\tend\n\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</div></div><div class=\"form-row\" _=\"\n\t\t\ton change from #status\n\t\t\t\tif #status.value is 'conducted'\n\t\t\t\t\tadd @hidden to #reasonGroup\n\t\t\t\t\tremove @required from #reason\n\t\t\t\t\tset #reason.value to ''\n\t\t\t\telse\n\t\t\t\t\tremove @hidden from #reasonGroup\n\t\t\t\t\tadd @required to #reason\n\t\t\t\t\tset #rate.value to 0\n\t\t\t\tend\n\t\t\tend\n\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

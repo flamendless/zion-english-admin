@@ -471,7 +471,7 @@ func EditClassFields(data EditClassData, readonly bool) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\"></div></div><div class=\"form-row\" _=\"\r\n\t\t\t\ton change from #status\r\n\t\t\t\t\tif #status.value is 'conducted'\r\n\t\t\t\t\t\tadd @hidden to #reasonGroup\r\n\t\t\t\t\t\tremove @required from #reason\r\n\t\t\t\t\t\tset #reason.value to ''\r\n\t\t\t\t\telse\r\n\t\t\t\t\t\tremove @hidden from #reasonGroup\r\n\t\t\t\t\t\tadd @required to #reason\r\n\t\t\t\t\tend\r\n\t\t\t\tend\r\n\t\t\t\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\"></div></div><div class=\"form-row\" _=\"\r\n\t\t\t\ton change from #status\r\n\t\t\t\t\tif #status.value is 'conducted'\r\n\t\t\t\t\t\tadd @hidden to #reasonGroup\r\n\t\t\t\t\t\tremove @required from #reason\r\n\t\t\t\t\t\tset #reason.value to ''\r\n\t\t\t\t\telse\r\n\t\t\t\t\t\tremove @hidden from #reasonGroup\r\n\t\t\t\t\t\tadd @required to #reason\r\n\t\t\t\t\t\tset #rate.value to 0\r\n\t\t\t\t\tend\r\n\t\t\t\tend\r\n\t\t\t\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -496,7 +496,7 @@ func EditClassFields(data EditClassData, readonly bool) templ.Component {
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Reason)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 217, Col: 24}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 218, Col: 24}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var17)
 			if templ_7745c5c3_Err != nil {
@@ -519,7 +519,7 @@ func EditClassFields(data EditClassData, readonly bool) templ.Component {
 			var templ_7745c5c3_Var18 string
 			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(data.Notes)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 225, Col: 88}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 226, Col: 88}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 			if templ_7745c5c3_Err != nil {
