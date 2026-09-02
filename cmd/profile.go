@@ -230,18 +230,20 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 		CanEditLastName:       utils.ProfileNameEditable(row.LastName),
 		CanUploadDocument:     blockingDocs == 0,
 	}
-	zoomConnected, zoomConfigured, zoomConnectionsAllowed := profileZoomStatus(ctx, user.ID)
+	zoomConnected, zoomConfigured, zoomVisible, zoomConnectionsAllowed := profileZoomStatus(ctx, user.ID)
 	data.ZoomConfigured = zoomConfigured
 	data.ZoomConnected = zoomConnected
+	data.ZoomIntegrationVisible = zoomVisible
 	data.ZoomConnectionsAllowed = zoomConnectionsAllowed
 	data.ZoomConnectURL = utils.URL("/profile/zoom/connect")
 	data.ZoomDisconnectURL = utils.URL("/profile/zoom/disconnect")
 	data.ZoomGuideURL = utils.URL("/guides/" + string(constants.GuideSlugConnectZoom))
 	data.ZoomStatusMessage = profileZoomFlashMessage(r.URL.Query())
 
-	googleCalendarConnected, googleCalendarConfigured, googleCalendarConnectionsAllowed := profileGoogleCalendarStatus(ctx, user.ID)
+	googleCalendarConnected, googleCalendarConfigured, googleCalendarVisible, googleCalendarConnectionsAllowed := profileGoogleCalendarStatus(ctx, user.ID)
 	data.GoogleCalendarConfigured = googleCalendarConfigured
 	data.GoogleCalendarConnected = googleCalendarConnected
+	data.GoogleCalendarIntegrationVisible = googleCalendarVisible
 	data.GoogleCalendarConnectionsAllowed = googleCalendarConnectionsAllowed
 	data.GoogleCalendarConnectURL = utils.URL("/profile/google-calendar/connect")
 	data.GoogleCalendarDisconnectURL = utils.URL("/profile/google-calendar/disconnect")

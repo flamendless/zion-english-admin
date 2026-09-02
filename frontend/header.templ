@@ -225,12 +225,23 @@ templ ErrorBannerHandlers() {
 		}
 
 		(function() {
-			const banner = document.getElementById('errorBanner');
-			const cookiePath = banner?.dataset.basePath || '/';
-			const match = document.cookie.match(/error_flash=([^;]+)/);
-			if (match) {
-				showErrorBanner(decodeURIComponent(match[1].replace(/\+/g, ' ')));
-				document.cookie = 'error_flash=; Max-Age=0; path=' + encodeURIComponent(cookiePath);
+			function readErrorFlash() {
+				const banner = document.getElementById('errorBanner');
+				if (!banner) {
+					return;
+				}
+				const cookiePath = banner.dataset.basePath || '/';
+				const match = document.cookie.match(/error_flash=([^;]+)/);
+				if (match) {
+					showErrorBanner(decodeURIComponent(match[1].replace(/\+/g, ' ')));
+					document.cookie = 'error_flash=; Max-Age=0; path=' + encodeURIComponent(cookiePath);
+				}
+			}
+
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', readErrorFlash);
+			} else {
+				readErrorFlash();
 			}
 		})();
 

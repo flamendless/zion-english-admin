@@ -16,7 +16,6 @@ import (
 	"zion-english/internal/calendar"
 	"zion-english/internal/conf"
 	"zion-english/internal/constants"
-	"zion-english/internal/featureflags"
 	"zion-english/internal/logs"
 
 	"go.uber.org/zap"
@@ -36,12 +35,13 @@ func handleGoogleCalendarConnect(w http.ResponseWriter, r *http.Request) {
 		HttpError(w, "Google Calendar integration is not configured", http.StatusServiceUnavailable)
 		return
 	}
-	if !featureflags.IsEnabled(r.Context(), dbRO, constants.FeatureFlagIntegrationGoogleCalendar) {
+	ctx := r.Context()
+	_, connectAllowed := integrationAccessForViewer(ctx, constants.FeatureFlagIntegrationGoogleCalendar)
+	if !connectAllowed {
 		HttpError(w, "Google Calendar connections are currently disabled", http.StatusServiceUnavailable)
 		return
 	}
 
-	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	cfg := conf.Conf()
 	auth.RefreshSessionCookie(w, r, cfg)
@@ -232,12 +232,12 @@ func logGoogleCalendarOAuthExchangeError(err error, teacherID int64) {
 	logs.Log().Error("google calendar oauth exchange failed", fields...)
 }
 
-func profileGoogleCalendarStatus(ctx context.Context, teacherID int64) (connected bool, envConfigured bool, connectionsAllowed bool) {
+func profileGoogleCalendarStatus(ctx context.Context, teacherID int64) (connected bool, envConfigured bool, visible bool, connectAllowed bool) {
 	envConfigured = calendarSvc != nil && calendarSvc.IsConfigured()
-	connectionsAllowed = featureflags.IsEnabled(ctx, dbRO, constants.FeatureFlagIntegrationGoogleCalendar)
+	visible, connectAllowed = integrationAccessForViewer(ctx, constants.FeatureFlagIntegrationGoogleCalendar)
 	if !envConfigured {
-		return false, false, connectionsAllowed
+		return false, false, visible, connectAllowed
 	}
 	connected = teacherGoogleCalendarConnected(ctx, teacherID)
-	return connected, envConfigured, connectionsAllowed
+	return connected, envConfigured, visible, connectAllowed
 }

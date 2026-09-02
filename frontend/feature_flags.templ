@@ -1,7 +1,11 @@
 package frontend
 
-import "fmt"
-import "zion-english/internal/utils"
+import (
+	"fmt"
+	"strings"
+	"zion-english/internal/constants"
+	"zion-english/internal/utils"
+)
 
 type FeatureFlagsData struct {
 	Zoom           FeatureFlagIntegrationItem
@@ -17,7 +21,27 @@ type FeatureFlagIntegrationItem struct {
 	LogoHeight         int
 	EnvConfigured      bool
 	ConnectionsAllowed bool
+	VisibleRoles       []constants.TeacherRole
+	RoleOptions        []constants.TeacherRole
 	FormFieldName      string
+	FormPrefix         string
+}
+
+func featureFlagRoleLabel(role constants.TeacherRole) string {
+	return strings.ToUpper(string(role[:1])) + string(role[1:])
+}
+
+func featureFlagRoleFieldName(prefix string, role constants.TeacherRole) string {
+	return fmt.Sprintf("%s_role_%s", prefix, role)
+}
+
+func featureFlagRoleChecked(visibleRoles []constants.TeacherRole, role constants.TeacherRole) bool {
+	for _, visible := range visibleRoles {
+		if visible == role {
+			return true
+		}
+	}
+	return false
 }
 
 templ FeatureFlags(data FeatureFlagsData) {
@@ -141,6 +165,28 @@ templ FeatureFlags(data FeatureFlagsData) {
 				cursor: pointer;
 			}
 
+			.feature-flag-roles {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-end;
+				gap: var(--space-2);
+			}
+
+			.feature-flag-roles-label {
+				font-size: 0.75rem;
+				font-weight: 600;
+				color: var(--color-muted-foreground);
+				text-transform: uppercase;
+				letter-spacing: 0.04em;
+			}
+
+			.feature-flag-role-options {
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: flex-end;
+				gap: var(--space-3);
+			}
+
 			.feature-flags-actions {
 				margin-top: var(--space-6);
 				display: flex;
@@ -152,15 +198,16 @@ templ FeatureFlags(data FeatureFlagsData) {
 		<div class="container">
 			@HeaderSimple()
 			@SuccessBanner()
+			@ErrorBanner()
 			@HubHeader("Feature Flags", "", "", false)
 
 			<div class="feature-flags-hero">
 				<p class="feature-flags-subtitle">
-					Control whether teachers can start new integration connections. Existing connections stay active when connections are disabled.
+					Control whether teachers can start new integration connections and which teacher roles can see each integration. Login superuser and admin accounts always see all integrations. Existing connections stay active when connections are disabled.
 				</p>
 			</div>
 
-			<form method="POST" action={ utils.URL("/feature-flags") } class="feature-flags-card">
+			<form method="POST" action={ utils.URL("/feature-flags") } class="feature-flags-card" id="featureFlagsForm">
 				<div class="integration-list">
 					@FeatureFlagIntegrationRow(data.Zoom)
 					@FeatureFlagIntegrationRow(data.GoogleCalendar)
@@ -170,7 +217,33 @@ templ FeatureFlags(data FeatureFlagsData) {
 				</div>
 			</form>
 		</div>
-		@SuccessBannerHandlers()
+		<script>
+			(function () {
+				const form = document.getElementById('featureFlagsForm');
+				if (!form) return;
+
+				const integrationChecks = [
+					{ prefix: 'zoom', label: 'Zoom' },
+					{ prefix: 'google_calendar', label: 'Google Calendar' },
+				];
+				const roles = ['teacher', 'admin', 'developer'];
+
+				form.addEventListener('submit', function (event) {
+					for (const integration of integrationChecks) {
+						const anyChecked = roles.some(function (role) {
+							return form.querySelector('input[name="' + integration.prefix + '_role_' + role + '"]:checked');
+						});
+						if (!anyChecked) {
+							event.preventDefault();
+							if (typeof showErrorBanner === 'function') {
+								showErrorBanner('Select at least one role for ' + integration.label + ' visibility');
+							}
+							return;
+						}
+					}
+				});
+			})();
+		</script>
 	</body>
 	</html>
 }
@@ -206,6 +279,21 @@ templ FeatureFlagIntegrationRow(item FeatureFlagIntegrationItem) {
 				/>
 				Allow new connections
 			</label>
+			<fieldset class="feature-flag-roles">
+				<legend class="feature-flag-roles-label">Visible to</legend>
+				<div class="feature-flag-role-options">
+					for _, role := range item.RoleOptions {
+						<label class="feature-flag-toggle">
+							<input
+								type="checkbox"
+								name={ featureFlagRoleFieldName(item.FormPrefix, role) }
+								checked?={ featureFlagRoleChecked(item.VisibleRoles, role) }
+							/>
+							{ featureFlagRoleLabel(role) }
+						</label>
+					}
+				</div>
+			</fieldset>
 		</div>
 	</div>
 }

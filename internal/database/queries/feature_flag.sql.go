@@ -10,34 +10,58 @@ import (
 )
 
 const getFeatureFlag = `-- name: GetFeatureFlag :one
-SELECT key, enabled, updated_at
+SELECT key, enabled, visible_roles, updated_at
 FROM tbl_feature_flags
 WHERE key = ?
 `
 
-func (q *Queries) GetFeatureFlag(ctx context.Context, key string) (TblFeatureFlag, error) {
+type GetFeatureFlagRow struct {
+	Key          string
+	Enabled      int64
+	VisibleRoles string
+	UpdatedAt    string
+}
+
+func (q *Queries) GetFeatureFlag(ctx context.Context, key string) (GetFeatureFlagRow, error) {
 	row := q.db.QueryRowContext(ctx, getFeatureFlag, key)
-	var i TblFeatureFlag
-	err := row.Scan(&i.Key, &i.Enabled, &i.UpdatedAt)
+	var i GetFeatureFlagRow
+	err := row.Scan(
+		&i.Key,
+		&i.Enabled,
+		&i.VisibleRoles,
+		&i.UpdatedAt,
+	)
 	return i, err
 }
 
 const listFeatureFlags = `-- name: ListFeatureFlags :many
-SELECT key, enabled, updated_at
+SELECT key, enabled, visible_roles, updated_at
 FROM tbl_feature_flags
 ORDER BY key ASC
 `
 
-func (q *Queries) ListFeatureFlags(ctx context.Context) ([]TblFeatureFlag, error) {
+type ListFeatureFlagsRow struct {
+	Key          string
+	Enabled      int64
+	VisibleRoles string
+	UpdatedAt    string
+}
+
+func (q *Queries) ListFeatureFlags(ctx context.Context) ([]ListFeatureFlagsRow, error) {
 	rows, err := q.db.QueryContext(ctx, listFeatureFlags)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TblFeatureFlag
+	var items []ListFeatureFlagsRow
 	for rows.Next() {
-		var i TblFeatureFlag
-		if err := rows.Scan(&i.Key, &i.Enabled, &i.UpdatedAt); err != nil {
+		var i ListFeatureFlagsRow
+		if err := rows.Scan(
+			&i.Key,
+			&i.Enabled,
+			&i.VisibleRoles,
+			&i.UpdatedAt,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -52,19 +76,21 @@ func (q *Queries) ListFeatureFlags(ctx context.Context) ([]TblFeatureFlag, error
 }
 
 const upsertFeatureFlag = `-- name: UpsertFeatureFlag :exec
-INSERT INTO tbl_feature_flags (key, enabled, updated_at)
-VALUES (?, ?, datetime('now'))
+INSERT INTO tbl_feature_flags (key, enabled, visible_roles, updated_at)
+VALUES (?, ?, ?, datetime('now'))
 ON CONFLICT(key) DO UPDATE SET
 	enabled = excluded.enabled,
+	visible_roles = excluded.visible_roles,
 	updated_at = datetime('now')
 `
 
 type UpsertFeatureFlagParams struct {
-	Key     string
-	Enabled int64
+	Key          string
+	Enabled      int64
+	VisibleRoles string
 }
 
 func (q *Queries) UpsertFeatureFlag(ctx context.Context, arg UpsertFeatureFlagParams) error {
-	_, err := q.db.ExecContext(ctx, upsertFeatureFlag, arg.Key, arg.Enabled)
+	_, err := q.db.ExecContext(ctx, upsertFeatureFlag, arg.Key, arg.Enabled, arg.VisibleRoles)
 	return err
 }

@@ -36,6 +36,7 @@ type ProfileData struct {
 	CanUploadDocument    bool
 	ZoomConfigured              bool
 	ZoomConnected               bool
+	ZoomIntegrationVisible      bool
 	ZoomConnectionsAllowed      bool
 	ZoomConnectURL              string
 	ZoomDisconnectURL           string
@@ -43,6 +44,7 @@ type ProfileData struct {
 	ZoomStatusMessage           string
 	GoogleCalendarConfigured         bool
 	GoogleCalendarConnected          bool
+	GoogleCalendarIntegrationVisible bool
 	GoogleCalendarConnectionsAllowed bool
 	GoogleCalendarConnectURL         string
 	GoogleCalendarDisconnectURL string
@@ -554,7 +556,7 @@ templ CooldownNotice(daysRemaining int, fieldLabel string) {
 }
 
 templ ProfileIntegrations(data ProfileData) {
-	if (data.ZoomConfigured && (data.ZoomConnected || data.ZoomConnectionsAllowed)) || (data.GoogleCalendarConfigured && (data.GoogleCalendarConnected || data.GoogleCalendarConnectionsAllowed)) {
+	if (data.ZoomConfigured && (data.ZoomConnected || data.ZoomIntegrationVisible)) || (data.GoogleCalendarConfigured && (data.GoogleCalendarConnected || data.GoogleCalendarIntegrationVisible)) {
 		<div class="profile-card profile-section">
 			<h2>Integrations</h2>
 			if data.ZoomStatusMessage != "" {
@@ -564,10 +566,10 @@ templ ProfileIntegrations(data ProfileData) {
 				<div class="form-warning" role="status">{ data.GoogleCalendarStatusMessage }</div>
 			}
 			<div class="integration-list">
-				if data.ZoomConfigured && (data.ZoomConnected || data.ZoomConnectionsAllowed) {
+				if data.ZoomConfigured && (data.ZoomConnected || data.ZoomIntegrationVisible) {
 					@ProfileZoomIntegrationRow(data)
 				}
-				if data.GoogleCalendarConfigured && (data.GoogleCalendarConnected || data.GoogleCalendarConnectionsAllowed) {
+				if data.GoogleCalendarConfigured && (data.GoogleCalendarConnected || data.GoogleCalendarIntegrationVisible) {
 					@ProfileGoogleCalendarIntegrationRow(data)
 				}
 			</div>

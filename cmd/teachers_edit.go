@@ -114,8 +114,8 @@ func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) 
 	}
 
 	teacherName := utils.ComposePersonName(row.FirstName, row.MiddleName, row.LastName)
-	zoomConnected, zoomConfigured, zoomConnectionsAllowed := profileZoomStatus(ctx, teacherID)
-	googleCalendarConnected, googleCalendarConfigured, googleCalendarConnectionsAllowed := profileGoogleCalendarStatus(ctx, teacherID)
+	zoomConnected, zoomConfigured, zoomVisible, zoomConnectionsAllowed := profileZoomStatus(ctx, teacherID)
+	googleCalendarConnected, googleCalendarConfigured, googleCalendarVisible, googleCalendarConnectionsAllowed := profileGoogleCalendarStatus(ctx, teacherID)
 	w.Header().Set("Content-Type", "text/html")
 	frontend.TeacherViewModal(frontend.TeacherViewData{
 		ID:             strconv.FormatInt(teacherID, 10),
@@ -139,9 +139,11 @@ func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		Avatar:         avatarWithTeacherRoles(buildTeacherAvatarProps(row), roleStrings),
 		ZoomConfigured:                   zoomConfigured,
 		ZoomConnected:                    zoomConnected,
+		ZoomIntegrationVisible:           zoomVisible,
 		ZoomConnectionsAllowed:           zoomConnectionsAllowed,
 		GoogleCalendarConfigured:         googleCalendarConfigured,
 		GoogleCalendarConnected:          googleCalendarConnected,
+		GoogleCalendarIntegrationVisible: googleCalendarVisible,
 		GoogleCalendarConnectionsAllowed: googleCalendarConnectionsAllowed,
 	}).Render(ctx, w)
 }

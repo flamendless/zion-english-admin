@@ -89,9 +89,10 @@ type TblClassRecordLearningMaterial struct {
 }
 
 type TblFeatureFlag struct {
-	Key       string
-	Enabled   int64
-	UpdatedAt string
+	Key          string
+	Enabled      int64
+	UpdatedAt    string
+	VisibleRoles string
 }
 
 type TblLearningMaterial struct {

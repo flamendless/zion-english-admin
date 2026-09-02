@@ -15,7 +15,6 @@ import (
 	"zion-english/internal/auth"
 	"zion-english/internal/conf"
 	"zion-english/internal/constants"
-	"zion-english/internal/featureflags"
 	"zion-english/internal/logs"
 	"zion-english/internal/meetings"
 
@@ -36,12 +35,13 @@ func handleZoomConnect(w http.ResponseWriter, r *http.Request) {
 		HttpError(w, "Zoom integration is not configured", http.StatusServiceUnavailable)
 		return
 	}
-	if !featureflags.IsEnabled(r.Context(), dbRO, constants.FeatureFlagIntegrationZoom) {
+	ctx := r.Context()
+	_, connectAllowed := integrationAccessForViewer(ctx, constants.FeatureFlagIntegrationZoom)
+	if !connectAllowed {
 		HttpError(w, "Zoom connections are currently disabled", http.StatusServiceUnavailable)
 		return
 	}
 
-	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	cfg := conf.Conf()
 	auth.RefreshSessionCookie(w, r, cfg)
@@ -224,12 +224,12 @@ func urlQueryEscape(value string) string {
 	return strings.ReplaceAll(strings.ReplaceAll(value, " ", "+"), "\n", "")
 }
 
-func profileZoomStatus(ctx context.Context, teacherID int64) (connected bool, envConfigured bool, connectionsAllowed bool) {
+func profileZoomStatus(ctx context.Context, teacherID int64) (connected bool, envConfigured bool, visible bool, connectAllowed bool) {
 	envConfigured = meetingSvc != nil && meetingSvc.IsZoomConfigured()
-	connectionsAllowed = featureflags.IsEnabled(ctx, dbRO, constants.FeatureFlagIntegrationZoom)
+	visible, connectAllowed = integrationAccessForViewer(ctx, constants.FeatureFlagIntegrationZoom)
 	if !envConfigured {
-		return false, false, connectionsAllowed
+		return false, false, visible, connectAllowed
 	}
 	connected = teacherZoomConnected(ctx, teacherID)
-	return connected, envConfigured, connectionsAllowed
+	return connected, envConfigured, visible, connectAllowed
 }

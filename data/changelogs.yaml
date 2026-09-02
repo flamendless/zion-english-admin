@@ -1,7 +1,8 @@
 unreleased:
   breaking_changes: []
   new_features: []
-  improvements: []
+  improvements:
+    - text: "Feature Flags now includes per-integration role visibility checkboxes so superusers can control which teacher roles see Zoom and Google Calendar. Login superuser and admin accounts always see all integrations."
   bug_fixes: []
   removed: []
   security: []
