@@ -86,6 +86,17 @@ templ Reports() {
 					hx-target="#reportsTableBody"
 					hx-swap="innerHTML"
 				>Filter</button>
+				<form
+					method="GET"
+					action={ utils.URL("/reports/summary") }
+					id="reportSummaryForm"
+					class="report-summary-form"
+					onsubmit="syncReportSummaryForm(event)"
+				>
+					<input type="hidden" name="q" id="summaryQ" value=""/>
+					<input type="hidden" name="datePreset" id="summaryDatePreset" value=""/>
+					<button type="submit" class="btn">Generate Summary</button>
+				</form>
 			</div>
 
 			<div class="table-wrapper">
@@ -158,6 +169,23 @@ templ Reports() {
 					}
 				}
 			});
+
+			window.syncReportSummaryForm = function (e) {
+				const search = document.getElementById('reportSearch');
+				const preset = document.getElementById('datePreset');
+				const qField = document.getElementById('summaryQ');
+				const presetField = document.getElementById('summaryDatePreset');
+				if (search && qField) {
+					qField.value = search.value || '';
+				}
+				if (preset && presetField) {
+					presetField.value = preset.value || '';
+				}
+				if (!presetField || !presetField.value) {
+					e.preventDefault();
+					alert('Select a date range first.');
+				}
+			};
 		</script>
 	</body>
 	</html>

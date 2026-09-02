@@ -141,6 +141,59 @@ func handleReportsAllTeachers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleReportSummary(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	startDate, endDate, err := requireReportDateRange(r)
+	if err != nil {
+		HttpError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	ctx := r.Context()
+
+	summaries, err := dbRO.GetQueries().GetReportTeacherSummaries(ctx, reportSearchParams(q, startDate, endDate))
+	if err != nil {
+		logs.Log().Error("load report summaries for summary export", zap.Error(err))
+		HttpError(w, "Failed to load report data", http.StatusInternalServerError)
+		return
+	}
+	if len(summaries) == 0 {
+		HttpError(w, "No teachers found.", http.StatusBadRequest)
+		return
+	}
+
+	summaryRows, err := dbRO.GetQueries().GetReportSummaryRows(ctx, reportSummaryParams(q, startDate, endDate))
+	if err != nil {
+		logs.Log().Error("load report summary rows", zap.Error(err))
+		HttpError(w, "Failed to load report data", http.StatusInternalServerError)
+		return
+	}
+
+	sheets := buildSummaryTeacherSheets(summaries, summaryRows)
+	filename := fmt.Sprintf("summary_%s_%s_%s.xlsx", startDate, endDate, utils.RandomString(8))
+	outputPath := filepath.Join("tmp", filename)
+	if err := processor.SaveSummaryReport(sheets, outputPath); err != nil {
+		logs.Log().Error("save summary report xlsx", zap.Error(err))
+		HttpError(w, "Failed to generate summary report", http.StatusInternalServerError)
+		return
+	}
+
+	user := auth.GetUser(ctx)
+	insertAuditLogAs(ctx, user, "reports", fmt.Sprintf(
+		"generated summary report (%s to %s): %s",
+		startDate, endDate, filename,
+	))
+
+	w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename))
+	http.ServeFile(w, r, outputPath)
+}
+
 func loadReportRows(ctx context.Context, startDate, endDate, q string) ([]frontend.ReportRowData, error) {
 	searchParams := reportSearchParams(q, startDate, endDate)
 
@@ -500,6 +553,19 @@ func reportSearchParams(q, startDate, endDate string) queries.GetReportTeacherSu
 	}
 }
 
+func reportSummaryParams(q, startDate, endDate string) queries.GetReportSummaryRowsParams {
+	qNull := sql.NullString{String: q, Valid: q != ""}
+	return queries.GetReportSummaryRowsParams{
+		Date:    startDate,
+		Date_2:  endDate,
+		Column3: q,
+		Column4: qNull,
+		Date_3:  startDate,
+		Date_4:  endDate,
+		Column7: qNull,
+	}
+}
+
 func requireReportDateRange(r *http.Request) (string, string, error) {
 	return parseListDateRange(r)
 }
@@ -574,6 +640,80 @@ func classRecordsToProcessor(records []queries.GetTeacherReportClassRecordsRow) 
 		out = append(out, item)
 	}
 	return out
+}
+
+type summaryStudentData struct {
+	name     string
+	classes  []processor.SummaryClassRow
+	total    float64
+	currency string
+	hasTotal bool
+}
+
+func buildSummaryTeacherSheets(summaries []queries.GetReportTeacherSummariesRow, rows []queries.GetReportSummaryRowsRow) []processor.SummaryTeacherSheet {
+	teacherStudents := map[int64]map[int64]*summaryStudentData{}
+	teacherStudentOrder := map[int64][]int64{}
+
+	for _, row := range rows {
+		if _, ok := teacherStudents[row.TeacherID]; !ok {
+			teacherStudents[row.TeacherID] = map[int64]*summaryStudentData{}
+			teacherStudentOrder[row.TeacherID] = []int64{}
+		}
+		if _, ok := teacherStudents[row.TeacherID][row.StudentID]; !ok {
+			teacherStudents[row.TeacherID][row.StudentID] = &summaryStudentData{name: row.StudentName}
+			teacherStudentOrder[row.TeacherID] = append(teacherStudentOrder[row.TeacherID], row.StudentID)
+		}
+		student := teacherStudents[row.TeacherID][row.StudentID]
+		classRow := summaryClassRowFromRecord(row)
+		student.classes = append(student.classes, classRow)
+		if classRow.HasRate {
+			student.total += classRow.RateValue
+			student.currency = row.ParentCurrency.String
+			student.hasTotal = true
+		}
+	}
+
+	sheets := make([]processor.SummaryTeacherSheet, 0, len(summaries))
+	for _, summary := range summaries {
+		sheet := processor.SummaryTeacherSheet{TeacherName: summary.TeacherName}
+		for _, studentID := range teacherStudentOrder[summary.TeacherID] {
+			student := teacherStudents[summary.TeacherID][studentID]
+			sheet.Students = append(sheet.Students, processor.SummaryStudentBlock{
+				StudentName: student.name,
+				Classes:     student.classes,
+				Total:       student.total,
+				Currency:    student.currency,
+				HasTotal:    student.hasTotal,
+			})
+		}
+		sheets = append(sheets, sheet)
+	}
+	return sheets
+}
+
+func summaryClassRowFromRecord(row queries.GetReportSummaryRowsRow) processor.SummaryClassRow {
+	display, value, hasRate := formatParentRateDisplay(row.ParentRate, row.ParentCurrency)
+	return processor.SummaryClassRow{
+		DateDisplay: formatReportSummaryClassDate(row.Date),
+		RateDisplay: display,
+		RateValue:   value,
+		HasRate:     hasRate,
+	}
+}
+
+func formatParentRateDisplay(rate sql.NullFloat64, currency sql.NullString) (string, float64, bool) {
+	if !rate.Valid || !currency.Valid || currency.String == "" {
+		return "-", 0, false
+	}
+	return utils.FormatCurrencyAmountFixed(rate.Float64, currency.String) + " " + currency.String, rate.Float64, true
+}
+
+func formatReportSummaryClassDate(dateStr string) string {
+	t, err := time.ParseInLocation(constants.DateLayout, dateStr, constants.LocationPHT)
+	if err != nil {
+		return dateStr
+	}
+	return t.Format("January 2")
 }
 
 func reportCacheFilename(outputPath string) (string, bool) {

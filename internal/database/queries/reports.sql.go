@@ -245,6 +245,105 @@ func (q *Queries) GetReportGenerationsForRange(ctx context.Context, arg GetRepor
 	return items, nil
 }
 
+const getReportSummaryRows = `-- name: GetReportSummaryRows :many
+SELECT
+	cr.teacher_id,
+	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
+	t.first_name AS teacher_first_name,
+	t.middle_name AS teacher_middle_name,
+	t.last_name AS teacher_last_name,
+	cr.student_id,
+	s.name AS student_name,
+	s.parent_rate,
+	s.parent_currency,
+	cr.date
+FROM tbl_class_records cr
+JOIN tbl_students s ON cr.student_id = s.id
+JOIN tbl_teachers t ON cr.teacher_id = t.id
+WHERE cr.date >= ? AND cr.date <= ?
+	AND cr.status = 'conducted'
+	AND cr.deleted_at IS NULL
+	AND t.status = 'approved' AND t.deleted = 0
+	AND (
+	? = ''
+	OR trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) LIKE '%' || ? || '%'
+	OR EXISTS (
+		SELECT 1 FROM tbl_class_records cr2
+		JOIN tbl_students s2 ON cr2.student_id = s2.id
+		WHERE cr2.teacher_id = t.id
+		AND cr2.date >= ? AND cr2.date <= ?
+		AND cr2.deleted_at IS NULL
+		AND s2.name LIKE '%' || ? || '%'
+	)
+	)
+ORDER BY t.last_name ASC, t.first_name ASC, t.middle_name ASC, s.name ASC, cr.date ASC
+`
+
+type GetReportSummaryRowsParams struct {
+	Date    string
+	Date_2  string
+	Column3 interface{}
+	Column4 sql.NullString
+	Date_3  string
+	Date_4  string
+	Column7 sql.NullString
+}
+
+type GetReportSummaryRowsRow struct {
+	TeacherID         int64
+	TeacherName       string
+	TeacherFirstName  string
+	TeacherMiddleName string
+	TeacherLastName   string
+	StudentID         int64
+	StudentName       string
+	ParentRate        sql.NullFloat64
+	ParentCurrency    sql.NullString
+	Date              string
+}
+
+func (q *Queries) GetReportSummaryRows(ctx context.Context, arg GetReportSummaryRowsParams) ([]GetReportSummaryRowsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getReportSummaryRows,
+		arg.Date,
+		arg.Date_2,
+		arg.Column3,
+		arg.Column4,
+		arg.Date_3,
+		arg.Date_4,
+		arg.Column7,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetReportSummaryRowsRow
+	for rows.Next() {
+		var i GetReportSummaryRowsRow
+		if err := rows.Scan(
+			&i.TeacherID,
+			&i.TeacherName,
+			&i.TeacherFirstName,
+			&i.TeacherMiddleName,
+			&i.TeacherLastName,
+			&i.StudentID,
+			&i.StudentName,
+			&i.ParentRate,
+			&i.ParentCurrency,
+			&i.Date,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getReportTeacherEarnings = `-- name: GetReportTeacherEarnings :many
 SELECT cr.teacher_id, cr.currency, COALESCE(SUM(cr.rate), 0) AS total_rate
 FROM tbl_class_records cr

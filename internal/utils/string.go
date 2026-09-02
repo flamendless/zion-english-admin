@@ -77,3 +77,20 @@ func SanitizeFilename(name string) string {
 	}
 	return name
 }
+
+func SanitizeSheetName(name string) string {
+	replacer := strings.NewReplacer(
+		"\\", "",
+		"/", "",
+		"?", "",
+		"*", "",
+		"[", "",
+		"]", "",
+		":", "",
+	)
+	name = strings.TrimSpace(replacer.Replace(name))
+	if len(name) > 31 {
+		name = name[:31]
+	}
+	return name
+}
