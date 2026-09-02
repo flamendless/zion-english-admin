@@ -60,9 +60,9 @@ templ Classes(data ClassesData) {
 			@SuccessBanner()
 			@ErrorBanner()
 			if data.LockTeacher {
-				@HubHeader("My Classes", "Record Class", utils.URL("/classes/record"), true)
+				@HubHeaderModalAction("My Classes", "New Class")
 			} else {
-				@HubHeader("Classes", "Record Class", utils.URL("/classes/record"), true)
+				@HubHeaderModalAction("Classes", "New Class")
 			}
 
 			<div class="toolbar" id="classesToolbar">
@@ -90,6 +90,20 @@ templ Classes(data ClassesData) {
 				<div class="form-group">
 					<label for="studentSearch">Student</label>
 					<input type="text" id="studentSearch" name="q" placeholder="Search student name..."/>
+				</div>
+				<div class="form-group report-month-group">
+					<label for="classesMonth">Month</label>
+					<input
+						type="month"
+						id="classesMonth"
+						name="month"
+						value={ utils.CurrentMonthPHT() }
+						hx-get={ utils.URL("/classes/partials/date-preset") }
+						hx-target="#datePresetGroup"
+						hx-swap="outerHTML"
+						hx-include="this"
+						hx-trigger="change"
+					/>
 				</div>
 				@DatePreset(true)
 				@ClassesStatusFilterDropdown()
@@ -143,6 +157,7 @@ templ Classes(data ClassesData) {
 			@ScheduledClassModals()
 			<div id="classViewModalHost"></div>
 			<div id="lmViewModalHost"></div>
+			@RecordClassesChoiceModal()
 		</div>
 
 		@LearningMaterialViewModalScripts()
@@ -153,20 +168,37 @@ templ Classes(data ClassesData) {
 			const classesPage = document.getElementById('classesPage');
 			const teacherSelect = document.getElementById('teacher');
 
-			function setDateRangeFromPreset(value) {
-				if (!value) {
-					delete datePresetSelect.dataset.startDate;
-					delete datePresetSelect.dataset.endDate;
+			function setDateRangeFromPreset(select) {
+				if (!select) return;
+				if (!select.value) {
+					delete select.dataset.startDate;
+					delete select.dataset.endDate;
 					return;
 				}
-				const parts = value.split('|');
+				const parts = select.value.split('|');
 				if (parts.length !== 2) return;
-				datePresetSelect.dataset.startDate = parts[0];
-				datePresetSelect.dataset.endDate = parts[1];
+				select.dataset.startDate = parts[0];
+				select.dataset.endDate = parts[1];
 			}
 
-			datePresetSelect.addEventListener('change', () => {
-				setDateRangeFromPreset(datePresetSelect.value);
+			function bindDatePresetSelect() {
+				const presetSelect = document.getElementById('datePreset');
+				if (!presetSelect) return;
+				setDateRangeFromPreset(presetSelect);
+				presetSelect.addEventListener('change', () => {
+					setDateRangeFromPreset(presetSelect);
+				});
+			}
+
+			bindDatePresetSelect();
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id !== 'datePresetGroup') return;
+				bindDatePresetSelect();
+				if (classesPage) classesPage.value = '1';
+				if (typeof htmx !== 'undefined') {
+					htmx.trigger('#classesTableBody', 'load');
+				}
 			});
 
 			filterBtn.addEventListener('click', () => {
@@ -176,8 +208,9 @@ templ Classes(data ClassesData) {
 			if (teacherSelect) {
 				teacherSelect.addEventListener('change', () => {
 					if (classesPage) classesPage.value = '1';
-					if (datePresetSelect.value) {
-						setDateRangeFromPreset(datePresetSelect.value);
+					const presetSelect = document.getElementById('datePreset');
+					if (presetSelect && presetSelect.value) {
+						setDateRangeFromPreset(presetSelect);
 						if (typeof htmx !== 'undefined') {
 							htmx.trigger('#classesTableBody', 'load');
 						}
@@ -195,10 +228,6 @@ templ Classes(data ClassesData) {
 					if (parsed.page) classesPage.value = String(parsed.page);
 				} catch (err) { /* ignore */ }
 			});
-
-			if (datePresetSelect.value) {
-				setDateRangeFromPreset(datePresetSelect.value);
-			}
 		</script>
 	</body>
 	</html>

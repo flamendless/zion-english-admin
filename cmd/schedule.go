@@ -991,7 +991,7 @@ func classRecordRequestFromSchedule(existing queries.GetScheduledClassByIDRow, s
 		startTime = existing.StartTime.String
 	}
 	endTime := utils.EndTimeFromStartAndDuration(startTime, existing.DurationMinutes)
-	return models.ClassRecordRequest{
+	req := models.ClassRecordRequest{
 		StudentID:       existing.StudentID,
 		TeacherID:       existing.TeacherID,
 		Date:            existing.ScheduledDate,
@@ -1004,6 +1004,8 @@ func classRecordRequestFromSchedule(existing queries.GetScheduledClassByIDRow, s
 		Reason:          reason,
 		Notes:           notes,
 	}
+	models.NormalizeClassRecordRate(&req)
+	return req
 }
 
 func insertClassRecordFromSchedule(ctx context.Context, user auth.User, existing queries.GetScheduledClassByIDRow, scheduleID int64, status, reason, notes string) error {

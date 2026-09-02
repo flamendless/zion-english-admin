@@ -577,6 +577,19 @@ func parseClassRecordsQuery(r *http.Request) (classRecordsQuery, error) {
 	}, nil
 }
 
+func handleClassesDatePresetPartial(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	month := strings.TrimSpace(r.URL.Query().Get("month"))
+	w.Header().Set("Content-Type", "text/html")
+	if err := frontend.DatePresetForMonth(month, true).Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -775,13 +788,6 @@ func handleClasses(w http.ResponseWriter, r *http.Request) {
 	HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 }
 
-func normalizeClassRecordRate(req *models.ClassRecordRequest) {
-	switch constants.ClassStatus(req.Status) {
-	case constants.ClassStatusCancelled, constants.ClassStatusRescheduled:
-		req.Rate = 0
-	}
-}
-
 func validateClassRecordRequest(req *models.ClassRecordRequest) error {
 	if req.StudentID == 0 {
 		return errors.New("student is required")
@@ -795,7 +801,7 @@ func validateClassRecordRequest(req *models.ClassRecordRequest) error {
 	if req.DurationMinutes <= 0 {
 		return errors.New("duration must be greater than zero")
 	}
-	normalizeClassRecordRate(req)
+	models.NormalizeClassRecordRate(req)
 	if req.Rate < 0 {
 		return errors.New("rate cannot be negative")
 	}

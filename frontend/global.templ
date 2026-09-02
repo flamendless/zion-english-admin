@@ -142,6 +142,7 @@ templ GlobalIncludes() {
 		input[type="text"],
 		input[type="number"],
 		input[type="date"],
+		input[type="month"],
 		input[type="time"],
 		input[type="email"],
 		input[type="tel"],
@@ -163,6 +164,7 @@ templ GlobalIncludes() {
 		input[type="text"]:focus,
 		input[type="number"]:focus,
 		input[type="date"]:focus,
+		input[type="month"]:focus,
 		input[type="time"]:focus,
 		input[type="email"]:focus,
 		input[type="tel"]:focus,
@@ -2966,10 +2968,23 @@ templ GlobalIncludes() {
 			display: none;
 			align-items: center;
 			justify-content: center;
+			line-height: 0;
+		}
+
+		.sort-order-icon svg {
+			display: block;
+			width: 1.125rem;
+			height: 1.125rem;
 		}
 
 		.sort-order-icon.is-active {
 			display: inline-flex;
+		}
+
+		.toolbar .report-month-group {
+			flex: 0 1 170px;
+			min-width: 150px;
+			max-width: 180px;
 		}
 
 		.toolbar .sort-by-group,

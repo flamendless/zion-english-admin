@@ -106,6 +106,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/students/", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleStudentsPath))
 		authMux.HandleFunc(basePath+"/teachers/", auth.RequireRole(auth.AdminAccessRoles()...)(handleTeachersPath))
 		authMux.HandleFunc(basePath+"/classes/partials/rows", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleClassRecordsPartial))
+		authMux.HandleFunc(basePath+"/classes/partials/date-preset", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleClassesDatePresetPartial))
 		authMux.HandleFunc(basePath+"/classes/", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleClassesPath))
 		authMux.HandleFunc(basePath+"/classes/record", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleClassRecord))
 		authMux.HandleFunc(basePath+"/classes", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleClasses))

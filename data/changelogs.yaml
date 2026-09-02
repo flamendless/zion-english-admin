@@ -9,6 +9,37 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.09.02"
+    date: "2026-09-02"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Teachers can read answers to common questions in the new FAQ guide, available from Guides and the public docs site."
+        commit: "6ccb3a3"
+      - text: "Superusers can record a parent rate and currency on student records; parent rates appear on the students list and detail views but stay hidden from teacher My Students pages."
+        commit: "d779267"
+      - text: "Superusers can open View all teachers on the Reports page to see total earnings and class counts for every approved teacher in the selected date range."
+        commit: "6f0f0d8"
+    improvements:
+      - text: "The dashboard Record Classes card opens a choice modal so you can plan upcoming lessons or record classes you already taught."
+        commit: "df86eb5"
+      - text: "Reports includes a month picker that updates first and second cutoff presets for the selected month."
+        commit: "038e973"
+      - text: "List pages with tables now include sort-by dropdowns and A-to-Z or Z-to-A order controls; sort choice is kept when you change pages."
+        commit: "3c8ab3a"
+      - text: "Report class previews now list records sorted by student name, then date."
+        commit: "d779267"
+      - text: "Cancelled and rescheduled classes automatically store a rate of zero when you record or edit them."
+        commit: "4e334eb"
+    bug_fixes:
+      - text: "Fixed Google Calendar connection failures caused by a missing OAuth email scope."
+        commit: "b942d8c"
+    removed: []
+    security: []
+    deprecated: []
+    internal:
+      - text: "Google Calendar OAuth errors now log redirect URI and Google API response details for easier troubleshooting."
+        commit: "05f1daa"
   - version: "2026.08.29"
     date: "2026-08-29"
     released: true

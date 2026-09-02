@@ -68,6 +68,9 @@ templ EditStudent(data EditStudentData) {
 			.inactive-reason-group.is-visible {
 				display: block;
 			}
+			.edit-student-form-actions {
+				margin-bottom: var(--space-6);
+			}
 		</style>
 	</head>
 	<body>
@@ -208,7 +211,9 @@ templ EditStudent(data EditStudentData) {
 							@StudentSearchbox()
 						</div>
 					</div>
-					<button type="submit">Save Changes</button>
+					<div class="edit-student-form-actions">
+						<button type="submit">Save Changes</button>
+					</div>
 				</form>
 				<div id="logOutput"></div>
 				<script>
@@ -252,7 +257,9 @@ templ EditStudent(data EditStudentData) {
 						<label for="assignedColor">Assigned Color *</label>
 						<input type="color" id="assignedColor" name="assignedColor" required value={ data.AssignedColor }/>
 					</div>
-					<button type="submit">Save Changes</button>
+					<div class="edit-student-form-actions">
+						<button type="submit">Save Changes</button>
+					</div>
 				</form>
 				<div id="logOutput"></div>
 				<p><a href={ utils.URL("/my-students") } class="btn">Back to My Students</a></p>

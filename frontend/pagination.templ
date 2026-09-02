@@ -14,6 +14,13 @@ templ HubHeader(title string, actionLabel string, actionHref string, showAction 
 	</div>
 }
 
+templ HubHeaderModalAction(title string, actionLabel string) {
+	<div class="hub-header">
+		<h2 class="hub-title">{ title }</h2>
+		<button type="button" class="add-btn" data-open-record-classes-modal>{ actionLabel }</button>
+	</div>
+}
+
 templ PaginationBar(hasPrev bool, prevURL string, hasNext bool, nextURL string, pageNum int, totalPages int, total int64) {
 	<div class="pagination-bar">
 		if hasPrev {

@@ -207,7 +207,7 @@ templ Schedule(data ScheduleData) {
 			@HeaderSimple()
 			@SuccessBanner()
 			@ErrorBanner()
-			@HubHeader("Class Schedule", "", "", false)
+			@HubHeaderModalAction("Class Schedule", "New Class")
 
 			<div class="schedule-toolbar">
 				if data.ShowAllTeachers {
@@ -374,6 +374,7 @@ templ Schedule(data ScheduleData) {
 			</div>
 			@DeleteClassModal()
 			@ScheduledClassModals()
+			@RecordClassesChoiceModal()
 			<div id="classViewModalHost"></div>
 		</div>
 
