@@ -15,6 +15,11 @@ func parseListSort(r *http.Request, kind frontend.ListSortKind) utils.SortParams
 	return utils.ParseSortParams(r, allowed, defaultBy, defaultOrder)
 }
 
+func isDefaultListSort(sort utils.SortParams, kind frontend.ListSortKind) bool {
+	defaultBy, defaultOrder := frontend.DefaultSortFor(kind)
+	return sort.By == defaultBy && sort.Order == defaultOrder
+}
+
 func listQueryParamsWithSort(r *http.Request, kind frontend.ListSortKind) map[string]string {
 	params := listQueryParams(r)
 	for k, v := range parseListSort(r, kind).QueryValues() {

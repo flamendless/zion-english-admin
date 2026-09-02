@@ -182,7 +182,11 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 		HttpError(w, fmt.Sprintf("Failed to fetch teachers: %v", err), http.StatusInternalServerError)
 		return
 	}
-	sortTeacherRows(allTeachers, sort)
+	if isDefaultListSort(sort, frontend.ListSortKindTeacher) {
+		sortTeacherRowsDefault(allTeachers)
+	} else {
+		sortTeacherRows(allTeachers, sort)
+	}
 	teachers := paginateSlice(allTeachers, page)
 
 	teacherIDs := make([]int64, len(teachers))

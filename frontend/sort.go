@@ -34,10 +34,10 @@ func SortOptionsFor(kind ListSortKind) []SortOption {
 		}
 	case ListSortKindTeacher:
 		return []SortOption{
-			{Value: "name", Label: "Name"},
-			{Value: "email", Label: "Email"},
 			{Value: "status", Label: "Status"},
 			{Value: "created_at", Label: "Date added"},
+			{Value: "name", Label: "Name"},
+			{Value: "email", Label: "Email"},
 		}
 	case ListSortKindMyStudent:
 		return []SortOption{
@@ -112,7 +112,7 @@ func DefaultSortFor(kind ListSortKind) (string, utils.SortOrder) {
 	case ListSortKindStudent:
 		return "created_at", utils.SortOrderDesc
 	case ListSortKindTeacher:
-		return "name", utils.SortOrderAsc
+		return "status", utils.SortOrderAsc
 	case ListSortKindMyStudent:
 		return "name", utils.SortOrderAsc
 	case ListSortKindClass:

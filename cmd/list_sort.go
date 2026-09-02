@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"database/sql"
+	"slices"
 	"strings"
 	"zion-english/frontend"
 	"zion-english/internal/database/queries"
@@ -42,20 +43,67 @@ func sortStudentRows(rows []queries.GetStudentsFilteredRow, sort utils.SortParam
 }
 
 func sortTeacherRows(rows []queries.GetTeachersFilteredRow, sort utils.SortParams) {
-	utils.SortSlice(rows, sort.Order, func(a, b queries.GetTeachersFilteredRow) int {
-		switch sort.By {
-		case "name":
-			return utils.CompareStrings(teacherFullName(a.FirstName, a.MiddleName, a.LastName), teacherFullName(b.FirstName, b.MiddleName, b.LastName))
-		case "email":
-			return utils.CompareStrings(a.Email, b.Email)
-		case "status":
-			return utils.CompareStrings(teacherSortStatus(a), teacherSortStatus(b))
-		case "created_at":
-			return utils.CompareStrings(nullTimeValue(a.CreatedAt), nullTimeValue(b.CreatedAt))
-		default:
-			return utils.CompareStrings(teacherFullName(a.FirstName, a.MiddleName, a.LastName), teacherFullName(b.FirstName, b.MiddleName, b.LastName))
+	slices.SortFunc(rows, func(a, b queries.GetTeachersFilteredRow) int {
+		primary := teacherPrimaryCompare(a, b, sort.By)
+		if sort.Order == utils.SortOrderDesc {
+			primary = -primary
 		}
+		if primary != 0 {
+			return primary
+		}
+		return teacherRowsTiebreak(a, b)
 	})
+}
+
+func sortTeacherRowsDefault(rows []queries.GetTeachersFilteredRow) {
+	slices.SortFunc(rows, func(a, b queries.GetTeachersFilteredRow) int {
+		if c := compareTeacherStatusRank(a, b); c != 0 {
+			return c
+		}
+		return teacherRowsTiebreak(a, b)
+	})
+}
+
+func teacherPrimaryCompare(a, b queries.GetTeachersFilteredRow, by string) int {
+	switch by {
+	case "name":
+		return utils.CompareStrings(teacherFullName(a.FirstName, a.MiddleName, a.LastName), teacherFullName(b.FirstName, b.MiddleName, b.LastName))
+	case "email":
+		return utils.CompareStrings(a.Email, b.Email)
+	case "status":
+		return compareTeacherStatusRank(a, b)
+	case "created_at":
+		return utils.CompareStrings(nullTimeValue(a.CreatedAt), nullTimeValue(b.CreatedAt))
+	default:
+		return compareTeacherStatusRank(a, b)
+	}
+}
+
+func teacherRowsTiebreak(a, b queries.GetTeachersFilteredRow) int {
+	if c := utils.CompareStrings(nullTimeValue(b.CreatedAt), nullTimeValue(a.CreatedAt)); c != 0 {
+		return c
+	}
+	return utils.CompareStrings(
+		teacherFullName(b.FirstName, b.MiddleName, b.LastName),
+		teacherFullName(a.FirstName, a.MiddleName, b.LastName),
+	)
+}
+
+func compareTeacherStatusRank(a, b queries.GetTeachersFilteredRow) int {
+	return utils.CompareInt64(teacherStatusRank(teacherSortStatus(a)), teacherStatusRank(teacherSortStatus(b)))
+}
+
+func teacherStatusRank(status string) int64 {
+	switch status {
+	case "approved":
+		return 0
+	case "pending":
+		return 1
+	case "deleted":
+		return 2
+	default:
+		return 3
+	}
 }
 
 func teacherSortStatus(row queries.GetTeachersFilteredRow) string {
