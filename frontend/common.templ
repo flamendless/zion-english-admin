@@ -161,6 +161,23 @@ templ DatePreset(selectCurrentCutoff bool) {
 	@DatePresetForMonth(utils.CurrentMonthPHT(), selectCurrentCutoff)
 }
 
+templ MonthPicker(inputID string, partialURL string) {
+	<div class="form-group report-month-group">
+		<label for={ inputID }>Month</label>
+		<input
+			type="month"
+			id={ inputID }
+			name="month"
+			value={ utils.CurrentMonthPHT() }
+			hx-get={ partialURL }
+			hx-target="#datePresetGroup"
+			hx-swap="outerHTML"
+			hx-include="this"
+			hx-trigger="change"
+		/>
+	</div>
+}
+
 templ DatePresetForMonth(monthValue string, selectCurrentCutoff bool) {
 	{{
 		firstCutoff, secondCutoff, activeCutoff, _ := cutoffPresetForMonth(monthValue, selectCurrentCutoff)

@@ -62,20 +62,7 @@ templ Reports() {
 					<label for="reportSearch">Search</label>
 					<input type="text" id="reportSearch" name="q" placeholder="Search teacher or student name..."/>
 				</div>
-				<div class="form-group report-month-group">
-					<label for="reportMonth">Month</label>
-					<input
-						type="month"
-						id="reportMonth"
-						name="month"
-						value={ utils.CurrentMonthPHT() }
-						hx-get={ utils.URL("/reports/partials/date-preset") }
-						hx-target="#datePresetGroup"
-						hx-swap="outerHTML"
-						hx-include="this"
-						hx-trigger="change"
-					/>
-				</div>
+				@MonthPicker("reportMonth", utils.URL("/reports/partials/date-preset"))
 				@DatePreset(true)
 				@SortControls("", "asc", ListSortKindReport)
 				<button

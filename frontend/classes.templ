@@ -81,20 +81,7 @@ templ Classes(data ClassesData) {
 					<label for="studentSearch">Student</label>
 					<input type="text" id="studentSearch" name="q" placeholder="Search student name..."/>
 				</div>
-				<div class="form-group report-month-group">
-					<label for="classesMonth">Month</label>
-					<input
-						type="month"
-						id="classesMonth"
-						name="month"
-						value={ utils.CurrentMonthPHT() }
-						hx-get={ utils.URL("/classes/partials/date-preset") }
-						hx-target="#datePresetGroup"
-						hx-swap="outerHTML"
-						hx-include="this"
-						hx-trigger="change"
-					/>
-				</div>
+				@MonthPicker("classesMonth", utils.URL("/classes/partials/date-preset"))
 				@DatePreset(true)
 				@ClassesStatusFilterDropdown()
 				@SortControls("", "desc", ListSortKindClass)

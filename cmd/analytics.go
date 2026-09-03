@@ -127,6 +127,19 @@ func handleAnalytics(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleAnalyticsDatePresetPartial(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	month := strings.TrimSpace(r.URL.Query().Get("month"))
+	w.Header().Set("Content-Type", "text/html")
+	if err := frontend.DatePresetForMonth(month, true).Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
