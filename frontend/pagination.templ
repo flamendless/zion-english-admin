@@ -2,7 +2,6 @@ package frontend
 
 import (
 	"fmt"
-	"zion-english/internal/utils"
 )
 
 templ HubHeader(title string, actionLabel string, actionHref string, showAction bool) {
@@ -76,7 +75,7 @@ func listSearchPlaceholder(statusType ListFilterKind) string {
 	return "Name..."
 }
 
-templ ListFilterForm(actionPath string, query string, status string, statusType ListFilterKind, teacherID string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool, showStatus bool, sortBy string, sortOrder string, sortKind ListSortKind) {
+templ ListFilterForm(actionPath string, query string, status string, statusType ListFilterKind, teacherID string, teacherName string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool, showStatus bool, sortBy string, sortOrder string, sortKind ListSortKind) {
 	<form class="list-toolbar" method="GET" action={ actionPath }>
 		<div class="form-group">
 			<label for="q">Search</label>
@@ -104,7 +103,7 @@ templ ListFilterForm(actionPath string, query string, status string, statusType 
 			</div>
 		}
 		if showTeacher {
-			@TeacherFilterDropdown(teacherID)
+			@TeacherFilterDropdown(teacherID, teacherName)
 		}
 		if showEmail {
 			<div class="form-group">
@@ -136,21 +135,16 @@ templ ListFilterForm(actionPath string, query string, status string, statusType 
 	</form>
 }
 
-templ TeacherFilterDropdown(selectedID string) {
-	<div class="form-group">
-		<label for="teacherId">Teacher</label>
-		<select
-			id="teacherId"
-			name="teacherId"
-			hx-get={ utils.URL("/api/teachers") }
-			hx-trigger="load"
-			hx-target="this"
-			hx-swap="innerHTML"
-		>
-			<option value="">All teachers</option>
-			if selectedID != "" {
-				<option value={ selectedID } selected>{ "Teacher #" + selectedID }</option>
-			}
-		</select>
-	</div>
+templ TeacherFilterDropdown(selectedID string, selectedName string) {
+	@TeacherSearch(TeacherSearchParams{
+		InputID:      "teacherIdSearch",
+		HiddenID:     "teacherId",
+		HiddenName:   "teacherId",
+		ResultsID:    "teacherIdSearchResults",
+		Label:        "Teacher",
+		Placeholder:  "All teachers",
+		FilterMode:   true,
+		SelectedID:   selectedID,
+		SelectedName: selectedName,
+	})
 }

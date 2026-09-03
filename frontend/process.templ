@@ -30,16 +30,10 @@ templ Process() {
 					<div
 						_="
 							on change from #teacher
-								set idAttr to event.target.selectedOptions[0].dataset.id
-								set #teacherID.value to idAttr
-
-								set nameAttr to event.target.selectedOptions[0].dataset.name
-								set #name.value to nameAttr
-
-								set driveURLAttr to event.target.selectedOptions[0].dataset.driveurl
-								set #driveUrl.value to driveURLAttr
-
-								set templateAttr to event.target.selectedOptions[0].dataset.template
+								set #teacherID.value to #teacher.value
+								set #name.value to #teacher.dataset.name
+								set #driveUrl.value to #teacher.dataset.driveurl
+								set templateAttr to #teacher.dataset.template
 								if templateAttr != ''
 									set #templateSelect.value to templateAttr
 									set cols to templateAttr.split(',')

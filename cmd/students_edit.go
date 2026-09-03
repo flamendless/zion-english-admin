@@ -310,12 +310,19 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := listQueryParamsWithSort(r, frontend.ListSortKindStudent)
+	teacherName := ""
+	if teacherID > 0 {
+		if teacher, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, teacherID); err == nil {
+			teacherName = utils.ComposePersonName(teacher.FirstName, teacher.MiddleName, teacher.LastName)
+		}
+	}
 	w.Header().Set("Content-Type", "text/html")
 	frontend.Students(frontend.StudentData{
 		Students:       viewStudents,
 		Query:          q,
 		Status:         constants.StudentStatus(status),
 		TeacherID:      strconv.FormatInt(teacherID, 10),
+		TeacherName:    teacherName,
 		SortBy:         sort.By,
 		SortOrder:      string(sort.Order),
 		PageNumber:     page.Number,

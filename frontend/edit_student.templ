@@ -181,7 +181,7 @@ templ EditStudent(data EditStudentData) {
 						<label for="parentName">Parent's Name</label>
 						<input type="text" id="parentName" name="parentName" value={ data.ParentName }/>
 					</div>
-					@TeacherAssignRows(data.TeacherIDs)
+					@TeacherAssignRows(data.TeacherIDs, data.TeacherNames)
 					<div class="form-group">
 						<label for="assignedColor">Assigned Color *</label>
 						<input type="color" id="assignedColor" name="assignedColor" required value={ data.AssignedColor }/>

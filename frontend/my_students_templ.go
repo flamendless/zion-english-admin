@@ -81,7 +81,7 @@ func MyStudents(data MyStudentsData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindStudent, "", "", "", "", "", false, false, false, false, true, data.SortBy, data.SortOrder, ListSortKindMyStudent).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindStudent, "", "", "", "", "", "", false, false, false, false, true, data.SortBy, data.SortOrder, ListSortKindMyStudent).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

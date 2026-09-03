@@ -113,7 +113,7 @@ func SystemLogs(data SystemLogData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = ListFilterForm(data.FilterPath, data.Query, "", "", "", "", data.Module, data.StartDate, data.EndDate, false, false, true, true, false, data.SortBy, data.SortOrder, ListSortKindSystemLog).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ListFilterForm(data.FilterPath, data.Query, "", "", "", "", "", data.Module, data.StartDate, data.EndDate, false, false, true, true, false, data.SortBy, data.SortOrder, ListSortKindSystemLog).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

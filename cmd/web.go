@@ -150,6 +150,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/header-avatar", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleHeaderAvatar))
 		authMux.HandleFunc(basePath+"/refresh", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleRefreshPage))
 		authMux.HandleFunc(basePath+"/api/teachers", auth.RequireRole(auth.AdminAccessRoles()...)(handleGetTeachers))
+		authMux.HandleFunc(basePath+"/api/teachers/search", auth.RequireRole(auth.AdminAccessRoles()...)(handleSearchTeachers))
 		authMux.HandleFunc(basePath+"/api/teacher-row", auth.RequireRole(auth.AdminAccessRoles()...)(handleGetTeacherRow))
 		authMux.HandleFunc(basePath+"/api/students", auth.RequireRole(auth.AdminAccessRoles()...)(handleGetStudents))
 		authMux.HandleFunc(basePath+"/api/students/search", auth.RequireRole(auth.AdminAccessRoles()...)(handleSearchStudents))
@@ -237,6 +238,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/documents", authHandler)
 		rootMux.Handle(basePath+"/documents/", authHandler)
 		rootMux.Handle(basePath+"/api/teachers", authHandler)
+		rootMux.Handle(basePath+"/api/teachers/search", authHandler)
 		rootMux.Handle(basePath+"/api/teacher-row", authHandler)
 		rootMux.Handle(basePath+"/api/students", authHandler)
 		rootMux.Handle(basePath+"/api/students/", authHandler)
@@ -1061,7 +1063,8 @@ func handleGetTeacherRow(w http.ResponseWriter, r *http.Request) {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	if err := frontend.TeacherAssignRow("", true).Render(r.Context(), w); err != nil {
+	rowKey := strconv.FormatInt(time.Now().UnixNano(), 10)
+	if err := frontend.TeacherAssignRow("", "", rowKey, true).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -1511,6 +1514,54 @@ func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
 	if err := frontend.TeacherOptions(teacherResponses, r.URL.Query().Get("selected")).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+}
+
+func handleSearchTeachers(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	hiddenID := strings.TrimSpace(r.URL.Query().Get("hiddenId"))
+	inputID := strings.TrimSpace(r.URL.Query().Get("inputId"))
+	resultsID := strings.TrimSpace(r.URL.Query().Get("resultsId"))
+
+	w.Header().Set("Content-Type", "text/html")
+	if q == "" {
+		frontend.TeacherSearchResults(nil, hiddenID, inputID, resultsID).Render(r.Context(), w)
+		return
+	}
+
+	searchQ := sql.NullString{String: q, Valid: true}
+	teachers, err := dbRO.GetQueries().SearchApprovedTeachersByName(r.Context(), queries.SearchApprovedTeachersByNameParams{
+		Column1: searchQ,
+		Column2: searchQ,
+		Column3: searchQ,
+	})
+	if err != nil {
+		HttpError(w, "Failed to search teachers", http.StatusInternalServerError)
+		return
+	}
+
+	var teacherResponses []models.TeacherAPIResponse
+	for _, t := range teachers {
+		template := ""
+		if t.Template.Valid {
+			template = t.Template.String
+		}
+		teacherResponses = append(teacherResponses, models.TeacherAPIResponse{
+			ID:           t.ID,
+			Name:         utils.ComposePersonName(t.FirstName, t.MiddleName, t.LastName),
+			DriveUrl:     t.DriveUrl,
+			RatePerClass: t.RatePerClass,
+			Template:     template,
+		})
+	}
+
+	if err := frontend.TeacherSearchResults(teacherResponses, hiddenID, inputID, resultsID).Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 

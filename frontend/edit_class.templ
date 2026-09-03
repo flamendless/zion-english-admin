@@ -102,7 +102,7 @@ templ EditClass(data EditClassData) {
 					"
 				>
 					<div class="form-row">
-						@TeacherDropdownWithValue(data.TeacherID)
+						@TeacherDropdownWithValue(data.TeacherID, data.TeacherName)
 						@StudentDropdownWithValue(data.StudentID)
 						@ClassDateField(data.Date, false)
 					</div>

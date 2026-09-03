@@ -133,7 +133,7 @@ func ProcessingLogs(data ProcessingLogData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = ListFilterForm(data.FilterPath, data.Query, "", "", "", "", "", data.StartDate, data.EndDate, false, false, false, true, false, data.SortBy, data.SortOrder, ListSortKindProcessingLog).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ListFilterForm(data.FilterPath, data.Query, "", "", "", "", "", "", data.StartDate, data.EndDate, false, false, false, true, false, data.SortBy, data.SortOrder, ListSortKindProcessingLog).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

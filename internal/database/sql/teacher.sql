@@ -32,6 +32,18 @@ FROM tbl_teachers
 WHERE status = 'approved' AND deleted = 0
 ORDER BY last_name ASC, first_name ASC, middle_name ASC;
 
+-- name: SearchApprovedTeachersByName :many
+SELECT id, first_name, middle_name, last_name, drive_url, rate_per_class, template
+FROM tbl_teachers
+WHERE status = 'approved' AND deleted = 0
+	AND (
+		first_name LIKE '%' || ? || '%'
+		OR last_name LIKE '%' || ? || '%'
+		OR (first_name || ' ' || COALESCE(NULLIF(middle_name, '') || ' ', '') || last_name) LIKE '%' || ? || '%'
+	)
+ORDER BY last_name ASC, first_name ASC, middle_name ASC
+LIMIT 10;
+
 -- name: ApproveTeacher :exec
 UPDATE tbl_teachers SET status = 'approved', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending' AND deleted = 0;
 

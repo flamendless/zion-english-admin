@@ -67,17 +67,7 @@ templ Classes(data ClassesData) {
 
 			<div class="toolbar" id="classesToolbar">
 				if data.ShowAllTeachers {
-					<div class="form-group">
-						<label for="teacher">Teacher</label>
-						<select id="teacher" name="teacherId"
-							hx-get={ utils.URL("/api/teachers") }
-							hx-trigger="load"
-							hx-swap="innerHTML"
-							hx-target="this"
-						>
-							<option value="">All teachers</option>
-						</select>
-					</div>
+					@ClassesTeacherFilterSearch()
 				} else if data.LockTeacher {
 					<input type="hidden" id="teacher" name="teacherId" value={ data.TeacherID }/>
 					<div class="form-group">

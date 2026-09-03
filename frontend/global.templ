@@ -213,6 +213,86 @@ templ GlobalIncludes() {
 			line-height: 1.4;
 		}
 
+		.currency-amount-control {
+			display: flex;
+			align-items: stretch;
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-sm);
+			overflow: hidden;
+			background: var(--color-surface);
+			transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+		}
+
+		.currency-amount-control:focus-within {
+			border-color: var(--color-primary);
+			box-shadow: 0 0 0 3px rgba(144, 192, 32, 0.2);
+		}
+
+		.currency-amount-currency {
+			display: flex;
+			align-items: center;
+			flex: 0 0 auto;
+			border-right: 1px solid var(--color-border);
+			background: var(--color-muted);
+		}
+
+		.currency-amount-symbol {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 1.75rem;
+			padding-left: 10px;
+			font-weight: 700;
+			font-size: 0.9375rem;
+			color: var(--color-foreground);
+			line-height: 1;
+		}
+
+		.currency-amount-currency select {
+			width: auto;
+			min-width: 7.5rem;
+			max-width: 11rem;
+			height: 100%;
+			border: none;
+			border-radius: 0;
+			box-shadow: none;
+			background: transparent;
+			font-weight: 600;
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+			letter-spacing: 0.02em;
+			padding: 10px 28px 10px 6px;
+		}
+
+		.currency-amount-currency select:focus {
+			box-shadow: none;
+			outline: none;
+		}
+
+		.currency-amount-amount {
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+
+		.currency-amount-amount input {
+			width: 100%;
+			height: 100%;
+			border: none;
+			border-radius: 0;
+			box-shadow: none;
+			font-variant-numeric: tabular-nums;
+			text-align: right;
+		}
+
+		.currency-amount-amount input:focus {
+			box-shadow: none;
+			outline: none;
+		}
+
+		.currency-amount-amount input::placeholder {
+			text-align: right;
+		}
+
 		.error-message.show {
 			display: block;
 		}
@@ -888,11 +968,14 @@ templ GlobalIncludes() {
 			}
 		}
 
-		.student-search {
+		.student-search,
+		.teacher-search,
+		.entity-search {
 			position: relative;
 		}
 
-		.student-search-results {
+		.student-search-results,
+		.entity-search-results {
 			position: absolute;
 			top: 100%;
 			left: 0;
@@ -907,7 +990,8 @@ templ GlobalIncludes() {
 			overflow-y: auto;
 		}
 
-		.student-search-item {
+		.student-search-item,
+		.entity-search-item {
 			display: block;
 			width: 100%;
 			padding: var(--space-3) var(--space-4);
@@ -920,7 +1004,9 @@ templ GlobalIncludes() {
 		}
 
 		.student-search-item:hover,
-		.student-search-item:focus {
+		.student-search-item:focus,
+		.entity-search-item:hover,
+		.entity-search-item:focus {
 			background: var(--color-primary-light);
 			outline: none;
 		}
@@ -3157,10 +3243,23 @@ templ GlobalIncludes() {
 		}
 
 		.teacher-assign-add {
-			margin-top: var(--space-2);
+			margin-top: 0;
 			background-color: var(--color-primary);
 			border-color: var(--color-primary);
 			color: var(--color-on-primary);
+		}
+
+		.teacher-assign-add-row {
+			display: flex;
+			align-items: center;
+			gap: var(--space-2);
+			margin-top: var(--space-2);
+		}
+
+		.teacher-assign-add-label {
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--color-muted-foreground);
 		}
 
 		.teacher-assign-add:hover {

@@ -1,0 +1,72 @@
+package frontend
+
+import "zion-english/internal/constants"
+
+type CurrencyAmountFieldParams struct {
+	Label             string
+	AmountID          string
+	AmountName        string
+	CurrencyID        string
+	CurrencyName      string
+	AmountValue       string
+	CurrencyValue     string
+	Required          bool
+	OptionalCurrency  bool
+	PlaceholderAmount string
+	Hint              string
+}
+
+templ currencyOptions(selected string, includeEmpty bool, includeSelectPrompt bool) {
+	if includeEmpty {
+		<option value="" data-symbol="" selected?={ selected == "" }>-- None --</option>
+	}
+	if includeSelectPrompt {
+		<option value="" data-symbol="" selected?={ selected == "" }>Select Currency</option>
+	}
+	for _, code := range constants.CurrencyCodes {
+		<option value={ code } data-symbol={ constants.CurrencySymbol(code) } selected?={ selected == code }>
+			{ constants.CurrencySymbol(code) } { code }
+		</option>
+	}
+}
+
+templ CurrencyAmountField(params CurrencyAmountFieldParams) {
+	<div class="form-group currency-amount-field">
+		<label for={ params.AmountID }>{ params.Label }</label>
+		<div class="currency-amount-control">
+			<div class="currency-amount-currency">
+				<span class="currency-amount-symbol" aria-hidden="true">{ constants.CurrencySymbol(params.CurrencyValue) }</span>
+				<select
+					id={ params.CurrencyID }
+					name={ params.CurrencyName }
+					aria-label="Currency"
+					required?={ params.Required && !params.OptionalCurrency }
+					_="
+						on load or change
+							set sym to my selectedOptions[0].dataset.symbol or ''
+							set the previousElementSibling's textContent to sym
+						end
+					"
+				>
+					@currencyOptions(params.CurrencyValue, params.OptionalCurrency, !params.OptionalCurrency && params.CurrencyValue == "")
+				</select>
+			</div>
+			<div class="currency-amount-amount">
+				<input
+					type="number"
+					id={ params.AmountID }
+					name={ params.AmountName }
+					step="0.01"
+					min="0"
+					inputmode="decimal"
+					placeholder={ params.PlaceholderAmount }
+					value={ params.AmountValue }
+					required?={ params.Required }
+				/>
+			</div>
+		</div>
+		if params.Hint != "" {
+			<p class="field-hint">{ params.Hint }</p>
+		}
+	</div>
+}

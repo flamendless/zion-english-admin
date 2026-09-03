@@ -223,17 +223,7 @@ templ Schedule(data ScheduleData) {
 						<input type="text" value={ data.TeacherName } disabled/>
 					</div>
 				} else {
-					<div class="form-group">
-						<label for="listTeacher">Teacher</label>
-						<select id="listTeacher" name="teacherId"
-							hx-get={ utils.URL("/api/teachers") }
-							hx-trigger="load"
-							hx-swap="innerHTML"
-							hx-target="this"
-						>
-							<option value="">-- Select Teacher --</option>
-						</select>
-					</div>
+					@ScheduleListTeacherSearch()
 				}
 			</div>
 
@@ -951,7 +941,7 @@ templ Schedule(data ScheduleData) {
 				});
 			}
 
-			if (listTeacher && listTeacher.tagName === 'SELECT') {
+			if (listTeacher) {
 				listTeacher.addEventListener('change', refreshCalendar);
 			}
 

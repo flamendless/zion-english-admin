@@ -632,6 +632,66 @@ func (q *Queries) InsertTeacher(ctx context.Context, arg InsertTeacherParams) er
 	return err
 }
 
+const searchApprovedTeachersByName = `-- name: SearchApprovedTeachersByName :many
+SELECT id, first_name, middle_name, last_name, drive_url, rate_per_class, template
+FROM tbl_teachers
+WHERE status = 'approved' AND deleted = 0
+	AND (
+		first_name LIKE '%' || ? || '%'
+		OR last_name LIKE '%' || ? || '%'
+		OR (first_name || ' ' || COALESCE(NULLIF(middle_name, '') || ' ', '') || last_name) LIKE '%' || ? || '%'
+	)
+ORDER BY last_name ASC, first_name ASC, middle_name ASC
+LIMIT 10
+`
+
+type SearchApprovedTeachersByNameParams struct {
+	Column1 sql.NullString
+	Column2 sql.NullString
+	Column3 sql.NullString
+}
+
+type SearchApprovedTeachersByNameRow struct {
+	ID           int64
+	FirstName    string
+	MiddleName   string
+	LastName     string
+	DriveUrl     string
+	RatePerClass float64
+	Template     sql.NullString
+}
+
+func (q *Queries) SearchApprovedTeachersByName(ctx context.Context, arg SearchApprovedTeachersByNameParams) ([]SearchApprovedTeachersByNameRow, error) {
+	rows, err := q.db.QueryContext(ctx, searchApprovedTeachersByName, arg.Column1, arg.Column2, arg.Column3)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SearchApprovedTeachersByNameRow
+	for rows.Next() {
+		var i SearchApprovedTeachersByNameRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.FirstName,
+			&i.MiddleName,
+			&i.LastName,
+			&i.DriveUrl,
+			&i.RatePerClass,
+			&i.Template,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const softDeleteTeacher = `-- name: SoftDeleteTeacher :exec
 UPDATE tbl_teachers SET deleted = 1, deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending' AND deleted = 0
 `

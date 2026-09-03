@@ -94,11 +94,11 @@ templ StudentOptions(students []models.StudentAPIResponse, selectedID string) {
 }
 
 templ StudentSearchResults(students []models.StudentAPIResponse) {
-	<div class="student-search-results">
+	<div class="entity-search-results">
 		for _, s := range students {
 			<button
 				type="button"
-				class="student-search-item"
+				class="entity-search-item"
 				data-id={ fmt.Sprintf("%d", s.ID) }
 				data-name={ s.Name }
 				_="
@@ -113,6 +113,48 @@ templ StudentSearchResults(students []models.StudentAPIResponse) {
 			</button>
 		}
 	</div>
+}
+
+templ TeacherSearchResults(teachers []models.TeacherAPIResponse, hiddenID string, inputID string, resultsID string) {
+	<div class="entity-search-results">
+		for _, t := range teachers {
+			<button
+				type="button"
+				class="entity-search-item"
+				data-id={ fmt.Sprintf("%d", t.ID) }
+				data-name={ t.Name }
+				data-driveurl={ t.DriveUrl }
+				data-template={ t.Template }
+				data-rate={ fmt.Sprintf("%.2f", t.RatePerClass) }
+				_={ teacherSearchSelectScript(hiddenID, inputID, resultsID) }
+			>
+				{ t.Name }
+			</button>
+		}
+	</div>
+}
+
+func teacherSearchSelectScript(hiddenID, inputID, resultsID string) string {
+	return fmt.Sprintf(`on click
+		set #%s.value to my @data-id
+		set #%s.dataset.name to my @data-name
+		set #%s.dataset.driveurl to my @data-driveurl
+		set #%s.dataset.template to my @data-template
+		set #%s.dataset.rate to my @data-rate
+		set #%s.value to my @data-name
+		set #%s.innerHTML to ''
+		trigger change on #%s
+	end`, hiddenID, hiddenID, hiddenID, hiddenID, hiddenID, inputID, resultsID, hiddenID)
+}
+
+func teacherSearchClearScript(hiddenID, resultsID string) string {
+	return fmt.Sprintf(`on input
+		if my.value is ''
+			set #%s.value to ''
+			set #%s.innerHTML to ''
+			trigger change on #%s
+		end
+	end`, hiddenID, resultsID, hiddenID)
 }
 
 templ DatePreset(selectCurrentCutoff bool) {

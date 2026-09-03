@@ -32,7 +32,15 @@ templ RegisterStudent(data RegisterStudentData) {
 				</div>
 
 				<div class="form-row">
-					@CurrencyDropdown()
+					@CurrencyAmountField(CurrencyAmountFieldParams{
+						Label:             "Rate Per Class *",
+						AmountID:          "ratePerClass",
+						AmountName:        "ratePerClass",
+						CurrencyID:        "currency",
+						CurrencyName:      "currency",
+						PlaceholderAmount: "0.00",
+						Required:          true,
+					})
 					@StudentStatusDropdown()
 				</div>
 
@@ -51,27 +59,31 @@ templ RegisterStudent(data RegisterStudentData) {
 					</div>
 				}
 
-				<div class="form-group">
-					<label for="ratePerClass">Rate Per Class *</label>
-					<input type="number" id="ratePerClass" name="ratePerClass" required
-					       step="0.01" min="0" placeholder="0.00">
-				</div>
-
 				if data.IsSuperuser {
 					<div class="form-row">
 						<div class="form-group">
-							<label for="parentRate">Parent Rate</label>
-							<input type="number" id="parentRate" name="parentRate" step="0.01" min="0" placeholder="0.00">
+							<label for="parentName">Parent's Name</label>
+							<input type="text" id="parentName" name="parentName"
+							       placeholder="Enter parent's name">
 						</div>
-						@ParentCurrencyDropdownWithValue("")
+						@CurrencyAmountField(CurrencyAmountFieldParams{
+							Label:             "Parent Rate",
+							AmountID:          "parentRate",
+							AmountName:        "parentRate",
+							CurrencyID:        "parentCurrency",
+							CurrencyName:      "parentCurrency",
+							PlaceholderAmount: "0.00",
+							OptionalCurrency:  true,
+							Hint:              "Optional. Set both amount and currency, or leave both empty.",
+						})
+					</div>
+				} else {
+					<div class="form-group">
+						<label for="parentName">Parent's Name</label>
+						<input type="text" id="parentName" name="parentName"
+						       placeholder="Enter parent's name">
 					</div>
 				}
-
-				<div class="form-group">
-					<label for="parentName">Parent's Name</label>
-					<input type="text" id="parentName" name="parentName"
-					       placeholder="Enter parent's name">
-				</div>
 
 				if data.IsSuperuser {
 					<div class="form-group">
@@ -86,7 +98,7 @@ templ RegisterStudent(data RegisterStudentData) {
 						</div>
 					</div>
 
-					@TeacherAssignRows(nil)
+					@TeacherAssignRows(nil, nil)
 
 					<div class="form-group">
 						<label for="assignedColor">Assigned Color *</label>
