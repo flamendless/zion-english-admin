@@ -192,8 +192,174 @@ templ Schedule(data ScheduleData) {
 					flex-wrap: wrap;
 				}
 			}
+			.modal-dialog-schedule-day {
+				width: min(100%, 56rem);
+			}
+			.day-timeline {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-1);
+				overflow-x: auto;
+				padding-bottom: var(--space-1);
+			}
+			.day-timeline-axis,
+			.day-timeline-row {
+				display: grid;
+				grid-template-columns: 2rem minmax(36rem, 1fr);
+				gap: var(--space-2);
+				align-items: center;
+				min-width: 40rem;
+			}
+			.day-timeline-axis {
+				position: sticky;
+				top: 0;
+				z-index: 2;
+				background: var(--color-surface);
+				padding-bottom: var(--space-2);
+				border-bottom: 1px solid var(--color-border-subtle);
+			}
+			.day-timeline-axis-spacer {
+				width: 2rem;
+				flex-shrink: 0;
+			}
+			.day-timeline-hours {
+				display: grid;
+				grid-template-columns: repeat(17, minmax(0, 1fr));
+				gap: 0;
+				border-bottom: 1px solid var(--color-border-subtle);
+			}
+			.day-timeline-hour {
+				font-size: 0.625rem;
+				font-weight: 600;
+				color: var(--color-muted-foreground);
+				text-align: center;
+				white-space: nowrap;
+				padding-bottom: var(--space-1);
+				border-left: 1px solid color-mix(in srgb, var(--color-border) 40%, transparent);
+			}
+			.day-timeline-hour:first-child {
+				border-left: none;
+			}
+			.day-timeline-rows {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-1);
+			}
+			.day-timeline-row {
+				border-radius: var(--radius-sm);
+				transition: background-color var(--transition-fast);
+			}
+			.day-timeline-row:hover {
+				background: color-mix(in srgb, var(--color-muted) 45%, transparent);
+			}
+			.day-timeline-teacher {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				position: sticky;
+				left: 0;
+				z-index: 1;
+				background: var(--color-surface);
+				padding: var(--space-1) 0;
+			}
+			.day-timeline-row:hover .day-timeline-teacher {
+				background: color-mix(in srgb, var(--color-muted) 45%, var(--color-surface));
+			}
+			.day-timeline-teacher .avatar {
+				border-width: 1px;
+				box-shadow: none;
+			}
+			.day-timeline-track {
+				position: relative;
+				height: 2rem;
+				border: 1px solid var(--color-border-subtle);
+				border-radius: var(--radius-sm);
+				background: var(--color-surface);
+				overflow: hidden;
+			}
+			.day-timeline-grid {
+				position: absolute;
+				inset: 0;
+				background-image: linear-gradient(to right, color-mix(in srgb, var(--color-border) 35%, transparent) 1px, transparent 1px);
+				background-size: calc(100% / 16) 100%;
+				pointer-events: none;
+			}
+			.day-timeline-bar {
+				position: absolute;
+				top: 0.1875rem;
+				bottom: 0.1875rem;
+				min-width: 0.375rem;
+				display: flex;
+				align-items: center;
+				margin: 0;
+				margin-top: 0;
+				padding: 0 0.375rem 0 0.25rem;
+				border: 1px solid color-mix(in srgb, var(--color-primary) 50%, var(--color-border));
+				border-left-width: 3px;
+				border-radius: var(--radius-sm);
+				background: color-mix(in srgb, var(--color-primary-light) 85%, var(--color-surface));
+				background-color: color-mix(in srgb, var(--color-primary-light) 85%, var(--color-surface));
+				color: var(--color-foreground);
+				overflow: hidden;
+				z-index: 1;
+				cursor: pointer;
+				text-align: left;
+				font-family: inherit;
+				transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+			}
+			.day-timeline-bar:hover {
+				border-color: var(--color-primary);
+				box-shadow: var(--shadow-sm);
+			}
+			@media (prefers-reduced-motion: no-preference) {
+				.day-timeline-bar:hover {
+					transform: translateY(-1px);
+				}
+				.day-timeline-bar:active {
+					transform: translateY(0);
+				}
+			}
+			.day-timeline-bar:focus-visible {
+				outline: 2px solid var(--color-ring);
+				outline-offset: 1px;
+			}
+			.day-timeline-bar.is-overdue {
+				background: color-mix(in srgb, var(--color-error-bg) 90%, var(--color-surface));
+				background-color: color-mix(in srgb, var(--color-error-bg) 90%, var(--color-surface));
+				border-color: var(--color-destructive);
+				border-left-color: var(--color-destructive);
+			}
+			.day-timeline-bar-label {
+				font-size: 0.6875rem;
+				font-weight: 600;
+				line-height: 1.2;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				width: 100%;
+			}
+			.day-timeline-bar-sr {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				padding: 0;
+				margin: -1px;
+				overflow: hidden;
+				clip: rect(0, 0, 0, 0);
+				white-space: nowrap;
+				border: 0;
+			}
+			@media (max-width: 768px) {
+				.day-timeline-axis,
+				.day-timeline-row {
+					grid-template-columns: 1.75rem minmax(28rem, 1fr);
+					min-width: 32rem;
+				}
+				.day-timeline-axis-spacer {
+					width: 1.75rem;
+				}
+			}
 		</style>
-		@ScrTimeRangeJS()
 	</head>
 	<body>
 		<div
@@ -287,19 +453,19 @@ templ Schedule(data ScheduleData) {
 				</div>
 			</div>
 
-			<div class="modal-overlay" id="scheduleModal" hidden>
-				<div class="modal-dialog modal-dialog-schedule" role="dialog" aria-modal="true" aria-labelledby="modalDateTitle">
+			<div class="modal-overlay" id="scheduleModal" hidden role="presentation">
+				<div class="modal-dialog modal-dialog-schedule modal-dialog-schedule-day" role="dialog" aria-modal="true" aria-labelledby="modalDateTitle">
 					<div class="modal-header">
 						<h3 id="modalDateTitle">Schedule</h3>
-						<button type="button" class="modal-close" id="modalCloseBtn" aria-label="Close">&times;</button>
+						<button type="button" class="modal-close schedule-modal-close" id="modalCloseBtn" aria-label="Close">&times;</button>
 					</div>
 					<div class="modal-body">
 						<section class="modal-section" aria-labelledby="dayClassesHeading">
-							<h4 class="modal-section-title" id="dayClassesHeading">Scheduled classes</h4>
+							<h4 class="modal-section-title" id="dayClassesHeading">Day schedule</h4>
 							<div
 								id="dayClassesList"
-								class="day-classes-list"
-								hx-get={ utils.URL("/schedule/partials/list") }
+								class="day-timeline-host"
+								hx-get={ utils.URL("/schedule/partials/day-timeline") }
 								hx-include="#listTeacher, #dayListStart, #dayListEnd, #dayListStatus"
 								hx-trigger="scheduleDayOpen from:body"
 								hx-swap="innerHTML"
@@ -837,6 +1003,10 @@ templ Schedule(data ScheduleData) {
 				}
 				modalTriggerEl = null;
 			}
+			window.closeScheduleModal = closeModal;
+			window.isScheduleModalOpen = function () {
+				return !!(scheduleModal && !scheduleModal.hidden);
+			};
 
 			async function refreshCalendar() {
 				await loadMonthData();
@@ -893,7 +1063,11 @@ templ Schedule(data ScheduleData) {
 					await refreshCalendar();
 				});
 			}
-			if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+			document.body.addEventListener('click', function (e) {
+				if (e.target.closest('.schedule-modal-close')) {
+					closeModal();
+				}
+			});
 			if (scheduleModal) {
 				scheduleModal.addEventListener('click', (e) => {
 					if (e.target === scheduleModal) closeModal();
@@ -909,10 +1083,22 @@ templ Schedule(data ScheduleData) {
 				if (e.key === 'Escape') {
 					if (zoomMeetingModal && !zoomMeetingModal.hidden) {
 						closeZoomMeetingModal();
+						e.preventDefault();
+						return;
+					}
+					if (typeof window.hasOpenScheduledClassActionModal === 'function' && window.hasOpenScheduledClassActionModal()) {
+						return;
+					}
+					const deleteModal = document.getElementById('deleteClassModal');
+					if (deleteModal && !deleteModal.hidden) {
+						return;
+					}
+					if (typeof window.hasOpenClassViewLayer === 'function' && window.hasOpenClassViewLayer()) {
 						return;
 					}
 					if (scheduleModal && !scheduleModal.hidden) {
 						closeModal();
+						e.preventDefault();
 					}
 				}
 				trapZoomModalFocus(e);

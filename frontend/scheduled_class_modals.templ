@@ -307,7 +307,11 @@ templ ScheduledClassModalsScript() {
 				if (conductModal) conductModal.hidden = true;
 				if (cancelModal) cancelModal.hidden = true;
 				if (editModal) editModal.hidden = true;
-				document.body.classList.remove('modal-open');
+				const scheduleOpen = typeof window.isScheduleModalOpen === 'function' && window.isScheduleModalOpen();
+				const classViewOpen = !!document.getElementById('classViewModal');
+				if (!scheduleOpen && !classViewOpen) {
+					document.body.classList.remove('modal-open');
+				}
 				if (conductNotes) conductNotes.value = '';
 				if (cancelReason) cancelReason.value = '';
 				if (cancelNotes) cancelNotes.value = '';
@@ -385,9 +389,24 @@ templ ScheduledClassModalsScript() {
 
 			document.addEventListener('keydown', function (e) {
 				if (e.key !== 'Escape') return;
-				if (conductModal && !conductModal.hidden) window.closeScheduledClassModals();
-				else if (cancelModal && !cancelModal.hidden) window.closeScheduledClassModals();
-				else if (editModal && !editModal.hidden) window.closeScheduledClassModals();
+				if (conductModal && !conductModal.hidden) {
+					window.closeScheduledClassModals();
+					e.preventDefault();
+					e.stopImmediatePropagation();
+					return;
+				}
+				if (cancelModal && !cancelModal.hidden) {
+					window.closeScheduledClassModals();
+					e.preventDefault();
+					e.stopImmediatePropagation();
+					return;
+				}
+				if (editModal && !editModal.hidden) {
+					window.closeScheduledClassModals();
+					e.preventDefault();
+					e.stopImmediatePropagation();
+					return;
+				}
 			});
 
 			if (conductForm) {

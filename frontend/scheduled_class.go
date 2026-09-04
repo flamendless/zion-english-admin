@@ -74,6 +74,158 @@ func ScheduledClassItemFromView(v models.ScheduledClassView) ScheduledClassItemD
 	return item
 }
 
+func TimelineHourLabels() []string {
+	labels := make([]string, 0, TimelineDayEndHour-TimelineDayStartHour+1)
+	for hour := TimelineDayStartHour; hour <= TimelineDayEndHour; hour++ {
+		labels = append(labels, formatTimelineHourLabel(hour))
+	}
+	return labels
+}
+
+func formatTimelineHourLabel(hour int) string {
+	if hour == 0 || hour == 24 {
+		return "12 AM"
+	}
+	if hour < 12 {
+		return fmt.Sprintf("%d AM", hour)
+	}
+	if hour == 12 {
+		return "12 PM"
+	}
+	return fmt.Sprintf("%d PM", hour%12)
+}
+
+func timelineBarPosition(startTime string, durationMinutes int64) (leftPct, widthPct float64, ok bool) {
+	startMins, err := utils.MinutesSinceMidnight(startTime)
+	if err != nil {
+		return 0, 0, false
+	}
+	dayStart := int64(TimelineDayStartHour * 60)
+	dayEnd := int64(TimelineDayEndHour * 60)
+	span := float64(dayEnd - dayStart)
+	if span <= 0 {
+		return 0, 0, false
+	}
+
+	endMins := startMins + durationMinutes
+	if durationMinutes <= 0 {
+		endMins = startMins + 60
+	}
+
+	barStart := startMins
+	if barStart < dayStart {
+		barStart = dayStart
+	}
+	barEnd := endMins
+	if barEnd > dayEnd {
+		barEnd = dayEnd
+	}
+	if barEnd <= barStart {
+		return 0, 0, false
+	}
+
+	leftPct = float64(barStart-dayStart) / span * 100
+	widthPct = float64(barEnd-barStart) / span * 100
+	return leftPct, widthPct, true
+}
+
+func BuildScheduledClassDayTimeline(items []ScheduledClassItemData, emptyMessage string) ScheduledClassDayTimelineData {
+	rowsByTeacher := make(map[int64]*ScheduledClassTeacherTimelineRow)
+	teacherOrder := make([]int64, 0)
+
+	for _, item := range items {
+		row, exists := rowsByTeacher[item.TeacherID]
+		if !exists {
+			row = &ScheduledClassTeacherTimelineRow{
+				TeacherID:     item.TeacherID,
+				TeacherName:   item.TeacherName,
+				TeacherAvatar: item.TeacherAvatar,
+				Bars:          []ScheduledClassTimelineBarData{},
+			}
+			rowsByTeacher[item.TeacherID] = row
+			teacherOrder = append(teacherOrder, item.TeacherID)
+		}
+
+		leftPct, widthPct, ok := timelineBarPosition(item.StartTime, item.DurationMinutes)
+		if !ok {
+			continue
+		}
+		row.Bars = append(row.Bars, ScheduledClassTimelineBarData{
+			Item:      item,
+			LeftPct:   leftPct,
+			WidthPct:  widthPct,
+			ShowLabel: widthPct >= 7,
+		})
+	}
+
+	rows := make([]ScheduledClassTeacherTimelineRow, 0, len(teacherOrder))
+	for _, teacherID := range teacherOrder {
+		row := rowsByTeacher[teacherID]
+		if len(row.Bars) == 0 {
+			continue
+		}
+		sort.Slice(row.Bars, func(i, j int) bool {
+			a, errA := utils.MinutesSinceMidnight(row.Bars[i].Item.StartTime)
+			b, errB := utils.MinutesSinceMidnight(row.Bars[j].Item.StartTime)
+			if errA != nil {
+				a = 9999
+			}
+			if errB != nil {
+				b = 9999
+			}
+			return a < b
+		})
+		rows = append(rows, *row)
+	}
+
+	sort.Slice(rows, func(i, j int) bool {
+		return rows[i].TeacherName < rows[j].TeacherName
+	})
+
+	return ScheduledClassDayTimelineData{
+		EmptyMessage: emptyMessage,
+		HourLabels:   TimelineHourLabels(),
+		Teachers:     rows,
+	}
+}
+
+func ScheduledClassItemFromEditClassData(data EditClassData) ScheduledClassItemData {
+	id, _ := strconv.ParseInt(data.RecordID, 10, 64)
+	studentID, _ := strconv.ParseInt(data.StudentID, 10, 64)
+	teacherID, _ := strconv.ParseInt(data.TeacherID, 10, 64)
+	item := ScheduledClassItemData{
+		ID:              id,
+		StudentID:       studentID,
+		TeacherID:       teacherID,
+		StudentName:     data.StudentName,
+		TeacherName:     data.TeacherName,
+		TeacherAvatar:   data.TeacherAvatar,
+		ScheduledDate:   data.Date,
+		StartTime:       data.StartTime,
+		EndTime:         data.EndTime,
+		DurationMinutes: data.DurationMinutes,
+		Rate:            data.Rate,
+		Currency:        data.Currency,
+		Status:          constants.ScheduledClassStatusScheduled,
+		TimeRange:       data.TimeRangeLabel(),
+		DeleteFrom:      data.ActionFrom,
+	}
+	item.Overdue = IsScheduledClassOverdue(item)
+	return item
+}
+
+func (data EditClassData) ClassEditURL() string {
+	return utils.URL("/classes/" + data.RecordID + "/edit")
+}
+
+func (data EditClassData) ClassDeleteURL() string {
+	id, err := strconv.ParseInt(data.RecordID, 10, 64)
+	if err != nil {
+		return ""
+	}
+	return ClassRecordDeleteURL(id)
+}
+
 func ScheduledClassItemsFromViews(views []models.ScheduledClassView) []ScheduledClassItemData {
 	items := make([]ScheduledClassItemData, 0, len(views))
 	for _, v := range views {

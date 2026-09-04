@@ -1,0 +1,91 @@
+package frontend
+
+import "fmt"
+
+const (
+	TimelineDayStartHour = 6
+	TimelineDayEndHour   = 22
+)
+
+type ScheduledClassTimelineBarData struct {
+	Item      ScheduledClassItemData
+	LeftPct   float64
+	WidthPct  float64
+	ShowLabel bool
+}
+
+type ScheduledClassTeacherTimelineRow struct {
+	TeacherID     int64
+	TeacherName   string
+	TeacherAvatar AvatarProps
+	Bars          []ScheduledClassTimelineBarData
+}
+
+type ScheduledClassDayTimelineData struct {
+	EmptyMessage string
+	HourLabels   []string
+	Teachers     []ScheduledClassTeacherTimelineRow
+}
+
+templ ScheduledClassDayTimeline(data ScheduledClassDayTimelineData) {
+	if len(data.Teachers) == 0 {
+		<p class="day-classes-empty">{ data.EmptyMessage }</p>
+	} else {
+		<div class="day-timeline" role="region" aria-label="Day schedule timeline">
+			<div class="day-timeline-axis" aria-hidden="true">
+				<span class="day-timeline-axis-spacer"></span>
+				<div class="day-timeline-hours">
+					for _, label := range data.HourLabels {
+						<span class="day-timeline-hour">{ label }</span>
+					}
+				</div>
+			</div>
+			<div class="day-timeline-rows">
+				for _, row := range data.Teachers {
+					@ScheduledClassTeacherTimelineRowView(row)
+				}
+			</div>
+		</div>
+	}
+}
+
+templ ScheduledClassTeacherTimelineRowView(row ScheduledClassTeacherTimelineRow) {
+	<div class="day-timeline-row">
+		<div class="day-timeline-teacher" title={ row.TeacherName } aria-label={ row.TeacherName }>
+			@Avatar(AvatarForTimeline(row.TeacherAvatar))
+		</div>
+		<div class="day-timeline-track" aria-label={ fmt.Sprintf("%s schedule", row.TeacherName) }>
+			<div class="day-timeline-grid" aria-hidden="true"></div>
+			for _, bar := range row.Bars {
+				@ScheduledClassTimelineBarView(bar)
+			}
+		</div>
+	</div>
+}
+
+templ ScheduledClassTimelineBarView(bar ScheduledClassTimelineBarData) {
+	<button
+		type="button"
+		class={ scheduledClassTimelineBarClass(bar.Item) }
+		style={ fmt.Sprintf("left: %.4f%%; width: %.4f%%", bar.LeftPct, bar.WidthPct) }
+		title={ bar.Item.StudentName + " · " + bar.Item.TimeRange }
+		aria-label={ "View class for " + bar.Item.StudentName + " at " + bar.Item.TimeRange }
+		hx-get={ ScheduledClassViewURL(bar.Item.ID) }
+		hx-target="#classViewModalHost"
+		hx-swap="innerHTML"
+	>
+		if bar.ShowLabel {
+			<span class="day-timeline-bar-label" aria-hidden="true">{ bar.Item.StudentName }</span>
+		} else {
+			<span class="day-timeline-bar-sr">{ bar.Item.StudentName }</span>
+		}
+	</button>
+}
+
+func scheduledClassTimelineBarClass(item ScheduledClassItemData) string {
+	className := "day-timeline-bar"
+	if item.Overdue {
+		className += " is-overdue"
+	}
+	return className
+}

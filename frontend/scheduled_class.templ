@@ -5,28 +5,36 @@ import (
 )
 templ ScheduledClassActions(item ScheduledClassItemData) {
 	<div class="scheduled-class-actions">
-		@IconActionButton("View", IconKindView, templ.Attributes{
-			"hx-get":    ScheduledClassViewURL(item.ID),
-			"hx-target": "#classViewModalHost",
-			"hx-swap":   "innerHTML",
-		})
-		@IconActionTrigger("Conduct", IconKindConduct, mergeTemplAttrs(scheduledClassDetailAttrs(item), templ.Attributes{
-			"data-conduct-url": ScheduledClassConductURL(item.ID),
-			"data-action-from": string(item.DeleteFrom),
-		}))
-		@IconActionTrigger("Edit", IconKindEdit, templ.Attributes{
-			"data-edit-url":    ScheduledClassEditModalURL(item.ID),
-			"data-action-from": string(item.DeleteFrom),
-		})
-		@IconActionTrigger("Cancel", IconKindCancel, mergeTemplAttrs(scheduledClassDetailAttrs(item), templ.Attributes{
-			"data-cancel-url":  ScheduledClassCancelURL(item.ID),
-			"data-action-from": string(item.DeleteFrom),
-		}))
-		@IconActionTrigger("Delete", IconKindDelete, mergeTemplAttrs(scheduledClassDetailAttrs(item), templ.Attributes{
-			"data-delete-url":  ScheduledClassDeleteURL(item.ID),
-			"data-delete-from": string(item.DeleteFrom),
-		}))
+		@ScheduledClassViewAction(item)
+		@ScheduledClassManageActions(item)
 	</div>
+}
+
+templ ScheduledClassViewAction(item ScheduledClassItemData) {
+	@IconActionButton("View", IconKindView, templ.Attributes{
+		"hx-get":    ScheduledClassViewURL(item.ID),
+		"hx-target": "#classViewModalHost",
+		"hx-swap":   "innerHTML",
+	})
+}
+
+templ ScheduledClassManageActions(item ScheduledClassItemData) {
+	@IconActionTrigger("Conduct", IconKindConduct, mergeTemplAttrs(scheduledClassDetailAttrs(item), templ.Attributes{
+		"data-conduct-url": ScheduledClassConductURL(item.ID),
+		"data-action-from": string(item.DeleteFrom),
+	}))
+	@IconActionTrigger("Edit", IconKindEdit, templ.Attributes{
+		"data-edit-url":    ScheduledClassEditModalURL(item.ID),
+		"data-action-from": string(item.DeleteFrom),
+	})
+	@IconActionTrigger("Cancel", IconKindCancel, mergeTemplAttrs(scheduledClassDetailAttrs(item), templ.Attributes{
+		"data-cancel-url":  ScheduledClassCancelURL(item.ID),
+		"data-action-from": string(item.DeleteFrom),
+	}))
+	@IconActionTrigger("Delete", IconKindDelete, mergeTemplAttrs(scheduledClassDetailAttrs(item), templ.Attributes{
+		"data-delete-url":  ScheduledClassDeleteURL(item.ID),
+		"data-delete-from": string(item.DeleteFrom),
+	}))
 }
 
 templ ScheduledClassMeeting(item ScheduledClassItemData, zoomLogoURL string) {

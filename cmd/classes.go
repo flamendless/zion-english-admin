@@ -133,9 +133,10 @@ func classEditClassData(ctx context.Context, recordID int64, readonly bool) (fro
 		Currency:        existing.Currency,
 		IsTrialClass:    existing.IsTrialClass != 0,
 		Status:          constants.ClassListFilterStatus(existing.Status),
-		Reason:          existing.Reason.String,
-		Notes:           existing.Notes.String,
+		Reason:            existing.Reason.String,
+		Notes:             existing.Notes.String,
 		LearningMaterials: materials,
+		ActionFrom:        frontend.ClassActionContextClasses,
 	}, nil
 }
 

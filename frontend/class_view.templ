@@ -52,8 +52,29 @@ templ ClassViewModal(data EditClassData) {
 					</div>
 				}
 			</div>
+			if data.Status == constants.ClassListFilterScheduled {
+				<div class="modal-footer class-view-footer">
+					<div class="class-view-footer-actions scheduled-class-actions">
+						@ScheduledClassManageActions(ScheduledClassItemFromEditClassData(data))
+					</div>
+				</div>
+			} else if data.Status != constants.ClassListFilterDeleted {
+				<div class="modal-footer class-view-footer">
+					<div class="class-view-footer-actions">
+						@ClassRecordViewActions(data)
+					</div>
+				</div>
+			}
 		</div>
 	</div>
+}
+
+templ ClassRecordViewActions(data EditClassData) {
+	@IconActionLink(data.ClassEditURL(), "Edit", IconKindEdit)
+	@IconActionTrigger("Delete", IconKindDelete, templ.Attributes{
+		"data-delete-url":  data.ClassDeleteURL(),
+		"data-delete-from": string(data.ActionFrom),
+	})
 }
 
 func (data EditClassData) TimeRangeLabel() string {
@@ -117,6 +138,29 @@ templ ClassViewModalStyles() {
 			border: none;
 			background: none;
 		}
+
+		#classViewModalHost .modal-overlay {
+			z-index: 1100;
+		}
+
+		.class-view-footer {
+			justify-content: flex-end;
+			padding: var(--space-4);
+			border-top: 1px solid var(--color-border-subtle);
+		}
+
+		.class-view-footer-actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: flex-end;
+			gap: var(--space-2);
+		}
+
+		.class-view-footer-actions .scheduled-class-actions,
+		.class-view-footer-actions .icon-action-btn {
+			margin-top: 0;
+		}
 	</style>
 }
 
@@ -125,7 +169,10 @@ templ ClassViewModalScripts() {
 		window.closeClassViewModal = function () {
 			const host = document.getElementById('classViewModalHost');
 			if (host) host.innerHTML = '';
-			document.body.classList.remove('modal-open');
+			const scheduleOpen = typeof window.isScheduleModalOpen === 'function' && window.isScheduleModalOpen();
+			if (!scheduleOpen) {
+				document.body.classList.remove('modal-open');
+			}
 		};
 
 		document.body.addEventListener('htmx:afterSwap', function (evt) {
@@ -148,7 +195,24 @@ templ ClassViewModalScripts() {
 		document.addEventListener('keydown', function (e) {
 			if (e.key !== 'Escape' || !document.getElementById('classViewModal')) return;
 			if (document.getElementById('lmViewModal')) return;
+			if (typeof window.hasOpenScheduledClassActionModal === 'function' && window.hasOpenScheduledClassActionModal()) return;
+			const deleteModal = document.getElementById('deleteClassModal');
+			if (deleteModal && !deleteModal.hidden) return;
+			e.preventDefault();
 			window.closeClassViewModal();
+			e.stopImmediatePropagation();
 		});
+
+		window.hasOpenClassViewLayer = function () {
+			return !!document.getElementById('classViewModal');
+		};
+
+		window.hasOpenScheduledClassActionModal = function () {
+			const ids = ['editScheduledClassModal', 'conductClassModal', 'cancelClassModal'];
+			return ids.some(function (id) {
+				const el = document.getElementById(id);
+				return el && !el.hidden;
+			});
+		};
 	</script>
 }

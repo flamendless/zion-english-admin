@@ -362,6 +362,48 @@ func handleScheduleListPartial(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleScheduleDayTimelinePartial(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	q, err := parseScheduledClassesQuery(r)
+	if err != nil {
+		if err.Error() == "forbidden" {
+			HttpError(w, err.Error(), http.StatusForbidden)
+			return
+		}
+		HttpError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	views, err := fetchScheduledClassViews(r.Context(), q, 500, 0)
+	if err != nil {
+		HttpError(w, "Failed to fetch scheduled classes", http.StatusInternalServerError)
+		return
+	}
+
+	items := frontend.ScheduledClassItemsFromViews(views)
+	emptyMsg := "No classes scheduled for this day."
+	if q.startDate == q.endDate && q.startDate == utils.TodayPHT() {
+		emptyMsg = "No classes scheduled for today."
+	}
+	role := auth.GetRole(r.Context())
+	if auth.HasAdminAccess(role) && q.teacherID == 0 {
+		teacherParam := strings.TrimSpace(r.URL.Query().Get("teacherId"))
+		if teacherParam == "" || teacherParam == "0" {
+			emptyMsg = "Select a teacher to view the day schedule."
+		}
+	}
+
+	timeline := frontend.BuildScheduledClassDayTimeline(items, emptyMsg)
+	w.Header().Set("Content-Type", "text/html")
+	if err := frontend.ScheduledClassDayTimeline(timeline).Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func handleGetScheduledClasses(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -971,6 +1013,7 @@ func scheduledClassViewData(ctx context.Context, scheduleID int64) (frontend.Edi
 		Status:            constants.ClassListFilterScheduled,
 		Reason:            reason,
 		LearningMaterials: materials,
+		ActionFrom:        frontend.ClassActionContextSchedule,
 	}, nil
 }
 

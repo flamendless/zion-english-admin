@@ -22,10 +22,11 @@ type EditClassData struct {
 	Rate            float64
 	Currency        string
 	IsTrialClass    bool
-	Status          constants.ClassListFilterStatus
+	Status            constants.ClassListFilterStatus
 	Reason            string
 	Notes             string
 	LearningMaterials []ClassLearningMaterialLink
+	ActionFrom        ClassActionContext
 }
 
 templ EditClass(data EditClassData) {

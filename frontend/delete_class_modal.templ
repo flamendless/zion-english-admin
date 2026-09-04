@@ -149,7 +149,11 @@ templ DeleteClassModal() {
 
 			window.closeDeleteClassModal = function () {
 				modal.hidden = true;
-				document.body.classList.remove('modal-open');
+				const scheduleOpen = typeof window.isScheduleModalOpen === 'function' && window.isScheduleModalOpen();
+				const classViewOpen = !!document.getElementById('classViewModal');
+				if (!scheduleOpen && !classViewOpen) {
+					document.body.classList.remove('modal-open');
+				}
 				reasonInput.value = '';
 				setDeleteDetailsVisible(false);
 			};
