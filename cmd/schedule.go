@@ -61,7 +61,7 @@ func handleSchedule(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		data := frontend.ScheduleData{}
 		role := auth.GetRole(r.Context())
-		if role == auth.RoleTeacher {
+		if auth.IsTeacherScoped(role) {
 			user := auth.GetUser(r.Context())
 			data.LockTeacher = true
 			data.TeacherID = strconv.FormatInt(user.ID, 10)
@@ -86,7 +86,7 @@ func handleScheduleRecord(w http.ResponseWriter, r *http.Request) {
 		}
 		role := auth.GetRole(r.Context())
 		data.IsSuperuser = auth.HasAdminAccess(role)
-		if role == auth.RoleTeacher {
+		if auth.IsTeacherScoped(role) {
 			user := auth.GetUser(r.Context())
 			data.LockTeacher = true
 			data.TeacherID = strconv.FormatInt(user.ID, 10)
@@ -252,7 +252,7 @@ func parseScheduledClassesQuery(r *http.Request) (scheduledClassesQuery, error) 
 			return scheduledClassesQuery{}, errors.New("invalid teacher ID")
 		}
 		teacherID = parsedID
-		if role == auth.RoleTeacher {
+		if auth.IsTeacherScoped(role) {
 			user := auth.GetUser(r.Context())
 			if teacherID != user.ID {
 				return scheduledClassesQuery{}, errors.New("forbidden")
@@ -919,7 +919,7 @@ func handleScheduledClassEditModal(w http.ResponseWriter, r *http.Request, sched
 		return
 	}
 
-	data, err := editScheduleData(ctx, scheduleID, role == auth.RoleTeacher, auth.HasAdminAccess(role))
+	data, err := editScheduleData(ctx, scheduleID, auth.IsTeacherScoped(role), auth.HasAdminAccess(role))
 	if err != nil {
 		HttpError(w, err.Error(), http.StatusForbidden)
 		return

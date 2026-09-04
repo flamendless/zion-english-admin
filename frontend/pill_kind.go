@@ -141,6 +141,8 @@ func TeacherRolePillTone(role constants.TeacherRole) PillTone {
 		return PillTonePrimary
 	case constants.TeacherRoleDeveloper:
 		return PillToneInfo
+	case constants.TeacherRoleTester:
+		return PillToneWarning
 	default:
 		return PillToneNeutral
 	}

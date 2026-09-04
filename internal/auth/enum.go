@@ -7,6 +7,7 @@ type Role string
 const (
 	RoleTeacher   Role = "teacher"
 	RoleAdmin     Role = "admin"
+	RoleTester    Role = "tester"
 	RoleSuperuser Role = "superuser"
 )
 
@@ -16,6 +17,10 @@ func AdminAccessRoles() []Role {
 
 func HasAdminAccess(role Role) bool {
 	return role == RoleSuperuser || role == RoleAdmin
+}
+
+func IsTeacherScoped(role Role) bool {
+	return role == RoleTeacher || role == RoleTester
 }
 
 type User struct {

@@ -139,7 +139,7 @@ func (r ScheduledClassRules) Validate(ctx context.Context, actor auth.User, inpu
 		return ErrInactiveStudent
 	}
 
-	if actor.Role == auth.RoleTeacher {
+	if auth.IsTeacherScoped(actor.Role) {
 		if input.TeacherID != actor.ID {
 			return ErrTeacherNotOwner
 		}
@@ -359,7 +359,7 @@ func findStudentScheduleOverlap(rows []queries.GetScheduledClassesByStudentOnDat
 }
 
 func (r ScheduledClassRules) ValidateAccess(scheduleTeacherID int64, actor auth.User) error {
-	if actor.Role == auth.RoleTeacher && scheduleTeacherID != actor.ID {
+	if auth.IsTeacherScoped(actor.Role) && scheduleTeacherID != actor.ID {
 		return ErrScheduleNotOwner
 	}
 	return nil

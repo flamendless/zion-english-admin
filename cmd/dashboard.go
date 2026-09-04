@@ -110,7 +110,7 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 				})
 			}
 		}
-	case auth.RoleTeacher:
+	case auth.RoleTeacher, auth.RoleTester:
 		user := auth.GetUser(ctx)
 		count, err := dbRO.GetQueries().CountStudentsByTeacherID(ctx, user.ID)
 		if err == nil {
@@ -276,7 +276,7 @@ func handleLogoutWithAccess(w http.ResponseWriter, r *http.Request) {
 	if user, ok := auth.UserFromRequest(r, conf.Conf()); ok {
 		if auth.HasAdminAccess(user.Role) {
 			insertAuditLogAs(ctx, user, "auth", fmt.Sprintf("logged out (%s)", user.Email))
-		} else if user.Role == auth.RoleTeacher && user.ID > 0 {
+		} else if auth.IsTeacherScoped(user.Role) && user.ID > 0 {
 			insertAuditLogAs(ctx, user, "auth", fmt.Sprintf("logged out (%s)", user.Email))
 			accessID, err := dbRW.GetQueries().GetLatestOpenAccessByTeacherID(ctx, user.ID)
 			if err == nil && accessID > 0 {

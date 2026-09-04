@@ -564,7 +564,7 @@ func parseClassRecordsQuery(r *http.Request) (classRecordsQuery, error) {
 			return classRecordsQuery{}, errors.New("invalid teacher ID")
 		}
 		teacherID = parsedID
-		if role == auth.RoleTeacher {
+		if auth.IsTeacherScoped(role) {
 			user := auth.GetUser(r.Context())
 			if teacherID != user.ID {
 				return classRecordsQuery{}, errors.New("forbidden")
@@ -684,7 +684,7 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if role == auth.RoleTeacher && user.ID == 0 {
+	if auth.IsTeacherScoped(role) && user.ID == 0 {
 		HttpError(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
@@ -778,7 +778,7 @@ func handleClasses(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		data := frontend.ClassesData{}
 		role := auth.GetRole(r.Context())
-		if role == auth.RoleTeacher {
+		if auth.IsTeacherScoped(role) {
 			user := auth.GetUser(r.Context())
 			data.LockTeacher = true
 			data.TeacherID = strconv.FormatInt(user.ID, 10)
@@ -873,7 +873,7 @@ func parseRecordClassPrefill(r *http.Request) models.RecordClassPrefill {
 		return models.RecordClassPrefill{}
 	}
 
-	if role := auth.GetRole(r.Context()); role == auth.RoleTeacher {
+	if auth.IsTeacherScoped(auth.GetRole(r.Context())) {
 		user := auth.GetUser(r.Context())
 		if existing.TeacherID != user.ID {
 			return models.RecordClassPrefill{}

@@ -7,8 +7,18 @@ import (
 
 func TestParseVisibleRolesDefaults(t *testing.T) {
 	roles := ParseVisibleRoles("")
-	if len(roles) != 3 {
-		t.Fatalf("expected 3 default roles, got %d", len(roles))
+	if len(roles) != 4 {
+		t.Fatalf("expected 4 default roles, got %d", len(roles))
+	}
+}
+
+func TestParseVisibleRolesIncludesTester(t *testing.T) {
+	roles := ParseVisibleRoles("teacher,tester")
+	if len(roles) != 2 {
+		t.Fatalf("expected 2 roles, got %d", len(roles))
+	}
+	if roles[0] != constants.TeacherRoleTeacher || roles[1] != constants.TeacherRoleTester {
+		t.Fatalf("unexpected roles: %v", roles)
 	}
 }
 

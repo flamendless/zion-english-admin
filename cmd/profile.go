@@ -309,7 +309,7 @@ func handleProfileMobile(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
-	if auth.GetRole(ctx) != auth.RoleTeacher {
+	if !auth.IsTeacherScoped(auth.GetRole(ctx)) {
 		HttpError(w, "Access denied", http.StatusForbidden)
 		return
 	}
@@ -384,7 +384,7 @@ func handleProfileNames(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
-	if auth.GetRole(ctx) != auth.RoleTeacher {
+	if !auth.IsTeacherScoped(auth.GetRole(ctx)) {
 		HttpError(w, "Access denied", http.StatusForbidden)
 		return
 	}
@@ -493,7 +493,7 @@ func handleProfilePassword(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
-	if auth.GetRole(ctx) != auth.RoleTeacher {
+	if !auth.IsTeacherScoped(auth.GetRole(ctx)) {
 		HttpError(w, "Access denied", http.StatusForbidden)
 		return
 	}
@@ -588,7 +588,7 @@ func handleProfileAvatar(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
-	if auth.GetRole(ctx) != auth.RoleTeacher {
+	if !auth.IsTeacherScoped(auth.GetRole(ctx)) {
 		HttpError(w, "Access denied", http.StatusForbidden)
 		return
 	}
@@ -682,7 +682,7 @@ func handleProfilePicture(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
-	if auth.GetRole(ctx) != auth.RoleTeacher {
+	if !auth.IsTeacherScoped(auth.GetRole(ctx)) {
 		HttpError(w, "Access denied", http.StatusForbidden)
 		return
 	}

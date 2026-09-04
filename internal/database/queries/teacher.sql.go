@@ -146,6 +146,10 @@ const getApprovedTeachers = `-- name: GetApprovedTeachers :many
 SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
 FROM tbl_teachers
 WHERE status = 'approved' AND deleted = 0
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = tbl_teachers.id AND tr.role = 'tester'
+	)
 ORDER BY last_name ASC, first_name ASC, middle_name ASC
 `
 
@@ -636,6 +640,10 @@ const searchApprovedTeachersByName = `-- name: SearchApprovedTeachersByName :man
 SELECT id, first_name, middle_name, last_name, drive_url, rate_per_class, template
 FROM tbl_teachers
 WHERE status = 'approved' AND deleted = 0
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = tbl_teachers.id AND tr.role = 'tester'
+	)
 	AND (
 		first_name LIKE '%' || ? || '%'
 		OR last_name LIKE '%' || ? || '%'

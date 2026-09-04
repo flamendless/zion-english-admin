@@ -104,6 +104,8 @@ templ DashboardStats(data DashboardData) {
 				<span class="stat-label">My Students</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.MyStudentCount) }</span>
 			</a>
+		}
+		if data.Role == auth.RoleTeacher || data.Role == auth.RoleTester {
 			<div class="stat-card stat-card-accent">
 				<span class="stat-label">Scheduled Today</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.ScheduledToday) }</span>

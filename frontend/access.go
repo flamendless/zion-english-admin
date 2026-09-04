@@ -43,11 +43,11 @@ func NavItems(role auth.Role) []NavItem {
 			continue
 		}
 		title := def.Title
-		if role == auth.RoleTeacher && def.TeacherTitle != "" {
+		if auth.IsTeacherScoped(role) && def.TeacherTitle != "" {
 			title = def.TeacherTitle
 		}
 		desc := def.Description
-		if role == auth.RoleTeacher && def.TeacherDesc != "" {
+		if auth.IsTeacherScoped(role) && def.TeacherDesc != "" {
 			desc = def.TeacherDesc
 		}
 		items = append(items, NavItem{
@@ -74,6 +74,15 @@ func IsNavAccessible(role auth.Role, path string) bool {
 			return role == auth.RoleSuperuser
 		}
 		return true
+	}
+
+	if role == auth.RoleTester {
+		switch path {
+		case "/profile", "/classes", "/classes/record", "/schedule", "/schedule/record":
+			return true
+		default:
+			return false
+		}
 	}
 
 	switch path {

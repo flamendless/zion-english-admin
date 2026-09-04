@@ -72,7 +72,7 @@ func parseClaims(tokenString string, cfg *conf.Config) (*Claims, error) {
 	if err != nil || !token.Valid {
 		return nil, errors.New("invalid token")
 	}
-	if claims.Role != RoleTeacher && claims.Role != RoleAdmin && claims.Role != RoleSuperuser {
+	if claims.Role != RoleTeacher && claims.Role != RoleAdmin && claims.Role != RoleTester && claims.Role != RoleSuperuser {
 		return nil, errors.New("invalid role")
 	}
 	return claims, nil
@@ -131,7 +131,7 @@ func Middleware(cfg *conf.Config, dbRO *queries.Queries, next http.Handler) http
 			return
 		}
 
-		if claims.Role == RoleTeacher || claims.Role == RoleAdmin {
+		if claims.Role == RoleTeacher || claims.Role == RoleAdmin || claims.Role == RoleTester {
 			if claims.UserID == 0 {
 				logs.Log().Error(logtag, zap.String("reason", "teacher token missing user id"))
 				invalidateSession(w, r)
@@ -261,7 +261,7 @@ func SessionUserValid(ctx context.Context, dbRO *queries.Queries, user User) boo
 	switch user.Role {
 	case RoleSuperuser:
 		return true
-	case RoleTeacher, RoleAdmin:
+	case RoleTeacher, RoleAdmin, RoleTester:
 		if user.ID == 0 {
 			return false
 		}
@@ -297,6 +297,9 @@ func accessDenied(w http.ResponseWriter, r *http.Request) {
 func resolveLoginRole(roles []constants.TeacherRole) Role {
 	if teachers.HasRole(roles, constants.TeacherRoleAdmin) {
 		return RoleAdmin
+	}
+	if teachers.HasRole(roles, constants.TeacherRoleTester) {
+		return RoleTester
 	}
 	return RoleTeacher
 }
