@@ -179,6 +179,14 @@ templ EditScheduledClassModalForm(data EditScheduleData) {
 		}
 		@ClassDateField(data.Date, false)
 		@TimeRangeFields(data.StartTime, data.EndTime, false)
+		<div class="form-row">
+			@CurrencyDropdownWithValue(data.Currency)
+			<div class="form-group">
+				<label for="rate">Rate *</label>
+				<input type="number" id="rate" name="rate" required min="0" step="0.01" value={ formatFloat(data.Rate) }/>
+			</div>
+		</div>
+		@TrialClassCheckbox(data.IsTrialClass, false)
 		@ClassLearningMaterialPicker(data.LearningMaterials)
 		<div class="modal-footer">
 			<button type="button" class="btn btn-secondary scheduled-class-modal-close">Cancel</button>
@@ -186,6 +194,7 @@ templ EditScheduledClassModalForm(data EditScheduleData) {
 		</div>
 	</form>
 	@ScrTimeRangeInit()
+	@ScrTrialClassJS()
 }
 
 templ ScheduledClassModalsScript() {

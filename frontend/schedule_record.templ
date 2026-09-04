@@ -141,6 +141,24 @@ templ ScheduleRecord(data ScheduleRecordData) {
 				const ZOOM_MAX_AUTO_MINUTES = 40;
 				const ZOOM_MANUAL_WARNING = 'Classes longer than 40 minutes cannot receive an automatic Zoom meeting room on a Basic account. Please create your Zoom meeting manually and share the link with your student.';
 
+				function getBaseURL() {
+					const banner = document.getElementById('errorBanner');
+					if (banner && banner.dataset.basePath) {
+						return banner.dataset.basePath.replace(/\/$/, '');
+					}
+					const pathname = window.location.pathname;
+					const cleanPath = pathname.replace(/\/$/, '');
+					const parts = cleanPath.split('/').filter(p => p !== '');
+					if (parts.length === 0 || cleanPath.endsWith('.html')) {
+						return cleanPath.includes('/zion-english-admin') ? '/zion-english-admin' : '';
+					}
+					if (parts.length === 1) return '/' + parts[0];
+					return '/' + parts.slice(0, -1).join('/');
+				}
+
+				const baseURL = getBaseURL();
+				function buildURL(path) { return baseURL + path; }
+
 				function getTeacherEl() {
 					return lockTeacher
 						? document.getElementById('modal_teacher')
@@ -209,14 +227,7 @@ templ ScheduleRecord(data ScheduleRecordData) {
 				const studentEl = getStudentEl();
 				if (studentEl) {
 					studentEl.addEventListener('change', () => {
-						const opt = studentEl.options[studentEl.selectedIndex];
-						if (!opt || !opt.value) return;
-						const rate = opt.getAttribute('data-rate');
-						const currency = opt.getAttribute('data-currency');
-						const rateEl = document.getElementById('rate');
-						const currencyEl = document.getElementById('currency');
-						if (rate && rateEl) rateEl.value = rate;
-						if (currency && currencyEl) currencyEl.value = currency;
+						applyStudentRateToForm();
 					});
 				}
 
@@ -226,6 +237,7 @@ templ ScheduleRecord(data ScheduleRecordData) {
 			})();
 		</script>
 		@ScrTimeRangeInit()
+		@ScrTrialClassJS()
 	</body>
 	</html>
 }

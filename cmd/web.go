@@ -318,6 +318,17 @@ func requireFloat64(n string) (float64, error) {
 	return v, nil
 }
 
+func formIsTrialClass(r *http.Request) bool {
+	return r.FormValue("is_trial_class") == "on"
+}
+
+func trialClassToInt64(v bool) int64 {
+	if v {
+		return 1
+	}
+	return 0
+}
+
 func parseStudentParentRateFields(rateValue, currency string) (sql.NullFloat64, sql.NullString, error) {
 	rateValue = strings.TrimSpace(rateValue)
 	currency = strings.TrimSpace(currency)

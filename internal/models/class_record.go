@@ -2,7 +2,22 @@ package models
 
 import "zion-english/internal/constants"
 
-// NormalizeClassRecordRate forces rate to 0 for cancelled and rescheduled classes.
+func ApplyTrialClassRate(req *ClassRecordRequest) {
+	if req == nil || !req.IsTrialClass {
+		return
+	}
+	req.Rate = constants.TrialClassRate
+	req.Currency = constants.TrialClassCurrency
+}
+
+func ApplyScheduledTrialClassRate(req *ScheduledClassRequest) {
+	if req == nil || !req.IsTrialClass {
+		return
+	}
+	req.Rate = constants.TrialClassRate
+	req.Currency = constants.TrialClassCurrency
+}
+
 func NormalizeClassRecordRate(req *ClassRecordRequest) {
 	if req == nil {
 		return

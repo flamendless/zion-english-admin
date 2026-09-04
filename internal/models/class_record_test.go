@@ -43,3 +43,32 @@ func TestNormalizeClassRecordRate(t *testing.T) {
 		})
 	}
 }
+
+func TestApplyTrialClassRate(t *testing.T) {
+	req := &ClassRecordRequest{
+		Rate:     300,
+		Currency: "KRW",
+		IsTrialClass: true,
+	}
+	ApplyTrialClassRate(req)
+	if req.Rate != constants.TrialClassRate {
+		t.Fatalf("Rate = %v, want %v", req.Rate, constants.TrialClassRate)
+	}
+	if req.Currency != constants.TrialClassCurrency {
+		t.Fatalf("Currency = %q, want %q", req.Currency, constants.TrialClassCurrency)
+	}
+}
+
+func TestApplyTrialClassRateThenNormalizeCancelled(t *testing.T) {
+	req := &ClassRecordRequest{
+		Status:       string(constants.ClassStatusCancelled),
+		Rate:         300,
+		Currency:     "KRW",
+		IsTrialClass: true,
+	}
+	ApplyTrialClassRate(req)
+	NormalizeClassRecordRate(req)
+	if req.Rate != 0 {
+		t.Fatalf("Rate = %v, want 0", req.Rate)
+	}
+}

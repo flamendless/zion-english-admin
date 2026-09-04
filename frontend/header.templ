@@ -247,8 +247,12 @@ templ ErrorBannerHandlers() {
 
 		document.addEventListener('htmx:responseError', function(evt) {
 			const xhr = evt.detail.xhr;
-			const message = xhr.responseText || 'An error occurred';
+			const message = (xhr.responseText || 'An error occurred').trim();
 			showErrorBanner(message);
+			const target = evt.detail.target;
+			if (target && target.id === 'logOutput') {
+				target.textContent = message;
+			}
 		});
 
 		document.addEventListener('htmx:sendError', function(evt) {

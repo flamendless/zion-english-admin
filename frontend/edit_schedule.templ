@@ -17,6 +17,7 @@ type EditScheduleData struct {
 	EndTime     string
 	Rate              float64
 	Currency          string
+	IsTrialClass      bool
 	TodayPHT          string
 	From              string
 	LearningMaterials []ClassLearningMaterialLink
@@ -74,6 +75,7 @@ templ EditSchedule(data EditScheduleData) {
 						<input type="number" id="rate" name="rate" required min="0" step="0.01" value={ formatFloat(data.Rate) }/>
 					</div>
 				</div>
+				@TrialClassCheckbox(data.IsTrialClass, false)
 				<button type="submit" class="btn">Save Changes</button>
 			</form>
 
@@ -86,17 +88,11 @@ templ EditSchedule(data EditScheduleData) {
 			const studentSelect = document.getElementById('student') || document.getElementById('schedule_student');
 			if (studentSelect) {
 				studentSelect.addEventListener('change', () => {
-					const opt = studentSelect.options[studentSelect.selectedIndex];
-					if (!opt || !opt.value) return;
-					const rate = opt.getAttribute('data-rate');
-					const currency = opt.getAttribute('data-currency');
-					const rateEl = document.getElementById('rate');
-					const currencyEl = document.getElementById('currency');
-					if (rate && rateEl) rateEl.value = rate;
-					if (currency && currencyEl) currencyEl.value = currency;
+					applyStudentRateToForm();
 				});
 			}
 		</script>
+		@ScrTrialClassJS()
 	</body>
 	</html>
 }

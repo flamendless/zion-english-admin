@@ -132,6 +132,7 @@ type ClassRecordRequest struct {
 	DurationMinutes int64   `json:"durationMinutes"`
 	Rate            float64 `json:"rate"`
 	Currency        string  `json:"currency"`
+	IsTrialClass    bool    `json:"isTrialClass"`
 	Status          string  `json:"status"`
 	Reason          string  `json:"reason"`
 	Notes           string  `json:"notes"`
@@ -171,6 +172,7 @@ type ScheduledClassRequest struct {
 	DurationMinutes int64   `json:"durationMinutes"`
 	Rate            float64 `json:"rate"`
 	Currency        string  `json:"currency"`
+	IsTrialClass    bool    `json:"isTrialClass"`
 }
 
 type AvatarView struct {
@@ -217,6 +219,7 @@ type RecordClassPrefill struct {
 	DurationMinutes string
 	Rate            string
 	Currency        string
+	IsTrialClass    bool
 	Status          constants.ClassStatus
 	HasPrefill      bool
 }

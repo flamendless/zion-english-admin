@@ -21,6 +21,7 @@ type EditClassData struct {
 	DurationMinutes int64
 	Rate            float64
 	Currency        string
+	IsTrialClass    bool
 	Status          constants.ClassListFilterStatus
 	Reason            string
 	Notes             string
@@ -149,6 +150,7 @@ templ EditClass(data EditClassData) {
 		<div id="lmViewModalHost"></div>
 		@ScrTimeRangeInit()
 		@LearningMaterialViewModalScripts()
+		@ScrTrialClassJS()
 	</body>
 	</html>
 }
@@ -167,6 +169,12 @@ templ EditClassFields(data EditClassData, readonly bool) {
 				<input type="text" id="rate" value={ formatFloat(data.Rate) } disabled/>
 			</div>
 		</div>
+		if data.IsTrialClass {
+			<div class="form-group">
+				<label>Trial class</label>
+				<input type="text" value="Yes" disabled/>
+			</div>
+		}
 		<div class="form-row">
 			<div class="form-group">
 				<label for="status">Status</label>
@@ -192,6 +200,7 @@ templ EditClassFields(data EditClassData, readonly bool) {
 				<input type="number" id="rate" name="rate" required min="0" step="0.01" value={ formatFloat(data.Rate) }/>
 			</div>
 		</div>
+		@TrialClassCheckbox(data.IsTrialClass, false)
 		<div
 			class="form-row"
 			_="

@@ -131,6 +131,7 @@ func classEditClassData(ctx context.Context, recordID int64, readonly bool) (fro
 		DurationMinutes: existing.DurationMinutes,
 		Rate:            existing.Rate,
 		Currency:        existing.Currency,
+		IsTrialClass:    existing.IsTrialClass != 0,
 		Status:          constants.ClassListFilterStatus(existing.Status),
 		Reason:          existing.Reason.String,
 		Notes:           existing.Notes.String,
@@ -233,6 +234,7 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 		DurationMinutes: duration,
 		Rate:            rate,
 		Currency:        r.FormValue("currency"),
+		IsTrialClass:    formIsTrialClass(r),
 		Status:          r.FormValue("status"),
 		Reason:          r.FormValue("reason"),
 		Notes:           r.FormValue("notes"),
@@ -263,6 +265,7 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 		DurationMinutes: req.DurationMinutes,
 		Rate:            req.Rate,
 		Currency:        req.Currency,
+		IsTrialClass:    trialClassToInt64(req.IsTrialClass),
 		Status:          req.Status,
 		Reason:          sql.NullString{String: req.Reason, Valid: req.Reason != ""},
 		Notes:           sql.NullString{String: req.Notes, Valid: req.Notes != ""},
@@ -322,6 +325,7 @@ func parseClassRecordRequest(r *http.Request, user auth.User, role auth.Role, de
 		DurationMinutes: duration,
 		Rate:            rate,
 		Currency:        r.FormValue("currency"),
+		IsTrialClass:    formIsTrialClass(r),
 		Status:          r.FormValue("status"),
 		Reason:          r.FormValue("reason"),
 		Notes:           r.FormValue("notes"),
@@ -710,6 +714,7 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		DurationMinutes: req.DurationMinutes,
 		Rate:            req.Rate,
 		Currency:        req.Currency,
+		IsTrialClass:    trialClassToInt64(req.IsTrialClass),
 		Status:          req.Status,
 		Reason:          sql.NullString{String: req.Reason, Valid: req.Reason != ""},
 		Notes:           sql.NullString{String: req.Notes, Valid: req.Notes != ""},
@@ -801,6 +806,7 @@ func validateClassRecordRequest(req *models.ClassRecordRequest) error {
 	if req.DurationMinutes <= 0 {
 		return errors.New("duration must be greater than zero")
 	}
+	models.ApplyTrialClassRate(req)
 	models.NormalizeClassRecordRate(req)
 	if req.Rate < 0 {
 		return errors.New("rate cannot be negative")
@@ -881,6 +887,7 @@ func parseRecordClassPrefill(r *http.Request) models.RecordClassPrefill {
 	prefill.DurationMinutes = strconv.FormatInt(existing.DurationMinutes, 10)
 	prefill.Rate = strconv.FormatFloat(existing.Rate, 'f', -1, 64)
 	prefill.Currency = existing.Currency
+	prefill.IsTrialClass = existing.IsTrialClass != 0
 	if existing.StartTime.Valid {
 		prefill.StartTime = existing.StartTime.String
 		prefill.EndTime = utils.EndTimeFromStartAndDuration(prefill.StartTime, existing.DurationMinutes)

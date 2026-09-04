@@ -1,0 +1,68 @@
+package frontend
+
+templ TrialClassCheckbox(checked bool, disabled bool) {
+	<div class="form-group trial-class-field">
+		<label class="trial-class-toggle">
+			if disabled && checked {
+				<input type="hidden" name="is_trial_class" value="on"/>
+			}
+			<input
+				type="checkbox"
+				id="is_trial_class"
+				name="is_trial_class"
+				checked?={ checked }
+				disabled?={ disabled }
+			/>
+			Trial class
+		</label>
+	</div>
+}
+
+templ ScrTrialClassJS() {
+	<script>
+		if (!window.__trialClassJSReady) {
+			window.__trialClassJSReady = true;
+
+			window.applyStudentRateToForm = function applyStudentRateToForm() {
+				const trialEl = document.getElementById('is_trial_class');
+				if (trialEl && trialEl.checked) return;
+				const studentEl = document.getElementById('student')
+					|| document.getElementById('schedule_student');
+				if (!studentEl) return;
+				const opt = studentEl.options[studentEl.selectedIndex];
+				if (!opt || !opt.value) return;
+				const rate = opt.getAttribute('data-rate');
+				const currency = opt.getAttribute('data-currency');
+				const rateEl = document.getElementById('rate');
+				const currencyEl = document.getElementById('currency');
+				if (rate && rateEl) rateEl.value = rate;
+				if (currency && currencyEl) currencyEl.value = currency;
+			};
+
+			window.applyTrialClassRateFromCheckbox = function applyTrialClassRateFromCheckbox() {
+				const trialEl = document.getElementById('is_trial_class');
+				const rateEl = document.getElementById('rate');
+				const currencyEl = document.getElementById('currency');
+				if (!trialEl || !rateEl || !currencyEl) return;
+				if (trialEl.checked) {
+					rateEl.value = '50';
+					currencyEl.value = 'PHP';
+					return;
+				}
+				applyStudentRateToForm();
+			};
+
+			document.addEventListener('change', (e) => {
+				const target = e.target;
+				if (!target || !target.id) return;
+				if (target.id === 'is_trial_class') {
+					applyTrialClassRateFromCheckbox();
+					return;
+				}
+				if (target.id === 'student' || target.id === 'schedule_student') {
+					applyStudentRateToForm();
+				}
+			});
+		}
+	</script>
+}

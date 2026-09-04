@@ -144,6 +144,7 @@ func handleScheduleCreate(w http.ResponseWriter, r *http.Request) {
 		DurationMinutes: req.DurationMinutes,
 		Rate:            req.Rate,
 		Currency:        req.Currency,
+		IsTrialClass:    trialClassToInt64(req.IsTrialClass),
 		Reason:          sql.NullString{},
 		CreatedByRole:   string(user.Role),
 	})
@@ -670,6 +671,7 @@ func editScheduleData(ctx context.Context, scheduleID int64, lockTeacher, isSupe
 		EndTime:     utils.EndTimeFromStartAndDuration(startTime, existing.DurationMinutes),
 		Rate:              existing.Rate,
 		Currency:          existing.Currency,
+		IsTrialClass:      existing.IsTrialClass != 0,
 		LearningMaterials: materials,
 	}, nil
 }
@@ -800,13 +802,44 @@ func handleScheduledClassEdit(w http.ResponseWriter, r *http.Request, scheduleID
 			)
 		}
 	}
-	if scheduleChanged && startTime != "" {
-		syncCalendarForSchedule(ctx, scheduleID, existing.TeacherID, studentID, newDate, startTime, duration, existing.Rate, existing.Currency, "schedule edit")
+
+	rate, err := requireFloat64(r.FormValue("rate"))
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+	detailsReq := models.ScheduledClassRequest{
+		StudentID:    studentID,
+		Rate:         rate,
+		Currency:     r.FormValue("currency"),
+		IsTrialClass: formIsTrialClass(r),
+	}
+	models.ApplyScheduledTrialClassRate(&detailsReq)
+	if err := validateScheduledClassRateCurrency(detailsReq.Rate, detailsReq.Currency); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	err = dbRW.GetQueries().UpdateScheduledClassDetails(ctx, queries.UpdateScheduledClassDetailsParams{
+		StudentID:    studentID,
+		Rate:         detailsReq.Rate,
+		Currency:     detailsReq.Currency,
+		IsTrialClass: trialClassToInt64(detailsReq.IsTrialClass),
+		ID:           scheduleID,
+	})
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
 	}
 
 	if err := saveScheduledClassLearningMaterials(ctx, user, scheduleID, parseLearningMaterialIDs(r)); err != nil {
 		sendErrorLog(w, err.Error())
 		return
+	}
+
+	rateChanged := detailsReq.Rate != existing.Rate || detailsReq.Currency != existing.Currency
+	if startTime != "" && (scheduleChanged || rateChanged) {
+		syncCalendarForSchedule(ctx, scheduleID, existing.TeacherID, studentID, newDate, startTime, duration, detailsReq.Rate, detailsReq.Currency, "schedule edit")
 	}
 
 	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("updated scheduled class id %d (student id %d, date %s)", scheduleID, studentID, newDate))
@@ -934,6 +967,7 @@ func scheduledClassViewData(ctx context.Context, scheduleID int64) (frontend.Edi
 		DurationMinutes:   existing.DurationMinutes,
 		Rate:              existing.Rate,
 		Currency:          existing.Currency,
+		IsTrialClass:      existing.IsTrialClass != 0,
 		Status:            constants.ClassListFilterScheduled,
 		Reason:            reason,
 		LearningMaterials: materials,
@@ -1000,6 +1034,7 @@ func classRecordRequestFromSchedule(existing queries.GetScheduledClassByIDRow, s
 		DurationMinutes: existing.DurationMinutes,
 		Rate:            existing.Rate,
 		Currency:        existing.Currency,
+		IsTrialClass:    existing.IsTrialClass != 0,
 		Status:          status,
 		Reason:          reason,
 		Notes:           notes,
@@ -1026,6 +1061,7 @@ func insertClassRecordFromSchedule(ctx context.Context, user auth.User, existing
 		DurationMinutes: req.DurationMinutes,
 		Rate:            req.Rate,
 		Currency:        req.Currency,
+		IsTrialClass:    trialClassToInt64(req.IsTrialClass),
 		Status:          req.Status,
 		Reason:          sql.NullString{String: req.Reason, Valid: req.Reason != ""},
 		Notes:           sql.NullString{String: req.Notes, Valid: req.Notes != ""},
@@ -1119,7 +1155,9 @@ func parseScheduledClassRequest(r *http.Request, user auth.User, role auth.Role)
 		DurationMinutes: duration,
 		Rate:            rate,
 		Currency:        r.FormValue("currency"),
+		IsTrialClass:    formIsTrialClass(r),
 	}
+	models.ApplyScheduledTrialClassRate(&req)
 	return req, validateScheduledClassRequest(&req)
 }
 
@@ -1178,16 +1216,7 @@ func validateScheduledClassRequest(req *models.ScheduledClassRequest) error {
 	if req.DurationMinutes <= 0 {
 		return errors.New("duration must be greater than zero")
 	}
-	if req.Rate <= 0 {
-		return errors.New("rate must be greater than zero")
-	}
-	if req.Currency == "" {
-		return errors.New("currency is required")
-	}
-	if !constants.ValidCurrency(req.Currency) {
-		return errors.New("invalid currency. Must be KRW, CAD, YEN, or PHP")
-	}
-	return nil
+	return validateScheduledClassRateCurrency(req.Rate, req.Currency)
 }
 
 func scheduledClassTeacherAvatar(sc queries.GetScheduledClassesFilteredRow) models.AvatarView {

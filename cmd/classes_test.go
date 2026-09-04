@@ -13,6 +13,7 @@ func TestValidateClassRecordRequestZeroesRateForCancelledOrRescheduled(t *testin
 		status     string
 		rate       float64
 		wantRate   float64
+		trial      bool
 		wantErr    bool
 		errContain string
 	}{
@@ -21,6 +22,13 @@ func TestValidateClassRecordRequestZeroesRateForCancelledOrRescheduled(t *testin
 			status:   string(constants.ClassStatusConducted),
 			rate:     100,
 			wantRate: 100,
+		},
+		{
+			name:     "trial conducted applies 50 PHP",
+			status:   string(constants.ClassStatusConducted),
+			rate:     100,
+			wantRate: constants.TrialClassRate,
+			trial:    true,
 		},
 		{
 			name:       "conducted rejects zero rate",
@@ -53,6 +61,7 @@ func TestValidateClassRecordRequestZeroesRateForCancelledOrRescheduled(t *testin
 				DurationMinutes: 60,
 				Rate:            tt.rate,
 				Currency:        "KRW",
+				IsTrialClass:    tt.trial,
 				Status:          tt.status,
 				Reason:          "student unavailable",
 			}
@@ -75,6 +84,9 @@ func TestValidateClassRecordRequestZeroesRateForCancelledOrRescheduled(t *testin
 			}
 			if req.Rate != tt.wantRate {
 				t.Fatalf("req.Rate = %v, want %v", req.Rate, tt.wantRate)
+			}
+			if tt.trial && req.Currency != constants.TrialClassCurrency {
+				t.Fatalf("req.Currency = %q, want %q", req.Currency, constants.TrialClassCurrency)
 			}
 		})
 	}

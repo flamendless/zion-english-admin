@@ -2,28 +2,116 @@ package classrules
 
 import (
 	"context"
+	"database/sql"
 	"errors"
+	"fmt"
 	"zion-english/internal/auth"
+	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/utils"
 )
 
 var (
-	ErrDuplicateScheduled      = errors.New("a scheduled class with the same student, teacher, date, and duration already exists")
-	ErrScheduleNotOwner        = errors.New("you can only manage your own scheduled classes")
-	ErrTeacherScheduleConflict = errors.New("teacher already has a class scheduled at this time")
-	ErrStudentScheduleConflict = errors.New("student already has a class scheduled at this time")
+	ErrDuplicateScheduled           = errors.New("a scheduled class with the same student, teacher, date, and duration already exists")
+	ErrScheduleNotOwner             = errors.New("you can only manage your own scheduled classes")
+	ErrTeacherScheduleConflict      = errors.New("teacher already has a class scheduled at this time")
+	ErrStudentScheduleConflict      = errors.New("student already has a class scheduled at this time")
+	ErrVerifyStudentAssignment      = errors.New("failed to verify student assignment")
+	ErrCheckScheduledDuplicate      = errors.New("failed to check duplicate scheduled class")
+	ErrCheckClassRecordDuplicate    = errors.New("failed to check duplicate class record")
+	ErrCheckTeacherScheduleConflict = errors.New("failed to check teacher schedule conflicts")
+	ErrCheckStudentScheduleConflict = errors.New("failed to check student schedule conflicts")
 )
 
-type scheduledClassTimeSlot struct {
-	StartTime       string
-	DurationMinutes int64
+type ScheduleConflict struct {
+	Date        string
+	StartTime   string
+	EndTime     string
+	Status      string
+	TeacherName string
+	StudentName string
+}
+
+type ScheduleConflictError struct {
+	Kind     error
+	Conflict ScheduleConflict
+}
+
+func (e *ScheduleConflictError) Error() string {
+	return fmt.Sprintf(
+		"%s. Conflicting class: %s, %s - %s, status: %s, teacher: %s, student: %s",
+		e.Kind.Error(),
+		e.Conflict.Date,
+		e.Conflict.StartTime,
+		e.Conflict.EndTime,
+		e.Conflict.Status,
+		e.Conflict.TeacherName,
+		e.Conflict.StudentName,
+	)
+}
+
+func (e *ScheduleConflictError) Unwrap() error {
+	return e.Kind
+}
+
+func newScheduleConflictError(kind error, date, startTime string, durationMinutes int64, status, teacherName, studentName string) *ScheduleConflictError {
+	endTime := ""
+	if startTime != "" {
+		endTime = utils.EndTimeFromStartAndDuration(startTime, durationMinutes)
+	}
+	return &ScheduleConflictError{
+		Kind: kind,
+		Conflict: ScheduleConflict{
+			Date:        date,
+			StartTime:   formatTimeHM(startTime),
+			EndTime:     formatTimeHM(endTime),
+			Status:      conflictStatusLabel(status),
+			TeacherName: teacherName,
+			StudentName: studentName,
+		},
+	}
+}
+
+func conflictStatusLabel(status string) string {
+	if constants.ValidClassStatus(status) {
+		return constants.ClassStatus(status).Label()
+	}
+	if status == string(constants.ScheduledClassStatusScheduled) {
+		return "Scheduled"
+	}
+	if status == "" {
+		return "-"
+	}
+	return status
+}
+
+func formatTimeHM(value string) string {
+	if value == "" {
+		return ""
+	}
+	parsed, err := utils.ParseTimeHM(value)
+	if err != nil {
+		return value
+	}
+	return parsed.Format("15:04")
+}
+
+func conflictEndTime(startTime sql.NullString, endTime sql.NullString, durationMinutes int64) string {
+	if endTime.Valid && endTime.String != "" {
+		return formatTimeHM(endTime.String)
+	}
+	if startTime.Valid && startTime.String != "" {
+		return formatTimeHM(utils.EndTimeFromStartAndDuration(startTime.String, durationMinutes))
+	}
+	return ""
 }
 
 type scheduledClassDB interface {
 	GetStudentByID(ctx context.Context, id int64) (queries.GetStudentByIDRow, error)
 	CountClassRecordDuplicate(ctx context.Context, arg queries.CountClassRecordDuplicateParams) (int64, error)
+	GetClassRecordDuplicate(ctx context.Context, arg queries.GetClassRecordDuplicateParams) (queries.GetClassRecordDuplicateRow, error)
 	CountScheduledDuplicate(ctx context.Context, arg queries.CountScheduledDuplicateParams) (int64, error)
+	GetScheduledDuplicate(ctx context.Context, arg queries.GetScheduledDuplicateParams) (queries.GetScheduledDuplicateRow, error)
 	GetScheduledClassesByTeacherOnDate(ctx context.Context, arg queries.GetScheduledClassesByTeacherOnDateParams) ([]queries.GetScheduledClassesByTeacherOnDateRow, error)
 	GetScheduledClassesByStudentOnDate(ctx context.Context, arg queries.GetScheduledClassesByStudentOnDateParams) ([]queries.GetScheduledClassesByStudentOnDateRow, error)
 	IsStudentAssignedToTeacher(ctx context.Context, arg queries.IsStudentAssignedToTeacherParams) (int64, error)
@@ -51,36 +139,6 @@ func (r ScheduledClassRules) Validate(ctx context.Context, actor auth.User, inpu
 		return ErrInactiveStudent
 	}
 
-	dup, err := r.DB.CountScheduledDuplicate(ctx, queries.CountScheduledDuplicateParams{
-		StudentID:       input.StudentID,
-		TeacherID:       input.TeacherID,
-		ScheduledDate:   input.Date,
-		DurationMinutes: input.DurationMinutes,
-		Column5:         input.ScheduleID,
-		ID:              input.ScheduleID,
-	})
-	if err != nil {
-		return errors.New("failed to check duplicate scheduled class")
-	}
-	if dup > 0 {
-		return ErrDuplicateScheduled
-	}
-
-	recordDup, err := r.DB.CountClassRecordDuplicate(ctx, queries.CountClassRecordDuplicateParams{
-		StudentID:       input.StudentID,
-		TeacherID:       input.TeacherID,
-		Date:            input.Date,
-		DurationMinutes: input.DurationMinutes,
-		Column5:         0,
-		ID:              0,
-	})
-	if err != nil {
-		return errors.New("failed to check duplicate class record")
-	}
-	if recordDup > 0 {
-		return ErrDuplicateClass
-	}
-
 	if actor.Role == auth.RoleTeacher {
 		if input.TeacherID != actor.ID {
 			return ErrTeacherNotOwner
@@ -92,7 +150,7 @@ func (r ScheduledClassRules) Validate(ctx context.Context, actor auth.User, inpu
 		StudentID: input.StudentID,
 	})
 	if err != nil {
-		return errors.New("failed to verify student assignment")
+		return ErrVerifyStudentAssignment
 	}
 	if assigned == 0 {
 		return ErrStudentNotAssigned
@@ -104,7 +162,104 @@ func (r ScheduledClassRules) Validate(ctx context.Context, actor auth.User, inpu
 		}
 	}
 
+	if err := r.validateDuplicateScheduled(ctx, input); err != nil {
+		return err
+	}
+
+	if err := r.validateDuplicateClassRecord(ctx, input); err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func (r ScheduledClassRules) validateDuplicateScheduled(ctx context.Context, input ScheduledClassInput) error {
+	dup, err := r.DB.CountScheduledDuplicate(ctx, queries.CountScheduledDuplicateParams{
+		StudentID:       input.StudentID,
+		TeacherID:       input.TeacherID,
+		ScheduledDate:   input.Date,
+		DurationMinutes: input.DurationMinutes,
+		Column5:         input.ScheduleID,
+		ID:              input.ScheduleID,
+	})
+	if err != nil {
+		return ErrCheckScheduledDuplicate
+	}
+	if dup == 0 {
+		return nil
+	}
+
+	row, err := r.DB.GetScheduledDuplicate(ctx, queries.GetScheduledDuplicateParams{
+		StudentID:       input.StudentID,
+		TeacherID:       input.TeacherID,
+		ScheduledDate:   input.Date,
+		DurationMinutes: input.DurationMinutes,
+		Column5:         input.ScheduleID,
+		ID:              input.ScheduleID,
+	})
+	if err != nil {
+		return ErrDuplicateScheduled
+	}
+
+	startTime := ""
+	if row.StartTime.Valid {
+		startTime = row.StartTime.String
+	}
+	return newScheduleConflictError(
+		ErrDuplicateScheduled,
+		row.ScheduledDate,
+		startTime,
+		row.DurationMinutes,
+		row.Status,
+		row.TeacherName,
+		row.StudentName,
+	)
+}
+
+func (r ScheduledClassRules) validateDuplicateClassRecord(ctx context.Context, input ScheduledClassInput) error {
+	dup, err := r.DB.CountClassRecordDuplicate(ctx, queries.CountClassRecordDuplicateParams{
+		StudentID:       input.StudentID,
+		TeacherID:       input.TeacherID,
+		Date:            input.Date,
+		DurationMinutes: input.DurationMinutes,
+		Column5:         0,
+		ID:              0,
+	})
+	if err != nil {
+		return ErrCheckClassRecordDuplicate
+	}
+	if dup == 0 {
+		return nil
+	}
+
+	row, err := r.DB.GetClassRecordDuplicate(ctx, queries.GetClassRecordDuplicateParams{
+		StudentID:       input.StudentID,
+		TeacherID:       input.TeacherID,
+		Date:            input.Date,
+		DurationMinutes: input.DurationMinutes,
+		Column5:         0,
+		ID:              0,
+	})
+	if err != nil {
+		return ErrDuplicateClass
+	}
+
+	startTime := ""
+	if row.StartTime.Valid {
+		startTime = row.StartTime.String
+	}
+	conflict := ScheduleConflict{
+		Date:        row.Date,
+		StartTime:   formatTimeHM(startTime),
+		EndTime:     conflictEndTime(row.StartTime, row.EndTime, row.DurationMinutes),
+		Status:      conflictStatusLabel(row.Status),
+		TeacherName: row.TeacherName,
+		StudentName: row.StudentName,
+	}
+	return &ScheduleConflictError{
+		Kind:     ErrDuplicateClass,
+		Conflict: conflict,
+	}
 }
 
 func (r ScheduledClassRules) validateNoScheduleOverlap(ctx context.Context, input ScheduledClassInput) error {
@@ -117,10 +272,22 @@ func (r ScheduledClassRules) validateNoScheduleOverlap(ctx context.Context, inpu
 		ID:            excludeID,
 	})
 	if err != nil {
-		return errors.New("failed to check teacher schedule conflicts")
+		return ErrCheckTeacherScheduleConflict
 	}
-	if scheduleOverlaps(teacherClassesToSlots(teacherClasses), input.StartTime, input.DurationMinutes) {
-		return ErrTeacherScheduleConflict
+	if row, ok := findTeacherScheduleOverlap(teacherClasses, input.StartTime, input.DurationMinutes); ok {
+		startTime := ""
+		if row.StartTime.Valid {
+			startTime = row.StartTime.String
+		}
+		return newScheduleConflictError(
+			ErrTeacherScheduleConflict,
+			row.ScheduledDate,
+			startTime,
+			row.DurationMinutes,
+			row.Status,
+			row.TeacherName,
+			row.StudentName,
+		)
 	}
 
 	studentClasses, err := r.DB.GetScheduledClassesByStudentOnDate(ctx, queries.GetScheduledClassesByStudentOnDateParams{
@@ -130,58 +297,65 @@ func (r ScheduledClassRules) validateNoScheduleOverlap(ctx context.Context, inpu
 		ID:            excludeID,
 	})
 	if err != nil {
-		return errors.New("failed to check student schedule conflicts")
+		return ErrCheckStudentScheduleConflict
 	}
-	if scheduleOverlaps(studentClassesToSlots(studentClasses), input.StartTime, input.DurationMinutes) {
-		return ErrStudentScheduleConflict
+	if row, ok := findStudentScheduleOverlap(studentClasses, input.StartTime, input.DurationMinutes); ok {
+		startTime := ""
+		if row.StartTime.Valid {
+			startTime = row.StartTime.String
+		}
+		return newScheduleConflictError(
+			ErrStudentScheduleConflict,
+			row.ScheduledDate,
+			startTime,
+			row.DurationMinutes,
+			row.Status,
+			row.TeacherName,
+			row.StudentName,
+		)
 	}
 
 	return nil
 }
 
-func teacherClassesToSlots(rows []queries.GetScheduledClassesByTeacherOnDateRow) []scheduledClassTimeSlot {
-	slots := make([]scheduledClassTimeSlot, 0, len(rows))
-	for _, row := range rows {
-		if !row.StartTime.Valid {
-			continue
-		}
-		slots = append(slots, scheduledClassTimeSlot{
-			StartTime:       row.StartTime.String,
-			DurationMinutes: row.DurationMinutes,
-		})
-	}
-	return slots
-}
-
-func studentClassesToSlots(rows []queries.GetScheduledClassesByStudentOnDateRow) []scheduledClassTimeSlot {
-	slots := make([]scheduledClassTimeSlot, 0, len(rows))
-	for _, row := range rows {
-		if !row.StartTime.Valid {
-			continue
-		}
-		slots = append(slots, scheduledClassTimeSlot{
-			StartTime:       row.StartTime.String,
-			DurationMinutes: row.DurationMinutes,
-		})
-	}
-	return slots
-}
-
-func scheduleOverlaps(existing []scheduledClassTimeSlot, startTime string, durationMinutes int64) bool {
+func findTeacherScheduleOverlap(rows []queries.GetScheduledClassesByTeacherOnDateRow, startTime string, durationMinutes int64) (queries.GetScheduledClassesByTeacherOnDateRow, bool) {
 	startMins, err := utils.MinutesSinceMidnight(startTime)
 	if err != nil {
-		return false
+		return queries.GetScheduledClassesByTeacherOnDateRow{}, false
 	}
-	for _, slot := range existing {
-		existingStart, err := utils.MinutesSinceMidnight(slot.StartTime)
+	for _, row := range rows {
+		if !row.StartTime.Valid {
+			continue
+		}
+		existingStart, err := utils.MinutesSinceMidnight(row.StartTime.String)
 		if err != nil {
 			continue
 		}
-		if utils.TimeRangesOverlapMinutes(existingStart, slot.DurationMinutes, startMins, durationMinutes) {
-			return true
+		if utils.TimeRangesOverlapMinutes(existingStart, row.DurationMinutes, startMins, durationMinutes) {
+			return row, true
 		}
 	}
-	return false
+	return queries.GetScheduledClassesByTeacherOnDateRow{}, false
+}
+
+func findStudentScheduleOverlap(rows []queries.GetScheduledClassesByStudentOnDateRow, startTime string, durationMinutes int64) (queries.GetScheduledClassesByStudentOnDateRow, bool) {
+	startMins, err := utils.MinutesSinceMidnight(startTime)
+	if err != nil {
+		return queries.GetScheduledClassesByStudentOnDateRow{}, false
+	}
+	for _, row := range rows {
+		if !row.StartTime.Valid {
+			continue
+		}
+		existingStart, err := utils.MinutesSinceMidnight(row.StartTime.String)
+		if err != nil {
+			continue
+		}
+		if utils.TimeRangesOverlapMinutes(existingStart, row.DurationMinutes, startMins, durationMinutes) {
+			return row, true
+		}
+	}
+	return queries.GetScheduledClassesByStudentOnDateRow{}, false
 }
 
 func (r ScheduledClassRules) ValidateAccess(scheduleTeacherID int64, actor auth.User) error {

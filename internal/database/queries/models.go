@@ -80,6 +80,7 @@ type TblClassRecord struct {
 	StartTime       sql.NullString
 	EndTime         sql.NullString
 	DeletedAt       sql.NullString
+	IsTrialClass    int64
 }
 
 type TblClassRecordLearningMaterial struct {
@@ -208,6 +209,7 @@ type TblScheduledClass struct {
 	CreatedAt       string
 	UpdatedAt       string
 	DeletedAt       sql.NullString
+	IsTrialClass    int64
 }
 
 type TblScheduledClassLearningMaterial struct {

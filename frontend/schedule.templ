@@ -930,14 +930,7 @@ templ Schedule(data ScheduleData) {
 				scheduleModalForm.addEventListener('change', (e) => {
 					const target = e.target;
 					if (!target || (target.id !== 'schedule_student' && target.id !== 'student')) return;
-					const opt = target.options[target.selectedIndex];
-					if (!opt || !opt.value) return;
-					const rate = opt.getAttribute('data-rate');
-					const currency = opt.getAttribute('data-currency');
-					const rateEl = document.getElementById('rate');
-					const currencyEl = document.getElementById('currency');
-					if (rate && rateEl) rateEl.value = rate;
-					if (currency && currencyEl) currencyEl.value = currency;
+					applyStudentRateToForm();
 				});
 			}
 
@@ -1049,6 +1042,7 @@ templ Schedule(data ScheduleData) {
 			}
 		</script>
 		@ScrTimeRangeInit()
+		@ScrTrialClassJS()
 	</body>
 	</html>
 }
@@ -1064,4 +1058,5 @@ templ ScheduleModalFields() {
 			<input type="number" id="rate" name="rate" required min="0" step="0.01" placeholder="0.00"/>
 		</div>
 	</div>
+	@TrialClassCheckbox(false, false)
 }
