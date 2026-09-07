@@ -795,6 +795,60 @@ func (q *Queries) SoftDeleteClassRecord(ctx context.Context, arg SoftDeleteClass
 	return err
 }
 
+const sumConductedParentRateByCurrencyAndDateRange = `-- name: SumConductedParentRateByCurrencyAndDateRange :many
+SELECT s.parent_currency AS currency, COALESCE(SUM(s.parent_rate), 0) AS total_rate
+FROM tbl_class_records cr
+JOIN tbl_students s ON cr.student_id = s.id
+WHERE cr.date >= ? AND cr.date <= ?
+	AND cr.status = 'conducted'
+	AND cr.deleted_at IS NULL
+	AND s.parent_rate IS NOT NULL
+	AND s.parent_currency IS NOT NULL
+	AND s.parent_currency != ''
+	AND (? = 0 OR cr.teacher_id = ?)
+GROUP BY s.parent_currency
+`
+
+type SumConductedParentRateByCurrencyAndDateRangeParams struct {
+	Date      string
+	Date_2    string
+	Column3   interface{}
+	TeacherID int64
+}
+
+type SumConductedParentRateByCurrencyAndDateRangeRow struct {
+	Currency  sql.NullString
+	TotalRate interface{}
+}
+
+func (q *Queries) SumConductedParentRateByCurrencyAndDateRange(ctx context.Context, arg SumConductedParentRateByCurrencyAndDateRangeParams) ([]SumConductedParentRateByCurrencyAndDateRangeRow, error) {
+	rows, err := q.db.QueryContext(ctx, sumConductedParentRateByCurrencyAndDateRange,
+		arg.Date,
+		arg.Date_2,
+		arg.Column3,
+		arg.TeacherID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SumConductedParentRateByCurrencyAndDateRangeRow
+	for rows.Next() {
+		var i SumConductedParentRateByCurrencyAndDateRangeRow
+		if err := rows.Scan(&i.Currency, &i.TotalRate); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const sumConductedRateByCurrencyAndDateRange = `-- name: SumConductedRateByCurrencyAndDateRange :many
 SELECT cr.currency, COALESCE(SUM(cr.rate), 0) as total_rate
 FROM tbl_class_records cr

@@ -110,6 +110,24 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 				})
 			}
 		}
+		parentRates, err := dbRO.GetQueries().SumConductedParentRateByCurrencyAndDateRange(ctx, queries.SumConductedParentRateByCurrencyAndDateRangeParams{
+			Date:      monthStart,
+			Date_2:    monthEnd,
+			Column3:   int64(0),
+			TeacherID: 0,
+		})
+		if err == nil {
+			for _, row := range parentRates {
+				if !row.Currency.Valid || row.Currency.String == "" {
+					continue
+				}
+				total, _ := row.TotalRate.(float64)
+				data.ParentMonthlyTotals = append(data.ParentMonthlyTotals, frontend.CurrencyTotal{
+					Currency: row.Currency.String,
+					Total:    total,
+				})
+			}
+		}
 	case auth.RoleTeacher, auth.RoleTester:
 		user := auth.GetUser(ctx)
 		count, err := dbRO.GetQueries().CountStudentsByTeacherID(ctx, user.ID)

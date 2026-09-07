@@ -195,3 +195,16 @@ WHERE cr.date >= ? AND cr.date <= ? AND cr.status = 'conducted'
 	AND cr.deleted_at IS NULL
 	AND (? = 0 OR cr.teacher_id = ?)
 GROUP BY cr.currency;
+
+-- name: SumConductedParentRateByCurrencyAndDateRange :many
+SELECT s.parent_currency AS currency, COALESCE(SUM(s.parent_rate), 0) AS total_rate
+FROM tbl_class_records cr
+JOIN tbl_students s ON cr.student_id = s.id
+WHERE cr.date >= ? AND cr.date <= ?
+	AND cr.status = 'conducted'
+	AND cr.deleted_at IS NULL
+	AND s.parent_rate IS NOT NULL
+	AND s.parent_currency IS NOT NULL
+	AND s.parent_currency != ''
+	AND (? = 0 OR cr.teacher_id = ?)
+GROUP BY s.parent_currency;
