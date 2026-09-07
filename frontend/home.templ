@@ -79,6 +79,17 @@ templ Home(data DashboardData) {
 	</html>
 }
 
+templ DashboardCurrencyStatCard(label string, totals []CurrencyTotal) {
+	<div class="stat-card">
+		<span class="stat-label">{ label }</span>
+		<div class="stat-currency-rows">
+			for _, total := range totals {
+				<span class="stat-currency-row">{ utils.FormatCurrency(total.Total, total.Currency) }</span>
+			}
+		</div>
+	</div>
+}
+
 templ DashboardStats(data DashboardData) {
 	<h2 class="dashboard-section-title">Overview</h2>
 	<div class="dashboard-stats">
@@ -123,19 +134,9 @@ templ DashboardStats(data DashboardData) {
 			<span class="stat-value">{ fmt.Sprintf("%d conducted", data.ClassesConductedWeek) }</span>
 			<span class="stat-sub">{ fmt.Sprintf("%d cancelled, %d rescheduled", data.ClassesCancelledWeek, data.ClassesRescheduledWeek) }</span>
 		</div>
-		for _, mt := range data.MonthlyTotals {
-			<div class="stat-card">
-				<span class="stat-label">Month ({ mt.Currency })</span>
-				<span class="stat-value">{ utils.FormatCurrencyAmountFixed(mt.Total, mt.Currency) }</span>
-			</div>
-		}
+		@DashboardCurrencyStatCard("Month", data.MonthlyTotals)
 		if auth.HasAdminAccess(data.Role) {
-			for _, pt := range data.ParentMonthlyTotals {
-				<div class="stat-card">
-					<span class="stat-label">Parent Rates Month ({ pt.Currency })</span>
-					<span class="stat-value">{ utils.FormatCurrencyAmountFixed(pt.Total, pt.Currency) }</span>
-				</div>
-			}
+			@DashboardCurrencyStatCard("Parent Rates Month", data.ParentMonthlyTotals)
 		}
 	</div>
 }
