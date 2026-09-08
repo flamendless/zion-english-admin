@@ -25,6 +25,10 @@ import (
 )
 
 func handleSchedulePath(w http.ResponseWriter, r *http.Request) {
+	if id, ok := extractPathID(r, "schedule", "/edit/preview"); ok {
+		handleScheduledClassEditPreview(w, r, id)
+		return
+	}
 	if id, ok := extractPathID(r, "schedule", "/edit/modal"); ok {
 		handleScheduledClassEditModal(w, r, id)
 		return
@@ -145,6 +149,7 @@ func handleScheduleCreate(w http.ResponseWriter, r *http.Request) {
 		Rate:            req.Rate,
 		Currency:        req.Currency,
 		IsTrialClass:    trialClassToInt64(req.IsTrialClass),
+		SeriesID:        sql.NullInt64{},
 		Reason:          sql.NullString{},
 		CreatedByRole:   string(user.Role),
 	})
@@ -342,6 +347,11 @@ func handleScheduleListPartial(w http.ResponseWriter, r *http.Request) {
 	}
 
 	items := frontend.ScheduledClassItemsFromViews(views)
+	items, err = enrichScheduledClassItemsSeries(r.Context(), items)
+	if err != nil {
+		HttpError(w, "Failed to fetch scheduled classes", http.StatusInternalServerError)
+		return
+	}
 	emptyMsg := "No classes scheduled for this day."
 	if q.startDate == q.endDate && q.startDate == utils.TodayPHT() {
 		emptyMsg = "No classes scheduled for today."
@@ -385,6 +395,11 @@ func handleScheduleDayTimelinePartial(w http.ResponseWriter, r *http.Request) {
 	}
 
 	items := frontend.ScheduledClassItemsFromViews(views)
+	items, err = enrichScheduledClassItemsSeries(r.Context(), items)
+	if err != nil {
+		HttpError(w, "Failed to fetch scheduled classes", http.StatusInternalServerError)
+		return
+	}
 	emptyMsg := "No classes scheduled for this day."
 	if q.startDate == q.endDate && q.startDate == utils.TodayPHT() {
 		emptyMsg = "No classes scheduled for today."
@@ -398,6 +413,8 @@ func handleScheduleDayTimelinePartial(w http.ResponseWriter, r *http.Request) {
 	}
 
 	timeline := frontend.BuildScheduledClassDayTimeline(items, emptyMsg)
+	timeline.ZoomLogoURL = utils.URL("/static/zoom-logo.svg")
+	timeline.CalendarLogoURL = utils.URL("/static/google-calendar-logo.svg")
 	w.Header().Set("Content-Type", "text/html")
 	if err := frontend.ScheduledClassDayTimeline(timeline).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
@@ -485,26 +502,27 @@ func handleCancelScheduledClass(w http.ResponseWriter, r *http.Request, schedule
 		return
 	}
 	notes := strings.TrimSpace(r.FormValue("notes"))
-
-	if meetingSvc != nil {
-		_ = meetingSvc.DeleteRoomForSchedule(ctx, scheduleID, existing.TeacherID)
-	}
-	if calendarSvc != nil {
-		_ = calendarSvc.DeleteEventForSchedule(ctx, scheduleID, existing.TeacherID)
-	}
-
-	if err := insertClassRecordFromSchedule(ctx, user, existing, scheduleID, "cancelled", reason, notes); err != nil {
+	scope := constants.ParseSeriesScope(r.FormValue("series_scope"))
+	targets, err := scheduledClassesForScope(ctx, existing, scope)
+	if err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
+	for _, target := range targets {
+		if err := cancelScheduledClassByID(ctx, user, target.ID, reason, notes); err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+	}
 
-	insertAuditLogAs(ctx, user, "classes", fmt.Sprintf("recorded class for student id %d (teacher id %d, date %s, status cancelled)", existing.StudentID, existing.TeacherID, existing.ScheduledDate))
-	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("cancelled scheduled class id %d (student id %d, date %s)", scheduleID, existing.StudentID, existing.ScheduledDate))
-	actor := auth.GetUser(ctx)
-	notifyCrossParty(ctx, actor, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
-		fmt.Sprintf("Scheduled class on %s was cancelled", existing.ScheduledDate))
+	notifyCrossParty(ctx, user, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
+		fmt.Sprintf("Scheduled class%s cancelled", formatSeriesScopeSummary(int64(len(targets)), "cancelled")))
 
-	respondScheduledClassAction(w, r.FormValue("from"), "Class cancelled.")
+	message := "Class cancelled."
+	if len(targets) > 1 {
+		message = fmt.Sprintf("%d classes cancelled.", len(targets))
+	}
+	respondScheduledClassAction(w, r.FormValue("from"), message)
 }
 
 func handleRescheduleScheduledClass(w http.ResponseWriter, r *http.Request, scheduleID int64) {
@@ -657,27 +675,27 @@ func handleDeleteScheduledClass(w http.ResponseWriter, r *http.Request, schedule
 		return
 	}
 
-	if meetingSvc != nil {
-		_ = meetingSvc.DeleteRoomForSchedule(ctx, scheduleID, existing.TeacherID)
-	}
-	if calendarSvc != nil {
-		_ = calendarSvc.DeleteEventForSchedule(ctx, scheduleID, existing.TeacherID)
-	}
-
-	err = dbRW.GetQueries().SoftDeleteScheduledClass(ctx, queries.SoftDeleteScheduledClassParams{
-		Reason: sql.NullString{String: reason, Valid: true},
-		ID:     scheduleID,
-	})
+	scope := constants.ParseSeriesScope(r.FormValue("series_scope"))
+	targets, err := scheduledClassesForScope(ctx, existing, scope)
 	if err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
+	for _, target := range targets {
+		if err := deleteScheduledClassByID(ctx, user, target.ID, reason); err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+	}
 
-	insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("deleted scheduled class id %d (student id %d, date %s, reason: %s)", scheduleID, existing.StudentID, existing.ScheduledDate, reason))
 	notifyCrossParty(ctx, user, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
-		fmt.Sprintf("Scheduled class on %s was deleted", existing.ScheduledDate))
+		fmt.Sprintf("Scheduled class%s deleted", formatSeriesScopeSummary(int64(len(targets)), "deleted")))
 
-	respondScheduledClassAction(w, r.FormValue("from"), "Scheduled class deleted successfully.")
+	message := "Scheduled class deleted successfully."
+	if len(targets) > 1 {
+		message = fmt.Sprintf("%d scheduled classes deleted successfully.", len(targets))
+	}
+	respondScheduledClassAction(w, r.FormValue("from"), message)
 }
 
 func editScheduleData(ctx context.Context, scheduleID int64, lockTeacher, isSuperuser bool) (frontend.EditScheduleData, error) {
@@ -701,6 +719,16 @@ func editScheduleData(ctx context.Context, scheduleID int64, lockTeacher, isSupe
 		return frontend.EditScheduleData{}, err
 	}
 
+	seriesID, _ := seriesIDFromRow(existing.SeriesID)
+	total, future, err := seriesCounts(ctx, existing.SeriesID, existing.ScheduledDate)
+	if err != nil {
+		return frontend.EditScheduleData{}, err
+	}
+	dates, err := seriesDates(ctx, existing.SeriesID)
+	if err != nil {
+		return frontend.EditScheduleData{}, err
+	}
+
 	return frontend.EditScheduleData{
 		ScheduleID:  strconv.FormatInt(scheduleID, 10),
 		LockTeacher: lockTeacher,
@@ -715,6 +743,10 @@ func editScheduleData(ctx context.Context, scheduleID int64, lockTeacher, isSupe
 		Currency:          existing.Currency,
 		IsTrialClass:      existing.IsTrialClass != 0,
 		LearningMaterials: materials,
+		SeriesID:          seriesID,
+		SeriesTotalCount:  total,
+		SeriesFutureCount: future,
+		SeriesDates:       dates,
 	}, nil
 }
 
@@ -760,89 +792,12 @@ func handleScheduledClassEdit(w http.ResponseWriter, r *http.Request, scheduleID
 		return
 	}
 
-	newDate := r.FormValue("scheduled_date")
-	if newDate == "" {
-		newDate = r.FormValue("date")
-	}
-	if newDate == "" {
-		sendErrorLog(w, "date is required")
-		return
-	}
-	if _, err := utils.ParseDatePHT(newDate); err != nil {
-		sendErrorLog(w, "invalid date format")
-		return
-	}
-
 	startTime := normalizeScheduleStartTime(r.FormValue("start_time"))
 	endTime := r.FormValue("end_time")
 	duration, err := utils.DurationMinutesFromRange(startTime, endTime)
 	if err != nil {
 		sendErrorLog(w, friendlyTimeRangeError(err).Error())
 		return
-	}
-
-	existingStart := ""
-	if existing.StartTime.Valid {
-		existingStart = existing.StartTime.String
-	}
-	if err := validateScheduleDateTimeChange(existing.ScheduledDate, existingStart, newDate, startTime); err != nil {
-		sendErrorLog(w, err.Error())
-		return
-	}
-
-	if err := rules.Validate(ctx, user, classrules.ScheduledClassInput{
-		ScheduleID:      scheduleID,
-		StudentID:       studentID,
-		TeacherID:       existing.TeacherID,
-		Date:            newDate,
-		StartTime:       startTime,
-		DurationMinutes: duration,
-	}); err != nil {
-		sendErrorLog(w, err.Error())
-		return
-	}
-
-	var startTimeNull sql.NullString
-	if startTime != "" {
-		startTimeNull = sql.NullString{String: startTime, Valid: true}
-	}
-
-	err = dbRW.GetQueries().UpdateScheduledClassSchedule(ctx, queries.UpdateScheduledClassScheduleParams{
-		StudentID:       studentID,
-		ScheduledDate:   newDate,
-		StartTime:       startTimeNull,
-		DurationMinutes: duration,
-		ID:              scheduleID,
-	})
-	if err != nil {
-		sendErrorLog(w, err.Error())
-		return
-	}
-
-	scheduleChanged := studentID != existing.StudentID ||
-		newDate != existing.ScheduledDate ||
-		startTime != existingStart ||
-		duration != existing.DurationMinutes
-	if scheduleChanged && meetingSvc != nil {
-		student, studentErr := dbRO.GetQueries().GetStudentByID(ctx, studentID)
-		studentName := "student"
-		if studentErr == nil {
-			studentName = student.Name
-		}
-		if err := meetingSvc.SyncRoomForSchedule(ctx, meetings.ScheduledClassMeetingInput{
-			ScheduleID:      scheduleID,
-			TeacherID:       existing.TeacherID,
-			StudentName:     studentName,
-			ScheduledDate:   newDate,
-			StartTime:       startTime,
-			DurationMinutes: duration,
-		}); err != nil {
-			logs.Log().Warn("zoom room sync failed after schedule edit",
-				zap.Error(err),
-				zap.Int64("schedule_id", scheduleID),
-				zap.Int64("teacher_id", existing.TeacherID),
-			)
-		}
 	}
 
 	rate, err := requireFloat64(r.FormValue("rate"))
@@ -862,34 +817,220 @@ func handleScheduledClassEdit(w http.ResponseWriter, r *http.Request, scheduleID
 		return
 	}
 
-	err = dbRW.GetQueries().UpdateScheduledClassDetails(ctx, queries.UpdateScheduledClassDetailsParams{
+	scope := constants.ParseSeriesScope(r.FormValue("edit_scope"))
+	lmIDs := parseLearningMaterialIDs(r)
+	editInput := scheduledClassEditInput{
+		StudentID:       studentID,
+		StartTime:       startTime,
+		DurationMinutes: duration,
+		Rate:            detailsReq.Rate,
+		Currency:        detailsReq.Currency,
+		IsTrialClass:    detailsReq.IsTrialClass,
+	}
+
+	existingStart := ""
+	if existing.StartTime.Valid {
+		existingStart = existing.StartTime.String
+	}
+
+	if _, ok := seriesIDFromRow(existing.SeriesID); ok {
+		allSeriesDates, err := seriesDates(ctx, existing.SeriesID)
+		if err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+		confirmDates, err := parseEditSeriesConfirmDates(r, allSeriesDates)
+		if err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+		if confirmDates != nil {
+			affected, err := applySeriesScheduleEdit(ctx, user, existing, scope, confirmDates, allSeriesDates, editInput, lmIDs, existingStart)
+			if err != nil {
+				sendErrorLog(w, err.Error())
+				return
+			}
+			auditAction := "updated scheduled class"
+			if affected > 1 {
+				auditAction = fmt.Sprintf("updated %d scheduled classes in series", affected)
+			}
+			insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("%s starting id %d (student id %d)", auditAction, scheduleID, studentID))
+			notifyCrossParty(ctx, user, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
+				fmt.Sprintf("Scheduled class%s updated", formatSeriesScopeSummary(int64(affected), "updated")))
+			respondScheduledClassAction(w, r.FormValue("from"), "Scheduled class updated successfully!")
+			return
+		}
+	}
+
+	newDate := r.FormValue("scheduled_date")
+	if newDate == "" {
+		newDate = r.FormValue("date")
+	}
+	if newDate == "" {
+		sendErrorLog(w, "date is required")
+		return
+	}
+	if _, err := utils.ParseDatePHT(newDate); err != nil {
+		sendErrorLog(w, "invalid date format")
+		return
+	}
+
+	targets, err := scheduledClassesForScope(ctx, existing, scope)
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+	if scope == constants.SeriesScopeSingle {
+		if err := validateScheduleDateTimeChange(existing.ScheduledDate, existingStart, newDate, startTime); err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+	} else if newDate != existing.ScheduledDate {
+		sendErrorLog(w, "date cannot be changed when updating this and future classes in a series")
+		return
+	}
+
+	for _, target := range targets {
+		targetDate := target.ScheduledDate
+		if scope == constants.SeriesScopeSingle {
+			targetDate = newDate
+		}
+		editInput.ScheduledDate = targetDate
+		if err := applyScheduledClassEdit(ctx, user, target, editInput, lmIDs); err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+	}
+
+	auditAction := "updated scheduled class"
+	if len(targets) > 1 {
+		auditAction = fmt.Sprintf("updated %d scheduled classes in series", len(targets))
+	}
+	insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("%s starting id %d (student id %d)", auditAction, scheduleID, studentID))
+	notifyCrossParty(ctx, user, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
+		fmt.Sprintf("Scheduled class%s updated", formatSeriesScopeSummary(int64(len(targets)), "updated")))
+
+	respondScheduledClassAction(w, r.FormValue("from"), "Scheduled class updated successfully!")
+}
+
+func handleScheduledClassEditPreview(w http.ResponseWriter, r *http.Request, scheduleID int64) {
+	if r.Method != http.MethodPost {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx := r.Context()
+	user := auth.GetUser(ctx)
+	role := auth.GetRole(ctx)
+
+	existing, err := dbRO.GetQueries().GetScheduledClassByID(ctx, scheduleID)
+	if err != nil {
+		HttpError(w, "Scheduled class not found", http.StatusNotFound)
+		return
+	}
+
+	rules := classrules.ScheduledClassRules{DB: dbRO.GetQueries()}
+	if err := rules.ValidateAccess(existing.TeacherID, user); err != nil {
+		HttpError(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	if existing.Status != "scheduled" {
+		HttpError(w, "only scheduled classes can be edited", http.StatusBadRequest)
+		return
+	}
+
+	if _, ok := seriesIDFromRow(existing.SeriesID); !ok {
+		HttpError(w, "this class is not part of a repeating series", http.StatusBadRequest)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
+		return
+	}
+
+	studentID, err := formInt64(r, "schedule_student", "student")
+	if err != nil {
+		sendErrorLog(w, "student is required")
+		return
+	}
+
+	startTime := normalizeScheduleStartTime(r.FormValue("start_time"))
+	endTime := r.FormValue("end_time")
+	duration, err := utils.DurationMinutesFromRange(startTime, endTime)
+	if err != nil {
+		sendErrorLog(w, friendlyTimeRangeError(err).Error())
+		return
+	}
+
+	rate, err := requireFloat64(r.FormValue("rate"))
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+	detailsReq := models.ScheduledClassRequest{
 		StudentID:    studentID,
-		Rate:         detailsReq.Rate,
-		Currency:     detailsReq.Currency,
-		IsTrialClass: trialClassToInt64(detailsReq.IsTrialClass),
-		ID:           scheduleID,
-	})
+		Rate:         rate,
+		Currency:     r.FormValue("currency"),
+		IsTrialClass: formIsTrialClass(r),
+	}
+	models.ApplyScheduledTrialClassRate(&detailsReq)
+	if err := validateScheduledClassRateCurrency(detailsReq.Rate, detailsReq.Currency); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	allSeriesDates, err := seriesDates(ctx, existing.SeriesID)
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+	selectedDates, err := parseEditSeriesDates(r, allSeriesDates)
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+	if selectedDates == nil {
+		sendErrorLog(w, "select at least one date for this series")
+		return
+	}
+
+	scope := constants.ParseSeriesScope(r.FormValue("edit_scope"))
+	editInput := scheduledClassEditInput{
+		StudentID:       studentID,
+		StartTime:       startTime,
+		DurationMinutes: duration,
+		Rate:            detailsReq.Rate,
+		Currency:        detailsReq.Currency,
+		IsTrialClass:    detailsReq.IsTrialClass,
+	}
+	rows, err := previewSeriesEditRows(ctx, user, existing, scope, selectedDates, editInput)
 	if err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
 
-	if err := saveScheduledClassLearningMaterials(ctx, user, scheduleID, parseLearningMaterialIDs(r)); err != nil {
-		sendErrorLog(w, err.Error())
-		return
+	w.Header().Set("Content-Type", "text/html")
+	if err := frontend.ScheduleSeriesEditPreview(frontend.ScheduleSeriesEditPreviewData{
+		ScheduleID: strconv.FormatInt(scheduleID, 10),
+		Scope:      string(scope),
+		From:       r.FormValue("from"),
+		LockTeacher: auth.IsTeacherScoped(role),
+		Base: frontend.ScheduleRepeatFormSnapshot{
+			TeacherID:    strconv.FormatInt(existing.TeacherID, 10),
+			StudentID:    strconv.FormatInt(studentID, 10),
+			StartTime:    startTime,
+			EndTime:      endTime,
+			Rate:         detailsReq.Rate,
+			Currency:     detailsReq.Currency,
+			IsTrialClass: detailsReq.IsTrialClass,
+		},
+		Rows:                rows,
+		LearningMaterialIDs: parseLearningMaterialIDs(r),
+	}).Render(ctx, w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
-
-	rateChanged := detailsReq.Rate != existing.Rate || detailsReq.Currency != existing.Currency
-	if startTime != "" && (scheduleChanged || rateChanged) {
-		syncCalendarForSchedule(ctx, scheduleID, existing.TeacherID, studentID, newDate, startTime, duration, detailsReq.Rate, detailsReq.Currency, "schedule edit")
-	}
-
-	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("updated scheduled class id %d (student id %d, date %s)", scheduleID, studentID, newDate))
-	actor := auth.GetUser(ctx)
-	notifyCrossParty(ctx, actor, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
-		fmt.Sprintf("Scheduled class on %s was updated", newDate))
-
-	respondScheduledClassAction(w, r.FormValue("from"), "Scheduled class updated successfully!")
 }
 
 func handleScheduledClassEditModal(w http.ResponseWriter, r *http.Request, scheduleID int64) {
@@ -984,6 +1125,11 @@ func scheduledClassViewData(ctx context.Context, scheduleID int64) (frontend.Edi
 	}
 
 	role := auth.GetRole(ctx)
+	seriesID, _ := seriesIDFromRow(existing.SeriesID)
+	_, future, err := seriesCounts(ctx, existing.SeriesID, existing.ScheduledDate)
+	if err != nil {
+		return frontend.EditClassData{}, err
+	}
 	return frontend.EditClassData{
 		RecordID:        strconv.FormatInt(scheduleID, 10),
 		Readonly:        true,
@@ -1014,6 +1160,8 @@ func scheduledClassViewData(ctx context.Context, scheduleID int64) (frontend.Edi
 		Reason:            reason,
 		LearningMaterials: materials,
 		ActionFrom:        frontend.ClassActionContextSchedule,
+		SeriesID:          seriesID,
+		SeriesFutureCount: future,
 	}, nil
 }
 
@@ -1133,9 +1281,12 @@ func validateScheduleDateTimeChange(existingDate, existingStart, newDate, newSta
 
 func respondScheduledClassAction(w http.ResponseWriter, from, message string) {
 	setSuccessFlash(w, message)
-	if from == "schedule" {
+	switch from {
+	case "schedule":
 		w.Header().Set("HX-Trigger", `{"scheduleDayOpen":null,"refreshScheduleCalendar":null}`)
-	} else {
+	case string(frontend.ClassActionContextScheduleSeries):
+		w.Header().Set("HX-Trigger", "scheduleSeriesRefresh")
+	default:
 		w.Header().Set("HX-Trigger", "classesRefresh")
 	}
 	if _, err := fmt.Fprint(w, message+"\n"); err != nil {
@@ -1302,7 +1453,15 @@ func scheduledClassViewFromRow(sc queries.GetScheduledClassesFilteredRow) models
 		Status:          sc.Status,
 		Reason:          reason,
 		CreatedAt:       sc.CreatedAt,
+		SeriesID:        scheduledClassSeriesID(sc.SeriesID),
 	}
+}
+
+func scheduledClassSeriesID(seriesID sql.NullInt64) int64 {
+	if !seriesID.Valid {
+		return 0
+	}
+	return seriesID.Int64
 }
 
 func syncCalendarForSchedule(ctx context.Context, scheduleID, teacherID, studentID int64, scheduledDate, startTime string, durationMinutes int64, rate float64, currency, action string) {

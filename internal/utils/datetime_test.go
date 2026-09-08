@@ -29,6 +29,53 @@ func TestFormatNullDateTimePHT(t *testing.T) {
 	}
 }
 
+func TestFormatCompactDateRanges(t *testing.T) {
+	tests := []struct {
+		name  string
+		dates []string
+		want  string
+	}{
+		{
+			name:  "empty",
+			dates: nil,
+			want:  "-",
+		},
+		{
+			name:  "single date",
+			dates: []string{"2026-09-14"},
+			want:  "Sep 14, 2026",
+		},
+		{
+			name:  "contiguous range",
+			dates: []string{"2026-09-14", "2026-09-15", "2026-09-16"},
+			want:  "Sep 14 - 16, 2026",
+		},
+		{
+			name:  "gapped dates",
+			dates: []string{"2026-09-14", "2026-09-15", "2026-09-17", "2026-09-18", "2026-09-19"},
+			want:  "Sep 14 - 15, 17 - 19, 2026",
+		},
+		{
+			name:  "same month non consecutive singles",
+			dates: []string{"2026-09-14", "2026-09-19"},
+			want:  "Sep 14, 19, 2026",
+		},
+		{
+			name:  "cross month consecutive",
+			dates: []string{"2026-09-30", "2026-10-01"},
+			want:  "Sep 30 - Oct 1, 2026",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := FormatCompactDateRanges(tt.dates); got != tt.want {
+				t.Fatalf("FormatCompactDateRanges() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestTodayPHTUsesManila(t *testing.T) {
 	now := time.Now().In(constants.LocationPHT)
 	if TodayPHT() != now.Format(constants.DateLayout) {

@@ -14,8 +14,9 @@ func (s ClassRecordSource) String() string {
 type ClassActionContext string
 
 const (
-	ClassActionContextSchedule ClassActionContext = "schedule"
-	ClassActionContextClasses  ClassActionContext = "classes"
+	ClassActionContextSchedule       ClassActionContext = "schedule"
+	ClassActionContextClasses        ClassActionContext = "classes"
+	ClassActionContextScheduleSeries ClassActionContext = "series"
 )
 
 func (c ClassActionContext) String() string {

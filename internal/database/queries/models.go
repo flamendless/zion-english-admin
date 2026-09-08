@@ -210,12 +210,19 @@ type TblScheduledClass struct {
 	UpdatedAt       string
 	DeletedAt       sql.NullString
 	IsTrialClass    int64
+	SeriesID        sql.NullInt64
 }
 
 type TblScheduledClassLearningMaterial struct {
 	ScheduledClassID int64
 	MaterialID       int64
 	CreatedAt        time.Time
+}
+
+type TblScheduledClassSeries struct {
+	ID            int64
+	CreatedByRole string
+	CreatedAt     string
 }
 
 type TblStudent struct {

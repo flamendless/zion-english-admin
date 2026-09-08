@@ -1,6 +1,8 @@
 unreleased:
   breaking_changes: []
-  new_features: []
+  new_features:
+    - text: "Schedule repeating classes from Record classes: pick multiple future dates, preview conflicts, and create a linked series."
+    - text: "Dashboard quick action and series page list active repeating scheduled classes with edit and delete controls."
   improvements: []
   bug_fixes: []
   removed: []

@@ -29,6 +29,10 @@ templ ScrTimeRangeJS() {
 	<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/time-range.js")) }></script>
 }
 
+templ ScrScheduleRepeatCalendarJS() {
+	<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/schedule-repeat-calendar.js")) }></script>
+}
+
 templ ScrTimeRangeInit() {
 	<script>
 		if (window.initTimeRangePreview) initTimeRangePreview();

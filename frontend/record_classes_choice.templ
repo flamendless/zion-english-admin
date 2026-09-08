@@ -14,8 +14,14 @@ templ RecordClassesChoiceModal() {
 				<div class="choice-option-cards">
 					<a href={ utils.URL("/schedule/record") } class="choice-option-card">
 						<span class="choice-option-card__body">
-							<span class="choice-option-card__title">Schedule a class for later</span>
-							<span class="choice-option-card__desc">Plan an upcoming lesson on your calendar. Zoom and Google Calendar links can be added automatically for eligible sessions.</span>
+							<span class="choice-option-card__title">Schedule one upcoming lesson</span>
+							<span class="choice-option-card__desc">Plan a single future lesson on your calendar. Zoom and Google Calendar links can be added automatically for eligible sessions.</span>
+						</span>
+					</a>
+					<a href={ utils.URL("/schedule/repeat") } class="choice-option-card">
+						<span class="choice-option-card__body">
+							<span class="choice-option-card__title">Schedule repeating classes</span>
+							<span class="choice-option-card__desc">Pick multiple future dates with the same student, time, and rate. Review conflicts before classes are created.</span>
 						</span>
 					</a>
 					<a href={ utils.URL("/classes/record") } class="choice-option-card">
@@ -30,7 +36,7 @@ templ RecordClassesChoiceModal() {
 	</div>
 	<style>
 		.modal-dialog-choice {
-			width: min(100%, 40rem);
+			width: min(100%, 56rem);
 		}
 
 		.record-classes-choice-body {
@@ -47,7 +53,7 @@ templ RecordClassesChoiceModal() {
 
 		.choice-option-cards {
 			display: grid;
-			grid-template-columns: 1fr 1fr;
+			grid-template-columns: repeat(3, 1fr);
 			gap: var(--space-3);
 		}
 

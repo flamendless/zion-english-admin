@@ -6,21 +6,29 @@ import (
 )
 
 type EditScheduleData struct {
-	ScheduleID  string
-	LockTeacher bool
-	IsSuperuser bool
-	TeacherID   string
-	TeacherName string
-	StudentID   string
-	Date        string
-	StartTime   string
-	EndTime     string
+	ScheduleID        string
+	LockTeacher       bool
+	IsSuperuser       bool
+	TeacherID         string
+	TeacherName       string
+	StudentID         string
+	Date              string
+	StartTime         string
+	EndTime           string
 	Rate              float64
 	Currency          string
 	IsTrialClass      bool
 	TodayPHT          string
 	From              string
 	LearningMaterials []ClassLearningMaterialLink
+	SeriesID          int64
+	SeriesTotalCount  int64
+	SeriesFutureCount int64
+	SeriesDates       []string
+}
+
+func EditScheduleUsesSeriesReview(data EditScheduleData) bool {
+	return data.SeriesID > 0 && len(data.SeriesDates) >= 1
 }
 
 templ EditSchedule(data EditScheduleData) {

@@ -28,6 +28,7 @@ var navItemDefs = []navItemDef{
 	{Path: "/students", LinkID: "studentsLink", Title: "Students", Description: "View and manage students"},
 	{Path: "/classes", LinkID: "classesLink", Title: "Classes", TeacherTitle: "My Classes", Description: "View and record classes", TeacherDesc: "View and record your classes"},
 	{Path: "/schedule", LinkID: "scheduleLink", Title: "Class Schedule", Description: "View and plan upcoming classes", FeatureCard: true},
+	{Path: "/schedule/series", LinkID: "scheduleSeriesLink", Title: "Repeating Scheduled Classes", Description: "View and manage linked class series", FeatureCard: true},
 	{Path: "/my-students", LinkID: "myStudentsLink", Title: "My Students", Description: "View your assigned students"},
 	{Path: "/reports", LinkID: "reportsLink", Title: "Reports", Description: "View teacher payroll reports by cutoff period"},
 	{Path: "/analytics", LinkID: "analyticsLink", Title: "Analytics", TeacherTitle: "My Analytics", Description: "Attendance, utilization, and student retention insights", TeacherDesc: "View attendance and utilization for your classes"},
@@ -78,7 +79,7 @@ func IsNavAccessible(role auth.Role, path string) bool {
 
 	if role == auth.RoleTester {
 		switch path {
-		case "/profile", "/classes", "/classes/record", "/schedule", "/schedule/record":
+		case "/profile", "/classes", "/classes/record", "/schedule", "/schedule/record", "/schedule/repeat", "/schedule/series":
 			return true
 		default:
 			return false
@@ -90,7 +91,7 @@ func IsNavAccessible(role auth.Role, path string) bool {
 		return false
 	case "/students/register":
 		return true
-	case "/classes", "/classes/record", "/schedule", "/schedule/record", "/profile", "/logs", "/my-students", "/documents", "/analytics", "/guides", "/learning-materials":
+	case "/classes", "/classes/record", "/schedule", "/schedule/record", "/schedule/repeat", "/schedule/series", "/profile", "/logs", "/my-students", "/documents", "/analytics", "/guides", "/learning-materials":
 		return true
 	default:
 		return false

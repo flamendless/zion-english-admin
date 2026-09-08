@@ -38,6 +38,9 @@ type ScheduledClassItemData struct {
 	Overdue         bool
 	ShowZoomWarning bool
 	DeleteFrom      ClassActionContext
+	SeriesID        int64
+	SeriesTotalCount int64
+	SeriesFutureCount int64
 }
 
 func ScheduledClassItemFromView(v models.ScheduledClassView) ScheduledClassItemData {
@@ -69,6 +72,7 @@ func ScheduledClassItemFromView(v models.ScheduledClassView) ScheduledClassItemD
 		TimeRange:       FormatScheduledClassTimeRange(v.StartTime, v.EndTime, v.DurationMinutes),
 		ShowZoomWarning: v.RoomURL == "" && v.DurationMinutes > ZoomMaxAutoMinutes,
 		DeleteFrom:      ClassActionContextSchedule,
+		SeriesID:        v.SeriesID,
 	}
 	item.Overdue = IsScheduledClassOverdue(item)
 	return item
@@ -132,6 +136,7 @@ func timelineBarPosition(startTime string, durationMinutes int64) (leftPct, widt
 func BuildScheduledClassDayTimeline(items []ScheduledClassItemData, emptyMessage string) ScheduledClassDayTimelineData {
 	rowsByTeacher := make(map[int64]*ScheduledClassTeacherTimelineRow)
 	teacherOrder := make([]int64, 0)
+	outsideWindow := make([]ScheduledClassItemData, 0)
 
 	for _, item := range items {
 		row, exists := rowsByTeacher[item.TeacherID]
@@ -148,6 +153,7 @@ func BuildScheduledClassDayTimeline(items []ScheduledClassItemData, emptyMessage
 
 		leftPct, widthPct, ok := timelineBarPosition(item.StartTime, item.DurationMinutes)
 		if !ok {
+			outsideWindow = append(outsideWindow, item)
 			continue
 		}
 		row.Bars = append(row.Bars, ScheduledClassTimelineBarData{
@@ -183,9 +189,10 @@ func BuildScheduledClassDayTimeline(items []ScheduledClassItemData, emptyMessage
 	})
 
 	return ScheduledClassDayTimelineData{
-		EmptyMessage: emptyMessage,
-		HourLabels:   TimelineHourLabels(),
-		Teachers:     rows,
+		EmptyMessage:       emptyMessage,
+		HourLabels:         TimelineHourLabels(),
+		Teachers:           rows,
+		OutsideWindowItems: outsideWindow,
 	}
 }
 
@@ -209,6 +216,8 @@ func ScheduledClassItemFromEditClassData(data EditClassData) ScheduledClassItemD
 		Status:          constants.ScheduledClassStatusScheduled,
 		TimeRange:       data.TimeRangeLabel(),
 		DeleteFrom:      data.ActionFrom,
+		SeriesID:        data.SeriesID,
+		SeriesFutureCount: data.SeriesFutureCount,
 	}
 	item.Overdue = IsScheduledClassOverdue(item)
 	return item
@@ -308,6 +317,10 @@ func FormatScheduledClassDateDisplay(date string) string {
 	return t.Format("Monday, Jan 2, 2006")
 }
 
+func FormatScheduledClassSeriesDates(dates []string) string {
+	return utils.FormatCompactDateRanges(dates)
+}
+
 func ScheduledClassConductURL(id int64) string {
 	return utils.URL(fmt.Sprintf("/schedule/%d/conduct", id))
 }
@@ -345,6 +358,11 @@ func scheduledClassDetailAttrs(item ScheduledClassItemData) templ.Attributes {
 	if item.TeacherAvatar.RoleBadge != "" {
 		attrs["data-teacher-role-badge"] = item.TeacherAvatar.RoleBadge
 		attrs["data-teacher-role-badge-class"] = pillClass(AvatarRoleBadgeTone(item.TeacherAvatar.RoleBadge))
+	}
+	if item.SeriesID > 0 {
+		attrs["data-series-id"] = strconv.FormatInt(item.SeriesID, 10)
+		attrs["data-series-total-count"] = strconv.FormatInt(item.SeriesTotalCount, 10)
+		attrs["data-series-future-count"] = strconv.FormatInt(item.SeriesFutureCount, 10)
 	}
 	return attrs
 }

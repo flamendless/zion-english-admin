@@ -10,6 +10,32 @@ templ ScheduledClassModals() {
 	@CancelClassModal()
 	@EditScheduledClassModal()
 	@ScheduledClassModalsScript()
+	@ScrScheduleRepeatCalendarJS()
+	@ScheduleRepeatDatePickerStyles()
+	<style>
+		.series-scope-fieldset {
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-md);
+			padding: var(--space-3);
+			margin: 0;
+		}
+		.series-scope-fieldset legend {
+			padding: 0 var(--space-1);
+			font-size: 0.875rem;
+			font-weight: 600;
+		}
+		.series-scope-option {
+			display: flex;
+			align-items: flex-start;
+			gap: var(--space-2);
+			margin-top: var(--space-2);
+			font-size: 0.875rem;
+			line-height: 1.45;
+		}
+		.series-scope-option input {
+			margin-top: 0.2rem;
+		}
+	</style>
 }
 
 templ ScheduledClassDetailCard(cardID string, startHidden bool) {
@@ -36,7 +62,7 @@ templ ScheduledClassDetailCard(cardID string, startHidden bool) {
 }
 
 templ ConductClassModal() {
-	<div class="modal-overlay" id="conductClassModal" hidden role="presentation">
+	<div class="modal-overlay modal-overlay-front" id="conductClassModal" hidden role="presentation">
 		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="conductClassModalTitle">
 			<div class="modal-header">
 				<h3 id="conductClassModalTitle">Conduct Class</h3>
@@ -67,7 +93,7 @@ templ ConductClassModal() {
 }
 
 templ CancelClassModal() {
-	<div class="modal-overlay" id="cancelClassModal" hidden role="presentation">
+	<div class="modal-overlay modal-overlay-front" id="cancelClassModal" hidden role="presentation">
 		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="cancelClassModalTitle">
 			<div class="modal-header">
 				<h3 id="cancelClassModalTitle">Cancel Class</h3>
@@ -97,6 +123,19 @@ templ CancelClassModal() {
 						<label for="cancelClassNotes">Notes</label>
 						<textarea id="cancelClassNotes" name="notes" rows="3" placeholder="Optional notes"></textarea>
 					</div>
+					<div id="cancelSeriesScopePanel" class="series-scope-panel" hidden>
+						<fieldset class="series-scope-fieldset">
+							<legend>Apply to</legend>
+							<label class="series-scope-option">
+								<input type="radio" name="series_scope" value="single" checked/>
+								This class only
+							</label>
+							<label class="series-scope-option">
+								<input type="radio" name="series_scope" value="future"/>
+								<span id="cancelSeriesScopeFutureLabel">This and future classes in this series</span>
+							</label>
+						</fieldset>
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary scheduled-class-modal-close">Cancel</button>
@@ -108,7 +147,7 @@ templ CancelClassModal() {
 }
 
 templ EditScheduledClassModal() {
-	<div class="modal-overlay" id="editScheduledClassModal" hidden role="presentation">
+	<div class="modal-overlay modal-overlay-front" id="editScheduledClassModal" hidden role="presentation">
 		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="editScheduledClassModalTitle">
 			<div class="modal-header">
 				<h3 id="editScheduledClassModalTitle">Edit Scheduled Class</h3>
@@ -122,6 +161,14 @@ templ EditScheduledClassModal() {
 }
 
 templ EditScheduledClassModalForm(data EditScheduleData) {
+	if EditScheduleUsesSeriesReview(data) {
+		@EditScheduledClassSeriesForm(data)
+	} else {
+		@EditScheduledClassSimpleForm(data)
+	}
+}
+
+templ EditScheduledClassSimpleForm(data EditScheduleData) {
 	<form
 		id="editScheduledClassForm"
 		class="scheduled-class-modal-form"
@@ -135,8 +182,8 @@ templ EditScheduledClassModalForm(data EditScheduleData) {
 			on submit
 				set origDate to my @data-original-date
 				set origStart to my @data-original-start
-				set newDate to #date.value
-				set newStart to #start_time.value
+				set newDate to (#date in me).value
+				set newStart to (first <[name='start_time']/> in me).value
 				if newDate is not origDate or newStart is not origStart
 					set today to my @data-today-pht
 					if newDate < today
@@ -156,38 +203,18 @@ templ EditScheduledClassModalForm(data EditScheduleData) {
 						end
 					end
 				end
-				if #start_time.value is ''
+				if (first <[name='start_time']/> in me).value is ''
 					alert('Please set start time')
 					halt
 				end
-				if #end_time.value is ''
+				if (first <[name='end_time']/> in me).value is ''
 					alert('Please set end time')
 					halt
 				end
 			end
 		"
 	>
-		<input type="hidden" id="editScheduledClassFrom" name="from" value={ data.From }/>
-		<div class="form-group">
-			<label>Teacher</label>
-			<input type="text" value={ data.TeacherName } disabled/>
-		</div>
-		if data.LockTeacher {
-			@TeacherStudentsDropdownWithValue(data.StudentID)
-		} else {
-			@ScheduleEditStudentDropdown(data.TeacherID, data.StudentID)
-		}
-		@ClassDateField(data.Date, false)
-		@TimeRangeFields(data.StartTime, data.EndTime, false)
-		<div class="form-row">
-			@CurrencyDropdownWithValue(data.Currency)
-			<div class="form-group">
-				<label for="rate">Rate *</label>
-				<input type="number" id="rate" name="rate" required min="0" step="0.01" value={ formatFloat(data.Rate) }/>
-			</div>
-		</div>
-		@TrialClassCheckbox(data.IsTrialClass, false)
-		@ClassLearningMaterialPicker(data.LearningMaterials)
+		@EditScheduledClassFormFields(data)
 		<div class="modal-footer">
 			<button type="button" class="btn btn-secondary scheduled-class-modal-close">Cancel</button>
 			<button type="submit" class="btn" id="editScheduledClassSubmitBtn">Save Changes</button>
@@ -195,6 +222,88 @@ templ EditScheduledClassModalForm(data EditScheduleData) {
 	</form>
 	@ScrTimeRangeInit()
 	@ScrTrialClassJS()
+}
+
+templ EditScheduledClassSeriesForm(data EditScheduleData) {
+	<form
+		id="editScheduledClassForm"
+		class="scheduled-class-modal-form"
+		method="POST"
+		hx-post={ utils.URL(fmt.Sprintf("/schedule/%s/edit/preview", data.ScheduleID)) }
+		hx-target="#editSeriesPreviewPanel"
+		hx-swap="innerHTML"
+		hx-indicator="#editSeriesPreviewBtn"
+		data-today-pht={ data.TodayPHT }
+		data-original-date={ data.Date }
+		data-original-start={ data.StartTime }
+		_="
+			on submit
+				if (first <[name='start_time']/> in me).value is ''
+					alert('Please set start time')
+					halt
+				end
+				if (first <[name='end_time']/> in me).value is ''
+					alert('Please set end time')
+					halt
+				end
+			end
+		"
+	>
+		@EditScheduledClassFormFields(data)
+		<div class="modal-footer">
+			<button type="button" class="btn btn-secondary scheduled-class-modal-close">Cancel</button>
+			<button type="submit" class="btn" id="editSeriesPreviewBtn">Review Dates</button>
+		</div>
+	</form>
+	<div id="editSeriesPreviewPanel" class="schedule-repeat-preview-panel"></div>
+	@ScrTimeRangeInit()
+	@ScrTrialClassJS()
+}
+
+templ EditScheduledClassFormFields(data EditScheduleData) {
+	<input type="hidden" id="editScheduledClassFrom" name="from" value={ data.From }/>
+	if data.SeriesID > 0 {
+		<p class="field-hint">Part of a repeating series ({ fmt.Sprintf("%d", data.SeriesTotalCount) } scheduled classes).</p>
+		@SeriesScopeFields("edit_scope", data.SeriesTotalCount, data.SeriesFutureCount)
+	}
+	<div class="form-group">
+		<label>Teacher</label>
+		<input type="text" value={ data.TeacherName } disabled/>
+	</div>
+	if data.LockTeacher {
+		@TeacherStudentsDropdownWithValue(data.StudentID)
+	} else {
+		@ScheduleEditStudentDropdown(data.TeacherID, data.StudentID)
+	}
+	@EditScheduledClassDateFields(data)
+	if data.SeriesID > 0 {
+		<p id="editSeriesDateHint" class="field-hint" hidden>Date changes on the calendar apply to this and future classes in the series.</p>
+	}
+	@TimeRangeFields(data.StartTime, data.EndTime, false)
+	<div class="form-row">
+		@CurrencyDropdownWithValue(data.Currency)
+		<div class="form-group">
+			<label for="rate">Rate *</label>
+			<input type="number" id="rate" name="rate" required min="0" step="0.01" value={ formatFloat(data.Rate) }/>
+		</div>
+	</div>
+	@TrialClassCheckbox(data.IsTrialClass, false)
+	@ClassLearningMaterialPicker(data.LearningMaterials)
+}
+
+templ EditScheduledClassDateFields(data EditScheduleData) {
+	if EditScheduleUsesSeriesReview(data) {
+		<input type="hidden" id="date" name="date" value={ data.Date } data-series-active-date="true"/>
+		@ScheduleRepeatDatePicker(ScheduleRepeatDatePickerConfig{
+			TodayPHT: data.TodayPHT,
+			Hint: "Click dates on the calendar to add or remove sessions, then review changes before saving.",
+			MinDates: 1,
+			InitialDates: data.SeriesDates,
+			SubmitMessage: "Select at least one date, then click Review Dates.",
+		})
+	} else {
+		@ClassDateField(data.Date, false)
+	}
 }
 
 templ ScheduledClassModalsScript() {
@@ -212,6 +321,8 @@ templ ScheduledClassModalsScript() {
 			const cancelReason = document.getElementById('cancelClassReason');
 			const cancelNotes = document.getElementById('cancelClassNotes');
 			const cancelFrom = document.getElementById('cancelClassFrom');
+			const cancelSeriesScopePanel = document.getElementById('cancelSeriesScopePanel');
+			const cancelSeriesScopeFutureLabel = document.getElementById('cancelSeriesScopeFutureLabel');
 
 			const editModal = document.getElementById('editScheduledClassModal');
 			const editBody = document.getElementById('editScheduledClassModalBody');
@@ -328,6 +439,44 @@ templ ScheduledClassModalsScript() {
 				if (conductNotes) conductNotes.focus();
 			};
 
+			function configureSeriesScopePanel(panel, futureLabelEl, trigger) {
+				if (!panel) return;
+				const seriesID = trigger ? trigger.getAttribute('data-series-id') : '';
+				const totalCount = trigger ? parseInt(trigger.getAttribute('data-series-total-count') || '0', 10) : 0;
+				const futureCount = trigger ? parseInt(trigger.getAttribute('data-series-future-count') || '0', 10) : 0;
+				const futureInput = panel.querySelector('input[value="future"]');
+				if (seriesID && totalCount > 1) {
+					panel.hidden = false;
+					if (futureLabelEl) {
+						if (futureCount > 1) {
+							futureLabelEl.textContent = 'This and ' + futureCount + ' scheduled classes in this series (including this date)';
+						} else {
+							futureLabelEl.textContent = 'This and future classes in this series';
+						}
+					}
+					if (futureInput) futureInput.disabled = futureCount <= 1;
+					const singleInput = panel.querySelector('input[value="single"]');
+					if (singleInput) singleInput.checked = true;
+				} else {
+					panel.hidden = true;
+					if (futureInput) futureInput.disabled = false;
+				}
+			}
+
+			function bindEditSeriesScopeHandlers() {
+				const form = document.getElementById('editScheduledClassForm');
+				if (!form) return;
+				const hint = document.getElementById('editSeriesDateHint');
+				const scopeInputs = form.querySelectorAll('input[name="edit_scope"]');
+				if (!scopeInputs.length) return;
+				function syncScopeUi() {
+					const futureSelected = Array.from(scopeInputs).some((input) => input.checked && input.value === 'future');
+					if (hint) hint.hidden = !futureSelected;
+				}
+				scopeInputs.forEach((input) => input.addEventListener('change', syncScopeUi));
+				syncScopeUi();
+			}
+
 			window.openCancelClassModal = function (url, trigger, from) {
 				if (!cancelModal || !cancelForm) return;
 				setFormPost(cancelForm, url);
@@ -335,6 +484,7 @@ templ ScheduledClassModalsScript() {
 				if (cancelFrom) cancelFrom.value = from || 'schedule';
 				if (cancelReason) cancelReason.value = '';
 				if (cancelNotes) cancelNotes.value = '';
+				configureSeriesScopePanel(cancelSeriesScopePanel, cancelSeriesScopeFutureLabel, trigger);
 				openModal(cancelModal);
 				if (cancelReason) cancelReason.focus();
 			};
@@ -428,15 +578,35 @@ templ ScheduledClassModalsScript() {
 			}
 
 			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id === 'editSeriesPreviewPanel') {
+					const confirmForm = document.getElementById('editSeriesConfirmForm');
+					if (confirmForm && typeof htmx !== 'undefined') {
+						htmx.process(confirmForm);
+					}
+					const confirmBtn = document.getElementById('editSeriesConfirmBtn');
+					if (confirmBtn) confirmBtn.focus();
+					return;
+				}
 				if (evt.detail.target !== editBody) return;
-				if (window.initTimeRangePreview) window.initTimeRangePreview();
-				if (window.attachTimeRangeFormValidation) window.attachTimeRangeFormValidation();
+				const editForm = document.getElementById('editScheduledClassForm');
+				if (editForm && window.initTimeRangePreview) {
+					window.initTimeRangePreview({ form: editForm });
+				}
+				if (editForm && window.initScheduleRepeatCalendar) {
+					const calRoot = editForm.querySelector('[data-schedule-repeat-calendar]');
+					if (calRoot) window.initScheduleRepeatCalendar(calRoot);
+				}
+				if (window.attachTimeRangeFormValidation) {
+					window.attachTimeRangeFormValidation();
+				}
+				if (window.initTimeRangePreview && !editForm) window.initTimeRangePreview();
 				const fromInput = document.getElementById('editScheduledClassFrom');
 				if (fromInput && window._editScheduledClassFrom) {
 					fromInput.value = window._editScheduledClassFrom;
 				}
 				const studentSelect = document.getElementById('student') || document.getElementById('schedule_student');
 				if (studentSelect) studentSelect.focus();
+				bindEditSeriesScopeHandlers();
 			});
 
 			function handleModalSuccess(form) {
@@ -449,8 +619,16 @@ templ ScheduledClassModalsScript() {
 			document.body.addEventListener('htmx:afterRequest', function (evt) {
 				const form = evt.detail.elt;
 				if (!evt.detail.successful) return;
-				if (form === conductForm || form === cancelForm || form === document.getElementById('editScheduledClassForm')) {
+				if (form === conductForm || form === cancelForm || form === document.getElementById('editSeriesConfirmForm')) {
 					handleModalSuccess(form);
+					return;
+				}
+				const editForm = document.getElementById('editScheduledClassForm');
+				if (form === editForm) {
+					const postURL = form.getAttribute('hx-post') || '';
+					if (postURL.indexOf('/edit/preview') === -1) {
+						handleModalSuccess(form);
+					}
 				}
 			});
 

@@ -27,6 +27,8 @@ type EditClassData struct {
 	Notes             string
 	LearningMaterials []ClassLearningMaterialLink
 	ActionFrom        ClassActionContext
+	SeriesID          int64
+	SeriesFutureCount int64
 }
 
 templ EditClass(data EditClassData) {

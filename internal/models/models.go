@@ -200,6 +200,7 @@ type ScheduledClassView struct {
 	Status          string  `json:"status"`
 	Reason          string  `json:"reason"`
 	CreatedAt       string  `json:"createdAt"`
+	SeriesID        int64   `json:"seriesId"`
 	RoomURL          string  `json:"roomUrl"`
 	RoomPasscode     string  `json:"roomPasscode"`
 	MeetingService   string  `json:"meetingService"`

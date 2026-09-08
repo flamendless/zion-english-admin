@@ -6,7 +6,7 @@ import (
 )
 
 templ DeleteClassModal() {
-	<div class="modal-overlay" id="deleteClassModal" hidden role="presentation">
+	<div class="modal-overlay modal-overlay-front" id="deleteClassModal" hidden role="presentation">
 		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="deleteClassModalTitle">
 			<div class="modal-header">
 				<h3 id="deleteClassModalTitle">Delete Class</h3>
@@ -32,6 +32,19 @@ templ DeleteClassModal() {
 							placeholder="Reason for deletion"
 						/>
 					</div>
+					<div id="deleteSeriesScopePanel" class="series-scope-panel" hidden>
+						<fieldset class="series-scope-fieldset">
+							<legend>Apply to</legend>
+							<label class="series-scope-option">
+								<input type="radio" name="series_scope" value="single" checked/>
+								This class only
+							</label>
+							<label class="series-scope-option">
+								<input type="radio" name="series_scope" value="future"/>
+								<span id="deleteSeriesScopeFutureLabel">This and future classes in this series</span>
+							</label>
+						</fieldset>
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary delete-class-modal-close">Cancel</button>
@@ -47,6 +60,8 @@ templ DeleteClassModal() {
 			const reasonInput = document.getElementById('deleteClassReason');
 			const fromInput = document.getElementById('deleteClassFrom');
 			const details = document.getElementById('deleteClassModalDetails');
+			const deleteSeriesScopePanel = document.getElementById('deleteSeriesScopePanel');
+			const deleteSeriesScopeFutureLabel = document.getElementById('deleteSeriesScopeFutureLabel');
 			if (!modal || !form || !reasonInput || !fromInput) return;
 
 			function escapeHtml(value) {
@@ -128,6 +143,30 @@ templ DeleteClassModal() {
 				details.hidden = !visible;
 			}
 
+			function configureDeleteSeriesScopePanel(trigger) {
+				if (!deleteSeriesScopePanel) return;
+				const seriesID = trigger ? trigger.getAttribute('data-series-id') : '';
+				const totalCount = trigger ? parseInt(trigger.getAttribute('data-series-total-count') || '0', 10) : 0;
+				const futureCount = trigger ? parseInt(trigger.getAttribute('data-series-future-count') || '0', 10) : 0;
+				const futureInput = deleteSeriesScopePanel.querySelector('input[value="future"]');
+				if (seriesID && totalCount > 1) {
+					deleteSeriesScopePanel.hidden = false;
+					if (deleteSeriesScopeFutureLabel) {
+						if (futureCount > 1) {
+							deleteSeriesScopeFutureLabel.textContent = 'This and ' + futureCount + ' scheduled classes in this series (including this date)';
+						} else {
+							deleteSeriesScopeFutureLabel.textContent = 'This and future classes in this series';
+						}
+					}
+					if (futureInput) futureInput.disabled = futureCount <= 1;
+					const singleInput = deleteSeriesScopePanel.querySelector('input[value="single"]');
+					if (singleInput) singleInput.checked = true;
+				} else {
+					deleteSeriesScopePanel.hidden = true;
+					if (futureInput) futureInput.disabled = false;
+				}
+			}
+
 			window.openDeleteClassModal = function (deleteURL, from, trigger) {
 				form.action = deleteURL;
 				form.setAttribute('hx-post', deleteURL);
@@ -136,6 +175,7 @@ templ DeleteClassModal() {
 				}
 				fromInput.value = from || 'classes';
 				reasonInput.value = '';
+				configureDeleteSeriesScopePanel(trigger);
 				if (trigger && trigger.getAttribute('data-student-name')) {
 					fillScheduledClassDetails(details, trigger);
 					setDeleteDetailsVisible(true);

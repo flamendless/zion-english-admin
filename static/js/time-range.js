@@ -17,8 +17,20 @@
 
 	function validateTimeRange(opts) {
 		opts = opts || {};
-		var startInput = document.getElementById(opts.startId || 'start_time');
-		var endInput = document.getElementById(opts.endId || 'end_time');
+		var startInput = opts.startInput;
+		var endInput = opts.endInput;
+		if (!startInput && opts.startId) {
+			startInput = document.getElementById(opts.startId);
+		}
+		if (!endInput && opts.endId) {
+			endInput = document.getElementById(opts.endId);
+		}
+		if (!startInput) {
+			startInput = document.getElementById(opts.startId || 'start_time');
+		}
+		if (!endInput) {
+			endInput = document.getElementById(opts.endId || 'end_time');
+		}
 		if (!startInput || !endInput) {
 			return { ok: true };
 		}
@@ -36,8 +48,8 @@
 		return { ok: true };
 	}
 
-	function showTimeRangeError(message) {
-		var preview = document.getElementById('durationPreview');
+	function showTimeRangeError(message, previewEl) {
+		var preview = previewEl || document.getElementById('durationPreview');
 		if (preview) {
 			preview.hidden = false;
 			preview.textContent = message;
@@ -47,9 +59,18 @@
 
 	function initTimeRangePreview(opts) {
 		opts = opts || {};
-		var startInput = document.getElementById(opts.startId || 'start_time');
-		var endInput = document.getElementById(opts.endId || 'end_time');
-		var preview = document.getElementById(opts.previewId || 'durationPreview');
+		var startInput;
+		var endInput;
+		var preview;
+		if (opts.form) {
+			startInput = opts.form.querySelector('[name="start_time"]');
+			endInput = opts.form.querySelector('[name="end_time"]');
+			preview = opts.form.querySelector('.duration-preview');
+		} else {
+			startInput = document.getElementById(opts.startId || 'start_time');
+			endInput = document.getElementById(opts.endId || 'end_time');
+			preview = document.getElementById(opts.previewId || 'durationPreview');
+		}
 		if (!startInput || !endInput || !preview) return;
 
 		function update() {
@@ -95,11 +116,14 @@
 			}
 			form.dataset.timeRangeValidation = 'true';
 			form.addEventListener('submit', function (e) {
-				var result = validateTimeRange();
+				var startInput = form.querySelector('[name="start_time"]');
+				var endInput = form.querySelector('[name="end_time"]');
+				var preview = form.querySelector('.duration-preview');
+				var result = validateTimeRange({ startInput: startInput, endInput: endInput });
 				if (!result.ok) {
 					e.preventDefault();
 					e.stopImmediatePropagation();
-					showTimeRangeError(result.message);
+					showTimeRangeError(result.message, preview);
 					alert(result.message);
 				}
 			}, true);
