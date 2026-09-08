@@ -6,41 +6,67 @@ import (
 )
 
 type TeacherData struct {
-	Teachers       []TeacherItem
-	Query          string
-	Status         constants.TeacherFilterStatus
-	SortBy         string
-	SortOrder      string
-	PageNumber     int
-	PageTotalPages int
-	PageTotal      int64
-	PrevURL        string
-	NextURL        string
-	HasPrev        bool
-	HasNext        bool
-	FilterPath     string
+	Teachers            []TeacherItem
+	Query               string
+	Status              constants.TeacherFilterStatus
+	DocsStatusFilter      string
+	ConnectionZoomFilter  bool
+	ConnectionGoogleFilter bool
+	SortBy           string
+	SortOrder        string
+	PageNumber       int
+	PageTotalPages   int
+	PageTotal        int64
+	PrevURL          string
+	NextURL          string
+	HasPrev          bool
+	HasNext          bool
+	FilterPath       string
 }
 
 type TeacherItem struct {
-	ID             string
-	Name           string
-	Avatar         AvatarProps
-	Birthdate      string
-	Address        string
-	JoiningDate    string
-	MobileNumber   string
-	Email          string
-	Certifications string
-	AssignedColor  string
-	RatePerClass   float64
-	Currency       string
-	DriveUrl       string
-	Sex            string
-	Status         constants.TeacherStatus
-	DocsStatus     constants.TeacherDocumentStatus
-	Roles          []constants.TeacherRole
-	Deleted        bool
-	CreatedAt      string
+	ID                      string
+	Name                    string
+	Avatar                  AvatarProps
+	Birthdate               string
+	Address                 string
+	JoiningDate             string
+	MobileNumber            string
+	Email                   string
+	Certifications          string
+	AssignedColor           string
+	RatePerClass            float64
+	Currency                string
+	DriveUrl                string
+	Sex                     string
+	Status                  constants.TeacherStatus
+	DocsStatus              constants.TeacherDocumentStatus
+	Roles                   []constants.TeacherRole
+	ZoomConnected           bool
+	GoogleCalendarConnected bool
+	Deleted                 bool
+	CreatedAt               string
+}
+
+templ ConnectionLogoPill(logoURL string, label string) {
+	<span class="pill pill--neutral connection-logo-pill" title={ label } aria-label={ label }>
+		<img src={ logoURL } alt="" width="24" height="24" aria-hidden="true"/>
+	</span>
+}
+
+templ TeacherConnectionsCell(zoomConnected bool, googleCalendarConnected bool) {
+	if zoomConnected || googleCalendarConnected {
+		<div class="teacher-connections-cell">
+			if zoomConnected {
+				@ConnectionLogoPill(utils.URL("/static/zoom-logo.svg"), "Zoom connected")
+			}
+			if googleCalendarConnected {
+				@ConnectionLogoPill(utils.URL("/static/google-calendar-logo.svg"), "Google Calendar connected")
+			}
+		</div>
+	} else {
+		<span>-</span>
+	}
 }
 
 func getTeacherRowClass(status constants.TeacherStatus, deleted bool) string {
@@ -89,6 +115,14 @@ templ Teachers(data TeacherData) {
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
 		@AvatarStyles()
+		<style>
+			.teacher-connections-cell {
+				display: inline-flex;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: var(--space-2);
+			}
+		</style>
 		<script>
 			window.closeTeacherViewModal = function () {
 				const host = document.getElementById('teacherViewModalHost');
@@ -139,7 +173,7 @@ templ Teachers(data TeacherData) {
 			@HeaderSimple()
 			@HubHeader("Teachers", "New Teacher", utils.URL("/teachers/register"), true)
 
-			@ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindTeacher, "", "", "", "", "", "", false, false, false, false, true, data.SortBy, data.SortOrder, ListSortKindTeacher)
+			@ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindTeacher, "", "", "", "", "", "", false, false, false, false, true, data.DocsStatusFilter, true, data.ConnectionZoomFilter, data.ConnectionGoogleFilter, true, data.SortBy, data.SortOrder, ListSortKindTeacher)
 
 			if len(data.Teachers) > 0 {
 				<div class="table-wrapper">
@@ -147,9 +181,9 @@ templ Teachers(data TeacherData) {
 						<thead>
 							<tr>
 								<th>Name</th>
-								<th>Roles</th>
 								<th>Status</th>
 								<th>Docs Status</th>
+								<th>Connections</th>
 								<th>Email</th>
 								<th>Mobile Number</th>
 								<th>Actions</th>
@@ -170,13 +204,6 @@ templ Teachers(data TeacherData) {
 											>{ teacher.Name }</button>
 										</div>
 									</td>
-									<td data-label="Roles">
-										if len(teacher.Roles) > 0 {
-											@RolePills(teacher.Roles)
-										} else {
-											<span>-</span>
-										}
-									</td>
 									<td data-label="Status">
 										@StatusPill(getTeacherDisplayStatus(teacher.Status, teacher.Deleted), TeacherStatusPillTone(teacher.Status, teacher.Deleted), false)
 									</td>
@@ -186,6 +213,9 @@ templ Teachers(data TeacherData) {
 										} else {
 											<span>-</span>
 										}
+									</td>
+									<td data-label="Connections">
+										@TeacherConnectionsCell(teacher.ZoomConnected, teacher.GoogleCalendarConnected)
 									</td>
 									<td class="email-cell" data-label="Email">{ getDisplayValue(teacher.Email) }</td>
 									<td data-label="Mobile">{ getDisplayValue(teacher.MobileNumber) }</td>

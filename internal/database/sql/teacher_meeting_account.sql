@@ -23,3 +23,8 @@ WHERE teacher_id = ? AND service = ?;
 SELECT COUNT(*) AS count
 FROM tbl_teacher_meeting_accounts
 WHERE teacher_id = ? AND service = ?;
+
+-- name: GetTeacherMeetingServicesByTeacherIDs :many
+SELECT teacher_id, service
+FROM tbl_teacher_meeting_accounts
+WHERE teacher_id IN (sqlc.slice('teacher_ids'));

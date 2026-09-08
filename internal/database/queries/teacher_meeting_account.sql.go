@@ -7,6 +7,7 @@ package queries
 
 import (
 	"context"
+	"strings"
 )
 
 const deleteTeacherMeetingAccount = `-- name: DeleteTeacherMeetingAccount :exec
@@ -64,6 +65,50 @@ func (q *Queries) GetTeacherMeetingAccount(ctx context.Context, arg GetTeacherMe
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const getTeacherMeetingServicesByTeacherIDs = `-- name: GetTeacherMeetingServicesByTeacherIDs :many
+SELECT teacher_id, service
+FROM tbl_teacher_meeting_accounts
+WHERE teacher_id IN (/*SLICE:teacher_ids*/?)
+`
+
+type GetTeacherMeetingServicesByTeacherIDsRow struct {
+	TeacherID int64
+	Service   string
+}
+
+func (q *Queries) GetTeacherMeetingServicesByTeacherIDs(ctx context.Context, teacherIds []int64) ([]GetTeacherMeetingServicesByTeacherIDsRow, error) {
+	query := getTeacherMeetingServicesByTeacherIDs
+	var queryParams []interface{}
+	if len(teacherIds) > 0 {
+		for _, v := range teacherIds {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:teacher_ids*/?", strings.Repeat(",?", len(teacherIds))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:teacher_ids*/?", "NULL", 1)
+	}
+	rows, err := q.db.QueryContext(ctx, query, queryParams...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTeacherMeetingServicesByTeacherIDsRow
+	for rows.Next() {
+		var i GetTeacherMeetingServicesByTeacherIDsRow
+		if err := rows.Scan(&i.TeacherID, &i.Service); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const hasTeacherMeetingAccount = `-- name: HasTeacherMeetingAccount :one

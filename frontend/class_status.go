@@ -83,3 +83,20 @@ var TeacherDocumentStatusOptions = func() []StatusOption {
 	}
 	return opts
 }()
+
+const TeacherDocsFilterStatusNone = "none"
+
+var TeacherDocsFilterStatusOptions = func() []StatusOption {
+	opts := make([]StatusOption, 0, len(TeacherDocumentStatusOptions)+1)
+	opts = append(opts, StatusOption{
+		Value: TeacherDocsFilterStatusNone,
+		Label: "None",
+	})
+	opts = append(opts, TeacherDocumentStatusOptions...)
+	return opts
+}()
+
+const (
+	TeacherConnectionsFilterZoom           = "zoom"
+	TeacherConnectionsFilterGoogleCalendar = "google_calendar"
+)

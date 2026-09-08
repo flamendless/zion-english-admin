@@ -1190,6 +1190,17 @@ templ GlobalIncludes() {
 			opacity: 0.9;
 		}
 
+		.connection-logo-pill {
+			padding: 8px 12px;
+			gap: 0;
+		}
+
+		.connection-logo-pill img {
+			display: block;
+			width: 1.5rem;
+			height: 1.5rem;
+		}
+
 		/* ============================= */
 		/* Color utilities               */
 		/* ============================= */
@@ -3059,6 +3070,77 @@ templ GlobalIncludes() {
 		.list-toolbar .list-toolbar-action {
 			flex: 0 0 auto;
 			min-width: auto;
+		}
+
+		.toolbar-filter-dropdown-label {
+			display: block;
+			margin-bottom: var(--space-1);
+			color: var(--color-foreground);
+			font-weight: 500;
+			font-size: 0.875rem;
+		}
+
+		.toolbar-filter-dropdown {
+			position: relative;
+		}
+
+		.toolbar-filter-dropdown-trigger {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: var(--space-2);
+			width: 100%;
+			padding: 10px 12px;
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-sm);
+			font-size: 14px;
+			font-family: inherit;
+			color: var(--color-foreground);
+			background: var(--color-surface);
+			cursor: pointer;
+			list-style: none;
+			transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+		}
+
+		.toolbar-filter-dropdown-trigger::-webkit-details-marker {
+			display: none;
+		}
+
+		.toolbar-filter-dropdown-trigger::after {
+			content: "";
+			width: 0.45rem;
+			height: 0.45rem;
+			border-right: 2px solid var(--color-muted-foreground);
+			border-bottom: 2px solid var(--color-muted-foreground);
+			transform: rotate(45deg);
+			margin-top: -0.15rem;
+			flex-shrink: 0;
+		}
+
+		.toolbar-filter-dropdown[open] .toolbar-filter-dropdown-trigger {
+			border-color: var(--color-primary);
+			box-shadow: 0 0 0 3px rgba(144, 192, 32, 0.2);
+		}
+
+		.toolbar-filter-dropdown-panel {
+			position: absolute;
+			top: calc(100% + 4px);
+			left: 0;
+			right: 0;
+			z-index: 30;
+			padding: var(--space-3);
+			background: var(--color-surface);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-sm);
+			box-shadow: var(--shadow-lg);
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-2);
+		}
+
+		.toolbar-filter-dropdown-panel .checkbox-label {
+			font-size: 0.875rem;
+			white-space: nowrap;
 		}
 
 		.list-toolbar .list-toolbar-action label {

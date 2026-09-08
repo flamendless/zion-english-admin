@@ -2,6 +2,7 @@ package frontend
 
 import (
 	"fmt"
+	"strings"
 )
 
 templ HubHeader(title string, actionLabel string, actionHref string, showAction bool) {
@@ -75,7 +76,42 @@ func listSearchPlaceholder(statusType ListFilterKind) string {
 	return "Name..."
 }
 
-templ ListFilterForm(actionPath string, query string, status string, statusType ListFilterKind, teacherID string, teacherName string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool, showStatus bool, sortBy string, sortOrder string, sortKind ListSortKind) {
+func teacherConnectionsFilterSummary(connectionZoom bool, connectionGoogle bool) string {
+	if !connectionZoom && !connectionGoogle {
+		return "All"
+	}
+	parts := make([]string, 0, 2)
+	if connectionZoom {
+		parts = append(parts, "Zoom")
+	}
+	if connectionGoogle {
+		parts = append(parts, "Google Calendar")
+	}
+	return strings.Join(parts, ", ")
+}
+
+templ TeacherConnectionsFilterDropdown(connectionZoom bool, connectionGoogle bool) {
+	<div class="form-group">
+		<span class="toolbar-filter-dropdown-label" id="connectionsFilterLabel">Connections</span>
+		<details class="toolbar-filter-dropdown">
+			<summary class="toolbar-filter-dropdown-trigger" aria-labelledby="connectionsFilterLabel">
+				{ teacherConnectionsFilterSummary(connectionZoom, connectionGoogle) }
+			</summary>
+			<div class="toolbar-filter-dropdown-panel" role="group" aria-labelledby="connectionsFilterLabel">
+				<label class="checkbox-label">
+					<input type="checkbox" name="connectionZoom" value="1" checked?={ connectionZoom }/>
+					Zoom
+				</label>
+				<label class="checkbox-label">
+					<input type="checkbox" name="connectionGoogle" value="1" checked?={ connectionGoogle }/>
+					Google Calendar
+				</label>
+			</div>
+		</details>
+	</div>
+}
+
+templ ListFilterForm(actionPath string, query string, status string, statusType ListFilterKind, teacherID string, teacherName string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool, showStatus bool, docsStatus string, showDocsStatus bool, connectionZoom bool, connectionGoogle bool, showConnections bool, sortBy string, sortOrder string, sortKind ListSortKind) {
 	<form class="list-toolbar" method="GET" action={ actionPath }>
 		<div class="form-group">
 			<label for="q">Search</label>
@@ -101,6 +137,20 @@ templ ListFilterForm(actionPath string, query string, status string, statusType 
 					}
 				</select>
 			</div>
+		}
+		if showDocsStatus {
+			<div class="form-group">
+				<label for="docsStatus">Docs status</label>
+				<select id="docsStatus" name="docsStatus">
+					<option value="">All</option>
+					for _, opt := range TeacherDocsFilterStatusOptions {
+						<option value={ opt.Value } selected?={ docsStatus == opt.Value }>{ opt.Label }</option>
+					}
+				</select>
+			</div>
+		}
+		if showConnections {
+			@TeacherConnectionsFilterDropdown(connectionZoom, connectionGoogle)
 		}
 		if showTeacher {
 			@TeacherFilterDropdown(teacherID, teacherName)
