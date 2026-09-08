@@ -1,8 +1,6 @@
 unreleased:
   breaking_changes: []
-  new_features:
-    - text: "Schedule repeating classes from Record classes: pick multiple future dates, preview conflicts, and create a linked series."
-    - text: "Dashboard quick action and series page list active repeating scheduled classes with edit and delete controls."
+  new_features: []
   improvements: []
   bug_fixes: []
   removed: []
@@ -11,6 +9,21 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.09.09"
+    date: "2026-09-09"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Schedule repeating classes from Record classes: pick multiple future dates, preview conflicts, and create a linked series."
+        commit: "500011a"
+      - text: "Dashboard quick action and series page list active repeating scheduled classes with edit and delete controls."
+        commit: "500011a"
+    improvements: []
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
   - version: "2026.09.08"
     date: "2026-09-08"
     released: true
