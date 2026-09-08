@@ -187,7 +187,7 @@ func ScheduledClassMeeting(item ScheduledClassItemData, zoomLogoURL string) temp
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" title=\"View Zoom meeting details\" aria-label=\"View Zoom meeting details\"><img src=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" data-tooltip=\"View Zoom meeting details\" aria-label=\"View Zoom meeting details\"><img src=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -262,7 +262,7 @@ func ScheduledClassCalendarEvent(item ScheduledClassItemData, calendarLogoURL st
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"calendar-event-btn\" target=\"_blank\" rel=\"noopener noreferrer\" title=\"Open in Google Calendar\" aria-label=\"Open in Google Calendar\"><img src=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"calendar-event-btn\" target=\"_blank\" rel=\"noopener noreferrer\" data-tooltip=\"Open in Google Calendar\" aria-label=\"Open in Google Calendar\"><img src=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

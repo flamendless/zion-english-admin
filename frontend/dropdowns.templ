@@ -15,12 +15,17 @@ type TeacherSearchParams struct {
 	FilterMode   bool
 	SelectedID   string
 	SelectedName string
+	AdminOnly    bool
 }
 
 templ TeacherSearch(params TeacherSearchParams) {
 	<div class="form-group entity-search teacher-search">
 		if params.Label != "" {
-			<label for={ params.InputID }>{ params.Label }</label>
+			if params.AdminOnly {
+				@AdminOnlyFormLabel(params.InputID, params.Label)
+			} else {
+				<label for={ params.InputID }>{ params.Label }</label>
+			}
 		}
 		<input type="hidden" name="hiddenId" value={ params.HiddenID }/>
 		<input type="hidden" name="inputId" value={ params.InputID }/>
@@ -71,6 +76,7 @@ templ TeacherDropdownWithValue(selectedID string, selectedName string) {
 		Required:     true,
 		SelectedID:   selectedID,
 		SelectedName: selectedName,
+		AdminOnly:    true,
 	})
 }
 
@@ -99,6 +105,7 @@ templ ScheduleListTeacherSearch() {
 		Label:        "Teacher",
 		Placeholder:  "Search teacher...",
 		Required:     true,
+		AdminOnly:    true,
 	})
 }
 
@@ -111,6 +118,7 @@ templ ClassesTeacherFilterSearch() {
 		Label:        "Teacher",
 		Placeholder:  "All teachers",
 		FilterMode:   true,
+		AdminOnly:    true,
 	})
 }
 
@@ -145,7 +153,7 @@ templ TeacherStudentsDropdown() {
 
 templ StudentDropdownWithValue(selectedID string) {
 	<div class="form-group">
-		<label for="student">Student *</label>
+		@AdminOnlyFormLabel("student", "Student *")
 		<select id="student" name="student" required
 			hx-get={ utils.URL("/api/students?selected=" + selectedID) }
 			hx-trigger="load"
@@ -159,7 +167,7 @@ templ StudentDropdownWithValue(selectedID string) {
 
 templ StudentDropdown() {
 	<div class="form-group">
-		<label for="student">Student *</label>
+		@AdminOnlyFormLabel("student", "Student *")
 		<select id="student" name="student" required
 			hx-get={ utils.URL("/api/students") }
 			hx-trigger="load"
@@ -181,12 +189,13 @@ templ ScheduleModalTeacherDropdown() {
 		Label:        "Teacher *",
 		Placeholder:  "Search teacher...",
 		Required:     true,
+		AdminOnly:    true,
 	})
 }
 
 templ ScheduleModalStudentDropdown() {
 	<div class="form-group">
-		<label for="schedule_student">Student *</label>
+		@AdminOnlyFormLabel("schedule_student", "Student *")
 		<select id="schedule_student" name="schedule_student" required>
 			<option value="">-- Select teacher first --</option>
 		</select>
@@ -195,7 +204,7 @@ templ ScheduleModalStudentDropdown() {
 
 templ ScheduleEditStudentDropdown(teacherID string, studentID string) {
 	<div class="form-group">
-		<label for="schedule_student">Student *</label>
+		@AdminOnlyFormLabel("schedule_student", "Student *")
 		<select id="schedule_student" name="schedule_student" required
 			hx-get={ utils.URL("/api/students?teacher=" + teacherID + "&selected=" + studentID) }
 			hx-trigger="load"
@@ -209,7 +218,7 @@ templ ScheduleEditStudentDropdown(teacherID string, studentID string) {
 
 templ StudentSearchbox() {
 	<div class="form-group entity-search student-search">
-		<label for="relatedStudentSearch">Existing Student</label>
+		<label for="relatedStudentSearch">Student name related with</label>
 		<input
 			type="text"
 			id="relatedStudentSearch"
@@ -228,7 +237,7 @@ templ StudentSearchbox() {
 
 templ ParentCurrencyDropdownWithValue(selected string) {
 	<div class="form-group">
-		<label for="parentCurrency">Parent Currency</label>
+		@AdminOnlyFormLabel("parentCurrency", "Parent Currency")
 		<select id="parentCurrency" name="parentCurrency">
 			<option value="" selected?={ selected == "" }>-- None --</option>
 			<option value="KRW" selected?={ selected == "KRW" }>KRW (Korean Won)</option>
@@ -276,7 +285,7 @@ templ ClassStatusDropdownWithValue(selected constants.ClassListFilterStatus) {
 
 templ StudentStatusDropdownWithValue(selected constants.StudentStatus) {
 	<div class="form-group">
-		<label for="status">Status *</label>
+		@AdminOnlyFormLabel("status", "Status *")
 		<select id="status" name="status" required>
 			for _, opt := range StudentStatusOptions {
 				<option value={ opt.Value } selected?={ string(selected) == opt.Value }>{ opt.Label }</option>
@@ -333,7 +342,7 @@ templ TeacherAssignRow(selectedID string, selectedName string, rowKey string, re
 			SelectedName: selectedName,
 		})
 		if removable {
-			<button type="button" class="teacher-assign-remove" aria-label="Remove teacher"
+			<button type="button" class="teacher-assign-remove" data-tooltip="Remove assigned teacher" aria-label="Remove assigned teacher"
 				_="on click
 					if #teacherRows.children.length > 1
 						remove closest .teacher-assign-row
@@ -346,7 +355,7 @@ templ TeacherAssignRow(selectedID string, selectedName string, rowKey string, re
 
 templ TeacherAssignRows(selectedIDs []string, selectedNames []string) {
 	<div class="form-group teacher-assign">
-		<label>Assigned Teachers *</label>
+		@AdminOnlyFieldLabel("Assigned Teachers *")
 		<div id="teacherRows" class="teacher-assign-rows">
 			if len(selectedIDs) == 0 {
 				@TeacherAssignRow("", "", "0", false)
@@ -357,7 +366,7 @@ templ TeacherAssignRows(selectedIDs []string, selectedNames []string) {
 			}
 		</div>
 		<div class="teacher-assign-add-row">
-			<button type="button" class="teacher-assign-add" aria-label="Assign to another teacher"
+			<button type="button" class="teacher-assign-add" data-tooltip="Assign to another teacher" aria-label="Assign to another teacher"
 				hx-get={ utils.URL("/api/teacher-row") }
 				hx-target="#teacherRows"
 				hx-swap="beforeend"

@@ -34,7 +34,7 @@ func DeleteClassModal() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"modal-overlay\" id=\"deleteClassModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"deleteClassModalTitle\"><div class=\"modal-header\"><h3 id=\"deleteClassModalTitle\">Delete Class</h3><button type=\"button\" class=\"modal-close delete-class-modal-close\" aria-label=\"Close\">&times;</button></div><form id=\"deleteClassForm\" method=\"POST\" class=\"modal-body scheduled-class-action-modal\" hx-swap=\"none\"><p id=\"deleteClassModalMessage\" class=\"scheduled-class-modal-lead\">This will remove the class from your lists. The record is kept for audit.</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"modal-overlay\" id=\"deleteClassModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"deleteClassModalTitle\"><div class=\"modal-header\"><h3 id=\"deleteClassModalTitle\">Delete Class</h3><button type=\"button\" class=\"modal-close delete-class-modal-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><form id=\"deleteClassForm\" method=\"POST\" class=\"modal-body scheduled-class-action-modal\" hx-swap=\"none\"><p id=\"deleteClassModalMessage\" class=\"scheduled-class-modal-lead\">This will remove the class from your lists. The record is kept for audit.</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

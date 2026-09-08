@@ -37,10 +37,14 @@ func badgeCountClass(tone BadgeTone) string {
 }
 
 func StudentStatusPillTone(status constants.StudentStatus) PillTone {
-	if status == constants.StudentStatusActive {
+	switch status {
+	case constants.StudentStatusActive:
 		return PillToneSuccess
+	case constants.StudentStatusDeleted:
+		return PillToneNeutral
+	default:
+		return PillToneError
 	}
-	return PillToneError
 }
 
 func TeacherStatusPillTone(status constants.TeacherStatus, deleted bool) PillTone {

@@ -63,7 +63,7 @@ templ SystemLogs(data SystemLogData) {
 								<th>Module</th>
 								<th>Message</th>
 								if !data.HideCreatedBy {
-									<th>Created By</th>
+									@AdminOnlyTableHeader("Created By")
 								}
 								<th>Created At</th>
 							</tr>

@@ -176,14 +176,14 @@ func SortOrderToggle(sortOrder string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" title=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" data-tooltip=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(sortOrderToggleLabel(sortOrder))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/sort.templ`, Line: 29, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/sort.templ`, Line: 29, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 		if templ_7745c5c3_Err != nil {
@@ -288,7 +288,7 @@ func SortToggleScript() templ.Component {
 			templ_7745c5c3_Var14 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<script>\r\n\t\tfunction toggleSortOrder(btn) {\r\n\t\t\tconst form = btn.closest('form, .toolbar, .list-toolbar, .notification-filter-bar');\r\n\t\t\tconst input = form ? form.querySelector('#sortOrder, [name=\"sortOrder\"]') : document.getElementById('sortOrder');\r\n\t\t\tif (!input) return;\r\n\t\t\tconst next = input.value === 'asc' ? 'desc' : 'asc';\r\n\t\t\tinput.value = next;\r\n\t\t\tbtn.dataset.sortOrder = next;\r\n\t\t\tbtn.setAttribute('aria-label', next === 'asc' ? 'Sort ascending (A to Z)' : 'Sort descending (Z to A)');\r\n\t\t\tbtn.setAttribute('title', next === 'asc' ? 'A to Z' : 'Z to A');\r\n\t\t\tbtn.querySelectorAll('.sort-order-icon').forEach(function (icon) {\r\n\t\t\t\ticon.classList.remove('is-active');\r\n\t\t\t});\r\n\t\t\tconst active = btn.querySelector('.sort-order-icon--' + next);\r\n\t\t\tif (active) active.classList.add('is-active');\r\n\t\t}\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<script>\r\n\t\tfunction toggleSortOrder(btn) {\r\n\t\t\tconst form = btn.closest('form, .toolbar, .list-toolbar, .notification-filter-bar');\r\n\t\t\tconst input = form ? form.querySelector('#sortOrder, [name=\"sortOrder\"]') : document.getElementById('sortOrder');\r\n\t\t\tif (!input) return;\r\n\t\t\tconst next = input.value === 'asc' ? 'desc' : 'asc';\r\n\t\t\tinput.value = next;\r\n\t\t\tbtn.dataset.sortOrder = next;\r\n\t\t\tbtn.setAttribute('aria-label', next === 'asc' ? 'Sort ascending (A to Z)' : 'Sort descending (Z to A)');\r\n\t\t\tbtn.setAttribute('data-tooltip', next === 'asc' ? 'A to Z' : 'Z to A');\r\n\t\t\tbtn.querySelectorAll('.sort-order-icon').forEach(function (icon) {\r\n\t\t\t\ticon.classList.remove('is-active');\r\n\t\t\t});\r\n\t\t\tconst active = btn.querySelector('.sort-order-icon--' + next);\r\n\t\t\tif (active) active.classList.add('is-active');\r\n\t\t}\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

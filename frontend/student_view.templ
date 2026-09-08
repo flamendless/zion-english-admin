@@ -8,7 +8,7 @@ templ StudentViewModal(data EditStudentData) {
 		<div class="modal-dialog modal-dialog-profile modal-dialog-entity" role="dialog" aria-modal="true" aria-labelledby="studentViewTitle">
 			<div class="modal-header">
 				<h3 id="studentViewTitle">Student Details</h3>
-				<button type="button" class="modal-close student-view-close" aria-label="Close" onclick="window.closeStudentViewModal()">&times;</button>
+				<button type="button" class="modal-close student-view-close" data-tooltip="Close" aria-label="Close" onclick="window.closeStudentViewModal()">&times;</button>
 			</div>
 			<div class="modal-body entity-view-body student-view-body">
 				@EntityViewModalStyles()
@@ -32,22 +32,27 @@ templ StudentViewModal(data EditStudentData) {
 						@EntityViewSection("Contact") {
 							<div class="profile-details">
 								@ProfileDetailField("Parent", displayOrDash(data.ParentName))
-								@ProfileDetailField("Contact", displayOrDash(data.Contact))
-								@ProfileDetailField("Parent rate", formatOptionalParentRate(data.ParentRate, data.ParentCurrency, data.HasParentRate))
+								@AdminOnlyProfileDetailField("Contact", displayOrDash(data.Contact))
+								@AdminOnlyProfileDetailField("Parent rate", formatOptionalParentRate(data.ParentRate, data.ParentCurrency, data.HasParentRate))
 							</div>
 						}
 						if data.Status == constants.StudentStatusInactive && data.InactiveReason != "" {
-							@EntityViewSection("Status") {
+							@EntityViewSectionAdminOnly("Status") {
 								@EntityViewNotePanel("Inactive reason", data.InactiveReason, PillToneWarning)
 							}
 						}
+						if data.Status == constants.StudentStatusDeleted && data.DeletedReason != "" {
+							@EntityViewSectionAdminOnly("Status") {
+								@EntityViewNotePanel("Delete reason", data.DeletedReason, PillToneNeutral)
+							}
+						}
 						if len(data.Teachers) > 0 {
-							@EntityViewSection("Teachers") {
+							@EntityViewSectionAdminOnly("Teachers") {
 								@EntityViewTeacherList(data.Teachers)
 							}
 						}
 						if len(data.Relationships) > 0 {
-							@EntityViewSection("Related to") {
+							@EntityViewSectionAdminOnly("Related to") {
 								@EntityViewRelationshipList(data.Relationships)
 							}
 						}

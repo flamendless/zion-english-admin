@@ -10,7 +10,7 @@ templ ReportAllTeachersModal(data ReportAllTeachersData) {
 						<p class="report-all-teachers-cutoff">{ data.CutoffLabel }</p>
 					}
 				</div>
-				<button type="button" class="modal-close report-view-close" aria-label="Close" onclick="window.closeReportViewModal()">&times;</button>
+				<button type="button" class="modal-close report-view-close" data-tooltip="Close" aria-label="Close" onclick="window.closeReportViewModal()">&times;</button>
 			</div>
 			<div class="modal-body report-all-teachers-body">
 				@ReportAllTeachersStyles()

@@ -62,8 +62,9 @@ func studentFilterParams(q, status string, teacherID int64) queries.CountStudent
 		Column1:   q,
 		Column2:   sql.NullString{String: q, Valid: true},
 		Column3:   status,
+		Column4:   status,
 		Status:    status,
-		Column5:   teacherID,
+		Column6:   teacherID,
 		TeacherID: teacherID,
 	}
 }
@@ -75,6 +76,10 @@ func handleStudentsPath(w http.ResponseWriter, r *http.Request) {
 	}
 	if id, ok := extractPathID(r, "students", "/view"); ok {
 		handleStudentView(w, r, id)
+		return
+	}
+	if id, ok := extractPathID(r, "students", "/delete"); ok {
+		handleStudentDelete(w, r, id)
 		return
 	}
 	HttpError(w, "Not found", http.StatusNotFound)
@@ -138,11 +143,15 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 	if existing.InactiveReason.Valid {
 		inactiveReason = existing.InactiveReason.String
 	}
+	deletedReason := ""
+	if existing.DeletedReason.Valid {
+		deletedReason = existing.DeletedReason.String
+	}
 	parentRate, parentCurrency, hasParentRate := studentParentRateView(existing.ParentRate, existing.ParentCurrency)
 
 	return frontend.EditStudentData{
 		ID:             strconv.FormatInt(studentID, 10),
-		Readonly:       readonly,
+		Readonly:       readonly || existing.Status == string(constants.StudentStatusDeleted),
 		Name:           existing.Name,
 		Currency:       existing.Currency,
 		Contact:        existing.Contact.String,
@@ -154,6 +163,7 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 		AssignedColor:  existing.AssignedColor,
 		Status:         constants.StudentStatus(existing.Status),
 		InactiveReason: inactiveReason,
+		DeletedReason:  deletedReason,
 		TeacherIDs:     teacherIDs,
 		TeacherNames:   teacherNames,
 		Teachers:       teachers,
@@ -204,6 +214,55 @@ func saveStudentRelationships(ctx context.Context, studentID int64, r *http.Requ
 	})
 }
 
+func handleStudentDelete(w http.ResponseWriter, r *http.Request, studentID int64) {
+	if r.Method != http.MethodPost {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if !auth.HasAdminAccess(auth.GetRole(r.Context())) {
+		HttpError(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
+		return
+	}
+
+	reason := strings.TrimSpace(r.FormValue("reason"))
+	if err := validateDeletionReason(reason); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	ctx := r.Context()
+	user := auth.GetUser(ctx)
+
+	existing, err := dbRO.GetQueries().GetStudentByID(ctx, studentID)
+	if err != nil {
+		HttpError(w, "Student not found", http.StatusNotFound)
+		return
+	}
+	if existing.Status == string(constants.StudentStatusDeleted) {
+		sendErrorLog(w, "Student is already deleted")
+		return
+	}
+
+	err = dbRW.GetQueries().SoftDeleteStudent(ctx, queries.SoftDeleteStudentParams{
+		DeletedReason: sql.NullString{String: reason, Valid: true},
+		ID:            studentID,
+	})
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	insertAuditLogAs(ctx, user, "students", fmt.Sprintf("deleted student '%s' (id %d, reason: %s)", existing.Name, studentID, reason))
+	setSuccessFlash(w, "Student deleted successfully.")
+	w.Header().Set("HX-Redirect", utils.URL("/students"))
+}
+
 func handleStudentView(w http.ResponseWriter, r *http.Request, studentID int64) {
 	if r.Method != http.MethodGet {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -252,8 +311,9 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		Column1:   filter.Column1,
 		Column2:   filter.Column2,
 		Column3:   filter.Column3,
+		Column4:   filter.Column4,
 		Status:    filter.Status,
-		Column5:   filter.Column5,
+		Column6:   filter.Column6,
 		TeacherID: filter.TeacherID,
 		Limit:     total,
 		Offset:    0,
@@ -383,6 +443,11 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		return
 	}
 
+	if existing.Status == string(constants.StudentStatusDeleted) {
+		sendErrorLog(w, "Deleted students cannot be edited")
+		return
+	}
+
 	if err := r.ParseForm(); err != nil {
 		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
 		return
@@ -435,6 +500,7 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 			AssignedColor:  req.AssignedColor,
 			Status:         req.Status,
 			InactiveReason: sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
+			DeletedReason:  existing.DeletedReason,
 			ID:             studentID,
 		})
 		if err != nil {
@@ -502,12 +568,13 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		Currency:       req.Currency,
 		Contact:        existing.Contact,
 		RatePerClass:   req.RatePerClass,
-			ParentName:     sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
-			ParentRate:     existing.ParentRate,
-			ParentCurrency: existing.ParentCurrency,
-			AssignedColor:  req.AssignedColor,
+		ParentName:     sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
+		ParentRate:     existing.ParentRate,
+		ParentCurrency: existing.ParentCurrency,
+		AssignedColor:  req.AssignedColor,
 		Status:         existing.Status,
 		InactiveReason: existing.InactiveReason,
+		DeletedReason:  existing.DeletedReason,
 		ID:             studentID,
 	})
 	if err != nil {

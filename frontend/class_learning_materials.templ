@@ -31,7 +31,7 @@ templ ClassLearningMaterialPicker(links []ClassLearningMaterialLink) {
 			for _, link := range links {
 				<span class="class-lm-chip" data-id={ link.ID } data-title={ link.Title }>
 					{ link.Title }
-					<button type="button" class="class-lm-chip-remove" aria-label={ "Remove " + link.Title }>&times;</button>
+					<button type="button" class="class-lm-chip-remove" data-tooltip={ "Remove " + link.Title } aria-label={ "Remove " + link.Title }>&times;</button>
 				</span>
 				<input type="hidden" name="learning_material_ids" value={ link.ID }/>
 			}
@@ -277,7 +277,7 @@ templ ClassLearningMaterialPickerScript() {
 				chip.className = 'class-lm-chip';
 				chip.setAttribute('data-id', id);
 				chip.setAttribute('data-title', title);
-				chip.innerHTML = title + '<button type="button" class="class-lm-chip-remove" aria-label="Remove ' + title + '">&times;</button>';
+				chip.innerHTML = title + '<button type="button" class="class-lm-chip-remove" data-tooltip="Remove ' + title + '" aria-label="Remove ' + title + '">&times;</button>';
 				chips.appendChild(chip);
 				syncHiddenInputs(picker);
 			}

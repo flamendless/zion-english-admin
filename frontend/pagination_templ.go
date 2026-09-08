@@ -607,8 +607,8 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 						return templ_7745c5c3_Err
 					}
 				}
-			} else {
-				for _, opt := range StudentStatusOptions {
+			} else if statusType == ListFilterKindStudent {
+				for _, opt := range StudentFilterStatusOptions {
 					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "<option value=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
@@ -775,6 +775,7 @@ func TeacherFilterDropdown(selectedID string, selectedName string) templ.Compone
 			FilterMode:   true,
 			SelectedID:   selectedID,
 			SelectedName: selectedName,
+			AdminOnly:    true,
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

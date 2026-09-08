@@ -103,7 +103,7 @@ templ Classes(data ClassesData) {
 						<th>Date</th>
 						<th>Time</th>
 						if data.ShowAllTeachers {
-							<th>Teacher</th>
+							@AdminOnlyTableHeader("Teacher")
 						}
 						<th>Student</th>
 						<th>Rate</th>

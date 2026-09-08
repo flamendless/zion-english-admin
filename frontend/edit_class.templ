@@ -57,7 +57,7 @@ templ EditClass(data EditClassData) {
 					<div class="form-readonly">
 						<div class="form-row">
 							<div class="form-group">
-								<label>Teacher</label>
+								@AdminOnlyFieldLabel("Teacher")
 								<input type="text" value={ data.TeacherName } disabled/>
 							</div>
 							<div class="form-group">

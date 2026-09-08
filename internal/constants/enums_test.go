@@ -17,8 +17,22 @@ func TestValidStudentStatus(t *testing.T) {
 	if !ValidStudentStatus("active") || !ValidStudentStatus("inactive") {
 		t.Fatal("expected active/inactive to be valid")
 	}
-	if ValidStudentStatus("pending") {
-		t.Fatal("expected pending to be invalid")
+	if ValidStudentStatus("deleted") || ValidStudentStatus("pending") {
+		t.Fatal("expected deleted/pending to be invalid for form status")
+	}
+}
+
+func TestValidStudentFilterStatus(t *testing.T) {
+	if !ValidStudentFilterStatus("") {
+		t.Fatal("expected empty filter to be valid")
+	}
+	for _, status := range []string{"active", "inactive", "deleted"} {
+		if !ValidStudentFilterStatus(status) {
+			t.Fatalf("ValidStudentFilterStatus(%q) = false, want true", status)
+		}
+	}
+	if ValidStudentFilterStatus("pending") {
+		t.Fatal("expected pending to be invalid for filter status")
 	}
 }
 

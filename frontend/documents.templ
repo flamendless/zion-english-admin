@@ -171,11 +171,11 @@ templ DocumentsTable(showUploader bool, showActions bool) {
 					<th>File size</th>
 					<th>Status</th>
 					if showUploader {
-						<th>Uploaded by</th>
+						@AdminOnlyTableHeader("Uploaded by")
 					}
 					<th>Uploaded at</th>
 					if showActions {
-						<th>Actions</th>
+						@AdminOnlyTableHeader("Actions")
 					}
 				</tr>
 			</thead>

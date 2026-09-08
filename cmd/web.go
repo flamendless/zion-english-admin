@@ -976,6 +976,7 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		AssignedColor:  req.AssignedColor,
 		Status:         req.Status,
 		InactiveReason: sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
+		DeletedReason:  sql.NullString{},
 	})
 	if err != nil {
 		sendErrorLog(w, "Failed to register student")

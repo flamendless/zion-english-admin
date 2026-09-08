@@ -144,18 +144,18 @@ templ Analytics(data AnalyticsData) {
 
 				if data.IsSuperuser {
 					<div class="analytics-section" id="teacherSection">
-						<h2>By Teacher</h2>
+						@AdminOnlySectionTitle("By Teacher")
 						<div class="table-wrapper">
 							<table class="table-stack-mobile" id="teacherTable">
 								<thead>
 									<tr>
-										<th>Teacher</th>
-										<th>Conducted</th>
-										<th>Cancelled</th>
-										<th>Rescheduled</th>
-										<th>Cancellation Rate</th>
-										<th>Utilization</th>
-										<th>No-Shows</th>
+										@AdminOnlyTableHeader("Teacher")
+										@AdminOnlyTableHeader("Conducted")
+										@AdminOnlyTableHeader("Cancelled")
+										@AdminOnlyTableHeader("Rescheduled")
+										@AdminOnlyTableHeader("Cancellation Rate")
+										@AdminOnlyTableHeader("Utilization")
+										@AdminOnlyTableHeader("No-Shows")
 									</tr>
 								</thead>
 								<tbody id="teacherTableBody"></tbody>
@@ -192,7 +192,7 @@ templ Analytics(data AnalyticsData) {
 									<th>Date</th>
 									<th>Student</th>
 									if data.IsSuperuser {
-										<th>Teacher</th>
+										@AdminOnlyTableHeader("Teacher")
 									}
 									<th>Duration</th>
 									<th>Days Overdue</th>

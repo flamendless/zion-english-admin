@@ -42,10 +42,14 @@ type StudentItem struct {
 }
 
 func getStudentRowClass(status constants.StudentStatus) string {
-	if status == constants.StudentStatusInactive {
+	switch status {
+	case constants.StudentStatusInactive:
 		return "student-inactive"
+	case constants.StudentStatusDeleted:
+		return "student-deleted"
+	default:
+		return ""
 	}
-	return ""
 }
 
 templ Students(data StudentData) {
@@ -59,6 +63,10 @@ templ Students(data StudentData) {
 		@GlobalIncludes()
 		@StudentViewModalScripts()
 		<style>
+			.student-deleted td {
+				color: var(--color-muted-foreground);
+			}
+
 			.rate-value {
 				display: inline-flex;
 				align-items: baseline;
@@ -93,10 +101,10 @@ templ Students(data StudentData) {
 							<tr>
 								<th>Name</th>
 								<th>Parent</th>
-								<th>Teacher</th>
+								@AdminOnlyTableHeader("Teacher")
 								<th>Rate Per Class</th>
-								<th>Parent Rate</th>
-								<th>Related To</th>
+								@AdminOnlyTableHeader("Parent Rate")
+								@AdminOnlyTableHeader("Related To")
 								<th>Status</th>
 								<th>Actions</th>
 							</tr>
@@ -127,7 +135,13 @@ templ Students(data StudentData) {
 												"hx-target": "#studentViewModalHost",
 												"hx-swap":   "innerHTML",
 											})
-											@IconActionLink(utils.URL("/students/" + student.ID + "/edit"), "Edit", IconKindEdit)
+											if student.Status != constants.StudentStatusDeleted {
+												@IconActionLink(utils.URL("/students/" + student.ID + "/edit"), "Edit", IconKindEdit)
+												@IconActionTrigger("Delete", IconKindDelete, templ.Attributes{
+													"data-student-delete-url": StudentDeleteURL(student.ID),
+													"data-student-name":       student.Name,
+												})
+											}
 										</div>
 									</td>
 								</tr>
@@ -142,6 +156,7 @@ templ Students(data StudentData) {
 				</div>
 			}
 			<div id="studentViewModalHost"></div>
+			@DeleteStudentModal()
 		</div>
 	</body>
 	</html>

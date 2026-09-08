@@ -45,7 +45,7 @@ templ ScheduledClassMeeting(item ScheduledClassItemData, zoomLogoURL string) {
 				class="zoom-meeting-btn"
 				data-room-url={ item.RoomURL }
 				data-passcode={ item.RoomPasscode }
-				title="View Zoom meeting details"
+				data-tooltip="View Zoom meeting details"
 				aria-label="View Zoom meeting details"
 			>
 				<img src={ zoomLogoURL } alt="" width="24" height="24" aria-hidden="true"/>
@@ -66,7 +66,7 @@ templ ScheduledClassCalendarEvent(item ScheduledClassItemData, calendarLogoURL s
 				class="calendar-event-btn"
 				target="_blank"
 				rel="noopener noreferrer"
-				title="Open in Google Calendar"
+				data-tooltip="Open in Google Calendar"
 				aria-label="Open in Google Calendar"
 			>
 				<img src={ calendarLogoURL } alt="" width="24" height="24" aria-hidden="true"/>

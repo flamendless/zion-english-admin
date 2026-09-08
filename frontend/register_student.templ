@@ -46,14 +46,14 @@ templ RegisterStudent(data RegisterStudentData) {
 
 				if data.IsSuperuser {
 					<div id="registerInactiveReasonGroup" class="form-group inactive-reason-group">
-						<label for="inactiveReason">Inactive Reason</label>
+						@AdminOnlyFormLabel("inactiveReason", "Inactive Reason")
 						<input type="text" id="inactiveReason" name="inactiveReason" placeholder="Why is this student inactive?"/>
 					</div>
 				}
 
 				if data.IsSuperuser {
 					<div class="form-group">
-						<label for="contact">Contact</label>
+						@AdminOnlyFormLabel("contact", "Contact")
 						<input type="text" id="contact" name="contact"
 						       placeholder="Enter contact information">
 					</div>
@@ -75,6 +75,7 @@ templ RegisterStudent(data RegisterStudentData) {
 							PlaceholderAmount: "0.00",
 							OptionalCurrency:  true,
 							Hint:              "Optional. Set both amount and currency, or leave both empty.",
+							AdminOnly:         true,
 						})
 					</div>
 				} else {
@@ -87,7 +88,7 @@ templ RegisterStudent(data RegisterStudentData) {
 
 				if data.IsSuperuser {
 					<div class="form-group">
-						<label>Related To</label>
+						@AdminOnlyFieldLabel("Related To")
 						<div class="form-row">
 							<div class="form-group">
 								<label for="relationship">Relationship</label>
@@ -101,7 +102,7 @@ templ RegisterStudent(data RegisterStudentData) {
 					@TeacherAssignRows(nil, nil)
 
 					<div class="form-group">
-						<label for="assignedColor">Assigned Color *</label>
+						@AdminOnlyFormLabel("assignedColor", "Assigned Color *")
 						<div class="color-group">
 							<input type="color" id="assignedColor" name="assignedColor" required
 							       value={ constants.DefaultAssignedColor }

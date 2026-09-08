@@ -26,7 +26,7 @@ templ SortOrderToggle(sortOrder string) {
 			class="sort-order-btn"
 			data-sort-order={ sortOrder }
 			aria-label={ sortOrderAriaLabel(sortOrder) }
-			title={ sortOrderToggleLabel(sortOrder) }
+			data-tooltip={ sortOrderToggleLabel(sortOrder) }
 			onclick="toggleSortOrder(this)"
 		>
 			<span class={ "sort-order-icon sort-order-icon--asc" + sortOrderIconClass(sortOrder, true) } aria-hidden="true">
@@ -59,7 +59,7 @@ templ SortToggleScript() {
 			input.value = next;
 			btn.dataset.sortOrder = next;
 			btn.setAttribute('aria-label', next === 'asc' ? 'Sort ascending (A to Z)' : 'Sort descending (Z to A)');
-			btn.setAttribute('title', next === 'asc' ? 'A to Z' : 'Z to A');
+			btn.setAttribute('data-tooltip', next === 'asc' ? 'A to Z' : 'Z to A');
 			btn.querySelectorAll('.sort-order-icon').forEach(function (icon) {
 				icon.classList.remove('is-active');
 			});

@@ -69,7 +69,7 @@ templ RecordClass(data RecordClassData) {
 						<input type="hidden" id="student" name="student" value={ data.Prefill.StudentID }/>
 						<div class="form-row">
 							<div class="form-group">
-								<label>Teacher</label>
+								@AdminOnlyFieldLabel("Teacher")
 								<input type="text" value={ data.Prefill.TeacherName } disabled/>
 							</div>
 							<div class="form-group">

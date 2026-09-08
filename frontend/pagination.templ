@@ -94,8 +94,8 @@ templ ListFilterForm(actionPath string, query string, status string, statusType 
 						for _, opt := range ClassRecordFilterStatusOptions {
 							<option value={ opt.Value } selected?={ status == opt.Value }>{ opt.Label }</option>
 						}
-					} else {
-						for _, opt := range StudentStatusOptions {
+					} else if statusType == ListFilterKindStudent {
+						for _, opt := range StudentFilterStatusOptions {
 							<option value={ opt.Value } selected?={ status == opt.Value }>{ opt.Label }</option>
 						}
 					}
@@ -146,5 +146,6 @@ templ TeacherFilterDropdown(selectedID string, selectedName string) {
 		FilterMode:   true,
 		SelectedID:   selectedID,
 		SelectedName: selectedName,
+		AdminOnly:    true,
 	})
 }

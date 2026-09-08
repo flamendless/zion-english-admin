@@ -40,6 +40,17 @@ var StudentStatusOptions = func() []StatusOption {
 	return opts
 }()
 
+var StudentFilterStatusOptions = func() []StatusOption {
+	opts := make([]StatusOption, 0, len(constants.StudentFilterStatuses))
+	for _, status := range constants.StudentFilterStatuses {
+		opts = append(opts, StatusOption{
+			Value: string(status),
+			Label: status.Label(),
+		})
+	}
+	return opts
+}()
+
 var TeacherFilterStatusOptions = func() []StatusOption {
 	opts := make([]StatusOption, 0, len(constants.TeacherFilterStatuses))
 	for _, status := range constants.TeacherFilterStatuses {

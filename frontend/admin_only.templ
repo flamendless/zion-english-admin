@@ -1,0 +1,165 @@
+package frontend
+
+const adminOnlyTooltip = "Admin only. Not visible to teachers."
+
+templ AdminOnlyIndicator() {
+	<span
+		class="admin-only-indicator"
+		data-tooltip={ adminOnlyTooltip }
+		tabindex="0"
+		role="img"
+		aria-label={ adminOnlyTooltip }
+	>
+		@iconSVGEyeOff()
+	</span>
+}
+
+templ AdminOnlyTableHeader(label string) {
+	<th>
+		<span class="table-header-label">
+			{ label }
+			@AdminOnlyIndicator()
+		</span>
+	</th>
+}
+
+templ AdminOnlyFormLabel(forID, label string) {
+	<label for={ forID } class="admin-only-label-wrap">
+		{ label }
+		@AdminOnlyIndicator()
+	</label>
+}
+
+templ AdminOnlyFieldLabel(label string) {
+	<label class="admin-only-label-wrap">
+		{ label }
+		@AdminOnlyIndicator()
+	</label>
+}
+
+templ AdminOnlySectionTitle(title string) {
+	<h2 class="admin-only-label-wrap">
+		{ title }
+		@AdminOnlyIndicator()
+	</h2>
+}
+
+templ AdminOnlyEntityViewSectionTitle(title string) {
+	<h4 class="entity-view-section-title admin-only-label-wrap">
+		{ title }
+		@AdminOnlyIndicator()
+	</h4>
+}
+
+templ EntityViewSectionAdminOnly(title string) {
+	<section class="entity-view-section">
+		@AdminOnlyEntityViewSectionTitle(title)
+		<div class="entity-view-section-body">
+			{ children... }
+		</div>
+	</section>
+}
+
+templ AdminOnlyProfileDetailField(label, value string) {
+	<div class="profile-detail">
+		<span class="profile-detail-label admin-only-label-wrap">
+			{ label }
+			@AdminOnlyIndicator()
+		</span>
+		<span class="profile-detail-value">{ value }</span>
+	</div>
+}
+
+templ AdminOnlyTooltipScript() {
+	<script>
+		(function () {
+			let tipEl = null;
+			let activeTarget = null;
+
+			function getTip() {
+				if (!tipEl) {
+					tipEl = document.createElement('div');
+					tipEl.id = 'adminOnlyTooltip';
+					tipEl.className = 'admin-only-floating-tooltip';
+					tipEl.setAttribute('role', 'tooltip');
+					tipEl.hidden = true;
+					document.body.appendChild(tipEl);
+				}
+				return tipEl;
+			}
+
+			function positionTip(target) {
+				const tip = getTip();
+				const text = target.getAttribute('data-tooltip');
+				if (!text) return;
+				tip.textContent = text;
+				tip.hidden = false;
+
+				tip.style.left = '0';
+				tip.style.top = '0';
+				const tipRect = tip.getBoundingClientRect();
+				const rect = target.getBoundingClientRect();
+				const gap = 6;
+				const margin = 8;
+
+				let top = rect.top - tipRect.height - gap;
+				let left = rect.left + rect.width / 2 - tipRect.width / 2;
+
+				if (top < margin) {
+					top = rect.bottom + gap;
+				}
+
+				const maxLeft = window.innerWidth - tipRect.width - margin;
+				left = Math.max(margin, Math.min(left, maxLeft));
+
+				if (top + tipRect.height > window.innerHeight - margin) {
+					top = Math.max(margin, rect.top - tipRect.height - gap);
+				}
+
+				tip.style.left = left + 'px';
+				tip.style.top = top + 'px';
+			}
+
+			function hideTip() {
+				if (tipEl) tipEl.hidden = true;
+				activeTarget = null;
+			}
+
+			function showTip(target) {
+				activeTarget = target;
+				positionTip(target);
+			}
+
+			document.addEventListener('mouseover', function (e) {
+				const el = e.target.closest('.admin-only-indicator[data-tooltip]');
+				if (el) showTip(el);
+			});
+
+			document.addEventListener('mouseout', function (e) {
+				const el = e.target.closest('.admin-only-indicator[data-tooltip]');
+				if (!el) return;
+				const related = e.relatedTarget;
+				if (related && el.contains(related)) return;
+				hideTip();
+			});
+
+			document.addEventListener('focusin', function (e) {
+				const el = e.target.closest('.admin-only-indicator[data-tooltip]');
+				if (el) showTip(el);
+			});
+
+			document.addEventListener('focusout', function (e) {
+				const el = e.target.closest('.admin-only-indicator[data-tooltip]');
+				if (el) hideTip();
+			});
+
+			window.addEventListener('scroll', function () {
+				if (activeTarget) positionTip(activeTarget);
+			}, true);
+
+			window.addEventListener('resize', function () {
+				if (activeTarget) positionTip(activeTarget);
+			});
+		})();
+	</script>
+}

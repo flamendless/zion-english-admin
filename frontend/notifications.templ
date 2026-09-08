@@ -39,6 +39,7 @@ templ NotificationBell() {
 			type="button"
 			class="notification-bell"
 			id="notificationBellBtn"
+			data-tooltip="Notifications"
 			aria-label="Notifications"
 			aria-expanded="false"
 			aria-controls="notificationPanelHost"
@@ -250,7 +251,9 @@ templ NotificationBellScript() {
 				if (!btn) return;
 				const badge = btn.parentElement?.querySelector('.badge-count');
 				const count = badge ? badge.textContent.trim() : '';
-				btn.setAttribute('aria-label', count ? 'Notifications, ' + count + ' unread' : 'Notifications');
+				const label = count ? 'Notifications, ' + count + ' unread' : 'Notifications';
+				btn.setAttribute('aria-label', label);
+				btn.setAttribute('data-tooltip', label);
 			}
 
 			function closeNotificationPanel() {

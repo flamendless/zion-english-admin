@@ -127,7 +127,7 @@ func ConductClassModal() templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"modal-overlay\" id=\"conductClassModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"conductClassModalTitle\"><div class=\"modal-header\"><h3 id=\"conductClassModalTitle\">Conduct Class</h3><button type=\"button\" class=\"modal-close scheduled-class-modal-close\" aria-label=\"Close\">&times;</button></div><form id=\"conductClassForm\" method=\"POST\" class=\"modal-body scheduled-class-action-modal\" hx-swap=\"none\"><p class=\"scheduled-class-modal-lead\">Record this session as conducted. Class details are fixed from the schedule.</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"modal-overlay\" id=\"conductClassModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"conductClassModalTitle\"><div class=\"modal-header\"><h3 id=\"conductClassModalTitle\">Conduct Class</h3><button type=\"button\" class=\"modal-close scheduled-class-modal-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><form id=\"conductClassForm\" method=\"POST\" class=\"modal-body scheduled-class-action-modal\" hx-swap=\"none\"><p class=\"scheduled-class-modal-lead\">Record this session as conducted. Class details are fixed from the schedule.</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -164,7 +164,7 @@ func CancelClassModal() templ.Component {
 			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"modal-overlay\" id=\"cancelClassModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"cancelClassModalTitle\"><div class=\"modal-header\"><h3 id=\"cancelClassModalTitle\">Cancel Class</h3><button type=\"button\" class=\"modal-close scheduled-class-modal-close\" aria-label=\"Close\">&times;</button></div><form id=\"cancelClassForm\" method=\"POST\" class=\"modal-body scheduled-class-action-modal\" hx-swap=\"none\"><p class=\"scheduled-class-modal-lead\">This will mark the class as cancelled and keep a record for your history.</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"modal-overlay\" id=\"cancelClassModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"cancelClassModalTitle\"><div class=\"modal-header\"><h3 id=\"cancelClassModalTitle\">Cancel Class</h3><button type=\"button\" class=\"modal-close scheduled-class-modal-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><form id=\"cancelClassForm\" method=\"POST\" class=\"modal-body scheduled-class-action-modal\" hx-swap=\"none\"><p class=\"scheduled-class-modal-lead\">This will mark the class as cancelled and keep a record for your history.</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -201,7 +201,7 @@ func EditScheduledClassModal() templ.Component {
 			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"modal-overlay\" id=\"editScheduledClassModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"editScheduledClassModalTitle\"><div class=\"modal-header\"><h3 id=\"editScheduledClassModalTitle\">Edit Scheduled Class</h3><button type=\"button\" class=\"modal-close scheduled-class-modal-close\" aria-label=\"Close\">&times;</button></div><div id=\"editScheduledClassModalBody\" class=\"modal-body\"><p class=\"modal-loading\">Loading...</p></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"modal-overlay\" id=\"editScheduledClassModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"editScheduledClassModalTitle\"><div class=\"modal-header\"><h3 id=\"editScheduledClassModalTitle\">Edit Scheduled Class</h3><button type=\"button\" class=\"modal-close scheduled-class-modal-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><div id=\"editScheduledClassModalBody\" class=\"modal-body\"><p class=\"modal-loading\">Loading...</p></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

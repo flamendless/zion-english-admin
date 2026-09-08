@@ -379,7 +379,7 @@ templ Schedule(data ScheduleData) {
 				if data.ShowAllTeachers {
 					<input type="hidden" id="listTeacher" name="teacherId" value="0"/>
 					<div class="form-group">
-						<label>Teacher</label>
+						@AdminOnlyFieldLabel("Teacher")
 						<input type="text" value="All teachers" disabled/>
 					</div>
 				} else if data.LockTeacher {
@@ -428,9 +428,9 @@ templ Schedule(data ScheduleData) {
 
 					<div class="schedule-calendar schedule-calendar-full" role="application" aria-label="Class schedule calendar">
 					<div class="calendar-header">
-						<button type="button" class="calendar-nav-btn" id="calPrev" aria-label="Previous month">&lsaquo;</button>
+						<button type="button" class="calendar-nav-btn" id="calPrev" data-tooltip="Previous month" aria-label="Previous month">&lsaquo;</button>
 						<span class="calendar-month-label" id="calMonthLabel"></span>
-						<button type="button" class="calendar-nav-btn" id="calNext" aria-label="Next month">&rsaquo;</button>
+						<button type="button" class="calendar-nav-btn" id="calNext" data-tooltip="Next month" aria-label="Next month">&rsaquo;</button>
 						<button type="button" class="calendar-today-btn" id="calToday" aria-label="Jump to today">Today</button>
 					</div>
 					<div class="calendar-weekdays" aria-hidden="true">
@@ -457,7 +457,7 @@ templ Schedule(data ScheduleData) {
 				<div class="modal-dialog modal-dialog-schedule modal-dialog-schedule-day" role="dialog" aria-modal="true" aria-labelledby="modalDateTitle">
 					<div class="modal-header">
 						<h3 id="modalDateTitle">Schedule</h3>
-						<button type="button" class="modal-close schedule-modal-close" id="modalCloseBtn" aria-label="Close">&times;</button>
+						<button type="button" class="modal-close schedule-modal-close" id="modalCloseBtn" data-tooltip="Close" aria-label="Close">&times;</button>
 					</div>
 					<div class="modal-body">
 						<section class="modal-section" aria-labelledby="dayClassesHeading">
@@ -507,7 +507,7 @@ templ Schedule(data ScheduleData) {
 				<div class="modal-dialog modal-dialog-zoom" role="dialog" aria-modal="true" aria-labelledby="zoomMeetingTitle">
 					<div class="modal-header modal-header-zoom">
 						<h3 id="zoomMeetingTitle" class="zoom-meeting-sr-title">Zoom Meeting</h3>
-						<button type="button" class="modal-close" id="zoomMeetingCloseBtn" aria-label="Close">&times;</button>
+						<button type="button" class="modal-close" id="zoomMeetingCloseBtn" data-tooltip="Close" aria-label="Close">&times;</button>
 					</div>
 					<div class="modal-body zoom-meeting-body">
 						<img

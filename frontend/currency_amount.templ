@@ -14,6 +14,7 @@ type CurrencyAmountFieldParams struct {
 	OptionalCurrency  bool
 	PlaceholderAmount string
 	Hint              string
+	AdminOnly         bool
 }
 
 templ currencyOptions(selected string, includeEmpty bool, includeSelectPrompt bool) {
@@ -32,7 +33,11 @@ templ currencyOptions(selected string, includeEmpty bool, includeSelectPrompt bo
 
 templ CurrencyAmountField(params CurrencyAmountFieldParams) {
 	<div class="form-group currency-amount-field">
-		<label for={ params.AmountID }>{ params.Label }</label>
+		if params.AdminOnly {
+			@AdminOnlyFormLabel(params.AmountID, params.Label)
+		} else {
+			<label for={ params.AmountID }>{ params.Label }</label>
+		}
 		<div class="currency-amount-control">
 			<div class="currency-amount-currency">
 				<span class="currency-amount-symbol" aria-hidden="true">{ constants.CurrencySymbol(params.CurrencyValue) }</span>

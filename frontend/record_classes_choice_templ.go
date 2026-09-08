@@ -31,7 +31,7 @@ func RecordClassesChoiceModal() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"modal-overlay\" id=\"recordClassesChoiceModal\" hidden role=\"presentation\"><div class=\"modal-dialog modal-dialog-choice\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"recordClassesChoiceTitle\"><div class=\"modal-header\"><h3 id=\"recordClassesChoiceTitle\">Record classes</h3><button type=\"button\" class=\"modal-close record-classes-choice-close\" aria-label=\"Close\">&times;</button></div><div class=\"modal-body record-classes-choice-body\"><p class=\"record-classes-choice-lead\">Choose how you want to add a class.</p><div class=\"choice-option-cards\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"modal-overlay\" id=\"recordClassesChoiceModal\" hidden role=\"presentation\"><div class=\"modal-dialog modal-dialog-choice\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"recordClassesChoiceTitle\"><div class=\"modal-header\"><h3 id=\"recordClassesChoiceTitle\">Record classes</h3><button type=\"button\" class=\"modal-close record-classes-choice-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><div class=\"modal-body record-classes-choice-body\"><p class=\"record-classes-choice-lead\">Choose how you want to add a class.</p><div class=\"choice-option-cards\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

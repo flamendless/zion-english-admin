@@ -26,6 +26,7 @@ type EditStudentData struct {
 	AssignedColor  string
 	Status         constants.StudentStatus
 	InactiveReason string
+	DeletedReason  string
 	TeacherIDs     []string
 	TeacherNames   []string
 	Teachers       []TeacherListItem
@@ -91,18 +92,24 @@ templ EditStudent(data EditStudentData) {
 							<input type="text" id="currency" value={ data.Currency } disabled/>
 						</div>
 						<div class="form-group">
-							<label for="status">Status</label>
+							@AdminOnlyFormLabel("status", "Status")
 							<input type="text" id="status" value={ string(data.Status) } disabled/>
 						</div>
 					</div>
 					if data.Status == constants.StudentStatusInactive && data.InactiveReason != "" {
 						<div class="form-group">
-							<label for="inactiveReason">Inactive Reason</label>
+							@AdminOnlyFormLabel("inactiveReason", "Inactive Reason")
 							<input type="text" id="inactiveReason" value={ data.InactiveReason } disabled/>
 						</div>
 					}
+					if data.Status == constants.StudentStatusDeleted && data.DeletedReason != "" {
+						<div class="form-group">
+							@AdminOnlyFormLabel("deletedReason", "Delete Reason")
+							<input type="text" id="deletedReason" value={ data.DeletedReason } disabled/>
+						</div>
+					}
 					<div class="form-group">
-						<label for="contact">Contact</label>
+						@AdminOnlyFormLabel("contact", "Contact")
 						<input type="text" id="contact" value={ data.Contact } disabled/>
 					</div>
 					<div class="form-group">
@@ -111,7 +118,7 @@ templ EditStudent(data EditStudentData) {
 					</div>
 					<div class="form-row">
 						<div class="form-group">
-							<label for="parentRate">Parent Rate</label>
+							@AdminOnlyFormLabel("parentRate", "Parent Rate")
 							<input type="text" id="parentRate" value={ formatOptionalParentRate(data.ParentRate, data.ParentCurrency, data.HasParentRate) } disabled/>
 						</div>
 					</div>
@@ -121,14 +128,14 @@ templ EditStudent(data EditStudentData) {
 					</div>
 					if len(data.Relationships) > 0 {
 						<div class="form-group">
-							<label>Related To</label>
+							@AdminOnlyFieldLabel("Related To")
 							for _, rel := range data.Relationships {
 								<input type="text" value={ formatStudentRelationshipLabel(rel) } disabled/>
 							}
 						</div>
 					}
 					<div class="form-group">
-						<label>Assigned Teachers</label>
+						@AdminOnlyFieldLabel("Assigned Teachers")
 						<div class="entity-view-teacher-list">
 							for _, teacher := range data.Teachers {
 								<div class="entity-view-teacher-item">
@@ -159,11 +166,11 @@ templ EditStudent(data EditStudentData) {
 						@StudentStatusDropdownWithValue(data.Status)
 					</div>
 					<div id="inactiveReasonGroup" class={ inactiveReasonGroupClass(data.Status) }>
-						<label for="inactiveReason">Inactive Reason *</label>
+						@AdminOnlyFormLabel("inactiveReason", "Inactive Reason *")
 						<input type="text" id="inactiveReason" name="inactiveReason" value={ data.InactiveReason } placeholder="Why is this student inactive?"/>
 					</div>
 					<div class="form-group">
-						<label for="contact">Contact</label>
+						@AdminOnlyFormLabel("contact", "Contact")
 						<input type="text" id="contact" name="contact" value={ data.Contact }/>
 					</div>
 					<div class="form-group">
@@ -172,7 +179,7 @@ templ EditStudent(data EditStudentData) {
 					</div>
 					<div class="form-row">
 						<div class="form-group">
-							<label for="parentRate">Parent Rate</label>
+							@AdminOnlyFormLabel("parentRate", "Parent Rate")
 							<input type="number" id="parentRate" name="parentRate" step="0.01" min="0" value={ formatOptionalFloat(data.ParentRate, data.HasParentRate) } placeholder="0.00"/>
 						</div>
 						@ParentCurrencyDropdownWithValue(data.ParentCurrency)
@@ -187,7 +194,7 @@ templ EditStudent(data EditStudentData) {
 						<input type="color" id="assignedColor" name="assignedColor" required value={ data.AssignedColor }/>
 					</div>
 					<div class="form-group">
-						<label>Related Students</label>
+						@AdminOnlyFieldLabel("Related Students")
 						if len(data.Relationships) > 0 {
 							<div class="relationship-list">
 								for _, rel := range data.Relationships {

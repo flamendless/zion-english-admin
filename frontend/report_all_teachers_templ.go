@@ -52,7 +52,7 @@ func ReportAllTeachersModal(data ReportAllTeachersData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div><button type=\"button\" class=\"modal-close report-view-close\" aria-label=\"Close\" onclick=\"window.closeReportViewModal()\">&times;</button></div><div class=\"modal-body report-all-teachers-body\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div><button type=\"button\" class=\"modal-close report-view-close\" data-tooltip=\"Close\" aria-label=\"Close\" onclick=\"window.closeReportViewModal()\">&times;</button></div><div class=\"modal-body report-all-teachers-body\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
