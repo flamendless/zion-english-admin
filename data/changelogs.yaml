@@ -1,8 +1,7 @@
 unreleased:
   breaking_changes: []
   new_features: []
-  improvements:
-    - text: "Feature Flags now includes per-integration role visibility checkboxes so superusers can control which teacher roles see Zoom and Google Calendar. Login superuser and admin accounts always see all integrations."
+  improvements: []
   bug_fixes: []
   removed: []
   security: []
@@ -10,6 +9,39 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.09.08"
+    date: "2026-09-08"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Superusers can delete students from the students list with a required reason; the record is kept for audit."
+        commit: "55eeef5"
+      - text: "You can mark scheduled and recorded classes as trial classes."
+        commit: "cf05105"
+      - text: "Reports includes a Generate Summary action to export payroll totals for all teachers in the selected date range."
+        commit: "db08b1b"
+      - text: "Analytics now includes interactive charts for utilization, cancellations, weekly trends, and related metrics."
+        commit: "960f2d1"
+    improvements:
+      - text: "Feature Flags now includes per-integration role visibility checkboxes so superusers can control which teacher roles see Zoom and Google Calendar. Login superuser and admin accounts always see all integrations."
+        commit: "e10f5e1"
+      - text: "Superuser-only fields such as parent rate now show an Admin only indicator so it is clear which data teachers cannot see."
+        commit: "55eeef5"
+      - text: "Rates and currencies use clearer formatting across classes, schedule, and student forms."
+        commit: "8276308"
+      - text: "The class schedule includes a day timeline view showing each teacher's classes by hour."
+        commit: "49b2ae5"
+      - text: "The superuser dashboard shows parent rate totals for the current month."
+        commit: "063ab81"
+      - text: "List pages open with sensible default sort options."
+        commit: "623c662"
+      - text: "Dashboard stat cards have an updated layout."
+        commit: "d4f069e"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
   - version: "2026.09.02"
     date: "2026-09-02"
     released: true
