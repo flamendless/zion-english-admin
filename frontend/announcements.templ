@@ -651,9 +651,10 @@ templ AnnouncementBannerStyles() {
 		}
 
 		.announcement-banner {
-			display: flex;
-			align-items: flex-start;
-			gap: var(--space-3);
+			display: grid;
+			grid-template-columns: 36px 1fr 36px;
+			align-items: start;
+			column-gap: var(--space-3);
 			padding: var(--space-3) var(--space-4);
 			border-radius: var(--radius-md);
 			border: 1px solid transparent;
@@ -662,13 +663,18 @@ templ AnnouncementBannerStyles() {
 		}
 
 		.announcement-banner__icon {
-			flex-shrink: 0;
+			grid-column: 1;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			width: 36px;
 			height: 36px;
 			border-radius: var(--radius-full);
+		}
+
+		.announcement-banner__content {
+			grid-column: 2;
+			text-align: center;
 		}
 
 		.announcement-banner__title {
@@ -749,15 +755,9 @@ templ AnnouncementBannerStyles() {
 
 		@media (max-width: 768px) {
 			.announcement-banner {
-				flex-direction: column;
-				align-items: flex-start;
-				gap: var(--space-2);
+				grid-template-columns: 32px 1fr 32px;
+				column-gap: var(--space-2);
 				padding: var(--space-3);
-			}
-
-			.home-welcome .announcement-banner {
-				align-items: center;
-				text-align: center;
 			}
 
 			.announcement-banner__icon {
@@ -768,16 +768,6 @@ templ AnnouncementBannerStyles() {
 			.announcement-banner__icon svg {
 				width: 18px;
 				height: 18px;
-			}
-
-			.announcement-banner__content {
-				width: 100%;
-			}
-
-			.home-welcome .announcement-banner__content {
-				display: flex;
-				flex-direction: column;
-				align-items: center;
 			}
 
 			.announcement-banner__title {
