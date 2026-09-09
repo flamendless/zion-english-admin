@@ -165,6 +165,33 @@ func teacherSearchClearScript(hiddenID, resultsID string) string {
 	end`, hiddenID, resultsID, hiddenID)
 }
 
+templ EntitySearchDismissScript() {
+	<script>
+		(function () {
+			if (window._entitySearchDismissBound) return;
+			window._entitySearchDismissBound = true;
+
+			document.addEventListener('click', function (e) {
+				document.querySelectorAll('.entity-search').forEach(function (search) {
+					if (search.contains(e.target)) return;
+					const results = search.querySelector('.entity-search-results');
+					if (results && results.parentElement) {
+						results.parentElement.innerHTML = '';
+					}
+				});
+
+				document.querySelectorAll('.class-lm-picker').forEach(function (picker) {
+					if (picker.contains(e.target)) return;
+					const results = picker.querySelector('.class-lm-results');
+					if (results) {
+						results.innerHTML = '';
+					}
+				});
+			});
+		})();
+	</script>
+}
+
 templ DatePreset(selectCurrentCutoff bool) {
 	@DatePresetForMonth(utils.CurrentMonthPHT(), selectCurrentCutoff)
 }

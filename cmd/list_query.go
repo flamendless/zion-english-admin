@@ -6,6 +6,15 @@ import (
 	"strings"
 )
 
+func firstQueryParam(r *http.Request, keys ...string) string {
+	for _, key := range keys {
+		if v := strings.TrimSpace(r.URL.Query().Get(key)); v != "" {
+			return v
+		}
+	}
+	return ""
+}
+
 func parseListDateRange(r *http.Request) (string, string, error) {
 	startDate := strings.TrimSpace(r.URL.Query().Get("startDate"))
 	endDate := strings.TrimSpace(r.URL.Query().Get("endDate"))

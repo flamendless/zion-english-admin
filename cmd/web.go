@@ -1535,13 +1535,89 @@ func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type approvedTeacherSearchRow struct {
+	ID           int64
+	FirstName    string
+	MiddleName   string
+	LastName     string
+	DriveUrl     string
+	RatePerClass float64
+	Template     sql.NullString
+}
+
+func searchApprovedTeachersByName(ctx context.Context, q string) ([]approvedTeacherSearchRow, error) {
+	searchQ := sql.NullString{String: q, Valid: true}
+	rows, err := dbRO.GetQueries().SearchApprovedTeachersByName(ctx, queries.SearchApprovedTeachersByNameParams{
+		Column1: searchQ,
+		Column2: searchQ,
+		Column3: searchQ,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(rows) > 0 {
+		return mapApprovedTeacherSearchRows(rows), nil
+	}
+
+	parts := strings.Fields(q)
+	if len(parts) < 2 {
+		return nil, nil
+	}
+
+	firstQ := sql.NullString{String: parts[0], Valid: true}
+	lastQ := sql.NullString{String: parts[len(parts)-1], Valid: true}
+	fallback, err := dbRO.GetQueries().SearchApprovedTeachersByFirstAndLast(ctx, queries.SearchApprovedTeachersByFirstAndLastParams{
+		Column1: firstQ,
+		Column2: lastQ,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return mapApprovedTeacherFirstLastRows(fallback), nil
+}
+
+func mapApprovedTeacherSearchRows(rows []queries.SearchApprovedTeachersByNameRow) []approvedTeacherSearchRow {
+	out := make([]approvedTeacherSearchRow, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, approvedTeacherSearchRow{
+			ID:           row.ID,
+			FirstName:    row.FirstName,
+			MiddleName:   row.MiddleName,
+			LastName:     row.LastName,
+			DriveUrl:     row.DriveUrl,
+			RatePerClass: row.RatePerClass,
+			Template:     row.Template,
+		})
+	}
+	return out
+}
+
+func mapApprovedTeacherFirstLastRows(rows []queries.SearchApprovedTeachersByFirstAndLastRow) []approvedTeacherSearchRow {
+	out := make([]approvedTeacherSearchRow, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, approvedTeacherSearchRow{
+			ID:           row.ID,
+			FirstName:    row.FirstName,
+			MiddleName:   row.MiddleName,
+			LastName:     row.LastName,
+			DriveUrl:     row.DriveUrl,
+			RatePerClass: row.RatePerClass,
+			Template:     row.Template,
+		})
+	}
+	return out
+}
+
 func handleSearchTeachers(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	q := strings.TrimSpace(r.URL.Query().Get("teacherQ"))
+	if q == "" {
+		q = strings.TrimSpace(r.URL.Query().Get("q"))
+	}
 	hiddenID := strings.TrimSpace(r.URL.Query().Get("hiddenId"))
 	inputID := strings.TrimSpace(r.URL.Query().Get("inputId"))
 	resultsID := strings.TrimSpace(r.URL.Query().Get("resultsId"))
@@ -1552,12 +1628,7 @@ func handleSearchTeachers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	searchQ := sql.NullString{String: q, Valid: true}
-	teachers, err := dbRO.GetQueries().SearchApprovedTeachersByName(r.Context(), queries.SearchApprovedTeachersByNameParams{
-		Column1: searchQ,
-		Column2: searchQ,
-		Column3: searchQ,
-	})
+	teachers, err := searchApprovedTeachersByName(r.Context(), q)
 	if err != nil {
 		HttpError(w, "Failed to search teachers", http.StatusInternalServerError)
 		return
@@ -1951,7 +2022,7 @@ func handleSearchStudents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	q := firstQueryParam(r, "studentQ", "q")
 	w.Header().Set("Content-Type", "text/html")
 	if q == "" {
 		frontend.StudentSearchResults(nil).Render(r.Context(), w)

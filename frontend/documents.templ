@@ -81,9 +81,9 @@ templ DocumentsToolbar(showTeacherFilter bool) {
 		<div class="form-group">
 			<label for="documentSearch">Search</label>
 			if showTeacherFilter {
-				<input type="text" id="documentSearch" name="q" placeholder="Filename or teacher name..."/>
+				<input type="text" id="documentSearch" name="documentQ" placeholder="Filename or teacher name..."/>
 			} else {
-				<input type="text" id="documentSearch" name="q" placeholder="Filename..."/>
+				<input type="text" id="documentSearch" name="documentQ" placeholder="Filename..."/>
 			}
 		</div>
 		@DocumentTypeFilterDropdown()

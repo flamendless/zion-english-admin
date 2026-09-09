@@ -166,7 +166,7 @@ func handleSearchLearningMaterials(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	q := firstQueryParam(r, "lmQ", "q")
 	w.Header().Set("Content-Type", "text/html")
 	if q == "" {
 		if err := frontend.LearningMaterialSearchResults(nil).Render(r.Context(), w); err != nil {

@@ -27,23 +27,20 @@ templ TeacherSearch(params TeacherSearchParams) {
 				<label for={ params.InputID }>{ params.Label }</label>
 			}
 		}
-		<input type="hidden" name="hiddenId" value={ params.HiddenID }/>
-		<input type="hidden" name="inputId" value={ params.InputID }/>
-		<input type="hidden" name="resultsId" value={ params.ResultsID }/>
 		<input
 			type="text"
 			id={ params.InputID }
-			name="q"
+			name="teacherQ"
 			autocomplete="off"
 			placeholder={ params.Placeholder }
 			value={ params.SelectedName }
 			if params.FilterMode {
 				_={ teacherSearchClearScript(params.HiddenID, params.ResultsID) }
 			}
-			hx-get={ utils.URL("/api/teachers/search") }
+			hx-get={ teacherSearchURL(params.HiddenID, params.InputID, params.ResultsID) }
 			hx-trigger="input changed delay:300ms"
 			hx-target={ "#" + params.ResultsID }
-			hx-include="closest .teacher-search"
+			hx-include={ "#" + params.InputID }
 		/>
 		if params.Required {
 			<input
@@ -222,7 +219,7 @@ templ StudentSearchbox() {
 		<input
 			type="text"
 			id="relatedStudentSearch"
-			name="q"
+			name="studentQ"
 			autocomplete="off"
 			placeholder="Search registered student..."
 			hx-get={ utils.URL("/api/students/search") }

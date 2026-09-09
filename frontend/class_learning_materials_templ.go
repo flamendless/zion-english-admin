@@ -37,7 +37,7 @@ func ClassLearningMaterialPicker(links []ClassLearningMaterialLink) templ.Compon
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"form-group class-lm-picker\"><label for=\"classLmSearch\">Learning Materials</label><div class=\"class-lm-search-wrap\"><input type=\"text\" id=\"classLmSearch\" name=\"q\" class=\"class-lm-search\" autocomplete=\"off\" placeholder=\"Search learning material by title...\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"form-group class-lm-picker\"><label for=\"classLmSearch\">Learning Materials</label><div class=\"class-lm-search-wrap\"><input type=\"text\" id=\"classLmSearch\" name=\"lmQ\" class=\"class-lm-search\" autocomplete=\"off\" placeholder=\"Search learning material by title...\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -181,12 +181,12 @@ func DocumentsToolbar(showTeacherFilter bool) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if showTeacherFilter {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<input type=\"text\" id=\"documentSearch\" name=\"q\" placeholder=\"Filename or teacher name...\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<input type=\"text\" id=\"documentSearch\" name=\"documentQ\" placeholder=\"Filename or teacher name...\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<input type=\"text\" id=\"documentSearch\" name=\"q\" placeholder=\"Filename...\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<input type=\"text\" id=\"documentSearch\" name=\"documentQ\" placeholder=\"Filename...\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

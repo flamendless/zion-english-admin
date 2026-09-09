@@ -548,7 +548,7 @@ func parseClassRecordsQuery(r *http.Request) (classRecordsQuery, error) {
 		teacherIDStr = strings.TrimSpace(r.URL.Query().Get("teacher"))
 	}
 	statusFilter := r.URL.Query().Get("status")
-	nameFilter := r.URL.Query().Get("q")
+	nameFilter := firstQueryParam(r, "studentQ", "q")
 
 	role := auth.GetRole(r.Context())
 	var teacherID int64
@@ -644,8 +644,9 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 	enrichClassRecordViewsWithRoleBadges(views, rolesMap)
 	rows := frontend.ClassRecordRowFromViews(views)
 
+	showTeacher := auth.HasAdminAccess(auth.GetRole(ctx))
 	colspan := 7
-	if q.showAll {
+	if showTeacher {
 		colspan = 8
 	}
 	pagination := frontend.BuildPaginationData(page.Number, page.Size, total)
@@ -653,7 +654,7 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 	includeSelector := "#classesToolbar"
 
 	w.Header().Set("Content-Type", "text/html")
-	if err := frontend.ClassRecordsPartial(rows, q.showAll, colspan, "No classes found for the selected criteria", pagination, partialsURL, includeSelector).Render(ctx, w); err != nil {
+	if err := frontend.ClassRecordsPartial(rows, showTeacher, colspan, "No classes found for the selected criteria", pagination, partialsURL, includeSelector).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }

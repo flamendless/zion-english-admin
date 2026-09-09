@@ -207,7 +207,7 @@ func (f documentFilters) active() bool {
 
 func parseDocumentFilters(r *http.Request) (documentFilters, error) {
 	filters := documentFilters{
-		Query:  strings.TrimSpace(r.URL.Query().Get("q")),
+		Query:  firstQueryParam(r, "documentQ", "q"),
 		Type:   strings.TrimSpace(r.URL.Query().Get("type")),
 		Status: strings.TrimSpace(r.URL.Query().Get("status")),
 	}

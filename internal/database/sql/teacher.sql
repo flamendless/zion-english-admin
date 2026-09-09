@@ -45,10 +45,23 @@ WHERE status = 'approved' AND deleted = 0
 		WHERE tr.teacher_id = tbl_teachers.id AND tr.role = 'tester'
 	)
 	AND (
-		first_name LIKE '%' || ? || '%'
+		trim(first_name || CASE WHEN middle_name != '' THEN ' ' || middle_name ELSE '' END || CASE WHEN last_name != '' THEN ' ' || last_name ELSE '' END) LIKE '%' || ? || '%'
+		OR first_name LIKE '%' || ? || '%'
 		OR last_name LIKE '%' || ? || '%'
-		OR (first_name || ' ' || COALESCE(NULLIF(middle_name, '') || ' ', '') || last_name) LIKE '%' || ? || '%'
 	)
+ORDER BY last_name ASC, first_name ASC, middle_name ASC
+LIMIT 10;
+
+-- name: SearchApprovedTeachersByFirstAndLast :many
+SELECT id, first_name, middle_name, last_name, drive_url, rate_per_class, template
+FROM tbl_teachers
+WHERE status = 'approved' AND deleted = 0
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = tbl_teachers.id AND tr.role = 'tester'
+	)
+	AND first_name LIKE '%' || ? || '%'
+	AND last_name LIKE '%' || ? || '%'
 ORDER BY last_name ASC, first_name ASC, middle_name ASC
 LIMIT 10;
 

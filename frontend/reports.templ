@@ -13,6 +13,10 @@ templ Reports() {
 		@GlobalIncludes()
 		@AvatarStyles()
 		<style>
+			.reports-filters {
+				display: contents;
+			}
+
 			.reports-teacher-cell {
 				display: flex;
 				align-items: center;
@@ -58,21 +62,23 @@ templ Reports() {
 			@HubHeader("Reports", "", "", false)
 
 			<div class="toolbar" id="reportsToolbar">
-				<div class="form-group">
-					<label for="reportSearch">Search</label>
-					<input type="text" id="reportSearch" name="q" placeholder="Search teacher or student name..."/>
+				<div id="reportsFilters" class="reports-filters">
+					<div class="form-group">
+						<label for="reportSearch">Search</label>
+						<input type="text" id="reportSearch" name="q" placeholder="Search teacher or student name..."/>
+					</div>
+					@MonthPicker("reportMonth", utils.URL("/reports/partials/date-preset"))
+					@DatePreset(true)
+					@SortControls("", "asc", ListSortKindReport)
+					<button
+						type="button"
+						id="filterBtn"
+						hx-get={ utils.URL("/reports/partials/rows") }
+						hx-include="#reportsFilters"
+						hx-target="#reportsTableBody"
+						hx-swap="innerHTML"
+					>Filter</button>
 				</div>
-				@MonthPicker("reportMonth", utils.URL("/reports/partials/date-preset"))
-				@DatePreset(true)
-				@SortControls("", "asc", ListSortKindReport)
-				<button
-					type="button"
-					id="filterBtn"
-					hx-get={ utils.URL("/reports/partials/rows") }
-					hx-include="#reportsToolbar"
-					hx-target="#reportsTableBody"
-					hx-swap="innerHTML"
-				>Filter</button>
 				<form
 					method="GET"
 					action={ utils.URL("/reports/summary") }
@@ -99,7 +105,7 @@ templ Reports() {
 					<tbody
 						id="reportsTableBody"
 						hx-get={ utils.URL("/reports/partials/rows") }
-						hx-include="#reportsToolbar"
+						hx-include="#reportsFilters"
 						hx-trigger="load"
 						hx-swap="innerHTML"
 					>

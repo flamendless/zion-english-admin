@@ -734,6 +734,66 @@ func (q *Queries) InsertTeacher(ctx context.Context, arg InsertTeacherParams) er
 	return err
 }
 
+const searchApprovedTeachersByFirstAndLast = `-- name: SearchApprovedTeachersByFirstAndLast :many
+SELECT id, first_name, middle_name, last_name, drive_url, rate_per_class, template
+FROM tbl_teachers
+WHERE status = 'approved' AND deleted = 0
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = tbl_teachers.id AND tr.role = 'tester'
+	)
+	AND first_name LIKE '%' || ? || '%'
+	AND last_name LIKE '%' || ? || '%'
+ORDER BY last_name ASC, first_name ASC, middle_name ASC
+LIMIT 10
+`
+
+type SearchApprovedTeachersByFirstAndLastParams struct {
+	Column1 sql.NullString
+	Column2 sql.NullString
+}
+
+type SearchApprovedTeachersByFirstAndLastRow struct {
+	ID           int64
+	FirstName    string
+	MiddleName   string
+	LastName     string
+	DriveUrl     string
+	RatePerClass float64
+	Template     sql.NullString
+}
+
+func (q *Queries) SearchApprovedTeachersByFirstAndLast(ctx context.Context, arg SearchApprovedTeachersByFirstAndLastParams) ([]SearchApprovedTeachersByFirstAndLastRow, error) {
+	rows, err := q.db.QueryContext(ctx, searchApprovedTeachersByFirstAndLast, arg.Column1, arg.Column2)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SearchApprovedTeachersByFirstAndLastRow
+	for rows.Next() {
+		var i SearchApprovedTeachersByFirstAndLastRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.FirstName,
+			&i.MiddleName,
+			&i.LastName,
+			&i.DriveUrl,
+			&i.RatePerClass,
+			&i.Template,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const searchApprovedTeachersByName = `-- name: SearchApprovedTeachersByName :many
 SELECT id, first_name, middle_name, last_name, drive_url, rate_per_class, template
 FROM tbl_teachers
@@ -743,9 +803,9 @@ WHERE status = 'approved' AND deleted = 0
 		WHERE tr.teacher_id = tbl_teachers.id AND tr.role = 'tester'
 	)
 	AND (
-		first_name LIKE '%' || ? || '%'
+		trim(first_name || CASE WHEN middle_name != '' THEN ' ' || middle_name ELSE '' END || CASE WHEN last_name != '' THEN ' ' || last_name ELSE '' END) LIKE '%' || ? || '%'
+		OR first_name LIKE '%' || ? || '%'
 		OR last_name LIKE '%' || ? || '%'
-		OR (first_name || ' ' || COALESCE(NULLIF(middle_name, '') || ' ', '') || last_name) LIKE '%' || ? || '%'
 	)
 ORDER BY last_name ASC, first_name ASC, middle_name ASC
 LIMIT 10
