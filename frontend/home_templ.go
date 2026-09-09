@@ -139,12 +139,12 @@ func Home(data DashboardData) templ.Component {
 		}
 		for _, item := range NavItems(data.Role) {
 			if item.FeatureCard {
-				templ_7745c5c3_Err = ActionCardFeature(item.Path, item.Title, item.Description).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = ActionCardFeature(item.Path, item.Title, item.Description, item.AdminOnlyCard).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = ActionCard(item.Path, item.Title, item.Description).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = ActionCard(item.Path, item.Title, item.Description, item.AdminOnlyCard).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -154,19 +154,19 @@ func Home(data DashboardData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if item.Path == "/profile" {
-				templ_7745c5c3_Err = ActionCard("/guides", "Guides", "Step-by-step help for using the admin tool").Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = ActionCard("/guides", "Guides", "Step-by-step help for using the admin tool", false).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 		}
 		if auth.HasAdminAccess(data.Role) {
-			templ_7745c5c3_Err = ActionCard("/announcements", "Announcements", "Create and manage system-wide banners").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = ActionCard("/announcements", "Announcements", "Create and manage system-wide banners", true).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = ActionCard("/changelogs", "Changelogs", "See what's new in the admin tool").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ActionCard("/changelogs", "Changelogs", "See what's new in the admin tool", false).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

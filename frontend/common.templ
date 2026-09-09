@@ -36,16 +36,24 @@ templ Flam() {
 	</p>
 }
 
-templ ActionCard(url string, h2 string, desc string) {
+templ ActionCard(url string, h2 string, desc string, adminOnly bool) {
 	<a href={ utils.URL(url) } class="card">
-		<h2>{ h2 }</h2>
+		if adminOnly {
+			@AdminOnlyCardTitle(h2)
+		} else {
+			<h2>{ h2 }</h2>
+		}
 		<p>{ desc }</p>
 	</a>
 }
 
-templ ActionCardFeature(url string, h2 string, desc string) {
+templ ActionCardFeature(url string, h2 string, desc string, adminOnly bool) {
 	<a href={ utils.URL(url) } class="card card-feature">
-		<h2>{ h2 }</h2>
+		if adminOnly {
+			@AdminOnlyCardTitle(h2)
+		} else {
+			<h2>{ h2 }</h2>
+		}
 		<p>{ desc }</p>
 	</a>
 }

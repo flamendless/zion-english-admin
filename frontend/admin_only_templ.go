@@ -270,7 +270,7 @@ func AdminOnlySectionTitle(title string) templ.Component {
 	})
 }
 
-func AdminOnlyEntityViewSectionTitle(title string) templ.Component {
+func AdminOnlyCardTitle(title string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -291,7 +291,7 @@ func AdminOnlyEntityViewSectionTitle(title string) templ.Component {
 			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<h4 class=\"entity-view-section-title admin-only-label-wrap\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<h2 class=\"admin-only-label-wrap\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -308,7 +308,53 @@ func AdminOnlyEntityViewSectionTitle(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</h4>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</h2>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func AdminOnlyEntityViewSectionTitle(title string) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var15 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var15 == nil {
+			templ_7745c5c3_Var15 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<h4 class=\"entity-view-section-title admin-only-label-wrap\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var16 string
+		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(title)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/admin_only.templ`, Line: 56, Col: 9}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = AdminOnlyIndicator().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</h4>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -332,12 +378,12 @@ func EntityViewSectionAdminOnly(title string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var15 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var15 == nil {
-			templ_7745c5c3_Var15 = templ.NopComponent
+		templ_7745c5c3_Var17 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var17 == nil {
+			templ_7745c5c3_Var17 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<section class=\"entity-view-section\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<section class=\"entity-view-section\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -345,15 +391,15 @@ func EntityViewSectionAdminOnly(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"entity-view-section-body\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<div class=\"entity-view-section-body\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templ_7745c5c3_Var15.Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templ_7745c5c3_Var17.Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div></section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</div></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -377,21 +423,21 @@ func AdminOnlyProfileDetailField(label, value string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var16 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var16 == nil {
-			templ_7745c5c3_Var16 = templ.NopComponent
+		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var18 == nil {
+			templ_7745c5c3_Var18 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<div class=\"profile-detail\"><span class=\"profile-detail-label admin-only-label-wrap\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<div class=\"profile-detail\"><span class=\"profile-detail-label admin-only-label-wrap\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var17 string
-		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(label)
+		var templ_7745c5c3_Var19 string
+		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/admin_only.templ`, Line: 66, Col: 10}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/admin_only.templ`, Line: 73, Col: 10}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -399,20 +445,20 @@ func AdminOnlyProfileDetailField(label, value string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</span> <span class=\"profile-detail-value\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</span> <span class=\"profile-detail-value\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var18 string
-		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(value)
+		var templ_7745c5c3_Var20 string
+		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/admin_only.templ`, Line: 69, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/admin_only.templ`, Line: 76, Col: 44}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</span></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</span></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -436,12 +482,12 @@ func AdminOnlyTooltipScript() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var19 == nil {
-			templ_7745c5c3_Var19 = templ.NopComponent
+		templ_7745c5c3_Var21 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var21 == nil {
+			templ_7745c5c3_Var21 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<script>\r\n\t\t(function () {\r\n\t\t\tlet tipEl = null;\r\n\t\t\tlet activeTarget = null;\r\n\r\n\t\t\tfunction getTip() {\r\n\t\t\t\tif (!tipEl) {\r\n\t\t\t\t\ttipEl = document.createElement('div');\r\n\t\t\t\t\ttipEl.id = 'adminOnlyTooltip';\r\n\t\t\t\t\ttipEl.className = 'admin-only-floating-tooltip';\r\n\t\t\t\t\ttipEl.setAttribute('role', 'tooltip');\r\n\t\t\t\t\ttipEl.hidden = true;\r\n\t\t\t\t\tdocument.body.appendChild(tipEl);\r\n\t\t\t\t}\r\n\t\t\t\treturn tipEl;\r\n\t\t\t}\r\n\r\n\t\t\tfunction positionTip(target) {\r\n\t\t\t\tconst tip = getTip();\r\n\t\t\t\tconst text = target.getAttribute('data-tooltip');\r\n\t\t\t\tif (!text) return;\r\n\t\t\t\ttip.textContent = text;\r\n\t\t\t\ttip.hidden = false;\r\n\r\n\t\t\t\ttip.style.left = '0';\r\n\t\t\t\ttip.style.top = '0';\r\n\t\t\t\tconst tipRect = tip.getBoundingClientRect();\r\n\t\t\t\tconst rect = target.getBoundingClientRect();\r\n\t\t\t\tconst gap = 6;\r\n\t\t\t\tconst margin = 8;\r\n\r\n\t\t\t\tlet top = rect.top - tipRect.height - gap;\r\n\t\t\t\tlet left = rect.left + rect.width / 2 - tipRect.width / 2;\r\n\r\n\t\t\t\tif (top < margin) {\r\n\t\t\t\t\ttop = rect.bottom + gap;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst maxLeft = window.innerWidth - tipRect.width - margin;\r\n\t\t\t\tleft = Math.max(margin, Math.min(left, maxLeft));\r\n\r\n\t\t\t\tif (top + tipRect.height > window.innerHeight - margin) {\r\n\t\t\t\t\ttop = Math.max(margin, rect.top - tipRect.height - gap);\r\n\t\t\t\t}\r\n\r\n\t\t\t\ttip.style.left = left + 'px';\r\n\t\t\t\ttip.style.top = top + 'px';\r\n\t\t\t}\r\n\r\n\t\t\tfunction hideTip() {\r\n\t\t\t\tif (tipEl) tipEl.hidden = true;\r\n\t\t\t\tactiveTarget = null;\r\n\t\t\t}\r\n\r\n\t\t\tfunction showTip(target) {\r\n\t\t\t\tactiveTarget = target;\r\n\t\t\t\tpositionTip(target);\r\n\t\t\t}\r\n\r\n\t\t\tdocument.addEventListener('mouseover', function (e) {\r\n\t\t\t\tconst el = e.target.closest('.admin-only-indicator[data-tooltip]');\r\n\t\t\t\tif (el) showTip(el);\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('mouseout', function (e) {\r\n\t\t\t\tconst el = e.target.closest('.admin-only-indicator[data-tooltip]');\r\n\t\t\t\tif (!el) return;\r\n\t\t\t\tconst related = e.relatedTarget;\r\n\t\t\t\tif (related && el.contains(related)) return;\r\n\t\t\t\thideTip();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('focusin', function (e) {\r\n\t\t\t\tconst el = e.target.closest('.admin-only-indicator[data-tooltip]');\r\n\t\t\t\tif (el) showTip(el);\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('focusout', function (e) {\r\n\t\t\t\tconst el = e.target.closest('.admin-only-indicator[data-tooltip]');\r\n\t\t\t\tif (el) hideTip();\r\n\t\t\t});\r\n\r\n\t\t\twindow.addEventListener('scroll', function () {\r\n\t\t\t\tif (activeTarget) positionTip(activeTarget);\r\n\t\t\t}, true);\r\n\r\n\t\t\twindow.addEventListener('resize', function () {\r\n\t\t\t\tif (activeTarget) positionTip(activeTarget);\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<script>\r\n\t\t(function () {\r\n\t\t\tlet tipEl = null;\r\n\t\t\tlet activeTarget = null;\r\n\r\n\t\t\tfunction getTip() {\r\n\t\t\t\tif (!tipEl) {\r\n\t\t\t\t\ttipEl = document.createElement('div');\r\n\t\t\t\t\ttipEl.id = 'adminOnlyTooltip';\r\n\t\t\t\t\ttipEl.className = 'admin-only-floating-tooltip';\r\n\t\t\t\t\ttipEl.setAttribute('role', 'tooltip');\r\n\t\t\t\t\ttipEl.hidden = true;\r\n\t\t\t\t\tdocument.body.appendChild(tipEl);\r\n\t\t\t\t}\r\n\t\t\t\treturn tipEl;\r\n\t\t\t}\r\n\r\n\t\t\tfunction positionTip(target) {\r\n\t\t\t\tconst tip = getTip();\r\n\t\t\t\tconst text = target.getAttribute('data-tooltip');\r\n\t\t\t\tif (!text) return;\r\n\t\t\t\ttip.textContent = text;\r\n\t\t\t\ttip.hidden = false;\r\n\r\n\t\t\t\ttip.style.left = '0';\r\n\t\t\t\ttip.style.top = '0';\r\n\t\t\t\tconst tipRect = tip.getBoundingClientRect();\r\n\t\t\t\tconst rect = target.getBoundingClientRect();\r\n\t\t\t\tconst gap = 6;\r\n\t\t\t\tconst margin = 8;\r\n\r\n\t\t\t\tlet top = rect.top - tipRect.height - gap;\r\n\t\t\t\tlet left = rect.left + rect.width / 2 - tipRect.width / 2;\r\n\r\n\t\t\t\tif (top < margin) {\r\n\t\t\t\t\ttop = rect.bottom + gap;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst maxLeft = window.innerWidth - tipRect.width - margin;\r\n\t\t\t\tleft = Math.max(margin, Math.min(left, maxLeft));\r\n\r\n\t\t\t\tif (top + tipRect.height > window.innerHeight - margin) {\r\n\t\t\t\t\ttop = Math.max(margin, rect.top - tipRect.height - gap);\r\n\t\t\t\t}\r\n\r\n\t\t\t\ttip.style.left = left + 'px';\r\n\t\t\t\ttip.style.top = top + 'px';\r\n\t\t\t}\r\n\r\n\t\t\tfunction hideTip() {\r\n\t\t\t\tif (tipEl) tipEl.hidden = true;\r\n\t\t\t\tactiveTarget = null;\r\n\t\t\t}\r\n\r\n\t\t\tfunction showTip(target) {\r\n\t\t\t\tactiveTarget = target;\r\n\t\t\t\tpositionTip(target);\r\n\t\t\t}\r\n\r\n\t\t\tdocument.addEventListener('mouseover', function (e) {\r\n\t\t\t\tconst el = e.target.closest('.admin-only-indicator[data-tooltip]');\r\n\t\t\t\tif (el) showTip(el);\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('mouseout', function (e) {\r\n\t\t\t\tconst el = e.target.closest('.admin-only-indicator[data-tooltip]');\r\n\t\t\t\tif (!el) return;\r\n\t\t\t\tconst related = e.relatedTarget;\r\n\t\t\t\tif (related && el.contains(related)) return;\r\n\t\t\t\thideTip();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('focusin', function (e) {\r\n\t\t\t\tconst el = e.target.closest('.admin-only-indicator[data-tooltip]');\r\n\t\t\t\tif (el) showTip(el);\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('focusout', function (e) {\r\n\t\t\t\tconst el = e.target.closest('.admin-only-indicator[data-tooltip]');\r\n\t\t\t\tif (el) hideTip();\r\n\t\t\t});\r\n\r\n\t\t\twindow.addEventListener('scroll', function () {\r\n\t\t\t\tif (activeTarget) positionTip(activeTarget);\r\n\t\t\t}, true);\r\n\r\n\t\t\twindow.addEventListener('resize', function () {\r\n\t\t\t\tif (activeTarget) positionTip(activeTarget);\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

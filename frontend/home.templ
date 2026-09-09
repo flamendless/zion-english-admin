@@ -61,18 +61,18 @@ templ Home(data DashboardData) {
 			<div class="cards-grid">
 				for _, item := range NavItems(data.Role) {
 					if item.FeatureCard {
-						@ActionCardFeature(item.Path, item.Title, item.Description)
+						@ActionCardFeature(item.Path, item.Title, item.Description, item.AdminOnlyCard)
 					} else {
-						@ActionCard(item.Path, item.Title, item.Description)
+						@ActionCard(item.Path, item.Title, item.Description, item.AdminOnlyCard)
 					}
 					if item.Path == "/profile" {
-						@ActionCard("/guides", "Guides", "Step-by-step help for using the admin tool")
+						@ActionCard("/guides", "Guides", "Step-by-step help for using the admin tool", false)
 					}
 				}
 				if auth.HasAdminAccess(data.Role) {
-					@ActionCard("/announcements", "Announcements", "Create and manage system-wide banners")
+					@ActionCard("/announcements", "Announcements", "Create and manage system-wide banners", true)
 				}
-				@ActionCard("/changelogs", "Changelogs", "See what's new in the admin tool")
+				@ActionCard("/changelogs", "Changelogs", "See what's new in the admin tool", false)
 			</div>
 		</div>
 	</body>

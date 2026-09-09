@@ -44,6 +44,13 @@ templ AdminOnlySectionTitle(title string) {
 	</h2>
 }
 
+templ AdminOnlyCardTitle(title string) {
+	<h2 class="admin-only-label-wrap">
+		{ title }
+		@AdminOnlyIndicator()
+	</h2>
+}
+
 templ AdminOnlyEntityViewSectionTitle(title string) {
 	<h4 class="entity-view-section-title admin-only-label-wrap">
 		{ title }

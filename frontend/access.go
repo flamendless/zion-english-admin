@@ -3,37 +3,39 @@ package frontend
 import "zion-english/internal/auth"
 
 type NavItem struct {
-	Path        string
-	LinkID      string
-	Title       string
-	Description string
-	FeatureCard bool
-}
-
-type navItemDef struct {
 	Path         string
 	LinkID       string
 	Title        string
-	TeacherTitle string
 	Description  string
-	TeacherDesc  string
 	FeatureCard  bool
+	AdminOnlyCard bool
+}
+
+type navItemDef struct {
+	Path          string
+	LinkID        string
+	Title         string
+	TeacherTitle  string
+	Description   string
+	TeacherDesc   string
+	FeatureCard   bool
+	AdminOnlyCard bool
 }
 
 var navItemDefs = []navItemDef{
 	{Path: "/profile", LinkID: "profileLink", Title: "My Profile", Description: "View account info and update settings"},
 	{Path: "/learning-materials", LinkID: "learningMaterialsLink", Title: "Learning Library", Description: "Browse and share teaching materials and resources", FeatureCard: true},
 	{Path: "/documents", LinkID: "documentsLink", Title: "Documents", TeacherTitle: "My Documents", Description: "Review teacher uploads and ID documents", TeacherDesc: "View your uploaded profile photos and ID documents"},
-	{Path: "/teachers", LinkID: "teachersLink", Title: "Teachers", Description: "View and manage teachers"},
-	{Path: "/students", LinkID: "studentsLink", Title: "Students", Description: "View and manage students"},
+	{Path: "/teachers", LinkID: "teachersLink", Title: "Teachers", Description: "View and manage teachers", AdminOnlyCard: true},
+	{Path: "/students", LinkID: "studentsLink", Title: "Students", Description: "View and manage students", AdminOnlyCard: true},
 	{Path: "/classes", LinkID: "classesLink", Title: "Classes", TeacherTitle: "My Classes", Description: "View and record classes", TeacherDesc: "View and record your classes"},
 	{Path: "/schedule", LinkID: "scheduleLink", Title: "Class Schedule", Description: "View and plan upcoming classes", FeatureCard: true},
 	{Path: "/schedule/series", LinkID: "scheduleSeriesLink", Title: "Repeating Scheduled Classes", Description: "View and manage linked class series", FeatureCard: true},
 	{Path: "/my-students", LinkID: "myStudentsLink", Title: "My Students", Description: "View your assigned students"},
-	{Path: "/reports", LinkID: "reportsLink", Title: "Reports", Description: "View teacher payroll reports by cutoff period"},
+	{Path: "/reports", LinkID: "reportsLink", Title: "Reports", Description: "View teacher payroll reports by cutoff period", AdminOnlyCard: true},
 	{Path: "/analytics", LinkID: "analyticsLink", Title: "Analytics", TeacherTitle: "My Analytics", Description: "Attendance, utilization, and student retention insights", TeacherDesc: "View attendance and utilization for your classes"},
-	{Path: "/process", LinkID: "processLink", Title: "Process", Description: "Process CSV files and view logs"},
-	{Path: "/feature-flags", LinkID: "featureFlagsLink", Title: "Feature Flags", Description: "Toggle integration connection availability"},
+	{Path: "/process", LinkID: "processLink", Title: "Process", Description: "Process CSV files and view logs", AdminOnlyCard: true},
+	{Path: "/feature-flags", LinkID: "featureFlagsLink", Title: "Feature Flags", Description: "Toggle integration connection availability", AdminOnlyCard: true},
 	{Path: "/logs", LinkID: "logsLink", Title: "Logs", TeacherTitle: "My Activity", Description: "View system logs", TeacherDesc: "View your recent actions"},
 }
 
@@ -52,11 +54,12 @@ func NavItems(role auth.Role) []NavItem {
 			desc = def.TeacherDesc
 		}
 		items = append(items, NavItem{
-			Path:        def.Path,
-			LinkID:      def.LinkID,
-			Title:       title,
-			Description: desc,
-			FeatureCard: def.FeatureCard,
+			Path:          def.Path,
+			LinkID:        def.LinkID,
+			Title:         title,
+			Description:   desc,
+			FeatureCard:   def.FeatureCard,
+			AdminOnlyCard: def.AdminOnlyCard,
 		})
 	}
 	return items
