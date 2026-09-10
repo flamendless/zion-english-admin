@@ -152,7 +152,7 @@ templ IconSVG(kind IconKind) {
 }
 
 templ IconActionLink(href string, label string, kind IconKind) {
-	<a href={ href } class={ iconActionClass(kind) } data-tooltip={ label } aria-label={ label }>
+	<a href={ href } class={ iconActionClass(kind) } data-tooltip={ label } aria-label={ label } target="_blank" rel="noopener noreferrer">
 		@IconSVG(kind)
 	</a>
 }

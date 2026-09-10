@@ -148,7 +148,7 @@ func Header(loggedIn bool, role auth.Role) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, item := range NavItems(role) {
+		for _, item := range NavBarItems(role) {
 			templ_7745c5c3_Err = NavLink(item.Path, item.LinkID, item.Title).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

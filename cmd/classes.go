@@ -665,18 +665,7 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 	role := auth.GetRole(ctx)
 
 	if r.Method == http.MethodGet {
-		prefill := parseRecordClassPrefill(r)
-		learningMaterials, err := recordClassLearningMaterials(ctx, prefill)
-		if err != nil {
-			HttpError(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-Type", "text/html")
-		frontend.RecordClass(frontend.RecordClassData{
-			IsSuperuser:         auth.HasAdminAccess(role),
-			Prefill:             prefill,
-			LearningMaterials:   learningMaterials,
-		}).Render(ctx, w)
+		HttpRedirect(w, r, "/classes")
 		return
 	}
 

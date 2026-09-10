@@ -237,7 +237,7 @@ templ EditClassFields(data EditClassData, readonly bool) {
 			<label for="notes">Notes</label>
 			<textarea id="notes" name="notes" rows="4" placeholder="Lesson notes...">{ data.Notes }</textarea>
 		</div>
-		@ClassLearningMaterialPicker(data.LearningMaterials)
+		@ClassLearningMaterialPicker(data.LearningMaterials, "")
 		<button type="submit">Save Changes</button>
 	}
 }

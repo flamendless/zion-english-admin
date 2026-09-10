@@ -536,10 +536,25 @@ templ Schedule(data ScheduleData) {
 			</div>
 			@DeleteClassModal()
 			@ScheduledClassModals()
+			@ConductClassWizardModal(ClassWizardPageData{
+				LockTeacher:     data.LockTeacher,
+				ShowAllTeachers: data.ShowAllTeachers,
+				TeacherID:       data.TeacherID,
+				TeacherName:     data.TeacherName,
+				TodayPHT:        utils.TodayPHT(),
+			})
+			@ScheduleClassWizardModal(ClassWizardPageData{
+				LockTeacher:     data.LockTeacher,
+				ShowAllTeachers: data.ShowAllTeachers,
+				TeacherID:       data.TeacherID,
+				TeacherName:     data.TeacherName,
+				TodayPHT:        utils.TodayPHT(),
+			})
 			@RecordClassesChoiceModal()
 			<div id="classViewModalHost"></div>
 		</div>
 
+		@ClassWizardScript()
 		@ClassViewModalScripts()
 
 		<script>
@@ -1242,7 +1257,7 @@ templ Schedule(data ScheduleData) {
 templ ScheduleModalFields() {
 	@TimeRangeFields("", "", false)
 	<div id="zoomDurationWarning" class="form-warning" role="status" hidden></div>
-	@ClassLearningMaterialPicker(nil)
+	@ClassLearningMaterialPicker(nil, "")
 	<div class="form-row">
 		@CurrencyDropdown()
 		<div class="form-group">

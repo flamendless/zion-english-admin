@@ -351,11 +351,35 @@ func Schedule(data ScheduleData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = ConductClassWizardModal(ClassWizardPageData{
+			LockTeacher:     data.LockTeacher,
+			ShowAllTeachers: data.ShowAllTeachers,
+			TeacherID:       data.TeacherID,
+			TeacherName:     data.TeacherName,
+			TodayPHT:        utils.TodayPHT(),
+		}).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ScheduleClassWizardModal(ClassWizardPageData{
+			LockTeacher:     data.LockTeacher,
+			ShowAllTeachers: data.ShowAllTeachers,
+			TeacherID:       data.TeacherID,
+			TeacherName:     data.TeacherName,
+			TodayPHT:        utils.TodayPHT(),
+		}).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = RecordClassesChoiceModal().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<div id=\"classViewModalHost\"></div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ClassWizardScript().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -412,7 +436,7 @@ func ScheduleModalFields() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = ClassLearningMaterialPicker(nil).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ClassLearningMaterialPicker(nil, "").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

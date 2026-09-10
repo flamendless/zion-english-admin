@@ -87,7 +87,7 @@ templ ScheduleRepeat(data ScheduleRepeatData) {
 
 			<h2>Schedule Repeating Classes</h2>
 			<p class="field-hint schedule-repeat-intro">Pick multiple future dates with the same time, student, and rate. You will review conflicts before classes are created.</p>
-			<p class="field-hint"><a href={ utils.URL("/schedule/record") }>Need just one date?</a> Use schedule a single class instead.</p>
+			<p class="field-hint"><a href={ utils.URL("/schedule?openScheduleWizard=1") }>Need just one date?</a> Use schedule a single class instead.</p>
 
 			if data.LockTeacher {
 				<form

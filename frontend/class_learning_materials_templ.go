@@ -16,7 +16,7 @@ type ClassLearningMaterialLink struct {
 	URL   string
 }
 
-func ClassLearningMaterialPicker(links []ClassLearningMaterialLink) templ.Component {
+func ClassLearningMaterialPicker(links []ClassLearningMaterialLink, prefix string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -37,121 +37,160 @@ func ClassLearningMaterialPicker(links []ClassLearningMaterialLink) templ.Compon
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"form-group class-lm-picker\"><label for=\"classLmSearch\">Learning Materials</label><div class=\"class-lm-search-wrap\"><input type=\"text\" id=\"classLmSearch\" name=\"lmQ\" class=\"class-lm-search\" autocomplete=\"off\" placeholder=\"Search learning material by title...\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"form-group class-lm-picker\"><label for=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/api/learning-materials/search"))
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(classLmSearchID(prefix))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 22, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 13, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" hx-trigger=\"input changed delay:300ms\" hx-target=\"next\" hx-swap=\"innerHTML\" hx-include=\"this\"><div class=\"class-lm-results\"></div></div><div class=\"class-lm-chips\" aria-live=\"polite\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\">Learning Materials</label><div class=\"class-lm-search-wrap\"><input type=\"text\" id=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var3 string
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(classLmSearchID(prefix))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 17, Col: 32}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" name=\"lmQ\" class=\"class-lm-search\" autocomplete=\"off\" placeholder=\"Search learning material by title...\" hx-get=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var4 string
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/api/learning-materials/search"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 22, Col: 56}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" hx-trigger=\"input changed delay:300ms\" hx-target=\"next\" hx-swap=\"innerHTML\" hx-include=\"this\"><div class=\"class-lm-results\"></div></div><div class=\"class-lm-chips\" aria-live=\"polite\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, link := range links {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<span class=\"class-lm-chip\" data-id=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(link.ID)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 32, Col: 49}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" data-title=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(link.Title)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 32, Col: 75}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<span class=\"class-lm-chip\" data-id=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
-			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(link.Title)
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(link.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 33, Col: 17}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 32, Col: 49}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, " <button type=\"button\" class=\"class-lm-chip-remove\" data-tooltip=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" data-title=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue("Remove " + link.Title)
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(link.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 34, Col: 93}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 32, Col: 75}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" aria-label=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
-			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue("Remove " + link.Title)
+			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(link.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 34, Col: 131}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 33, Col: 17}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\">&times;</button></span> <input type=\"hidden\" name=\"learning_material_ids\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, " <button type=\"button\" class=\"class-lm-chip-remove\" data-tooltip=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var8 string
-			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(link.ID)
+			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue("Remove " + link.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 36, Col: 69}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 34, Col: 93}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" aria-label=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var9 string
+			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue("Remove " + link.Title)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 34, Col: 131}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\">&times;</button></span> <input type=\"hidden\" name=\"learning_material_ids\" value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var10 string
+			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(link.ID)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 36, Col: 69}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = ClassLearningMaterialPickerStyles().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = ClassLearningMaterialPickerScript().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
+		if prefix == "" {
+			templ_7745c5c3_Err = ClassLearningMaterialPickerStyles().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = ClassLearningMaterialPickerScript().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
 		return nil
 	})
+}
+
+func classLmSearchID(prefix string) string {
+	if prefix == "" {
+		return "classLmSearch"
+	}
+	return prefix + "_lmSearch"
 }
 
 func LearningMaterialSearchResults(items []ClassLearningMaterialLink) templ.Component {
@@ -170,61 +209,61 @@ func LearningMaterialSearchResults(items []ClassLearningMaterialLink) templ.Comp
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var9 == nil {
-			templ_7745c5c3_Var9 = templ.NopComponent
+		templ_7745c5c3_Var11 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var11 == nil {
+			templ_7745c5c3_Var11 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"class-lm-search-results\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"class-lm-search-results\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, item := range items {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<button type=\"button\" class=\"class-lm-search-item\" data-id=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var10 string
-			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ID)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 50, Col: 21}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" data-title=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var11 string
-			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.Title)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 51, Col: 27}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<button type=\"button\" class=\"class-lm-search-item\" data-id=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var12 string
-			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(item.Title)
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 53, Col: 16}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 59, Col: 21}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</button>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" data-title=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var13 string
+			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.Title)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 60, Col: 27}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var14 string
+			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(item.Title)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 62, Col: 16}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -248,44 +287,44 @@ func ClassLearningMaterialReadonlyList(links []ClassLearningMaterialLink) templ.
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var13 == nil {
-			templ_7745c5c3_Var13 = templ.NopComponent
+		templ_7745c5c3_Var15 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var15 == nil {
+			templ_7745c5c3_Var15 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		if len(links) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<section class=\"entity-view-lm-section\" aria-label=\"Learning materials\"><h4 class=\"entity-view-section-title\">Learning Materials</h4><div class=\"class-lm-readonly-pills\" role=\"list\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<section class=\"entity-view-lm-section\" aria-label=\"Learning materials\"><h4 class=\"entity-view-section-title\">Learning Materials</h4><div class=\"class-lm-readonly-pills\" role=\"list\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, link := range links {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<button type=\"button\" class=\"class-lm-readonly-pill\" role=\"listitem\" hx-get=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<button type=\"button\" class=\"class-lm-readonly-pill\" role=\"listitem\" hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var14 string
-				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/learning-materials/" + link.ID + "/view"))
+				var templ_7745c5c3_Var16 string
+				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/learning-materials/" + link.ID + "/view"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 69, Col: 68}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 78, Col: 68}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" hx-target=\"#lmViewModalHost\" hx-swap=\"innerHTML\" aria-label=\"")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var15 string
-				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue("View learning material: " + link.Title)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 72, Col: 58}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" hx-target=\"#lmViewModalHost\" hx-swap=\"innerHTML\" aria-label=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\">")
+				var templ_7745c5c3_Var17 string
+				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue("View learning material: " + link.Title)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 81, Col: 58}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var17)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -293,25 +332,25 @@ func ClassLearningMaterialReadonlyList(links []ClassLearningMaterialLink) templ.
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<span class=\"class-lm-readonly-pill-label\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<span class=\"class-lm-readonly-pill-label\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var16 string
-				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(link.Title)
+				var templ_7745c5c3_Var18 string
+				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(link.Title)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 75, Col: 61}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_learning_materials.templ`, Line: 84, Col: 61}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</span></button>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</span></button>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</div></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -340,12 +379,12 @@ func ClassLearningMaterialPillIcon() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var17 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var17 == nil {
-			templ_7745c5c3_Var17 = templ.NopComponent
+		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var19 == nil {
+			templ_7745c5c3_Var19 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<svg class=\"class-lm-readonly-pill-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 19.5A2.5 2.5 0 0 1 6.5 17H20\"></path> <path d=\"M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z\"></path></svg>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<svg class=\"class-lm-readonly-pill-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 19.5A2.5 2.5 0 0 1 6.5 17H20\"></path> <path d=\"M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z\"></path></svg>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -369,12 +408,12 @@ func ClassLearningMaterialReadonlyStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var18 == nil {
-			templ_7745c5c3_Var18 = templ.NopComponent
+		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var20 == nil {
+			templ_7745c5c3_Var20 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<style>\r\n\t\t.entity-view-lm-section {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.class-lm-readonly-pills {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.class-lm-readonly-pill {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tpadding: 6px 12px 6px 10px;\r\n\t\t\tmargin: 0;\r\n\t\t\tmargin-top: 0;\r\n\t\t\tborder: var(--pill-border);\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: #E6FFFA;\r\n\t\t\tcolor: #115E59;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tfont-family: inherit;\r\n\t\t\tline-height: 1.3;\r\n\t\t\tcursor: pointer;\r\n\t\t\tbox-sizing: border-box;\r\n\t\t\ttransition: background var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.class-lm-readonly-pill:hover,\r\n\t\t.class-lm-readonly-pill:focus-visible {\r\n\t\t\tbackground: #CCFBF1;\r\n\t\t\tcolor: #134E4A;\r\n\t\t\toutline: none;\r\n\t\t\tbox-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);\r\n\t\t}\r\n\r\n\t\t.class-lm-readonly-pill:active {\r\n\t\t\ttransform: scale(0.98);\r\n\t\t}\r\n\r\n\t\t.class-lm-readonly-pill-icon {\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tcolor: #0D9488;\r\n\t\t}\r\n\r\n\t\t.class-lm-readonly-pill-label {\r\n\t\t\tmax-width: 16rem;\r\n\t\t\toverflow: hidden;\r\n\t\t\ttext-overflow: ellipsis;\r\n\t\t\twhite-space: nowrap;\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<style>\r\n\t\t.entity-view-lm-section {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.class-lm-readonly-pills {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.class-lm-readonly-pill {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tpadding: 6px 12px 6px 10px;\r\n\t\t\tmargin: 0;\r\n\t\t\tmargin-top: 0;\r\n\t\t\tborder: var(--pill-border);\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: #E6FFFA;\r\n\t\t\tcolor: #115E59;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tfont-family: inherit;\r\n\t\t\tline-height: 1.3;\r\n\t\t\tcursor: pointer;\r\n\t\t\tbox-sizing: border-box;\r\n\t\t\ttransition: background var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.class-lm-readonly-pill:hover,\r\n\t\t.class-lm-readonly-pill:focus-visible {\r\n\t\t\tbackground: #CCFBF1;\r\n\t\t\tcolor: #134E4A;\r\n\t\t\toutline: none;\r\n\t\t\tbox-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);\r\n\t\t}\r\n\r\n\t\t.class-lm-readonly-pill:active {\r\n\t\t\ttransform: scale(0.98);\r\n\t\t}\r\n\r\n\t\t.class-lm-readonly-pill-icon {\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tcolor: #0D9488;\r\n\t\t}\r\n\r\n\t\t.class-lm-readonly-pill-label {\r\n\t\t\tmax-width: 16rem;\r\n\t\t\toverflow: hidden;\r\n\t\t\ttext-overflow: ellipsis;\r\n\t\t\twhite-space: nowrap;\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -398,12 +437,12 @@ func ClassLearningMaterialPickerStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var19 == nil {
-			templ_7745c5c3_Var19 = templ.NopComponent
+		templ_7745c5c3_Var21 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var21 == nil {
+			templ_7745c5c3_Var21 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<style>\r\n\t\t.class-lm-search-wrap {\r\n\t\t\tposition: relative;\r\n\t\t}\r\n\r\n\t\t.class-lm-results {\r\n\t\t\tposition: absolute;\r\n\t\t\ttop: 100%;\r\n\t\t\tleft: 0;\r\n\t\t\tright: 0;\r\n\t\t\tz-index: 40;\r\n\t\t}\r\n\r\n\t\t.class-lm-search-results {\r\n\t\t\tmargin-top: var(--space-1, 4px);\r\n\t\t\tmax-height: 220px;\r\n\t\t\toverflow-y: auto;\r\n\t\t\tbackground: var(--color-surface, #fff);\r\n\t\t\tborder: 1px solid var(--color-border, #ddd);\r\n\t\t\tborder-radius: var(--radius-md, 6px);\r\n\t\t\tbox-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.08));\r\n\t\t}\r\n\r\n\t\t.class-lm-search-item {\r\n\t\t\tdisplay: block;\r\n\t\t\twidth: 100%;\r\n\t\t\tpadding: 0.6rem 0.75rem;\r\n\t\t\tborder: none;\r\n\t\t\tbackground: transparent;\r\n\t\t\ttext-align: left;\r\n\t\t\tfont-size: 0.9rem;\r\n\t\t\tcolor: var(--color-foreground, #222);\r\n\t\t\tcursor: pointer;\r\n\t\t}\r\n\r\n\t\t.class-lm-search-item:hover,\r\n\t\t.class-lm-search-item:focus {\r\n\t\t\tbackground: var(--color-muted, #f5f5f5);\r\n\t\t\toutline: none;\r\n\t\t}\r\n\r\n\t\t.class-lm-chips {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: 0.5rem;\r\n\t\t\tmargin-top: 0.5rem;\r\n\t\t}\r\n\r\n\t\t.class-lm-chip {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: 0.35rem;\r\n\t\t\tpadding: 0.25rem 0.5rem;\r\n\t\t\tborder-radius: 999px;\r\n\t\t\tborder: var(--pill-border);\r\n\t\t\tbackground: var(--color-muted, #f0f0f0);\r\n\t\t\tfont-size: 0.85rem;\r\n\t\t\tcolor: var(--color-foreground, #222);\r\n\t\t\tbox-sizing: border-box;\r\n\t\t}\r\n\r\n\t\t.class-lm-chip-remove {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 1.125rem;\r\n\t\t\theight: 1.125rem;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: 0;\r\n\t\t\tmargin-top: 0;\r\n\t\t\tborder: none;\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: transparent;\r\n\t\t\tbackground-color: transparent;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tcursor: pointer;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tfont-weight: 400;\r\n\t\t\tline-height: 1;\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.class-lm-chip-remove:hover {\r\n\t\t\tbackground: rgba(0, 0, 0, 0.06);\r\n\t\t\tbackground-color: rgba(0, 0, 0, 0.06);\r\n\t\t\tcolor: var(--color-foreground, #222);\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<style>\r\n\t\t.class-lm-search-wrap {\r\n\t\t\tposition: relative;\r\n\t\t}\r\n\r\n\t\t.class-lm-results {\r\n\t\t\tposition: absolute;\r\n\t\t\ttop: 100%;\r\n\t\t\tleft: 0;\r\n\t\t\tright: 0;\r\n\t\t\tz-index: 40;\r\n\t\t}\r\n\r\n\t\t.class-lm-search-results {\r\n\t\t\tmargin-top: var(--space-1, 4px);\r\n\t\t\tmax-height: 220px;\r\n\t\t\toverflow-y: auto;\r\n\t\t\tbackground: var(--color-surface, #fff);\r\n\t\t\tborder: 1px solid var(--color-border, #ddd);\r\n\t\t\tborder-radius: var(--radius-md, 6px);\r\n\t\t\tbox-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.08));\r\n\t\t}\r\n\r\n\t\t.class-lm-search-item {\r\n\t\t\tdisplay: block;\r\n\t\t\twidth: 100%;\r\n\t\t\tpadding: 0.6rem 0.75rem;\r\n\t\t\tborder: none;\r\n\t\t\tbackground: transparent;\r\n\t\t\ttext-align: left;\r\n\t\t\tfont-size: 0.9rem;\r\n\t\t\tcolor: var(--color-foreground, #222);\r\n\t\t\tcursor: pointer;\r\n\t\t}\r\n\r\n\t\t.class-lm-search-item:hover,\r\n\t\t.class-lm-search-item:focus {\r\n\t\t\tbackground: var(--color-muted, #f5f5f5);\r\n\t\t\toutline: none;\r\n\t\t}\r\n\r\n\t\t.class-lm-chips {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: 0.5rem;\r\n\t\t\tmargin-top: 0.5rem;\r\n\t\t}\r\n\r\n\t\t.class-lm-chip {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: 0.35rem;\r\n\t\t\tpadding: 0.25rem 0.5rem;\r\n\t\t\tborder-radius: 999px;\r\n\t\t\tborder: var(--pill-border);\r\n\t\t\tbackground: var(--color-muted, #f0f0f0);\r\n\t\t\tfont-size: 0.85rem;\r\n\t\t\tcolor: var(--color-foreground, #222);\r\n\t\t\tbox-sizing: border-box;\r\n\t\t}\r\n\r\n\t\t.class-lm-chip-remove {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 1.125rem;\r\n\t\t\theight: 1.125rem;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: 0;\r\n\t\t\tmargin-top: 0;\r\n\t\t\tborder: none;\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: transparent;\r\n\t\t\tbackground-color: transparent;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tcursor: pointer;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tfont-weight: 400;\r\n\t\t\tline-height: 1;\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.class-lm-chip-remove:hover {\r\n\t\t\tbackground: rgba(0, 0, 0, 0.06);\r\n\t\t\tbackground-color: rgba(0, 0, 0, 0.06);\r\n\t\t\tcolor: var(--color-foreground, #222);\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -427,12 +466,12 @@ func ClassLearningMaterialPickerScript() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var20 == nil {
-			templ_7745c5c3_Var20 = templ.NopComponent
+		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var22 == nil {
+			templ_7745c5c3_Var22 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<script>\r\n\t\t(function () {\r\n\t\t\tif (window._classLmPickerBound) return;\r\n\t\t\twindow._classLmPickerBound = true;\r\n\r\n\t\t\tfunction getPicker(form) {\r\n\t\t\t\treturn form ? form.querySelector('.class-lm-picker') : null;\r\n\t\t\t}\r\n\r\n\t\t\tfunction selectedIDs(picker) {\r\n\t\t\t\tconst ids = new Set();\r\n\t\t\t\tpicker.querySelectorAll('input[name=\"learning_material_ids\"]').forEach(function (input) {\r\n\t\t\t\t\tif (input.value) ids.add(input.value);\r\n\t\t\t\t});\r\n\t\t\t\treturn ids;\r\n\t\t\t}\r\n\r\n\t\t\tfunction syncHiddenInputs(picker) {\r\n\t\t\t\tconst chips = picker.querySelector('.class-lm-chips');\r\n\t\t\t\tif (!chips) return;\r\n\t\t\t\tchips.querySelectorAll('input[name=\"learning_material_ids\"]').forEach(function (el) { el.remove(); });\r\n\t\t\t\tchips.querySelectorAll('.class-lm-chip').forEach(function (chip) {\r\n\t\t\t\t\tconst input = document.createElement('input');\r\n\t\t\t\t\tinput.type = 'hidden';\r\n\t\t\t\t\tinput.name = 'learning_material_ids';\r\n\t\t\t\t\tinput.value = chip.getAttribute('data-id') || '';\r\n\t\t\t\t\tchips.appendChild(input);\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tfunction renderChip(picker, id, title) {\r\n\t\t\t\tconst chips = picker.querySelector('.class-lm-chips');\r\n\t\t\t\tif (!chips || !id) return;\r\n\t\t\t\tconst chip = document.createElement('span');\r\n\t\t\t\tchip.className = 'class-lm-chip';\r\n\t\t\t\tchip.setAttribute('data-id', id);\r\n\t\t\t\tchip.setAttribute('data-title', title);\r\n\t\t\t\tchip.innerHTML = title + '<button type=\"button\" class=\"class-lm-chip-remove\" data-tooltip=\"Remove ' + title + '\" aria-label=\"Remove ' + title + '\">&times;</button>';\r\n\t\t\t\tchips.appendChild(chip);\r\n\t\t\t\tsyncHiddenInputs(picker);\r\n\t\t\t}\r\n\r\n\t\t\tfunction clearPicker(picker) {\r\n\t\t\t\tif (!picker) return;\r\n\t\t\t\tconst chips = picker.querySelector('.class-lm-chips');\r\n\t\t\t\tif (chips) chips.innerHTML = '';\r\n\t\t\t\tconst search = picker.querySelector('.class-lm-search');\r\n\t\t\t\tif (search) search.value = '';\r\n\t\t\t\tconst results = picker.querySelector('.class-lm-results');\r\n\t\t\t\tif (results) results.innerHTML = '';\r\n\t\t\t}\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tconst item = e.target.closest('.class-lm-search-item');\r\n\t\t\t\tif (!item) return;\r\n\t\t\t\tconst picker = item.closest('.class-lm-picker');\r\n\t\t\t\tif (!picker) return;\r\n\t\t\t\tconst id = item.getAttribute('data-id');\r\n\t\t\t\tconst title = item.getAttribute('data-title');\r\n\t\t\t\tif (!id || selectedIDs(picker).has(id)) {\r\n\t\t\t\t\tconst results = picker.querySelector('.class-lm-results');\r\n\t\t\t\t\tif (results) results.innerHTML = '';\r\n\t\t\t\t\tconst search = picker.querySelector('.class-lm-search');\r\n\t\t\t\t\tif (search) search.value = '';\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\trenderChip(picker, id, title);\r\n\t\t\t\tconst results = picker.querySelector('.class-lm-results');\r\n\t\t\t\tif (results) results.innerHTML = '';\r\n\t\t\t\tconst search = picker.querySelector('.class-lm-search');\r\n\t\t\t\tif (search) {\r\n\t\t\t\t\tsearch.value = '';\r\n\t\t\t\t\tsearch.focus();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tconst removeBtn = e.target.closest('.class-lm-chip-remove');\r\n\t\t\t\tif (!removeBtn) return;\r\n\t\t\t\tconst chip = removeBtn.closest('.class-lm-chip');\r\n\t\t\t\tconst picker = chip && chip.closest('.class-lm-picker');\r\n\t\t\t\tif (!chip || !picker) return;\r\n\t\t\t\tchip.remove();\r\n\t\t\t\tsyncHiddenInputs(picker);\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('reset', function (e) {\r\n\t\t\t\tconst picker = getPicker(e.target);\r\n\t\t\t\tif (picker) clearPicker(picker);\r\n\t\t\t}, true);\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tconst picker = evt.detail.target.querySelector && evt.detail.target.querySelector('.class-lm-picker');\r\n\t\t\t\tif (picker && window.initTimeRangePreview) {\r\n\t\t\t\t\t// no-op; picker chips are server-rendered on edit modal load\r\n\t\t\t\t}\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<script>\r\n\t\t(function () {\r\n\t\t\tif (window._classLmPickerBound) return;\r\n\t\t\twindow._classLmPickerBound = true;\r\n\r\n\t\t\tfunction getPicker(form) {\r\n\t\t\t\treturn form ? form.querySelector('.class-lm-picker') : null;\r\n\t\t\t}\r\n\r\n\t\t\tfunction selectedIDs(picker) {\r\n\t\t\t\tconst ids = new Set();\r\n\t\t\t\tpicker.querySelectorAll('input[name=\"learning_material_ids\"]').forEach(function (input) {\r\n\t\t\t\t\tif (input.value) ids.add(input.value);\r\n\t\t\t\t});\r\n\t\t\t\treturn ids;\r\n\t\t\t}\r\n\r\n\t\t\tfunction syncHiddenInputs(picker) {\r\n\t\t\t\tconst chips = picker.querySelector('.class-lm-chips');\r\n\t\t\t\tif (!chips) return;\r\n\t\t\t\tchips.querySelectorAll('input[name=\"learning_material_ids\"]').forEach(function (el) { el.remove(); });\r\n\t\t\t\tchips.querySelectorAll('.class-lm-chip').forEach(function (chip) {\r\n\t\t\t\t\tconst input = document.createElement('input');\r\n\t\t\t\t\tinput.type = 'hidden';\r\n\t\t\t\t\tinput.name = 'learning_material_ids';\r\n\t\t\t\t\tinput.value = chip.getAttribute('data-id') || '';\r\n\t\t\t\t\tchips.appendChild(input);\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tfunction renderChip(picker, id, title) {\r\n\t\t\t\tconst chips = picker.querySelector('.class-lm-chips');\r\n\t\t\t\tif (!chips || !id) return;\r\n\t\t\t\tconst chip = document.createElement('span');\r\n\t\t\t\tchip.className = 'class-lm-chip';\r\n\t\t\t\tchip.setAttribute('data-id', id);\r\n\t\t\t\tchip.setAttribute('data-title', title);\r\n\t\t\t\tchip.innerHTML = title + '<button type=\"button\" class=\"class-lm-chip-remove\" data-tooltip=\"Remove ' + title + '\" aria-label=\"Remove ' + title + '\">&times;</button>';\r\n\t\t\t\tchips.appendChild(chip);\r\n\t\t\t\tsyncHiddenInputs(picker);\r\n\t\t\t}\r\n\r\n\t\t\tfunction clearPicker(picker) {\r\n\t\t\t\tif (!picker) return;\r\n\t\t\t\tconst chips = picker.querySelector('.class-lm-chips');\r\n\t\t\t\tif (chips) chips.innerHTML = '';\r\n\t\t\t\tconst search = picker.querySelector('.class-lm-search');\r\n\t\t\t\tif (search) search.value = '';\r\n\t\t\t\tconst results = picker.querySelector('.class-lm-results');\r\n\t\t\t\tif (results) results.innerHTML = '';\r\n\t\t\t}\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tconst item = e.target.closest('.class-lm-search-item');\r\n\t\t\t\tif (!item) return;\r\n\t\t\t\tconst picker = item.closest('.class-lm-picker');\r\n\t\t\t\tif (!picker) return;\r\n\t\t\t\tconst id = item.getAttribute('data-id');\r\n\t\t\t\tconst title = item.getAttribute('data-title');\r\n\t\t\t\tif (!id || selectedIDs(picker).has(id)) {\r\n\t\t\t\t\tconst results = picker.querySelector('.class-lm-results');\r\n\t\t\t\t\tif (results) results.innerHTML = '';\r\n\t\t\t\t\tconst search = picker.querySelector('.class-lm-search');\r\n\t\t\t\t\tif (search) search.value = '';\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\trenderChip(picker, id, title);\r\n\t\t\t\tconst results = picker.querySelector('.class-lm-results');\r\n\t\t\t\tif (results) results.innerHTML = '';\r\n\t\t\t\tconst search = picker.querySelector('.class-lm-search');\r\n\t\t\t\tif (search) {\r\n\t\t\t\t\tsearch.value = '';\r\n\t\t\t\t\tsearch.focus();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tconst removeBtn = e.target.closest('.class-lm-chip-remove');\r\n\t\t\t\tif (!removeBtn) return;\r\n\t\t\t\tconst chip = removeBtn.closest('.class-lm-chip');\r\n\t\t\t\tconst picker = chip && chip.closest('.class-lm-picker');\r\n\t\t\t\tif (!chip || !picker) return;\r\n\t\t\t\tchip.remove();\r\n\t\t\t\tsyncHiddenInputs(picker);\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('reset', function (e) {\r\n\t\t\t\tconst picker = getPicker(e.target);\r\n\t\t\t\tif (picker) clearPicker(picker);\r\n\t\t\t}, true);\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tconst picker = evt.detail.target.querySelector && evt.detail.target.querySelector('.class-lm-picker');\r\n\t\t\t\tif (picker && window.initTimeRangePreview) {\r\n\t\t\t\t\t// no-op; picker chips are server-rendered on edit modal load\r\n\t\t\t\t}\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -134,9 +134,26 @@ templ Classes(data ClassesData) {
 			@ScheduledClassModals()
 			<div id="classViewModalHost"></div>
 			<div id="lmViewModalHost"></div>
+			@ConductClassWizardModal(ClassWizardPageData{
+				LockTeacher:     data.LockTeacher,
+				ShowAllTeachers: data.ShowAllTeachers,
+				TeacherID:       data.TeacherID,
+				TeacherName:     data.TeacherName,
+				TodayPHT:        utils.TodayPHT(),
+			})
+			@ScheduleClassWizardModal(ClassWizardPageData{
+				LockTeacher:     data.LockTeacher,
+				ShowAllTeachers: data.ShowAllTeachers,
+				TeacherID:       data.TeacherID,
+				TeacherName:     data.TeacherName,
+				TodayPHT:        utils.TodayPHT(),
+			})
 			@RecordClassesChoiceModal()
 		</div>
 
+		@ClassWizardScript()
+		@ScrTrialClassJS()
+		@ScrTimeRangeInit()
 		@LearningMaterialViewModalScripts()
 
 		<script>

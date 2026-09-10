@@ -23,44 +23,71 @@ templ ScrTrialClassJS() {
 		if (!window.__trialClassJSReady) {
 			window.__trialClassJSReady = true;
 
-			window.applyStudentRateToForm = function applyStudentRateToForm() {
-				const trialEl = document.getElementById('is_trial_class');
-				if (trialEl && trialEl.checked) return;
-				const studentEl = document.getElementById('student')
-					|| document.getElementById('schedule_student');
+			function isTrialClassActive(root) {
+				const scope = root || document;
+				const checkbox = scope.querySelector('#is_trial_class');
+				if (checkbox) return checkbox.checked;
+				const trialYes = scope.querySelector('input[name="is_trial_class"][value="on"]');
+				return trialYes && trialYes.checked;
+			}
+
+			function findStudentEl(root) {
+				const scope = root || document;
+				return scope.querySelector('[name="student"]')
+					|| scope.querySelector('[name="schedule_student"]')
+					|| scope.querySelector('#student')
+					|| scope.querySelector('#schedule_student');
+			}
+
+			function findRateEl(root) {
+				const scope = root || document;
+				return scope.querySelector('[name="rate"]') || scope.querySelector('#rate');
+			}
+
+			function findCurrencyEl(root) {
+				const scope = root || document;
+				return scope.querySelector('[name="currency"]') || scope.querySelector('#currency');
+			}
+
+			window.applyStudentRateToForm = function applyStudentRateToForm(formOrRoot) {
+				const root = formOrRoot && formOrRoot.querySelector ? formOrRoot : document;
+				if (isTrialClassActive(root)) return;
+				const studentEl = findStudentEl(root);
 				if (!studentEl) return;
 				const opt = studentEl.options[studentEl.selectedIndex];
 				if (!opt || !opt.value) return;
 				const rate = opt.getAttribute('data-rate');
 				const currency = opt.getAttribute('data-currency');
-				const rateEl = document.getElementById('rate');
-				const currencyEl = document.getElementById('currency');
+				const rateEl = findRateEl(root);
+				const currencyEl = findCurrencyEl(root);
 				if (rate && rateEl) rateEl.value = rate;
 				if (currency && currencyEl) currencyEl.value = currency;
 			};
 
-			window.applyTrialClassRateFromCheckbox = function applyTrialClassRateFromCheckbox() {
-				const trialEl = document.getElementById('is_trial_class');
-				const rateEl = document.getElementById('rate');
-				const currencyEl = document.getElementById('currency');
-				if (!trialEl || !rateEl || !currencyEl) return;
-				if (trialEl.checked) {
+			window.applyTrialClassRateFromCheckbox = function applyTrialClassRateFromCheckbox(formOrRoot) {
+				const root = formOrRoot && formOrRoot.querySelector ? formOrRoot : document;
+				const rateEl = findRateEl(root);
+				const currencyEl = findCurrencyEl(root);
+				if (!rateEl || !currencyEl) return;
+				if (isTrialClassActive(root)) {
 					rateEl.value = '50';
 					currencyEl.value = 'PHP';
 					return;
 				}
-				applyStudentRateToForm();
+				applyStudentRateToForm(root);
 			};
 
 			document.addEventListener('change', (e) => {
 				const target = e.target;
-				if (!target || !target.id) return;
-				if (target.id === 'is_trial_class') {
-					applyTrialClassRateFromCheckbox();
+				if (!target) return;
+				const form = target.closest('form') || document;
+				if (target.name === 'is_trial_class' || target.id === 'is_trial_class') {
+					applyTrialClassRateFromCheckbox(form);
 					return;
 				}
-				if (target.id === 'student' || target.id === 'schedule_student') {
-					applyStudentRateToForm();
+				if (target.name === 'student' || target.name === 'schedule_student'
+					|| target.id === 'student' || target.id === 'schedule_student') {
+					applyStudentRateToForm(form);
 				}
 			});
 		}

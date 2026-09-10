@@ -8,13 +8,13 @@ type ClassLearningMaterialLink struct {
 	URL   string
 }
 
-templ ClassLearningMaterialPicker(links []ClassLearningMaterialLink) {
+templ ClassLearningMaterialPicker(links []ClassLearningMaterialLink, prefix string) {
 	<div class="form-group class-lm-picker">
-		<label for="classLmSearch">Learning Materials</label>
+		<label for={ classLmSearchID(prefix) }>Learning Materials</label>
 		<div class="class-lm-search-wrap">
 			<input
 				type="text"
-				id="classLmSearch"
+				id={ classLmSearchID(prefix) }
 				name="lmQ"
 				class="class-lm-search"
 				autocomplete="off"
@@ -37,8 +37,17 @@ templ ClassLearningMaterialPicker(links []ClassLearningMaterialLink) {
 			}
 		</div>
 	</div>
-	@ClassLearningMaterialPickerStyles()
-	@ClassLearningMaterialPickerScript()
+	if prefix == "" {
+		@ClassLearningMaterialPickerStyles()
+		@ClassLearningMaterialPickerScript()
+	}
+}
+
+func classLmSearchID(prefix string) string {
+	if prefix == "" {
+		return "classLmSearch"
+	}
+	return prefix + "_lmSearch"
 }
 
 templ LearningMaterialSearchResults(items []ClassLearningMaterialLink) {

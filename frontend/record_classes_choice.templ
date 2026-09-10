@@ -10,24 +10,32 @@ templ RecordClassesChoiceModal() {
 				<button type="button" class="modal-close record-classes-choice-close" data-tooltip="Close" aria-label="Close">&times;</button>
 			</div>
 			<div class="modal-body record-classes-choice-body">
-				<p class="record-classes-choice-lead">Choose how you want to add a class.</p>
 				<div class="choice-option-cards">
-					<a href={ utils.URL("/schedule/record") } class="choice-option-card">
-						<span class="choice-option-card__body">
-							<span class="choice-option-card__title">Schedule one upcoming lesson</span>
-							<span class="choice-option-card__desc">Plan a single future lesson on your calendar. Zoom and Google Calendar links can be added automatically for eligible sessions.</span>
+					<button type="button" class="choice-option-card" data-open-conduct-class-wizard>
+						<span class="choice-option-card__icon choice-option-card__icon--past" aria-hidden="true">
+							@RecordClassesChoiceIconPast()
 						</span>
-					</a>
+						<span class="choice-option-card__body">
+							<span class="choice-option-card__title">Record a past class</span>
+							<span class="choice-option-card__desc">Log a lesson as <strong>conducted</strong>, or mark a session as <strong>cancelled</strong> or <strong>rescheduled</strong>.</span>
+						</span>
+					</button>
+					<button type="button" class="choice-option-card" data-open-schedule-class-wizard>
+						<span class="choice-option-card__icon choice-option-card__icon--upcoming" aria-hidden="true">
+							@RecordClassesChoiceIconUpcoming()
+						</span>
+						<span class="choice-option-card__body">
+							<span class="choice-option-card__title">Schedule an upcoming class</span>
+							<span class="choice-option-card__desc">Plan a single future class on your calendar.</span>
+						</span>
+					</button>
 					<a href={ utils.URL("/schedule/repeat") } class="choice-option-card">
+						<span class="choice-option-card__icon choice-option-card__icon--repeat" aria-hidden="true">
+							@RecordClassesChoiceIconRepeat()
+						</span>
 						<span class="choice-option-card__body">
 							<span class="choice-option-card__title">Schedule repeating classes</span>
 							<span class="choice-option-card__desc">Pick multiple future dates with the same student, time, and rate. Review conflicts before classes are created.</span>
-						</span>
-					</a>
-					<a href={ utils.URL("/classes/record") } class="choice-option-card">
-						<span class="choice-option-card__body">
-							<span class="choice-option-card__title">Record a conducted class</span>
-							<span class="choice-option-card__desc">Log a lesson that already happened, or mark a session as cancelled or rescheduled for your records and earnings.</span>
 						</span>
 					</a>
 				</div>
@@ -45,21 +53,20 @@ templ RecordClassesChoiceModal() {
 			gap: var(--space-4);
 		}
 
-		.record-classes-choice-lead {
-			color: var(--color-muted-foreground);
-			font-size: 0.9375rem;
-			line-height: 1.5;
-		}
-
 		.choice-option-cards {
 			display: grid;
-			grid-template-columns: repeat(3, 1fr);
+			grid-template-columns: repeat(3, minmax(0, 1fr));
 			gap: var(--space-3);
+			align-items: stretch;
 		}
 
 		.choice-option-card {
 			display: flex;
 			align-items: flex-start;
+			gap: var(--space-3);
+			box-sizing: border-box;
+			height: 100%;
+			margin: 0;
 			padding: var(--space-4);
 			border: 2px solid var(--color-border);
 			border-radius: var(--radius-md);
@@ -67,20 +74,69 @@ templ RecordClassesChoiceModal() {
 			text-decoration: none;
 			color: inherit;
 			cursor: pointer;
+			font: inherit;
+			text-align: left;
+			width: 100%;
 			transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 		}
 
-		.choice-option-card:hover {
+		button.choice-option-card {
+			display: flex;
+			margin-top: 0;
+			background: var(--color-surface);
+			color: inherit;
+		}
+
+		.choice-option-card:hover,
+		button.choice-option-card:hover {
 			border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border));
 			background: var(--color-primary-light);
+			background-color: var(--color-primary-light);
 			box-shadow: var(--shadow-sm);
 			transform: translateY(-1px);
 			text-decoration: none;
 		}
 
+		button.choice-option-card:active:not(:disabled) {
+			transform: translateY(-1px);
+		}
+
 		.choice-option-card:focus-visible {
 			outline: 2px solid var(--color-ring);
 			outline-offset: 2px;
+		}
+
+		.choice-option-card__icon {
+			flex-shrink: 0;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 2.75rem;
+			height: 2.75rem;
+			border-radius: var(--radius-md);
+		}
+
+		.choice-option-card__icon--upcoming {
+			background: var(--color-primary-light);
+			color: var(--color-primary-hover);
+		}
+
+		.choice-option-card__icon--repeat {
+			background: var(--color-info-bg);
+			color: var(--color-info);
+		}
+
+		.choice-option-card__icon--past {
+			background: var(--color-success-bg);
+			color: var(--color-success);
+		}
+
+		.choice-option-card__body {
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			min-width: 0;
+			height: 100%;
 		}
 
 		.choice-option-card__title {
@@ -96,6 +152,11 @@ templ RecordClassesChoiceModal() {
 			color: var(--color-muted-foreground);
 			margin-top: var(--space-2);
 			line-height: 1.45;
+		}
+
+		.choice-option-card__desc strong {
+			font-weight: 600;
+			color: var(--color-foreground);
 		}
 
 		@media (max-width: 640px) {
@@ -176,4 +237,35 @@ templ RecordClassesChoiceModal() {
 			});
 		})();
 	</script>
+}
+
+templ RecordClassesChoiceIconUpcoming() {
+	<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+		<line x1="16" x2="16" y1="2" y2="6"></line>
+		<line x1="8" x2="8" y1="2" y2="6"></line>
+		<line x1="3" x2="21" y1="10" y2="10"></line>
+		<path d="M8 14h.01"></path>
+		<path d="M12 14h.01"></path>
+		<path d="M16 14h.01"></path>
+	</svg>
+}
+
+templ RecordClassesChoiceIconRepeat() {
+	<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<path d="M8 2v4"></path>
+		<path d="M16 2v4"></path>
+		<rect width="18" height="18" x="3" y="4" rx="2"></rect>
+		<path d="M3 10h18"></path>
+		<path d="m17 14-2 2 2 2"></path>
+		<path d="M7 18h10"></path>
+	</svg>
+}
+
+templ RecordClassesChoiceIconPast() {
+	<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+		<path d="M3 3v5h5"></path>
+		<path d="M12 7v5l4 2"></path>
+	</svg>
 }

@@ -20,6 +20,7 @@ type navItemDef struct {
 	TeacherDesc   string
 	FeatureCard   bool
 	AdminOnlyCard bool
+	HideFromNav   bool
 }
 
 var navItemDefs = []navItemDef{
@@ -28,9 +29,9 @@ var navItemDefs = []navItemDef{
 	{Path: "/documents", LinkID: "documentsLink", Title: "Documents", TeacherTitle: "My Documents", Description: "Review teacher uploads and ID documents", TeacherDesc: "View your uploaded profile photos and ID documents"},
 	{Path: "/teachers", LinkID: "teachersLink", Title: "Teachers", Description: "View and manage teachers", AdminOnlyCard: true},
 	{Path: "/students", LinkID: "studentsLink", Title: "Students", Description: "View and manage students", AdminOnlyCard: true},
-	{Path: "/classes", LinkID: "classesLink", Title: "Classes", TeacherTitle: "My Classes", Description: "View and record classes", TeacherDesc: "View and record your classes"},
-	{Path: "/schedule", LinkID: "scheduleLink", Title: "Class Schedule", Description: "View and plan upcoming classes", FeatureCard: true},
-	{Path: "/schedule/series", LinkID: "scheduleSeriesLink", Title: "Repeating Scheduled Classes", Description: "View and manage linked class series", FeatureCard: true},
+	{Path: "/classes", LinkID: "classesLink", Title: "Classes", TeacherTitle: "My Classes", Description: "View and record classes", TeacherDesc: "View and record your classes", HideFromNav: true},
+	{Path: "/schedule", LinkID: "scheduleLink", Title: "Class Schedule", Description: "View and plan upcoming classes", FeatureCard: true, HideFromNav: true},
+	{Path: "/schedule/series", LinkID: "scheduleSeriesLink", Title: "Repeating Scheduled Classes", Description: "View and manage linked class series", FeatureCard: true, HideFromNav: true},
 	{Path: "/my-students", LinkID: "myStudentsLink", Title: "My Students", Description: "View your assigned students"},
 	{Path: "/reports", LinkID: "reportsLink", Title: "Reports", Description: "View teacher payroll reports by cutoff period", AdminOnlyCard: true},
 	{Path: "/analytics", LinkID: "analyticsLink", Title: "Analytics", TeacherTitle: "My Analytics", Description: "Attendance, utilization, and student retention insights", TeacherDesc: "View attendance and utilization for your classes"},
@@ -40,8 +41,19 @@ var navItemDefs = []navItemDef{
 }
 
 func NavItems(role auth.Role) []NavItem {
+	return navItemsForRole(role, false)
+}
+
+func NavBarItems(role auth.Role) []NavItem {
+	return navItemsForRole(role, true)
+}
+
+func navItemsForRole(role auth.Role, navbarOnly bool) []NavItem {
 	var items []NavItem
 	for _, def := range navItemDefs {
+		if navbarOnly && def.HideFromNav {
+			continue
+		}
 		if !IsNavAccessible(role, def.Path) {
 			continue
 		}
