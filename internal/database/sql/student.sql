@@ -65,3 +65,19 @@ LIMIT ? OFFSET ?;
 SELECT status, COUNT(*) as count
 FROM tbl_students
 GROUP BY status;
+
+-- name: CountActiveStudentsWithoutParent :one
+SELECT COUNT(*) AS count
+FROM tbl_students
+WHERE status = 'active'
+	AND TRIM(COALESCE(parent_name, '')) = '';
+
+-- name: CountActiveStudentsWithoutParentRate :one
+SELECT COUNT(*) AS count
+FROM tbl_students
+WHERE status = 'active'
+	AND (
+		parent_rate IS NULL
+		OR parent_currency IS NULL
+		OR TRIM(COALESCE(parent_currency, '')) = ''
+	);
