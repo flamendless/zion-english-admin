@@ -1,0 +1,750 @@
+package frontend
+
+import (
+	"strings"
+	"zion-english/internal/trainingmaterials"
+	"zion-english/internal/utils"
+)
+
+type TrainingMaterialListItem struct {
+	ID                string
+	Title             string
+	Description       string
+	URL               string
+	Status            string
+	CreatedAt         string
+	UpdatedAt         string
+	PublicationStatus string
+	PublicationTone   PillTone
+	IsDeleted         bool
+	CanEdit           bool
+	CanDelete         bool
+}
+
+type TrainingMaterialsData struct {
+	Materials      []TrainingMaterialListItem
+	CanCreate      bool
+	PageNumber     int
+	PageTotalPages int
+	PageTotal      int64
+	PrevURL        string
+	NextURL        string
+	HasPrev        bool
+	HasNext        bool
+}
+
+type TrainingMaterialFormData struct {
+	ID          string
+	Title       string
+	Description string
+	URL         string
+	Status      string
+	IsEdit      bool
+}
+
+type TrainingMaterialViewData struct {
+	ID          string
+	Title       string
+	Description string
+	URL         string
+	Status      string
+	CreatedAt   string
+	UpdatedAt   string
+	DeletedAt   string
+	CanEdit     bool
+	CanDelete   bool
+}
+
+func trainingMaterialFormAction(data TrainingMaterialFormData) string {
+	if data.IsEdit {
+		return utils.URL("/training-materials/" + data.ID + "/edit")
+	}
+	return utils.URL("/training-materials/create")
+}
+
+func trainingMaterialFormTitle(data TrainingMaterialFormData) string {
+	if data.IsEdit {
+		return "Edit training material"
+	}
+	return "Add training material"
+}
+
+func trainingMaterialSubmitLabel(data TrainingMaterialFormData) string {
+	if data.IsEdit {
+		return "Save changes"
+	}
+	return "Create material"
+}
+
+func trainingMaterialDescriptionPreview(desc string) string {
+	desc = strings.TrimSpace(desc)
+	if desc == "" {
+		return ""
+	}
+	if len(desc) <= 120 {
+		return desc
+	}
+	return desc[:117] + "..."
+}
+
+func trainingMaterialRowClass(isDeleted bool) string {
+	if isDeleted {
+		return "tm-card--deleted"
+	}
+	return ""
+}
+
+func trainingMaterialModalID(data TrainingMaterialFormData) string {
+	if data.IsEdit {
+		return "tmEditModal"
+	}
+	return "tmFormModal"
+}
+
+func trainingMaterialViewStatusLabel(status string) string {
+	switch trainingmaterials.Status(status) {
+	case trainingmaterials.StatusPublished:
+		return "Published"
+	case trainingmaterials.StatusDeleted:
+		return "Deleted"
+	default:
+		return "Draft"
+	}
+}
+
+func trainingMaterialViewStatusTone(status string) PillTone {
+	switch trainingmaterials.Status(status) {
+	case trainingmaterials.StatusPublished:
+		return PillToneSuccess
+	case trainingmaterials.StatusDeleted:
+		return PillToneError
+	default:
+		return PillToneNeutral
+	}
+}
+
+templ TrainingMaterials(data TrainingMaterialsData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>Training Materials - Zion English Admin</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@TrainingMaterialsStyles()
+	</head>
+	<body>
+		<div class="container tm-page">
+			@HeaderSimple()
+			<div class="hub-header">
+				<div class="tm-page-heading">
+					<h2 class="hub-title">Training Materials</h2>
+					<p class="tm-page-subtitle">YouTube and Google Drive resources for teacher onboarding and training.</p>
+				</div>
+				if data.CanCreate {
+					<button type="button" class="add-btn tm-add-btn" id="openCreateTrainingMaterialBtn">
+						@TrainingMaterialPlusIcon()
+						Add material
+					</button>
+				}
+			</div>
+			@SuccessBanner()
+			@ErrorBanner()
+
+			if len(data.Materials) > 0 {
+				<div class="tm-grid" role="list">
+					for _, item := range data.Materials {
+						@TrainingMaterialCard(item)
+					}
+				</div>
+				@PaginationBar(data.HasPrev, data.PrevURL, data.HasNext, data.NextURL, data.PageNumber, data.PageTotalPages, data.PageTotal)
+			} else {
+				<div class="tm-empty">
+					<div class="tm-empty-icon" aria-hidden="true">
+						@TrainingMaterialVideoIcon()
+					</div>
+					<p>No training materials yet.</p>
+					if data.CanCreate {
+						<button type="button" class="add-btn tm-add-btn" onclick="document.getElementById('openCreateTrainingMaterialBtn')?.click()">
+							Add your first material
+						</button>
+					}
+				</div>
+			}
+		</div>
+
+		<div id="tmViewModalHost"></div>
+		<div id="tmEditModalHost"></div>
+
+		if data.CanCreate {
+			@TrainingMaterialFormModal(TrainingMaterialFormData{
+				Status: string(trainingmaterials.StatusDraft),
+			})
+		}
+
+		@TrainingMaterialsScripts()
+	</body>
+	</html>
+}
+
+templ TrainingMaterialCard(item TrainingMaterialListItem) {
+	<article class={ "tm-card " + trainingMaterialRowClass(item.IsDeleted) } role="listitem">
+		<div class="tm-card-top">
+			<div class="tm-card-badges">
+				@StatusPill(item.PublicationStatus, item.PublicationTone, false)
+			</div>
+			<div class="tm-card-actions">
+				@IconActionButton("View", IconKindView, templ.Attributes{
+					"hx-get":    utils.URL("/training-materials/" + item.ID + "/view"),
+					"hx-target": "#tmViewModalHost",
+					"hx-swap":   "innerHTML",
+				})
+				if item.CanEdit && !item.IsDeleted {
+					@IconActionButton("Edit", IconKindEdit, templ.Attributes{
+						"hx-get":    utils.URL("/training-materials/" + item.ID + "/edit"),
+						"hx-target": "#tmEditModalHost",
+						"hx-swap":   "innerHTML",
+					})
+				}
+				if item.CanDelete && !item.IsDeleted {
+					<form method="POST" action={ utils.URL("/training-materials/" + item.ID + "/delete") } class="table-action-form" onsubmit="return confirm('Delete this training material?');">
+						@IconActionSubmit("Delete", IconKindDelete)
+					</form>
+				}
+			</div>
+		</div>
+		<h3 class="tm-card-title">{ item.Title }</h3>
+		if trainingMaterialDescriptionPreview(item.Description) != "" {
+			<p class="tm-card-description">{ trainingMaterialDescriptionPreview(item.Description) }</p>
+		}
+		<div class="tm-card-meta">
+			<a href={ item.URL } class="tm-card-link" target="_blank" rel="noopener noreferrer">Open resource</a>
+			<span class="tm-card-date">{ item.UpdatedAt }</span>
+		</div>
+	</article>
+}
+
+templ TrainingMaterialViewModal(data TrainingMaterialViewData) {
+	<div class="modal-overlay" id="tmViewModal" role="presentation">
+		<div class="modal-dialog modal-dialog-entity tm-modal" role="dialog" aria-modal="true" aria-labelledby="tmViewTitle">
+			<div class="modal-header">
+				<h3 id="tmViewTitle">{ data.Title }</h3>
+				<button type="button" class="modal-close tm-view-close" aria-label="Close">&times;</button>
+			</div>
+			<div class="modal-body tm-view-body">
+				<div class="tm-view-badges">
+					@StatusPill(trainingMaterialViewStatusLabel(data.Status), trainingMaterialViewStatusTone(data.Status), false)
+				</div>
+				if strings.TrimSpace(data.Description) != "" {
+					<div class="tm-view-section">
+						<h4 class="tm-view-label">Description</h4>
+						<p class="tm-view-text">{ data.Description }</p>
+					</div>
+				}
+				<div class="tm-view-section">
+					<h4 class="tm-view-label">URL</h4>
+					<a href={ data.URL } class="tm-view-link" target="_blank" rel="noopener noreferrer">{ data.URL }</a>
+				</div>
+				<div class="tm-view-meta-grid">
+					@TrainingMaterialMetaItem("Created", data.CreatedAt)
+					@TrainingMaterialMetaItem("Updated", data.UpdatedAt)
+					if data.DeletedAt != "" {
+						@TrainingMaterialMetaItem("Deleted", data.DeletedAt)
+					}
+				</div>
+			</div>
+			<div class="modal-footer tm-view-footer">
+				if data.CanEdit {
+					<button
+						type="button"
+						class="add-btn tm-edit-from-view"
+						hx-get={ utils.URL("/training-materials/" + data.ID + "/edit") }
+						hx-target="#tmEditModalHost"
+						hx-swap="innerHTML"
+					>Edit</button>
+				}
+				if data.CanDelete && data.Status != string(trainingmaterials.StatusDeleted) {
+					<form method="POST" action={ utils.URL("/training-materials/" + data.ID + "/delete") } class="table-action-form" onsubmit="return confirm('Delete this training material?');">
+						<button type="submit" class="btn btn-danger">Delete</button>
+					</form>
+				}
+				<a href={ data.URL } class="add-btn add-btn-secondary" target="_blank" rel="noopener noreferrer">Open resource</a>
+			</div>
+		</div>
+	</div>
+}
+
+templ TrainingMaterialMetaItem(label string, value string) {
+	<div class="tm-meta-item">
+		<span class="tm-meta-label">{ label }</span>
+		<span class="tm-meta-value">{ value }</span>
+	</div>
+}
+
+templ TrainingMaterialFormModal(data TrainingMaterialFormData) {
+	<div class="modal-overlay" id={ trainingMaterialModalID(data) } hidden?={ !data.IsEdit } role="presentation">
+		<div class="modal-dialog tm-modal" role="dialog" aria-modal="true" aria-labelledby="tmFormTitle">
+			<div class="modal-header">
+				<h3 id="tmFormTitle">{ trainingMaterialFormTitle(data) }</h3>
+				<button type="button" class="modal-close tm-form-close" aria-label="Close">&times;</button>
+			</div>
+			<form
+				id="tmMaterialForm"
+				method="POST"
+				action={ trainingMaterialFormAction(data) }
+				class="modal-body tm-form-body"
+			>
+				<div class="form-group">
+					<label for="tmTitle">Title *</label>
+					<input
+						type="text"
+						id="tmTitle"
+						name="title"
+						required
+						maxlength="200"
+						value={ data.Title }
+						placeholder="e.g. New teacher onboarding"
+					/>
+				</div>
+				<div class="form-group">
+					<label for="tmDescription">Description</label>
+					<textarea
+						id="tmDescription"
+						name="description"
+						rows="4"
+						maxlength="1000"
+						placeholder="Optional summary for teachers"
+					>{ data.Description }</textarea>
+				</div>
+				<div class="form-group">
+					<label for="tmURL">URL *</label>
+					<input
+						type="url"
+						id="tmURL"
+						name="url"
+						required
+						value={ data.URL }
+						placeholder="https://www.youtube.com/... or https://drive.google.com/..."
+					/>
+					<p class="field-hint">YouTube or Google Drive links only.</p>
+				</div>
+
+				<div class="form-group">
+					<label>Status *</label>
+					<div class="tm-option-cards" role="radiogroup" aria-label="Publication status">
+						<label class="tm-option-card">
+							<input type="radio" name="status" value={ string(trainingmaterials.StatusDraft) } checked?={ data.Status != string(trainingmaterials.StatusPublished) }/>
+							<span class="tm-option-card__body">
+								<span class="tm-option-card__title">Draft</span>
+								<span class="tm-option-card__desc">Saved but hidden from teachers</span>
+							</span>
+						</label>
+						<label class="tm-option-card">
+							<input type="radio" name="status" value={ string(trainingmaterials.StatusPublished) } checked?={ data.Status == string(trainingmaterials.StatusPublished) }/>
+							<span class="tm-option-card__body">
+								<span class="tm-option-card__title">Published</span>
+								<span class="tm-option-card__desc">Visible to all teachers</span>
+							</span>
+						</label>
+					</div>
+				</div>
+
+				<div class="modal-footer tm-form-footer">
+					<button type="button" class="btn btn-secondary tm-form-close">Cancel</button>
+					<button type="submit" class="add-btn tm-submit-btn">{ trainingMaterialSubmitLabel(data) }</button>
+				</div>
+			</form>
+		</div>
+	</div>
+}
+
+templ TrainingMaterialPlusIcon() {
+	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<path d="M12 5v14"></path>
+		<path d="M5 12h14"></path>
+	</svg>
+}
+
+templ TrainingMaterialVideoIcon() {
+	<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<rect x="2" y="4" width="20" height="16" rx="2"></rect>
+		<path d="m10 9 6 4-6 4z"></path>
+	</svg>
+}
+
+templ TrainingMaterialsStyles() {
+	<style>
+		.tm-page {
+			padding-bottom: var(--space-10);
+		}
+
+		.tm-page-heading {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-1);
+		}
+
+		.tm-page-subtitle {
+			color: var(--color-muted-foreground);
+			font-size: 0.9375rem;
+			line-height: 1.5;
+			max-width: 36rem;
+		}
+
+		.tm-add-btn {
+			display: inline-flex;
+			align-items: center;
+			gap: var(--space-2);
+		}
+
+		.tm-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+			gap: var(--space-4);
+			margin-bottom: var(--space-6);
+		}
+
+		.tm-card {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-3);
+			padding: var(--space-5);
+			border: 1px solid var(--color-border-subtle);
+			border-radius: var(--radius-lg);
+			background: var(--color-surface);
+			box-shadow: var(--shadow-sm);
+			transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+		}
+
+		.tm-card:hover {
+			border-color: var(--color-primary);
+			box-shadow: var(--shadow-md);
+			transform: translateY(-2px);
+		}
+
+		.tm-card--deleted {
+			opacity: 0.55;
+		}
+
+		.tm-card--deleted .tm-card-title,
+		.tm-card--deleted .tm-card-description {
+			text-decoration: line-through;
+		}
+
+		.tm-card-top {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			gap: var(--space-3);
+		}
+
+		.tm-card-badges {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--space-2);
+		}
+
+		.tm-card-actions {
+			display: flex;
+			align-items: center;
+			gap: var(--space-1);
+			flex-shrink: 0;
+		}
+
+		.tm-card-title {
+			font-size: 1.0625rem;
+			font-weight: 600;
+			line-height: 1.35;
+			margin: 0;
+		}
+
+		.tm-card-description {
+			font-size: 0.9375rem;
+			line-height: 1.55;
+			color: var(--color-muted-foreground);
+		}
+
+		.tm-card-meta {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: var(--space-2);
+			padding-top: var(--space-2);
+			border-top: 1px solid var(--color-border-subtle);
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+		}
+
+		.tm-card-link {
+			font-weight: 600;
+			color: var(--color-primary);
+		}
+
+		.tm-card-date {
+			font-family: 'Fira Code', monospace;
+			font-size: 0.75rem;
+		}
+
+		.tm-empty {
+			text-align: center;
+			padding: var(--space-10) var(--space-4);
+			color: var(--color-muted-foreground);
+			border: 1px dashed var(--color-border);
+			border-radius: var(--radius-lg);
+			background: var(--color-surface);
+		}
+
+		.tm-empty-icon {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 56px;
+			height: 56px;
+			margin-bottom: var(--space-4);
+			border-radius: var(--radius-full);
+			background: var(--color-primary-light);
+			color: var(--color-primary);
+		}
+
+		.tm-empty p {
+			margin-bottom: var(--space-4);
+		}
+
+		.tm-modal {
+			max-width: 560px;
+		}
+
+		.tm-view-body,
+		.tm-form-body {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-4);
+		}
+
+		.tm-view-badges {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--space-2);
+		}
+
+		.tm-view-section {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-2);
+		}
+
+		.tm-view-label {
+			font-size: 0.8125rem;
+			font-weight: 600;
+			color: var(--color-muted-foreground);
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+		}
+
+		.tm-view-text {
+			font-size: 0.9375rem;
+			line-height: 1.6;
+			white-space: pre-wrap;
+		}
+
+		.tm-view-link {
+			word-break: break-all;
+			font-size: 0.875rem;
+		}
+
+		.tm-view-meta-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: var(--space-3);
+			padding: var(--space-4);
+			border-radius: var(--radius-md);
+			background: var(--color-muted);
+		}
+
+		.tm-meta-item {
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+		}
+
+		.tm-meta-label {
+			font-size: 0.75rem;
+			color: var(--color-muted-foreground);
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+		}
+
+		.tm-meta-value {
+			font-size: 0.875rem;
+		}
+
+		.tm-view-footer,
+		.tm-form-footer {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-3);
+		}
+
+		.tm-option-cards {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: var(--space-3);
+		}
+
+		.tm-option-card {
+			display: flex;
+			align-items: flex-start;
+			gap: var(--space-3);
+			padding: var(--space-3);
+			border: 2px solid var(--color-border);
+			border-radius: var(--radius-md);
+			cursor: pointer;
+			transition: border-color var(--transition-fast), background var(--transition-fast);
+		}
+
+		.tm-option-card:hover {
+			background: var(--color-muted);
+		}
+
+		.tm-option-card:has(input:checked) {
+			border-color: var(--color-primary);
+			background: var(--color-primary-light);
+		}
+
+		.tm-option-card input {
+			margin-top: 4px;
+			accent-color: var(--color-primary);
+		}
+
+		.tm-option-card__title {
+			display: block;
+			font-weight: 600;
+			font-size: 0.875rem;
+		}
+
+		.tm-option-card__desc {
+			display: block;
+			font-size: 0.75rem;
+			color: var(--color-muted-foreground);
+			margin-top: 2px;
+			line-height: 1.4;
+		}
+
+		.tm-submit-btn {
+			min-width: 140px;
+		}
+
+		@media (max-width: 768px) {
+			.tm-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.tm-option-cards {
+				grid-template-columns: 1fr;
+			}
+
+			.tm-view-meta-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.hub-header {
+				flex-direction: column;
+				align-items: stretch;
+			}
+		}
+	</style>
+}
+
+templ TrainingMaterialsScripts() {
+	<script>
+		(function () {
+			window.openTrainingMaterialFormModal = function () {
+				const formModal = document.getElementById('tmFormModal');
+				if (!formModal) return;
+				formModal.hidden = false;
+				document.body.classList.add('modal-open');
+				const title = formModal.querySelector('#tmTitle');
+				if (title) title.focus();
+			};
+
+			window.closeTrainingMaterialFormModal = function () {
+				const formModal = document.getElementById('tmFormModal');
+				if (formModal) formModal.hidden = true;
+				document.body.classList.remove('modal-open');
+			};
+
+			window.closeTrainingMaterialViewModal = function () {
+				const host = document.getElementById('tmViewModalHost');
+				if (host) host.innerHTML = '';
+				document.body.classList.remove('modal-open');
+			};
+
+			window.closeTrainingMaterialEditModal = function () {
+				const host = document.getElementById('tmEditModalHost');
+				if (host) host.innerHTML = '';
+				document.body.classList.remove('modal-open');
+			};
+
+			const openCreateBtn = document.getElementById('openCreateTrainingMaterialBtn');
+			if (openCreateBtn) {
+				openCreateBtn.addEventListener('click', window.openTrainingMaterialFormModal);
+			}
+
+			document.body.addEventListener('click', function (e) {
+				if (e.target.closest('.tm-form-close')) {
+					window.closeTrainingMaterialFormModal();
+					window.closeTrainingMaterialEditModal();
+					return;
+				}
+				if (e.target.closest('.tm-view-close')) {
+					window.closeTrainingMaterialViewModal();
+					return;
+				}
+				if (e.target.closest('.tm-edit-from-view')) {
+					window.closeTrainingMaterialViewModal();
+					return;
+				}
+				const viewOverlay = e.target.closest('#tmViewModal');
+				if (viewOverlay && e.target === viewOverlay) {
+					window.closeTrainingMaterialViewModal();
+					return;
+				}
+				const formOverlay = e.target.closest('#tmFormModal');
+				if (formOverlay && e.target === formOverlay) {
+					window.closeTrainingMaterialFormModal();
+					return;
+				}
+				const editOverlay = e.target.closest('#tmEditModal');
+				if (editOverlay && e.target === editOverlay) {
+					window.closeTrainingMaterialEditModal();
+				}
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key !== 'Escape') return;
+				window.closeTrainingMaterialViewModal();
+				window.closeTrainingMaterialEditModal();
+				window.closeTrainingMaterialFormModal();
+			});
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id === 'tmViewModalHost') {
+					document.body.classList.add('modal-open');
+					const closeBtn = evt.detail.target.querySelector('.tm-view-close');
+					if (closeBtn) closeBtn.focus();
+				}
+				if (evt.detail.target.id === 'tmEditModalHost') {
+					document.body.classList.add('modal-open');
+					const editModal = evt.detail.target.querySelector('#tmEditModal');
+					if (editModal) {
+						const closeBtn = editModal.querySelector('.tm-form-close');
+						if (closeBtn) closeBtn.focus();
+					}
+				}
+			});
+		})();
+	</script>
+}

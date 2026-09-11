@@ -270,6 +270,18 @@ type TblTeachersStudentsM2m struct {
 	CreatedAt string
 }
 
+type TblTrainingMaterial struct {
+	ID          int64
+	Title       string
+	Description string
+	Url         string
+	Status      string
+	CreatedByID int64
+	CreatedAt   string
+	UpdatedAt   string
+	DeletedAt   sql.NullString
+}
+
 type TblUseragent struct {
 	ID             int64
 	UserAgent      string
