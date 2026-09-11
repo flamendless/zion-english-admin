@@ -896,6 +896,80 @@ templ GlobalIncludes() {
 			text-decoration: none;
 		}
 
+		.nav-dropdown {
+			position: relative;
+		}
+
+		.nav-dropdown-trigger {
+			display: inline-flex;
+			align-items: center;
+			gap: var(--space-1);
+			color: var(--color-foreground);
+			font-weight: 500;
+			font-size: 0.875rem;
+			padding: 6px 12px;
+			border-radius: var(--radius-full);
+			cursor: pointer;
+			list-style: none;
+			transition: background-color var(--transition-fast), color var(--transition-fast);
+			user-select: none;
+		}
+
+		.nav-dropdown-trigger::-webkit-details-marker {
+			display: none;
+		}
+
+		.nav-dropdown-trigger::after {
+			content: "";
+			width: 0.4rem;
+			height: 0.4rem;
+			border-right: 2px solid var(--color-muted-foreground);
+			border-bottom: 2px solid var(--color-muted-foreground);
+			transform: rotate(45deg);
+			margin-top: -0.1rem;
+			flex-shrink: 0;
+		}
+
+		.nav-dropdown-trigger:hover,
+		.nav-dropdown[open] .nav-dropdown-trigger {
+			background-color: var(--color-primary-light);
+			color: var(--color-primary-hover);
+		}
+
+		.nav-dropdown-panel {
+			position: absolute;
+			top: calc(100% + 4px);
+			left: 0;
+			z-index: 40;
+			min-width: 12rem;
+			padding: var(--space-2);
+			background: var(--color-surface);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-md);
+			box-shadow: var(--shadow-lg);
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-1);
+		}
+
+		.nav-dropdown-link {
+			display: block;
+			padding: var(--space-2) var(--space-3);
+			border-radius: var(--radius-sm);
+			color: var(--color-foreground);
+			text-decoration: none;
+			font-size: 0.875rem;
+			font-weight: 500;
+			white-space: nowrap;
+			transition: background-color var(--transition-fast), color var(--transition-fast);
+		}
+
+		.nav-dropdown-link:hover {
+			background-color: var(--color-primary-light);
+			color: var(--color-primary-hover);
+			text-decoration: none;
+		}
+
 		.header-section h1 {
 			margin: 0;
 		}
@@ -2378,6 +2452,134 @@ templ GlobalIncludes() {
 			width: min(100%, 56rem);
 		}
 
+		.modal-dialog-choice {
+			width: min(100%, 56rem);
+		}
+
+		.nav-group-choice-body {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-4);
+		}
+
+		.choice-option-cards {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: var(--space-3);
+			align-items: stretch;
+		}
+
+		.choice-option-card {
+			display: flex;
+			align-items: flex-start;
+			gap: var(--space-3);
+			box-sizing: border-box;
+			height: 100%;
+			margin: 0;
+			padding: var(--space-4);
+			border: 2px solid var(--color-border);
+			border-radius: var(--radius-md);
+			background: var(--color-surface);
+			text-decoration: none;
+			color: inherit;
+			cursor: pointer;
+			font: inherit;
+			text-align: left;
+			width: 100%;
+			transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+		}
+
+		button.choice-option-card {
+			display: flex;
+			margin-top: 0;
+			background: var(--color-surface);
+			color: inherit;
+		}
+
+		.choice-option-card:hover,
+		button.choice-option-card:hover {
+			border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border));
+			background: var(--color-primary-light);
+			background-color: var(--color-primary-light);
+			box-shadow: var(--shadow-sm);
+			transform: translateY(-1px);
+			text-decoration: none;
+		}
+
+		button.choice-option-card:active:not(:disabled) {
+			transform: translateY(-1px);
+		}
+
+		.choice-option-card:focus-visible {
+			outline: 2px solid var(--color-ring);
+			outline-offset: 2px;
+		}
+
+		.choice-option-card__icon {
+			flex-shrink: 0;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 2.75rem;
+			height: 2.75rem;
+			border-radius: var(--radius-md);
+		}
+
+		.choice-option-card__icon--primary {
+			background: var(--color-primary-light);
+			color: var(--color-primary-hover);
+		}
+
+		.choice-option-card__icon--info {
+			background: var(--color-info-bg);
+			color: var(--color-info);
+		}
+
+		.choice-option-card__icon--success {
+			background: var(--color-success-bg);
+			color: var(--color-success);
+		}
+
+		.choice-option-card__icon--warning {
+			background: var(--color-warning-bg);
+			color: var(--color-warning);
+		}
+
+		.choice-option-card__icon--neutral {
+			background: var(--color-muted);
+			color: var(--color-muted-foreground);
+		}
+
+		.choice-option-card__body {
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			min-width: 0;
+			height: 100%;
+		}
+
+		.choice-option-card__title,
+		.choice-option-card h2 {
+			display: block;
+			margin: 0;
+			font-weight: 600;
+			font-size: 0.9375rem;
+			color: var(--color-foreground);
+		}
+
+		.choice-option-card__desc {
+			display: block;
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+			margin-top: var(--space-2);
+			line-height: 1.45;
+		}
+
+		.choice-option-card__desc strong {
+			font-weight: 600;
+			color: var(--color-foreground);
+		}
+
 		@keyframes modal-dialog-in {
 			from {
 				opacity: 0;
@@ -3498,8 +3700,55 @@ templ GlobalIncludes() {
 			opacity: 1;
 		}
 
+		.card__head {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-3);
+			margin-bottom: var(--space-3);
+		}
+
+		.nav-icon-badge {
+			flex-shrink: 0;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 2.75rem;
+			height: 2.75rem;
+			border-radius: var(--radius-md);
+		}
+
+		.nav-icon-badge svg {
+			width: 1.375rem;
+			height: 1.375rem;
+		}
+
+		.nav-icon-badge--primary {
+			background: var(--color-primary-light);
+			color: var(--color-primary-hover);
+		}
+
+		.nav-icon-badge--info {
+			background: var(--color-info-bg);
+			color: var(--color-info);
+		}
+
+		.nav-icon-badge--success {
+			background: var(--color-success-bg);
+			color: var(--color-success);
+		}
+
+		.nav-icon-badge--warning {
+			background: var(--color-warning-bg);
+			color: var(--color-warning);
+		}
+
+		.nav-icon-badge--neutral {
+			background: var(--color-muted);
+			color: var(--color-muted-foreground);
+		}
+
 		.card h2 {
-			margin: 0 0 var(--space-3) 0;
+			margin: 0;
 			font-size: 1.25rem;
 			color: var(--color-foreground);
 		}
@@ -3849,6 +4098,10 @@ templ GlobalIncludes() {
 				-webkit-overflow-scrolling: touch;
 				padding-bottom: var(--space-2);
 				scrollbar-width: thin;
+			}
+
+			.choice-option-cards {
+				grid-template-columns: 1fr;
 			}
 
 			.hub-header {

@@ -148,10 +148,18 @@ func Header(loggedIn bool, role auth.Role) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, item := range NavBarItems(role) {
-			templ_7745c5c3_Err = NavLink(item.Path, item.LinkID, item.Title).Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
+		for _, entry := range NavBarEntries(role) {
+			switch entry.Kind {
+			case NavBarEntryLink:
+				templ_7745c5c3_Err = NavLink(entry.Item.Path, entry.Item.LinkID, entry.Item.Title).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			case NavBarEntryGroup:
+				templ_7745c5c3_Err = NavDropdown(entry.Group).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 			}
 		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div></div><div class=\"header-right\">")
@@ -264,7 +272,7 @@ func SuccessBannerScript(message string) templ.Component {
 		}
 		templ_7745c5c3_Var9, templ_7745c5c3_Err := templruntime.ScriptContentOutsideStringLiteral(message)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 70, Col: 25}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 75, Col: 25}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 		if templ_7745c5c3_Err != nil {
@@ -364,7 +372,7 @@ func ErrorBanner() templ.Component {
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.BasePath())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 196, Col: 77}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/header.templ`, Line: 201, Col: 77}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
 		if templ_7745c5c3_Err != nil {

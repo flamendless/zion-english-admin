@@ -36,8 +36,13 @@ templ Header(loggedIn bool, role auth.Role) {
 					</div>
 				}
 				<div class="nav-links">
-					for _, item := range NavBarItems(role) {
-						@NavLink(item.Path, item.LinkID, item.Title)
+					for _, entry := range NavBarEntries(role) {
+						switch entry.Kind {
+						case NavBarEntryLink:
+							@NavLink(entry.Item.Path, entry.Item.LinkID, entry.Item.Title)
+						case NavBarEntryGroup:
+							@NavDropdown(entry.Group)
+						}
 					}
 				</div>
 			</div>

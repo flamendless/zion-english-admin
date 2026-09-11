@@ -1,8 +1,24 @@
 unreleased:
   breaking_changes: []
-  new_features: []
-  improvements: []
-  bug_fixes: []
+  new_features:
+    - text: "You can record past classes and schedule upcoming classes through new step-by-step wizards opened from the Record Classes modal, with a review step before saving."
+      commit: "6254f33"
+  improvements:
+    - text: "The navbar groups related pages into dropdowns, with Dashboard first and Classes, People, Resources, Insights, and Admin groups by role. Resources includes Learning Library, Documents, and Guides. On the dashboard, group cards in Quick actions open a choice modal with the same destinations."
+      commit: ""
+    - text: "The teachers list shows Zoom and Google Calendar connection status, with filters for document review status and connected integrations."
+      commit: "4f7f2ba"
+    - text: "Dashboard quick-action cards for admin-only tools such as Teachers, Students, Reports, Process, and Feature Flags now show an Admin only indicator."
+      commit: "ba453af"
+    - text: "Announcement banners use a clearer centered layout on the dashboard and page headers, including on mobile."
+      commit: "831db34"
+  bug_fixes:
+    - text: "Fixed teacher search so you can find teachers by typing first and last name together."
+      commit: "956e743"
+    - text: "Fixed reports filters including Generate Summary form fields and returning unexpected results."
+      commit: "956e743"
+    - text: "Fixed the classes list showing or hiding the teacher column incorrectly after filtering."
+      commit: "956e743"
   removed: []
   security: []
   deprecated: []

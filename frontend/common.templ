@@ -36,38 +36,38 @@ templ Flam() {
 	</p>
 }
 
-templ ActionCard(url string, h2 string, desc string, adminOnly bool) {
-	<a href={ utils.URL(url) } class="card">
-		if adminOnly {
-			@AdminOnlyCardTitle(h2)
+templ ActionCardContent(item NavItem) {
+	<div class="card__head">
+		@NavIconBadge(item.Icon)
+		if item.AdminOnlyCard {
+			@AdminOnlyCardTitle(item.Title)
 		} else {
-			<h2>{ h2 }</h2>
+			<h2>{ item.Title }</h2>
 		}
-		<p>{ desc }</p>
+	</div>
+	<p>{ item.Description }</p>
+}
+
+templ ActionCard(item NavItem) {
+	<a href={ utils.URL(item.Path) } class="card">
+		@ActionCardContent(item)
 	</a>
 }
 
-templ ActionCardFeature(url string, h2 string, desc string, adminOnly bool) {
-	<a href={ utils.URL(url) } class="card card-feature">
-		if adminOnly {
-			@AdminOnlyCardTitle(h2)
-		} else {
-			<h2>{ h2 }</h2>
-		}
-		<p>{ desc }</p>
+templ ActionCardFeature(item NavItem) {
+	<a href={ utils.URL(item.Path) } class="card card-feature">
+		@ActionCardContent(item)
 	</a>
 }
 
-templ ActionCardOpensModal(h2 string, desc string, feature bool) {
-	if feature {
+templ ActionCardOpensModal(item NavItem) {
+	if item.FeatureCard {
 		<button type="button" class="card card-feature" data-open-record-classes-modal>
-			<h2>{ h2 }</h2>
-			<p>{ desc }</p>
+			@ActionCardContent(item)
 		</button>
 	} else {
 		<button type="button" class="card" data-open-record-classes-modal>
-			<h2>{ h2 }</h2>
-			<p>{ desc }</p>
+			@ActionCardContent(item)
 		</button>
 	}
 }

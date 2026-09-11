@@ -59,21 +59,24 @@ templ Home(data DashboardData) {
 
 			<h2 class="dashboard-section-title">Quick actions</h2>
 			<div class="cards-grid">
-				for _, item := range NavItems(data.Role) {
-					if item.FeatureCard {
-						@ActionCardFeature(item.Path, item.Title, item.Description, item.AdminOnlyCard)
-					} else {
-						@ActionCard(item.Path, item.Title, item.Description, item.AdminOnlyCard)
-					}
-					if item.Path == "/profile" {
-						@ActionCard("/guides", "Guides", "Step-by-step help for using the admin tool", false)
+				for _, entry := range DashboardQuickActionEntries(data.Role) {
+					switch entry.Kind {
+					case NavBarEntryLink:
+						if entry.Item.FeatureCard {
+							@ActionCardFeature(entry.Item)
+						} else {
+							@ActionCard(entry.Item)
+						}
+					case NavBarEntryGroup:
+						@NavGroupActionCard(entry.Group)
 					}
 				}
-				if auth.HasAdminAccess(data.Role) {
-					@ActionCard("/announcements", "Announcements", "Create and manage system-wide banners", true)
+				for _, item := range DashboardExtraItems(data.Role) {
+					@ActionCard(item)
 				}
-				@ActionCard("/changelogs", "Changelogs", "See what's new in the admin tool", false)
 			</div>
+
+			@NavGroupChoiceModals(NavGroups(data.Role))
 		</div>
 	</body>
 	</html>
