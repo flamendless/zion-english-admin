@@ -22,8 +22,10 @@ type DashboardData struct {
 	ClassesRescheduledWeek int64
 	ScheduledToday         int64
 	MonthlyTotals          []CurrencyTotal
-	ParentMonthlyTotals    []CurrencyTotal
-	CutoffTotals           []CurrencyTotal
+	ParentMonthlyTotals           []CurrencyTotal
+	CutoffTotals                  []CurrencyTotal
+	StudentsWithoutParent         int64
+	StudentsWithoutParentRate     int64
 }
 
 templ Home(data DashboardData) {
@@ -113,6 +115,14 @@ templ DashboardStats(data DashboardData) {
 			<div class="stat-card">
 				<span class="stat-label">Pending Documents</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.PendingDocuments) }</span>
+			</div>
+			<div class="stat-card">
+				<span class="stat-label">Students Without Parent</span>
+				<span class="stat-value">{ fmt.Sprintf("%d", data.StudentsWithoutParent) }</span>
+			</div>
+			<div class="stat-card">
+				<span class="stat-label">Students Without Parent Rate</span>
+				<span class="stat-value">{ fmt.Sprintf("%d", data.StudentsWithoutParentRate) }</span>
 			</div>
 		}
 		if data.Role == auth.RoleTeacher {

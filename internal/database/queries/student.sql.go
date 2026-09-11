@@ -10,6 +10,38 @@ import (
 	"database/sql"
 )
 
+const countActiveStudentsWithoutParent = `-- name: CountActiveStudentsWithoutParent :one
+SELECT COUNT(*) AS count
+FROM tbl_students
+WHERE status = 'active'
+	AND TRIM(COALESCE(parent_name, '')) = ''
+`
+
+func (q *Queries) CountActiveStudentsWithoutParent(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countActiveStudentsWithoutParent)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countActiveStudentsWithoutParentRate = `-- name: CountActiveStudentsWithoutParentRate :one
+SELECT COUNT(*) AS count
+FROM tbl_students
+WHERE status = 'active'
+	AND (
+		parent_rate IS NULL
+		OR parent_currency IS NULL
+		OR TRIM(COALESCE(parent_currency, '')) = ''
+	)
+`
+
+func (q *Queries) CountActiveStudentsWithoutParentRate(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countActiveStudentsWithoutParentRate)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const countStudentsByStatus = `-- name: CountStudentsByStatus :many
 SELECT status, COUNT(*) as count
 FROM tbl_students
