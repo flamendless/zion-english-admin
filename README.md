@@ -40,6 +40,13 @@ Admin portal for Zion English teachers and administrators. Manage students, clas
 - **Guides:** Step-by-step help for everyday admin tasks
 - **Audit logs:** System and processing logs for accountability
 
+## LLM use
+
+Disclaimers:
+
+- This repo started without any use of LLM because it was so simple and basic for that time.
+- I now use LLM extensively to further improve the system, but with utmost care for code review. LLM use started in [9e438bc](https://github.com/flamendless/zion-english-admin/commit/9e438bcb49bfaa29ddfc41c18589aae1b4f74bdb) (2026-06-17, "UI and auth fixes"), when Cursor rules and agent skills were first added to the repository.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
