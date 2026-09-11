@@ -93,6 +93,21 @@ func DocumentStatusPillTone(status constants.TeacherDocumentStatus) PillTone {
 	}
 }
 
+func IntroVideoStatusPillTone(status constants.TeacherIntroVideoStatus) PillTone {
+	switch status {
+	case constants.TeacherIntroVideoStatusSubmitted:
+		return PillToneWarning
+	case constants.TeacherIntroVideoStatusApproved:
+		return PillToneSuccess
+	case constants.TeacherIntroVideoStatusRejected:
+		return PillToneError
+	case constants.TeacherIntroVideoStatusDeleted:
+		return PillToneNeutral
+	default:
+		return PillToneNeutral
+	}
+}
+
 func AnnouncementLevelPillTone(level string) PillTone {
 	switch level {
 	case "info":

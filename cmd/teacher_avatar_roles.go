@@ -54,6 +54,12 @@ func enrichDocumentItemsWithRoleBadges(items []frontend.DocumentItem, teacherIDs
 	}
 }
 
+func enrichIntroVideoItemsWithRoleBadges(items []frontend.IntroVideoItem, teacherIDs []int64, rolesMap map[int64][]constants.TeacherRole) {
+	for i, id := range teacherIDs {
+		items[i].UploadedByAvatar = avatarWithTeacherRoles(items[i].UploadedByAvatar, rolesMap[id])
+	}
+}
+
 func uniqueTeacherIDs(ids []int64) []int64 {
 	seen := make(map[int64]struct{}, len(ids))
 	unique := make([]int64, 0, len(ids))

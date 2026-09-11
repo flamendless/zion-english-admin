@@ -43,6 +43,7 @@ var navIconByPath = map[string]NavIconKind{
 	"/guides":             NavIconGuides,
 	"/learning-materials":   NavIconLibrary,
 	"/documents":            NavIconDocuments,
+	"/intro-videos":         NavIconDocuments,
 	"/teachers":             NavIconTeachers,
 	"/students":             NavIconStudents,
 	"/classes":              NavIconClasses,

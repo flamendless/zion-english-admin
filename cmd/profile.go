@@ -178,6 +178,11 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 		logs.Log().Error("check blocking teacher document", zap.Error(err))
 		blockingDocs = 0
 	}
+	blockingIntroVideo, err := dbRO.GetQueries().HasBlockingTeacherIntroVideo(ctx, user.ID)
+	if err != nil {
+		logs.Log().Error("check blocking teacher intro video", zap.Error(err))
+		blockingIntroVideo = 0
+	}
 
 	certifications := ""
 	if row.Certifications.Valid {
@@ -229,6 +234,17 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 		CanEditMiddleName:     utils.ProfileNameEditable(row.MiddleName),
 		CanEditLastName:       utils.ProfileNameEditable(row.LastName),
 		CanUploadDocument:     blockingDocs == 0,
+		CanUploadIntroVideo:   blockingIntroVideo == 0,
+	}
+	if introVideo, err := dbRO.GetQueries().GetLatestTeacherIntroVideoByTeacherID(ctx, user.ID); err == nil {
+		data.HasIntroVideo = true
+		data.IntroVideoStatus = constants.TeacherIntroVideoStatus(introVideo.Status)
+		data.IntroVideoViewURL = utils.URL(fmt.Sprintf("/intro-videos/%d/file", introVideo.ID))
+		if introVideo.RejectReason.Valid {
+			data.IntroVideoRejectReason = introVideo.RejectReason.String
+		}
+	} else if !errors.Is(err, sql.ErrNoRows) {
+		logs.Log().Error("get latest teacher intro video", zap.Error(err))
 	}
 	zoomConnected, zoomConfigured, zoomVisible, zoomConnectionsAllowed := profileZoomStatus(ctx, user.ID)
 	data.ZoomConfigured = zoomConfigured

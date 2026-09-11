@@ -198,6 +198,40 @@ func sortTeacherDocumentRows(rows []queries.TblTeacherDocument, sort utils.SortP
 	})
 }
 
+func sortIntroVideoRows(rows []queries.GetAllTeacherIntroVideosFilteredRow, sort utils.SortParams) {
+	utils.SortSlice(rows, sort.Order, func(a, b queries.GetAllTeacherIntroVideosFilteredRow) int {
+		switch sort.By {
+		case "filename":
+			return utils.CompareStrings(a.OriginalFilename, b.OriginalFilename)
+		case "file_size":
+			return utils.CompareInt64(a.FileSize, b.FileSize)
+		case "status":
+			return utils.CompareStrings(a.Status, b.Status)
+		case "uploaded_at":
+			return utils.CompareStrings(nullTimeValue(a.CreatedAt), nullTimeValue(b.CreatedAt))
+		default:
+			return utils.CompareStrings(nullTimeValue(a.CreatedAt), nullTimeValue(b.CreatedAt))
+		}
+	})
+}
+
+func sortTeacherIntroVideoRows(rows []queries.TblTeacherIntroVideo, sort utils.SortParams) {
+	utils.SortSlice(rows, sort.Order, func(a, b queries.TblTeacherIntroVideo) int {
+		switch sort.By {
+		case "filename":
+			return utils.CompareStrings(a.OriginalFilename, b.OriginalFilename)
+		case "file_size":
+			return utils.CompareInt64(a.FileSize, b.FileSize)
+		case "status":
+			return utils.CompareStrings(a.Status, b.Status)
+		case "uploaded_at":
+			return utils.CompareStrings(nullTimeValue(a.CreatedAt), nullTimeValue(b.CreatedAt))
+		default:
+			return utils.CompareStrings(nullTimeValue(a.CreatedAt), nullTimeValue(b.CreatedAt))
+		}
+	})
+}
+
 func sortProcessingLogRows(rows []queries.TblProcessingLog, sort utils.SortParams) {
 	utils.SortSlice(rows, sort.Order, func(a, b queries.TblProcessingLog) int {
 		switch sort.By {
