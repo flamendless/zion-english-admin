@@ -67,7 +67,14 @@ templ GuideCard(guide GuideEntry) {
 			@GuideBookIcon()
 		</span>
 		<span class="guide-card-body">
-			<span class="guide-card-title">{ guide.Title }</span>
+			if guide.Access == "superuser" {
+				<span class="guide-card-title admin-only-label-wrap">
+					{ guide.Title }
+					@AdminOnlyIndicator()
+				</span>
+			} else {
+				<span class="guide-card-title">{ guide.Title }</span>
+			}
 			<span class="guide-card-desc">{ guide.Description }</span>
 		</span>
 		<span class="guide-card-arrow" aria-hidden="true">
@@ -120,6 +127,7 @@ templ GuideGettingStarted() {
 						"Scroll to the Mobile number section, enter your new number, and click Update mobile number. Changes are limited to once every 7 days.",
 						"Scroll to the Password section, enter your current password and a new strong password, then click Update password. Password changes are also limited to once every 7 days.",
 					},
+					false,
 				)
 				@GuideSection(
 					"student-registration",
@@ -134,6 +142,7 @@ templ GuideGettingStarted() {
 						"You are automatically assigned as the student's teacher, so no teacher picker is shown.",
 						"Confirm the new student appears in My Students before scheduling or recording classes.",
 					},
+					false,
 				)
 				@GuideSection(
 					"class-schedule",
@@ -147,6 +156,7 @@ templ GuideGettingStarted() {
 						"Today's Classes lists everything scheduled for today. Use Conduct to record a class as completed, Edit to change the student or date/time, Cancel to mark it cancelled, or Delete to remove a scheduled class (reason required).",
 						"Conduct opens a short modal where you can add optional notes. Cancel asks for a reason and optional notes.",
 					},
+					false,
 				)
 				@GuideSection(
 					"my-classes",
@@ -162,6 +172,7 @@ templ GuideGettingStarted() {
 						"Use Delete on a class row to remove it from your lists. A reason is required; the record is kept for audit.",
 						"During the beta phase, continue recording classes in your Google Sheet as well for auditing.",
 					},
+					false,
 				)
 				@GuideSection(
 					"editing-classes",
@@ -174,6 +185,7 @@ templ GuideGettingStarted() {
 						"For recorded classes, click Edit on the row to update date, times, status, reason, notes, or other fields.",
 						"Click Save changes. A success message confirms the update.",
 					},
+					false,
 				)
 			</div>
 
@@ -210,7 +222,12 @@ templ GuideReportsGeneration() {
 				<span class="guides-breadcrumb-current" aria-current="page">Reports &amp; Generation</span>
 			</nav>
 
-			@HubHeader("Reports &amp; Generation", "", "", false)
+			<div class="hub-header">
+				<h2 class="hub-title admin-only-label-wrap">
+					Reports &amp; Generation
+					@AdminOnlyIndicator()
+				</h2>
+			</div>
 
 			<div class="guides-hero">
 				<p class="guides-subtitle">
@@ -229,6 +246,7 @@ templ GuideReportsGeneration() {
 						"The table lists each teacher with conducted/total classes and earnings broken down by currency.",
 						"Use the actions on each row to view details, generate an XLSX file, or download a report that is already ready.",
 					},
+					false,
 				)
 				@GuideSection(
 					"date-range-and-search",
@@ -240,6 +258,7 @@ templ GuideReportsGeneration() {
 						"Optionally type in the search box to narrow results by teacher or student name.",
 						"Click Filter to refresh the table with the selected range and search term.",
 					},
+					false,
 				)
 				@GuideSection(
 					"view-report",
@@ -252,6 +271,7 @@ templ GuideReportsGeneration() {
 						"Scroll through the class list to verify dates, students, rates, times, and statuses.",
 						"Close the modal with the X button, Escape, or by clicking outside the dialog.",
 					},
+					false,
 				)
 				@GuideSection(
 					"generate-and-download",
@@ -265,6 +285,7 @@ templ GuideReportsGeneration() {
 						"Click Regenerate after teachers update class records if you need a fresh XLSX.",
 						"The downloaded file uses the same format as the Process pipeline output.",
 					},
+					false,
 				)
 			</div>
 
@@ -345,6 +366,7 @@ templ GuideConnectZoomSections() {
 			"After connecting, classes up to 40 minutes receive a Zoom meeting link automatically when you schedule them.",
 			"Scheduling classes up to 40 minutes requires a connected Zoom account.",
 		},
+		false,
 	)
 	@GuideSection(
 		"before-you-start",
@@ -355,6 +377,7 @@ templ GuideConnectZoomSections() {
 			"Use your own Zoom account (Basic is fine).",
 			"Sign in with the same email you use for Zoom.",
 		},
+		false,
 	)
 	@GuideSection(
 		"connect-your-account",
@@ -367,6 +390,7 @@ templ GuideConnectZoomSections() {
 			"Sign in to Zoom if prompted and approve access.",
 			"Return to the profile page and confirm the Zoom badge shows Connected.",
 		},
+		false,
 	)
 	@GuideSection(
 		"schedule-with-zoom",
@@ -378,6 +402,7 @@ templ GuideConnectZoomSections() {
 			"For classes up to 40 minutes, a Zoom button appears on the class card after scheduling.",
 			"Click the Zoom button to open meeting details, then use Open to launch Zoom or Copy to share the link and passcode with your student.",
 		},
+		false,
 	)
 	@GuideSection(
 		"forty-minute-limit",
@@ -389,6 +414,7 @@ templ GuideConnectZoomSections() {
 			"No automatic Zoom room is created for those classes.",
 			"Create your Zoom meeting manually in Zoom and share the link with your student.",
 		},
+		false,
 	)
 	@GuideSection(
 		"disconnect-reconnect",
@@ -400,6 +426,7 @@ templ GuideConnectZoomSections() {
 			"Scheduling classes up to 40 minutes is blocked until you reconnect.",
 			"Reconnect if you switch Zoom accounts.",
 		},
+		false,
 	)
 	@GuideSection(
 		"troubleshooting",
@@ -412,6 +439,7 @@ templ GuideConnectZoomSections() {
 			"If connection fails for your Zoom account but works for the administrator, the Zoom app may still be in development-only mode. Your administrator must use Production credentials and request Beta Test sharing or publish the app.",
 			"If Zoom is down, try again later or schedule a class longer than 40 minutes without an automatic room.",
 		},
+		false,
 	)
 	@GuideSection(
 		"admin-zoom-setup",
@@ -428,6 +456,7 @@ templ GuideConnectZoomSections() {
 			"Copy the authorization URL from Marketplace (Local Test or Beta Test) into server ZOOM_AUTHORIZE_URL. Connect Zoom uses this URL.",
 			"Under Beta Test, complete requirements and submit Request to Share so external Zoom accounts can authorize (or publish the app for full production).",
 		},
+		true,
 	)
 }
 
@@ -496,6 +525,7 @@ templ GuideConnectGoogleCalendarSections() {
 			"The admin tool creates a dedicated Zion English calendar in your Google account on first connect.",
 			"When you schedule a class with a start time, a calendar event is created or updated automatically.",
 		},
+		false,
 	)
 	@GuideSection(
 		"before-you-start-google-calendar",
@@ -506,6 +536,7 @@ templ GuideConnectGoogleCalendarSections() {
 			"Use the Google account where you want class events to appear.",
 			"Sign in with the same email you use for Google Calendar.",
 		},
+		false,
 	)
 	@GuideSection(
 		"connect-google-calendar-account",
@@ -519,6 +550,7 @@ templ GuideConnectGoogleCalendarSections() {
 			"Return to the profile page and confirm the Google Calendar badge shows Connected.",
 			"Open Google Calendar and confirm a Zion English calendar was created.",
 		},
+		false,
 	)
 	@GuideSection(
 		"schedule-with-google-calendar",
@@ -530,6 +562,7 @@ templ GuideConnectGoogleCalendarSections() {
 			"A calendar icon appears on the class card after scheduling when sync succeeds.",
 			"Click the calendar icon to open the event in Google Calendar.",
 		},
+		false,
 	)
 	@GuideSection(
 		"disconnect-reconnect-google-calendar",
@@ -541,6 +574,7 @@ templ GuideConnectGoogleCalendarSections() {
 			"Existing calendar events are not removed automatically when you disconnect.",
 			"Reconnect if you switch Google accounts.",
 		},
+		false,
 	)
 	@GuideSection(
 		"troubleshooting-google-calendar",
@@ -553,6 +587,7 @@ templ GuideConnectGoogleCalendarSections() {
 			"If your Google account is not on the OAuth test user list, ask your administrator to add your email in Google Cloud Console while the app is in Testing mode.",
 			"If sync fails for a class, confirm the class has a start time set.",
 		},
+		false,
 	)
 	@GuideSection(
 		"admin-google-calendar-setup",
@@ -571,6 +606,7 @@ templ GuideConnectGoogleCalendarSections() {
 			"While Testing: add teacher Google emails as test users (up to 100). For production use beyond test users, submit the app for Google verification.",
 			"Deploy updated environment variables and restart the server. Verify by connecting from Profile and scheduling a class with a start time.",
 		},
+		true,
 	)
 }
 
@@ -772,7 +808,7 @@ templ GuideBetaCallout() {
 	</div>
 }
 
-templ GuideSection(anchor string, title string, href string, summary string, steps []string) {
+templ GuideSection(anchor string, title string, href string, summary string, steps []string, adminOnly bool) {
 	<section class="guide-section" id={ anchor }>
 		<h2 class="guide-section-title">
 			<a
@@ -780,17 +816,22 @@ templ GuideSection(anchor string, title string, href string, summary string, ste
 				class="guide-section-anchor"
 				aria-label={ "Link to " + title }
 			>#</a>
-			<a
-				href={ href }
-				class="guide-section-link"
-				target="_blank"
-				rel="noopener noreferrer"
-			>
-				{ title }
-				<span class="guide-external-icon" aria-hidden="true">
-					@GuideExternalIcon()
-				</span>
-			</a>
+			<span class="admin-only-label-wrap">
+				<a
+					href={ href }
+					class="guide-section-link"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					{ title }
+					<span class="guide-external-icon" aria-hidden="true">
+						@GuideExternalIcon()
+					</span>
+				</a>
+				if adminOnly {
+					@AdminOnlyIndicator()
+				}
+			</span>
 		</h2>
 		<p class="guide-section-summary">{ summary }</p>
 		<ol class="guide-steps">
@@ -840,6 +881,7 @@ templ GuideThemeVars() {
 			--color-surface: #FFFFFF;
 			--color-foreground: #0F172A;
 			--color-ring: #90C020;
+			--radius-sm: 6px;
 			--radius-lg: 12px;
 			--shadow-sm: 0 1px 2px rgba(45, 45, 45, 0.06);
 			--shadow-md: 0 4px 12px rgba(45, 45, 45, 0.08);
@@ -857,6 +899,44 @@ templ GuideThemeVars() {
 
 templ GuideStyles() {
 	<style>
+		.admin-only-label-wrap {
+			display: inline-flex;
+			align-items: center;
+			gap: var(--space-1);
+		}
+
+		.admin-only-indicator {
+			display: inline-flex;
+			color: var(--color-muted-foreground);
+			cursor: help;
+			flex-shrink: 0;
+		}
+
+		.admin-only-indicator svg {
+			width: 14px;
+			height: 14px;
+		}
+
+		.admin-only-indicator[data-tooltip]::after {
+			display: none;
+		}
+
+		.admin-only-floating-tooltip {
+			position: fixed;
+			z-index: 4000;
+			padding: 0.35rem 0.55rem;
+			border-radius: var(--radius-sm);
+			background: var(--color-foreground);
+			color: var(--color-surface);
+			font-size: 0.75rem;
+			font-weight: 500;
+			line-height: 1.3;
+			max-width: 14rem;
+			text-align: center;
+			pointer-events: none;
+			box-shadow: var(--shadow-md);
+		}
+
 		.guides-page {
 			padding-bottom: var(--space-10);
 		}
