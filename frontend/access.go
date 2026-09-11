@@ -97,29 +97,29 @@ var navGroupDefs = []navGroupDef{
 }
 
 var adminNavLayout = []navLayoutEntry{
+	{LinkPath: "/dashboard"},
 	{LinkPath: "/profile"},
 	{GroupID: "resources"},
 	{GroupID: "people"},
 	{GroupID: "classes"},
 	{GroupID: "insights"},
 	{GroupID: "admin"},
-	{LinkPath: "/dashboard"},
 }
 
 var teacherNavLayout = []navLayoutEntry{
+	{LinkPath: "/dashboard"},
 	{LinkPath: "/profile"},
 	{GroupID: "resources"},
 	{LinkPath: "/my-students"},
 	{GroupID: "classes"},
 	{LinkPath: "/analytics"},
 	{LinkPath: "/logs"},
-	{LinkPath: "/dashboard"},
 }
 
 var testerNavLayout = []navLayoutEntry{
+	{LinkPath: "/dashboard"},
 	{LinkPath: "/profile"},
 	{GroupID: "classes"},
-	{LinkPath: "/dashboard"},
 }
 
 var groupedNavPaths = buildGroupedNavPaths()
