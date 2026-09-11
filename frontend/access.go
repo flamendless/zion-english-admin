@@ -2,12 +2,20 @@ package frontend
 
 import "zion-english/internal/auth"
 
+type NavItemActionKind string
+
+const (
+	NavItemActionLink          NavItemActionKind = ""
+	NavItemActionRecordClasses NavItemActionKind = "record-classes"
+)
+
 type NavItem struct {
 	Path          string
 	LinkID        string
 	Title         string
 	Description   string
 	Icon          NavIconKind
+	Action        NavItemActionKind
 	FeatureCard   bool
 	AdminOnlyCard bool
 }
@@ -255,6 +263,9 @@ func navGroupForRole(role auth.Role, groupID string) *NavGroup {
 			continue
 		}
 		var items []NavItem
+		if def.ID == "classes" {
+			items = append(items, recordClassesNavItem())
+		}
 		for _, path := range def.Paths {
 			item := navItemForPath(role, path)
 			if item == nil {
@@ -300,6 +311,15 @@ func navItemForPath(role auth.Role, path string) *NavItem {
 		return &item
 	}
 	return nil
+}
+
+func recordClassesNavItem() NavItem {
+	return NavItem{
+		Title:       "Record a class",
+		Description: "Log a past lesson, schedule an upcoming class, or set up repeating sessions.",
+		Icon:        NavIconRecordClass,
+		Action:      NavItemActionRecordClasses,
+	}
 }
 
 func navItemFromDef(role auth.Role, def navItemDef) NavItem {

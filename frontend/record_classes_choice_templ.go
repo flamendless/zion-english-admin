@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "zion-english/internal/utils"
 
-func RecordClassesChoiceModal() templ.Component {
+func RecordClassFlowModals(data ClassWizardPageData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -29,6 +29,59 @@ func RecordClassesChoiceModal() templ.Component {
 		templ_7745c5c3_Var1 := templ.GetChildren(ctx)
 		if templ_7745c5c3_Var1 == nil {
 			templ_7745c5c3_Var1 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = ConductClassWizardModal(data).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ScheduleClassWizardModal(data).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = RecordClassesChoiceModal().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ScrTimeRangeJS().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ClassWizardScript().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ScrTrialClassJS().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ScrTimeRangeInit().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func RecordClassesChoiceModal() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var2 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var2 == nil {
+			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"modal-overlay\" id=\"recordClassesChoiceModal\" hidden role=\"presentation\"><div class=\"modal-dialog modal-dialog-choice\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"recordClassesChoiceTitle\"><div class=\"modal-header\"><h3 id=\"recordClassesChoiceTitle\">Record classes</h3><button type=\"button\" class=\"modal-close record-classes-choice-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><div class=\"modal-body record-classes-choice-body\"><div class=\"choice-option-cards\"><button type=\"button\" class=\"choice-option-card\" data-open-conduct-class-wizard><span class=\"choice-option-card__icon choice-option-card__icon--past\" aria-hidden=\"true\">")
@@ -51,12 +104,12 @@ func RecordClassesChoiceModal() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var2 templ.SafeURL
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/schedule/repeat"))
+		var templ_7745c5c3_Var3 templ.SafeURL
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/schedule/repeat"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_classes_choice.templ`, Line: 32, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/record_classes_choice.templ`, Line: 42, Col: 44}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -68,7 +121,7 @@ func RecordClassesChoiceModal() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span> <span class=\"choice-option-card__body\"><span class=\"choice-option-card__title\">Schedule repeating classes</span> <span class=\"choice-option-card__desc\">Pick multiple future dates with the same student, time, and rate. Review conflicts before classes are created.</span></span></a></div></div></div></div><style>\r\n\t\t.modal-dialog-choice {\r\n\t\t\twidth: min(100%, 56rem);\r\n\t\t}\r\n\r\n\t\t.record-classes-choice-body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.choice-option-cards {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: repeat(3, minmax(0, 1fr));\r\n\t\t\tgap: var(--space-3);\r\n\t\t\talign-items: stretch;\r\n\t\t}\r\n\r\n\t\t.choice-option-card {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tbox-sizing: border-box;\r\n\t\t\theight: 100%;\r\n\t\t\tmargin: 0;\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tborder: 2px solid var(--color-border);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\ttext-decoration: none;\r\n\t\t\tcolor: inherit;\r\n\t\t\tcursor: pointer;\r\n\t\t\tfont: inherit;\r\n\t\t\ttext-align: left;\r\n\t\t\twidth: 100%;\r\n\t\t\ttransition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);\r\n\t\t}\r\n\r\n\t\tbutton.choice-option-card {\r\n\t\t\tdisplay: flex;\r\n\t\t\tmargin-top: 0;\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tcolor: inherit;\r\n\t\t}\r\n\r\n\t\t.choice-option-card:hover,\r\n\t\tbutton.choice-option-card:hover {\r\n\t\t\tborder-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border));\r\n\t\t\tbackground: var(--color-primary-light);\r\n\t\t\tbackground-color: var(--color-primary-light);\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\ttransform: translateY(-1px);\r\n\t\t\ttext-decoration: none;\r\n\t\t}\r\n\r\n\t\tbutton.choice-option-card:active:not(:disabled) {\r\n\t\t\ttransform: translateY(-1px);\r\n\t\t}\r\n\r\n\t\t.choice-option-card:focus-visible {\r\n\t\t\toutline: 2px solid var(--color-ring);\r\n\t\t\toutline-offset: 2px;\r\n\t\t}\r\n\r\n\t\t.choice-option-card__icon {\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 2.75rem;\r\n\t\t\theight: 2.75rem;\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t}\r\n\r\n\t\t.choice-option-card__icon--upcoming {\r\n\t\t\tbackground: var(--color-primary-light);\r\n\t\t\tcolor: var(--color-primary-hover);\r\n\t\t}\r\n\r\n\t\t.choice-option-card__icon--repeat {\r\n\t\t\tbackground: var(--color-info-bg);\r\n\t\t\tcolor: var(--color-info);\r\n\t\t}\r\n\r\n\t\t.choice-option-card__icon--past {\r\n\t\t\tbackground: var(--color-success-bg);\r\n\t\t\tcolor: var(--color-success);\r\n\t\t}\r\n\r\n\t\t.choice-option-card__body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tflex: 1;\r\n\t\t\tmin-width: 0;\r\n\t\t\theight: 100%;\r\n\t\t}\r\n\r\n\t\t.choice-option-card__title {\r\n\t\t\tdisplay: block;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.choice-option-card__desc {\r\n\t\t\tdisplay: block;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t\tline-height: 1.45;\r\n\t\t}\r\n\r\n\t\t.choice-option-card__desc strong {\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t@media (max-width: 640px) {\r\n\t\t\t.choice-option-cards {\r\n\t\t\t\tgrid-template-columns: 1fr;\r\n\t\t\t}\r\n\t\t}\r\n\t</style><script>\r\n\t\t(function () {\r\n\t\t\tconst modal = document.getElementById('recordClassesChoiceModal');\r\n\t\t\tif (!modal) return;\r\n\r\n\t\t\tlet triggerEl = null;\r\n\r\n\t\t\tfunction getFocusables() {\r\n\t\t\t\treturn Array.from(modal.querySelectorAll(\r\n\t\t\t\t\t'a[href], button:not([disabled]), [tabindex]:not([tabindex=\"-1\"])'\r\n\t\t\t\t)).filter((el) => !el.hidden && el.offsetParent !== null);\r\n\t\t\t}\r\n\r\n\t\t\tfunction trapFocus(e) {\r\n\t\t\t\tif (modal.hidden || e.key !== 'Tab') return;\r\n\t\t\t\tconst focusables = getFocusables();\r\n\t\t\t\tif (!focusables.length) return;\r\n\t\t\t\tconst first = focusables[0];\r\n\t\t\t\tconst last = focusables[focusables.length - 1];\r\n\t\t\t\tif (e.shiftKey && document.activeElement === first) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\tlast.focus();\r\n\t\t\t\t} else if (!e.shiftKey && document.activeElement === last) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\tfirst.focus();\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction openModal(trigger) {\r\n\t\t\t\ttriggerEl = trigger || document.activeElement;\r\n\t\t\t\tmodal.hidden = false;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\trequestAnimationFrame(() => {\r\n\t\t\t\t\tconst firstCard = modal.querySelector('.choice-option-card');\r\n\t\t\t\t\tif (firstCard) firstCard.focus();\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tfunction closeModal() {\r\n\t\t\t\tmodal.hidden = true;\r\n\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\tif (triggerEl && typeof triggerEl.focus === 'function') {\r\n\t\t\t\t\ttriggerEl.focus();\r\n\t\t\t\t}\r\n\t\t\t\ttriggerEl = null;\r\n\t\t\t}\r\n\r\n\t\t\tdocument.addEventListener('click', (e) => {\r\n\t\t\t\tconst trigger = e.target.closest('[data-open-record-classes-modal]');\r\n\t\t\t\tif (trigger) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\topenModal(trigger);\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tmodal.querySelectorAll('.record-classes-choice-close').forEach((btn) => {\r\n\t\t\t\tbtn.addEventListener('click', closeModal);\r\n\t\t\t});\r\n\r\n\t\t\tmodal.addEventListener('click', (e) => {\r\n\t\t\t\tif (e.target === modal) closeModal();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', (e) => {\r\n\t\t\t\tif (e.key === 'Escape' && !modal.hidden) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\tcloseModal();\r\n\t\t\t\t}\r\n\t\t\t\ttrapFocus(e);\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span> <span class=\"choice-option-card__body\"><span class=\"choice-option-card__title\">Schedule repeating classes</span> <span class=\"choice-option-card__desc\">Pick multiple future dates with the same student, time, and rate. Review conflicts before classes are created.</span></span></a></div></div></div></div><style>\r\n\t\t.modal-dialog-choice {\r\n\t\t\twidth: min(100%, 56rem);\r\n\t\t}\r\n\r\n\t\t.record-classes-choice-body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.choice-option-cards {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: repeat(3, minmax(0, 1fr));\r\n\t\t\tgap: var(--space-3);\r\n\t\t\talign-items: stretch;\r\n\t\t}\r\n\r\n\t\t.choice-option-card {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tbox-sizing: border-box;\r\n\t\t\theight: 100%;\r\n\t\t\tmargin: 0;\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tborder: 2px solid var(--color-border);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\ttext-decoration: none;\r\n\t\t\tcolor: inherit;\r\n\t\t\tcursor: pointer;\r\n\t\t\tfont: inherit;\r\n\t\t\ttext-align: left;\r\n\t\t\twidth: 100%;\r\n\t\t\ttransition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);\r\n\t\t}\r\n\r\n\t\tbutton.choice-option-card {\r\n\t\t\tdisplay: flex;\r\n\t\t\tmargin-top: 0;\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tcolor: inherit;\r\n\t\t}\r\n\r\n\t\t.choice-option-card:hover,\r\n\t\tbutton.choice-option-card:hover {\r\n\t\t\tborder-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border));\r\n\t\t\tbackground: var(--color-primary-light);\r\n\t\t\tbackground-color: var(--color-primary-light);\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\ttransform: translateY(-1px);\r\n\t\t\ttext-decoration: none;\r\n\t\t}\r\n\r\n\t\tbutton.choice-option-card:active:not(:disabled) {\r\n\t\t\ttransform: translateY(-1px);\r\n\t\t}\r\n\r\n\t\t.choice-option-card:focus-visible {\r\n\t\t\toutline: 2px solid var(--color-ring);\r\n\t\t\toutline-offset: 2px;\r\n\t\t}\r\n\r\n\t\t.choice-option-card__icon {\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 2.75rem;\r\n\t\t\theight: 2.75rem;\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t}\r\n\r\n\t\t.choice-option-card__icon--upcoming {\r\n\t\t\tbackground: var(--color-primary-light);\r\n\t\t\tcolor: var(--color-primary-hover);\r\n\t\t}\r\n\r\n\t\t.choice-option-card__icon--repeat {\r\n\t\t\tbackground: var(--color-info-bg);\r\n\t\t\tcolor: var(--color-info);\r\n\t\t}\r\n\r\n\t\t.choice-option-card__icon--past {\r\n\t\t\tbackground: var(--color-success-bg);\r\n\t\t\tcolor: var(--color-success);\r\n\t\t}\r\n\r\n\t\t.choice-option-card__body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tflex: 1;\r\n\t\t\tmin-width: 0;\r\n\t\t\theight: 100%;\r\n\t\t}\r\n\r\n\t\t.choice-option-card__title {\r\n\t\t\tdisplay: block;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.choice-option-card__desc {\r\n\t\t\tdisplay: block;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t\tline-height: 1.45;\r\n\t\t}\r\n\r\n\t\t.choice-option-card__desc strong {\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t@media (max-width: 640px) {\r\n\t\t\t.choice-option-cards {\r\n\t\t\t\tgrid-template-columns: 1fr;\r\n\t\t\t}\r\n\t\t}\r\n\t</style><script>\r\n\t\t(function () {\r\n\t\t\tconst modal = document.getElementById('recordClassesChoiceModal');\r\n\t\t\tif (!modal) return;\r\n\r\n\t\t\tlet triggerEl = null;\r\n\r\n\t\t\tfunction getFocusables() {\r\n\t\t\t\treturn Array.from(modal.querySelectorAll(\r\n\t\t\t\t\t'a[href], button:not([disabled]), [tabindex]:not([tabindex=\"-1\"])'\r\n\t\t\t\t)).filter((el) => !el.hidden && el.offsetParent !== null);\r\n\t\t\t}\r\n\r\n\t\t\tfunction trapFocus(e) {\r\n\t\t\t\tif (modal.hidden || e.key !== 'Tab') return;\r\n\t\t\t\tconst focusables = getFocusables();\r\n\t\t\t\tif (!focusables.length) return;\r\n\t\t\t\tconst first = focusables[0];\r\n\t\t\t\tconst last = focusables[focusables.length - 1];\r\n\t\t\t\tif (e.shiftKey && document.activeElement === first) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\tlast.focus();\r\n\t\t\t\t} else if (!e.shiftKey && document.activeElement === last) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\tfirst.focus();\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction openModal(trigger) {\r\n\t\t\t\tdocument.querySelectorAll('.nav-dropdown[open]').forEach(function (dropdown) {\r\n\t\t\t\t\tdropdown.open = false;\r\n\t\t\t\t});\r\n\t\t\t\ttriggerEl = trigger || document.activeElement;\r\n\t\t\t\tmodal.hidden = false;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\trequestAnimationFrame(() => {\r\n\t\t\t\t\tconst firstCard = modal.querySelector('.choice-option-card');\r\n\t\t\t\t\tif (firstCard) firstCard.focus();\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\twindow.openRecordClassesChoiceModal = openModal;\r\n\r\n\t\t\tfunction closeModal() {\r\n\t\t\t\tmodal.hidden = true;\r\n\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\tif (triggerEl && typeof triggerEl.focus === 'function') {\r\n\t\t\t\t\ttriggerEl.focus();\r\n\t\t\t\t}\r\n\t\t\t\ttriggerEl = null;\r\n\t\t\t}\r\n\r\n\t\t\tdocument.addEventListener('click', (e) => {\r\n\t\t\t\tconst trigger = e.target.closest('[data-open-record-classes-modal]');\r\n\t\t\t\tif (!trigger) return;\r\n\t\t\t\te.preventDefault();\r\n\t\t\t\tif (trigger.closest('[data-nav-group-modal]')) {\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\topenModal(trigger);\r\n\t\t\t});\r\n\r\n\t\t\tmodal.querySelectorAll('.record-classes-choice-close').forEach((btn) => {\r\n\t\t\t\tbtn.addEventListener('click', closeModal);\r\n\t\t\t});\r\n\r\n\t\t\tmodal.addEventListener('click', (e) => {\r\n\t\t\t\tif (e.target === modal) closeModal();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', (e) => {\r\n\t\t\t\tif (e.key === 'Escape' && !modal.hidden) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\tcloseModal();\r\n\t\t\t\t}\r\n\t\t\t\ttrapFocus(e);\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -92,9 +145,9 @@ func RecordClassesChoiceIconUpcoming() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var3 == nil {
-			templ_7745c5c3_Var3 = templ.NopComponent
+		templ_7745c5c3_Var4 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var4 == nil {
+			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect width=\"18\" height=\"18\" x=\"3\" y=\"4\" rx=\"2\" ry=\"2\"></rect> <line x1=\"16\" x2=\"16\" y1=\"2\" y2=\"6\"></line> <line x1=\"8\" x2=\"8\" y1=\"2\" y2=\"6\"></line> <line x1=\"3\" x2=\"21\" y1=\"10\" y2=\"10\"></line> <path d=\"M8 14h.01\"></path> <path d=\"M12 14h.01\"></path> <path d=\"M16 14h.01\"></path></svg>")
@@ -121,9 +174,9 @@ func RecordClassesChoiceIconRepeat() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var4 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var4 == nil {
-			templ_7745c5c3_Var4 = templ.NopComponent
+		templ_7745c5c3_Var5 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var5 == nil {
+			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M8 2v4\"></path> <path d=\"M16 2v4\"></path> <rect width=\"18\" height=\"18\" x=\"3\" y=\"4\" rx=\"2\"></rect> <path d=\"M3 10h18\"></path> <path d=\"m17 14-2 2 2 2\"></path> <path d=\"M7 18h10\"></path></svg>")
@@ -150,9 +203,9 @@ func RecordClassesChoiceIconPast() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var5 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var5 == nil {
-			templ_7745c5c3_Var5 = templ.NopComponent
+		templ_7745c5c3_Var6 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var6 == nil {
+			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\"></path> <path d=\"M3 3v5h5\"></path> <path d=\"M12 7v5l4 2\"></path></svg>")

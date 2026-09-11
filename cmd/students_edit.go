@@ -538,7 +538,7 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		}
 		notifyNewlyAssignedTeachers(ctx, user, req.Name, beforeIDs, teacherIDs)
 
-		if _, err := fmt.Fprint(w, "Student updated successfully!\n"); err != nil {
+		if err := respondFormMutation(w, "Student updated successfully!", "/students"); err != nil {
 			sendErrorLog(w, err.Error())
 		}
 		return
@@ -585,7 +585,7 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 	updated, _ := dbRW.GetQueries().GetStudentByID(ctx, studentID)
 	insertAuditLogAs(ctx, user, "students", formatStudentAudit(existing, updated, teachersBefore, teachersBefore))
 
-	if _, err := fmt.Fprint(w, "Student updated successfully!\n"); err != nil {
+	if err := respondFormMutation(w, "Student updated successfully!", "/students"); err != nil {
 		sendErrorLog(w, err.Error())
 	}
 }

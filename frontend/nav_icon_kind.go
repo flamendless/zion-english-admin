@@ -13,6 +13,7 @@ const (
 	NavIconClasses          NavIconKind = "classes"
 	NavIconSchedule         NavIconKind = "schedule"
 	NavIconScheduleSeries   NavIconKind = "schedule-series"
+	NavIconRecordClass      NavIconKind = "record-class"
 	NavIconReports          NavIconKind = "reports"
 	NavIconAnalytics        NavIconKind = "analytics"
 	NavIconProcess          NavIconKind = "process"
@@ -77,6 +78,7 @@ var navIconToneByKind = map[NavIconKind]NavIconTone{
 	NavIconClasses:        NavIconTonePrimary,
 	NavIconSchedule:       NavIconTonePrimary,
 	NavIconScheduleSeries: NavIconToneInfo,
+	NavIconRecordClass:      NavIconToneSuccess,
 	NavIconReports:        NavIconToneInfo,
 	NavIconAnalytics:      NavIconToneInfo,
 	NavIconProcess:        NavIconToneWarning,

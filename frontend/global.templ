@@ -964,10 +964,28 @@ templ GlobalIncludes() {
 			transition: background-color var(--transition-fast), color var(--transition-fast);
 		}
 
-		.nav-dropdown-link:hover {
+		.nav-dropdown-link:hover,
+		button.nav-dropdown-link:hover {
 			background-color: var(--color-primary-light);
 			color: var(--color-primary-hover);
 			text-decoration: none;
+		}
+
+		button.nav-dropdown-link {
+			display: block;
+			width: 100%;
+			margin: 0;
+			margin-top: 0;
+			padding: var(--space-2) var(--space-3);
+			border: none;
+			border-radius: var(--radius-sm);
+			background: transparent;
+			color: var(--color-foreground);
+			text-align: left;
+			cursor: pointer;
+			font-size: 0.875rem;
+			font-weight: 500;
+			white-space: nowrap;
 		}
 
 		.header-section h1 {
@@ -1262,6 +1280,20 @@ templ GlobalIncludes() {
 		.rate-pill-currency {
 			font-weight: 500;
 			opacity: 0.9;
+		}
+
+		.duration-pill {
+			gap: var(--space-1);
+			font-variant-numeric: tabular-nums;
+		}
+
+		.duration-pill-icon {
+			flex-shrink: 0;
+			opacity: 0.85;
+		}
+
+		.duration-pill-value {
+			font-weight: 600;
 		}
 
 		.connection-logo-pill {
@@ -2729,7 +2761,7 @@ templ GlobalIncludes() {
 		.scheduled-class-detail-meta {
 			margin: 0;
 			display: grid;
-			grid-template-columns: repeat(3, minmax(0, 1fr));
+			grid-template-columns: repeat(4, minmax(0, 1fr));
 			gap: var(--space-3);
 			padding: var(--space-4);
 		}
@@ -2763,7 +2795,8 @@ templ GlobalIncludes() {
 		}
 
 		.scheduled-class-detail-row dd .rate-pill,
-		.scheduled-class-detail-row dd .time-range-pill {
+		.scheduled-class-detail-row dd .time-range-pill,
+		.scheduled-class-detail-row dd .duration-pill-wrap {
 			display: inline-flex;
 			justify-content: flex-start;
 		}
@@ -2788,10 +2821,7 @@ templ GlobalIncludes() {
 		}
 
 		.scheduled-class-modal-form .time-range-group {
-			display: flex;
-			flex-direction: column;
-			gap: var(--space-4);
-			grid-template-columns: none;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
 
 		.scheduled-class-modal-form .modal-footer,
@@ -3226,46 +3256,56 @@ templ GlobalIncludes() {
 
 		.time-range-group {
 			display: grid;
-			grid-template-columns: 1fr 1fr;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
 			gap: var(--space-4);
 			align-items: start;
 		}
 
-		.time-range-separator {
-			padding-bottom: 0.65rem;
-			color: var(--color-muted-foreground);
-			font-weight: 500;
-			text-align: center;
+		.time-range-group .time-input-wrap {
+			min-width: 0;
+			width: 100%;
 		}
 
 		.time-input-wrap input[type="time"] {
 			width: 100%;
 			font-size: 1rem;
 			padding: 0.65rem 0.75rem;
+			box-sizing: border-box;
 		}
 
-		.duration-preview[hidden] {
+		.duration-bridge[hidden] {
 			display: none;
 		}
 
-		.duration-preview {
-			display: inline-flex;
+		.duration-bridge {
+			display: flex;
 			align-items: center;
+			justify-content: flex-start;
 			gap: var(--space-2);
-			margin-bottom: var(--space-4);
-			padding: 0.5rem 0.75rem;
-			background: var(--color-primary-light);
-			border: 1px solid var(--color-border);
-			border-radius: var(--radius-sm);
-			font-size: 0.875rem;
-			color: var(--color-foreground);
-			min-height: 2.5rem;
+			width: 100%;
+			min-height: 2rem;
+			margin-top: var(--space-1);
 		}
 
-		.duration-preview.is-invalid {
-			background: var(--color-error-bg);
-			border-color: var(--color-destructive);
-			color: var(--color-destructive);
+		.duration-bridge-label {
+			flex-shrink: 0;
+			font-size: 0.875rem;
+			font-weight: 500;
+			color: var(--color-muted-foreground);
+		}
+
+		.duration-bridge .duration-pill {
+			white-space: nowrap;
+		}
+
+		.duration-pill--pending .duration-pill-value {
+			opacity: 0.65;
+		}
+
+		.duration-bridge--invalid .duration-pill {
+			white-space: normal;
+			text-align: center;
+			max-width: 16rem;
 		}
 
 		.list-toolbar {
@@ -4159,10 +4199,6 @@ templ GlobalIncludes() {
 				grid-template-columns: 1fr;
 			}
 
-			.time-range-separator {
-				display: none;
-			}
-
 			.toolbar {
 				flex-direction: column;
 				align-items: stretch;
@@ -4342,6 +4378,7 @@ templ GlobalIncludes() {
 	@ScrHyperscript()
 	@ScrClock()
 	@SuccessBannerHandlers()
+	@ListRefreshHandlers()
 	@CsrfHandlers()
 	@ErrorBannerHandlers()
 	@ScrClipboardHelpers()

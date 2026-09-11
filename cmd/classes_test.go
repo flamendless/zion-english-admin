@@ -7,7 +7,7 @@ import (
 	"zion-english/internal/models"
 )
 
-func TestValidateClassRecordRequestZeroesRateForCancelledOrRescheduled(t *testing.T) {
+func TestValidateClassRecordRequestRateByStatus(t *testing.T) {
 	tests := []struct {
 		name       string
 		status     string
@@ -39,16 +39,16 @@ func TestValidateClassRecordRequestZeroesRateForCancelledOrRescheduled(t *testin
 			errContain: "rate must be greater than zero",
 		},
 		{
-			name:     "cancelled zeroes rate",
+			name:     "cancelled keeps rate",
 			status:   string(constants.ClassStatusCancelled),
 			rate:     250,
-			wantRate: 0,
+			wantRate: 250,
 		},
 		{
-			name:     "rescheduled zeroes rate",
+			name:     "rescheduled keeps rate",
 			status:   string(constants.ClassStatusRescheduled),
 			rate:     180,
-			wantRate: 0,
+			wantRate: 180,
 		},
 	}
 

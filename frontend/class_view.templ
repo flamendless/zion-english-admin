@@ -29,7 +29,9 @@ templ ClassViewModal(data EditClassData) {
 						<div class="class-view-meta-row">
 							@ClassViewMetaPill("Date", data.Date, PillToneInfo)
 							@ClassViewMetaPill("Time", data.TimeRangeLabel(), PillTonePrimary)
-							@ClassViewMetaPill("Duration", formatDurationMinutes(data.DurationMinutes), PillToneWarning)
+							<span class="class-view-meta-pill class-view-meta-pill--duration" title="Duration">
+								@DurationPill(formatDurationMinutes(data.DurationMinutes))
+							</span>
 							@ClassViewRateMetaPill(data.Rate, data.Currency)
 						</div>
 					</div>
@@ -131,6 +133,13 @@ templ ClassViewModalStyles() {
 		}
 
 		.class-view-meta-pill--rate .rate-pill {
+			width: 100%;
+			justify-content: center;
+			padding: 6px 8px;
+			font-size: 0.75rem;
+		}
+
+		.class-view-meta-pill--duration .duration-pill {
 			width: 100%;
 			justify-content: center;
 			padding: 6px 8px;

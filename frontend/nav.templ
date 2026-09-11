@@ -9,15 +9,23 @@ templ NavDropdown(group NavGroup) {
 		</summary>
 		<div class="nav-dropdown-panel" role="menu">
 			for _, item := range group.Items {
-				<a
-					href={ utils.URL(item.Path) }
-					id={ item.LinkID }
-					class="nav-dropdown-link"
-					role="menuitem"
-				>{ item.Title }</a>
+				@NavDropdownItem(item)
 			}
 		</div>
 	</details>
+}
+
+templ NavDropdownItem(item NavItem) {
+	if item.Action == NavItemActionRecordClasses {
+		<button type="button" class="nav-dropdown-link" data-open-record-classes-modal role="menuitem">{ item.Title }</button>
+	} else {
+		<a
+			href={ utils.URL(item.Path) }
+			id={ item.LinkID }
+			class="nav-dropdown-link"
+			role="menuitem"
+		>{ item.Title }</a>
+	}
 }
 
 templ NavDropdownScript() {
@@ -109,17 +117,27 @@ templ NavGroupChoiceModal(group NavGroup) {
 }
 
 templ NavGroupChoiceCard(item NavItem) {
-	<a href={ utils.URL(item.Path) } class="choice-option-card">
-		@NavChoiceIcon(item.Icon)
-		<span class="choice-option-card__body">
-			if item.AdminOnlyCard {
-				@AdminOnlyCardTitle(item.Title)
-			} else {
+	if item.Action == NavItemActionRecordClasses {
+		<button type="button" class="choice-option-card" data-open-record-classes-modal>
+			@NavChoiceIcon(item.Icon)
+			<span class="choice-option-card__body">
 				<span class="choice-option-card__title">{ item.Title }</span>
-			}
-			<span class="choice-option-card__desc">{ item.Description }</span>
-		</span>
-	</a>
+				<span class="choice-option-card__desc">{ item.Description }</span>
+			</span>
+		</button>
+	} else {
+		<a href={ utils.URL(item.Path) } class="choice-option-card">
+			@NavChoiceIcon(item.Icon)
+			<span class="choice-option-card__body">
+				if item.AdminOnlyCard {
+					@AdminOnlyCardTitle(item.Title)
+				} else {
+					<span class="choice-option-card__title">{ item.Title }</span>
+				}
+				<span class="choice-option-card__desc">{ item.Description }</span>
+			</span>
+		</a>
+	}
 }
 
 templ NavGroupChoiceModalScript() {
@@ -181,6 +199,16 @@ templ NavGroupChoiceModalScript() {
 				if (trigger) {
 					e.preventDefault();
 					openNavGroupModal(trigger.getAttribute('data-open-nav-group-modal'), trigger);
+					return;
+				}
+				if (e.target.closest('[data-open-record-classes-modal]') && openModal) {
+					const returnTrigger = triggerEl;
+					openModal.hidden = true;
+					openModal = null;
+					triggerEl = null;
+					if (typeof window.openRecordClassesChoiceModal === 'function') {
+						window.openRecordClassesChoiceModal(returnTrigger);
+					}
 					return;
 				}
 				if (e.target.closest('.nav-group-choice-close')) {

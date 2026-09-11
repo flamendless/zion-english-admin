@@ -20,14 +20,11 @@ templ ConductClassWizardModal(data ClassWizardPageData) {
 			<div class="modal-header">
 				<div class="wizard-header-text">
 					<h3 id="conductClassWizardTitle">Record a past class</h3>
-					<p class="wizard-step-label" id="conductWizardStepLabel" aria-live="polite">Step 1 of 7</p>
+					<p class="wizard-step-label" id="conductWizardStepLabel" aria-live="polite">Step 1 of 8</p>
 				</div>
 				<button type="button" class="modal-close class-wizard-close" data-wizard="conduct" data-tooltip="Close" aria-label="Close">&times;</button>
 			</div>
 			<form id="conductClassWizardForm" class="class-wizard-form" novalidate data-lock-teacher={ fmt.Sprintf("%t", data.LockTeacher) }>
-				<input type="hidden" id="conductWizard_rate" name="rate" value="0"/>
-				<input type="hidden" id="conductWizard_currency" name="currency" value=""/>
-
 				<div class="modal-body class-wizard-body">
 					<div id="conductWizardMessage" class="form-message" role="alert" aria-live="assertive" hidden></div>
 
@@ -56,17 +53,22 @@ templ ConductClassWizardModal(data ClassWizardPageData) {
 						@WizardTimeRangeFields("conductWizard", "", "", false)
 					</div>
 
-					<div class="wizard-step" data-step="4">
+					<div class="wizard-step" data-step="4" data-required="true">
+						<p class="wizard-step-lead">Set the class rate and currency.</p>
+						@WizardRateCurrencyFields("conductWizard")
+					</div>
+
+					<div class="wizard-step" data-step="5">
 						<p class="wizard-step-lead">Attach learning materials if needed. This step is optional.</p>
 						@ClassLearningMaterialPicker(nil, "conductWizard")
 					</div>
 
-					<div class="wizard-step" data-step="5">
+					<div class="wizard-step" data-step="6">
 						<p class="wizard-step-lead">Was this a trial class?</p>
 						@TrialClassYesNoRadios("conductWizard")
 					</div>
 
-					<div class="wizard-step" data-step="6">
+					<div class="wizard-step" data-step="7">
 						<p class="wizard-step-lead">Add any lesson notes. This step is optional.</p>
 						<div class="form-group">
 							<label for="conductWizard_notes">Notes</label>
@@ -74,7 +76,7 @@ templ ConductClassWizardModal(data ClassWizardPageData) {
 						</div>
 					</div>
 
-					<div class="wizard-step" data-step="7">
+					<div class="wizard-step" data-step="8">
 						<p class="wizard-step-lead">Review the details below, then save.</p>
 						@ClassWizardSummaryCard("conductWizardSummary", data.ShowAllTeachers)
 					</div>
@@ -273,7 +275,30 @@ templ WizardTimeRangeFields(prefix string, startTime string, endTime string, rea
 			@WizardTimeInput(prefix + "_start_time", "start_time", "Start time *", startTime, readonly)
 			@WizardTimeInput(prefix + "_end_time", "end_time", "End time *", endTime, readonly)
 		</div>
-		<div class="duration-preview" id={ prefix + "_durationPreview" } aria-live="polite" hidden></div>
+		@DurationPreview(prefix + "_durationPreview")
+	</div>
+}
+
+templ WizardCurrencyDropdown(prefix string) {
+	<div class="form-group">
+		<label for={ prefix + "_currency" }>Currency *</label>
+		<select id={ prefix + "_currency" } name="currency" required>
+			<option value="">-- Select Currency --</option>
+			<option value="KRW">KRW (Korean Won)</option>
+			<option value="CAD">CAD (Canadian Dollar)</option>
+			<option value="YEN">YEN (Japanese Yen)</option>
+			<option value="PHP">PHP (Philippine Peso)</option>
+		</select>
+	</div>
+}
+
+templ WizardRateCurrencyFields(prefix string) {
+	<div class="form-row">
+		@WizardCurrencyDropdown(prefix)
+		<div class="form-group">
+			<label for={ prefix + "_rate" }>Rate *</label>
+			<input type="number" id={ prefix + "_rate" } name="rate" required min="0" step="0.01" placeholder="0.00"/>
+		</div>
 	</div>
 }
 
@@ -390,6 +415,10 @@ templ ClassWizardSummaryCard(cardID string, showTeacher bool) {
 			<div class="class-wizard-summary-row">
 				<dt>Time</dt>
 				<dd data-field="time">-</dd>
+			</div>
+			<div class="class-wizard-summary-row">
+				<dt>Duration</dt>
+				<dd data-field="duration">-</dd>
 			</div>
 			<div class="class-wizard-summary-row">
 				<dt>Rate</dt>
@@ -767,7 +796,7 @@ templ ClassWizardScript() {
 					saveId: 'conductWizardSave',
 					messageId: 'conductWizardMessage',
 					summaryId: 'conductWizardSummary',
-					totalSteps: 7,
+					totalSteps: 8,
 					postURL: buildURL('/classes/record'),
 					showStatus: true,
 					showNotes: true,
@@ -811,6 +840,69 @@ templ ClassWizardScript() {
 					'<span class="rate-pill-amount">' + escapeHtml(rate) + '</span>' +
 					'<span class="rate-pill-currency">' + escapeHtml(currency) + '</span>' +
 					'</span>';
+			}
+
+			function fillDurationPill(el, label) {
+				if (!el) return;
+				el.innerHTML =
+					'<span class="duration-pill-wrap" aria-label="Duration: ' + escapeHtml(label) + '">' +
+					'<span class="pill pill--neutral duration-pill">' +
+					'<svg class="duration-pill-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+					'<circle cx="12" cy="12" r="10"></circle>' +
+					'<polyline points="12 6 12 12 16 14"></polyline>' +
+					'</svg>' +
+					'<span class="duration-pill-value">' + escapeHtml(label) + '</span>' +
+					'</span>' +
+					'</span>';
+			}
+
+			function formatDurationLabel(minutes) {
+				if (minutes < 60) return minutes + ' min';
+				const h = Math.floor(minutes / 60);
+				const m = minutes % 60;
+				return m === 0 ? h + ' hr' : h + ' hr ' + m + ' min';
+			}
+
+			function updateWizardDurationPreview(form, stepEl) {
+				if (!form) return;
+				const scope = stepEl || form.querySelector('.wizard-step.is-active') || form;
+				const bridge = scope.querySelector('.duration-bridge');
+				const start = scope.querySelector('[name="start_time"]');
+				const end = scope.querySelector('[name="end_time"]');
+				if (!bridge || !start || !end) return;
+
+				const pill = bridge.querySelector('.duration-pill');
+				const valueEl = bridge.querySelector('.duration-pill-value');
+				const icon = bridge.querySelector('.duration-pill-icon');
+				const startMin = parseTimeToMinutes(start.value);
+				const endMin = parseTimeToMinutes(end.value);
+
+				bridge.removeAttribute('hidden');
+
+				if (startMin === null || endMin === null || !start.value || !end.value) {
+					bridge.classList.remove('duration-bridge--invalid');
+					bridge.setAttribute('aria-label', 'Duration');
+					if (pill) pill.className = 'pill pill--neutral duration-pill duration-pill--pending';
+					if (icon) icon.hidden = false;
+					if (valueEl) valueEl.textContent = '-';
+					return;
+				}
+
+				if (endMin <= startMin) {
+					bridge.classList.add('duration-bridge--invalid');
+					bridge.setAttribute('aria-label', 'End time must be after start time');
+					if (pill) pill.className = 'pill pill--error duration-pill';
+					if (icon) icon.hidden = true;
+					if (valueEl) valueEl.textContent = 'Invalid';
+					return;
+				}
+
+				const label = formatDurationLabel(endMin - startMin);
+				bridge.classList.remove('duration-bridge--invalid');
+				bridge.setAttribute('aria-label', 'Duration: ' + label);
+				if (pill) pill.className = 'pill pill--neutral duration-pill';
+				if (icon) icon.hidden = false;
+				if (valueEl) valueEl.textContent = label;
 			}
 
 			function getSelectedOptionLabel(selectEl) {
@@ -898,6 +990,16 @@ templ ClassWizardScript() {
 					return true;
 				}
 
+				if (kind === 'conduct' && step === 4) {
+					const rate = form.querySelector('[name="rate"]');
+					const currency = form.querySelector('[name="currency"]');
+					if (!currency || !currency.value) return false;
+					if (!rate || rate.value === '' || parseFloat(rate.value) < 0) return false;
+					const status = form.querySelector('input[name="status"]:checked');
+					if (status && status.value === 'conducted' && parseFloat(rate.value) <= 0) return false;
+					return true;
+				}
+
 				if ((kind === 'conduct' && step === 3) || (kind === 'schedule' && step === 2)) {
 					const dateInput = form.querySelector('[name="date"]') || form.querySelector('[name="scheduled_date"]');
 					const start = stepEl.querySelector('[name="start_time"]');
@@ -942,17 +1044,22 @@ templ ClassWizardScript() {
 
 			function showStep(config, state) {
 				const form = document.getElementById(config.formId);
+				const kind = state.kind;
 				if (!form) return;
 				form.querySelectorAll('.wizard-step').forEach(function (step) {
 					const stepNum = parseInt(step.getAttribute('data-step') || '0', 10);
 					step.classList.toggle('is-active', stepNum === state.current);
 				});
+				if (kind === 'conduct' && state.current === 4 && window.applyStudentRateToForm) {
+					window.applyStudentRateToForm(form);
+				}
 				if (state.current === config.totalSteps) {
 					populateSummary(config, state.kind);
 				}
 				updateNav(config, state);
-				if (window.initTimeRangePreview) {
-					window.initTimeRangePreview({ form: form });
+				const stepEl = form.querySelector('.wizard-step[data-step="' + state.current + '"]');
+				if ((kind === 'conduct' && state.current === 3) || (kind === 'schedule' && state.current === 2)) {
+					updateWizardDurationPreview(form, stepEl);
 				}
 			}
 
@@ -969,6 +1076,7 @@ templ ClassWizardScript() {
 				const reasonRow = summary.querySelector('[data-summary-row="reason"]');
 				const dateField = summary.querySelector('[data-field="date"]');
 				const timeField = summary.querySelector('[data-field="time"]');
+				const durationField = summary.querySelector('[data-field="duration"]');
 				const rateField = summary.querySelector('[data-field="rate"]');
 				const materialsField = summary.querySelector('[data-field="materials"]');
 				const materialsRow = summary.querySelector('[data-summary-row="materials"]');
@@ -1003,6 +1111,16 @@ templ ClassWizardScript() {
 				const end = form.querySelector('[name="end_time"]');
 				if (timeField) {
 					fillTimePill(timeField, formatTimeRange(start?.value, end?.value));
+				}
+
+				if (durationField) {
+					const startMins = parseTimeToMinutes(start?.value);
+					const endMins = parseTimeToMinutes(end?.value);
+					if (startMins !== null && endMins !== null && endMins > startMins) {
+						fillDurationPill(durationField, formatDurationLabel(endMins - startMins));
+					} else {
+						durationField.textContent = '-';
+					}
 				}
 
 				const rateInput = form.querySelector('[name="rate"]');
@@ -1041,7 +1159,6 @@ templ ClassWizardScript() {
 					input.addEventListener('change', function () {
 						const reasonGroup = form.querySelector('#conductWizard_reasonGroup');
 						const reason = form.querySelector('[name="reason"]');
-						const rate = form.querySelector('[name="rate"]');
 						if (!reasonGroup || !reason) return;
 						if (input.value === 'conducted') {
 							reasonGroup.hidden = true;
@@ -1049,7 +1166,6 @@ templ ClassWizardScript() {
 							if (window.applyStudentRateToForm) window.applyStudentRateToForm(form);
 						} else {
 							reasonGroup.hidden = false;
-							if (rate) rate.value = '0';
 						}
 						const state = form._wizardState;
 						if (state) updateNav(configs.conduct, state);
@@ -1144,10 +1260,7 @@ templ ClassWizardScript() {
 
 				modal.hidden = false;
 				document.body.classList.add('modal-open');
-
-				if (window.initTimeRangePreview) {
-					window.initTimeRangePreview({ form: form });
-				}
+				updateWizardDurationPreview(form);
 
 				requestAnimationFrame(function () {
 					const active = form.querySelector('.wizard-step.is-active input, .wizard-step.is-active select, .wizard-step.is-active textarea, .wizard-step.is-active button');
@@ -1203,12 +1316,24 @@ templ ClassWizardScript() {
 					}
 					closeWizard(kind);
 
-					if (kind === 'conduct' && typeof htmx !== 'undefined') {
-						const tableBody = document.getElementById('classesTableBody');
-						if (tableBody) htmx.trigger(tableBody, 'load');
+					if (kind === 'conduct') {
+						if (typeof window.refreshClassesTable === 'function') {
+							window.refreshClassesTable();
+						} else if (typeof htmx !== 'undefined') {
+							htmx.trigger(document.body, 'classesRefresh');
+						}
 					}
-					if (kind === 'schedule' && typeof window.refreshCalendar === 'function') {
-						window.refreshCalendar();
+					if (kind === 'schedule') {
+						if (typeof window.refreshScheduleList === 'function') {
+							window.refreshScheduleList();
+						} else if (typeof htmx !== 'undefined') {
+							htmx.trigger(document.body, 'scheduleRefresh');
+						}
+						if (typeof window.refreshScheduleCalendar === 'function') {
+							window.refreshScheduleCalendar();
+						} else if (typeof htmx !== 'undefined') {
+							htmx.trigger(document.body, 'refreshScheduleCalendar');
+						}
 					}
 				} catch (err) {
 					showWizardMessage(config, err.message || 'Request failed', true);
@@ -1236,20 +1361,26 @@ templ ClassWizardScript() {
 				}
 				if (kind === 'schedule') {
 					wireAdminTeacherSearch(form, kind);
-					form.querySelectorAll('[name="start_time"], [name="end_time"]').forEach(function (input) {
-						input.addEventListener('change', function () { updateScheduleZoomWarning(form); });
-						input.addEventListener('input', function () { updateScheduleZoomWarning(form); });
-					});
 				}
 
 				updateNav(config, state);
 
-				form.addEventListener('input', function () {
-					const stepEl = form.querySelector('.wizard-step.is-active');
-					updateNav(config, form._wizardState);
+				form.addEventListener('input', function (e) {
+					const target = e.target;
+					if (target && (target.name === 'start_time' || target.name === 'end_time')) {
+						const stepEl = target.closest('.wizard-step');
+						updateWizardDurationPreview(form, stepEl);
+						if (kind === 'schedule') updateScheduleZoomWarning(form);
+					}
+					if (form._wizardState) updateNav(config, form._wizardState);
 				});
-				form.addEventListener('change', function () {
-					const stepEl = form.querySelector('.wizard-step.is-active');
+				form.addEventListener('change', function (e) {
+					const target = e.target;
+					if (target && (target.name === 'start_time' || target.name === 'end_time')) {
+						const stepEl = target.closest('.wizard-step');
+						updateWizardDurationPreview(form, stepEl);
+						if (kind === 'schedule') updateScheduleZoomWarning(form);
+					}
 					if (form._wizardState) updateNav(config, form._wizardState);
 					if (window.applyStudentRateToForm) window.applyStudentRateToForm(form);
 				});

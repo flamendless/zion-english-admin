@@ -290,7 +290,7 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 			fmt.Sprintf("Class record updated for student on %s (status %s)", updated.Date, updated.Status))
 	}
 
-	if _, err := fmt.Fprint(w, "Class updated successfully!\n"); err != nil {
+	if err := respondFormMutation(w, "Class updated successfully!", "/classes", "classesRefresh"); err != nil {
 		sendErrorLog(w, err.Error())
 	}
 }
@@ -750,7 +750,7 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 	notifyCrossParty(ctx, actor, req.TeacherID, teacherNameByID(ctx, req.TeacherID), notifications.KindClassRecorded,
 		fmt.Sprintf("Class recorded for student on %s (status %s)", req.Date, req.Status))
 
-	if _, err := fmt.Fprint(w, "Class recorded successfully!\n"); err != nil {
+	if err := respondFormMutation(w, "Class recorded successfully!", "", "classesRefresh"); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
@@ -798,7 +798,6 @@ func validateClassRecordRequest(req *models.ClassRecordRequest) error {
 		return errors.New("duration must be greater than zero")
 	}
 	models.ApplyTrialClassRate(req)
-	models.NormalizeClassRecordRate(req)
 	if req.Rate < 0 {
 		return errors.New("rate cannot be negative")
 	}

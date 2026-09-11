@@ -179,7 +179,7 @@ func handleScheduleCreate(w http.ResponseWriter, r *http.Request) {
 	notifyCrossParty(ctx, actor, req.TeacherID, teacherNameByID(ctx, req.TeacherID), notifications.KindScheduleChanged,
 		fmt.Sprintf("Class scheduled for %s", req.ScheduledDate))
 
-	if _, err := fmt.Fprint(w, "Class scheduled successfully!\n"); err != nil {
+	if err := respondFormMutation(w, "Class scheduled successfully!", "", "scheduleRefresh", "refreshScheduleCalendar"); err != nil {
 		sendErrorLog(w, err.Error())
 	}
 }
@@ -1216,7 +1216,6 @@ func classRecordRequestFromSchedule(existing queries.GetScheduledClassByIDRow, s
 		Reason:          reason,
 		Notes:           notes,
 	}
-	models.NormalizeClassRecordRate(&req)
 	return req
 }
 
@@ -1273,7 +1272,7 @@ func respondScheduledClassAction(w http.ResponseWriter, from, message string) {
 	case string(frontend.ClassActionContextScheduleSeries):
 		w.Header().Set("HX-Trigger", "scheduleSeriesRefresh")
 	default:
-		w.Header().Set("HX-Trigger", "classesRefresh")
+		setListRefreshTriggers(w, "classesRefresh")
 	}
 	if _, err := fmt.Fprint(w, message+"\n"); err != nil {
 		sendErrorLog(w, err.Error())

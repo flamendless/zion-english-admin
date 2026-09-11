@@ -8,10 +8,24 @@ func formatDurationMinutes(minutes int64) string {
 	if minutes <= 0 {
 		return "-"
 	}
-	if minutes == 1 {
-		return "1 min"
+	if minutes < 60 {
+		if minutes == 1 {
+			return "1 min"
+		}
+		return fmt.Sprintf("%d min", minutes)
 	}
-	return fmt.Sprintf("%d min", minutes)
+	hours := minutes / 60
+	remainder := minutes % 60
+	if remainder == 0 {
+		if hours == 1 {
+			return "1 hr"
+		}
+		return fmt.Sprintf("%d hr", hours)
+	}
+	if hours == 1 {
+		return fmt.Sprintf("1 hr %d min", remainder)
+	}
+	return fmt.Sprintf("%d hr %d min", hours, remainder)
 }
 
 func classStatusAccentClass(status constants.ClassListFilterStatus) string {

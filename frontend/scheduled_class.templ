@@ -84,6 +84,7 @@ templ ScheduledClassListItem(item ScheduledClassItemData, zoomLogoURL string, ca
 			</div>
 			<div class="day-class-pills">
 				@TimeRangePill(item.TimeRange)
+				@DurationPill(formatDurationMinutes(item.DurationMinutes))
 				@RatePill(item.Rate, item.Currency)
 				if item.Overdue {
 					@StatusPill("OVERDUE", PillToneError, false)

@@ -54,6 +54,10 @@ templ ScheduledClassDetailCard(cardID string, startHidden bool) {
 				<dd data-field="time"></dd>
 			</div>
 			<div class="scheduled-class-detail-row">
+				<dt>Duration</dt>
+				<dd data-field="duration"></dd>
+			</div>
+			<div class="scheduled-class-detail-row">
 				<dt>Rate</dt>
 				<dd data-field="rate"></dd>
 			</div>
@@ -360,6 +364,20 @@ templ ScheduledClassModalsScript() {
 					'</span>';
 			}
 
+			function fillDurationPill(el, label) {
+				if (!el) return;
+				el.innerHTML =
+					'<span class="duration-pill-wrap" aria-label="Duration: ' + escapeHtml(label) + '">' +
+					'<span class="pill pill--neutral duration-pill">' +
+					'<svg class="duration-pill-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+					'<circle cx="12" cy="12" r="10"></circle>' +
+					'<polyline points="12 6 12 12 16 14"></polyline>' +
+					'</svg>' +
+					'<span class="duration-pill-value">' + escapeHtml(label) + '</span>' +
+					'</span>' +
+					'</span>';
+			}
+
 			function fillTeacherCell(el, trigger) {
 				if (!el || !trigger) return;
 				const name = trigger.getAttribute('data-teacher-name') || '-';
@@ -397,11 +415,13 @@ templ ScheduledClassModalsScript() {
 				const teacherCell = container.querySelector('[data-field="teacher-cell"]');
 				const dateEl = container.querySelector('[data-field="date"]');
 				const timeEl = container.querySelector('[data-field="time"]');
+				const durationEl = container.querySelector('[data-field="duration"]');
 				const rateEl = container.querySelector('[data-field="rate"]');
 				if (studentEl) studentEl.textContent = trigger.getAttribute('data-student-name') || '-';
 				fillTeacherCell(teacherCell, trigger);
 				if (dateEl) dateEl.textContent = trigger.getAttribute('data-scheduled-date') || '-';
 				fillTimePill(timeEl, trigger.getAttribute('data-time-range') || '-');
+				fillDurationPill(durationEl, trigger.getAttribute('data-duration') || '-');
 				fillRatePill(
 					rateEl,
 					trigger.getAttribute('data-rate') || '-',
@@ -632,14 +652,6 @@ templ ScheduledClassModalsScript() {
 				}
 			});
 
-			document.body.addEventListener('classesRefresh', function () {
-				const filterBtn = document.getElementById('filterBtn');
-				if (filterBtn) filterBtn.click();
-			});
-
-			document.body.addEventListener('refreshScheduleCalendar', function () {
-				if (typeof refreshCalendar === 'function') refreshCalendar();
-			});
 		})();
 	</script>
 }

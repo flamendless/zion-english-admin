@@ -18,12 +18,3 @@ func ApplyScheduledTrialClassRate(req *ScheduledClassRequest) {
 	req.Currency = constants.TrialClassCurrency
 }
 
-func NormalizeClassRecordRate(req *ClassRecordRequest) {
-	if req == nil {
-		return
-	}
-	switch constants.ClassStatus(req.Status) {
-	case constants.ClassStatusCancelled, constants.ClassStatusRescheduled:
-		req.Rate = 0
-	}
-}

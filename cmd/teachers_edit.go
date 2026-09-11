@@ -507,7 +507,7 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 	notifyTeacher(ctx, teacherID, teacherName, auth.GetUser(ctx), notifications.KindProfileUpdated,
 		"Your profile was updated by an administrator", "")
 
-	if _, err := fmt.Fprint(w, "Teacher updated successfully!\n"); err != nil {
+	if err := respondFormMutation(w, "Teacher updated successfully!", "/teachers"); err != nil {
 		sendErrorLog(w, err.Error())
 	}
 }

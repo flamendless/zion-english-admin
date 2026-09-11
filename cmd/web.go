@@ -433,6 +433,31 @@ func setSuccessFlash(w http.ResponseWriter, msg string) {
 	http.SetCookie(w, cookie)
 }
 
+func setListRefreshTriggers(w http.ResponseWriter, events ...string) {
+	if len(events) == 0 {
+		return
+	}
+	if len(events) == 1 {
+		w.Header().Set("HX-Trigger", events[0])
+		return
+	}
+	parts := make([]string, 0, len(events))
+	for _, event := range events {
+		parts = append(parts, fmt.Sprintf(`"%s":null`, event))
+	}
+	w.Header().Set("HX-Trigger", "{"+strings.Join(parts, ",")+"}")
+}
+
+func respondFormMutation(w http.ResponseWriter, message, redirectPath string, refreshEvents ...string) error {
+	setSuccessFlash(w, message)
+	setListRefreshTriggers(w, refreshEvents...)
+	if redirectPath != "" {
+		w.Header().Set("HX-Redirect", utils.URL(redirectPath))
+	}
+	_, err := fmt.Fprint(w, message+"\n")
+	return err
+}
+
 func readFlashCookie(w http.ResponseWriter, r *http.Request, name string) string {
 	cookie, err := r.Cookie(name)
 	if err != nil || cookie.Value == "" {
@@ -1037,7 +1062,7 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	notifyTeachers(r.Context(), teacherIDs, teacherNamesMap(r.Context(), teacherIDs), auth.GetUser(r.Context()), notifications.KindStudentRegistered,
 		fmt.Sprintf("New student '%s' was assigned to you", req.Name))
 
-	if _, err := fmt.Fprintf(w, "Student '%s' registered successfully\n", req.Name); err != nil {
+	if err := respondFormMutation(w, fmt.Sprintf("Student '%s' registered successfully", req.Name), "/students"); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
@@ -1252,7 +1277,7 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if isSuperuser {
-		if _, err := fmt.Fprintf(w, "Teacher '%s' registered successfully\n", req.Name); err != nil {
+		if err := respondFormMutation(w, fmt.Sprintf("Teacher '%s' registered successfully", req.Name), "/teachers"); err != nil {
 			sendErrorLog(w, err.Error())
 			return
 		}

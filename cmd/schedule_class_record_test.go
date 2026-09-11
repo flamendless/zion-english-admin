@@ -32,7 +32,7 @@ func TestClassRecordRequestFromSchedulePreservesTrialClass(t *testing.T) {
 	}
 }
 
-func TestClassRecordRequestFromScheduleZeroesRateForCancelled(t *testing.T) {
+func TestClassRecordRequestFromSchedulePreservesRateForCancelled(t *testing.T) {
 	existing := queries.GetScheduledClassByIDRow{
 		StudentID:       1,
 		TeacherID:       2,
@@ -47,7 +47,7 @@ func TestClassRecordRequestFromScheduleZeroesRateForCancelled(t *testing.T) {
 	if err := validateClassRecordRequest(&req); err != nil {
 		t.Fatalf("validateClassRecordRequest() unexpected error: %v", err)
 	}
-	if req.Rate != 0 {
-		t.Fatalf("req.Rate = %v, want 0", req.Rate)
+	if req.Rate != 500 {
+		t.Fatalf("req.Rate = %v, want 500", req.Rate)
 	}
 }

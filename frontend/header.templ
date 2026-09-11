@@ -61,8 +61,12 @@ templ HeaderSimple() {
 	{{
 		role := auth.GetRole(ctx)
 		loggedIn := role != ""
+		classWizard := ClassWizardPageDataForContext(ctx)
 	}}
 	@Header(loggedIn, role)
+	if loggedIn {
+		@RecordClassFlowModals(classWizard)
+	}
 }
 
 templ SuccessBanner() {

@@ -347,6 +347,7 @@ func scheduledClassDetailAttrs(item ScheduledClassItemData) templ.Attributes {
 		"data-teacher-name":   item.TeacherName,
 		"data-scheduled-date": FormatScheduledClassDateDisplay(item.ScheduledDate),
 		"data-time-range":     item.TimeRange,
+		"data-duration":       formatDurationMinutes(item.DurationMinutes),
 		"data-rate":           formatRateAmount(item.Rate, item.Currency),
 		"data-currency":       item.Currency,
 		"data-teacher-initials":      item.TeacherAvatar.Initials,

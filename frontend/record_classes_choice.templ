@@ -2,6 +2,16 @@ package frontend
 
 import "zion-english/internal/utils"
 
+templ RecordClassFlowModals(data ClassWizardPageData) {
+	@ConductClassWizardModal(data)
+	@ScheduleClassWizardModal(data)
+	@RecordClassesChoiceModal()
+	@ScrTimeRangeJS()
+	@ClassWizardScript()
+	@ScrTrialClassJS()
+	@ScrTimeRangeInit()
+}
+
 templ RecordClassesChoiceModal() {
 	<div class="modal-overlay" id="recordClassesChoiceModal" hidden role="presentation">
 		<div class="modal-dialog modal-dialog-choice" role="dialog" aria-modal="true" aria-labelledby="recordClassesChoiceTitle">
@@ -194,6 +204,9 @@ templ RecordClassesChoiceModal() {
 			}
 
 			function openModal(trigger) {
+				document.querySelectorAll('.nav-dropdown[open]').forEach(function (dropdown) {
+					dropdown.open = false;
+				});
 				triggerEl = trigger || document.activeElement;
 				modal.hidden = false;
 				document.body.classList.add('modal-open');
@@ -202,6 +215,8 @@ templ RecordClassesChoiceModal() {
 					if (firstCard) firstCard.focus();
 				});
 			}
+
+			window.openRecordClassesChoiceModal = openModal;
 
 			function closeModal() {
 				modal.hidden = true;
@@ -214,10 +229,12 @@ templ RecordClassesChoiceModal() {
 
 			document.addEventListener('click', (e) => {
 				const trigger = e.target.closest('[data-open-record-classes-modal]');
-				if (trigger) {
-					e.preventDefault();
-					openModal(trigger);
+				if (!trigger) return;
+				e.preventDefault();
+				if (trigger.closest('[data-nav-group-modal]')) {
+					return;
 				}
+				openModal(trigger);
 			});
 
 			modal.querySelectorAll('.record-classes-choice-close').forEach((btn) => {

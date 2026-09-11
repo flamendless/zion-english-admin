@@ -1,0 +1,106 @@
+package frontend
+
+templ ListRefreshHandlers() {
+	<script>
+		(function () {
+			function refreshHTMXTable(bodyId, pageInputId) {
+				if (pageInputId) {
+					const pageInput = document.getElementById(pageInputId);
+					if (pageInput) pageInput.value = '1';
+				}
+				const tableBody = document.getElementById(bodyId);
+				if (tableBody && typeof htmx !== 'undefined') {
+					htmx.trigger(tableBody, 'load');
+				}
+			}
+
+			window.refreshClassesTable = function () {
+				const classesPage = document.getElementById('classesPage');
+				if (classesPage) classesPage.value = '1';
+				const filterBtn = document.getElementById('filterBtn');
+				if (filterBtn) {
+					filterBtn.click();
+					return;
+				}
+				if (typeof htmx !== 'undefined') {
+					htmx.trigger(document.body, 'classesRefresh');
+					return;
+				}
+				refreshHTMXTable('classesTableBody', 'classesPage');
+			};
+
+			window.refreshDocumentsTable = function () {
+				refreshHTMXTable('documentsTableBody', null);
+			};
+
+			window.refreshReportsTable = function () {
+				refreshHTMXTable('reportsTableBody', null);
+			};
+
+			window.refreshScheduleList = function () {
+				const todayScheduleList = document.getElementById('todayScheduleList');
+				if (todayScheduleList && typeof htmx !== 'undefined') {
+					htmx.trigger(todayScheduleList, 'scheduleRefresh');
+				}
+			};
+
+			window.refreshScheduleCalendar = function () {
+				if (typeof refreshCalendar === 'function') refreshCalendar();
+			};
+
+			function reloadIfOnPath(pathSegment) {
+				if (window.location.pathname.includes(pathSegment)) {
+					window.location.reload();
+				}
+			}
+
+			function bindListRefreshHandlers() {
+				if (window.__listRefreshBound) return;
+				window.__listRefreshBound = true;
+
+				document.addEventListener('classesRefresh', function () {
+					const classesPage = document.getElementById('classesPage');
+					if (classesPage) classesPage.value = '1';
+				}, true);
+
+				document.addEventListener('documentsRefresh', function () {
+					window.refreshDocumentsTable();
+				});
+
+				document.addEventListener('reportsRefresh', function () {
+					window.refreshReportsTable();
+				});
+
+				document.addEventListener('scheduleRefresh', function () {
+					window.refreshScheduleList();
+				});
+
+				document.addEventListener('refreshScheduleCalendar', function () {
+					window.refreshScheduleCalendar();
+				});
+
+				document.addEventListener('studentsRefresh', function () {
+					reloadIfOnPath('/students');
+				});
+
+				document.addEventListener('teachersRefresh', function () {
+					reloadIfOnPath('/teachers');
+				});
+
+				document.addEventListener('learningMaterialsRefresh', function () {
+					reloadIfOnPath('/learning-materials');
+				});
+
+				document.addEventListener('announcementsRefresh', function () {
+					reloadIfOnPath('/announcements');
+				});
+			}
+
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', bindListRefreshHandlers);
+			} else {
+				bindListRefreshHandlers();
+			}
+		})();
+	</script>
+}

@@ -536,25 +536,9 @@ templ Schedule(data ScheduleData) {
 			</div>
 			@DeleteClassModal()
 			@ScheduledClassModals()
-			@ConductClassWizardModal(ClassWizardPageData{
-				LockTeacher:     data.LockTeacher,
-				ShowAllTeachers: data.ShowAllTeachers,
-				TeacherID:       data.TeacherID,
-				TeacherName:     data.TeacherName,
-				TodayPHT:        utils.TodayPHT(),
-			})
-			@ScheduleClassWizardModal(ClassWizardPageData{
-				LockTeacher:     data.LockTeacher,
-				ShowAllTeachers: data.ShowAllTeachers,
-				TeacherID:       data.TeacherID,
-				TeacherName:     data.TeacherName,
-				TodayPHT:        utils.TodayPHT(),
-			})
-			@RecordClassesChoiceModal()
 			<div id="classViewModalHost"></div>
 		</div>
 
-		@ClassWizardScript()
 		@ClassViewModalScripts()
 
 		<script>
