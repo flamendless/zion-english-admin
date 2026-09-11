@@ -16,6 +16,7 @@ const (
 	ListSortKindClass         ListSortKind = "class"
 	ListSortKindReport        ListSortKind = "report"
 	ListSortKindDocument      ListSortKind = "document"
+	ListSortKindIntroVideo    ListSortKind = "intro_video"
 	ListSortKindProcessingLog ListSortKind = "processing_log"
 	ListSortKindSystemLog     ListSortKind = "system_log"
 	ListSortKindNotification  ListSortKind = "notification"
@@ -66,6 +67,13 @@ func SortOptionsFor(kind ListSortKind) []SortOption {
 			{Value: "uploaded_at", Label: "Uploaded"},
 			{Value: "filename", Label: "Filename"},
 			{Value: "type", Label: "Type"},
+			{Value: "file_size", Label: "File size"},
+			{Value: "status", Label: "Status"},
+		}
+	case ListSortKindIntroVideo:
+		return []SortOption{
+			{Value: "uploaded_at", Label: "Uploaded"},
+			{Value: "filename", Label: "Filename"},
 			{Value: "file_size", Label: "File size"},
 			{Value: "status", Label: "Status"},
 		}
@@ -120,6 +128,8 @@ func DefaultSortFor(kind ListSortKind) (string, utils.SortOrder) {
 	case ListSortKindReport:
 		return "teacher_name", utils.SortOrderAsc
 	case ListSortKindDocument:
+		return "uploaded_at", utils.SortOrderDesc
+	case ListSortKindIntroVideo:
 		return "uploaded_at", utils.SortOrderDesc
 	case ListSortKindProcessingLog, ListSortKindSystemLog, ListSortKindNotification:
 		return "created_at", utils.SortOrderDesc

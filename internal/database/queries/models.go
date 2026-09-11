@@ -291,6 +291,21 @@ type TblTeacherDocument struct {
 	ReviewedBy       sql.NullInt64
 }
 
+type TblTeacherIntroVideo struct {
+	ID               int64
+	TeacherID        int64
+	OriginalFilename string
+	StoredFilename   string
+	MimeType         string
+	FileSize         int64
+	Status           string
+	CreatedAt        sql.NullTime
+	ReviewedAt       sql.NullTime
+	ReviewedBy       sql.NullInt64
+	DeletedAt        sql.NullTime
+	RejectReason     sql.NullString
+}
+
 type TblTeacherMeetingAccount struct {
 	ID             int64
 	TeacherID      int64

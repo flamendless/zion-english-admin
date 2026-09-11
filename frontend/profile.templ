@@ -34,6 +34,11 @@ type ProfileData struct {
 	CanEditMiddleName    bool
 	CanEditLastName      bool
 	CanUploadDocument    bool
+	CanUploadIntroVideo  bool
+	HasIntroVideo        bool
+	IntroVideoStatus     constants.TeacherIntroVideoStatus
+	IntroVideoViewURL    string
+	IntroVideoRejectReason string
 	ZoomConfigured              bool
 	ZoomConnected               bool
 	ZoomIntegrationVisible      bool
@@ -534,6 +539,7 @@ templ Profile(data ProfileData) {
 					}
 
 					@ProfileDocumentUpload(data)
+					@ProfileIntroVideoUpload(data)
 				</div>
 			</div>
 		</div>

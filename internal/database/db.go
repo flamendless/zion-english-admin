@@ -131,6 +131,10 @@ func Init(path string) error {
 		return err
 	}
 
+	if err := goose.SetDialect("sqlite3"); err != nil {
+		return err
+	}
+
 	goose.SetBaseFS(nil)
 	if err := goose.Up(db, "migrations/sqlite3"); err != nil {
 		return err

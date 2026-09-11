@@ -84,6 +84,17 @@ var TeacherDocumentStatusOptions = func() []StatusOption {
 	return opts
 }()
 
+var TeacherIntroVideoStatusOptions = func() []StatusOption {
+	opts := make([]StatusOption, 0, len(constants.TeacherIntroVideoStatuses))
+	for _, status := range constants.TeacherIntroVideoStatuses {
+		opts = append(opts, StatusOption{
+			Value: string(status),
+			Label: status.Label(),
+		})
+	}
+	return opts
+}()
+
 const TeacherDocsFilterStatusNone = "none"
 
 var TeacherDocsFilterStatusOptions = func() []StatusOption {

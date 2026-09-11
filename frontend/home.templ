@@ -16,6 +16,7 @@ type DashboardData struct {
 	InactiveStudents       int64
 	PendingTeachers        int64
 	PendingDocuments       int64
+	PendingIntroVideos     int64
 	MyStudentCount         int64
 	ClassesConductedWeek   int64
 	ClassesCancelledWeek   int64
@@ -115,6 +116,10 @@ templ DashboardStats(data DashboardData) {
 			<div class="stat-card">
 				<span class="stat-label">Pending Documents</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.PendingDocuments) }</span>
+			</div>
+			<div class="stat-card">
+				<span class="stat-label">Pending Intro Videos</span>
+				<span class="stat-value">{ fmt.Sprintf("%d", data.PendingIntroVideos) }</span>
 			</div>
 			<div class="stat-card">
 				<span class="stat-label">Students Without Parent</span>

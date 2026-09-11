@@ -77,6 +77,10 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 			data.PendingDocuments = pendingDocs
 		}
+		pendingIntroVideos, err := dbRO.GetQueries().CountTeacherIntroVideosByStatus(ctx, string(constants.TeacherIntroVideoStatusSubmitted))
+		if err == nil {
+			data.PendingIntroVideos = pendingIntroVideos
+		}
 		withoutParent, err := dbRO.GetQueries().CountActiveStudentsWithoutParent(ctx)
 		if err == nil {
 			data.StudentsWithoutParent = withoutParent

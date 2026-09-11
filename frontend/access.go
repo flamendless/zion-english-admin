@@ -82,6 +82,7 @@ var navItemDefs = []navItemDef{
 	{Path: "/profile", LinkID: "profileLink", Title: "My Profile", Description: "View account info and update settings"},
 	{Path: "/learning-materials", LinkID: "learningMaterialsLink", Title: "Learning Library", Description: "Browse and share teaching materials and resources", FeatureCard: true},
 	{Path: "/documents", LinkID: "documentsLink", Title: "Documents", TeacherTitle: "My Documents", Description: "Review teacher uploads and ID documents", TeacherDesc: "View your uploaded profile photos and ID documents"},
+	{Path: "/intro-videos", LinkID: "introVideosLink", Title: "Intro Videos", TeacherTitle: "My Intro Video", Description: "Review teacher introduction video uploads", TeacherDesc: "View your submitted introduction video", AdminOnlyCard: true},
 	{Path: "/guides", LinkID: "guidesLink", Title: "Guides", Description: "Step-by-step help for using the admin tool"},
 	{Path: "/teachers", LinkID: "teachersLink", Title: "Teachers", Description: "View and manage teachers", AdminOnlyCard: true},
 	{Path: "/students", LinkID: "studentsLink", Title: "Students", Description: "View and manage students", AdminOnlyCard: true},
@@ -100,7 +101,7 @@ var navItemDefs = []navItemDef{
 var navGroupDefs = []navGroupDef{
 	{ID: "classes", Label: "Classes", Description: "View classes, schedules, and repeating series", TeacherDesc: "View and record classes, schedules, and repeating series", FeatureCard: true, Paths: []string{"/classes", "/schedule", "/schedule/series"}},
 	{ID: "people", Label: "People", Description: "Manage teachers and students", AdminOnlyCard: true, Paths: []string{"/teachers", "/students"}},
-	{ID: "resources", Label: "Resources", Description: "Guides, documents, and learning materials", TeacherDesc: "Guides, your documents, and learning materials", FeatureCard: true, Paths: []string{"/guides", "/documents", "/learning-materials"}},
+	{ID: "resources", Label: "Resources", Description: "Guides, documents, and learning materials", TeacherDesc: "Guides, your documents, and learning materials", FeatureCard: true, Paths: []string{"/guides", "/documents", "/intro-videos", "/learning-materials"}},
 	{ID: "insights", Label: "Insights", Description: "Payroll reports and analytics", AdminOnlyCard: true, Paths: []string{"/reports", "/analytics", "/student-relationships"}},
 	{ID: "admin", Label: "Admin", Description: "Process CSV files, feature flags, and system logs", AdminOnlyCard: true, Paths: []string{"/process", "/feature-flags", "/logs"}},
 }
@@ -387,7 +388,7 @@ func IsNavAccessible(role auth.Role, path string) bool {
 		return false
 	case "/students/register":
 		return true
-	case "/classes", "/classes/record", "/schedule", "/schedule/record", "/schedule/repeat", "/schedule/series", "/profile", "/logs", "/my-students", "/documents", "/analytics", "/guides", "/learning-materials":
+	case "/classes", "/classes/record", "/schedule", "/schedule/record", "/schedule/repeat", "/schedule/series", "/profile", "/logs", "/my-students", "/documents", "/intro-videos", "/analytics", "/guides", "/learning-materials":
 		return true
 	default:
 		return false
