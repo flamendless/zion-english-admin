@@ -113,6 +113,105 @@ func (q *Queries) GetRelationshipsByStudentID(ctx context.Context, studentID int
 	return items, nil
 }
 
+const getStudentRelationshipEdges = `-- name: GetStudentRelationshipEdges :many
+SELECT
+	sr.student_id,
+	s.name AS student_name,
+	sr.related_student_id,
+	rs.name AS related_student_name,
+	sr.relationship
+FROM tbl_student_relationships sr
+INNER JOIN tbl_students s ON s.id = sr.student_id AND s.status != 'deleted'
+INNER JOIN tbl_students rs ON rs.id = sr.related_student_id AND rs.status != 'deleted'
+ORDER BY s.name ASC, rs.name ASC
+`
+
+type GetStudentRelationshipEdgesRow struct {
+	StudentID          int64
+	StudentName        string
+	RelatedStudentID   int64
+	RelatedStudentName string
+	Relationship       sql.NullString
+}
+
+func (q *Queries) GetStudentRelationshipEdges(ctx context.Context) ([]GetStudentRelationshipEdgesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getStudentRelationshipEdges)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetStudentRelationshipEdgesRow
+	for rows.Next() {
+		var i GetStudentRelationshipEdgesRow
+		if err := rows.Scan(
+			&i.StudentID,
+			&i.StudentName,
+			&i.RelatedStudentID,
+			&i.RelatedStudentName,
+			&i.Relationship,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getStudentsForRelationshipGraph = `-- name: GetStudentsForRelationshipGraph :many
+SELECT id, name, parent_name, assigned_color, status
+FROM tbl_students
+WHERE status != 'deleted'
+	AND (
+		TRIM(COALESCE(parent_name, '')) != ''
+		OR id IN (SELECT student_id FROM tbl_student_relationships)
+		OR id IN (SELECT related_student_id FROM tbl_student_relationships)
+	)
+ORDER BY name ASC
+`
+
+type GetStudentsForRelationshipGraphRow struct {
+	ID            int64
+	Name          string
+	ParentName    sql.NullString
+	AssignedColor string
+	Status        string
+}
+
+func (q *Queries) GetStudentsForRelationshipGraph(ctx context.Context) ([]GetStudentsForRelationshipGraphRow, error) {
+	rows, err := q.db.QueryContext(ctx, getStudentsForRelationshipGraph)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetStudentsForRelationshipGraphRow
+	for rows.Next() {
+		var i GetStudentsForRelationshipGraphRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.ParentName,
+			&i.AssignedColor,
+			&i.Status,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const insertStudentRelationship = `-- name: InsertStudentRelationship :exec
 INSERT INTO tbl_student_relationships (student_id, related_student_id, relationship)
 VALUES (?, ?, ?)

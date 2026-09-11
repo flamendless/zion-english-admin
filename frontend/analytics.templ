@@ -80,6 +80,14 @@ templ Analytics(data AnalyticsData) {
 				color: var(--color-muted-foreground);
 				font-size: 0.9rem;
 			}
+			.analytics-header-tooltip {
+				cursor: help;
+			}
+			.analytics-header-tooltip[data-tooltip]::after {
+				white-space: normal;
+				max-width: 16rem;
+				text-align: center;
+			}
 			@media (max-width: 768px) {
 				.analytics-charts {
 					grid-template-columns: 1fr;
@@ -154,13 +162,23 @@ templ Analytics(data AnalyticsData) {
 										@AdminOnlyTableHeader("Cancelled")
 										@AdminOnlyTableHeader("Rescheduled")
 										@AdminOnlyTableHeader("Cancellation Rate")
-										@AdminOnlyTableHeader("Utilization")
+										<th>
+											<span class="table-header-label">
+												<span
+													class="analytics-header-tooltip"
+													data-tooltip="Conducted class minutes divided by scheduled class minutes, times 100. Scheduled minutes is the total duration of scheduled classes in the period; conducted minutes is the total duration of conducted classes."
+													tabindex="0"
+												>Utilization</span>
+												@AdminOnlyIndicator()
+											</span>
+										</th>
 										@AdminOnlyTableHeader("No-Shows")
 									</tr>
 								</thead>
 								<tbody id="teacherTableBody"></tbody>
 							</table>
 						</div>
+						<div id="teacherTablePagination" class="pagination-bar" hidden></div>
 					</div>
 				}
 
@@ -180,6 +198,7 @@ templ Analytics(data AnalyticsData) {
 							<tbody id="studentTableBody"></tbody>
 						</table>
 					</div>
+					<div id="studentTablePagination" class="pagination-bar" hidden></div>
 				</div>
 
 				<div class="analytics-section">
@@ -255,7 +274,10 @@ templ Analytics(data AnalyticsData) {
 			const analyticsContent = document.getElementById('analyticsContent');
 			const sortBySelect = document.getElementById('sortBy');
 			const sortOrderInput = document.getElementById('sortOrder');
+			const ANALYTICS_PAGE_SIZE = 20;
 			let analyticsCache = null;
+			let teacherPage = 1;
+			let studentPage = 1;
 
 			function getAnalyticsSort() {
 				return {
@@ -422,6 +444,47 @@ templ Analytics(data AnalyticsData) {
 				tbody.innerHTML = rows;
 			}
 
+			function paginateRows(rows, page, pageSize) {
+				const total = rows ? rows.length : 0;
+				const totalPages = Math.max(1, Math.ceil(total / pageSize));
+				const safePage = Math.min(Math.max(1, page), totalPages);
+				const start = (safePage - 1) * pageSize;
+				return {
+					rows: (rows || []).slice(start, start + pageSize),
+					page: safePage,
+					totalPages: totalPages,
+					total: total,
+					hasPrev: safePage > 1,
+					hasNext: safePage < totalPages
+				};
+			}
+
+			function renderPaginationBar(containerId, pagination, onPageChange) {
+				const container = document.getElementById(containerId);
+				if (!container) return pagination.page;
+				if (pagination.total <= ANALYTICS_PAGE_SIZE) {
+					container.innerHTML = '';
+					container.hidden = true;
+					return pagination.page;
+				}
+				container.hidden = false;
+				const prevBtn = pagination.hasPrev
+					? '<button type="button" class="pagination-btn" data-page="' + (pagination.page - 1) + '">Previous</button>'
+					: '<span class="pagination-btn disabled">Previous</span>';
+				const nextBtn = pagination.hasNext
+					? '<button type="button" class="pagination-btn" data-page="' + (pagination.page + 1) + '">Next</button>'
+					: '<span class="pagination-btn disabled">Next</span>';
+				container.innerHTML = prevBtn +
+					'<span class="pagination-info">Page ' + pagination.page + ' of ' + pagination.totalPages +
+					' (' + pagination.total + ' total)</span>' + nextBtn;
+				container.querySelectorAll('button[data-page]').forEach(function (btn) {
+					btn.addEventListener('click', function () {
+						onPageChange(parseInt(btn.getAttribute('data-page'), 10));
+					});
+				});
+				return pagination.page;
+			}
+
 			function renderWeekly(rows) {
 				const tbody = document.getElementById('weeklyTableBody');
 				const sorted = sortRows(rows, {
@@ -454,9 +517,15 @@ templ Analytics(data AnalyticsData) {
 				});
 				if (!sorted || sorted.length === 0) {
 					renderTableBody(tbody, null, 'No teacher data in this period.');
+					renderPaginationBar('teacherTablePagination', { page: 1, totalPages: 1, total: 0, hasPrev: false, hasNext: false }, function () {});
 					return;
 				}
-				renderTableBody(tbody, sorted.map(function (row) {
+				const paged = paginateRows(sorted, teacherPage, ANALYTICS_PAGE_SIZE);
+				teacherPage = renderPaginationBar('teacherTablePagination', paged, function (page) {
+					teacherPage = page;
+					renderTeachers(analyticsCache ? analyticsCache.byTeacher : []);
+				});
+				renderTableBody(tbody, paged.rows.map(function (row) {
 					return '<tr><td data-label="Teacher">' + renderTeacherCell(row.teacherName, row.teacherAvatar) +
 						'</td><td data-label="Conducted">' + row.conducted +
 						'</td><td data-label="Cancelled">' + row.cancelled +
@@ -477,9 +546,15 @@ templ Analytics(data AnalyticsData) {
 				});
 				if (!sorted || sorted.length === 0) {
 					renderTableBody(tbody, null, 'No student data in this period.');
+					renderPaginationBar('studentTablePagination', { page: 1, totalPages: 1, total: 0, hasPrev: false, hasNext: false }, function () {});
 					return;
 				}
-				renderTableBody(tbody, sorted.map(function (row) {
+				const paged = paginateRows(sorted, studentPage, ANALYTICS_PAGE_SIZE);
+				studentPage = renderPaginationBar('studentTablePagination', paged, function (page) {
+					studentPage = page;
+					renderStudents(analyticsCache ? analyticsCache.byStudent : []);
+				});
+				renderTableBody(tbody, paged.rows.map(function (row) {
 					return '<tr><td data-label="Student">' + escapeHTML(row.studentName) +
 						'</td><td data-label="Conducted">' + row.conducted +
 						'</td><td data-label="Cancelled">' + row.cancelled +
@@ -534,6 +609,8 @@ templ Analytics(data AnalyticsData) {
 			}
 
 			function renderAnalyticsData(data) {
+				teacherPage = 1;
+				studentPage = 1;
 				renderSummary(data.summary);
 				if (window.analyticsCharts) {
 					window.analyticsCharts.renderAll(data);
@@ -587,7 +664,24 @@ templ Analytics(data AnalyticsData) {
 			filterBtn.addEventListener('click', loadAnalytics);
 			if (sortBySelect) {
 				sortBySelect.addEventListener('change', function () {
-					if (analyticsCache) renderAnalyticsData(analyticsCache);
+					if (analyticsCache) {
+						teacherPage = 1;
+						studentPage = 1;
+						renderAnalyticsData(analyticsCache);
+					}
+				});
+			}
+			const sortOrderToggle = document.getElementById('sortOrderToggle');
+			if (sortOrderToggle) {
+				sortOrderToggle.addEventListener('click', function () {
+					window.setTimeout(function () {
+						if (analyticsCache) {
+							teacherPage = 1;
+							studentPage = 1;
+							renderTeachers(analyticsCache.byTeacher);
+							renderStudents(analyticsCache.byStudent);
+						}
+					}, 0);
 				});
 			}
 			loadAnalytics();

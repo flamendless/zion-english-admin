@@ -50,6 +50,7 @@ var navIconByPath = map[string]NavIconKind{
 	"/my-students":          NavIconMyStudents,
 	"/reports":              NavIconReports,
 	"/analytics":            NavIconAnalytics,
+	"/student-relationships": NavIconStudents,
 	"/process":              NavIconProcess,
 	"/feature-flags":        NavIconFeatureFlags,
 	"/logs":                 NavIconLogs,

@@ -1,0 +1,410 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/models"
+	"zion-english/internal/utils"
+)
+
+type StudentRelationshipsData struct {
+	GraphAPIURL       string
+	StudentSearchURL  string
+}
+
+templ StudentDiagramSearchResults(students []models.StudentAPIResponse) {
+	<div class="entity-search-results">
+		for _, s := range students {
+			<button
+				type="button"
+				class="entity-search-item"
+				data-id={ fmt.Sprintf("%d", s.ID) }
+				data-name={ s.Name }
+			>
+				{ s.Name }
+			</button>
+		}
+	</div>
+}
+
+templ StudentRelationships(data StudentRelationshipsData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Students Relationship Diagram - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@ScrForceGraph()
+		<style>
+			.student-relationships-hint {
+				font-size: 0.9rem;
+				color: var(--color-muted-foreground);
+				margin-bottom: var(--space-4);
+			}
+			.student-relationships-legend-overlay {
+				position: absolute;
+				top: var(--space-3);
+				left: var(--space-3);
+				z-index: 2;
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: var(--space-2) var(--space-3);
+				max-width: calc(100% - 1.5rem);
+				padding: 0.4rem 0.65rem;
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-full);
+				background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+				backdrop-filter: blur(6px);
+				box-shadow: var(--shadow-sm);
+				pointer-events: none;
+				font-size: 0.72rem;
+				color: var(--color-muted-foreground);
+			}
+			.student-relationships-legend-overlay__item {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.35rem;
+				white-space: nowrap;
+			}
+			.student-relationships-legend-overlay__swatch {
+				display: inline-block;
+				width: 0.85rem;
+				height: 0.65rem;
+				border-radius: 3px;
+				background: var(--color-surface);
+				border: 1.5px solid var(--color-border);
+				flex-shrink: 0;
+			}
+			.student-relationships-legend-overlay__swatch--parent {
+				background: var(--color-muted);
+				border-style: dashed;
+				border-color: var(--color-muted-foreground);
+			}
+			.student-relationships-legend-overlay__swatch--student {
+				border-color: var(--color-primary);
+				border-width: 2px;
+			}
+			.student-relationships-legend-overlay__swatch--inactive {
+				opacity: 0.5;
+			}
+			.student-relationships-legend-overlay__swatch--edge {
+				width: 1.1rem;
+				height: 0;
+				border: none;
+				border-top: 1.5px solid var(--color-muted-foreground);
+				border-radius: 0;
+				position: relative;
+			}
+			.student-relationships-legend-overlay__swatch--edge::after {
+				content: "";
+				position: absolute;
+				right: -1px;
+				top: -3px;
+				border-top: 3px solid transparent;
+				border-bottom: 3px solid transparent;
+				border-left: 4px solid var(--color-muted-foreground);
+			}
+			.student-relationships-graph-card {
+				background: var(--color-surface);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+				overflow: hidden;
+			}
+			.student-relationships-graph-wrap {
+				position: relative;
+			}
+			.student-relationships-graph {
+				width: 100%;
+				height: 70vh;
+				min-height: 28rem;
+				background: var(--color-background);
+			}
+			.student-relationships-controls-overlay {
+				position: absolute;
+				left: var(--space-3);
+				bottom: var(--space-3);
+				z-index: 2;
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-2);
+				max-width: min(100% - 1.5rem, 20rem);
+				padding: var(--space-3);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-md);
+				background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+				backdrop-filter: blur(6px);
+				box-shadow: var(--shadow-sm);
+				pointer-events: none;
+			}
+			.student-relationships-controls-overlay__title {
+				margin: 0;
+				font-size: 0.75rem;
+				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.04em;
+				color: var(--color-muted-foreground);
+			}
+			.student-relationships-controls-overlay__list {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-1);
+			}
+			.student-relationships-controls-overlay__item {
+				display: flex;
+				align-items: baseline;
+				gap: var(--space-2);
+				font-size: 0.8rem;
+				color: var(--color-foreground);
+				line-height: 1.35;
+			}
+			.student-relationships-controls-overlay__key {
+				flex-shrink: 0;
+				min-width: 5.5rem;
+				padding: 0.1rem 0.35rem;
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-sm);
+				background: var(--color-muted);
+				font-size: 0.7rem;
+				font-weight: 600;
+				color: var(--color-muted-foreground);
+				text-align: center;
+			}
+			.student-relationships-empty {
+				display: none;
+				margin: 0;
+				padding: var(--space-8) var(--space-4);
+				text-align: center;
+				color: var(--color-muted-foreground);
+				font-size: 0.95rem;
+			}
+			.student-relationships-empty.is-visible {
+				display: block;
+			}
+			.student-relationships-loading {
+				padding: var(--space-6) var(--space-4);
+				text-align: center;
+				color: var(--color-muted-foreground);
+				font-size: 0.9rem;
+			}
+			.student-relationships-toolbar {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: stretch;
+				gap: 0;
+				margin-bottom: var(--space-4);
+				padding: var(--space-3) var(--space-4);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-lg);
+				background: var(--color-surface);
+				box-shadow: var(--shadow-sm);
+			}
+			.student-relationships-toolbar__section {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-2);
+				min-width: 0;
+			}
+			.student-relationships-toolbar__section--search {
+				flex: 1 1 16rem;
+				padding-right: var(--space-4);
+			}
+			.student-relationships-toolbar__section--nav {
+				flex: 1 1 18rem;
+				padding-left: var(--space-4);
+				border-left: 1px solid var(--color-border-subtle);
+			}
+			.student-relationships-toolbar__label {
+				font-size: 0.72rem;
+				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.04em;
+				color: var(--color-muted-foreground);
+			}
+			.student-relationships-toolbar .entity-search {
+				margin-bottom: 0;
+			}
+			.student-relationships-toolbar .entity-search label {
+				display: none;
+			}
+			.student-relationships-toolbar .entity-search input[type="text"] {
+				width: 100%;
+				min-height: 2.5rem;
+			}
+			.student-relationships-search-feedback {
+				margin: 0;
+				font-size: 0.8rem;
+				color: var(--color-destructive);
+			}
+			.student-relationships-search-feedback:empty {
+				display: none;
+			}
+			.student-relationships-nav {
+				display: flex;
+				align-items: center;
+				gap: var(--space-2);
+				min-height: 2.5rem;
+			}
+			.student-relationships-nav__focus {
+				flex: 1 1 8rem;
+				min-width: 0;
+				padding: 0.5rem 0.75rem;
+				border: 1px solid var(--color-border-subtle);
+				border-radius: var(--radius-md);
+				background: var(--color-muted);
+				font-size: 0.8125rem;
+				font-weight: 500;
+				color: var(--color-foreground);
+				text-align: center;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			.student-relationships-nav .btn {
+				flex-shrink: 0;
+				margin-top: 0;
+				min-width: 5.5rem;
+				padding-left: var(--space-3);
+				padding-right: var(--space-3);
+			}
+			@media (max-width: 768px) {
+				.student-relationships-toolbar__section--search {
+					flex: 1 1 100%;
+					padding-right: 0;
+					padding-bottom: var(--space-3);
+					border-bottom: 1px solid var(--color-border-subtle);
+				}
+				.student-relationships-toolbar__section--nav {
+					flex: 1 1 100%;
+					padding-left: 0;
+					padding-top: var(--space-3);
+					border-left: none;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container student-relationships-page">
+			@HeaderSimple()
+			@HubHeader("Students Relationship Diagram", "", "", false)
+			<p class="student-relationships-hint">
+				Parent names group students into families. Explicit relationships appear as labeled lines between student boxes.
+			</p>
+			<div class="student-relationships-toolbar">
+				<div class="student-relationships-toolbar__section student-relationships-toolbar__section--search">
+					<span class="student-relationships-toolbar__label" id="diagramStudentSearchLabel">Find student</span>
+					<div class="form-group entity-search student-search">
+						<label for="diagramStudentSearch">Find student</label>
+						<input
+							type="text"
+							id="diagramStudentSearch"
+							name="studentQ"
+							autocomplete="off"
+							placeholder="Search by name..."
+							aria-labelledby="diagramStudentSearchLabel"
+							hx-get={ data.StudentSearchURL }
+							hx-trigger="input changed delay:300ms"
+							hx-target="#diagramStudentSearchResults"
+							hx-include="this"
+						/>
+						<div id="diagramStudentSearchResults"></div>
+					</div>
+					<p
+						id="student-relationships-search-feedback"
+						class="student-relationships-search-feedback"
+						role="alert"
+						aria-live="assertive"
+					></p>
+				</div>
+				<div class="student-relationships-toolbar__section student-relationships-toolbar__section--nav">
+					<span class="student-relationships-toolbar__label" id="diagramStudentFocusLabel">Focused student</span>
+					<div class="student-relationships-nav">
+						<button
+							type="button"
+							id="diagramStudentPrev"
+							class="btn btn-secondary"
+							disabled
+							aria-label="Previous student"
+						>Previous</button>
+						<span
+							id="diagramStudentFocusValue"
+							class="student-relationships-nav__focus"
+							aria-live="polite"
+						>No student focused</span>
+						<button
+							type="button"
+							id="diagramStudentNext"
+							class="btn btn-secondary"
+							disabled
+							aria-label="Next student"
+						>Next</button>
+					</div>
+				</div>
+			</div>
+			<div class="student-relationships-graph-card">
+				<div class="student-relationships-graph-wrap">
+					<div
+						id="student-relationship-graph"
+						class="student-relationships-graph"
+						data-api-url={ data.GraphAPIURL }
+						role="img"
+						aria-label="Student relationship diagram"
+					>
+						<p class="student-relationships-loading">Loading diagram...</p>
+					</div>
+					<aside class="student-relationships-legend-overlay" aria-label="Diagram legend">
+						<span class="student-relationships-legend-overlay__item">
+							<span class="student-relationships-legend-overlay__swatch student-relationships-legend-overlay__swatch--parent" aria-hidden="true"></span>
+							Parent
+						</span>
+						<span class="student-relationships-legend-overlay__item">
+							<span class="student-relationships-legend-overlay__swatch student-relationships-legend-overlay__swatch--student" aria-hidden="true"></span>
+							Student
+						</span>
+						<span class="student-relationships-legend-overlay__item">
+							<span class="student-relationships-legend-overlay__swatch student-relationships-legend-overlay__swatch--inactive" aria-hidden="true"></span>
+							Inactive
+						</span>
+						<span class="student-relationships-legend-overlay__item">
+							<span class="student-relationships-legend-overlay__swatch student-relationships-legend-overlay__swatch--edge" aria-hidden="true"></span>
+							Link
+						</span>
+					</aside>
+					<aside class="student-relationships-controls-overlay" aria-label="Diagram controls">
+						<p class="student-relationships-controls-overlay__title">Controls</p>
+						<ul class="student-relationships-controls-overlay__list">
+							<li class="student-relationships-controls-overlay__item">
+								<span class="student-relationships-controls-overlay__key">Drag box</span>
+								<span>Move a node</span>
+							</li>
+							<li class="student-relationships-controls-overlay__item">
+								<span class="student-relationships-controls-overlay__key">Scroll</span>
+								<span>Zoom in or out</span>
+							</li>
+							<li class="student-relationships-controls-overlay__item">
+								<span class="student-relationships-controls-overlay__key">Drag canvas</span>
+								<span>Pan the diagram</span>
+							</li>
+							<li class="student-relationships-controls-overlay__item">
+								<span class="student-relationships-controls-overlay__key">Click student</span>
+								<span>Open student details</span>
+							</li>
+						</ul>
+					</aside>
+				</div>
+			</div>
+			<p id="student-relationships-empty" class="student-relationships-empty">
+				No students with parent names or linked relationships yet. Add a parent name or relationship on a student profile to see them here.
+			</p>
+			<div id="studentViewModalHost"></div>
+		</div>
+		@StudentViewModalScripts()
+		<script type="text/javascript" src={ utils.URL("/static/js/student-relationships-graph.js") }></script>
+	</body>
+	</html>
+}

@@ -20,6 +20,35 @@ templ NavDropdown(group NavGroup) {
 	</details>
 }
 
+templ NavDropdownScript() {
+	<script>
+		(function () {
+			if (window._navDropdownBound) return;
+			window._navDropdownBound = true;
+
+			document.addEventListener('toggle', function (e) {
+				const dropdown = e.target;
+				if (!dropdown.matches || !dropdown.matches('.nav-dropdown') || !dropdown.open) {
+					return;
+				}
+				document.querySelectorAll('.nav-dropdown[open]').forEach(function (other) {
+					if (other !== dropdown) {
+						other.open = false;
+					}
+				});
+			});
+
+			document.addEventListener('click', function (e) {
+				document.querySelectorAll('.nav-dropdown[open]').forEach(function (dropdown) {
+					if (!dropdown.contains(e.target)) {
+						dropdown.open = false;
+					}
+				});
+			});
+		})();
+	</script>
+}
+
 templ NavGroupActionCard(group NavGroup) {
 	if group.FeatureCard {
 		<button type="button" class="card card-feature" data-open-nav-group-modal={ group.ID }>
