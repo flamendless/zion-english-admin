@@ -8,7 +8,8 @@ SELECT
 	t.assigned_color AS teacher_assigned_color,
 	t.profile_picture AS teacher_profile_picture,
 	COUNT(cr.id) AS total_classes,
-	COALESCE(SUM(CASE WHEN cr.status = 'conducted' THEN 1 ELSE 0 END), 0) AS conducted_classes
+	COALESCE(SUM(CASE WHEN cr.status = 'conducted' THEN 1 ELSE 0 END), 0) AS conducted_classes,
+	COALESCE(SUM(CASE WHEN cr.status = 'cancelled' THEN 1 ELSE 0 END), 0) AS cancelled_classes
 FROM tbl_teachers t
 LEFT JOIN tbl_class_records cr ON cr.teacher_id = t.id
 	AND cr.date >= ? AND cr.date <= ?
@@ -34,7 +35,7 @@ SELECT cr.teacher_id, cr.currency, COALESCE(SUM(cr.rate), 0) AS total_rate
 FROM tbl_class_records cr
 JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE cr.date >= ? AND cr.date <= ?
-	AND cr.status = 'conducted'
+	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
 	AND cr.deleted_at IS NULL
 	AND t.status = 'approved' AND t.deleted = 0
 	AND (
@@ -124,7 +125,7 @@ FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE cr.date >= ? AND cr.date <= ?
-	AND cr.status = 'conducted'
+	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
 	AND cr.deleted_at IS NULL
 	AND t.status = 'approved' AND t.deleted = 0
 	AND (

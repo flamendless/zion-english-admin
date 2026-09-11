@@ -135,8 +135,8 @@ templ DashboardStats(data DashboardData) {
 		}
 		<div class="stat-card">
 			<span class="stat-label">Classes This Week</span>
-			<span class="stat-value">{ fmt.Sprintf("%d conducted", data.ClassesConductedWeek) }</span>
-			<span class="stat-sub">{ fmt.Sprintf("%d cancelled, %d rescheduled", data.ClassesCancelledWeek, data.ClassesRescheduledWeek) }</span>
+			<span class="stat-value">{ fmt.Sprintf("%d total", data.ClassesConductedWeek + data.ClassesCancelledWeek + data.ClassesRescheduledWeek) }</span>
+			<span class="stat-sub">{ fmt.Sprintf("%d conducted, %d cancelled, %d rescheduled", data.ClassesConductedWeek, data.ClassesCancelledWeek, data.ClassesRescheduledWeek) }</span>
 		</div>
 		@DashboardCurrencyStatCard("Month", data.MonthlyTotals)
 		if auth.HasAdminAccess(data.Role) {

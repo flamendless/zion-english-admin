@@ -17,7 +17,8 @@ ORDER BY cr.created_at DESC;
 -- name: GetTotalRateByTeacherAndDateRange :one
 SELECT COALESCE(SUM(cr.rate), 0) as total_rate
 FROM tbl_class_records cr
-WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ? AND cr.status = 'conducted'
+WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
+	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
 	AND cr.deleted_at IS NULL;
 
 -- name: GetClassRecordByID :one
@@ -191,7 +192,8 @@ GROUP BY cr.status;
 -- name: SumConductedRateByCurrencyAndDateRange :many
 SELECT cr.currency, COALESCE(SUM(cr.rate), 0) as total_rate
 FROM tbl_class_records cr
-WHERE cr.date >= ? AND cr.date <= ? AND cr.status = 'conducted'
+WHERE cr.date >= ? AND cr.date <= ?
+	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
 	AND cr.deleted_at IS NULL
 	AND (? = 0 OR cr.teacher_id = ?)
 GROUP BY cr.currency;
@@ -201,7 +203,7 @@ SELECT s.parent_currency AS currency, COALESCE(SUM(s.parent_rate), 0) AS total_r
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 WHERE cr.date >= ? AND cr.date <= ?
-	AND cr.status = 'conducted'
+	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
 	AND cr.deleted_at IS NULL
 	AND s.parent_rate IS NOT NULL
 	AND s.parent_currency IS NOT NULL

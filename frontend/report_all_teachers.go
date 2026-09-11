@@ -11,6 +11,7 @@ type ReportAllTeachersRow struct {
 	TeacherName      string
 	TeacherAvatar    AvatarProps
 	ConductedClasses int64
+	CancelledClasses int64
 	TotalClasses     int64
 	Earnings         []ReportEarningData
 }
@@ -22,7 +23,7 @@ type ReportAllTeachersData struct {
 }
 
 func (r ReportAllTeachersRow) ClassesLabel() string {
-	return fmt.Sprintf("%d/%d", r.ConductedClasses, r.TotalClasses)
+	return fmt.Sprintf("%d", r.TotalClasses)
 }
 
 func (r ReportAllTeachersRow) EarningsHTML() string {

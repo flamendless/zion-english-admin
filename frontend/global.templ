@@ -900,6 +900,10 @@ templ GlobalIncludes() {
 			position: relative;
 		}
 
+		.nav-dropdown[open] {
+			z-index: 50;
+		}
+
 		.nav-dropdown-trigger {
 			display: inline-flex;
 			align-items: center;
@@ -4120,6 +4124,7 @@ templ GlobalIncludes() {
 				flex-direction: column;
 				gap: var(--space-2);
 				width: 100%;
+				overflow: visible;
 			}
 
 			.header-right {
@@ -4133,11 +4138,9 @@ templ GlobalIncludes() {
 
 			.nav-links {
 				width: 100%;
-				flex-wrap: nowrap;
-				overflow-x: auto;
-				-webkit-overflow-scrolling: touch;
-				padding-bottom: var(--space-2);
-				scrollbar-width: thin;
+				flex-wrap: wrap;
+				overflow: visible;
+				row-gap: var(--space-1);
 			}
 
 			.choice-option-cards {

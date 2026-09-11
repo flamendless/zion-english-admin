@@ -121,6 +121,7 @@ func handleReportsAllTeachers(w http.ResponseWriter, r *http.Request) {
 			TeacherName:      row.TeacherName,
 			TeacherAvatar:    row.TeacherAvatar,
 			ConductedClasses: row.ConductedClasses,
+			CancelledClasses: row.CancelledClasses,
 			TotalClasses:     row.TotalClasses,
 			Earnings:         row.Earnings,
 		})
@@ -265,6 +266,7 @@ func loadReportRows(ctx context.Context, startDate, endDate, q string) ([]fronte
 				rolesMap[summary.TeacherID],
 			),
 			ConductedClasses: sqlNumericToInt64(summary.ConductedClasses),
+			CancelledClasses: sqlNumericToInt64(summary.CancelledClasses),
 			TotalClasses:     summary.TotalClasses,
 			Earnings:         reportEarningsToFrontend(earningsByTeacher[summary.TeacherID]),
 		}
