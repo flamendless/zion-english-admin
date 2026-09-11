@@ -1,0 +1,135 @@
+package frontend
+
+templ TeacherTableColumnsDropdown() {
+	<div class="form-group teachers-table-columns-control" data-teachers-table-columns>
+		<span class="toolbar-filter-dropdown-label" id="teacherColumnsLabel">Columns</span>
+		<details class="toolbar-filter-dropdown">
+			<summary class="toolbar-filter-dropdown-trigger" aria-labelledby="teacherColumnsLabel" data-teacher-columns-summary>
+				{ teacherTableColumnsDefaultSummary() }
+			</summary>
+			<div class="toolbar-filter-dropdown-panel" role="group" aria-labelledby="teacherColumnsLabel">
+				for _, col := range TeacherTableOptionalColumns {
+					<label class="checkbox-label">
+						<input
+							type="checkbox"
+							data-teacher-column={ string(col.ID) }
+							checked?={ col.DefaultVisible }
+						/>
+						{ col.Label }
+					</label>
+				}
+			</div>
+		</details>
+	</div>
+	<script>
+		(function () {
+			const STORAGE_KEY = 'teachers-table-columns';
+			const control = document.querySelector('[data-teachers-table-columns]');
+			const table = document.getElementById('teachersTable');
+			if (!control || !table) return;
+
+			const columnInputs = Array.from(control.querySelectorAll('[data-teacher-column]'));
+			const summary = control.querySelector('[data-teacher-columns-summary]');
+			const defaultState = {};
+			columnInputs.forEach(function (input) {
+				defaultState[input.dataset.teacherColumn] = input.checked;
+			});
+
+			function readState() {
+				try {
+					const raw = localStorage.getItem(STORAGE_KEY);
+					if (!raw) return Object.assign({}, defaultState);
+					const parsed = JSON.parse(raw);
+					if (!parsed || typeof parsed !== 'object') return Object.assign({}, defaultState);
+					const state = Object.assign({}, defaultState);
+					columnInputs.forEach(function (input) {
+						const key = input.dataset.teacherColumn;
+						if (typeof parsed[key] === 'boolean') {
+							state[key] = parsed[key];
+						}
+					});
+					return state;
+				} catch (err) {
+					return Object.assign({}, defaultState);
+				}
+			}
+
+			function writeState(state) {
+				localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+			}
+
+			function selectedLabels(state) {
+				const labels = [];
+				columnInputs.forEach(function (input) {
+					if (!state[input.dataset.teacherColumn]) return;
+					const label = input.closest('label');
+					if (label) labels.push(label.textContent.trim());
+				});
+				return labels;
+			}
+
+			function updateSummary(state) {
+				if (!summary) return;
+				const labels = selectedLabels(state);
+				if (labels.length === 0) {
+					summary.textContent = 'None';
+					return;
+				}
+				if (labels.length === columnInputs.length) {
+					summary.textContent = 'All';
+					return;
+				}
+				summary.textContent = labels.join(', ');
+			}
+
+			function applyState(state) {
+				columnInputs.forEach(function (input) {
+					const key = input.dataset.teacherColumn;
+					const visible = !!state[key];
+					input.checked = visible;
+					table.querySelectorAll('[data-teacher-col="' + key + '"]').forEach(function (cell) {
+						cell.hidden = !visible;
+					});
+				});
+				updateSummary(state);
+			}
+
+			let state = readState();
+			applyState(state);
+
+			columnInputs.forEach(function (input) {
+				input.addEventListener('change', function () {
+					state = readState();
+					state[input.dataset.teacherColumn] = input.checked;
+					writeState(state);
+					applyState(state);
+				});
+			});
+		})();
+	</script>
+}
+
+templ TeacherTableOptionalHeaderCells() {
+	for _, col := range TeacherTableOptionalColumns {
+		<th data-teacher-col={ string(col.ID) }>{ col.HeaderLabel }</th>
+	}
+}
+
+templ TeacherTableOptionalRowCells(teacher TeacherItem) {
+	for _, col := range TeacherTableOptionalColumns {
+		switch col.ID {
+		case TeacherTableColumnDocsStatus:
+			<td data-teacher-col={ string(col.ID) } data-label={ col.HeaderLabel }>
+				if teacher.DocsStatus != "" {
+					@StatusPill(teacher.DocsStatus.Label(), DocumentStatusPillTone(teacher.DocsStatus), false)
+				} else {
+					<span>-</span>
+				}
+			</td>
+		case TeacherTableColumnConnections:
+			<td data-teacher-col={ string(col.ID) } data-label={ col.HeaderLabel }>
+				@TeacherConnectionsCell(teacher.ZoomConnected, teacher.GoogleCalendarConnected)
+			</td>
+		}
+	}
+}

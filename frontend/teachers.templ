@@ -173,7 +173,7 @@ templ Teachers(data TeacherData) {
 			@HeaderSimple()
 			@HubHeader("Teachers", "New Teacher", utils.URL("/teachers/register"), true)
 
-			@ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindTeacher, "", "", "", "", "", "", false, false, false, false, true, data.DocsStatusFilter, true, data.ConnectionZoomFilter, data.ConnectionGoogleFilter, true, data.SortBy, data.SortOrder, ListSortKindTeacher)
+			@ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindTeacher, "", "", "", "", "", "", false, false, false, false, true, data.DocsStatusFilter, true, data.ConnectionZoomFilter, data.ConnectionGoogleFilter, true, data.SortBy, data.SortOrder, ListSortKindTeacher, true)
 
 			if len(data.Teachers) > 0 {
 				<div class="table-wrapper">
@@ -182,8 +182,7 @@ templ Teachers(data TeacherData) {
 							<tr>
 								<th>Name</th>
 								<th>Status</th>
-								<th>Docs Status</th>
-								<th>Connections</th>
+								@TeacherTableOptionalHeaderCells()
 								<th>Email</th>
 								<th>Mobile Number</th>
 								<th>Actions</th>
@@ -207,16 +206,7 @@ templ Teachers(data TeacherData) {
 									<td data-label="Status">
 										@StatusPill(getTeacherDisplayStatus(teacher.Status, teacher.Deleted), TeacherStatusPillTone(teacher.Status, teacher.Deleted), false)
 									</td>
-									<td data-label="Docs Status">
-										if teacher.DocsStatus != "" {
-											@StatusPill(teacher.DocsStatus.Label(), DocumentStatusPillTone(teacher.DocsStatus), false)
-										} else {
-											<span>-</span>
-										}
-									</td>
-									<td data-label="Connections">
-										@TeacherConnectionsCell(teacher.ZoomConnected, teacher.GoogleCalendarConnected)
-									</td>
+									@TeacherTableOptionalRowCells(teacher)
 									<td class="email-cell" data-label="Email">{ getDisplayValue(teacher.Email) }</td>
 									<td data-label="Mobile">{ getDisplayValue(teacher.MobileNumber) }</td>
 									<td data-label="Actions">
