@@ -1,30 +1,51 @@
 unreleased:
   breaking_changes: []
-  new_features:
-    - text: "You can record past classes and schedule upcoming classes through new step-by-step wizards opened from the Record Classes modal, with a review step before saving."
-      commit: "6254f33"
-  improvements:
-    - text: "The navbar groups related pages into dropdowns, with Dashboard first and Classes, People, Resources, Insights, and Admin groups by role. Resources includes Learning Library, Documents, and Guides. On the dashboard, group cards in Quick actions open a choice modal with the same destinations."
-      commit: ""
-    - text: "The teachers list shows Zoom and Google Calendar connection status, with filters for document review status and connected integrations."
-      commit: "4f7f2ba"
-    - text: "Dashboard quick-action cards for admin-only tools such as Teachers, Students, Reports, Process, and Feature Flags now show an Admin only indicator."
-      commit: "ba453af"
-    - text: "Announcement banners use a clearer centered layout on the dashboard and page headers, including on mobile."
-      commit: "831db34"
-  bug_fixes:
-    - text: "Fixed teacher search so you can find teachers by typing first and last name together."
-      commit: "956e743"
-    - text: "Fixed reports filters including Generate Summary form fields and returning unexpected results."
-      commit: "956e743"
-    - text: "Fixed the classes list showing or hiding the teacher column incorrectly after filtering."
-      commit: "956e743"
+  new_features: []
+  improvements: []
+  bug_fixes: []
   removed: []
   security: []
   deprecated: []
   internal: []
 
 versions:
+  - version: "2026.09.11"
+    date: "2026-09-11"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "You can record past classes and schedule upcoming classes through new step-by-step wizards opened from the Record Classes modal, with a review step before saving."
+        commit: "6254f33"
+      - text: "Superusers can open the Students Relationship Diagram under Insights to explore family groupings and explicit links between students, with search and pan/zoom controls."
+        commit: "78729c1"
+    improvements:
+      - text: "The navbar groups related pages into dropdowns, with Dashboard first and Classes, People, Resources, Insights, and Admin groups by role. Resources includes Learning Library, Documents, and Guides. On the dashboard, group cards in Quick actions open a choice modal with the same destinations."
+        commit: "0a1f920"
+      - text: "Superuser-only guides now show an Admin only indicator on guide cards and page headings."
+        commit: "95b2eda"
+      - text: "Analytics tables for teachers and students now paginate long result sets, and Utilization includes a tooltip explaining the calculation."
+        commit: "78729c1"
+      - text: "Classes, schedule, reports, and documents lists refresh automatically after you save or delete without reloading the page."
+        commit: "ac95ef5"
+      - text: "Class record and schedule wizards include a dedicated rate and currency step, and time fields show a live duration preview as you enter start and end times."
+        commit: "ac95ef5"
+      - text: "The teachers list shows Zoom and Google Calendar connection status, with filters for document review status and connected integrations."
+        commit: "4f7f2ba"
+      - text: "Dashboard quick-action cards for admin-only tools such as Teachers, Students, Reports, Process, and Feature Flags now show an Admin only indicator."
+        commit: "ba453af"
+      - text: "Announcement banners use a clearer centered layout on the dashboard and page headers, including on mobile."
+        commit: "831db34"
+    bug_fixes:
+      - text: "Fixed teacher search so you can find teachers by typing first and last name together."
+        commit: "956e743"
+      - text: "Fixed reports filters including Generate Summary form fields and returning unexpected results."
+        commit: "956e743"
+      - text: "Fixed the classes list showing or hiding the teacher column incorrectly after filtering."
+        commit: "956e743"
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
   - version: "2026.09.09"
     date: "2026-09-09"
     released: true
