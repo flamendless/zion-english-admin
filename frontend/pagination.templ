@@ -111,7 +111,7 @@ templ TeacherConnectionsFilterDropdown(connectionZoom bool, connectionGoogle boo
 	</div>
 }
 
-templ ListFilterForm(actionPath string, query string, status string, statusType ListFilterKind, teacherID string, teacherName string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool, showStatus bool, docsStatus string, showDocsStatus bool, connectionZoom bool, connectionGoogle bool, showConnections bool, sortBy string, sortOrder string, sortKind ListSortKind) {
+templ ListFilterForm(actionPath string, query string, status string, statusType ListFilterKind, teacherID string, teacherName string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool, showStatus bool, docsStatus string, showDocsStatus bool, connectionZoom bool, connectionGoogle bool, showConnections bool, sortBy string, sortOrder string, sortKind ListSortKind, showTeacherTableColumns bool) {
 	<form class="list-toolbar" method="GET" action={ actionPath }>
 		<div class="form-group">
 			<label for="q">Search</label>
@@ -178,6 +178,9 @@ templ ListFilterForm(actionPath string, query string, status string, statusType 
 			</div>
 		}
 		@SortControls(sortBy, sortOrder, sortKind)
+		if showTeacherTableColumns {
+			@TeacherTableColumnsDropdown()
+		}
 		<div class="form-group list-toolbar-action">
 			<label for="listFilterSubmit">&nbsp;</label>
 			<button type="submit" id="listFilterSubmit">Filter</button>
