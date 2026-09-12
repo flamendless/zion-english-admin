@@ -75,7 +75,14 @@ func ScheduledClassItemFromView(v models.ScheduledClassView, gracePeriodMinutes 
 		DeleteFrom:      ClassActionContextSchedule,
 		SeriesID:        v.SeriesID,
 	}
-	item.Overdue = IsScheduledClassOverdue(item, gracePeriodMinutes)
+	item.Overdue = scheduledclass.IsOverdue(
+		item.Status,
+		item.ScheduledDate,
+		item.StartTime,
+		item.DurationMinutes,
+		time.Now(),
+		gracePeriodMinutes,
+	)
 	return item
 }
 
@@ -220,7 +227,14 @@ func ScheduledClassItemFromEditClassData(data EditClassData) ScheduledClassItemD
 		SeriesID:        data.SeriesID,
 		SeriesFutureCount: data.SeriesFutureCount,
 	}
-	item.Overdue = IsScheduledClassOverdue(item, data.OverdueGracePeriodMinutes)
+	item.Overdue = scheduledclass.IsOverdue(
+		item.Status,
+		item.ScheduledDate,
+		item.StartTime,
+		item.DurationMinutes,
+		time.Now(),
+		data.OverdueGracePeriodMinutes,
+	)
 	return item
 }
 
@@ -279,17 +293,6 @@ func normalizeDisplayTime(value string) string {
 		return ""
 	}
 	return t.Format(constants.TimeHMLayout)
-}
-
-func IsScheduledClassOverdue(item ScheduledClassItemData, gracePeriodMinutes int64) bool {
-	return scheduledclass.IsOverdue(
-		item.Status,
-		item.ScheduledDate,
-		item.StartTime,
-		item.DurationMinutes,
-		time.Now(),
-		gracePeriodMinutes,
-	)
 }
 
 func FormatScheduledClassDateDisplay(date string) string {
