@@ -29,7 +29,7 @@ func handleNotifications(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
-	notifySvc.ScanMissedClasses(ctx)
+	notifySvc.ScanMissedClasses(ctx, classOverdueGracePeriodMinutes(ctx))
 
 	unreadOnly := r.URL.Query().Get("filter") == "unread"
 	sort := parseListSort(r, frontend.ListSortKindNotification)
@@ -167,7 +167,7 @@ func handleNotificationsReadAll(w http.ResponseWriter, r *http.Request) {
 func renderNotificationsPanel(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
-	notifySvc.ScanMissedClasses(ctx)
+	notifySvc.ScanMissedClasses(ctx, classOverdueGracePeriodMinutes(ctx))
 
 	rows, err := notifySvc.Recent(ctx, user)
 	if err != nil {

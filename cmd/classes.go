@@ -117,6 +117,7 @@ func classEditClassData(ctx context.Context, recordID int64, readonly bool) (fro
 		return frontend.EditClassData{}, err
 	}
 	return frontend.EditClassData{
+		OverdueGracePeriodMinutes: classOverdueGracePeriodMinutes(ctx),
 		RecordID:        strconv.FormatInt(recordID, 10),
 		Readonly:        readonly,
 		IsSuperuser:     auth.HasAdminAccess(role),

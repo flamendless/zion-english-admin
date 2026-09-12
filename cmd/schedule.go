@@ -332,7 +332,8 @@ func handleScheduleListPartial(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	items := frontend.ScheduledClassItemsFromViews(views)
+	gracePeriod := classOverdueGracePeriodMinutes(r.Context())
+	items := frontend.ScheduledClassItemsFromViews(views, gracePeriod)
 	items, err = enrichScheduledClassItemsSeries(r.Context(), items)
 	if err != nil {
 		HttpError(w, "Failed to fetch scheduled classes", http.StatusInternalServerError)
@@ -380,7 +381,8 @@ func handleScheduleDayTimelinePartial(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	items := frontend.ScheduledClassItemsFromViews(views)
+	gracePeriod := classOverdueGracePeriodMinutes(r.Context())
+	items := frontend.ScheduledClassItemsFromViews(views, gracePeriod)
 	items, err = enrichScheduledClassItemsSeries(r.Context(), items)
 	if err != nil {
 		HttpError(w, "Failed to fetch scheduled classes", http.StatusInternalServerError)
@@ -1117,6 +1119,7 @@ func scheduledClassViewData(ctx context.Context, scheduleID int64) (frontend.Edi
 		return frontend.EditClassData{}, err
 	}
 	return frontend.EditClassData{
+		OverdueGracePeriodMinutes: classOverdueGracePeriodMinutes(ctx),
 		RecordID:        strconv.FormatInt(scheduleID, 10),
 		Readonly:        true,
 		IsSuperuser:     auth.HasAdminAccess(role),

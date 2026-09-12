@@ -10,7 +10,7 @@ import (
 )
 
 const getFeatureFlag = `-- name: GetFeatureFlag :one
-SELECT key, enabled, visible_roles, updated_at
+SELECT key, enabled, visible_roles, value_text, updated_at
 FROM tbl_feature_flags
 WHERE key = ?
 `
@@ -19,6 +19,7 @@ type GetFeatureFlagRow struct {
 	Key          string
 	Enabled      int64
 	VisibleRoles string
+	ValueText    string
 	UpdatedAt    string
 }
 
@@ -29,13 +30,14 @@ func (q *Queries) GetFeatureFlag(ctx context.Context, key string) (GetFeatureFla
 		&i.Key,
 		&i.Enabled,
 		&i.VisibleRoles,
+		&i.ValueText,
 		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const listFeatureFlags = `-- name: ListFeatureFlags :many
-SELECT key, enabled, visible_roles, updated_at
+SELECT key, enabled, visible_roles, value_text, updated_at
 FROM tbl_feature_flags
 ORDER BY key ASC
 `
@@ -44,6 +46,7 @@ type ListFeatureFlagsRow struct {
 	Key          string
 	Enabled      int64
 	VisibleRoles string
+	ValueText    string
 	UpdatedAt    string
 }
 
@@ -60,6 +63,7 @@ func (q *Queries) ListFeatureFlags(ctx context.Context) ([]ListFeatureFlagsRow, 
 			&i.Key,
 			&i.Enabled,
 			&i.VisibleRoles,
+			&i.ValueText,
 			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
@@ -76,8 +80,8 @@ func (q *Queries) ListFeatureFlags(ctx context.Context) ([]ListFeatureFlagsRow, 
 }
 
 const upsertFeatureFlag = `-- name: UpsertFeatureFlag :exec
-INSERT INTO tbl_feature_flags (key, enabled, visible_roles, updated_at)
-VALUES (?, ?, ?, datetime('now'))
+INSERT INTO tbl_feature_flags (key, enabled, visible_roles, value_text, updated_at)
+VALUES (?, ?, ?, '', datetime('now'))
 ON CONFLICT(key) DO UPDATE SET
 	enabled = excluded.enabled,
 	visible_roles = excluded.visible_roles,
@@ -92,5 +96,23 @@ type UpsertFeatureFlagParams struct {
 
 func (q *Queries) UpsertFeatureFlag(ctx context.Context, arg UpsertFeatureFlagParams) error {
 	_, err := q.db.ExecContext(ctx, upsertFeatureFlag, arg.Key, arg.Enabled, arg.VisibleRoles)
+	return err
+}
+
+const upsertFeatureFlagValue = `-- name: UpsertFeatureFlagValue :exec
+INSERT INTO tbl_feature_flags (key, enabled, visible_roles, value_text, updated_at)
+VALUES (?, 1, '', ?, datetime('now'))
+ON CONFLICT(key) DO UPDATE SET
+	value_text = excluded.value_text,
+	updated_at = datetime('now')
+`
+
+type UpsertFeatureFlagValueParams struct {
+	Key       string
+	ValueText string
+}
+
+func (q *Queries) UpsertFeatureFlagValue(ctx context.Context, arg UpsertFeatureFlagValueParams) error {
+	_, err := q.db.ExecContext(ctx, upsertFeatureFlagValue, arg.Key, arg.ValueText)
 	return err
 }

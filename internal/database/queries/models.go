@@ -94,6 +94,7 @@ type TblFeatureFlag struct {
 	Enabled      int64
 	UpdatedAt    string
 	VisibleRoles string
+	ValueText    string
 }
 
 type TblLearningMaterial struct {

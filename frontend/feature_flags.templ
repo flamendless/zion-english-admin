@@ -8,8 +8,9 @@ import (
 )
 
 type FeatureFlagsData struct {
-	Zoom           FeatureFlagIntegrationItem
-	GoogleCalendar FeatureFlagIntegrationItem
+	ClassOverdueGracePeriodMinutes int64
+	Zoom                           FeatureFlagIntegrationItem
+	GoogleCalendar                 FeatureFlagIntegrationItem
 }
 
 type FeatureFlagIntegrationItem struct {
@@ -192,6 +193,82 @@ templ FeatureFlags(data FeatureFlagsData) {
 				display: flex;
 				justify-content: flex-end;
 			}
+
+			.feature-flags-section {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+			}
+
+			.feature-flags-section + .feature-flags-section {
+				margin-top: var(--space-6);
+				padding-top: var(--space-6);
+				border-top: 1px solid var(--color-border-subtle);
+			}
+
+			.feature-flags-section-title {
+				margin: 0;
+				font-size: 1rem;
+				font-weight: 600;
+			}
+
+			.feature-flag-setting-row {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: flex-start;
+				justify-content: space-between;
+				gap: var(--space-4);
+				padding: var(--space-4);
+				border: 1px solid var(--color-border-subtle);
+				border-radius: var(--radius-md);
+				background: var(--color-muted);
+			}
+
+			.feature-flag-setting-copy {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-2);
+				flex: 1 1 16rem;
+				min-width: 0;
+			}
+
+			.feature-flag-setting-name {
+				font-weight: 600;
+				font-size: 1rem;
+			}
+
+			.feature-flag-setting-desc {
+				margin: 0;
+				font-size: 0.875rem;
+				color: var(--color-muted-foreground);
+				line-height: 1.5;
+			}
+
+			.feature-flag-number-field {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-end;
+				gap: var(--space-2);
+				flex-shrink: 0;
+			}
+
+			.feature-flag-number-label {
+				font-size: 0.75rem;
+				font-weight: 600;
+				color: var(--color-muted-foreground);
+				text-transform: uppercase;
+				letter-spacing: 0.04em;
+			}
+
+			.feature-flag-number-input {
+				width: 7rem;
+				padding: var(--space-2) var(--space-3);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-md);
+				background: var(--color-surface);
+				font: inherit;
+				text-align: right;
+			}
 		</style>
 	</head>
 	<body>
@@ -203,15 +280,22 @@ templ FeatureFlags(data FeatureFlagsData) {
 
 			<div class="feature-flags-hero">
 				<p class="feature-flags-subtitle">
-					Control whether teachers can start new integration connections and which teacher roles can see each integration. Login superuser and admin accounts always see all integrations. Existing connections stay active when connections are disabled.
+					Control integration availability, class overdue timing, and which teacher roles can see each integration. Login superuser and admin accounts always see all integrations. Existing connections stay active when connections are disabled.
 				</p>
 			</div>
 
 			<form method="POST" action={ utils.URL("/feature-flags") } class="feature-flags-card" id="featureFlagsForm">
-				<div class="integration-list">
-					@FeatureFlagIntegrationRow(data.Zoom)
-					@FeatureFlagIntegrationRow(data.GoogleCalendar)
-				</div>
+				<section class="feature-flags-section">
+					<h2 class="feature-flags-section-title">Class scheduling</h2>
+					@FeatureFlagClassOverdueGracePeriodRow(data.ClassOverdueGracePeriodMinutes)
+				</section>
+				<section class="feature-flags-section">
+					<h2 class="feature-flags-section-title">Integrations</h2>
+					<div class="integration-list">
+						@FeatureFlagIntegrationRow(data.Zoom)
+						@FeatureFlagIntegrationRow(data.GoogleCalendar)
+					</div>
+				</section>
 				<div class="feature-flags-actions">
 					<button type="submit" class="btn">Save</button>
 				</div>
@@ -246,6 +330,31 @@ templ FeatureFlags(data FeatureFlagsData) {
 		</script>
 	</body>
 	</html>
+}
+
+templ FeatureFlagClassOverdueGracePeriodRow(minutes int64) {
+	<div class="feature-flag-setting-row">
+		<div class="feature-flag-setting-copy">
+			<span class="feature-flag-setting-name">Overdue grace period</span>
+			<p class="feature-flag-setting-desc">
+				Minutes after a scheduled class ends before it is marked overdue on the schedule and included in missed-class notifications.
+			</p>
+		</div>
+		<div class="feature-flag-number-field">
+			<label class="feature-flag-number-label" for="classOverdueGracePeriodMinutes">Minutes</label>
+			<input
+				id="classOverdueGracePeriodMinutes"
+				class="feature-flag-number-input"
+				type="number"
+				name="class_overdue_grace_period_minutes"
+				min="0"
+				max={ fmt.Sprintf("%d", constants.MaxClassOverdueGracePeriodMinutes) }
+				step="1"
+				value={ fmt.Sprintf("%d", minutes) }
+				required
+			/>
+		</div>
+	</div>
 }
 
 templ FeatureFlagIntegrationRow(item FeatureFlagIntegrationItem) {
