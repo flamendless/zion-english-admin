@@ -13,7 +13,18 @@ func getDisplayValue(value string) string {
 }
 
 func formatRate(rate float64, currency string) string {
-	return fmt.Sprintf("%.2f %s", rate, currency)
+	return utils.FormatCurrency(rate, currency)
+}
+
+func formatRateAmount(rate float64, currency string) string {
+	return utils.FormatCurrencyAmount(rate, currency)
+}
+
+func formatOptionalParentRate(rate float64, currency string, hasRate bool) string {
+	if !hasRate {
+		return "-"
+	}
+	return utils.FormatCurrencyAmountFixed(rate, currency) + " " + currency
 }
 
 var onceScrPassword = templ.NewOnceHandle()
@@ -25,18 +36,40 @@ templ Flam() {
 	</p>
 }
 
-templ ActionCard(url string, h2 string, desc string) {
-	<a href={ utils.URL(url) } class="card">
-		<h2>{ h2 }</h2>
-		<p>{ desc }</p>
+templ ActionCardContent(item NavItem) {
+	<div class="card__head">
+		@NavIconBadge(item.Icon)
+		if item.AdminOnlyCard {
+			@AdminOnlyCardTitle(item.Title)
+		} else {
+			<h2>{ item.Title }</h2>
+		}
+	</div>
+	<p>{ item.Description }</p>
+}
+
+templ ActionCard(item NavItem) {
+	<a href={ utils.URL(item.Path) } class="card">
+		@ActionCardContent(item)
 	</a>
 }
 
-templ ActionCardFeature(url string, h2 string, desc string) {
-	<a href={ utils.URL(url) } class="card card-feature">
-		<h2>{ h2 }</h2>
-		<p>{ desc }</p>
+templ ActionCardFeature(item NavItem) {
+	<a href={ utils.URL(item.Path) } class="card card-feature">
+		@ActionCardContent(item)
 	</a>
+}
+
+templ ActionCardOpensModal(item NavItem) {
+	if item.FeatureCard {
+		<button type="button" class="card card-feature" data-open-record-classes-modal>
+			@ActionCardContent(item)
+		</button>
+	} else {
+		<button type="button" class="card" data-open-record-classes-modal>
+			@ActionCardContent(item)
+		</button>
+	}
 }
 
 templ TeacherOptions(teachers []models.TeacherAPIResponse, selectedID string) {
@@ -69,11 +102,11 @@ templ StudentOptions(students []models.StudentAPIResponse, selectedID string) {
 }
 
 templ StudentSearchResults(students []models.StudentAPIResponse) {
-	<div class="student-search-results">
+	<div class="entity-search-results">
 		for _, s := range students {
 			<button
 				type="button"
-				class="student-search-item"
+				class="entity-search-item"
 				data-id={ fmt.Sprintf("%d", s.ID) }
 				data-name={ s.Name }
 				_="
@@ -90,31 +123,111 @@ templ StudentSearchResults(students []models.StudentAPIResponse) {
 	</div>
 }
 
-func currentCutoffRange() (firstCutoff string, secondCutoff string, activeCutoff string) {
-	now := time.Now()
-	year, month, day := now.Date()
-	lastOfMonth := time.Date(year, month, 1, 0, 0, 0, 0, time.Local).AddDate(0, 1, -1).Day()
+templ TeacherSearchResults(teachers []models.TeacherAPIResponse, hiddenID string, inputID string, resultsID string) {
+	<div class="entity-search-results">
+		for _, t := range teachers {
+			<button
+				type="button"
+				class="entity-search-item"
+				data-id={ fmt.Sprintf("%d", t.ID) }
+				data-name={ t.Name }
+				data-driveurl={ t.DriveUrl }
+				data-template={ t.Template }
+				data-rate={ fmt.Sprintf("%.2f", t.RatePerClass) }
+				_={ teacherSearchSelectScript(hiddenID, inputID, resultsID) }
+			>
+				{ t.Name }
+			</button>
+		}
+	</div>
+}
 
-	a := time.Date(year, month, 1, 0, 0, 0, 0, time.Local).Format("2006-01-02")
-	b := time.Date(year, month, 15, 0, 0, 0, 0, time.Local).Format("2006-01-02")
-	c := time.Date(year, month, 16, 0, 0, 0, 0, time.Local).Format("2006-01-02")
-	d := time.Date(year, month, lastOfMonth, 0, 0, 0, 0, time.Local).Format("2006-01-02")
+func teacherSearchSelectScript(hiddenID, inputID, resultsID string) string {
+	return fmt.Sprintf(`on click
+		set #%s.value to my @data-id
+		set #%s.dataset.name to my @data-name
+		set #%s.dataset.driveurl to my @data-driveurl
+		set #%s.dataset.template to my @data-template
+		set #%s.dataset.rate to my @data-rate
+		set #%s.value to my @data-name
+		set #%s.innerHTML to ''
+		trigger change on #%s
+	end`, hiddenID, hiddenID, hiddenID, hiddenID, hiddenID, inputID, resultsID, hiddenID)
+}
 
-	firstCutoff = fmt.Sprintf("%s|%s", a, b)
-	secondCutoff = fmt.Sprintf("%s|%s", c, d)
-	if day <= 15 {
-		activeCutoff = firstCutoff
-	} else {
-		activeCutoff = secondCutoff
-	}
-	return firstCutoff, secondCutoff, activeCutoff
+func teacherSearchClearScript(hiddenID, resultsID string) string {
+	return fmt.Sprintf(`on input
+		if my.value is ''
+			set #%s.value to ''
+			set #%s.innerHTML to ''
+			trigger change on #%s
+		end
+	end`, hiddenID, resultsID, hiddenID)
+}
+
+templ EntitySearchDismissScript() {
+	<script>
+		(function () {
+			if (window._entitySearchDismissBound) return;
+			window._entitySearchDismissBound = true;
+
+			document.addEventListener('click', function (e) {
+				document.querySelectorAll('.entity-search').forEach(function (search) {
+					if (search.contains(e.target)) return;
+					const resultsHost = search.querySelector('[id$="SearchResults"]');
+					if (resultsHost) {
+						const portaled = document.querySelector('.entity-search-results[data-wizard-results-host="' + resultsHost.id + '"]');
+						if (portaled) {
+							if (portaled.contains(e.target)) return;
+							portaled.remove();
+						}
+						resultsHost.innerHTML = '';
+						return;
+					}
+					const results = search.querySelector('.entity-search-results');
+					if (results && results.parentElement) {
+						results.parentElement.innerHTML = '';
+					}
+				});
+
+				document.querySelectorAll('.class-lm-picker').forEach(function (picker) {
+					if (picker.contains(e.target)) return;
+					const results = picker.querySelector('.class-lm-results');
+					if (results) {
+						results.innerHTML = '';
+					}
+				});
+			});
+		})();
+	</script>
 }
 
 templ DatePreset(selectCurrentCutoff bool) {
+	@DatePresetForMonth(utils.CurrentMonthPHT(), selectCurrentCutoff)
+}
+
+templ MonthPicker(inputID string, partialURL string) {
+	<div class="form-group report-month-group">
+		<label for={ inputID }>Month</label>
+		<input
+			type="month"
+			id={ inputID }
+			name="month"
+			value={ utils.CurrentMonthPHT() }
+			hx-get={ partialURL }
+			hx-target="#datePresetGroup"
+			hx-swap="outerHTML"
+			hx-include="this"
+			hx-trigger="change"
+		/>
+	</div>
+}
+
+templ DatePresetForMonth(monthValue string, selectCurrentCutoff bool) {
 	{{
-		firstCutoff, secondCutoff, activeCutoff := currentCutoffRange()
+		firstCutoff, secondCutoff, activeCutoff, _ := cutoffPresetForMonth(monthValue, selectCurrentCutoff)
 	}}
-	<div class="form-group">
+	<div class="form-group" id="datePresetGroup">
 		<label for="datePreset">Date Range</label>
 		<select id="datePreset" name="datePreset">
 			if !selectCurrentCutoff {
@@ -200,6 +313,7 @@ templ ShowPassword(inputID string) {
 		type="button"
 		class="password-toggle"
 		data-target={ inputID }
+		data-tooltip="Show password"
 		aria-label="Show password"
 		onclick="togglePasswordField(this)"
 	>
@@ -280,6 +394,7 @@ templ ShowPassword(inputID string) {
 				passwordInput.type = isPassword ? 'text' : 'password';
 				btn.classList.toggle('is-visible', isPassword);
 				btn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+				btn.setAttribute('data-tooltip', isPassword ? 'Hide password' : 'Show password');
 			}
 		</script>
 	}

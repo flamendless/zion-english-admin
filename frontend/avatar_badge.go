@@ -17,6 +17,14 @@ func WithSuperuserBadge(props AvatarProps) AvatarProps {
 	return props
 }
 
+func AvatarForTimeline(props AvatarProps) AvatarProps {
+	props.RoleBadge = ""
+	if props.Size == "" {
+		props.Size = "sm"
+	}
+	return props
+}
+
 func AvatarRoleBadgeTone(label string) PillTone {
 	if label == "superuser" {
 		return PillTonePrimary

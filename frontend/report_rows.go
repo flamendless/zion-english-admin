@@ -19,6 +19,7 @@ type ReportRowData struct {
 	TeacherName      string
 	TeacherAvatar    AvatarProps
 	ConductedClasses int64
+	CancelledClasses int64
 	TotalClasses     int64
 	Earnings         []ReportEarningData
 	DownloadReady    bool
@@ -26,7 +27,7 @@ type ReportRowData struct {
 }
 
 func (r ReportRowData) ClassesLabel() string {
-	return fmt.Sprintf("%d/%d", r.ConductedClasses, r.TotalClasses)
+	return fmt.Sprintf("%d", r.TotalClasses)
 }
 
 func (r ReportRowData) GenerateLabel() string {
@@ -49,7 +50,7 @@ func (r ReportRowData) EarningsHTML() string {
 	}
 	parts := make([]string, 0, len(r.Earnings))
 	for _, item := range r.Earnings {
-		parts = append(parts, fmt.Sprintf("%.2f %s", item.Total, item.Currency))
+		parts = append(parts, utils.FormatCurrency(item.Total, item.Currency))
 	}
 	return strings.Join(parts, "<br>")
 }

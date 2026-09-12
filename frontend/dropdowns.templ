@@ -1,49 +1,122 @@
 package frontend
 
+import "fmt"
 import "zion-english/internal/utils"
+import "zion-english/internal/constants"
 
-templ TeacherDropdownWithValue(selectedID string) {
-	<div class="form-group">
-		<label for="teacher">Teacher *</label>
-		<select id="teacher" name="teacher" required
-			hx-get={ utils.URL("/api/teachers?selected=" + selectedID) }
-			hx-trigger="load"
-			hx-swap="innerHTML"
-			hx-target="this"
-		>
-			<option value="">-- Select Teacher --</option>
-		</select>
+type TeacherSearchParams struct {
+	InputID      string
+	HiddenID     string
+	HiddenName   string
+	ResultsID    string
+	Label        string
+	Placeholder  string
+	Required     bool
+	FilterMode   bool
+	SelectedID   string
+	SelectedName string
+	AdminOnly    bool
+}
+
+templ TeacherSearch(params TeacherSearchParams) {
+	<div class="form-group entity-search teacher-search">
+		if params.Label != "" {
+			if params.AdminOnly {
+				@AdminOnlyFormLabel(params.InputID, params.Label)
+			} else {
+				<label for={ params.InputID }>{ params.Label }</label>
+			}
+		}
+		<input
+			type="text"
+			id={ params.InputID }
+			name="teacherQ"
+			autocomplete="off"
+			placeholder={ params.Placeholder }
+			value={ params.SelectedName }
+			if params.FilterMode {
+				_={ teacherSearchClearScript(params.HiddenID, params.ResultsID) }
+			}
+			hx-get={ teacherSearchURL(params.HiddenID, params.InputID, params.ResultsID) }
+			hx-trigger="input changed delay:300ms"
+			hx-target={ "#" + params.ResultsID }
+			hx-include={ "#" + params.InputID }
+		/>
+		if params.Required {
+			<input
+				type="hidden"
+				id={ params.HiddenID }
+				name={ params.HiddenName }
+				value={ params.SelectedID }
+				required
+			/>
+		} else {
+			<input
+				type="hidden"
+				id={ params.HiddenID }
+				name={ params.HiddenName }
+				value={ params.SelectedID }
+			/>
+		}
+		<div id={ params.ResultsID }></div>
 	</div>
+}
+
+templ TeacherDropdownWithValue(selectedID string, selectedName string) {
+	@TeacherSearch(TeacherSearchParams{
+		InputID:      "teacherSearch",
+		HiddenID:     "teacher",
+		HiddenName:   "teacher",
+		ResultsID:    "teacherSearchResults",
+		Label:        "Teacher *",
+		Placeholder:  "Search teacher...",
+		Required:     true,
+		SelectedID:   selectedID,
+		SelectedName: selectedName,
+		AdminOnly:    true,
+	})
 }
 
 templ TeacherDropdown() {
-	<div class="form-group">
-		<label for="teacher">Teacher *</label>
-		<select id="teacher" name="teacher" required
-			hx-get={ utils.URL("/api/teachers") }
-			hx-trigger="load"
-			hx-swap="innerHTML"
-			hx-target="this"
-		>
-			//TeacherOption
-			<option value="">-- Select Teacher --</option>
-		</select>
-	</div>
+	@TeacherDropdownWithValue("", "")
 }
 
 templ TeacherDropdownEx(label string) {
-	<div class="form-group">
-		<label for="teacher">{ label }</label>
-		<select id="teacher" name="teacher" required
-			hx-get={ utils.URL("/api/teachers") }
-			hx-trigger="load"
-			hx-swap="innerHTML"
-			hx-target="this"
-		>
-			//TeacherOption
-			<option value="">-- Select Teacher --</option>
-		</select>
-	</div>
+	@TeacherSearch(TeacherSearchParams{
+		InputID:      "teacherSearch",
+		HiddenID:     "teacher",
+		HiddenName:   "teacher",
+		ResultsID:    "teacherSearchResults",
+		Label:        label,
+		Placeholder:  "Search teacher...",
+		Required:     true,
+	})
+}
+
+templ ScheduleListTeacherSearch() {
+	@TeacherSearch(TeacherSearchParams{
+		InputID:      "listTeacherSearch",
+		HiddenID:     "listTeacher",
+		HiddenName:   "teacherId",
+		ResultsID:    "listTeacherSearchResults",
+		Label:        "Teacher",
+		Placeholder:  "Search teacher...",
+		Required:     true,
+		AdminOnly:    true,
+	})
+}
+
+templ ClassesTeacherFilterSearch() {
+	@TeacherSearch(TeacherSearchParams{
+		InputID:      "teacherSearch",
+		HiddenID:     "teacher",
+		HiddenName:   "teacherId",
+		ResultsID:    "teacherSearchResults",
+		Label:        "Teacher",
+		Placeholder:  "All teachers",
+		FilterMode:   true,
+		AdminOnly:    true,
+	})
 }
 
 templ TeacherStudentsDropdownWithValue(selectedID string) {
@@ -77,7 +150,7 @@ templ TeacherStudentsDropdown() {
 
 templ StudentDropdownWithValue(selectedID string) {
 	<div class="form-group">
-		<label for="student">Student *</label>
+		@AdminOnlyFormLabel("student", "Student *")
 		<select id="student" name="student" required
 			hx-get={ utils.URL("/api/students?selected=" + selectedID) }
 			hx-trigger="load"
@@ -91,7 +164,7 @@ templ StudentDropdownWithValue(selectedID string) {
 
 templ StudentDropdown() {
 	<div class="form-group">
-		<label for="student">Student *</label>
+		@AdminOnlyFormLabel("student", "Student *")
 		<select id="student" name="student" required
 			hx-get={ utils.URL("/api/students") }
 			hx-trigger="load"
@@ -105,22 +178,21 @@ templ StudentDropdown() {
 }
 
 templ ScheduleModalTeacherDropdown() {
-	<div class="form-group">
-		<label for="schedule_teacher">Teacher *</label>
-		<select id="schedule_teacher" name="schedule_teacher" required
-			hx-get={ utils.URL("/api/teachers") }
-			hx-trigger="load"
-			hx-swap="innerHTML"
-			hx-target="this"
-		>
-			<option value="">-- Select Teacher --</option>
-		</select>
-	</div>
+	@TeacherSearch(TeacherSearchParams{
+		InputID:      "scheduleTeacherSearch",
+		HiddenID:     "schedule_teacher",
+		HiddenName:   "schedule_teacher",
+		ResultsID:    "scheduleTeacherSearchResults",
+		Label:        "Teacher *",
+		Placeholder:  "Search teacher...",
+		Required:     true,
+		AdminOnly:    true,
+	})
 }
 
 templ ScheduleModalStudentDropdown() {
 	<div class="form-group">
-		<label for="schedule_student">Student *</label>
+		@AdminOnlyFormLabel("schedule_student", "Student *")
 		<select id="schedule_student" name="schedule_student" required>
 			<option value="">-- Select teacher first --</option>
 		</select>
@@ -129,7 +201,7 @@ templ ScheduleModalStudentDropdown() {
 
 templ ScheduleEditStudentDropdown(teacherID string, studentID string) {
 	<div class="form-group">
-		<label for="schedule_student">Student *</label>
+		@AdminOnlyFormLabel("schedule_student", "Student *")
 		<select id="schedule_student" name="schedule_student" required
 			hx-get={ utils.URL("/api/students?teacher=" + teacherID + "&selected=" + studentID) }
 			hx-trigger="load"
@@ -142,12 +214,12 @@ templ ScheduleEditStudentDropdown(teacherID string, studentID string) {
 }
 
 templ StudentSearchbox() {
-	<div class="form-group student-search">
-		<label for="relatedStudentSearch">Existing Student</label>
+	<div class="form-group entity-search student-search">
+		<label for="relatedStudentSearch">Student name related with</label>
 		<input
 			type="text"
 			id="relatedStudentSearch"
-			name="q"
+			name="studentQ"
 			autocomplete="off"
 			placeholder="Search registered student..."
 			hx-get={ utils.URL("/api/students/search") }
@@ -157,6 +229,19 @@ templ StudentSearchbox() {
 		/>
 		<input type="hidden" id="relatedStudentId" name="relatedStudentId"/>
 		<div id="relatedStudentResults"></div>
+	</div>
+}
+
+templ ParentCurrencyDropdownWithValue(selected string) {
+	<div class="form-group">
+		@AdminOnlyFormLabel("parentCurrency", "Parent Currency")
+		<select id="parentCurrency" name="parentCurrency">
+			<option value="" selected?={ selected == "" }>-- None --</option>
+			<option value="KRW" selected?={ selected == "KRW" }>KRW (Korean Won)</option>
+			<option value="CAD" selected?={ selected == "CAD" }>CAD (Canadian Dollar)</option>
+			<option value="YEN" selected?={ selected == "YEN" }>YEN (Japanese Yen)</option>
+			<option value="PHP" selected?={ selected == "PHP" }>PHP (Philippine Peso)</option>
+		</select>
 	</div>
 }
 
@@ -184,23 +269,24 @@ templ ClassesStatusFilterDropdown() {
 	</div>
 }
 
-templ ClassStatusDropdownWithValue(selected string) {
+templ ClassStatusDropdownWithValue(selected constants.ClassListFilterStatus) {
 	<div class="form-group">
 		<label for="status">Status *</label>
 		<select id="status" name="status" required>
 			for _, opt := range ClassRecordStatusOptions {
-				<option value={ opt.Value } selected?={ selected == opt.Value }>{ opt.Label }</option>
+				<option value={ opt.Value } selected?={ string(selected) == opt.Value }>{ opt.Label }</option>
 			}
 		</select>
 	</div>
 }
 
-templ StudentStatusDropdownWithValue(selected string) {
+templ StudentStatusDropdownWithValue(selected constants.StudentStatus) {
 	<div class="form-group">
-		<label for="status">Status *</label>
+		@AdminOnlyFormLabel("status", "Status *")
 		<select id="status" name="status" required>
-			<option value="active" selected?={ selected == "active" }>Active</option>
-			<option value="inactive" selected?={ selected == "inactive" }>Inactive</option>
+			for _, opt := range StudentStatusOptions {
+				<option value={ opt.Value } selected?={ string(selected) == opt.Value }>{ opt.Label }</option>
+			}
 		</select>
 	</div>
 }
@@ -233,24 +319,27 @@ templ StudentStatusDropdown() {
 	<div class="form-group">
 		<label for="status">Status *</label>
 		<select id="status" name="status" required>
-			<option value="active">Active</option>
-			<option value="inactive">Inactive</option>
+			for _, opt := range StudentStatusOptions {
+				<option value={ opt.Value }>{ opt.Label }</option>
+			}
 		</select>
 	</div>
 }
 
-templ TeacherAssignRow(selectedID string, removable bool) {
+templ TeacherAssignRow(selectedID string, selectedName string, rowKey string, removable bool) {
 	<div class="teacher-assign-row">
-		<select name="teachers" required
-			hx-get={ utils.URL("/api/teachers?selected=" + selectedID) }
-			hx-trigger="load"
-			hx-swap="innerHTML"
-			hx-target="this"
-		>
-			<option value="">-- Select Teacher --</option>
-		</select>
+		@TeacherSearch(TeacherSearchParams{
+			InputID:      "teacherSearch_" + rowKey,
+			HiddenID:     "teacher_" + rowKey,
+			HiddenName:   "teachers",
+			ResultsID:    "teacherSearchResults_" + rowKey,
+			Placeholder:  "Search teacher...",
+			Required:     true,
+			SelectedID:   selectedID,
+			SelectedName: selectedName,
+		})
 		if removable {
-			<button type="button" class="teacher-assign-remove" aria-label="Remove teacher"
+			<button type="button" class="teacher-assign-remove" data-tooltip="Remove assigned teacher" aria-label="Remove assigned teacher"
 				_="on click
 					if #teacherRows.children.length > 1
 						remove closest .teacher-assign-row
@@ -261,23 +350,26 @@ templ TeacherAssignRow(selectedID string, removable bool) {
 	</div>
 }
 
-templ TeacherAssignRows(selectedIDs []string) {
+templ TeacherAssignRows(selectedIDs []string, selectedNames []string) {
 	<div class="form-group teacher-assign">
-		<label>Assigned Teachers *</label>
+		@AdminOnlyFieldLabel("Assigned Teachers *")
 		<div id="teacherRows" class="teacher-assign-rows">
 			if len(selectedIDs) == 0 {
-				@TeacherAssignRow("", false)
+				@TeacherAssignRow("", "", "0", false)
 			} else {
 				for i, id := range selectedIDs {
-					@TeacherAssignRow(id, i > 0 || len(selectedIDs) > 1)
+					@TeacherAssignRow(id, selectedNames[i], fmt.Sprintf("%d", i), i > 0 || len(selectedIDs) > 1)
 				}
 			}
 		</div>
-		<button type="button" class="teacher-assign-add" aria-label="Add teacher"
-			hx-get={ utils.URL("/api/teacher-row") }
-			hx-target="#teacherRows"
-			hx-swap="beforeend"
-		>+</button>
+		<div class="teacher-assign-add-row">
+			<button type="button" class="teacher-assign-add" data-tooltip="Assign to another teacher" aria-label="Assign to another teacher"
+				hx-get={ utils.URL("/api/teacher-row") }
+				hx-target="#teacherRows"
+				hx-swap="beforeend"
+			>+</button>
+			<span class="teacher-assign-add-label">Assign to another teacher</span>
+		</div>
 	</div>
 }
 

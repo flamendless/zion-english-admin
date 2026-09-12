@@ -1,0 +1,125 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+templ DeleteStudentModal() {
+	<div class="modal-overlay" id="deleteStudentModal" hidden role="presentation">
+		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="deleteStudentModalTitle">
+			<div class="modal-header">
+				<h3 id="deleteStudentModalTitle">Delete Student</h3>
+				<button type="button" class="modal-close delete-student-modal-close" data-tooltip="Close" aria-label="Close">&times;</button>
+			</div>
+			<form
+				id="deleteStudentForm"
+				method="POST"
+				class="modal-body scheduled-class-action-modal"
+				hx-swap="none"
+			>
+				<p class="scheduled-class-modal-lead">This will mark the student as deleted. The record is kept for audit.</p>
+				<div class="form-group">
+					<label>Student</label>
+					<p id="deleteStudentModalName" class="delete-student-modal-name">-</p>
+				</div>
+				<div class="scheduled-class-modal-fields">
+					<div class="form-group">
+						<label for="deleteStudentReason">Reason *</label>
+						<input
+							type="text"
+							id="deleteStudentReason"
+							name="reason"
+							required
+							placeholder="Reason for deletion"
+						/>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary delete-student-modal-close">Cancel</button>
+					<button type="submit" class="btn btn-danger" id="deleteStudentSubmitBtn">Delete</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<style>
+		.delete-student-modal-name {
+			margin: 0;
+			font-weight: 600;
+			color: var(--color-foreground);
+		}
+	</style>
+	<script>
+		(function () {
+			const modal = document.getElementById('deleteStudentModal');
+			const form = document.getElementById('deleteStudentForm');
+			const reasonInput = document.getElementById('deleteStudentReason');
+			const nameEl = document.getElementById('deleteStudentModalName');
+			if (!modal || !form || !reasonInput || !nameEl) return;
+
+			window.openDeleteStudentModal = function (deleteURL, studentName) {
+				form.action = deleteURL;
+				form.setAttribute('hx-post', deleteURL);
+				if (typeof htmx !== 'undefined') {
+					htmx.process(form);
+				}
+				reasonInput.value = '';
+				nameEl.textContent = studentName || '-';
+				modal.hidden = false;
+				document.body.classList.add('modal-open');
+				reasonInput.focus();
+			};
+
+			window.closeDeleteStudentModal = function () {
+				modal.hidden = true;
+				const studentViewOpen = !!document.getElementById('studentViewModal');
+				if (!studentViewOpen) {
+					document.body.classList.remove('modal-open');
+				}
+				reasonInput.value = '';
+				nameEl.textContent = '-';
+			};
+
+			form.addEventListener('submit', function (e) {
+				if (!reasonInput.value.trim()) {
+					e.preventDefault();
+					alert('Reason is required for deletion');
+					return;
+				}
+				reasonInput.value = reasonInput.value.trim();
+			});
+
+			document.body.addEventListener('click', function (e) {
+				if (e.target.closest('[data-student-delete-url]')) {
+					e.preventDefault();
+					const btn = e.target.closest('[data-student-delete-url]');
+					const url = btn.getAttribute('data-student-delete-url');
+					const name = btn.getAttribute('data-student-name') || '-';
+					if (url) window.openDeleteStudentModal(url, name);
+					return;
+				}
+				if (e.target.closest('.delete-student-modal-close')) {
+					window.closeDeleteStudentModal();
+					return;
+				}
+				if (e.target === modal) {
+					window.closeDeleteStudentModal();
+				}
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key === 'Escape' && !modal.hidden) {
+					window.closeDeleteStudentModal();
+				}
+			});
+
+			document.body.addEventListener('htmx:afterRequest', function (evt) {
+				if (evt.detail.elt !== form) return;
+				if (evt.detail.successful) {
+					window.closeDeleteStudentModal();
+				}
+			});
+		})();
+	</script>
+}
+
+func StudentDeleteURL(id string) string {
+	return utils.URL("/students/" + id + "/delete")
+}

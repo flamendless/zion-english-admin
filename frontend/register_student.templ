@@ -1,5 +1,6 @@
 package frontend
 
+import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 type RegisterStudentData struct {
@@ -31,40 +32,63 @@ templ RegisterStudent(data RegisterStudentData) {
 				</div>
 
 				<div class="form-row">
-					@CurrencyDropdown()
+					@CurrencyAmountField(CurrencyAmountFieldParams{
+						Label:             "Rate Per Class *",
+						AmountID:          "ratePerClass",
+						AmountName:        "ratePerClass",
+						CurrencyID:        "currency",
+						CurrencyName:      "currency",
+						PlaceholderAmount: "0.00",
+						Required:          true,
+					})
 					@StudentStatusDropdown()
 				</div>
 
 				if data.IsSuperuser {
 					<div id="registerInactiveReasonGroup" class="form-group inactive-reason-group">
-						<label for="inactiveReason">Inactive Reason</label>
+						@AdminOnlyFormLabel("inactiveReason", "Inactive Reason")
 						<input type="text" id="inactiveReason" name="inactiveReason" placeholder="Why is this student inactive?"/>
 					</div>
 				}
 
 				if data.IsSuperuser {
 					<div class="form-group">
-						<label for="contact">Contact</label>
+						@AdminOnlyFormLabel("contact", "Contact")
 						<input type="text" id="contact" name="contact"
 						       placeholder="Enter contact information">
 					</div>
 				}
 
-				<div class="form-group">
-					<label for="ratePerClass">Rate Per Class *</label>
-					<input type="number" id="ratePerClass" name="ratePerClass" required
-					       step="0.01" min="0" placeholder="0.00">
-				</div>
-
-				<div class="form-group">
-					<label for="parentName">Parent's Name</label>
-					<input type="text" id="parentName" name="parentName"
-					       placeholder="Enter parent's name">
-				</div>
+				if data.IsSuperuser {
+					<div class="form-row">
+						<div class="form-group">
+							<label for="parentName">Parent's Name</label>
+							<input type="text" id="parentName" name="parentName"
+							       placeholder="Enter parent's name">
+						</div>
+						@CurrencyAmountField(CurrencyAmountFieldParams{
+							Label:             "Parent Rate",
+							AmountID:          "parentRate",
+							AmountName:        "parentRate",
+							CurrencyID:        "parentCurrency",
+							CurrencyName:      "parentCurrency",
+							PlaceholderAmount: "0.00",
+							OptionalCurrency:  true,
+							Hint:              "Optional. Set both amount and currency, or leave both empty.",
+							AdminOnly:         true,
+						})
+					</div>
+				} else {
+					<div class="form-group">
+						<label for="parentName">Parent's Name</label>
+						<input type="text" id="parentName" name="parentName"
+						       placeholder="Enter parent's name">
+					</div>
+				}
 
 				if data.IsSuperuser {
 					<div class="form-group">
-						<label>Related To</label>
+						@AdminOnlyFieldLabel("Related To")
 						<div class="form-row">
 							<div class="form-group">
 								<label for="relationship">Relationship</label>
@@ -75,19 +99,19 @@ templ RegisterStudent(data RegisterStudentData) {
 						</div>
 					</div>
 
-					@TeacherAssignRows(nil)
+					@TeacherAssignRows(nil, nil)
 
 					<div class="form-group">
-						<label for="assignedColor">Assigned Color *</label>
+						@AdminOnlyFormLabel("assignedColor", "Assigned Color *")
 						<div class="color-group">
 							<input type="color" id="assignedColor" name="assignedColor" required
-							       value="#90C020"
+							       value={ constants.DefaultAssignedColor }
 								_="
 									on input
 										set #colorPreview.style.backgroundColor to me.value
 									end
 								">
-							<div class="color-preview" id="colorPreview" style="background-color: #90C020;"></div>
+							<div class="color-preview" id="colorPreview" style={ "background-color: " + constants.DefaultAssignedColor }></div>
 						</div>
 					</div>
 				}

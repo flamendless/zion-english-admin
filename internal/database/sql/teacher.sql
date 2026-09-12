@@ -30,7 +30,40 @@ ORDER BY CASE WHEN deleted = 1 THEN 2 WHEN status = 'pending' THEN 0 ELSE 1 END,
 SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
 FROM tbl_teachers
 WHERE status = 'approved' AND deleted = 0
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = tbl_teachers.id AND tr.role = 'tester'
+	)
 ORDER BY last_name ASC, first_name ASC, middle_name ASC;
+
+-- name: SearchApprovedTeachersByName :many
+SELECT id, first_name, middle_name, last_name, drive_url, rate_per_class, template
+FROM tbl_teachers
+WHERE status = 'approved' AND deleted = 0
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = tbl_teachers.id AND tr.role = 'tester'
+	)
+	AND (
+		trim(first_name || CASE WHEN middle_name != '' THEN ' ' || middle_name ELSE '' END || CASE WHEN last_name != '' THEN ' ' || last_name ELSE '' END) LIKE '%' || ? || '%'
+		OR first_name LIKE '%' || ? || '%'
+		OR last_name LIKE '%' || ? || '%'
+	)
+ORDER BY last_name ASC, first_name ASC, middle_name ASC
+LIMIT 10;
+
+-- name: SearchApprovedTeachersByFirstAndLast :many
+SELECT id, first_name, middle_name, last_name, drive_url, rate_per_class, template
+FROM tbl_teachers
+WHERE status = 'approved' AND deleted = 0
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = tbl_teachers.id AND tr.role = 'tester'
+	)
+	AND first_name LIKE '%' || ? || '%'
+	AND last_name LIKE '%' || ? || '%'
+ORDER BY last_name ASC, first_name ASC, middle_name ASC
+LIMIT 10;
 
 -- name: ApproveTeacher :exec
 UPDATE tbl_teachers SET status = 'approved', updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending' AND deleted = 0;
@@ -88,7 +121,38 @@ WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || midd
 	AND (
 	? = ''
 	OR (? = 'deleted' AND deleted = 1)
-	OR (? != 'deleted' AND ? != '' AND status = ? AND deleted = 0)
+	OR (? != 'deleted' AND ? != '' AND tbl_teachers.status = ? AND deleted = 0)
+	)
+	AND (
+	? = ''
+	OR (
+		? = 'none'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'document'
+		)
+	)
+	OR (
+		? != ''
+		AND ? != 'none'
+		AND (
+			SELECT d.status FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'document'
+			ORDER BY d.uploaded_at DESC
+			LIMIT 1
+		) = ?
+	)
+	)
+	AND (
+	(? = 0 AND ? = 0)
+	OR (? = 1 AND EXISTS (
+		SELECT 1 FROM tbl_teacher_meeting_accounts m
+		WHERE m.teacher_id = tbl_teachers.id AND m.service = 'zoom'
+	))
+	OR (? = 1 AND EXISTS (
+		SELECT 1 FROM tbl_teacher_meeting_accounts m
+		WHERE m.teacher_id = tbl_teachers.id AND m.service = 'google_calendar'
+	))
 	);
 
 -- name: GetTeachersFiltered :many
@@ -98,9 +162,40 @@ WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || midd
 	AND (
 	? = ''
 	OR (? = 'deleted' AND deleted = 1)
-	OR (? != 'deleted' AND ? != '' AND status = ? AND deleted = 0)
+	OR (? != 'deleted' AND ? != '' AND tbl_teachers.status = ? AND deleted = 0)
 	)
-ORDER BY CASE WHEN deleted = 1 THEN 2 WHEN status = 'pending' THEN 0 ELSE 1 END, last_name ASC, first_name ASC, middle_name ASC
+	AND (
+	? = ''
+	OR (
+		? = 'none'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'document'
+		)
+	)
+	OR (
+		? != ''
+		AND ? != 'none'
+		AND (
+			SELECT d.status FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'document'
+			ORDER BY d.uploaded_at DESC
+			LIMIT 1
+		) = ?
+	)
+	)
+	AND (
+	(? = 0 AND ? = 0)
+	OR (? = 1 AND EXISTS (
+		SELECT 1 FROM tbl_teacher_meeting_accounts m
+		WHERE m.teacher_id = tbl_teachers.id AND m.service = 'zoom'
+	))
+	OR (? = 1 AND EXISTS (
+		SELECT 1 FROM tbl_teacher_meeting_accounts m
+		WHERE m.teacher_id = tbl_teachers.id AND m.service = 'google_calendar'
+	))
+	)
+ORDER BY CASE WHEN deleted = 1 THEN 2 WHEN tbl_teachers.status = 'pending' THEN 0 ELSE 1 END, last_name ASC, first_name ASC, middle_name ASC
 LIMIT ? OFFSET ?;
 
 -- name: CountTeachersByStatus :one

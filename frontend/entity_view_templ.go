@@ -9,24 +9,40 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import "fmt"
+import "zion-english/internal/constants"
+import "zion-english/internal/utils"
 
 func formatDurationMinutes(minutes int64) string {
 	if minutes <= 0 {
 		return "-"
 	}
-	if minutes == 1 {
-		return "1 min"
+	if minutes < 60 {
+		if minutes == 1 {
+			return "1 min"
+		}
+		return fmt.Sprintf("%d min", minutes)
 	}
-	return fmt.Sprintf("%d min", minutes)
+	hours := minutes / 60
+	remainder := minutes % 60
+	if remainder == 0 {
+		if hours == 1 {
+			return "1 hr"
+		}
+		return fmt.Sprintf("%d hr", hours)
+	}
+	if hours == 1 {
+		return fmt.Sprintf("1 hr %d min", remainder)
+	}
+	return fmt.Sprintf("%d hr %d min", hours, remainder)
 }
 
-func classStatusAccentClass(status string) string {
+func classStatusAccentClass(status constants.ClassListFilterStatus) string {
 	switch status {
-	case "conducted":
+	case constants.ClassListFilterConducted:
 		return "entity-view-hero--success"
-	case "cancelled", "deleted":
+	case constants.ClassListFilterCancelled, constants.ClassListFilterDeleted:
 		return "entity-view-hero--error"
-	case "rescheduled":
+	case constants.ClassListFilterRescheduled:
 		return "entity-view-hero--warning"
 	default:
 		return "entity-view-hero--neutral"
@@ -61,7 +77,7 @@ func EntityViewStatCard(label, value string) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 30, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 46, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -74,7 +90,7 @@ func EntityViewStatCard(label, value string) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 31, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 47, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -116,7 +132,7 @@ func EntityViewMetaChip(label, value string) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 37, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 53, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -129,7 +145,7 @@ func EntityViewMetaChip(label, value string) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 38, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 54, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -171,7 +187,7 @@ func EntityViewSection(title string) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 44, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 60, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -193,7 +209,7 @@ func EntityViewSection(title string) templ.Component {
 	})
 }
 
-func EntityViewNotePanel(title, content, tone string) templ.Component {
+func EntityViewNotePanel(title, content string, tone PillTone) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -214,7 +230,7 @@ func EntityViewNotePanel(title, content, tone string) templ.Component {
 			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var10 = []any{"entity-view-note entity-view-note--" + tone}
+		var templ_7745c5c3_Var10 = []any{"entity-view-note entity-view-note--" + string(tone)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var10...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -239,7 +255,7 @@ func EntityViewNotePanel(title, content, tone string) templ.Component {
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 53, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 69, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -252,7 +268,7 @@ func EntityViewNotePanel(title, content, tone string) templ.Component {
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(content)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 54, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 70, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -386,7 +402,7 @@ func EntityViewRelationshipList(items []StudentRelationshipItem) templ.Component
 				var templ_7745c5c3_Var17 string
 				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(rel.RelatedStudentName)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 82, Col: 73}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 98, Col: 73}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 				if templ_7745c5c3_Err != nil {
@@ -404,7 +420,7 @@ func EntityViewRelationshipList(items []StudentRelationshipItem) templ.Component
 					var templ_7745c5c3_Var18 string
 					templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(rel.Relationship)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 84, Col: 68}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 100, Col: 68}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 					if templ_7745c5c3_Err != nil {
@@ -450,7 +466,7 @@ func EntityViewModalStyles() templ.Component {
 			templ_7745c5c3_Var19 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<style>\r\n\t\t.entity-view-body {\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-4);\r\n\t\t\toverflow-y: auto;\r\n\t\t}\r\n\r\n\t\t.entity-view-layout {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t@media (min-width: 640px) {\r\n\t\t\t.entity-view-layout--split {\r\n\t\t\t\tgrid-template-columns: 220px 1fr;\r\n\t\t\t\talign-items: start;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t.entity-view-card {\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.entity-view-hero {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: var(--space-4);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tbackground: linear-gradient(\r\n\t\t\t\t135deg,\r\n\t\t\t\tcolor-mix(in srgb, var(--hero-accent, var(--color-primary)) 10%, var(--color-surface)) 0%,\r\n\t\t\t\tvar(--color-muted) 100%\r\n\t\t\t);\r\n\t\t\tborder-left: 4px solid var(--hero-accent, var(--color-primary));\r\n\t\t}\r\n\r\n\t\t.entity-view-hero--success {\r\n\t\t\t--hero-accent: var(--color-success);\r\n\t\t}\r\n\r\n\t\t.entity-view-hero--warning {\r\n\t\t\t--hero-accent: var(--color-warning);\r\n\t\t}\r\n\r\n\t\t.entity-view-hero--error {\r\n\t\t\t--hero-accent: var(--color-destructive);\r\n\t\t}\r\n\r\n\t\t.entity-view-hero--neutral {\r\n\t\t\t--hero-accent: var(--color-accent);\r\n\t\t}\r\n\r\n\t\t.entity-view-eyebrow {\r\n\t\t\tmargin: 0 0 var(--space-1);\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.08em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.entity-view-hero h2 {\r\n\t\t\tmargin: 0 0 var(--space-2);\r\n\t\t\tfont-size: 1.25rem;\r\n\t\t\tline-height: 1.3;\r\n\t\t}\r\n\r\n\t\t.entity-view-meta-row {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.entity-view-meta-chip {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tpadding: var(--space-1) var(--space-2);\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: color-mix(in srgb, var(--color-surface) 88%, transparent);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-variant-numeric: tabular-nums;\r\n\t\t}\r\n\r\n\t\t.entity-view-meta-chip-label {\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t}\r\n\r\n\t\t.entity-view-meta-chip-value {\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tfont-weight: 500;\r\n\t\t}\r\n\r\n\t\t.entity-view-stats {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: repeat(auto-fit, minmax(120px, 1fr));\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.entity-view-stat {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-1);\r\n\t\t\tpadding: var(--space-3);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.entity-view-stat-label {\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.06em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.entity-view-stat-value {\r\n\t\t\tfont-size: 1rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tfont-variant-numeric: tabular-nums;\r\n\t\t\tword-break: break-word;\r\n\t\t}\r\n\r\n\t\t.entity-view-stat-value--rate {\r\n\t\t\tfont-size: 1.125rem;\r\n\t\t}\r\n\r\n\t\t.entity-view-stat-value--rate .entity-view-rate-currency {\r\n\t\t\tmargin-left: var(--space-1);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.entity-view-section-title {\r\n\t\t\tmargin: 0 0 var(--space-3);\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.06em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.entity-view-section-body {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.entity-view-detail-grid {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t@media (min-width: 480px) {\r\n\t\t\t.entity-view-detail-grid {\r\n\t\t\t\tgrid-template-columns: 1fr 1fr;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t.entity-view-note {\r\n\t\t\tpadding: var(--space-3) var(--space-4);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.entity-view-note-title {\r\n\t\t\tdisplay: block;\r\n\t\t\tmargin-bottom: var(--space-1);\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.06em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.entity-view-note-content {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tline-height: 1.55;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\twhite-space: pre-wrap;\r\n\t\t\tword-break: break-word;\r\n\t\t}\r\n\r\n\t\t.entity-view-note--info {\r\n\t\t\tbackground: var(--color-info-bg);\r\n\t\t\tborder-color: color-mix(in srgb, var(--color-info) 22%, transparent);\r\n\t\t}\r\n\r\n\t\t.entity-view-note--warning {\r\n\t\t\tbackground: var(--color-warning-bg);\r\n\t\t\tborder-color: color-mix(in srgb, var(--color-warning) 22%, transparent);\r\n\t\t}\r\n\r\n\t\t.entity-view-identity {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: center;\r\n\t\t\ttext-align: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.entity-view-color-swatch {\r\n\t\t\twidth: 72px;\r\n\t\t\theight: 72px;\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tborder: 3px solid var(--color-surface);\r\n\t\t\tbox-shadow: var(--shadow-md);\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.entity-view-identity h2 {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 1.0625rem;\r\n\t\t\tline-height: 1.3;\r\n\t\t}\r\n\r\n\t\t.entity-view-rate-highlight {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: baseline;\r\n\t\t\tgap: var(--space-1);\r\n\t\t\tpadding: var(--space-1) var(--space-3);\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tfont-variant-numeric: tabular-nums;\r\n\t\t}\r\n\r\n\t\t.entity-view-rate-block {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-1);\r\n\t\t}\r\n\r\n\t\t.entity-view-rate-caption {\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.06em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.entity-view-rate-highlight-amount {\r\n\t\t\tfont-size: 1rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.entity-view-rate-highlight-currency {\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tletter-spacing: 0.03em;\r\n\t\t}\r\n\r\n\t\t.entity-view-teacher-list {\r\n\t\t\tlist-style: none;\r\n\t\t\tmargin: 0;\r\n\t\t\tpadding: 0;\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.entity-view-teacher-item {\r\n\t\t\tpadding: var(--space-2) var(--space-3);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.entity-view-stat--teacher .teacher-name-cell {\r\n\t\t\tmargin-top: var(--space-1);\r\n\t\t}\r\n\r\n\t\t.entity-view-relationships {\r\n\t\t\tlist-style: none;\r\n\t\t\tmargin: 0;\r\n\t\t\tpadding: 0;\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.entity-view-relationship {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-2) var(--space-3);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.entity-view-relationship-name {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.entity-view-relationship-type {\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\ttext-transform: capitalize;\r\n\t\t}\r\n\r\n\t\t.entity-view-card .profile-details {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.entity-view-card .entity-view-section + .entity-view-section {\r\n\t\t\tmargin-top: var(--space-4);\r\n\t\t\tpadding-top: var(--space-4);\r\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t@media (min-width: 480px) {\r\n\t\t\t.entity-view-card .profile-details {\r\n\t\t\t\tgrid-template-columns: 1fr 1fr;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t.entity-view-card .profile-detail {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-1);\r\n\t\t}\r\n\r\n\t\t.entity-view-card .profile-detail-label {\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.06em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.entity-view-card .profile-detail-value {\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tword-break: break-word;\r\n\t\t}\r\n\r\n\t\t.modal-dialog-entity {\r\n\t\t\tmax-width: 36rem;\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<style>\r\n\t\t.entity-view-body {\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-4);\r\n\t\t\toverflow-y: auto;\r\n\t\t}\r\n\r\n\t\t.entity-view-layout {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t@media (min-width: 640px) {\r\n\t\t\t.entity-view-layout--split {\r\n\t\t\t\tgrid-template-columns: 220px 1fr;\r\n\t\t\t\talign-items: start;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t.entity-view-card {\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.entity-view-hero {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: var(--space-4);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tbackground: linear-gradient(\r\n\t\t\t\t135deg,\r\n\t\t\t\tcolor-mix(in srgb, var(--hero-accent, var(--color-primary)) 10%, var(--color-surface)) 0%,\r\n\t\t\t\tvar(--color-muted) 100%\r\n\t\t\t);\r\n\t\t\tborder-left: 4px solid var(--hero-accent, var(--color-primary));\r\n\t\t}\r\n\r\n\t\t.entity-view-hero--success {\r\n\t\t\t--hero-accent: var(--color-success);\r\n\t\t}\r\n\r\n\t\t.entity-view-hero--warning {\r\n\t\t\t--hero-accent: var(--color-warning);\r\n\t\t}\r\n\r\n\t\t.entity-view-hero--error {\r\n\t\t\t--hero-accent: var(--color-destructive);\r\n\t\t}\r\n\r\n\t\t.entity-view-hero--neutral {\r\n\t\t\t--hero-accent: var(--color-accent);\r\n\t\t}\r\n\r\n\t\t.entity-view-eyebrow {\r\n\t\t\tmargin: 0 0 var(--space-1);\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.08em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.entity-view-hero h2 {\r\n\t\t\tmargin: 0 0 var(--space-2);\r\n\t\t\tfont-size: 1.25rem;\r\n\t\t\tline-height: 1.3;\r\n\t\t}\r\n\r\n\t\t.entity-view-hero-teacher {\r\n\t\t\tmargin: 0 0 var(--space-3);\r\n\t\t}\r\n\r\n\t\t.entity-view-meta-row {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.entity-view-meta-chip {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tpadding: var(--space-1) var(--space-2);\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: color-mix(in srgb, var(--color-surface) 88%, transparent);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-variant-numeric: tabular-nums;\r\n\t\t}\r\n\r\n\t\t.entity-view-meta-chip-label {\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t}\r\n\r\n\t\t.entity-view-meta-chip-value {\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tfont-weight: 500;\r\n\t\t}\r\n\r\n\t\t.entity-view-stats {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: repeat(auto-fit, minmax(120px, 1fr));\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.entity-view-stat {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-1);\r\n\t\t\tpadding: var(--space-3);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.entity-view-stat-label {\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.06em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.entity-view-stat-value {\r\n\t\t\tfont-size: 1rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tfont-variant-numeric: tabular-nums;\r\n\t\t\tword-break: break-word;\r\n\t\t}\r\n\r\n\t\t.entity-view-stat-value--rate {\r\n\t\t\tfont-size: 1.125rem;\r\n\t\t}\r\n\r\n\t\t.entity-view-stat-value--rate .entity-view-rate-currency {\r\n\t\t\tmargin-left: var(--space-1);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.entity-view-section-title {\r\n\t\t\tmargin: 0 0 var(--space-3);\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.06em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.entity-view-section-body {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.entity-view-detail-grid {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t@media (min-width: 480px) {\r\n\t\t\t.entity-view-detail-grid {\r\n\t\t\t\tgrid-template-columns: 1fr 1fr;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t.entity-view-note {\r\n\t\t\tpadding: var(--space-3) var(--space-4);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.entity-view-note-title {\r\n\t\t\tdisplay: block;\r\n\t\t\tmargin-bottom: var(--space-1);\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.06em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.entity-view-note-content {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tline-height: 1.55;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\twhite-space: pre-wrap;\r\n\t\t\tword-break: break-word;\r\n\t\t}\r\n\r\n\t\t.entity-view-note--info {\r\n\t\t\tbackground: var(--color-info-bg);\r\n\t\t\tborder-color: color-mix(in srgb, var(--color-info) 22%, transparent);\r\n\t\t}\r\n\r\n\t\t.entity-view-note--warning {\r\n\t\t\tbackground: var(--color-warning-bg);\r\n\t\t\tborder-color: color-mix(in srgb, var(--color-warning) 22%, transparent);\r\n\t\t}\r\n\r\n\t\t.entity-view-identity {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: center;\r\n\t\t\ttext-align: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.entity-view-color-swatch {\r\n\t\t\twidth: 72px;\r\n\t\t\theight: 72px;\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tborder: 3px solid var(--color-surface);\r\n\t\t\tbox-shadow: var(--shadow-md);\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.entity-view-identity h2 {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 1.0625rem;\r\n\t\t\tline-height: 1.3;\r\n\t\t}\r\n\r\n\t\t.entity-view-rate-highlight {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: baseline;\r\n\t\t\tgap: var(--space-1);\r\n\t\t\tpadding: var(--space-1) var(--space-3);\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tfont-variant-numeric: tabular-nums;\r\n\t\t}\r\n\r\n\t\t.entity-view-rate-block {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-1);\r\n\t\t}\r\n\r\n\t\t.entity-view-rate-caption {\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.06em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.entity-view-rate-highlight-amount {\r\n\t\t\tfont-size: 1rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.entity-view-rate-highlight-currency {\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tletter-spacing: 0.03em;\r\n\t\t}\r\n\r\n\t\t.entity-view-teacher-list {\r\n\t\t\tlist-style: none;\r\n\t\t\tmargin: 0;\r\n\t\t\tpadding: 0;\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.entity-view-teacher-item {\r\n\t\t\tpadding: var(--space-2) var(--space-3);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.entity-view-stat--teacher .teacher-name-cell {\r\n\t\t\tmargin-top: var(--space-1);\r\n\t\t}\r\n\r\n\t\t.entity-view-relationships {\r\n\t\t\tlist-style: none;\r\n\t\t\tmargin: 0;\r\n\t\t\tpadding: 0;\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.entity-view-relationship {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-2) var(--space-3);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.entity-view-relationship-name {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.entity-view-relationship-type {\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\ttext-transform: capitalize;\r\n\t\t}\r\n\r\n\t\t.entity-view-card .profile-details {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.entity-view-card .entity-view-section + .entity-view-section {\r\n\t\t\tmargin-top: var(--space-4);\r\n\t\t\tpadding-top: var(--space-4);\r\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t@media (min-width: 480px) {\r\n\t\t\t.entity-view-card .profile-details {\r\n\t\t\t\tgrid-template-columns: 1fr 1fr;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t.entity-view-card .profile-detail {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-1);\r\n\t\t}\r\n\r\n\t\t.entity-view-card .profile-detail-label {\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.06em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.entity-view-card .profile-detail-value {\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tword-break: break-word;\r\n\t\t}\r\n\r\n\t\t.modal-dialog-entity {\r\n\t\t\tmax-width: 36rem;\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -484,9 +500,9 @@ func EntityViewRateStat(amount float64, currency string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var21 string
-		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.2f", amount))
+		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(utils.FormatCurrencyAmountFixed(amount, currency))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 464, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 484, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
@@ -499,7 +515,7 @@ func EntityViewRateStat(amount float64, currency string) templ.Component {
 		var templ_7745c5c3_Var22 string
 		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(currency)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 465, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/entity_view.templ`, Line: 485, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {

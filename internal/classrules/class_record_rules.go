@@ -59,7 +59,7 @@ func (r ClassRecordRules) Validate(ctx context.Context, actor auth.User, input C
 		return ErrDuplicateClass
 	}
 
-	if actor.Role == auth.RoleTeacher {
+	if auth.IsTeacherScoped(actor.Role) {
 		if input.TeacherID != actor.ID {
 			return ErrTeacherNotOwner
 		}
@@ -79,7 +79,7 @@ func (r ClassRecordRules) Validate(ctx context.Context, actor auth.User, input C
 }
 
 func (r ClassRecordRules) ValidateEditAccess(recordTeacherID int64, actor auth.User) error {
-	if actor.Role == auth.RoleTeacher && recordTeacherID != actor.ID {
+	if auth.IsTeacherScoped(actor.Role) && recordTeacherID != actor.ID {
 		return ErrTeacherNotOwner
 	}
 	return nil

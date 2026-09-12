@@ -2,10 +2,12 @@ package frontend
 
 import (
 	"fmt"
+	"zion-english/internal/constants"
 	"zion-english/internal/utils"
 )
 
 type EditClassData struct {
+	OverdueGracePeriodMinutes int64
 	RecordID        string
 	Readonly        bool
 	IsSuperuser     bool
@@ -20,9 +22,14 @@ type EditClassData struct {
 	DurationMinutes int64
 	Rate            float64
 	Currency        string
-	Status          string
-	Reason          string
-	Notes           string
+	IsTrialClass    bool
+	Status            constants.ClassListFilterStatus
+	Reason            string
+	Notes             string
+	LearningMaterials []ClassLearningMaterialLink
+	ActionFrom        ClassActionContext
+	SeriesID          int64
+	SeriesFutureCount int64
 }
 
 templ EditClass(data EditClassData) {
@@ -39,6 +46,8 @@ templ EditClass(data EditClassData) {
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
 		@ScrTimeRangeJS()
+		@AvatarStyles()
+		@LearningMaterialViewModalStyles()
 	</head>
 	<body>
 		<div class="container">
@@ -51,7 +60,7 @@ templ EditClass(data EditClassData) {
 					<div class="form-readonly">
 						<div class="form-row">
 							<div class="form-group">
-								<label>Teacher</label>
+								@AdminOnlyFieldLabel("Teacher")
 								<input type="text" value={ data.TeacherName } disabled/>
 							</div>
 							<div class="form-group">
@@ -98,7 +107,7 @@ templ EditClass(data EditClassData) {
 					"
 				>
 					<div class="form-row">
-						@TeacherDropdownWithValue(data.TeacherID)
+						@TeacherDropdownWithValue(data.TeacherID, data.TeacherName)
 						@StudentDropdownWithValue(data.StudentID)
 						@ClassDateField(data.Date, false)
 					</div>
@@ -142,7 +151,10 @@ templ EditClass(data EditClassData) {
 				</div>
 			}
 		</div>
+		<div id="lmViewModalHost"></div>
 		@ScrTimeRangeInit()
+		@LearningMaterialViewModalScripts()
+		@ScrTrialClassJS()
 	</body>
 	</html>
 }
@@ -161,12 +173,18 @@ templ EditClassFields(data EditClassData, readonly bool) {
 				<input type="text" id="rate" value={ formatFloat(data.Rate) } disabled/>
 			</div>
 		</div>
+		if data.IsTrialClass {
+			<div class="form-group">
+				<label>Trial class</label>
+				<input type="text" value="Yes" disabled/>
+			</div>
+		}
 		<div class="form-row">
 			<div class="form-group">
 				<label for="status">Status</label>
-				<input type="text" id="status" value={ data.Status } disabled/>
+				<input type="text" id="status" value={ string(data.Status) } disabled/>
 			</div>
-			if data.Status != "conducted" {
+			if data.Status != constants.ClassListFilterConducted {
 				<div class="form-group">
 					<label for="reason">Reason</label>
 					<input type="text" id="reason" value={ data.Reason } disabled/>
@@ -177,6 +195,7 @@ templ EditClassFields(data EditClassData, readonly bool) {
 			<label for="notes">Notes</label>
 			<textarea id="notes" rows="4" readonly>{ data.Notes }</textarea>
 		</div>
+		@ClassLearningMaterialReadonlyList(data.LearningMaterials)
 	} else {
 		<div class="form-row">
 			@CurrencyDropdownWithValue(data.Currency)
@@ -185,6 +204,7 @@ templ EditClassFields(data EditClassData, readonly bool) {
 				<input type="number" id="rate" name="rate" required min="0" step="0.01" value={ formatFloat(data.Rate) }/>
 			</div>
 		</div>
+		@TrialClassCheckbox(data.IsTrialClass, false)
 		<div
 			class="form-row"
 			_="
@@ -201,7 +221,7 @@ templ EditClassFields(data EditClassData, readonly bool) {
 			"
 		>
 			@ClassStatusDropdownWithValue(data.Status)
-			<div class="form-group" id="reasonGroup" hidden?={ data.Status == "conducted" }>
+			<div class="form-group" id="reasonGroup" hidden?={ data.Status == constants.ClassListFilterConducted }>
 				<label for="reason">Reason *</label>
 				<input
 					type="text"
@@ -209,7 +229,7 @@ templ EditClassFields(data EditClassData, readonly bool) {
 					name="reason"
 					value={ data.Reason }
 					placeholder="Reason for cancellation/reschedule"
-					required?={ data.Status != "conducted" }
+					required?={ data.Status != constants.ClassListFilterConducted }
 				/>
 			</div>
 		</div>
@@ -217,6 +237,7 @@ templ EditClassFields(data EditClassData, readonly bool) {
 			<label for="notes">Notes</label>
 			<textarea id="notes" name="notes" rows="4" placeholder="Lesson notes...">{ data.Notes }</textarea>
 		</div>
+		@ClassLearningMaterialPicker(data.LearningMaterials, "")
 		<button type="submit">Save Changes</button>
 	}
 }

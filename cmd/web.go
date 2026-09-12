@@ -27,6 +27,7 @@ import (
 	"zion-english/internal/notifications"
 	"zion-english/internal/processor"
 	"zion-english/internal/sheet"
+	"zion-english/internal/startup"
 	"zion-english/internal/utils"
 
 	"github.com/google/uuid"
@@ -71,6 +72,7 @@ var cmdWeb = &cobra.Command{
 		dbRO = database.New(database.DB_MODE_RO)
 		initNotifyService()
 		initMeetingService()
+		initCalendarService()
 
 		basePath := "/" + strings.TrimPrefix(webFlags.baseURL, "/")
 		cfg.BasePath = basePath
@@ -86,6 +88,7 @@ var cmdWeb = &cobra.Command{
 		publicMux.HandleFunc(basePath+"/teachers/register", handleTeacherRegister)
 		publicMux.HandleFunc(basePath+"/health", handleHealth)
 		publicMux.HandleFunc(basePath+"/profile/zoom/callback", handleZoomCallback)
+		publicMux.HandleFunc(basePath+"/profile/google-calendar/callback", handleGoogleCalendarCallback)
 
 		publicMux.Handle(
 			basePath+"/static/",
@@ -93,7 +96,7 @@ var cmdWeb = &cobra.Command{
 		)
 
 		authMux := http.NewServeMux()
-		authMux.HandleFunc(basePath+"/dashboard", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleHome))
+		authMux.HandleFunc(basePath+"/dashboard", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleHome))
 		authMux.HandleFunc(basePath+"/students", auth.RequireRole(auth.AdminAccessRoles()...)(handleStudents))
 		authMux.HandleFunc(basePath+"/students/register", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleStudentRegister))
 		authMux.HandleFunc(basePath+"/teachers", auth.RequireRole(auth.AdminAccessRoles()...)(handleTeachers))
@@ -102,53 +105,77 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/teachers/delete", auth.RequireRole(auth.AdminAccessRoles()...)(handleTeacherDelete))
 		authMux.HandleFunc(basePath+"/students/", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleStudentsPath))
 		authMux.HandleFunc(basePath+"/teachers/", auth.RequireRole(auth.AdminAccessRoles()...)(handleTeachersPath))
-		authMux.HandleFunc(basePath+"/classes/partials/rows", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleClassRecordsPartial))
-		authMux.HandleFunc(basePath+"/classes/", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleClassesPath))
-		authMux.HandleFunc(basePath+"/classes/record", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleClassRecord))
-		authMux.HandleFunc(basePath+"/classes", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleClasses))
-		authMux.HandleFunc(basePath+"/schedule/partials/list", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleScheduleListPartial))
-		authMux.HandleFunc(basePath+"/schedule/", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleSchedulePath))
-		authMux.HandleFunc(basePath+"/schedule", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleSchedule))
+		authMux.HandleFunc(basePath+"/classes/partials/rows", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleClassRecordsPartial))
+		authMux.HandleFunc(basePath+"/classes/partials/date-preset", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleClassesDatePresetPartial))
+		authMux.HandleFunc(basePath+"/classes/", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleClassesPath))
+		authMux.HandleFunc(basePath+"/classes/record", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleClassRecord))
+		authMux.HandleFunc(basePath+"/classes", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleClasses))
+		authMux.HandleFunc(basePath+"/schedule/partials/list", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleScheduleListPartial))
+		authMux.HandleFunc(basePath+"/schedule/partials/day-timeline", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleScheduleDayTimelinePartial))
+		authMux.HandleFunc(basePath+"/schedule/record", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleScheduleRecord))
+		authMux.HandleFunc(basePath+"/schedule/repeat/preview", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleScheduleRepeatPreview))
+		authMux.HandleFunc(basePath+"/schedule/repeat", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleScheduleRepeat))
+		authMux.HandleFunc(basePath+"/schedule/series", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleScheduleSeries))
+		authMux.HandleFunc(basePath+"/schedule/", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleSchedulePath))
+		authMux.HandleFunc(basePath+"/schedule", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleSchedule))
 		authMux.HandleFunc(basePath+"/my-students", auth.RequireRole(auth.RoleTeacher)(handleMyStudents))
 		authMux.HandleFunc(basePath+"/logs", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleSystemLogs))
-		authMux.HandleFunc(basePath+"/changelogs", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleChangelogs))
+		authMux.HandleFunc(basePath+"/changelogs", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleChangelogs))
+		authMux.HandleFunc(basePath+"/feature-flags", auth.RequireRole(auth.RoleSuperuser)(handleFeatureFlags))
 		authMux.HandleFunc(basePath+"/guides/", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleGuidesPath))
 		authMux.HandleFunc(basePath+"/guides", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleGuides))
 		authMux.HandleFunc(basePath+"/process-logs", auth.RequireRole(auth.AdminAccessRoles()...)(handleLogs))
 		authMux.HandleFunc(basePath+"/process", auth.RequireRole(auth.AdminAccessRoles()...)(handleProcessPage))
+		authMux.HandleFunc(basePath+"/reports/partials/all-teachers", auth.RequireRole(auth.AdminAccessRoles()...)(handleReportsAllTeachers))
+		authMux.HandleFunc(basePath+"/reports/partials/date-preset", auth.RequireRole(auth.AdminAccessRoles()...)(handleReportsDatePresetPartial))
 		authMux.HandleFunc(basePath+"/reports/partials/rows", auth.RequireRole(auth.AdminAccessRoles()...)(handleReportsPartial))
+		authMux.HandleFunc(basePath+"/reports/summary", auth.RequireRole(auth.AdminAccessRoles()...)(handleReportSummary))
 		authMux.HandleFunc(basePath+"/reports/", auth.RequireRole(auth.AdminAccessRoles()...)(handleReportsPath))
 		authMux.HandleFunc(basePath+"/reports", auth.RequireRole(auth.AdminAccessRoles()...)(handleReports))
+		authMux.HandleFunc(basePath+"/analytics/partials/date-preset", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleAnalyticsDatePresetPartial))
 		authMux.HandleFunc(basePath+"/analytics", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleAnalytics))
 		authMux.HandleFunc(basePath+"/api/analytics", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleGetAnalytics))
+		authMux.HandleFunc(basePath+"/student-relationships/partials/student-search", auth.RequireRole(auth.AdminAccessRoles()...)(handleStudentRelationshipStudentSearch))
+		authMux.HandleFunc(basePath+"/student-relationships", auth.RequireRole(auth.AdminAccessRoles()...)(handleStudentRelationships))
+		authMux.HandleFunc(basePath+"/api/student-relationships/graph", auth.RequireRole(auth.AdminAccessRoles()...)(handleGetStudentRelationshipGraph))
 		authMux.HandleFunc(basePath+"/download/processed", auth.RequireRole(auth.AdminAccessRoles()...)(handleDownload))
-		authMux.HandleFunc(basePath+"/profile", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleProfile))
-		authMux.HandleFunc(basePath+"/profile/mobile", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleProfileMobile))
-		authMux.HandleFunc(basePath+"/profile/names", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleProfileNames))
-		authMux.HandleFunc(basePath+"/profile/password", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleProfilePassword))
-		authMux.HandleFunc(basePath+"/profile/avatar", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleProfileAvatar))
-		authMux.HandleFunc(basePath+"/profile/picture", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleProfilePicture))
-		authMux.HandleFunc(basePath+"/profile/document", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleProfileDocument))
-		authMux.HandleFunc(basePath+"/profile/zoom/connect", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleZoomConnect))
-		authMux.HandleFunc(basePath+"/profile/zoom/disconnect", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin)(handleZoomDisconnect))
+		authMux.HandleFunc(basePath+"/profile", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleProfile))
+		authMux.HandleFunc(basePath+"/profile/mobile", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleProfileMobile))
+		authMux.HandleFunc(basePath+"/profile/names", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleProfileNames))
+		authMux.HandleFunc(basePath+"/profile/password", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleProfilePassword))
+		authMux.HandleFunc(basePath+"/profile/avatar", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleProfileAvatar))
+		authMux.HandleFunc(basePath+"/profile/picture", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleProfilePicture))
+		authMux.HandleFunc(basePath+"/profile/document", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleProfileDocument))
+		authMux.HandleFunc(basePath+"/profile/intro-video", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleProfileIntroVideo))
+		authMux.HandleFunc(basePath+"/profile/zoom/connect", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleZoomConnect))
+		authMux.HandleFunc(basePath+"/profile/zoom/disconnect", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleZoomDisconnect))
+		authMux.HandleFunc(basePath+"/profile/google-calendar/connect", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleGoogleCalendarConnect))
+		authMux.HandleFunc(basePath+"/profile/google-calendar/disconnect", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleGoogleCalendarDisconnect))
 		documentsRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)
 		authMux.HandleFunc(basePath+"/documents/partials/rows", documentsRole(handleDocumentsPartial))
 		authMux.HandleFunc(basePath+"/documents", documentsRole(handleDocuments))
 		authMux.HandleFunc(basePath+"/documents/", documentsRole(handleDocumentsPath))
-		authMux.HandleFunc(basePath+"/role", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleGetRole))
-		authMux.HandleFunc(basePath+"/header-avatar", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleHeaderAvatar))
-		authMux.HandleFunc(basePath+"/refresh", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleRefreshPage))
+		introVideosRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)
+		authMux.HandleFunc(basePath+"/intro-videos/partials/rows", introVideosRole(handleIntroVideosPartial))
+		authMux.HandleFunc(basePath+"/intro-videos", introVideosRole(handleIntroVideos))
+		authMux.HandleFunc(basePath+"/intro-videos/", introVideosRole(handleIntroVideosPath))
+		authMux.HandleFunc(basePath+"/role", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleGetRole))
+		authMux.HandleFunc(basePath+"/header-avatar", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleHeaderAvatar))
+		authMux.HandleFunc(basePath+"/refresh", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleRefreshPage))
 		authMux.HandleFunc(basePath+"/api/teachers", auth.RequireRole(auth.AdminAccessRoles()...)(handleGetTeachers))
+		authMux.HandleFunc(basePath+"/api/teachers/search", auth.RequireRole(auth.AdminAccessRoles()...)(handleSearchTeachers))
 		authMux.HandleFunc(basePath+"/api/teacher-row", auth.RequireRole(auth.AdminAccessRoles()...)(handleGetTeacherRow))
 		authMux.HandleFunc(basePath+"/api/students", auth.RequireRole(auth.AdminAccessRoles()...)(handleGetStudents))
 		authMux.HandleFunc(basePath+"/api/students/search", auth.RequireRole(auth.AdminAccessRoles()...)(handleSearchStudents))
-		authMux.HandleFunc(basePath+"/api/me/students", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleGetMyStudents))
-		authMux.HandleFunc(basePath+"/api/scheduled-classes", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleGetScheduledClasses))
-		authMux.HandleFunc(basePath+"/api/teacher-picture", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleTeacherPicture))
+		authMux.HandleFunc(basePath+"/api/learning-materials/search", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleSearchLearningMaterials))
+		authMux.HandleFunc(basePath+"/api/me/students", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleGetMyStudents))
+		authMux.HandleFunc(basePath+"/api/scheduled-classes", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleGetScheduledClasses))
+		authMux.HandleFunc(basePath+"/api/teacher-picture", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleTeacherPicture))
 		authMux.HandleFunc(basePath+"/announcements", auth.RequireRole(auth.AdminAccessRoles()...)(handleAnnouncements))
 		authMux.HandleFunc(basePath+"/announcements/register", auth.RequireRole(auth.AdminAccessRoles()...)(handleAnnouncementRegister))
 		authMux.HandleFunc(basePath+"/announcements/", auth.RequireRole(auth.AdminAccessRoles()...)(handleAnnouncementsPath))
 		lmRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)
+		authMux.HandleFunc(basePath+"/learning-materials/preview", lmRole(handleLearningMaterialURLPreview))
 		authMux.HandleFunc(basePath+"/learning-materials/create", lmRole(handleLearningMaterialCreate))
 		authMux.HandleFunc(basePath+"/learning-materials/", lmRole(handleLearningMaterialsPath))
 		authMux.HandleFunc(basePath+"/learning-materials", lmRole(handleLearningMaterials))
@@ -157,7 +184,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/training-materials/create", tmManageRole(handleTrainingMaterialCreate))
 		authMux.HandleFunc(basePath+"/training-materials/", tmViewRole(handleTrainingMaterialsPath))
 		authMux.HandleFunc(basePath+"/training-materials", tmViewRole(handleTrainingMaterials))
-		notificationsRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)
+		notificationsRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)
 		authMux.HandleFunc(basePath+"/notifications", notificationsRole(handleNotifications))
 		authMux.HandleFunc(basePath+"/notifications/panel", notificationsRole(handleNotificationsPanel))
 		authMux.HandleFunc(basePath+"/notifications/unread-count", notificationsRole(handleNotificationsUnreadCount))
@@ -177,6 +204,8 @@ var cmdWeb = &cobra.Command{
 		rootMux.HandleFunc(basePath+"/terms", handleTerms)
 		rootMux.HandleFunc(basePath+"/support", handleSupport)
 		rootMux.HandleFunc(basePath+"/docs/connect-zoom", handleDocsConnectZoom)
+		rootMux.HandleFunc(basePath+"/docs/connect-google-calendar", handleDocsConnectGoogleCalendar)
+		rootMux.HandleFunc(basePath+"/docs/guides", handleDocsGuides)
 		rootMux.HandleFunc(basePath+"/", func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path != basePath+"/" {
 				http.NotFound(w, r)
@@ -189,11 +218,13 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/teachers/register", publicMux)
 		rootMux.Handle(basePath+"/health", publicMux)
 		rootMux.Handle(basePath+"/profile/zoom/callback", publicMux)
+		rootMux.Handle(basePath+"/profile/google-calendar/callback", publicMux)
 
 		// protected routes
 		rootMux.Handle(basePath+"/dashboard", authHandler)
 		rootMux.Handle(basePath+"/logs", authHandler)
 		rootMux.Handle(basePath+"/changelogs", authHandler)
+		rootMux.Handle(basePath+"/feature-flags", authHandler)
 		rootMux.Handle(basePath+"/guides", authHandler)
 		rootMux.Handle(basePath+"/guides/", authHandler)
 		rootMux.Handle(basePath+"/process-logs", authHandler)
@@ -201,8 +232,12 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/reports/partials/", authHandler)
 		rootMux.Handle(basePath+"/reports", authHandler)
 		rootMux.Handle(basePath+"/reports/", authHandler)
+		rootMux.Handle(basePath+"/analytics/partials/", authHandler)
 		rootMux.Handle(basePath+"/analytics", authHandler)
 		rootMux.Handle(basePath+"/api/analytics", authHandler)
+		rootMux.Handle(basePath+"/student-relationships/partials/", authHandler)
+		rootMux.Handle(basePath+"/student-relationships", authHandler)
+		rootMux.Handle(basePath+"/api/student-relationships/graph", authHandler)
 		rootMux.Handle(basePath+"/download/processed", authHandler)
 		rootMux.Handle(basePath+"/role", authHandler)
 		rootMux.Handle(basePath+"/header-avatar", authHandler)
@@ -224,10 +259,14 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/profile/", authHandler)
 		rootMux.Handle(basePath+"/documents", authHandler)
 		rootMux.Handle(basePath+"/documents/", authHandler)
+		rootMux.Handle(basePath+"/intro-videos", authHandler)
+		rootMux.Handle(basePath+"/intro-videos/", authHandler)
 		rootMux.Handle(basePath+"/api/teachers", authHandler)
+		rootMux.Handle(basePath+"/api/teachers/search", authHandler)
 		rootMux.Handle(basePath+"/api/teacher-row", authHandler)
 		rootMux.Handle(basePath+"/api/students", authHandler)
 		rootMux.Handle(basePath+"/api/students/", authHandler)
+		rootMux.Handle(basePath+"/api/learning-materials/search", authHandler)
 		rootMux.Handle(basePath+"/api/scheduled-classes", authHandler)
 		rootMux.Handle(basePath+"/api/teacher-picture", authHandler)
 		rootMux.Handle(basePath+"/api/me/students", authHandler)
@@ -250,12 +289,20 @@ var cmdWeb = &cobra.Command{
 			port = ":" + port
 		}
 
-		logs.Log().Info(
-			"Starting web server",
-			zap.String("port", port),
-			zap.String("base URL", webFlags.baseURL),
-			zap.Bool("https", webFlags.https),
-		)
+		startupOpts := startup.Options{
+			Cfg:        cfg,
+			ListenPort: port,
+			BasePath:   basePath,
+			HTTPS:      webFlags.https,
+			TLSAddress: webFlags.address,
+			Integrations: startup.IntegrationStatus{
+				ZoomConfigured:           meetingSvc != nil && meetingSvc.IsZoomConfigured(),
+				GoogleCalendarConfigured: calendarSvc != nil && calendarSvc.IsConfigured(),
+				MeetingService:           cfg.Meeting.Service,
+			},
+		}
+		startup.LogStartup(startupOpts)
+		startup.LogListening(startupOpts)
 
 		var err error
 		if webFlags.https {
@@ -264,12 +311,6 @@ var cmdWeb = &cobra.Command{
 			}
 			certFile := fmt.Sprintf("/etc/letsencrypt/live/%s/fullchain.pem", webFlags.address)
 			keyFile := fmt.Sprintf("/etc/letsencrypt/live/%s/privkey.pem", webFlags.address)
-			logs.Log().Info(
-				"Starting HTTPS server",
-				zap.String("address", webFlags.address),
-				zap.String("cert", certFile),
-				zap.String("key", keyFile),
-			)
 			err = http.ListenAndServeTLS(port, certFile, keyFile, handler)
 		} else {
 			err = http.ListenAndServe(port, handler)
@@ -299,6 +340,49 @@ func requireFloat64(n string) (float64, error) {
 		return 0, fmt.Errorf("invalid number: %s", n)
 	}
 	return v, nil
+}
+
+func formIsTrialClass(r *http.Request) bool {
+	return r.FormValue("is_trial_class") == "on"
+}
+
+func trialClassToInt64(v bool) int64 {
+	if v {
+		return 1
+	}
+	return 0
+}
+
+func parseStudentParentRateFields(rateValue, currency string) (sql.NullFloat64, sql.NullString, error) {
+	rateValue = strings.TrimSpace(rateValue)
+	currency = strings.TrimSpace(currency)
+	if rateValue == "" && currency == "" {
+		return sql.NullFloat64{}, sql.NullString{}, nil
+	}
+	if rateValue == "" {
+		return sql.NullFloat64{}, sql.NullString{}, errors.New("parent rate is required when parent currency is set")
+	}
+	if currency == "" {
+		return sql.NullFloat64{}, sql.NullString{}, errors.New("parent currency is required when parent rate is set")
+	}
+	if !constants.ValidCurrency(currency) {
+		return sql.NullFloat64{}, sql.NullString{}, errors.New("invalid parent currency. Must be KRW, CAD, YEN, or PHP")
+	}
+	rate, err := requireFloat64(rateValue)
+	if err != nil {
+		return sql.NullFloat64{}, sql.NullString{}, errors.New("invalid parent rate")
+	}
+	if rate < 0 {
+		return sql.NullFloat64{}, sql.NullString{}, errors.New("parent rate cannot be negative")
+	}
+	return sql.NullFloat64{Float64: rate, Valid: true}, sql.NullString{String: currency, Valid: true}, nil
+}
+
+func studentParentRateView(rate sql.NullFloat64, currency sql.NullString) (float64, string, bool) {
+	if !rate.Valid || !currency.Valid {
+		return 0, "", false
+	}
+	return rate.Float64, currency.String, true
 }
 
 func requireInt64(n string) (int64, error) {
@@ -361,6 +445,31 @@ func setSuccessFlash(w http.ResponseWriter, msg string) {
 		cookie.Secure = true
 	}
 	http.SetCookie(w, cookie)
+}
+
+func setListRefreshTriggers(w http.ResponseWriter, events ...string) {
+	if len(events) == 0 {
+		return
+	}
+	if len(events) == 1 {
+		w.Header().Set("HX-Trigger", events[0])
+		return
+	}
+	parts := make([]string, 0, len(events))
+	for _, event := range events {
+		parts = append(parts, fmt.Sprintf(`"%s":null`, event))
+	}
+	w.Header().Set("HX-Trigger", "{"+strings.Join(parts, ",")+"}")
+}
+
+func respondFormMutation(w http.ResponseWriter, message, redirectPath string, refreshEvents ...string) error {
+	setSuccessFlash(w, message)
+	setListRefreshTriggers(w, refreshEvents...)
+	if redirectPath != "" {
+		w.Header().Set("HX-Redirect", utils.URL(redirectPath))
+	}
+	_, err := fmt.Fprint(w, message+"\n")
+	return err
 }
 
 func readFlashCookie(w http.ResponseWriter, r *http.Request, name string) string {
@@ -863,7 +972,7 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		req.Relationship = r.FormValue("relationship")
 		req.RelatedStudentID = relatedStudentID
 	} else {
-		req.AssignedColor = "#90C020"
+		req.AssignedColor = constants.DefaultAssignedColor
 	}
 
 	if err := validateStudentRequest(&req); err != nil {
@@ -871,10 +980,20 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var parentRate sql.NullFloat64
+	var parentCurrency sql.NullString
+	if isSuperuser {
+		parentRate, parentCurrency, err = parseStudentParentRateFields(r.FormValue("parentRate"), r.FormValue("parentCurrency"))
+		if err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+	}
+
 	rl.add(fmt.Sprintf("Registering student: %s", req.Name))
 
 	if req.AssignedColor == "" {
-		req.AssignedColor = "#B9D283"
+		req.AssignedColor = constants.DefaultTeacherAssignedColor
 	}
 
 	if req.RelatedStudentID > 0 {
@@ -900,9 +1019,12 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		Contact:        sql.NullString{String: req.Contact, Valid: req.Contact != ""},
 		RatePerClass:   req.RatePerClass,
 		ParentName:     sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
+		ParentRate:     parentRate,
+		ParentCurrency: parentCurrency,
 		AssignedColor:  req.AssignedColor,
 		Status:         req.Status,
 		InactiveReason: sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
+		DeletedReason:  sql.NullString{},
 	})
 	if err != nil {
 		sendErrorLog(w, "Failed to register student")
@@ -954,7 +1076,7 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	notifyTeachers(r.Context(), teacherIDs, teacherNamesMap(r.Context(), teacherIDs), auth.GetUser(r.Context()), notifications.KindStudentRegistered,
 		fmt.Sprintf("New student '%s' was assigned to you", req.Name))
 
-	if _, err := fmt.Fprintf(w, "Student '%s' registered successfully\n", req.Name); err != nil {
+	if err := respondFormMutation(w, fmt.Sprintf("Student '%s' registered successfully", req.Name), "/students"); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
@@ -1004,7 +1126,8 @@ func handleGetTeacherRow(w http.ResponseWriter, r *http.Request) {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	if err := frontend.TeacherAssignRow("", true).Render(r.Context(), w); err != nil {
+	rowKey := strconv.FormatInt(time.Now().UnixNano(), 10)
+	if err := frontend.TeacherAssignRow("", "", rowKey, true).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -1103,7 +1226,7 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.AssignedColor == "" {
-		req.AssignedColor = "#B9D283"
+		req.AssignedColor = constants.DefaultTeacherAssignedColor
 	}
 
 	teacherStatus := string(constants.TeacherStatusPending)
@@ -1168,7 +1291,7 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if isSuperuser {
-		if _, err := fmt.Fprintf(w, "Teacher '%s' registered successfully\n", req.Name); err != nil {
+		if err := respondFormMutation(w, fmt.Sprintf("Teacher '%s' registered successfully", req.Name), "/teachers"); err != nil {
 			sendErrorLog(w, err.Error())
 			return
 		}
@@ -1457,6 +1580,125 @@ func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type approvedTeacherSearchRow struct {
+	ID           int64
+	FirstName    string
+	MiddleName   string
+	LastName     string
+	DriveUrl     string
+	RatePerClass float64
+	Template     sql.NullString
+}
+
+func searchApprovedTeachersByName(ctx context.Context, q string) ([]approvedTeacherSearchRow, error) {
+	searchQ := sql.NullString{String: q, Valid: true}
+	rows, err := dbRO.GetQueries().SearchApprovedTeachersByName(ctx, queries.SearchApprovedTeachersByNameParams{
+		Column1: searchQ,
+		Column2: searchQ,
+		Column3: searchQ,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(rows) > 0 {
+		return mapApprovedTeacherSearchRows(rows), nil
+	}
+
+	parts := strings.Fields(q)
+	if len(parts) < 2 {
+		return nil, nil
+	}
+
+	firstQ := sql.NullString{String: parts[0], Valid: true}
+	lastQ := sql.NullString{String: parts[len(parts)-1], Valid: true}
+	fallback, err := dbRO.GetQueries().SearchApprovedTeachersByFirstAndLast(ctx, queries.SearchApprovedTeachersByFirstAndLastParams{
+		Column1: firstQ,
+		Column2: lastQ,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return mapApprovedTeacherFirstLastRows(fallback), nil
+}
+
+func mapApprovedTeacherSearchRows(rows []queries.SearchApprovedTeachersByNameRow) []approvedTeacherSearchRow {
+	out := make([]approvedTeacherSearchRow, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, approvedTeacherSearchRow{
+			ID:           row.ID,
+			FirstName:    row.FirstName,
+			MiddleName:   row.MiddleName,
+			LastName:     row.LastName,
+			DriveUrl:     row.DriveUrl,
+			RatePerClass: row.RatePerClass,
+			Template:     row.Template,
+		})
+	}
+	return out
+}
+
+func mapApprovedTeacherFirstLastRows(rows []queries.SearchApprovedTeachersByFirstAndLastRow) []approvedTeacherSearchRow {
+	out := make([]approvedTeacherSearchRow, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, approvedTeacherSearchRow{
+			ID:           row.ID,
+			FirstName:    row.FirstName,
+			MiddleName:   row.MiddleName,
+			LastName:     row.LastName,
+			DriveUrl:     row.DriveUrl,
+			RatePerClass: row.RatePerClass,
+			Template:     row.Template,
+		})
+	}
+	return out
+}
+
+func handleSearchTeachers(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	q := strings.TrimSpace(r.URL.Query().Get("teacherQ"))
+	if q == "" {
+		q = strings.TrimSpace(r.URL.Query().Get("q"))
+	}
+	hiddenID := strings.TrimSpace(r.URL.Query().Get("hiddenId"))
+	inputID := strings.TrimSpace(r.URL.Query().Get("inputId"))
+	resultsID := strings.TrimSpace(r.URL.Query().Get("resultsId"))
+
+	w.Header().Set("Content-Type", "text/html")
+	if q == "" {
+		frontend.TeacherSearchResults(nil, hiddenID, inputID, resultsID).Render(r.Context(), w)
+		return
+	}
+
+	teachers, err := searchApprovedTeachersByName(r.Context(), q)
+	if err != nil {
+		HttpError(w, "Failed to search teachers", http.StatusInternalServerError)
+		return
+	}
+
+	var teacherResponses []models.TeacherAPIResponse
+	for _, t := range teachers {
+		template := ""
+		if t.Template.Valid {
+			template = t.Template.String
+		}
+		teacherResponses = append(teacherResponses, models.TeacherAPIResponse{
+			ID:           t.ID,
+			Name:         utils.ComposePersonName(t.FirstName, t.MiddleName, t.LastName),
+			DriveUrl:     t.DriveUrl,
+			RatePerClass: t.RatePerClass,
+			Template:     template,
+		})
+	}
+
+	if err := frontend.TeacherSearchResults(teacherResponses, hiddenID, inputID, resultsID).Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func handleLanding(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -1523,11 +1765,11 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	auth.ResetLoginFailures(ip)
 
 	switch user.Role {
-	case auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher:
+	case auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester:
 		insertAuditLogAs(r.Context(), user, "auth", fmt.Sprintf("logged in (%s)", user.Email))
 	}
 
-	if ua := r.UserAgent(); ua != "" && (user.Role == auth.RoleTeacher || user.Role == auth.RoleAdmin) && user.ID != 0 {
+	if ua := r.UserAgent(); ua != "" && (auth.IsTeacherScoped(user.Role) || user.Role == auth.RoleAdmin) && user.ID != 0 {
 		useragentID := getOrCreateUserAgentID(r.Context(), dbRW, ua)
 		if _, err := dbRW.GetQueries().CreateAccess(r.Context(), queries.CreateAccessParams{
 			TeacherID:   user.ID,
@@ -1808,6 +2050,9 @@ func handleGetRole(w http.ResponseWriter, r *http.Request) {
 	case auth.RoleTeacher:
 		user := auth.GetUser(ctx)
 		greetings = fmt.Sprintf("Welcome, teacher %s!", user.Name)
+	case auth.RoleTester:
+		user := auth.GetUser(ctx)
+		greetings = fmt.Sprintf("Welcome, tester %s!", user.Name)
 	}
 
 	if _, err := fmt.Fprint(w, greetings); err != nil {
@@ -1822,7 +2067,7 @@ func handleSearchStudents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	q := firstQueryParam(r, "studentQ", "q")
 	w.Header().Set("Content-Type", "text/html")
 	if q == "" {
 		frontend.StudentSearchResults(nil).Render(r.Context(), w)

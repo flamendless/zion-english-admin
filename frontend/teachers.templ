@@ -6,66 +6,94 @@ import (
 )
 
 type TeacherData struct {
-	Teachers       []TeacherItem
-	Query          string
-	Status         string
-	PageNumber     int
-	PageTotalPages int
-	PageTotal      int64
-	PrevURL        string
-	NextURL        string
-	HasPrev        bool
-	HasNext        bool
-	FilterPath     string
+	Teachers            []TeacherItem
+	Query               string
+	Status              constants.TeacherFilterStatus
+	DocsStatusFilter      string
+	ConnectionZoomFilter  bool
+	ConnectionGoogleFilter bool
+	SortBy           string
+	SortOrder        string
+	PageNumber       int
+	PageTotalPages   int
+	PageTotal        int64
+	PrevURL          string
+	NextURL          string
+	HasPrev          bool
+	HasNext          bool
+	FilterPath       string
 }
 
 type TeacherItem struct {
-	ID             string
-	Name           string
-	Avatar         AvatarProps
-	Birthdate      string
-	Address        string
-	JoiningDate    string
-	MobileNumber   string
-	Email          string
-	Certifications string
-	AssignedColor  string
-	RatePerClass   float64
-	Currency       string
-	DriveUrl       string
-	Sex            string
-	Status         string
-	DocsStatus     string
-	Roles          []constants.TeacherRole
-	Deleted        bool
-	CreatedAt      string
+	ID                      string
+	Name                    string
+	Avatar                  AvatarProps
+	Birthdate               string
+	Address                 string
+	JoiningDate             string
+	MobileNumber            string
+	Email                   string
+	Certifications          string
+	AssignedColor           string
+	RatePerClass            float64
+	Currency                string
+	DriveUrl                string
+	Sex                     string
+	Status                  constants.TeacherStatus
+	DocsStatus              constants.TeacherDocumentStatus
+	Roles                   []constants.TeacherRole
+	ZoomConnected           bool
+	GoogleCalendarConnected bool
+	Deleted                 bool
+	CreatedAt               string
 }
 
-func getTeacherRowClass(status string, deleted bool) string {
+templ ConnectionLogoPill(logoURL string, label string) {
+	<span class="pill pill--neutral connection-logo-pill" title={ label } aria-label={ label }>
+		<img src={ logoURL } alt="" width="24" height="24" aria-hidden="true"/>
+	</span>
+}
+
+templ TeacherConnectionsCell(zoomConnected bool, googleCalendarConnected bool) {
+	if zoomConnected || googleCalendarConnected {
+		<div class="teacher-connections-cell">
+			if zoomConnected {
+				@ConnectionLogoPill(utils.URL("/static/zoom-logo.svg"), "Zoom connected")
+			}
+			if googleCalendarConnected {
+				@ConnectionLogoPill(utils.URL("/static/google-calendar-logo.svg"), "Google Calendar connected")
+			}
+		</div>
+	} else {
+		<span>-</span>
+	}
+}
+
+func getTeacherRowClass(status constants.TeacherStatus, deleted bool) string {
 	if deleted {
 		return "teacher-deleted"
 	}
-	if status == "pending" {
+	if status == constants.TeacherStatusPending {
 		return "teacher-pending"
 	}
-	if status == "approved" {
+	if status == constants.TeacherStatusApproved {
 		return "teacher-approved"
 	}
 	return ""
 }
 
-func getTeacherDisplayStatus(status string, deleted bool) string {
+func getTeacherDisplayStatus(status constants.TeacherStatus, deleted bool) string {
 	if deleted {
-		return "deleted"
+		return constants.TeacherDisplayStatusDeleted
 	}
-	return status
+	return string(status)
 }
 
 templ CopyableTextCell(value string) {
 	if value != "" {
 		<div class="copyable-cell">
 			<span class="copyable-text" title={ value }>{ value }</span>
-			<button type="button" class="copy-btn" data-copy={ value } onclick="copyCellText(this)" title="Copy to clipboard" aria-label="Copy to clipboard">
+			<button type="button" class="copy-btn" data-copy={ value } onclick="copyCellText(this)" data-tooltip="Copy to clipboard" aria-label="Copy to clipboard">
 				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 					<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
 					<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -87,6 +115,14 @@ templ Teachers(data TeacherData) {
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
 		@AvatarStyles()
+		<style>
+			.teacher-connections-cell {
+				display: inline-flex;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: var(--space-2);
+			}
+		</style>
 		<script>
 			window.closeTeacherViewModal = function () {
 				const host = document.getElementById('teacherViewModalHost');
@@ -137,7 +173,7 @@ templ Teachers(data TeacherData) {
 			@HeaderSimple()
 			@HubHeader("Teachers", "New Teacher", utils.URL("/teachers/register"), true)
 
-			@ListFilterForm(data.FilterPath, data.Query, data.Status, "teacher", "", "", "", "", "", false, false, false, false, true)
+			@ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindTeacher, "", "", "", "", "", "", false, false, false, false, true, data.DocsStatusFilter, true, data.ConnectionZoomFilter, data.ConnectionGoogleFilter, true, data.SortBy, data.SortOrder, ListSortKindTeacher, true)
 
 			if len(data.Teachers) > 0 {
 				<div class="table-wrapper">
@@ -145,9 +181,8 @@ templ Teachers(data TeacherData) {
 						<thead>
 							<tr>
 								<th>Name</th>
-								<th>Roles</th>
 								<th>Status</th>
-								<th>Docs Status</th>
+								@TeacherTableOptionalHeaderCells()
 								<th>Email</th>
 								<th>Mobile Number</th>
 								<th>Actions</th>
@@ -168,23 +203,10 @@ templ Teachers(data TeacherData) {
 											>{ teacher.Name }</button>
 										</div>
 									</td>
-									<td data-label="Roles">
-										if len(teacher.Roles) > 0 {
-											@RolePills(teacher.Roles)
-										} else {
-											<span>-</span>
-										}
-									</td>
 									<td data-label="Status">
 										@StatusPill(getTeacherDisplayStatus(teacher.Status, teacher.Deleted), TeacherStatusPillTone(teacher.Status, teacher.Deleted), false)
 									</td>
-									<td data-label="Docs Status">
-										if teacher.DocsStatus != "" {
-											@StatusPill(documentStatusLabel(teacher.DocsStatus), DocumentStatusPillTone(teacher.DocsStatus), false)
-										} else {
-											<span>-</span>
-										}
-									</td>
+									@TeacherTableOptionalRowCells(teacher)
 									<td class="email-cell" data-label="Email">{ getDisplayValue(teacher.Email) }</td>
 									<td data-label="Mobile">{ getDisplayValue(teacher.MobileNumber) }</td>
 									<td data-label="Actions">
@@ -196,7 +218,7 @@ templ Teachers(data TeacherData) {
 											})
 											if !teacher.Deleted {
 												@IconActionLink(utils.URL("/teachers/" + teacher.ID + "/edit"), "Edit", IconKindEdit)
-												if teacher.Status == "pending" {
+												if teacher.Status == constants.TeacherStatusPending {
 													@IconActionButton("Approve", IconKindApprove, templ.Attributes{
 														"hx-post":  utils.URL("/teachers/approve"),
 														"hx-vals":  `{"id": "` + teacher.ID + `"}`,
@@ -209,7 +231,7 @@ templ Teachers(data TeacherData) {
 														"hx-swap":     "none",
 													})
 												}
-												if teacher.Status == "approved" {
+												if teacher.Status == constants.TeacherStatusApproved {
 													@IconActionButton("Un-approve", IconKindUnapprove, templ.Attributes{
 														"hx-post": utils.URL("/teachers/unapprove"),
 														"hx-vals": `{"id": "` + teacher.ID + `"}`,

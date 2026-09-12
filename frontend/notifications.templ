@@ -21,6 +21,8 @@ type NotificationPanelData struct {
 type NotificationListData struct {
 	Items          []NotificationItem
 	UnreadOnly     bool
+	SortBy         string
+	SortOrder      string
 	PageNumber     int
 	PageTotalPages int
 	PageTotal      int64
@@ -37,6 +39,7 @@ templ NotificationBell() {
 			type="button"
 			class="notification-bell"
 			id="notificationBellBtn"
+			data-tooltip="Notifications"
 			aria-label="Notifications"
 			aria-expanded="false"
 			aria-controls="notificationPanelHost"
@@ -136,6 +139,16 @@ templ Notifications(data NotificationListData) {
 					href={ utils.URL("/notifications?filter=unread") }
 					class={ notificationFilterClass(data.UnreadOnly) }
 				>Unread</a>
+				<form class="notification-sort-form" method="GET" action={ utils.URL("/notifications") }>
+					if data.UnreadOnly {
+						<input type="hidden" name="filter" value="unread"/>
+					}
+					@SortControls(data.SortBy, data.SortOrder, ListSortKindNotification)
+					<div class="form-group list-toolbar-action">
+						<label for="notificationSortSubmit">&nbsp;</label>
+						<button type="submit" id="notificationSortSubmit">Apply</button>
+					</div>
+				</form>
 				if data.UnreadOnly && data.PageTotal > 0 {
 					<button
 						type="button"
@@ -198,7 +211,7 @@ templ NotificationListRow(item NotificationItem) {
 					})
 				</div>
 			} else {
-				<span class="notification-no-action">—</span>
+				<span class="notification-no-action">-</span>
 			}
 		</td>
 	</tr>
@@ -238,7 +251,9 @@ templ NotificationBellScript() {
 				if (!btn) return;
 				const badge = btn.parentElement?.querySelector('.badge-count');
 				const count = badge ? badge.textContent.trim() : '';
-				btn.setAttribute('aria-label', count ? 'Notifications, ' + count + ' unread' : 'Notifications');
+				const label = count ? 'Notifications, ' + count + ' unread' : 'Notifications';
+				btn.setAttribute('aria-label', label);
+				btn.setAttribute('data-tooltip', label);
 			}
 
 			function closeNotificationPanel() {

@@ -49,7 +49,6 @@ templ RolePillStyles() {
 		}
 		.role-tags .pill--neutral {
 			background: var(--color-surface);
-			border: 1px solid var(--color-border);
 			color: var(--color-foreground);
 		}
 		.role-tags-add {
@@ -113,6 +112,8 @@ templ TeacherRoleEditor(roles []constants.TeacherRole, roleOptions []constants.T
 							return 'role-tag-pill pill pill--primary';
 						case 'developer':
 							return 'role-tag-pill pill pill--info';
+						case 'tester':
+							return 'role-tag-pill pill pill--warning';
 						default:
 							return 'role-tag-pill pill pill--neutral';
 					}
@@ -147,7 +148,7 @@ templ TeacherRoleEditor(roles []constants.TeacherRole, roleOptions []constants.T
 					pill.innerHTML =
 						'<span class="role-tag-label">' + escapeHTML(role) + '</span>' +
 						(removable
-							? '<button type="button" class="role-tag-remove" aria-label="Remove ' + escapeHTML(role) + ' role">&times;</button>'
+							? '<button type="button" class="role-tag-remove" data-tooltip="Remove ' + escapeHTML(role) + ' role" aria-label="Remove ' + escapeHTML(role) + ' role">&times;</button>'
 							: '') +
 						'<input type="hidden" name="roles" value="' + escapeHTML(role) + '">';
 					return pill;
@@ -182,7 +183,7 @@ templ RemovableRolePill(role constants.TeacherRole) {
 	<span class={ RoleTagPillClass(role) } data-role={ string(role) }>
 		<span class="role-tag-label">{ string(role) }</span>
 		if role != constants.TeacherRoleTeacher {
-			<button type="button" class="role-tag-remove" aria-label={ "Remove " + string(role) + " role" }>&times;</button>
+			<button type="button" class="role-tag-remove" data-tooltip={ "Remove " + string(role) + " role" } aria-label={ "Remove " + string(role) + " role" }>&times;</button>
 		}
 		<input type="hidden" name="roles" value={ string(role) }/>
 	</span>

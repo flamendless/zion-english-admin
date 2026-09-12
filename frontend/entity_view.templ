@@ -1,24 +1,40 @@
 package frontend
 
 import "fmt"
+import "zion-english/internal/constants"
+import "zion-english/internal/utils"
 
 func formatDurationMinutes(minutes int64) string {
 	if minutes <= 0 {
 		return "-"
 	}
-	if minutes == 1 {
-		return "1 min"
+	if minutes < 60 {
+		if minutes == 1 {
+			return "1 min"
+		}
+		return fmt.Sprintf("%d min", minutes)
 	}
-	return fmt.Sprintf("%d min", minutes)
+	hours := minutes / 60
+	remainder := minutes % 60
+	if remainder == 0 {
+		if hours == 1 {
+			return "1 hr"
+		}
+		return fmt.Sprintf("%d hr", hours)
+	}
+	if hours == 1 {
+		return fmt.Sprintf("1 hr %d min", remainder)
+	}
+	return fmt.Sprintf("%d hr %d min", hours, remainder)
 }
 
-func classStatusAccentClass(status string) string {
+func classStatusAccentClass(status constants.ClassListFilterStatus) string {
 	switch status {
-	case "conducted":
+	case constants.ClassListFilterConducted:
 		return "entity-view-hero--success"
-	case "cancelled", "deleted":
+	case constants.ClassListFilterCancelled, constants.ClassListFilterDeleted:
 		return "entity-view-hero--error"
-	case "rescheduled":
+	case constants.ClassListFilterRescheduled:
 		return "entity-view-hero--warning"
 	default:
 		return "entity-view-hero--neutral"
@@ -48,8 +64,8 @@ templ EntityViewSection(title string) {
 	</section>
 }
 
-templ EntityViewNotePanel(title, content, tone string) {
-	<div class={ "entity-view-note entity-view-note--" + tone }>
+templ EntityViewNotePanel(title, content string, tone PillTone) {
+	<div class={ "entity-view-note entity-view-note--" + string(tone) }>
 		<span class="entity-view-note-title">{ title }</span>
 		<p class="entity-view-note-content">{ content }</p>
 	</div>
@@ -163,6 +179,10 @@ templ EntityViewModalStyles() {
 			margin: 0 0 var(--space-2);
 			font-size: 1.25rem;
 			line-height: 1.3;
+		}
+
+		.entity-view-hero-teacher {
+			margin: 0 0 var(--space-3);
 		}
 
 		.entity-view-meta-row {
@@ -461,7 +481,7 @@ templ EntityViewRateStat(amount float64, currency string) {
 	<div class="entity-view-stat">
 		<span class="entity-view-stat-label">Rate</span>
 		<span class="entity-view-stat-value entity-view-stat-value--rate">
-			{ fmt.Sprintf("%.2f", amount) }
+			{ utils.FormatCurrencyAmountFixed(amount, currency) }
 			<span class="entity-view-rate-currency">{ currency }</span>
 		</span>
 	</div>

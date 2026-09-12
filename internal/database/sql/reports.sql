@@ -8,7 +8,8 @@ SELECT
 	t.assigned_color AS teacher_assigned_color,
 	t.profile_picture AS teacher_profile_picture,
 	COUNT(cr.id) AS total_classes,
-	COALESCE(SUM(CASE WHEN cr.status = 'conducted' THEN 1 ELSE 0 END), 0) AS conducted_classes
+	COALESCE(SUM(CASE WHEN cr.status = 'conducted' THEN 1 ELSE 0 END), 0) AS conducted_classes,
+	COALESCE(SUM(CASE WHEN cr.status = 'cancelled' THEN 1 ELSE 0 END), 0) AS cancelled_classes
 FROM tbl_teachers t
 LEFT JOIN tbl_class_records cr ON cr.teacher_id = t.id
 	AND cr.date >= ? AND cr.date <= ?
@@ -34,7 +35,7 @@ SELECT cr.teacher_id, cr.currency, COALESCE(SUM(cr.rate), 0) AS total_rate
 FROM tbl_class_records cr
 JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE cr.date >= ? AND cr.date <= ?
-	AND cr.status = 'conducted'
+	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
 	AND cr.deleted_at IS NULL
 	AND t.status = 'approved' AND t.deleted = 0
 	AND (
@@ -62,7 +63,7 @@ JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
-ORDER BY cr.date ASC, s.name ASC, cr.rate ASC, cr.start_time ASC;
+ORDER BY s.name ASC, cr.date ASC, cr.rate ASC, cr.start_time ASC;
 
 -- name: GetClassRecordFingerprintRows :many
 SELECT cr.id, cr.student_id, cr.date, cr.start_time, cr.end_time,
@@ -107,3 +108,36 @@ SELECT rg.id, rg.teacher_id, rg.start_date, rg.end_date, rg.content_hash, rg.out
 FROM tbl_report_generations rg
 JOIN tbl_teachers t ON rg.teacher_id = t.id
 WHERE rg.output_path = ?;
+
+-- name: GetReportSummaryRows :many
+SELECT
+	cr.teacher_id,
+	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
+	t.first_name AS teacher_first_name,
+	t.middle_name AS teacher_middle_name,
+	t.last_name AS teacher_last_name,
+	cr.student_id,
+	s.name AS student_name,
+	s.parent_rate,
+	s.parent_currency,
+	cr.date
+FROM tbl_class_records cr
+JOIN tbl_students s ON cr.student_id = s.id
+JOIN tbl_teachers t ON cr.teacher_id = t.id
+WHERE cr.date >= ? AND cr.date <= ?
+	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
+	AND cr.deleted_at IS NULL
+	AND t.status = 'approved' AND t.deleted = 0
+	AND (
+	? = ''
+	OR trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) LIKE '%' || ? || '%'
+	OR EXISTS (
+		SELECT 1 FROM tbl_class_records cr2
+		JOIN tbl_students s2 ON cr2.student_id = s2.id
+		WHERE cr2.teacher_id = t.id
+		AND cr2.date >= ? AND cr2.date <= ?
+		AND cr2.deleted_at IS NULL
+		AND s2.name LIKE '%' || ? || '%'
+	)
+	)
+ORDER BY t.last_name ASC, t.first_name ASC, t.middle_name ASC, s.name ASC, cr.date ASC;

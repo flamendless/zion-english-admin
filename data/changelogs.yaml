@@ -9,6 +9,177 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.09.11"
+    date: "2026-09-11"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "You can record past classes and schedule upcoming classes through new step-by-step wizards opened from the Record Classes modal, with a review step before saving."
+        commit: "6254f33"
+      - text: "Superusers can open the Students Relationship Diagram under Insights to explore family groupings and explicit links between students, with search and pan/zoom controls."
+        commit: "78729c1"
+    improvements:
+      - text: "The navbar groups related pages into dropdowns, with Dashboard first and Classes, People, Resources, Insights, and Admin groups by role. Resources includes Learning Library, Documents, and Guides. On the dashboard, group cards in Quick actions open a choice modal with the same destinations."
+        commit: "0a1f920"
+      - text: "Superuser-only guides now show an Admin only indicator on guide cards and page headings."
+        commit: "95b2eda"
+      - text: "Analytics tables for teachers and students now paginate long result sets, and Utilization includes a tooltip explaining the calculation."
+        commit: "78729c1"
+      - text: "Classes, schedule, reports, and documents lists refresh automatically after you save or delete without reloading the page."
+        commit: "ac95ef5"
+      - text: "Class record and schedule wizards include a dedicated rate and currency step, and time fields show a live duration preview as you enter start and end times."
+        commit: "ac95ef5"
+      - text: "The teachers list shows Zoom and Google Calendar connection status, with filters for document review status and connected integrations."
+        commit: "4f7f2ba"
+      - text: "Dashboard quick-action cards for admin-only tools such as Teachers, Students, Reports, Process, and Feature Flags now show an Admin only indicator."
+        commit: "ba453af"
+      - text: "Announcement banners use a clearer centered layout on the dashboard and page headers, including on mobile."
+        commit: "831db34"
+    bug_fixes:
+      - text: "Fixed teacher search so you can find teachers by typing first and last name together."
+        commit: "956e743"
+      - text: "Fixed reports filters including Generate Summary form fields and returning unexpected results."
+        commit: "956e743"
+      - text: "Fixed the classes list showing or hiding the teacher column incorrectly after filtering."
+        commit: "956e743"
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+  - version: "2026.09.09"
+    date: "2026-09-09"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Schedule repeating classes from Record classes: pick multiple future dates, preview conflicts, and create a linked series."
+        commit: "500011a"
+      - text: "Dashboard quick action and series page list active repeating scheduled classes with edit and delete controls."
+        commit: "500011a"
+    improvements: []
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+  - version: "2026.09.08"
+    date: "2026-09-08"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Superusers can delete students from the students list with a required reason; the record is kept for audit."
+        commit: "55eeef5"
+      - text: "You can mark scheduled and recorded classes as trial classes."
+        commit: "cf05105"
+      - text: "Reports includes a Generate Summary action to export payroll totals for all teachers in the selected date range."
+        commit: "db08b1b"
+      - text: "Analytics now includes interactive charts for utilization, cancellations, weekly trends, and related metrics."
+        commit: "960f2d1"
+    improvements:
+      - text: "Feature Flags now includes per-integration role visibility checkboxes so superusers can control which teacher roles see Zoom and Google Calendar. Login superuser and admin accounts always see all integrations."
+        commit: "e10f5e1"
+      - text: "Superuser-only fields such as parent rate now show an Admin only indicator so it is clear which data teachers cannot see."
+        commit: "55eeef5"
+      - text: "Rates and currencies use clearer formatting across classes, schedule, and student forms."
+        commit: "8276308"
+      - text: "The class schedule includes a day timeline view showing each teacher's classes by hour."
+        commit: "49b2ae5"
+      - text: "The superuser dashboard shows parent rate totals for the current month."
+        commit: "063ab81"
+      - text: "List pages open with sensible default sort options."
+        commit: "623c662"
+      - text: "Dashboard stat cards have an updated layout."
+        commit: "d4f069e"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+  - version: "2026.09.02"
+    date: "2026-09-02"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Teachers can read answers to common questions in the new FAQ guide, available from Guides and the public docs site."
+        commit: "6ccb3a3"
+      - text: "Superusers can record a parent rate and currency on student records; parent rates appear on the students list and detail views but stay hidden from teacher My Students pages."
+        commit: "d779267"
+      - text: "Superusers can open View all teachers on the Reports page to see total earnings and class counts for every approved teacher in the selected date range."
+        commit: "6f0f0d8"
+    improvements:
+      - text: "The dashboard Record Classes card opens a choice modal so you can plan upcoming lessons or record classes you already taught."
+        commit: "df86eb5"
+      - text: "Reports includes a month picker that updates first and second cutoff presets for the selected month."
+        commit: "038e973"
+      - text: "List pages with tables now include sort-by dropdowns and A-to-Z or Z-to-A order controls; sort choice is kept when you change pages."
+        commit: "3c8ab3a"
+      - text: "Report class previews now list records sorted by student name, then date."
+        commit: "d779267"
+      - text: "Cancelled and rescheduled classes automatically store a rate of zero when you record or edit them."
+        commit: "4e334eb"
+    bug_fixes:
+      - text: "Fixed Google Calendar connection failures caused by a missing OAuth email scope."
+        commit: "b942d8c"
+    removed: []
+    security: []
+    deprecated: []
+    internal:
+      - text: "Google Calendar OAuth errors now log redirect URI and Google API response details for easier troubleshooting."
+        commit: "05f1daa"
+  - version: "2026.08.29"
+    date: "2026-08-29"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Teachers can connect Google Calendar from My Profile. Scheduled classes with a start time sync automatically to a dedicated Zion English calendar."
+        commit: "c4df8bd"
+      - text: "Superusers can use the Feature Flags page to allow or block new Zoom and Google Calendar connections from My Profile; existing teacher connections stay active when disabled."
+        commit: "c4df8bd"
+    improvements: []
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+  - version: "2026.08.28"
+    date: "2026-08-28"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "You can attach learning materials from the Learning Library when scheduling, recording, or editing a class; linked materials appear on class detail views."
+        commit: "120fc43"
+    improvements:
+      - text: "Learning Library materials now have titles and show in-app link previews with thumbnails when you add or browse resources."
+        commit: "f57e24d"
+      - text: "Link previews fall back gracefully when a site does not provide standard preview metadata."
+        commit: "a737fa8"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
+  - version: "2026.08.27.2"
+    date: "2026-08-27"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "You can browse and share teaching resources in the new Learning Library, with tags, links, and public or private access."
+        commit: "6c36db3"
+      - text: "Superusers can assign an Admin role to teachers, giving them access to admin tools such as students, teachers, reports, and payroll processing."
+        commit: "9794cb2"
+    improvements:
+      - text: "Conducting, cancelling, and deleting classes from the schedule now use confirmation modals instead of inline forms."
+        commit: "fe69d0d"
+      - text: "Teacher avatars and names appear more consistently across analytics, documents, classes, and announcements."
+        commit: "c6e6326"
+      - text: "Reports show teacher role badges on avatars in the list and quick-view modal."
+        commit: "9794cb2"
+    bug_fixes:
+      - text: "Fixed a layout issue on class schedule cards."
+        commit: "27c176c"
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
   - version: "2026.08.27.1"
     date: "2026-08-27"
     released: true
@@ -76,7 +247,7 @@ versions:
     released: true
     breaking_changes: []
     new_features:
-      - text: "In-app notifications keep you informed — use the bell in the header for recent alerts or open the full Notifications page to browse, filter, and mark items read."
+      - text: "In-app notifications keep you informed. Use the bell in the header for recent alerts or open the full Notifications page to browse, filter, and mark items read."
       - text: "You receive notifications for key events such as class and schedule changes, student assignments, document reviews, teacher approvals, and profile updates."
       - text: "Teachers and superusers get automatic alerts when a scheduled class passes without a recorded session."
     improvements: []

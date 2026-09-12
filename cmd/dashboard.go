@@ -77,6 +77,18 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 			data.PendingDocuments = pendingDocs
 		}
+		pendingIntroVideos, err := dbRO.GetQueries().CountTeacherIntroVideosByStatus(ctx, string(constants.TeacherIntroVideoStatusSubmitted))
+		if err == nil {
+			data.PendingIntroVideos = pendingIntroVideos
+		}
+		withoutParent, err := dbRO.GetQueries().CountActiveStudentsWithoutParent(ctx)
+		if err == nil {
+			data.StudentsWithoutParent = withoutParent
+		}
+		withoutParentRate, err := dbRO.GetQueries().CountActiveStudentsWithoutParentRate(ctx)
+		if err == nil {
+			data.StudentsWithoutParentRate = withoutParentRate
+		}
 		classCounts, err := dbRO.GetQueries().CountClassRecordsByStatusAndDateRange(ctx, queries.CountClassRecordsByStatusAndDateRangeParams{
 			Date:      weekStart,
 			Date_2:    weekEnd,
@@ -110,7 +122,25 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 				})
 			}
 		}
-	case auth.RoleTeacher:
+		parentRates, err := dbRO.GetQueries().SumConductedParentRateByCurrencyAndDateRange(ctx, queries.SumConductedParentRateByCurrencyAndDateRangeParams{
+			Date:      monthStart,
+			Date_2:    monthEnd,
+			Column3:   int64(0),
+			TeacherID: 0,
+		})
+		if err == nil {
+			for _, row := range parentRates {
+				if !row.Currency.Valid || row.Currency.String == "" {
+					continue
+				}
+				total, _ := row.TotalRate.(float64)
+				data.ParentMonthlyTotals = append(data.ParentMonthlyTotals, frontend.CurrencyTotal{
+					Currency: row.Currency.String,
+					Total:    total,
+				})
+			}
+		}
+	case auth.RoleTeacher, auth.RoleTester:
 		user := auth.GetUser(ctx)
 		count, err := dbRO.GetQueries().CountStudentsByTeacherID(ctx, user.ID)
 		if err == nil {
@@ -199,6 +229,7 @@ func handleMyStudents(w http.ResponseWriter, r *http.Request) {
 
 	q := r.URL.Query().Get("q")
 	status := r.URL.Query().Get("status")
+	sort := parseListSort(r, frontend.ListSortKindMyStudent)
 	page := utils.ParsePageQuery(r)
 
 	filter := queries.CountStudentsByTeacherIDFilteredParams{
@@ -216,19 +247,21 @@ func handleMyStudents(w http.ResponseWriter, r *http.Request) {
 	}
 	page.Total = total
 
-	students, err := dbRO.GetQueries().GetStudentsByTeacherIDFiltered(ctx, queries.GetStudentsByTeacherIDFilteredParams{
+	allStudents, err := dbRO.GetQueries().GetStudentsByTeacherIDFiltered(ctx, queries.GetStudentsByTeacherIDFilteredParams{
 		TeacherID: user.ID,
 		Column2:   q,
 		Column3:   sql.NullString{String: q, Valid: true},
 		Column4:   status,
 		Status:    status,
-		Limit:     int64(page.Size),
-		Offset:    int64(page.Offset()),
+		Limit:     total,
+		Offset:    0,
 	})
 	if err != nil {
 		HttpError(w, "Failed to fetch students", http.StatusInternalServerError)
 		return
 	}
+	sortMyStudentRows(allStudents, sort)
+	students := paginateSlice(allStudents, page)
 
 	viewStudents := make([]frontend.StudentItem, len(students))
 	for i, s := range students {
@@ -240,16 +273,18 @@ func handleMyStudents(w http.ResponseWriter, r *http.Request) {
 			RatePerClass:  s.RatePerClass,
 			ParentName:    s.ParentName.String,
 			AssignedColor: s.AssignedColor,
-			Status:        s.Status,
+			Status:        constants.StudentStatus(s.Status),
 		}
 	}
 
-	params := map[string]string{"q": q, "status": status}
+	params := listQueryParamsWithSort(r, frontend.ListSortKindMyStudent)
 	w.Header().Set("Content-Type", "text/html")
 	frontend.MyStudents(frontend.MyStudentsData{
 		Students:       viewStudents,
 		Query:          q,
-		Status:         status,
+		Status:         constants.StudentStatus(status),
+		SortBy:         sort.By,
+		SortOrder:      string(sort.Order),
 		PageNumber:     page.Number,
 		PageTotalPages: page.TotalPages(),
 		PageTotal:      page.Total,
@@ -271,7 +306,7 @@ func handleLogoutWithAccess(w http.ResponseWriter, r *http.Request) {
 	if user, ok := auth.UserFromRequest(r, conf.Conf()); ok {
 		if auth.HasAdminAccess(user.Role) {
 			insertAuditLogAs(ctx, user, "auth", fmt.Sprintf("logged out (%s)", user.Email))
-		} else if user.Role == auth.RoleTeacher && user.ID > 0 {
+		} else if auth.IsTeacherScoped(user.Role) && user.ID > 0 {
 			insertAuditLogAs(ctx, user, "auth", fmt.Sprintf("logged out (%s)", user.Email))
 			accessID, err := dbRW.GetQueries().GetLatestOpenAccessByTeacherID(ctx, user.ID)
 			if err == nil && accessID > 0 {

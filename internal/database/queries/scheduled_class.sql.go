@@ -10,6 +10,21 @@ import (
 	"database/sql"
 )
 
+const countScheduledClassesBySeries = `-- name: CountScheduledClassesBySeries :one
+SELECT COUNT(*) as count
+FROM tbl_scheduled_classes
+WHERE series_id = ?
+	AND deleted_at IS NULL
+	AND status = 'scheduled'
+`
+
+func (q *Queries) CountScheduledClassesBySeries(ctx context.Context, seriesID sql.NullInt64) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countScheduledClassesBySeries, seriesID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const countScheduledClassesByStatusAndDate = `-- name: CountScheduledClassesByStatusAndDate :one
 SELECT COUNT(*) as count
 FROM tbl_scheduled_classes
@@ -74,6 +89,27 @@ func (q *Queries) CountScheduledClassesFiltered(ctx context.Context, arg CountSc
 	return count, err
 }
 
+const countScheduledClassesInSeriesFromDate = `-- name: CountScheduledClassesInSeriesFromDate :one
+SELECT COUNT(*) as count
+FROM tbl_scheduled_classes
+WHERE series_id = ?
+	AND scheduled_date >= ?
+	AND deleted_at IS NULL
+	AND status = 'scheduled'
+`
+
+type CountScheduledClassesInSeriesFromDateParams struct {
+	SeriesID      sql.NullInt64
+	ScheduledDate string
+}
+
+func (q *Queries) CountScheduledClassesInSeriesFromDate(ctx context.Context, arg CountScheduledClassesInSeriesFromDateParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countScheduledClassesInSeriesFromDate, arg.SeriesID, arg.ScheduledDate)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const countScheduledDuplicate = `-- name: CountScheduledDuplicate :one
 SELECT COUNT(*) as count
 FROM tbl_scheduled_classes
@@ -107,7 +143,7 @@ func (q *Queries) CountScheduledDuplicate(ctx context.Context, arg CountSchedule
 }
 
 const getScheduledClassByID = `-- name: GetScheduledClassByID :one
-SELECT sc.id, sc.student_id, sc.teacher_id, sc.scheduled_date, sc.start_time, sc.duration_minutes, sc.rate, sc.currency, sc.status, sc.reason, sc.created_by_role, sc.created_at, sc.updated_at,
+SELECT sc.id, sc.student_id, sc.teacher_id, sc.scheduled_date, sc.start_time, sc.duration_minutes, sc.rate, sc.currency, sc.is_trial_class, sc.series_id, sc.status, sc.reason, sc.created_by_role, sc.created_at, sc.updated_at,
 	s.name as student_name,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_scheduled_classes sc
@@ -125,6 +161,8 @@ type GetScheduledClassByIDRow struct {
 	DurationMinutes int64
 	Rate            float64
 	Currency        string
+	IsTrialClass    int64
+	SeriesID        sql.NullInt64
 	Status          string
 	Reason          sql.NullString
 	CreatedByRole   string
@@ -146,6 +184,8 @@ func (q *Queries) GetScheduledClassByID(ctx context.Context, id int64) (GetSched
 		&i.DurationMinutes,
 		&i.Rate,
 		&i.Currency,
+		&i.IsTrialClass,
+		&i.SeriesID,
 		&i.Status,
 		&i.Reason,
 		&i.CreatedByRole,
@@ -158,12 +198,21 @@ func (q *Queries) GetScheduledClassByID(ctx context.Context, id int64) (GetSched
 }
 
 const getScheduledClassesByStudentOnDate = `-- name: GetScheduledClassesByStudentOnDate :many
-SELECT id, start_time, duration_minutes
-FROM tbl_scheduled_classes
-WHERE student_id = ? AND scheduled_date = ? AND status = 'scheduled'
-	AND deleted_at IS NULL
-	AND start_time IS NOT NULL AND trim(start_time) != ''
-	AND (? = 0 OR id != ?)
+SELECT
+	sc.id,
+	sc.scheduled_date,
+	sc.start_time,
+	sc.duration_minutes,
+	sc.status,
+	s.name as student_name,
+	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
+FROM tbl_scheduled_classes sc
+JOIN tbl_students s ON sc.student_id = s.id
+JOIN tbl_teachers t ON sc.teacher_id = t.id
+WHERE sc.student_id = ? AND sc.scheduled_date = ? AND sc.status = 'scheduled'
+	AND sc.deleted_at IS NULL
+	AND sc.start_time IS NOT NULL AND trim(sc.start_time) != ''
+	AND (? = 0 OR sc.id != ?)
 `
 
 type GetScheduledClassesByStudentOnDateParams struct {
@@ -175,8 +224,12 @@ type GetScheduledClassesByStudentOnDateParams struct {
 
 type GetScheduledClassesByStudentOnDateRow struct {
 	ID              int64
+	ScheduledDate   string
 	StartTime       sql.NullString
 	DurationMinutes int64
+	Status          string
+	StudentName     string
+	TeacherName     string
 }
 
 func (q *Queries) GetScheduledClassesByStudentOnDate(ctx context.Context, arg GetScheduledClassesByStudentOnDateParams) ([]GetScheduledClassesByStudentOnDateRow, error) {
@@ -193,7 +246,15 @@ func (q *Queries) GetScheduledClassesByStudentOnDate(ctx context.Context, arg Ge
 	var items []GetScheduledClassesByStudentOnDateRow
 	for rows.Next() {
 		var i GetScheduledClassesByStudentOnDateRow
-		if err := rows.Scan(&i.ID, &i.StartTime, &i.DurationMinutes); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.ScheduledDate,
+			&i.StartTime,
+			&i.DurationMinutes,
+			&i.Status,
+			&i.StudentName,
+			&i.TeacherName,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -208,12 +269,21 @@ func (q *Queries) GetScheduledClassesByStudentOnDate(ctx context.Context, arg Ge
 }
 
 const getScheduledClassesByTeacherOnDate = `-- name: GetScheduledClassesByTeacherOnDate :many
-SELECT id, start_time, duration_minutes
-FROM tbl_scheduled_classes
-WHERE teacher_id = ? AND scheduled_date = ? AND status = 'scheduled'
-	AND deleted_at IS NULL
-	AND start_time IS NOT NULL AND trim(start_time) != ''
-	AND (? = 0 OR id != ?)
+SELECT
+	sc.id,
+	sc.scheduled_date,
+	sc.start_time,
+	sc.duration_minutes,
+	sc.status,
+	s.name as student_name,
+	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
+FROM tbl_scheduled_classes sc
+JOIN tbl_students s ON sc.student_id = s.id
+JOIN tbl_teachers t ON sc.teacher_id = t.id
+WHERE sc.teacher_id = ? AND sc.scheduled_date = ? AND sc.status = 'scheduled'
+	AND sc.deleted_at IS NULL
+	AND sc.start_time IS NOT NULL AND trim(sc.start_time) != ''
+	AND (? = 0 OR sc.id != ?)
 `
 
 type GetScheduledClassesByTeacherOnDateParams struct {
@@ -225,8 +295,12 @@ type GetScheduledClassesByTeacherOnDateParams struct {
 
 type GetScheduledClassesByTeacherOnDateRow struct {
 	ID              int64
+	ScheduledDate   string
 	StartTime       sql.NullString
 	DurationMinutes int64
+	Status          string
+	StudentName     string
+	TeacherName     string
 }
 
 func (q *Queries) GetScheduledClassesByTeacherOnDate(ctx context.Context, arg GetScheduledClassesByTeacherOnDateParams) ([]GetScheduledClassesByTeacherOnDateRow, error) {
@@ -243,7 +317,15 @@ func (q *Queries) GetScheduledClassesByTeacherOnDate(ctx context.Context, arg Ge
 	var items []GetScheduledClassesByTeacherOnDateRow
 	for rows.Next() {
 		var i GetScheduledClassesByTeacherOnDateRow
-		if err := rows.Scan(&i.ID, &i.StartTime, &i.DurationMinutes); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.ScheduledDate,
+			&i.StartTime,
+			&i.DurationMinutes,
+			&i.Status,
+			&i.StudentName,
+			&i.TeacherName,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -258,7 +340,7 @@ func (q *Queries) GetScheduledClassesByTeacherOnDate(ctx context.Context, arg Ge
 }
 
 const getScheduledClassesFiltered = `-- name: GetScheduledClassesFiltered :many
-SELECT sc.id, sc.student_id, sc.teacher_id, sc.scheduled_date, sc.start_time, sc.duration_minutes, sc.rate, sc.currency, sc.status, sc.reason, sc.created_by_role, sc.created_at, sc.updated_at,
+SELECT sc.id, sc.student_id, sc.teacher_id, sc.scheduled_date, sc.start_time, sc.duration_minutes, sc.rate, sc.currency, sc.status, sc.reason, sc.created_by_role, sc.created_at, sc.updated_at, sc.series_id,
 	s.name as student_name,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name,
 	t.first_name as teacher_first_name, t.middle_name as teacher_middle_name, t.last_name as teacher_last_name,
@@ -301,6 +383,7 @@ type GetScheduledClassesFilteredRow struct {
 	CreatedByRole         string
 	CreatedAt             string
 	UpdatedAt             string
+	SeriesID              sql.NullInt64
 	StudentName           string
 	TeacherName           string
 	TeacherFirstName      string
@@ -344,6 +427,7 @@ func (q *Queries) GetScheduledClassesFiltered(ctx context.Context, arg GetSchedu
 			&i.CreatedByRole,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.SeriesID,
 			&i.StudentName,
 			&i.TeacherName,
 			&i.TeacherFirstName,
@@ -365,9 +449,144 @@ func (q *Queries) GetScheduledClassesFiltered(ctx context.Context, arg GetSchedu
 	return items, nil
 }
 
+const getScheduledClassesInSeriesFromDate = `-- name: GetScheduledClassesInSeriesFromDate :many
+SELECT
+	sc.id,
+	sc.student_id,
+	sc.teacher_id,
+	sc.scheduled_date,
+	sc.start_time,
+	sc.duration_minutes,
+	sc.rate,
+	sc.currency,
+	sc.is_trial_class,
+	sc.series_id,
+	sc.status
+FROM tbl_scheduled_classes sc
+WHERE sc.series_id = ?
+	AND sc.scheduled_date >= ?
+	AND sc.deleted_at IS NULL
+	AND sc.status = 'scheduled'
+ORDER BY sc.scheduled_date ASC, sc.start_time ASC, sc.id ASC
+`
+
+type GetScheduledClassesInSeriesFromDateParams struct {
+	SeriesID      sql.NullInt64
+	ScheduledDate string
+}
+
+type GetScheduledClassesInSeriesFromDateRow struct {
+	ID              int64
+	StudentID       int64
+	TeacherID       int64
+	ScheduledDate   string
+	StartTime       sql.NullString
+	DurationMinutes int64
+	Rate            float64
+	Currency        string
+	IsTrialClass    int64
+	SeriesID        sql.NullInt64
+	Status          string
+}
+
+func (q *Queries) GetScheduledClassesInSeriesFromDate(ctx context.Context, arg GetScheduledClassesInSeriesFromDateParams) ([]GetScheduledClassesInSeriesFromDateRow, error) {
+	rows, err := q.db.QueryContext(ctx, getScheduledClassesInSeriesFromDate, arg.SeriesID, arg.ScheduledDate)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetScheduledClassesInSeriesFromDateRow
+	for rows.Next() {
+		var i GetScheduledClassesInSeriesFromDateRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.StudentID,
+			&i.TeacherID,
+			&i.ScheduledDate,
+			&i.StartTime,
+			&i.DurationMinutes,
+			&i.Rate,
+			&i.Currency,
+			&i.IsTrialClass,
+			&i.SeriesID,
+			&i.Status,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getScheduledDuplicate = `-- name: GetScheduledDuplicate :one
+SELECT
+	sc.id,
+	sc.scheduled_date,
+	sc.start_time,
+	sc.duration_minutes,
+	sc.status,
+	s.name as student_name,
+	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
+FROM tbl_scheduled_classes sc
+JOIN tbl_students s ON sc.student_id = s.id
+JOIN tbl_teachers t ON sc.teacher_id = t.id
+WHERE sc.student_id = ? AND sc.teacher_id = ? AND sc.scheduled_date = ? AND sc.duration_minutes = ?
+	AND sc.status = 'scheduled'
+	AND sc.deleted_at IS NULL
+	AND (? = 0 OR sc.id != ?)
+LIMIT 1
+`
+
+type GetScheduledDuplicateParams struct {
+	StudentID       int64
+	TeacherID       int64
+	ScheduledDate   string
+	DurationMinutes int64
+	Column5         interface{}
+	ID              int64
+}
+
+type GetScheduledDuplicateRow struct {
+	ID              int64
+	ScheduledDate   string
+	StartTime       sql.NullString
+	DurationMinutes int64
+	Status          string
+	StudentName     string
+	TeacherName     string
+}
+
+func (q *Queries) GetScheduledDuplicate(ctx context.Context, arg GetScheduledDuplicateParams) (GetScheduledDuplicateRow, error) {
+	row := q.db.QueryRowContext(ctx, getScheduledDuplicate,
+		arg.StudentID,
+		arg.TeacherID,
+		arg.ScheduledDate,
+		arg.DurationMinutes,
+		arg.Column5,
+		arg.ID,
+	)
+	var i GetScheduledDuplicateRow
+	err := row.Scan(
+		&i.ID,
+		&i.ScheduledDate,
+		&i.StartTime,
+		&i.DurationMinutes,
+		&i.Status,
+		&i.StudentName,
+		&i.TeacherName,
+	)
+	return i, err
+}
+
 const insertScheduledClass = `-- name: InsertScheduledClass :one
-INSERT INTO tbl_scheduled_classes (student_id, teacher_id, scheduled_date, start_time, duration_minutes, rate, currency, status, reason, created_by_role)
-VALUES (?, ?, ?, ?, ?, ?, ?, 'scheduled', ?, ?)
+INSERT INTO tbl_scheduled_classes (student_id, teacher_id, scheduled_date, start_time, duration_minutes, rate, currency, is_trial_class, series_id, status, reason, created_by_role)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'scheduled', ?, ?)
 RETURNING id
 `
 
@@ -379,6 +598,8 @@ type InsertScheduledClassParams struct {
 	DurationMinutes int64
 	Rate            float64
 	Currency        string
+	IsTrialClass    int64
+	SeriesID        sql.NullInt64
 	Reason          sql.NullString
 	CreatedByRole   string
 }
@@ -392,12 +613,198 @@ func (q *Queries) InsertScheduledClass(ctx context.Context, arg InsertScheduledC
 		arg.DurationMinutes,
 		arg.Rate,
 		arg.Currency,
+		arg.IsTrialClass,
+		arg.SeriesID,
 		arg.Reason,
 		arg.CreatedByRole,
 	)
 	var id int64
 	err := row.Scan(&id)
 	return id, err
+}
+
+const insertScheduledClassSeries = `-- name: InsertScheduledClassSeries :one
+INSERT INTO tbl_scheduled_class_series (created_by_role)
+VALUES (?)
+RETURNING id
+`
+
+func (q *Queries) InsertScheduledClassSeries(ctx context.Context, createdByRole string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, insertScheduledClassSeries, createdByRole)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
+const listActiveScheduledClassSeries = `-- name: ListActiveScheduledClassSeries :many
+SELECT
+	ser.id AS series_id,
+	sc.id AS anchor_class_id,
+	sc.student_id,
+	sc.teacher_id,
+	sc.scheduled_date AS anchor_date,
+	sc.start_time,
+	sc.duration_minutes,
+	sc.rate,
+	sc.currency,
+	s.name AS student_name,
+	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
+	t.first_name AS teacher_first_name,
+	t.middle_name AS teacher_middle_name,
+	t.last_name AS teacher_last_name,
+	t.assigned_color AS teacher_assigned_color,
+	t.profile_picture AS teacher_profile_picture,
+	(
+		SELECT CAST(MIN(sc2.scheduled_date) AS TEXT)
+		FROM tbl_scheduled_classes sc2
+		WHERE sc2.series_id = ser.id
+			AND sc2.deleted_at IS NULL
+			AND sc2.status = 'scheduled'
+	) AS first_date,
+	(
+		SELECT CAST(MAX(sc2.scheduled_date) AS TEXT)
+		FROM tbl_scheduled_classes sc2
+		WHERE sc2.series_id = ser.id
+			AND sc2.deleted_at IS NULL
+			AND sc2.status = 'scheduled'
+	) AS last_date,
+	(
+		SELECT COUNT(*)
+		FROM tbl_scheduled_classes sc2
+		WHERE sc2.series_id = ser.id
+			AND sc2.deleted_at IS NULL
+			AND sc2.status = 'scheduled'
+	) AS scheduled_count
+FROM tbl_scheduled_class_series ser
+INNER JOIN tbl_scheduled_classes sc ON sc.series_id = ser.id
+	AND sc.deleted_at IS NULL
+	AND sc.status = 'scheduled'
+	AND sc.id = (
+		SELECT sc3.id
+		FROM tbl_scheduled_classes sc3
+		WHERE sc3.series_id = ser.id
+			AND sc3.deleted_at IS NULL
+			AND sc3.status = 'scheduled'
+		ORDER BY
+			CASE WHEN sc3.scheduled_date >= date('now', 'localtime') THEN 0 ELSE 1 END,
+			sc3.scheduled_date ASC,
+			sc3.start_time ASC,
+			sc3.id ASC
+		LIMIT 1
+	)
+INNER JOIN tbl_students s ON sc.student_id = s.id
+INNER JOIN tbl_teachers t ON sc.teacher_id = t.id
+WHERE EXISTS (
+	SELECT 1
+	FROM tbl_scheduled_classes sc4
+	WHERE sc4.series_id = ser.id
+		AND sc4.deleted_at IS NULL
+		AND sc4.status = 'scheduled'
+)
+	AND (? = 0 OR sc.teacher_id = ?)
+ORDER BY sc.scheduled_date ASC, sc.start_time ASC, ser.id ASC
+`
+
+type ListActiveScheduledClassSeriesParams struct {
+	Column1   interface{}
+	TeacherID int64
+}
+
+type ListActiveScheduledClassSeriesRow struct {
+	SeriesID              int64
+	AnchorClassID         int64
+	StudentID             int64
+	TeacherID             int64
+	AnchorDate            string
+	StartTime             sql.NullString
+	DurationMinutes       int64
+	Rate                  float64
+	Currency              string
+	StudentName           string
+	TeacherName           string
+	TeacherFirstName      string
+	TeacherMiddleName     string
+	TeacherLastName       string
+	TeacherAssignedColor  string
+	TeacherProfilePicture sql.NullString
+	FirstDate             string
+	LastDate              string
+	ScheduledCount        int64
+}
+
+func (q *Queries) ListActiveScheduledClassSeries(ctx context.Context, arg ListActiveScheduledClassSeriesParams) ([]ListActiveScheduledClassSeriesRow, error) {
+	rows, err := q.db.QueryContext(ctx, listActiveScheduledClassSeries, arg.Column1, arg.TeacherID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListActiveScheduledClassSeriesRow
+	for rows.Next() {
+		var i ListActiveScheduledClassSeriesRow
+		if err := rows.Scan(
+			&i.SeriesID,
+			&i.AnchorClassID,
+			&i.StudentID,
+			&i.TeacherID,
+			&i.AnchorDate,
+			&i.StartTime,
+			&i.DurationMinutes,
+			&i.Rate,
+			&i.Currency,
+			&i.StudentName,
+			&i.TeacherName,
+			&i.TeacherFirstName,
+			&i.TeacherMiddleName,
+			&i.TeacherLastName,
+			&i.TeacherAssignedColor,
+			&i.TeacherProfilePicture,
+			&i.FirstDate,
+			&i.LastDate,
+			&i.ScheduledCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listScheduledClassDatesBySeries = `-- name: ListScheduledClassDatesBySeries :many
+SELECT sc.scheduled_date
+FROM tbl_scheduled_classes sc
+WHERE sc.series_id = ?
+	AND sc.deleted_at IS NULL
+	AND sc.status = 'scheduled'
+ORDER BY sc.scheduled_date ASC, sc.start_time ASC, sc.id ASC
+`
+
+func (q *Queries) ListScheduledClassDatesBySeries(ctx context.Context, seriesID sql.NullInt64) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, listScheduledClassDatesBySeries, seriesID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var scheduled_date string
+		if err := rows.Scan(&scheduled_date); err != nil {
+			return nil, err
+		}
+		items = append(items, scheduled_date)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const rescheduleScheduledClass = `-- name: RescheduleScheduledClass :exec
@@ -441,15 +848,16 @@ func (q *Queries) SoftDeleteScheduledClass(ctx context.Context, arg SoftDeleteSc
 
 const updateScheduledClassDetails = `-- name: UpdateScheduledClassDetails :exec
 UPDATE tbl_scheduled_classes
-SET student_id = ?, rate = ?, currency = ?, updated_at = datetime('now')
+SET student_id = ?, rate = ?, currency = ?, is_trial_class = ?, updated_at = datetime('now')
 WHERE id = ? AND deleted_at IS NULL
 `
 
 type UpdateScheduledClassDetailsParams struct {
-	StudentID int64
-	Rate      float64
-	Currency  string
-	ID        int64
+	StudentID    int64
+	Rate         float64
+	Currency     string
+	IsTrialClass int64
+	ID           int64
 }
 
 func (q *Queries) UpdateScheduledClassDetails(ctx context.Context, arg UpdateScheduledClassDetailsParams) error {
@@ -457,6 +865,7 @@ func (q *Queries) UpdateScheduledClassDetails(ctx context.Context, arg UpdateSch
 		arg.StudentID,
 		arg.Rate,
 		arg.Currency,
+		arg.IsTrialClass,
 		arg.ID,
 	)
 	return err

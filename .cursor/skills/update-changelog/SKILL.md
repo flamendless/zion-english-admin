@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 # Update Changelog
 
-Maintain `data/changelogs.yaml` — the single source of truth for the `/changelogs` page.
+Maintain `data/changelogs.yaml`: the single source of truth for the `/changelogs` page.
 
 ## When to use
 
@@ -44,7 +44,7 @@ Task Progress:
 
 ### Insertion rules
 
-- **Append only** under `unreleased` — never edit released `versions` unless the user explicitly asks.
+- **Append only** under `unreleased`: never edit released `versions` unless the user explicitly asks.
 - Place entries in the correct section key (see schema).
 - Each entry: `text` (required), `commit` (short SHA, recommended for GitHub link).
 - Dedupe: skip if the same `commit` or substantially the same `text` already exists anywhere in the file.
@@ -74,7 +74,7 @@ Only when the user asks to **release**, **publish**, or **ship** a changelog ver
 
 ## Writing rules
 
-- **Voice:** user-friendly, admin-focused — "You can now…", "Fixed an issue where…"
+- **Voice:** user-friendly, admin-focused: "You can now…", "Fixed an issue where…"
 - **Granularity:** one user-visible change per bullet
 - **Commits:** link via short SHA; use `version.GitHubCommitURL` pattern (`https://github.com/flamendless/zion-english-admin/commit/<sha>`)
 - **Dates:** ISO `YYYY-MM-DD` on released versions; page displays PHT
@@ -93,7 +93,7 @@ Only when the user asks to **release**, **publish**, or **ship** a changelog ver
 
 ## Editing rules
 
-1. Use the Read tool before editing; use StrReplace/Write — never `echo >>` in shell.
+1. Use the Read tool before editing; use StrReplace/Write: never `echo >>` in shell.
 2. Preserve unrelated entries and formatting.
 3. Minimal diff: only touch changelog sections being updated.
 

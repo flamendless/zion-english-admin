@@ -11,6 +11,17 @@ import (
 	"strings"
 )
 
+const clearLearningMaterialDeleted = `-- name: ClearLearningMaterialDeleted :exec
+UPDATE tbl_learning_materials
+SET deleted_at = NULL, updated_at = datetime('now')
+WHERE id = ? AND status != 'deleted' AND deleted_at IS NOT NULL
+`
+
+func (q *Queries) ClearLearningMaterialDeleted(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, clearLearningMaterialDeleted, id)
+	return err
+}
+
 const countLearningMaterialTags = `-- name: CountLearningMaterialTags :one
 SELECT COUNT(*) FROM tbl_learning_material_tags
 `
@@ -36,10 +47,11 @@ func (q *Queries) CountLearningMaterialsForSuperuser(ctx context.Context) (int64
 const countLearningMaterialsForUser = `-- name: CountLearningMaterialsForUser :one
 SELECT COUNT(*)
 FROM tbl_learning_materials m
-WHERE m.status != 'deleted'
-	AND (
-		m.owner_id = ?
-		OR (m.status = 'published' AND m.access = 'public')
+WHERE m.owner_id = ?
+	OR (
+		m.status = 'published'
+		AND m.access = 'public'
+		AND m.status != 'deleted'
 	)
 `
 
@@ -105,19 +117,35 @@ func (q *Queries) GetAllLearningMaterialTags(ctx context.Context) ([]TblLearning
 }
 
 const getLearningMaterialByID = `-- name: GetLearningMaterialByID :one
-SELECT id, owner_id, description, url, access, status, created_at, updated_at, deleted_at
+SELECT id, owner_id, title, description, url, thumbnail_url, access, status, created_at, updated_at, deleted_at
 FROM tbl_learning_materials
 WHERE id = ?
 `
 
-func (q *Queries) GetLearningMaterialByID(ctx context.Context, id int64) (TblLearningMaterial, error) {
+type GetLearningMaterialByIDRow struct {
+	ID           int64
+	OwnerID      int64
+	Title        string
+	Description  string
+	Url          string
+	ThumbnailUrl string
+	Access       string
+	Status       string
+	CreatedAt    string
+	UpdatedAt    string
+	DeletedAt    sql.NullString
+}
+
+func (q *Queries) GetLearningMaterialByID(ctx context.Context, id int64) (GetLearningMaterialByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getLearningMaterialByID, id)
-	var i TblLearningMaterial
+	var i GetLearningMaterialByIDRow
 	err := row.Scan(
 		&i.ID,
 		&i.OwnerID,
+		&i.Title,
 		&i.Description,
 		&i.Url,
+		&i.ThumbnailUrl,
 		&i.Access,
 		&i.Status,
 		&i.CreatedAt,
@@ -146,7 +174,7 @@ func (q *Queries) GetLearningMaterialTagByLabel(ctx context.Context, label strin
 }
 
 const getLearningMaterialsPagedForSuperuser = `-- name: GetLearningMaterialsPagedForSuperuser :many
-SELECT id, owner_id, description, url, access, status, created_at, updated_at, deleted_at
+SELECT id, owner_id, title, description, url, thumbnail_url, access, status, created_at, updated_at, deleted_at
 FROM tbl_learning_materials
 ORDER BY created_at DESC, id DESC
 LIMIT ? OFFSET ?
@@ -157,20 +185,36 @@ type GetLearningMaterialsPagedForSuperuserParams struct {
 	Offset int64
 }
 
-func (q *Queries) GetLearningMaterialsPagedForSuperuser(ctx context.Context, arg GetLearningMaterialsPagedForSuperuserParams) ([]TblLearningMaterial, error) {
+type GetLearningMaterialsPagedForSuperuserRow struct {
+	ID           int64
+	OwnerID      int64
+	Title        string
+	Description  string
+	Url          string
+	ThumbnailUrl string
+	Access       string
+	Status       string
+	CreatedAt    string
+	UpdatedAt    string
+	DeletedAt    sql.NullString
+}
+
+func (q *Queries) GetLearningMaterialsPagedForSuperuser(ctx context.Context, arg GetLearningMaterialsPagedForSuperuserParams) ([]GetLearningMaterialsPagedForSuperuserRow, error) {
 	rows, err := q.db.QueryContext(ctx, getLearningMaterialsPagedForSuperuser, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TblLearningMaterial
+	var items []GetLearningMaterialsPagedForSuperuserRow
 	for rows.Next() {
-		var i TblLearningMaterial
+		var i GetLearningMaterialsPagedForSuperuserRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.OwnerID,
+			&i.Title,
 			&i.Description,
 			&i.Url,
+			&i.ThumbnailUrl,
 			&i.Access,
 			&i.Status,
 			&i.CreatedAt,
@@ -191,12 +235,13 @@ func (q *Queries) GetLearningMaterialsPagedForSuperuser(ctx context.Context, arg
 }
 
 const getLearningMaterialsPagedForUser = `-- name: GetLearningMaterialsPagedForUser :many
-SELECT id, owner_id, description, url, access, status, created_at, updated_at, deleted_at
+SELECT id, owner_id, title, description, url, thumbnail_url, access, status, created_at, updated_at, deleted_at
 FROM tbl_learning_materials m
-WHERE m.status != 'deleted'
-	AND (
-		m.owner_id = ?
-		OR (m.status = 'published' AND m.access = 'public')
+WHERE m.owner_id = ?
+	OR (
+		m.status = 'published'
+		AND m.access = 'public'
+		AND m.status != 'deleted'
 	)
 ORDER BY m.created_at DESC, m.id DESC
 LIMIT ? OFFSET ?
@@ -208,20 +253,36 @@ type GetLearningMaterialsPagedForUserParams struct {
 	Offset  int64
 }
 
-func (q *Queries) GetLearningMaterialsPagedForUser(ctx context.Context, arg GetLearningMaterialsPagedForUserParams) ([]TblLearningMaterial, error) {
+type GetLearningMaterialsPagedForUserRow struct {
+	ID           int64
+	OwnerID      int64
+	Title        string
+	Description  string
+	Url          string
+	ThumbnailUrl string
+	Access       string
+	Status       string
+	CreatedAt    string
+	UpdatedAt    string
+	DeletedAt    sql.NullString
+}
+
+func (q *Queries) GetLearningMaterialsPagedForUser(ctx context.Context, arg GetLearningMaterialsPagedForUserParams) ([]GetLearningMaterialsPagedForUserRow, error) {
 	rows, err := q.db.QueryContext(ctx, getLearningMaterialsPagedForUser, arg.OwnerID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TblLearningMaterial
+	var items []GetLearningMaterialsPagedForUserRow
 	for rows.Next() {
-		var i TblLearningMaterial
+		var i GetLearningMaterialsPagedForUserRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.OwnerID,
+			&i.Title,
 			&i.Description,
 			&i.Url,
+			&i.ThumbnailUrl,
 			&i.Access,
 			&i.Status,
 			&i.CreatedAt,
@@ -379,24 +440,28 @@ func (q *Queries) GetTeacherNameByID(ctx context.Context, id int64) (GetTeacherN
 }
 
 const insertLearningMaterial = `-- name: InsertLearningMaterial :one
-INSERT INTO tbl_learning_materials (owner_id, description, url, access, status)
-VALUES (?, ?, ?, ?, ?)
+INSERT INTO tbl_learning_materials (owner_id, title, description, url, thumbnail_url, access, status)
+VALUES (?, ?, ?, ?, ?, ?, ?)
 RETURNING id
 `
 
 type InsertLearningMaterialParams struct {
-	OwnerID     int64
-	Description string
-	Url         string
-	Access      string
-	Status      string
+	OwnerID      int64
+	Title        string
+	Description  string
+	Url          string
+	ThumbnailUrl string
+	Access       string
+	Status       string
 }
 
 func (q *Queries) InsertLearningMaterial(ctx context.Context, arg InsertLearningMaterialParams) (int64, error) {
 	row := q.db.QueryRowContext(ctx, insertLearningMaterial,
 		arg.OwnerID,
+		arg.Title,
 		arg.Description,
 		arg.Url,
+		arg.ThumbnailUrl,
 		arg.Access,
 		arg.Status,
 	)
@@ -480,22 +545,38 @@ func (q *Queries) SearchLearningMaterialTags(ctx context.Context, arg SearchLear
 
 const updateLearningMaterial = `-- name: UpdateLearningMaterial :exec
 UPDATE tbl_learning_materials
-SET description = ?, url = ?, access = ?, status = ?, updated_at = datetime('now')
-WHERE id = ?
+SET
+	title = ?1,
+	description = ?2,
+	url = ?3,
+	thumbnail_url = ?4,
+	access = ?5,
+	status = ?6,
+	deleted_at = CASE
+		WHEN ?6 = 'deleted' AND deleted_at IS NULL THEN datetime('now')
+		WHEN ?6 = 'draft' OR ?6 = 'published' THEN NULL
+		ELSE deleted_at
+	END,
+	updated_at = datetime('now')
+WHERE id = ?7
 `
 
 type UpdateLearningMaterialParams struct {
-	Description string
-	Url         string
-	Access      string
-	Status      string
-	ID          int64
+	Title        string
+	Description  string
+	Url          string
+	ThumbnailUrl string
+	Access       string
+	Status       string
+	ID           int64
 }
 
 func (q *Queries) UpdateLearningMaterial(ctx context.Context, arg UpdateLearningMaterialParams) error {
 	_, err := q.db.ExecContext(ctx, updateLearningMaterial,
+		arg.Title,
 		arg.Description,
 		arg.Url,
+		arg.ThumbnailUrl,
 		arg.Access,
 		arg.Status,
 		arg.ID,

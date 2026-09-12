@@ -13,6 +13,10 @@ templ Reports() {
 		@GlobalIncludes()
 		@AvatarStyles()
 		<style>
+			.reports-filters {
+				display: contents;
+			}
+
 			.reports-teacher-cell {
 				display: flex;
 				align-items: center;
@@ -30,7 +34,7 @@ templ Reports() {
 			document.body.addEventListener('htmx:afterSwap', function (evt) {
 				if (evt.detail.target.id !== 'reportViewModalHost') return;
 				document.body.classList.add('modal-open');
-				const overlay = evt.detail.target.querySelector('#reportViewModal');
+				const overlay = evt.detail.target.querySelector('.modal-overlay');
 				const closeBtn = overlay && overlay.querySelector('.report-view-close');
 				if (closeBtn) closeBtn.focus();
 			});
@@ -45,7 +49,7 @@ templ Reports() {
 			});
 
 			document.addEventListener('keydown', function (e) {
-				if (e.key === 'Escape' && document.getElementById('reportViewModal')) {
+				if (e.key === 'Escape' && document.getElementById('reportViewModalHost')?.innerHTML) {
 					window.closeReportViewModal();
 				}
 			});
@@ -58,19 +62,34 @@ templ Reports() {
 			@HubHeader("Reports", "", "", false)
 
 			<div class="toolbar" id="reportsToolbar">
-				<div class="form-group">
-					<label for="reportSearch">Search</label>
-					<input type="text" id="reportSearch" name="q" placeholder="Search teacher or student name..."/>
+				<div id="reportsFilters" class="reports-filters">
+					<div class="form-group">
+						<label for="reportSearch">Search</label>
+						<input type="text" id="reportSearch" name="q" placeholder="Search teacher or student name..."/>
+					</div>
+					@MonthPicker("reportMonth", utils.URL("/reports/partials/date-preset"))
+					@DatePreset(true)
+					@SortControls("", "asc", ListSortKindReport)
+					<button
+						type="button"
+						id="filterBtn"
+						hx-get={ utils.URL("/reports/partials/rows") }
+						hx-include="#reportsFilters"
+						hx-target="#reportsTableBody"
+						hx-swap="innerHTML"
+					>Filter</button>
 				</div>
-				@DatePreset(true)
-				<button
-					type="button"
-					id="filterBtn"
-					hx-get={ utils.URL("/reports/partials/rows") }
-					hx-include="#reportsToolbar"
-					hx-target="#reportsTableBody"
-					hx-swap="innerHTML"
-				>Filter</button>
+				<form
+					method="GET"
+					action={ utils.URL("/reports/summary") }
+					id="reportSummaryForm"
+					class="report-summary-form"
+					onsubmit="syncReportSummaryForm(event)"
+				>
+					<input type="hidden" name="q" id="summaryQ" value=""/>
+					<input type="hidden" name="datePreset" id="summaryDatePreset" value=""/>
+					<button type="submit" class="btn">Generate Summary</button>
+				</form>
 			</div>
 
 			<div class="table-wrapper">
@@ -86,7 +105,7 @@ templ Reports() {
 					<tbody
 						id="reportsTableBody"
 						hx-get={ utils.URL("/reports/partials/rows") }
-						hx-include="#reportsToolbar"
+						hx-include="#reportsFilters"
 						hx-trigger="load"
 						hx-swap="innerHTML"
 					>
@@ -101,26 +120,39 @@ templ Reports() {
 		</div>
 
 		<script>
-			const datePresetSelect = document.getElementById('datePreset');
 			const reportSearch = document.getElementById('reportSearch');
 
-			function setDateRangeFromPreset(value) {
-				if (!value) {
-					delete datePresetSelect.dataset.startDate;
-					delete datePresetSelect.dataset.endDate;
+			function setDateRangeFromPreset(select) {
+				if (!select) return;
+				if (!select.value) {
+					delete select.dataset.startDate;
+					delete select.dataset.endDate;
 					return;
 				}
-				const parts = value.split('|');
+				const parts = select.value.split('|');
 				if (parts.length !== 2) return;
-				datePresetSelect.dataset.startDate = parts[0];
-				datePresetSelect.dataset.endDate = parts[1];
+				select.dataset.startDate = parts[0];
+				select.dataset.endDate = parts[1];
 			}
 
-			datePresetSelect.addEventListener('change', () => {
-				setDateRangeFromPreset(datePresetSelect.value);
-			});
+			function bindDatePresetSelect() {
+				const datePresetSelect = document.getElementById('datePreset');
+				if (!datePresetSelect) return;
+				setDateRangeFromPreset(datePresetSelect);
+				datePresetSelect.addEventListener('change', () => {
+					setDateRangeFromPreset(datePresetSelect);
+				});
+			}
 
-			setDateRangeFromPreset(datePresetSelect.value);
+			bindDatePresetSelect();
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id !== 'datePresetGroup') return;
+				bindDatePresetSelect();
+				if (typeof htmx !== 'undefined') {
+					htmx.trigger('#reportsTableBody', 'load');
+				}
+			});
 
 			reportSearch.addEventListener('keydown', function (e) {
 				if (e.key === 'Enter') {
@@ -130,6 +162,23 @@ templ Reports() {
 					}
 				}
 			});
+
+			window.syncReportSummaryForm = function (e) {
+				const search = document.getElementById('reportSearch');
+				const preset = document.getElementById('datePreset');
+				const qField = document.getElementById('summaryQ');
+				const presetField = document.getElementById('summaryDatePreset');
+				if (search && qField) {
+					qField.value = search.value || '';
+				}
+				if (preset && presetField) {
+					presetField.value = preset.value || '';
+				}
+				if (!presetField || !presetField.value) {
+					e.preventDefault();
+					alert('Select a date range first.');
+				}
+			};
 		</script>
 	</body>
 	</html>

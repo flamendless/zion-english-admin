@@ -8,6 +8,8 @@ package frontend
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+import "zion-english/internal/constants"
+
 func ClassViewModal(data EditClassData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -29,7 +31,7 @@ func ClassViewModal(data EditClassData) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"modal-overlay\" id=\"classViewModal\" role=\"presentation\"><div class=\"modal-dialog modal-dialog-profile modal-dialog-entity\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"classViewTitle\"><div class=\"modal-header\"><h3 id=\"classViewTitle\">Class details</h3><button type=\"button\" class=\"modal-close class-view-close\" aria-label=\"Close\" onclick=\"window.closeClassViewModal()\">&times;</button></div><div class=\"modal-body entity-view-body class-view-body\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"modal-overlay\" id=\"classViewModal\" role=\"presentation\"><div class=\"modal-dialog modal-dialog-profile modal-dialog-entity\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"classViewTitle\"><div class=\"modal-header\"><h3 id=\"classViewTitle\">Class Details</h3><button type=\"button\" class=\"modal-close class-view-close\" data-tooltip=\"Close\" aria-label=\"Close\" onclick=\"window.closeClassViewModal()\">&times;</button></div><div class=\"modal-body entity-view-body class-view-body\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -38,6 +40,10 @@ func ClassViewModal(data EditClassData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = AvatarStyles().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ClassViewModalStyles().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -59,32 +65,74 @@ func ClassViewModal(data EditClassData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><div class=\"entity-view-hero-main\"><p class=\"entity-view-eyebrow\">Class record</p><h2>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><div class=\"entity-view-hero-main\"><p class=\"entity-view-eyebrow\">Student Name</p><h2>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(data.StudentName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_view.templ`, Line: 16, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_view.templ`, Line: 19, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</h2><div class=\"entity-view-meta-row\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</h2>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = EntityViewMetaChip("Date", data.Date).Render(ctx, templ_7745c5c3_Buffer)
+		if data.IsSuperuser {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"entity-view-hero-teacher\"><p class=\"entity-view-eyebrow admin-only-label-wrap\">Teacher")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = AdminOnlyIndicator().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</p>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = TeacherNameCell(data.TeacherName, data.TeacherAvatar).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"class-view-meta-row\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = EntityViewMetaChip("Time", data.TimeRangeLabel()).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ClassViewMetaPill("Date", data.Date, PillToneInfo).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></div>")
+		templ_7745c5c3_Err = ClassViewMetaPill("Time", data.TimeRangeLabel(), PillTonePrimary).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<span class=\"class-view-meta-pill class-view-meta-pill--duration\" title=\"Duration\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = DurationPill(formatDurationMinutes(data.DurationMinutes)).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</span>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ClassViewRateMetaPill(data.Rate, data.Currency).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -92,54 +140,127 @@ func ClassViewModal(data EditClassData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div><div class=\"entity-view-stats\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = EntityViewRateStat(data.Rate, data.Currency).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = EntityViewStatCard("Duration", formatDurationMinutes(data.DurationMinutes)).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if data.IsSuperuser {
-			templ_7745c5c3_Err = EntityViewTeacherStat(TeacherListItem{
-				Name:   data.TeacherName,
-				Avatar: data.TeacherAvatar,
-			}).Render(ctx, templ_7745c5c3_Buffer)
+		if len(data.LearningMaterials) > 0 {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"entity-view-card\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = ClassLearningMaterialReadonlyList(data.LearningMaterials).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if (data.Status != "conducted" && data.Reason != "") || data.Notes != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"entity-view-card\"><div class=\"entity-view-section-body\">")
+		if (data.Status != constants.ClassListFilterConducted && data.Reason != "") || data.Notes != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"entity-view-card\"><div class=\"entity-view-section-body\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if data.Status != "conducted" && data.Reason != "" {
-				templ_7745c5c3_Err = EntityViewNotePanel("Reason", data.Reason, "warning").Render(ctx, templ_7745c5c3_Buffer)
+			if data.Status != constants.ClassListFilterConducted && data.Reason != "" {
+				templ_7745c5c3_Err = EntityViewNotePanel("Reason", data.Reason, PillToneWarning).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 			if data.Notes != "" {
-				templ_7745c5c3_Err = EntityViewNotePanel("Notes", data.Notes, "info").Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"class-view-note\"><span class=\"entity-view-note-title\">Notes</span><p class=\"entity-view-note-content\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var5 string
+				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(data.Notes)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_view.templ`, Line: 54, Col: 57}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</p></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.Status == constants.ClassListFilterScheduled {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<div class=\"modal-footer class-view-footer\"><div class=\"class-view-footer-actions scheduled-class-actions\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = ScheduledClassManageActions(ScheduledClassItemFromEditClassData(data)).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else if data.Status != constants.ClassListFilterDeleted {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"modal-footer class-view-footer\"><div class=\"class-view-footer-actions\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = ClassRecordViewActions(data).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func ClassRecordViewActions(data EditClassData) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var6 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var6 == nil {
+			templ_7745c5c3_Var6 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = IconActionLink(data.ClassEditURL(), "Edit", IconKindEdit).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = IconActionTrigger("Delete", IconKindDelete, templ.Attributes{
+			"data-delete-url":  data.ClassDeleteURL(),
+			"data-delete-from": string(data.ActionFrom),
+		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -149,6 +270,148 @@ func ClassViewModal(data EditClassData) templ.Component {
 
 func (data EditClassData) TimeRangeLabel() string {
 	return FormatScheduledClassTimeRange(data.StartTime, data.EndTime, data.DurationMinutes)
+}
+
+func ClassViewMetaPill(kind, value string, tone PillTone) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var7 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var7 == nil {
+			templ_7745c5c3_Var7 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<span class=\"class-view-meta-pill\" aria-label=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(kind + ": " + value)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_view.templ`, Line: 91, Col: 68}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" title=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var9 string
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(kind)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_view.templ`, Line: 91, Col: 83}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = Pill(value, tone).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</span>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func ClassViewRateMetaPill(rate float64, currency string) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var10 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var10 == nil {
+			templ_7745c5c3_Var10 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<span class=\"class-view-meta-pill class-view-meta-pill--rate\" aria-label=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var11 string
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue("Rate: " + formatRate(rate, currency))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_view.templ`, Line: 97, Col: 113}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\" title=\"Rate\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = RatePill(rate, currency).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</span>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func ClassViewModalStyles() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var12 == nil {
+			templ_7745c5c3_Var12 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<style>\r\n\t\t.class-view-body .entity-view-hero-main {\r\n\t\t\tmin-width: 0;\r\n\t\t\tflex: 1;\r\n\t\t}\r\n\r\n\t\t.class-view-meta-row {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: nowrap;\r\n\t\t\tgap: var(--space-1);\r\n\t\t\twidth: 100%;\r\n\t\t\tmax-width: 100%;\r\n\t\t}\r\n\r\n\t\t.class-view-meta-pill {\r\n\t\t\tflex: 1 1 0;\r\n\t\t\tmin-width: 0;\r\n\t\t\tdisplay: flex;\r\n\t\t}\r\n\r\n\t\t.class-view-meta-pill .pill {\r\n\t\t\twidth: 100%;\r\n\t\t\tjustify-content: center;\r\n\t\t\tpadding: 6px 8px;\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tline-height: 1.3;\r\n\t\t\tfont-variant-numeric: tabular-nums;\r\n\t\t\toverflow: hidden;\r\n\t\t\ttext-overflow: ellipsis;\r\n\t\t\twhite-space: nowrap;\r\n\t\t}\r\n\r\n\t\t.class-view-meta-pill--rate .rate-pill {\r\n\t\t\twidth: 100%;\r\n\t\t\tjustify-content: center;\r\n\t\t\tpadding: 6px 8px;\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t}\r\n\r\n\t\t.class-view-meta-pill--duration .duration-pill {\r\n\t\t\twidth: 100%;\r\n\t\t\tjustify-content: center;\r\n\t\t\tpadding: 6px 8px;\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t}\r\n\r\n\t\t.class-view-note {\r\n\t\t\tpadding: 0;\r\n\t\t\tborder: none;\r\n\t\t\tbackground: none;\r\n\t\t}\r\n\r\n\t\t#classViewModalHost .modal-overlay {\r\n\t\t\tz-index: 1100;\r\n\t\t}\r\n\r\n\t\t.class-view-footer {\r\n\t\t\tjustify-content: flex-end;\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.class-view-footer-actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: flex-end;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.class-view-footer-actions .scheduled-class-actions,\r\n\t\t.class-view-footer-actions .icon-action-btn {\r\n\t\t\tmargin-top: 0;\r\n\t\t}\r\n\t</style>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
 }
 
 func ClassViewModalScripts() templ.Component {
@@ -167,12 +430,12 @@ func ClassViewModalScripts() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var5 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var5 == nil {
-			templ_7745c5c3_Var5 = templ.NopComponent
+		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var13 == nil {
+			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<script>\r\n\t\twindow.closeClassViewModal = function () {\r\n\t\t\tconst host = document.getElementById('classViewModalHost');\r\n\t\t\tif (host) host.innerHTML = '';\r\n\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t};\r\n\r\n\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\tif (evt.detail.target.id !== 'classViewModalHost') return;\r\n\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\tconst overlay = evt.detail.target.querySelector('#classViewModal');\r\n\t\t\tconst closeBtn = overlay && overlay.querySelector('.class-view-close');\r\n\t\t\tif (closeBtn) closeBtn.focus();\r\n\t\t});\r\n\r\n\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\tif (e.target.closest('.class-view-close')) {\r\n\t\t\t\twindow.closeClassViewModal();\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tconst overlay = e.target.closest('#classViewModal');\r\n\t\t\tif (overlay && e.target === overlay) window.closeClassViewModal();\r\n\t\t});\r\n\r\n\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\tif (e.key === 'Escape' && document.getElementById('classViewModal')) {\r\n\t\t\t\twindow.closeClassViewModal();\r\n\t\t\t}\r\n\t\t});\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<script>\r\n\t\twindow.closeClassViewModal = function () {\r\n\t\t\tconst host = document.getElementById('classViewModalHost');\r\n\t\t\tif (host) host.innerHTML = '';\r\n\t\t\tconst scheduleOpen = typeof window.isScheduleModalOpen === 'function' && window.isScheduleModalOpen();\r\n\t\t\tif (!scheduleOpen) {\r\n\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t}\r\n\t\t};\r\n\r\n\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\tif (evt.detail.target.id !== 'classViewModalHost') return;\r\n\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\tconst overlay = evt.detail.target.querySelector('#classViewModal');\r\n\t\t\tconst closeBtn = overlay && overlay.querySelector('.class-view-close');\r\n\t\t\tif (closeBtn) closeBtn.focus();\r\n\t\t});\r\n\r\n\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\tif (e.target.closest('.class-view-close')) {\r\n\t\t\t\twindow.closeClassViewModal();\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tconst overlay = e.target.closest('#classViewModal');\r\n\t\t\tif (overlay && e.target === overlay) window.closeClassViewModal();\r\n\t\t});\r\n\r\n\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\tif (e.key !== 'Escape' || !document.getElementById('classViewModal')) return;\r\n\t\t\tif (document.getElementById('lmViewModal')) return;\r\n\t\t\tif (typeof window.hasOpenScheduledClassActionModal === 'function' && window.hasOpenScheduledClassActionModal()) return;\r\n\t\t\tconst deleteModal = document.getElementById('deleteClassModal');\r\n\t\t\tif (deleteModal && !deleteModal.hidden) return;\r\n\t\t\te.preventDefault();\r\n\t\t\twindow.closeClassViewModal();\r\n\t\t\te.stopImmediatePropagation();\r\n\t\t});\r\n\r\n\t\twindow.hasOpenClassViewLayer = function () {\r\n\t\t\treturn !!document.getElementById('classViewModal');\r\n\t\t};\r\n\r\n\t\twindow.hasOpenScheduledClassActionModal = function () {\r\n\t\t\tconst ids = ['editScheduledClassModal', 'conductClassModal', 'cancelClassModal'];\r\n\t\t\treturn ids.some(function (id) {\r\n\t\t\t\tconst el = document.getElementById(id);\r\n\t\t\t\treturn el && !el.hidden;\r\n\t\t\t});\r\n\t\t};\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

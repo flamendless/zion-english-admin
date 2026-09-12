@@ -1,5 +1,7 @@
 package models
 
+import "zion-english/internal/constants"
+
 type ProcessRequest struct {
 	TeacherID    string `json:"teacherID"`
 	DriveURL     string `json:"driveUrl"`
@@ -54,6 +56,8 @@ type StudentRegisterRequest struct {
 	Contact          string  `json:"contact"`
 	RatePerClass     float64 `json:"ratePerClass"`
 	ParentName       string  `json:"parentName"`
+	ParentRate       float64 `json:"parentRate,omitempty"`
+	ParentCurrency   string  `json:"parentCurrency,omitempty"`
 	AssignedColor    string  `json:"assignedColor"`
 	Status           string  `json:"status"`
 	InactiveReason   string  `json:"inactiveReason"`
@@ -128,6 +132,7 @@ type ClassRecordRequest struct {
 	DurationMinutes int64   `json:"durationMinutes"`
 	Rate            float64 `json:"rate"`
 	Currency        string  `json:"currency"`
+	IsTrialClass    bool    `json:"isTrialClass"`
 	Status          string  `json:"status"`
 	Reason          string  `json:"reason"`
 	Notes           string  `json:"notes"`
@@ -167,6 +172,7 @@ type ScheduledClassRequest struct {
 	DurationMinutes int64   `json:"durationMinutes"`
 	Rate            float64 `json:"rate"`
 	Currency        string  `json:"currency"`
+	IsTrialClass    bool    `json:"isTrialClass"`
 }
 
 type AvatarView struct {
@@ -194,9 +200,12 @@ type ScheduledClassView struct {
 	Status          string  `json:"status"`
 	Reason          string  `json:"reason"`
 	CreatedAt       string  `json:"createdAt"`
-	RoomURL         string  `json:"roomUrl"`
-	RoomPasscode    string  `json:"roomPasscode"`
-	MeetingService  string  `json:"meetingService"`
+	SeriesID        int64   `json:"seriesId"`
+	RoomURL          string  `json:"roomUrl"`
+	RoomPasscode     string  `json:"roomPasscode"`
+	MeetingService   string  `json:"meetingService"`
+	CalendarEventURL string  `json:"calendarEventUrl"`
+	CalendarService  string  `json:"calendarService"`
 }
 
 type RecordClassPrefill struct {
@@ -211,6 +220,7 @@ type RecordClassPrefill struct {
 	DurationMinutes string
 	Rate            string
 	Currency        string
-	Status          string
+	IsTrialClass    bool
+	Status          constants.ClassStatus
 	HasPrefill      bool
 }

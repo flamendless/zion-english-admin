@@ -208,7 +208,7 @@ func (q *Queries) CountClassesListFiltered(ctx context.Context, arg CountClasses
 }
 
 const getClassRecordByID = `-- name: GetClassRecordByID :one
-SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
+SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.is_trial_class, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
 	s.name as student_name,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name,
 	t.first_name as teacher_first_name,
@@ -232,6 +232,7 @@ type GetClassRecordByIDRow struct {
 	DurationMinutes       int64
 	Rate                  float64
 	Currency              string
+	IsTrialClass          int64
 	Status                string
 	Reason                sql.NullString
 	Notes                 sql.NullString
@@ -260,6 +261,7 @@ func (q *Queries) GetClassRecordByID(ctx context.Context, id int64) (GetClassRec
 		&i.DurationMinutes,
 		&i.Rate,
 		&i.Currency,
+		&i.IsTrialClass,
 		&i.Status,
 		&i.Reason,
 		&i.Notes,
@@ -273,6 +275,68 @@ func (q *Queries) GetClassRecordByID(ctx context.Context, id int64) (GetClassRec
 		&i.TeacherLastName,
 		&i.TeacherAssignedColor,
 		&i.TeacherProfilePicture,
+	)
+	return i, err
+}
+
+const getClassRecordDuplicate = `-- name: GetClassRecordDuplicate :one
+SELECT
+	cr.id,
+	cr.date,
+	cr.start_time,
+	cr.end_time,
+	cr.duration_minutes,
+	cr.status,
+	s.name as student_name,
+	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
+FROM tbl_class_records cr
+JOIN tbl_students s ON cr.student_id = s.id
+JOIN tbl_teachers t ON cr.teacher_id = t.id
+WHERE cr.student_id = ? AND cr.teacher_id = ? AND cr.date = ? AND cr.duration_minutes = ?
+	AND cr.deleted_at IS NULL
+	AND (? = 0 OR cr.id != ?)
+LIMIT 1
+`
+
+type GetClassRecordDuplicateParams struct {
+	StudentID       int64
+	TeacherID       int64
+	Date            string
+	DurationMinutes int64
+	Column5         interface{}
+	ID              int64
+}
+
+type GetClassRecordDuplicateRow struct {
+	ID              int64
+	Date            string
+	StartTime       sql.NullString
+	EndTime         sql.NullString
+	DurationMinutes int64
+	Status          string
+	StudentName     string
+	TeacherName     string
+}
+
+func (q *Queries) GetClassRecordDuplicate(ctx context.Context, arg GetClassRecordDuplicateParams) (GetClassRecordDuplicateRow, error) {
+	row := q.db.QueryRowContext(ctx, getClassRecordDuplicate,
+		arg.StudentID,
+		arg.TeacherID,
+		arg.Date,
+		arg.DurationMinutes,
+		arg.Column5,
+		arg.ID,
+	)
+	var i GetClassRecordDuplicateRow
+	err := row.Scan(
+		&i.ID,
+		&i.Date,
+		&i.StartTime,
+		&i.EndTime,
+		&i.DurationMinutes,
+		&i.Status,
+		&i.StudentName,
+		&i.TeacherName,
 	)
 	return i, err
 }
@@ -649,7 +713,8 @@ func (q *Queries) GetClassesListFiltered(ctx context.Context, arg GetClassesList
 const getTotalRateByTeacherAndDateRange = `-- name: GetTotalRateByTeacherAndDateRange :one
 SELECT COALESCE(SUM(cr.rate), 0) as total_rate
 FROM tbl_class_records cr
-WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ? AND cr.status = 'conducted'
+WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
+	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
 	AND cr.deleted_at IS NULL
 `
 
@@ -672,9 +737,10 @@ func (q *Queries) GetTotalRateByTeacherAndDateRange(ctx context.Context, arg Get
 	return total_rate, err
 }
 
-const insertClassRecord = `-- name: InsertClassRecord :exec
-INSERT INTO tbl_class_records (student_id, teacher_id, date, start_time, end_time, duration_minutes, rate, currency, status, reason, notes, recorded_by_role)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+const insertClassRecord = `-- name: InsertClassRecord :one
+INSERT INTO tbl_class_records (student_id, teacher_id, date, start_time, end_time, duration_minutes, rate, currency, is_trial_class, status, reason, notes, recorded_by_role)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+RETURNING id
 `
 
 type InsertClassRecordParams struct {
@@ -686,14 +752,15 @@ type InsertClassRecordParams struct {
 	DurationMinutes int64
 	Rate            float64
 	Currency        string
+	IsTrialClass    int64
 	Status          string
 	Reason          sql.NullString
 	Notes           sql.NullString
 	RecordedByRole  string
 }
 
-func (q *Queries) InsertClassRecord(ctx context.Context, arg InsertClassRecordParams) error {
-	_, err := q.db.ExecContext(ctx, insertClassRecord,
+func (q *Queries) InsertClassRecord(ctx context.Context, arg InsertClassRecordParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, insertClassRecord,
 		arg.StudentID,
 		arg.TeacherID,
 		arg.Date,
@@ -702,12 +769,15 @@ func (q *Queries) InsertClassRecord(ctx context.Context, arg InsertClassRecordPa
 		arg.DurationMinutes,
 		arg.Rate,
 		arg.Currency,
+		arg.IsTrialClass,
 		arg.Status,
 		arg.Reason,
 		arg.Notes,
 		arg.RecordedByRole,
 	)
-	return err
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
 const softDeleteClassRecord = `-- name: SoftDeleteClassRecord :exec
@@ -726,10 +796,65 @@ func (q *Queries) SoftDeleteClassRecord(ctx context.Context, arg SoftDeleteClass
 	return err
 }
 
+const sumConductedParentRateByCurrencyAndDateRange = `-- name: SumConductedParentRateByCurrencyAndDateRange :many
+SELECT s.parent_currency AS currency, COALESCE(SUM(s.parent_rate), 0) AS total_rate
+FROM tbl_class_records cr
+JOIN tbl_students s ON cr.student_id = s.id
+WHERE cr.date >= ? AND cr.date <= ?
+	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
+	AND cr.deleted_at IS NULL
+	AND s.parent_rate IS NOT NULL
+	AND s.parent_currency IS NOT NULL
+	AND s.parent_currency != ''
+	AND (? = 0 OR cr.teacher_id = ?)
+GROUP BY s.parent_currency
+`
+
+type SumConductedParentRateByCurrencyAndDateRangeParams struct {
+	Date      string
+	Date_2    string
+	Column3   interface{}
+	TeacherID int64
+}
+
+type SumConductedParentRateByCurrencyAndDateRangeRow struct {
+	Currency  sql.NullString
+	TotalRate interface{}
+}
+
+func (q *Queries) SumConductedParentRateByCurrencyAndDateRange(ctx context.Context, arg SumConductedParentRateByCurrencyAndDateRangeParams) ([]SumConductedParentRateByCurrencyAndDateRangeRow, error) {
+	rows, err := q.db.QueryContext(ctx, sumConductedParentRateByCurrencyAndDateRange,
+		arg.Date,
+		arg.Date_2,
+		arg.Column3,
+		arg.TeacherID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SumConductedParentRateByCurrencyAndDateRangeRow
+	for rows.Next() {
+		var i SumConductedParentRateByCurrencyAndDateRangeRow
+		if err := rows.Scan(&i.Currency, &i.TotalRate); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const sumConductedRateByCurrencyAndDateRange = `-- name: SumConductedRateByCurrencyAndDateRange :many
 SELECT cr.currency, COALESCE(SUM(cr.rate), 0) as total_rate
 FROM tbl_class_records cr
-WHERE cr.date >= ? AND cr.date <= ? AND cr.status = 'conducted'
+WHERE cr.date >= ? AND cr.date <= ?
+	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
 	AND cr.deleted_at IS NULL
 	AND (? = 0 OR cr.teacher_id = ?)
 GROUP BY cr.currency
@@ -777,7 +902,7 @@ func (q *Queries) SumConductedRateByCurrencyAndDateRange(ctx context.Context, ar
 
 const updateClassRecord = `-- name: UpdateClassRecord :exec
 UPDATE tbl_class_records
-SET student_id = ?, teacher_id = ?, date = ?, start_time = ?, end_time = ?, duration_minutes = ?, rate = ?, currency = ?, status = ?, reason = ?, notes = ?, updated_at = datetime('now')
+SET student_id = ?, teacher_id = ?, date = ?, start_time = ?, end_time = ?, duration_minutes = ?, rate = ?, currency = ?, is_trial_class = ?, status = ?, reason = ?, notes = ?, updated_at = datetime('now')
 WHERE id = ? AND deleted_at IS NULL
 `
 
@@ -790,6 +915,7 @@ type UpdateClassRecordParams struct {
 	DurationMinutes int64
 	Rate            float64
 	Currency        string
+	IsTrialClass    int64
 	Status          string
 	Reason          sql.NullString
 	Notes           sql.NullString
@@ -806,6 +932,7 @@ func (q *Queries) UpdateClassRecord(ctx context.Context, arg UpdateClassRecordPa
 		arg.DurationMinutes,
 		arg.Rate,
 		arg.Currency,
+		arg.IsTrialClass,
 		arg.Status,
 		arg.Reason,
 		arg.Notes,

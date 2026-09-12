@@ -112,7 +112,12 @@ func classEditClassData(ctx context.Context, recordID int64, readonly bool) (fro
 	if err != nil {
 		return frontend.EditClassData{}, err
 	}
+	materials, err := loadClassRecordLearningMaterialLinks(ctx, recordID)
+	if err != nil {
+		return frontend.EditClassData{}, err
+	}
 	return frontend.EditClassData{
+		OverdueGracePeriodMinutes: classOverdueGracePeriodMinutes(ctx),
 		RecordID:        strconv.FormatInt(recordID, 10),
 		Readonly:        readonly,
 		IsSuperuser:     auth.HasAdminAccess(role),
@@ -127,9 +132,12 @@ func classEditClassData(ctx context.Context, recordID int64, readonly bool) (fro
 		DurationMinutes: existing.DurationMinutes,
 		Rate:            existing.Rate,
 		Currency:        existing.Currency,
-		Status:          existing.Status,
-		Reason:          existing.Reason.String,
-		Notes:           existing.Notes.String,
+		IsTrialClass:    existing.IsTrialClass != 0,
+		Status:          constants.ClassListFilterStatus(existing.Status),
+		Reason:            existing.Reason.String,
+		Notes:             existing.Notes.String,
+		LearningMaterials: materials,
+		ActionFrom:        frontend.ClassActionContextClasses,
 	}, nil
 }
 
@@ -228,6 +236,7 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 		DurationMinutes: duration,
 		Rate:            rate,
 		Currency:        r.FormValue("currency"),
+		IsTrialClass:    formIsTrialClass(r),
 		Status:          r.FormValue("status"),
 		Reason:          r.FormValue("reason"),
 		Notes:           r.FormValue("notes"),
@@ -258,12 +267,18 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 		DurationMinutes: req.DurationMinutes,
 		Rate:            req.Rate,
 		Currency:        req.Currency,
+		IsTrialClass:    trialClassToInt64(req.IsTrialClass),
 		Status:          req.Status,
 		Reason:          sql.NullString{String: req.Reason, Valid: req.Reason != ""},
 		Notes:           sql.NullString{String: req.Notes, Valid: req.Notes != ""},
 		ID:              recordID,
 	})
 	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	if err := saveClassRecordLearningMaterials(ctx, user, recordID, parseLearningMaterialIDs(r)); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
@@ -276,7 +291,7 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 			fmt.Sprintf("Class record updated for student on %s (status %s)", updated.Date, updated.Status))
 	}
 
-	if _, err := fmt.Fprint(w, "Class updated successfully!\n"); err != nil {
+	if err := respondFormMutation(w, "Class updated successfully!", "/classes", "classesRefresh"); err != nil {
 		sendErrorLog(w, err.Error())
 	}
 }
@@ -312,6 +327,7 @@ func parseClassRecordRequest(r *http.Request, user auth.User, role auth.Role, de
 		DurationMinutes: duration,
 		Rate:            rate,
 		Currency:        r.FormValue("currency"),
+		IsTrialClass:    formIsTrialClass(r),
 		Status:          r.FormValue("status"),
 		Reason:          r.FormValue("reason"),
 		Notes:           r.FormValue("notes"),
@@ -365,7 +381,7 @@ func classesListTeacherAvatar(row queries.GetClassesListFilteredRow) models.Avat
 	hasPicture := row.TeacherProfilePicture.Valid && row.TeacherProfilePicture.String != ""
 	assignedColor := row.TeacherAssignedColor
 	if assignedColor == "" {
-		assignedColor = "#B9D283"
+		assignedColor = constants.DefaultTeacherAssignedColor
 	}
 	return models.AvatarView{
 		Initials:      utils.PersonInitials(row.TeacherFirstName, row.TeacherMiddleName, row.TeacherLastName, row.TeacherName),
@@ -533,7 +549,7 @@ func parseClassRecordsQuery(r *http.Request) (classRecordsQuery, error) {
 		teacherIDStr = strings.TrimSpace(r.URL.Query().Get("teacher"))
 	}
 	statusFilter := r.URL.Query().Get("status")
-	nameFilter := r.URL.Query().Get("q")
+	nameFilter := firstQueryParam(r, "studentQ", "q")
 
 	role := auth.GetRole(r.Context())
 	var teacherID int64
@@ -549,7 +565,7 @@ func parseClassRecordsQuery(r *http.Request) (classRecordsQuery, error) {
 			return classRecordsQuery{}, errors.New("invalid teacher ID")
 		}
 		teacherID = parsedID
-		if role == auth.RoleTeacher {
+		if auth.IsTeacherScoped(role) {
 			user := auth.GetUser(r.Context())
 			if teacherID != user.ID {
 				return classRecordsQuery{}, errors.New("forbidden")
@@ -565,6 +581,19 @@ func parseClassRecordsQuery(r *http.Request) (classRecordsQuery, error) {
 		nameFilter:   nameFilter,
 		showAll:      showAll,
 	}, nil
+}
+
+func handleClassesDatePresetPartial(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	month := strings.TrimSpace(r.URL.Query().Get("month"))
+	w.Header().Set("Content-Type", "text/html")
+	if err := frontend.DatePresetForMonth(month, true).Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
@@ -583,6 +612,7 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sort := parseListSort(r, frontend.ListSortKindClass)
 	page := utils.ParsePageQuery(r)
 	ctx := r.Context()
 
@@ -593,11 +623,13 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 	}
 	page.Total = total
 
-	records, err := dbRO.GetQueries().GetClassesListFiltered(ctx, classesListListParams(q.teacherID, q.startDate, q.endDate, q.statusFilter, q.nameFilter, int64(page.Size), int64(page.Offset())))
+	allRecords, err := dbRO.GetQueries().GetClassesListFiltered(ctx, classesListListParams(q.teacherID, q.startDate, q.endDate, q.statusFilter, q.nameFilter, total, 0))
 	if err != nil {
 		HttpError(w, "Failed to fetch class records", http.StatusInternalServerError)
 		return
 	}
+	sortClassListRows(allRecords, sort)
+	records := paginateSlice(allRecords, page)
 
 	views := make([]models.ClassRecordView, 0, len(records))
 	teacherIDs := make([]int64, 0, len(records))
@@ -613,8 +645,9 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 	enrichClassRecordViewsWithRoleBadges(views, rolesMap)
 	rows := frontend.ClassRecordRowFromViews(views)
 
+	showTeacher := auth.HasAdminAccess(auth.GetRole(ctx))
 	colspan := 7
-	if q.showAll {
+	if showTeacher {
 		colspan = 8
 	}
 	pagination := frontend.BuildPaginationData(page.Number, page.Size, total)
@@ -622,7 +655,7 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 	includeSelector := "#classesToolbar"
 
 	w.Header().Set("Content-Type", "text/html")
-	if err := frontend.ClassRecordsPartial(rows, q.showAll, colspan, "No classes found for the selected criteria", pagination, partialsURL, includeSelector).Render(ctx, w); err != nil {
+	if err := frontend.ClassRecordsPartial(rows, showTeacher, colspan, "No classes found for the selected criteria", pagination, partialsURL, includeSelector).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -633,12 +666,7 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 	role := auth.GetRole(ctx)
 
 	if r.Method == http.MethodGet {
-		prefill := parseRecordClassPrefill(r)
-		w.Header().Set("Content-Type", "text/html")
-		frontend.RecordClass(frontend.RecordClassData{
-			IsSuperuser: auth.HasAdminAccess(role),
-			Prefill:     prefill,
-		}).Render(ctx, w)
+		HttpRedirect(w, r, "/classes")
 		return
 	}
 
@@ -647,7 +675,7 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if role == auth.RoleTeacher && user.ID == 0 {
+	if auth.IsTeacherScoped(role) && user.ID == 0 {
 		HttpError(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
@@ -669,7 +697,7 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = dbRW.GetQueries().InsertClassRecord(ctx, queries.InsertClassRecordParams{
+	recordID, err := dbRW.GetQueries().InsertClassRecord(ctx, queries.InsertClassRecordParams{
 		StudentID:       req.StudentID,
 		TeacherID:       req.TeacherID,
 		Date:            req.Date,
@@ -678,12 +706,29 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		DurationMinutes: req.DurationMinutes,
 		Rate:            req.Rate,
 		Currency:        req.Currency,
+		IsTrialClass:    trialClassToInt64(req.IsTrialClass),
 		Status:          req.Status,
 		Reason:          sql.NullString{String: req.Reason, Valid: req.Reason != ""},
 		Notes:           sql.NullString{String: req.Notes, Valid: req.Notes != ""},
 		RecordedByRole:  string(user.Role),
 	})
 	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	materialIDs := parseLearningMaterialIDs(r)
+	if len(materialIDs) == 0 {
+		if fromSchedule := r.FormValue("fromSchedule"); fromSchedule != "" {
+			scheduleID, parseErr := strconv.ParseInt(fromSchedule, 10, 64)
+			if parseErr == nil && scheduleID > 0 {
+				if copyErr := copyScheduledClassLearningMaterials(ctx, dbRW.GetQueries(), scheduleID, recordID); copyErr != nil {
+					sendErrorLog(w, copyErr.Error())
+					return
+				}
+			}
+		}
+	} else if err := saveClassRecordLearningMaterials(ctx, user, recordID, materialIDs); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
@@ -706,7 +751,7 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 	notifyCrossParty(ctx, actor, req.TeacherID, teacherNameByID(ctx, req.TeacherID), notifications.KindClassRecorded,
 		fmt.Sprintf("Class recorded for student on %s (status %s)", req.Date, req.Status))
 
-	if _, err := fmt.Fprint(w, "Class recorded successfully!\n"); err != nil {
+	if err := respondFormMutation(w, "Class recorded successfully!", "", "classesRefresh"); err != nil {
 		sendErrorLog(w, err.Error())
 		return
 	}
@@ -724,7 +769,7 @@ func handleClasses(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		data := frontend.ClassesData{}
 		role := auth.GetRole(r.Context())
-		if role == auth.RoleTeacher {
+		if auth.IsTeacherScoped(role) {
 			user := auth.GetUser(r.Context())
 			data.LockTeacher = true
 			data.TeacherID = strconv.FormatInt(user.ID, 10)
@@ -753,7 +798,11 @@ func validateClassRecordRequest(req *models.ClassRecordRequest) error {
 	if req.DurationMinutes <= 0 {
 		return errors.New("duration must be greater than zero")
 	}
-	if req.Rate <= 0 {
+	models.ApplyTrialClassRate(req)
+	if req.Rate < 0 {
+		return errors.New("rate cannot be negative")
+	}
+	if constants.ClassStatus(req.Status) == constants.ClassStatusConducted && req.Rate <= 0 {
 		return errors.New("rate must be greater than zero")
 	}
 	if req.Currency == "" {
@@ -771,6 +820,17 @@ func validateClassRecordRequest(req *models.ClassRecordRequest) error {
 	return nil
 }
 
+func recordClassLearningMaterials(ctx context.Context, prefill models.RecordClassPrefill) ([]frontend.ClassLearningMaterialLink, error) {
+	if !prefill.HasPrefill || prefill.FromSchedule == "" {
+		return nil, nil
+	}
+	scheduleID, err := strconv.ParseInt(prefill.FromSchedule, 10, 64)
+	if err != nil || scheduleID <= 0 {
+		return nil, nil
+	}
+	return loadScheduledClassLearningMaterialLinks(ctx, scheduleID)
+}
+
 func parseRecordClassPrefill(r *http.Request) models.RecordClassPrefill {
 	q := r.URL.Query()
 	fromSchedule := q.Get("fromSchedule")
@@ -786,11 +846,11 @@ func parseRecordClassPrefill(r *http.Request) models.RecordClassPrefill {
 		DurationMinutes: q.Get("duration"),
 		Rate:            q.Get("rate"),
 		Currency:        q.Get("currency"),
-		Status:          q.Get("status"),
+		Status:          constants.ClassStatus(q.Get("status")),
 		HasPrefill:      true,
 	}
 	if prefill.Status == "" {
-		prefill.Status = "conducted"
+		prefill.Status = constants.ClassStatusConducted
 	}
 
 	scheduleID, err := strconv.ParseInt(fromSchedule, 10, 64)
@@ -803,7 +863,7 @@ func parseRecordClassPrefill(r *http.Request) models.RecordClassPrefill {
 		return models.RecordClassPrefill{}
 	}
 
-	if role := auth.GetRole(r.Context()); role == auth.RoleTeacher {
+	if auth.IsTeacherScoped(auth.GetRole(r.Context())) {
 		user := auth.GetUser(r.Context())
 		if existing.TeacherID != user.ID {
 			return models.RecordClassPrefill{}
@@ -818,6 +878,7 @@ func parseRecordClassPrefill(r *http.Request) models.RecordClassPrefill {
 	prefill.DurationMinutes = strconv.FormatInt(existing.DurationMinutes, 10)
 	prefill.Rate = strconv.FormatFloat(existing.Rate, 'f', -1, 64)
 	prefill.Currency = existing.Currency
+	prefill.IsTrialClass = existing.IsTrialClass != 0
 	if existing.StartTime.Valid {
 		prefill.StartTime = existing.StartTime.String
 		prefill.EndTime = utils.EndTimeFromStartAndDuration(prefill.StartTime, existing.DurationMinutes)

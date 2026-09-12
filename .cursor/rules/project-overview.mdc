@@ -17,17 +17,29 @@ Go 1.26 admin tool. Module: `zion-english`. Entry: `main.go` → `cmd.Execute()`
 | `static/` | Assets (logo, favicon, htmx, hyperscript) |
 | `migrations/sqlite3/` | Goose migrations (schema source of truth) |
 | `internal/database/sql/` | Hand-written sqlc queries |
-| `internal/database/queries/` | Generated sqlc code — never edit |
+| `internal/database/queries/` | Generated sqlc code: never edit |
 | `data/` | SQLite DB (`data/zion.db`) |
 | `tmp/` | Runtime temp files (CSV downloads, XLSX output) |
 
 ## Where New Code Goes
 
-- HTTP route → handler in `cmd/web.go`, register in `publicMux` or `authMux`
+- HTTP handler → `cmd/{feature}.go` (or existing handler file)
 - Domain logic → `internal/processor`, `internal/sheet`, etc.
 - API/form DTOs → `internal/models`
 - View/display structs → co-located in `frontend/*.templ`
 - DB queries → SQL in `internal/database/sql/`, optional wrapper in `internal/database/`
+
+## New authenticated route checklist
+
+Routing is **two-step** in [`cmd/web.go`](cmd/web.go). Registering only `authMux` causes **404** at runtime.
+
+1. **`authMux.HandleFunc`** — wire handler + `auth.RequireRole(...)` (role gate and dispatch).
+2. **`rootMux.Handle(basePath+"/your-path", authHandler)`** — mount under the protected `authHandler` in the `// protected routes` block. Use a trailing `/` mount when the route has subpaths (e.g. `/guides/`, `/announcements/`).
+3. **`frontend/access.go`** — if the page appears in nav or dashboard quick actions: add `navItemDefs` entry and update `IsNavAccessible` for role-specific paths.
+4. **Links in templates** — use `utils.URL("/your-path")`, never hardcode `/zion-english-admin`.
+5. **Verify** — restart `./run.sh serve` and hit the path (or `curl -I` while logged in). A 404 with handler never running means step 2 was missed.
+
+Public routes (login, OAuth callbacks, static) use `publicMux` + matching `rootMux.Handle(..., publicMux)` instead.
 
 ## Dev Workflow
 
@@ -41,5 +53,5 @@ Local URL: `http://localhost:8080/zion-english-admin` (prod uses bare paths via 
 
 ## Do Not Edit
 
-- `internal/database/queries/*` — regenerate with sqlc
-- `frontend/*_templ.go` — regenerate with templ
+- `internal/database/queries/*`: regenerate with sqlc
+- `frontend/*_templ.go`: regenerate with templ

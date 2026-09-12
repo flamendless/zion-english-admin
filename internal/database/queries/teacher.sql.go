@@ -37,19 +37,59 @@ WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || midd
 	AND (
 	? = ''
 	OR (? = 'deleted' AND deleted = 1)
-	OR (? != 'deleted' AND ? != '' AND status = ? AND deleted = 0)
+	OR (? != 'deleted' AND ? != '' AND tbl_teachers.status = ? AND deleted = 0)
+	)
+	AND (
+	? = ''
+	OR (
+		? = 'none'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'document'
+		)
+	)
+	OR (
+		? != ''
+		AND ? != 'none'
+		AND (
+			SELECT d.status FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'document'
+			ORDER BY d.uploaded_at DESC
+			LIMIT 1
+		) = ?
+	)
+	)
+	AND (
+	(? = 0 AND ? = 0)
+	OR (? = 1 AND EXISTS (
+		SELECT 1 FROM tbl_teacher_meeting_accounts m
+		WHERE m.teacher_id = tbl_teachers.id AND m.service = 'zoom'
+	))
+	OR (? = 1 AND EXISTS (
+		SELECT 1 FROM tbl_teacher_meeting_accounts m
+		WHERE m.teacher_id = tbl_teachers.id AND m.service = 'google_calendar'
+	))
 	)
 `
 
 type CountTeachersFilteredParams struct {
-	Column1 interface{}
-	Column2 sql.NullString
-	Column3 sql.NullString
-	Column4 interface{}
-	Column5 interface{}
-	Column6 interface{}
-	Column7 interface{}
-	Status  string
+	Column1  interface{}
+	Column2  sql.NullString
+	Column3  sql.NullString
+	Column4  interface{}
+	Column5  interface{}
+	Column6  interface{}
+	Column7  interface{}
+	Status   string
+	Column9  interface{}
+	Column10 interface{}
+	Column11 interface{}
+	Column12 interface{}
+	Status_2 string
+	Column14 interface{}
+	Column15 interface{}
+	Column16 interface{}
+	Column17 interface{}
 }
 
 func (q *Queries) CountTeachersFiltered(ctx context.Context, arg CountTeachersFilteredParams) (int64, error) {
@@ -62,6 +102,15 @@ func (q *Queries) CountTeachersFiltered(ctx context.Context, arg CountTeachersFi
 		arg.Column6,
 		arg.Column7,
 		arg.Status,
+		arg.Column9,
+		arg.Column10,
+		arg.Column11,
+		arg.Column12,
+		arg.Status_2,
+		arg.Column14,
+		arg.Column15,
+		arg.Column16,
+		arg.Column17,
 	)
 	var count int64
 	err := row.Scan(&count)
@@ -146,6 +195,10 @@ const getApprovedTeachers = `-- name: GetApprovedTeachers :many
 SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
 FROM tbl_teachers
 WHERE status = 'approved' AND deleted = 0
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = tbl_teachers.id AND tr.role = 'tester'
+	)
 ORDER BY last_name ASC, first_name ASC, middle_name ASC
 `
 
@@ -483,23 +536,63 @@ WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || midd
 	AND (
 	? = ''
 	OR (? = 'deleted' AND deleted = 1)
-	OR (? != 'deleted' AND ? != '' AND status = ? AND deleted = 0)
+	OR (? != 'deleted' AND ? != '' AND tbl_teachers.status = ? AND deleted = 0)
 	)
-ORDER BY CASE WHEN deleted = 1 THEN 2 WHEN status = 'pending' THEN 0 ELSE 1 END, last_name ASC, first_name ASC, middle_name ASC
+	AND (
+	? = ''
+	OR (
+		? = 'none'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'document'
+		)
+	)
+	OR (
+		? != ''
+		AND ? != 'none'
+		AND (
+			SELECT d.status FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'document'
+			ORDER BY d.uploaded_at DESC
+			LIMIT 1
+		) = ?
+	)
+	)
+	AND (
+	(? = 0 AND ? = 0)
+	OR (? = 1 AND EXISTS (
+		SELECT 1 FROM tbl_teacher_meeting_accounts m
+		WHERE m.teacher_id = tbl_teachers.id AND m.service = 'zoom'
+	))
+	OR (? = 1 AND EXISTS (
+		SELECT 1 FROM tbl_teacher_meeting_accounts m
+		WHERE m.teacher_id = tbl_teachers.id AND m.service = 'google_calendar'
+	))
+	)
+ORDER BY CASE WHEN deleted = 1 THEN 2 WHEN tbl_teachers.status = 'pending' THEN 0 ELSE 1 END, last_name ASC, first_name ASC, middle_name ASC
 LIMIT ? OFFSET ?
 `
 
 type GetTeachersFilteredParams struct {
-	Column1 interface{}
-	Column2 sql.NullString
-	Column3 sql.NullString
-	Column4 interface{}
-	Column5 interface{}
-	Column6 interface{}
-	Column7 interface{}
-	Status  string
-	Limit   int64
-	Offset  int64
+	Column1  interface{}
+	Column2  sql.NullString
+	Column3  sql.NullString
+	Column4  interface{}
+	Column5  interface{}
+	Column6  interface{}
+	Column7  interface{}
+	Status   string
+	Column9  interface{}
+	Column10 interface{}
+	Column11 interface{}
+	Column12 interface{}
+	Status_2 string
+	Column14 interface{}
+	Column15 interface{}
+	Column16 interface{}
+	Column17 interface{}
+	Limit    int64
+	Offset   int64
 }
 
 type GetTeachersFilteredRow struct {
@@ -538,6 +631,15 @@ func (q *Queries) GetTeachersFiltered(ctx context.Context, arg GetTeachersFilter
 		arg.Column6,
 		arg.Column7,
 		arg.Status,
+		arg.Column9,
+		arg.Column10,
+		arg.Column11,
+		arg.Column12,
+		arg.Status_2,
+		arg.Column14,
+		arg.Column15,
+		arg.Column16,
+		arg.Column17,
 		arg.Limit,
 		arg.Offset,
 	)
@@ -630,6 +732,130 @@ func (q *Queries) InsertTeacher(ctx context.Context, arg InsertTeacherParams) er
 		arg.Status,
 	)
 	return err
+}
+
+const searchApprovedTeachersByFirstAndLast = `-- name: SearchApprovedTeachersByFirstAndLast :many
+SELECT id, first_name, middle_name, last_name, drive_url, rate_per_class, template
+FROM tbl_teachers
+WHERE status = 'approved' AND deleted = 0
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = tbl_teachers.id AND tr.role = 'tester'
+	)
+	AND first_name LIKE '%' || ? || '%'
+	AND last_name LIKE '%' || ? || '%'
+ORDER BY last_name ASC, first_name ASC, middle_name ASC
+LIMIT 10
+`
+
+type SearchApprovedTeachersByFirstAndLastParams struct {
+	Column1 sql.NullString
+	Column2 sql.NullString
+}
+
+type SearchApprovedTeachersByFirstAndLastRow struct {
+	ID           int64
+	FirstName    string
+	MiddleName   string
+	LastName     string
+	DriveUrl     string
+	RatePerClass float64
+	Template     sql.NullString
+}
+
+func (q *Queries) SearchApprovedTeachersByFirstAndLast(ctx context.Context, arg SearchApprovedTeachersByFirstAndLastParams) ([]SearchApprovedTeachersByFirstAndLastRow, error) {
+	rows, err := q.db.QueryContext(ctx, searchApprovedTeachersByFirstAndLast, arg.Column1, arg.Column2)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SearchApprovedTeachersByFirstAndLastRow
+	for rows.Next() {
+		var i SearchApprovedTeachersByFirstAndLastRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.FirstName,
+			&i.MiddleName,
+			&i.LastName,
+			&i.DriveUrl,
+			&i.RatePerClass,
+			&i.Template,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const searchApprovedTeachersByName = `-- name: SearchApprovedTeachersByName :many
+SELECT id, first_name, middle_name, last_name, drive_url, rate_per_class, template
+FROM tbl_teachers
+WHERE status = 'approved' AND deleted = 0
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = tbl_teachers.id AND tr.role = 'tester'
+	)
+	AND (
+		trim(first_name || CASE WHEN middle_name != '' THEN ' ' || middle_name ELSE '' END || CASE WHEN last_name != '' THEN ' ' || last_name ELSE '' END) LIKE '%' || ? || '%'
+		OR first_name LIKE '%' || ? || '%'
+		OR last_name LIKE '%' || ? || '%'
+	)
+ORDER BY last_name ASC, first_name ASC, middle_name ASC
+LIMIT 10
+`
+
+type SearchApprovedTeachersByNameParams struct {
+	Column1 sql.NullString
+	Column2 sql.NullString
+	Column3 sql.NullString
+}
+
+type SearchApprovedTeachersByNameRow struct {
+	ID           int64
+	FirstName    string
+	MiddleName   string
+	LastName     string
+	DriveUrl     string
+	RatePerClass float64
+	Template     sql.NullString
+}
+
+func (q *Queries) SearchApprovedTeachersByName(ctx context.Context, arg SearchApprovedTeachersByNameParams) ([]SearchApprovedTeachersByNameRow, error) {
+	rows, err := q.db.QueryContext(ctx, searchApprovedTeachersByName, arg.Column1, arg.Column2, arg.Column3)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SearchApprovedTeachersByNameRow
+	for rows.Next() {
+		var i SearchApprovedTeachersByNameRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.FirstName,
+			&i.MiddleName,
+			&i.LastName,
+			&i.DriveUrl,
+			&i.RatePerClass,
+			&i.Template,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const softDeleteTeacher = `-- name: SoftDeleteTeacher :exec

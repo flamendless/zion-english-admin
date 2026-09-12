@@ -8,8 +8,8 @@ templ Landing() {
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>Zion English — Admin Portal</title>
-		<meta name="description" content="The admin portal for Zion English teachers and administrators. Manage students, classes, schedules, and payroll in one place."/>
+		<title>Zion English | Admin Portal</title>
+		<meta name="description" content="The admin portal for Zion English teachers and administrators. Manage students, classes, schedules, learning materials, analytics, and payroll in one place."/>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		<link rel="preconnect" href="https://fonts.googleapis.com"/>
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -38,12 +38,13 @@ templ Landing() {
 		<main>
 			<section class="landing-hero">
 				<div class="landing-hero__content">
-					<p class="landing-eyebrow reveal" data-reveal="fade-up" data-delay="0">Admin portal</p>
-					<h1 class="landing-hero__title reveal" data-reveal="fade-up" data-delay="80">
+					<h1 class="landing-hero__brand reveal" data-reveal="fade-up" data-delay="0">Zion English</h1>
+					<p class="landing-eyebrow reveal" data-reveal="fade-up" data-delay="40">Admin portal</p>
+					<h2 class="landing-hero__title reveal" data-reveal="fade-up" data-delay="80">
 						Run your English classes with clarity and confidence
-					</h1>
+					</h2>
 					<p class="landing-hero__subtitle reveal" data-reveal="fade-up" data-delay="160">
-						Schedule lessons, track students, process class sheets, and keep your teaching operations organized — all in one dedicated workspace for Zion English.
+						Schedule classes with Zoom, attach learning materials, track analytics, and process payroll. Everything your teaching team needs in one dedicated workspace for Zion English.
 					</p>
 					<div class="landing-hero__actions reveal" data-reveal="fade-up" data-delay="240">
 						<a href={ utils.URL("/auth/login") } class="landing-btn landing-btn--primary">Sign in to dashboard</a>
@@ -51,21 +52,21 @@ templ Landing() {
 				</div>
 				<div class="landing-hero__panel reveal" data-reveal="fade-left" data-delay="320">
 					<div class="landing-glass landing-glass--hero">
-						<div class="landing-stat">
-							<span class="landing-stat__value">Students</span>
-							<span class="landing-stat__label">Manage profiles, rates, and status</span>
-						</div>
-						<div class="landing-stat">
-							<span class="landing-stat__value">Classes</span>
-							<span class="landing-stat__label">Record conducted, cancelled, and rescheduled</span>
-						</div>
-						<div class="landing-stat">
-							<span class="landing-stat__value">Sheets</span>
-							<span class="landing-stat__label">Process Google Drive exports to payroll</span>
-						</div>
 						<div class="landing-stat landing-stat--accent">
-							<span class="landing-stat__value">Schedule</span>
-							<span class="landing-stat__label">See what's on today at a glance</span>
+							<span class="landing-stat__value">Learning Library</span>
+							<span class="landing-stat__label">Share resources and attach materials to classes</span>
+						</div>
+						<div class="landing-stat">
+							<span class="landing-stat__value">Class schedule</span>
+							<span class="landing-stat__label">Plan lessons with Zoom links and material attachments</span>
+						</div>
+						<div class="landing-stat">
+							<span class="landing-stat__value">Analytics</span>
+							<span class="landing-stat__label">Utilization, attendance, and retention insights</span>
+						</div>
+						<div class="landing-stat">
+							<span class="landing-stat__value">Reports</span>
+							<span class="landing-stat__label">Payroll summaries and XLSX exports by cutoff</span>
 						</div>
 					</div>
 				</div>
@@ -76,33 +77,45 @@ templ Landing() {
 					<p class="landing-eyebrow">Built for teachers &amp; admins</p>
 					<h2>Everything you need to stay on top of teaching ops</h2>
 					<p class="landing-section-header__desc">
-						A focused toolkit for day-to-day work — no clutter, no guesswork.
+						From lesson planning to payroll, a focused toolkit for day-to-day teaching operations.
 					</p>
 				</div>
 				<div class="landing-features__grid">
 					@LandingFeatureCard(
 						"students",
 						"Student management",
-						"Register students, assign teachers, track active and inactive status, and keep contact details in one place.",
+						"Register students, assign teachers, track active and inactive status, and let teachers update their assigned students.",
 						0,
 					)
 					@LandingFeatureCard(
 						"calendar",
 						"Scheduling & classes",
-						"View your schedule, record class outcomes, and monitor weekly conducted, cancelled, and rescheduled totals.",
+						"Plan upcoming classes, connect Zoom for automatic meeting links, record outcomes, and attach learning materials.",
 						80,
 					)
 					@LandingFeatureCard(
-						"sheet",
-						"Sheet processing",
-						"Import class data from Google Drive spreadsheets and generate payroll-ready exports automatically.",
+						"library",
+						"Learning library",
+						"Browse and share tagged teaching resources with link previews. Attach materials when scheduling, recording, or editing a class.",
 						160,
+					)
+					@LandingFeatureCard(
+						"chart",
+						"Analytics & reports",
+						"Track utilization, cancellations, and retention. Generate teacher payroll XLSX reports by cutoff period with quick-view summaries.",
+						240,
+					)
+					@LandingFeatureCard(
+						"bell",
+						"Notifications & announcements",
+						"In-app alerts for schedule changes, document reviews, and missed sessions. Superusers publish banners for all or selected teachers.",
+						320,
 					)
 					@LandingFeatureCard(
 						"shield",
 						"Role-based access",
-						"Teachers see their students and classes. Superusers manage the full organization with audit logs.",
-						240,
+						"Teachers manage their students and classes. Superusers and assigned Admins get full organization tools with audit logs.",
+						400,
 					)
 				</div>
 			</section>
@@ -110,7 +123,7 @@ templ Landing() {
 			<section class="landing-cta reveal" data-reveal="scale-up">
 				<div class="landing-glass landing-glass--cta">
 					<h2>Ready to get started?</h2>
-					<p>Sign in to your dashboard to manage students, classes, and schedules.</p>
+					<p>Sign in to your dashboard to manage students, classes, learning materials, and more.</p>
 					<div class="landing-cta__actions">
 						<a href={ utils.URL("/auth/login") } class="landing-btn landing-btn--primary">Sign in</a>
 					</div>
@@ -180,6 +193,18 @@ templ LandingFeatureCard(icon string, title string, desc string, delay int) {
 				case "sheet":
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
+					</svg>
+				case "library":
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/>
+					</svg>
+				case "chart":
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/>
+					</svg>
+				case "bell":
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>
 					</svg>
 				default:
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -421,8 +446,15 @@ templ LandingStyles() {
 			margin-bottom: 16px;
 		}
 
+		.landing-hero__brand {
+			font-size: clamp(2.75rem, 7vw, 4rem);
+			margin: 0 0 8px;
+			letter-spacing: -0.03em;
+			line-height: 1.05;
+		}
+
 		.landing-hero__title {
-			font-size: clamp(2.25rem, 5vw, 3.25rem);
+			font-size: clamp(1.75rem, 4vw, 2.5rem);
 			margin-bottom: 20px;
 			letter-spacing: -0.02em;
 		}
@@ -510,8 +542,20 @@ templ LandingStyles() {
 
 		.landing-features__grid {
 			display: grid;
-			grid-template-columns: repeat(2, 1fr);
+			grid-template-columns: 1fr;
 			gap: 24px;
+		}
+
+		@media (min-width: 640px) {
+			.landing-features__grid {
+				grid-template-columns: repeat(2, 1fr);
+			}
+		}
+
+		@media (min-width: 1024px) {
+			.landing-features__grid {
+				grid-template-columns: repeat(3, 1fr);
+			}
 		}
 
 		.landing-feature {
@@ -748,10 +792,6 @@ templ LandingStyles() {
 
 			.landing-hero__panel {
 				order: -1;
-			}
-
-			.landing-features__grid {
-				grid-template-columns: 1fr;
 			}
 
 			.landing-nav__links .landing-nav__link:first-child {

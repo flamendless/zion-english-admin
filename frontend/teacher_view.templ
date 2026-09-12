@@ -1,7 +1,7 @@
 package frontend
 
-import "fmt"
 import "zion-english/internal/constants"
+import "zion-english/internal/utils"
 
 type TeacherViewData struct {
 	ID             string
@@ -20,19 +20,25 @@ type TeacherViewData struct {
 	Currency       string
 	DriveUrl       string
 	Sex            string
-	Status         string
+	Status         constants.TeacherStatus
 	Roles          []constants.TeacherRole
 	Avatar         AvatarProps
-	ZoomConfigured bool
-	ZoomConnected  bool
+	ZoomConfigured                   bool
+	ZoomConnected                    bool
+	ZoomIntegrationVisible           bool
+	ZoomConnectionsAllowed           bool
+	GoogleCalendarConfigured         bool
+	GoogleCalendarConnected          bool
+	GoogleCalendarIntegrationVisible bool
+	GoogleCalendarConnectionsAllowed bool
 }
 
 templ TeacherViewModal(data TeacherViewData) {
 	<div class="modal-overlay" id="teacherViewModal" role="presentation">
 		<div class="modal-dialog modal-dialog-profile" role="dialog" aria-modal="true" aria-labelledby="teacherViewTitle">
 			<div class="modal-header">
-				<h3 id="teacherViewTitle">Teacher profile</h3>
-				<button type="button" class="modal-close teacher-view-close" aria-label="Close" onclick="window.closeTeacherViewModal()">&times;</button>
+				<h3 id="teacherViewTitle">Teacher Profile</h3>
+				<button type="button" class="modal-close teacher-view-close" data-tooltip="Close" aria-label="Close" onclick="window.closeTeacherViewModal()">&times;</button>
 			</div>
 			<div class="modal-body teacher-view-body">
 				@TeacherViewProfileStyles()
@@ -55,7 +61,7 @@ templ TeacherViewModal(data TeacherViewData) {
 								@ProfileDetailField("First name", data.FirstName)
 								@ProfileDetailField("Middle name", displayOrDash(data.MiddleName))
 								@ProfileDetailField("Last name", data.LastName)
-								@ProfileDetailField("Status", data.Status)
+								@ProfileDetailField("Status", string(data.Status))
 								@ProfileDetailField("Birthdate", data.Birthdate)
 								@ProfileDetailField("Date joined", data.JoiningDate)
 								@ProfileDetailField("Address", data.Address)
@@ -67,13 +73,21 @@ templ TeacherViewModal(data TeacherViewData) {
 							<div class="profile-details">
 								@ProfileDetailField("Email", data.Email)
 								@ProfileDetailField("Mobile number", data.MobileNumber)
-								@ProfileDetailField("Rate per class", fmt.Sprintf("%.2f %s", data.RatePerClass, data.Currency))
+								@ProfileDetailField("Rate per class", utils.FormatCurrency(data.RatePerClass, data.Currency))
 								@ProfileDetailField("Certifications", displayOrDash(data.Certifications))
-								if data.ZoomConfigured {
+								if data.ZoomConfigured && (data.ZoomConnected || data.ZoomIntegrationVisible) {
 									<div class="profile-detail">
 										<span class="profile-detail-label">Zoom</span>
 										<span class="profile-detail-value">
 											@IntegrationStatusBadge(data.ZoomConnected)
+										</span>
+									</div>
+								}
+								if data.GoogleCalendarConfigured && (data.GoogleCalendarConnected || data.GoogleCalendarIntegrationVisible) {
+									<div class="profile-detail">
+										<span class="profile-detail-label">Google Calendar</span>
+										<span class="profile-detail-value">
+											@IntegrationStatusBadge(data.GoogleCalendarConnected)
 										</span>
 									</div>
 								}

@@ -12,6 +12,7 @@ import (
 	"strings"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
+	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
 	"zion-english/internal/models"
@@ -123,6 +124,19 @@ func handleAnalytics(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	if err := frontend.Analytics(data).Render(r.Context(), w); err != nil {
 		logs.Log().Error("render analytics", zap.Error(err))
+	}
+}
+
+func handleAnalyticsDatePresetPartial(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	month := strings.TrimSpace(r.URL.Query().Get("month"))
+	w.Header().Set("Content-Type", "text/html")
+	if err := frontend.DatePresetForMonth(month, true).Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
@@ -519,7 +533,7 @@ func medianInt64(values []int64) int64 {
 func analyticsTeacherAvatar(teacherID int64, firstName, middleName, lastName, teacherName, assignedColor string, profilePicture sql.NullString) models.AvatarView {
 	hasPicture := profilePicture.Valid && profilePicture.String != ""
 	if assignedColor == "" {
-		assignedColor = "#B9D283"
+		assignedColor = constants.DefaultTeacherAssignedColor
 	}
 	return models.AvatarView{
 		Initials:      utils.PersonInitials(firstName, middleName, lastName, teacherName),

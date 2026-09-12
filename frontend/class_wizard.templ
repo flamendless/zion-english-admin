@@ -1,0 +1,1468 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/constants"
+	"zion-english/internal/utils"
+)
+
+type ClassWizardPageData struct {
+	LockTeacher     bool
+	ShowAllTeachers bool
+	TeacherID       string
+	TeacherName     string
+	TodayPHT        string
+}
+
+templ ConductClassWizardModal(data ClassWizardPageData) {
+	<div class="modal-overlay modal-overlay-front" id="conductClassWizardModal" hidden role="presentation">
+		<div class="modal-dialog modal-dialog-wizard" role="dialog" aria-modal="true" aria-labelledby="conductClassWizardTitle">
+			<div class="modal-header">
+				<div class="wizard-header-text">
+					<h3 id="conductClassWizardTitle">Record a past class</h3>
+					<p class="wizard-step-label" id="conductWizardStepLabel" aria-live="polite">Step 1 of 8</p>
+				</div>
+				<button type="button" class="modal-close class-wizard-close" data-wizard="conduct" data-tooltip="Close" aria-label="Close">&times;</button>
+			</div>
+			<form id="conductClassWizardForm" class="class-wizard-form" novalidate data-lock-teacher={ fmt.Sprintf("%t", data.LockTeacher) }>
+				<div class="modal-body class-wizard-body">
+					<div id="conductWizardMessage" class="form-message" role="alert" aria-live="assertive" hidden></div>
+
+					<div class="wizard-step is-active" data-step="1" data-required="true">
+						<p class="wizard-step-lead">Choose who this class was with.</p>
+						@ConductWizardStudentStep(data)
+					</div>
+
+					<div class="wizard-step" data-step="2" data-required="true">
+						<p class="wizard-step-lead">How should this session be recorded?</p>
+						@ClassStatusRadioCards()
+						<div class="form-group" id="conductWizard_reasonGroup" hidden>
+							<label for="conductWizard_reason">Reason *</label>
+							<input
+								type="text"
+								id="conductWizard_reason"
+								name="reason"
+								placeholder="Reason for cancellation or reschedule"
+							/>
+						</div>
+					</div>
+
+					<div class="wizard-step" data-step="3" data-required="true">
+						<p class="wizard-step-lead">When did the class take place?</p>
+						@WizardClassDateField("conductWizard", data.TodayPHT)
+						@WizardTimeRangeFields("conductWizard", "", "", false)
+					</div>
+
+					<div class="wizard-step" data-step="4" data-required="true">
+						<p class="wizard-step-lead">Set the class rate and currency.</p>
+						@WizardRateCurrencyFields("conductWizard")
+					</div>
+
+					<div class="wizard-step" data-step="5">
+						<p class="wizard-step-lead">Attach learning materials if needed. This step is optional.</p>
+						@ClassLearningMaterialPicker(nil, "conductWizard")
+					</div>
+
+					<div class="wizard-step" data-step="6">
+						<p class="wizard-step-lead">Was this a trial class?</p>
+						@TrialClassYesNoRadios("conductWizard")
+					</div>
+
+					<div class="wizard-step" data-step="7">
+						<p class="wizard-step-lead">Add any lesson notes. This step is optional.</p>
+						<div class="form-group">
+							<label for="conductWizard_notes">Notes</label>
+							<textarea id="conductWizard_notes" name="notes" rows="4" placeholder="Lesson notes..."></textarea>
+						</div>
+					</div>
+
+					<div class="wizard-step" data-step="8">
+						<p class="wizard-step-lead">Review the details below, then save.</p>
+						@ClassWizardSummaryCard("conductWizardSummary", data.ShowAllTeachers)
+					</div>
+				</div>
+
+				<div class="modal-footer wizard-footer">
+					<button type="button" class="btn btn-secondary wizard-nav-btn wizard-nav-prev" id="conductWizardPrev" hidden>Previous</button>
+					<button type="button" class="btn wizard-nav-btn" id="conductWizardNext" disabled>Next</button>
+					<button type="submit" class="btn wizard-nav-btn" id="conductWizardSave" hidden>Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	@ClassWizardStyles()
+}
+
+templ ScheduleClassWizardModal(data ClassWizardPageData) {
+	<div class="modal-overlay modal-overlay-front" id="scheduleClassWizardModal" hidden role="presentation">
+		<div class="modal-dialog modal-dialog-wizard" role="dialog" aria-modal="true" aria-labelledby="scheduleClassWizardTitle">
+			<div class="modal-header">
+				<div class="wizard-header-text">
+					<h3 id="scheduleClassWizardTitle">Schedule an upcoming class</h3>
+					<p class="wizard-step-label" id="scheduleWizardStepLabel" aria-live="polite">Step 1 of 5</p>
+				</div>
+				<button type="button" class="modal-close class-wizard-close" data-wizard="schedule" data-tooltip="Close" aria-label="Close">&times;</button>
+			</div>
+			<form id="scheduleClassWizardForm" class="class-wizard-form" novalidate data-lock-teacher={ fmt.Sprintf("%t", data.LockTeacher) }>
+				<input type="hidden" id="scheduleWizard_rate" name="rate" value="0"/>
+				<input type="hidden" id="scheduleWizard_currency" name="currency" value=""/>
+
+				<div class="modal-body class-wizard-body">
+					<div id="scheduleWizardMessage" class="form-message" role="alert" aria-live="assertive" hidden></div>
+
+					<div class="wizard-step is-active" data-step="1" data-required="true">
+						<p class="wizard-step-lead">Choose who this class is for.</p>
+						@ScheduleWizardStudentStep(data)
+					</div>
+
+					<div class="wizard-step" data-step="2" data-required="true">
+						<p class="wizard-step-lead">Pick the date and time for this class.</p>
+						@WizardScheduledDateField("scheduleWizard", data.TodayPHT)
+						@WizardTimeRangeFields("scheduleWizard", "", "", false)
+						<div id="scheduleWizard_zoomWarning" class="form-warning" role="status" hidden></div>
+					</div>
+
+					<div class="wizard-step" data-step="3">
+						<p class="wizard-step-lead">Attach learning materials if needed. This step is optional.</p>
+						@ClassLearningMaterialPicker(nil, "scheduleWizard")
+					</div>
+
+					<div class="wizard-step" data-step="4">
+						<p class="wizard-step-lead">Is this a trial class?</p>
+						@TrialClassYesNoRadios("scheduleWizard")
+					</div>
+
+					<div class="wizard-step" data-step="5">
+						<p class="wizard-step-lead">Review the details below, then save.</p>
+						@ClassWizardSummaryCard("scheduleWizardSummary", data.ShowAllTeachers)
+					</div>
+				</div>
+
+				<div class="modal-footer wizard-footer">
+					<button type="button" class="btn btn-secondary wizard-nav-btn wizard-nav-prev" id="scheduleWizardPrev" hidden>Previous</button>
+					<button type="button" class="btn wizard-nav-btn" id="scheduleWizardNext" disabled>Next</button>
+					<button type="submit" class="btn wizard-nav-btn" id="scheduleWizardSave" hidden>Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	@ClassWizardStyles()
+	@ClassLearningMaterialPickerStyles()
+	@ClassLearningMaterialPickerScript()
+}
+
+templ ConductWizardStudentStep(data ClassWizardPageData) {
+	if data.LockTeacher {
+		<input type="hidden" id="conductWizard_teacher" name="teacher" value={ data.TeacherID }/>
+		<div class="form-row">
+			<div class="form-group">
+				<label>Teacher</label>
+				<input type="text" value={ data.TeacherName } disabled/>
+			</div>
+			@WizardTeacherStudentsDropdown("conductWizard")
+		</div>
+	} else {
+		<div class="form-row">
+			@TeacherSearch(TeacherSearchParams{
+				InputID:     "conductWizardTeacherSearch",
+				HiddenID:    "conductWizard_teacher",
+				HiddenName:  "teacher",
+				ResultsID:   "conductWizardTeacherSearchResults",
+				Label:       "Teacher *",
+				Placeholder: "Search teacher...",
+				Required:    true,
+				AdminOnly:   true,
+			})
+			@WizardAdminStudentDropdown("conductWizard")
+		</div>
+	}
+}
+
+templ ScheduleWizardStudentStep(data ClassWizardPageData) {
+	if data.LockTeacher {
+		<input type="hidden" id="scheduleWizard_teacher" name="teacher" value={ data.TeacherID }/>
+		<div class="form-row">
+			<div class="form-group">
+				<label>Teacher</label>
+				<input type="text" value={ data.TeacherName } disabled/>
+			</div>
+			@WizardTeacherStudentsDropdown("scheduleWizard")
+		</div>
+	} else {
+		<div class="form-row">
+			@TeacherSearch(TeacherSearchParams{
+				InputID:     "scheduleWizardTeacherSearch",
+				HiddenID:    "scheduleWizard_schedule_teacher",
+				HiddenName:  "schedule_teacher",
+				ResultsID:   "scheduleWizardTeacherSearchResults",
+				Label:       "Teacher *",
+				Placeholder: "Search teacher...",
+				Required:    true,
+				AdminOnly:   true,
+			})
+			@WizardScheduleStudentDropdown("scheduleWizard")
+		</div>
+	}
+}
+
+templ WizardTeacherStudentsDropdown(prefix string) {
+	<div class="form-group">
+		<label for={ prefix + "_student" }>Student *</label>
+		<select
+			id={ prefix + "_student" }
+			name={ wizardStudentFieldName(prefix) }
+			required
+			hx-get={ utils.URL("/api/me/students") }
+			hx-trigger="load"
+			hx-swap="innerHTML"
+			hx-target="this"
+		>
+			<option value="">-- Select Student --</option>
+		</select>
+	</div>
+}
+
+templ WizardAdminStudentDropdown(prefix string) {
+	<div class="form-group">
+		@AdminOnlyFormLabel(prefix + "_student", "Student *")
+		<select
+			id={ prefix + "_student" }
+			name={ wizardStudentFieldName(prefix) }
+			required
+		>
+			<option value="">-- Select teacher first --</option>
+		</select>
+	</div>
+}
+
+templ WizardScheduleStudentDropdown(prefix string) {
+	<div class="form-group">
+		@AdminOnlyFormLabel(prefix + "_schedule_student", "Student *")
+		<select
+			id={ prefix + "_schedule_student" }
+			name="schedule_student"
+			required
+		>
+			<option value="">-- Select teacher first --</option>
+		</select>
+	</div>
+}
+
+func wizardStudentFieldName(prefix string) string {
+	if prefix == "scheduleWizard" {
+		return "student"
+	}
+	return "student"
+}
+
+templ WizardClassDateField(prefix string, todayPHT string) {
+	<div class="form-group">
+		<label for={ prefix + "_date" }>Date *</label>
+		<input type="date" id={ prefix + "_date" } name="date" value={ todayPHT } required/>
+	</div>
+}
+
+templ WizardScheduledDateField(prefix string, todayPHT string) {
+	<div class="form-group">
+		<label for={ prefix + "_scheduled_date" }>Date *</label>
+		<input type="date" id={ prefix + "_scheduled_date" } name="scheduled_date" value={ todayPHT } required min={ todayPHT }/>
+	</div>
+}
+
+templ WizardTimeRangeFields(prefix string, startTime string, endTime string, readonly bool) {
+	<div class="time-range-fields">
+		<div class="time-range-group">
+			@WizardTimeInput(prefix + "_start_time", "start_time", "Start time *", startTime, readonly)
+			@WizardTimeInput(prefix + "_end_time", "end_time", "End time *", endTime, readonly)
+		</div>
+		@DurationPreview(prefix + "_durationPreview")
+	</div>
+}
+
+templ WizardCurrencyDropdown(prefix string) {
+	<div class="form-group">
+		<label for={ prefix + "_currency" }>Currency *</label>
+		<select id={ prefix + "_currency" } name="currency" required>
+			<option value="">-- Select Currency --</option>
+			<option value="KRW">KRW (Korean Won)</option>
+			<option value="CAD">CAD (Canadian Dollar)</option>
+			<option value="YEN">YEN (Japanese Yen)</option>
+			<option value="PHP">PHP (Philippine Peso)</option>
+		</select>
+	</div>
+}
+
+templ WizardRateCurrencyFields(prefix string) {
+	<div class="form-row">
+		@WizardCurrencyDropdown(prefix)
+		<div class="form-group">
+			<label for={ prefix + "_rate" }>Rate *</label>
+			<input type="number" id={ prefix + "_rate" } name="rate" required min="0" step="0.01" placeholder="0.00"/>
+		</div>
+	</div>
+}
+
+templ WizardTimeInput(id string, name string, label string, value string, readonly bool) {
+	<div class="form-group time-input-wrap">
+		<label for={ id }>{ label }</label>
+		if readonly && value != "" {
+			<input type="time" id={ id } name={ name } step="300" required value={ value } readonly/>
+		} else if value != "" {
+			<input type="time" id={ id } name={ name } step="300" required value={ value }/>
+		} else {
+			<input type="time" id={ id } name={ name } step="300" required/>
+		}
+	</div>
+}
+
+templ ClassStatusRadioCards() {
+	<fieldset class="status-radio-cards" aria-label="Class status">
+		<legend class="sr-only">Status</legend>
+		for _, opt := range ClassRecordStatusOptions {
+			<label class="status-radio-card">
+				<input
+					type="radio"
+					name="status"
+					value={ opt.Value }
+					class="status-radio-card__input"
+					checked?={ opt.Value == string(constants.ClassStatusConducted) }
+				/>
+				<span class={ "status-radio-card__icon status-radio-card__icon--" + opt.Value } aria-hidden="true">
+					@ClassStatusRadioIcon(constants.ClassStatus(opt.Value))
+				</span>
+				<span class="status-radio-card__body">
+					<span class="status-radio-card__title">{ opt.Label }</span>
+					<span class="status-radio-card__desc">{ classStatusRadioDescription(constants.ClassStatus(opt.Value)) }</span>
+				</span>
+			</label>
+		}
+	</fieldset>
+}
+
+templ ClassStatusRadioIcon(status constants.ClassStatus) {
+	switch status {
+	case constants.ClassStatusConducted:
+		<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<path d="M20 6 9 17l-5-5"></path>
+		</svg>
+	case constants.ClassStatusCancelled:
+		<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<path d="M18 6 6 18"></path>
+			<path d="m6 6 12 12"></path>
+		</svg>
+	case constants.ClassStatusRescheduled:
+		<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+			<path d="M3 3v5h5"></path>
+		</svg>
+	}
+}
+
+func classStatusRadioDescription(status constants.ClassStatus) string {
+	switch status {
+	case constants.ClassStatusConducted:
+		return "The lesson was completed as planned."
+	case constants.ClassStatusCancelled:
+		return "The session did not take place."
+	case constants.ClassStatusRescheduled:
+		return "The session was moved to another time."
+	default:
+		return ""
+	}
+}
+
+templ TrialClassYesNoRadios(prefix string) {
+	<fieldset class="trial-yesno-cards" aria-label="Trial class">
+		<legend class="sr-only">Trial class</legend>
+		<label class="trial-yesno-card">
+			<input type="radio" name="is_trial_class" value="" class="trial-yesno-card__input" checked/>
+			<span class="trial-yesno-card__title">No</span>
+			<span class="trial-yesno-card__desc">Use the student's regular rate.</span>
+		</label>
+		<label class="trial-yesno-card">
+			<input type="radio" name="is_trial_class" value="on" class="trial-yesno-card__input"/>
+			<span class="trial-yesno-card__title">Yes</span>
+			<span class="trial-yesno-card__desc">Apply the trial class rate (PHP 50).</span>
+		</label>
+	</fieldset>
+}
+
+templ ClassWizardSummaryCard(cardID string, showTeacher bool) {
+	<div class="class-wizard-summary" id={ cardID } aria-label="Summary">
+		<dl class="class-wizard-summary-grid">
+			if showTeacher {
+				<div class="class-wizard-summary-row">
+					<dt>Teacher</dt>
+					<dd data-field="teacher">-</dd>
+				</div>
+			}
+			<div class="class-wizard-summary-row">
+				<dt>Student</dt>
+				<dd data-field="student">-</dd>
+			</div>
+			<div class="class-wizard-summary-row">
+				<dt>Status</dt>
+				<dd data-field="status">-</dd>
+			</div>
+			<div class="class-wizard-summary-row" data-summary-row="reason" hidden>
+				<dt>Reason</dt>
+				<dd data-field="reason">-</dd>
+			</div>
+			<div class="class-wizard-summary-row">
+				<dt>Date</dt>
+				<dd data-field="date">-</dd>
+			</div>
+			<div class="class-wizard-summary-row">
+				<dt>Time</dt>
+				<dd data-field="time">-</dd>
+			</div>
+			<div class="class-wizard-summary-row">
+				<dt>Duration</dt>
+				<dd data-field="duration">-</dd>
+			</div>
+			<div class="class-wizard-summary-row">
+				<dt>Rate</dt>
+				<dd data-field="rate">-</dd>
+			</div>
+			<div class="class-wizard-summary-row" data-summary-row="materials" hidden>
+				<dt>Learning materials</dt>
+				<dd data-field="materials">-</dd>
+			</div>
+			<div class="class-wizard-summary-row">
+				<dt>Trial class</dt>
+				<dd data-field="trial">-</dd>
+			</div>
+			<div class="class-wizard-summary-row" data-summary-row="notes" hidden>
+				<dt>Notes</dt>
+				<dd data-field="notes">-</dd>
+			</div>
+		</dl>
+	</div>
+}
+
+templ ClassWizardStyles() {
+	<style>
+		.modal-dialog-wizard {
+			width: min(100%, 56rem);
+			max-height: min(90vh, 720px);
+			display: flex;
+			flex-direction: column;
+			overflow: visible;
+		}
+
+		.modal-dialog-wizard > .modal-header {
+			overflow: visible;
+			flex-shrink: 0;
+			position: relative;
+			z-index: 2;
+		}
+
+		.modal-dialog-wizard .class-wizard-form {
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			min-height: 0;
+			overflow: visible;
+		}
+
+		.wizard-header-text {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-1);
+			min-width: 0;
+		}
+
+		.wizard-step-label {
+			margin: 0;
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+		}
+
+		.class-wizard-body {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-3);
+			overflow: visible;
+		}
+
+		.modal-dialog-wizard .modal-body.class-wizard-body {
+			overflow: visible;
+		}
+
+		.modal-dialog-wizard .entity-search > [id$="SearchResults"] {
+			height: 0;
+			overflow: visible;
+		}
+
+		.entity-search-results.wizard-teacher-results-floating {
+			position: fixed;
+			top: auto;
+			left: auto;
+			right: auto;
+			margin-top: 0;
+			z-index: 1400;
+			max-height: min(220px, calc(100vh - 2rem));
+			overflow-y: auto;
+		}
+
+		.wizard-step {
+			display: none;
+		}
+
+		.wizard-step.is-active {
+			display: block;
+		}
+
+		.wizard-step-lead {
+			margin: 0 0 var(--space-4);
+			font-size: 0.875rem;
+			color: var(--color-muted-foreground);
+			line-height: 1.45;
+		}
+
+		.wizard-footer {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: flex-end;
+			gap: var(--space-3);
+			padding: var(--space-4);
+			border-top: 1px solid var(--color-border-subtle);
+			margin: 0;
+		}
+
+		.wizard-footer .wizard-nav-prev:not([hidden]) {
+			margin-right: auto;
+		}
+
+		.wizard-footer .wizard-nav-btn[hidden] {
+			display: none !important;
+		}
+
+		.status-radio-cards,
+		.trial-yesno-cards {
+			display: grid;
+			gap: var(--space-3);
+			border: none;
+			padding: 0;
+			margin: 0;
+		}
+
+		.status-radio-cards {
+			grid-template-columns: 1fr;
+		}
+
+		.trial-yesno-cards {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		.status-radio-card,
+		.trial-yesno-card {
+			display: flex;
+			align-items: flex-start;
+			gap: var(--space-3);
+			padding: var(--space-4);
+			border: 2px solid var(--color-border);
+			border-radius: var(--radius-md);
+			background: var(--color-surface);
+			cursor: pointer;
+			transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
+		}
+
+		.status-radio-card__input,
+		.trial-yesno-card__input {
+			position: absolute;
+			opacity: 0;
+			pointer-events: none;
+		}
+
+		.status-radio-card:has(.status-radio-card__input:checked),
+		.trial-yesno-card:has(.trial-yesno-card__input:checked) {
+			border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border));
+			background: var(--color-primary-light);
+			box-shadow: var(--shadow-sm);
+		}
+
+		.status-radio-card__icon {
+			flex-shrink: 0;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 2.75rem;
+			height: 2.75rem;
+			border-radius: var(--radius-md);
+		}
+
+		.status-radio-card__icon--conducted {
+			background: var(--color-success-bg);
+			color: var(--color-success);
+		}
+
+		.status-radio-card__icon--cancelled {
+			background: var(--color-error-bg);
+			color: var(--color-destructive);
+		}
+
+		.status-radio-card__icon--rescheduled {
+			background: var(--color-warning-bg);
+			color: var(--color-warning);
+		}
+
+		.status-radio-card__body,
+		.trial-yesno-card {
+			flex-direction: column;
+			gap: var(--space-2);
+		}
+
+		.status-radio-card__title,
+		.trial-yesno-card__title {
+			display: block;
+			font-weight: 600;
+			font-size: 0.9375rem;
+			color: var(--color-foreground);
+		}
+
+		.status-radio-card__desc,
+		.trial-yesno-card__desc {
+			display: block;
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+			line-height: 1.45;
+		}
+
+		.class-wizard-summary {
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-md);
+			background: var(--color-surface);
+			padding: var(--space-4);
+		}
+
+		.class-wizard-summary-grid {
+			display: grid;
+			gap: var(--space-3);
+			margin: 0;
+		}
+
+		.class-wizard-summary-row {
+			display: grid;
+			grid-template-columns: 8rem 1fr;
+			gap: var(--space-2);
+			align-items: start;
+		}
+
+		.class-wizard-summary-row dt {
+			margin: 0;
+			font-size: 0.8125rem;
+			font-weight: 600;
+			color: var(--color-muted-foreground);
+		}
+
+		.class-wizard-summary-row dd {
+			margin: 0;
+			font-size: 0.875rem;
+			color: var(--color-foreground);
+		}
+
+		.sr-only {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			padding: 0;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			white-space: nowrap;
+			border: 0;
+		}
+
+		@media (max-width: 640px) {
+			.trial-yesno-cards {
+				grid-template-columns: 1fr;
+			}
+
+			.class-wizard-summary-row {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+}
+
+templ ClassWizardScript() {
+	<script>
+		(function () {
+			if (window.__classWizardReady) return;
+			window.__classWizardReady = true;
+
+			const ZOOM_MAX_AUTO_MINUTES = 40;
+			const ZOOM_MANUAL_WARNING = 'Classes longer than 40 minutes cannot receive an automatic Zoom meeting room on a Basic account. Please create your Zoom meeting manually and share the link with your student.';
+
+			function buildURL(path) {
+				const banner = document.getElementById('errorBanner');
+				if (banner && banner.dataset.basePath) {
+					return banner.dataset.basePath.replace(/\/$/, '') + path;
+				}
+				const pathname = window.location.pathname.replace(/\/$/, '');
+				if (pathname.includes('/zion-english-admin')) {
+					return '/zion-english-admin' + path;
+				}
+				return path;
+			}
+
+			function findWizardTeacherResults(search) {
+				const resultsHost = search.querySelector('[id$="TeacherSearchResults"]');
+				if (!resultsHost) return null;
+				return resultsHost.querySelector('.entity-search-results')
+					|| document.querySelector('.entity-search-results[data-wizard-results-host="' + resultsHost.id + '"]');
+			}
+
+			function positionFloatingTeacherResults(search) {
+				if (!search || !search.closest('.modal-dialog-wizard')) return;
+				const input = search.querySelector('input[name="teacherQ"]');
+				const resultsHost = search.querySelector('[id$="TeacherSearchResults"]');
+				const results = findWizardTeacherResults(search);
+				if (!input || !results || !resultsHost) return;
+
+				if (results.parentElement !== document.body) {
+					results.dataset.wizardResultsHost = resultsHost.id;
+					document.body.appendChild(results);
+				}
+
+				const rect = input.getBoundingClientRect();
+				const gap = 4;
+				const maxHeight = Math.max(120, window.innerHeight - rect.bottom - gap - 16);
+				results.classList.add('wizard-teacher-results-floating');
+				results.style.top = Math.round(rect.bottom + gap) + 'px';
+				results.style.left = Math.round(rect.left) + 'px';
+				results.style.width = Math.round(rect.width) + 'px';
+				results.style.maxHeight = Math.round(maxHeight) + 'px';
+			}
+
+			function repositionAllWizardTeacherResults() {
+				document.querySelectorAll('.modal-dialog-wizard .entity-search').forEach(positionFloatingTeacherResults);
+			}
+
+			function clearPortaledTeacherResults(search) {
+				const resultsHost = search.querySelector('[id$="TeacherSearchResults"]');
+				if (!resultsHost) return;
+				const portaled = document.querySelector('.entity-search-results[data-wizard-results-host="' + resultsHost.id + '"]');
+				if (portaled) portaled.remove();
+				resultsHost.innerHTML = '';
+			}
+
+			function clearAllPortaledTeacherResults() {
+				document.querySelectorAll('.entity-search-results[data-wizard-results-host]').forEach(function (el) {
+					el.remove();
+				});
+			}
+
+			function wireWizardTeacherSearchFloating() {
+				document.body.addEventListener('htmx:afterSwap', function (evt) {
+					const target = evt.detail.target;
+					if (!target || !target.id || !target.id.endsWith('TeacherSearchResults')) return;
+					const search = target.closest('.entity-search');
+					if (!search || !search.closest('.modal-dialog-wizard')) return;
+					positionFloatingTeacherResults(search);
+				});
+				document.body.addEventListener('focusin', function (evt) {
+					const input = evt.target;
+					if (!input || input.name !== 'teacherQ') return;
+					const search = input.closest('.entity-search');
+					if (!search || !search.closest('.modal-dialog-wizard')) return;
+					positionFloatingTeacherResults(search);
+				});
+				document.body.addEventListener('click', function (e) {
+					const item = e.target.closest('.entity-search-item');
+					if (!item) return;
+					const portaled = item.closest('.entity-search-results[data-wizard-results-host]');
+					if (!portaled) return;
+					window.setTimeout(function () {
+						const hostId = portaled.dataset.wizardResultsHost;
+						portaled.remove();
+						const host = hostId ? document.getElementById(hostId) : null;
+						if (host) host.innerHTML = '';
+					}, 0);
+				});
+				window.addEventListener('resize', repositionAllWizardTeacherResults);
+				window.addEventListener('scroll', repositionAllWizardTeacherResults, true);
+			}
+
+			const configs = {
+				conduct: {
+					modalId: 'conductClassWizardModal',
+					formId: 'conductClassWizardForm',
+					stepLabelId: 'conductWizardStepLabel',
+					prevId: 'conductWizardPrev',
+					nextId: 'conductWizardNext',
+					saveId: 'conductWizardSave',
+					messageId: 'conductWizardMessage',
+					summaryId: 'conductWizardSummary',
+					totalSteps: 8,
+					postURL: buildURL('/classes/record'),
+					showStatus: true,
+					showNotes: true,
+				},
+				schedule: {
+					modalId: 'scheduleClassWizardModal',
+					formId: 'scheduleClassWizardForm',
+					stepLabelId: 'scheduleWizardStepLabel',
+					prevId: 'scheduleWizardPrev',
+					nextId: 'scheduleWizardNext',
+					saveId: 'scheduleWizardSave',
+					messageId: 'scheduleWizardMessage',
+					summaryId: 'scheduleWizardSummary',
+					totalSteps: 5,
+					postURL: buildURL('/schedule/record'),
+					showStatus: false,
+					showNotes: false,
+				},
+			};
+
+			function escapeHtml(value) {
+				return String(value || '')
+					.replace(/&/g, '&amp;')
+					.replace(/</g, '&lt;')
+					.replace(/>/g, '&gt;')
+					.replace(/"/g, '&quot;');
+			}
+
+			function fillTimePill(el, timeRange) {
+				if (!el) return;
+				el.innerHTML =
+					'<span class="time-range-pill" aria-label="Time: ' + escapeHtml(timeRange) + '">' +
+					'<span class="pill pill--primary">' + escapeHtml(timeRange) + '</span>' +
+					'</span>';
+			}
+
+			function fillRatePill(el, rate, currency) {
+				if (!el) return;
+				el.innerHTML =
+					'<span class="pill pill--info rate-pill" aria-label="' + escapeHtml(rate + ' ' + currency) + '">' +
+					'<span class="rate-pill-amount">' + escapeHtml(rate) + '</span>' +
+					'<span class="rate-pill-currency">' + escapeHtml(currency) + '</span>' +
+					'</span>';
+			}
+
+			function fillDurationPill(el, label) {
+				if (!el) return;
+				el.innerHTML =
+					'<span class="duration-pill-wrap" aria-label="Duration: ' + escapeHtml(label) + '">' +
+					'<span class="pill pill--neutral duration-pill">' +
+					'<svg class="duration-pill-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+					'<circle cx="12" cy="12" r="10"></circle>' +
+					'<polyline points="12 6 12 12 16 14"></polyline>' +
+					'</svg>' +
+					'<span class="duration-pill-value">' + escapeHtml(label) + '</span>' +
+					'</span>' +
+					'</span>';
+			}
+
+			function formatDurationLabel(minutes) {
+				if (minutes < 60) return minutes + ' min';
+				const h = Math.floor(minutes / 60);
+				const m = minutes % 60;
+				return m === 0 ? h + ' hr' : h + ' hr ' + m + ' min';
+			}
+
+			function updateWizardDurationPreview(form, stepEl) {
+				if (!form) return;
+				const scope = stepEl || form.querySelector('.wizard-step.is-active') || form;
+				const bridge = scope.querySelector('.duration-bridge');
+				const start = scope.querySelector('[name="start_time"]');
+				const end = scope.querySelector('[name="end_time"]');
+				if (!bridge || !start || !end) return;
+
+				const pill = bridge.querySelector('.duration-pill');
+				const valueEl = bridge.querySelector('.duration-pill-value');
+				const icon = bridge.querySelector('.duration-pill-icon');
+				const startMin = parseTimeToMinutes(start.value);
+				const endMin = parseTimeToMinutes(end.value);
+
+				bridge.removeAttribute('hidden');
+
+				if (startMin === null || endMin === null || !start.value || !end.value) {
+					bridge.classList.remove('duration-bridge--invalid');
+					bridge.setAttribute('aria-label', 'Duration');
+					if (pill) pill.className = 'pill pill--neutral duration-pill duration-pill--pending';
+					if (icon) icon.hidden = false;
+					if (valueEl) valueEl.textContent = '-';
+					return;
+				}
+
+				if (endMin <= startMin) {
+					bridge.classList.add('duration-bridge--invalid');
+					bridge.setAttribute('aria-label', 'End time must be after start time');
+					if (pill) pill.className = 'pill pill--error duration-pill';
+					if (icon) icon.hidden = true;
+					if (valueEl) valueEl.textContent = 'Invalid';
+					return;
+				}
+
+				const label = formatDurationLabel(endMin - startMin);
+				bridge.classList.remove('duration-bridge--invalid');
+				bridge.setAttribute('aria-label', 'Duration: ' + label);
+				if (pill) pill.className = 'pill pill--neutral duration-pill';
+				if (icon) icon.hidden = false;
+				if (valueEl) valueEl.textContent = label;
+			}
+
+			function getSelectedOptionLabel(selectEl) {
+				if (!selectEl || !selectEl.value) return '-';
+				const opt = selectEl.options[selectEl.selectedIndex];
+				return opt ? opt.textContent.trim() : '-';
+			}
+
+			function getTeacherName(form, prefix) {
+				const lockedName = form.querySelector('.form-group input[disabled]');
+				if (lockedName && lockedName.value) return lockedName.value.trim();
+				const search = form.querySelector('[id$="TeacherSearch"]');
+				if (search && search.value) return search.value.trim();
+				return '-';
+			}
+
+			function getStudentSelect(form, kind) {
+				if (kind === 'schedule') {
+					return form.querySelector('[name="schedule_student"]') || form.querySelector('[name="student"]');
+				}
+				return form.querySelector('[name="student"]');
+			}
+
+			function getTeacherHidden(form, kind) {
+				if (kind === 'schedule') {
+					return form.querySelector('[name="schedule_teacher"]') || form.querySelector('[name="teacher"]');
+				}
+				return form.querySelector('[name="teacher"]');
+			}
+
+			function parseTimeToMinutes(value) {
+				if (!value) return null;
+				const match = String(value).match(/^(\d{1,2}):(\d{2})$/);
+				if (!match) return null;
+				return parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
+			}
+
+			function formatTimeRange(start, end) {
+				if (!start || !end) return '-';
+				return start + ' - ' + end;
+			}
+
+			function showWizardMessage(config, text, isError) {
+				const el = document.getElementById(config.messageId);
+				if (!el) return;
+				if (!text) {
+					el.hidden = true;
+					el.textContent = '';
+					el.classList.remove('is-error');
+					return;
+				}
+				el.hidden = false;
+				el.textContent = text;
+				el.classList.toggle('is-error', !!isError);
+			}
+
+			function validateStep(form, stepEl, kind) {
+				if (!stepEl) return true;
+				const step = parseInt(stepEl.getAttribute('data-step') || '0', 10);
+				const required = stepEl.getAttribute('data-required') === 'true';
+
+				if (kind === 'conduct' && step === 1) {
+					const teacher = getTeacherHidden(form, kind);
+					const student = getStudentSelect(form, kind);
+					if (teacher && !teacher.value) return false;
+					if (!student || !student.value) return false;
+					return true;
+				}
+
+				if (kind === 'schedule' && step === 1) {
+					const teacher = getTeacherHidden(form, kind);
+					const student = getStudentSelect(form, kind);
+					if (teacher && !teacher.value) return false;
+					if (!student || !student.value) return false;
+					return true;
+				}
+
+				if (kind === 'conduct' && step === 2) {
+					const status = form.querySelector('input[name="status"]:checked');
+					if (!status) return false;
+					if (status.value !== 'conducted') {
+						const reason = form.querySelector('[name="reason"]');
+						return reason && reason.value.trim() !== '';
+					}
+					return true;
+				}
+
+				if (kind === 'conduct' && step === 4) {
+					const rate = form.querySelector('[name="rate"]');
+					const currency = form.querySelector('[name="currency"]');
+					if (!currency || !currency.value) return false;
+					if (!rate || rate.value === '' || parseFloat(rate.value) < 0) return false;
+					const status = form.querySelector('input[name="status"]:checked');
+					if (status && status.value === 'conducted' && parseFloat(rate.value) <= 0) return false;
+					return true;
+				}
+
+				if ((kind === 'conduct' && step === 3) || (kind === 'schedule' && step === 2)) {
+					const dateInput = form.querySelector('[name="date"]') || form.querySelector('[name="scheduled_date"]');
+					const start = stepEl.querySelector('[name="start_time"]');
+					const end = stepEl.querySelector('[name="end_time"]');
+					if (!dateInput || !dateInput.value) return false;
+					if (!start || !start.value || !end || !end.value) return false;
+					if (window.validateTimeRange) {
+						const check = window.validateTimeRange({ startInput: start, endInput: end });
+						if (!check.ok) return false;
+					} else {
+						const startMin = parseTimeToMinutes(start.value);
+						const endMin = parseTimeToMinutes(end.value);
+						if (startMin === null || endMin === null || endMin <= startMin) return false;
+					}
+					return true;
+				}
+
+				if (!required) return true;
+				return true;
+			}
+
+			function updateNav(config, state) {
+				const prev = document.getElementById(config.prevId);
+				const next = document.getElementById(config.nextId);
+				const save = document.getElementById(config.saveId);
+				const stepLabel = document.getElementById(config.stepLabelId);
+				const form = document.getElementById(config.formId);
+				const stepEl = form?.querySelector('.wizard-step[data-step="' + state.current + '"]');
+
+				if (stepLabel) {
+					stepLabel.textContent = 'Step ' + state.current + ' of ' + config.totalSteps;
+				}
+				if (prev) prev.hidden = state.current <= 1;
+				if (next) {
+					next.hidden = state.current >= config.totalSteps;
+					next.disabled = !validateStep(form, stepEl, state.kind);
+				}
+				if (save) {
+					save.hidden = state.current < config.totalSteps;
+				}
+			}
+
+			function showStep(config, state) {
+				const form = document.getElementById(config.formId);
+				const kind = state.kind;
+				if (!form) return;
+				form.querySelectorAll('.wizard-step').forEach(function (step) {
+					const stepNum = parseInt(step.getAttribute('data-step') || '0', 10);
+					step.classList.toggle('is-active', stepNum === state.current);
+				});
+				if (kind === 'conduct' && state.current === 4 && window.applyStudentRateToForm) {
+					window.applyStudentRateToForm(form);
+				}
+				if (state.current === config.totalSteps) {
+					populateSummary(config, state.kind);
+				}
+				updateNav(config, state);
+				const stepEl = form.querySelector('.wizard-step[data-step="' + state.current + '"]');
+				if ((kind === 'conduct' && state.current === 3) || (kind === 'schedule' && state.current === 2)) {
+					updateWizardDurationPreview(form, stepEl);
+				}
+			}
+
+			function populateSummary(config, kind) {
+				const form = document.getElementById(config.formId);
+				const summary = document.getElementById(config.summaryId);
+				if (!form || !summary) return;
+
+				const student = getStudentSelect(form, kind);
+				const teacherField = summary.querySelector('[data-field="teacher"]');
+				const studentField = summary.querySelector('[data-field="student"]');
+				const statusField = summary.querySelector('[data-field="status"]');
+				const reasonField = summary.querySelector('[data-field="reason"]');
+				const reasonRow = summary.querySelector('[data-summary-row="reason"]');
+				const dateField = summary.querySelector('[data-field="date"]');
+				const timeField = summary.querySelector('[data-field="time"]');
+				const durationField = summary.querySelector('[data-field="duration"]');
+				const rateField = summary.querySelector('[data-field="rate"]');
+				const materialsField = summary.querySelector('[data-field="materials"]');
+				const materialsRow = summary.querySelector('[data-summary-row="materials"]');
+				const trialField = summary.querySelector('[data-field="trial"]');
+				const notesField = summary.querySelector('[data-field="notes"]');
+				const notesRow = summary.querySelector('[data-summary-row="notes"]');
+
+				if (teacherField) teacherField.textContent = getTeacherName(form, kind);
+				if (studentField) studentField.textContent = getSelectedOptionLabel(student);
+
+				const statusInput = form.querySelector('input[name="status"]:checked');
+				if (statusField) {
+					if (config.showStatus && statusInput) {
+						const label = statusInput.closest('.status-radio-card')?.querySelector('.status-radio-card__title');
+						statusField.textContent = label ? label.textContent.trim() : statusInput.value;
+					} else {
+						statusField.closest('.class-wizard-summary-row')?.setAttribute('hidden', '');
+					}
+				}
+
+				const reasonInput = form.querySelector('[name="reason"]');
+				if (reasonRow && reasonField) {
+					const showReason = config.showStatus && statusInput && statusInput.value !== 'conducted' && reasonInput && reasonInput.value.trim();
+					reasonRow.hidden = !showReason;
+					if (showReason) reasonField.textContent = reasonInput.value.trim();
+				}
+
+				const dateInput = form.querySelector('[name="date"], [name="scheduled_date"]');
+				if (dateField) dateField.textContent = dateInput && dateInput.value ? dateInput.value : '-';
+
+				const start = form.querySelector('[name="start_time"]');
+				const end = form.querySelector('[name="end_time"]');
+				if (timeField) {
+					fillTimePill(timeField, formatTimeRange(start?.value, end?.value));
+				}
+
+				if (durationField) {
+					const startMins = parseTimeToMinutes(start?.value);
+					const endMins = parseTimeToMinutes(end?.value);
+					if (startMins !== null && endMins !== null && endMins > startMins) {
+						fillDurationPill(durationField, formatDurationLabel(endMins - startMins));
+					} else {
+						durationField.textContent = '-';
+					}
+				}
+
+				const rateInput = form.querySelector('[name="rate"]');
+				const currencyInput = form.querySelector('[name="currency"]');
+				if (rateField) {
+					fillRatePill(rateField, rateInput?.value || '0', currencyInput?.value || '');
+				}
+
+				const chips = form.querySelectorAll('.class-lm-chip');
+				if (materialsRow && materialsField) {
+					if (chips.length) {
+						materialsRow.hidden = false;
+						materialsField.textContent = Array.from(chips).map(function (chip) {
+							return chip.getAttribute('data-title') || chip.textContent.trim();
+						}).join(', ');
+					} else {
+						materialsRow.hidden = true;
+					}
+				}
+
+				const trialYes = form.querySelector('input[name="is_trial_class"][value="on"]');
+				if (trialField) {
+					trialField.textContent = trialYes && trialYes.checked ? 'Yes' : 'No';
+				}
+
+				const notesInput = form.querySelector('[name="notes"]');
+				if (notesRow && notesField) {
+					const notes = notesInput && notesInput.value.trim();
+					notesRow.hidden = !notes;
+					if (notes) notesField.textContent = notes;
+				}
+			}
+
+			function bindStatusReason(form) {
+				form.querySelectorAll('input[name="status"]').forEach(function (input) {
+					input.addEventListener('change', function () {
+						const reasonGroup = form.querySelector('#conductWizard_reasonGroup');
+						const reason = form.querySelector('[name="reason"]');
+						if (!reasonGroup || !reason) return;
+						if (input.value === 'conducted') {
+							reasonGroup.hidden = true;
+							reason.value = '';
+							if (window.applyStudentRateToForm) window.applyStudentRateToForm(form);
+						} else {
+							reasonGroup.hidden = false;
+						}
+						const state = form._wizardState;
+						if (state) updateNav(configs.conduct, state);
+					});
+				});
+			}
+
+			function updateScheduleZoomWarning(form) {
+				const warning = form.querySelector('#scheduleWizard_zoomWarning');
+				if (!warning) return;
+				const start = form.querySelector('[name="start_time"]');
+				const end = form.querySelector('[name="end_time"]');
+				const startMin = parseTimeToMinutes(start?.value);
+				const endMin = parseTimeToMinutes(end?.value);
+				if (startMin !== null && endMin !== null && endMin > startMin && (endMin - startMin) > ZOOM_MAX_AUTO_MINUTES) {
+					warning.textContent = ZOOM_MANUAL_WARNING;
+					warning.hidden = false;
+				} else {
+					warning.hidden = true;
+					warning.textContent = '';
+				}
+			}
+
+			function resetAdminStudentDropdown(form, kind) {
+				if (form.dataset.lockTeacher === 'true') return;
+				const student = getStudentSelect(form, kind);
+				if (!student) return;
+				student.innerHTML = '<option value="">-- Select teacher first --</option>';
+				student.value = '';
+			}
+
+			async function loadWizardStudents(form, kind) {
+				const teacher = getTeacherHidden(form, kind);
+				const student = getStudentSelect(form, kind);
+				if (!student || form.dataset.lockTeacher === 'true') return;
+				const teacherId = teacher ? teacher.value : '';
+				if (!teacherId) {
+					resetAdminStudentDropdown(form, kind);
+					return;
+				}
+				try {
+					const response = await fetch(buildURL('/api/students?teacher=' + encodeURIComponent(teacherId)));
+					const html = await response.text();
+					if (!response.ok) throw new Error(html);
+					student.innerHTML = html;
+					student.value = '';
+				} catch (err) {
+					if (typeof showErrorBanner === 'function') {
+						showErrorBanner(err.message || 'Failed to load students');
+					}
+					resetAdminStudentDropdown(form, kind);
+				}
+			}
+
+			function wireAdminTeacherSearch(form, kind) {
+				if (form.dataset.lockTeacher === 'true') return;
+				const teacher = getTeacherHidden(form, kind);
+				if (!teacher) return;
+				teacher.addEventListener('change', function () {
+					const search = teacher.closest('.entity-search');
+					if (search) clearPortaledTeacherResults(search);
+					loadWizardStudents(form, kind);
+					if (form._wizardState) updateNav(configs[kind], form._wizardState);
+				});
+			}
+
+			function openWizard(kind) {
+				const config = configs[kind];
+				const modal = document.getElementById(config.modalId);
+				const form = document.getElementById(config.formId);
+				if (!modal || !form) return;
+
+				const choiceModal = document.getElementById('recordClassesChoiceModal');
+				if (choiceModal) choiceModal.hidden = true;
+
+				form.reset();
+				form.querySelectorAll('.class-lm-chips').forEach(function (chips) {
+					chips.innerHTML = '';
+				});
+
+				const state = { kind: kind, current: 1 };
+				form._wizardState = state;
+				showWizardMessage(config, '', false);
+				showStep(config, state);
+
+				if (kind === 'conduct') {
+					const reasonGroup = form.querySelector('#conductWizard_reasonGroup');
+					if (reasonGroup) reasonGroup.hidden = true;
+				}
+				resetAdminStudentDropdown(form, kind);
+				form.querySelectorAll('.entity-search').forEach(clearPortaledTeacherResults);
+
+				modal.hidden = false;
+				document.body.classList.add('modal-open');
+				updateWizardDurationPreview(form);
+
+				requestAnimationFrame(function () {
+					const active = form.querySelector('.wizard-step.is-active input, .wizard-step.is-active select, .wizard-step.is-active textarea, .wizard-step.is-active button');
+					if (active && typeof active.focus === 'function') active.focus();
+				});
+			}
+
+			function closeWizard(kind) {
+				const config = configs[kind];
+				const modal = document.getElementById(config.modalId);
+				const form = document.getElementById(config.formId);
+				if (!modal) return;
+				if (form) {
+					form.querySelectorAll('.entity-search').forEach(clearPortaledTeacherResults);
+				}
+				clearAllPortaledTeacherResults();
+				modal.hidden = true;
+				const conductOpen = document.getElementById('conductClassWizardModal') && !document.getElementById('conductClassWizardModal').hidden;
+				const scheduleOpen = document.getElementById('scheduleClassWizardModal') && !document.getElementById('scheduleClassWizardModal').hidden;
+				const choiceOpen = document.getElementById('recordClassesChoiceModal') && !document.getElementById('recordClassesChoiceModal').hidden;
+				if (!conductOpen && !scheduleOpen && !choiceOpen) {
+					document.body.classList.remove('modal-open');
+				}
+			}
+
+			async function submitWizard(kind) {
+				const config = configs[kind];
+				const form = document.getElementById(config.formId);
+				if (!form) return;
+
+				const save = document.getElementById(config.saveId);
+				if (save) {
+					save.disabled = true;
+					save.classList.add('is-loading');
+				}
+
+				try {
+					const formData = new FormData(form);
+					const response = await fetch(config.postURL, {
+						method: 'POST',
+						headers: Object.assign({}, window.getCSRFHeaders ? window.getCSRFHeaders() : {}),
+						body: new URLSearchParams(formData),
+					});
+					const text = await response.text();
+					if (!response.ok) {
+						showWizardMessage(config, text, true);
+						if (typeof showErrorBanner === 'function') showErrorBanner(text);
+						return;
+					}
+
+					if (typeof showSuccessBanner === 'function') {
+						showSuccessBanner(kind === 'conduct' ? 'Class recorded' : 'Class scheduled');
+					}
+					closeWizard(kind);
+
+					if (kind === 'conduct') {
+						if (typeof window.refreshClassesTable === 'function') {
+							window.refreshClassesTable();
+						} else if (typeof htmx !== 'undefined') {
+							htmx.trigger(document.body, 'classesRefresh');
+						}
+					}
+					if (kind === 'schedule') {
+						if (typeof window.refreshScheduleList === 'function') {
+							window.refreshScheduleList();
+						} else if (typeof htmx !== 'undefined') {
+							htmx.trigger(document.body, 'scheduleRefresh');
+						}
+						if (typeof window.refreshScheduleCalendar === 'function') {
+							window.refreshScheduleCalendar();
+						} else if (typeof htmx !== 'undefined') {
+							htmx.trigger(document.body, 'refreshScheduleCalendar');
+						}
+					}
+				} catch (err) {
+					showWizardMessage(config, err.message || 'Request failed', true);
+					if (typeof showErrorBanner === 'function') showErrorBanner(err.message || 'Request failed');
+				} finally {
+					if (save) {
+						save.disabled = false;
+						save.classList.remove('is-loading');
+					}
+				}
+			}
+
+			function initWizard(kind) {
+				const config = configs[kind];
+				const form = document.getElementById(config.formId);
+				const modal = document.getElementById(config.modalId);
+				if (!form || !modal) return;
+
+				const state = { kind: kind, current: 1 };
+				form._wizardState = state;
+
+				if (kind === 'conduct') {
+					bindStatusReason(form);
+					wireAdminTeacherSearch(form, kind);
+				}
+				if (kind === 'schedule') {
+					wireAdminTeacherSearch(form, kind);
+				}
+
+				updateNav(config, state);
+
+				form.addEventListener('input', function (e) {
+					const target = e.target;
+					if (target && (target.name === 'start_time' || target.name === 'end_time')) {
+						const stepEl = target.closest('.wizard-step');
+						updateWizardDurationPreview(form, stepEl);
+						if (kind === 'schedule') updateScheduleZoomWarning(form);
+					}
+					if (form._wizardState) updateNav(config, form._wizardState);
+				});
+				form.addEventListener('change', function (e) {
+					const target = e.target;
+					if (target && (target.name === 'start_time' || target.name === 'end_time')) {
+						const stepEl = target.closest('.wizard-step');
+						updateWizardDurationPreview(form, stepEl);
+						if (kind === 'schedule') updateScheduleZoomWarning(form);
+					}
+					if (form._wizardState) updateNav(config, form._wizardState);
+					if (window.applyStudentRateToForm) window.applyStudentRateToForm(form);
+				});
+
+				document.getElementById(config.prevId)?.addEventListener('click', function () {
+					if (!form._wizardState || form._wizardState.current <= 1) return;
+					form._wizardState.current -= 1;
+					showWizardMessage(config, '', false);
+					showStep(config, form._wizardState);
+				});
+
+				document.getElementById(config.nextId)?.addEventListener('click', function () {
+					if (!form._wizardState) return;
+					const stepEl = form.querySelector('.wizard-step.is-active');
+					if (!validateStep(form, stepEl, kind)) return;
+					if (form._wizardState.current >= config.totalSteps) return;
+					form._wizardState.current += 1;
+					showWizardMessage(config, '', false);
+					showStep(config, form._wizardState);
+				});
+
+				form.addEventListener('submit', function (e) {
+					e.preventDefault();
+					submitWizard(kind);
+				});
+			}
+
+			window.openConductClassWizard = function () {
+				openWizard('conduct');
+			};
+			window.openScheduleClassWizard = function () {
+				openWizard('schedule');
+			};
+
+			wireWizardTeacherSearchFloating();
+			initWizard('conduct');
+			initWizard('schedule');
+
+			document.addEventListener('click', function (e) {
+				const conductTrigger = e.target.closest('[data-open-conduct-class-wizard]');
+				if (conductTrigger) {
+					e.preventDefault();
+					window.openConductClassWizard();
+					return;
+				}
+				const scheduleTrigger = e.target.closest('[data-open-schedule-class-wizard]');
+				if (scheduleTrigger) {
+					e.preventDefault();
+					window.openScheduleClassWizard();
+					return;
+				}
+				const closeBtn = e.target.closest('.class-wizard-close');
+				if (closeBtn) {
+					closeWizard(closeBtn.getAttribute('data-wizard'));
+					return;
+				}
+				if (e.target.id === 'conductClassWizardModal') {
+					closeWizard('conduct');
+					return;
+				}
+				if (e.target.id === 'scheduleClassWizardModal') {
+					closeWizard('schedule');
+				}
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key !== 'Escape') return;
+				if (document.getElementById('conductClassWizardModal') && !document.getElementById('conductClassWizardModal').hidden) {
+					closeWizard('conduct');
+					e.preventDefault();
+					return;
+				}
+				if (document.getElementById('scheduleClassWizardModal') && !document.getElementById('scheduleClassWizardModal').hidden) {
+					closeWizard('schedule');
+					e.preventDefault();
+				}
+			});
+
+			const scheduleParams = new URLSearchParams(window.location.search);
+			if (scheduleParams.get('openScheduleWizard') === '1') {
+				window.openScheduleClassWizard();
+			}
+		})();
+	</script>
+}

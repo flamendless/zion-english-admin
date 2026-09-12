@@ -1,0 +1,408 @@
+package frontend
+
+import (
+	"fmt"
+	"strings"
+	"zion-english/internal/constants"
+	"zion-english/internal/utils"
+)
+
+type FeatureFlagsData struct {
+	ClassOverdueGracePeriodMinutes int64
+	Zoom                           FeatureFlagIntegrationItem
+	GoogleCalendar                 FeatureFlagIntegrationItem
+}
+
+type FeatureFlagIntegrationItem struct {
+	Name               string
+	Description        string
+	LogoURL            string
+	LogoClass          string
+	LogoWidth          int
+	LogoHeight         int
+	EnvConfigured      bool
+	ConnectionsAllowed bool
+	VisibleRoles       []constants.TeacherRole
+	RoleOptions        []constants.TeacherRole
+	FormFieldName      string
+	FormPrefix         string
+}
+
+func featureFlagRoleLabel(role constants.TeacherRole) string {
+	return strings.ToUpper(string(role[:1])) + string(role[1:])
+}
+
+func featureFlagRoleFieldName(prefix string, role constants.TeacherRole) string {
+	return fmt.Sprintf("%s_role_%s", prefix, role)
+}
+
+func featureFlagRoleChecked(visibleRoles []constants.TeacherRole, role constants.TeacherRole) bool {
+	for _, visible := range visibleRoles {
+		if visible == role {
+			return true
+		}
+	}
+	return false
+}
+
+templ FeatureFlags(data FeatureFlagsData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>Feature Flags - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		<style>
+			.feature-flags-hero {
+				margin-bottom: var(--space-6);
+			}
+
+			.feature-flags-subtitle {
+				margin-top: var(--space-2);
+				color: var(--color-muted-foreground);
+				max-width: 42rem;
+			}
+
+			.feature-flags-card {
+				background: var(--color-surface);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-lg);
+				padding: var(--space-6);
+				max-width: 48rem;
+			}
+
+			.integration-list {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+			}
+
+			.integration-row {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: flex-start;
+				justify-content: space-between;
+				gap: var(--space-4);
+				padding: var(--space-4);
+				border: 1px solid var(--color-border-subtle);
+				border-radius: var(--radius-md);
+				background: var(--color-muted);
+			}
+
+			.integration-row-brand {
+				display: flex;
+				align-items: flex-start;
+				gap: var(--space-4);
+				flex: 1 1 16rem;
+				min-width: 0;
+			}
+
+			.integration-logo-wrap {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 3.5rem;
+				height: 3.5rem;
+				flex-shrink: 0;
+				border-radius: var(--radius-md);
+				background: var(--color-surface);
+				border: 1px solid var(--color-border-subtle);
+			}
+
+			.integration-logo {
+				display: block;
+				max-width: 100%;
+				height: auto;
+			}
+
+			.integration-logo-calendar {
+				width: 1.5rem;
+				height: 1.5rem;
+			}
+
+			.integration-info {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-2);
+				min-width: 0;
+			}
+
+			.integration-name {
+				font-weight: 600;
+				font-size: 1rem;
+			}
+
+			.integration-desc {
+				margin: 0;
+				font-size: 0.875rem;
+				color: var(--color-muted-foreground);
+				line-height: 1.5;
+			}
+
+			.integration-row-meta {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-end;
+				gap: var(--space-3);
+				flex-shrink: 0;
+			}
+
+			.feature-flag-toggle {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--space-2);
+				font-size: 0.875rem;
+				font-weight: 500;
+				cursor: pointer;
+				user-select: none;
+			}
+
+			.feature-flag-toggle input {
+				width: 1rem;
+				height: 1rem;
+				margin: 0;
+				cursor: pointer;
+			}
+
+			.feature-flag-roles {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-end;
+				gap: var(--space-2);
+			}
+
+			.feature-flag-roles-label {
+				font-size: 0.75rem;
+				font-weight: 600;
+				color: var(--color-muted-foreground);
+				text-transform: uppercase;
+				letter-spacing: 0.04em;
+			}
+
+			.feature-flag-role-options {
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: flex-end;
+				gap: var(--space-3);
+			}
+
+			.feature-flags-actions {
+				margin-top: var(--space-6);
+				display: flex;
+				justify-content: flex-end;
+			}
+
+			.feature-flags-section {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+			}
+
+			.feature-flags-section + .feature-flags-section {
+				margin-top: var(--space-6);
+				padding-top: var(--space-6);
+				border-top: 1px solid var(--color-border-subtle);
+			}
+
+			.feature-flags-section-title {
+				margin: 0;
+				font-size: 1rem;
+				font-weight: 600;
+			}
+
+			.feature-flag-setting-row {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: flex-start;
+				justify-content: space-between;
+				gap: var(--space-4);
+				padding: var(--space-4);
+				border: 1px solid var(--color-border-subtle);
+				border-radius: var(--radius-md);
+				background: var(--color-muted);
+			}
+
+			.feature-flag-setting-copy {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-2);
+				flex: 1 1 16rem;
+				min-width: 0;
+			}
+
+			.feature-flag-setting-name {
+				font-weight: 600;
+				font-size: 1rem;
+			}
+
+			.feature-flag-setting-desc {
+				margin: 0;
+				font-size: 0.875rem;
+				color: var(--color-muted-foreground);
+				line-height: 1.5;
+			}
+
+			.feature-flag-number-field {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-end;
+				gap: var(--space-2);
+				flex-shrink: 0;
+			}
+
+			.feature-flag-number-label {
+				font-size: 0.75rem;
+				font-weight: 600;
+				color: var(--color-muted-foreground);
+				text-transform: uppercase;
+				letter-spacing: 0.04em;
+			}
+
+			.feature-flag-number-input {
+				width: 7rem;
+				padding: var(--space-2) var(--space-3);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-md);
+				background: var(--color-surface);
+				font: inherit;
+				text-align: right;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@SuccessBanner()
+			@ErrorBanner()
+			@HubHeader("Feature Flags", "", "", false)
+
+			<div class="feature-flags-hero">
+				<p class="feature-flags-subtitle">
+					Control integration availability, class overdue timing, and which teacher roles can see each integration. Login superuser and admin accounts always see all integrations. Existing connections stay active when connections are disabled.
+				</p>
+			</div>
+
+			<form method="POST" action={ utils.URL("/feature-flags") } class="feature-flags-card" id="featureFlagsForm">
+				<section class="feature-flags-section">
+					<h2 class="feature-flags-section-title">Class scheduling</h2>
+					@FeatureFlagClassOverdueGracePeriodRow(data.ClassOverdueGracePeriodMinutes)
+				</section>
+				<section class="feature-flags-section">
+					<h2 class="feature-flags-section-title">Integrations</h2>
+					<div class="integration-list">
+						@FeatureFlagIntegrationRow(data.Zoom)
+						@FeatureFlagIntegrationRow(data.GoogleCalendar)
+					</div>
+				</section>
+				<div class="feature-flags-actions">
+					<button type="submit" class="btn">Save</button>
+				</div>
+			</form>
+		</div>
+		<script>
+			(function () {
+				const form = document.getElementById('featureFlagsForm');
+				if (!form) return;
+
+				const integrationChecks = [
+					{ prefix: 'zoom', label: 'Zoom' },
+					{ prefix: 'google_calendar', label: 'Google Calendar' },
+				];
+				const roles = ['teacher', 'admin', 'developer', 'tester'];
+
+				form.addEventListener('submit', function (event) {
+					for (const integration of integrationChecks) {
+						const anyChecked = roles.some(function (role) {
+							return form.querySelector('input[name="' + integration.prefix + '_role_' + role + '"]:checked');
+						});
+						if (!anyChecked) {
+							event.preventDefault();
+							if (typeof showErrorBanner === 'function') {
+								showErrorBanner('Select at least one role for ' + integration.label + ' visibility');
+							}
+							return;
+						}
+					}
+				});
+			})();
+		</script>
+	</body>
+	</html>
+}
+
+templ FeatureFlagClassOverdueGracePeriodRow(minutes int64) {
+	<div class="feature-flag-setting-row">
+		<div class="feature-flag-setting-copy">
+			<span class="feature-flag-setting-name">Overdue grace period</span>
+			<p class="feature-flag-setting-desc">
+				Minutes after a scheduled class ends before it is marked overdue on the schedule and included in missed-class notifications.
+			</p>
+		</div>
+		<div class="feature-flag-number-field">
+			<label class="feature-flag-number-label" for="classOverdueGracePeriodMinutes">Minutes</label>
+			<input
+				id="classOverdueGracePeriodMinutes"
+				class="feature-flag-number-input"
+				type="number"
+				name="class_overdue_grace_period_minutes"
+				min="0"
+				max={ fmt.Sprintf("%d", constants.MaxClassOverdueGracePeriodMinutes) }
+				step="1"
+				value={ fmt.Sprintf("%d", minutes) }
+				required
+			/>
+		</div>
+	</div>
+}
+
+templ FeatureFlagIntegrationRow(item FeatureFlagIntegrationItem) {
+	<div class="integration-row">
+		<div class="integration-row-brand">
+			<div class="integration-logo-wrap">
+				<img
+					class={ item.LogoClass }
+					src={ item.LogoURL }
+					width={ fmt.Sprintf("%d", item.LogoWidth) }
+					height={ fmt.Sprintf("%d", item.LogoHeight) }
+					alt=""
+				/>
+			</div>
+			<div class="integration-info">
+				<span class="integration-name">{ item.Name }</span>
+				<p class="integration-desc">{ item.Description }</p>
+			</div>
+		</div>
+		<div class="integration-row-meta">
+			if item.EnvConfigured {
+				@StatusPill("Server configured", PillToneSuccess, false)
+			} else {
+				@StatusPill("Not configured", PillToneNeutral, false)
+			}
+			<label class="feature-flag-toggle">
+				<input
+					type="checkbox"
+					name={ item.FormFieldName }
+					checked?={ item.ConnectionsAllowed }
+				/>
+				Allow new connections
+			</label>
+			<fieldset class="feature-flag-roles">
+				<legend class="feature-flag-roles-label">Visible to</legend>
+				<div class="feature-flag-role-options">
+					for _, role := range item.RoleOptions {
+						<label class="feature-flag-toggle">
+							<input
+								type="checkbox"
+								name={ featureFlagRoleFieldName(item.FormPrefix, role) }
+								checked?={ featureFlagRoleChecked(item.VisibleRoles, role) }
+							/>
+							{ featureFlagRoleLabel(role) }
+						</label>
+					}
+				</div>
+			</fieldset>
+		</div>
+	</div>
+}

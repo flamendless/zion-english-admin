@@ -23,6 +23,7 @@ templ Analytics(data AnalyticsData) {
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
 		@AvatarStyles()
+		@ScrChartJS()
 		<style>
 			.analytics-section {
 				margin-bottom: var(--space-8);
@@ -51,6 +52,47 @@ templ Analytics(data AnalyticsData) {
 				gap: var(--space-2);
 				min-width: 0;
 			}
+			.analytics-charts {
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: var(--space-4);
+				margin-bottom: var(--space-8);
+			}
+			.analytics-chart-card {
+				background: var(--color-surface);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm);
+				padding: var(--space-4);
+			}
+			.analytics-chart-card h2 {
+				margin: 0 0 var(--space-3);
+				font-size: 1.1rem;
+			}
+			.analytics-chart-wrap {
+				position: relative;
+				height: 280px;
+			}
+			.analytics-chart-empty {
+				margin: 0;
+				padding: var(--space-6) var(--space-4);
+				text-align: center;
+				color: var(--color-muted-foreground);
+				font-size: 0.9rem;
+			}
+			.analytics-header-tooltip {
+				cursor: help;
+			}
+			.analytics-header-tooltip[data-tooltip]::after {
+				white-space: normal;
+				max-width: 16rem;
+				text-align: center;
+			}
+			@media (max-width: 768px) {
+				.analytics-charts {
+					grid-template-columns: 1fr;
+				}
+			}
 		</style>
 	</head>
 	<body>
@@ -63,8 +105,10 @@ templ Analytics(data AnalyticsData) {
 				@HubHeader("My Analytics", "", "", false)
 			}
 
-			<div class="toolbar">
+			<div class="toolbar" id="analyticsToolbar">
+				@MonthPicker("analyticsMonth", utils.URL("/analytics/partials/date-preset"))
 				@DatePreset(true)
+				@SortControls("", "asc", ListSortKindAnalytics)
 				<button type="button" id="filterBtn">Filter</button>
 			</div>
 
@@ -72,6 +116,21 @@ templ Analytics(data AnalyticsData) {
 			<div id="analyticsContent" hidden>
 
 				<div class="analytics-summary" id="summaryCards"></div>
+
+				<div class="analytics-charts">
+					<div class="analytics-chart-card">
+						<h2>Class Status</h2>
+						<div class="analytics-chart-wrap">
+							<canvas id="classStatusChart"></canvas>
+						</div>
+					</div>
+					<div class="analytics-chart-card">
+						<h2>Weekly Trend</h2>
+						<div class="analytics-chart-wrap">
+							<canvas id="weeklyTrendChart"></canvas>
+						</div>
+					</div>
+				</div>
 
 				<div class="analytics-section">
 					<h2>Weekly Trend</h2>
@@ -93,23 +152,33 @@ templ Analytics(data AnalyticsData) {
 
 				if data.IsSuperuser {
 					<div class="analytics-section" id="teacherSection">
-						<h2>By Teacher</h2>
+						@AdminOnlySectionTitle("By Teacher")
 						<div class="table-wrapper">
 							<table class="table-stack-mobile" id="teacherTable">
 								<thead>
 									<tr>
-										<th>Teacher</th>
-										<th>Conducted</th>
-										<th>Cancelled</th>
-										<th>Rescheduled</th>
-										<th>Cancellation Rate</th>
-										<th>Utilization</th>
-										<th>No-Shows</th>
+										@AdminOnlyTableHeader("Teacher")
+										@AdminOnlyTableHeader("Conducted")
+										@AdminOnlyTableHeader("Cancelled")
+										@AdminOnlyTableHeader("Rescheduled")
+										@AdminOnlyTableHeader("Cancellation Rate")
+										<th>
+											<span class="table-header-label">
+												<span
+													class="analytics-header-tooltip"
+													data-tooltip="Conducted class minutes divided by scheduled class minutes, times 100. Scheduled minutes is the total duration of scheduled classes in the period; conducted minutes is the total duration of conducted classes."
+													tabindex="0"
+												>Utilization</span>
+												@AdminOnlyIndicator()
+											</span>
+										</th>
+										@AdminOnlyTableHeader("No-Shows")
 									</tr>
 								</thead>
 								<tbody id="teacherTableBody"></tbody>
 							</table>
 						</div>
+						<div id="teacherTablePagination" class="pagination-bar" hidden></div>
 					</div>
 				}
 
@@ -129,6 +198,7 @@ templ Analytics(data AnalyticsData) {
 							<tbody id="studentTableBody"></tbody>
 						</table>
 					</div>
+					<div id="studentTablePagination" class="pagination-bar" hidden></div>
 				</div>
 
 				<div class="analytics-section">
@@ -141,7 +211,7 @@ templ Analytics(data AnalyticsData) {
 									<th>Date</th>
 									<th>Student</th>
 									if data.IsSuperuser {
-										<th>Teacher</th>
+										@AdminOnlyTableHeader("Teacher")
 									}
 									<th>Duration</th>
 									<th>Days Overdue</th>
@@ -156,6 +226,13 @@ templ Analytics(data AnalyticsData) {
 					<h2>Student Retention</h2>
 					<p class="analytics-hint">Churn dates use the student&rsquo;s last update time as a proxy when status changed to inactive.</p>
 					<div class="analytics-summary" id="retentionCards"></div>
+
+					<div class="analytics-chart-card" style="margin-bottom: var(--space-6);">
+						<h2>Inactive Reasons</h2>
+						<div class="analytics-chart-wrap">
+							<canvas id="inactiveReasonsChart"></canvas>
+						</div>
+					</div>
 
 					<h3>Inactive Reasons</h3>
 					<div class="table-wrapper">
@@ -188,13 +265,41 @@ templ Analytics(data AnalyticsData) {
 			</div>
 		</div>
 
+		<script type="text/javascript" src={ utils.URL("/static/js/analytics-charts.js") }></script>
 		<script>
 			const pageRoot = document.querySelector('.analytics-page');
 			const isSuperuser = pageRoot && pageRoot.dataset.isSuperuser === 'true';
-			const datePresetSelect = document.getElementById('datePreset');
 			const filterBtn = document.getElementById('filterBtn');
 			const analyticsLoading = document.getElementById('analyticsLoading');
 			const analyticsContent = document.getElementById('analyticsContent');
+			const sortBySelect = document.getElementById('sortBy');
+			const sortOrderInput = document.getElementById('sortOrder');
+			const ANALYTICS_PAGE_SIZE = 20;
+			let analyticsCache = null;
+			let teacherPage = 1;
+			let studentPage = 1;
+
+			function getAnalyticsSort() {
+				return {
+					by: sortBySelect ? sortBySelect.value : 'name',
+					order: sortOrderInput && sortOrderInput.value === 'desc' ? 'desc' : 'asc'
+				};
+			}
+
+			function compareValues(a, b, order) {
+				if (a === b) return 0;
+				const result = a < b ? -1 : 1;
+				return order === 'desc' ? -result : result;
+			}
+
+			function sortRows(rows, accessors) {
+				const sort = getAnalyticsSort();
+				const accessor = accessors[sort.by];
+				if (!accessor || !rows) return rows || [];
+				return rows.slice().sort(function (left, right) {
+					return compareValues(accessor(left), accessor(right), sort.order);
+				});
+			}
 
 			function getBaseURL() {
 				const pathname = window.location.pathname;
@@ -218,22 +323,35 @@ templ Analytics(data AnalyticsData) {
 				return baseURL + path;
 			}
 
-			function setDateRangeFromPreset(value) {
-				if (!value) {
-					delete datePresetSelect.dataset.startDate;
-					delete datePresetSelect.dataset.endDate;
+			function setDateRangeFromPreset(select) {
+				if (!select) return;
+				if (!select.value) {
+					delete select.dataset.startDate;
+					delete select.dataset.endDate;
 					return;
 				}
-				const parts = value.split('|');
+				const parts = select.value.split('|');
 				if (parts.length !== 2) return;
-				datePresetSelect.dataset.startDate = parts[0];
-				datePresetSelect.dataset.endDate = parts[1];
+				select.dataset.startDate = parts[0];
+				select.dataset.endDate = parts[1];
 			}
 
-			datePresetSelect.addEventListener('change', () => {
-				setDateRangeFromPreset(datePresetSelect.value);
+			function bindDatePresetSelect() {
+				const presetSelect = document.getElementById('datePreset');
+				if (!presetSelect) return;
+				setDateRangeFromPreset(presetSelect);
+				presetSelect.addEventListener('change', () => {
+					setDateRangeFromPreset(presetSelect);
+				});
+			}
+
+			bindDatePresetSelect();
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id !== 'datePresetGroup') return;
+				bindDatePresetSelect();
+				loadAnalytics();
 			});
-			setDateRangeFromPreset(datePresetSelect.value);
 
 			function escapeHTML(value) {
 				const div = document.createElement('div');
@@ -326,13 +444,60 @@ templ Analytics(data AnalyticsData) {
 				tbody.innerHTML = rows;
 			}
 
+			function paginateRows(rows, page, pageSize) {
+				const total = rows ? rows.length : 0;
+				const totalPages = Math.max(1, Math.ceil(total / pageSize));
+				const safePage = Math.min(Math.max(1, page), totalPages);
+				const start = (safePage - 1) * pageSize;
+				return {
+					rows: (rows || []).slice(start, start + pageSize),
+					page: safePage,
+					totalPages: totalPages,
+					total: total,
+					hasPrev: safePage > 1,
+					hasNext: safePage < totalPages
+				};
+			}
+
+			function renderPaginationBar(containerId, pagination, onPageChange) {
+				const container = document.getElementById(containerId);
+				if (!container) return pagination.page;
+				if (pagination.total <= ANALYTICS_PAGE_SIZE) {
+					container.innerHTML = '';
+					container.hidden = true;
+					return pagination.page;
+				}
+				container.hidden = false;
+				const prevBtn = pagination.hasPrev
+					? '<button type="button" class="pagination-btn" data-page="' + (pagination.page - 1) + '">Previous</button>'
+					: '<span class="pagination-btn disabled">Previous</span>';
+				const nextBtn = pagination.hasNext
+					? '<button type="button" class="pagination-btn" data-page="' + (pagination.page + 1) + '">Next</button>'
+					: '<span class="pagination-btn disabled">Next</span>';
+				container.innerHTML = prevBtn +
+					'<span class="pagination-info">Page ' + pagination.page + ' of ' + pagination.totalPages +
+					' (' + pagination.total + ' total)</span>' + nextBtn;
+				container.querySelectorAll('button[data-page]').forEach(function (btn) {
+					btn.addEventListener('click', function () {
+						onPageChange(parseInt(btn.getAttribute('data-page'), 10));
+					});
+				});
+				return pagination.page;
+			}
+
 			function renderWeekly(rows) {
 				const tbody = document.getElementById('weeklyTableBody');
-				if (!rows || rows.length === 0) {
+				const sorted = sortRows(rows, {
+					name: function (row) { return row.weekLabel || ''; },
+					conducted: function (row) { return row.conducted || 0; },
+					cancelled: function (row) { return row.cancelled || 0; },
+					rate: function (row) { return row.cancellationRate || 0; }
+				});
+				if (!sorted || sorted.length === 0) {
 					renderTableBody(tbody, null, 'No class records in this period.');
 					return;
 				}
-				renderTableBody(tbody, rows.map(function (row) {
+				renderTableBody(tbody, sorted.map(function (row) {
 					return '<tr><td data-label="Week">' + escapeHTML(row.weekLabel) +
 						'</td><td data-label="Conducted">' + row.conducted +
 						'</td><td data-label="Cancelled">' + row.cancelled +
@@ -344,11 +509,23 @@ templ Analytics(data AnalyticsData) {
 			function renderTeachers(rows) {
 				if (!isSuperuser) return;
 				const tbody = document.getElementById('teacherTableBody');
-				if (!rows || rows.length === 0) {
+				const sorted = sortRows(rows, {
+					name: function (row) { return row.teacherName || ''; },
+					conducted: function (row) { return row.conducted || 0; },
+					cancelled: function (row) { return row.cancelled || 0; },
+					rate: function (row) { return row.cancellationRate || 0; }
+				});
+				if (!sorted || sorted.length === 0) {
 					renderTableBody(tbody, null, 'No teacher data in this period.');
+					renderPaginationBar('teacherTablePagination', { page: 1, totalPages: 1, total: 0, hasPrev: false, hasNext: false }, function () {});
 					return;
 				}
-				renderTableBody(tbody, rows.map(function (row) {
+				const paged = paginateRows(sorted, teacherPage, ANALYTICS_PAGE_SIZE);
+				teacherPage = renderPaginationBar('teacherTablePagination', paged, function (page) {
+					teacherPage = page;
+					renderTeachers(analyticsCache ? analyticsCache.byTeacher : []);
+				});
+				renderTableBody(tbody, paged.rows.map(function (row) {
 					return '<tr><td data-label="Teacher">' + renderTeacherCell(row.teacherName, row.teacherAvatar) +
 						'</td><td data-label="Conducted">' + row.conducted +
 						'</td><td data-label="Cancelled">' + row.cancelled +
@@ -361,11 +538,23 @@ templ Analytics(data AnalyticsData) {
 
 			function renderStudents(rows) {
 				const tbody = document.getElementById('studentTableBody');
-				if (!rows || rows.length === 0) {
+				const sorted = sortRows(rows, {
+					name: function (row) { return row.studentName || ''; },
+					conducted: function (row) { return row.conducted || 0; },
+					cancelled: function (row) { return row.cancelled || 0; },
+					rate: function (row) { return row.cancellationRate || 0; }
+				});
+				if (!sorted || sorted.length === 0) {
 					renderTableBody(tbody, null, 'No student data in this period.');
+					renderPaginationBar('studentTablePagination', { page: 1, totalPages: 1, total: 0, hasPrev: false, hasNext: false }, function () {});
 					return;
 				}
-				renderTableBody(tbody, rows.map(function (row) {
+				const paged = paginateRows(sorted, studentPage, ANALYTICS_PAGE_SIZE);
+				studentPage = renderPaginationBar('studentTablePagination', paged, function (page) {
+					studentPage = page;
+					renderStudents(analyticsCache ? analyticsCache.byStudent : []);
+				});
+				renderTableBody(tbody, paged.rows.map(function (row) {
 					return '<tr><td data-label="Student">' + escapeHTML(row.studentName) +
 						'</td><td data-label="Conducted">' + row.conducted +
 						'</td><td data-label="Cancelled">' + row.cancelled +
@@ -419,9 +608,26 @@ templ Analytics(data AnalyticsData) {
 				}).join(''));
 			}
 
+			function renderAnalyticsData(data) {
+				teacherPage = 1;
+				studentPage = 1;
+				renderSummary(data.summary);
+				if (window.analyticsCharts) {
+					window.analyticsCharts.renderAll(data);
+				}
+				renderWeekly(data.weekly);
+				renderTeachers(data.byTeacher);
+				renderStudents(data.byStudent);
+				renderNoShows(data.noShows);
+				renderRetention(data.retention);
+				renderReasons(data.inactiveReasons);
+				renderChurned(data.churnedStudents);
+			}
+
 			async function loadAnalytics() {
-				const startDate = datePresetSelect.dataset.startDate;
-				const endDate = datePresetSelect.dataset.endDate;
+				const presetSelect = document.getElementById('datePreset');
+				const startDate = presetSelect && presetSelect.dataset.startDate;
+				const endDate = presetSelect && presetSelect.dataset.endDate;
 				if (!startDate || !endDate) {
 					analyticsLoading.textContent = 'Select a date range.';
 					analyticsContent.hidden = true;
@@ -431,6 +637,9 @@ templ Analytics(data AnalyticsData) {
 				analyticsLoading.hidden = false;
 				analyticsLoading.textContent = 'Loading analytics...';
 				analyticsContent.hidden = true;
+				if (window.analyticsCharts) {
+					window.analyticsCharts.destroyAll();
+				}
 
 				const params = new URLSearchParams({ startDate: startDate, endDate: endDate });
 
@@ -442,14 +651,8 @@ templ Analytics(data AnalyticsData) {
 						throw new Error('Failed to load analytics');
 					}
 					const data = await response.json();
-					renderSummary(data.summary);
-					renderWeekly(data.weekly);
-					renderTeachers(data.byTeacher);
-					renderStudents(data.byStudent);
-					renderNoShows(data.noShows);
-					renderRetention(data.retention);
-					renderReasons(data.inactiveReasons);
-					renderChurned(data.churnedStudents);
+					analyticsCache = data;
+					renderAnalyticsData(data);
 					analyticsLoading.hidden = true;
 					analyticsContent.hidden = false;
 				} catch (err) {
@@ -459,6 +662,28 @@ templ Analytics(data AnalyticsData) {
 			}
 
 			filterBtn.addEventListener('click', loadAnalytics);
+			if (sortBySelect) {
+				sortBySelect.addEventListener('change', function () {
+					if (analyticsCache) {
+						teacherPage = 1;
+						studentPage = 1;
+						renderAnalyticsData(analyticsCache);
+					}
+				});
+			}
+			const sortOrderToggle = document.getElementById('sortOrderToggle');
+			if (sortOrderToggle) {
+				sortOrderToggle.addEventListener('click', function () {
+					window.setTimeout(function () {
+						if (analyticsCache) {
+							teacherPage = 1;
+							studentPage = 1;
+							renderTeachers(analyticsCache.byTeacher);
+							renderStudents(analyticsCache.byStudent);
+						}
+					}, 0);
+				});
+			}
 			loadAnalytics();
 		</script>
 	</body>

@@ -16,13 +16,17 @@ type DashboardData struct {
 	InactiveStudents       int64
 	PendingTeachers        int64
 	PendingDocuments       int64
+	PendingIntroVideos     int64
 	MyStudentCount         int64
 	ClassesConductedWeek   int64
 	ClassesCancelledWeek   int64
 	ClassesRescheduledWeek int64
 	ScheduledToday         int64
 	MonthlyTotals          []CurrencyTotal
-	CutoffTotals           []CurrencyTotal
+	ParentMonthlyTotals           []CurrencyTotal
+	CutoffTotals                  []CurrencyTotal
+	StudentsWithoutParent         int64
+	StudentsWithoutParentRate     int64
 }
 
 templ Home(data DashboardData) {
@@ -58,24 +62,39 @@ templ Home(data DashboardData) {
 
 			<h2 class="dashboard-section-title">Quick actions</h2>
 			<div class="cards-grid">
-				for _, item := range NavItems(data.Role) {
-					if item.FeatureCard {
-						@ActionCardFeature(item.Path, item.Title, item.Description)
-					} else {
-						@ActionCard(item.Path, item.Title, item.Description)
-					}
-					if item.Path == "/profile" {
-						@ActionCard("/guides", "Guides", "Step-by-step help for using the admin tool")
-					}
-					if auth.HasAdminAccess(data.Role) && item.Path == "/schedule" {
-						@ActionCard("/announcements", "Announcements", "Create and manage system-wide banners")
+				for _, entry := range DashboardQuickActionEntries(data.Role) {
+					switch entry.Kind {
+					case NavBarEntryLink:
+						if entry.Item.FeatureCard {
+							@ActionCardFeature(entry.Item)
+						} else {
+							@ActionCard(entry.Item)
+						}
+					case NavBarEntryGroup:
+						@NavGroupActionCard(entry.Group)
 					}
 				}
-				@ActionCard("/changelogs", "Changelogs", "See what's new in the admin tool")
+				for _, item := range DashboardExtraItems(data.Role) {
+					@ActionCard(item)
+				}
 			</div>
+
+			@NavGroupChoiceModals(NavGroups(data.Role))
+			@RecordClassFlowModals(ClassWizardPageDataForContext(ctx))
 		</div>
 	</body>
 	</html>
+}
+
+templ DashboardCurrencyStatCard(label string, totals []CurrencyTotal) {
+	<div class="stat-card">
+		<span class="stat-label">{ label }</span>
+		<div class="stat-currency-rows">
+			for _, total := range totals {
+				<span class="stat-currency-row">{ utils.FormatCurrency(total.Total, total.Currency) }</span>
+			}
+		</div>
+	</div>
 }
 
 templ DashboardStats(data DashboardData) {
@@ -98,12 +117,26 @@ templ DashboardStats(data DashboardData) {
 				<span class="stat-label">Pending Documents</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.PendingDocuments) }</span>
 			</div>
+			<div class="stat-card">
+				<span class="stat-label">Pending Intro Videos</span>
+				<span class="stat-value">{ fmt.Sprintf("%d", data.PendingIntroVideos) }</span>
+			</div>
+			<div class="stat-card">
+				<span class="stat-label">Students Without Parent</span>
+				<span class="stat-value">{ fmt.Sprintf("%d", data.StudentsWithoutParent) }</span>
+			</div>
+			<div class="stat-card">
+				<span class="stat-label">Students Without Parent Rate</span>
+				<span class="stat-value">{ fmt.Sprintf("%d", data.StudentsWithoutParentRate) }</span>
+			</div>
 		}
 		if data.Role == auth.RoleTeacher {
 			<a href={ utils.URL("/my-students") } class="stat-card stat-card-link">
 				<span class="stat-label">My Students</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.MyStudentCount) }</span>
 			</a>
+		}
+		if data.Role == auth.RoleTeacher || data.Role == auth.RoleTester {
 			<div class="stat-card stat-card-accent">
 				<span class="stat-label">Scheduled Today</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.ScheduledToday) }</span>
@@ -111,20 +144,18 @@ templ DashboardStats(data DashboardData) {
 			for _, ct := range data.CutoffTotals {
 				<div class="stat-card stat-card-accent">
 					<span class="stat-label">Earnings This Cutoff ({ ct.Currency })</span>
-					<span class="stat-value">{ fmt.Sprintf("%.2f", ct.Total) }</span>
+					<span class="stat-value">{ utils.FormatCurrencyAmountFixed(ct.Total, ct.Currency) }</span>
 				</div>
 			}
 		}
 		<div class="stat-card">
 			<span class="stat-label">Classes This Week</span>
-			<span class="stat-value">{ fmt.Sprintf("%d conducted", data.ClassesConductedWeek) }</span>
-			<span class="stat-sub">{ fmt.Sprintf("%d cancelled, %d rescheduled", data.ClassesCancelledWeek, data.ClassesRescheduledWeek) }</span>
+			<span class="stat-value">{ fmt.Sprintf("%d total", data.ClassesConductedWeek + data.ClassesCancelledWeek + data.ClassesRescheduledWeek) }</span>
+			<span class="stat-sub">{ fmt.Sprintf("%d conducted, %d cancelled, %d rescheduled", data.ClassesConductedWeek, data.ClassesCancelledWeek, data.ClassesRescheduledWeek) }</span>
 		</div>
-		for _, mt := range data.MonthlyTotals {
-			<div class="stat-card">
-				<span class="stat-label">Month ({ mt.Currency })</span>
-				<span class="stat-value">{ fmt.Sprintf("%.2f", mt.Total) }</span>
-			</div>
+		@DashboardCurrencyStatCard("Month", data.MonthlyTotals)
+		if auth.HasAdminAccess(data.Role) {
+			@DashboardCurrencyStatCard("Parent Rates Month", data.ParentMonthlyTotals)
 		}
 	</div>
 }

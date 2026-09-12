@@ -1,0 +1,132 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/utils"
+)
+
+type ScheduledClassSeriesItem struct {
+	Item           ScheduledClassItemData
+	Dates          []string
+	ScheduledCount int64
+}
+
+type ScheduleSeriesData struct {
+	Series            []ScheduledClassSeriesItem
+	ShowSeriesTeacher bool
+}
+
+templ ScheduleSeries(data ScheduleSeriesData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Repeating Scheduled Classes - Zion English Admin</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@AvatarStyles()
+	</head>
+	<body>
+		<div class="container schedule-series-page">
+			@HeaderSimple()
+			@SuccessBanner()
+			@ErrorBanner()
+			@HubHeader("Repeating Scheduled Classes", "Schedule repeating classes", utils.URL("/schedule/repeat"), true)
+
+			if len(data.Series) == 0 {
+				<div class="empty-state">
+					<p>No active repeating class series yet.</p>
+					<p><a href={ utils.URL("/schedule/repeat") }>Schedule repeating classes</a></p>
+				</div>
+			} else {
+				<div class="table-wrapper">
+					<table class="table-stack-mobile">
+						<thead>
+							<tr>
+								<th>Student</th>
+								if data.ShowSeriesTeacher {
+									<th>Teacher</th>
+								}
+								<th>Time</th>
+								<th>Rate</th>
+								<th>Dates</th>
+								<th>Series</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							for _, series := range data.Series {
+								@ScheduledClassSeriesTableRow(series, data.ShowSeriesTeacher)
+							}
+						</tbody>
+					</table>
+				</div>
+			}
+		</div>
+
+		@DeleteClassModal()
+		@ScheduledClassModals()
+		@ClassViewModalScripts()
+		<div id="classViewModalHost"></div>
+		@ScheduleSeriesScripts()
+	</body>
+	</html>
+}
+
+templ ScheduledClassSeriesTableRow(series ScheduledClassSeriesItem, showTeacher bool) {
+	<tr>
+		<td data-label="Student">{ series.Item.StudentName }</td>
+		if showTeacher {
+			<td data-label="Teacher">
+				@TeacherNameCell(series.Item.TeacherName, series.Item.TeacherAvatar)
+			</td>
+		}
+		<td data-label="Time">
+			@TimeRangePill(series.Item.TimeRange)
+		</td>
+		<td class="rate-cell" data-label="Rate">
+			@RatePill(series.Item.Rate, series.Item.Currency)
+		</td>
+		<td data-label="Dates">{ FormatScheduledClassSeriesDates(series.Dates) }</td>
+		<td data-label="Series">
+			@Pill(formatSeriesCountLabel(series.ScheduledCount), PillToneInfo)
+		</td>
+		<td data-label="Actions">
+			<div class="table-actions">
+				@ScheduledClassSeriesActions(series.Item)
+			</div>
+		</td>
+	</tr>
+}
+
+templ ScheduledClassSeriesActions(item ScheduledClassItemData) {
+	@IconActionTrigger("Edit", IconKindEdit, mergeTemplAttrs(scheduledClassDetailAttrs(item), templ.Attributes{
+		"data-edit-url":    ScheduledClassEditModalURL(item.ID),
+		"data-action-from": string(ClassActionContextScheduleSeries),
+	}))
+	@IconActionTrigger("Delete", IconKindDelete, mergeTemplAttrs(scheduledClassDetailAttrs(item), templ.Attributes{
+		"data-delete-url":  ScheduledClassDeleteURL(item.ID),
+		"data-delete-from": string(ClassActionContextScheduleSeries),
+	}))
+}
+
+func formatSeriesCountLabel(count int64) string {
+	if count == 1 {
+		return "1 scheduled"
+	}
+	return fmt.Sprintf("%d scheduled", count)
+}
+
+templ ScheduleSeriesScripts() {
+	<script>
+		(function () {
+			if (window._scheduleSeriesPageBound) return;
+			window._scheduleSeriesPageBound = true;
+
+			document.body.addEventListener('scheduleSeriesRefresh', function () {
+				window.location.reload();
+			});
+		})();
+	</script>
+}

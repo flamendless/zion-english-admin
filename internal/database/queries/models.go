@@ -6,6 +6,7 @@ package queries
 
 import (
 	"database/sql"
+	"time"
 )
 
 type TblAccess struct {
@@ -39,6 +40,17 @@ type TblAnnouncementsTeachersM2m struct {
 	CreatedAt      string
 }
 
+type TblClassCalendarEvent struct {
+	ID        int64
+	ClassID   int64
+	Service   string
+	EventID   string
+	EventUrl  string
+	CreatedAt string
+	UpdatedAt string
+	DeletedAt interface{}
+}
+
 type TblClassMeetingRoom struct {
 	ID           int64
 	ClassID      int64
@@ -68,18 +80,35 @@ type TblClassRecord struct {
 	StartTime       sql.NullString
 	EndTime         sql.NullString
 	DeletedAt       sql.NullString
+	IsTrialClass    int64
+}
+
+type TblClassRecordLearningMaterial struct {
+	ClassRecordID int64
+	MaterialID    int64
+	CreatedAt     time.Time
+}
+
+type TblFeatureFlag struct {
+	Key          string
+	Enabled      int64
+	UpdatedAt    string
+	VisibleRoles string
+	ValueText    string
 }
 
 type TblLearningMaterial struct {
-	ID          int64
-	OwnerID     int64
-	Description string
-	Url         string
-	Access      string
-	Status      string
-	CreatedAt   string
-	UpdatedAt   string
-	DeletedAt   sql.NullString
+	ID           int64
+	OwnerID      int64
+	Description  string
+	Url          string
+	Access       string
+	Status       string
+	CreatedAt    string
+	UpdatedAt    string
+	DeletedAt    sql.NullString
+	Title        string
+	ThumbnailUrl string
 }
 
 type TblLearningMaterialTag struct {
@@ -181,6 +210,20 @@ type TblScheduledClass struct {
 	CreatedAt       string
 	UpdatedAt       string
 	DeletedAt       sql.NullString
+	IsTrialClass    int64
+	SeriesID        sql.NullInt64
+}
+
+type TblScheduledClassLearningMaterial struct {
+	ScheduledClassID int64
+	MaterialID       int64
+	CreatedAt        time.Time
+}
+
+type TblScheduledClassSeries struct {
+	ID            int64
+	CreatedByRole string
+	CreatedAt     string
 }
 
 type TblStudent struct {
@@ -190,11 +233,14 @@ type TblStudent struct {
 	Contact        sql.NullString
 	RatePerClass   float64
 	ParentName     sql.NullString
+	ParentRate     sql.NullFloat64
+	ParentCurrency sql.NullString
 	AssignedColor  string
 	Status         string
 	CreatedAt      sql.NullTime
 	UpdatedAt      sql.NullTime
 	InactiveReason sql.NullString
+	DeletedReason  sql.NullString
 }
 
 type TblStudentRelationship struct {
@@ -246,6 +292,21 @@ type TblTeacherDocument struct {
 	ReviewedBy       sql.NullInt64
 }
 
+type TblTeacherIntroVideo struct {
+	ID               int64
+	TeacherID        int64
+	OriginalFilename string
+	StoredFilename   string
+	MimeType         string
+	FileSize         int64
+	Status           string
+	CreatedAt        sql.NullTime
+	ReviewedAt       sql.NullTime
+	ReviewedBy       sql.NullInt64
+	DeletedAt        sql.NullTime
+	RejectReason     sql.NullString
+}
+
 type TblTeacherMeetingAccount struct {
 	ID             int64
 	TeacherID      int64
@@ -256,6 +317,7 @@ type TblTeacherMeetingAccount struct {
 	TokenExpiresAt interface{}
 	ConnectedAt    string
 	UpdatedAt      string
+	ResourceID     string
 }
 
 type TblTeacherRole struct {

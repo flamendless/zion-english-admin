@@ -14,19 +14,29 @@ import (
 )
 
 type EditScheduleData struct {
-	ScheduleID  string
-	LockTeacher bool
-	IsSuperuser bool
-	TeacherID   string
-	TeacherName string
-	StudentID   string
-	Date        string
-	StartTime   string
-	EndTime     string
-	Rate        float64
-	Currency    string
-	TodayPHT    string
-	From        string
+	ScheduleID        string
+	LockTeacher       bool
+	IsSuperuser       bool
+	TeacherID         string
+	TeacherName       string
+	StudentID         string
+	Date              string
+	StartTime         string
+	EndTime           string
+	Rate              float64
+	Currency          string
+	IsTrialClass      bool
+	TodayPHT          string
+	From              string
+	LearningMaterials []ClassLearningMaterialLink
+	SeriesID          int64
+	SeriesTotalCount  int64
+	SeriesFutureCount int64
+	SeriesDates       []string
+}
+
+func EditScheduleUsesSeriesReview(data EditScheduleData) bool {
+	return data.SeriesID > 0 && len(data.SeriesDates) >= 1
 }
 
 func EditSchedule(data EditScheduleData) templ.Component {
@@ -57,7 +67,7 @@ func EditSchedule(data EditScheduleData) templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_schedule.templ`, Line: 31, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_schedule.templ`, Line: 41, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -94,7 +104,7 @@ func EditSchedule(data EditScheduleData) templ.Component {
 		var templ_7745c5c3_Var3 templ.SafeURL
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/schedule"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_schedule.templ`, Line: 41, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_schedule.templ`, Line: 51, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -107,7 +117,7 @@ func EditSchedule(data EditScheduleData) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/schedule/" + data.ScheduleID + "/edit"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_schedule.templ`, Line: 44, Col: 65}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_schedule.templ`, Line: 54, Col: 65}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 		if templ_7745c5c3_Err != nil {
@@ -120,7 +130,7 @@ func EditSchedule(data EditScheduleData) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_schedule.templ`, Line: 51, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_schedule.templ`, Line: 61, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 		if templ_7745c5c3_Err != nil {
@@ -133,7 +143,7 @@ func EditSchedule(data EditScheduleData) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Date)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_schedule.templ`, Line: 55, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_schedule.templ`, Line: 65, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 		if templ_7745c5c3_Err != nil {
@@ -146,7 +156,7 @@ func EditSchedule(data EditScheduleData) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(formatScheduleTimeRange(data.StartTime, data.EndTime))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_schedule.templ`, Line: 59, Col: 86}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_schedule.templ`, Line: 69, Col: 86}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 		if templ_7745c5c3_Err != nil {
@@ -182,13 +192,29 @@ func EditSchedule(data EditScheduleData) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(formatFloat(data.Rate))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_schedule.templ`, Line: 73, Col: 108}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_schedule.templ`, Line: 83, Col: 108}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\"></div></div><button type=\"submit\" class=\"btn\">Save Changes</button></form><div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div></div><script>\r\n\t\t\tconst studentSelect = document.getElementById('student') || document.getElementById('schedule_student');\r\n\t\t\tif (studentSelect) {\r\n\t\t\t\tstudentSelect.addEventListener('change', () => {\r\n\t\t\t\t\tconst opt = studentSelect.options[studentSelect.selectedIndex];\r\n\t\t\t\t\tif (!opt || !opt.value) return;\r\n\t\t\t\t\tconst rate = opt.getAttribute('data-rate');\r\n\t\t\t\t\tconst currency = opt.getAttribute('data-currency');\r\n\t\t\t\t\tconst rateEl = document.getElementById('rate');\r\n\t\t\t\t\tconst currencyEl = document.getElementById('currency');\r\n\t\t\t\t\tif (rate && rateEl) rateEl.value = rate;\r\n\t\t\t\t\tif (currency && currencyEl) currencyEl.value = currency;\r\n\t\t\t\t});\r\n\t\t\t}\r\n\t\t</script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\"></div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = TrialClassCheckbox(data.IsTrialClass, false).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<button type=\"submit\" class=\"btn\">Save Changes</button></form><div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div></div><script>\r\n\t\t\tconst studentSelect = document.getElementById('student') || document.getElementById('schedule_student');\r\n\t\t\tif (studentSelect) {\r\n\t\t\t\tstudentSelect.addEventListener('change', () => {\r\n\t\t\t\t\tapplyStudentRateToForm();\r\n\t\t\t\t});\r\n\t\t\t}\r\n\t\t</script>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ScrTrialClassJS().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -1,13 +1,18 @@
 package frontend
 
-import "fmt"
-import "zion-english/internal/utils"
+import (
+	"zion-english/internal/constants"
+	"zion-english/internal/utils"
+)
 
 type StudentData struct {
 	Students       []StudentItem
 	Query          string
-	Status         string
+	Status         constants.StudentStatus
 	TeacherID      string
+	TeacherName    string
+	SortBy         string
+	SortOrder      string
 	PageNumber     int
 	PageTotalPages int
 	PageTotal      int64
@@ -25,19 +30,26 @@ type StudentItem struct {
 	Contact          string
 	RatePerClass     float64
 	ParentName       string
+	ParentRate       float64
+	ParentCurrency   string
+	HasParentRate    bool
 	AssignedColor    string
-	Status           string
+	Status           constants.StudentStatus
 	TeacherDisplay   string
 	RelatedToDisplay string
 	CreatedAt        string
 	UpdatedAt        string
 }
 
-func getStudentRowClass(status string) string {
-	if status == "inactive" {
+func getStudentRowClass(status constants.StudentStatus) string {
+	switch status {
+	case constants.StudentStatusInactive:
 		return "student-inactive"
+	case constants.StudentStatusDeleted:
+		return "student-deleted"
+	default:
+		return ""
 	}
-	return ""
 }
 
 templ Students(data StudentData) {
@@ -51,6 +63,10 @@ templ Students(data StudentData) {
 		@GlobalIncludes()
 		@StudentViewModalScripts()
 		<style>
+			.student-deleted td {
+				color: var(--color-muted-foreground);
+			}
+
 			.rate-value {
 				display: inline-flex;
 				align-items: baseline;
@@ -76,7 +92,7 @@ templ Students(data StudentData) {
 			@HeaderSimple()
 			@HubHeader("Students", "New Student", utils.URL("/students/register"), true)
 
-			@ListFilterForm(data.FilterPath, data.Query, data.Status, "student", data.TeacherID, "", "", "", "", true, false, false, false, true)
+			@ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindStudent, data.TeacherID, data.TeacherName, "", "", "", "", true, false, false, false, true, "", false, false, false, false, data.SortBy, data.SortOrder, ListSortKindStudent, false)
 
 			if len(data.Students) > 0 {
 				<div class="table-wrapper">
@@ -85,9 +101,10 @@ templ Students(data StudentData) {
 							<tr>
 								<th>Name</th>
 								<th>Parent</th>
-								<th>Teacher</th>
+								@AdminOnlyTableHeader("Teacher")
 								<th>Rate Per Class</th>
-								<th>Related To</th>
+								@AdminOnlyTableHeader("Parent Rate")
+								@AdminOnlyTableHeader("Related To")
 								<th>Status</th>
 								<th>Actions</th>
 							</tr>
@@ -100,9 +117,12 @@ templ Students(data StudentData) {
 									<td data-label="Teacher">{ getDisplayValue(student.TeacherDisplay) }</td>
 									<td class="rate-cell" data-label="Rate">
 										<span class="rate-value">
-											<span class="rate-amount">{ fmt.Sprintf("%.2f", student.RatePerClass) }</span>
+											<span class="rate-amount">{ utils.FormatCurrencyAmountFixed(student.RatePerClass, student.Currency) }</span>
 											<span class="rate-currency">{ student.Currency }</span>
 										</span>
+									</td>
+									<td class="rate-cell" data-label="Parent Rate">
+										{ formatOptionalParentRate(student.ParentRate, student.ParentCurrency, student.HasParentRate) }
 									</td>
 									<td data-label="Related To">{ getDisplayValue(student.RelatedToDisplay) }</td>
 									<td data-label="Status">
@@ -115,7 +135,13 @@ templ Students(data StudentData) {
 												"hx-target": "#studentViewModalHost",
 												"hx-swap":   "innerHTML",
 											})
-											@IconActionLink(utils.URL("/students/" + student.ID + "/edit"), "Edit", IconKindEdit)
+											if student.Status != constants.StudentStatusDeleted {
+												@IconActionLink(utils.URL("/students/" + student.ID + "/edit"), "Edit", IconKindEdit)
+												@IconActionTrigger("Delete", IconKindDelete, templ.Attributes{
+													"data-student-delete-url": StudentDeleteURL(student.ID),
+													"data-student-name":       student.Name,
+												})
+											}
 										</div>
 									</td>
 								</tr>
@@ -130,6 +156,7 @@ templ Students(data StudentData) {
 				</div>
 			}
 			<div id="studentViewModalHost"></div>
+			@DeleteStudentModal()
 		</div>
 	</body>
 	</html>

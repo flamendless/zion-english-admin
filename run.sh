@@ -2,7 +2,7 @@
 
 # @Brandon Blanker Lim-it
 
-set -eufx -o pipefail
+set -euf -o pipefail
 
 TMP="./tmp"
 
@@ -30,12 +30,11 @@ serve() {
 	load_env
 	gensql
 	gentempl
-	local -; set -x;
 
 	if "${ISWSL}"; then
-		cmd.exe /c "start ${BROWSER} http://localhost:${PORT}/zion-english-admin"
+		cmd.exe /c "start ${BROWSER} http://localhost:${PORT}/zion-english-admin/dashboard"
 	elif "${ISMAC}"; then
-		open -a ${BROWSER} "http://localhost:${PORT}/zion-english-admin"
+		open -a ${BROWSER} "http://localhost:${PORT}/zion-english-admin/dashboard"
 	fi
 
 	go run . web
@@ -67,7 +66,7 @@ prod() {
 }
 
 gentempl() {
-	go tool templ generate templ -v
+	go tool templ generate templ
 }
 
 gensql() {

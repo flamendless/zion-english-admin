@@ -1,9 +1,10 @@
 package frontend
 
+import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 type GuideEntry struct {
-	Slug        string
+	Slug        constants.GuideSlug
 	Title       string
 	Description string
 	Access      string
@@ -51,7 +52,7 @@ templ Guides(data GuidesData) {
 
 templ GuideCard(guide GuideEntry) {
 	<a
-		href={ utils.URL("/guides/" + guide.Slug) }
+		href={ utils.URL("/guides/" + string(guide.Slug)) }
 		class={ "guide-card guide-card--" + guide.Access }
 		role="listitem"
 	>
@@ -66,7 +67,14 @@ templ GuideCard(guide GuideEntry) {
 			@GuideBookIcon()
 		</span>
 		<span class="guide-card-body">
-			<span class="guide-card-title">{ guide.Title }</span>
+			if guide.Access == "superuser" {
+				<span class="guide-card-title admin-only-label-wrap">
+					{ guide.Title }
+					@AdminOnlyIndicator()
+				</span>
+			} else {
+				<span class="guide-card-title">{ guide.Title }</span>
+			}
 			<span class="guide-card-desc">{ guide.Description }</span>
 		</span>
 		<span class="guide-card-arrow" aria-hidden="true">
@@ -114,11 +122,12 @@ templ GuideGettingStarted() {
 					[]string{
 						"Open My Profile from the dashboard or navigation.",
 						"Scroll to the Name section.",
-						"Enter your first, middle (optional), and last name correctly — each field can only be set once.",
+						"Enter your first, middle (optional), and last name correctly. Each field can only be set once.",
 						"Click Update name.",
 						"Scroll to the Mobile number section, enter your new number, and click Update mobile number. Changes are limited to once every 7 days.",
 						"Scroll to the Password section, enter your current password and a new strong password, then click Update password. Password changes are also limited to once every 7 days.",
 					},
+					false,
 				)
 				@GuideSection(
 					"student-registration",
@@ -130,9 +139,10 @@ templ GuideGettingStarted() {
 						"Enter the student name using the exact casing as in your Google Sheet (e.g. Kim Min-Ji, not kim min-ji). This is critical for matching records during processing.",
 						"Select currency and status (active or inactive).",
 						"Enter the rate per class and click Register Student.",
-						"You are automatically assigned as the student's teacher — no teacher picker is shown.",
+						"You are automatically assigned as the student's teacher, so no teacher picker is shown.",
 						"Confirm the new student appears in My Students before scheduling or recording classes.",
 					},
+					false,
 				)
 				@GuideSection(
 					"class-schedule",
@@ -146,6 +156,7 @@ templ GuideGettingStarted() {
 						"Today's Classes lists everything scheduled for today. Use Conduct to record a class as completed, Edit to change the student or date/time, Cancel to mark it cancelled, or Delete to remove a scheduled class (reason required).",
 						"Conduct opens a short modal where you can add optional notes. Cancel asks for a reason and optional notes.",
 					},
+					false,
 				)
 				@GuideSection(
 					"my-classes",
@@ -161,6 +172,7 @@ templ GuideGettingStarted() {
 						"Use Delete on a class row to remove it from your lists. A reason is required; the record is kept for audit.",
 						"During the beta phase, continue recording classes in your Google Sheet as well for auditing.",
 					},
+					false,
 				)
 				@GuideSection(
 					"editing-classes",
@@ -173,6 +185,7 @@ templ GuideGettingStarted() {
 						"For recorded classes, click Edit on the row to update date, times, status, reason, notes, or other fields.",
 						"Click Save changes. A success message confirms the update.",
 					},
+					false,
 				)
 			</div>
 
@@ -209,7 +222,12 @@ templ GuideReportsGeneration() {
 				<span class="guides-breadcrumb-current" aria-current="page">Reports &amp; Generation</span>
 			</nav>
 
-			@HubHeader("Reports &amp; Generation", "", "", false)
+			<div class="hub-header">
+				<h2 class="hub-title admin-only-label-wrap">
+					Reports &amp; Generation
+					@AdminOnlyIndicator()
+				</h2>
+			</div>
 
 			<div class="guides-hero">
 				<p class="guides-subtitle">
@@ -228,6 +246,7 @@ templ GuideReportsGeneration() {
 						"The table lists each teacher with conducted/total classes and earnings broken down by currency.",
 						"Use the actions on each row to view details, generate an XLSX file, or download a report that is already ready.",
 					},
+					false,
 				)
 				@GuideSection(
 					"date-range-and-search",
@@ -239,6 +258,7 @@ templ GuideReportsGeneration() {
 						"Optionally type in the search box to narrow results by teacher or student name.",
 						"Click Filter to refresh the table with the selected range and search term.",
 					},
+					false,
 				)
 				@GuideSection(
 					"view-report",
@@ -251,6 +271,7 @@ templ GuideReportsGeneration() {
 						"Scroll through the class list to verify dates, students, rates, times, and statuses.",
 						"Close the modal with the X button, Escape, or by clicking outside the dialog.",
 					},
+					false,
 				)
 				@GuideSection(
 					"generate-and-download",
@@ -264,6 +285,7 @@ templ GuideReportsGeneration() {
 						"Click Regenerate after teachers update class records if you need a fresh XLSX.",
 						"The downloaded file uses the same format as the Process pipeline output.",
 					},
+					false,
 				)
 			</div>
 
@@ -344,6 +366,7 @@ templ GuideConnectZoomSections() {
 			"After connecting, classes up to 40 minutes receive a Zoom meeting link automatically when you schedule them.",
 			"Scheduling classes up to 40 minutes requires a connected Zoom account.",
 		},
+		false,
 	)
 	@GuideSection(
 		"before-you-start",
@@ -354,6 +377,7 @@ templ GuideConnectZoomSections() {
 			"Use your own Zoom account (Basic is fine).",
 			"Sign in with the same email you use for Zoom.",
 		},
+		false,
 	)
 	@GuideSection(
 		"connect-your-account",
@@ -366,6 +390,7 @@ templ GuideConnectZoomSections() {
 			"Sign in to Zoom if prompted and approve access.",
 			"Return to the profile page and confirm the Zoom badge shows Connected.",
 		},
+		false,
 	)
 	@GuideSection(
 		"schedule-with-zoom",
@@ -377,6 +402,7 @@ templ GuideConnectZoomSections() {
 			"For classes up to 40 minutes, a Zoom button appears on the class card after scheduling.",
 			"Click the Zoom button to open meeting details, then use Open to launch Zoom or Copy to share the link and passcode with your student.",
 		},
+		false,
 	)
 	@GuideSection(
 		"forty-minute-limit",
@@ -388,6 +414,7 @@ templ GuideConnectZoomSections() {
 			"No automatic Zoom room is created for those classes.",
 			"Create your Zoom meeting manually in Zoom and share the link with your student.",
 		},
+		false,
 	)
 	@GuideSection(
 		"disconnect-reconnect",
@@ -399,6 +426,7 @@ templ GuideConnectZoomSections() {
 			"Scheduling classes up to 40 minutes is blocked until you reconnect.",
 			"Reconnect if you switch Zoom accounts.",
 		},
+		false,
 	)
 	@GuideSection(
 		"troubleshooting",
@@ -408,9 +436,10 @@ templ GuideConnectZoomSections() {
 		[]string{
 			"If Connect Zoom is missing, ask your administrator to configure Zoom for the system.",
 			"If scheduling fails, confirm Zoom shows Connected on your profile.",
-			"If connection fails for your Zoom account but works for the administrator, the Zoom app may still be in development-only mode — your administrator must use Production credentials and request Beta Test sharing or publish the app.",
+			"If connection fails for your Zoom account but works for the administrator, the Zoom app may still be in development-only mode. Your administrator must use Production credentials and request Beta Test sharing or publish the app.",
 			"If Zoom is down, try again later or schedule a class longer than 40 minutes without an automatic room.",
 		},
+		false,
 	)
 	@GuideSection(
 		"admin-zoom-setup",
@@ -424,10 +453,343 @@ templ GuideConnectZoomSections() {
 			"Set Documentation URL to this page, e.g. https://your-domain/zion-english-admin/docs/connect-zoom.",
 			"Enable only these scopes: user:read:user, meeting:write:meeting, meeting:update:meeting, meeting:delete:meeting.",
 			"Copy Production Client ID and Secret into server ZOOM_CLIENT_ID and ZOOM_CLIENT_SECRET; set ZOOM_REDIRECT_URI to the same callback URL.",
-			"Copy the authorization URL from Marketplace (Local Test or Beta Test) into server ZOOM_AUTHORIZE_URL — Connect Zoom uses this URL.",
+			"Copy the authorization URL from Marketplace (Local Test or Beta Test) into server ZOOM_AUTHORIZE_URL. Connect Zoom uses this URL.",
 			"Under Beta Test, complete requirements and submit Request to Share so external Zoom accounts can authorize (or publish the app for full production).",
 		},
+		true,
 	)
+}
+
+templ GuideConnectGoogleCalendar() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Connect Google Calendar - Guides - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@GuideStyles()
+	</head>
+	<body>
+		<div class="container guides-page">
+			@HeaderSimple()
+
+			<nav class="guides-breadcrumb" aria-label="Breadcrumb">
+				<a href={ utils.URL("/guides") } class="guides-breadcrumb-link">Guides</a>
+				<span class="guides-breadcrumb-sep" aria-hidden="true">/</span>
+				<span class="guides-breadcrumb-current" aria-current="page">Connect Google Calendar</span>
+			</nav>
+
+			@HubHeader("Connect Google Calendar", "", "", false)
+
+			<div class="guides-hero">
+				<p class="guides-subtitle">
+					Link Google Calendar once so scheduled classes are added automatically to your dedicated Zion English calendar.
+				</p>
+			</div>
+
+			<div class="guide-content">
+				@GuideConnectGoogleCalendarSections()
+			</div>
+
+			<div class="guides-footer-nav">
+				<a href={ utils.URL("/guides") } class="guides-back-link">
+					@GuideBackIcon()
+					All guides
+				</a>
+			</div>
+		</div>
+		@GuideAnchorScript()
+	</body>
+	</html>
+}
+
+templ DocsConnectGoogleCalendar() {
+	@LegalDocPage(
+		"Connect Google Calendar",
+		"Link Google Calendar once so scheduled classes are added automatically to your dedicated Zion English calendar.",
+	) {
+		@GuideConnectGoogleCalendarSections()
+	}
+}
+
+templ GuideConnectGoogleCalendarSections() {
+	@GuideSection(
+		"why-connect-google-calendar",
+		"Why connect Google Calendar?",
+		utils.URL("/profile"),
+		"One-time setup that adds scheduled classes to your Google Calendar automatically.",
+		[]string{
+			"Connect your Google account from My Profile.",
+			"The admin tool creates a dedicated Zion English calendar in your Google account on first connect.",
+			"When you schedule a class with a start time, a calendar event is created or updated automatically.",
+		},
+		false,
+	)
+	@GuideSection(
+		"before-you-start-google-calendar",
+		"Before you start",
+		utils.URL("/profile"),
+		"You need a Google account you can sign into.",
+		[]string{
+			"Use the Google account where you want class events to appear.",
+			"Sign in with the same email you use for Google Calendar.",
+		},
+		false,
+	)
+	@GuideSection(
+		"connect-google-calendar-account",
+		"Connect your account",
+		utils.URL("/profile"),
+		"Authorize the admin tool from your profile page.",
+		[]string{
+			"Open My Profile from the dashboard or navigation.",
+			"Scroll to Integrations and click Connect next to Google Calendar.",
+			"Sign in to Google if prompted and approve access.",
+			"Return to the profile page and confirm the Google Calendar badge shows Connected.",
+			"Open Google Calendar and confirm a Zion English calendar was created.",
+		},
+		false,
+	)
+	@GuideSection(
+		"schedule-with-google-calendar",
+		"Schedule a class with Google Calendar",
+		utils.URL("/schedule"),
+		"Calendar events appear on class cards after scheduling.",
+		[]string{
+			"Open Class Schedule and add a class with a start time.",
+			"A calendar icon appears on the class card after scheduling when sync succeeds.",
+			"Click the calendar icon to open the event in Google Calendar.",
+		},
+		false,
+	)
+	@GuideSection(
+		"disconnect-reconnect-google-calendar",
+		"Disconnect or reconnect",
+		utils.URL("/profile"),
+		"Manage your Google Calendar connection from My Profile.",
+		[]string{
+			"Click Disconnect Google Calendar in Integrations if you need to remove access.",
+			"Existing calendar events are not removed automatically when you disconnect.",
+			"Reconnect if you switch Google accounts.",
+		},
+		false,
+	)
+	@GuideSection(
+		"troubleshooting-google-calendar",
+		"Troubleshooting",
+		utils.URL("/profile"),
+		"Common issues when connecting or scheduling with Google Calendar.",
+		[]string{
+			"If Connect Google Calendar is missing, ask your administrator to configure Google Calendar for the system.",
+			"If connection fails, confirm Google Calendar shows Connected on your profile.",
+			"If your Google account is not on the OAuth test user list, ask your administrator to add your email in Google Cloud Console while the app is in Testing mode.",
+			"If sync fails for a class, confirm the class has a start time set.",
+		},
+		false,
+	)
+	@GuideSection(
+		"admin-google-calendar-setup",
+		"Administrator: Google Cloud Console setup",
+		utils.URL("/profile"),
+		"Required so teachers on their own Google accounts can connect.",
+		[]string{
+			"In Google Cloud Console, create a project or select an existing one.",
+			"Enable the Google Calendar API under APIs and Services, Library.",
+			"Configure the OAuth consent screen: External user type (unless all teachers are in your Google Workspace), app name Zion English Admin, support email, and authorized domains for production.",
+			"Add scopes https://www.googleapis.com/auth/calendar and https://www.googleapis.com/auth/userinfo.email.",
+			"Set Privacy Policy, Terms, Support URL (/support), and Documentation URL (/docs/connect-google-calendar).",
+			"Create an OAuth client ID (Web application). Add authorized JavaScript origins and redirect URIs for local and production, e.g. https://your-domain/zion-english-admin/profile/google-calendar/callback.",
+			"Copy Client ID and Client Secret into server GOOGLE_CALENDAR_CLIENT_ID and GOOGLE_CALENDAR_CLIENT_SECRET.",
+			"Set GOOGLE_CALENDAR_REDIRECT_URI to the exact production callback URL registered in Google Cloud Console: https scheme, no trailing slash, same host and path the browser uses after Google redirects (check server logs if unsure).",
+			"While Testing: add teacher Google emails as test users (up to 100). For production use beyond test users, submit the app for Google verification.",
+			"Deploy updated environment variables and restart the server. Verify by connecting from Profile and scheduling a class with a start time.",
+		},
+		true,
+	)
+}
+
+templ GuideFAQ() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>FAQ - Guides - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@GuideStyles()
+	</head>
+	<body>
+		<div class="container guides-page">
+			@HeaderSimple()
+
+			<nav class="guides-breadcrumb" aria-label="Breadcrumb">
+				<a href={ utils.URL("/guides") } class="guides-breadcrumb-link">Guides</a>
+				<span class="guides-breadcrumb-sep" aria-hidden="true">/</span>
+				<span class="guides-breadcrumb-current" aria-current="page">FAQ</span>
+			</nav>
+
+			@HubHeader("FAQ", "", "", false)
+
+			<div class="guides-hero">
+				<p class="guides-subtitle">
+					Quick answers to common questions about scheduling, recording classes, student absences, and earnings.
+				</p>
+			</div>
+
+			<div class="guide-content">
+				@GuideFAQSections()
+			</div>
+
+			<div class="guides-footer-nav">
+				<a href={ utils.URL("/guides") } class="guides-back-link">
+					@GuideBackIcon()
+					All guides
+				</a>
+			</div>
+		</div>
+		@GuideAnchorScript()
+	</body>
+	</html>
+}
+
+templ DocsGuides() {
+	@LegalDocPage(
+		"FAQ",
+		"Quick answers to common questions about scheduling, recording classes, student absences, and earnings in the Zion English Admin Portal.",
+	) {
+		@GuideFAQSections()
+	}
+}
+
+templ GuideFAQSections() {
+	@GuideFAQItem(
+		"scheduled-class-vs-class",
+		"What is the difference between a scheduled class and a class?",
+		"A scheduled class is a lesson you plan ahead on Class Schedule. A class (recorded class) is an entry in My Classes with a final status: conducted, cancelled, or rescheduled.",
+		[]string{
+			"Use Class Schedule to plan upcoming lessons, see today's schedule, and optionally get Zoom or Google Calendar links.",
+			"Use Conduct on a scheduled class when the lesson happened as planned. This creates a conducted class record in My Classes.",
+			"Use Cancel or Reschedule on a scheduled class when the lesson did not happen as planned.",
+			"You can also skip scheduling and use Record Class in My Classes to log a class directly.",
+		},
+	)
+	@GuideFAQItem(
+		"student-absent-or-sick",
+		"What if my student is absent or sick?",
+		"Mark the session as cancelled or rescheduled so your records stay accurate. Only conducted classes count toward earnings.",
+		[]string{
+			"From Class Schedule (today's class): click Cancel, enter a reason such as student absent or student sick, and submit.",
+			"If you will hold the lesson on another day instead, use Reschedule or schedule a new class for the new date.",
+			"From My Classes: click Record Class, set status to cancelled or rescheduled, and enter the reason.",
+			"If you already conducted the class but the student was a no-show, cancel the scheduled entry or record the class as cancelled with an appropriate reason.",
+		},
+	)
+	@GuideFAQItem(
+		"total-earnings",
+		"Where can I see my total earnings?",
+		"Your dashboard shows earnings summaries. My Classes lists each class with its rate.",
+		[]string{
+			"Open the dashboard after signing in. Under Overview, Earnings This Cutoff shows your conducted-class totals for the current payroll period, broken down by currency.",
+			"Month ({currency}) cards on the dashboard show conducted-class totals for the current calendar month.",
+			"Open My Classes and filter by date range to review individual class rates and statuses.",
+			"Only classes with status conducted are included in earnings totals.",
+		},
+	)
+	@GuideFAQItem(
+		"what-counts-toward-earnings",
+		"What counts toward my earnings?",
+		"Only conducted classes are included in earnings. Cancelled and rescheduled classes are tracked for reporting but do not add to your totals.",
+		[]string{
+			"When you Conduct a scheduled class, it is recorded as conducted at the rate shown.",
+			"When recording a class manually, choose conducted only if the lesson took place.",
+			"Check the dashboard or My Classes filters if a total looks lower than expected.",
+		},
+	)
+	@GuideFAQItem(
+		"forgot-to-schedule",
+		"What if I forgot to schedule a class?",
+		"You can record a past or same-day class without scheduling it first.",
+		[]string{
+			"Open My Classes and click Record Class.",
+			"Select the student, date, start and end times, rate, and status.",
+			"Click Record Class to save. The entry appears in your class history like any other recorded class.",
+		},
+	)
+	@GuideFAQItem(
+		"edit-recorded-class",
+		"Can I edit a class after I recorded it?",
+		"Yes. You can update details for classes you already saved.",
+		[]string{
+			"Open My Classes and find the class. Use filters if needed.",
+			"Click Edit on the row to change date, times, status, reason, notes, or other fields.",
+			"Click Save changes. Earnings totals update when status or rate changes.",
+		},
+	)
+	@GuideFAQItem(
+		"no-shows",
+		"What is a no-show?",
+		"A no-show is a scheduled class whose date has passed but was never conducted, cancelled, or rescheduled.",
+		[]string{
+			"Open My Analytics to see no-show entries for your classes.",
+			"Resolve no-shows by conducting the class if it happened, or by cancelling or rescheduling if it did not.",
+			"Keeping scheduled classes up to date helps your analytics and payroll records stay accurate.",
+		},
+	)
+	@GuideFAQItem(
+		"google-sheets-beta",
+		"Do I still need to record classes in Google Sheets?",
+		"During the beta phase, yes. Record classes in the admin tool and continue entering them in your Google Sheet for auditing.",
+		[]string{
+			"Use the admin tool for scheduling, conducting, and class history.",
+			"Keep your Google Sheet updated until Zion English fully transitions off sheet-based auditing.",
+			"Student names in the admin tool must match your sheet casing exactly.",
+		},
+	)
+	@GuideFAQItem(
+		"register-student",
+		"How do I register a new student?",
+		"Register students from My Students so you can schedule and record classes for them.",
+		[]string{
+			"Open My Students and click Register Student.",
+			"Enter the student name with the exact casing used in your Google Sheet.",
+			"Set currency, status, and rate per class, then click Register Student.",
+			"You are automatically assigned as the student's teacher.",
+		},
+	)
+	@GuideFAQItem(
+		"connect-integrations",
+		"How do I connect Zoom or Google Calendar?",
+		"Connect integrations once from My Profile.",
+		[]string{
+			"Open My Profile and scroll to Integrations.",
+			"Click Connect Zoom or Connect Google Calendar and approve access.",
+			"See the Connect Zoom and Connect Google Calendar guides for step-by-step instructions.",
+		},
+	)
+}
+
+templ GuideFAQItem(anchor string, question string, answer string, bullets []string) {
+	<section class="guide-faq-item guide-section" id={ anchor }>
+		<h2 class="guide-faq-question">
+			<a
+				href={ "#" + anchor }
+				class="guide-section-anchor"
+				aria-label={ "Link to " + question }
+			>#</a>
+			{ question }
+		</h2>
+		<p class="guide-faq-answer">{ answer }</p>
+		if len(bullets) > 0 {
+			<ul class="guide-faq-bullets">
+				for _, bullet := range bullets {
+					<li>{ bullet }</li>
+				}
+			</ul>
+		}
+	</section>
 }
 
 templ GuideBetaCallout() {
@@ -446,7 +808,7 @@ templ GuideBetaCallout() {
 	</div>
 }
 
-templ GuideSection(anchor string, title string, href string, summary string, steps []string) {
+templ GuideSection(anchor string, title string, href string, summary string, steps []string, adminOnly bool) {
 	<section class="guide-section" id={ anchor }>
 		<h2 class="guide-section-title">
 			<a
@@ -454,17 +816,22 @@ templ GuideSection(anchor string, title string, href string, summary string, ste
 				class="guide-section-anchor"
 				aria-label={ "Link to " + title }
 			>#</a>
-			<a
-				href={ href }
-				class="guide-section-link"
-				target="_blank"
-				rel="noopener noreferrer"
-			>
-				{ title }
-				<span class="guide-external-icon" aria-hidden="true">
-					@GuideExternalIcon()
-				</span>
-			</a>
+			<span class="admin-only-label-wrap">
+				<a
+					href={ href }
+					class="guide-section-link"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					{ title }
+					<span class="guide-external-icon" aria-hidden="true">
+						@GuideExternalIcon()
+					</span>
+				</a>
+				if adminOnly {
+					@AdminOnlyIndicator()
+				}
+			</span>
 		</h2>
 		<p class="guide-section-summary">{ summary }</p>
 		<ol class="guide-steps">
@@ -509,11 +876,12 @@ templ GuideThemeVars() {
 		:root {
 			--color-primary: #90C020;
 			--color-primary-hover: #7A9F18;
-			--color-muted-foreground: #6B6560;
-			--color-border-subtle: #F0EDE6;
+			--color-muted-foreground: #64748B;
+			--color-border-subtle: #F1F5F9;
 			--color-surface: #FFFFFF;
-			--color-foreground: #2D2D2D;
+			--color-foreground: #0F172A;
 			--color-ring: #90C020;
+			--radius-sm: 6px;
 			--radius-lg: 12px;
 			--shadow-sm: 0 1px 2px rgba(45, 45, 45, 0.06);
 			--shadow-md: 0 4px 12px rgba(45, 45, 45, 0.08);
@@ -531,6 +899,44 @@ templ GuideThemeVars() {
 
 templ GuideStyles() {
 	<style>
+		.admin-only-label-wrap {
+			display: inline-flex;
+			align-items: center;
+			gap: var(--space-1);
+		}
+
+		.admin-only-indicator {
+			display: inline-flex;
+			color: var(--color-muted-foreground);
+			cursor: help;
+			flex-shrink: 0;
+		}
+
+		.admin-only-indicator svg {
+			width: 14px;
+			height: 14px;
+		}
+
+		.admin-only-indicator[data-tooltip]::after {
+			display: none;
+		}
+
+		.admin-only-floating-tooltip {
+			position: fixed;
+			z-index: 4000;
+			padding: 0.35rem 0.55rem;
+			border-radius: var(--radius-sm);
+			background: var(--color-foreground);
+			color: var(--color-surface);
+			font-size: 0.75rem;
+			font-weight: 500;
+			line-height: 1.3;
+			max-width: 14rem;
+			text-align: center;
+			pointer-events: none;
+			box-shadow: var(--shadow-md);
+		}
+
 		.guides-page {
 			padding-bottom: var(--space-10);
 		}
@@ -880,6 +1286,38 @@ templ GuideStyles() {
 			outline: 2px solid var(--color-ring);
 			outline-offset: 2px;
 			border-radius: var(--radius-sm);
+		}
+
+		.guide-faq-question {
+			margin: 0;
+			font-size: 1.125rem;
+			line-height: 1.4;
+			display: flex;
+			align-items: flex-start;
+			gap: var(--space-2);
+			flex-wrap: wrap;
+			color: var(--color-foreground);
+		}
+
+		.guide-faq-answer {
+			margin-top: var(--space-3);
+			color: var(--color-foreground);
+			font-size: 0.9375rem;
+			line-height: 1.625;
+		}
+
+		.guide-faq-bullets {
+			margin-top: var(--space-3);
+			padding-left: 1.25rem;
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-2);
+		}
+
+		.guide-faq-bullets li {
+			color: var(--color-muted-foreground);
+			font-size: 0.9375rem;
+			line-height: 1.625;
 		}
 	</style>
 }

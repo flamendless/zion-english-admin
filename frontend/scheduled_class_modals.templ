@@ -10,15 +10,39 @@ templ ScheduledClassModals() {
 	@CancelClassModal()
 	@EditScheduledClassModal()
 	@ScheduledClassModalsScript()
+	@ScrScheduleRepeatCalendarJS()
+	@ScheduleRepeatDatePickerStyles()
+	<style>
+		.series-scope-fieldset {
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-md);
+			padding: var(--space-3);
+			margin: 0;
+		}
+		.series-scope-fieldset legend {
+			padding: 0 var(--space-1);
+			font-size: 0.875rem;
+			font-weight: 600;
+		}
+		.series-scope-option {
+			display: flex;
+			align-items: flex-start;
+			gap: var(--space-2);
+			margin-top: var(--space-2);
+			font-size: 0.875rem;
+			line-height: 1.45;
+		}
+		.series-scope-option input {
+			margin-top: 0.2rem;
+		}
+	</style>
 }
 
-templ ScheduledClassDetailCard(cardID string) {
-	<div class="scheduled-class-detail-card" id={ cardID } aria-label="Class details">
+templ ScheduledClassDetailCard(cardID string, startHidden bool) {
+	<div class="scheduled-class-detail-card" id={ cardID } hidden?={ startHidden } aria-label="Class Details">
 		<div class="scheduled-class-detail-header">
 			<span class="scheduled-class-detail-student" data-field="student"></span>
-			<span class="scheduled-class-detail-teacher">
-				with <span data-field="teacher"></span>
-			</span>
+			<div class="scheduled-class-detail-teacher" data-field="teacher-cell"></div>
 		</div>
 		<dl class="scheduled-class-detail-meta">
 			<div class="scheduled-class-detail-row">
@@ -30,6 +54,10 @@ templ ScheduledClassDetailCard(cardID string) {
 				<dd data-field="time"></dd>
 			</div>
 			<div class="scheduled-class-detail-row">
+				<dt>Duration</dt>
+				<dd data-field="duration"></dd>
+			</div>
+			<div class="scheduled-class-detail-row">
 				<dt>Rate</dt>
 				<dd data-field="rate"></dd>
 			</div>
@@ -38,11 +66,11 @@ templ ScheduledClassDetailCard(cardID string) {
 }
 
 templ ConductClassModal() {
-	<div class="modal-overlay" id="conductClassModal" hidden role="presentation">
+	<div class="modal-overlay modal-overlay-front" id="conductClassModal" hidden role="presentation">
 		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="conductClassModalTitle">
 			<div class="modal-header">
 				<h3 id="conductClassModalTitle">Conduct Class</h3>
-				<button type="button" class="modal-close scheduled-class-modal-close" aria-label="Close">&times;</button>
+				<button type="button" class="modal-close scheduled-class-modal-close" data-tooltip="Close" aria-label="Close">&times;</button>
 			</div>
 			<form
 				id="conductClassForm"
@@ -51,7 +79,7 @@ templ ConductClassModal() {
 				hx-swap="none"
 			>
 				<p class="scheduled-class-modal-lead">Record this session as conducted. Class details are fixed from the schedule.</p>
-				@ScheduledClassDetailCard("conductClassModalDetails")
+				@ScheduledClassDetailCard("conductClassModalDetails", false)
 				<input type="hidden" id="conductClassFrom" name="from" value="schedule"/>
 				<div class="scheduled-class-modal-fields">
 					<div class="form-group">
@@ -60,7 +88,7 @@ templ ConductClassModal() {
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn scheduled-class-modal-close">Cancel</button>
+					<button type="button" class="btn btn-secondary scheduled-class-modal-close">Cancel</button>
 					<button type="submit" class="btn" id="conductClassSubmitBtn">Conduct</button>
 				</div>
 			</form>
@@ -69,11 +97,11 @@ templ ConductClassModal() {
 }
 
 templ CancelClassModal() {
-	<div class="modal-overlay" id="cancelClassModal" hidden role="presentation">
+	<div class="modal-overlay modal-overlay-front" id="cancelClassModal" hidden role="presentation">
 		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="cancelClassModalTitle">
 			<div class="modal-header">
 				<h3 id="cancelClassModalTitle">Cancel Class</h3>
-				<button type="button" class="modal-close scheduled-class-modal-close" aria-label="Close">&times;</button>
+				<button type="button" class="modal-close scheduled-class-modal-close" data-tooltip="Close" aria-label="Close">&times;</button>
 			</div>
 			<form
 				id="cancelClassForm"
@@ -82,7 +110,7 @@ templ CancelClassModal() {
 				hx-swap="none"
 			>
 				<p class="scheduled-class-modal-lead">This will mark the class as cancelled and keep a record for your history.</p>
-				@ScheduledClassDetailCard("cancelClassModalDetails")
+				@ScheduledClassDetailCard("cancelClassModalDetails", false)
 				<input type="hidden" id="cancelClassFrom" name="from" value="schedule"/>
 				<div class="scheduled-class-modal-fields">
 					<div class="form-group">
@@ -99,9 +127,22 @@ templ CancelClassModal() {
 						<label for="cancelClassNotes">Notes</label>
 						<textarea id="cancelClassNotes" name="notes" rows="3" placeholder="Optional notes"></textarea>
 					</div>
+					<div id="cancelSeriesScopePanel" class="series-scope-panel" hidden>
+						<fieldset class="series-scope-fieldset">
+							<legend>Apply to</legend>
+							<label class="series-scope-option">
+								<input type="radio" name="series_scope" value="single" checked/>
+								This class only
+							</label>
+							<label class="series-scope-option">
+								<input type="radio" name="series_scope" value="future"/>
+								<span id="cancelSeriesScopeFutureLabel">This and future classes in this series</span>
+							</label>
+						</fieldset>
+					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn scheduled-class-modal-close">Cancel</button>
+					<button type="button" class="btn btn-secondary scheduled-class-modal-close">Cancel</button>
 					<button type="submit" class="btn btn-danger" id="cancelClassSubmitBtn">Cancel Class</button>
 				</div>
 			</form>
@@ -110,11 +151,11 @@ templ CancelClassModal() {
 }
 
 templ EditScheduledClassModal() {
-	<div class="modal-overlay" id="editScheduledClassModal" hidden role="presentation">
+	<div class="modal-overlay modal-overlay-front" id="editScheduledClassModal" hidden role="presentation">
 		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="editScheduledClassModalTitle">
 			<div class="modal-header">
 				<h3 id="editScheduledClassModalTitle">Edit Scheduled Class</h3>
-				<button type="button" class="modal-close scheduled-class-modal-close" aria-label="Close">&times;</button>
+				<button type="button" class="modal-close scheduled-class-modal-close" data-tooltip="Close" aria-label="Close">&times;</button>
 			</div>
 			<div id="editScheduledClassModalBody" class="modal-body">
 				<p class="modal-loading">Loading...</p>
@@ -124,6 +165,14 @@ templ EditScheduledClassModal() {
 }
 
 templ EditScheduledClassModalForm(data EditScheduleData) {
+	if EditScheduleUsesSeriesReview(data) {
+		@EditScheduledClassSeriesForm(data)
+	} else {
+		@EditScheduledClassSimpleForm(data)
+	}
+}
+
+templ EditScheduledClassSimpleForm(data EditScheduleData) {
 	<form
 		id="editScheduledClassForm"
 		class="scheduled-class-modal-form"
@@ -137,8 +186,8 @@ templ EditScheduledClassModalForm(data EditScheduleData) {
 			on submit
 				set origDate to my @data-original-date
 				set origStart to my @data-original-start
-				set newDate to #date.value
-				set newStart to #start_time.value
+				set newDate to (#date in me).value
+				set newStart to (first <[name='start_time']/> in me).value
 				if newDate is not origDate or newStart is not origStart
 					set today to my @data-today-pht
 					if newDate < today
@@ -158,35 +207,107 @@ templ EditScheduledClassModalForm(data EditScheduleData) {
 						end
 					end
 				end
-				if #start_time.value is ''
+				if (first <[name='start_time']/> in me).value is ''
 					alert('Please set start time')
 					halt
 				end
-				if #end_time.value is ''
+				if (first <[name='end_time']/> in me).value is ''
 					alert('Please set end time')
 					halt
 				end
 			end
 		"
 	>
-		<input type="hidden" id="editScheduledClassFrom" name="from" value={ data.From }/>
-		<div class="form-group">
-			<label>Teacher</label>
-			<input type="text" value={ data.TeacherName } disabled/>
-		</div>
-		if data.LockTeacher {
-			@TeacherStudentsDropdownWithValue(data.StudentID)
-		} else {
-			@ScheduleEditStudentDropdown(data.TeacherID, data.StudentID)
-		}
-		@ClassDateField(data.Date, false)
-		@TimeRangeFields(data.StartTime, data.EndTime, false)
+		@EditScheduledClassFormFields(data)
 		<div class="modal-footer">
-			<button type="button" class="btn scheduled-class-modal-close">Cancel</button>
+			<button type="button" class="btn btn-secondary scheduled-class-modal-close">Cancel</button>
 			<button type="submit" class="btn" id="editScheduledClassSubmitBtn">Save Changes</button>
 		</div>
 	</form>
 	@ScrTimeRangeInit()
+	@ScrTrialClassJS()
+}
+
+templ EditScheduledClassSeriesForm(data EditScheduleData) {
+	<form
+		id="editScheduledClassForm"
+		class="scheduled-class-modal-form"
+		method="POST"
+		hx-post={ utils.URL(fmt.Sprintf("/schedule/%s/edit/preview", data.ScheduleID)) }
+		hx-target="#editSeriesPreviewPanel"
+		hx-swap="innerHTML"
+		hx-indicator="#editSeriesPreviewBtn"
+		data-today-pht={ data.TodayPHT }
+		data-original-date={ data.Date }
+		data-original-start={ data.StartTime }
+		_="
+			on submit
+				if (first <[name='start_time']/> in me).value is ''
+					alert('Please set start time')
+					halt
+				end
+				if (first <[name='end_time']/> in me).value is ''
+					alert('Please set end time')
+					halt
+				end
+			end
+		"
+	>
+		@EditScheduledClassFormFields(data)
+		<div class="modal-footer">
+			<button type="button" class="btn btn-secondary scheduled-class-modal-close">Cancel</button>
+			<button type="submit" class="btn" id="editSeriesPreviewBtn">Review Dates</button>
+		</div>
+	</form>
+	<div id="editSeriesPreviewPanel" class="schedule-repeat-preview-panel"></div>
+	@ScrTimeRangeInit()
+	@ScrTrialClassJS()
+}
+
+templ EditScheduledClassFormFields(data EditScheduleData) {
+	<input type="hidden" id="editScheduledClassFrom" name="from" value={ data.From }/>
+	if data.SeriesID > 0 {
+		<p class="field-hint">Part of a repeating series ({ fmt.Sprintf("%d", data.SeriesTotalCount) } scheduled classes).</p>
+		@SeriesScopeFields("edit_scope", data.SeriesTotalCount, data.SeriesFutureCount)
+	}
+	<div class="form-group">
+		<label>Teacher</label>
+		<input type="text" value={ data.TeacherName } disabled/>
+	</div>
+	if data.LockTeacher {
+		@TeacherStudentsDropdownWithValue(data.StudentID)
+	} else {
+		@ScheduleEditStudentDropdown(data.TeacherID, data.StudentID)
+	}
+	@EditScheduledClassDateFields(data)
+	if data.SeriesID > 0 {
+		<p id="editSeriesDateHint" class="field-hint" hidden>Date changes on the calendar apply to this and future classes in the series.</p>
+	}
+	@TimeRangeFields(data.StartTime, data.EndTime, false)
+	<div class="form-row">
+		@CurrencyDropdownWithValue(data.Currency)
+		<div class="form-group">
+			<label for="rate">Rate *</label>
+			<input type="number" id="rate" name="rate" required min="0" step="0.01" value={ formatFloat(data.Rate) }/>
+		</div>
+	</div>
+	@TrialClassCheckbox(data.IsTrialClass, false)
+	@ClassLearningMaterialPicker(data.LearningMaterials, "")
+}
+
+templ EditScheduledClassDateFields(data EditScheduleData) {
+	if EditScheduleUsesSeriesReview(data) {
+		<input type="hidden" id="date" name="date" value={ data.Date } data-series-active-date="true"/>
+		@ScheduleRepeatDatePicker(ScheduleRepeatDatePickerConfig{
+			TodayPHT: data.TodayPHT,
+			Hint: "Click dates on the calendar to add or remove sessions, then review changes before saving.",
+			MinDates: 1,
+			InitialDates: data.SeriesDates,
+			SubmitMessage: "Select at least one date, then click Review Dates.",
+		})
+	} else {
+		@ClassDateField(data.Date, false)
+	}
 }
 
 templ ScheduledClassModalsScript() {
@@ -204,6 +325,8 @@ templ ScheduledClassModalsScript() {
 			const cancelReason = document.getElementById('cancelClassReason');
 			const cancelNotes = document.getElementById('cancelClassNotes');
 			const cancelFrom = document.getElementById('cancelClassFrom');
+			const cancelSeriesScopePanel = document.getElementById('cancelSeriesScopePanel');
+			const cancelSeriesScopeFutureLabel = document.getElementById('cancelSeriesScopeFutureLabel');
 
 			const editModal = document.getElementById('editScheduledClassModal');
 			const editBody = document.getElementById('editScheduledClassModalBody');
@@ -216,21 +339,94 @@ templ ScheduledClassModalsScript() {
 				}
 			}
 
+			function escapeHtml(value) {
+				return String(value || '')
+					.replace(/&/g, '&amp;')
+					.replace(/</g, '&lt;')
+					.replace(/>/g, '&gt;')
+					.replace(/"/g, '&quot;');
+			}
+
+			function fillTimePill(el, timeRange) {
+				if (!el) return;
+				el.innerHTML =
+					'<span class="time-range-pill" aria-label="Time: ' + escapeHtml(timeRange) + '">' +
+					'<span class="pill pill--primary">' + escapeHtml(timeRange) + '</span>' +
+					'</span>';
+			}
+
+			function fillRatePill(el, rate, currency) {
+				if (!el) return;
+				el.innerHTML =
+					'<span class="pill pill--info rate-pill" aria-label="' + escapeHtml(rate + ' ' + currency) + '">' +
+					'<span class="rate-pill-amount">' + escapeHtml(rate) + '</span>' +
+					'<span class="rate-pill-currency">' + escapeHtml(currency) + '</span>' +
+					'</span>';
+			}
+
+			function fillDurationPill(el, label) {
+				if (!el) return;
+				el.innerHTML =
+					'<span class="duration-pill-wrap" aria-label="Duration: ' + escapeHtml(label) + '">' +
+					'<span class="pill pill--neutral duration-pill">' +
+					'<svg class="duration-pill-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+					'<circle cx="12" cy="12" r="10"></circle>' +
+					'<polyline points="12 6 12 12 16 14"></polyline>' +
+					'</svg>' +
+					'<span class="duration-pill-value">' + escapeHtml(label) + '</span>' +
+					'</span>' +
+					'</span>';
+			}
+
+			function fillTeacherCell(el, trigger) {
+				if (!el || !trigger) return;
+				const name = trigger.getAttribute('data-teacher-name') || '-';
+				const initials = trigger.getAttribute('data-teacher-initials') || '';
+				const color = trigger.getAttribute('data-teacher-color') || '#B9D283';
+				const pictureURL = trigger.getAttribute('data-teacher-picture-url') || '';
+				const hasPicture = trigger.getAttribute('data-teacher-has-picture') === 'true';
+				const alt = trigger.getAttribute('data-teacher-alt') || (name + ' avatar');
+				const roleBadge = trigger.getAttribute('data-teacher-role-badge') || '';
+				const roleBadgeClass = trigger.getAttribute('data-teacher-role-badge-class') || 'pill pill--neutral';
+				const avatarContent = hasPicture && pictureURL
+					? '<img src="' + escapeHtml(pictureURL) + '" alt="' + escapeHtml(alt) + '" class="avatar-image"/>'
+					: '<span class="avatar-initials" aria-hidden="true">' + escapeHtml(initials) + '</span>';
+				let avatarHTML =
+					'<div class="avatar avatar-sm" style="background-color: ' + escapeHtml(color) + ';" aria-label="' + escapeHtml(alt) + '">' +
+					avatarContent +
+					'</div>';
+				if (roleBadge) {
+					avatarHTML =
+						'<div class="avatar-with-role">' +
+						avatarHTML +
+						'<span class="avatar-role-badge ' + escapeHtml(roleBadgeClass) + '">' + escapeHtml(roleBadge) + '</span>' +
+						'</div>';
+				}
+				el.innerHTML =
+					'<div class="teacher-name-cell">' +
+					avatarHTML +
+					'<span class="teacher-name-cell-text">' + escapeHtml(name) + '</span>' +
+					'</div>';
+			}
+
 			function fillScheduledClassDetails(container, trigger) {
 				if (!container || !trigger) return;
-				const fields = {
-					student: trigger.getAttribute('data-student-name') || '—',
-					teacher: trigger.getAttribute('data-teacher-name') || '—',
-					date: trigger.getAttribute('data-scheduled-date') || '—',
-					time: trigger.getAttribute('data-time-range') || '—',
-					rate: trigger.getAttribute('data-rate-label') || '—',
-				};
-				container.querySelectorAll('[data-field]').forEach(function (el) {
-					const key = el.getAttribute('data-field');
-					if (key && fields[key] !== undefined) {
-						el.textContent = fields[key];
-					}
-				});
+				const studentEl = container.querySelector('[data-field="student"]');
+				const teacherCell = container.querySelector('[data-field="teacher-cell"]');
+				const dateEl = container.querySelector('[data-field="date"]');
+				const timeEl = container.querySelector('[data-field="time"]');
+				const durationEl = container.querySelector('[data-field="duration"]');
+				const rateEl = container.querySelector('[data-field="rate"]');
+				if (studentEl) studentEl.textContent = trigger.getAttribute('data-student-name') || '-';
+				fillTeacherCell(teacherCell, trigger);
+				if (dateEl) dateEl.textContent = trigger.getAttribute('data-scheduled-date') || '-';
+				fillTimePill(timeEl, trigger.getAttribute('data-time-range') || '-');
+				fillDurationPill(durationEl, trigger.getAttribute('data-duration') || '-');
+				fillRatePill(
+					rateEl,
+					trigger.getAttribute('data-rate') || '-',
+					trigger.getAttribute('data-currency') || ''
+				);
 			}
 
 			function openModal(modal) {
@@ -242,7 +438,11 @@ templ ScheduledClassModalsScript() {
 				if (conductModal) conductModal.hidden = true;
 				if (cancelModal) cancelModal.hidden = true;
 				if (editModal) editModal.hidden = true;
-				document.body.classList.remove('modal-open');
+				const scheduleOpen = typeof window.isScheduleModalOpen === 'function' && window.isScheduleModalOpen();
+				const classViewOpen = !!document.getElementById('classViewModal');
+				if (!scheduleOpen && !classViewOpen) {
+					document.body.classList.remove('modal-open');
+				}
 				if (conductNotes) conductNotes.value = '';
 				if (cancelReason) cancelReason.value = '';
 				if (cancelNotes) cancelNotes.value = '';
@@ -259,6 +459,44 @@ templ ScheduledClassModalsScript() {
 				if (conductNotes) conductNotes.focus();
 			};
 
+			function configureSeriesScopePanel(panel, futureLabelEl, trigger) {
+				if (!panel) return;
+				const seriesID = trigger ? trigger.getAttribute('data-series-id') : '';
+				const totalCount = trigger ? parseInt(trigger.getAttribute('data-series-total-count') || '0', 10) : 0;
+				const futureCount = trigger ? parseInt(trigger.getAttribute('data-series-future-count') || '0', 10) : 0;
+				const futureInput = panel.querySelector('input[value="future"]');
+				if (seriesID && totalCount > 1) {
+					panel.hidden = false;
+					if (futureLabelEl) {
+						if (futureCount > 1) {
+							futureLabelEl.textContent = 'This and ' + futureCount + ' scheduled classes in this series (including this date)';
+						} else {
+							futureLabelEl.textContent = 'This and future classes in this series';
+						}
+					}
+					if (futureInput) futureInput.disabled = futureCount <= 1;
+					const singleInput = panel.querySelector('input[value="single"]');
+					if (singleInput) singleInput.checked = true;
+				} else {
+					panel.hidden = true;
+					if (futureInput) futureInput.disabled = false;
+				}
+			}
+
+			function bindEditSeriesScopeHandlers() {
+				const form = document.getElementById('editScheduledClassForm');
+				if (!form) return;
+				const hint = document.getElementById('editSeriesDateHint');
+				const scopeInputs = form.querySelectorAll('input[name="edit_scope"]');
+				if (!scopeInputs.length) return;
+				function syncScopeUi() {
+					const futureSelected = Array.from(scopeInputs).some((input) => input.checked && input.value === 'future');
+					if (hint) hint.hidden = !futureSelected;
+				}
+				scopeInputs.forEach((input) => input.addEventListener('change', syncScopeUi));
+				syncScopeUi();
+			}
+
 			window.openCancelClassModal = function (url, trigger, from) {
 				if (!cancelModal || !cancelForm) return;
 				setFormPost(cancelForm, url);
@@ -266,6 +504,7 @@ templ ScheduledClassModalsScript() {
 				if (cancelFrom) cancelFrom.value = from || 'schedule';
 				if (cancelReason) cancelReason.value = '';
 				if (cancelNotes) cancelNotes.value = '';
+				configureSeriesScopePanel(cancelSeriesScopePanel, cancelSeriesScopeFutureLabel, trigger);
 				openModal(cancelModal);
 				if (cancelReason) cancelReason.focus();
 			};
@@ -320,9 +559,24 @@ templ ScheduledClassModalsScript() {
 
 			document.addEventListener('keydown', function (e) {
 				if (e.key !== 'Escape') return;
-				if (conductModal && !conductModal.hidden) window.closeScheduledClassModals();
-				else if (cancelModal && !cancelModal.hidden) window.closeScheduledClassModals();
-				else if (editModal && !editModal.hidden) window.closeScheduledClassModals();
+				if (conductModal && !conductModal.hidden) {
+					window.closeScheduledClassModals();
+					e.preventDefault();
+					e.stopImmediatePropagation();
+					return;
+				}
+				if (cancelModal && !cancelModal.hidden) {
+					window.closeScheduledClassModals();
+					e.preventDefault();
+					e.stopImmediatePropagation();
+					return;
+				}
+				if (editModal && !editModal.hidden) {
+					window.closeScheduledClassModals();
+					e.preventDefault();
+					e.stopImmediatePropagation();
+					return;
+				}
 			});
 
 			if (conductForm) {
@@ -344,15 +598,35 @@ templ ScheduledClassModalsScript() {
 			}
 
 			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id === 'editSeriesPreviewPanel') {
+					const confirmForm = document.getElementById('editSeriesConfirmForm');
+					if (confirmForm && typeof htmx !== 'undefined') {
+						htmx.process(confirmForm);
+					}
+					const confirmBtn = document.getElementById('editSeriesConfirmBtn');
+					if (confirmBtn) confirmBtn.focus();
+					return;
+				}
 				if (evt.detail.target !== editBody) return;
-				if (window.initTimeRangePreview) window.initTimeRangePreview();
-				if (window.attachTimeRangeFormValidation) window.attachTimeRangeFormValidation();
+				const editForm = document.getElementById('editScheduledClassForm');
+				if (editForm && window.initTimeRangePreview) {
+					window.initTimeRangePreview({ form: editForm });
+				}
+				if (editForm && window.initScheduleRepeatCalendar) {
+					const calRoot = editForm.querySelector('[data-schedule-repeat-calendar]');
+					if (calRoot) window.initScheduleRepeatCalendar(calRoot);
+				}
+				if (window.attachTimeRangeFormValidation) {
+					window.attachTimeRangeFormValidation();
+				}
+				if (window.initTimeRangePreview && !editForm) window.initTimeRangePreview();
 				const fromInput = document.getElementById('editScheduledClassFrom');
 				if (fromInput && window._editScheduledClassFrom) {
 					fromInput.value = window._editScheduledClassFrom;
 				}
 				const studentSelect = document.getElementById('student') || document.getElementById('schedule_student');
 				if (studentSelect) studentSelect.focus();
+				bindEditSeriesScopeHandlers();
 			});
 
 			function handleModalSuccess(form) {
@@ -365,145 +639,19 @@ templ ScheduledClassModalsScript() {
 			document.body.addEventListener('htmx:afterRequest', function (evt) {
 				const form = evt.detail.elt;
 				if (!evt.detail.successful) return;
-				if (form === conductForm || form === cancelForm || form === document.getElementById('editScheduledClassForm')) {
+				if (form === conductForm || form === cancelForm || form === document.getElementById('editSeriesConfirmForm')) {
 					handleModalSuccess(form);
+					return;
+				}
+				const editForm = document.getElementById('editScheduledClassForm');
+				if (form === editForm) {
+					const postURL = form.getAttribute('hx-post') || '';
+					if (postURL.indexOf('/edit/preview') === -1) {
+						handleModalSuccess(form);
+					}
 				}
 			});
 
-			document.body.addEventListener('classesRefresh', function () {
-				const filterBtn = document.getElementById('filterBtn');
-				if (filterBtn) filterBtn.click();
-			});
-
-			document.body.addEventListener('refreshScheduleCalendar', function () {
-				if (typeof refreshCalendar === 'function') refreshCalendar();
-			});
 		})();
 	</script>
-	<style>
-		.scheduled-class-action-modal {
-			gap: var(--space-4);
-		}
-
-		.scheduled-class-modal-lead {
-			margin: 0;
-			font-size: 0.9rem;
-			line-height: 1.5;
-			color: var(--color-muted-foreground);
-		}
-
-		.scheduled-class-detail-card {
-			padding: var(--space-4);
-			border: 1px solid var(--color-border-subtle);
-			border-radius: var(--radius-md);
-			background: var(--color-muted);
-			display: flex;
-			flex-direction: column;
-			gap: var(--space-4);
-		}
-
-		.scheduled-class-detail-header {
-			display: flex;
-			flex-direction: column;
-			gap: var(--space-1);
-		}
-
-		.scheduled-class-detail-student {
-			font-size: 1.05rem;
-			font-weight: 600;
-			color: var(--color-foreground);
-			line-height: 1.3;
-		}
-
-		.scheduled-class-detail-teacher {
-			font-size: 0.875rem;
-			color: var(--color-muted-foreground);
-		}
-
-		.scheduled-class-detail-meta {
-			margin: 0;
-			display: grid;
-			grid-template-columns: 1fr;
-			gap: var(--space-3);
-		}
-
-		.scheduled-class-detail-row {
-			display: flex;
-			align-items: baseline;
-			justify-content: space-between;
-			gap: var(--space-4);
-			padding-top: var(--space-3);
-			border-top: 1px solid var(--color-border-subtle);
-		}
-
-		.scheduled-class-detail-row:first-child {
-			padding-top: 0;
-			border-top: none;
-		}
-
-		.scheduled-class-detail-row dt {
-			margin: 0;
-			font-size: 0.75rem;
-			font-weight: 600;
-			letter-spacing: 0.04em;
-			text-transform: uppercase;
-			color: var(--color-muted-foreground);
-			flex-shrink: 0;
-		}
-
-		.scheduled-class-detail-row dd {
-			margin: 0;
-			font-size: 0.95rem;
-			font-weight: 500;
-			color: var(--color-foreground);
-			text-align: right;
-		}
-
-		.scheduled-class-modal-fields {
-			display: flex;
-			flex-direction: column;
-			gap: var(--space-4);
-		}
-
-		.scheduled-class-modal-form {
-			display: flex;
-			flex-direction: column;
-			gap: var(--space-4);
-		}
-
-		.scheduled-class-modal-form .form-group,
-		.scheduled-class-modal-form .time-range-fields,
-		.scheduled-class-modal-form .time-input-wrap {
-			width: 100%;
-			max-width: none;
-		}
-
-		.scheduled-class-modal-form .time-range-group {
-			display: flex;
-			flex-direction: column;
-			gap: var(--space-4);
-			grid-template-columns: none;
-		}
-
-		.scheduled-class-modal-form .modal-footer {
-			margin-top: var(--space-2);
-			padding-top: var(--space-4);
-			border-top: 1px solid var(--color-border-subtle);
-		}
-
-		.modal-loading {
-			color: var(--color-muted-foreground);
-			margin: 0;
-		}
-
-		.btn-danger {
-			background: var(--color-danger, #c0392b);
-			color: #fff;
-			border-color: var(--color-danger, #c0392b);
-		}
-
-		.btn-danger:hover {
-			filter: brightness(0.92);
-		}
-	</style>
 }

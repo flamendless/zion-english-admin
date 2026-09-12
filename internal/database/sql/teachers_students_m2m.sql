@@ -13,6 +13,7 @@ SELECT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.a
 FROM tbl_students s
 INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?
+	AND s.status != 'deleted'
 ORDER BY s.name ASC;
 
 -- name: CountStudentsByTeacherIDFiltered :one
@@ -20,6 +21,7 @@ SELECT COUNT(*) as count
 FROM tbl_students s
 INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?
+	AND s.status != 'deleted'
 	AND (? = '' OR s.name LIKE '%' || ? || '%')
 	AND (? = '' OR s.status = ?);
 
@@ -28,6 +30,7 @@ SELECT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.a
 FROM tbl_students s
 INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?
+	AND s.status != 'deleted'
 	AND (? = '' OR s.name LIKE '%' || ? || '%')
 	AND (? = '' OR s.status = ?)
 ORDER BY s.name ASC

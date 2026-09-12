@@ -43,13 +43,6 @@ func avatarFilePath(filename string) string {
 	return filepath.Join(avatarDir, filepath.Base(filename))
 }
 
-func teacherAvatarURL(hasPicture bool) string {
-	if !hasPicture {
-		return ""
-	}
-	return utils.URL("/profile/picture")
-}
-
 func teacherPictureURL(teacherID int64, hasPicture bool) string {
 	if !hasPicture {
 		return ""
@@ -61,14 +54,14 @@ func buildTeacherAvatarProps(row queries.GetTeacherProfileByIDRow) frontend.Avat
 	hasPicture := row.ProfilePicture.Valid && row.ProfilePicture.String != ""
 	assignedColor := row.AssignedColor
 	if assignedColor == "" {
-		assignedColor = "#B9D283"
+		assignedColor = constants.DefaultTeacherAssignedColor
 	}
 	displayName := utils.ComposePersonName(row.FirstName, row.MiddleName, row.LastName)
 	return frontend.AvatarProps{
 		Size:          "xl",
 		Initials:      utils.PersonInitials(row.FirstName, row.MiddleName, row.LastName, displayName),
 		AssignedColor: assignedColor,
-		PictureURL:    teacherAvatarURL(hasPicture),
+		PictureURL:    teacherPictureURL(row.ID, hasPicture),
 		HasPicture:    hasPicture,
 		Alt:           displayName + " avatar",
 	}
@@ -77,7 +70,7 @@ func buildTeacherAvatarProps(row queries.GetTeacherProfileByIDRow) frontend.Avat
 func buildTeacherListAvatarProps(teacherID int64, firstName, middleName, lastName, assignedColor string, profilePicture sql.NullString) frontend.AvatarProps {
 	hasPicture := profilePicture.Valid && profilePicture.String != ""
 	if assignedColor == "" {
-		assignedColor = "#B9D283"
+		assignedColor = constants.DefaultTeacherAssignedColor
 	}
 	displayName := utils.ComposePersonName(firstName, middleName, lastName)
 	return frontend.AvatarProps{
@@ -94,7 +87,7 @@ func buildSuperuserAvatarProps(user auth.User) frontend.AvatarProps {
 	return frontend.AvatarProps{
 		Size:          "xl",
 		Initials:      utils.PersonInitials("", "", "", user.Name),
-		AssignedColor: "#90C020",
+		AssignedColor: constants.DefaultAssignedColor,
 		HasPicture:    false,
 		Alt:           user.Name + " avatar",
 	}
@@ -185,6 +178,11 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 		logs.Log().Error("check blocking teacher document", zap.Error(err))
 		blockingDocs = 0
 	}
+	blockingIntroVideo, err := dbRO.GetQueries().HasBlockingTeacherIntroVideo(ctx, user.ID)
+	if err != nil {
+		logs.Log().Error("check blocking teacher intro video", zap.Error(err))
+		blockingIntroVideo = 0
+	}
 
 	certifications := ""
 	if row.Certifications.Valid {
@@ -225,7 +223,7 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 		Currency:              row.Currency,
 		DriveUrl:              row.DriveUrl,
 		Sex:                   sex,
-		Status:                row.Status,
+		Status:                constants.TeacherStatus(row.Status),
 		HasProfilePicture:     row.ProfilePicture.Valid && row.ProfilePicture.String != "",
 		Avatar:                avatarWithTeacherRoles(buildTeacherAvatarProps(row), roleStrings),
 		CanChangeMobile:       canChangeMobile,
@@ -236,14 +234,37 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 		CanEditMiddleName:     utils.ProfileNameEditable(row.MiddleName),
 		CanEditLastName:       utils.ProfileNameEditable(row.LastName),
 		CanUploadDocument:     blockingDocs == 0,
+		CanUploadIntroVideo:   blockingIntroVideo == 0,
 	}
-	zoomConnected, zoomConfigured := profileZoomStatus(ctx, user.ID)
+	if introVideo, err := dbRO.GetQueries().GetLatestTeacherIntroVideoByTeacherID(ctx, user.ID); err == nil {
+		data.HasIntroVideo = true
+		data.IntroVideoStatus = constants.TeacherIntroVideoStatus(introVideo.Status)
+		data.IntroVideoViewURL = utils.URL(fmt.Sprintf("/intro-videos/%d/file", introVideo.ID))
+		if introVideo.RejectReason.Valid {
+			data.IntroVideoRejectReason = introVideo.RejectReason.String
+		}
+	} else if !errors.Is(err, sql.ErrNoRows) {
+		logs.Log().Error("get latest teacher intro video", zap.Error(err))
+	}
+	zoomConnected, zoomConfigured, zoomVisible, zoomConnectionsAllowed := profileZoomStatus(ctx, user.ID)
 	data.ZoomConfigured = zoomConfigured
 	data.ZoomConnected = zoomConnected
+	data.ZoomIntegrationVisible = zoomVisible
+	data.ZoomConnectionsAllowed = zoomConnectionsAllowed
 	data.ZoomConnectURL = utils.URL("/profile/zoom/connect")
 	data.ZoomDisconnectURL = utils.URL("/profile/zoom/disconnect")
-	data.ZoomGuideURL = utils.URL("/guides/connect-zoom")
+	data.ZoomGuideURL = utils.URL("/guides/" + string(constants.GuideSlugConnectZoom))
 	data.ZoomStatusMessage = profileZoomFlashMessage(r.URL.Query())
+
+	googleCalendarConnected, googleCalendarConfigured, googleCalendarVisible, googleCalendarConnectionsAllowed := profileGoogleCalendarStatus(ctx, user.ID)
+	data.GoogleCalendarConfigured = googleCalendarConfigured
+	data.GoogleCalendarConnected = googleCalendarConnected
+	data.GoogleCalendarIntegrationVisible = googleCalendarVisible
+	data.GoogleCalendarConnectionsAllowed = googleCalendarConnectionsAllowed
+	data.GoogleCalendarConnectURL = utils.URL("/profile/google-calendar/connect")
+	data.GoogleCalendarDisconnectURL = utils.URL("/profile/google-calendar/disconnect")
+	data.GoogleCalendarGuideURL = utils.URL("/guides/" + string(constants.GuideSlugConnectGoogleCalendar))
+	data.GoogleCalendarStatusMessage = profileGoogleCalendarFlashMessage(r.URL.Query())
 
 	if err := frontend.Profile(data).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
@@ -257,19 +278,42 @@ func profileZoomFlashMessage(query url.Values) string {
 	if query.Get("zoom_disconnected") == "1" {
 		return "Zoom account disconnected."
 	}
-	switch query.Get("zoom_error") {
-	case "invalid_state":
+	switch constants.IntegrationOAuthError(query.Get("zoom_error")) {
+	case constants.IntegrationOAuthErrorInvalidState:
 		return "Zoom connection failed: invalid session. Please try again."
-	case "missing_code":
+	case constants.IntegrationOAuthErrorMissingCode:
 		return "Zoom connection failed: authorization was not completed."
-	case "exchange_failed":
+	case constants.IntegrationOAuthErrorExchangeFailed:
 		return "Zoom connection failed: could not exchange authorization code."
-	case "save_failed":
+	case constants.IntegrationOAuthErrorSaveFailed:
 		return "Zoom connection failed: could not save account."
 	case "":
 		return ""
 	default:
 		return "Zoom connection failed: " + query.Get("zoom_error")
+	}
+}
+
+func profileGoogleCalendarFlashMessage(query url.Values) string {
+	if query.Get("google_calendar_connected") == "1" {
+		return "Google Calendar connected successfully."
+	}
+	if query.Get("google_calendar_disconnected") == "1" {
+		return "Google Calendar disconnected."
+	}
+	switch constants.IntegrationOAuthError(query.Get("google_calendar_error")) {
+	case constants.IntegrationOAuthErrorInvalidState:
+		return "Google Calendar connection failed: invalid session. Please try again."
+	case constants.IntegrationOAuthErrorMissingCode:
+		return "Google Calendar connection failed: authorization was not completed."
+	case constants.IntegrationOAuthErrorExchangeFailed:
+		return "Google Calendar connection failed: could not exchange authorization code."
+	case constants.IntegrationOAuthErrorSaveFailed:
+		return "Google Calendar connection failed: could not save account."
+	case "":
+		return ""
+	default:
+		return "Google Calendar connection failed: " + query.Get("google_calendar_error")
 	}
 }
 
@@ -281,7 +325,7 @@ func handleProfileMobile(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
-	if auth.GetRole(ctx) != auth.RoleTeacher {
+	if !auth.IsTeacherScoped(auth.GetRole(ctx)) {
 		HttpError(w, "Access denied", http.StatusForbidden)
 		return
 	}
@@ -356,7 +400,7 @@ func handleProfileNames(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
-	if auth.GetRole(ctx) != auth.RoleTeacher {
+	if !auth.IsTeacherScoped(auth.GetRole(ctx)) {
 		HttpError(w, "Access denied", http.StatusForbidden)
 		return
 	}
@@ -465,7 +509,7 @@ func handleProfilePassword(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
-	if auth.GetRole(ctx) != auth.RoleTeacher {
+	if !auth.IsTeacherScoped(auth.GetRole(ctx)) {
 		HttpError(w, "Access denied", http.StatusForbidden)
 		return
 	}
@@ -560,7 +604,7 @@ func handleProfileAvatar(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
-	if auth.GetRole(ctx) != auth.RoleTeacher {
+	if !auth.IsTeacherScoped(auth.GetRole(ctx)) {
 		HttpError(w, "Access denied", http.StatusForbidden)
 		return
 	}
@@ -654,7 +698,7 @@ func handleProfilePicture(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
-	if auth.GetRole(ctx) != auth.RoleTeacher {
+	if !auth.IsTeacherScoped(auth.GetRole(ctx)) {
 		HttpError(w, "Access denied", http.StatusForbidden)
 		return
 	}

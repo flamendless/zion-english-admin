@@ -31,7 +31,7 @@ func RolePillStyles() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<style>\r\n\t\t.role-tags {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmargin-bottom: var(--space-3);\r\n\t\t}\r\n\t\t.role-tags--readonly {\r\n\t\t\tmargin-bottom: 0;\r\n\t\t}\r\n\t\t.role-tag-pill {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: 2px;\r\n\t\t\tpadding: 3px 4px 3px 10px;\r\n\t\t}\r\n\t\t.role-tag-pill:not(:has(.role-tag-remove)) {\r\n\t\t\tpadding-right: 10px;\r\n\t\t}\r\n\t\t.role-tag-label {\r\n\t\t\tline-height: 1.2;\r\n\t\t}\r\n\t\t.role-tag-remove {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 1.125rem;\r\n\t\t\theight: 1.125rem;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: 0;\r\n\t\t\tborder: none;\r\n\t\t\tborder-radius: 999px;\r\n\t\t\tbackground: transparent;\r\n\t\t\tcolor: inherit;\r\n\t\t\tcursor: pointer;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tline-height: 1;\r\n\t\t\topacity: 0.75;\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\t\t.role-tag-remove:hover {\r\n\t\t\topacity: 1;\r\n\t\t\tbackground: rgba(0, 0, 0, 0.08);\r\n\t\t}\r\n\t\t.role-tags .pill--neutral {\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\t\t.role-tags-add {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\talign-items: center;\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<style>\r\n\t\t.role-tags {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmargin-bottom: var(--space-3);\r\n\t\t}\r\n\t\t.role-tags--readonly {\r\n\t\t\tmargin-bottom: 0;\r\n\t\t}\r\n\t\t.role-tag-pill {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: 2px;\r\n\t\t\tpadding: 3px 4px 3px 10px;\r\n\t\t}\r\n\t\t.role-tag-pill:not(:has(.role-tag-remove)) {\r\n\t\t\tpadding-right: 10px;\r\n\t\t}\r\n\t\t.role-tag-label {\r\n\t\t\tline-height: 1.2;\r\n\t\t}\r\n\t\t.role-tag-remove {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 1.125rem;\r\n\t\t\theight: 1.125rem;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: 0;\r\n\t\t\tborder: none;\r\n\t\t\tborder-radius: 999px;\r\n\t\t\tbackground: transparent;\r\n\t\t\tcolor: inherit;\r\n\t\t\tcursor: pointer;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tline-height: 1;\r\n\t\t\topacity: 0.75;\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\t\t.role-tag-remove:hover {\r\n\t\t\topacity: 1;\r\n\t\t\tbackground: rgba(0, 0, 0, 0.08);\r\n\t\t}\r\n\t\t.role-tags .pill--neutral {\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\t\t.role-tags-add {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\talign-items: center;\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -134,7 +134,7 @@ func TeacherRoleEditor(roles []constants.TeacherRole, roleOptions []constants.Te
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(option))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 87, Col: 36}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 86, Col: 36}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 				if templ_7745c5c3_Err != nil {
@@ -147,7 +147,7 @@ func TeacherRoleEditor(roles []constants.TeacherRole, roleOptions []constants.Te
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(string(option))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 87, Col: 55}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 86, Col: 55}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -163,7 +163,7 @@ func TeacherRoleEditor(roles []constants.TeacherRole, roleOptions []constants.Te
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<script>\r\n\t\t\t(function () {\r\n\t\t\t\tconst tags = document.getElementById('teacherRoleTags');\r\n\t\t\t\tif (!tags) return;\r\n\r\n\t\t\t\tconst addSelect = document.getElementById('teacherRoleAdd');\r\n\t\t\t\tconst addBtn = document.getElementById('teacherRoleAddBtn');\r\n\t\t\t\tconst addPanel = document.querySelector('.role-tags-add');\r\n\r\n\t\t\t\tfunction escapeHTML(value) {\r\n\t\t\t\t\treturn String(value)\r\n\t\t\t\t\t\t.replaceAll('&', '&amp;')\r\n\t\t\t\t\t\t.replaceAll('<', '&lt;')\r\n\t\t\t\t\t\t.replaceAll('>', '&gt;')\r\n\t\t\t\t\t\t.replaceAll('\"', '&quot;');\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction roleTagPillClass(role) {\r\n\t\t\t\t\tswitch (role) {\r\n\t\t\t\t\t\tcase 'admin':\r\n\t\t\t\t\t\t\treturn 'role-tag-pill pill pill--primary';\r\n\t\t\t\t\t\tcase 'developer':\r\n\t\t\t\t\t\t\treturn 'role-tag-pill pill pill--info';\r\n\t\t\t\t\t\tdefault:\r\n\t\t\t\t\t\t\treturn 'role-tag-pill pill pill--neutral';\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction restoreRoleOption(role) {\r\n\t\t\t\t\tif (!addSelect || !role) return;\r\n\t\t\t\t\tif (Array.from(addSelect.options).some(function (opt) { return opt.value === role; })) {\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\t\t\t\t\tconst option = document.createElement('option');\r\n\t\t\t\t\toption.value = role;\r\n\t\t\t\t\toption.textContent = role;\r\n\t\t\t\t\taddSelect.appendChild(option);\r\n\t\t\t\t\tif (addPanel) {\r\n\t\t\t\t\t\taddPanel.style.display = '';\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction removeRolePill(pill) {\r\n\t\t\t\t\tif (!pill) return;\r\n\t\t\t\t\tconst role = pill.dataset.role;\r\n\t\t\t\t\tpill.remove();\r\n\t\t\t\t\trestoreRoleOption(role);\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction createPill(role) {\r\n\t\t\t\t\tconst removable = role !== 'teacher';\r\n\t\t\t\t\tconst pill = document.createElement('span');\r\n\t\t\t\t\tpill.className = roleTagPillClass(role);\r\n\t\t\t\t\tpill.dataset.role = role;\r\n\t\t\t\t\tpill.innerHTML =\r\n\t\t\t\t\t\t'<span class=\"role-tag-label\">' + escapeHTML(role) + '</span>' +\r\n\t\t\t\t\t\t(removable\r\n\t\t\t\t\t\t\t? '<button type=\"button\" class=\"role-tag-remove\" aria-label=\"Remove ' + escapeHTML(role) + ' role\">&times;</button>'\r\n\t\t\t\t\t\t\t: '') +\r\n\t\t\t\t\t\t'<input type=\"hidden\" name=\"roles\" value=\"' + escapeHTML(role) + '\">';\r\n\t\t\t\t\treturn pill;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (addBtn && addSelect) {\r\n\t\t\t\t\taddBtn.addEventListener('click', function () {\r\n\t\t\t\t\t\tconst role = addSelect.value;\r\n\t\t\t\t\t\tif (!role) return;\r\n\t\t\t\t\t\tif (tags.querySelector('[data-role=\"' + role + '\"]')) return;\r\n\t\t\t\t\t\ttags.appendChild(createPill(role));\r\n\t\t\t\t\t\tconst option = addSelect.querySelector('option[value=\"' + role + '\"]');\r\n\t\t\t\t\t\tif (option) option.remove();\r\n\t\t\t\t\t\tif (addSelect.options.length === 0 && addPanel) {\r\n\t\t\t\t\t\t\taddPanel.style.display = 'none';\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t});\r\n\t\t\t\t}\r\n\r\n\t\t\t\ttags.addEventListener('click', function (event) {\r\n\t\t\t\t\tconst button = event.target.closest('.role-tag-remove');\r\n\t\t\t\t\tif (!button) return;\r\n\t\t\t\t\tevent.preventDefault();\r\n\t\t\t\t\tremoveRolePill(button.closest('.role-tag-pill'));\r\n\t\t\t\t});\r\n\t\t\t})();\r\n\t\t</script></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<script>\r\n\t\t\t(function () {\r\n\t\t\t\tconst tags = document.getElementById('teacherRoleTags');\r\n\t\t\t\tif (!tags) return;\r\n\r\n\t\t\t\tconst addSelect = document.getElementById('teacherRoleAdd');\r\n\t\t\t\tconst addBtn = document.getElementById('teacherRoleAddBtn');\r\n\t\t\t\tconst addPanel = document.querySelector('.role-tags-add');\r\n\r\n\t\t\t\tfunction escapeHTML(value) {\r\n\t\t\t\t\treturn String(value)\r\n\t\t\t\t\t\t.replaceAll('&', '&amp;')\r\n\t\t\t\t\t\t.replaceAll('<', '&lt;')\r\n\t\t\t\t\t\t.replaceAll('>', '&gt;')\r\n\t\t\t\t\t\t.replaceAll('\"', '&quot;');\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction roleTagPillClass(role) {\r\n\t\t\t\t\tswitch (role) {\r\n\t\t\t\t\t\tcase 'admin':\r\n\t\t\t\t\t\t\treturn 'role-tag-pill pill pill--primary';\r\n\t\t\t\t\t\tcase 'developer':\r\n\t\t\t\t\t\t\treturn 'role-tag-pill pill pill--info';\r\n\t\t\t\t\t\tcase 'tester':\r\n\t\t\t\t\t\t\treturn 'role-tag-pill pill pill--warning';\r\n\t\t\t\t\t\tdefault:\r\n\t\t\t\t\t\t\treturn 'role-tag-pill pill pill--neutral';\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction restoreRoleOption(role) {\r\n\t\t\t\t\tif (!addSelect || !role) return;\r\n\t\t\t\t\tif (Array.from(addSelect.options).some(function (opt) { return opt.value === role; })) {\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\t\t\t\t\tconst option = document.createElement('option');\r\n\t\t\t\t\toption.value = role;\r\n\t\t\t\t\toption.textContent = role;\r\n\t\t\t\t\taddSelect.appendChild(option);\r\n\t\t\t\t\tif (addPanel) {\r\n\t\t\t\t\t\taddPanel.style.display = '';\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction removeRolePill(pill) {\r\n\t\t\t\t\tif (!pill) return;\r\n\t\t\t\t\tconst role = pill.dataset.role;\r\n\t\t\t\t\tpill.remove();\r\n\t\t\t\t\trestoreRoleOption(role);\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction createPill(role) {\r\n\t\t\t\t\tconst removable = role !== 'teacher';\r\n\t\t\t\t\tconst pill = document.createElement('span');\r\n\t\t\t\t\tpill.className = roleTagPillClass(role);\r\n\t\t\t\t\tpill.dataset.role = role;\r\n\t\t\t\t\tpill.innerHTML =\r\n\t\t\t\t\t\t'<span class=\"role-tag-label\">' + escapeHTML(role) + '</span>' +\r\n\t\t\t\t\t\t(removable\r\n\t\t\t\t\t\t\t? '<button type=\"button\" class=\"role-tag-remove\" data-tooltip=\"Remove ' + escapeHTML(role) + ' role\" aria-label=\"Remove ' + escapeHTML(role) + ' role\">&times;</button>'\r\n\t\t\t\t\t\t\t: '') +\r\n\t\t\t\t\t\t'<input type=\"hidden\" name=\"roles\" value=\"' + escapeHTML(role) + '\">';\r\n\t\t\t\t\treturn pill;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (addBtn && addSelect) {\r\n\t\t\t\t\taddBtn.addEventListener('click', function () {\r\n\t\t\t\t\t\tconst role = addSelect.value;\r\n\t\t\t\t\t\tif (!role) return;\r\n\t\t\t\t\t\tif (tags.querySelector('[data-role=\"' + role + '\"]')) return;\r\n\t\t\t\t\t\ttags.appendChild(createPill(role));\r\n\t\t\t\t\t\tconst option = addSelect.querySelector('option[value=\"' + role + '\"]');\r\n\t\t\t\t\t\tif (option) option.remove();\r\n\t\t\t\t\t\tif (addSelect.options.length === 0 && addPanel) {\r\n\t\t\t\t\t\t\taddPanel.style.display = 'none';\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t});\r\n\t\t\t\t}\r\n\r\n\t\t\t\ttags.addEventListener('click', function (event) {\r\n\t\t\t\t\tconst button = event.target.closest('.role-tag-remove');\r\n\t\t\t\t\tif (!button) return;\r\n\t\t\t\t\tevent.preventDefault();\r\n\t\t\t\t\tremoveRolePill(button.closest('.role-tag-pill'));\r\n\t\t\t\t});\r\n\t\t\t})();\r\n\t\t</script></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -217,7 +217,7 @@ func RemovableRolePill(role constants.TeacherRole) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(role))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 182, Col: 64}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 183, Col: 64}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 		if templ_7745c5c3_Err != nil {
@@ -230,7 +230,7 @@ func RemovableRolePill(role constants.TeacherRole) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(string(role))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 183, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 184, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -241,38 +241,51 @@ func RemovableRolePill(role constants.TeacherRole) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if role != constants.TeacherRoleTeacher {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<button type=\"button\" class=\"role-tag-remove\" aria-label=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<button type=\"button\" class=\"role-tag-remove\" data-tooltip=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue("Remove " + string(role) + " role")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 185, Col: 96}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 186, Col: 98}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\">&times;</button> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" aria-label=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var12 string
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue("Remove " + string(role) + " role")
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 186, Col: 148}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\">&times;</button> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<input type=\"hidden\" name=\"roles\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<input type=\"hidden\" name=\"roles\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var12 string
-		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(role))
+		var templ_7745c5c3_Var13 string
+		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(role))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 187, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/role_pills.templ`, Line: 188, Col: 56}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\"></span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\"></span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

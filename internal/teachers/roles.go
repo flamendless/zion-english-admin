@@ -57,7 +57,7 @@ func ParseTeacherRoles(values []string) ([]constants.TeacherRole, error) {
 	if len(roles) == 0 {
 		return nil, ErrTeacherRoleRequired
 	}
-	if !HasRole(roles, constants.TeacherRoleTeacher) {
+	if !HasRole(roles, constants.TeacherRoleTeacher) && !HasRole(roles, constants.TeacherRoleTester) {
 		return nil, ErrTeacherRoleRequired
 	}
 	return roles, nil
@@ -75,7 +75,7 @@ func ValidateRoleAssignment(actorRole string, targetHasAdmin bool, submitted []c
 			return ErrInvalidRole
 		}
 	}
-	if !HasRole(submitted, constants.TeacherRoleTeacher) {
+	if !HasRole(submitted, constants.TeacherRoleTeacher) && !HasRole(submitted, constants.TeacherRoleTester) {
 		return ErrTeacherRoleRequired
 	}
 	return nil

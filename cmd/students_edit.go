@@ -10,6 +10,7 @@ import (
 	"strings"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
+	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/models"
 	"zion-english/internal/utils"
@@ -61,8 +62,9 @@ func studentFilterParams(q, status string, teacherID int64) queries.CountStudent
 		Column1:   q,
 		Column2:   sql.NullString{String: q, Valid: true},
 		Column3:   status,
+		Column4:   status,
 		Status:    status,
-		Column5:   teacherID,
+		Column6:   teacherID,
 		TeacherID: teacherID,
 	}
 }
@@ -74,6 +76,10 @@ func handleStudentsPath(w http.ResponseWriter, r *http.Request) {
 	}
 	if id, ok := extractPathID(r, "students", "/view"); ok {
 		handleStudentView(w, r, id)
+		return
+	}
+	if id, ok := extractPathID(r, "students", "/delete"); ok {
+		handleStudentDelete(w, r, id)
 		return
 	}
 	HttpError(w, "Not found", http.StatusNotFound)
@@ -137,18 +143,27 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 	if existing.InactiveReason.Valid {
 		inactiveReason = existing.InactiveReason.String
 	}
+	deletedReason := ""
+	if existing.DeletedReason.Valid {
+		deletedReason = existing.DeletedReason.String
+	}
+	parentRate, parentCurrency, hasParentRate := studentParentRateView(existing.ParentRate, existing.ParentCurrency)
 
 	return frontend.EditStudentData{
 		ID:             strconv.FormatInt(studentID, 10),
-		Readonly:       readonly,
+		Readonly:       readonly || existing.Status == string(constants.StudentStatusDeleted),
 		Name:           existing.Name,
 		Currency:       existing.Currency,
 		Contact:        existing.Contact.String,
 		RatePerClass:   existing.RatePerClass,
 		ParentName:     existing.ParentName.String,
+		ParentRate:     parentRate,
+		ParentCurrency: parentCurrency,
+		HasParentRate:  hasParentRate,
 		AssignedColor:  existing.AssignedColor,
-		Status:         existing.Status,
+		Status:         constants.StudentStatus(existing.Status),
 		InactiveReason: inactiveReason,
+		DeletedReason:  deletedReason,
 		TeacherIDs:     teacherIDs,
 		TeacherNames:   teacherNames,
 		Teachers:       teachers,
@@ -199,6 +214,55 @@ func saveStudentRelationships(ctx context.Context, studentID int64, r *http.Requ
 	})
 }
 
+func handleStudentDelete(w http.ResponseWriter, r *http.Request, studentID int64) {
+	if r.Method != http.MethodPost {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if !auth.HasAdminAccess(auth.GetRole(r.Context())) {
+		HttpError(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
+		return
+	}
+
+	reason := strings.TrimSpace(r.FormValue("reason"))
+	if err := validateDeletionReason(reason); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	ctx := r.Context()
+	user := auth.GetUser(ctx)
+
+	existing, err := dbRO.GetQueries().GetStudentByID(ctx, studentID)
+	if err != nil {
+		HttpError(w, "Student not found", http.StatusNotFound)
+		return
+	}
+	if existing.Status == string(constants.StudentStatusDeleted) {
+		sendErrorLog(w, "Student is already deleted")
+		return
+	}
+
+	err = dbRW.GetQueries().SoftDeleteStudent(ctx, queries.SoftDeleteStudentParams{
+		DeletedReason: sql.NullString{String: reason, Valid: true},
+		ID:            studentID,
+	})
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
+	insertAuditLogAs(ctx, user, "students", fmt.Sprintf("deleted student '%s' (id %d, reason: %s)", existing.Name, studentID, reason))
+	setSuccessFlash(w, "Student deleted successfully.")
+	w.Header().Set("HX-Redirect", utils.URL("/students"))
+}
+
 func handleStudentView(w http.ResponseWriter, r *http.Request, studentID int64) {
 	if r.Method != http.MethodGet {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -232,6 +296,7 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("q")
 	status := r.URL.Query().Get("status")
 	teacherID := utils.QueryParamInt64(r, "teacherId")
+	sort := parseListSort(r, frontend.ListSortKindStudent)
 	page := utils.ParsePageQuery(r)
 
 	filter := studentFilterParams(q, status, teacherID)
@@ -242,20 +307,23 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 	}
 	page.Total = total
 
-	students, err := dbRO.GetQueries().GetStudentsFiltered(ctx, queries.GetStudentsFilteredParams{
+	allStudents, err := dbRO.GetQueries().GetStudentsFiltered(ctx, queries.GetStudentsFilteredParams{
 		Column1:   filter.Column1,
 		Column2:   filter.Column2,
 		Column3:   filter.Column3,
+		Column4:   filter.Column4,
 		Status:    filter.Status,
-		Column5:   filter.Column5,
+		Column6:   filter.Column6,
 		TeacherID: filter.TeacherID,
-		Limit:     int64(page.Size),
-		Offset:    int64(page.Offset()),
+		Limit:     total,
+		Offset:    0,
 	})
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to fetch students: %v", err), http.StatusInternalServerError)
 		return
 	}
+	sortStudentRows(allStudents, sort)
+	students := paginateSlice(allStudents, page)
 
 	relationships, err := dbRO.GetQueries().GetAllStudentRelationships(ctx)
 	if err != nil {
@@ -281,6 +349,7 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 
 	viewStudents := make([]frontend.StudentItem, len(students))
 	for i, s := range students {
+		parentRate, parentCurrency, hasParentRate := studentParentRateView(s.ParentRate, s.ParentCurrency)
 		viewStudents[i] = frontend.StudentItem{
 			ID:               strconv.FormatInt(s.ID, 10),
 			Name:             s.Name,
@@ -288,8 +357,11 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 			Contact:          s.Contact.String,
 			RatePerClass:     s.RatePerClass,
 			ParentName:       s.ParentName.String,
+			ParentRate:       parentRate,
+			ParentCurrency:   parentCurrency,
+			HasParentRate:    hasParentRate,
 			AssignedColor:    s.AssignedColor,
-			Status:           s.Status,
+			Status:           constants.StudentStatus(s.Status),
 			TeacherDisplay:   strings.Join(teachersByStudent[s.ID], ", "),
 			RelatedToDisplay: formatStudentRelationships(relationshipsByStudent[s.ID]),
 			CreatedAt:        utils.FormatNullDateTimeSecondsPHT(s.CreatedAt),
@@ -297,13 +369,22 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	params := listQueryParams(r)
+	params := listQueryParamsWithSort(r, frontend.ListSortKindStudent)
+	teacherName := ""
+	if teacherID > 0 {
+		if teacher, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, teacherID); err == nil {
+			teacherName = utils.ComposePersonName(teacher.FirstName, teacher.MiddleName, teacher.LastName)
+		}
+	}
 	w.Header().Set("Content-Type", "text/html")
 	frontend.Students(frontend.StudentData{
 		Students:       viewStudents,
 		Query:          q,
-		Status:         status,
+		Status:         constants.StudentStatus(status),
 		TeacherID:      strconv.FormatInt(teacherID, 10),
+		TeacherName:    teacherName,
+		SortBy:         sort.By,
+		SortOrder:      string(sort.Order),
 		PageNumber:     page.Number,
 		PageTotalPages: page.TotalPages(),
 		PageTotal:      page.Total,
@@ -362,6 +443,11 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		return
 	}
 
+	if existing.Status == string(constants.StudentStatusDeleted) {
+		sendErrorLog(w, "Deleted students cannot be edited")
+		return
+	}
+
 	if err := r.ParseForm(); err != nil {
 		sendErrorLog(w, fmt.Sprintf("Invalid request: %v", err))
 		return
@@ -397,15 +483,24 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 			return
 		}
 
+		parentRate, parentCurrency, err := parseStudentParentRateFields(r.FormValue("parentRate"), r.FormValue("parentCurrency"))
+		if err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+
 		err = dbRW.GetQueries().UpdateStudent(ctx, queries.UpdateStudentParams{
 			Name:           req.Name,
 			Currency:       req.Currency,
 			Contact:        sql.NullString{String: req.Contact, Valid: req.Contact != ""},
 			RatePerClass:   req.RatePerClass,
 			ParentName:     sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
+			ParentRate:     parentRate,
+			ParentCurrency: parentCurrency,
 			AssignedColor:  req.AssignedColor,
 			Status:         req.Status,
 			InactiveReason: sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
+			DeletedReason:  existing.DeletedReason,
 			ID:             studentID,
 		})
 		if err != nil {
@@ -443,7 +538,7 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		}
 		notifyNewlyAssignedTeachers(ctx, user, req.Name, beforeIDs, teacherIDs)
 
-		if _, err := fmt.Fprint(w, "Student updated successfully!\n"); err != nil {
+		if err := respondFormMutation(w, "Student updated successfully!", "/students"); err != nil {
 			sendErrorLog(w, err.Error())
 		}
 		return
@@ -474,9 +569,12 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		Contact:        existing.Contact,
 		RatePerClass:   req.RatePerClass,
 		ParentName:     sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
+		ParentRate:     existing.ParentRate,
+		ParentCurrency: existing.ParentCurrency,
 		AssignedColor:  req.AssignedColor,
 		Status:         existing.Status,
 		InactiveReason: existing.InactiveReason,
+		DeletedReason:  existing.DeletedReason,
 		ID:             studentID,
 	})
 	if err != nil {
@@ -487,7 +585,7 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 	updated, _ := dbRW.GetQueries().GetStudentByID(ctx, studentID)
 	insertAuditLogAs(ctx, user, "students", formatStudentAudit(existing, updated, teachersBefore, teachersBefore))
 
-	if _, err := fmt.Fprint(w, "Student updated successfully!\n"); err != nil {
+	if err := respondFormMutation(w, "Student updated successfully!", "/students"); err != nil {
 		sendErrorLog(w, err.Error())
 	}
 }

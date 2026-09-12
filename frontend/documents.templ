@@ -2,7 +2,7 @@ package frontend
 
 import (
 	"fmt"
-	"strings"
+	"zion-english/internal/constants"
 	"zion-english/internal/utils"
 )
 
@@ -12,7 +12,7 @@ type DocumentItem struct {
 	Extension        string
 	Type             string
 	FileSize         string
-	Status           string
+	Status           constants.TeacherDocumentStatus
 	UploadedAt       string
 	UploadedBy       string
 	UploadedByAvatar AvatarProps
@@ -20,11 +20,11 @@ type DocumentItem struct {
 	CanReview        bool
 }
 
-func documentRowClass(status string) string {
+func documentRowClass(status constants.TeacherDocumentStatus) string {
 	switch status {
-	case "submitted":
+	case constants.TeacherDocumentStatusSubmitted:
 		return "document-row-submitted"
-	case "rejected":
+	case constants.TeacherDocumentStatusRejected:
 		return "document-row-rejected"
 	default:
 		return ""
@@ -40,13 +40,6 @@ func documentTypeLabel(docType string) string {
 	default:
 		return docType
 	}
-}
-
-func documentStatusLabel(status string) string {
-	if status == "" {
-		return ""
-	}
-	return strings.ToUpper(status[:1]) + status[1:]
 }
 
 func documentsTableColspan(showUploader bool, showActions bool) int {
@@ -76,9 +69,9 @@ templ DocumentStatusFilterDropdown() {
 		<label for="documentStatus">Status</label>
 		<select id="documentStatus" name="status">
 			<option value="">All</option>
-			<option value="submitted">Submitted</option>
-			<option value="approved">Approved</option>
-			<option value="rejected">Rejected</option>
+			for _, opt := range TeacherDocumentStatusOptions {
+				<option value={ opt.Value }>{ opt.Label }</option>
+			}
 		</select>
 	</div>
 }
@@ -88,16 +81,17 @@ templ DocumentsToolbar(showTeacherFilter bool) {
 		<div class="form-group">
 			<label for="documentSearch">Search</label>
 			if showTeacherFilter {
-				<input type="text" id="documentSearch" name="q" placeholder="Filename or teacher name..."/>
+				<input type="text" id="documentSearch" name="documentQ" placeholder="Filename or teacher name..."/>
 			} else {
-				<input type="text" id="documentSearch" name="q" placeholder="Filename..."/>
+				<input type="text" id="documentSearch" name="documentQ" placeholder="Filename..."/>
 			}
 		</div>
 		@DocumentTypeFilterDropdown()
 		@DocumentStatusFilterDropdown()
 		if showTeacherFilter {
-			@TeacherFilterDropdown("")
+			@TeacherFilterDropdown("", "")
 		}
+		@SortControls("", "desc", ListSortKindDocument)
 		<button
 			type="button"
 			id="documentsFilterBtn"
@@ -122,7 +116,7 @@ templ DocumentTableRow(item DocumentItem, showUploader bool, showActions bool) {
 		</td>
 		<td data-label="File size">{ item.FileSize }</td>
 		<td data-label="Status">
-			@StatusPill(documentStatusLabel(item.Status), DocumentStatusPillTone(item.Status), true)
+			@StatusPill(item.Status.Label(), DocumentStatusPillTone(item.Status), true)
 		</td>
 		if showUploader {
 			<td data-label="Uploaded by">
@@ -177,11 +171,11 @@ templ DocumentsTable(showUploader bool, showActions bool) {
 					<th>File size</th>
 					<th>Status</th>
 					if showUploader {
-						<th>Uploaded by</th>
+						@AdminOnlyTableHeader("Uploaded by")
 					}
 					<th>Uploaded at</th>
 					if showActions {
-						<th>Actions</th>
+						@AdminOnlyTableHeader("Actions")
 					}
 				</tr>
 			</thead>
@@ -512,7 +506,7 @@ templ ProfileDocumentUpload(data ProfileData) {
 						</span>
 						<span class="upload-zone-meta">
 							<span>Choose ID document</span>
-							<span class="upload-zone-hint">PNG, JPEG, JPG, or PDF — max 5 MB</span>
+							<span class="upload-zone-hint">PNG, JPEG, JPG, or PDF (max 5 MB)</span>
 						</span>
 						<input
 							type="file"

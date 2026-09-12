@@ -36,8 +36,13 @@ templ Header(loggedIn bool, role auth.Role) {
 					</div>
 				}
 				<div class="nav-links">
-					for _, item := range NavItems(role) {
-						@NavLink(item.Path, item.LinkID, item.Title)
+					for _, entry := range NavBarEntries(role) {
+						switch entry.Kind {
+						case NavBarEntryLink:
+							@NavLink(entry.Item.Path, entry.Item.LinkID, entry.Item.Title)
+						case NavBarEntryGroup:
+							@NavDropdown(entry.Group)
+						}
 					}
 				</div>
 			</div>
@@ -56,8 +61,12 @@ templ HeaderSimple() {
 	{{
 		role := auth.GetRole(ctx)
 		loggedIn := role != ""
+		classWizard := ClassWizardPageDataForContext(ctx)
 	}}
 	@Header(loggedIn, role)
+	if loggedIn {
+		@RecordClassFlowModals(classWizard)
+	}
 }
 
 templ SuccessBanner() {
@@ -225,19 +234,34 @@ templ ErrorBannerHandlers() {
 		}
 
 		(function() {
-			const banner = document.getElementById('errorBanner');
-			const cookiePath = banner?.dataset.basePath || '/';
-			const match = document.cookie.match(/error_flash=([^;]+)/);
-			if (match) {
-				showErrorBanner(decodeURIComponent(match[1].replace(/\+/g, ' ')));
-				document.cookie = 'error_flash=; Max-Age=0; path=' + encodeURIComponent(cookiePath);
+			function readErrorFlash() {
+				const banner = document.getElementById('errorBanner');
+				if (!banner) {
+					return;
+				}
+				const cookiePath = banner.dataset.basePath || '/';
+				const match = document.cookie.match(/error_flash=([^;]+)/);
+				if (match) {
+					showErrorBanner(decodeURIComponent(match[1].replace(/\+/g, ' ')));
+					document.cookie = 'error_flash=; Max-Age=0; path=' + encodeURIComponent(cookiePath);
+				}
+			}
+
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', readErrorFlash);
+			} else {
+				readErrorFlash();
 			}
 		})();
 
 		document.addEventListener('htmx:responseError', function(evt) {
 			const xhr = evt.detail.xhr;
-			const message = xhr.responseText || 'An error occurred';
+			const message = (xhr.responseText || 'An error occurred').trim();
 			showErrorBanner(message);
+			const target = evt.detail.target;
+			if (target && target.id === 'logOutput') {
+				target.textContent = message;
+			}
 		});
 
 		document.addEventListener('htmx:sendError', function(evt) {

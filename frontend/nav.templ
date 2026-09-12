@@ -1,0 +1,232 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+templ NavDropdown(group NavGroup) {
+	<details class="nav-dropdown">
+		<summary class="nav-dropdown-trigger">
+			<span>{ group.Label }</span>
+		</summary>
+		<div class="nav-dropdown-panel" role="menu">
+			for _, item := range group.Items {
+				@NavDropdownItem(item)
+			}
+		</div>
+	</details>
+}
+
+templ NavDropdownItem(item NavItem) {
+	if item.Action == NavItemActionRecordClasses {
+		<button type="button" class="nav-dropdown-link" data-open-record-classes-modal role="menuitem">{ item.Title }</button>
+	} else {
+		<a
+			href={ utils.URL(item.Path) }
+			id={ item.LinkID }
+			class="nav-dropdown-link"
+			role="menuitem"
+		>{ item.Title }</a>
+	}
+}
+
+templ NavDropdownScript() {
+	<script>
+		(function () {
+			if (window._navDropdownBound) return;
+			window._navDropdownBound = true;
+
+			document.addEventListener('toggle', function (e) {
+				const dropdown = e.target;
+				if (!dropdown.matches || !dropdown.matches('.nav-dropdown') || !dropdown.open) {
+					return;
+				}
+				document.querySelectorAll('.nav-dropdown[open]').forEach(function (other) {
+					if (other !== dropdown) {
+						other.open = false;
+					}
+				});
+			});
+
+			document.addEventListener('click', function (e) {
+				document.querySelectorAll('.nav-dropdown[open]').forEach(function (dropdown) {
+					if (!dropdown.contains(e.target)) {
+						dropdown.open = false;
+					}
+				});
+			});
+		})();
+	</script>
+}
+
+templ NavGroupActionCard(group NavGroup) {
+	if group.FeatureCard {
+		<button type="button" class="card card-feature" data-open-nav-group-modal={ group.ID }>
+			<div class="card__head">
+				@NavIconBadge(group.Icon)
+				if group.AdminOnlyCard {
+					@AdminOnlyCardTitle(group.Label)
+				} else {
+					<h2>{ group.Label }</h2>
+				}
+			</div>
+			<p>{ group.Description }</p>
+		</button>
+	} else {
+		<button type="button" class="card" data-open-nav-group-modal={ group.ID }>
+			<div class="card__head">
+				@NavIconBadge(group.Icon)
+				if group.AdminOnlyCard {
+					@AdminOnlyCardTitle(group.Label)
+				} else {
+					<h2>{ group.Label }</h2>
+				}
+			</div>
+			<p>{ group.Description }</p>
+		</button>
+	}
+}
+
+templ NavGroupChoiceModals(groups []NavGroup) {
+	for _, group := range groups {
+		@NavGroupChoiceModal(group)
+	}
+	@NavGroupChoiceModalScript()
+}
+
+templ NavGroupChoiceModal(group NavGroup) {
+	<div
+		class="modal-overlay nav-group-choice-modal"
+		id={ "navGroupModal-" + group.ID }
+		hidden
+		role="presentation"
+		data-nav-group-modal={ group.ID }
+	>
+		<div class="modal-dialog modal-dialog-choice" role="dialog" aria-modal="true" aria-labelledby={ "navGroupModalTitle-" + group.ID }>
+			<div class="modal-header">
+				<h3 id={ "navGroupModalTitle-" + group.ID }>{ group.Label }</h3>
+				<button type="button" class="modal-close nav-group-choice-close" data-tooltip="Close" aria-label="Close">&times;</button>
+			</div>
+			<div class="modal-body nav-group-choice-body">
+				<div class="choice-option-cards">
+					for _, item := range group.Items {
+						@NavGroupChoiceCard(item)
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+templ NavGroupChoiceCard(item NavItem) {
+	if item.Action == NavItemActionRecordClasses {
+		<button type="button" class="choice-option-card" data-open-record-classes-modal>
+			@NavChoiceIcon(item.Icon)
+			<span class="choice-option-card__body">
+				<span class="choice-option-card__title">{ item.Title }</span>
+				<span class="choice-option-card__desc">{ item.Description }</span>
+			</span>
+		</button>
+	} else {
+		<a href={ utils.URL(item.Path) } class="choice-option-card">
+			@NavChoiceIcon(item.Icon)
+			<span class="choice-option-card__body">
+				if item.AdminOnlyCard {
+					@AdminOnlyCardTitle(item.Title)
+				} else {
+					<span class="choice-option-card__title">{ item.Title }</span>
+				}
+				<span class="choice-option-card__desc">{ item.Description }</span>
+			</span>
+		</a>
+	}
+}
+
+templ NavGroupChoiceModalScript() {
+	<script>
+		(function () {
+			const modals = Array.from(document.querySelectorAll('[data-nav-group-modal]'));
+			if (!modals.length) return;
+
+			let triggerEl = null;
+			let openModal = null;
+
+			function getFocusables(modal) {
+				return Array.from(modal.querySelectorAll(
+					'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+				)).filter((el) => !el.hidden && el.offsetParent !== null);
+			}
+
+			function trapFocus(e) {
+				if (!openModal || openModal.hidden || e.key !== 'Tab') return;
+				const focusables = getFocusables(openModal);
+				if (!focusables.length) return;
+				const first = focusables[0];
+				const last = focusables[focusables.length - 1];
+				if (e.shiftKey && document.activeElement === first) {
+					e.preventDefault();
+					last.focus();
+				} else if (!e.shiftKey && document.activeElement === last) {
+					e.preventDefault();
+					first.focus();
+				}
+			}
+
+			function openNavGroupModal(groupID, trigger) {
+				const modal = document.getElementById('navGroupModal-' + groupID);
+				if (!modal) return;
+				triggerEl = trigger || document.activeElement;
+				openModal = modal;
+				modal.hidden = false;
+				document.body.classList.add('modal-open');
+				requestAnimationFrame(() => {
+					const firstCard = modal.querySelector('.choice-option-card');
+					if (firstCard) firstCard.focus();
+				});
+			}
+
+			function closeNavGroupModal() {
+				if (!openModal) return;
+				openModal.hidden = true;
+				document.body.classList.remove('modal-open');
+				if (triggerEl && typeof triggerEl.focus === 'function') {
+					triggerEl.focus();
+				}
+				triggerEl = null;
+				openModal = null;
+			}
+
+			document.addEventListener('click', (e) => {
+				const trigger = e.target.closest('[data-open-nav-group-modal]');
+				if (trigger) {
+					e.preventDefault();
+					openNavGroupModal(trigger.getAttribute('data-open-nav-group-modal'), trigger);
+					return;
+				}
+				if (e.target.closest('[data-open-record-classes-modal]') && openModal) {
+					const returnTrigger = triggerEl;
+					openModal.hidden = true;
+					openModal = null;
+					triggerEl = null;
+					if (typeof window.openRecordClassesChoiceModal === 'function') {
+						window.openRecordClassesChoiceModal(returnTrigger);
+					}
+					return;
+				}
+				if (e.target.closest('.nav-group-choice-close')) {
+					closeNavGroupModal();
+					return;
+				}
+				if (openModal && e.target === openModal) {
+					closeNavGroupModal();
+				}
+			});
+
+			document.addEventListener('keydown', (e) => {
+				if (e.key === 'Escape' && openModal && !openModal.hidden) {
+					e.preventDefault();
+					closeNavGroupModal();
+				}
+				trapFocus(e);
+			});
+		})();
+	</script>
+}

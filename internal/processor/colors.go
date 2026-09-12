@@ -21,6 +21,8 @@ var LightStudentColors = []string{
 }
 
 var defaultStudentColors = map[string]bool{
+	"#2563eb": true,
+	"#3b82f6": true,
 	"#90c020": true,
 	"#b9d283": true,
 }

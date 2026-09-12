@@ -14,6 +14,7 @@ import (
 	"time"
 	"zion-english/internal/auth"
 	"zion-english/internal/conf"
+	"zion-english/internal/constants"
 	"zion-english/internal/logs"
 	"zion-english/internal/meetings"
 
@@ -34,8 +35,13 @@ func handleZoomConnect(w http.ResponseWriter, r *http.Request) {
 		HttpError(w, "Zoom integration is not configured", http.StatusServiceUnavailable)
 		return
 	}
-
 	ctx := r.Context()
+	_, connectAllowed := integrationAccessForViewer(ctx, constants.FeatureFlagIntegrationZoom)
+	if !connectAllowed {
+		HttpError(w, "Zoom connections are currently disabled", http.StatusServiceUnavailable)
+		return
+	}
+
 	user := auth.GetUser(ctx)
 	cfg := conf.Conf()
 	auth.RefreshSessionCookie(w, r, cfg)
@@ -76,33 +82,33 @@ func handleZoomCallback(w http.ResponseWriter, r *http.Request) {
 	state := r.URL.Query().Get("state")
 	cookieState, err := r.Cookie(zoomOAuthStateCookie)
 	if err != nil || cookieState.Value == "" || cookieState.Value != state {
-		HttpRedirect(w, r, "/profile?zoom_error=invalid_state")
+		HttpRedirect(w, r, "/profile?zoom_error="+string(constants.IntegrationOAuthErrorInvalidState))
 		return
 	}
 	teacherID, ok := parseZoomOAuthState(cfg.Secret, state)
 	if !ok {
 		clearZoomOAuthStateCookie(w, cfg)
-		HttpRedirect(w, r, "/profile?zoom_error=invalid_state")
+		HttpRedirect(w, r, "/profile?zoom_error="+string(constants.IntegrationOAuthErrorInvalidState))
 		return
 	}
 	clearZoomOAuthStateCookie(w, cfg)
 
 	code := r.URL.Query().Get("code")
 	if code == "" {
-		HttpRedirect(w, r, "/profile?zoom_error=missing_code")
+		HttpRedirect(w, r, "/profile?zoom_error="+string(constants.IntegrationOAuthErrorMissingCode))
 		return
 	}
 
 	account, expiresAt, err := meetingSvc.ZoomProvider().ExchangeCode(ctx, code)
 	if err != nil {
 		logs.Log().Error("zoom oauth exchange failed", zap.Error(err))
-		HttpRedirect(w, r, "/profile?zoom_error=exchange_failed")
+		HttpRedirect(w, r, "/profile?zoom_error="+string(constants.IntegrationOAuthErrorExchangeFailed))
 		return
 	}
 	account.Service = meetings.ServiceZoom
 	if err := meetingSvc.SaveOAuthAccount(ctx, teacherID, account, expiresAt); err != nil {
 		logs.Log().Error("save zoom account failed", zap.Error(err))
-		HttpRedirect(w, r, "/profile?zoom_error=save_failed")
+		HttpRedirect(w, r, "/profile?zoom_error="+string(constants.IntegrationOAuthErrorSaveFailed))
 		return
 	}
 
@@ -218,11 +224,12 @@ func urlQueryEscape(value string) string {
 	return strings.ReplaceAll(strings.ReplaceAll(value, " ", "+"), "\n", "")
 }
 
-func profileZoomStatus(ctx context.Context, teacherID int64) (connected bool, configured bool) {
-	configured = meetingSvc != nil && meetingSvc.IsZoomConfigured()
-	if !configured {
-		return false, false
+func profileZoomStatus(ctx context.Context, teacherID int64) (connected bool, envConfigured bool, visible bool, connectAllowed bool) {
+	envConfigured = meetingSvc != nil && meetingSvc.IsZoomConfigured()
+	visible, connectAllowed = integrationAccessForViewer(ctx, constants.FeatureFlagIntegrationZoom)
+	if !envConfigured {
+		return false, false, visible, connectAllowed
 	}
 	connected = teacherZoomConnected(ctx, teacherID)
-	return connected, configured
+	return connected, envConfigured, visible, connectAllowed
 }

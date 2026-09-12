@@ -10,26 +10,63 @@ import (
 	"strings"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
+	"zion-english/internal/calendar"
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
+	"zion-english/internal/meetings"
 	"zion-english/internal/notifications"
 	"zion-english/internal/processor"
 	"zion-english/internal/teachers"
 	"zion-english/internal/utils"
 )
 
-func teacherFilterParams(q, status string) queries.CountTeachersFilteredParams {
+func teacherFilterParams(q, status, docsStatus string, connectionZoom, connectionGoogle bool) queries.CountTeachersFilteredParams {
 	qNull := sql.NullString{String: q, Valid: q != ""}
-	return queries.CountTeachersFilteredParams{
-		Column1: q,
-		Column2: qNull,
-		Column3: qNull,
-		Column4: status,
-		Column5: status,
-		Column6: status,
-		Column7: status,
-		Status:  status,
+	zoomFlag := int64(0)
+	if connectionZoom {
+		zoomFlag = 1
 	}
+	googleFlag := int64(0)
+	if connectionGoogle {
+		googleFlag = 1
+	}
+	return queries.CountTeachersFilteredParams{
+		Column1:  q,
+		Column2:  qNull,
+		Column3:  qNull,
+		Column4:  status,
+		Column5:  status,
+		Column6:  status,
+		Column7:  status,
+		Status:   status,
+		Column9:  docsStatus,
+		Column10: docsStatus,
+		Column11: docsStatus,
+		Column12: docsStatus,
+		Status_2: docsStatus,
+		Column14: zoomFlag,
+		Column15: googleFlag,
+		Column16: zoomFlag,
+		Column17: googleFlag,
+	}
+}
+
+func parseConnectionCheckboxFilter(r *http.Request, name string) bool {
+	return r.URL.Query().Get(name) == "1"
+}
+
+func parseTeacherDocsStatusFilter(value string) string {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return ""
+	}
+	if value == frontend.TeacherDocsFilterStatusNone {
+		return value
+	}
+	if constants.ValidTeacherDocumentStatus(value) {
+		return value
+	}
+	return ""
 }
 
 func loadTeacherRoles(ctx context.Context, teacherID int64) ([]constants.TeacherRole, error) {
@@ -114,7 +151,8 @@ func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) 
 	}
 
 	teacherName := utils.ComposePersonName(row.FirstName, row.MiddleName, row.LastName)
-	zoomConnected, zoomConfigured := profileZoomStatus(ctx, teacherID)
+	zoomConnected, zoomConfigured, zoomVisible, zoomConnectionsAllowed := profileZoomStatus(ctx, teacherID)
+	googleCalendarConnected, googleCalendarConfigured, googleCalendarVisible, googleCalendarConnectionsAllowed := profileGoogleCalendarStatus(ctx, teacherID)
 	w.Header().Set("Content-Type", "text/html")
 	frontend.TeacherViewModal(frontend.TeacherViewData{
 		ID:             strconv.FormatInt(teacherID, 10),
@@ -133,11 +171,17 @@ func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		Currency:       row.Currency,
 		DriveUrl:       row.DriveUrl,
 		Sex:            sex,
-		Status:         row.Status,
+		Status:         constants.TeacherStatus(row.Status),
 		Roles:          roleStrings,
 		Avatar:         avatarWithTeacherRoles(buildTeacherAvatarProps(row), roleStrings),
-		ZoomConfigured: zoomConfigured,
-		ZoomConnected:  zoomConnected,
+		ZoomConfigured:                   zoomConfigured,
+		ZoomConnected:                    zoomConnected,
+		ZoomIntegrationVisible:           zoomVisible,
+		ZoomConnectionsAllowed:           zoomConnectionsAllowed,
+		GoogleCalendarConfigured:         googleCalendarConfigured,
+		GoogleCalendarConnected:          googleCalendarConnected,
+		GoogleCalendarIntegrationVisible: googleCalendarVisible,
+		GoogleCalendarConnectionsAllowed: googleCalendarConnectionsAllowed,
 	}).Render(ctx, w)
 }
 
@@ -150,9 +194,13 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	q := r.URL.Query().Get("q")
 	status := r.URL.Query().Get("status")
+	docsStatus := parseTeacherDocsStatusFilter(r.URL.Query().Get("docsStatus"))
+	connectionZoom := parseConnectionCheckboxFilter(r, "connectionZoom")
+	connectionGoogle := parseConnectionCheckboxFilter(r, "connectionGoogle")
+	sort := parseListSort(r, frontend.ListSortKindTeacher)
 	page := utils.ParsePageQuery(r)
 
-	filter := teacherFilterParams(q, status)
+	filter := teacherFilterParams(q, status, docsStatus, connectionZoom, connectionGoogle)
 	total, err := dbRO.GetQueries().CountTeachersFiltered(ctx, filter)
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to count teachers: %v", err), http.StatusInternalServerError)
@@ -160,22 +208,37 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 	}
 	page.Total = total
 
-	teachers, err := dbRO.GetQueries().GetTeachersFiltered(ctx, queries.GetTeachersFilteredParams{
-		Column1: filter.Column1,
-		Column2: filter.Column2,
-		Column3: filter.Column3,
-		Column4: filter.Column4,
-		Column5: filter.Column5,
-		Column6: filter.Column6,
-		Column7: filter.Column7,
-		Status:  filter.Status,
-		Limit:   int64(page.Size),
-		Offset:  int64(page.Offset()),
+	allTeachers, err := dbRO.GetQueries().GetTeachersFiltered(ctx, queries.GetTeachersFilteredParams{
+		Column1:  filter.Column1,
+		Column2:  filter.Column2,
+		Column3:  filter.Column3,
+		Column4:  filter.Column4,
+		Column5:  filter.Column5,
+		Column6:  filter.Column6,
+		Column7:  filter.Column7,
+		Status:   filter.Status,
+		Column9:  filter.Column9,
+		Column10: filter.Column10,
+		Column11: filter.Column11,
+		Column12: filter.Column12,
+		Status_2: filter.Status_2,
+		Column14: filter.Column14,
+		Column15: filter.Column15,
+		Column16: filter.Column16,
+		Column17: filter.Column17,
+		Limit:    total,
+		Offset:   0,
 	})
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to fetch teachers: %v", err), http.StatusInternalServerError)
 		return
 	}
+	if isDefaultListSort(sort, frontend.ListSortKindTeacher) {
+		sortTeacherRowsDefault(allTeachers)
+	} else {
+		sortTeacherRows(allTeachers, sort)
+	}
+	teachers := paginateSlice(allTeachers, page)
 
 	teacherIDs := make([]int64, len(teachers))
 	for i, t := range teachers {
@@ -184,6 +247,8 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 
 	docsStatusByTeacher := make(map[int64]string)
 	rolesByTeacher := make(map[int64][]constants.TeacherRole)
+	zoomConnectedByTeacher := make(map[int64]bool)
+	googleConnectedByTeacher := make(map[int64]bool)
 	if len(teacherIDs) > 0 {
 		docRows, err := dbRO.GetQueries().GetLatestTeacherDocumentStatusesByTeacherIDs(ctx, teacherIDs)
 		if err != nil {
@@ -204,6 +269,20 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 		for _, row := range roleRows {
 			rolesByTeacher[row.TeacherID] = append(rolesByTeacher[row.TeacherID], constants.TeacherRole(row.Role))
 		}
+
+		serviceRows, err := dbRO.GetQueries().GetTeacherMeetingServicesByTeacherIDs(ctx, teacherIDs)
+		if err != nil {
+			HttpError(w, fmt.Sprintf("Failed to fetch teacher connections: %v", err), http.StatusInternalServerError)
+			return
+		}
+		for _, row := range serviceRows {
+			switch row.Service {
+			case meetings.ServiceZoom:
+				zoomConnectedByTeacher[row.TeacherID] = true
+			case calendar.ServiceGoogleCalendar:
+				googleConnectedByTeacher[row.TeacherID] = true
+			}
+		}
 	}
 
 	viewTeachers := make([]frontend.TeacherItem, len(teachers))
@@ -223,10 +302,12 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 			Currency:       t.Currency,
 			DriveUrl:       t.DriveUrl,
 			Sex:            t.Sex.String,
-			Status:         t.Status,
-			DocsStatus:     docsStatusByTeacher[t.ID],
-			Roles:          rolesByTeacher[t.ID],
-			Deleted:        t.Deleted != 0,
+			Status:         constants.TeacherStatus(t.Status),
+			DocsStatus:              constants.TeacherDocumentStatus(docsStatusByTeacher[t.ID]),
+			Roles:                     rolesByTeacher[t.ID],
+			ZoomConnected:             zoomConnectedByTeacher[t.ID],
+			GoogleCalendarConnected:   googleConnectedByTeacher[t.ID],
+			Deleted:                   t.Deleted != 0,
 			CreatedAt:      utils.FormatNullDateTimeSecondsPHT(t.CreatedAt),
 			Avatar: avatarWithTeacherRoles(buildTeacherListAvatarProps(
 				t.ID, t.FirstName, t.MiddleName, t.LastName, t.AssignedColor, t.ProfilePicture,
@@ -234,12 +315,17 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	params := listQueryParams(r)
+	params := listQueryParamsWithSort(r, frontend.ListSortKindTeacher)
 	w.Header().Set("Content-Type", "text/html")
 	frontend.Teachers(frontend.TeacherData{
-		Teachers:       viewTeachers,
-		Query:          q,
-		Status:         status,
+		Teachers:         viewTeachers,
+		Query:            q,
+		Status:           constants.TeacherFilterStatus(status),
+		DocsStatusFilter:       docsStatus,
+		ConnectionZoomFilter:   connectionZoom,
+		ConnectionGoogleFilter: connectionGoogle,
+		SortBy:         sort.By,
+		SortOrder:      string(sort.Order),
 		PageNumber:     page.Number,
 		PageTotalPages: page.TotalPages(),
 		PageTotal:      page.Total,
@@ -421,7 +507,7 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 	notifyTeacher(ctx, teacherID, teacherName, auth.GetUser(ctx), notifications.KindProfileUpdated,
 		"Your profile was updated by an administrator", "")
 
-	if _, err := fmt.Fprint(w, "Teacher updated successfully!\n"); err != nil {
+	if err := respondFormMutation(w, "Teacher updated successfully!", "/teachers"); err != nil {
 		sendErrorLog(w, err.Error())
 	}
 }

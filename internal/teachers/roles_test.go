@@ -26,7 +26,15 @@ func TestParseTeacherRolesRequiresTeacher(t *testing.T) {
 		t.Fatalf("expected ErrTeacherRoleRequired, got %v", err)
 	}
 
-	roles, err := ParseTeacherRoles([]string{"teacher", "developer", "developer"})
+	roles, err := ParseTeacherRoles([]string{"tester"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(roles) != 1 || roles[0] != constants.TeacherRoleTester {
+		t.Fatalf("expected tester-only role, got %v", roles)
+	}
+
+	roles, err = ParseTeacherRoles([]string{"teacher", "developer", "developer"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -66,5 +74,10 @@ func TestPrimaryTeacherRole(t *testing.T) {
 	})
 	if !ok || role != constants.TeacherRoleAdmin {
 		t.Fatalf("expected admin, got %q ok=%v", role, ok)
+	}
+
+	role, ok = PrimaryTeacherRole([]constants.TeacherRole{constants.TeacherRoleTester})
+	if !ok || role != constants.TeacherRoleTester {
+		t.Fatalf("expected tester, got %q ok=%v", role, ok)
 	}
 }

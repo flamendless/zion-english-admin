@@ -15,13 +15,26 @@ templ TimeInput(id string, label string, value string, readonly bool) {
 	</div>
 }
 
+templ DurationPreview(id string) {
+	<div class="duration-bridge" id={ id } aria-live="polite" aria-label="Duration">
+		<span class="duration-bridge-label">Duration:</span>
+		<span class="pill pill--neutral duration-pill duration-pill--pending">
+			<svg class="duration-pill-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+				<circle cx="12" cy="12" r="10"></circle>
+				<polyline points="12 6 12 12 16 14"></polyline>
+			</svg>
+			<span class="duration-pill-value">-</span>
+		</span>
+	</div>
+}
+
 templ TimeRangeFields(startTime string, endTime string, readonly bool) {
 	<div class="time-range-fields">
 		<div class="time-range-group">
 			@TimeInput("start_time", "Start time *", startTime, readonly)
 			@TimeInput("end_time", "End time *", endTime, readonly)
 		</div>
-		<div class="duration-preview" id="durationPreview" aria-live="polite" hidden></div>
+		@DurationPreview("durationPreview")
 	</div>
 }
 
@@ -29,9 +42,14 @@ templ ScrTimeRangeJS() {
 	<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/time-range.js")) }></script>
 }
 
+templ ScrScheduleRepeatCalendarJS() {
+	<script type="text/javascript" src={ templ.URL(utils.URL("/static/js/schedule-repeat-calendar.js")) }></script>
+}
+
 templ ScrTimeRangeInit() {
 	<script>
-		if (window.initTimeRangePreview) initTimeRangePreview();
+		if (window.initAllTimeRangePreviews) initAllTimeRangePreviews();
+		else if (window.initTimeRangePreview) initTimeRangePreview();
 		if (window.attachTimeRangeFormValidation) attachTimeRangeFormValidation();
 	</script>
 }

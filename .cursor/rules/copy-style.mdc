@@ -1,0 +1,16 @@
+---
+description: Avoid em dashes; use hyphens and normal punctuation in copy
+alwaysApply: true
+---
+
+# Copy & punctuation
+
+Do not use em dashes (`—`, U+2014) in user-facing copy, README, changelogs, handler messages, or template text.
+
+Prefer:
+
+- **Hyphen `-`** for compounds, empty UI placeholders, and simple separators (e.g. table cell `-`, `PNG, JPEG, or PDF (max 5 MB)`, `Zion English - %s`)
+- **Comma, period, or colon** to join or break clauses in prose
+- **Pipe `|`** for HTML `<title>` separators when needed (e.g. `Zion English | Admin Portal`)
+
+Do not use en dashes (`–`, U+2013) as a stand-in for em dashes.

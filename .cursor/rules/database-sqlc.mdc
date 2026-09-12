@@ -66,8 +66,8 @@ func GetAllTeachers(db Service) ([]Teacher, error) {
 ```
 
 Two access patterns coexist:
-- Wrappers: `database.GetAllStudents(dbRO)` — list pages
-- Direct: `dbRW.GetQueries().InsertStudent(ctx, params)` — form handlers
+- Wrappers: `database.GetAllStudents(dbRO)`: list pages
+- Direct: `dbRW.GetQueries().InsertStudent(ctx, params)`: form handlers
 
 ## Migrations
 
