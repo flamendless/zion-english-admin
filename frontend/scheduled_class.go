@@ -9,6 +9,7 @@ import (
 	"github.com/a-h/templ"
 	"zion-english/internal/constants"
 	"zion-english/internal/models"
+	"zion-english/internal/scheduledclass"
 	"zion-english/internal/utils"
 )
 
@@ -43,7 +44,7 @@ type ScheduledClassItemData struct {
 	SeriesFutureCount int64
 }
 
-func ScheduledClassItemFromView(v models.ScheduledClassView) ScheduledClassItemData {
+func ScheduledClassItemFromView(v models.ScheduledClassView, gracePeriodMinutes int64) ScheduledClassItemData {
 	item := ScheduledClassItemData{
 		ID:              v.ID,
 		StudentID:       v.StudentID,
@@ -74,7 +75,7 @@ func ScheduledClassItemFromView(v models.ScheduledClassView) ScheduledClassItemD
 		DeleteFrom:      ClassActionContextSchedule,
 		SeriesID:        v.SeriesID,
 	}
-	item.Overdue = IsScheduledClassOverdue(item)
+	item.Overdue = IsScheduledClassOverdue(item, gracePeriodMinutes)
 	return item
 }
 
@@ -219,7 +220,7 @@ func ScheduledClassItemFromEditClassData(data EditClassData) ScheduledClassItemD
 		SeriesID:        data.SeriesID,
 		SeriesFutureCount: data.SeriesFutureCount,
 	}
-	item.Overdue = IsScheduledClassOverdue(item)
+	item.Overdue = IsScheduledClassOverdue(item, data.OverdueGracePeriodMinutes)
 	return item
 }
 
@@ -235,10 +236,10 @@ func (data EditClassData) ClassDeleteURL() string {
 	return ClassRecordDeleteURL(id)
 }
 
-func ScheduledClassItemsFromViews(views []models.ScheduledClassView) []ScheduledClassItemData {
+func ScheduledClassItemsFromViews(views []models.ScheduledClassView, gracePeriodMinutes int64) []ScheduledClassItemData {
 	items := make([]ScheduledClassItemData, 0, len(views))
 	for _, v := range views {
-		items = append(items, ScheduledClassItemFromView(v))
+		items = append(items, ScheduledClassItemFromView(v, gracePeriodMinutes))
 	}
 	sort.Slice(items, func(i, j int) bool {
 		a, errA := utils.MinutesSinceMidnight(items[i].StartTime)
@@ -280,30 +281,15 @@ func normalizeDisplayTime(value string) string {
 	return t.Format(constants.TimeHMLayout)
 }
 
-func IsScheduledClassOverdue(item ScheduledClassItemData) bool {
-	if item.Status != constants.ScheduledClassStatusScheduled {
-		return false
-	}
-	if item.ScheduledDate == "" {
-		return false
-	}
-	date, err := time.ParseInLocation(constants.DateLayout, item.ScheduledDate, constants.LocationPHT)
-	if err != nil {
-		return false
-	}
-	var endAt time.Time
-	if item.StartTime != "" && item.DurationMinutes > 0 {
-		startMins, err := utils.MinutesSinceMidnight(item.StartTime)
-		if err != nil {
-			endAt = time.Date(date.Year(), date.Month(), date.Day(), 23, 59, 59, 0, constants.LocationPHT)
-		} else {
-			total := int(startMins) + int(item.DurationMinutes)
-			endAt = time.Date(date.Year(), date.Month(), date.Day(), total/60%24, total%60, 0, 0, constants.LocationPHT)
-		}
-	} else {
-		endAt = time.Date(date.Year(), date.Month(), date.Day(), 23, 59, 59, 0, constants.LocationPHT)
-	}
-	return time.Now().In(constants.LocationPHT).After(endAt)
+func IsScheduledClassOverdue(item ScheduledClassItemData, gracePeriodMinutes int64) bool {
+	return scheduledclass.IsOverdue(
+		item.Status,
+		item.ScheduledDate,
+		item.StartTime,
+		item.DurationMinutes,
+		time.Now(),
+		gracePeriodMinutes,
+	)
 }
 
 func FormatScheduledClassDateDisplay(date string) string {

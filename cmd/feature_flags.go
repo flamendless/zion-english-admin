@@ -1,15 +1,22 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"slices"
+	"strconv"
+	"strings"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/constants"
 	"zion-english/internal/featureflags"
 	"zion-english/internal/utils"
 )
+
+func classOverdueGracePeriodMinutes(ctx context.Context) int64 {
+	return featureflags.ClassOverdueGracePeriodMinutes(ctx, dbRO)
+}
 
 func handleFeatureFlags(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
@@ -33,6 +40,7 @@ func handleFeatureFlagsGet(w http.ResponseWriter, r *http.Request) {
 	roleOptions := constants.AllTeacherRoles()
 
 	data := frontend.FeatureFlagsData{
+		ClassOverdueGracePeriodMinutes: classOverdueGracePeriodMinutes(ctx),
 		Zoom: frontend.FeatureFlagIntegrationItem{
 			Name:               "Zoom",
 			Description:        "Allow teachers to connect Zoom accounts for automatic meeting rooms on scheduled classes.",
@@ -99,6 +107,14 @@ func handleFeatureFlagsUpdate(w http.ResponseWriter, r *http.Request) {
 
 	prevZoomEnabled, prevZoomRoles, _ := featureflags.GetFlag(ctx, dbRO, constants.FeatureFlagIntegrationZoom)
 	prevGoogleEnabled, prevGoogleRoles, _ := featureflags.GetFlag(ctx, dbRO, constants.FeatureFlagIntegrationGoogleCalendar)
+	prevGracePeriod := classOverdueGracePeriodMinutes(ctx)
+
+	gracePeriod, err := parseClassOverdueGracePeriodFromForm(r)
+	if err != nil {
+		setErrorFlash(w, err.Error())
+		HttpRedirect(w, r, "/feature-flags")
+		return
+	}
 
 	if err := featureflags.SetFlag(ctx, dbRW, constants.FeatureFlagIntegrationZoom, zoomEnabled, zoomRoles); err != nil {
 		setErrorFlash(w, fmt.Sprintf("Failed to update Zoom flag: %v", err))
@@ -107,6 +123,11 @@ func handleFeatureFlagsUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := featureflags.SetFlag(ctx, dbRW, constants.FeatureFlagIntegrationGoogleCalendar, googleEnabled, googleRoles); err != nil {
 		setErrorFlash(w, fmt.Sprintf("Failed to update Google Calendar flag: %v", err))
+		HttpRedirect(w, r, "/feature-flags")
+		return
+	}
+	if err := featureflags.SetIntValue(ctx, dbRW, constants.FeatureFlagClassOverdueGracePeriod, gracePeriod); err != nil {
+		setErrorFlash(w, fmt.Sprintf("Failed to update class overdue grace period: %v", err))
 		HttpRedirect(w, r, "/feature-flags")
 		return
 	}
@@ -132,7 +153,28 @@ func handleFeatureFlagsUpdate(w http.ResponseWriter, r *http.Request) {
 	if !slices.Equal(prevGoogleRoles, googleRoles) {
 		insertAuditLogAs(ctx, user, "feature-flags", "updated google calendar visible roles: "+formatVisibleRolesAudit(googleRoles))
 	}
+	if prevGracePeriod != gracePeriod {
+		insertAuditLogAs(ctx, user, "feature-flags", fmt.Sprintf("updated class overdue grace period to %d minutes", gracePeriod))
+	}
 
 	setSuccessFlash(w, "Feature flags saved successfully")
 	HttpRedirect(w, r, "/feature-flags")
+}
+
+func parseClassOverdueGracePeriodFromForm(r *http.Request) (int64, error) {
+	raw := strings.TrimSpace(r.FormValue("class_overdue_grace_period_minutes"))
+	if raw == "" {
+		return constants.DefaultClassOverdueGracePeriodMinutes, nil
+	}
+	value, err := strconv.ParseInt(raw, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("Class overdue grace period must be a whole number of minutes")
+	}
+	if value < 0 {
+		return 0, fmt.Errorf("Class overdue grace period cannot be negative")
+	}
+	if value > constants.MaxClassOverdueGracePeriodMinutes {
+		return 0, fmt.Errorf("Class overdue grace period cannot exceed %d minutes", constants.MaxClassOverdueGracePeriodMinutes)
+	}
+	return value, nil
 }

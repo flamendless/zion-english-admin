@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"slices"
+	"strconv"
 	"strings"
 	"zion-english/internal/constants"
 	"zion-english/internal/database"
@@ -112,4 +113,37 @@ func SetFlag(ctx context.Context, db database.Service, key constants.FeatureFlag
 func SetEnabled(ctx context.Context, db database.Service, key constants.FeatureFlagKey, enabled bool) error {
 	visibleRoles := VisibleRoles(ctx, db, key)
 	return SetFlag(ctx, db, key, enabled, visibleRoles)
+}
+
+func GetIntValue(ctx context.Context, db database.Service, key constants.FeatureFlagKey, defaultValue int64) int64 {
+	row, err := db.GetQueries().GetFeatureFlag(ctx, string(key))
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return defaultValue
+		}
+		return defaultValue
+	}
+	if strings.TrimSpace(row.ValueText) == "" {
+		return defaultValue
+	}
+	value, err := strconv.ParseInt(strings.TrimSpace(row.ValueText), 10, 64)
+	if err != nil || value < 0 {
+		return defaultValue
+	}
+	return value
+}
+
+func SetIntValue(ctx context.Context, db database.Service, key constants.FeatureFlagKey, value int64) error {
+	return db.GetQueries().UpsertFeatureFlagValue(ctx, queries.UpsertFeatureFlagValueParams{
+		Key:       string(key),
+		ValueText: strconv.FormatInt(value, 10),
+	})
+}
+
+func ClassOverdueGracePeriodMinutes(ctx context.Context, db database.Service) int64 {
+	value := GetIntValue(ctx, db, constants.FeatureFlagClassOverdueGracePeriod, constants.DefaultClassOverdueGracePeriodMinutes)
+	if value > constants.MaxClassOverdueGracePeriodMinutes {
+		return constants.MaxClassOverdueGracePeriodMinutes
+	}
+	return value
 }

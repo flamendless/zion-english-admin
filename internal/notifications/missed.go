@@ -7,9 +7,12 @@ import (
 	"zion-english/internal/utils"
 )
 
-func (s *Service) ScanMissedClasses(ctx context.Context) {
-	nowPHT := utils.DateTimePHT(time.Now())
-	rows, err := s.q.GetMissedScheduledClasses(ctx, nowPHT)
+func (s *Service) ScanMissedClasses(ctx context.Context, gracePeriodMinutes int64) {
+	if gracePeriodMinutes < 0 {
+		gracePeriodMinutes = 0
+	}
+	cutoff := time.Now().Add(-time.Duration(gracePeriodMinutes) * time.Minute)
+	rows, err := s.q.GetMissedScheduledClasses(ctx, utils.DateTimePHT(cutoff))
 	if err != nil {
 		return
 	}
