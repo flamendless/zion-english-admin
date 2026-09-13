@@ -70,14 +70,15 @@ New handlers also need **both** `authMux` and `rootMux` registration in `cmd/web
 
 ### Sentinel Errors
 
-Use package-level `var Err… = errors.New("…")` for domain and validation errors that callers may compare with `errors.Is`. See `internal/classrules` and `internal/utils/time_range.go`.
+Do **not** return inline `errors.New("…")` from functions. Define package-level `var Err… = errors.New("…")` sentinels instead so callers can compare with `errors.Is`, branch on specific failures, and keep messages consistent. See `internal/classrules/errors.go`, `internal/meetings/errors.go`, and `cmd/errors.go`.
 
 ```go
+// errors.go
 var (
-	ErrInvalidStartTime = errors.New("invalid start time")
-	ErrEndBeforeStart   = errors.New("end time must be after start time")
+	ErrZoomNotConnected = errors.New("[ZOOM] connect zoom on your profile first")
 )
 
+// time_range.go
 func DurationMinutesFromRange(start, end string) (int64, error) {
 	startT, err := ParseTimeHM(start)
 	if err != nil {
@@ -87,9 +88,12 @@ func DurationMinutesFromRange(start, end string) (int64, error) {
 }
 ```
 
+- Place all package sentinels in a dedicated `errors.go` at the package root. Do not declare `Err…` variables in handler, validate, or rules files.
+- Name with the `Err` prefix; reuse an existing sentinel when the message and meaning match.
+- **Module-scoped prefixes:** when a sentinel belongs to one feature, integration, or file (not shared cross-feature validation), prefix the message with `[MODULE]` in uppercase (e.g. `[ZOOM] connect zoom on your profile first`, `[INTRO VIDEO] invalid intro video status`). Omit the prefix for shared `cmd/errors.go` form validation shown across many handlers (`student is required`, `invalid currency`, etc.).
 - Return sentinels directly for stable, user-facing validation failures.
 - Wrap with `%w` only when adding context (e.g. `fmt.Errorf("%w: %s", ErrInvalidTimeFormat, value)`).
-- Ad-hoc `errors.New` is fine for one-off internal failures (DB lookup errors, etc.) that are not compared with `errors.Is`.
+- Inline `errors.New` is only for errors created and handled in the same function (never returned from a reusable helper).
 
 ## Nullable DB Fields
 

@@ -46,7 +46,24 @@ WHERE (? = '' OR s.name LIKE '%' || ? || '%')
 		(? = '' AND s.status != 'deleted')
 		OR (? != '' AND s.status = ?)
 	)
-	AND (? = 0 OR m2m.teacher_id = ?);
+	AND (? = 0 OR m2m.teacher_id = ?)
+	AND (
+		? = ''
+		OR (
+			? = 'missing_name'
+			AND s.status = 'active'
+			AND TRIM(COALESCE(s.parent_name, '')) = ''
+		)
+		OR (
+			? = 'missing_rate'
+			AND s.status = 'active'
+			AND (
+				s.parent_rate IS NULL
+				OR s.parent_currency IS NULL
+				OR TRIM(COALESCE(s.parent_currency, '')) = ''
+			)
+		)
+	);
 
 -- name: GetStudentsFiltered :many
 SELECT DISTINCT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.parent_rate, s.parent_currency, s.assigned_color, s.status, s.inactive_reason, s.deleted_reason, s.created_at, s.updated_at
@@ -58,6 +75,23 @@ WHERE (? = '' OR s.name LIKE '%' || ? || '%')
 		OR (? != '' AND s.status = ?)
 	)
 	AND (? = 0 OR m2m.teacher_id = ?)
+	AND (
+		? = ''
+		OR (
+			? = 'missing_name'
+			AND s.status = 'active'
+			AND TRIM(COALESCE(s.parent_name, '')) = ''
+		)
+		OR (
+			? = 'missing_rate'
+			AND s.status = 'active'
+			AND (
+				s.parent_rate IS NULL
+				OR s.parent_currency IS NULL
+				OR TRIM(COALESCE(s.parent_currency, '')) = ''
+			)
+		)
+	)
 ORDER BY s.created_at DESC
 LIMIT ? OFFSET ?;
 

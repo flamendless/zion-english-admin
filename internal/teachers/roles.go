@@ -1,16 +1,9 @@
 package teachers
 
 import (
-	"errors"
 	"slices"
 	"strings"
 	"zion-english/internal/constants"
-)
-
-var (
-	ErrRolesForbidden      = errors.New("you are not allowed to manage roles for this teacher")
-	ErrInvalidRole         = errors.New("invalid role")
-	ErrTeacherRoleRequired = errors.New("teacher role is required")
 )
 
 func CanManageTeacherRoles(actorRole string, targetHasAdmin bool) bool {

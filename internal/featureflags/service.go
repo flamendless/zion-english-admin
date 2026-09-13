@@ -58,12 +58,16 @@ func ParseVisibleRoles(raw string) []constants.TeacherRole {
 }
 
 func GetFlag(ctx context.Context, db database.Service, key constants.FeatureFlagKey) (enabled bool, visibleRoles []constants.TeacherRole, err error) {
+	return GetFlagDefault(ctx, db, key, true)
+}
+
+func GetFlagDefault(ctx context.Context, db database.Service, key constants.FeatureFlagKey, defaultEnabled bool) (enabled bool, visibleRoles []constants.TeacherRole, err error) {
 	row, err := db.GetQueries().GetFeatureFlag(ctx, string(key))
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return true, DefaultVisibleRoles(), nil
+			return defaultEnabled, DefaultVisibleRoles(), nil
 		}
-		return true, DefaultVisibleRoles(), err
+		return defaultEnabled, DefaultVisibleRoles(), err
 	}
 	return row.Enabled == 1, ParseVisibleRoles(row.VisibleRoles), nil
 }
@@ -146,4 +150,19 @@ func ClassOverdueGracePeriodMinutes(ctx context.Context, db database.Service) in
 		return constants.MaxClassOverdueGracePeriodMinutes
 	}
 	return value
+}
+
+func IntroVideoUploadAccess(ctx context.Context, db database.Service, roles []constants.TeacherRole) (visible bool, uploadAllowed bool) {
+	enabled, allowedRoles, err := GetFlagDefault(ctx, db, constants.FeatureFlagIntroVideoUploads, false)
+	if err != nil {
+		return false, false
+	}
+	for _, role := range roles {
+		if slices.Contains(allowedRoles, role) {
+			visible = true
+			break
+		}
+	}
+	uploadAllowed = enabled && visible
+	return visible, uploadAllowed
 }

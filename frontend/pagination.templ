@@ -111,12 +111,15 @@ templ TeacherConnectionsFilterDropdown(connectionZoom bool, connectionGoogle boo
 	</div>
 }
 
-templ ListFilterForm(actionPath string, query string, status string, statusType ListFilterKind, teacherID string, teacherName string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool, showStatus bool, docsStatus string, showDocsStatus bool, connectionZoom bool, connectionGoogle bool, showConnections bool, sortBy string, sortOrder string, sortKind ListSortKind, showTeacherTableColumns bool) {
+templ ListFilterForm(actionPath string, query string, status string, statusType ListFilterKind, teacherID string, teacherName string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool, showStatus bool, docsStatus string, showDocsStatus bool, connectionZoom bool, connectionGoogle bool, showConnections bool, sortBy string, sortOrder string, sortKind ListSortKind, showTeacherTableColumns bool, parentFilter string) {
 	<form class="list-toolbar" method="GET" action={ actionPath }>
 		<div class="form-group">
 			<label for="q">Search</label>
 			<input type="text" id="q" name="q" value={ query } placeholder={ listSearchPlaceholder(statusType) }/>
 		</div>
+		if showTeacherTableColumns {
+			@TeacherTableColumnsDropdown()
+		}
 		if showStatus {
 			<div class="form-group">
 				<label for="status">Status</label>
@@ -137,20 +140,6 @@ templ ListFilterForm(actionPath string, query string, status string, statusType 
 					}
 				</select>
 			</div>
-		}
-		if showDocsStatus {
-			<div class="form-group">
-				<label for="docsStatus">Docs status</label>
-				<select id="docsStatus" name="docsStatus">
-					<option value="">All</option>
-					for _, opt := range TeacherDocsFilterStatusOptions {
-						<option value={ opt.Value } selected?={ docsStatus == opt.Value }>{ opt.Label }</option>
-					}
-				</select>
-			</div>
-		}
-		if showConnections {
-			@TeacherConnectionsFilterDropdown(connectionZoom, connectionGoogle)
 		}
 		if showTeacher {
 			@TeacherFilterDropdown(teacherID, teacherName)
@@ -178,13 +167,33 @@ templ ListFilterForm(actionPath string, query string, status string, statusType 
 			</div>
 		}
 		@SortControls(sortBy, sortOrder, sortKind)
-		if showTeacherTableColumns {
-			@TeacherTableColumnsDropdown()
+		if parentFilter != "" {
+			<input type="hidden" name="parentFilter" value={ parentFilter }/>
 		}
 		<div class="form-group list-toolbar-action">
 			<label for="listFilterSubmit">&nbsp;</label>
 			<button type="submit" id="listFilterSubmit">Filter</button>
 		</div>
+		if showDocsStatus || showConnections {
+			<div class="list-toolbar-extra-filters" data-teachers-extra-filters>
+				if showDocsStatus {
+					<div class="form-group" data-teacher-filter-for={ string(TeacherTableColumnDocsStatus) }>
+						<label for="docsStatus">Docs status</label>
+						<select id="docsStatus" name="docsStatus">
+							<option value="">All</option>
+							for _, opt := range TeacherDocsFilterStatusOptions {
+								<option value={ opt.Value } selected?={ docsStatus == opt.Value }>{ opt.Label }</option>
+							}
+						</select>
+					</div>
+				}
+				if showConnections {
+					<div data-teacher-filter-for={ string(TeacherTableColumnConnections) }>
+						@TeacherConnectionsFilterDropdown(connectionZoom, connectionGoogle)
+					</div>
+				}
+			</div>
+		}
 	</form>
 }
 

@@ -2,6 +2,7 @@ package notifications
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"time"
 	"zion-english/internal/utils"
@@ -12,7 +13,7 @@ func (s *Service) ScanMissedClasses(ctx context.Context, gracePeriodMinutes int6
 		gracePeriodMinutes = 0
 	}
 	cutoff := time.Now().Add(-time.Duration(gracePeriodMinutes) * time.Minute)
-	rows, err := s.q.GetMissedScheduledClasses(ctx, utils.DateTimePHT(cutoff))
+	rows, err := s.q.GetMissedScheduledClasses(ctx, sql.NullString{String: utils.DateTimePHT(cutoff), Valid: true})
 	if err != nil {
 		return
 	}

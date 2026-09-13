@@ -7,6 +7,7 @@ const (
 	KindDocumentReviewed   = "document_reviewed"
 	KindIntroVideoSubmitted = "intro_video_submitted"
 	KindIntroVideoReviewed  = "intro_video_reviewed"
+	KindIntroVideoDeleted   = "intro_video_deleted"
 	KindTeacherApproved    = "teacher_approved"
 	KindClassRecorded      = "class_recorded"
 	KindClassUpdated       = "class_updated"

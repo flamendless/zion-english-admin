@@ -1,7 +1,6 @@
 package processor
 
 import (
-	"errors"
 	"strconv"
 	"strings"
 	"time"
@@ -14,8 +13,6 @@ func ColumnLetterToIndex(col string) int {
 	}
 	return int(col[0] - 'A')
 }
-
-var ErrInvalidSheetTemplate = errors.New("template must be four comma-separated Excel column letters (e.g. A,B,C,G)")
 
 func ValidateSheetTemplate(template string) error {
 	template = strings.TrimSpace(template)
@@ -131,7 +128,7 @@ func ParseDateStringWithYear(dateStr string, year int) (*time.Time, error) {
 
 func ParseDateFromRecord(record []string, year int) (*time.Time, error) {
 	if len(record) == 0 {
-		return nil, errors.New("empty record")
+		return nil, ErrEmptyRecord
 	}
 	return ParseDateStringWithYear(record[0], year)
 }
@@ -197,7 +194,7 @@ func ParseClassTime(record string, date time.Time) (*time.Time, error) {
 		}
 		return &parsedTime, nil
 	}
-	return nil, errors.New("invalid time")
+	return nil, ErrInvalidTime
 }
 
 func max(a, b int) int {

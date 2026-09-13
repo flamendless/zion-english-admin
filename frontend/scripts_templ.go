@@ -249,4 +249,33 @@ func ScrClipboardHelpers() templ.Component {
 	})
 }
 
+func ScrTableTruncationTooltips() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var12 == nil {
+			templ_7745c5c3_Var12 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<script>\n\t\t(function () {\n\t\t\tif (window._tableTruncationTooltipsBound) return;\n\t\t\twindow._tableTruncationTooltipsBound = true;\n\n\t\t\tfunction updateTableTruncationTooltips(root) {\n\t\t\t\tvar scope = root || document;\n\t\t\t\tscope.querySelectorAll('[data-full-text]').forEach(function (el) {\n\t\t\t\t\tvar full = el.getAttribute('data-full-text');\n\t\t\t\t\tif (!full) {\n\t\t\t\t\t\tel.removeAttribute('title');\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\t\t\t\t\tif (el.scrollWidth > el.clientWidth) {\n\t\t\t\t\t\tel.setAttribute('title', full);\n\t\t\t\t\t} else {\n\t\t\t\t\t\tel.removeAttribute('title');\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\twindow.updateTableTruncationTooltips = updateTableTruncationTooltips;\n\n\t\t\tfunction runUpdate(root) {\n\t\t\t\trequestAnimationFrame(function () {\n\t\t\t\t\tupdateTableTruncationTooltips(root);\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tif (document.readyState === 'loading') {\n\t\t\t\tdocument.addEventListener('DOMContentLoaded', function () {\n\t\t\t\t\trunUpdate(document);\n\t\t\t\t});\n\t\t\t} else {\n\t\t\t\trunUpdate(document);\n\t\t\t}\n\n\t\t\twindow.addEventListener('resize', function () {\n\t\t\t\trunUpdate(document);\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\trunUpdate(evt.detail.target);\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('htmx:afterSettle', function (evt) {\n\t\t\t\trunUpdate(evt.detail.target);\n\t\t\t});\n\t\t})();\n\t</script>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
 var _ = templruntime.GeneratedTemplate

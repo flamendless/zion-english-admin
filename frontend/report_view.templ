@@ -74,7 +74,9 @@ templ ReportViewModal(data ReportViewData) {
 								for _, class := range data.Classes {
 									<tr>
 										<td data-label="Date">{ class.Date }</td>
-										<td data-label="Student">{ class.StudentName }</td>
+										<td class="table-truncate-cell" data-label="Student">
+											@TableTruncatedText(class.StudentName)
+										</td>
 										<td data-label="Rate">{ class.Rate }</td>
 										<td data-label="Time">{ class.TimeRange }</td>
 										<td data-label="Status">

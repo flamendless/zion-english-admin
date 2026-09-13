@@ -3,24 +3,11 @@ package classrules
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"zion-english/internal/auth"
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/utils"
-)
-
-var (
-	ErrDuplicateScheduled           = errors.New("a scheduled class with the same student, teacher, date, and duration already exists")
-	ErrScheduleNotOwner             = errors.New("you can only manage your own scheduled classes")
-	ErrTeacherScheduleConflict      = errors.New("teacher already has a class scheduled at this time")
-	ErrStudentScheduleConflict      = errors.New("student already has a class scheduled at this time")
-	ErrVerifyStudentAssignment      = errors.New("failed to verify student assignment")
-	ErrCheckScheduledDuplicate      = errors.New("failed to check duplicate scheduled class")
-	ErrCheckClassRecordDuplicate    = errors.New("failed to check duplicate class record")
-	ErrCheckTeacherScheduleConflict = errors.New("failed to check teacher schedule conflicts")
-	ErrCheckStudentScheduleConflict = errors.New("failed to check student schedule conflicts")
 )
 
 type ScheduleConflict struct {

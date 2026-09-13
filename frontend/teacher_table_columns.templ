@@ -21,6 +21,9 @@ templ TeacherTableColumnsDropdown() {
 			</div>
 		</details>
 	</div>
+}
+
+templ TeacherTableColumnsScript() {
 	<script>
 		(function () {
 			const STORAGE_KEY = 'teachers-table-columns';
@@ -91,7 +94,21 @@ templ TeacherTableColumnsDropdown() {
 						cell.hidden = !visible;
 					});
 				});
+
+				const extraFiltersRow = document.querySelector('[data-teachers-extra-filters]');
+				let anyExtraFilterVisible = false;
+				document.querySelectorAll('[data-teacher-filter-for]').forEach(function (filterGroup) {
+					const key = filterGroup.getAttribute('data-teacher-filter-for');
+					const visible = !!state[key];
+					filterGroup.hidden = !visible;
+					if (visible) anyExtraFilterVisible = true;
+				});
+				if (extraFiltersRow) {
+					extraFiltersRow.hidden = !anyExtraFilterVisible;
+				}
+
 				updateSummary(state);
+				table.classList.add('teachers-table-columns-ready');
 			}
 
 			let state = readState();

@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"net/http"
 	"sort"
@@ -41,7 +40,7 @@ type repeatSchedulePreviewRow struct {
 func parseScheduledClassBase(r *http.Request, user auth.User, role auth.Role) (scheduledClassCreateParams, error) {
 	studentID, err := formInt64(r, "schedule_student", "student")
 	if err != nil {
-		return scheduledClassCreateParams{}, errors.New("student is required")
+		return scheduledClassCreateParams{}, ErrStudentRequired
 	}
 	startTime := r.FormValue("start_time")
 	endTime := r.FormValue("end_time")
@@ -58,7 +57,7 @@ func parseScheduledClassBase(r *http.Request, user auth.User, role auth.Role) (s
 	if auth.HasAdminAccess(role) {
 		teacherID, err = formInt64(r, "schedule_teacher", "teacher")
 		if err != nil {
-			return scheduledClassCreateParams{}, errors.New("teacher is required")
+			return scheduledClassCreateParams{}, ErrTeacherRequired
 		}
 	}
 
@@ -76,19 +75,19 @@ func parseScheduledClassBase(r *http.Request, user auth.User, role auth.Role) (s
 		return scheduledClassCreateParams{}, err
 	}
 	if req.StudentID == 0 {
-		return scheduledClassCreateParams{}, errors.New("student is required")
+		return scheduledClassCreateParams{}, ErrStudentRequired
 	}
 	if req.TeacherID == 0 {
-		return scheduledClassCreateParams{}, errors.New("teacher is required")
+		return scheduledClassCreateParams{}, ErrTeacherRequired
 	}
 	if req.StartTime == "" {
-		return scheduledClassCreateParams{}, errors.New("start time is required")
+		return scheduledClassCreateParams{}, ErrStartTimeRequired
 	}
 	if _, err := utils.ParseTimeHM(req.StartTime); err != nil {
 		return scheduledClassCreateParams{}, utils.ErrInvalidStartTime
 	}
 	if req.DurationMinutes <= 0 {
-		return scheduledClassCreateParams{}, errors.New("duration must be greater than zero")
+		return scheduledClassCreateParams{}, ErrDurationMustBePositive
 	}
 
 	return scheduledClassCreateParams{
@@ -110,7 +109,7 @@ func parseScheduledDates(r *http.Request) ([]string, error) {
 		}
 	}
 	if len(rawDates) == 0 {
-		return nil, errors.New("select at least two dates for repeating classes")
+		return nil, ErrSelectAtLeastTwoDatesForRepeating
 	}
 	if len(rawDates) > constants.MaxRepeatScheduleDates {
 		return nil, fmt.Errorf("select at most %d dates", constants.MaxRepeatScheduleDates)
@@ -125,7 +124,7 @@ func parseScheduledDates(r *http.Request) ([]string, error) {
 			continue
 		}
 		if _, err := utils.ParseDatePHT(date); err != nil {
-			return nil, errors.New("invalid date format")
+			return nil, ErrInvalidDateFormat
 		}
 		if date < today {
 			return nil, fmt.Errorf("date %s cannot be in the past", date)
@@ -137,7 +136,7 @@ func parseScheduledDates(r *http.Request) ([]string, error) {
 		dates = append(dates, date)
 	}
 	if len(dates) < 2 {
-		return nil, errors.New("select at least two dates for repeating classes")
+		return nil, ErrSelectAtLeastTwoDatesForRepeating
 	}
 	sort.Strings(dates)
 	return dates, nil
@@ -146,7 +145,7 @@ func parseScheduledDates(r *http.Request) ([]string, error) {
 func parseConfirmedScheduledDates(r *http.Request) ([]string, error) {
 	rawDates := r.Form["confirm_dates"]
 	if len(rawDates) == 0 {
-		return nil, errors.New("select at least one date to create")
+		return nil, ErrSelectAtLeastOneDateToCreate
 	}
 	if len(rawDates) > constants.MaxRepeatScheduleDates {
 		return nil, fmt.Errorf("select at most %d dates", constants.MaxRepeatScheduleDates)
@@ -161,7 +160,7 @@ func parseConfirmedScheduledDates(r *http.Request) ([]string, error) {
 			continue
 		}
 		if _, err := utils.ParseDatePHT(date); err != nil {
-			return nil, errors.New("invalid date format")
+			return nil, ErrInvalidDateFormat
 		}
 		if date < today {
 			return nil, fmt.Errorf("date %s cannot be in the past", date)
@@ -173,7 +172,7 @@ func parseConfirmedScheduledDates(r *http.Request) ([]string, error) {
 		dates = append(dates, date)
 	}
 	if len(dates) == 0 {
-		return nil, errors.New("select at least one date to create")
+		return nil, ErrSelectAtLeastOneDateToCreate
 	}
 	sort.Strings(dates)
 	return dates, nil
@@ -344,10 +343,10 @@ func applyScheduledClassEdit(ctx context.Context, user auth.User, target queries
 func cancelScheduledClassByID(ctx context.Context, user auth.User, scheduleID int64, reason, notes string) error {
 	existing, err := dbRO.GetQueries().GetScheduledClassByID(ctx, scheduleID)
 	if err != nil {
-		return errors.New("scheduled class not found")
+		return ErrScheduledClassNotFound
 	}
 	if existing.Status != "scheduled" {
-		return errors.New("only scheduled classes can be cancelled")
+		return ErrOnlyScheduledClassesCanBeCancelled
 	}
 	if meetingSvc != nil {
 		_ = meetingSvc.DeleteRoomForSchedule(ctx, scheduleID, existing.TeacherID)
@@ -366,10 +365,10 @@ func cancelScheduledClassByID(ctx context.Context, user auth.User, scheduleID in
 func deleteScheduledClassByID(ctx context.Context, user auth.User, scheduleID int64, reason string) error {
 	existing, err := dbRO.GetQueries().GetScheduledClassByID(ctx, scheduleID)
 	if err != nil {
-		return errors.New("scheduled class not found")
+		return ErrScheduledClassNotFound
 	}
 	if existing.Status != "scheduled" {
-		return errors.New("only scheduled classes can be deleted")
+		return ErrOnlyScheduledClassesCanBeDeleted
 	}
 	if meetingSvc != nil {
 		_ = meetingSvc.DeleteRoomForSchedule(ctx, scheduleID, existing.TeacherID)

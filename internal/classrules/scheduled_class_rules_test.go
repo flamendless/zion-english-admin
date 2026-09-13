@@ -69,7 +69,7 @@ func TestValidateDuplicateScheduled(t *testing.T) {
 	if !errors.Is(err, classrules.ErrDuplicateScheduled) {
 		t.Fatalf("expected ErrDuplicateScheduled, got %v", err)
 	}
-	if err.Error() != "a scheduled class with the same student, teacher, date, and duration already exists. Conflicting class: 2026-01-01, 10:00 - 11:00, status: Scheduled, teacher: Jane Teacher, student: John Student" {
+	if err.Error() != "[SCHEDULE] a scheduled class with the same student, teacher, date, and duration already exists. Conflicting class: 2026-01-01, 10:00 - 11:00, status: Scheduled, teacher: Jane Teacher, student: John Student" {
 		t.Fatalf("unexpected error message: %v", err)
 	}
 }
@@ -98,7 +98,7 @@ func TestValidateTeacherScheduleConflict(t *testing.T) {
 	if !errors.Is(err, classrules.ErrTeacherScheduleConflict) {
 		t.Fatalf("expected ErrTeacherScheduleConflict, got %v", err)
 	}
-	if err.Error() != "teacher already has a class scheduled at this time. Conflicting class: 2026-01-01, 10:00 - 11:00, status: Scheduled, teacher: Jane Teacher, student: John Student" {
+	if err.Error() != "[SCHEDULE] teacher already has a class scheduled at this time. Conflicting class: 2026-01-01, 10:00 - 11:00, status: Scheduled, teacher: Jane Teacher, student: John Student" {
 		t.Fatalf("unexpected error message: %v", err)
 	}
 }
@@ -127,7 +127,7 @@ func TestValidateStudentScheduleConflict(t *testing.T) {
 	if !errors.Is(err, classrules.ErrStudentScheduleConflict) {
 		t.Fatalf("expected ErrStudentScheduleConflict, got %v", err)
 	}
-	if err.Error() != "student already has a class scheduled at this time. Conflicting class: 2026-01-01, 14:00 - 14:30, status: Scheduled, teacher: Jane Teacher, student: John Student" {
+	if err.Error() != "[SCHEDULE] student already has a class scheduled at this time. Conflicting class: 2026-01-01, 14:00 - 14:30, status: Scheduled, teacher: Jane Teacher, student: John Student" {
 		t.Fatalf("unexpected error message: %v", err)
 	}
 }

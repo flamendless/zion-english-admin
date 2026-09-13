@@ -122,6 +122,10 @@ templ Teachers(data TeacherData) {
 				flex-wrap: wrap;
 				gap: var(--space-2);
 			}
+
+			#teachersTable:not(.teachers-table-columns-ready) [data-teacher-col] {
+				visibility: hidden;
+			}
 		</style>
 		<script>
 			window.closeTeacherViewModal = function () {
@@ -173,7 +177,7 @@ templ Teachers(data TeacherData) {
 			@HeaderSimple()
 			@HubHeader("Teachers", "New Teacher", utils.URL("/teachers/register"), true)
 
-			@ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindTeacher, "", "", "", "", "", "", false, false, false, false, true, data.DocsStatusFilter, true, data.ConnectionZoomFilter, data.ConnectionGoogleFilter, true, data.SortBy, data.SortOrder, ListSortKindTeacher, true)
+			@ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindTeacher, "", "", "", "", "", "", false, false, false, false, true, data.DocsStatusFilter, true, data.ConnectionZoomFilter, data.ConnectionGoogleFilter, true, data.SortBy, data.SortOrder, ListSortKindTeacher, true, "")
 
 			if len(data.Teachers) > 0 {
 				<div class="table-wrapper">
@@ -246,6 +250,7 @@ templ Teachers(data TeacherData) {
 						</tbody>
 					</table>
 				</div>
+				@TeacherTableColumnsScript()
 				@PaginationBar(data.HasPrev, data.PrevURL, data.HasNext, data.NextURL, data.PageNumber, data.PageTotalPages, data.PageTotal)
 			} else {
 				<div class="empty-state">

@@ -276,7 +276,7 @@ func FormatScheduledClassTimeRange(startTime, endTime string, durationMinutes in
 		end = utils.EndTimeFromStartAndDuration(start, durationMinutes)
 	}
 	if start != "" && end != "" {
-		return start + " – " + end
+		return start + " - " + end
 	}
 	if start != "" {
 		return start

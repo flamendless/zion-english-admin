@@ -9,6 +9,11 @@ const (
 	TeacherTableColumnConnections TeacherTableColumnID = "connectedTo"
 )
 
+const (
+	TeacherTableColumnsSummaryNone = "None"
+	TeacherTableColumnsSummaryAll  = "All"
+)
+
 type TeacherTableColumnDef struct {
 	ID             TeacherTableColumnID
 	Label          string
@@ -16,20 +21,18 @@ type TeacherTableColumnDef struct {
 	DefaultVisible bool
 }
 
-// TeacherTableOptionalColumns defines toggleable columns shown after Status on the teachers list.
-// Add entries here to expose new optional columns in the toolbar dropdown.
 var TeacherTableOptionalColumns = []TeacherTableColumnDef{
 	{
 		ID:             TeacherTableColumnDocsStatus,
 		Label:          "Doc status",
 		HeaderLabel:    "Docs Status",
-		DefaultVisible: true,
+		DefaultVisible: false,
 	},
 	{
 		ID:             TeacherTableColumnConnections,
 		Label:          "Connected to",
 		HeaderLabel:    "Connections",
-		DefaultVisible: true,
+		DefaultVisible: false,
 	},
 }
 
@@ -52,7 +55,7 @@ func teacherTableColumnsDefaultVisibility() map[TeacherTableColumnID]bool {
 
 func teacherTableColumnsSummary(visible map[TeacherTableColumnID]bool) string {
 	if len(TeacherTableOptionalColumns) == 0 {
-		return "None"
+		return TeacherTableColumnsSummaryNone
 	}
 
 	selected := make([]string, 0, len(TeacherTableOptionalColumns))
@@ -64,9 +67,9 @@ func teacherTableColumnsSummary(visible map[TeacherTableColumnID]bool) string {
 
 	switch len(selected) {
 	case 0:
-		return "None"
+		return TeacherTableColumnsSummaryNone
 	case len(TeacherTableOptionalColumns):
-		return "All"
+		return TeacherTableColumnsSummaryAll
 	default:
 		return strings.Join(selected, ", ")
 	}

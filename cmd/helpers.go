@@ -45,6 +45,7 @@ func listQueryParams(r *http.Request) map[string]string {
 		"module":     r.URL.Query().Get("module"),
 		"startDate":  r.URL.Query().Get("startDate"),
 		"endDate":   r.URL.Query().Get("endDate"),
+		"parentFilter": r.URL.Query().Get("parentFilter"),
 		"sortBy":     r.URL.Query().Get("sortBy"),
 		"sortOrder":  r.URL.Query().Get("sortOrder"),
 	}

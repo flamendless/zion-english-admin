@@ -6,6 +6,10 @@ import (
 	"zion-english/internal/utils"
 )
 
+func scheduledDayEndPHT(date time.Time) time.Time {
+	return time.Date(date.Year(), date.Month(), date.Day(), 23, 59, 59, 0, constants.LocationPHT)
+}
+
 func ScheduledEndAtPHT(scheduledDate, startTime string, durationMinutes int64) (time.Time, bool) {
 	if scheduledDate == "" {
 		return time.Time{}, false
@@ -15,14 +19,18 @@ func ScheduledEndAtPHT(scheduledDate, startTime string, durationMinutes int64) (
 		return time.Time{}, false
 	}
 	if startTime != "" && durationMinutes > 0 {
-		startMins, err := utils.MinutesSinceMidnight(startTime)
+		startAt, err := utils.ParseTimeHM(startTime)
 		if err != nil {
-			return time.Date(date.Year(), date.Month(), date.Day(), 23, 59, 59, 0, constants.LocationPHT), true
+			return scheduledDayEndPHT(date), true
 		}
-		total := int(startMins) + int(durationMinutes)
-		return time.Date(date.Year(), date.Month(), date.Day(), total/60%24, total%60, 0, 0, constants.LocationPHT), true
+		classStart := time.Date(
+			date.Year(), date.Month(), date.Day(),
+			startAt.Hour(), startAt.Minute(), 0, 0,
+			constants.LocationPHT,
+		)
+		return classStart.Add(time.Duration(durationMinutes) * time.Minute), true
 	}
-	return time.Date(date.Year(), date.Month(), date.Day(), 23, 59, 59, 0, constants.LocationPHT), true
+	return scheduledDayEndPHT(date), true
 }
 
 func IsOverdue(status constants.ScheduledClassStatus, scheduledDate, startTime string, durationMinutes int64, now time.Time, gracePeriodMinutes int64) bool {

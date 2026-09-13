@@ -12,6 +12,10 @@ func getDisplayValue(value string) string {
 	return "-"
 }
 
+templ TableTruncatedText(fullText string) {
+	<span class="table-truncated-text" data-full-text={ fullText }>{ getDisplayValue(fullText) }</span>
+}
+
 func formatRate(rate float64, currency string) string {
 	return utils.FormatCurrency(rate, currency)
 }

@@ -83,7 +83,7 @@ func (p *GoogleProvider) AuthorizeURL(state string) (string, error) {
 func (p *GoogleProvider) ExchangeCode(ctx context.Context, code string) (AccountRef, time.Time, error) {
 	code = strings.TrimSpace(code)
 	if code == "" {
-		return AccountRef{}, time.Time{}, errors.New("authorization code is required")
+		return AccountRef{}, time.Time{}, ErrAuthorizationCodeRequired
 	}
 	ctx = p.oauthContext(ctx)
 	token, err := p.oauthConfig().Exchange(ctx, code)

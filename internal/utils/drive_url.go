@@ -1,15 +1,9 @@
 package utils
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
 	"strings"
-)
-
-var (
-	ErrDriveURLRequired           = errors.New("spreadsheet URL is required")
-	ErrInvalidDriveSpreadsheetURL = errors.New("invalid spreadsheet URL")
 )
 
 func DriveURLToExportURL(driveURL string, format string) (string, error) {
@@ -24,7 +18,7 @@ func DriveURLToExportURL(driveURL string, format string) (string, error) {
 
 	pathParts := strings.Split(strings.Trim(parsedURL.Path, "/"), "/")
 	if len(pathParts) < 4 || pathParts[0] != "spreadsheets" || pathParts[1] != "d" {
-		return "", errors.New("invalid Google Sheets URL path: expected /spreadsheets/d/{DOCUMENT_ID}/.../")
+		return "", ErrInvalidDriveSpreadsheetPath
 	}
 
 	exportURL := &url.URL{

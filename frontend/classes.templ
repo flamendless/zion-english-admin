@@ -40,15 +40,8 @@ templ Classes(data ClassesData) {
 				font-variant-numeric: tabular-nums;
 			}
 
-			.note-reason-cell {
-				max-width: 200px;
-			}
-
-			.note-reason-text {
-				display: block;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
+			#classesTable td[data-label="Teacher"] {
+				max-width: 220px;
 			}
 		</style>
 		@ClassViewModalScripts()

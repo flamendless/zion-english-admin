@@ -34,3 +34,56 @@ templ ScrClipboardHelpers() {
 		};
 	</script>
 }
+
+templ ScrTableTruncationTooltips() {
+	<script>
+		(function () {
+			if (window._tableTruncationTooltipsBound) return;
+			window._tableTruncationTooltipsBound = true;
+
+			function updateTableTruncationTooltips(root) {
+				var scope = root || document;
+				scope.querySelectorAll('[data-full-text]').forEach(function (el) {
+					var full = el.getAttribute('data-full-text');
+					if (!full) {
+						el.removeAttribute('title');
+						return;
+					}
+					if (el.scrollWidth > el.clientWidth) {
+						el.setAttribute('title', full);
+					} else {
+						el.removeAttribute('title');
+					}
+				});
+			}
+
+			window.updateTableTruncationTooltips = updateTableTruncationTooltips;
+
+			function runUpdate(root) {
+				requestAnimationFrame(function () {
+					updateTableTruncationTooltips(root);
+				});
+			}
+
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', function () {
+					runUpdate(document);
+				});
+			} else {
+				runUpdate(document);
+			}
+
+			window.addEventListener('resize', function () {
+				runUpdate(document);
+			});
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				runUpdate(evt.detail.target);
+			});
+
+			document.body.addEventListener('htmx:afterSettle', function (evt) {
+				runUpdate(evt.detail.target);
+			});
+		})();
+	</script>
+}

@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -18,7 +17,7 @@ import (
 
 func parseAssignedTeacherIDs(ctx context.Context, q *queries.Queries, raw []string) ([]int64, error) {
 	if len(raw) == 0 {
-		return nil, errors.New("at least one assigned teacher is required")
+		return nil, ErrAssignedTeacherRequired
 	}
 	seen := make(map[int64]bool)
 	var ids []int64
@@ -28,17 +27,17 @@ func parseAssignedTeacherIDs(ctx context.Context, q *queries.Queries, raw []stri
 			continue
 		}
 		if seen[tid] {
-			return nil, errors.New("duplicate teacher assignment")
+			return nil, ErrDuplicateTeacherAssignment
 		}
 		seen[tid] = true
 		teacher, err := q.GetTeacherByID(ctx, tid)
 		if err != nil || teacher.Status != "approved" {
-			return nil, errors.New("invalid assigned teacher")
+			return nil, ErrInvalidAssignedTeacher
 		}
 		ids = append(ids, tid)
 	}
 	if len(ids) == 0 {
-		return nil, errors.New("at least one assigned teacher is required")
+		return nil, ErrAssignedTeacherRequired
 	}
 	return ids, nil
 }
@@ -52,12 +51,12 @@ func requireStudentAssignedToTeacher(ctx context.Context, teacherID, studentID i
 		return err
 	}
 	if assigned == 0 {
-		return errors.New("student is not assigned to this teacher")
+		return ErrStudentNotAssignedToTeacher
 	}
 	return nil
 }
 
-func studentFilterParams(q, status string, teacherID int64) queries.CountStudentsFilteredParams {
+func studentFilterParams(q, status string, teacherID int64, parentFilter string) queries.CountStudentsFilteredParams {
 	return queries.CountStudentsFilteredParams{
 		Column1:   q,
 		Column2:   sql.NullString{String: q, Valid: true},
@@ -66,6 +65,9 @@ func studentFilterParams(q, status string, teacherID int64) queries.CountStudent
 		Status:    status,
 		Column6:   teacherID,
 		TeacherID: teacherID,
+		Column8:   parentFilter,
+		Column9:   parentFilter,
+		Column10:  parentFilter,
 	}
 }
 
@@ -190,7 +192,7 @@ func saveStudentRelationships(ctx context.Context, studentID int64, r *http.Requ
 		var err error
 		relatedStudentID, err = strconv.ParseInt(relatedStudentValue, 10, 64)
 		if err != nil || relatedStudentID <= 0 {
-			return errors.New("invalid related student")
+			return ErrInvalidRelatedStudent
 		}
 	}
 
@@ -199,11 +201,11 @@ func saveStudentRelationships(ctx context.Context, studentID int64, r *http.Requ
 	}
 
 	if relatedStudentID == studentID {
-		return errors.New("a student cannot be related to themselves")
+		return ErrStudentCannotRelateToSelf
 	}
 
 	if _, err := dbRO.GetQueries().GetStudentByID(ctx, relatedStudentID); err != nil {
-		return errors.New("related student not found")
+		return ErrRelatedStudentNotFound
 	}
 
 	relationship := strings.TrimSpace(r.FormValue("relationship"))
@@ -295,11 +297,15 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	q := r.URL.Query().Get("q")
 	status := r.URL.Query().Get("status")
+	parentFilter := strings.TrimSpace(r.URL.Query().Get("parentFilter"))
+	if parentFilter != "" && !constants.ValidStudentParentFilter(parentFilter) {
+		parentFilter = ""
+	}
 	teacherID := utils.QueryParamInt64(r, "teacherId")
 	sort := parseListSort(r, frontend.ListSortKindStudent)
 	page := utils.ParsePageQuery(r)
 
-	filter := studentFilterParams(q, status, teacherID)
+	filter := studentFilterParams(q, status, teacherID, parentFilter)
 	total, err := dbRO.GetQueries().CountStudentsFiltered(ctx, filter)
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to count students: %v", err), http.StatusInternalServerError)
@@ -315,6 +321,9 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		Status:    filter.Status,
 		Column6:   filter.Column6,
 		TeacherID: filter.TeacherID,
+		Column8:   filter.Column8,
+		Column9:   filter.Column9,
+		Column10:  filter.Column10,
 		Limit:     total,
 		Offset:    0,
 	})
@@ -381,6 +390,7 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		Students:       viewStudents,
 		Query:          q,
 		Status:         constants.StudentStatus(status),
+		ParentFilter:   parentFilter,
 		TeacherID:      strconv.FormatInt(teacherID, 10),
 		TeacherName:    teacherName,
 		SortBy:         sort.By,

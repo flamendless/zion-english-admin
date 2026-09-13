@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -228,25 +227,25 @@ func parseScheduledClassesQuery(r *http.Request) (scheduledClassesQuery, error) 
 	nameFilter := r.URL.Query().Get("q")
 
 	if startDate == "" || endDate == "" {
-		return scheduledClassesQuery{}, errors.New("missing required parameters")
+		return scheduledClassesQuery{}, ErrMissingRequiredParameters
 	}
 
 	role := auth.GetRole(r.Context())
 	var teacherID int64
 	if teacherIDStr == "" || teacherIDStr == "0" {
 		if !auth.HasAdminAccess(role) {
-			return scheduledClassesQuery{}, errors.New("missing required parameters")
+			return scheduledClassesQuery{}, ErrMissingRequiredParameters
 		}
 	} else {
 		parsedID, err := strconv.ParseInt(teacherIDStr, 10, 64)
 		if err != nil {
-			return scheduledClassesQuery{}, errors.New("invalid teacher ID")
+			return scheduledClassesQuery{}, ErrInvalidTeacherID
 		}
 		teacherID = parsedID
 		if auth.IsTeacherScoped(role) {
 			user := auth.GetUser(r.Context())
 			if teacherID != user.ID {
-				return scheduledClassesQuery{}, errors.New("forbidden")
+				return scheduledClassesQuery{}, ErrForbidden
 			}
 		}
 	}
@@ -1262,7 +1261,7 @@ func validateScheduleDateTimeChange(existingDate, existingStart, newDate, newSta
 		return nil
 	}
 	if utils.IsDateTimeInPastPHT(newDate, newStart) {
-		return errors.New("date and time cannot be in the past")
+		return ErrDateTimeInPast
 	}
 	return nil
 }
@@ -1285,17 +1284,17 @@ func respondScheduledClassAction(w http.ResponseWriter, from, message string) {
 func markScheduledClassConducted(ctx context.Context, scheduleID int64, req models.ClassRecordRequest) error {
 	existing, err := dbRO.GetQueries().GetScheduledClassByID(ctx, scheduleID)
 	if err != nil {
-		return errors.New("scheduled class not found")
+		return ErrScheduledClassNotFound
 	}
 
 	if existing.Status != "scheduled" {
-		return errors.New("scheduled class is not in scheduled status")
+		return ErrScheduledClassNotInScheduledStatus
 	}
 	if existing.StudentID != req.StudentID ||
 		existing.TeacherID != req.TeacherID ||
 		existing.ScheduledDate != req.Date ||
 		existing.DurationMinutes != req.DurationMinutes {
-		return errors.New("class record does not match scheduled class")
+		return ErrClassRecordDoesNotMatchScheduledClass
 	}
 
 	return dbRW.GetQueries().UpdateScheduledClassStatus(ctx, queries.UpdateScheduledClassStatusParams{
@@ -1308,7 +1307,7 @@ func markScheduledClassConducted(ctx context.Context, scheduleID int64, req mode
 func parseScheduledClassRequest(r *http.Request, user auth.User, role auth.Role) (models.ScheduledClassRequest, error) {
 	studentID, err := formInt64(r, "schedule_student", "student")
 	if err != nil {
-		return models.ScheduledClassRequest{}, errors.New("student is required")
+		return models.ScheduledClassRequest{}, ErrStudentRequired
 	}
 	startTime := r.FormValue("start_time")
 	endTime := r.FormValue("end_time")
@@ -1325,7 +1324,7 @@ func parseScheduledClassRequest(r *http.Request, user auth.User, role auth.Role)
 	if auth.HasAdminAccess(role) {
 		teacherID, err = formInt64(r, "schedule_teacher", "teacher")
 		if err != nil {
-			return models.ScheduledClassRequest{}, errors.New("teacher is required")
+			return models.ScheduledClassRequest{}, ErrTeacherRequired
 		}
 	}
 
@@ -1360,43 +1359,43 @@ func formInt64(r *http.Request, names ...string) (int64, error) {
 			return requireInt64(value)
 		}
 	}
-	return 0, errors.New("missing integer value")
+	return 0, ErrMissingIntegerValue
 }
 
 func validateScheduledClassRateCurrency(rate float64, currency string) error {
 	if rate <= 0 {
-		return errors.New("rate must be greater than zero")
+		return ErrRateMustBePositive
 	}
 	if currency == "" {
-		return errors.New("currency is required")
+		return ErrCurrencyRequired
 	}
 	if !constants.ValidCurrency(currency) {
-		return errors.New("invalid currency. Must be KRW, CAD, YEN, or PHP")
+		return ErrInvalidCurrency
 	}
 	return nil
 }
 
 func validateScheduledClassRequest(req *models.ScheduledClassRequest) error {
 	if req.StudentID == 0 {
-		return errors.New("student is required")
+		return ErrStudentRequired
 	}
 	if req.TeacherID == 0 {
-		return errors.New("teacher is required")
+		return ErrTeacherRequired
 	}
 	if req.ScheduledDate == "" {
-		return errors.New("date is required")
+		return ErrDateRequired
 	}
 	if _, err := utils.ParseDatePHT(req.ScheduledDate); err != nil {
-		return errors.New("invalid date format")
+		return ErrInvalidDateFormat
 	}
 	if req.StartTime == "" {
-		return errors.New("start time is required")
+		return ErrStartTimeRequired
 	}
 	if _, err := utils.ParseTimeHM(req.StartTime); err != nil {
 		return utils.ErrInvalidStartTime
 	}
 	if req.DurationMinutes <= 0 {
-		return errors.New("duration must be greater than zero")
+		return ErrDurationMustBePositive
 	}
 	return validateScheduledClassRateCurrency(req.Rate, req.Currency)
 }

@@ -2,18 +2,8 @@ package classrules
 
 import (
 	"context"
-	"errors"
 	"zion-english/internal/auth"
 	"zion-english/internal/database/queries"
-)
-
-var (
-	ErrInactiveStudent    = errors.New("cannot record class for an inactive student")
-	ErrDuplicateClass     = errors.New("a class with the same student, teacher, date, and duration already exists")
-	ErrStudentNotAssigned = errors.New("student is not assigned to this teacher")
-	ErrStudentNotFound    = errors.New("student not found")
-	ErrTeacherNotOwner    = errors.New("you can only edit your own class records")
-	ErrAlreadyDeleted     = errors.New("this class has already been deleted")
 )
 
 type classRecordDB interface {
@@ -53,7 +43,7 @@ func (r ClassRecordRules) Validate(ctx context.Context, actor auth.User, input C
 		ID:              excludeID,
 	})
 	if err != nil {
-		return errors.New("failed to check duplicate class")
+		return ErrCheckClassDuplicate
 	}
 	if dup > 0 {
 		return ErrDuplicateClass
@@ -68,7 +58,7 @@ func (r ClassRecordRules) Validate(ctx context.Context, actor auth.User, input C
 			StudentID: input.StudentID,
 		})
 		if err != nil {
-			return errors.New("failed to verify student assignment")
+			return ErrVerifyStudentAssignment
 		}
 		if assigned == 0 {
 			return ErrStudentNotAssigned

@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -295,7 +294,7 @@ func loadReportRow(ctx context.Context, teacherID int64, startDate, endDate stri
 			return row, nil
 		}
 	}
-	return frontend.ReportRowData{}, errors.New("teacher not found in report summaries")
+	return frontend.ReportRowData{}, ErrTeacherNotFoundInReportSummaries
 }
 
 func reportEarningsToFrontend(earnings []reportEarningJSON) []frontend.ReportEarningData {

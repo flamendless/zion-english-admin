@@ -20,7 +20,7 @@ type TeacherListItem struct {
 templ TeacherNameCell(name string, avatar AvatarProps) {
 	<div class="teacher-name-cell">
 		@Avatar(avatar)
-		<span class="teacher-name-cell-text">{ name }</span>
+		<span class="teacher-name-cell-text" data-full-text={ name }>{ name }</span>
 	</div>
 }
 

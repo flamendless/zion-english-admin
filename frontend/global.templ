@@ -532,6 +532,18 @@ templ GlobalIncludes() {
 			font-size: 0.875rem;
 		}
 
+		.table-truncate-cell {
+			max-width: 200px;
+		}
+
+		.table-truncated-text {
+			display: block;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			min-width: 0;
+		}
+
 		/* ============================= */
 		/* Header & Navigation           */
 		/* ============================= */
@@ -3335,6 +3347,34 @@ templ GlobalIncludes() {
 			min-width: auto;
 		}
 
+		.list-toolbar .teachers-table-columns-control {
+			flex: 0 1 auto;
+			min-width: 160px;
+		}
+
+		.list-toolbar-extra-filters {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--space-3);
+			align-items: flex-end;
+			flex-basis: 100%;
+			width: 100%;
+			padding-top: var(--space-3);
+			border-top: 1px solid var(--color-border-subtle);
+		}
+
+		.list-toolbar-extra-filters > * {
+			flex: 0 1 auto;
+			width: auto;
+		}
+
+		.list-toolbar-extra-filters .form-group {
+			margin-bottom: 0;
+			min-width: 140px;
+			flex: 0 1 auto;
+			width: auto;
+		}
+
 		.toolbar-filter-dropdown-label {
 			display: block;
 			margin-bottom: var(--space-1);
@@ -4165,6 +4205,16 @@ templ GlobalIncludes() {
 				width: 100%;
 			}
 
+			.list-toolbar-extra-filters > * {
+				flex: 1 1 100%;
+				width: 100%;
+			}
+
+			.list-toolbar-extra-filters .form-group {
+				flex: 1 1 100%;
+				width: 100%;
+			}
+
 			.list-toolbar-action {
 				flex: 1 1 100%;
 				width: 100%;
@@ -4385,6 +4435,7 @@ templ GlobalIncludes() {
 	@CsrfHandlers()
 	@ErrorBannerHandlers()
 	@ScrClipboardHelpers()
+	@ScrTableTruncationTooltips()
 	@SortToggleScript()
 	@AdminOnlyTooltipScript()
 	@EntitySearchDismissScript()

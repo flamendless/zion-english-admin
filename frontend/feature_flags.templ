@@ -9,8 +9,19 @@ import (
 
 type FeatureFlagsData struct {
 	ClassOverdueGracePeriodMinutes int64
+	IntroVideoUploads              FeatureFlagRoleGatedItem
 	Zoom                           FeatureFlagIntegrationItem
 	GoogleCalendar                 FeatureFlagIntegrationItem
+}
+
+type FeatureFlagRoleGatedItem struct {
+	Name          string
+	Description   string
+	Enabled       bool
+	VisibleRoles  []constants.TeacherRole
+	RoleOptions   []constants.TeacherRole
+	FormFieldName string
+	FormPrefix    string
 }
 
 type FeatureFlagIntegrationItem struct {
@@ -280,7 +291,7 @@ templ FeatureFlags(data FeatureFlagsData) {
 
 			<div class="feature-flags-hero">
 				<p class="feature-flags-subtitle">
-					Control integration availability, class overdue timing, and which teacher roles can see each integration. Login superuser and admin accounts always see all integrations. Existing connections stay active when connections are disabled.
+					Control integration availability, teacher profile features, class overdue timing, and which teacher roles can see each option. Login superuser and admin accounts always see all integrations. Existing connections stay active when connections are disabled.
 				</p>
 			</div>
 
@@ -288,6 +299,12 @@ templ FeatureFlags(data FeatureFlagsData) {
 				<section class="feature-flags-section">
 					<h2 class="feature-flags-section-title">Class scheduling</h2>
 					@FeatureFlagClassOverdueGracePeriodRow(data.ClassOverdueGracePeriodMinutes)
+				</section>
+				<section class="feature-flags-section">
+					<h2 class="feature-flags-section-title">Teacher profile</h2>
+					<div class="integration-list">
+						@FeatureFlagRoleGatedRow(data.IntroVideoUploads)
+					</div>
 				</section>
 				<section class="feature-flags-section">
 					<h2 class="feature-flags-section-title">Integrations</h2>
@@ -307,6 +324,7 @@ templ FeatureFlags(data FeatureFlagsData) {
 				if (!form) return;
 
 				const integrationChecks = [
+					{ prefix: 'intro_video', label: 'Intro video uploads' },
 					{ prefix: 'zoom', label: 'Zoom' },
 					{ prefix: 'google_calendar', label: 'Google Calendar' },
 				];
@@ -353,6 +371,42 @@ templ FeatureFlagClassOverdueGracePeriodRow(minutes int64) {
 				value={ fmt.Sprintf("%d", minutes) }
 				required
 			/>
+		</div>
+	</div>
+}
+
+templ FeatureFlagRoleGatedRow(item FeatureFlagRoleGatedItem) {
+	<div class="integration-row">
+		<div class="integration-row-brand">
+			<div class="integration-info">
+				<span class="integration-name">{ item.Name }</span>
+				<p class="integration-desc">{ item.Description }</p>
+			</div>
+		</div>
+		<div class="integration-row-meta">
+			<label class="feature-flag-toggle">
+				<input
+					type="checkbox"
+					name={ item.FormFieldName }
+					checked?={ item.Enabled }
+				/>
+				Allow uploads
+			</label>
+			<fieldset class="feature-flag-roles">
+				<legend class="feature-flag-roles-label">Visible to</legend>
+				<div class="feature-flag-role-options">
+					for _, role := range item.RoleOptions {
+						<label class="feature-flag-toggle">
+							<input
+								type="checkbox"
+								name={ featureFlagRoleFieldName(item.FormPrefix, role) }
+								checked?={ featureFlagRoleChecked(item.VisibleRoles, role) }
+							/>
+							{ featureFlagRoleLabel(role) }
+						</label>
+					}
+				</div>
+			</fieldset>
 		</div>
 	</div>
 }

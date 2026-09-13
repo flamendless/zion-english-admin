@@ -36,14 +36,14 @@ func handleClassesPath(w http.ResponseWriter, r *http.Request) {
 
 func validateDeletionReason(reason string) error {
 	if utils.IsBlank(reason) {
-		return errors.New("reason is required for deletion")
+		return ErrReasonRequiredForDeletion
 	}
 	return nil
 }
 
 func validateClassReason(reason string) error {
 	if utils.IsBlank(reason) {
-		return errors.New("reason is required")
+		return ErrReasonRequired
 	}
 	return nil
 }
@@ -314,7 +314,7 @@ func parseClassRecordRequest(r *http.Request, user auth.User, role auth.Role, de
 	if auth.HasAdminAccess(role) {
 		teacherID, err = requireInt64(r.FormValue("teacher"))
 		if err != nil {
-			return models.ClassRecordRequest{}, errors.New("teacher is required")
+			return models.ClassRecordRequest{}, ErrTeacherRequired
 		}
 	}
 
@@ -556,19 +556,19 @@ func parseClassRecordsQuery(r *http.Request) (classRecordsQuery, error) {
 	showAll := false
 	if teacherIDStr == "" {
 		if !auth.HasAdminAccess(role) {
-			return classRecordsQuery{}, errors.New("missing required parameters")
+			return classRecordsQuery{}, ErrMissingRequiredParameters
 		}
 		showAll = true
 	} else {
 		parsedID, err := strconv.ParseInt(teacherIDStr, 10, 64)
 		if err != nil {
-			return classRecordsQuery{}, errors.New("invalid teacher ID")
+			return classRecordsQuery{}, ErrInvalidTeacherID
 		}
 		teacherID = parsedID
 		if auth.IsTeacherScoped(role) {
 			user := auth.GetUser(r.Context())
 			if teacherID != user.ID {
-				return classRecordsQuery{}, errors.New("forbidden")
+				return classRecordsQuery{}, ErrForbidden
 			}
 		}
 	}
@@ -787,35 +787,35 @@ func handleClasses(w http.ResponseWriter, r *http.Request) {
 
 func validateClassRecordRequest(req *models.ClassRecordRequest) error {
 	if req.StudentID == 0 {
-		return errors.New("student is required")
+		return ErrStudentRequired
 	}
 	if req.TeacherID == 0 {
-		return errors.New("teacher is required")
+		return ErrTeacherRequired
 	}
 	if req.Date == "" {
-		return errors.New("date is required")
+		return ErrDateRequired
 	}
 	if req.DurationMinutes <= 0 {
-		return errors.New("duration must be greater than zero")
+		return ErrDurationMustBePositive
 	}
 	models.ApplyTrialClassRate(req)
 	if req.Rate < 0 {
-		return errors.New("rate cannot be negative")
+		return ErrRateCannotBeNegative
 	}
 	if constants.ClassStatus(req.Status) == constants.ClassStatusConducted && req.Rate <= 0 {
-		return errors.New("rate must be greater than zero")
+		return ErrRateMustBePositive
 	}
 	if req.Currency == "" {
-		return errors.New("currency is required")
+		return ErrCurrencyRequired
 	}
 	if !constants.ValidCurrency(req.Currency) {
-		return errors.New("invalid currency. Must be KRW, CAD, YEN, or PHP")
+		return ErrInvalidCurrency
 	}
 	if !constants.ValidClassStatus(req.Status) {
-		return errors.New("invalid status")
+		return ErrInvalidStatus
 	}
 	if req.Status != "conducted" && utils.IsBlank(req.Reason) {
-		return errors.New("reason is required for cancelled or rescheduled classes")
+		return ErrReasonRequiredForCancelledRescheduled
 	}
 	return nil
 }
@@ -891,7 +891,7 @@ func classRecordDurationFromForm(r *http.Request) (int64, error) {
 	startTime := r.FormValue("start_time")
 	endTime := r.FormValue("end_time")
 	if startTime == "" || endTime == "" {
-		return 0, errors.New("start and end times are required")
+		return 0, ErrStartAndEndTimesRequired
 	}
 	duration, err := utils.DurationMinutesFromRange(startTime, endTime)
 	if err != nil {
@@ -903,13 +903,13 @@ func classRecordDurationFromForm(r *http.Request) (int64, error) {
 func friendlyTimeRangeError(err error) error {
 	switch {
 	case errors.Is(err, utils.ErrEndBeforeStart):
-		return errors.New("end time must be after start time")
+		return utils.ErrEndBeforeStart
 	case errors.Is(err, utils.ErrInvalidStartTime):
-		return errors.New("invalid start time")
+		return utils.ErrInvalidStartTime
 	case errors.Is(err, utils.ErrInvalidEndTime):
-		return errors.New("invalid end time")
+		return utils.ErrInvalidEndTime
 	case errors.Is(err, utils.ErrTimeRequired):
-		return errors.New("start and end times are required")
+		return ErrStartAndEndTimesRequired
 	default:
 		return err
 	}

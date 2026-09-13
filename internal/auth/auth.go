@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"crypto/subtle"
-	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -59,8 +58,6 @@ func RecordRegistration(ip string) {
 	registrationLimiter.RecordFailure(ip)
 }
 
-var ErrTeacherPendingApproval = errors.New("your account is pending approval. please wait for an administrator to approve your registration")
-
 func parseClaims(tokenString string, cfg *conf.Config) (*Claims, error) {
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
@@ -70,10 +67,10 @@ func parseClaims(tokenString string, cfg *conf.Config) (*Claims, error) {
 		return []byte(cfg.Secret), nil
 	})
 	if err != nil || !token.Valid {
-		return nil, errors.New("invalid token")
+		return nil, ErrInvalidToken
 	}
 	if claims.Role != RoleTeacher && claims.Role != RoleAdmin && claims.Role != RoleTester && claims.Role != RoleSuperuser {
-		return nil, errors.New("invalid role")
+		return nil, ErrInvalidRole
 	}
 	return claims, nil
 }
@@ -179,11 +176,11 @@ func Login(w http.ResponseWriter, r *http.Request, cfg *conf.Config, dbRO *queri
 	default:
 		teacher, err := dbRO.GetTeacherByEmail(r.Context(), email)
 		if err != nil {
-			return User{}, errors.New("invalid credentials")
+			return User{}, ErrInvalidCredentials
 		}
 
 		if err := bcrypt.CompareHashAndPassword([]byte(teacher.Password), []byte(password)); err != nil {
-			return User{}, errors.New("invalid credentials")
+			return User{}, ErrInvalidCredentials
 		}
 
 		if teacher.Status != string(constants.TeacherStatusApproved) {

@@ -43,6 +43,8 @@ type ProfileData struct {
 	CanEditLastName                  bool
 	CanUploadDocument                bool
 	CanUploadIntroVideo              bool
+	IntroVideoUploadVisible          bool
+	IntroVideoUploadsAllowed         bool
 	HasIntroVideo                    bool
 	IntroVideoStatus                 constants.TeacherIntroVideoStatus
 	IntroVideoViewURL                string
@@ -93,7 +95,7 @@ func Profile(data ProfileData) templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 67, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 69, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -146,7 +148,7 @@ func Profile(data ProfileData) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 324, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 326, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -159,7 +161,7 @@ func Profile(data ProfileData) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(data.Email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 325, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 327, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -195,7 +197,7 @@ func Profile(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(displayProfileName(data.FirstName, data.CanEditFirstName))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 344, Col: 103}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 346, Col: 103}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -208,7 +210,7 @@ func Profile(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(displayProfileName(data.MiddleName, data.CanEditMiddleName))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 348, Col: 105}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 350, Col: 105}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -221,7 +223,7 @@ func Profile(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(displayProfileName(data.LastName, data.CanEditLastName))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 352, Col: 101}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 354, Col: 101}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -234,7 +236,7 @@ func Profile(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(data.Status)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 356, Col: 57}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 358, Col: 57}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -247,7 +249,7 @@ func Profile(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(data.Birthdate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 360, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 362, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
@@ -260,7 +262,7 @@ func Profile(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(data.JoiningDate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 364, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 366, Col: 62}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -273,7 +275,7 @@ func Profile(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(data.Address)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 368, Col: 58}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 370, Col: 58}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -286,7 +288,7 @@ func Profile(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(displayOrDash(data.Sex))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 372, Col: 69}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 374, Col: 69}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -299,7 +301,7 @@ func Profile(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var13 string
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(utils.FormatCurrency(data.RatePerClass, data.Currency))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 376, Col: 100}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 378, Col: 100}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
@@ -312,7 +314,7 @@ func Profile(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(displayOrDash(data.Certifications))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 380, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 382, Col: 80}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
@@ -338,7 +340,7 @@ func Profile(data ProfileData) templ.Component {
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(data.Email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 391, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 393, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
@@ -356,7 +358,7 @@ func Profile(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var16 string
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(data.MobileNumber)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 396, Col: 63}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 398, Col: 63}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {
@@ -388,7 +390,7 @@ func Profile(data ProfileData) templ.Component {
 				var templ_7745c5c3_Var17 templ.SafeURL
 				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/names"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 408, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 410, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 				if templ_7745c5c3_Err != nil {
@@ -438,7 +440,7 @@ func Profile(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var18 templ.SafeURL
 			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/mobile"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 464, Col: 64}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 466, Col: 64}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 			if templ_7745c5c3_Err != nil {
@@ -451,7 +453,7 @@ func Profile(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var19 string
 			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.MobileNumber)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 473, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 475, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var19)
 			if templ_7745c5c3_Err != nil {
@@ -494,7 +496,7 @@ func Profile(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var20 templ.SafeURL
 			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/password"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 491, Col: 66}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 493, Col: 66}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {
@@ -625,7 +627,7 @@ func CooldownNotice(daysRemaining int, fieldLabel string) templ.Component {
 		var templ_7745c5c3_Var22 string
 		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(fieldLabel)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 559, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 561, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {
@@ -638,7 +640,7 @@ func CooldownNotice(daysRemaining int, fieldLabel string) templ.Component {
 		var templ_7745c5c3_Var23 string
 		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", daysRemaining))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 559, Col: 81}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 561, Col: 81}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 		if templ_7745c5c3_Err != nil {
@@ -686,7 +688,7 @@ func ProfileIntegrations(data ProfileData) templ.Component {
 				var templ_7745c5c3_Var25 string
 				templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(data.ZoomStatusMessage)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 569, Col: 68}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 571, Col: 68}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 				if templ_7745c5c3_Err != nil {
@@ -705,7 +707,7 @@ func ProfileIntegrations(data ProfileData) templ.Component {
 				var templ_7745c5c3_Var26 string
 				templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(data.GoogleCalendarStatusMessage)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 572, Col: 78}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 574, Col: 78}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 				if templ_7745c5c3_Err != nil {
@@ -769,7 +771,7 @@ func ProfileZoomIntegrationRow(data ProfileData) templ.Component {
 		var templ_7745c5c3_Var28 string
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/zoom-logo.svg"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 592, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 594, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var28)
 		if templ_7745c5c3_Err != nil {
@@ -782,7 +784,7 @@ func ProfileZoomIntegrationRow(data ProfileData) templ.Component {
 		var templ_7745c5c3_Var29 templ.SafeURL
 		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinURLErrs(data.ZoomGuideURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 600, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 602, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 		if templ_7745c5c3_Err != nil {
@@ -815,7 +817,7 @@ func ProfileZoomIntegrationRow(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var30 templ.SafeURL
 			templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinURLErrs(data.ZoomDisconnectURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 612, Col: 56}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 614, Col: 56}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 			if templ_7745c5c3_Err != nil {
@@ -833,7 +835,7 @@ func ProfileZoomIntegrationRow(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var31 templ.SafeURL
 			templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinURLErrs(data.ZoomConnectURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 616, Col: 34}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 618, Col: 34}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 			if templ_7745c5c3_Err != nil {
@@ -880,7 +882,7 @@ func ProfileGoogleCalendarIntegrationRow(data ProfileData) templ.Component {
 		var templ_7745c5c3_Var33 string
 		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/google-calendar-logo.svg"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 629, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 631, Col: 56}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var33)
 		if templ_7745c5c3_Err != nil {
@@ -893,7 +895,7 @@ func ProfileGoogleCalendarIntegrationRow(data ProfileData) templ.Component {
 		var templ_7745c5c3_Var34 templ.SafeURL
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinURLErrs(data.GoogleCalendarGuideURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 637, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 639, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {
@@ -926,7 +928,7 @@ func ProfileGoogleCalendarIntegrationRow(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var35 templ.SafeURL
 			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinURLErrs(data.GoogleCalendarDisconnectURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 649, Col: 66}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 651, Col: 66}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 			if templ_7745c5c3_Err != nil {
@@ -944,7 +946,7 @@ func ProfileGoogleCalendarIntegrationRow(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var36 templ.SafeURL
 			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinURLErrs(data.GoogleCalendarConnectURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 653, Col: 44}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 655, Col: 44}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 			if templ_7745c5c3_Err != nil {

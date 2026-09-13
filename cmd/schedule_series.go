@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"net/http"
 	"sort"
@@ -66,7 +65,7 @@ func scheduledClassesForScope(ctx context.Context, existing queries.GetScheduled
 		return nil, err
 	}
 	if len(rows) == 0 {
-		return nil, errors.New("no scheduled classes found in this series")
+		return nil, ErrNoScheduledClassesInSeries
 	}
 	return rows, nil
 }
@@ -234,7 +233,7 @@ func parseEditSeriesDateList(rawDates []string, allowedExisting []string) ([]str
 			continue
 		}
 		if _, err := utils.ParseDatePHT(date); err != nil {
-			return nil, errors.New("invalid date format")
+			return nil, ErrInvalidDateFormat
 		}
 		if date < today {
 			if _, ok := allowedPast[date]; !ok {
@@ -248,7 +247,7 @@ func parseEditSeriesDateList(rawDates []string, allowedExisting []string) ([]str
 		dates = append(dates, date)
 	}
 	if len(dates) == 0 {
-		return nil, errors.New("select at least one date for this series")
+		return nil, ErrSelectAtLeastOneDateForSeries
 	}
 	if len(dates) > constants.MaxRepeatScheduleDates {
 		return nil, fmt.Errorf("select at most %d dates", constants.MaxRepeatScheduleDates)
@@ -379,7 +378,7 @@ func finalizeSeriesConfirmDates(scope constants.SeriesScope, anchorDate string, 
 	}
 	for _, date := range allSeriesDates {
 		if date < anchorDate && !dateInList(date, confirmDates) {
-			return nil, errors.New("past sessions in this series cannot be removed when applying to this and future classes only")
+			return nil, ErrCannotRemovePastSeriesSessions
 		}
 	}
 	merged := make(map[string]struct{}, len(confirmDates)+len(allSeriesDates))
@@ -474,7 +473,7 @@ func previewSeriesEditRows(ctx context.Context, user auth.User, existing queries
 	if scope == constants.SeriesScopeFuture {
 		for _, class := range classes {
 			if class.ScheduledDate < existing.ScheduledDate && !dateInList(class.ScheduledDate, selectedDates) {
-				return nil, errors.New("past sessions in this series cannot be removed when applying to this and future classes only")
+				return nil, ErrCannotRemovePastSeriesSessions
 			}
 		}
 	}

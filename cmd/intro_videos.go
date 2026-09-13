@@ -17,12 +17,14 @@ import (
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/constants"
+	"zion-english/internal/database"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
 	"zion-english/internal/notifications"
 	"zion-english/internal/utils"
 
 	"go.uber.org/zap"
+	"gopkg.in/vansante/go-ffprobe.v2"
 )
 
 const introVideoDir = "data/teacher-intro-videos"
@@ -208,13 +210,13 @@ func parseIntroVideoFilters(r *http.Request) (introVideoFilters, error) {
 		Status: strings.TrimSpace(r.URL.Query().Get("status")),
 	}
 	if filters.Status != "" && !constants.ValidTeacherIntroVideoStatus(filters.Status) {
-		return introVideoFilters{}, errors.New("invalid intro video status")
+		return introVideoFilters{}, ErrInvalidIntroVideoStatus
 	}
 	teacherIDStr := strings.TrimSpace(r.URL.Query().Get("teacherId"))
 	if teacherIDStr != "" {
 		teacherID, err := strconv.ParseInt(teacherIDStr, 10, 64)
 		if err != nil {
-			return introVideoFilters{}, errors.New("invalid teacher ID")
+			return introVideoFilters{}, ErrInvalidTeacherID
 		}
 		filters.TeacherID = teacherID
 	}
@@ -285,6 +287,12 @@ func handleProfileIntroVideo(w http.ResponseWriter, r *http.Request) {
 		HttpError(w, "Access denied", http.StatusForbidden)
 		return
 	}
+	_, uploadAllowed := introVideoUploadAccessForViewer(ctx)
+	if !uploadAllowed {
+		setErrorFlash(w, "Intro video uploads are currently disabled")
+		HttpRedirect(w, r, "/profile")
+		return
+	}
 
 	blocking, err := dbRO.GetQueries().HasBlockingTeacherIntroVideo(ctx, user.ID)
 	if err != nil {
@@ -328,9 +336,13 @@ func handleProfileIntroVideo(w http.ResponseWriter, r *http.Request) {
 	}
 	defer os.Remove(tempPath)
 
-	duration, err := probeVideoDuration(tempPath)
+	duration, err := probeVideoDuration(ctx, tempPath)
 	if err != nil {
-		setErrorFlash(w, "Could not read video duration. Please upload a valid video file.")
+		if errors.Is(err, ErrFfprobeUnavailable) {
+			setErrorFlash(w, "Video duration check requires ffprobe. Install ffmpeg and ensure ffprobe is on PATH.")
+		} else {
+			setErrorFlash(w, "Could not read video duration. Please upload a valid video file.")
+		}
 		HttpRedirect(w, r, "/profile")
 		return
 	}
@@ -362,8 +374,12 @@ func handleProfileIntroVideo(w http.ResponseWriter, r *http.Request) {
 		Status:           string(constants.TeacherIntroVideoStatusSubmitted),
 	}); err != nil {
 		_ = os.Remove(destPath)
-		logs.Log().Error("insert teacher intro video", zap.Error(err))
-		setErrorFlash(w, "Failed to record intro video")
+		if database.IsUniqueConstraint(err) {
+			setErrorFlash(w, "You already have a submitted or approved intro video. You cannot upload again unless it is rejected or deleted.")
+		} else {
+			logs.Log().Error("insert teacher intro video", zap.Error(err))
+			setErrorFlash(w, "Failed to record intro video")
+		}
 		HttpRedirect(w, r, "/profile")
 		return
 	}
@@ -513,6 +529,9 @@ func handleIntroVideoDelete(w http.ResponseWriter, r *http.Request, videoID int6
 	}
 
 	insertAuditLogAs(ctx, user, "teachers", fmt.Sprintf("deleted intro video '%s' (id %d)", row.OriginalFilename, videoID))
+	teacherName := teacherNameByID(ctx, row.TeacherID)
+	notifyTeacher(ctx, row.TeacherID, teacherName, user, notifications.KindIntroVideoDeleted,
+		fmt.Sprintf("Your intro video '%s' was deleted by an administrator. You may upload a new one.", row.OriginalFilename), "")
 	setSuccessFlash(w, "Intro video deleted successfully.")
 	HttpRedirect(w, r, "/intro-videos")
 }
@@ -526,18 +545,18 @@ func saveTempIntroVideo(file io.ReadSeeker, filename string, size int64) (string
 	ext := strings.ToLower(filepath.Ext(filename))
 	tempFile, err := os.CreateTemp(introVideoDir, "upload-*"+ext)
 	if err != nil {
-		return "", "", errors.New("Failed to prepare upload")
+		return "", "", ErrIntroVideoUploadPrepareFailed
 	}
 	tempPath := tempFile.Name()
 
 	if _, err := io.Copy(tempFile, file); err != nil {
 		tempFile.Close()
 		_ = os.Remove(tempPath)
-		return "", "", errors.New("Failed to save video")
+		return "", "", ErrIntroVideoSaveFailed
 	}
 	if err := tempFile.Close(); err != nil {
 		_ = os.Remove(tempPath)
-		return "", "", errors.New("Failed to save video")
+		return "", "", ErrIntroVideoSaveFailed
 	}
 
 	return tempPath, mimeType, nil
@@ -545,27 +564,27 @@ func saveTempIntroVideo(file io.ReadSeeker, filename string, size int64) (string
 
 func validateIntroVideoUpload(file io.ReadSeeker, filename string, size int64) (string, error) {
 	if size <= 0 {
-		return "", errors.New("Uploaded file is empty")
+		return "", ErrIntroVideoFileEmpty
 	}
 	if size > constants.MaxIntroVideoBytes {
-		return "", errors.New("File is too large. Maximum size is 20 MB.")
+		return "", ErrIntroVideoFileTooLarge
 	}
 
 	ext := strings.ToLower(filepath.Ext(filename))
 	mimeType, ok := allowedIntroVideoExtensions[ext]
 	if !ok {
-		return "", errors.New("Unsupported file format. Please upload MP4, WebM, MOV, AVI, MKV, OGV, M4V, or 3GP.")
+		return "", ErrUnsupportedIntroVideoFormat
 	}
 
 	header := make([]byte, 12)
 	if _, err := io.ReadFull(file, header); err != nil {
-		return "", errors.New("Invalid video file")
+		return "", ErrInvalidIntroVideoFile
 	}
 	if _, err := file.Seek(0, io.SeekStart); err != nil {
-		return "", errors.New("Failed to read uploaded file")
+		return "", ErrIntroVideoReadFailed
 	}
 	if !looksLikeVideo(header, ext) {
-		return "", errors.New("Invalid video file. Please upload a valid video.")
+		return "", ErrInvalidIntroVideoContent
 	}
 
 	return mimeType, nil
@@ -588,21 +607,21 @@ func looksLikeVideo(header []byte, ext string) bool {
 	}
 }
 
-func probeVideoDuration(path string) (float64, error) {
-	out, err := exec.Command("ffprobe",
-		"-v", "error",
-		"-show_entries", "format=duration",
-		"-of", "default=noprint_wrappers=1:nokey=1",
-		path,
-	).Output()
+func probeVideoDuration(ctx context.Context, path string) (float64, error) {
+	probeCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
+	defer cancel()
+
+	data, err := ffprobe.ProbeURL(probeCtx, path)
 	if err != nil {
+		if _, ok := errors.AsType[*exec.Error](err); ok {
+			return 0, ErrFfprobeUnavailable
+		}
 		return 0, err
 	}
-	value := strings.TrimSpace(string(out))
-	if value == "" {
-		return 0, errors.New("empty duration")
+	if data.Format == nil || data.Format.DurationSeconds <= 0 {
+		return 0, ErrEmptyIntroVideoDuration
 	}
-	return strconv.ParseFloat(value, 64)
+	return data.Format.DurationSeconds, nil
 }
 
 func copyFile(src, dst string) error {

@@ -3,11 +3,15 @@ package frontend
 import "testing"
 
 func TestTeacherTableColumnsSummary(t *testing.T) {
+	if got := teacherTableColumnsDefaultSummary(); got != TeacherTableColumnsSummaryNone {
+		t.Fatalf("expected default None, got %q", got)
+	}
+
 	visible := map[TeacherTableColumnID]bool{
 		TeacherTableColumnDocsStatus:  true,
 		TeacherTableColumnConnections: true,
 	}
-	if got := teacherTableColumnsSummary(visible); got != "All" {
+	if got := teacherTableColumnsSummary(visible); got != TeacherTableColumnsSummaryAll {
 		t.Fatalf("expected All, got %q", got)
 	}
 
@@ -17,7 +21,7 @@ func TestTeacherTableColumnsSummary(t *testing.T) {
 	}
 
 	visible[TeacherTableColumnConnections] = false
-	if got := teacherTableColumnsSummary(visible); got != "None" {
+	if got := teacherTableColumnsSummary(visible); got != TeacherTableColumnsSummaryNone {
 		t.Fatalf("expected None, got %q", got)
 	}
 }

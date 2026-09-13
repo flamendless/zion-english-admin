@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -11,7 +10,14 @@ import (
 	"zion-english/internal/featureflags"
 )
 
-var ErrFeatureFlagRoleRequired = errors.New("at least one role must be selected")
+func introVideoUploadAccessForViewer(ctx context.Context) (visible bool, uploadAllowed bool) {
+	viewer := auth.GetUser(ctx)
+	roles, err := loadTeacherRoles(ctx, viewer.ID)
+	if err != nil {
+		return false, false
+	}
+	return featureflags.IntroVideoUploadAccess(ctx, dbRO, roles)
+}
 
 func integrationAccessForViewer(ctx context.Context, key constants.FeatureFlagKey) (visible bool, connectAllowed bool) {
 	viewer := auth.GetUser(ctx)

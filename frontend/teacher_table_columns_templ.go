@@ -88,7 +88,36 @@ func TeacherTableColumnsDropdown() templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></details></div><script>\r\n\t\t(function () {\r\n\t\t\tconst STORAGE_KEY = 'teachers-table-columns';\r\n\t\t\tconst control = document.querySelector('[data-teachers-table-columns]');\r\n\t\t\tconst table = document.getElementById('teachersTable');\r\n\t\t\tif (!control || !table) return;\r\n\r\n\t\t\tconst columnInputs = Array.from(control.querySelectorAll('[data-teacher-column]'));\r\n\t\t\tconst summary = control.querySelector('[data-teacher-columns-summary]');\r\n\t\t\tconst defaultState = {};\r\n\t\t\tcolumnInputs.forEach(function (input) {\r\n\t\t\t\tdefaultState[input.dataset.teacherColumn] = input.checked;\r\n\t\t\t});\r\n\r\n\t\t\tfunction readState() {\r\n\t\t\t\ttry {\r\n\t\t\t\t\tconst raw = localStorage.getItem(STORAGE_KEY);\r\n\t\t\t\t\tif (!raw) return Object.assign({}, defaultState);\r\n\t\t\t\t\tconst parsed = JSON.parse(raw);\r\n\t\t\t\t\tif (!parsed || typeof parsed !== 'object') return Object.assign({}, defaultState);\r\n\t\t\t\t\tconst state = Object.assign({}, defaultState);\r\n\t\t\t\t\tcolumnInputs.forEach(function (input) {\r\n\t\t\t\t\t\tconst key = input.dataset.teacherColumn;\r\n\t\t\t\t\t\tif (typeof parsed[key] === 'boolean') {\r\n\t\t\t\t\t\t\tstate[key] = parsed[key];\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t});\r\n\t\t\t\t\treturn state;\r\n\t\t\t\t} catch (err) {\r\n\t\t\t\t\treturn Object.assign({}, defaultState);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction writeState(state) {\r\n\t\t\t\tlocalStorage.setItem(STORAGE_KEY, JSON.stringify(state));\r\n\t\t\t}\r\n\r\n\t\t\tfunction selectedLabels(state) {\r\n\t\t\t\tconst labels = [];\r\n\t\t\t\tcolumnInputs.forEach(function (input) {\r\n\t\t\t\t\tif (!state[input.dataset.teacherColumn]) return;\r\n\t\t\t\t\tconst label = input.closest('label');\r\n\t\t\t\t\tif (label) labels.push(label.textContent.trim());\r\n\t\t\t\t});\r\n\t\t\t\treturn labels;\r\n\t\t\t}\r\n\r\n\t\t\tfunction updateSummary(state) {\r\n\t\t\t\tif (!summary) return;\r\n\t\t\t\tconst labels = selectedLabels(state);\r\n\t\t\t\tif (labels.length === 0) {\r\n\t\t\t\t\tsummary.textContent = 'None';\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (labels.length === columnInputs.length) {\r\n\t\t\t\t\tsummary.textContent = 'All';\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tsummary.textContent = labels.join(', ');\r\n\t\t\t}\r\n\r\n\t\t\tfunction applyState(state) {\r\n\t\t\t\tcolumnInputs.forEach(function (input) {\r\n\t\t\t\t\tconst key = input.dataset.teacherColumn;\r\n\t\t\t\t\tconst visible = !!state[key];\r\n\t\t\t\t\tinput.checked = visible;\r\n\t\t\t\t\ttable.querySelectorAll('[data-teacher-col=\"' + key + '\"]').forEach(function (cell) {\r\n\t\t\t\t\t\tcell.hidden = !visible;\r\n\t\t\t\t\t});\r\n\t\t\t\t});\r\n\t\t\t\tupdateSummary(state);\r\n\t\t\t}\r\n\r\n\t\t\tlet state = readState();\r\n\t\t\tapplyState(state);\r\n\r\n\t\t\tcolumnInputs.forEach(function (input) {\r\n\t\t\t\tinput.addEventListener('change', function () {\r\n\t\t\t\t\tstate = readState();\r\n\t\t\t\t\tstate[input.dataset.teacherColumn] = input.checked;\r\n\t\t\t\t\twriteState(state);\r\n\t\t\t\t\tapplyState(state);\r\n\t\t\t\t});\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></details></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func TeacherTableColumnsScript() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var5 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var5 == nil {
+			templ_7745c5c3_Var5 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<script>\r\n\t\t(function () {\r\n\t\t\tconst STORAGE_KEY = 'teachers-table-columns';\r\n\t\t\tconst control = document.querySelector('[data-teachers-table-columns]');\r\n\t\t\tconst table = document.getElementById('teachersTable');\r\n\t\t\tif (!control || !table) return;\r\n\r\n\t\t\tconst columnInputs = Array.from(control.querySelectorAll('[data-teacher-column]'));\r\n\t\t\tconst summary = control.querySelector('[data-teacher-columns-summary]');\r\n\t\t\tconst defaultState = {};\r\n\t\t\tcolumnInputs.forEach(function (input) {\r\n\t\t\t\tdefaultState[input.dataset.teacherColumn] = input.checked;\r\n\t\t\t});\r\n\r\n\t\t\tfunction readState() {\r\n\t\t\t\ttry {\r\n\t\t\t\t\tconst raw = localStorage.getItem(STORAGE_KEY);\r\n\t\t\t\t\tif (!raw) return Object.assign({}, defaultState);\r\n\t\t\t\t\tconst parsed = JSON.parse(raw);\r\n\t\t\t\t\tif (!parsed || typeof parsed !== 'object') return Object.assign({}, defaultState);\r\n\t\t\t\t\tconst state = Object.assign({}, defaultState);\r\n\t\t\t\t\tcolumnInputs.forEach(function (input) {\r\n\t\t\t\t\t\tconst key = input.dataset.teacherColumn;\r\n\t\t\t\t\t\tif (typeof parsed[key] === 'boolean') {\r\n\t\t\t\t\t\t\tstate[key] = parsed[key];\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t});\r\n\t\t\t\t\treturn state;\r\n\t\t\t\t} catch (err) {\r\n\t\t\t\t\treturn Object.assign({}, defaultState);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction writeState(state) {\r\n\t\t\t\tlocalStorage.setItem(STORAGE_KEY, JSON.stringify(state));\r\n\t\t\t}\r\n\r\n\t\t\tfunction selectedLabels(state) {\r\n\t\t\t\tconst labels = [];\r\n\t\t\t\tcolumnInputs.forEach(function (input) {\r\n\t\t\t\t\tif (!state[input.dataset.teacherColumn]) return;\r\n\t\t\t\t\tconst label = input.closest('label');\r\n\t\t\t\t\tif (label) labels.push(label.textContent.trim());\r\n\t\t\t\t});\r\n\t\t\t\treturn labels;\r\n\t\t\t}\r\n\r\n\t\t\tfunction updateSummary(state) {\r\n\t\t\t\tif (!summary) return;\r\n\t\t\t\tconst labels = selectedLabels(state);\r\n\t\t\t\tif (labels.length === 0) {\r\n\t\t\t\t\tsummary.textContent = 'None';\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (labels.length === columnInputs.length) {\r\n\t\t\t\t\tsummary.textContent = 'All';\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tsummary.textContent = labels.join(', ');\r\n\t\t\t}\r\n\r\n\t\t\tfunction applyState(state) {\r\n\t\t\t\tcolumnInputs.forEach(function (input) {\r\n\t\t\t\t\tconst key = input.dataset.teacherColumn;\r\n\t\t\t\t\tconst visible = !!state[key];\r\n\t\t\t\t\tinput.checked = visible;\r\n\t\t\t\t\ttable.querySelectorAll('[data-teacher-col=\"' + key + '\"]').forEach(function (cell) {\r\n\t\t\t\t\t\tcell.hidden = !visible;\r\n\t\t\t\t\t});\r\n\t\t\t\t});\r\n\r\n\t\t\t\tconst extraFiltersRow = document.querySelector('[data-teachers-extra-filters]');\r\n\t\t\t\tlet anyExtraFilterVisible = false;\r\n\t\t\t\tdocument.querySelectorAll('[data-teacher-filter-for]').forEach(function (filterGroup) {\r\n\t\t\t\t\tconst key = filterGroup.getAttribute('data-teacher-filter-for');\r\n\t\t\t\t\tconst visible = !!state[key];\r\n\t\t\t\t\tfilterGroup.hidden = !visible;\r\n\t\t\t\t\tif (visible) anyExtraFilterVisible = true;\r\n\t\t\t\t});\r\n\t\t\t\tif (extraFiltersRow) {\r\n\t\t\t\t\textraFiltersRow.hidden = !anyExtraFilterVisible;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tupdateSummary(state);\r\n\t\t\t\ttable.classList.add('teachers-table-columns-ready');\r\n\t\t\t}\r\n\r\n\t\t\tlet state = readState();\r\n\t\t\tapplyState(state);\r\n\r\n\t\t\tcolumnInputs.forEach(function (input) {\r\n\t\t\t\tinput.addEventListener('change', function () {\r\n\t\t\t\t\tstate = readState();\r\n\t\t\t\t\tstate[input.dataset.teacherColumn] = input.checked;\r\n\t\t\t\t\twriteState(state);\r\n\t\t\t\t\tapplyState(state);\r\n\t\t\t\t});\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -112,39 +141,39 @@ func TeacherTableOptionalHeaderCells() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var5 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var5 == nil {
-			templ_7745c5c3_Var5 = templ.NopComponent
+		templ_7745c5c3_Var6 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var6 == nil {
+			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		for _, col := range TeacherTableOptionalColumns {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<th data-teacher-col=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var6 string
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(col.ID))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_table_columns.templ`, Line: 114, Col: 39}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<th data-teacher-col=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
-			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(col.HeaderLabel)
+			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(col.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_table_columns.templ`, Line: 114, Col: 59}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_table_columns.templ`, Line: 131, Col: 39}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</th>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var8 string
+			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(col.HeaderLabel)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_table_columns.templ`, Line: 131, Col: 59}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</th>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -169,41 +198,41 @@ func TeacherTableOptionalRowCells(teacher TeacherItem) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var8 == nil {
-			templ_7745c5c3_Var8 = templ.NopComponent
+		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var9 == nil {
+			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		for _, col := range TeacherTableOptionalColumns {
 			switch col.ID {
 			case TeacherTableColumnDocsStatus:
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<td data-teacher-col=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var9 string
-				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(col.ID))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_table_columns.templ`, Line: 122, Col: 40}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" data-label=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<td data-teacher-col=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var10 string
-				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(col.HeaderLabel)
+				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(col.ID))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_table_columns.templ`, Line: 122, Col: 71}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_table_columns.templ`, Line: 139, Col: 40}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" data-label=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var11 string
+				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(col.HeaderLabel)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_table_columns.templ`, Line: 139, Col: 71}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -213,43 +242,43 @@ func TeacherTableOptionalRowCells(teacher TeacherItem) templ.Component {
 						return templ_7745c5c3_Err
 					}
 				} else {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<span>-</span>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<span>-</span>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</td>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</td>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			case TeacherTableColumnConnections:
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<td data-teacher-col=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var11 string
-				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(col.ID))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_table_columns.templ`, Line: 130, Col: 40}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" data-label=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<td data-teacher-col=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var12 string
-				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(col.HeaderLabel)
+				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(col.ID))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_table_columns.templ`, Line: 130, Col: 71}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_table_columns.templ`, Line: 147, Col: 40}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" data-label=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var13 string
+				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(col.HeaderLabel)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_table_columns.templ`, Line: 147, Col: 71}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -257,7 +286,7 @@ func TeacherTableOptionalRowCells(teacher TeacherItem) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</td>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</td>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

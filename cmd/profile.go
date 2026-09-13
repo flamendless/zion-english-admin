@@ -234,7 +234,6 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 		CanEditMiddleName:     utils.ProfileNameEditable(row.MiddleName),
 		CanEditLastName:       utils.ProfileNameEditable(row.LastName),
 		CanUploadDocument:     blockingDocs == 0,
-		CanUploadIntroVideo:   blockingIntroVideo == 0,
 	}
 	if introVideo, err := dbRO.GetQueries().GetLatestTeacherIntroVideoByTeacherID(ctx, user.ID); err == nil {
 		data.HasIntroVideo = true
@@ -246,6 +245,10 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 	} else if !errors.Is(err, sql.ErrNoRows) {
 		logs.Log().Error("get latest teacher intro video", zap.Error(err))
 	}
+	introVisible, introUploadAllowed := introVideoUploadAccessForViewer(ctx)
+	data.IntroVideoUploadVisible = data.HasIntroVideo || introVisible
+	data.IntroVideoUploadsAllowed = introUploadAllowed
+	data.CanUploadIntroVideo = introUploadAllowed && blockingIntroVideo == 0
 	zoomConnected, zoomConfigured, zoomVisible, zoomConnectionsAllowed := profileZoomStatus(ctx, user.ID)
 	data.ZoomConfigured = zoomConfigured
 	data.ZoomConnected = zoomConnected
@@ -750,18 +753,18 @@ func handleTeacherPicture(w http.ResponseWriter, r *http.Request) {
 
 func validateAvatarUpload(file io.ReadSeeker, size int64) (string, error) {
 	if size <= 0 {
-		return "", errors.New("Uploaded file is empty")
+		return "", ErrAvatarUploadedFileEmpty
 	}
 	if size > maxAvatarBytes {
-		return "", errors.New("File is too large. Maximum size is 2 MB.")
+		return "", ErrAvatarFileTooLarge
 	}
 
 	cfg, format, err := image.DecodeConfig(file)
 	if err != nil {
-		return "", errors.New("Invalid image file. Please upload a JPEG or PNG image.")
+		return "", ErrInvalidAvatarImage
 	}
 	if _, err := file.Seek(0, io.SeekStart); err != nil {
-		return "", errors.New("Failed to read uploaded image")
+		return "", ErrFailedToReadUploadedImage
 	}
 	_ = cfg
 
@@ -771,7 +774,7 @@ func validateAvatarUpload(file io.ReadSeeker, size int64) (string, error) {
 	case "png":
 		return ".png", nil
 	default:
-		return "", errors.New("Unsupported image format. Please upload a JPEG or PNG image.")
+		return "", ErrUnsupportedAvatarImageFormat
 	}
 }
 

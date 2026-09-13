@@ -121,14 +121,14 @@ templ DashboardStats(data DashboardData) {
 				<span class="stat-label">Pending Intro Videos</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.PendingIntroVideos) }</span>
 			</div>
-			<div class="stat-card">
+			<a href={ utils.URL("/students?status=active&parentFilter=missing_name") } class="stat-card stat-card-link">
 				<span class="stat-label">Students Without Parent</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.StudentsWithoutParent) }</span>
-			</div>
-			<div class="stat-card">
+			</a>
+			<a href={ utils.URL("/students?status=active&parentFilter=missing_rate") } class="stat-card stat-card-link">
 				<span class="stat-label">Students Without Parent Rate</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.StudentsWithoutParentRate) }</span>
-			</div>
+			</a>
 		}
 		if data.Role == auth.RoleTeacher {
 			<a href={ utils.URL("/my-students") } class="stat-card stat-card-link">

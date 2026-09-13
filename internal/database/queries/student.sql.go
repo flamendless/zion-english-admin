@@ -86,6 +86,23 @@ WHERE (? = '' OR s.name LIKE '%' || ? || '%')
 		OR (? != '' AND s.status = ?)
 	)
 	AND (? = 0 OR m2m.teacher_id = ?)
+	AND (
+		? = ''
+		OR (
+			? = 'missing_name'
+			AND s.status = 'active'
+			AND TRIM(COALESCE(s.parent_name, '')) = ''
+		)
+		OR (
+			? = 'missing_rate'
+			AND s.status = 'active'
+			AND (
+				s.parent_rate IS NULL
+				OR s.parent_currency IS NULL
+				OR TRIM(COALESCE(s.parent_currency, '')) = ''
+			)
+		)
+	)
 `
 
 type CountStudentsFilteredParams struct {
@@ -96,6 +113,9 @@ type CountStudentsFilteredParams struct {
 	Status    string
 	Column6   interface{}
 	TeacherID int64
+	Column8   interface{}
+	Column9   interface{}
+	Column10  interface{}
 }
 
 func (q *Queries) CountStudentsFiltered(ctx context.Context, arg CountStudentsFilteredParams) (int64, error) {
@@ -107,6 +127,9 @@ func (q *Queries) CountStudentsFiltered(ctx context.Context, arg CountStudentsFi
 		arg.Status,
 		arg.Column6,
 		arg.TeacherID,
+		arg.Column8,
+		arg.Column9,
+		arg.Column10,
 	)
 	var count int64
 	err := row.Scan(&count)
@@ -291,6 +314,23 @@ WHERE (? = '' OR s.name LIKE '%' || ? || '%')
 		OR (? != '' AND s.status = ?)
 	)
 	AND (? = 0 OR m2m.teacher_id = ?)
+	AND (
+		? = ''
+		OR (
+			? = 'missing_name'
+			AND s.status = 'active'
+			AND TRIM(COALESCE(s.parent_name, '')) = ''
+		)
+		OR (
+			? = 'missing_rate'
+			AND s.status = 'active'
+			AND (
+				s.parent_rate IS NULL
+				OR s.parent_currency IS NULL
+				OR TRIM(COALESCE(s.parent_currency, '')) = ''
+			)
+		)
+	)
 ORDER BY s.created_at DESC
 LIMIT ? OFFSET ?
 `
@@ -303,6 +343,9 @@ type GetStudentsFilteredParams struct {
 	Status    string
 	Column6   interface{}
 	TeacherID int64
+	Column8   interface{}
+	Column9   interface{}
+	Column10  interface{}
 	Limit     int64
 	Offset    int64
 }
@@ -333,6 +376,9 @@ func (q *Queries) GetStudentsFiltered(ctx context.Context, arg GetStudentsFilter
 		arg.Status,
 		arg.Column6,
 		arg.TeacherID,
+		arg.Column8,
+		arg.Column9,
+		arg.Column10,
 		arg.Limit,
 		arg.Offset,
 	)

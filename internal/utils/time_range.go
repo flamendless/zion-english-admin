@@ -1,20 +1,11 @@
 package utils
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"time"
 
 	"zion-english/internal/constants"
-)
-
-var (
-	ErrTimeRequired      = errors.New("time is required")
-	ErrInvalidTimeFormat = errors.New("invalid time format")
-	ErrInvalidStartTime  = errors.New("invalid start time")
-	ErrInvalidEndTime    = errors.New("invalid end time")
-	ErrEndBeforeStart    = errors.New("end time must be after start time")
 )
 
 func ParseTimeHM(value string) (time.Time, error) {

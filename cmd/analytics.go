@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"math"
 	"net/http"
 	"sort"
@@ -401,15 +400,15 @@ func analyticsTeacherID(r *http.Request) (int64, error) {
 	if role == auth.RoleTeacher {
 		user := auth.GetUser(r.Context())
 		if user.ID == 0 {
-			return 0, errors.New("unauthorized")
+			return 0, ErrUnauthorized
 		}
 		if teacherIDStr := strings.TrimSpace(r.URL.Query().Get("teacherId")); teacherIDStr != "" {
 			parsedID, err := strconv.ParseInt(teacherIDStr, 10, 64)
 			if err != nil {
-				return 0, errors.New("invalid teacher ID")
+				return 0, ErrInvalidTeacherID
 			}
 			if parsedID != user.ID {
-				return 0, errors.New("forbidden")
+				return 0, ErrForbidden
 			}
 		}
 		return user.ID, nil
@@ -421,7 +420,7 @@ func analyticsTeacherID(r *http.Request) (int64, error) {
 	}
 	parsedID, err := strconv.ParseInt(teacherIDStr, 10, 64)
 	if err != nil {
-		return 0, errors.New("invalid teacher ID")
+		return 0, ErrInvalidTeacherID
 	}
 	return parsedID, nil
 }

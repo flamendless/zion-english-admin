@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"image"
 	_ "image/jpeg"
@@ -212,16 +211,16 @@ func parseDocumentFilters(r *http.Request) (documentFilters, error) {
 		Status: strings.TrimSpace(r.URL.Query().Get("status")),
 	}
 	if filters.Type != "" && !constants.ValidTeacherDocumentType(filters.Type) {
-		return documentFilters{}, errors.New("invalid document type")
+		return documentFilters{}, ErrInvalidDocumentType
 	}
 	if filters.Status != "" && !constants.ValidTeacherDocumentStatus(filters.Status) {
-		return documentFilters{}, errors.New("invalid document status")
+		return documentFilters{}, ErrInvalidDocumentStatus
 	}
 	teacherIDStr := strings.TrimSpace(r.URL.Query().Get("teacherId"))
 	if teacherIDStr != "" {
 		teacherID, err := strconv.ParseInt(teacherIDStr, 10, 64)
 		if err != nil {
-			return documentFilters{}, errors.New("invalid teacher ID")
+			return documentFilters{}, ErrInvalidTeacherID
 		}
 		filters.TeacherID = teacherID
 	}
@@ -510,10 +509,10 @@ func handleDocumentDelete(w http.ResponseWriter, r *http.Request, documentID int
 
 func validateDocumentUpload(file io.ReadSeeker, filename string, size int64) (string, error) {
 	if size <= 0 {
-		return "", errors.New("Uploaded file is empty")
+		return "", ErrUploadedFileEmpty
 	}
 	if size > maxDocumentBytes {
-		return "", errors.New("File is too large. Maximum size is 5 MB.")
+		return "", ErrDocumentFileTooLarge
 	}
 
 	ext := strings.ToLower(filepath.Ext(filename))
@@ -521,10 +520,10 @@ func validateDocumentUpload(file io.ReadSeeker, filename string, size int64) (st
 	case ".png", ".jpg", ".jpeg":
 		_, format, err := image.DecodeConfig(file)
 		if err != nil {
-			return "", errors.New("Invalid image file. Please upload a PNG or JPEG image.")
+			return "", ErrInvalidDocumentImage
 		}
 		if _, err := file.Seek(0, io.SeekStart); err != nil {
-			return "", errors.New("Failed to read uploaded file")
+			return "", ErrFailedToReadUploadedFile
 		}
 		if ext == ".jpeg" || format == "jpeg" {
 			return ".jpg", nil
@@ -533,17 +532,17 @@ func validateDocumentUpload(file io.ReadSeeker, filename string, size int64) (st
 	case ".pdf":
 		header := make([]byte, 4)
 		if _, err := io.ReadFull(file, header); err != nil {
-			return "", errors.New("Invalid PDF file")
+			return "", ErrInvalidPDFFile
 		}
 		if _, err := file.Seek(0, io.SeekStart); err != nil {
-			return "", errors.New("Failed to read uploaded file")
+			return "", ErrFailedToReadUploadedFile
 		}
 		if !bytes.Equal(header, []byte("%PDF")) {
-			return "", errors.New("Invalid PDF file")
+			return "", ErrInvalidPDFFile
 		}
 		return ".pdf", nil
 	default:
-		return "", errors.New("Unsupported file format. Please upload PNG, JPEG, JPG, or PDF.")
+		return "", ErrUnsupportedDocumentFormat
 	}
 }
 

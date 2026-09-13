@@ -6,7 +6,6 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"io"
 )
@@ -56,7 +55,7 @@ func DecryptToken(secret, encoded string) (string, error) {
 	}
 	nonceSize := gcm.NonceSize()
 	if len(raw) < nonceSize {
-		return "", errors.New("invalid encrypted token")
+		return "", ErrInvalidEncryptedToken
 	}
 	nonce, ciphertext := raw[:nonceSize], raw[nonceSize:]
 	plain, err := gcm.Open(nil, nonce, ciphertext, nil)

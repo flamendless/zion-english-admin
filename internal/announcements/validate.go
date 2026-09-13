@@ -1,30 +1,10 @@
 package announcements
 
 import (
-	"errors"
 	"net/url"
 	"strings"
 
 	"zion-english/internal/utils"
-)
-
-var (
-	ErrTitleRequired       = errors.New("title is required")
-	ErrDescriptionRequired = errors.New("description is required")
-	ErrInvalidLevel        = errors.New("invalid announcement level")
-	ErrStartDateRequired   = errors.New("start date is required")
-	ErrEndDateRequired     = errors.New("end date is required")
-	ErrInvalidStartDate    = errors.New("invalid start date format")
-	ErrInvalidEndDate      = errors.New("invalid end date format")
-	ErrStartDatePast       = errors.New("start date cannot be in the past")
-	ErrEndDatePast         = errors.New("end date cannot be in the past")
-	ErrEndBeforeStart      = errors.New("end date must be on or after start date")
-	ErrTeachersRequired    = errors.New("select at least one teacher when not visible to all")
-	ErrCTALabelRequired    = errors.New("CTA label is required when CTA URL is set")
-	ErrCTAURLRequired      = errors.New("CTA URL is required when CTA label is set")
-	ErrCTALabelTooLong     = errors.New("CTA label must be 60 characters or fewer")
-	ErrInvalidCTAURL       = errors.New("CTA URL must be http(s):// or an internal path starting with /")
-	ErrInvalidStatus       = errors.New("invalid announcement status")
 )
 
 const maxCTALabelLen = 60

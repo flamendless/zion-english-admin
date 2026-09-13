@@ -37,10 +37,20 @@ func handleFeatureFlagsGet(w http.ResponseWriter, r *http.Request) {
 
 	zoomEnabled, zoomVisibleRoles, _ := featureflags.GetFlag(ctx, dbRO, constants.FeatureFlagIntegrationZoom)
 	googleEnabled, googleVisibleRoles, _ := featureflags.GetFlag(ctx, dbRO, constants.FeatureFlagIntegrationGoogleCalendar)
+	introVideoEnabled, introVideoVisibleRoles, _ := featureflags.GetFlagDefault(ctx, dbRO, constants.FeatureFlagIntroVideoUploads, false)
 	roleOptions := constants.AllTeacherRoles()
 
 	data := frontend.FeatureFlagsData{
 		ClassOverdueGracePeriodMinutes: classOverdueGracePeriodMinutes(ctx),
+		IntroVideoUploads: frontend.FeatureFlagRoleGatedItem{
+			Name:          "Intro video uploads",
+			Description:   "Allow teachers to upload introduction videos from My Profile. Admins can still review existing uploads when this is off.",
+			Enabled:       introVideoEnabled,
+			VisibleRoles:  introVideoVisibleRoles,
+			RoleOptions:   roleOptions,
+			FormFieldName: "intro_video_uploads_enabled",
+			FormPrefix:    "intro_video",
+		},
 		Zoom: frontend.FeatureFlagIntegrationItem{
 			Name:               "Zoom",
 			Description:        "Allow teachers to connect Zoom accounts for automatic meeting rooms on scheduled classes.",
@@ -91,6 +101,7 @@ func handleFeatureFlagsUpdate(w http.ResponseWriter, r *http.Request) {
 
 	zoomEnabled := r.FormValue("zoom_enabled") == "on"
 	googleEnabled := r.FormValue("google_calendar_enabled") == "on"
+	introVideoEnabled := r.FormValue("intro_video_uploads_enabled") == "on"
 
 	zoomRoles, err := parseFeatureFlagRolesFromForm(r, "zoom")
 	if err != nil {
@@ -104,9 +115,16 @@ func handleFeatureFlagsUpdate(w http.ResponseWriter, r *http.Request) {
 		HttpRedirect(w, r, "/feature-flags")
 		return
 	}
+	introVideoRoles, err := parseFeatureFlagRolesFromForm(r, "intro_video")
+	if err != nil {
+		setErrorFlash(w, "Select at least one role for intro video upload visibility")
+		HttpRedirect(w, r, "/feature-flags")
+		return
+	}
 
 	prevZoomEnabled, prevZoomRoles, _ := featureflags.GetFlag(ctx, dbRO, constants.FeatureFlagIntegrationZoom)
 	prevGoogleEnabled, prevGoogleRoles, _ := featureflags.GetFlag(ctx, dbRO, constants.FeatureFlagIntegrationGoogleCalendar)
+	prevIntroVideoEnabled, prevIntroVideoRoles, _ := featureflags.GetFlagDefault(ctx, dbRO, constants.FeatureFlagIntroVideoUploads, false)
 	prevGracePeriod := classOverdueGracePeriodMinutes(ctx)
 
 	gracePeriod, err := parseClassOverdueGracePeriodFromForm(r)
@@ -123,6 +141,11 @@ func handleFeatureFlagsUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := featureflags.SetFlag(ctx, dbRW, constants.FeatureFlagIntegrationGoogleCalendar, googleEnabled, googleRoles); err != nil {
 		setErrorFlash(w, fmt.Sprintf("Failed to update Google Calendar flag: %v", err))
+		HttpRedirect(w, r, "/feature-flags")
+		return
+	}
+	if err := featureflags.SetFlag(ctx, dbRW, constants.FeatureFlagIntroVideoUploads, introVideoEnabled, introVideoRoles); err != nil {
+		setErrorFlash(w, fmt.Sprintf("Failed to update intro video uploads flag: %v", err))
 		HttpRedirect(w, r, "/feature-flags")
 		return
 	}
@@ -152,6 +175,16 @@ func handleFeatureFlagsUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	if !slices.Equal(prevGoogleRoles, googleRoles) {
 		insertAuditLogAs(ctx, user, "feature-flags", "updated google calendar visible roles: "+formatVisibleRolesAudit(googleRoles))
+	}
+	if prevIntroVideoEnabled != introVideoEnabled {
+		if introVideoEnabled {
+			insertAuditLogAs(ctx, user, "feature-flags", "enabled intro video uploads")
+		} else {
+			insertAuditLogAs(ctx, user, "feature-flags", "disabled intro video uploads")
+		}
+	}
+	if !slices.Equal(prevIntroVideoRoles, introVideoRoles) {
+		insertAuditLogAs(ctx, user, "feature-flags", "updated intro video upload visible roles: "+formatVisibleRolesAudit(introVideoRoles))
 	}
 	if prevGracePeriod != gracePeriod {
 		insertAuditLogAs(ctx, user, "feature-flags", fmt.Sprintf("updated class overdue grace period to %d minutes", gracePeriod))

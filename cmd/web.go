@@ -326,7 +326,7 @@ func init() {
 
 func requireFloat64(n string) (float64, error) {
 	if n == "" {
-		return 0, errors.New("missing numeric value")
+		return 0, ErrMissingNumericValue
 	}
 	v, err := strconv.ParseFloat(n, 64)
 	if err != nil {
@@ -353,20 +353,20 @@ func parseStudentParentRateFields(rateValue, currency string) (sql.NullFloat64, 
 		return sql.NullFloat64{}, sql.NullString{}, nil
 	}
 	if rateValue == "" {
-		return sql.NullFloat64{}, sql.NullString{}, errors.New("parent rate is required when parent currency is set")
+		return sql.NullFloat64{}, sql.NullString{}, ErrParentRateRequiredWhenCurrencySet
 	}
 	if currency == "" {
-		return sql.NullFloat64{}, sql.NullString{}, errors.New("parent currency is required when parent rate is set")
+		return sql.NullFloat64{}, sql.NullString{}, ErrParentCurrencyRequiredWhenRateSet
 	}
 	if !constants.ValidCurrency(currency) {
-		return sql.NullFloat64{}, sql.NullString{}, errors.New("invalid parent currency. Must be KRW, CAD, YEN, or PHP")
+		return sql.NullFloat64{}, sql.NullString{}, ErrInvalidParentCurrency
 	}
 	rate, err := requireFloat64(rateValue)
 	if err != nil {
-		return sql.NullFloat64{}, sql.NullString{}, errors.New("invalid parent rate")
+		return sql.NullFloat64{}, sql.NullString{}, ErrInvalidParentRate
 	}
 	if rate < 0 {
-		return sql.NullFloat64{}, sql.NullString{}, errors.New("parent rate cannot be negative")
+		return sql.NullFloat64{}, sql.NullString{}, ErrParentRateCannotBeNegative
 	}
 	return sql.NullFloat64{Float64: rate, Valid: true}, sql.NullString{String: currency, Valid: true}, nil
 }
@@ -380,7 +380,7 @@ func studentParentRateView(rate sql.NullFloat64, currency sql.NullString) (float
 
 func requireInt64(n string) (int64, error) {
 	if n == "" {
-		return 0, errors.New("missing integer value")
+		return 0, ErrMissingIntegerValue
 	}
 	v, err := strconv.ParseInt(n, 10, 64)
 	if err != nil {
@@ -815,37 +815,37 @@ func handleDownload(w http.ResponseWriter, r *http.Request) {
 func validateProcessRequest(req *models.ProcessRequest) error {
 	if err := utils.ValidateDriveSpreadsheetURL(req.DriveURL); err != nil {
 		if errors.Is(err, utils.ErrInvalidDriveSpreadsheetURL) {
-			return errors.New("invalid Google Spreadsheet URL")
+			return ErrInvalidGoogleSpreadsheetURL
 		}
-		return errors.New("google spreadsheet url is required")
+		return ErrGoogleSpreadsheetURLRequired
 	}
 
 	// Validate name
 	matched, _ := regexp.MatchString(`^[a-zA-Z.\s-]+$`, req.Name)
 	if !matched {
-		return errors.New("name must contain only letters, periods, dashes, and spaces")
+		return ErrNameInvalidCharacters
 	}
 
 	// Validate dates
 	if req.StartDate == "" {
-		return errors.New("start date is required")
+		return ErrStartDateRequired
 	}
 	if req.EndDate == "" {
-		return errors.New("end date is required")
+		return ErrEndDateRequired
 	}
 
 	parsedStartDate, err := processor.ParseDateString(req.StartDate)
 	if err != nil {
-		return errors.New("invalid start date format")
+		return ErrInvalidStartDateFormat
 	}
 
 	parsedEndDate, err := processor.ParseDateString(req.EndDate)
 	if err != nil {
-		return errors.New("invalid end date format")
+		return ErrInvalidEndDateFormat
 	}
 
 	if !parsedEndDate.After(*parsedStartDate) {
-		return errors.New("end date must be after start date")
+		return ErrEndDateBeforeStart
 	}
 
 	return nil
@@ -1084,28 +1084,28 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 
 func validateStudentRequest(req *models.StudentRegisterRequest) error {
 	if req.Name == "" {
-		return errors.New("name is required")
+		return ErrNameRequired
 	}
 
 	if !constants.ValidCurrency(req.Currency) {
-		return errors.New("invalid currency. Must be KRW, CAD, YEN, or PHP")
+		return ErrInvalidCurrency
 	}
 
 	if req.RatePerClass < 0 {
-		return errors.New("rate per class cannot be negative")
+		return ErrRatePerClassCannotBeNegative
 	}
 
 	if req.AssignedColor == "" {
-		return errors.New("assigned color is required")
+		return ErrAssignedColorRequired
 	}
 
 	if !constants.ValidStudentStatus(req.Status) {
-		return errors.New("invalid status. Must be active or inactive")
+		return ErrInvalidStudentStatus
 	}
 
 	req.InactiveReason = strings.TrimSpace(req.InactiveReason)
 	if req.Status == "inactive" && req.InactiveReason == "" {
-		return errors.New("inactive reason is required when status is inactive")
+		return ErrInactiveReasonRequired
 	}
 	if req.Status == "active" {
 		req.InactiveReason = ""
@@ -1337,40 +1337,40 @@ func validateTeacherFields(req *models.TeacherRegisterRequest) error {
 	req.Name = utils.ComposePersonName(req.FirstName, req.MiddleName, req.LastName)
 
 	if utils.IsBlank(req.FirstName) {
-		return errors.New("first name is required")
+		return ErrFirstNameRequired
 	}
 	if utils.IsBlank(req.LastName) {
-		return errors.New("last name is required")
+		return ErrLastNameRequired
 	}
 	if req.Name == "" {
-		return errors.New("name is required")
+		return ErrNameRequired
 	}
 
 	if req.Birthdate == "" {
-		return errors.New("birthdate is required")
+		return ErrBirthdateRequired
 	}
 
 	if utils.IsBlank(req.Address) {
-		return errors.New("address is required")
+		return ErrAddressRequired
 	}
 
 	if utils.IsBlank(req.MobileNumber) {
-		return errors.New("mobile number is required")
+		return ErrMobileNumberRequired
 	}
 
 	if req.Email == "" {
-		return errors.New("email is required")
+		return ErrEmailRequired
 	}
 	if _, err := mail.ParseAddress(req.Email); err != nil {
-		return errors.New("invalid email address")
+		return ErrInvalidEmailAddress
 	}
 
 	if !constants.ValidCurrency(req.Currency) {
-		return errors.New("invalid currency. Must be KRW, CAD, YEN, or PHP")
+		return ErrInvalidCurrency
 	}
 
 	if req.RatePerClass < 0 {
-		return errors.New("rate per class cannot be negative")
+		return ErrRatePerClassCannotBeNegative
 	}
 
 	if err := utils.ValidateDriveSpreadsheetURL(req.DriveUrl); err != nil {
@@ -1378,7 +1378,7 @@ func validateTeacherFields(req *models.TeacherRegisterRequest) error {
 	}
 
 	if !constants.ValidSex(req.Sex) {
-		return errors.New("invalid sex. Must be M or F")
+		return ErrInvalidSex
 	}
 
 	return nil
@@ -1390,15 +1390,15 @@ func validateTeacherRegisterRequest(req *models.TeacherRegisterRequest) error {
 	}
 
 	if req.Password == "" {
-		return errors.New("password is required")
+		return ErrPasswordRequired
 	}
 
 	if !constants.ValidPassword(req.Password) {
-		return errors.New("password must be 8-32 characters with uppercase, lowercase, number, and symbol (!@#$%^&*?)")
+		return ErrInvalidPassword
 	}
 
 	if req.Password != req.RetypePassword {
-		return errors.New("passwords do not match")
+		return ErrPasswordsDoNotMatch
 	}
 
 	return nil
@@ -1792,7 +1792,7 @@ func insertPasswordResetEvent(ctx context.Context, email, ip, status, event stri
 func passwordResetTokenValid(ctx context.Context, token string) (queries.TblPasswordResetEvent, error) {
 	tokenNull := sql.NullString{String: token, Valid: token != ""}
 	if token == "" {
-		return queries.TblPasswordResetEvent{}, errors.New("missing token")
+		return queries.TblPasswordResetEvent{}, ErrMissingToken
 	}
 
 	completed, err := dbRO.GetQueries().HasCompletedPasswordResetForToken(ctx, tokenNull)
@@ -1800,27 +1800,27 @@ func passwordResetTokenValid(ctx context.Context, token string) (queries.TblPass
 		return queries.TblPasswordResetEvent{}, err
 	}
 	if completed > 0 {
-		return queries.TblPasswordResetEvent{}, errors.New("token already used")
+		return queries.TblPasswordResetEvent{}, ErrTokenAlreadyUsed
 	}
 
 	row, err := dbRO.GetQueries().GetPasswordResetByToken(ctx, tokenNull)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return queries.TblPasswordResetEvent{}, errors.New("invalid token")
+			return queries.TblPasswordResetEvent{}, ErrInvalidToken
 		}
 		return queries.TblPasswordResetEvent{}, err
 	}
 
 	if !row.ExpiresAt.Valid {
-		return queries.TblPasswordResetEvent{}, errors.New("token expired")
+		return queries.TblPasswordResetEvent{}, ErrTokenExpired
 	}
 	expires, err := time.Parse("2006-01-02 15:04:05", row.ExpiresAt.String)
 	if err != nil {
-		return queries.TblPasswordResetEvent{}, errors.New("token expired")
+		return queries.TblPasswordResetEvent{}, ErrTokenExpired
 	}
 	if time.Now().After(expires) {
 		_ = insertPasswordResetEvent(ctx, row.Email, row.IpAddress, "failed", "token_expired", row.TeacherID, tokenNull, row.ExpiresAt)
-		return queries.TblPasswordResetEvent{}, errors.New("token expired")
+		return queries.TblPasswordResetEvent{}, ErrTokenExpired
 	}
 
 	return row, nil

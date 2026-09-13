@@ -13,13 +13,15 @@ templ ClassRecordRow(record ClassRecordRowData, showTeacher bool) {
 				@TeacherNameCell(record.TeacherName, record.TeacherAvatar)
 			</td>
 		}
-		<td data-label="Student">{ record.StudentName }</td>
+		<td class="table-truncate-cell" data-label="Student">
+			@TableTruncatedText(record.StudentName)
+		</td>
 		<td data-label="Rate">@RatePill(record.Rate, record.Currency)</td>
 		<td data-label="Status">
 			@StatusPill(capitalizeStatus(record.Status), ClassStatusPillTone(record.Status), false)
 		</td>
-		<td class="note-reason-cell" data-label="Note / Reason">
-			<span class="note-reason-text" title={ record.NoteOrReasonDisplay() }>{ getDisplayValue(record.NoteOrReasonDisplay()) }</span>
+		<td class="table-truncate-cell" data-label="Note / Reason">
+			@TableTruncatedText(record.NoteOrReasonDisplay())
 		</td>
 		<td data-label="Actions">
 			<div class="table-actions">

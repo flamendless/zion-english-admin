@@ -51,3 +51,27 @@ func TestIsOverdueIgnoresNonScheduledStatus(t *testing.T) {
 		t.Fatal("expected conducted class not to be overdue")
 	}
 }
+
+func TestIsOverdueAfterMidnightRollover(t *testing.T) {
+	endAt, ok := scheduledclass.ScheduledEndAtPHT("2026-09-12", "23:30", 90)
+	if !ok {
+		t.Fatal("expected scheduled end time")
+	}
+	expected := time.Date(2026, 9, 13, 1, 0, 0, 0, constants.LocationPHT)
+	if !endAt.Equal(expected) {
+		t.Fatalf("expected end at %s, got %s", expected, endAt)
+	}
+
+	now := time.Date(2026, 9, 13, 1, 1, 0, 0, constants.LocationPHT)
+	overdue := scheduledclass.IsOverdue(
+		constants.ScheduledClassStatusScheduled,
+		"2026-09-12",
+		"23:30",
+		90,
+		now,
+		0,
+	)
+	if !overdue {
+		t.Fatal("expected class to be overdue after midnight rollover")
+	}
+}
