@@ -119,9 +119,11 @@ SELECT COUNT(*) as count
 FROM tbl_teachers
 WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || middle_name ELSE '' END || CASE WHEN last_name != '' THEN ' ' || last_name ELSE '' END) LIKE '%' || ? || '%' OR email LIKE '%' || ? || '%')
 	AND (
-	? = ''
-	OR (? = 'deleted' AND deleted = 1)
-	OR (? != 'deleted' AND ? != '' AND tbl_teachers.status = ? AND deleted = 0)
+	(? = 'deleted' AND deleted = 1)
+	OR (deleted = 0 AND (
+		? = ''
+		OR (? != 'deleted' AND ? != '' AND tbl_teachers.status = ?)
+	))
 	)
 	AND (
 	? = ''
@@ -160,9 +162,11 @@ SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date,
 FROM tbl_teachers
 WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || middle_name ELSE '' END || CASE WHEN last_name != '' THEN ' ' || last_name ELSE '' END) LIKE '%' || ? || '%' OR email LIKE '%' || ? || '%')
 	AND (
-	? = ''
-	OR (? = 'deleted' AND deleted = 1)
-	OR (? != 'deleted' AND ? != '' AND tbl_teachers.status = ? AND deleted = 0)
+	(? = 'deleted' AND deleted = 1)
+	OR (deleted = 0 AND (
+		? = ''
+		OR (? != 'deleted' AND ? != '' AND tbl_teachers.status = ?)
+	))
 	)
 	AND (
 	? = ''
