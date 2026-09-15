@@ -32,11 +32,15 @@ WHERE t.status = 'approved' AND t.deleted = 0
 	)
 	)
 	AND (
-	? = 0
-	OR EXISTS (
+	(? = 0 AND ? = 0)
+	OR (? = 1 AND EXISTS (
 		SELECT 1 FROM tbl_teacher_roles tr
 		WHERE tr.teacher_id = t.id AND tr.role = 'teacher'
-	)
+	))
+	OR (? = 1 AND EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role = 'admin'
+	))
 	)
 GROUP BY t.id, t.first_name, t.middle_name, t.last_name, t.assigned_color, t.profile_picture
 ORDER BY t.last_name ASC, t.first_name ASC, t.middle_name ASC;
@@ -66,11 +70,15 @@ WHERE cr.date >= ? AND cr.date <= ?
 	)
 	)
 	AND (
-	? = 0
-	OR EXISTS (
+	(? = 0 AND ? = 0)
+	OR (? = 1 AND EXISTS (
 		SELECT 1 FROM tbl_teacher_roles tr
 		WHERE tr.teacher_id = t.id AND tr.role = 'teacher'
-	)
+	))
+	OR (? = 1 AND EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role = 'admin'
+	))
 	)
 GROUP BY cr.teacher_id, cr.currency;
 
@@ -108,11 +116,15 @@ WHERE cr.date >= ? AND cr.date <= ?
 		WHERE tr.teacher_id = t.id AND tr.role IN ('tester', 'developer')
 	)
 	AND (
-	? = 0
-	OR EXISTS (
+	(? = 0 AND ? = 0)
+	OR (? = 1 AND EXISTS (
 		SELECT 1 FROM tbl_teacher_roles tr
 		WHERE tr.teacher_id = t.id AND tr.role = 'teacher'
-	)
+	))
+	OR (? = 1 AND EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role = 'admin'
+	))
 	)
 ORDER BY cr.teacher_id ASC, cr.id ASC;
 
@@ -178,10 +190,14 @@ WHERE cr.date >= ? AND cr.date <= ?
 	)
 	)
 	AND (
-	? = 0
-	OR EXISTS (
+	(? = 0 AND ? = 0)
+	OR (? = 1 AND EXISTS (
 		SELECT 1 FROM tbl_teacher_roles tr
 		WHERE tr.teacher_id = t.id AND tr.role = 'teacher'
-	)
+	))
+	OR (? = 1 AND EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role = 'admin'
+	))
 	)
 ORDER BY t.last_name ASC, t.first_name ASC, t.middle_name ASC, s.name ASC, cr.date ASC;

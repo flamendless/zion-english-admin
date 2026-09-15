@@ -85,11 +85,15 @@ WHERE cr.date >= ? AND cr.date <= ?
 		WHERE tr.teacher_id = t.id AND tr.role IN ('tester', 'developer')
 	)
 	AND (
-	? = 0
-	OR EXISTS (
+	(? = 0 AND ? = 0)
+	OR (? = 1 AND EXISTS (
 		SELECT 1 FROM tbl_teacher_roles tr
 		WHERE tr.teacher_id = t.id AND tr.role = 'teacher'
-	)
+	))
+	OR (? = 1 AND EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role = 'admin'
+	))
 	)
 ORDER BY cr.teacher_id ASC, cr.id ASC
 `
@@ -98,6 +102,9 @@ type GetClassRecordFingerprintRowsForRangeParams struct {
 	Date    string
 	Date_2  string
 	Column3 interface{}
+	Column4 interface{}
+	Column5 interface{}
+	Column6 interface{}
 }
 
 type GetClassRecordFingerprintRowsForRangeRow struct {
@@ -115,7 +122,14 @@ type GetClassRecordFingerprintRowsForRangeRow struct {
 }
 
 func (q *Queries) GetClassRecordFingerprintRowsForRange(ctx context.Context, arg GetClassRecordFingerprintRowsForRangeParams) ([]GetClassRecordFingerprintRowsForRangeRow, error) {
-	rows, err := q.db.QueryContext(ctx, getClassRecordFingerprintRowsForRange, arg.Date, arg.Date_2, arg.Column3)
+	rows, err := q.db.QueryContext(ctx, getClassRecordFingerprintRowsForRange,
+		arg.Date,
+		arg.Date_2,
+		arg.Column3,
+		arg.Column4,
+		arg.Column5,
+		arg.Column6,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -293,24 +307,31 @@ WHERE cr.date >= ? AND cr.date <= ?
 	)
 	)
 	AND (
-	? = 0
-	OR EXISTS (
+	(? = 0 AND ? = 0)
+	OR (? = 1 AND EXISTS (
 		SELECT 1 FROM tbl_teacher_roles tr
 		WHERE tr.teacher_id = t.id AND tr.role = 'teacher'
-	)
+	))
+	OR (? = 1 AND EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role = 'admin'
+	))
 	)
 ORDER BY t.last_name ASC, t.first_name ASC, t.middle_name ASC, s.name ASC, cr.date ASC
 `
 
 type GetReportSummaryRowsParams struct {
-	Date    string
-	Date_2  string
-	Column3 interface{}
-	Column4 sql.NullString
-	Date_3  string
-	Date_4  string
-	Column7 sql.NullString
-	Column8 interface{}
+	Date     string
+	Date_2   string
+	Column3  interface{}
+	Column4  sql.NullString
+	Date_3   string
+	Date_4   string
+	Column7  sql.NullString
+	Column8  interface{}
+	Column9  interface{}
+	Column10 interface{}
+	Column11 interface{}
 }
 
 type GetReportSummaryRowsRow struct {
@@ -336,6 +357,9 @@ func (q *Queries) GetReportSummaryRows(ctx context.Context, arg GetReportSummary
 		arg.Date_4,
 		arg.Column7,
 		arg.Column8,
+		arg.Column9,
+		arg.Column10,
+		arg.Column11,
 	)
 	if err != nil {
 		return nil, err
@@ -394,24 +418,31 @@ WHERE cr.date >= ? AND cr.date <= ?
 	)
 	)
 	AND (
-	? = 0
-	OR EXISTS (
+	(? = 0 AND ? = 0)
+	OR (? = 1 AND EXISTS (
 		SELECT 1 FROM tbl_teacher_roles tr
 		WHERE tr.teacher_id = t.id AND tr.role = 'teacher'
-	)
+	))
+	OR (? = 1 AND EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role = 'admin'
+	))
 	)
 GROUP BY cr.teacher_id, cr.currency
 `
 
 type GetReportTeacherEarningsParams struct {
-	Date    string
-	Date_2  string
-	Column3 interface{}
-	Column4 sql.NullString
-	Date_3  string
-	Date_4  string
-	Column7 sql.NullString
-	Column8 interface{}
+	Date     string
+	Date_2   string
+	Column3  interface{}
+	Column4  sql.NullString
+	Date_3   string
+	Date_4   string
+	Column7  sql.NullString
+	Column8  interface{}
+	Column9  interface{}
+	Column10 interface{}
+	Column11 interface{}
 }
 
 type GetReportTeacherEarningsRow struct {
@@ -430,6 +461,9 @@ func (q *Queries) GetReportTeacherEarnings(ctx context.Context, arg GetReportTea
 		arg.Date_4,
 		arg.Column7,
 		arg.Column8,
+		arg.Column9,
+		arg.Column10,
+		arg.Column11,
 	)
 	if err != nil {
 		return nil, err
@@ -486,25 +520,32 @@ WHERE t.status = 'approved' AND t.deleted = 0
 	)
 	)
 	AND (
-	? = 0
-	OR EXISTS (
+	(? = 0 AND ? = 0)
+	OR (? = 1 AND EXISTS (
 		SELECT 1 FROM tbl_teacher_roles tr
 		WHERE tr.teacher_id = t.id AND tr.role = 'teacher'
-	)
+	))
+	OR (? = 1 AND EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role = 'admin'
+	))
 	)
 GROUP BY t.id, t.first_name, t.middle_name, t.last_name, t.assigned_color, t.profile_picture
 ORDER BY t.last_name ASC, t.first_name ASC, t.middle_name ASC
 `
 
 type GetReportTeacherSummariesParams struct {
-	Date    string
-	Date_2  string
-	Column3 interface{}
-	Column4 sql.NullString
-	Date_3  string
-	Date_4  string
-	Column7 sql.NullString
-	Column8 interface{}
+	Date     string
+	Date_2   string
+	Column3  interface{}
+	Column4  sql.NullString
+	Date_3   string
+	Date_4   string
+	Column7  sql.NullString
+	Column8  interface{}
+	Column9  interface{}
+	Column10 interface{}
+	Column11 interface{}
 }
 
 type GetReportTeacherSummariesRow struct {
@@ -530,6 +571,9 @@ func (q *Queries) GetReportTeacherSummaries(ctx context.Context, arg GetReportTe
 		arg.Date_4,
 		arg.Column7,
 		arg.Column8,
+		arg.Column9,
+		arg.Column10,
+		arg.Column11,
 	)
 	if err != nil {
 		return nil, err

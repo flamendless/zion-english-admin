@@ -199,19 +199,26 @@ func handleReportSummary(w http.ResponseWriter, r *http.Request) {
 
 type reportRoleFilters struct {
 	Teacher bool
+	Admin   bool
 }
 
 func parseReportRoleFilters(r *http.Request) reportRoleFilters {
 	return reportRoleFilters{
 		Teacher: parseConnectionCheckboxFilter(r, "roleTeacher"),
+		Admin:   parseConnectionCheckboxFilter(r, "roleAdmin"),
 	}
 }
 
-func reportRoleFilterFlag(filters reportRoleFilters) int64 {
+func reportRoleFilterFlags(filters reportRoleFilters) (int64, int64) {
+	teacherFlag := int64(0)
 	if filters.Teacher {
-		return 1
+		teacherFlag = 1
 	}
-	return 0
+	adminFlag := int64(0)
+	if filters.Admin {
+		adminFlag = 1
+	}
+	return teacherFlag, adminFlag
 }
 
 func loadReportRows(ctx context.Context, startDate, endDate, q string, roleFilters reportRoleFilters) ([]frontend.ReportRowData, error) {
@@ -235,11 +242,14 @@ func loadReportRows(ctx context.Context, startDate, endDate, q string, roleFilte
 		})
 	}
 
-	teacherRoleFlag := reportRoleFilterFlag(roleFilters)
+	teacherRoleFlag, adminRoleFlag := reportRoleFilterFlags(roleFilters)
 	fingerprintRows, err := dbRO.GetQueries().GetClassRecordFingerprintRowsForRange(ctx, queries.GetClassRecordFingerprintRowsForRangeParams{
-		Date:    startDate,
-		Date_2:  endDate,
-		Column3: teacherRoleFlag,
+		Date:     startDate,
+		Date_2:   endDate,
+		Column3:  teacherRoleFlag,
+		Column4:  adminRoleFlag,
+		Column5:  teacherRoleFlag,
+		Column6:  adminRoleFlag,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to load report fingerprints")
@@ -565,31 +575,37 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 
 func reportSearchParams(q, startDate, endDate string, roleFilters reportRoleFilters) queries.GetReportTeacherSummariesParams {
 	qNull := sql.NullString{String: q, Valid: q != ""}
-	teacherRoleFlag := reportRoleFilterFlag(roleFilters)
+	teacherRoleFlag, adminRoleFlag := reportRoleFilterFlags(roleFilters)
 	return queries.GetReportTeacherSummariesParams{
-		Date:    startDate,
-		Date_2:  endDate,
-		Column3: q,
-		Column4: qNull,
-		Date_3:  startDate,
-		Date_4:  endDate,
-		Column7: qNull,
-		Column8: teacherRoleFlag,
+		Date:     startDate,
+		Date_2:   endDate,
+		Column3:  q,
+		Column4:  qNull,
+		Date_3:   startDate,
+		Date_4:   endDate,
+		Column7:  qNull,
+		Column8:  teacherRoleFlag,
+		Column9:  adminRoleFlag,
+		Column10: teacherRoleFlag,
+		Column11: adminRoleFlag,
 	}
 }
 
 func reportSummaryParams(q, startDate, endDate string, roleFilters reportRoleFilters) queries.GetReportSummaryRowsParams {
 	qNull := sql.NullString{String: q, Valid: q != ""}
-	teacherRoleFlag := reportRoleFilterFlag(roleFilters)
+	teacherRoleFlag, adminRoleFlag := reportRoleFilterFlags(roleFilters)
 	return queries.GetReportSummaryRowsParams{
-		Date:    startDate,
-		Date_2:  endDate,
-		Column3: q,
-		Column4: qNull,
-		Date_3:  startDate,
-		Date_4:  endDate,
-		Column7: qNull,
-		Column8: teacherRoleFlag,
+		Date:     startDate,
+		Date_2:   endDate,
+		Column3:  q,
+		Column4:  qNull,
+		Date_3:   startDate,
+		Date_4:   endDate,
+		Column7:  qNull,
+		Column8:  teacherRoleFlag,
+		Column9:  adminRoleFlag,
+		Column10: teacherRoleFlag,
+		Column11: adminRoleFlag,
 	}
 }
 
@@ -614,16 +630,19 @@ func fingerprintRowFromRange(row queries.GetClassRecordFingerprintRowsForRangeRo
 
 func reportEarningsParams(q, startDate, endDate string, roleFilters reportRoleFilters) queries.GetReportTeacherEarningsParams {
 	qNull := sql.NullString{String: q, Valid: q != ""}
-	teacherRoleFlag := reportRoleFilterFlag(roleFilters)
+	teacherRoleFlag, adminRoleFlag := reportRoleFilterFlags(roleFilters)
 	return queries.GetReportTeacherEarningsParams{
-		Date:    startDate,
-		Date_2:  endDate,
-		Column3: q,
-		Column4: qNull,
-		Date_3:  startDate,
-		Date_4:  endDate,
-		Column7: qNull,
-		Column8: teacherRoleFlag,
+		Date:     startDate,
+		Date_2:   endDate,
+		Column3:  q,
+		Column4:  qNull,
+		Date_3:   startDate,
+		Date_4:   endDate,
+		Column7:  qNull,
+		Column8:  teacherRoleFlag,
+		Column9:  adminRoleFlag,
+		Column10: teacherRoleFlag,
+		Column11: adminRoleFlag,
 	}
 }
 

@@ -23,6 +23,11 @@ templ Reports() {
 				gap: var(--space-2);
 				min-width: 0;
 			}
+
+			.report-role-excluded {
+				color: var(--color-muted-foreground);
+				cursor: not-allowed;
+			}
 		</style>
 		<script>
 			window.closeReportViewModal = function () {
@@ -69,7 +74,7 @@ templ Reports() {
 					</div>
 					@MonthPicker("reportMonth", utils.URL("/reports/partials/date-preset"))
 					@DatePreset(true)
-					@ReportRolesFilterDropdown(true)
+					@ReportRolesFilterDropdown(true, false)
 					@SortControls("", "asc", ListSortKindReport)
 					<button
 						type="button"
@@ -90,6 +95,7 @@ templ Reports() {
 					<input type="hidden" name="q" id="summaryQ" value=""/>
 					<input type="hidden" name="datePreset" id="summaryDatePreset" value=""/>
 					<input type="hidden" name="roleTeacher" id="summaryRoleTeacher" value=""/>
+					<input type="hidden" name="roleAdmin" id="summaryRoleAdmin" value=""/>
 					<button type="submit" class="btn">Generate Summary</button>
 				</form>
 			</div>
@@ -171,7 +177,9 @@ templ Reports() {
 				const qField = document.getElementById('summaryQ');
 				const presetField = document.getElementById('summaryDatePreset');
 				const roleTeacher = document.querySelector('#reportsFilters input[name="roleTeacher"]');
+				const roleAdmin = document.querySelector('#reportsFilters input[name="roleAdmin"]');
 				const summaryRoleTeacher = document.getElementById('summaryRoleTeacher');
+				const summaryRoleAdmin = document.getElementById('summaryRoleAdmin');
 				if (search && qField) {
 					qField.value = search.value || '';
 				}
@@ -180,6 +188,9 @@ templ Reports() {
 				}
 				if (summaryRoleTeacher) {
 					summaryRoleTeacher.value = roleTeacher && roleTeacher.checked ? '1' : '';
+				}
+				if (summaryRoleAdmin) {
+					summaryRoleAdmin.value = roleAdmin && roleAdmin.checked ? '1' : '';
 				}
 				if (!presetField || !presetField.value) {
 					e.preventDefault();

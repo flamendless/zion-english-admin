@@ -112,24 +112,43 @@ templ TeacherConnectionsFilterDropdown(connectionZoom bool, connectionGoogle boo
 	</div>
 }
 
-func reportRolesFilterSummary(roleTeacher bool) string {
-	if !roleTeacher {
+func reportRolesFilterSummary(roleTeacher bool, roleAdmin bool) string {
+	if !roleTeacher && !roleAdmin {
 		return "All"
 	}
-	return featureFlagRoleLabel(constants.TeacherRoleTeacher)
+	parts := make([]string, 0, 2)
+	if roleTeacher {
+		parts = append(parts, featureFlagRoleLabel(constants.TeacherRoleTeacher))
+	}
+	if roleAdmin {
+		parts = append(parts, featureFlagRoleLabel(constants.TeacherRoleAdmin))
+	}
+	return strings.Join(parts, ", ")
 }
 
-templ ReportRolesFilterDropdown(roleTeacher bool) {
+templ ReportRolesFilterDropdown(roleTeacher bool, roleAdmin bool) {
 	<div class="form-group">
 		<span class="toolbar-filter-dropdown-label" id="rolesFilterLabel">Roles</span>
 		<details class="toolbar-filter-dropdown">
 			<summary class="toolbar-filter-dropdown-trigger" aria-labelledby="rolesFilterLabel">
-				{ reportRolesFilterSummary(roleTeacher) }
+				{ reportRolesFilterSummary(roleTeacher, roleAdmin) }
 			</summary>
 			<div class="toolbar-filter-dropdown-panel" role="group" aria-labelledby="rolesFilterLabel">
 				<label class="checkbox-label">
 					<input type="checkbox" name="roleTeacher" value="1" checked?={ roleTeacher }/>
 					{ featureFlagRoleLabel(constants.TeacherRoleTeacher) }
+				</label>
+				<label class="checkbox-label">
+					<input type="checkbox" name="roleAdmin" value="1" checked?={ roleAdmin }/>
+					{ featureFlagRoleLabel(constants.TeacherRoleAdmin) }
+				</label>
+				<label class="checkbox-label report-role-excluded">
+					<input type="checkbox" name="roleDeveloper" value="1" disabled aria-disabled="true"/>
+					{ featureFlagRoleLabel(constants.TeacherRoleDeveloper) }
+				</label>
+				<label class="checkbox-label report-role-excluded">
+					<input type="checkbox" name="roleTester" value="1" disabled aria-disabled="true"/>
+					{ featureFlagRoleLabel(constants.TeacherRoleTester) }
 				</label>
 			</div>
 		</details>
