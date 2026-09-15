@@ -15,6 +15,10 @@ LEFT JOIN tbl_class_records cr ON cr.teacher_id = t.id
 	AND cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
 WHERE t.status = 'approved' AND t.deleted = 0
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role IN ('tester', 'developer')
+	)
 	AND (
 	? = ''
 	OR trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) LIKE '%' || ? || '%'
@@ -25,6 +29,13 @@ WHERE t.status = 'approved' AND t.deleted = 0
 		AND cr2.date >= ? AND cr2.date <= ?
 		AND cr2.deleted_at IS NULL
 		AND s.name LIKE '%' || ? || '%'
+	)
+	)
+	AND (
+	? = 0
+	OR EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role = 'teacher'
 	)
 	)
 GROUP BY t.id, t.first_name, t.middle_name, t.last_name, t.assigned_color, t.profile_picture
@@ -38,6 +49,10 @@ WHERE cr.date >= ? AND cr.date <= ?
 	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
 	AND cr.deleted_at IS NULL
 	AND t.status = 'approved' AND t.deleted = 0
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role IN ('tester', 'developer')
+	)
 	AND (
 	? = ''
 	OR trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) LIKE '%' || ? || '%'
@@ -48,6 +63,13 @@ WHERE cr.date >= ? AND cr.date <= ?
 		AND cr2.date >= ? AND cr2.date <= ?
 		AND cr2.deleted_at IS NULL
 		AND s.name LIKE '%' || ? || '%'
+	)
+	)
+	AND (
+	? = 0
+	OR EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role = 'teacher'
 	)
 	)
 GROUP BY cr.teacher_id, cr.currency;
@@ -81,6 +103,17 @@ JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
 	AND t.status = 'approved' AND t.deleted = 0
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role IN ('tester', 'developer')
+	)
+	AND (
+	? = 0
+	OR EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role = 'teacher'
+	)
+	)
 ORDER BY cr.teacher_id ASC, cr.id ASC;
 
 -- name: GetReportGeneration :one
@@ -128,6 +161,10 @@ WHERE cr.date >= ? AND cr.date <= ?
 	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
 	AND cr.deleted_at IS NULL
 	AND t.status = 'approved' AND t.deleted = 0
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role IN ('tester', 'developer')
+	)
 	AND (
 	? = ''
 	OR trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) LIKE '%' || ? || '%'
@@ -138,6 +175,13 @@ WHERE cr.date >= ? AND cr.date <= ?
 		AND cr2.date >= ? AND cr2.date <= ?
 		AND cr2.deleted_at IS NULL
 		AND s2.name LIKE '%' || ? || '%'
+	)
+	)
+	AND (
+	? = 0
+	OR EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role = 'teacher'
 	)
 	)
 ORDER BY t.last_name ASC, t.first_name ASC, t.middle_name ASC, s.name ASC, cr.date ASC;

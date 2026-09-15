@@ -80,12 +80,24 @@ JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
 	AND t.status = 'approved' AND t.deleted = 0
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role IN ('tester', 'developer')
+	)
+	AND (
+	? = 0
+	OR EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role = 'teacher'
+	)
+	)
 ORDER BY cr.teacher_id ASC, cr.id ASC
 `
 
 type GetClassRecordFingerprintRowsForRangeParams struct {
-	Date   string
-	Date_2 string
+	Date    string
+	Date_2  string
+	Column3 interface{}
 }
 
 type GetClassRecordFingerprintRowsForRangeRow struct {
@@ -103,7 +115,7 @@ type GetClassRecordFingerprintRowsForRangeRow struct {
 }
 
 func (q *Queries) GetClassRecordFingerprintRowsForRange(ctx context.Context, arg GetClassRecordFingerprintRowsForRangeParams) ([]GetClassRecordFingerprintRowsForRangeRow, error) {
-	rows, err := q.db.QueryContext(ctx, getClassRecordFingerprintRowsForRange, arg.Date, arg.Date_2)
+	rows, err := q.db.QueryContext(ctx, getClassRecordFingerprintRowsForRange, arg.Date, arg.Date_2, arg.Column3)
 	if err != nil {
 		return nil, err
 	}
@@ -264,6 +276,10 @@ WHERE cr.date >= ? AND cr.date <= ?
 	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
 	AND cr.deleted_at IS NULL
 	AND t.status = 'approved' AND t.deleted = 0
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role IN ('tester', 'developer')
+	)
 	AND (
 	? = ''
 	OR trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) LIKE '%' || ? || '%'
@@ -274,6 +290,13 @@ WHERE cr.date >= ? AND cr.date <= ?
 		AND cr2.date >= ? AND cr2.date <= ?
 		AND cr2.deleted_at IS NULL
 		AND s2.name LIKE '%' || ? || '%'
+	)
+	)
+	AND (
+	? = 0
+	OR EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role = 'teacher'
 	)
 	)
 ORDER BY t.last_name ASC, t.first_name ASC, t.middle_name ASC, s.name ASC, cr.date ASC
@@ -287,6 +310,7 @@ type GetReportSummaryRowsParams struct {
 	Date_3  string
 	Date_4  string
 	Column7 sql.NullString
+	Column8 interface{}
 }
 
 type GetReportSummaryRowsRow struct {
@@ -311,6 +335,7 @@ func (q *Queries) GetReportSummaryRows(ctx context.Context, arg GetReportSummary
 		arg.Date_3,
 		arg.Date_4,
 		arg.Column7,
+		arg.Column8,
 	)
 	if err != nil {
 		return nil, err
@@ -352,6 +377,10 @@ WHERE cr.date >= ? AND cr.date <= ?
 	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
 	AND cr.deleted_at IS NULL
 	AND t.status = 'approved' AND t.deleted = 0
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role IN ('tester', 'developer')
+	)
 	AND (
 	? = ''
 	OR trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) LIKE '%' || ? || '%'
@@ -362,6 +391,13 @@ WHERE cr.date >= ? AND cr.date <= ?
 		AND cr2.date >= ? AND cr2.date <= ?
 		AND cr2.deleted_at IS NULL
 		AND s.name LIKE '%' || ? || '%'
+	)
+	)
+	AND (
+	? = 0
+	OR EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role = 'teacher'
 	)
 	)
 GROUP BY cr.teacher_id, cr.currency
@@ -375,6 +411,7 @@ type GetReportTeacherEarningsParams struct {
 	Date_3  string
 	Date_4  string
 	Column7 sql.NullString
+	Column8 interface{}
 }
 
 type GetReportTeacherEarningsRow struct {
@@ -392,6 +429,7 @@ func (q *Queries) GetReportTeacherEarnings(ctx context.Context, arg GetReportTea
 		arg.Date_3,
 		arg.Date_4,
 		arg.Column7,
+		arg.Column8,
 	)
 	if err != nil {
 		return nil, err
@@ -431,6 +469,10 @@ LEFT JOIN tbl_class_records cr ON cr.teacher_id = t.id
 	AND cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
 WHERE t.status = 'approved' AND t.deleted = 0
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role IN ('tester', 'developer')
+	)
 	AND (
 	? = ''
 	OR trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) LIKE '%' || ? || '%'
@@ -441,6 +483,13 @@ WHERE t.status = 'approved' AND t.deleted = 0
 		AND cr2.date >= ? AND cr2.date <= ?
 		AND cr2.deleted_at IS NULL
 		AND s.name LIKE '%' || ? || '%'
+	)
+	)
+	AND (
+	? = 0
+	OR EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role = 'teacher'
 	)
 	)
 GROUP BY t.id, t.first_name, t.middle_name, t.last_name, t.assigned_color, t.profile_picture
@@ -455,6 +504,7 @@ type GetReportTeacherSummariesParams struct {
 	Date_3  string
 	Date_4  string
 	Column7 sql.NullString
+	Column8 interface{}
 }
 
 type GetReportTeacherSummariesRow struct {
@@ -479,6 +529,7 @@ func (q *Queries) GetReportTeacherSummaries(ctx context.Context, arg GetReportTe
 		arg.Date_3,
 		arg.Date_4,
 		arg.Column7,
+		arg.Column8,
 	)
 	if err != nil {
 		return nil, err

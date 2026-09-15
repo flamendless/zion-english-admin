@@ -6,6 +6,10 @@ SELECT
 		WHERE cr.date >= ? AND cr.date <= ?
 			AND cr.deleted_at IS NULL
 			AND (? = 0 OR cr.teacher_id = ?)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_teacher_roles tr
+				WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
+			)
 	), 0) AS conducted,
 	COALESCE((
 		SELECT SUM(CASE WHEN cr.status = 'cancelled' THEN 1 ELSE 0 END)
@@ -13,6 +17,10 @@ SELECT
 		WHERE cr.date >= ? AND cr.date <= ?
 			AND cr.deleted_at IS NULL
 			AND (? = 0 OR cr.teacher_id = ?)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_teacher_roles tr
+				WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
+			)
 	), 0) AS cancelled,
 	COALESCE((
 		SELECT SUM(CASE WHEN cr.status = 'rescheduled' THEN 1 ELSE 0 END)
@@ -20,6 +28,10 @@ SELECT
 		WHERE cr.date >= ? AND cr.date <= ?
 			AND cr.deleted_at IS NULL
 			AND (? = 0 OR cr.teacher_id = ?)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_teacher_roles tr
+				WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
+			)
 	), 0) AS rescheduled,
 	COALESCE((
 		SELECT SUM(sc.duration_minutes)
@@ -27,6 +39,10 @@ SELECT
 		WHERE sc.scheduled_date >= ? AND sc.scheduled_date <= ?
 			AND sc.deleted_at IS NULL
 			AND (? = 0 OR sc.teacher_id = ?)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_teacher_roles tr
+				WHERE tr.teacher_id = sc.teacher_id AND tr.role IN ('tester', 'developer')
+			)
 	), 0) AS scheduled_minutes,
 	COALESCE((
 		SELECT SUM(cr.duration_minutes)
@@ -35,6 +51,10 @@ SELECT
 			AND cr.status = 'conducted'
 			AND cr.deleted_at IS NULL
 			AND (? = 0 OR cr.teacher_id = ?)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_teacher_roles tr
+				WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
+			)
 	), 0) AS conducted_minutes,
 	COALESCE((
 		SELECT COUNT(*)
@@ -44,6 +64,10 @@ SELECT
 			AND sc.scheduled_date < date('now', 'localtime')
 			AND sc.scheduled_date >= ? AND sc.scheduled_date <= ?
 			AND (? = 0 OR sc.teacher_id = ?)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_teacher_roles tr
+				WHERE tr.teacher_id = sc.teacher_id AND tr.role IN ('tester', 'developer')
+			)
 	), 0) AS no_show_count;
 
 -- name: GetAnalyticsCancellationByTeacher :many
@@ -88,6 +112,10 @@ LEFT JOIN tbl_class_records cr ON cr.teacher_id = t.id
 	AND cr.deleted_at IS NULL
 WHERE t.status = 'approved' AND t.deleted = 0
 	AND (? = 0 OR t.id = ?)
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role IN ('tester', 'developer')
+	)
 GROUP BY t.id, t.first_name, t.middle_name, t.last_name, t.profile_picture, t.assigned_color
 HAVING conducted + cancelled + rescheduled > 0
 	OR scheduled_minutes > 0
@@ -106,6 +134,10 @@ LEFT JOIN tbl_class_records cr ON cr.student_id = s.id
 	AND cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
 	AND (? = 0 OR cr.teacher_id = ?)
+	AND (cr.teacher_id IS NULL OR NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
+	))
 WHERE (? = 0 OR EXISTS (
 	SELECT 1 FROM tbl_teachers_students_m2m m
 	WHERE m.student_id = s.id AND m.teacher_id = ?
@@ -124,6 +156,10 @@ FROM tbl_class_records cr
 WHERE cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
 	AND (? = 0 OR cr.teacher_id = ?)
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
+	)
 GROUP BY week_label
 ORDER BY week_label ASC;
 
@@ -150,6 +186,10 @@ WHERE sc.status = 'scheduled'
 	AND sc.scheduled_date < date('now', 'localtime')
 	AND sc.scheduled_date >= ? AND sc.scheduled_date <= ?
 	AND (? = 0 OR sc.teacher_id = ?)
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = t.id AND tr.role IN ('tester', 'developer')
+	)
 ORDER BY sc.scheduled_date ASC, sc.start_time ASC
 LIMIT 50;
 

@@ -76,8 +76,9 @@ func handleReportsPartial(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	roleFilters := parseReportRoleFilters(r)
 	sort := parseListSort(r, frontend.ListSortKindReport)
-	rows, err := loadReportRows(r.Context(), startDate, endDate, q)
+	rows, err := loadReportRows(r.Context(), startDate, endDate, q, roleFilters)
 	if err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -107,7 +108,8 @@ func handleReportsAllTeachers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rows, err := loadReportRows(r.Context(), startDate, endDate, "")
+	roleFilters := parseReportRoleFilters(r)
+	rows, err := loadReportRows(r.Context(), startDate, endDate, "", roleFilters)
 	if err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -154,9 +156,10 @@ func handleReportSummary(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	roleFilters := parseReportRoleFilters(r)
 	ctx := r.Context()
 
-	summaries, err := dbRO.GetQueries().GetReportTeacherSummaries(ctx, reportSearchParams(q, startDate, endDate))
+	summaries, err := dbRO.GetQueries().GetReportTeacherSummaries(ctx, reportSearchParams(q, startDate, endDate, roleFilters))
 	if err != nil {
 		logs.Log().Error("load report summaries for summary export", zap.Error(err))
 		HttpError(w, "Failed to load report data", http.StatusInternalServerError)
@@ -167,7 +170,7 @@ func handleReportSummary(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	summaryRows, err := dbRO.GetQueries().GetReportSummaryRows(ctx, reportSummaryParams(q, startDate, endDate))
+	summaryRows, err := dbRO.GetQueries().GetReportSummaryRows(ctx, reportSummaryParams(q, startDate, endDate, roleFilters))
 	if err != nil {
 		logs.Log().Error("load report summary rows", zap.Error(err))
 		HttpError(w, "Failed to load report data", http.StatusInternalServerError)
@@ -194,15 +197,32 @@ func handleReportSummary(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, outputPath)
 }
 
-func loadReportRows(ctx context.Context, startDate, endDate, q string) ([]frontend.ReportRowData, error) {
-	searchParams := reportSearchParams(q, startDate, endDate)
+type reportRoleFilters struct {
+	Teacher bool
+}
+
+func parseReportRoleFilters(r *http.Request) reportRoleFilters {
+	return reportRoleFilters{
+		Teacher: parseConnectionCheckboxFilter(r, "roleTeacher"),
+	}
+}
+
+func reportRoleFilterFlag(filters reportRoleFilters) int64 {
+	if filters.Teacher {
+		return 1
+	}
+	return 0
+}
+
+func loadReportRows(ctx context.Context, startDate, endDate, q string, roleFilters reportRoleFilters) ([]frontend.ReportRowData, error) {
+	searchParams := reportSearchParams(q, startDate, endDate, roleFilters)
 
 	summaries, err := dbRO.GetQueries().GetReportTeacherSummaries(ctx, searchParams)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load report summaries")
 	}
 
-	earningsRows, err := dbRO.GetQueries().GetReportTeacherEarnings(ctx, reportEarningsParams(q, startDate, endDate))
+	earningsRows, err := dbRO.GetQueries().GetReportTeacherEarnings(ctx, reportEarningsParams(q, startDate, endDate, roleFilters))
 	if err != nil {
 		return nil, fmt.Errorf("failed to load report earnings")
 	}
@@ -215,9 +235,11 @@ func loadReportRows(ctx context.Context, startDate, endDate, q string) ([]fronte
 		})
 	}
 
+	teacherRoleFlag := reportRoleFilterFlag(roleFilters)
 	fingerprintRows, err := dbRO.GetQueries().GetClassRecordFingerprintRowsForRange(ctx, queries.GetClassRecordFingerprintRowsForRangeParams{
-		Date:   startDate,
-		Date_2: endDate,
+		Date:    startDate,
+		Date_2:  endDate,
+		Column3: teacherRoleFlag,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to load report fingerprints")
@@ -284,7 +306,7 @@ func loadReportRows(ctx context.Context, startDate, endDate, q string) ([]fronte
 }
 
 func loadReportRow(ctx context.Context, teacherID int64, startDate, endDate string) (frontend.ReportRowData, error) {
-	rows, err := loadReportRows(ctx, startDate, endDate, "")
+	rows, err := loadReportRows(ctx, startDate, endDate, "", reportRoleFilters{})
 	if err != nil {
 		return frontend.ReportRowData{}, err
 	}
@@ -541,8 +563,9 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 	renderReportGenerateRow(w, r, teacherID, startDate, endDate, false)
 }
 
-func reportSearchParams(q, startDate, endDate string) queries.GetReportTeacherSummariesParams {
+func reportSearchParams(q, startDate, endDate string, roleFilters reportRoleFilters) queries.GetReportTeacherSummariesParams {
 	qNull := sql.NullString{String: q, Valid: q != ""}
+	teacherRoleFlag := reportRoleFilterFlag(roleFilters)
 	return queries.GetReportTeacherSummariesParams{
 		Date:    startDate,
 		Date_2:  endDate,
@@ -551,11 +574,13 @@ func reportSearchParams(q, startDate, endDate string) queries.GetReportTeacherSu
 		Date_3:  startDate,
 		Date_4:  endDate,
 		Column7: qNull,
+		Column8: teacherRoleFlag,
 	}
 }
 
-func reportSummaryParams(q, startDate, endDate string) queries.GetReportSummaryRowsParams {
+func reportSummaryParams(q, startDate, endDate string, roleFilters reportRoleFilters) queries.GetReportSummaryRowsParams {
 	qNull := sql.NullString{String: q, Valid: q != ""}
+	teacherRoleFlag := reportRoleFilterFlag(roleFilters)
 	return queries.GetReportSummaryRowsParams{
 		Date:    startDate,
 		Date_2:  endDate,
@@ -564,6 +589,7 @@ func reportSummaryParams(q, startDate, endDate string) queries.GetReportSummaryR
 		Date_3:  startDate,
 		Date_4:  endDate,
 		Column7: qNull,
+		Column8: teacherRoleFlag,
 	}
 }
 
@@ -586,8 +612,9 @@ func fingerprintRowFromRange(row queries.GetClassRecordFingerprintRowsForRangeRo
 	}
 }
 
-func reportEarningsParams(q, startDate, endDate string) queries.GetReportTeacherEarningsParams {
+func reportEarningsParams(q, startDate, endDate string, roleFilters reportRoleFilters) queries.GetReportTeacherEarningsParams {
 	qNull := sql.NullString{String: q, Valid: q != ""}
+	teacherRoleFlag := reportRoleFilterFlag(roleFilters)
 	return queries.GetReportTeacherEarningsParams{
 		Date:    startDate,
 		Date_2:  endDate,
@@ -596,6 +623,7 @@ func reportEarningsParams(q, startDate, endDate string) queries.GetReportTeacher
 		Date_3:  startDate,
 		Date_4:  endDate,
 		Column7: qNull,
+		Column8: teacherRoleFlag,
 	}
 }
 

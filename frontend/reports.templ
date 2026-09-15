@@ -69,6 +69,7 @@ templ Reports() {
 					</div>
 					@MonthPicker("reportMonth", utils.URL("/reports/partials/date-preset"))
 					@DatePreset(true)
+					@ReportRolesFilterDropdown(true)
 					@SortControls("", "asc", ListSortKindReport)
 					<button
 						type="button"
@@ -88,6 +89,7 @@ templ Reports() {
 				>
 					<input type="hidden" name="q" id="summaryQ" value=""/>
 					<input type="hidden" name="datePreset" id="summaryDatePreset" value=""/>
+					<input type="hidden" name="roleTeacher" id="summaryRoleTeacher" value=""/>
 					<button type="submit" class="btn">Generate Summary</button>
 				</form>
 			</div>
@@ -168,11 +170,16 @@ templ Reports() {
 				const preset = document.getElementById('datePreset');
 				const qField = document.getElementById('summaryQ');
 				const presetField = document.getElementById('summaryDatePreset');
+				const roleTeacher = document.querySelector('#reportsFilters input[name="roleTeacher"]');
+				const summaryRoleTeacher = document.getElementById('summaryRoleTeacher');
 				if (search && qField) {
 					qField.value = search.value || '';
 				}
 				if (preset && presetField) {
 					presetField.value = preset.value || '';
+				}
+				if (summaryRoleTeacher) {
+					summaryRoleTeacher.value = roleTeacher && roleTeacher.checked ? '1' : '';
 				}
 				if (!presetField || !presetField.value) {
 					e.preventDefault();
