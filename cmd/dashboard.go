@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"net/http"
@@ -35,6 +36,83 @@ func monthRange() (string, string) {
 	return start.Format("2006-01-02"), end.Format("2006-01-02")
 }
 
+func dashboardEarningsTeacherID(role auth.Role, userID int64) int64 {
+	if role == auth.RoleSuperuser {
+		return 0
+	}
+	return userID
+}
+
+func fetchCutoffTotalsByPreset(ctx context.Context, preset string, teacherID int64) []frontend.CurrencyTotal {
+	startDate, endDate := utils.CutoffDatesFromPreset(preset)
+	if startDate == "" || endDate == "" {
+		return nil
+	}
+	rows, err := dbRO.GetQueries().SumConductedRateByCurrencyAndDateRange(ctx, queries.SumConductedRateByCurrencyAndDateRangeParams{
+		Date:      startDate,
+		Date_2:    endDate,
+		Column3:   teacherID,
+		TeacherID: teacherID,
+	})
+	if err != nil {
+		return nil
+	}
+	totals := make([]frontend.CurrencyTotal, 0, len(rows))
+	for _, row := range rows {
+		total, _ := row.TotalRate.(float64)
+		totals = append(totals, frontend.CurrencyTotal{
+			Currency: row.Currency,
+			Total:    total,
+		})
+	}
+	return totals
+}
+
+func populateDashboardEarnings(ctx context.Context, data *frontend.DashboardData, teacherID int64, monthStart, monthEnd string) {
+	firstCutoff, secondCutoff, _ := utils.CurrentCutoffRange()
+	data.FirstCutoffTotals = fetchCutoffTotalsByPreset(ctx, firstCutoff, teacherID)
+	data.SecondCutoffTotals = fetchCutoffTotalsByPreset(ctx, secondCutoff, teacherID)
+
+	rates, err := dbRO.GetQueries().SumConductedRateByCurrencyAndDateRange(ctx, queries.SumConductedRateByCurrencyAndDateRangeParams{
+		Date:      monthStart,
+		Date_2:    monthEnd,
+		Column3:   teacherID,
+		TeacherID: teacherID,
+	})
+	if err == nil {
+		for _, row := range rates {
+			total, _ := row.TotalRate.(float64)
+			data.MonthlyTotals = append(data.MonthlyTotals, frontend.CurrencyTotal{
+				Currency: row.Currency,
+				Total:    total,
+			})
+		}
+	}
+
+	if !auth.HasAdminAccess(data.Role) {
+		return
+	}
+
+	parentRates, err := dbRO.GetQueries().SumConductedParentRateByCurrencyAndDateRange(ctx, queries.SumConductedParentRateByCurrencyAndDateRangeParams{
+		Date:      monthStart,
+		Date_2:    monthEnd,
+		Column3:   teacherID,
+		TeacherID: teacherID,
+	})
+	if err == nil {
+		for _, row := range parentRates {
+			if !row.Currency.Valid || row.Currency.String == "" {
+				continue
+			}
+			total, _ := row.TotalRate.(float64)
+			data.ParentMonthlyTotals = append(data.ParentMonthlyTotals, frontend.CurrencyTotal{
+				Currency: row.Currency.String,
+				Total:    total,
+			})
+		}
+	}
+}
+
 func handleHome(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -55,16 +133,17 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 
 	weekStart, weekEnd := weekRange()
 	monthStart, monthEnd := monthRange()
+	earningsTeacherID := dashboardEarningsTeacherID(role, user.ID)
 
 	switch role {
 	case auth.RoleSuperuser, auth.RoleAdmin:
 		statusCounts, err := dbRO.GetQueries().CountStudentsByStatus(ctx)
 		if err == nil {
 			for _, row := range statusCounts {
-				switch row.Status {
-				case "active":
+				switch constants.StudentStatus(row.Status) {
+				case constants.StudentStatusActive:
 					data.ActiveStudents = row.Count
-				case "inactive":
+				case constants.StudentStatusInactive:
 					data.InactiveStudents = row.Count
 				}
 			}
@@ -107,62 +186,12 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-		rates, err := dbRO.GetQueries().SumConductedRateByCurrencyAndDateRange(ctx, queries.SumConductedRateByCurrencyAndDateRangeParams{
-			Date:      monthStart,
-			Date_2:    monthEnd,
-			Column3:   int64(0),
-			TeacherID: 0,
-		})
-		if err == nil {
-			for _, row := range rates {
-				total, _ := row.TotalRate.(float64)
-				data.MonthlyTotals = append(data.MonthlyTotals, frontend.CurrencyTotal{
-					Currency: row.Currency,
-					Total:    total,
-				})
-			}
-		}
-		parentRates, err := dbRO.GetQueries().SumConductedParentRateByCurrencyAndDateRange(ctx, queries.SumConductedParentRateByCurrencyAndDateRangeParams{
-			Date:      monthStart,
-			Date_2:    monthEnd,
-			Column3:   int64(0),
-			TeacherID: 0,
-		})
-		if err == nil {
-			for _, row := range parentRates {
-				if !row.Currency.Valid || row.Currency.String == "" {
-					continue
-				}
-				total, _ := row.TotalRate.(float64)
-				data.ParentMonthlyTotals = append(data.ParentMonthlyTotals, frontend.CurrencyTotal{
-					Currency: row.Currency.String,
-					Total:    total,
-				})
-			}
-		}
+		populateDashboardEarnings(ctx, &data, earningsTeacherID, monthStart, monthEnd)
 	case auth.RoleTeacher, auth.RoleTester:
 		user := auth.GetUser(ctx)
 		count, err := dbRO.GetQueries().CountStudentsByTeacherID(ctx, user.ID)
 		if err == nil {
 			data.MyStudentCount = count
-		}
-		cutoffStart, cutoffEnd := utils.ActiveCutoffDates()
-		if cutoffStart != "" && cutoffEnd != "" {
-			cutoffRates, err := dbRO.GetQueries().SumConductedRateByCurrencyAndDateRange(ctx, queries.SumConductedRateByCurrencyAndDateRangeParams{
-				Date:      cutoffStart,
-				Date_2:    cutoffEnd,
-				Column3:   user.ID,
-				TeacherID: user.ID,
-			})
-			if err == nil {
-				for _, row := range cutoffRates {
-					total, _ := row.TotalRate.(float64)
-					data.CutoffTotals = append(data.CutoffTotals, frontend.CurrencyTotal{
-						Currency: row.Currency,
-						Total:    total,
-					})
-				}
-			}
 		}
 		classCounts, err := dbRO.GetQueries().CountClassRecordsByStatusAndDateRange(ctx, queries.CountClassRecordsByStatusAndDateRangeParams{
 			Date:      weekStart,
@@ -182,21 +211,7 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-		rates, err := dbRO.GetQueries().SumConductedRateByCurrencyAndDateRange(ctx, queries.SumConductedRateByCurrencyAndDateRangeParams{
-			Date:      monthStart,
-			Date_2:    monthEnd,
-			Column3:   user.ID,
-			TeacherID: user.ID,
-		})
-		if err == nil {
-			for _, row := range rates {
-				total, _ := row.TotalRate.(float64)
-				data.MonthlyTotals = append(data.MonthlyTotals, frontend.CurrencyTotal{
-					Currency: row.Currency,
-					Total:    total,
-				})
-			}
-		}
+		populateDashboardEarnings(ctx, &data, earningsTeacherID, monthStart, monthEnd)
 		today := utils.TodayPHT()
 		scheduledToday, err := dbRO.GetQueries().CountScheduledClassesByStatusAndDate(ctx, queries.CountScheduledClassesByStatusAndDateParams{
 			ScheduledDate: today,

@@ -39,6 +39,16 @@ func TestActiveCutoffDates(t *testing.T) {
 	}
 }
 
+func TestCutoffDatesFromPreset(t *testing.T) {
+	start, end := CutoffDatesFromPreset("2026-09-01|2026-09-15")
+	if start != "2026-09-01" || end != "2026-09-15" {
+		t.Fatalf("unexpected dates: %q %q", start, end)
+	}
+	if start, end := CutoffDatesFromPreset("invalid"); start != "" || end != "" {
+		t.Fatalf("expected empty dates for invalid preset, got %q %q", start, end)
+	}
+}
+
 func TestCurrentCutoffRange(t *testing.T) {
 	first, second, active := CurrentCutoffRange()
 	if first == "" || second == "" || active == "" {

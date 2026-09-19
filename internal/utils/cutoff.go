@@ -63,7 +63,12 @@ func CurrentCutoffRange() (firstCutoff, secondCutoff, activeCutoff string) {
 // ActiveCutoffDates returns the start and end date strings for the current payroll cutoff.
 func ActiveCutoffDates() (startDate, endDate string) {
 	_, _, active := CurrentCutoffRange()
-	parts := splitCutoff(active)
+	return CutoffDatesFromPreset(active)
+}
+
+// CutoffDatesFromPreset parses a cutoff preset (YYYY-MM-DD|YYYY-MM-DD) into start and end dates.
+func CutoffDatesFromPreset(preset string) (startDate, endDate string) {
+	parts := splitCutoff(preset)
 	if len(parts) != 2 {
 		return "", ""
 	}

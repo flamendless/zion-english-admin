@@ -9,6 +9,11 @@ type CurrencyTotal struct {
 	Total    float64
 }
 
+type DashboardCurrencySection struct {
+	Title  string
+	Totals []CurrencyTotal
+}
+
 type DashboardData struct {
 	Role                   auth.Role
 	Avatar                 AvatarProps
@@ -24,7 +29,8 @@ type DashboardData struct {
 	ScheduledToday         int64
 	MonthlyTotals          []CurrencyTotal
 	ParentMonthlyTotals           []CurrencyTotal
-	CutoffTotals                  []CurrencyTotal
+	FirstCutoffTotals             []CurrencyTotal
+	SecondCutoffTotals            []CurrencyTotal
 	StudentsWithoutParent         int64
 	StudentsWithoutParentRate     int64
 }
@@ -38,6 +44,59 @@ templ Home(data DashboardData) {
 		<title>Zion English Admin</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
+		<style>
+			.stat-link-rows {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-2);
+			}
+
+			.stat-link-row {
+				display: flex;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: var(--space-3);
+				text-decoration: none;
+				color: inherit;
+				padding: var(--space-1) 0;
+			}
+
+			.stat-link-row:hover .stat-link-row-value {
+				color: var(--color-primary);
+			}
+
+			.stat-link-row-label {
+				font-size: 0.8rem;
+				color: var(--color-muted-foreground);
+			}
+
+			.stat-link-row-value {
+				font-size: 1.1rem;
+				font-weight: 600;
+				font-variant-numeric: tabular-nums;
+				line-height: 1.2;
+			}
+
+			.stat-section {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-1);
+			}
+
+			.stat-section + .stat-section {
+				margin-top: var(--space-2);
+				padding-top: var(--space-2);
+				border-top: 1px solid var(--color-border-subtle);
+			}
+
+			.stat-section-title {
+				font-size: 0.75rem;
+				font-weight: 600;
+				color: var(--color-muted-foreground);
+				text-transform: uppercase;
+				letter-spacing: 0.03em;
+			}
+		</style>
 	</head>
 	<body>
 		<div class="home-container">
@@ -86,13 +145,36 @@ templ Home(data DashboardData) {
 	</html>
 }
 
-templ DashboardCurrencyStatCard(label string, totals []CurrencyTotal) {
+templ DashboardSectionedCurrencyStatCard(label string, sections []DashboardCurrencySection) {
 	<div class="stat-card">
 		<span class="stat-label">{ label }</span>
-		<div class="stat-currency-rows">
-			for _, total := range totals {
-				<span class="stat-currency-row">{ utils.FormatCurrency(total.Total, total.Currency) }</span>
-			}
+		for _, section := range sections {
+			<div class="stat-section">
+				if section.Title != "" {
+					<span class="stat-section-title">{ section.Title }</span>
+				}
+				<div class="stat-currency-rows">
+					for _, total := range section.Totals {
+						<span class="stat-currency-row">{ utils.FormatCurrency(total.Total, total.Currency) }</span>
+					}
+				</div>
+			</div>
+		}
+	</div>
+}
+
+templ DashboardParentGapStatCard(withoutParent int64, withoutParentRate int64) {
+	<div class="stat-card">
+		<span class="stat-label">Students Missing Parent Info</span>
+		<div class="stat-link-rows">
+			<a href={ utils.URL("/students?status=active&parentFilter=missing_name") } class="stat-link-row">
+				<span class="stat-link-row-label">Without parent name</span>
+				<span class="stat-link-row-value">{ fmt.Sprintf("%d", withoutParent) }</span>
+			</a>
+			<a href={ utils.URL("/students?status=active&parentFilter=missing_rate") } class="stat-link-row">
+				<span class="stat-link-row-label">Without parent rate</span>
+				<span class="stat-link-row-value">{ fmt.Sprintf("%d", withoutParentRate) }</span>
+			</a>
 		</div>
 	</div>
 }
@@ -102,12 +184,9 @@ templ DashboardStats(data DashboardData) {
 	<div class="dashboard-stats">
 		if auth.HasAdminAccess(data.Role) {
 			<div class="stat-card">
-				<span class="stat-label">Active Students</span>
-				<span class="stat-value">{ fmt.Sprintf("%d", data.ActiveStudents) }</span>
-			</div>
-			<div class="stat-card">
-				<span class="stat-label">Inactive Students</span>
-				<span class="stat-value">{ fmt.Sprintf("%d", data.InactiveStudents) }</span>
+				<span class="stat-label">Students</span>
+				<span class="stat-value">{ fmt.Sprintf("%d", data.ActiveStudents + data.InactiveStudents) }</span>
+				<span class="stat-sub">{ fmt.Sprintf("%d active, %d inactive", data.ActiveStudents, data.InactiveStudents) }</span>
 			</div>
 			<div class="stat-card">
 				<span class="stat-label">Pending Teachers</span>
@@ -121,14 +200,7 @@ templ DashboardStats(data DashboardData) {
 				<span class="stat-label">Pending Intro Videos</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.PendingIntroVideos) }</span>
 			</div>
-			<a href={ utils.URL("/students?status=active&parentFilter=missing_name") } class="stat-card stat-card-link">
-				<span class="stat-label">Students Without Parent</span>
-				<span class="stat-value">{ fmt.Sprintf("%d", data.StudentsWithoutParent) }</span>
-			</a>
-			<a href={ utils.URL("/students?status=active&parentFilter=missing_rate") } class="stat-card stat-card-link">
-				<span class="stat-label">Students Without Parent Rate</span>
-				<span class="stat-value">{ fmt.Sprintf("%d", data.StudentsWithoutParentRate) }</span>
-			</a>
+			@DashboardParentGapStatCard(data.StudentsWithoutParent, data.StudentsWithoutParentRate)
 		}
 		if data.Role == auth.RoleTeacher {
 			<a href={ utils.URL("/my-students") } class="stat-card stat-card-link">
@@ -141,21 +213,25 @@ templ DashboardStats(data DashboardData) {
 				<span class="stat-label">Scheduled Today</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.ScheduledToday) }</span>
 			</div>
-			for _, ct := range data.CutoffTotals {
-				<div class="stat-card stat-card-accent">
-					<span class="stat-label">Earnings This Cutoff ({ ct.Currency })</span>
-					<span class="stat-value">{ utils.FormatCurrencyAmountFixed(ct.Total, ct.Currency) }</span>
-				</div>
-			}
 		}
 		<div class="stat-card">
 			<span class="stat-label">Classes This Week</span>
 			<span class="stat-value">{ fmt.Sprintf("%d total", data.ClassesConductedWeek + data.ClassesCancelledWeek + data.ClassesRescheduledWeek) }</span>
 			<span class="stat-sub">{ fmt.Sprintf("%d conducted, %d cancelled, %d rescheduled", data.ClassesConductedWeek, data.ClassesCancelledWeek, data.ClassesRescheduledWeek) }</span>
 		</div>
-		@DashboardCurrencyStatCard("Month", data.MonthlyTotals)
+		@DashboardSectionedCurrencyStatCard("Cutoffs", []DashboardCurrencySection{
+			{Title: "First cutoff", Totals: data.FirstCutoffTotals},
+			{Title: "Second cutoff", Totals: data.SecondCutoffTotals},
+		})
 		if auth.HasAdminAccess(data.Role) {
-			@DashboardCurrencyStatCard("Parent Rates Month", data.ParentMonthlyTotals)
+			@DashboardSectionedCurrencyStatCard("Month", []DashboardCurrencySection{
+				{Title: "Teacher rates", Totals: data.MonthlyTotals},
+				{Title: "Parent rates", Totals: data.ParentMonthlyTotals},
+			})
+		} else {
+			@DashboardSectionedCurrencyStatCard("Month", []DashboardCurrencySection{
+				{Totals: data.MonthlyTotals},
+			})
 		}
 	</div>
 }

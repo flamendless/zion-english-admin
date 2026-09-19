@@ -1525,8 +1525,8 @@ func GuideFAQSections() templ.Component {
 			"Where can I see my total earnings?",
 			"Your dashboard shows earnings summaries. My Classes lists each class with its rate.",
 			[]string{
-				"Open the dashboard after signing in. Under Overview, Earnings This Cutoff shows your conducted-class totals for the current payroll period, broken down by currency.",
-				"Month ({currency}) cards on the dashboard show conducted-class totals for the current calendar month.",
+				"Open the dashboard after signing in. Under Overview, Cutoffs shows your conducted-class totals for the first and second payroll periods in the current month, broken down by currency.",
+				"Month on the dashboard shows conducted-class totals for the current calendar month.",
 				"Open My Classes and filter by date range to review individual class rates and statuses.",
 				"Only classes with status conducted are included in earnings totals.",
 			},
