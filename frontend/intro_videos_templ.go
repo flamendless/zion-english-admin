@@ -50,7 +50,7 @@ func introVideosTableColspan(showUploader bool, showActions bool) int {
 	return colspan
 }
 
-func IntroVideoStatusFilterDropdown() templ.Component {
+func IntroVideoStatusFilterDropdownWithValue(selected constants.TeacherIntroVideoStatus) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -71,12 +71,22 @@ func IntroVideoStatusFilterDropdown() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"form-group\"><label for=\"introVideoStatus\">Status</label> <select id=\"introVideoStatus\" name=\"status\"><option value=\"\">All</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"form-group\"><label for=\"introVideoStatus\">Status</label> <select id=\"introVideoStatus\" name=\"status\"><option value=\"\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if selected == "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, ">All</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, opt := range TeacherIntroVideoStatusOptions {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<option value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<option value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -89,25 +99,35 @@ func IntroVideoStatusFilterDropdown() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if string(selected) == opt.Value {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, " selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, ">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 51, Col: 43}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 51, Col: 87}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</option>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</option>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</select></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</select></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -115,7 +135,7 @@ func IntroVideoStatusFilterDropdown() templ.Component {
 	})
 }
 
-func IntroVideosToolbar(showTeacherFilter bool) templ.Component {
+func IntroVideosToolbar(showTeacherFilter bool, status constants.TeacherIntroVideoStatus) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -136,26 +156,26 @@ func IntroVideosToolbar(showTeacherFilter bool) templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"toolbar\" id=\"introVideosToolbar\"><div class=\"form-group\"><label for=\"introVideoSearch\">Search</label> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"toolbar\" id=\"introVideosToolbar\"><div class=\"form-group\"><label for=\"introVideoSearch\">Search</label> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if showTeacherFilter {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<input type=\"text\" id=\"introVideoSearch\" name=\"introVideoQ\" placeholder=\"Filename or teacher name...\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<input type=\"text\" id=\"introVideoSearch\" name=\"introVideoQ\" placeholder=\"Filename or teacher name...\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<input type=\"text\" id=\"introVideoSearch\" name=\"introVideoQ\" placeholder=\"Filename...\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<input type=\"text\" id=\"introVideoSearch\" name=\"introVideoQ\" placeholder=\"Filename...\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = IntroVideoStatusFilterDropdown().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = IntroVideoStatusFilterDropdownWithValue(status).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -169,7 +189,7 @@ func IntroVideosToolbar(showTeacherFilter bool) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<button type=\"button\" id=\"introVideosFilterBtn\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<button type=\"button\" id=\"introVideosFilterBtn\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -182,7 +202,7 @@ func IntroVideosToolbar(showTeacherFilter bool) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" hx-include=\"#introVideosToolbar\" hx-target=\"#introVideosTableBody\" hx-swap=\"innerHTML\">Filter</button></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" hx-include=\"#introVideosToolbar\" hx-target=\"#introVideosTableBody\" hx-swap=\"innerHTML\">Filter</button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -216,7 +236,7 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<tr class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<tr class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -229,7 +249,7 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\"><td data-label=\"Filename\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\"><td data-label=\"Filename\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -242,7 +262,7 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" class=\"documents-filename documents-filename-link\" title=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" class=\"documents-filename documents-filename-link\" title=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -255,7 +275,7 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" target=\"_blank\" rel=\"noopener noreferrer\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" target=\"_blank\" rel=\"noopener noreferrer\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -268,12 +288,12 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</a> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</a> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if item.RejectReason != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"intro-video-reject-reason\">Reject reason: ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<div class=\"intro-video-reject-reason\">Reject reason: ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -286,12 +306,12 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</td><td data-label=\"Type\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</td><td data-label=\"Type\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -299,7 +319,7 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</td><td data-label=\"File size\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</td><td data-label=\"File size\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -312,7 +332,7 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</td><td data-label=\"Status\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</td><td data-label=\"Status\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -320,12 +340,12 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</td>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</td>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if showUploader {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<td data-label=\"Uploaded by\"><div class=\"documents-uploader-cell\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<td data-label=\"Uploaded by\"><div class=\"documents-uploader-cell\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -333,7 +353,7 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -346,12 +366,12 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</span></div></td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</span></div></td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<td data-label=\"Uploaded at\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<td data-label=\"Uploaded at\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -364,12 +384,12 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</td>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</td>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if showActions {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<td data-label=\"Actions\"><div class=\"table-actions\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<td data-label=\"Actions\"><div class=\"table-actions\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -378,7 +398,7 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool
 				return templ_7745c5c3_Err
 			}
 			if item.CanReview {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<form method=\"POST\" action=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<form method=\"POST\" action=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -391,7 +411,7 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\" class=\"table-action-form\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "\" class=\"table-action-form\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -399,7 +419,7 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</form>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "</form>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -412,7 +432,7 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<form method=\"POST\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<form method=\"POST\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -425,7 +445,7 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\" class=\"table-action-form\" onsubmit=\"return confirm('Delete this intro video? The file will be removed and the teacher can upload a new one.');\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\" class=\"table-action-form\" onsubmit=\"return confirm('Delete this intro video? The file will be removed and the teacher can upload a new one.');\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -433,12 +453,12 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</form></div></td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</form></div></td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "</tr>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</tr>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -468,7 +488,7 @@ func IntroVideosTableBody(items []IntroVideoItem, showUploader bool, showActions
 		}
 		ctx = templ.ClearChildren(ctx)
 		if len(items) == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<tr><td colspan=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "<tr><td colspan=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -481,7 +501,7 @@ func IntroVideosTableBody(items []IntroVideoItem, showUploader bool, showActions
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\" class=\"empty-state\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" class=\"empty-state\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -494,7 +514,7 @@ func IntroVideosTableBody(items []IntroVideoItem, showUploader bool, showActions
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</td></tr>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</td></tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -531,7 +551,7 @@ func IntroVideosTable(showUploader bool, showActions bool) templ.Component {
 			templ_7745c5c3_Var21 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<div class=\"table-wrapper documents-table-wrapper\"><table class=\"documents-table table-stack-mobile\"><thead><tr><th>Filename</th><th>Type</th><th>File size</th><th>Status</th>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<div class=\"table-wrapper documents-table-wrapper\"><table class=\"documents-table table-stack-mobile\"><thead><tr><th>Filename</th><th>Type</th><th>File size</th><th>Status</th>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -541,7 +561,7 @@ func IntroVideosTable(showUploader bool, showActions bool) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "<th>Uploaded at</th>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<th>Uploaded at</th>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -551,7 +571,7 @@ func IntroVideosTable(showUploader bool, showActions bool) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</tr></thead> <tbody id=\"introVideosTableBody\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "</tr></thead> <tbody id=\"introVideosTableBody\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -564,7 +584,7 @@ func IntroVideosTable(showUploader bool, showActions bool) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "\" hx-include=\"#introVideosToolbar\" hx-trigger=\"load\" hx-swap=\"innerHTML\"><tr><td colspan=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\" hx-include=\"#introVideosToolbar\" hx-trigger=\"load\" hx-swap=\"innerHTML\"><tr><td colspan=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -577,7 +597,7 @@ func IntroVideosTable(showUploader bool, showActions bool) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "\" class=\"empty-state\">Loading intro videos...</td></tr></tbody></table></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "\" class=\"empty-state\">Loading intro videos...</td></tr></tbody></table></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -591,6 +611,7 @@ type IntroVideosPageData struct {
 	ShowUploader      bool
 	ShowActions       bool
 	ShowTeacherFilter bool
+	Status            constants.TeacherIntroVideoStatus
 }
 
 func IntroVideosPage(data IntroVideosPageData) templ.Component {
@@ -614,33 +635,33 @@ func IntroVideosPage(data IntroVideosPageData) templ.Component {
 			templ_7745c5c3_Var24 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(data.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 189, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 190, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, " - Zion English Admin Tool</title><link rel=\"icon\" type=\"image/x-icon\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, " - Zion English Admin Tool</title><link rel=\"icon\" type=\"image/x-icon\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var26 templ.SafeURL
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 190, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 191, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -656,7 +677,7 @@ func IntroVideosPage(data IntroVideosPageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "<style>\r\n\t\t\t.intro-video-reject-reason {\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t}\r\n\t\t</style></head><body><div class=\"container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "<style>\r\n\t\t\t.intro-video-reject-reason {\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t}\r\n\t\t</style></head><body><div class=\"container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -677,25 +698,25 @@ func IntroVideosPage(data IntroVideosPageData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if data.Description != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "<p class=\"documents-page-desc\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "<p class=\"documents-page-desc\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var27 string
 			templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 208, Col: 53}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 209, Col: 53}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = IntroVideosToolbar(data.ShowTeacherFilter).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = IntroVideosToolbar(data.ShowTeacherFilter, data.Status).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -709,7 +730,7 @@ func IntroVideosPage(data IntroVideosPageData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -721,7 +742,7 @@ func IntroVideosPage(data IntroVideosPageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "<script>\r\n\t\t\tconst introVideoSearch = document.getElementById('introVideoSearch');\r\n\t\t\tif (introVideoSearch) {\r\n\t\t\t\tintroVideoSearch.addEventListener('keydown', function (e) {\r\n\t\t\t\t\tif (e.key === 'Enter') {\r\n\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\r\n\t\t\t\t\t\t\thtmx.trigger('#introVideosTableBody', 'load');\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\t\t\t}\r\n\t\t</script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<script>\r\n\t\t\tconst introVideoSearch = document.getElementById('introVideoSearch');\r\n\t\t\tif (introVideoSearch) {\r\n\t\t\t\tintroVideoSearch.addEventListener('keydown', function (e) {\r\n\t\t\t\t\tif (e.key === 'Enter') {\r\n\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\r\n\t\t\t\t\t\t\thtmx.trigger('#introVideosTableBody', 'load');\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\t\t\t}\r\n\t\t</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -750,7 +771,7 @@ func IntroVideoRejectModal() templ.Component {
 			templ_7745c5c3_Var28 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "<div class=\"modal-overlay\" id=\"introVideoRejectModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"introVideoRejectModalTitle\"><div class=\"modal-header\"><h3 id=\"introVideoRejectModalTitle\">Reject intro video</h3><button type=\"button\" class=\"modal-close intro-video-reject-modal-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><form id=\"introVideoRejectForm\" method=\"POST\" class=\"modal-body scheduled-class-action-modal\"><p class=\"scheduled-class-modal-lead\">The teacher will be able to upload a new intro video after rejection.</p><div class=\"form-group\"><label>Video</label><p id=\"introVideoRejectFilename\" class=\"intro-video-reject-modal-filename\">-</p></div><div class=\"scheduled-class-modal-fields\"><div class=\"form-group\"><label for=\"introVideoRejectReason\">Reject reason *</label> <textarea id=\"introVideoRejectReason\" name=\"reject_reason\" required rows=\"3\" placeholder=\"Explain what the teacher should fix before resubmitting\"></textarea></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary intro-video-reject-modal-close\">Cancel</button> <button type=\"submit\" class=\"btn btn-danger\">Reject video</button></div></form></div></div><style>\r\n\t\t.intro-video-reject-modal-filename {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tword-break: break-word;\r\n\t\t}\r\n\t</style><script>\r\n\t\t(function () {\r\n\t\t\tconst modal = document.getElementById('introVideoRejectModal');\r\n\t\t\tconst form = document.getElementById('introVideoRejectForm');\r\n\t\t\tconst reasonInput = document.getElementById('introVideoRejectReason');\r\n\t\t\tconst filenameEl = document.getElementById('introVideoRejectFilename');\r\n\t\t\tif (!modal || !form || !reasonInput || !filenameEl) return;\r\n\r\n\t\t\twindow.openIntroVideoRejectModal = function (rejectURL, filename) {\r\n\t\t\t\tform.action = rejectURL;\r\n\t\t\t\treasonInput.value = '';\r\n\t\t\t\tfilenameEl.textContent = filename || '-';\r\n\t\t\t\tmodal.hidden = false;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\treasonInput.focus();\r\n\t\t\t};\r\n\r\n\t\t\twindow.closeIntroVideoRejectModal = function () {\r\n\t\t\t\tmodal.hidden = true;\r\n\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\treasonInput.value = '';\r\n\t\t\t\tfilenameEl.textContent = '-';\r\n\t\t\t};\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tconst rejectBtn = e.target.closest('[data-intro-video-reject-url]');\r\n\t\t\t\tif (rejectBtn) {\r\n\t\t\t\t\tconst rejectURL = rejectBtn.getAttribute('data-intro-video-reject-url');\r\n\t\t\t\t\tconst filename = rejectBtn.getAttribute('data-intro-video-reject-filename') || '';\r\n\t\t\t\t\tif (!rejectURL) return;\r\n\t\t\t\t\twindow.openIntroVideoRejectModal(rejectURL, filename);\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (e.target.closest('.intro-video-reject-modal-close')) {\r\n\t\t\t\t\twindow.closeIntroVideoRejectModal();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (e.target === modal) {\r\n\t\t\t\t\twindow.closeIntroVideoRejectModal();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key === 'Escape' && modal && !modal.hidden) {\r\n\t\t\t\t\twindow.closeIntroVideoRejectModal();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tform.addEventListener('submit', function (e) {\r\n\t\t\t\tif (!reasonInput.value.trim()) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\treasonInput.focus();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "<div class=\"modal-overlay\" id=\"introVideoRejectModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"introVideoRejectModalTitle\"><div class=\"modal-header\"><h3 id=\"introVideoRejectModalTitle\">Reject intro video</h3><button type=\"button\" class=\"modal-close intro-video-reject-modal-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><form id=\"introVideoRejectForm\" method=\"POST\" class=\"modal-body scheduled-class-action-modal\"><p class=\"scheduled-class-modal-lead\">The teacher will be able to upload a new intro video after rejection.</p><div class=\"form-group\"><label>Video</label><p id=\"introVideoRejectFilename\" class=\"intro-video-reject-modal-filename\">-</p></div><div class=\"scheduled-class-modal-fields\"><div class=\"form-group\"><label for=\"introVideoRejectReason\">Reject reason *</label> <textarea id=\"introVideoRejectReason\" name=\"reject_reason\" required rows=\"3\" placeholder=\"Explain what the teacher should fix before resubmitting\"></textarea></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary intro-video-reject-modal-close\">Cancel</button> <button type=\"submit\" class=\"btn btn-danger\">Reject video</button></div></form></div></div><style>\r\n\t\t.intro-video-reject-modal-filename {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tword-break: break-word;\r\n\t\t}\r\n\t</style><script>\r\n\t\t(function () {\r\n\t\t\tconst modal = document.getElementById('introVideoRejectModal');\r\n\t\t\tconst form = document.getElementById('introVideoRejectForm');\r\n\t\t\tconst reasonInput = document.getElementById('introVideoRejectReason');\r\n\t\t\tconst filenameEl = document.getElementById('introVideoRejectFilename');\r\n\t\t\tif (!modal || !form || !reasonInput || !filenameEl) return;\r\n\r\n\t\t\twindow.openIntroVideoRejectModal = function (rejectURL, filename) {\r\n\t\t\t\tform.action = rejectURL;\r\n\t\t\t\treasonInput.value = '';\r\n\t\t\t\tfilenameEl.textContent = filename || '-';\r\n\t\t\t\tmodal.hidden = false;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\treasonInput.focus();\r\n\t\t\t};\r\n\r\n\t\t\twindow.closeIntroVideoRejectModal = function () {\r\n\t\t\t\tmodal.hidden = true;\r\n\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\treasonInput.value = '';\r\n\t\t\t\tfilenameEl.textContent = '-';\r\n\t\t\t};\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tconst rejectBtn = e.target.closest('[data-intro-video-reject-url]');\r\n\t\t\t\tif (rejectBtn) {\r\n\t\t\t\t\tconst rejectURL = rejectBtn.getAttribute('data-intro-video-reject-url');\r\n\t\t\t\t\tconst filename = rejectBtn.getAttribute('data-intro-video-reject-filename') || '';\r\n\t\t\t\t\tif (!rejectURL) return;\r\n\t\t\t\t\twindow.openIntroVideoRejectModal(rejectURL, filename);\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (e.target.closest('.intro-video-reject-modal-close')) {\r\n\t\t\t\t\twindow.closeIntroVideoRejectModal();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (e.target === modal) {\r\n\t\t\t\t\twindow.closeIntroVideoRejectModal();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key === 'Escape' && modal && !modal.hidden) {\r\n\t\t\t\t\twindow.closeIntroVideoRejectModal();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tform.addEventListener('submit', function (e) {\r\n\t\t\t\tif (!reasonInput.value.trim()) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\treasonInput.focus();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -780,12 +801,12 @@ func ProfileIntroVideoUpload(data ProfileData) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		if !data.IsSuperuser && data.IntroVideoUploadVisible {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "<div class=\"profile-card profile-section\"><h2>Introduction video</h2><p class=\"profile-section-desc\">Upload a short introduction video for students and administrators. Accepted formats: MP4, WebM, MOV, AVI, MKV, OGV, M4V, or 3GP (max 1 minute, 20 MB).</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "<div class=\"profile-card profile-section\"><h2>Introduction video</h2><p class=\"profile-section-desc\">Upload a short introduction video for students and administrators. Accepted formats: MP4, WebM, MOV, AVI, MKV, OGV, M4V, or 3GP (max 1 minute, 20 MB).</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.HasIntroVideo {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "<div class=\"profile-detail\" style=\"margin-bottom: var(--space-4);\"><span class=\"profile-detail-label\">Current video</span><div style=\"display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-top: var(--space-2);\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "<div class=\"profile-detail\" style=\"margin-bottom: var(--space-4);\"><span class=\"profile-detail-label\">Current video</span><div style=\"display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-top: var(--space-2);\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -794,103 +815,103 @@ func ProfileIntroVideoUpload(data ProfileData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				if data.IntroVideoViewURL != "" {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<a href=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "<a href=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var30 templ.SafeURL
 					templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinURLErrs(data.IntroVideoViewURL)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 348, Col: 39}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 349, Col: 39}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\" class=\"documents-filename-link\" target=\"_blank\" rel=\"noopener noreferrer\">View uploaded video</a>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "\" class=\"documents-filename-link\" target=\"_blank\" rel=\"noopener noreferrer\">View uploaded video</a>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "</div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if data.IntroVideoRejectReason != "" {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "<p class=\"profile-section-desc\" style=\"margin-top: var(--space-2); margin-bottom: 0;\">Reject reason: ")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "<p class=\"profile-section-desc\" style=\"margin-top: var(--space-2); margin-bottom: 0;\">Reject reason: ")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var31 string
 					templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(data.IntroVideoRejectReason)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 352, Col: 136}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 353, Col: 136}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "</p>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "</p>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 			if !data.IntroVideoUploadsAllowed {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "<div class=\"upload-locked-notice\" role=\"status\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle> <line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line> <line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg> <span>Intro video uploads are currently disabled.</span></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "<div class=\"upload-locked-notice\" role=\"status\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle> <line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line> <line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg> <span>Intro video uploads are currently disabled.</span></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else if !data.CanUploadIntroVideo {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "<div class=\"upload-locked-notice\" role=\"status\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle> <line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line> <line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg> <span>You already have a submitted or approved intro video on file. You cannot upload again unless it is rejected or deleted by an administrator.</span></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "<div class=\"upload-locked-notice\" role=\"status\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle> <line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line> <line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg> <span>You already have a submitted or approved intro video on file. You cannot upload again unless it is rejected or deleted by an administrator.</span></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 			if data.IntroVideoUploadsAllowed {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "<form method=\"POST\" action=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "<form method=\"POST\" action=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var32 templ.SafeURL
 				templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/intro-video"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 378, Col: 47}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 379, Col: 47}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "\" enctype=\"multipart/form-data\" onsubmit=\"return confirm('Once submitted, you will not be able to upload a new intro video unless your current submission is rejected or deleted. Continue?');\"><div class=\"upload-zone\"><label class=\"upload-zone-label\" for=\"intro_video\"><span class=\"upload-zone-icon\" aria-hidden=\"true\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"23 7 16 12 23 17 23 7\"></polygon> <rect x=\"1\" y=\"5\" width=\"15\" height=\"14\" rx=\"2\" ry=\"2\"></rect></svg></span> <span class=\"upload-zone-meta\"><span>Choose intro video</span> <span class=\"upload-zone-hint\">MP4, WebM, MOV, AVI, MKV, OGV, M4V, or 3GP (max 1 min, 20 MB)</span></span> <input type=\"file\" id=\"intro_video\" name=\"intro_video\" accept=\"video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska,video/ogg,video/3gpp,.mp4,.webm,.mov,.avi,.mkv,.ogv,.m4v,.3gp\" required")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "\" enctype=\"multipart/form-data\" onsubmit=\"return confirm('Once submitted, you will not be able to upload a new intro video unless your current submission is rejected or deleted. Continue?');\"><div class=\"upload-zone\"><label class=\"upload-zone-label\" for=\"intro_video\"><span class=\"upload-zone-icon\" aria-hidden=\"true\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"23 7 16 12 23 17 23 7\"></polygon> <rect x=\"1\" y=\"5\" width=\"15\" height=\"14\" rx=\"2\" ry=\"2\"></rect></svg></span> <span class=\"upload-zone-meta\"><span>Choose intro video</span> <span class=\"upload-zone-hint\">MP4, WebM, MOV, AVI, MKV, OGV, M4V, or 3GP (max 1 min, 20 MB)</span></span> <input type=\"file\" id=\"intro_video\" name=\"intro_video\" accept=\"video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska,video/ogg,video/3gpp,.mp4,.webm,.mov,.avi,.mkv,.ogv,.m4v,.3gp\" required")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if !data.CanUploadIntroVideo {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, " disabled")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, " disabled")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, " onchange=\"this.form.querySelector('.upload-filename').textContent = this.files[0] ? this.files[0].name : ''\"></label><p class=\"upload-filename\" aria-live=\"polite\"></p></div><div class=\"profile-form-actions\"><button type=\"submit\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, " onchange=\"this.form.querySelector('.upload-filename').textContent = this.files[0] ? this.files[0].name : ''\"></label><p class=\"upload-filename\" aria-live=\"polite\"></p></div><div class=\"profile-form-actions\"><button type=\"submit\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if !data.CanUploadIntroVideo {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, " disabled")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, " disabled")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, ">Submit intro video</button></div></form>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, ">Submit intro video</button></div></form>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

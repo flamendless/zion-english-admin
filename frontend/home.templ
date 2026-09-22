@@ -79,6 +79,19 @@ templ Home(data DashboardData) {
 				line-height: 1.2;
 			}
 
+			.stat-value-signifier {
+				align-self: stretch;
+				border-bottom: 1px dotted var(--color-primary);
+			}
+
+			.stat-link-row-value-wrap {
+				display: inline-flex;
+				flex-direction: column;
+				align-items: flex-end;
+				width: fit-content;
+				gap: var(--space-1);
+			}
+
 			.stat-section {
 				display: flex;
 				flex-direction: column;
@@ -158,6 +171,23 @@ templ Home(data DashboardData) {
 	</html>
 }
 
+templ DashboardStatLinkRow(label string, href string, count int64, tooltip string) {
+	if count > 0 {
+		<a href={ href } class="stat-link-row" data-tooltip={ tooltip }>
+			<span class="stat-link-row-label">{ label }</span>
+			<span class="stat-link-row-value-wrap">
+				<span class="stat-link-row-value">{ fmt.Sprintf("%d", count) }</span>
+				<span class="stat-value-signifier" aria-hidden="true"></span>
+			</span>
+		</a>
+	} else {
+		<div class="stat-link-row">
+			<span class="stat-link-row-label">{ label }</span>
+			<span class="stat-link-row-value">{ fmt.Sprintf("%d", count) }</span>
+		</div>
+	}
+}
+
 templ DashboardSectionedCurrencyStatCard(label string, sections []DashboardCurrencySection) {
 	<div class="stat-card">
 		<span class="stat-label">{ label }</span>
@@ -176,18 +206,48 @@ templ DashboardSectionedCurrencyStatCard(label string, sections []DashboardCurre
 	</div>
 }
 
+templ DashboardPendingStatCard(pendingTeachers int64, pendingDocuments int64, pendingIntroVideos int64) {
+	<div class="stat-card">
+		<span class="stat-label">Pending Review</span>
+		<div class="stat-link-rows">
+			@DashboardStatLinkRow(
+				"Teachers",
+				utils.URL("/teachers?status=pending"),
+				pendingTeachers,
+				"View unapproved teachers",
+			)
+			@DashboardStatLinkRow(
+				"Documents",
+				utils.URL("/documents?status=submitted"),
+				pendingDocuments,
+				"View submitted documents",
+			)
+			@DashboardStatLinkRow(
+				"Intro videos",
+				utils.URL("/intro-videos?status=submitted"),
+				pendingIntroVideos,
+				"View submitted intro videos",
+			)
+		</div>
+	</div>
+}
+
 templ DashboardParentGapStatCard(withoutParent int64, withoutParentRate int64) {
 	<div class="stat-card">
 		<span class="stat-label">Students Missing Parent Info</span>
 		<div class="stat-link-rows">
-			<a href={ utils.URL("/students?status=active&parentFilter=missing_name") } class="stat-link-row">
-				<span class="stat-link-row-label">Without parent name</span>
-				<span class="stat-link-row-value">{ fmt.Sprintf("%d", withoutParent) }</span>
-			</a>
-			<a href={ utils.URL("/students?status=active&parentFilter=missing_rate") } class="stat-link-row">
-				<span class="stat-link-row-label">Without parent rate</span>
-				<span class="stat-link-row-value">{ fmt.Sprintf("%d", withoutParentRate) }</span>
-			</a>
+			@DashboardStatLinkRow(
+				"Without parent name",
+				utils.URL("/students?status=active&parentFilter=missing_name"),
+				withoutParent,
+				"View students missing parent name",
+			)
+			@DashboardStatLinkRow(
+				"Without parent rate",
+				utils.URL("/students?status=active&parentFilter=missing_rate"),
+				withoutParentRate,
+				"View students missing parent rate",
+			)
 		</div>
 	</div>
 }
@@ -201,18 +261,7 @@ templ DashboardStats(data DashboardData) {
 				<span class="stat-value">{ fmt.Sprintf("%d", data.ActiveStudents + data.InactiveStudents) }</span>
 				<span class="stat-sub">{ fmt.Sprintf("%d active, %d inactive", data.ActiveStudents, data.InactiveStudents) }</span>
 			</div>
-			<div class="stat-card">
-				<span class="stat-label">Pending Teachers</span>
-				<span class="stat-value">{ fmt.Sprintf("%d", data.PendingTeachers) }</span>
-			</div>
-			<div class="stat-card">
-				<span class="stat-label">Pending Documents</span>
-				<span class="stat-value">{ fmt.Sprintf("%d", data.PendingDocuments) }</span>
-			</div>
-			<div class="stat-card">
-				<span class="stat-label">Pending Intro Videos</span>
-				<span class="stat-value">{ fmt.Sprintf("%d", data.PendingIntroVideos) }</span>
-			</div>
+			@DashboardPendingStatCard(data.PendingTeachers, data.PendingDocuments, data.PendingIntroVideos)
 			@DashboardParentGapStatCard(data.StudentsWithoutParent, data.StudentsWithoutParentRate)
 		}
 		if data.Role == auth.RoleTeacher {

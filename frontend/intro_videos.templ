@@ -42,19 +42,19 @@ func introVideosTableColspan(showUploader bool, showActions bool) int {
 	return colspan
 }
 
-templ IntroVideoStatusFilterDropdown() {
+templ IntroVideoStatusFilterDropdownWithValue(selected constants.TeacherIntroVideoStatus) {
 	<div class="form-group">
 		<label for="introVideoStatus">Status</label>
 		<select id="introVideoStatus" name="status">
-			<option value="">All</option>
+			<option value="" selected?={ selected == "" }>All</option>
 			for _, opt := range TeacherIntroVideoStatusOptions {
-				<option value={ opt.Value }>{ opt.Label }</option>
+				<option value={ opt.Value } selected?={ string(selected) == opt.Value }>{ opt.Label }</option>
 			}
 		</select>
 	</div>
 }
 
-templ IntroVideosToolbar(showTeacherFilter bool) {
+templ IntroVideosToolbar(showTeacherFilter bool, status constants.TeacherIntroVideoStatus) {
 	<div class="toolbar" id="introVideosToolbar">
 		<div class="form-group">
 			<label for="introVideoSearch">Search</label>
@@ -64,7 +64,7 @@ templ IntroVideosToolbar(showTeacherFilter bool) {
 				<input type="text" id="introVideoSearch" name="introVideoQ" placeholder="Filename..."/>
 			}
 		</div>
-		@IntroVideoStatusFilterDropdown()
+		@IntroVideoStatusFilterDropdownWithValue(status)
 		if showTeacherFilter {
 			@TeacherFilterDropdown("", "")
 		}
@@ -178,6 +178,7 @@ type IntroVideosPageData struct {
 	ShowUploader      bool
 	ShowActions       bool
 	ShowTeacherFilter bool
+	Status            constants.TeacherIntroVideoStatus
 }
 
 templ IntroVideosPage(data IntroVideosPageData) {
@@ -207,7 +208,7 @@ templ IntroVideosPage(data IntroVideosPageData) {
 			if data.Description != "" {
 				<p class="documents-page-desc">{ data.Description }</p>
 			}
-			@IntroVideosToolbar(data.ShowTeacherFilter)
+			@IntroVideosToolbar(data.ShowTeacherFilter, data.Status)
 			@IntroVideosTable(data.ShowUploader, data.ShowActions)
 			if data.ShowActions {
 				@IntroVideoRejectModal()

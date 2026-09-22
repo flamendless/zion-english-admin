@@ -126,6 +126,12 @@ func handleDocuments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	status := strings.TrimSpace(r.URL.Query().Get("status"))
+	if status != "" && !constants.ValidTeacherDocumentStatus(status) {
+		status = ""
+	}
+	data.Status = constants.TeacherDocumentStatus(status)
+
 	w.Header().Set("Content-Type", "text/html")
 	if err := frontend.DocumentsPage(data).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)

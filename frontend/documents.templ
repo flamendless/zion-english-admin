@@ -64,19 +64,19 @@ templ DocumentTypeFilterDropdown() {
 	</div>
 }
 
-templ DocumentStatusFilterDropdown() {
+templ DocumentStatusFilterDropdownWithValue(selected constants.TeacherDocumentStatus) {
 	<div class="form-group">
 		<label for="documentStatus">Status</label>
 		<select id="documentStatus" name="status">
-			<option value="">All</option>
+			<option value="" selected?={ selected == "" }>All</option>
 			for _, opt := range TeacherDocumentStatusOptions {
-				<option value={ opt.Value }>{ opt.Label }</option>
+				<option value={ opt.Value } selected?={ string(selected) == opt.Value }>{ opt.Label }</option>
 			}
 		</select>
 	</div>
 }
 
-templ DocumentsToolbar(showTeacherFilter bool) {
+templ DocumentsToolbar(showTeacherFilter bool, status constants.TeacherDocumentStatus) {
 	<div class="toolbar" id="documentsToolbar">
 		<div class="form-group">
 			<label for="documentSearch">Search</label>
@@ -87,7 +87,7 @@ templ DocumentsToolbar(showTeacherFilter bool) {
 			}
 		</div>
 		@DocumentTypeFilterDropdown()
-		@DocumentStatusFilterDropdown()
+		@DocumentStatusFilterDropdownWithValue(status)
 		if showTeacherFilter {
 			@TeacherFilterDropdown("", "")
 		}
@@ -204,7 +204,7 @@ templ DocumentsCard(title string, description string, showUploader bool, showAct
 				}
 			</div>
 		</div>
-		@DocumentsToolbar(showTeacherFilter)
+		@DocumentsToolbar(showTeacherFilter, "")
 		@DocumentsTable(showUploader, showActions)
 	</section>
 }
@@ -398,6 +398,7 @@ type DocumentsPageData struct {
 	ShowUploader      bool
 	ShowActions       bool
 	ShowTeacherFilter bool
+	Status            constants.TeacherDocumentStatus
 }
 
 templ DocumentsPage(data DocumentsPageData) {
@@ -421,7 +422,7 @@ templ DocumentsPage(data DocumentsPageData) {
 			if data.Description != "" {
 				<p class="documents-page-desc">{ data.Description }</p>
 			}
-			@DocumentsToolbar(data.ShowTeacherFilter)
+			@DocumentsToolbar(data.ShowTeacherFilter, data.Status)
 			@DocumentsTable(data.ShowUploader, data.ShowActions)
 		</div>
 		@SuccessBannerHandlers()
