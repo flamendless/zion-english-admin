@@ -42,16 +42,24 @@ type LearningMaterialListItem struct {
 }
 
 type LearningMaterialsData struct {
-	Materials      []LearningMaterialListItem
-	ExistingTags   []LearningMaterialTag
-	CanCreate      bool
-	PageNumber     int
-	PageTotalPages int
-	PageTotal      int64
-	PrevURL        string
-	NextURL        string
-	HasPrev        bool
-	HasNext        bool
+	Materials        []LearningMaterialListItem
+	ExistingTags     []LearningMaterialTag
+	CanCreate        bool
+	Query            string
+	StatusFilter     string
+	AccessFilter     string
+	TagFilter        string
+	SortBy           string
+	SortOrder        string
+	ShowStatusFilter bool
+	FilterPath       string
+	PageNumber       int
+	PageTotalPages   int
+	PageTotal        int64
+	PrevURL          string
+	NextURL          string
+	HasPrev          bool
+	HasNext          bool
 }
 
 type LearningMaterialFormData struct {
@@ -114,6 +122,24 @@ func learningMaterialDescriptionPreview(desc string) string {
 	return desc[:117] + "..."
 }
 
+func learningMaterialStatusFilterOptions(show bool) []StatusOption {
+	if !show {
+		return nil
+	}
+	return []StatusOption{
+		{Value: learningmaterials.StatusDraft, Label: "Draft"},
+		{Value: learningmaterials.StatusPublished, Label: "Published"},
+		{Value: learningmaterials.StatusDeleted, Label: "Deleted"},
+	}
+}
+
+func learningMaterialAccessFilterOptions() []StatusOption {
+	return []StatusOption{
+		{Value: learningmaterials.AccessPublic, Label: "Public"},
+		{Value: learningmaterials.AccessPrivate, Label: "Private"},
+	}
+}
+
 func learningMaterialCardClass(status string) string {
 	switch status {
 	case learningmaterials.StatusPublished:
@@ -153,7 +179,7 @@ func LearningMaterials(data LearningMaterialsData) templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 127, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 153, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -213,6 +239,32 @@ func LearningMaterials(data LearningMaterialsData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = MaterialLibraryFilterStyles().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = MaterialLibraryFilterBar(MaterialLibraryFilterData{
+			ActionPath:       data.FilterPath,
+			Query:            data.Query,
+			StatusFilter:     data.StatusFilter,
+			AccessFilter:     data.AccessFilter,
+			TagFilter:        data.TagFilter,
+			SortBy:           data.SortBy,
+			SortOrder:        data.SortOrder,
+			SortKind:         ListSortKindLearningMaterial,
+			ExistingTags:     data.ExistingTags,
+			StatusOptions:    learningMaterialStatusFilterOptions(data.ShowStatusFilter),
+			AccessOptions:    learningMaterialAccessFilterOptions(),
+			ShowStatusFilter: data.ShowStatusFilter,
+			ShowAccessFilter: true,
+		}).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = SortToggleScript().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		if len(data.Materials) > 0 {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"lm-grid\" role=\"list\">")
 			if templ_7745c5c3_Err != nil {
@@ -241,22 +293,33 @@ func LearningMaterials(data LearningMaterialsData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div><p>No learning materials yet.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if data.CanCreate {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<button type=\"button\" class=\"add-btn lm-add-btn\" onclick=\"document.getElementById('openCreateMaterialBtn')?.click()\">Add your first material</button>")
+			if data.Query != "" || data.StatusFilter != "" || data.AccessFilter != "" || data.TagFilter != "" {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<p>No learning materials match your filters.</p>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			} else {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<p>No learning materials yet.</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div>")
+			if data.CanCreate {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<button type=\"button\" class=\"add-btn lm-add-btn\" onclick=\"document.getElementById('openCreateMaterialBtn')?.click()\">Add your first material</button>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div><div id=\"lmViewModalHost\"></div><div id=\"lmEditModalHost\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</div><div id=\"lmViewModalHost\"></div><div id=\"lmEditModalHost\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -276,7 +339,7 @@ func LearningMaterials(data LearningMaterialsData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -310,7 +373,7 @@ func LearningMaterialCard(item LearningMaterialListItem) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<article class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<article class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -323,7 +386,7 @@ func LearningMaterialCard(item LearningMaterialListItem) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" role=\"listitem\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" role=\"listitem\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -331,59 +394,59 @@ func LearningMaterialCard(item LearningMaterialListItem) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<h3 class=\"lm-card-title\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<h3 class=\"lm-card-title\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(item.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 190, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 237, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</h3><p class=\"lm-card-description\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</h3><p class=\"lm-card-description\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(learningMaterialDescriptionPreview(item.Description))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 191, Col: 87}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 238, Col: 87}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</p><div class=\"lm-card-url\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</p><div class=\"lm-card-url\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 templ.SafeURL
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(item.URL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 193, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 240, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"lm-card-url-text\" target=\"_blank\" rel=\"noopener noreferrer\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\" class=\"lm-card-url-text\" target=\"_blank\" rel=\"noopener noreferrer\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(item.URL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 194, Col: 14}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 241, Col: 14}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</a></div><div class=\"lm-card-badges\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</a></div><div class=\"lm-card-badges\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -395,12 +458,12 @@ func LearningMaterialCard(item LearningMaterialListItem) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(item.Tags) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<div class=\"lm-tag-list\" aria-label=\"Tags\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<div class=\"lm-tag-list\" aria-label=\"Tags\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -410,12 +473,12 @@ func LearningMaterialCard(item LearningMaterialListItem) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<div class=\"lm-card-footer\"><div class=\"lm-card-owner\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<div class=\"lm-card-footer\"><div class=\"lm-card-owner\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -423,7 +486,7 @@ func LearningMaterialCard(item LearningMaterialListItem) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</div><div class=\"lm-card-actions\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</div><div class=\"lm-card-actions\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -449,7 +512,7 @@ func LearningMaterialCard(item LearningMaterialListItem) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</div></div></article>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</div></div></article>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -478,33 +541,33 @@ func LearningMaterialTagPill(tag LearningMaterialTag) templ.Component {
 			templ_7745c5c3_Var10 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<span class=\"lm-tag-pill\" style=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<span class=\"lm-tag-pill\" style=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color: " + tag.Color + "33; color: #2D2D2D;")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 232, Col: 91}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 279, Col: 91}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(tag.Label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 233, Col: 13}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 280, Col: 13}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -533,20 +596,20 @@ func LearningMaterialViewModal(data LearningMaterialViewData) templ.Component {
 			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<div class=\"modal-overlay\" id=\"lmViewModal\" role=\"presentation\"><div class=\"modal-dialog modal-dialog-entity lm-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"lmViewTitle\"><div class=\"modal-header\"><h3 id=\"lmViewTitle\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<div class=\"modal-overlay\" id=\"lmViewModal\" role=\"presentation\"><div class=\"modal-dialog modal-dialog-entity lm-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"lmViewTitle\"><div class=\"modal-header\"><h3 id=\"lmViewTitle\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(data.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 241, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 288, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</h3><button type=\"button\" class=\"modal-close lm-view-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><div class=\"modal-body lm-view-body\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "</h3><button type=\"button\" class=\"modal-close lm-view-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><div class=\"modal-body lm-view-body\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -554,46 +617,46 @@ func LearningMaterialViewModal(data LearningMaterialViewData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<div class=\"lm-view-section\"><h4 class=\"lm-view-label\">Description</h4><p class=\"lm-view-text\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<div class=\"lm-view-section\"><h4 class=\"lm-view-label\">Description</h4><p class=\"lm-view-text\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 248, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 295, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "</p></div><div class=\"lm-view-section\"><h4 class=\"lm-view-label\">URL</h4><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "</p></div><div class=\"lm-view-section\"><h4 class=\"lm-view-label\">URL</h4><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var16 templ.SafeURL
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinURLErrs(data.URL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 252, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 299, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "\" class=\"lm-view-link\" target=\"_blank\" rel=\"noopener noreferrer\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\" class=\"lm-view-link\" target=\"_blank\" rel=\"noopener noreferrer\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(data.URL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 252, Col: 99}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 299, Col: 99}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "</a></div><div class=\"lm-view-section\"><h4 class=\"lm-view-label\">Status</h4><div class=\"lm-view-badges\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</a></div><div class=\"lm-view-section\"><h4 class=\"lm-view-label\">Status</h4><div class=\"lm-view-badges\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -605,12 +668,12 @@ func LearningMaterialViewModal(data LearningMaterialViewData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(data.Tags) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<div class=\"lm-view-section\"><h4 class=\"lm-view-label\">Tags</h4><div class=\"lm-tag-list\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<div class=\"lm-view-section\"><h4 class=\"lm-view-label\">Tags</h4><div class=\"lm-tag-list\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -620,12 +683,12 @@ func LearningMaterialViewModal(data LearningMaterialViewData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<div class=\"lm-view-meta\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<div class=\"lm-view-meta\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -647,7 +710,7 @@ func LearningMaterialViewModal(data LearningMaterialViewData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</div></div><div class=\"modal-footer lm-view-footer\"><div class=\"lm-view-footer-actions\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</div></div><div class=\"modal-footer lm-view-footer\"><div class=\"lm-view-footer-actions\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -655,7 +718,7 @@ func LearningMaterialViewModal(data LearningMaterialViewData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "</div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -684,33 +747,33 @@ func LearningMaterialMetaItem(label string, value string) templ.Component {
 			templ_7745c5c3_Var18 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<div class=\"lm-meta-item\"><span class=\"lm-meta-label\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "<div class=\"lm-meta-item\"><span class=\"lm-meta-label\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 291, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 338, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "</span> <span class=\"lm-meta-value\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</span> <span class=\"lm-meta-value\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 292, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 339, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "</span></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</span></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -739,7 +802,7 @@ func LearningMaterialMetaOwner(name string, avatar AvatarProps) templ.Component 
 			templ_7745c5c3_Var21 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "<div class=\"lm-meta-item lm-meta-item--owner\"><span class=\"lm-meta-label\">Owner</span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "<div class=\"lm-meta-item lm-meta-item--owner\"><span class=\"lm-meta-label\">Owner</span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -747,7 +810,7 @@ func LearningMaterialMetaOwner(name string, avatar AvatarProps) templ.Component 
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -776,105 +839,95 @@ func LearningMaterialFormModal(data LearningMaterialFormData) templ.Component {
 			templ_7745c5c3_Var22 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "<div class=\"modal-overlay\" id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "<div class=\"modal-overlay\" id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var23 string
 		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.ResolveAttributeValue(learningMaterialModalID(data))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 304, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 351, Col: 62}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if !data.IsEdit {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, " hidden")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, " hidden")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, " role=\"presentation\"><div class=\"modal-dialog lm-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"lmFormTitle\"><div class=\"modal-header\"><h3 id=\"lmFormTitle\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, " role=\"presentation\"><div class=\"modal-dialog lm-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"lmFormTitle\"><div class=\"modal-header\"><h3 id=\"lmFormTitle\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(learningMaterialFormTitle(data))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 307, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 354, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "</h3><button type=\"button\" class=\"modal-close lm-form-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><form id=\"lmMaterialForm\" method=\"POST\" action=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "</h3><button type=\"button\" class=\"modal-close lm-form-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><form id=\"lmMaterialForm\" method=\"POST\" action=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var25 templ.SafeURL
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinURLErrs(learningMaterialFormAction(data))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 313, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 360, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "\" class=\"modal-body lm-form-body\"><div class=\"form-group\"><label for=\"lmTitle\">Title *</label> <input type=\"text\" id=\"lmTitle\" name=\"title\" required maxlength=\"64\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\" class=\"modal-body lm-form-body\"><div class=\"form-group\"><label for=\"lmTitle\">Title *</label> <input type=\"text\" id=\"lmTitle\" name=\"title\" required maxlength=\"64\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var26 string
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 324, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 371, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "\" placeholder=\"Short name for this resource\"></div><div class=\"form-group\"><label for=\"lmDescription\">Description *</label> <textarea id=\"lmDescription\" name=\"description\" required rows=\"4\" maxlength=\"1000\" placeholder=\"What is this resource about?\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "\" placeholder=\"Short name for this resource\"></div><div class=\"form-group\"><label for=\"lmDescription\">Description *</label> <textarea id=\"lmDescription\" name=\"description\" required rows=\"4\" maxlength=\"1000\" placeholder=\"What is this resource about?\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 337, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 384, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "</textarea></div><div class=\"form-group\"><label for=\"lmURL\">URL *</label> <input type=\"url\" id=\"lmURL\" class=\"lm-form-url\" name=\"url\" required value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "</textarea></div><div class=\"form-group\"><label for=\"lmURL\">URL *</label> <input type=\"url\" id=\"lmURL\" class=\"lm-form-url\" name=\"url\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var28 string
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.URL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 347, Col: 22}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 394, Col: 22}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var28)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "\" placeholder=\"https://...\"><div id=\"lmUrlPreview\" class=\"lm-thumb lm-thumb--compact lm-url-preview\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if data.ThumbnailURL == "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, " hidden")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "><img id=\"lmUrlPreviewImg\" class=\"lm-thumb-img\" alt=\"Link preview\" referrerpolicy=\"no-referrer\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "\" placeholder=\"https://...\"><div id=\"lmUrlPreview\" class=\"lm-thumb lm-thumb--compact lm-url-preview\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -884,36 +937,46 @@ func LearningMaterialFormModal(data LearningMaterialFormData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "><img id=\"lmUrlPreviewImg\" class=\"lm-thumb-img\" alt=\"Link preview\" referrerpolicy=\"no-referrer\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.ThumbnailURL == "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, " hidden")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
 		if data.ThumbnailURL != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, " src=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, " src=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var29 string
 			templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.ThumbnailURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 362, Col: 31}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 409, Col: 31}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var29)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "><div id=\"lmUrlPreviewPlaceholder\" class=\"lm-thumb-placeholder\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "><div id=\"lmUrlPreviewPlaceholder\" class=\"lm-thumb-placeholder\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.ThumbnailURL != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, " hidden")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, " hidden")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, " aria-hidden=\"true\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, " aria-hidden=\"true\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -921,214 +984,214 @@ func LearningMaterialFormModal(data LearningMaterialFormData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "</div><span class=\"lm-url-preview-loading\">Fetching preview…</span></div><input type=\"hidden\" id=\"lmThumbnailURL\" class=\"lm-form-thumbnail-url\" name=\"thumbnail_url\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "</div><span class=\"lm-url-preview-loading\">Fetching preview…</span></div><input type=\"hidden\" id=\"lmThumbnailURL\" class=\"lm-form-thumbnail-url\" name=\"thumbnail_url\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var30 string
 		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.ThumbnailURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 375, Col: 122}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 422, Col: 122}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var30)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "\"></div><div class=\"form-group\"><label>Access *</label><div class=\"lm-option-cards\" role=\"radiogroup\" aria-label=\"Access level\"><label class=\"lm-option-card\"><input type=\"radio\" name=\"access\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "\"></div><div class=\"form-group\"><label>Access *</label><div class=\"lm-option-cards\" role=\"radiogroup\" aria-label=\"Access level\"><label class=\"lm-option-card\"><input type=\"radio\" name=\"access\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var31 string
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.ResolveAttributeValue(learningmaterials.AccessPublic)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 382, Col: 79}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 429, Col: 79}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var31)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.Access != learningmaterials.AccessPrivate {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, " checked")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, " checked")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "> <span class=\"lm-option-card__body\"><span class=\"lm-option-card__title\">Public</span> <span class=\"lm-option-card__desc\">Visible to all teachers when published</span></span></label> <label class=\"lm-option-card\"><input type=\"radio\" name=\"access\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "> <span class=\"lm-option-card__body\"><span class=\"lm-option-card__title\">Public</span> <span class=\"lm-option-card__desc\">Visible to all teachers when published</span></span></label> <label class=\"lm-option-card\"><input type=\"radio\" name=\"access\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var32 string
 		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.ResolveAttributeValue(learningmaterials.AccessPrivate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 389, Col: 80}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 436, Col: 80}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var32)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.Access == learningmaterials.AccessPrivate {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, " checked")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, " checked")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "> <span class=\"lm-option-card__body\"><span class=\"lm-option-card__title\">Private</span> <span class=\"lm-option-card__desc\">Only you and superuser can view</span></span></label></div></div><div class=\"form-group\"><label for=\"lmStatus\">Status *</label> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "> <span class=\"lm-option-card__body\"><span class=\"lm-option-card__title\">Private</span> <span class=\"lm-option-card__desc\">Only you and superuser can view</span></span></label></div></div><div class=\"form-group\"><label for=\"lmStatus\">Status *</label> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.IsDeleted {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "<p class=\"field-hint\">This material is deleted. Choose Draft or Published to restore it.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "<p class=\"field-hint\">This material is deleted. Choose Draft or Published to restore it.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "<select id=\"lmStatus\" name=\"status\" required><option value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "<select id=\"lmStatus\" name=\"status\" required><option value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var33 string
 		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.ResolveAttributeValue(learningmaterials.StatusDraft)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 404, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 451, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var33)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.Status != learningmaterials.StatusPublished && data.Status != learningmaterials.StatusDeleted {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, " selected")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, " selected")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, ">Draft</option> <option value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, ">Draft</option> <option value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var34 string
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.ResolveAttributeValue(learningmaterials.StatusPublished)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 405, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 452, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var34)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.Status == learningmaterials.StatusPublished {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, " selected")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, " selected")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, ">Published</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, ">Published</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.IsEdit && data.CanDelete {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "<option value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "<option value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var35 string
 			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.ResolveAttributeValue(learningmaterials.StatusDeleted)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 407, Col: 54}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 454, Col: 54}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var35)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, "\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.Status == learningmaterials.StatusDeleted {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, " selected")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, " selected")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, ">Deleted</option>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, ">Deleted</option>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "</select></div><div class=\"form-group\"><label for=\"lmTagInput\">Tags * <span class=\"lm-tag-hint\">(1–7 tags)</span></label><div class=\"lm-tag-input-wrap\" id=\"lmTagInputWrap\"><div class=\"lm-tag-chips\" id=\"lmTagChips\" aria-live=\"polite\"></div><input type=\"text\" id=\"lmTagInput\" class=\"lm-tag-text-input\" placeholder=\"Type a tag and press Enter\" autocomplete=\"off\" list=\"lmTagSuggestions\"> <datalist id=\"lmTagSuggestions\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "</select></div><div class=\"form-group\"><label for=\"lmTagInput\">Tags * <span class=\"lm-tag-hint\">(1–7 tags)</span></label><div class=\"lm-tag-input-wrap\" id=\"lmTagInputWrap\"><div class=\"lm-tag-chips\" id=\"lmTagChips\" aria-live=\"polite\"></div><input type=\"text\" id=\"lmTagInput\" class=\"lm-tag-text-input\" placeholder=\"Type a tag and press Enter\" autocomplete=\"off\" list=\"lmTagSuggestions\"> <datalist id=\"lmTagSuggestions\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, tag := range data.ExistingTags {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "<option value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "<option value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var36 string
 			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.ResolveAttributeValue(tag.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 426, Col: 33}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 473, Col: 33}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var36)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "\"></option>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, "\"></option>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "</datalist></div><p class=\"field-hint lm-tag-limit-warning\" hidden>Maximum of 7 tags reached. Remove a tag to add another.</p><p class=\"field-hint\">Tags are stored in lowercase. Type a tag and press Enter.</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "</datalist></div><p class=\"field-hint lm-tag-limit-warning\" hidden>Maximum of 7 tags reached. Remove a tag to add another.</p><p class=\"field-hint\">Tags are stored in lowercase. Type a tag and press Enter.</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, tag := range data.SelectedTags {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, "<input type=\"hidden\" name=\"tags\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "<input type=\"hidden\" name=\"tags\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var37 string
 			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.ResolveAttributeValue(tag.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 433, Col: 56}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 480, Col: 56}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var37)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "</div><div class=\"modal-footer lm-form-footer\"><div class=\"lm-form-footer-actions\"><button type=\"button\" class=\"btn btn-secondary lm-form-close\">Cancel</button> <button type=\"submit\" class=\"add-btn lm-submit-btn\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 94, "</div><div class=\"modal-footer lm-form-footer\"><div class=\"lm-form-footer-actions\"><button type=\"button\" class=\"btn btn-secondary lm-form-close\">Cancel</button> <button type=\"submit\" class=\"add-btn lm-submit-btn\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var38 string
 		templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(learningMaterialSubmitLabel(data))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 440, Col: 93}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 487, Col: 93}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "</button></div></div></form></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 95, "</button></div></div></form></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1212,7 +1275,7 @@ func LearningMaterialThumbnail(thumbnailURL string, title string, size LearningM
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 94, "<div class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 96, "<div class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1225,51 +1288,38 @@ func LearningMaterialThumbnail(thumbnailURL string, title string, size LearningM
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 95, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 97, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if thumbnailURL != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 96, "<img src=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 98, "<img src=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var42 string
 			templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.ResolveAttributeValue(thumbnailURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 502, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 549, Col: 22}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var42)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 97, "\" class=\"lm-thumb-img\" alt=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 99, "\" class=\"lm-thumb-img\" alt=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var43 string
 			templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.ResolveAttributeValue("Preview for " + title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 504, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/learning_materials.templ`, Line: 551, Col: 32}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var43)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 98, "\" loading=\"lazy\" referrerpolicy=\"no-referrer\" onerror=\"this.hidden=true; const p=this.parentElement.querySelector('.lm-thumb-placeholder'); if(p) p.hidden=false;\"><div class=\"lm-thumb-placeholder\" hidden aria-hidden=\"true\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = LearningMaterialBookIcon().Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 99, "</div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 100, "<div class=\"lm-thumb-placeholder\" aria-hidden=\"true\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 100, "\" loading=\"lazy\" referrerpolicy=\"no-referrer\" onerror=\"this.hidden=true; const p=this.parentElement.querySelector('.lm-thumb-placeholder'); if(p) p.hidden=false;\"><div class=\"lm-thumb-placeholder\" hidden aria-hidden=\"true\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1281,8 +1331,21 @@ func LearningMaterialThumbnail(thumbnailURL string, title string, size LearningM
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "<div class=\"lm-thumb-placeholder\" aria-hidden=\"true\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = LearningMaterialBookIcon().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, "</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1311,7 +1374,7 @@ func LearningMaterialBookIcon() templ.Component {
 			templ_7745c5c3_Var44 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 19.5A2.5 2.5 0 0 1 6.5 17H20\"></path> <path d=\"M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z\"></path> <path d=\"M8 7h8\"></path> <path d=\"M8 11h6\"></path></svg>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 105, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 19.5A2.5 2.5 0 0 1 6.5 17H20\"></path> <path d=\"M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z\"></path> <path d=\"M8 7h8\"></path> <path d=\"M8 11h6\"></path></svg>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1340,7 +1403,7 @@ func LearningMaterialPlusIcon() templ.Component {
 			templ_7745c5c3_Var45 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14\"></path> <path d=\"M5 12h14\"></path></svg>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 106, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14\"></path> <path d=\"M5 12h14\"></path></svg>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1369,7 +1432,7 @@ func LearningMaterialsStyles() templ.Component {
 			templ_7745c5c3_Var46 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 105, "<style>\r\n\t\t.lm-page {\r\n\t\t\tpadding-bottom: var(--space-10);\r\n\t\t}\r\n\r\n\t\t.lm-page-heading {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-1);\r\n\t\t}\r\n\r\n\t\t.lm-page-subtitle {\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tline-height: 1.5;\r\n\t\t\tmax-width: 36rem;\r\n\t\t}\r\n\r\n\t\t.lm-add-btn {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.lm-grid {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: repeat(auto-fill, minmax(300px, 1fr));\r\n\t\t\tgap: var(--space-4);\r\n\t\t\tmargin-bottom: var(--space-6);\r\n\t\t}\r\n\r\n\t\t.lm-card {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-5);\r\n\t\t\tborder: 2px solid var(--color-border-subtle);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tbackground: transparent;\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\ttransition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.lm-thumb {\r\n\t\t\twidth: 100%;\r\n\t\t\taspect-ratio: 16 / 9;\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\toverflow: hidden;\r\n\t\t\tbackground: linear-gradient(180deg, #F0FDFA 0%, #E6FFFA 100%);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.lm-thumb--compact {\r\n\t\t\twidth: 100%;\r\n\t\t\tmax-width: 168px;\r\n\t\t\taspect-ratio: 16 / 9;\r\n\t\t}\r\n\r\n\t\t.lm-thumb-img {\r\n\t\t\tdisplay: block;\r\n\t\t\twidth: 100%;\r\n\t\t\theight: 100%;\r\n\t\t\tobject-fit: cover;\r\n\t\t}\r\n\r\n\t\t.lm-thumb-placeholder {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 100%;\r\n\t\t\theight: 100%;\r\n\t\t\tcolor: #0D9488;\r\n\t\t}\r\n\r\n\t\t.lm-url-preview {\r\n\t\t\tposition: relative;\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t\toverflow: hidden;\r\n\t\t}\r\n\r\n\t\t.lm-url-preview .lm-thumb-placeholder {\r\n\t\t\tposition: absolute;\r\n\t\t\tinset: 0;\r\n\t\t}\r\n\r\n\t\t.lm-url-preview .lm-thumb-img:not([src]) {\r\n\t\t\topacity: 0;\r\n\t\t\tposition: absolute;\r\n\t\t\tinset: 0;\r\n\t\t}\r\n\r\n\t\t.lm-url-preview .lm-thumb-img[src] {\r\n\t\t\tposition: relative;\r\n\t\t\tz-index: 1;\r\n\t\t}\r\n\r\n\t\t.lm-url-preview-loading {\r\n\t\t\tposition: absolute;\r\n\t\t\tinset: 0;\r\n\t\t\tdisplay: none;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tbackground: rgba(255, 255, 255, 0.85);\r\n\t\t}\r\n\r\n\t\t.lm-url-preview--loading .lm-url-preview-loading {\r\n\t\t\tdisplay: flex;\r\n\t\t}\r\n\r\n\t\t.lm-url-preview--loading .lm-url-preview-img {\r\n\t\t\topacity: 0.35;\r\n\t\t}\r\n\r\n\t\t.lm-thumb-img[hidden] {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\r\n\t\t.lm-card--published {\r\n\t\t\tborder-color: #22C55E;\r\n\t\t}\r\n\r\n\t\t.lm-card--draft {\r\n\t\t\tborder-color: #FACC15;\r\n\t\t}\r\n\r\n\t\t.lm-card--deleted {\r\n\t\t\tborder-color: #EF4444;\r\n\t\t}\r\n\r\n\t\t.lm-card:hover {\r\n\t\t\tbox-shadow: var(--shadow-md);\r\n\t\t\ttransform: translateY(-2px);\r\n\t\t}\r\n\r\n\t\t.lm-card--published:hover {\r\n\t\t\tborder-color: #16A34A;\r\n\t\t}\r\n\r\n\t\t.lm-card--draft:hover {\r\n\t\t\tborder-color: #EAB308;\r\n\t\t}\r\n\r\n\t\t.lm-card--deleted:hover {\r\n\t\t\tborder-color: #DC2626;\r\n\t\t}\r\n\r\n\t\t.lm-card-badges {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.lm-card-footer {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tmargin-top: auto;\r\n\t\t\tpadding-top: var(--space-3);\r\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.lm-card-owner {\r\n\t\t\tflex: 1;\r\n\t\t\tmin-width: 0;\r\n\t\t}\r\n\r\n\t\t.lm-card-owner .teacher-name-cell-text {\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.lm-card-actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: flex-end;\r\n\t\t\tgap: var(--space-1);\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.lm-card-title {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 1rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tline-height: 1.4;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.lm-card-url {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmin-width: 0;\r\n\t\t}\r\n\r\n\t\t.lm-card-url-text {\r\n\t\t\tflex: 1;\r\n\t\t\tmin-width: 0;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-family: 'Fira Code', monospace;\r\n\t\t\tcolor: #0D9488;\r\n\t\t\ttext-decoration: none;\r\n\t\t\tline-height: 1.5;\r\n\t\t\toverflow-wrap: anywhere;\r\n\t\t\tword-break: break-word;\r\n\t\t}\r\n\r\n\t\t.lm-card-url-text:hover {\r\n\t\t\ttext-decoration: underline;\r\n\t\t}\r\n\r\n\t\t.lm-card-description {\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tline-height: 1.55;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.lm-tag-list {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.lm-tag-pill {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tpadding: 4px 10px;\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tborder: var(--pill-border);\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tline-height: 1.2;\r\n\t\t\ttext-transform: lowercase;\r\n\t\t\tbox-sizing: border-box;\r\n\t\t}\r\n\r\n\t\t.lm-empty {\r\n\t\t\ttext-align: center;\r\n\t\t\tpadding: var(--space-10) var(--space-4);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tborder: 1px dashed var(--color-border);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tbackground: linear-gradient(180deg, #F0FDFA 0%, var(--color-surface) 100%);\r\n\t\t}\r\n\r\n\t\t.lm-empty-icon {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 56px;\r\n\t\t\theight: 56px;\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: #E6FFFA;\r\n\t\t\tcolor: #0D9488;\r\n\t\t}\r\n\r\n\t\t.lm-empty p {\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.lm-modal {\r\n\t\t\tmax-width: 560px;\r\n\t\t}\r\n\r\n\t\t.lm-view-body,\r\n\t\t.lm-form-body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.lm-view-badges {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.lm-view-section {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.lm-view-label {\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t}\r\n\r\n\t\t.lm-view-text {\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tline-height: 1.6;\r\n\t\t\twhite-space: pre-wrap;\r\n\t\t}\r\n\r\n\t\t.lm-view-link {\r\n\t\t\tword-break: break-all;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.lm-view-meta {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t}\r\n\r\n\t\t.lm-meta-item {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: 2px;\r\n\t\t}\r\n\r\n\t\t.lm-meta-label {\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-weight: 600;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t}\r\n\r\n\t\t.lm-meta-value {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.lm-meta-item--owner .teacher-name-cell-text {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.lm-view-footer,\r\n\t\t.lm-form-footer {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.lm-form-footer {\r\n\t\t\tjustify-content: flex-end;\r\n\t\t}\r\n\r\n\t\t.lm-form-footer-actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.lm-view-footer {\r\n\t\t\tpadding: var(--space-2) var(--space-4) var(--space-4);\r\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.lm-view-footer-actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: flex-end;\r\n\t\t\tgap: var(--space-1);\r\n\t\t\twidth: 100%;\r\n\t\t}\r\n\r\n\t\t.lm-view-footer button,\r\n\t\t.lm-view-footer .btn,\r\n\t\t.lm-view-footer .add-btn,\r\n\t\t.lm-form-footer button,\r\n\t\t.lm-form-footer .btn,\r\n\t\t.lm-form-footer .add-btn {\r\n\t\t\tmargin-top: 0;\r\n\t\t}\r\n\r\n\t\t.lm-option-cards {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: 1fr 1fr;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.lm-option-card {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-3);\r\n\t\t\tborder: 2px solid var(--color-border);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tcursor: pointer;\r\n\t\t\ttransition: border-color var(--transition-fast), background var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.lm-option-card:hover {\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t}\r\n\r\n\t\t.lm-option-card:has(input:checked) {\r\n\t\t\tborder-color: #0D9488;\r\n\t\t\tbackground: #F0FDFA;\r\n\t\t}\r\n\r\n\t\t.lm-option-card input {\r\n\t\t\tmargin-top: 4px;\r\n\t\t\taccent-color: #0D9488;\r\n\t\t}\r\n\r\n\t\t.lm-option-card__title {\r\n\t\t\tdisplay: block;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.lm-option-card__desc {\r\n\t\t\tdisplay: block;\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tmargin-top: 2px;\r\n\t\t\tline-height: 1.4;\r\n\t\t}\r\n\r\n\t\t.lm-tag-hint {\r\n\t\t\tfont-weight: 400;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t}\r\n\r\n\t\t.lm-tag-input-wrap {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: stretch;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tpadding: var(--space-2) var(--space-3);\r\n\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\ttransition: border-color var(--transition-fast), box-shadow var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.lm-tag-input-wrap:focus-within {\r\n\t\t\tborder-color: #0D9488;\r\n\t\t\tbox-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);\r\n\t\t}\r\n\r\n\t\t.lm-tag-chips {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\twidth: 100%;\r\n\t\t}\r\n\r\n\t\t.lm-tag-chip {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-1);\r\n\t\t\tpadding: 4px 8px 4px 10px;\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: #E6FFFA;\r\n\t\t\tborder: var(--pill-border);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\ttext-transform: lowercase;\r\n\t\t\tbox-sizing: border-box;\r\n\t\t}\r\n\r\n\t\t.lm-tag-chip-remove {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 1.125rem;\r\n\t\t\theight: 1.125rem;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: 0;\r\n\t\t\tborder: none;\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: transparent;\r\n\t\t\tbackground-color: transparent;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tcursor: pointer;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tfont-weight: 400;\r\n\t\t\tline-height: 1;\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.lm-tag-chip-remove:hover {\r\n\t\t\tbackground: rgba(0, 0, 0, 0.06);\r\n\t\t\tbackground-color: rgba(0, 0, 0, 0.06);\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.lm-tag-text-input {\r\n\t\t\twidth: 100%;\r\n\t\t\tborder: none;\r\n\t\t\toutline: none;\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tbackground: transparent;\r\n\t\t\tpadding: var(--space-1) 0;\r\n\t\t}\r\n\r\n\t\t.lm-tag-text-input:disabled {\r\n\t\t\tcursor: not-allowed;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.lm-tag-limit-warning {\r\n\t\t\tcolor: #B45309;\r\n\t\t\tfont-weight: 500;\r\n\t\t}\r\n\r\n\t\t.lm-submit-btn {\r\n\t\t\tmin-width: 140px;\r\n\t\t}\r\n\r\n\t\t@media (max-width: 768px) {\r\n\t\t\t.lm-grid {\r\n\t\t\t\tgrid-template-columns: 1fr;\r\n\t\t\t}\r\n\r\n\t\t\t.lm-option-cards {\r\n\t\t\t\tgrid-template-columns: 1fr;\r\n\t\t\t}\r\n\r\n\t\t\t.lm-view-meta-grid {\r\n\t\t\t\tgrid-template-columns: 1fr;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-header {\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: stretch;\r\n\t\t\t}\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 107, "<style>\r\n\t\t.lm-page {\r\n\t\t\tpadding-bottom: var(--space-10);\r\n\t\t}\r\n\r\n\t\t.lm-page-heading {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-1);\r\n\t\t}\r\n\r\n\t\t.lm-page-subtitle {\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tline-height: 1.5;\r\n\t\t\tmax-width: 36rem;\r\n\t\t}\r\n\r\n\t\t.lm-add-btn {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.lm-grid {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: repeat(auto-fill, minmax(300px, 1fr));\r\n\t\t\tgap: var(--space-4);\r\n\t\t\tmargin-bottom: var(--space-6);\r\n\t\t}\r\n\r\n\t\t.lm-card {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-5);\r\n\t\t\tborder: 2px solid var(--color-border-subtle);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tbackground: transparent;\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\ttransition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.lm-thumb {\r\n\t\t\twidth: 100%;\r\n\t\t\taspect-ratio: 16 / 9;\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\toverflow: hidden;\r\n\t\t\tbackground: linear-gradient(180deg, #F0FDFA 0%, #E6FFFA 100%);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.lm-thumb--compact {\r\n\t\t\twidth: 100%;\r\n\t\t\tmax-width: 168px;\r\n\t\t\taspect-ratio: 16 / 9;\r\n\t\t}\r\n\r\n\t\t.lm-thumb-img {\r\n\t\t\tdisplay: block;\r\n\t\t\twidth: 100%;\r\n\t\t\theight: 100%;\r\n\t\t\tobject-fit: cover;\r\n\t\t}\r\n\r\n\t\t.lm-thumb-placeholder {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 100%;\r\n\t\t\theight: 100%;\r\n\t\t\tcolor: #0D9488;\r\n\t\t}\r\n\r\n\t\t.lm-url-preview {\r\n\t\t\tposition: relative;\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t\toverflow: hidden;\r\n\t\t}\r\n\r\n\t\t.lm-url-preview .lm-thumb-placeholder {\r\n\t\t\tposition: absolute;\r\n\t\t\tinset: 0;\r\n\t\t}\r\n\r\n\t\t.lm-url-preview .lm-thumb-img:not([src]) {\r\n\t\t\topacity: 0;\r\n\t\t\tposition: absolute;\r\n\t\t\tinset: 0;\r\n\t\t}\r\n\r\n\t\t.lm-url-preview .lm-thumb-img[src] {\r\n\t\t\tposition: relative;\r\n\t\t\tz-index: 1;\r\n\t\t}\r\n\r\n\t\t.lm-url-preview-loading {\r\n\t\t\tposition: absolute;\r\n\t\t\tinset: 0;\r\n\t\t\tdisplay: none;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tbackground: rgba(255, 255, 255, 0.85);\r\n\t\t}\r\n\r\n\t\t.lm-url-preview--loading .lm-url-preview-loading {\r\n\t\t\tdisplay: flex;\r\n\t\t}\r\n\r\n\t\t.lm-url-preview--loading .lm-url-preview-img {\r\n\t\t\topacity: 0.35;\r\n\t\t}\r\n\r\n\t\t.lm-thumb-img[hidden] {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\r\n\t\t.lm-card--published {\r\n\t\t\tborder-color: #22C55E;\r\n\t\t}\r\n\r\n\t\t.lm-card--draft {\r\n\t\t\tborder-color: #FACC15;\r\n\t\t}\r\n\r\n\t\t.lm-card--deleted {\r\n\t\t\tborder-color: #EF4444;\r\n\t\t}\r\n\r\n\t\t.lm-card:hover {\r\n\t\t\tbox-shadow: var(--shadow-md);\r\n\t\t\ttransform: translateY(-2px);\r\n\t\t}\r\n\r\n\t\t.lm-card--published:hover {\r\n\t\t\tborder-color: #16A34A;\r\n\t\t}\r\n\r\n\t\t.lm-card--draft:hover {\r\n\t\t\tborder-color: #EAB308;\r\n\t\t}\r\n\r\n\t\t.lm-card--deleted:hover {\r\n\t\t\tborder-color: #DC2626;\r\n\t\t}\r\n\r\n\t\t.lm-card-badges {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.lm-card-footer {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tmargin-top: auto;\r\n\t\t\tpadding-top: var(--space-3);\r\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.lm-card-owner {\r\n\t\t\tflex: 1;\r\n\t\t\tmin-width: 0;\r\n\t\t}\r\n\r\n\t\t.lm-card-owner .teacher-name-cell-text {\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.lm-card-actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: flex-end;\r\n\t\t\tgap: var(--space-1);\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.lm-card-title {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 1rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tline-height: 1.4;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.lm-card-url {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmin-width: 0;\r\n\t\t}\r\n\r\n\t\t.lm-card-url-text {\r\n\t\t\tflex: 1;\r\n\t\t\tmin-width: 0;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-family: 'Fira Code', monospace;\r\n\t\t\tcolor: #0D9488;\r\n\t\t\ttext-decoration: none;\r\n\t\t\tline-height: 1.5;\r\n\t\t\toverflow-wrap: anywhere;\r\n\t\t\tword-break: break-word;\r\n\t\t}\r\n\r\n\t\t.lm-card-url-text:hover {\r\n\t\t\ttext-decoration: underline;\r\n\t\t}\r\n\r\n\t\t.lm-card-description {\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tline-height: 1.55;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.lm-tag-list {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.lm-tag-pill {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tpadding: 4px 10px;\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tborder: var(--pill-border);\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tline-height: 1.2;\r\n\t\t\ttext-transform: lowercase;\r\n\t\t\tbox-sizing: border-box;\r\n\t\t}\r\n\r\n\t\t.lm-empty {\r\n\t\t\ttext-align: center;\r\n\t\t\tpadding: var(--space-10) var(--space-4);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tborder: 1px dashed var(--color-border);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tbackground: linear-gradient(180deg, #F0FDFA 0%, var(--color-surface) 100%);\r\n\t\t}\r\n\r\n\t\t.lm-empty-icon {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 56px;\r\n\t\t\theight: 56px;\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: #E6FFFA;\r\n\t\t\tcolor: #0D9488;\r\n\t\t}\r\n\r\n\t\t.lm-empty p {\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.lm-modal {\r\n\t\t\tmax-width: 560px;\r\n\t\t}\r\n\r\n\t\t.lm-view-body,\r\n\t\t.lm-form-body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.lm-view-badges {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.lm-view-section {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.lm-view-label {\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t}\r\n\r\n\t\t.lm-view-text {\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tline-height: 1.6;\r\n\t\t\twhite-space: pre-wrap;\r\n\t\t}\r\n\r\n\t\t.lm-view-link {\r\n\t\t\tword-break: break-all;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.lm-view-meta {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t}\r\n\r\n\t\t.lm-meta-item {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: 2px;\r\n\t\t}\r\n\r\n\t\t.lm-meta-label {\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-weight: 600;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t}\r\n\r\n\t\t.lm-meta-value {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.lm-meta-item--owner .teacher-name-cell-text {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.lm-view-footer,\r\n\t\t.lm-form-footer {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.lm-form-footer {\r\n\t\t\tjustify-content: flex-end;\r\n\t\t}\r\n\r\n\t\t.lm-form-footer-actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.lm-view-footer {\r\n\t\t\tpadding: var(--space-2) var(--space-4) var(--space-4);\r\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.lm-view-footer-actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: flex-end;\r\n\t\t\tgap: var(--space-1);\r\n\t\t\twidth: 100%;\r\n\t\t}\r\n\r\n\t\t.lm-view-footer button,\r\n\t\t.lm-view-footer .btn,\r\n\t\t.lm-view-footer .add-btn,\r\n\t\t.lm-form-footer button,\r\n\t\t.lm-form-footer .btn,\r\n\t\t.lm-form-footer .add-btn {\r\n\t\t\tmargin-top: 0;\r\n\t\t}\r\n\r\n\t\t.lm-option-cards {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: 1fr 1fr;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.lm-option-card {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-3);\r\n\t\t\tborder: 2px solid var(--color-border);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tcursor: pointer;\r\n\t\t\ttransition: border-color var(--transition-fast), background var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.lm-option-card:hover {\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t}\r\n\r\n\t\t.lm-option-card:has(input:checked) {\r\n\t\t\tborder-color: #0D9488;\r\n\t\t\tbackground: #F0FDFA;\r\n\t\t}\r\n\r\n\t\t.lm-option-card input {\r\n\t\t\tmargin-top: 4px;\r\n\t\t\taccent-color: #0D9488;\r\n\t\t}\r\n\r\n\t\t.lm-option-card__title {\r\n\t\t\tdisplay: block;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.lm-option-card__desc {\r\n\t\t\tdisplay: block;\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tmargin-top: 2px;\r\n\t\t\tline-height: 1.4;\r\n\t\t}\r\n\r\n\t\t.lm-tag-hint {\r\n\t\t\tfont-weight: 400;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t}\r\n\r\n\t\t.lm-tag-input-wrap {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: stretch;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tpadding: var(--space-2) var(--space-3);\r\n\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\ttransition: border-color var(--transition-fast), box-shadow var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.lm-tag-input-wrap:focus-within {\r\n\t\t\tborder-color: #0D9488;\r\n\t\t\tbox-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);\r\n\t\t}\r\n\r\n\t\t.lm-tag-chips {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\twidth: 100%;\r\n\t\t}\r\n\r\n\t\t.lm-tag-chip {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-1);\r\n\t\t\tpadding: 4px 8px 4px 10px;\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: #E6FFFA;\r\n\t\t\tborder: var(--pill-border);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\ttext-transform: lowercase;\r\n\t\t\tbox-sizing: border-box;\r\n\t\t}\r\n\r\n\t\tbutton.lm-tag-chip-remove {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 1.125rem;\r\n\t\t\theight: 1.125rem;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: 0;\r\n\t\t\tmargin-top: 0;\r\n\t\t\tborder: none;\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: transparent;\r\n\t\t\tbackground-color: transparent;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tcursor: pointer;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tfont-weight: 400;\r\n\t\t\tline-height: 1;\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tbox-sizing: border-box;\r\n\t\t\ttransform: none;\r\n\t\t}\r\n\r\n\t\tbutton.lm-tag-chip-remove:hover {\r\n\t\t\tbackground: rgba(0, 0, 0, 0.06);\r\n\t\t\tbackground-color: rgba(0, 0, 0, 0.06);\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\tbutton.lm-tag-chip-remove:active {\r\n\t\t\ttransform: none;\r\n\t\t}\r\n\r\n\t\t.lm-tag-text-input {\r\n\t\t\twidth: 100%;\r\n\t\t\tborder: none;\r\n\t\t\toutline: none;\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tbackground: transparent;\r\n\t\t\tpadding: var(--space-1) 0;\r\n\t\t}\r\n\r\n\t\t.lm-tag-text-input:disabled {\r\n\t\t\tcursor: not-allowed;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.lm-tag-limit-warning {\r\n\t\t\tcolor: #B45309;\r\n\t\t\tfont-weight: 500;\r\n\t\t}\r\n\r\n\t\t.lm-submit-btn {\r\n\t\t\tmin-width: 140px;\r\n\t\t}\r\n\r\n\t\t@media (max-width: 768px) {\r\n\t\t\t.lm-grid {\r\n\t\t\t\tgrid-template-columns: 1fr;\r\n\t\t\t}\r\n\r\n\t\t\t.lm-option-cards {\r\n\t\t\t\tgrid-template-columns: 1fr;\r\n\t\t\t}\r\n\r\n\t\t\t.lm-view-meta-grid {\r\n\t\t\t\tgrid-template-columns: 1fr;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-header {\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: stretch;\r\n\t\t\t}\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1405,7 +1468,7 @@ func LearningMaterialViewModalStyles() templ.Component {
 			templ_7745c5c3_Var47 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 106, "<style>\r\n\t\t#lmViewModalHost .modal-overlay {\r\n\t\t\tz-index: 1100;\r\n\t\t}\r\n\r\n\t\t.lm-thumb {\r\n\t\t\twidth: 100%;\r\n\t\t\taspect-ratio: 16 / 9;\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\toverflow: hidden;\r\n\t\t\tbackground: linear-gradient(180deg, #F0FDFA 0%, #E6FFFA 100%);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.lm-thumb--compact {\r\n\t\t\twidth: 100%;\r\n\t\t\tmax-width: 168px;\r\n\t\t\taspect-ratio: 16 / 9;\r\n\t\t}\r\n\r\n\t\t.lm-thumb-img {\r\n\t\t\tdisplay: block;\r\n\t\t\twidth: 100%;\r\n\t\t\theight: 100%;\r\n\t\t\tobject-fit: cover;\r\n\t\t}\r\n\r\n\t\t.lm-thumb-placeholder {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 100%;\r\n\t\t\theight: 100%;\r\n\t\t\tcolor: #0D9488;\r\n\t\t}\r\n\r\n\t\t.lm-thumb-img[hidden] {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\r\n\t\t.lm-tag-list {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.lm-tag-pill {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tpadding: 4px 10px;\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tborder: var(--pill-border);\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tline-height: 1.2;\r\n\t\t\ttext-transform: lowercase;\r\n\t\t\tbox-sizing: border-box;\r\n\t\t}\r\n\r\n\t\t.lm-modal {\r\n\t\t\tmax-width: 560px;\r\n\t\t}\r\n\r\n\t\t.lm-view-body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.lm-view-badges {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.lm-view-section {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.lm-view-label {\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t}\r\n\r\n\t\t.lm-view-text {\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tline-height: 1.6;\r\n\t\t\twhite-space: pre-wrap;\r\n\t\t}\r\n\r\n\t\t.lm-view-link {\r\n\t\t\tword-break: break-all;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.lm-view-meta {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t}\r\n\r\n\t\t.lm-meta-item {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: 2px;\r\n\t\t}\r\n\r\n\t\t.lm-meta-label {\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-weight: 600;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t}\r\n\r\n\t\t.lm-meta-value {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.lm-meta-item--owner .teacher-name-cell-text {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.lm-view-footer {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-2) var(--space-4) var(--space-4);\r\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.lm-view-footer-actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: flex-end;\r\n\t\t\tgap: var(--space-1);\r\n\t\t\twidth: 100%;\r\n\t\t}\r\n\r\n\t\t.lm-view-footer button,\r\n\t\t.lm-view-footer .btn,\r\n\t\t.lm-view-footer .add-btn {\r\n\t\t\tmargin-top: 0;\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 108, "<style>\r\n\t\t#lmViewModalHost .modal-overlay {\r\n\t\t\tz-index: 1100;\r\n\t\t}\r\n\r\n\t\t.lm-thumb {\r\n\t\t\twidth: 100%;\r\n\t\t\taspect-ratio: 16 / 9;\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\toverflow: hidden;\r\n\t\t\tbackground: linear-gradient(180deg, #F0FDFA 0%, #E6FFFA 100%);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.lm-thumb--compact {\r\n\t\t\twidth: 100%;\r\n\t\t\tmax-width: 168px;\r\n\t\t\taspect-ratio: 16 / 9;\r\n\t\t}\r\n\r\n\t\t.lm-thumb-img {\r\n\t\t\tdisplay: block;\r\n\t\t\twidth: 100%;\r\n\t\t\theight: 100%;\r\n\t\t\tobject-fit: cover;\r\n\t\t}\r\n\r\n\t\t.lm-thumb-placeholder {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 100%;\r\n\t\t\theight: 100%;\r\n\t\t\tcolor: #0D9488;\r\n\t\t}\r\n\r\n\t\t.lm-thumb-img[hidden] {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\r\n\t\t.lm-tag-list {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.lm-tag-pill {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tpadding: 4px 10px;\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tborder: var(--pill-border);\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tline-height: 1.2;\r\n\t\t\ttext-transform: lowercase;\r\n\t\t\tbox-sizing: border-box;\r\n\t\t}\r\n\r\n\t\t.lm-modal {\r\n\t\t\tmax-width: 560px;\r\n\t\t}\r\n\r\n\t\t.lm-view-body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.lm-view-badges {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.lm-view-section {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.lm-view-label {\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t}\r\n\r\n\t\t.lm-view-text {\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tline-height: 1.6;\r\n\t\t\twhite-space: pre-wrap;\r\n\t\t}\r\n\r\n\t\t.lm-view-link {\r\n\t\t\tword-break: break-all;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.lm-view-meta {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t}\r\n\r\n\t\t.lm-meta-item {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: 2px;\r\n\t\t}\r\n\r\n\t\t.lm-meta-label {\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-weight: 600;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t}\r\n\r\n\t\t.lm-meta-value {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.lm-meta-item--owner .teacher-name-cell-text {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.lm-view-footer {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-2) var(--space-4) var(--space-4);\r\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.lm-view-footer-actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: flex-end;\r\n\t\t\tgap: var(--space-1);\r\n\t\t\twidth: 100%;\r\n\t\t}\r\n\r\n\t\t.lm-view-footer button,\r\n\t\t.lm-view-footer .btn,\r\n\t\t.lm-view-footer .add-btn {\r\n\t\t\tmargin-top: 0;\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1434,7 +1497,7 @@ func LearningMaterialViewModalScripts() templ.Component {
 			templ_7745c5c3_Var48 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 107, "<script>\r\n\t\t(function () {\r\n\t\t\tif (window._lmViewModalBound) return;\r\n\t\t\twindow._lmViewModalBound = true;\r\n\r\n\t\t\tfunction hasOpenModalLayer() {\r\n\t\t\t\treturn !!(\r\n\t\t\t\t\tdocument.getElementById('classViewModal') ||\r\n\t\t\t\t\tdocument.getElementById('lmEditModal') ||\r\n\t\t\t\t\tdocument.getElementById('lmFormModal') ||\r\n\t\t\t\t\tdocument.getElementById('lmViewModal')\r\n\t\t\t\t);\r\n\t\t\t}\r\n\r\n\t\t\twindow.closeLearningMaterialViewModal = function () {\r\n\t\t\t\tconst host = document.getElementById('lmViewModalHost');\r\n\t\t\t\tif (host) host.innerHTML = '';\r\n\t\t\t\tif (!hasOpenModalLayer()) {\r\n\t\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\t}\r\n\t\t\t};\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tif (e.target.closest('.lm-view-close')) {\r\n\t\t\t\t\twindow.closeLearningMaterialViewModal();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst viewOverlay = e.target.closest('#lmViewModal');\r\n\t\t\t\tif (viewOverlay && e.target === viewOverlay) {\r\n\t\t\t\t\twindow.closeLearningMaterialViewModal();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key !== 'Escape' || !document.getElementById('lmViewModal')) return;\r\n\t\t\t\twindow.closeLearningMaterialViewModal();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tif (evt.detail.target.id !== 'lmViewModalHost') return;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\tconst closeBtn = evt.detail.target.querySelector('.lm-view-close');\r\n\t\t\t\tif (closeBtn) closeBtn.focus();\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 109, "<script>\r\n\t\t(function () {\r\n\t\t\tif (window._lmViewModalBound) return;\r\n\t\t\twindow._lmViewModalBound = true;\r\n\r\n\t\t\tfunction isOpenModalOverlay(id) {\r\n\t\t\t\tconst el = document.getElementById(id);\r\n\t\t\t\treturn !!(el && !el.hidden);\r\n\t\t\t}\r\n\r\n\t\t\tfunction hasOpenModalLayer() {\r\n\t\t\t\treturn (\r\n\t\t\t\t\tisOpenModalOverlay('classViewModal') ||\r\n\t\t\t\t\tisOpenModalOverlay('lmEditModal') ||\r\n\t\t\t\t\tisOpenModalOverlay('lmFormModal') ||\r\n\t\t\t\t\tisOpenModalOverlay('lmViewModal')\r\n\t\t\t\t);\r\n\t\t\t}\r\n\r\n\t\t\twindow.closeLearningMaterialViewModal = function () {\r\n\t\t\t\tconst host = document.getElementById('lmViewModalHost');\r\n\t\t\t\tif (host) host.innerHTML = '';\r\n\t\t\t\tif (!hasOpenModalLayer()) {\r\n\t\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\t}\r\n\t\t\t};\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tif (e.target.closest('.lm-view-close')) {\r\n\t\t\t\t\twindow.closeLearningMaterialViewModal();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst viewOverlay = e.target.closest('#lmViewModal');\r\n\t\t\t\tif (viewOverlay && e.target === viewOverlay) {\r\n\t\t\t\t\twindow.closeLearningMaterialViewModal();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key !== 'Escape' || !document.getElementById('lmViewModal')) return;\r\n\t\t\t\twindow.closeLearningMaterialViewModal();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tif (evt.detail.target.id !== 'lmViewModalHost') return;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\tconst closeBtn = evt.detail.target.querySelector('.lm-view-close');\r\n\t\t\t\tif (closeBtn) closeBtn.focus();\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1463,7 +1526,7 @@ func LearningMaterialViewModalSupport() templ.Component {
 			templ_7745c5c3_Var49 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 108, "<div id=\"lmViewModalHost\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 110, "<div id=\"lmViewModalHost\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1504,7 +1567,7 @@ func LearningMaterialsScripts() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 109, "<script>\r\n\t\t(function () {\r\n\t\t\tconst MAX_TAGS = 7;\r\n\t\t\tconst MIN_TAGS = 1;\r\n\t\t\tconst previewURLScript = document.getElementById('lmPreviewURL');\r\n\t\t\tconst PREVIEW_URL = previewURLScript ? JSON.parse(previewURLScript.textContent) : '/learning-materials/preview';\r\n\t\t\tlet activeModal = null;\r\n\r\n\t\t\tfunction normalizeTag(value) {\r\n\t\t\t\treturn (value || '').trim().toLowerCase();\r\n\t\t\t}\r\n\r\n\t\t\tfunction getFormSelectedTags(form) {\r\n\t\t\t\tif (!form) return null;\r\n\t\t\t\tif (!form._lmSelectedTags) {\r\n\t\t\t\t\tform._lmSelectedTags = new Set();\r\n\t\t\t\t}\r\n\t\t\t\treturn form._lmSelectedTags;\r\n\t\t\t}\r\n\r\n\t\t\tfunction updateTagLimitUI(form) {\r\n\t\t\t\tconst selectedTags = getFormSelectedTags(form);\r\n\t\t\t\tif (!selectedTags) return;\r\n\t\t\t\tconst tagInput = form.querySelector('.lm-tag-text-input');\r\n\t\t\t\tconst warning = form.querySelector('.lm-tag-limit-warning');\r\n\t\t\t\tconst atMax = selectedTags.size >= MAX_TAGS;\r\n\t\t\t\tif (tagInput) {\r\n\t\t\t\t\ttagInput.disabled = atMax;\r\n\t\t\t\t\tif (atMax) {\r\n\t\t\t\t\t\ttagInput.value = '';\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t\tif (warning) {\r\n\t\t\t\t\twarning.hidden = !atMax;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction renderTagChips(form) {\r\n\t\t\t\tconst selectedTags = getFormSelectedTags(form);\r\n\t\t\t\tconst tagChips = form.querySelector('.lm-tag-chips');\r\n\t\t\t\tif (!tagChips || !selectedTags) return;\r\n\t\t\t\ttagChips.innerHTML = '';\r\n\t\t\t\tselectedTags.forEach(function (tag) {\r\n\t\t\t\t\tconst chip = document.createElement('span');\r\n\t\t\t\t\tchip.className = 'lm-tag-chip';\r\n\t\t\t\t\tchip.innerHTML = tag + '<button type=\"button\" class=\"lm-tag-chip-remove\" data-tooltip=\"Remove ' + tag + '\" aria-label=\"Remove ' + tag + '\">&times;</button>';\r\n\t\t\t\t\tconst removeBtn = chip.querySelector('.lm-tag-chip-remove');\r\n\t\t\t\t\tremoveBtn.addEventListener('click', function () {\r\n\t\t\t\t\t\tselectedTags.delete(tag);\r\n\t\t\t\t\t\tsyncHiddenTagInputs(form);\r\n\t\t\t\t\t\trenderTagChips(form);\r\n\t\t\t\t\t});\r\n\t\t\t\t\ttagChips.appendChild(chip);\r\n\t\t\t\t});\r\n\t\t\t\tupdateTagLimitUI(form);\r\n\t\t\t}\r\n\r\n\t\t\tfunction syncHiddenTagInputs(form) {\r\n\t\t\t\tconst selectedTags = getFormSelectedTags(form);\r\n\t\t\t\tif (!selectedTags) return;\r\n\t\t\t\tform.querySelectorAll('input[name=\"tags\"]').forEach(function (el) { el.remove(); });\r\n\t\t\t\tselectedTags.forEach(function (tag) {\r\n\t\t\t\t\tconst input = document.createElement('input');\r\n\t\t\t\t\tinput.type = 'hidden';\r\n\t\t\t\t\tinput.name = 'tags';\r\n\t\t\t\t\tinput.value = tag;\r\n\t\t\t\t\tform.appendChild(input);\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tfunction bindTagInput(form) {\r\n\t\t\t\tconst tagInput = form.querySelector('.lm-tag-text-input');\r\n\t\t\t\tif (!tagInput || tagInput.dataset.lmBound === '1') return;\r\n\t\t\t\ttagInput.dataset.lmBound = '1';\r\n\r\n\t\t\t\ttagInput.addEventListener('keydown', function (e) {\r\n\t\t\t\t\tconst selectedTags = getFormSelectedTags(form);\r\n\t\t\t\t\tif (!selectedTags || selectedTags.size >= MAX_TAGS) {\r\n\t\t\t\t\t\tif (e.key === 'Enter' || e.key === ',') {\r\n\t\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\t\t\t\t\tif (e.key === 'Enter' || e.key === ',') {\r\n\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\tif (addTag(tagInput.value, form)) {\r\n\t\t\t\t\t\t\ttagInput.value = '';\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t} else if (e.key === 'Backspace' && tagInput.value === '' && selectedTags.size > 0) {\r\n\t\t\t\t\t\tconst tags = Array.from(selectedTags);\r\n\t\t\t\t\t\tselectedTags.delete(tags[tags.length - 1]);\r\n\t\t\t\t\t\tsyncHiddenTagInputs(form);\r\n\t\t\t\t\t\trenderTagChips(form);\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\r\n\t\t\t\ttagInput.addEventListener('blur', function () {\r\n\t\t\t\t\tconst selectedTags = getFormSelectedTags(form);\r\n\t\t\t\t\tif (!selectedTags || selectedTags.size >= MAX_TAGS || !tagInput.value.trim()) {\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\t\t\t\t\tif (addTag(tagInput.value, form)) {\r\n\t\t\t\t\t\ttagInput.value = '';\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tfunction addTag(raw, form) {\r\n\t\t\t\tconst selectedTags = getFormSelectedTags(form);\r\n\t\t\t\tif (!selectedTags) return false;\r\n\t\t\t\tconst tag = normalizeTag(raw);\r\n\t\t\t\tif (!tag) return false;\r\n\t\t\t\tif (selectedTags.has(tag)) return false;\r\n\t\t\t\tif (selectedTags.size >= MAX_TAGS) {\r\n\t\t\t\t\treturn false;\r\n\t\t\t\t}\r\n\t\t\t\tselectedTags.add(tag);\r\n\t\t\t\tsyncHiddenTagInputs(form);\r\n\t\t\t\trenderTagChips(form);\r\n\t\t\t\treturn true;\r\n\t\t\t}\r\n\r\n\t\t\tfunction bindUrlPreview(form) {\r\n\t\t\t\tconst urlInput = form.querySelector('.lm-form-url');\r\n\t\t\t\tconst preview = form.querySelector('.lm-url-preview');\r\n\t\t\t\tconst previewImg = preview ? preview.querySelector('.lm-thumb-img') : null;\r\n\t\t\t\tconst thumbHidden = form.querySelector('.lm-form-thumbnail-url');\r\n\t\t\t\tif (!urlInput || !preview || !previewImg || !thumbHidden || urlInput.dataset.lmUrlBound === '1') {\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\turlInput.dataset.lmUrlBound = '1';\r\n\r\n\t\t\t\tlet debounceTimer = null;\r\n\t\t\t\tlet fetchRequestID = 0;\r\n\t\t\t\tlet lastFetchedUrl = '';\r\n\r\n\t\t\t\tfunction setPreviewLoading(loading) {\r\n\t\t\t\t\tpreview.classList.toggle('lm-url-preview--loading', loading);\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction getPreviewPlaceholder() {\r\n\t\t\t\t\treturn preview.querySelector('.lm-thumb-placeholder');\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction clearPreview() {\r\n\t\t\t\t\tpreview.hidden = true;\r\n\t\t\t\t\tpreviewImg.removeAttribute('src');\r\n\t\t\t\t\tpreviewImg.hidden = true;\r\n\t\t\t\t\tconst placeholder = getPreviewPlaceholder();\r\n\t\t\t\t\tif (placeholder) placeholder.hidden = false;\r\n\t\t\t\t\tthumbHidden.value = '';\r\n\t\t\t\t\tlastFetchedUrl = '';\r\n\t\t\t\t\tsetPreviewLoading(false);\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction showFallbackPreview() {\r\n\t\t\t\t\tpreview.hidden = false;\r\n\t\t\t\t\tpreviewImg.removeAttribute('src');\r\n\t\t\t\t\tpreviewImg.hidden = true;\r\n\t\t\t\t\tconst placeholder = getPreviewPlaceholder();\r\n\t\t\t\t\tif (placeholder) placeholder.hidden = false;\r\n\t\t\t\t\tthumbHidden.value = '';\r\n\t\t\t\t\tsetPreviewLoading(false);\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction showPreview(thumbnailURL) {\r\n\t\t\t\t\tif (!thumbnailURL) {\r\n\t\t\t\t\t\tshowFallbackPreview();\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\t\t\t\t\tpreview.hidden = false;\r\n\t\t\t\t\tpreviewImg.hidden = false;\r\n\t\t\t\t\tpreviewImg.referrerPolicy = 'no-referrer';\r\n\t\t\t\t\tpreviewImg.onerror = function () {\r\n\t\t\t\t\t\tshowFallbackPreview();\r\n\t\t\t\t\t};\r\n\t\t\t\t\tconst placeholder = getPreviewPlaceholder();\r\n\t\t\t\t\tif (placeholder) placeholder.hidden = true;\r\n\t\t\t\t\tpreviewImg.src = thumbnailURL;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tasync function fetchPreview(rawURL) {\r\n\t\t\t\t\tconst normalized = (rawURL || '').trim();\r\n\t\t\t\t\tif (!normalized || !/^https?:\\/\\//i.test(normalized)) {\r\n\t\t\t\t\t\tclearPreview();\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\t\t\t\t\tif (normalized === lastFetchedUrl) {\r\n\t\t\t\t\t\tif (thumbHidden.value) {\r\n\t\t\t\t\t\t\tshowPreview(thumbHidden.value);\r\n\t\t\t\t\t\t} else {\r\n\t\t\t\t\t\t\tshowFallbackPreview();\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\tconst requestID = ++fetchRequestID;\r\n\t\t\t\t\tpreview.hidden = false;\r\n\t\t\t\t\tsetPreviewLoading(true);\r\n\t\t\t\t\tpreviewImg.hidden = true;\r\n\t\t\t\t\tconst placeholder = getPreviewPlaceholder();\r\n\t\t\t\t\tif (placeholder) placeholder.hidden = false;\r\n\t\t\t\t\ttry {\r\n\t\t\t\t\t\tconst resp = await fetch(PREVIEW_URL + '?url=' + encodeURIComponent(normalized), {\r\n\t\t\t\t\t\t\tcredentials: 'same-origin',\r\n\t\t\t\t\t\t});\r\n\t\t\t\t\t\tif (requestID !== fetchRequestID) {\r\n\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tif (!resp.ok) {\r\n\t\t\t\t\t\t\tlastFetchedUrl = normalized;\r\n\t\t\t\t\t\t\tshowFallbackPreview();\r\n\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tconst data = await resp.json();\r\n\t\t\t\t\t\tif (requestID !== fetchRequestID) {\r\n\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tlastFetchedUrl = normalized;\r\n\t\t\t\t\t\tif (data.thumbnail_url) {\r\n\t\t\t\t\t\t\tthumbHidden.value = data.thumbnail_url;\r\n\t\t\t\t\t\t\tshowPreview(data.thumbnail_url);\r\n\t\t\t\t\t\t} else {\r\n\t\t\t\t\t\t\tshowFallbackPreview();\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t} catch (err) {\r\n\t\t\t\t\t\tif (requestID !== fetchRequestID) {\r\n\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tlastFetchedUrl = normalized;\r\n\t\t\t\t\t\tshowFallbackPreview();\r\n\t\t\t\t\t} finally {\r\n\t\t\t\t\t\tif (requestID === fetchRequestID) {\r\n\t\t\t\t\t\t\tsetPreviewLoading(false);\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction schedulePreview() {\r\n\t\t\t\t\tclearTimeout(debounceTimer);\r\n\t\t\t\t\tdebounceTimer = setTimeout(function () {\r\n\t\t\t\t\t\tfetchPreview(urlInput.value);\r\n\t\t\t\t\t}, 400);\r\n\t\t\t\t}\r\n\r\n\t\t\t\turlInput.addEventListener('input', schedulePreview);\r\n\t\t\t\turlInput.addEventListener('paste', function () {\r\n\t\t\t\t\tsetTimeout(function () {\r\n\t\t\t\t\t\tfetchPreview(urlInput.value);\r\n\t\t\t\t\t}, 0);\r\n\t\t\t\t});\r\n\r\n\t\t\t\tif (thumbHidden.value && urlInput.value.trim()) {\r\n\t\t\t\t\tlastFetchedUrl = urlInput.value.trim();\r\n\t\t\t\t\tshowPreview(thumbHidden.value);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction initModalForm(modal, initialTags) {\r\n\t\t\t\tactiveModal = modal;\r\n\t\t\t\tconst form = modal.querySelector('form');\r\n\t\t\t\tif (!form) return;\r\n\r\n\t\t\t\tconst selectedTags = new Set(initialTags || []);\r\n\t\t\t\tform._lmSelectedTags = selectedTags;\r\n\t\t\t\tsyncHiddenTagInputs(form);\r\n\t\t\t\trenderTagChips(form);\r\n\t\t\t\tbindTagInput(form);\r\n\t\t\t\tbindUrlPreview(form);\r\n\r\n\t\t\t\tif (form.dataset.lmSubmitBound !== '1') {\r\n\t\t\t\t\tform.dataset.lmSubmitBound = '1';\r\n\t\t\t\t\tform.addEventListener('submit', function (e) {\r\n\t\t\t\t\t\tconst tags = getFormSelectedTags(form);\r\n\t\t\t\t\t\tconst tagInput = form.querySelector('.lm-tag-text-input');\r\n\t\t\t\t\t\tif (tagInput && tagInput.value.trim() && tags.size < MAX_TAGS) {\r\n\t\t\t\t\t\t\taddTag(tagInput.value, form);\r\n\t\t\t\t\t\t\ttagInput.value = '';\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tsyncHiddenTagInputs(form);\r\n\t\t\t\t\t\tif (tags.size < MIN_TAGS || tags.size > MAX_TAGS) {\r\n\t\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\t\talert('Please add between ' + MIN_TAGS + ' and ' + MAX_TAGS + ' tags.');\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t});\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\twindow.openLearningMaterialFormModal = function () {\r\n\t\t\t\tconst formModal = document.getElementById('lmFormModal');\r\n\t\t\t\tif (!formModal) return;\r\n\t\t\t\tformModal.hidden = false;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\tinitModalForm(formModal, []);\r\n\t\t\t\tconst desc = formModal.querySelector('#lmDescription');\r\n\t\t\t\tif (desc) desc.focus();\r\n\t\t\t};\r\n\r\n\t\t\twindow.closeLearningMaterialFormModal = function () {\r\n\t\t\t\tconst formModal = document.getElementById('lmFormModal');\r\n\t\t\t\tif (formModal) formModal.hidden = true;\r\n\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\tactiveModal = null;\r\n\t\t\t};\r\n\r\n\t\t\twindow.closeLearningMaterialEditModal = function () {\r\n\t\t\t\tconst host = document.getElementById('lmEditModalHost');\r\n\t\t\t\tif (host) host.innerHTML = '';\r\n\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\tactiveModal = null;\r\n\t\t\t};\r\n\r\n\t\t\tconst openCreateBtn = document.getElementById('openCreateMaterialBtn');\r\n\t\t\tif (openCreateBtn) {\r\n\t\t\t\topenCreateBtn.addEventListener('click', window.openLearningMaterialFormModal);\r\n\t\t\t}\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tif (e.target.closest('.lm-form-close')) {\r\n\t\t\t\t\twindow.closeLearningMaterialFormModal();\r\n\t\t\t\t\twindow.closeLearningMaterialEditModal();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst formOverlay = e.target.closest('#lmFormModal');\r\n\t\t\t\tif (formOverlay && e.target === formOverlay) {\r\n\t\t\t\t\twindow.closeLearningMaterialFormModal();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst editOverlay = e.target.closest('#lmEditModal');\r\n\t\t\t\tif (editOverlay && e.target === editOverlay) {\r\n\t\t\t\t\twindow.closeLearningMaterialEditModal();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key !== 'Escape') return;\r\n\t\t\t\twindow.closeLearningMaterialEditModal();\r\n\t\t\t\twindow.closeLearningMaterialFormModal();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tif (evt.detail.target.id === 'lmEditModalHost') {\r\n\t\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\t\tconst editModal = evt.detail.target.querySelector('#lmEditModal');\r\n\t\t\t\t\tconst initial = [];\r\n\t\t\t\t\tif (editModal) {\r\n\t\t\t\t\t\teditModal.querySelectorAll('input[name=\"tags\"]').forEach(function (input) {\r\n\t\t\t\t\t\t\tinitial.push(input.value);\r\n\t\t\t\t\t\t});\r\n\t\t\t\t\t\tinitModalForm(editModal, initial);\r\n\t\t\t\t\t\tconst closeBtn = editModal.querySelector('.lm-form-close');\r\n\t\t\t\t\t\tif (closeBtn) closeBtn.focus();\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tconst createModal = document.getElementById('lmFormModal');\r\n\t\t\tif (createModal) {\r\n\t\t\t\tinitModalForm(createModal, []);\r\n\t\t\t}\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 111, "<script>\r\n\t\t(function () {\r\n\t\t\tconst MAX_TAGS = 7;\r\n\t\t\tconst MIN_TAGS = 1;\r\n\t\t\tconst previewURLScript = document.getElementById('lmPreviewURL');\r\n\t\t\tconst PREVIEW_URL = previewURLScript ? JSON.parse(previewURLScript.textContent) : '/learning-materials/preview';\r\n\t\t\tlet activeModal = null;\r\n\r\n\t\t\tfunction normalizeTag(value) {\r\n\t\t\t\treturn (value || '').trim().toLowerCase();\r\n\t\t\t}\r\n\r\n\t\t\tfunction getFormSelectedTags(form) {\r\n\t\t\t\tif (!form) return null;\r\n\t\t\t\tif (!form._lmSelectedTags) {\r\n\t\t\t\t\tform._lmSelectedTags = new Set();\r\n\t\t\t\t}\r\n\t\t\t\treturn form._lmSelectedTags;\r\n\t\t\t}\r\n\r\n\t\t\tfunction updateTagLimitUI(form) {\r\n\t\t\t\tconst selectedTags = getFormSelectedTags(form);\r\n\t\t\t\tif (!selectedTags) return;\r\n\t\t\t\tconst tagInput = form.querySelector('.lm-tag-text-input');\r\n\t\t\t\tconst warning = form.querySelector('.lm-tag-limit-warning');\r\n\t\t\t\tconst atMax = selectedTags.size >= MAX_TAGS;\r\n\t\t\t\tif (tagInput) {\r\n\t\t\t\t\ttagInput.disabled = atMax;\r\n\t\t\t\t\tif (atMax) {\r\n\t\t\t\t\t\ttagInput.value = '';\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t\tif (warning) {\r\n\t\t\t\t\twarning.hidden = !atMax;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction renderTagChips(form) {\r\n\t\t\t\tconst selectedTags = getFormSelectedTags(form);\r\n\t\t\t\tconst tagChips = form.querySelector('.lm-tag-chips');\r\n\t\t\t\tif (!tagChips || !selectedTags) return;\r\n\t\t\t\ttagChips.innerHTML = '';\r\n\t\t\t\tselectedTags.forEach(function (tag) {\r\n\t\t\t\t\tconst chip = document.createElement('span');\r\n\t\t\t\t\tchip.className = 'lm-tag-chip';\r\n\t\t\t\t\tchip.innerHTML = tag + '<button type=\"button\" class=\"lm-tag-chip-remove\" data-tooltip=\"Remove ' + tag + '\" aria-label=\"Remove ' + tag + '\">&times;</button>';\r\n\t\t\t\t\tconst removeBtn = chip.querySelector('.lm-tag-chip-remove');\r\n\t\t\t\t\tremoveBtn.addEventListener('click', function () {\r\n\t\t\t\t\t\tselectedTags.delete(tag);\r\n\t\t\t\t\t\tsyncHiddenTagInputs(form);\r\n\t\t\t\t\t\trenderTagChips(form);\r\n\t\t\t\t\t});\r\n\t\t\t\t\ttagChips.appendChild(chip);\r\n\t\t\t\t});\r\n\t\t\t\tupdateTagLimitUI(form);\r\n\t\t\t}\r\n\r\n\t\t\tfunction syncHiddenTagInputs(form) {\r\n\t\t\t\tconst selectedTags = getFormSelectedTags(form);\r\n\t\t\t\tif (!selectedTags) return;\r\n\t\t\t\tform.querySelectorAll('input[name=\"tags\"]').forEach(function (el) { el.remove(); });\r\n\t\t\t\tselectedTags.forEach(function (tag) {\r\n\t\t\t\t\tconst input = document.createElement('input');\r\n\t\t\t\t\tinput.type = 'hidden';\r\n\t\t\t\t\tinput.name = 'tags';\r\n\t\t\t\t\tinput.value = tag;\r\n\t\t\t\t\tform.appendChild(input);\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tfunction bindTagInput(form) {\r\n\t\t\t\tconst tagInput = form.querySelector('.lm-tag-text-input');\r\n\t\t\t\tif (!tagInput || tagInput.dataset.lmBound === '1') return;\r\n\t\t\t\ttagInput.dataset.lmBound = '1';\r\n\r\n\t\t\t\ttagInput.addEventListener('keydown', function (e) {\r\n\t\t\t\t\tconst selectedTags = getFormSelectedTags(form);\r\n\t\t\t\t\tif (!selectedTags || selectedTags.size >= MAX_TAGS) {\r\n\t\t\t\t\t\tif (e.key === 'Enter' || e.key === ',') {\r\n\t\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\t\t\t\t\tif (e.key === 'Enter' || e.key === ',') {\r\n\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\tif (addTag(tagInput.value, form)) {\r\n\t\t\t\t\t\t\ttagInput.value = '';\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t} else if (e.key === 'Backspace' && tagInput.value === '' && selectedTags.size > 0) {\r\n\t\t\t\t\t\tconst tags = Array.from(selectedTags);\r\n\t\t\t\t\t\tselectedTags.delete(tags[tags.length - 1]);\r\n\t\t\t\t\t\tsyncHiddenTagInputs(form);\r\n\t\t\t\t\t\trenderTagChips(form);\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\r\n\t\t\t\ttagInput.addEventListener('blur', function () {\r\n\t\t\t\t\tconst selectedTags = getFormSelectedTags(form);\r\n\t\t\t\t\tif (!selectedTags || selectedTags.size >= MAX_TAGS || !tagInput.value.trim()) {\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\t\t\t\t\tif (addTag(tagInput.value, form)) {\r\n\t\t\t\t\t\ttagInput.value = '';\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tfunction addTag(raw, form) {\r\n\t\t\t\tconst selectedTags = getFormSelectedTags(form);\r\n\t\t\t\tif (!selectedTags) return false;\r\n\t\t\t\tconst tag = normalizeTag(raw);\r\n\t\t\t\tif (!tag) return false;\r\n\t\t\t\tif (selectedTags.has(tag)) return false;\r\n\t\t\t\tif (selectedTags.size >= MAX_TAGS) {\r\n\t\t\t\t\treturn false;\r\n\t\t\t\t}\r\n\t\t\t\tselectedTags.add(tag);\r\n\t\t\t\tsyncHiddenTagInputs(form);\r\n\t\t\t\trenderTagChips(form);\r\n\t\t\t\treturn true;\r\n\t\t\t}\r\n\r\n\t\t\tfunction bindUrlPreview(form) {\r\n\t\t\t\tconst urlInput = form.querySelector('.lm-form-url');\r\n\t\t\t\tconst preview = form.querySelector('.lm-url-preview');\r\n\t\t\t\tconst previewImg = preview ? preview.querySelector('.lm-thumb-img') : null;\r\n\t\t\t\tconst thumbHidden = form.querySelector('.lm-form-thumbnail-url');\r\n\t\t\t\tif (!urlInput || !preview || !previewImg || !thumbHidden || urlInput.dataset.lmUrlBound === '1') {\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\turlInput.dataset.lmUrlBound = '1';\r\n\r\n\t\t\t\tlet debounceTimer = null;\r\n\t\t\t\tlet fetchRequestID = 0;\r\n\t\t\t\tlet lastFetchedUrl = '';\r\n\r\n\t\t\t\tfunction setPreviewLoading(loading) {\r\n\t\t\t\t\tpreview.classList.toggle('lm-url-preview--loading', loading);\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction getPreviewPlaceholder() {\r\n\t\t\t\t\treturn preview.querySelector('.lm-thumb-placeholder');\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction clearPreview() {\r\n\t\t\t\t\tpreview.hidden = true;\r\n\t\t\t\t\tpreviewImg.removeAttribute('src');\r\n\t\t\t\t\tpreviewImg.hidden = true;\r\n\t\t\t\t\tconst placeholder = getPreviewPlaceholder();\r\n\t\t\t\t\tif (placeholder) placeholder.hidden = false;\r\n\t\t\t\t\tthumbHidden.value = '';\r\n\t\t\t\t\tlastFetchedUrl = '';\r\n\t\t\t\t\tsetPreviewLoading(false);\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction showFallbackPreview() {\r\n\t\t\t\t\tpreview.hidden = false;\r\n\t\t\t\t\tpreviewImg.removeAttribute('src');\r\n\t\t\t\t\tpreviewImg.hidden = true;\r\n\t\t\t\t\tconst placeholder = getPreviewPlaceholder();\r\n\t\t\t\t\tif (placeholder) placeholder.hidden = false;\r\n\t\t\t\t\tthumbHidden.value = '';\r\n\t\t\t\t\tsetPreviewLoading(false);\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction showPreview(thumbnailURL) {\r\n\t\t\t\t\tif (!thumbnailURL) {\r\n\t\t\t\t\t\tshowFallbackPreview();\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\t\t\t\t\tpreview.hidden = false;\r\n\t\t\t\t\tpreviewImg.hidden = false;\r\n\t\t\t\t\tpreviewImg.referrerPolicy = 'no-referrer';\r\n\t\t\t\t\tpreviewImg.onerror = function () {\r\n\t\t\t\t\t\tshowFallbackPreview();\r\n\t\t\t\t\t};\r\n\t\t\t\t\tconst placeholder = getPreviewPlaceholder();\r\n\t\t\t\t\tif (placeholder) placeholder.hidden = true;\r\n\t\t\t\t\tpreviewImg.src = thumbnailURL;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tasync function fetchPreview(rawURL) {\r\n\t\t\t\t\tconst normalized = (rawURL || '').trim();\r\n\t\t\t\t\tif (!normalized || !/^https?:\\/\\//i.test(normalized)) {\r\n\t\t\t\t\t\tclearPreview();\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\t\t\t\t\tif (normalized === lastFetchedUrl) {\r\n\t\t\t\t\t\tif (thumbHidden.value) {\r\n\t\t\t\t\t\t\tshowPreview(thumbHidden.value);\r\n\t\t\t\t\t\t} else {\r\n\t\t\t\t\t\t\tshowFallbackPreview();\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\tconst requestID = ++fetchRequestID;\r\n\t\t\t\t\tpreview.hidden = false;\r\n\t\t\t\t\tsetPreviewLoading(true);\r\n\t\t\t\t\tpreviewImg.hidden = true;\r\n\t\t\t\t\tconst placeholder = getPreviewPlaceholder();\r\n\t\t\t\t\tif (placeholder) placeholder.hidden = false;\r\n\t\t\t\t\ttry {\r\n\t\t\t\t\t\tconst resp = await fetch(PREVIEW_URL + '?url=' + encodeURIComponent(normalized), {\r\n\t\t\t\t\t\t\tcredentials: 'same-origin',\r\n\t\t\t\t\t\t});\r\n\t\t\t\t\t\tif (requestID !== fetchRequestID) {\r\n\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tif (!resp.ok) {\r\n\t\t\t\t\t\t\tlastFetchedUrl = normalized;\r\n\t\t\t\t\t\t\tshowFallbackPreview();\r\n\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tconst data = await resp.json();\r\n\t\t\t\t\t\tif (requestID !== fetchRequestID) {\r\n\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tlastFetchedUrl = normalized;\r\n\t\t\t\t\t\tif (data.thumbnail_url) {\r\n\t\t\t\t\t\t\tthumbHidden.value = data.thumbnail_url;\r\n\t\t\t\t\t\t\tshowPreview(data.thumbnail_url);\r\n\t\t\t\t\t\t} else {\r\n\t\t\t\t\t\t\tshowFallbackPreview();\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t} catch (err) {\r\n\t\t\t\t\t\tif (requestID !== fetchRequestID) {\r\n\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tlastFetchedUrl = normalized;\r\n\t\t\t\t\t\tshowFallbackPreview();\r\n\t\t\t\t\t} finally {\r\n\t\t\t\t\t\tif (requestID === fetchRequestID) {\r\n\t\t\t\t\t\t\tsetPreviewLoading(false);\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction schedulePreview() {\r\n\t\t\t\t\tclearTimeout(debounceTimer);\r\n\t\t\t\t\tdebounceTimer = setTimeout(function () {\r\n\t\t\t\t\t\tfetchPreview(urlInput.value);\r\n\t\t\t\t\t}, 400);\r\n\t\t\t\t}\r\n\r\n\t\t\t\turlInput.addEventListener('input', schedulePreview);\r\n\t\t\t\turlInput.addEventListener('paste', function () {\r\n\t\t\t\t\tsetTimeout(function () {\r\n\t\t\t\t\t\tfetchPreview(urlInput.value);\r\n\t\t\t\t\t}, 0);\r\n\t\t\t\t});\r\n\r\n\t\t\t\tif (thumbHidden.value && urlInput.value.trim()) {\r\n\t\t\t\t\tlastFetchedUrl = urlInput.value.trim();\r\n\t\t\t\t\tshowPreview(thumbHidden.value);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction initModalForm(modal, initialTags) {\r\n\t\t\t\tactiveModal = modal;\r\n\t\t\t\tconst form = modal.querySelector('form');\r\n\t\t\t\tif (!form) return;\r\n\r\n\t\t\t\tconst selectedTags = new Set(initialTags || []);\r\n\t\t\t\tform._lmSelectedTags = selectedTags;\r\n\t\t\t\tsyncHiddenTagInputs(form);\r\n\t\t\t\trenderTagChips(form);\r\n\t\t\t\tbindTagInput(form);\r\n\t\t\t\tbindUrlPreview(form);\r\n\r\n\t\t\t\tif (form.dataset.lmSubmitBound !== '1') {\r\n\t\t\t\t\tform.dataset.lmSubmitBound = '1';\r\n\t\t\t\t\tform.addEventListener('submit', function (e) {\r\n\t\t\t\t\t\tconst tags = getFormSelectedTags(form);\r\n\t\t\t\t\t\tconst tagInput = form.querySelector('.lm-tag-text-input');\r\n\t\t\t\t\t\tif (tagInput && tagInput.value.trim() && tags.size < MAX_TAGS) {\r\n\t\t\t\t\t\t\taddTag(tagInput.value, form);\r\n\t\t\t\t\t\t\ttagInput.value = '';\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tsyncHiddenTagInputs(form);\r\n\t\t\t\t\t\tif (tags.size < MIN_TAGS || tags.size > MAX_TAGS) {\r\n\t\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\t\talert('Please add between ' + MIN_TAGS + ' and ' + MAX_TAGS + ' tags.');\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t});\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\twindow.openLearningMaterialFormModal = function () {\r\n\t\t\t\tconst formModal = document.getElementById('lmFormModal');\r\n\t\t\t\tif (!formModal) return;\r\n\t\t\t\tformModal.hidden = false;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\tinitModalForm(formModal, []);\r\n\t\t\t\tconst desc = formModal.querySelector('#lmDescription');\r\n\t\t\t\tif (desc) desc.focus();\r\n\t\t\t};\r\n\r\n\t\t\twindow.closeLearningMaterialFormModal = function () {\r\n\t\t\t\tconst formModal = document.getElementById('lmFormModal');\r\n\t\t\t\tif (formModal) formModal.hidden = true;\r\n\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\tactiveModal = null;\r\n\t\t\t};\r\n\r\n\t\t\twindow.closeLearningMaterialEditModal = function () {\r\n\t\t\t\tconst host = document.getElementById('lmEditModalHost');\r\n\t\t\t\tif (host) host.innerHTML = '';\r\n\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\tactiveModal = null;\r\n\t\t\t};\r\n\r\n\t\t\tconst openCreateBtn = document.getElementById('openCreateMaterialBtn');\r\n\t\t\tif (openCreateBtn) {\r\n\t\t\t\topenCreateBtn.addEventListener('click', window.openLearningMaterialFormModal);\r\n\t\t\t}\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tif (e.target.closest('.lm-form-close')) {\r\n\t\t\t\t\twindow.closeLearningMaterialFormModal();\r\n\t\t\t\t\twindow.closeLearningMaterialEditModal();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst formOverlay = e.target.closest('#lmFormModal');\r\n\t\t\t\tif (formOverlay && e.target === formOverlay) {\r\n\t\t\t\t\twindow.closeLearningMaterialFormModal();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst editOverlay = e.target.closest('#lmEditModal');\r\n\t\t\t\tif (editOverlay && e.target === editOverlay) {\r\n\t\t\t\t\twindow.closeLearningMaterialEditModal();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key !== 'Escape') return;\r\n\t\t\t\twindow.closeLearningMaterialEditModal();\r\n\t\t\t\twindow.closeLearningMaterialFormModal();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tif (evt.detail.target.id === 'lmEditModalHost') {\r\n\t\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\t\tconst editModal = evt.detail.target.querySelector('#lmEditModal');\r\n\t\t\t\t\tconst initial = [];\r\n\t\t\t\t\tif (editModal) {\r\n\t\t\t\t\t\teditModal.querySelectorAll('input[name=\"tags\"]').forEach(function (input) {\r\n\t\t\t\t\t\t\tinitial.push(input.value);\r\n\t\t\t\t\t\t});\r\n\t\t\t\t\t\tinitModalForm(editModal, initial);\r\n\t\t\t\t\t\tconst closeBtn = editModal.querySelector('.lm-form-close');\r\n\t\t\t\t\t\tif (closeBtn) closeBtn.focus();\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tconst createModal = document.getElementById('lmFormModal');\r\n\t\t\tif (createModal) {\r\n\t\t\t\tinitModalForm(createModal, []);\r\n\t\t\t}\r\n\t\t})();\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

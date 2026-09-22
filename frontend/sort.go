@@ -21,7 +21,9 @@ const (
 	ListSortKindSystemLog     ListSortKind = "system_log"
 	ListSortKindNotification  ListSortKind = "notification"
 	ListSortKindAnnouncement  ListSortKind = "announcement"
-	ListSortKindAnalytics     ListSortKind = "analytics"
+	ListSortKindAnalytics        ListSortKind = "analytics"
+	ListSortKindLearningMaterial ListSortKind = "learning_material"
+	ListSortKindTrainingMaterial ListSortKind = "training_material"
 )
 
 func SortOptionsFor(kind ListSortKind) []SortOption {
@@ -110,6 +112,21 @@ func SortOptionsFor(kind ListSortKind) []SortOption {
 			{Value: "cancelled", Label: "Cancelled"},
 			{Value: "rate", Label: "Rate"},
 		}
+	case ListSortKindLearningMaterial:
+		return []SortOption{
+			{Value: "created_at", Label: "Date added"},
+			{Value: "updated_at", Label: "Last updated"},
+			{Value: "title", Label: "Title"},
+			{Value: "status", Label: "Status"},
+			{Value: "access", Label: "Access"},
+		}
+	case ListSortKindTrainingMaterial:
+		return []SortOption{
+			{Value: "created_at", Label: "Date added"},
+			{Value: "updated_at", Label: "Last updated"},
+			{Value: "title", Label: "Title"},
+			{Value: "status", Label: "Status"},
+		}
 	default:
 		return nil
 	}
@@ -137,6 +154,8 @@ func DefaultSortFor(kind ListSortKind) (string, utils.SortOrder) {
 		return "start_date", utils.SortOrderDesc
 	case ListSortKindAnalytics:
 		return "name", utils.SortOrderAsc
+	case ListSortKindLearningMaterial, ListSortKindTrainingMaterial:
+		return "created_at", utils.SortOrderDesc
 	default:
 		return "created_at", utils.SortOrderDesc
 	}

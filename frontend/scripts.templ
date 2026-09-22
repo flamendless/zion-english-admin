@@ -77,13 +77,21 @@ templ ScrTableTruncationTooltips() {
 				runUpdate(document);
 			});
 
-			document.body.addEventListener('htmx:afterSwap', function (evt) {
-				runUpdate(evt.detail.target);
-			});
+			function bindBodyHTMXListeners() {
+				if (!document.body) return;
+				document.body.addEventListener('htmx:afterSwap', function (evt) {
+					runUpdate(evt.detail.target);
+				});
+				document.body.addEventListener('htmx:afterSettle', function (evt) {
+					runUpdate(evt.detail.target);
+				});
+			}
 
-			document.body.addEventListener('htmx:afterSettle', function (evt) {
-				runUpdate(evt.detail.target);
-			});
+			if (document.body) {
+				bindBodyHTMXListeners();
+			} else {
+				document.addEventListener('DOMContentLoaded', bindBodyHTMXListeners);
+			}
 		})();
 	</script>
 }

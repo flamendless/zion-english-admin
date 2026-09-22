@@ -1,0 +1,72 @@
+---
+description: Avoid misaligned buttons and controls in flex rows, modals, and cards
+alwaysApply: true
+---
+
+# Button and Control Alignment
+
+Global `button, .btn` in `global.templ` sets `margin-top: var(--space-5)`, large padding, and filled primary styling. `.add-btn` resets `margin-top: 0`, but `.btn` / `.btn-secondary` do not.
+
+Mixing those classes in one row is the most common cause of misaligned UI.
+
+## Flex rows with multiple controls
+
+Any horizontal group of buttons or icon actions (modal footers, card actions, toolbars) needs:
+
+```css
+.my-footer,
+.my-footer-actions,
+.my-card-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--space-2);
+}
+
+.my-footer button,
+.my-footer .btn,
+.my-footer .add-btn {
+	margin-top: 0;
+}
+```
+
+Apply the `margin-top: 0` reset to **every** button class in the row, not only `.add-btn`.
+
+Reference: `.lm-form-footer` / `.tm-form-footer` in `learning_materials.templ` and `training_materials.templ`.
+
+## Text buttons beside icon actions
+
+`.icon-action-btn` is fixed at `36px` height with `margin-top: 0`. A nearby `.btn` or `button` will look taller and sit off baseline unless you normalize it:
+
+```css
+.my-card-actions .btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 36px;
+	margin-top: 0;
+	padding: 0 var(--space-3);
+	font-size: 0.8125rem;
+	line-height: 1;
+	box-sizing: border-box;
+}
+```
+
+Reference: `.tm-card-actions .btn` in `training_materials.templ`.
+
+## Chip and tag remove buttons
+
+Do not use bare `button` for chip × controls. Use the global reset in `global.templ` (`button.lm-tag-chip-remove`, `button.chip-remove`, etc.) or match that pattern with a `button.` compound selector so global button padding/background/margin do not leak through.
+
+Parent chip: `display: inline-flex; align-items: center; gap: …`.
+
+## Head scripts
+
+Inline scripts in `<head>` (`GlobalIncludes`) run before `<body>` exists. Never call `document.body.addEventListener` without a guard or `DOMContentLoaded` deferral. See `ScrTableTruncationTooltips` in `scripts.templ`.
+
+## Checklist for new UI
+
+- [ ] Footer/action row uses `display: flex; align-items: center`
+- [ ] All buttons in the row have `margin-top: 0`
+- [ ] Mixed `.btn` + `.icon-action-btn` rows share the same height (usually `36px`)
+- [ ] Chip remove buttons use the global chip-remove reset, not default `button` styles

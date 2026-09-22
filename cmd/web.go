@@ -167,6 +167,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/api/teacher-row", auth.RequireRole(auth.AdminAccessRoles()...)(handleGetTeacherRow))
 		authMux.HandleFunc(basePath+"/api/students", auth.RequireRole(auth.AdminAccessRoles()...)(handleGetStudents))
 		authMux.HandleFunc(basePath+"/api/students/search", auth.RequireRole(auth.AdminAccessRoles()...)(handleSearchStudents))
+		// RoleTester can search learning materials when linking resources during class record/schedule flows.
 		authMux.HandleFunc(basePath+"/api/learning-materials/search", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleSearchLearningMaterials))
 		authMux.HandleFunc(basePath+"/api/me/students", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleGetMyStudents))
 		authMux.HandleFunc(basePath+"/api/scheduled-classes", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleGetScheduledClasses))
@@ -179,6 +180,13 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/learning-materials/create", lmRole(handleLearningMaterialCreate))
 		authMux.HandleFunc(basePath+"/learning-materials/", lmRole(handleLearningMaterialsPath))
 		authMux.HandleFunc(basePath+"/learning-materials", lmRole(handleLearningMaterials))
+		tmRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)
+		tmAdminRole := auth.RequireRole(auth.AdminAccessRoles()...)
+		authMux.HandleFunc(basePath+"/training-materials/progress", tmAdminRole(handleTrainingMaterialsProgressReport))
+		authMux.HandleFunc(basePath+"/training-materials/preview", tmAdminRole(handleTrainingMaterialURLPreview))
+		authMux.HandleFunc(basePath+"/training-materials/create", tmAdminRole(handleTrainingMaterialCreate))
+		authMux.HandleFunc(basePath+"/training-materials/", tmRole(handleTrainingMaterialsPath))
+		authMux.HandleFunc(basePath+"/training-materials", tmRole(handleTrainingMaterials))
 		notificationsRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)
 		authMux.HandleFunc(basePath+"/notifications", notificationsRole(handleNotifications))
 		authMux.HandleFunc(basePath+"/notifications/panel", notificationsRole(handleNotificationsPanel))
@@ -269,6 +277,8 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/announcements/", authHandler)
 		rootMux.Handle(basePath+"/learning-materials", authHandler)
 		rootMux.Handle(basePath+"/learning-materials/", authHandler)
+		rootMux.Handle(basePath+"/training-materials", authHandler)
+		rootMux.Handle(basePath+"/training-materials/", authHandler)
 		rootMux.Handle(basePath+"/notifications", authHandler)
 		rootMux.Handle(basePath+"/notifications/", authHandler)
 
@@ -544,9 +554,28 @@ func securityHeaders(next http.Handler) http.Handler {
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("X-Frame-Options", "DENY")
 		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
-		w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:")
+		w.Header().Set("Content-Security-Policy", contentSecurityPolicy(r))
 		next.ServeHTTP(w, r)
 	})
+}
+
+func contentSecurityPolicy(r *http.Request) string {
+	if isTrainingMaterialWatchRequest(r) {
+		return strings.Join([]string{
+			"default-src 'self'",
+			"script-src 'self' 'unsafe-inline' https://www.youtube.com",
+			"style-src 'self' 'unsafe-inline'",
+			"img-src 'self' data: https://i.ytimg.com https://img.youtube.com",
+			"frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com",
+			"connect-src 'self'",
+		}, "; ")
+	}
+	return "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+}
+
+func isTrainingMaterialWatchRequest(r *http.Request) bool {
+	path := strings.TrimSuffix(r.URL.Path, "/")
+	return strings.Contains(path, "/training-materials/") && strings.HasSuffix(path, "/watch")
 }
 
 func HttpRedirect(w http.ResponseWriter, r *http.Request, url string) {

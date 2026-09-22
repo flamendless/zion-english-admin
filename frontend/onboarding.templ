@@ -1,0 +1,187 @@
+package frontend
+
+import (
+	"zion-english/internal/onboarding"
+	"zion-english/internal/utils"
+)
+
+type OnboardingItemView struct {
+	ID         string
+	Label      string
+	Status     onboarding.ItemStatus
+	Detail     string
+	ActionURL  string
+	StatusTone PillTone
+}
+
+type OnboardingChecklistData struct {
+	Items          []OnboardingItemView
+	CompletedCount int
+	TotalCount     int
+	ShowSummary    bool
+	EmptyMessage   string
+}
+
+func MapOnboardingItems(items []onboarding.Item) []OnboardingItemView {
+	views := make([]OnboardingItemView, 0, len(items))
+	for _, item := range items {
+		views = append(views, OnboardingItemView{
+			ID:         string(item.ID),
+			Label:      item.Label,
+			Status:     item.Status,
+			Detail:     item.Detail,
+			ActionURL:  utils.URL(item.ActionPath),
+			StatusTone: onboardingItemTone(item.Status),
+		})
+	}
+	return views
+}
+
+func onboardingItemTone(status onboarding.ItemStatus) PillTone {
+	switch status {
+	case onboarding.ItemStatusComplete:
+		return PillToneSuccess
+	case onboarding.ItemStatusInProgress:
+		return PillToneInfo
+	case onboarding.ItemStatusRejected:
+		return PillToneError
+	case onboarding.ItemStatusNotRequired:
+		return PillToneNeutral
+	default:
+		return PillToneWarning
+	}
+}
+
+func onboardingItemStatusLabel(status onboarding.ItemStatus) string {
+	switch status {
+	case onboarding.ItemStatusComplete:
+		return "Complete"
+	case onboarding.ItemStatusInProgress:
+		return "In progress"
+	case onboarding.ItemStatusRejected:
+		return "Needs attention"
+	case onboarding.ItemStatusNotRequired:
+		return "Not required"
+	default:
+		return "Not started"
+	}
+}
+
+templ OnboardingChecklist(data OnboardingChecklistData) {
+	@OnboardingChecklistStyles()
+	<section class="onboarding-checklist" aria-label="Teacher onboarding checklist">
+		if data.ShowSummary && data.TotalCount > 0 {
+			<div class="onboarding-summary">
+				<h3 class="onboarding-summary-title">Setup progress</h3>
+				<p class="onboarding-summary-meta">{ data.CompletedCount } of { data.TotalCount } complete</p>
+			</div>
+		}
+		if len(data.Items) == 0 {
+			<p class="onboarding-empty">{ data.EmptyMessage }</p>
+		} else {
+			<ul class="onboarding-list">
+				for _, item := range data.Items {
+					<li class="onboarding-item">
+						<div class="onboarding-item-main">
+							<strong class="onboarding-item-label">{ item.Label }</strong>
+							<p class="onboarding-item-detail">{ item.Detail }</p>
+						</div>
+						<div class="onboarding-item-status">
+							@StatusPill(onboardingItemStatusLabel(item.Status), item.StatusTone, false)
+						</div>
+						<div class="onboarding-item-action">
+							if item.Status != onboarding.ItemStatusComplete && item.Status != onboarding.ItemStatusNotRequired {
+								<a href={ item.ActionURL } class="btn btn-secondary btn-sm">Open</a>
+							}
+						</div>
+					</li>
+				}
+			</ul>
+		}
+	</section>
+}
+
+templ OnboardingChecklistStyles() {
+	<style>
+		.onboarding-checklist {
+			background: var(--color-surface);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-lg);
+			padding: var(--space-4);
+		}
+		.onboarding-summary {
+			margin-bottom: var(--space-3);
+		}
+		.onboarding-summary-title {
+			margin: 0;
+			font-size: 1rem;
+		}
+		.onboarding-summary-meta {
+			margin: var(--space-1) 0 0;
+			color: var(--color-muted-foreground);
+			font-size: 0.875rem;
+		}
+		.onboarding-list {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			flex-direction: column;
+			gap: 0;
+		}
+		.onboarding-item {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) 9.5rem 5.25rem;
+			align-items: center;
+			column-gap: var(--space-3);
+			padding: var(--space-3) 0;
+			border-bottom: 1px solid var(--color-border-subtle);
+		}
+		.onboarding-item:last-child {
+			border-bottom: none;
+			padding-bottom: 0;
+		}
+		.onboarding-item:first-child {
+			padding-top: 0;
+		}
+		.onboarding-item-label {
+			display: block;
+			font-size: 0.9375rem;
+		}
+		.onboarding-item-detail {
+			margin: var(--space-1) 0 0;
+			color: var(--color-muted-foreground);
+			font-size: 0.8125rem;
+		}
+		.onboarding-item-status {
+			display: flex;
+			justify-content: center;
+		}
+		.onboarding-item-status .status-pill {
+			white-space: nowrap;
+		}
+		.onboarding-item-action {
+			display: flex;
+			justify-content: flex-end;
+		}
+		.onboarding-empty {
+			margin: 0;
+			color: var(--color-muted-foreground);
+		}
+		.onboarding-item .btn-sm {
+			padding: 0.35rem 0.75rem;
+			font-size: 0.8125rem;
+			margin-top: 0;
+		}
+		@media (max-width: 640px) {
+			.onboarding-item {
+				grid-template-columns: 1fr;
+				row-gap: var(--space-2);
+			}
+			.onboarding-item-status,
+			.onboarding-item-action {
+				justify-content: flex-start;
+			}
+		}
+	</style>
+}

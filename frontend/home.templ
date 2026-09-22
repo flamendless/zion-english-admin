@@ -17,6 +17,8 @@ type DashboardCurrencySection struct {
 type DashboardData struct {
 	Role                   auth.Role
 	Avatar                 AvatarProps
+	Onboarding             OnboardingChecklistData
+	ShowOnboarding         bool
 	ActiveStudents         int64
 	InactiveStudents       int64
 	PendingTeachers        int64
@@ -96,6 +98,10 @@ templ Home(data DashboardData) {
 				text-transform: uppercase;
 				letter-spacing: 0.03em;
 			}
+
+			.dashboard-setup-section {
+				margin-bottom: var(--space-6);
+			}
 		</style>
 	</head>
 	<body>
@@ -118,6 +124,13 @@ templ Home(data DashboardData) {
 			</div>
 
 			@DashboardStats(data)
+
+			if data.ShowOnboarding {
+				<section class="dashboard-setup-section">
+					<h2 class="dashboard-section-title">Complete your setup</h2>
+					@OnboardingChecklist(data.Onboarding)
+				</section>
+			}
 
 			<h2 class="dashboard-section-title">Quick actions</h2>
 			<div class="cards-grid">

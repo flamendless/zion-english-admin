@@ -1,0 +1,109 @@
+package frontend
+
+type MaterialLibraryFilterData struct {
+	ActionPath         string
+	Query              string
+	StatusFilter       string
+	AccessFilter       string
+	TagFilter          string
+	ProgressFilter     string
+	SortBy             string
+	SortOrder          string
+	SortKind           ListSortKind
+	ExistingTags       []LearningMaterialTag
+	TrainingTags       []TrainingMaterialTag
+	StatusOptions      []StatusOption
+	AccessOptions      []StatusOption
+	ProgressOptions    []StatusOption
+	ShowStatusFilter   bool
+	ShowAccessFilter   bool
+	ShowProgressFilter bool
+}
+
+templ MaterialLibraryFilterBar(data MaterialLibraryFilterData) {
+	<form class="list-toolbar material-library-toolbar" method="GET" action={ data.ActionPath }>
+		<div class="form-group material-library-search-group">
+			<label for="materialLibraryQ">Search</label>
+			<input
+				type="search"
+				id="materialLibraryQ"
+				name="q"
+				value={ data.Query }
+				placeholder="Title or description..."
+				autocomplete="off"
+			/>
+		</div>
+		if data.ShowStatusFilter && len(data.StatusOptions) > 0 {
+			<div class="form-group">
+				<label for="materialLibraryStatus">Status</label>
+				<select id="materialLibraryStatus" name="status">
+					<option value="">All</option>
+					for _, opt := range data.StatusOptions {
+						<option value={ opt.Value } selected?={ data.StatusFilter == opt.Value }>{ opt.Label }</option>
+					}
+				</select>
+			</div>
+		}
+		if data.ShowAccessFilter && len(data.AccessOptions) > 0 {
+			<div class="form-group">
+				<label for="materialLibraryAccess">Access</label>
+				<select id="materialLibraryAccess" name="access">
+					<option value="">All</option>
+					for _, opt := range data.AccessOptions {
+						<option value={ opt.Value } selected?={ data.AccessFilter == opt.Value }>{ opt.Label }</option>
+					}
+				</select>
+			</div>
+		}
+		if len(data.ExistingTags) > 0 || len(data.TrainingTags) > 0 {
+			<div class="form-group">
+				<label for="materialLibraryTag">Tag</label>
+				<select id="materialLibraryTag" name="tag_id">
+					<option value="">All</option>
+					if len(data.ExistingTags) > 0 {
+						for _, tag := range data.ExistingTags {
+							<option value={ tag.ID } selected?={ data.TagFilter == tag.ID }>{ tag.Label }</option>
+						}
+					} else {
+						for _, tag := range data.TrainingTags {
+							<option value={ tag.ID } selected?={ data.TagFilter == tag.ID }>{ tag.Label }</option>
+						}
+					}
+				</select>
+			</div>
+		}
+		if data.ShowProgressFilter && len(data.ProgressOptions) > 0 {
+			<div class="form-group">
+				<label for="materialLibraryProgress">Progress</label>
+				<select id="materialLibraryProgress" name="progress">
+					<option value="">All</option>
+					for _, opt := range data.ProgressOptions {
+						<option value={ opt.Value } selected?={ data.ProgressFilter == opt.Value }>{ opt.Label }</option>
+					}
+				</select>
+			</div>
+		}
+		@SortControls(data.SortBy, data.SortOrder, data.SortKind)
+		<div class="form-group list-toolbar-action">
+			<label for="materialLibraryFilterSubmit">&nbsp;</label>
+			<button type="submit" id="materialLibraryFilterSubmit">Filter</button>
+		</div>
+	</form>
+}
+
+templ MaterialLibraryFilterStyles() {
+	<style>
+		.material-library-toolbar .material-library-search-group {
+			flex: 2 1 280px;
+			min-width: min(100%, 280px);
+		}
+
+		.material-library-toolbar input[type="search"] {
+			width: 100%;
+		}
+
+		.material-library-toolbar input[type="search"]::-webkit-search-cancel-button {
+			cursor: pointer;
+		}
+	</style>
+}

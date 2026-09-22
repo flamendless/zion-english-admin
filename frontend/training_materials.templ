@@ -1,0 +1,1181 @@
+package frontend
+
+import (
+	"fmt"
+	"strings"
+	"zion-english/internal/trainingmaterials"
+	"zion-english/internal/utils"
+)
+
+type TrainingMaterialTag struct {
+	ID    string
+	Label string
+	Color string
+}
+
+type TrainingMaterialProgressSummary struct {
+	ProgressPercent float64
+	IsCompleted     bool
+	CompletedLabel  string
+	ProgressTone    PillTone
+}
+
+type TrainingMaterialListItem struct {
+	ID                string
+	Title             string
+	Description       string
+	URL               string
+	ThumbnailURL      string
+	SourceType        string
+	Status            string
+	Required          bool
+	Tags              []TrainingMaterialTag
+	PublicationStatus string
+	PublicationTone   PillTone
+	IsDeleted         bool
+	CanEdit           bool
+	CanWatch          bool
+	Progress          TrainingMaterialProgressSummary
+	HasProgress       bool
+}
+
+type TrainingMaterialsData struct {
+	Materials          []TrainingMaterialListItem
+	ExistingTags       []TrainingMaterialTag
+	CanCreate          bool
+	CanViewReport      bool
+	Query              string
+	StatusFilter       string
+	TagFilter          string
+	ProgressFilter     string
+	SortBy             string
+	SortOrder          string
+	ShowStatusFilter   bool
+	ShowProgressFilter bool
+	FilterPath         string
+	PageNumber         int
+	PageTotalPages     int
+	PageTotal          int64
+	PrevURL            string
+	NextURL            string
+	HasPrev            bool
+	HasNext            bool
+}
+
+type TrainingMaterialFormData struct {
+	ID           string
+	Title        string
+	Description  string
+	URL          string
+	ThumbnailURL string
+	SourceType   string
+	Status       string
+	Required     bool
+	SelectedTags []TrainingMaterialTag
+	ExistingTags []TrainingMaterialTag
+	IsEdit       bool
+	IsDeleted    bool
+	CanDelete    bool
+}
+
+type TrainingMaterialViewData struct {
+	ID           string
+	Title        string
+	Description  string
+	URL          string
+	ThumbnailURL string
+	SourceType   string
+	Status       string
+	Required     bool
+	CreatedAt    string
+	UpdatedAt    string
+	DeletedAt    string
+	Tags         []TrainingMaterialTag
+	CanEdit      bool
+	CanWatch     bool
+}
+
+type TrainingMaterialWatchData struct {
+	ID              string
+	Title           string
+	Description     string
+	EmbedURL        string
+	VideoID         string
+	SourceType      string
+	ThumbnailURL    string
+	Tags            []TrainingMaterialTag
+	DurationSeconds int64
+	Progress        TrainingMaterialProgressSummary
+	ProgressURL     string
+	BackURL         string
+}
+
+type TrainingMaterialSelectOption struct {
+	ID    string
+	Title string
+}
+
+type TrainingMaterialProgressReportItem struct {
+	MaterialID      string
+	MaterialTitle   string
+	TeacherID       string
+	TeacherName     string
+	TeacherAvatar   AvatarProps
+	ProgressPercent float64
+	CompletedAt     string
+	LastViewedAt    string
+	IsCompleted     bool
+}
+
+type TrainingMaterialsProgressData struct {
+	Items            []TrainingMaterialProgressReportItem
+	MaterialOptions  []TrainingMaterialSelectOption
+	SelectedMaterial string
+	StatusFilter     string
+	BackURL          string
+	PageNumber       int
+	PageTotalPages   int
+	PageTotal        int64
+	PrevURL          string
+	NextURL          string
+	HasPrev          bool
+	HasNext          bool
+}
+
+func trainingMaterialFormAction(data TrainingMaterialFormData) string {
+	if data.IsEdit {
+		return utils.URL("/training-materials/" + data.ID + "/edit")
+	}
+	return utils.URL("/training-materials/create")
+}
+
+func trainingMaterialFormTitle(data TrainingMaterialFormData) string {
+	if data.IsEdit {
+		return "Edit Training Material"
+	}
+	return "Add Training Material"
+}
+
+func trainingMaterialSubmitLabel(data TrainingMaterialFormData) string {
+	if data.IsEdit {
+		return "Save changes"
+	}
+	return "Create material"
+}
+
+func trainingMaterialDescriptionPreview(desc string) string {
+	desc = strings.TrimSpace(desc)
+	if len(desc) <= 120 {
+		return desc
+	}
+	return desc[:117] + "..."
+}
+
+func trainingMaterialStatusFilterOptions(show bool) []StatusOption {
+	if !show {
+		return nil
+	}
+	return []StatusOption{
+		{Value: trainingmaterials.StatusDraft, Label: "Draft"},
+		{Value: trainingmaterials.StatusPublished, Label: "Published"},
+		{Value: trainingmaterials.StatusDeleted, Label: "Deleted"},
+	}
+}
+
+func trainingMaterialProgressFilterOptions() []StatusOption {
+	return []StatusOption{
+		{Value: "not_started", Label: "Not started"},
+		{Value: "in_progress", Label: "In progress"},
+		{Value: "completed", Label: "Completed"},
+	}
+}
+
+func trainingMaterialCardClass(status string) string {
+	switch status {
+	case trainingmaterials.StatusPublished:
+		return "tm-card tm-card--published"
+	case trainingmaterials.StatusDeleted:
+		return "tm-card tm-card--deleted"
+	default:
+		return "tm-card tm-card--draft"
+	}
+}
+
+func trainingMaterialViewStatusLabel(status string) string {
+	switch status {
+	case trainingmaterials.StatusPublished:
+		return "Published"
+	case trainingmaterials.StatusDeleted:
+		return "Deleted"
+	default:
+		return "Draft"
+	}
+}
+
+func trainingMaterialViewStatusTone(status string) PillTone {
+	switch status {
+	case trainingmaterials.StatusPublished:
+		return PillToneSuccess
+	case trainingmaterials.StatusDeleted:
+		return PillToneError
+	default:
+		return PillToneNeutral
+	}
+}
+
+func trainingMaterialRequiredLabel(required bool) string {
+	if required {
+		return "Yes"
+	}
+	return "No"
+}
+
+func trainingMaterialProgressPercentLabel(percent float64) string {
+	return fmt.Sprintf("%.0f%% complete", percent)
+}
+
+templ TrainingMaterials(data TrainingMaterialsData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>Training Materials - Zion English Admin</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@TrainingMaterialsStyles()
+	</head>
+	<body>
+		<div class="container tm-page">
+			@HeaderSimple()
+			<div class="hub-header">
+				<div class="tm-page-heading">
+					<h2 class="hub-title">Training Materials</h2>
+					<p class="tm-page-subtitle">Admin-curated training videos for teachers.</p>
+				</div>
+				<div class="tm-header-actions">
+					if data.CanViewReport {
+						<a href={ utils.URL("/training-materials/progress") } class="btn btn-secondary">View progress</a>
+					}
+					if data.CanCreate {
+						<button type="button" class="add-btn tm-add-btn" id="openCreateTrainingBtn">
+							@TrainingMaterialPlusIcon()
+							Add material
+						</button>
+					}
+				</div>
+			</div>
+			@SuccessBanner()
+			@ErrorBanner()
+			@MaterialLibraryFilterStyles()
+			@MaterialLibraryFilterBar(MaterialLibraryFilterData{
+				ActionPath:         data.FilterPath,
+				Query:              data.Query,
+				StatusFilter:       data.StatusFilter,
+				TagFilter:          data.TagFilter,
+				ProgressFilter:     data.ProgressFilter,
+				SortBy:             data.SortBy,
+				SortOrder:          data.SortOrder,
+				SortKind:           ListSortKindTrainingMaterial,
+				TrainingTags:       data.ExistingTags,
+				StatusOptions:      trainingMaterialStatusFilterOptions(data.ShowStatusFilter),
+				ProgressOptions:    trainingMaterialProgressFilterOptions(),
+				ShowStatusFilter:   data.ShowStatusFilter,
+				ShowProgressFilter: data.ShowProgressFilter,
+			})
+			@SortToggleScript()
+
+			if len(data.Materials) > 0 {
+				<div class="tm-grid" role="list">
+					for _, item := range data.Materials {
+						@TrainingMaterialCard(item)
+					}
+				</div>
+				@PaginationBar(data.HasPrev, data.PrevURL, data.HasNext, data.NextURL, data.PageNumber, data.PageTotalPages, data.PageTotal)
+			} else {
+				<div class="tm-empty">
+					<div class="tm-empty-icon" aria-hidden="true">
+						@TrainingMaterialVideoIcon()
+					</div>
+					if data.Query != "" || data.StatusFilter != "" || data.TagFilter != "" || data.ProgressFilter != "" {
+						<p>No training materials match your filters.</p>
+					} else {
+						<p>No training materials yet.</p>
+					}
+					if data.CanCreate {
+						<button type="button" class="add-btn tm-add-btn" onclick="document.getElementById('openCreateTrainingBtn')?.click()">
+							Add your first material
+						</button>
+					}
+				</div>
+			}
+		</div>
+
+		<div id="tmViewModalHost"></div>
+		<div id="tmEditModalHost"></div>
+
+		if data.CanCreate {
+			@TrainingMaterialFormModal(TrainingMaterialFormData{
+				SourceType:   string(trainingmaterials.SourceYouTube),
+				Status:       trainingmaterials.StatusDraft,
+				ExistingTags: data.ExistingTags,
+			})
+		}
+
+		@TrainingMaterialsScripts()
+		@TrainingMaterialViewModalScripts()
+	</body>
+	</html>
+}
+
+templ TrainingMaterialCard(item TrainingMaterialListItem) {
+	<article class={ trainingMaterialCardClass(item.Status) } role="listitem">
+		@TrainingMaterialThumbnail(item.ThumbnailURL, item.Title)
+		<h3 class="tm-card-title">{ item.Title }</h3>
+		<p class="tm-card-description">{ trainingMaterialDescriptionPreview(item.Description) }</p>
+		<div class="tm-card-badges">
+			@StatusPill(item.PublicationStatus, item.PublicationTone, false)
+			if item.Required {
+				@StatusPill("Required", PillToneWarning, false)
+			}
+			if item.HasProgress {
+				@StatusPill(item.Progress.CompletedLabel, item.Progress.ProgressTone, false)
+			}
+		</div>
+		if len(item.Tags) > 0 {
+			<div class="tm-tag-list" aria-label="Tags">
+				for _, tag := range item.Tags {
+					@TrainingMaterialTagPill(tag)
+				}
+			</div>
+		}
+		<div class="tm-card-footer">
+			<div class="tm-card-actions">
+				if item.CanWatch {
+					<a href={ utils.URL("/training-materials/" + item.ID + "/watch") } class="btn">Watch</a>
+				}
+				@IconActionButton("View", IconKindView, templ.Attributes{
+					"hx-get":    utils.URL("/training-materials/" + item.ID + "/view"),
+					"hx-target": "#tmViewModalHost",
+					"hx-swap":   "innerHTML",
+				})
+				if item.CanEdit {
+					@IconActionButton("Edit", IconKindEdit, templ.Attributes{
+						"hx-get":    utils.URL("/training-materials/" + item.ID + "/edit"),
+						"hx-target": "#tmEditModalHost",
+						"hx-swap":   "innerHTML",
+					})
+				}
+			</div>
+		</div>
+	</article>
+}
+
+templ TrainingMaterialTagPill(tag TrainingMaterialTag) {
+	<span class="tm-tag-pill" style={ "background-color: " + tag.Color + "33; color: #2D2D2D;" }>
+		{ tag.Label }
+	</span>
+}
+
+templ TrainingMaterialThumbnail(thumbnailURL string, title string) {
+	<div class="tm-thumb">
+		if thumbnailURL != "" {
+			<img
+				src={ thumbnailURL }
+				class="tm-thumb-img"
+				alt={ "Preview for " + title }
+				loading="lazy"
+				referrerpolicy="no-referrer"
+				onerror="this.hidden=true; const p=this.parentElement.querySelector('.tm-thumb-placeholder'); if(p) p.hidden=false;"
+			/>
+			<div class="tm-thumb-placeholder" hidden aria-hidden="true">
+				@TrainingMaterialVideoIcon()
+			</div>
+		} else {
+			<div class="tm-thumb-placeholder" aria-hidden="true">
+				@TrainingMaterialVideoIcon()
+			</div>
+		}
+	</div>
+}
+
+templ TrainingMaterialViewModal(data TrainingMaterialViewData) {
+	<div class="modal-overlay" id="tmViewModal" role="presentation">
+		<div class="modal-dialog modal-dialog-entity tm-modal" role="dialog" aria-modal="true" aria-labelledby="tmViewTitle">
+			<div class="modal-header">
+				<h3 id="tmViewTitle">{ data.Title }</h3>
+				<button type="button" class="modal-close tm-view-close" data-tooltip="Close" aria-label="Close">&times;</button>
+			</div>
+			<div class="modal-body tm-view-body">
+				@TrainingMaterialThumbnail(data.ThumbnailURL, data.Title)
+				<div class="tm-view-section">
+					<h4 class="tm-view-label">Description</h4>
+					<p class="tm-view-text">{ data.Description }</p>
+				</div>
+				<div class="tm-view-section">
+					<h4 class="tm-view-label">URL</h4>
+					<a href={ data.URL } class="tm-view-link" target="_blank" rel="noopener noreferrer">{ data.URL }</a>
+				</div>
+				<div class="tm-view-section">
+					<h4 class="tm-view-label">Status</h4>
+					@StatusPill(trainingMaterialViewStatusLabel(data.Status), trainingMaterialViewStatusTone(data.Status), false)
+				</div>
+				<div class="tm-view-section">
+					<h4 class="tm-view-label">Required for onboarding</h4>
+					<p class="tm-view-text">{ trainingMaterialRequiredLabel(data.Required) }</p>
+				</div>
+				if len(data.Tags) > 0 {
+					<div class="tm-view-section">
+						<h4 class="tm-view-label">Tags</h4>
+						<div class="tm-tag-list">
+							for _, tag := range data.Tags {
+								@TrainingMaterialTagPill(tag)
+							}
+						</div>
+					</div>
+				}
+				<div class="tm-view-meta">
+					@TrainingMaterialMetaItem("Created", data.CreatedAt)
+					@TrainingMaterialMetaItem("Updated", data.UpdatedAt)
+					if data.DeletedAt != "" {
+						@TrainingMaterialMetaItem("Deleted", data.DeletedAt)
+					}
+				</div>
+			</div>
+			<div class="modal-footer tm-view-footer">
+				<div class="tm-view-footer-actions">
+					if data.CanWatch {
+						<a href={ utils.URL("/training-materials/" + data.ID + "/watch") } class="btn">Watch</a>
+					}
+					<button type="button" class="btn btn-secondary tm-view-close">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+templ TrainingMaterialMetaItem(label string, value string) {
+	<div class="tm-meta-item">
+		<span class="tm-meta-label">{ label }</span>
+		<span class="tm-meta-value">{ value }</span>
+	</div>
+}
+
+templ TrainingMaterialFormModal(data TrainingMaterialFormData) {
+	<div class="modal-overlay" id={ trainingMaterialModalID(data) } hidden?={ !data.IsEdit } role="presentation">
+		<div class="modal-dialog tm-modal" role="dialog" aria-modal="true" aria-labelledby="tmFormTitle">
+			<div class="modal-header">
+				<h3 id="tmFormTitle">{ trainingMaterialFormTitle(data) }</h3>
+				<button type="button" class="modal-close tm-form-close" data-tooltip="Close" aria-label="Close">&times;</button>
+			</div>
+			<form
+				id="tmMaterialForm"
+				method="POST"
+				action={ trainingMaterialFormAction(data) }
+				class="modal-body tm-form-body"
+			>
+				<div class="form-group">
+					<label for="tmTitle">Title *</label>
+					<input type="text" id="tmTitle" name="title" required maxlength="64" value={ data.Title } placeholder="Short name for this training"/>
+				</div>
+				<div class="form-group">
+					<label for="tmDescription">Description *</label>
+					<textarea id="tmDescription" name="description" required rows="4" maxlength="1000" placeholder="What will teachers learn?">{ data.Description }</textarea>
+				</div>
+				<div class="form-group">
+					<label for="tmURL">YouTube URL *</label>
+					<input type="url" id="tmURL" class="tm-form-url" name="url" required value={ data.URL } placeholder="https://www.youtube.com/watch?v=..."/>
+					<p class="field-hint">Paste a YouTube link. Other video hosts are not supported yet.</p>
+					<div id="tmUrlPreview" class="tm-thumb tm-url-preview" hidden?={ data.ThumbnailURL == "" }>
+						<img
+							id="tmUrlPreviewImg"
+							class="tm-thumb-img"
+							alt="Link preview"
+							referrerpolicy="no-referrer"
+							hidden?={ data.ThumbnailURL == "" }
+							if data.ThumbnailURL != "" {
+								src={ data.ThumbnailURL }
+							}
+						/>
+						<div id="tmUrlPreviewPlaceholder" class="tm-thumb-placeholder" hidden?={ data.ThumbnailURL != "" } aria-hidden="true">
+							@TrainingMaterialVideoIcon()
+						</div>
+						<span class="tm-url-preview-loading">Fetching preview…</span>
+					</div>
+					<input type="hidden" id="tmSourceType" name="source_type" value={ data.SourceType }/>
+				</div>
+				<div class="form-group">
+					<label for="tmStatus">Status *</label>
+					if data.IsDeleted {
+						<p class="field-hint">This material is deleted. Choose Draft or Published to restore it.</p>
+					}
+					<select id="tmStatus" name="status" required>
+						<option value={ trainingmaterials.StatusDraft } selected?={ data.Status != trainingmaterials.StatusPublished && data.Status != trainingmaterials.StatusDeleted }>Draft</option>
+						<option value={ trainingmaterials.StatusPublished } selected?={ data.Status == trainingmaterials.StatusPublished }>Published</option>
+						if data.IsEdit && data.CanDelete {
+							<option value={ trainingmaterials.StatusDeleted } selected?={ data.Status == trainingmaterials.StatusDeleted }>Deleted</option>
+						}
+					</select>
+				</div>
+				<div class="form-group">
+					<label class="checkbox-label">
+						<input type="checkbox" name="required" value="1" checked?={ data.Required }/>
+						Required for teacher onboarding
+					</label>
+					<p class="field-hint">Teachers must complete this video before their setup checklist is done.</p>
+				</div>
+				<div class="form-group">
+					<label for="tmTagInput">Tags * <span class="tm-tag-hint">(1–7 tags)</span></label>
+					<div class="tm-tag-input-wrap" id="tmTagInputWrap">
+						<div class="tm-tag-chips" id="tmTagChips" aria-live="polite"></div>
+						<input type="text" id="tmTagInput" class="tm-tag-text-input" placeholder="Type a tag and press Enter" autocomplete="off" list="tmTagSuggestions"/>
+						<datalist id="tmTagSuggestions">
+							for _, tag := range data.ExistingTags {
+								<option value={ tag.Label }></option>
+							}
+						</datalist>
+					</div>
+					<p class="field-hint tm-tag-limit-warning" hidden>Maximum of 7 tags reached. Remove a tag to add another.</p>
+					for _, tag := range data.SelectedTags {
+						<input type="hidden" name="tags" value={ tag.Label }/>
+					}
+				</div>
+				<div class="modal-footer tm-form-footer">
+					<div class="tm-form-footer-actions">
+						<button type="button" class="btn btn-secondary tm-form-close">Cancel</button>
+						<button type="submit" class="add-btn tm-submit-btn">{ trainingMaterialSubmitLabel(data) }</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+}
+
+func trainingMaterialModalID(data TrainingMaterialFormData) string {
+	if data.IsEdit {
+		return "tmEditModal"
+	}
+	return "tmFormModal"
+}
+
+templ TrainingMaterialWatch(data TrainingMaterialWatchData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>{ data.Title } - Training - Zion English Admin</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@TrainingMaterialsStyles()
+	</head>
+	<body>
+		<div class="container tm-watch-page">
+			@HeaderSimple()
+			<div class="tm-watch-header">
+				<a href={ data.BackURL } class="btn btn-secondary">Back to library</a>
+				<h2 class="hub-title">{ data.Title }</h2>
+				<p class="tm-page-subtitle">{ data.Description }</p>
+			</div>
+
+			if data.SourceType == string(trainingmaterials.SourceYouTube) {
+				<div class="tm-player-wrap">
+					<div id="tmYouTubePlayer"></div>
+				</div>
+			}
+
+			<div class="tm-watch-progress">
+				<div class="tm-progress-bar" aria-hidden="true">
+					<div id="tmProgressFill" class="tm-progress-fill" style={ fmt.Sprintf("width: %.1f%%", data.Progress.ProgressPercent) }></div>
+				</div>
+				<p id="tmProgressLabel" class="tm-progress-label">{ trainingMaterialProgressPercentLabel(data.Progress.ProgressPercent) }</p>
+			</div>
+
+			if len(data.Tags) > 0 {
+				<div class="tm-tag-list">
+					for _, tag := range data.Tags {
+						@TrainingMaterialTagPill(tag)
+					}
+				</div>
+			}
+		</div>
+
+		@templ.JSONScript("tmWatchConfig", map[string]interface{}{
+			"videoId": data.VideoID,
+			"embedUrl": data.EmbedURL,
+			"sourceType": data.SourceType,
+			"progressUrl": data.ProgressURL,
+			"initialProgress": data.Progress.ProgressPercent,
+			"durationSeconds": data.DurationSeconds,
+		})
+		@TrainingMaterialWatchScripts()
+	</body>
+	</html>
+}
+
+templ TrainingMaterialsProgressReport(data TrainingMaterialsProgressData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>Training Progress - Zion English Admin</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@AvatarStyles()
+		@TrainingMaterialsStyles()
+	</head>
+	<body>
+		<div class="container tm-page">
+			@HeaderSimple()
+			<div class="hub-header">
+				<div class="tm-page-heading">
+					<h2 class="hub-title">Training Progress</h2>
+					<p class="tm-page-subtitle">See which teachers have watched each training material.</p>
+				</div>
+				<a href={ data.BackURL } class="btn btn-secondary">Back to library</a>
+			</div>
+
+			<form class="tm-filter-form" method="GET" action={ utils.URL("/training-materials/progress") }>
+				<div class="form-group">
+					<label for="tmFilterMaterial">Material</label>
+					<select id="tmFilterMaterial" name="material_id">
+						<option value="">All materials</option>
+						for _, opt := range data.MaterialOptions {
+							<option value={ opt.ID } selected?={ data.SelectedMaterial == opt.ID }>{ opt.Title }</option>
+						}
+					</select>
+				</div>
+				<div class="form-group">
+					<label for="tmFilterStatus">Status</label>
+					<select id="tmFilterStatus" name="status">
+						<option value="all" selected?={ data.StatusFilter == "all" }>All</option>
+						<option value="completed" selected?={ data.StatusFilter == "completed" }>Completed</option>
+						<option value="in_progress" selected?={ data.StatusFilter == "in_progress" }>In progress</option>
+						<option value="not_started" selected?={ data.StatusFilter == "not_started" }>Not started</option>
+					</select>
+				</div>
+				<button type="submit" class="btn">Filter</button>
+			</form>
+
+			if len(data.Items) > 0 {
+				<div class="table-wrap">
+					<table class="data-table">
+						<thead>
+							<tr>
+								<th>Teacher</th>
+								<th>Material</th>
+								<th>Progress</th>
+								<th>Completed</th>
+								<th>Last watched</th>
+							</tr>
+						</thead>
+						<tbody>
+							for _, item := range data.Items {
+								<tr>
+									<td>@TeacherNameCell(item.TeacherName, item.TeacherAvatar)</td>
+									<td>{ item.MaterialTitle }</td>
+									<td>
+										if item.IsCompleted {
+											@StatusPill("Completed", PillToneSuccess, false)
+										} else {
+											@StatusPill(fmt.Sprintf("%.0f%%", item.ProgressPercent), PillToneInfo, false)
+										}
+									</td>
+									<td>{ item.CompletedAt }</td>
+									<td>{ item.LastViewedAt }</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+				@PaginationBar(data.HasPrev, data.PrevURL, data.HasNext, data.NextURL, data.PageNumber, data.PageTotalPages, data.PageTotal)
+			} else {
+				<div class="tm-empty">
+					<p>No progress records match these filters.</p>
+				</div>
+			}
+		</div>
+	</body>
+	</html>
+}
+
+templ TrainingMaterialPlusIcon() {
+	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<path d="M12 5v14"></path>
+		<path d="M5 12h14"></path>
+	</svg>
+}
+
+templ TrainingMaterialVideoIcon() {
+	<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<path d="m16 13 5.223-3.482a.5.5 0 0 1 .777.416V14.87a.5.5 0 0 1-.777.416L16 11.87"></path>
+		<rect width="14" height="12" x="2" y="6" rx="2"></rect>
+	</svg>
+}
+
+templ TrainingMaterialsStyles() {
+	<style>
+		.tm-page { padding-bottom: var(--space-10); }
+		.tm-page-heading { display: flex; flex-direction: column; gap: var(--space-1); }
+		.tm-page-subtitle { color: var(--color-muted-foreground); font-size: 0.9375rem; line-height: 1.5; max-width: 36rem; }
+		.tm-header-actions {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--space-2);
+			align-items: center;
+			justify-content: flex-end;
+			flex-shrink: 0;
+		}
+		.tm-header-actions .btn,
+		.tm-header-actions .add-btn,
+		.tm-header-actions button {
+			margin-top: 0;
+			width: auto;
+		}
+		.hub-header > .btn,
+		.hub-header > a.btn {
+			margin-top: 0;
+			width: auto;
+			flex-shrink: 0;
+		}
+		.tm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-4); margin-top: var(--space-4); }
+		.tm-card { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); box-shadow: var(--shadow-sm); }
+		.tm-card-title { font-size: 1.0625rem; font-weight: 600; line-height: 1.35; }
+		.tm-card-description { color: var(--color-muted-foreground); font-size: 0.875rem; line-height: 1.5; }
+		.tm-card-badges { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+		.tm-card-actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: flex-end;
+			gap: var(--space-1);
+			flex-shrink: 0;
+		}
+		.tm-card-actions .btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			height: 36px;
+			margin-top: 0;
+			padding: 0 var(--space-3);
+			font-size: 0.8125rem;
+			line-height: 1;
+			box-sizing: border-box;
+		}
+		.tm-card-footer { margin-top: auto; display: flex; justify-content: flex-end; }
+		.tm-thumb { width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-md); overflow: hidden; background: linear-gradient(180deg, #F0FDFA 0%, #E6FFFA 100%); border: 1px solid var(--color-border-subtle); position: relative; }
+		.tm-thumb-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+		.tm-thumb-placeholder { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: var(--color-muted-foreground); }
+		.tm-tag-list { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+		.tm-tag-pill { display: inline-flex; align-items: center; padding: 0.2rem 0.55rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600; border: var(--pill-border); }
+		.tm-empty { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); padding: var(--space-10) var(--space-4); color: var(--color-muted-foreground); text-align: center; }
+		.tm-empty-icon { color: var(--color-primary); }
+		.tm-view-body, .tm-form-body { display: flex; flex-direction: column; gap: var(--space-4); }
+		.tm-view-label { font-size: 0.8125rem; font-weight: 600; color: var(--color-muted-foreground); text-transform: uppercase; letter-spacing: 0.04em; }
+		.tm-view-text { font-size: 0.9375rem; line-height: 1.6; white-space: pre-wrap; }
+		.tm-view-link { word-break: break-all; font-size: 0.875rem; }
+		.tm-view-meta { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); border-radius: var(--radius-md); background: var(--color-muted); }
+		.tm-meta-item { display: flex; flex-direction: column; gap: 2px; }
+		.tm-meta-label { font-size: 0.75rem; font-weight: 600; color: var(--color-muted-foreground); text-transform: uppercase; }
+		.tm-meta-value { font-size: 0.875rem; }
+		.tm-form-footer {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-3);
+			justify-content: flex-end;
+		}
+		.tm-view-footer {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-3);
+			padding: var(--space-2) var(--space-4) var(--space-4);
+			border-top: 1px solid var(--color-border-subtle);
+		}
+		.tm-form-footer-actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: flex-end;
+			gap: var(--space-3);
+			width: 100%;
+		}
+		.tm-view-footer-actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: flex-end;
+			gap: var(--space-3);
+			width: 100%;
+		}
+		.tm-view-footer button,
+		.tm-view-footer .btn,
+		.tm-view-footer .add-btn,
+		.tm-form-footer button,
+		.tm-form-footer .btn,
+		.tm-form-footer .add-btn {
+			margin-top: 0;
+		}
+		.tm-tag-input-wrap { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; padding: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); min-height: 2.75rem; }
+		.tm-tag-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+		.tm-tag-chip { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.15rem 0.5rem; border-radius: var(--radius-full); background: var(--color-muted); font-size: 0.8125rem; border: var(--pill-border); }
+		.tm-tag-text-input { flex: 1; min-width: 8rem; border: none; outline: none; background: transparent; font-size: 0.875rem; }
+		.tm-url-preview-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.75); font-size: 0.8125rem; color: var(--color-muted-foreground); }
+		.tm-url-preview.is-loading .tm-url-preview-loading { display: flex; }
+		.tm-url-preview:not(.is-loading) .tm-url-preview-loading { display: none; }
+		.tm-watch-page { padding-bottom: var(--space-10); }
+		.tm-watch-header {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: var(--space-3);
+			margin-bottom: var(--space-4);
+		}
+		.tm-watch-header .btn {
+			margin-top: 0;
+			width: auto;
+		}
+		.tm-player-wrap { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--color-border); background: #000; }
+		.tm-player-wrap iframe, #tmYouTubePlayer { width: 100%; height: 100%; }
+		.tm-watch-progress { margin-top: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); }
+		.tm-progress-bar { width: 100%; height: 0.5rem; border-radius: var(--radius-full); background: var(--color-muted); overflow: hidden; }
+		.tm-progress-fill { height: 100%; background: var(--color-primary); transition: width 0.3s ease; }
+		.tm-progress-label { font-size: 0.875rem; color: var(--color-muted-foreground); }
+		.tm-filter-form { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: flex-end; margin: var(--space-4) 0; }
+		.tm-filter-form .form-group { margin: 0; min-width: 12rem; }
+		#tmViewModalHost .modal-overlay, #tmEditModalHost .modal-overlay { z-index: 1100; }
+		@media (max-width: 768px) {
+			.hub-header { flex-direction: column; align-items: stretch; }
+			.hub-header > .btn,
+			.hub-header > a.btn {
+				align-self: flex-start;
+			}
+			.tm-header-actions .btn,
+			.tm-header-actions .add-btn {
+				width: auto;
+			}
+		}
+	</style>
+}
+
+templ TrainingMaterialsScripts() {
+	@templ.JSONScript("tmPreviewURL", utils.URL("/training-materials/preview"))
+	<script>
+		(function () {
+			if (window._tmScriptsBound) return;
+			window._tmScriptsBound = true;
+
+			const MAX_TAGS = 7;
+			const MIN_TAGS = 1;
+			const previewURLScript = document.getElementById('tmPreviewURL');
+			const PREVIEW_URL = previewURLScript ? JSON.parse(previewURLScript.textContent) : '/training-materials/preview';
+
+			function normalizeTag(value) {
+				return (value || '').trim().toLowerCase();
+			}
+
+			function bindTagInput(form) {
+				const wrap = form.querySelector('#tmTagInputWrap');
+				const chips = form.querySelector('#tmTagChips');
+				const input = form.querySelector('#tmTagInput');
+				const limitWarning = form.querySelector('.tm-tag-limit-warning');
+				if (!wrap || !chips || !input) return;
+
+				function currentTags() {
+					return Array.from(form.querySelectorAll('input[name="tags"]')).map(function (el) { return el.value; });
+				}
+
+				function renderChips() {
+					chips.innerHTML = '';
+					currentTags().forEach(function (label) {
+						const chip = document.createElement('span');
+						chip.className = 'tm-tag-chip';
+						chip.textContent = label;
+						const remove = document.createElement('button');
+						remove.type = 'button';
+						remove.className = 'chip-remove';
+						remove.setAttribute('aria-label', 'Remove tag');
+						remove.textContent = '×';
+						remove.addEventListener('click', function () {
+							form.querySelectorAll('input[name="tags"]').forEach(function (el) {
+								if (el.value === label) el.remove();
+							});
+							renderChips();
+							if (limitWarning) limitWarning.hidden = currentTags().length < MAX_TAGS;
+						});
+						chip.appendChild(remove);
+						chips.appendChild(chip);
+					});
+					if (limitWarning) limitWarning.hidden = currentTags().length < MAX_TAGS;
+				}
+
+				function addTag(value) {
+					const label = normalizeTag(value);
+					if (!label || currentTags().includes(label)) return;
+					if (currentTags().length >= MAX_TAGS) return;
+					const hidden = document.createElement('input');
+					hidden.type = 'hidden';
+					hidden.name = 'tags';
+					hidden.value = label;
+					form.appendChild(hidden);
+					input.value = '';
+					renderChips();
+				}
+
+				input.addEventListener('keydown', function (e) {
+					if (e.key === 'Enter' || e.key === ',') {
+						e.preventDefault();
+						addTag(input.value);
+					}
+				});
+
+				renderChips();
+			}
+
+			let previewTimer = null;
+			function bindUrlPreview(form) {
+				const urlInput = form.querySelector('#tmURL');
+				const preview = form.querySelector('#tmUrlPreview');
+				const img = form.querySelector('#tmUrlPreviewImg');
+				const placeholder = form.querySelector('#tmUrlPreviewPlaceholder');
+				const sourceTypeInput = form.querySelector('#tmSourceType');
+				if (!urlInput || !preview) return;
+
+				urlInput.addEventListener('input', function () {
+					clearTimeout(previewTimer);
+					previewTimer = setTimeout(function () {
+						const url = (urlInput.value || '').trim();
+						if (!url) {
+							preview.hidden = true;
+							return;
+						}
+						preview.hidden = false;
+						preview.classList.add('is-loading');
+						fetch(PREVIEW_URL + '?url=' + encodeURIComponent(url))
+							.then(function (r) { return r.json(); })
+							.then(function (data) {
+								preview.classList.remove('is-loading');
+								if (data.thumbnail_url && img) {
+									img.src = data.thumbnail_url;
+									img.hidden = false;
+									if (placeholder) placeholder.hidden = true;
+								}
+								if (data.source_type && sourceTypeInput) {
+									sourceTypeInput.value = data.source_type;
+								}
+							})
+							.catch(function () { preview.classList.remove('is-loading'); });
+					}, 400);
+				});
+			}
+
+			function openModal(overlay) {
+				if (!overlay) return;
+				overlay.hidden = false;
+				document.body.classList.add('modal-open');
+				const form = overlay.querySelector('form');
+				if (form) {
+					bindTagInput(form);
+					bindUrlPreview(form);
+				}
+			}
+
+			function closeModal(overlay) {
+				if (!overlay) return;
+				overlay.hidden = true;
+				if (!document.getElementById('tmViewModal') && !document.getElementById('tmEditModal')) {
+					document.body.classList.remove('modal-open');
+				}
+			}
+
+			document.getElementById('openCreateTrainingBtn')?.addEventListener('click', function () {
+				openModal(document.getElementById('tmFormModal'));
+			});
+
+			document.body.addEventListener('click', function (e) {
+				if (e.target.closest('.tm-form-close')) {
+					const overlay = e.target.closest('.modal-overlay');
+					if (overlay?.id === 'tmEditModal') {
+						document.getElementById('tmEditModalHost').innerHTML = '';
+					} else {
+						closeModal(overlay);
+					}
+					return;
+				}
+				const overlay = e.target.closest('#tmFormModal, #tmEditModal');
+				if (overlay && e.target === overlay) {
+					if (overlay.id === 'tmEditModal') {
+						document.getElementById('tmEditModalHost').innerHTML = '';
+					} else {
+						closeModal(overlay);
+					}
+				}
+			});
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id === 'tmEditModalHost') {
+					document.body.classList.add('modal-open');
+					const form = evt.detail.target.querySelector('form');
+					if (form) {
+						bindTagInput(form);
+						bindUrlPreview(form);
+					}
+				}
+			});
+		})();
+	</script>
+}
+
+templ TrainingMaterialViewModalScripts() {
+	<script>
+		(function () {
+			if (window._tmViewModalBound) return;
+			window._tmViewModalBound = true;
+
+			function isOpenModalOverlay(id) {
+				const el = document.getElementById(id);
+				return !!(el && !el.hidden);
+			}
+
+			function hasOpenModalLayer() {
+				return (
+					isOpenModalOverlay('tmViewModal') ||
+					isOpenModalOverlay('tmEditModal') ||
+					isOpenModalOverlay('tmFormModal')
+				);
+			}
+
+			window.closeTrainingMaterialViewModal = function () {
+				const host = document.getElementById('tmViewModalHost');
+				if (host) host.innerHTML = '';
+				if (!hasOpenModalLayer()) {
+					document.body.classList.remove('modal-open');
+				}
+			};
+
+			document.body.addEventListener('click', function (e) {
+				if (e.target.closest('.tm-view-close')) {
+					window.closeTrainingMaterialViewModal();
+					return;
+				}
+				const viewOverlay = e.target.closest('#tmViewModal');
+				if (viewOverlay && e.target === viewOverlay) {
+					window.closeTrainingMaterialViewModal();
+				}
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key === 'Escape' && document.getElementById('tmViewModal')) {
+					window.closeTrainingMaterialViewModal();
+				}
+			});
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id !== 'tmViewModalHost') return;
+				document.body.classList.add('modal-open');
+			});
+		})();
+	</script>
+}
+
+templ TrainingMaterialWatchScripts() {
+	<script>
+		(function () {
+			const configEl = document.getElementById('tmWatchConfig');
+			if (!configEl) return;
+			const config = JSON.parse(configEl.textContent);
+			const playerHost = document.getElementById('tmYouTubePlayer');
+			let player = null;
+			let durationSeconds = config.durationSeconds || 0;
+			let lastReportedSeconds = 0;
+			let heartbeatTimer = null;
+
+			function updateProgressUI(percent) {
+				const fill = document.getElementById('tmProgressFill');
+				const label = document.getElementById('tmProgressLabel');
+				if (fill) fill.style.width = percent + '%';
+				if (label) label.textContent = Math.round(percent) + '% complete';
+			}
+
+			function sendProgress() {
+				if (!player || !config.progressUrl) return;
+				const current = Math.floor(player.getCurrentTime() || 0);
+				if (current < lastReportedSeconds) return;
+				lastReportedSeconds = current;
+				const duration = Math.floor(player.getDuration() || durationSeconds || 0);
+				if (duration > 0) durationSeconds = duration;
+				const percent = duration > 0 ? Math.min(100, (current / duration) * 100) : 0;
+				updateProgressUI(percent);
+				fetch(config.progressUrl, {
+					method: 'POST',
+					credentials: 'same-origin',
+					headers: Object.assign(
+						{ 'Content-Type': 'application/json' },
+						window.getCSRFHeaders ? window.getCSRFHeaders() : {}
+					),
+					body: JSON.stringify({
+						watch_seconds: current,
+						progress_percent: percent,
+						duration_seconds: duration
+					})
+				}).catch(function () {});
+			}
+
+			function pauseOnFocusLoss() {
+				if (player && typeof player.pauseVideo === 'function') {
+					player.pauseVideo();
+				}
+			}
+
+			document.addEventListener('visibilitychange', function () {
+				if (document.hidden) pauseOnFocusLoss();
+			});
+			window.addEventListener('blur', pauseOnFocusLoss);
+
+			function initYouTubePlayer() {
+				if (config.sourceType !== 'youtube' || !config.videoId || !playerHost) return;
+				player = new YT.Player('tmYouTubePlayer', {
+					videoId: config.videoId,
+					playerVars: { enablejsapi: 1, rel: 0, modestbranding: 1 },
+					events: {
+						onReady: function () {
+							updateProgressUI(config.initialProgress || 0);
+							heartbeatTimer = setInterval(sendProgress, 15000);
+						},
+						onStateChange: function (event) {
+							if (event.data === YT.PlayerState.PLAYING) {
+								sendProgress();
+							}
+						}
+					}
+				});
+			}
+
+			window.onYouTubeIframeAPIReady = initYouTubePlayer;
+
+			function loadYouTubeAPI() {
+				if (config.sourceType !== 'youtube' || !config.videoId || !playerHost) return;
+				if (window.YT && window.YT.Player) {
+					initYouTubePlayer();
+					return;
+				}
+				const existing = document.querySelector('script[data-tm-youtube-api]');
+				if (existing) return;
+				const tag = document.createElement('script');
+				tag.src = 'https://www.youtube.com/iframe_api';
+				tag.async = true;
+				tag.setAttribute('data-tm-youtube-api', '1');
+				document.head.appendChild(tag);
+			}
+
+			loadYouTubeAPI();
+
+			window.addEventListener('beforeunload', function () {
+				if (heartbeatTimer) clearInterval(heartbeatTimer);
+				sendProgress();
+			});
+		})();
+	</script>
+}

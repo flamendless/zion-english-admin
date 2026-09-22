@@ -38,19 +38,21 @@ func handleLearningMaterials(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
+	filters := parseMaterialLibraryFilters(r)
+	sort := parseListSort(r, frontend.ListSortKindLearningMaterial)
 	page := utils.ParsePageQuery(r)
 
 	var rows []learningMaterialRow
 	var err error
 	if user.Role == auth.RoleSuperuser {
-		page.Total, err = dbRO.GetQueries().CountLearningMaterialsForSuperuser(ctx)
+		total, err := dbRO.GetQueries().CountLearningMaterialsForSuperuser(ctx)
 		if err != nil {
 			HttpError(w, fmt.Sprintf("Failed to count materials: %v", err), http.StatusInternalServerError)
 			return
 		}
 		superRows, err := dbRO.GetQueries().GetLearningMaterialsPagedForSuperuser(ctx, queries.GetLearningMaterialsPagedForSuperuserParams{
-			Limit:  int64(page.Size),
-			Offset: int64(page.Offset()),
+			Limit:  total,
+			Offset: 0,
 		})
 		if err != nil {
 			HttpError(w, fmt.Sprintf("Failed to load materials: %v", err), http.StatusInternalServerError)
@@ -58,15 +60,15 @@ func handleLearningMaterials(w http.ResponseWriter, r *http.Request) {
 		}
 		rows = mapLearningMaterialSuperuserRows(superRows)
 	} else {
-		page.Total, err = dbRO.GetQueries().CountLearningMaterialsForUser(ctx, user.ID)
+		total, err := dbRO.GetQueries().CountLearningMaterialsForUser(ctx, user.ID)
 		if err != nil {
 			HttpError(w, fmt.Sprintf("Failed to count materials: %v", err), http.StatusInternalServerError)
 			return
 		}
 		userRows, err := dbRO.GetQueries().GetLearningMaterialsPagedForUser(ctx, queries.GetLearningMaterialsPagedForUserParams{
 			OwnerID: user.ID,
-			Limit:   int64(page.Size),
-			Offset:  int64(page.Offset()),
+			Limit:   total,
+			Offset:  0,
 		})
 		if err != nil {
 			HttpError(w, fmt.Sprintf("Failed to load materials: %v", err), http.StatusInternalServerError)
@@ -74,6 +76,20 @@ func handleLearningMaterials(w http.ResponseWriter, r *http.Request) {
 		}
 		rows = mapLearningMaterialUserRows(userRows)
 	}
+
+	materialIDs := make([]int64, 0, len(rows))
+	for _, row := range rows {
+		materialIDs = append(materialIDs, row.ID)
+	}
+	tagsByMaterial, err := loadMaterialTagIDsByMaterial(ctx, materialIDs, false)
+	if err != nil {
+		HttpError(w, fmt.Sprintf("Failed to load tags: %v", err), http.StatusInternalServerError)
+		return
+	}
+	rows = filterLearningMaterialRows(rows, tagsByMaterial, filters)
+	sortLearningMaterialRows(rows, sort)
+	page.Total = int64(len(rows))
+	rows = paginateSlice(rows, page)
 
 	items, err := buildLearningMaterialListItems(ctx, rows, user)
 	if err != nil {
@@ -88,15 +104,24 @@ func handleLearningMaterials(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filterPath := utils.URL("/learning-materials")
+	filterParams := materialLibraryFilterParams(filters, sort)
 	data := frontend.LearningMaterialsData{
 		Materials:      items,
 		ExistingTags:   mapLearningMaterialTags(existingTags),
 		CanCreate:      true,
+		Query:          filters.Query,
+		StatusFilter:   filters.Status,
+		AccessFilter:   filters.Access,
+		TagFilter:      materialTagFilterValue(filters.TagID),
+		SortBy:         sort.By,
+		SortOrder:      string(sort.Order),
+		ShowStatusFilter: user.Role == auth.RoleSuperuser,
+		FilterPath:     filterPath,
 		PageNumber:     page.Number,
 		PageTotalPages: page.TotalPages(),
 		PageTotal:      page.Total,
-		PrevURL:        utils.BuildPageURLAt(filterPath, page.Number-1, page.Size, nil),
-		NextURL:        utils.BuildPageURLAt(filterPath, page.Number+1, page.Size, nil),
+		PrevURL:        utils.BuildPageURLAt(filterPath, page.Number-1, page.Size, filterParams),
+		NextURL:        utils.BuildPageURLAt(filterPath, page.Number+1, page.Size, filterParams),
 		HasPrev:        page.HasPrev(),
 		HasNext:        page.HasNext(),
 	}

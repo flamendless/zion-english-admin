@@ -332,6 +332,47 @@ type TblTeachersStudentsM2m struct {
 	CreatedAt string
 }
 
+type TblTrainingMaterial struct {
+	ID              int64
+	Title           string
+	Description     string
+	Url             string
+	EmbedUrl        string
+	SourceType      string
+	VideoID         string
+	ThumbnailUrl    string
+	DurationSeconds sql.NullInt64
+	Status          string
+	CreatedBy       int64
+	CreatedAt       string
+	UpdatedAt       string
+	DeletedAt       sql.NullString
+	Required        int64
+}
+
+type TblTrainingMaterialProgress struct {
+	MaterialID      int64
+	TeacherID       int64
+	WatchSeconds    int64
+	ProgressPercent float64
+	CompletedAt     sql.NullString
+	FirstViewedAt   string
+	LastViewedAt    string
+}
+
+type TblTrainingMaterialTag struct {
+	ID        int64
+	Label     string
+	Color     string
+	CreatedAt string
+}
+
+type TblTrainingMaterialsTagsM2m struct {
+	MaterialID int64
+	TagID      int64
+	CreatedAt  string
+}
+
 type TblUseragent struct {
 	ID             int64
 	UserAgent      string

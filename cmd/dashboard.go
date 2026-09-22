@@ -13,6 +13,7 @@ import (
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
+	"zion-english/internal/onboarding"
 	"zion-english/internal/utils"
 
 	"go.uber.org/zap"
@@ -189,6 +190,19 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		populateDashboardEarnings(ctx, &data, earningsTeacherID, monthStart, monthEnd)
 	case auth.RoleTeacher, auth.RoleTester:
 		user := auth.GetUser(ctx)
+		if role == auth.RoleTeacher {
+			checklist, err := loadTeacherOnboardingChecklist(ctx, user.ID)
+			if err == nil {
+				completed, total := onboarding.Summary(checklist)
+				data.ShowOnboarding = total > 0 && completed < total
+				data.Onboarding = frontend.OnboardingChecklistData{
+					Items:          frontend.MapOnboardingItems(checklist),
+					CompletedCount: completed,
+					TotalCount:     total,
+					ShowSummary:    true,
+				}
+			}
+		}
 		count, err := dbRO.GetQueries().CountStudentsByTeacherID(ctx, user.ID)
 		if err == nil {
 			data.MyStudentCount = count
@@ -333,5 +347,5 @@ func handleLogoutWithAccess(w http.ResponseWriter, r *http.Request) {
 	}
 
 	auth.Logout(w)
-	HttpRedirect(w, r, "/")
+	HttpRedirect(w, r, "/auth/login")
 }

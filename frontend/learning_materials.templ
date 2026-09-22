@@ -34,16 +34,24 @@ type LearningMaterialListItem struct {
 }
 
 type LearningMaterialsData struct {
-	Materials      []LearningMaterialListItem
-	ExistingTags   []LearningMaterialTag
-	CanCreate      bool
-	PageNumber     int
-	PageTotalPages int
-	PageTotal      int64
-	PrevURL        string
-	NextURL        string
-	HasPrev        bool
-	HasNext        bool
+	Materials        []LearningMaterialListItem
+	ExistingTags     []LearningMaterialTag
+	CanCreate        bool
+	Query            string
+	StatusFilter     string
+	AccessFilter     string
+	TagFilter        string
+	SortBy           string
+	SortOrder        string
+	ShowStatusFilter bool
+	FilterPath       string
+	PageNumber       int
+	PageTotalPages   int
+	PageTotal        int64
+	PrevURL          string
+	NextURL          string
+	HasPrev          bool
+	HasNext          bool
 }
 
 type LearningMaterialFormData struct {
@@ -106,6 +114,24 @@ func learningMaterialDescriptionPreview(desc string) string {
 	return desc[:117] + "..."
 }
 
+func learningMaterialStatusFilterOptions(show bool) []StatusOption {
+	if !show {
+		return nil
+	}
+	return []StatusOption{
+		{Value: learningmaterials.StatusDraft, Label: "Draft"},
+		{Value: learningmaterials.StatusPublished, Label: "Published"},
+		{Value: learningmaterials.StatusDeleted, Label: "Deleted"},
+	}
+}
+
+func learningMaterialAccessFilterOptions() []StatusOption {
+	return []StatusOption{
+		{Value: learningmaterials.AccessPublic, Label: "Public"},
+		{Value: learningmaterials.AccessPrivate, Label: "Private"},
+	}
+}
+
 func learningMaterialCardClass(status string) string {
 	switch status {
 	case learningmaterials.StatusPublished:
@@ -146,6 +172,23 @@ templ LearningMaterials(data LearningMaterialsData) {
 			</div>
 			@SuccessBanner()
 			@ErrorBanner()
+			@MaterialLibraryFilterStyles()
+			@MaterialLibraryFilterBar(MaterialLibraryFilterData{
+				ActionPath:       data.FilterPath,
+				Query:            data.Query,
+				StatusFilter:     data.StatusFilter,
+				AccessFilter:     data.AccessFilter,
+				TagFilter:        data.TagFilter,
+				SortBy:           data.SortBy,
+				SortOrder:        data.SortOrder,
+				SortKind:         ListSortKindLearningMaterial,
+				ExistingTags:     data.ExistingTags,
+				StatusOptions:    learningMaterialStatusFilterOptions(data.ShowStatusFilter),
+				AccessOptions:    learningMaterialAccessFilterOptions(),
+				ShowStatusFilter: data.ShowStatusFilter,
+				ShowAccessFilter: true,
+			})
+			@SortToggleScript()
 
 			if len(data.Materials) > 0 {
 				<div class="lm-grid" role="list">
@@ -159,7 +202,11 @@ templ LearningMaterials(data LearningMaterialsData) {
 					<div class="lm-empty-icon" aria-hidden="true">
 						@LearningMaterialBookIcon()
 					</div>
-					<p>No learning materials yet.</p>
+					if data.Query != "" || data.StatusFilter != "" || data.AccessFilter != "" || data.TagFilter != "" {
+						<p>No learning materials match your filters.</p>
+					} else {
+						<p>No learning materials yet.</p>
+					}
 					if data.CanCreate {
 						<button type="button" class="add-btn lm-add-btn" onclick="document.getElementById('openCreateMaterialBtn')?.click()">
 							Add your first material
@@ -1003,7 +1050,7 @@ templ LearningMaterialsStyles() {
 			box-sizing: border-box;
 		}
 
-		.lm-tag-chip-remove {
+		button.lm-tag-chip-remove {
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
@@ -1011,6 +1058,7 @@ templ LearningMaterialsStyles() {
 			height: 1.125rem;
 			padding: 0;
 			margin: 0;
+			margin-top: 0;
 			border: none;
 			border-radius: var(--radius-full);
 			background: transparent;
@@ -1021,12 +1069,18 @@ templ LearningMaterialsStyles() {
 			font-weight: 400;
 			line-height: 1;
 			flex-shrink: 0;
+			box-sizing: border-box;
+			transform: none;
 		}
 
-		.lm-tag-chip-remove:hover {
+		button.lm-tag-chip-remove:hover {
 			background: rgba(0, 0, 0, 0.06);
 			background-color: rgba(0, 0, 0, 0.06);
 			color: var(--color-foreground);
+		}
+
+		button.lm-tag-chip-remove:active {
+			transform: none;
 		}
 
 		.lm-tag-text-input {
@@ -1245,12 +1299,17 @@ templ LearningMaterialViewModalScripts() {
 			if (window._lmViewModalBound) return;
 			window._lmViewModalBound = true;
 
+			function isOpenModalOverlay(id) {
+				const el = document.getElementById(id);
+				return !!(el && !el.hidden);
+			}
+
 			function hasOpenModalLayer() {
-				return !!(
-					document.getElementById('classViewModal') ||
-					document.getElementById('lmEditModal') ||
-					document.getElementById('lmFormModal') ||
-					document.getElementById('lmViewModal')
+				return (
+					isOpenModalOverlay('classViewModal') ||
+					isOpenModalOverlay('lmEditModal') ||
+					isOpenModalOverlay('lmFormModal') ||
+					isOpenModalOverlay('lmViewModal')
 				);
 			}
 

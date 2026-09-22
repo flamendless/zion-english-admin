@@ -1,7 +1,9 @@
 package frontend
 
-import "zion-english/internal/constants"
-import "zion-english/internal/utils"
+import (
+	"zion-english/internal/constants"
+	"zion-english/internal/utils"
+)
 
 type TeacherViewData struct {
 	ID             string
@@ -31,6 +33,8 @@ type TeacherViewData struct {
 	GoogleCalendarConnected          bool
 	GoogleCalendarIntegrationVisible bool
 	GoogleCalendarConnectionsAllowed bool
+	Onboarding                       OnboardingChecklistData
+	ShowOnboarding                   bool
 }
 
 templ TeacherViewModal(data TeacherViewData) {
@@ -54,6 +58,9 @@ templ TeacherViewModal(data TeacherViewData) {
 						<div class="profile-tablist" role="tablist" aria-label="Teacher profile sections">
 							<button type="button" class="profile-tab is-active" role="tab" aria-selected="true" data-profile-tab="personal" onclick="window.switchTeacherProfileTab('personal')">Personal</button>
 							<button type="button" class="profile-tab" role="tab" aria-selected="false" data-profile-tab="contact" onclick="window.switchTeacherProfileTab('contact')">Contact &amp; work</button>
+							if data.ShowOnboarding {
+								<button type="button" class="profile-tab" role="tab" aria-selected="false" data-profile-tab="onboarding" onclick="window.switchTeacherProfileTab('onboarding')">Setup</button>
+							}
 						</div>
 						<div class="profile-tab-panel is-active" role="tabpanel" data-profile-panel="personal">
 							<h2>Personal information</h2>
@@ -68,6 +75,12 @@ templ TeacherViewModal(data TeacherViewData) {
 								@ProfileDetailField("Sex", displayOrDash(data.Sex))
 							</div>
 						</div>
+						if data.ShowOnboarding {
+							<div class="profile-tab-panel" role="tabpanel" data-profile-panel="onboarding">
+								<h2>Setup checklist</h2>
+								@OnboardingChecklist(data.Onboarding)
+							</div>
+						}
 						<div class="profile-tab-panel" role="tabpanel" data-profile-panel="contact">
 							<h2>Contact & work</h2>
 							<div class="profile-details">

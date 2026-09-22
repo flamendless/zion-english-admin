@@ -756,6 +756,7 @@ templ ClassWizardScript() {
 			}
 
 			function wireWizardTeacherSearchFloating() {
+				if (!document.body) return;
 				document.body.addEventListener('htmx:afterSwap', function (evt) {
 					const target = evt.detail.target;
 					if (!target || !target.id || !target.id.endsWith('TeacherSearchResults')) return;

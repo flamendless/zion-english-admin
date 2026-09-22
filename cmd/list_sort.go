@@ -85,7 +85,7 @@ func teacherRowsTiebreak(a, b queries.GetTeachersFilteredRow) int {
 	}
 	return utils.CompareStrings(
 		teacherFullName(b.FirstName, b.MiddleName, b.LastName),
-		teacherFullName(a.FirstName, a.MiddleName, b.LastName),
+		teacherFullName(a.FirstName, a.MiddleName, a.LastName),
 	)
 }
 
@@ -269,6 +269,42 @@ func sortSystemLogByUserRows(rows []queries.GetLogsByCreatedByFilteredRow, sort 
 			return utils.CompareInt64(a.ID, b.ID)
 		case "module":
 			return utils.CompareStrings(a.Module, b.Module)
+		case "created_at":
+			return utils.CompareStrings(a.CreatedAt, b.CreatedAt)
+		default:
+			return utils.CompareStrings(a.CreatedAt, b.CreatedAt)
+		}
+	})
+}
+
+func sortLearningMaterialRows(rows []learningMaterialRow, sort utils.SortParams) {
+	utils.SortSlice(rows, sort.Order, func(a, b learningMaterialRow) int {
+		switch sort.By {
+		case "title":
+			return utils.CompareStrings(a.Title, b.Title)
+		case "updated_at":
+			return utils.CompareStrings(a.UpdatedAt, b.UpdatedAt)
+		case "status":
+			return utils.CompareStrings(a.Status, b.Status)
+		case "access":
+			return utils.CompareStrings(a.Access, b.Access)
+		case "created_at":
+			return utils.CompareStrings(a.CreatedAt, b.CreatedAt)
+		default:
+			return utils.CompareStrings(a.CreatedAt, b.CreatedAt)
+		}
+	})
+}
+
+func sortTrainingMaterialRows(rows []trainingMaterialRow, sort utils.SortParams) {
+	utils.SortSlice(rows, sort.Order, func(a, b trainingMaterialRow) int {
+		switch sort.By {
+		case "title":
+			return utils.CompareStrings(a.Title, b.Title)
+		case "updated_at":
+			return utils.CompareStrings(a.UpdatedAt, b.UpdatedAt)
+		case "status":
+			return utils.CompareStrings(a.Status, b.Status)
 		case "created_at":
 			return utils.CompareStrings(a.CreatedAt, b.CreatedAt)
 		default:

@@ -165,11 +165,15 @@ Default assigned colors: `constants.DefaultAssignedColor` (`#90C020`) and `const
 - Hardcode hex colors in templates/handlers when a semantic token or `constants` value exists
 - Duplicate global button/pill/modal styles in feature-specific `<style>` blocks
 
+### Button and control alignment
+
+Global `button, .btn` sets `margin-top: var(--space-5)`; `.add-btn` does not. Mixed button rows (modal footers, card actions, toolbars) misalign easily. Follow `ui-button-alignment.mdc` when adding footers, action rows, or controls beside `.icon-action-btn`.
+
 ### Inline chip remove buttons
 
 Global `button` styles in `global.templ` set `margin-top`, padding, `display: inline-block`, and filled backgrounds. Any small remove/close control inside a chip, tag, or pill **must** override those defaults or the × will sit below the label.
 
-Use the same reset as `.lm-tag-chip-remove` in `learning_materials.templ`:
+Prefer the global chip-remove reset in `global.templ` (`button.lm-tag-chip-remove`, `button.chip-remove`, etc.). Per-page fallback pattern:
 
 ```css
 .chip-remove {
