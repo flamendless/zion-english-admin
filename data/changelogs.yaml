@@ -1,8 +1,36 @@
 unreleased:
   breaking_changes: []
-  new_features: []
-  improvements: []
-  bug_fixes: []
+  new_features:
+    - text: "Teachers can watch admin-curated training videos on the new Training Materials page; watch progress is saved as you complete each video."
+      commit: "69a5d6f"
+    - text: "Superusers can add, edit, and publish training materials, mark videos as required for onboarding, and open View progress to see teacher completion."
+      commit: "69a5d6f"
+    - text: "Teachers see a Setup progress checklist on the dashboard for account approval, profile photo, documents, required training, and connected integrations."
+      commit: "69a5d6f"
+    - text: "Teachers can upload an introduction video from My Profile for superuser review; approved videos appear on teacher profiles."
+      commit: "2f98c0b"
+    - text: "Superusers can review, approve, or reject teacher introduction videos from the Intro Videos page, with a pending count on the dashboard."
+      commit: "2f98c0b"
+  improvements:
+    - text: "The superuser dashboard Overview shows first and second payroll cutoff totals separately, alongside monthly teacher and parent rate totals."
+      commit: "2f5c188"
+    - text: "The superuser dashboard shows how many active students are missing parent name or parent rate, with links to the filtered students list."
+      commit: "7bf3e63"
+    - text: "Reports and Generate Summary now include cancelled and rescheduled classes in earnings totals."
+      commit: "fd8238e"
+    - text: "Reports includes Teacher and Admin role filters so you can limit payroll results to specific teacher roles."
+      commit: "2baeb1a"
+    - text: "The teachers list includes a Columns control to show or hide optional columns; your choices are remembered in the browser."
+      commit: "f5c8fd5"
+    - text: "Feature Flags includes a configurable overdue grace period for when scheduled classes are marked overdue and missed-class notifications are sent."
+      commit: "c763f00"
+    - text: "Feature Flags includes controls for which teacher roles can upload introduction videos."
+      commit: "2f98c0b"
+    - text: "Learning Library and Training Materials use an updated filter toolbar with search, status, access, tag, and progress filters."
+      commit: "69a5d6f"
+  bug_fixes:
+    - text: "Fixed the teachers list incorrectly including deleted teachers in some views."
+      commit: "997dec3"
   removed: []
   security: []
   deprecated: []
