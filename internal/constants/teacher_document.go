@@ -17,6 +17,17 @@ func ValidTeacherDocumentType(value string) bool {
 	}
 }
 
+func (t TeacherDocumentType) StorageSubdir() string {
+	switch t {
+	case TeacherDocumentTypeDocument:
+		return "document"
+	case TeacherDocumentTypeResume:
+		return "resume"
+	default:
+		return ""
+	}
+}
+
 type TeacherDocumentStatus string
 
 const (

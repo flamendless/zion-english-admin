@@ -68,9 +68,26 @@ Parent chip: `display: inline-flex; align-items: center; gap: …`.
 
 Inline scripts in `<head>` (`GlobalIncludes`) run before `<body>` exists. Never call `document.body.addEventListener` without a guard or `DOMContentLoaded` deferral. See `ScrTableTruncationTooltips` in `scripts.templ`.
 
+## Tooltips on icon actions
+
+`[data-tooltip]` uses a `::after` pseudo-element on the trigger. It is clipped by `overflow: hidden` / `auto` / `scroll` on any ancestor. Do not wrap icon-action rows in clipping containers; see the **Tooltips** section in `templ-frontend.mdc`.
+
+For icon actions at the right edge of a row or panel, right-align the tooltip so it does not extend past the container:
+
+```css
+.my-row-actions [data-tooltip]::after {
+	left: auto;
+	right: 0;
+	transform: none;
+}
+```
+
+Inside scrollable tables or chip rows, use the floating-tooltip pattern (`ScrFloatingTooltips()` in `scripts.templ`) instead of pseudo-tooltips.
+
 ## Checklist for new UI
 
 - [ ] Footer/action row uses `display: flex; align-items: center`
 - [ ] All buttons in the row have `margin-top: 0`
 - [ ] Mixed `.btn` + `.icon-action-btn` rows share the same height (usually `36px`)
 - [ ] Chip remove buttons use the global chip-remove reset, not default `button` styles
+- [ ] `[data-tooltip]` on icon actions is not inside a clipping ancestor; edge controls use a right-aligned tooltip override or the floating-tooltip pattern

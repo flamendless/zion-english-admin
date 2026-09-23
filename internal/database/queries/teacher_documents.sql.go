@@ -387,6 +387,20 @@ func (q *Queries) GetTeacherDocumentByID(ctx context.Context, id int64) (TblTeac
 	return i, err
 }
 
+const getTeacherDocumentTypeByStoredFilename = `-- name: GetTeacherDocumentTypeByStoredFilename :one
+SELECT type
+FROM tbl_teacher_documents
+WHERE stored_filename = ?
+LIMIT 1
+`
+
+func (q *Queries) GetTeacherDocumentTypeByStoredFilename(ctx context.Context, storedFilename string) (string, error) {
+	row := q.db.QueryRowContext(ctx, getTeacherDocumentTypeByStoredFilename, storedFilename)
+	var type_ string
+	err := row.Scan(&type_)
+	return type_, err
+}
+
 const getTeacherDocumentsByTeacherID = `-- name: GetTeacherDocumentsByTeacherID :many
 SELECT
 	id,
@@ -501,6 +515,42 @@ func (q *Queries) GetTeacherDocumentsByTeacherIDFiltered(ctx context.Context, ar
 			&i.ReviewedAt,
 			&i.ReviewedBy,
 		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getTeacherDocumentsForStorageReorganize = `-- name: GetTeacherDocumentsForStorageReorganize :many
+SELECT
+	type,
+	stored_filename
+FROM tbl_teacher_documents
+WHERE type IN ('document', 'resume')
+`
+
+type GetTeacherDocumentsForStorageReorganizeRow struct {
+	Type           string
+	StoredFilename string
+}
+
+func (q *Queries) GetTeacherDocumentsForStorageReorganize(ctx context.Context) ([]GetTeacherDocumentsForStorageReorganizeRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTeacherDocumentsForStorageReorganize)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTeacherDocumentsForStorageReorganizeRow
+	for rows.Next() {
+		var i GetTeacherDocumentsForStorageReorganizeRow
+		if err := rows.Scan(&i.Type, &i.StoredFilename); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

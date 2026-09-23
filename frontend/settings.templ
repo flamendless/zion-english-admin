@@ -1,0 +1,477 @@
+package frontend
+
+import (
+	"strings"
+	"zion-english/internal/conf"
+	"zion-english/internal/utils"
+)
+
+type SettingsData struct {
+	Title    string
+	Subtitle string
+	Sections []conf.SettingsSection
+}
+
+func settingsFieldValueID(fieldKey string) string {
+	return "settings-value-" + fieldKey
+}
+
+func settingsIntegrationTone(value string) PillTone {
+	if strings.HasPrefix(value, "configured") {
+		return PillToneSuccess
+	}
+	if strings.HasPrefix(value, "not configured") {
+		return PillToneWarning
+	}
+	return PillToneNeutral
+}
+
+func settingsIntegrationLabel(value string) string {
+	switch {
+	case value == "configured":
+		return "Configured"
+	case strings.HasPrefix(value, "not configured"):
+		return "Not configured"
+	default:
+		return value
+	}
+}
+
+func settingsIntegrationDetail(value string) string {
+	if strings.HasPrefix(value, "not configured (") {
+		return strings.TrimPrefix(value, "not configured ")
+	}
+	return ""
+}
+
+templ Settings(data SettingsData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<title>{ data.Title } - Zion English Admin Tool</title>
+		<link rel="icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		<style>
+			.settings-layout {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-5);
+				max-width: 56rem;
+			}
+
+			.settings-panel {
+				background: var(--color-surface);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm, 0 1px 2px rgba(15, 23, 42, 0.05));
+			}
+
+			.settings-panel-header {
+				padding: var(--space-4) var(--space-5);
+				border-bottom: 1px solid var(--color-border-subtle);
+				background: linear-gradient(180deg, var(--color-primary-light) 0%, var(--color-surface) 100%);
+			}
+
+			.settings-section-title {
+				margin: 0;
+				font-size: 1rem;
+				font-weight: 600;
+				color: var(--color-foreground, #0f172a);
+			}
+
+			.settings-section-meta {
+				margin: var(--space-1) 0 0;
+				font-size: 0.8125rem;
+				color: var(--color-muted-foreground);
+			}
+
+			.settings-fields {
+				margin: 0;
+				padding: 0;
+			}
+
+			.settings-field-row {
+				display: grid;
+				grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+				gap: var(--space-3) var(--space-4);
+				padding: var(--space-4) var(--space-5);
+				border-bottom: 1px solid var(--color-border-subtle);
+				align-items: start;
+			}
+
+			.settings-field-row:last-child {
+				border-bottom: none;
+			}
+
+			.settings-field-label {
+				margin: 0;
+				color: var(--color-muted-foreground);
+				font-size: 0.8125rem;
+				font-weight: 500;
+				line-height: 1.4;
+			}
+
+			.settings-field-env {
+				display: inline-block;
+				margin-top: var(--space-1);
+				padding: 0.1rem 0.4rem;
+				border-radius: var(--radius-sm);
+				border: var(--pill-border);
+				background: var(--color-muted);
+				font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+				font-size: 0.6875rem;
+				font-weight: 500;
+				color: var(--color-muted-foreground);
+				line-height: 1.4;
+			}
+
+			.settings-field-value {
+				margin: 0;
+				color: var(--color-foreground, #0f172a);
+				font-size: 0.875rem;
+				line-height: 1.5;
+				word-break: break-word;
+			}
+
+			.settings-field-value-mono {
+				font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+				font-size: 0.8125rem;
+			}
+
+			.settings-value-box {
+				display: block;
+				padding: var(--space-2) var(--space-3);
+				border: 1px solid var(--color-border-subtle);
+				border-radius: var(--radius-md);
+				background: var(--color-muted);
+				word-break: break-all;
+			}
+
+			.settings-sensitive-wrap {
+				display: flex;
+				align-items: flex-start;
+				justify-content: space-between;
+				gap: var(--space-3);
+			}
+
+			.settings-sensitive-value {
+				flex: 1 1 auto;
+				min-width: 0;
+			}
+
+			.settings-sensitive-actions {
+				display: flex;
+				align-items: center;
+				flex-shrink: 0;
+			}
+
+			.settings-sensitive-actions .icon-action-btn {
+				margin-top: 0;
+			}
+
+			.settings-sensitive-actions [data-tooltip]::after {
+				left: auto;
+				right: 0;
+				transform: none;
+			}
+
+			.settings-integration-value {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-2);
+			}
+
+			.settings-integration-detail {
+				margin: 0;
+				font-size: 0.8125rem;
+				color: var(--color-muted-foreground);
+			}
+
+			.settings-revealed-value {
+				margin: 0;
+				padding: var(--space-2) var(--space-3);
+				border: 1px solid var(--color-success);
+				border-radius: var(--radius-md);
+				background: var(--color-success-bg);
+				font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+				font-size: 0.8125rem;
+				word-break: break-all;
+			}
+
+			.settings-revealed-note {
+				margin: var(--space-2) 0 0;
+				font-size: 0.75rem;
+				color: var(--color-muted-foreground);
+			}
+
+			.settings-reveal-error {
+				margin: 0;
+				padding: var(--space-2) var(--space-3);
+				border: 1px solid var(--color-destructive);
+				border-radius: var(--radius-md);
+				background: rgba(239, 68, 68, 0.08);
+				color: var(--color-destructive);
+				font-size: 0.8125rem;
+			}
+
+			.settings-reveal-lead {
+				margin: 0 0 var(--space-4);
+				color: var(--color-muted-foreground);
+				font-size: 0.875rem;
+				line-height: 1.5;
+			}
+
+			.settings-reveal-field-name {
+				font-weight: 600;
+				color: var(--color-foreground, #0f172a);
+			}
+
+			.settings-reveal-form .form-group {
+				margin-bottom: var(--space-4);
+			}
+
+			.settings-reveal-form label {
+				display: block;
+				margin-bottom: var(--space-2);
+				font-size: 0.875rem;
+				font-weight: 500;
+			}
+
+			.settings-reveal-form input[type="password"] {
+				width: 100%;
+				margin-top: 0;
+				box-sizing: border-box;
+			}
+
+			.modal-dialog-settings-reveal {
+				width: min(100%, 28rem);
+			}
+
+			@media (max-width: 640px) {
+				.settings-field-row {
+					grid-template-columns: 1fr;
+					gap: var(--space-2);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@HubHeader(data.Title, "", data.Subtitle, false)
+
+			<div class="settings-layout">
+				for _, section := range data.Sections {
+					<section class="settings-panel">
+						<div class="settings-panel-header">
+							<h2 class="settings-section-title">{ section.Title }</h2>
+							<p class="settings-section-meta">{ len(section.Fields) } fields</p>
+						</div>
+						<dl class="settings-fields">
+							for _, field := range section.Fields {
+								<div class="settings-field-row">
+									<dt class="settings-field-label">
+										{ field.Label }
+										if field.EnvKey != "" {
+											<span class="settings-field-env">{ field.EnvKey }</span>
+										}
+									</dt>
+									if field.Sensitive {
+										<dd class="settings-field-value" id={ settingsFieldValueID(string(field.FieldKey)) }>
+											@SettingsSensitiveField(field)
+										</dd>
+									} else if section.Title == "Services and integrations" && (strings.HasPrefix(field.Value, "configured") || strings.HasPrefix(field.Value, "not configured")) {
+										<dd class="settings-field-value settings-integration-value">
+											@StatusPill(settingsIntegrationLabel(field.Value), settingsIntegrationTone(field.Value), false)
+											if detail := settingsIntegrationDetail(field.Value); detail != "" {
+												<p class="settings-integration-detail">{ detail }</p>
+											}
+										</dd>
+									} else if field.Monospace {
+										<dd class="settings-field-value settings-field-value-mono">
+											<span class="settings-value-box">{ field.Value }</span>
+										</dd>
+									} else {
+										<dd class="settings-field-value">{ field.Value }</dd>
+									}
+								</div>
+							}
+						</dl>
+					</section>
+				}
+			</div>
+		</div>
+
+		@SettingsRevealModal()
+		@SettingsRevealScript()
+	</body>
+	</html>
+}
+
+templ SettingsSensitiveField(field conf.SettingsField) {
+	<div class="settings-sensitive-wrap">
+		<span class="settings-sensitive-value settings-value-box settings-field-value-mono">{ field.Value }</span>
+		<div class="settings-sensitive-actions">
+			@IconActionButton("View secret", IconKindView, templ.Attributes{
+				"data-settings-reveal":       "",
+				"data-field-key":             string(field.FieldKey),
+				"data-field-label":           field.Label,
+				"data-field-env":             field.EnvKey,
+			})
+		</div>
+	</div>
+}
+
+templ SettingsRevealModal() {
+	<div class="modal-overlay" id="settingsRevealModal" hidden role="presentation">
+		<div class="modal-dialog modal-dialog-settings-reveal" role="dialog" aria-modal="true" aria-labelledby="settingsRevealTitle">
+			<div class="modal-header">
+				<h3 id="settingsRevealTitle">View secret value</h3>
+				<button type="button" class="modal-close settings-reveal-close" data-tooltip="Close" aria-label="Close">&times;</button>
+			</div>
+			<form
+				class="settings-reveal-form"
+				id="settingsRevealForm"
+				hx-post={ utils.URL("/settings/reveal") }
+				hx-target="#settingsRevealFeedback"
+				hx-swap={ HxSwapInnerHTML }
+			>
+				<div class="modal-body">
+					<p class="settings-reveal-lead">
+						Enter the superuser password to reveal
+						<span class="settings-reveal-field-name" id="settingsRevealFieldName">this value</span>.
+					</p>
+					<input type="hidden" name="field" id="settingsRevealFieldKey" value=""/>
+					<div class="form-group">
+						<label for="settingsRevealPassword">Superuser password</label>
+						<input
+							type="password"
+							id="settingsRevealPassword"
+							name="password"
+							placeholder="Enter superuser password"
+							autocomplete="current-password"
+							required
+						/>
+					</div>
+					<div id="settingsRevealFeedback" aria-live="polite"></div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary settings-reveal-close">Cancel</button>
+					<button type="submit" class="btn">View value</button>
+				</div>
+			</form>
+		</div>
+	</div>
+}
+
+templ SettingsRevealedValueInline(value string) {
+	<p class="settings-revealed-value">{ value }</p>
+	<p class="settings-revealed-note">Refresh the page to mask this value again.</p>
+}
+
+templ SettingsRevealSuccess(fieldKey string, value string) {
+	<div id={ settingsFieldValueID(fieldKey) } hx-swap-oob={ HxSwapInnerHTML }>
+		@SettingsRevealedValueInline(value)
+	</div>
+}
+
+templ SettingsRevealError(message string) {
+	<p class="settings-reveal-error" role="alert">{ message }</p>
+}
+
+templ SettingsRevealScript() {
+	<script>
+		(function () {
+			const modal = document.getElementById('settingsRevealModal');
+			const form = document.getElementById('settingsRevealForm');
+			const fieldKeyInput = document.getElementById('settingsRevealFieldKey');
+			const fieldNameEl = document.getElementById('settingsRevealFieldName');
+			const passwordInput = document.getElementById('settingsRevealPassword');
+			const feedback = document.getElementById('settingsRevealFeedback');
+			if (!modal || !form || !fieldKeyInput || !fieldNameEl || !passwordInput || !feedback) return;
+
+			let triggerEl = null;
+
+			function resetModal() {
+				form.reset();
+				fieldKeyInput.value = '';
+				fieldNameEl.textContent = 'this value';
+				feedback.innerHTML = '';
+			}
+
+			function getFocusables() {
+				return Array.from(modal.querySelectorAll(
+					'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
+				)).filter(function (el) {
+					return el.offsetParent !== null;
+				});
+			}
+
+			function trapFocus(e) {
+				if (modal.hidden || e.key !== 'Tab') return;
+				const focusables = getFocusables();
+				if (!focusables.length) return;
+				const first = focusables[0];
+				const last = focusables[focusables.length - 1];
+				if (e.shiftKey && document.activeElement === first) {
+					e.preventDefault();
+					last.focus();
+				} else if (!e.shiftKey && document.activeElement === last) {
+					e.preventDefault();
+					first.focus();
+				}
+			}
+
+			function openModal(trigger) {
+				const fieldKey = trigger.getAttribute('data-field-key') || '';
+				const fieldLabel = trigger.getAttribute('data-field-label') || 'this value';
+				const fieldEnv = trigger.getAttribute('data-field-env') || '';
+				resetModal();
+				fieldKeyInput.value = fieldKey;
+				fieldNameEl.textContent = fieldEnv ? fieldLabel + ' (' + fieldEnv + ')' : fieldLabel;
+				triggerEl = trigger;
+				modal.hidden = false;
+				document.body.classList.add('modal-open');
+				requestAnimationFrame(function () {
+					passwordInput.focus();
+				});
+			}
+
+			function closeModal() {
+				modal.hidden = true;
+				document.body.classList.remove('modal-open');
+				resetModal();
+				if (triggerEl && typeof triggerEl.focus === 'function') {
+					triggerEl.focus();
+				}
+				triggerEl = null;
+			}
+
+			window.closeSettingsRevealModal = closeModal;
+
+			document.addEventListener('click', function (e) {
+				const trigger = e.target.closest('[data-settings-reveal]');
+				if (!trigger) return;
+				e.preventDefault();
+				openModal(trigger);
+			});
+
+			modal.querySelectorAll('.settings-reveal-close').forEach(function (btn) {
+				btn.addEventListener('click', closeModal);
+			});
+
+			modal.addEventListener('click', function (e) {
+				if (e.target === modal) closeModal();
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key === 'Escape' && !modal.hidden) {
+					closeModal();
+				}
+				trapFocus(e);
+			});
+
+			document.body.addEventListener('settings-revealed', closeModal);
+		})();
+	</script>
+}

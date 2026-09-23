@@ -44,6 +44,13 @@ func (s *LocalStorage) EnsureDirs() error {
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			return err
 		}
+		if category == CategoryTeacherDocuments {
+			for _, subdir := range []string{"document", "resume"} {
+				if err := os.MkdirAll(filepath.Join(dir, subdir), 0755); err != nil {
+					return err
+				}
+			}
+		}
 	}
 	if s.root == "" {
 		if err := os.MkdirAll("tmp", 0755); err != nil {
@@ -126,15 +133,18 @@ func (s *LocalStorage) Exists(ctx context.Context, category Category, filename s
 }
 
 func (s *LocalStorage) localPath(category Category, filename string) (string, error) {
-	base := SanitizeFilename(filename)
-	if base == "" || base == "." {
+	rel := SanitizeRelativePath(filename)
+	if rel == "" {
+		rel = SanitizeFilename(filename)
+	}
+	if rel == "" || rel == "." {
 		return "", ErrObjectNotFound
 	}
 	dir, ok := s.categoryRoot(category)
 	if !ok {
 		return "", ErrObjectNotFound
 	}
-	return filepath.Join(dir, base), nil
+	return filepath.Join(dir, rel), nil
 }
 
 func localCategoryDir(category Category) (string, bool) {

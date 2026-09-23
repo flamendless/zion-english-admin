@@ -1,10 +1,12 @@
 package storage
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
@@ -56,11 +58,14 @@ func (s *R2Storage) EnsureDirs() error {
 }
 
 func (s *R2Storage) objectKey(category Category, filename string) (string, error) {
-	base := SanitizeFilename(filename)
-	if base == "" || base == "." {
+	rel := SanitizeRelativePath(filename)
+	if rel == "" {
+		rel = SanitizeFilename(filename)
+	}
+	if rel == "" || rel == "." {
 		return "", ErrObjectNotFound
 	}
-	return ObjectKey(category, base), nil
+	return ObjectKey(category, rel), nil
 }
 
 func (s *R2Storage) Put(ctx context.Context, category Category, filename string, body io.Reader, contentType string) error {
@@ -71,13 +76,44 @@ func (s *R2Storage) Put(ctx context.Context, category Category, filename string,
 	if contentType == "" {
 		contentType = "application/octet-stream"
 	}
-	_, err = s.client.PutObject(ctx, &s3.PutObjectInput{
+	input := &s3.PutObjectInput{
 		Bucket:      aws.String(s.bucket),
 		Key:         aws.String(key),
 		Body:        body,
 		ContentType: aws.String(contentType),
-	})
+	}
+	if length, ok := contentLengthForPut(body); ok {
+		input.ContentLength = aws.Int64(length)
+	}
+	_, err = s.client.PutObject(ctx, input)
 	return err
+}
+
+func contentLengthForPut(body io.Reader) (int64, bool) {
+	switch r := body.(type) {
+	case *bytes.Reader:
+		return int64(r.Len()), true
+	case *bytes.Buffer:
+		return int64(r.Len()), true
+	case *strings.Reader:
+		return int64(r.Len()), true
+	}
+	rs, ok := body.(io.ReadSeeker)
+	if !ok {
+		return 0, false
+	}
+	cur, err := rs.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return 0, false
+	}
+	end, err := rs.Seek(0, io.SeekEnd)
+	if err != nil {
+		return 0, false
+	}
+	if _, err := rs.Seek(cur, io.SeekStart); err != nil {
+		return 0, false
+	}
+	return end - cur, true
 }
 
 func (s *R2Storage) Get(ctx context.Context, category Category, filename string) (*Object, error) {

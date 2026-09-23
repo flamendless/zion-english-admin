@@ -129,4 +129,7 @@ var (
 
 	ErrEmptyNotificationCreatedAt   = errors.New("[NOTIFICATION] empty created at")
 	ErrInvalidNotificationCreatedAt = errors.New("[NOTIFICATION] invalid created at")
+
+	ErrSettingsInvalidPassword = errors.New("[SETTINGS] invalid superuser password")
+	ErrSettingsInvalidField    = errors.New("[SETTINGS] invalid settings field")
 )

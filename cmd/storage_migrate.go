@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"mime"
 	"os"
@@ -9,6 +11,8 @@ import (
 	"strings"
 
 	"zion-english/internal/conf"
+	"zion-english/internal/constants"
+	"zion-english/internal/database"
 	"zion-english/internal/logs"
 	"zion-english/internal/storage"
 
@@ -62,12 +66,17 @@ func runStorageMigrate() {
 	totalUploaded := 0
 	totalSkipped := 0
 
+	if err := database.Init("data/zion.db"); err != nil {
+		panic(fmt.Sprintf("failed to initialize database: %v", err))
+	}
+	defer database.Close()
+	dbRO := database.New(database.DB_MODE_RO)
+
 	for _, job := range []struct {
 		dir      string
 		category storage.Category
 	}{
 		{"data/avatars", storage.CategoryAvatars},
-		{"data/teacher-documents", storage.CategoryTeacherDocuments},
 		{"data/teacher-intro-videos", storage.CategoryIntroVideos},
 	} {
 		uploaded, skipped, err := migrateLocalDir(ctx, store, job.dir, job.category)
@@ -78,6 +87,14 @@ func runStorageMigrate() {
 		totalSkipped += skipped
 		fmt.Printf("%s: uploaded=%d skipped=%d\n", job.category, uploaded, skipped)
 	}
+
+	teacherDocUploaded, teacherDocSkipped, err := migrateTeacherDocumentsDir(ctx, store, dbRO, "data/teacher-documents")
+	if err != nil {
+		panic(fmt.Sprintf("migrate teacher-documents: %v", err))
+	}
+	totalUploaded += teacherDocUploaded
+	totalSkipped += teacherDocSkipped
+	fmt.Printf("%s: uploaded=%d skipped=%d\n", storage.CategoryTeacherDocuments, teacherDocUploaded, teacherDocSkipped)
 
 	reportUploaded, reportSkipped, err := migrateReportFiles(ctx, store)
 	if err != nil {
@@ -92,6 +109,69 @@ func runStorageMigrate() {
 		zap.Int("uploaded", totalUploaded),
 		zap.Int("skipped", totalSkipped),
 	)
+}
+
+func migrateTeacherDocumentsDir(ctx context.Context, store storage.Storage, dbRO database.Service, dir string) (int, int, error) {
+	if _, err := os.Stat(dir); err != nil {
+		if os.IsNotExist(err) {
+			return 0, 0, nil
+		}
+		return 0, 0, err
+	}
+
+	var uploaded, skipped int
+	err := filepath.WalkDir(dir, func(path string, entry os.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if entry.IsDir() {
+			return nil
+		}
+
+		rel, err := filepath.Rel(dir, path)
+		if err != nil {
+			return err
+		}
+		rel = filepath.ToSlash(rel)
+		if strings.HasPrefix(rel, "../") {
+			return nil
+		}
+
+		storageKey := rel
+		if !strings.Contains(rel, "/") {
+			docType, err := dbRO.GetQueries().GetTeacherDocumentTypeByStoredFilename(ctx, entry.Name())
+			if err != nil {
+				if errors.Is(err, sql.ErrNoRows) {
+					fmt.Printf("skip (no db row): %s/%s\n", storage.CategoryTeacherDocuments, entry.Name())
+					return nil
+				}
+				return err
+			}
+			subdir := constants.TeacherDocumentType(docType).StorageSubdir()
+			if subdir == "" {
+				fmt.Printf("skip (unknown type): %s/%s\n", storage.CategoryTeacherDocuments, entry.Name())
+				return nil
+			}
+			storageKey = storage.TeacherDocumentKey(constants.TeacherDocumentType(docType), entry.Name())
+		}
+
+		didUpload, err := migrateLocalFile(ctx, store, path, storage.CategoryTeacherDocuments, storageKey)
+		if err != nil {
+			return err
+		}
+		if didUpload {
+			uploaded++
+			fmt.Printf("upload: %s/%s\n", storage.CategoryTeacherDocuments, storageKey)
+		} else {
+			skipped++
+			fmt.Printf("skip (exists): %s/%s\n", storage.CategoryTeacherDocuments, storageKey)
+		}
+		return nil
+	})
+	if err != nil {
+		return uploaded, skipped, err
+	}
+	return uploaded, skipped, nil
 }
 
 func migrateLocalDir(ctx context.Context, store storage.Storage, dir string, category storage.Category) (int, int, error) {

@@ -50,6 +50,8 @@ templ NavIconSVG(kind NavIconKind) {
 			@navIconSVGSettings()
 		case NavIconFeatureFlags:
 			@navIconSVGFlag()
+		case NavIconSettings:
+			@navIconSVGServer()
 		case NavIconLogs:
 			@navIconSVGScrollText()
 		case NavIconAnnouncements:
@@ -208,6 +210,15 @@ templ navIconSVGFlag() {
 	<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 		<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
 		<line x1="4" x2="4" y1="22" y2="15"></line>
+	</svg>
+}
+
+templ navIconSVGServer() {
+	<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<rect width="20" height="8" x="2" y="2" rx="2" ry="2"></rect>
+		<rect width="20" height="8" x="2" y="14" rx="2" ry="2"></rect>
+		<line x1="6" x2="6.01" y1="6" y2="6"></line>
+		<line x1="6" x2="6.01" y1="18" y2="18"></line>
 	</svg>
 }
 

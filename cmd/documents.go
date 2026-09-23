@@ -323,8 +323,9 @@ func handleProfileDocument(w http.ResponseWriter, r *http.Request) {
 	}
 
 	storedFilename := fmt.Sprintf("%d_%d%s", user.ID, time.Now().UnixNano(), ext)
+	storageKey := storage.TeacherDocumentKey(constants.TeacherDocumentTypeDocument, storedFilename)
 	store := storage.Default()
-	if err := store.Put(ctx, storage.CategoryTeacherDocuments, storedFilename, file, documentContentType(strings.TrimPrefix(ext, "."))); err != nil {
+	if err := store.Put(ctx, storage.CategoryTeacherDocuments, storageKey, file, documentContentType(strings.TrimPrefix(ext, "."))); err != nil {
 		logs.Log().Error("write document file", zap.Error(err))
 		setErrorFlash(w, "Failed to save document")
 		HttpRedirect(w, r, "/profile")
@@ -340,7 +341,7 @@ func handleProfileDocument(w http.ResponseWriter, r *http.Request) {
 		FileSize:         header.Size,
 		Status:           string(constants.TeacherDocumentStatusSubmitted),
 	}); err != nil {
-		_ = store.Delete(ctx, storage.CategoryTeacherDocuments, storedFilename)
+		_ = store.Delete(ctx, storage.CategoryTeacherDocuments, storageKey)
 		logs.Log().Error("insert teacher document", zap.Error(err))
 		setErrorFlash(w, "Failed to record document")
 		HttpRedirect(w, r, "/profile")
@@ -404,8 +405,9 @@ func handleProfileResume(w http.ResponseWriter, r *http.Request) {
 	}
 
 	storedFilename := fmt.Sprintf("%d_%d%s", user.ID, time.Now().UnixNano(), ext)
+	storageKey := storage.TeacherDocumentKey(constants.TeacherDocumentTypeResume, storedFilename)
 	store := storage.Default()
-	if err := store.Put(ctx, storage.CategoryTeacherDocuments, storedFilename, file, documentContentType(strings.TrimPrefix(ext, "."))); err != nil {
+	if err := store.Put(ctx, storage.CategoryTeacherDocuments, storageKey, file, documentContentType(strings.TrimPrefix(ext, "."))); err != nil {
 		logs.Log().Error("write resume file", zap.Error(err))
 		setErrorFlash(w, "Failed to save resume/CV")
 		HttpRedirect(w, r, "/profile")
@@ -421,7 +423,7 @@ func handleProfileResume(w http.ResponseWriter, r *http.Request) {
 		FileSize:         header.Size,
 		Status:           string(constants.TeacherDocumentStatusApproved),
 	}); err != nil {
-		_ = store.Delete(ctx, storage.CategoryTeacherDocuments, storedFilename)
+		_ = store.Delete(ctx, storage.CategoryTeacherDocuments, storageKey)
 		logs.Log().Error("insert teacher resume", zap.Error(err))
 		setErrorFlash(w, "Failed to record resume/CV")
 		HttpRedirect(w, r, "/profile")
@@ -452,7 +454,12 @@ func handleDocumentFile(w http.ResponseWriter, r *http.Request, documentID int64
 		return
 	}
 
-	obj, err := storage.Default().Get(ctx, documentStorageCategory(row), row.StoredFilename)
+	var obj *storage.Object
+	if row.Type == string(constants.TeacherDocumentTypeAvatar) {
+		obj, err = storage.Default().Get(ctx, storage.CategoryAvatars, row.StoredFilename)
+	} else {
+		obj, err = storage.GetTeacherDocument(ctx, storage.Default(), constants.TeacherDocumentType(row.Type), row.StoredFilename)
+	}
 	if err != nil {
 		HttpError(w, "Document not found", http.StatusNotFound)
 		return
@@ -549,7 +556,11 @@ func handleDocumentDelete(w http.ResponseWriter, r *http.Request, documentID int
 		}
 	}
 
-	if err := storage.Default().Delete(ctx, documentStorageCategory(row), row.StoredFilename); err != nil {
+	if row.Type == string(constants.TeacherDocumentTypeAvatar) {
+		if err := storage.Default().Delete(ctx, storage.CategoryAvatars, row.StoredFilename); err != nil {
+			logs.Log().Error("remove document file", zap.Error(err), zap.String("filename", row.StoredFilename))
+		}
+	} else if err := storage.DeleteTeacherDocument(ctx, storage.Default(), constants.TeacherDocumentType(row.Type), row.StoredFilename); err != nil {
 		logs.Log().Error("remove document file", zap.Error(err), zap.String("filename", row.StoredFilename))
 	}
 

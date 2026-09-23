@@ -13,11 +13,23 @@ Use a **separate R2 bucket per environment** (e.g. dev vs prod). Set `R2_BUCKET`
 
 ```
 avatars/{stored_filename}
-teacher-documents/{stored_filename}
+teacher-documents/document/{stored_filename}
+teacher-documents/resume/{stored_filename}
 intro-videos/{stored_filename}
 reports/{stored_filename}
 backups/{backup_name}.tar.gz
 ```
+
+## Type-based grouping
+
+When a storage category holds multiple domain types (enum), group objects under `{category}/{type_subdir}/{basename}`.
+
+- Map type to subdir via a method on the domain enum (e.g. `TeacherDocumentType.StorageSubdir()`), not ad-hoc strings in handlers.
+- DB continues storing basename only (`stored_filename`); resolve the full storage key at the handler/storage boundary using type + basename (`storage.TeacherDocumentKey`).
+- On read/delete, support legacy flat layout fallback during transition (same pattern as reports' `tmp/` fallback).
+- New uploads always use the typed subfolder.
+- `storage migrate` walks subdirs recursively and uses DB type for legacy flat files.
+- `storage reorganize-teacher-documents` moves legacy flat local/R2 objects into typed subfolders without changing the DB.
 
 ## DB fields
 
@@ -25,7 +37,7 @@ Continue storing basename only (`stored_filename`, `profile_picture`). Report ca
 
 ## Handlers
 
-Use `storage.Default()` for Put/Get/Delete/Exists. Serve files through existing app routes (`serveStorageObject` in `cmd/storage_http.go`), not public R2 URLs.
+Use `storage.Default()` for Put/Get/Delete/Exists. Teacher documents use `storage.TeacherDocumentKey`, `storage.GetTeacherDocument`, and `storage.DeleteTeacherDocument`. Serve files through existing app routes (`serveStorageObject` in `cmd/storage_http.go`), not public R2 URLs.
 
 ## Categories
 
@@ -34,3 +46,4 @@ Typed in `internal/storage/category.go`: `CategoryAvatars`, `CategoryTeacherDocu
 ## Scripts
 
 - `go run . storage migrate`: one-time upload of existing local files to R2 using app credentials from `.env`
+- `go run . storage reorganize-teacher-documents`: move legacy flat teacher document files into `document/` and `resume/` subfolders

@@ -124,6 +124,8 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/logs", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleSystemLogs))
 		authMux.HandleFunc(basePath+"/changelogs", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleChangelogs))
 		authMux.HandleFunc(basePath+"/feature-flags", auth.RequireRole(auth.RoleSuperuser)(handleFeatureFlags))
+		authMux.HandleFunc(basePath+"/settings/reveal", auth.RequireRole(auth.RoleSuperuser)(handleSettingsReveal))
+		authMux.HandleFunc(basePath+"/settings", auth.RequireRole(auth.RoleSuperuser)(handleSettings))
 		authMux.HandleFunc(basePath+"/guides/", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleGuidesPath))
 		authMux.HandleFunc(basePath+"/guides", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleGuides))
 		authMux.HandleFunc(basePath+"/process-logs", auth.RequireRole(auth.AdminAccessRoles()...)(handleLogs))
@@ -236,6 +238,8 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/logs", authHandler)
 		rootMux.Handle(basePath+"/changelogs", authHandler)
 		rootMux.Handle(basePath+"/feature-flags", authHandler)
+		rootMux.Handle(basePath+"/settings/reveal", authHandler)
+		rootMux.Handle(basePath+"/settings", authHandler)
 		rootMux.Handle(basePath+"/guides", authHandler)
 		rootMux.Handle(basePath+"/guides/", authHandler)
 		rootMux.Handle(basePath+"/process-logs", authHandler)
@@ -316,6 +320,7 @@ var cmdWeb = &cobra.Command{
 				MeetingService:           cfg.Meeting.Service,
 			},
 		}
+		serverStartupOpts = startupOpts
 		startup.LogStartup(startupOpts)
 		startup.LogListening(startupOpts)
 

@@ -40,6 +40,12 @@ To upload existing local files to R2:
 go run . storage migrate
 ```
 
+Teacher documents are stored under type subfolders (`teacher-documents/document/`, `teacher-documents/resume/`). To move legacy flat files into those folders:
+
+```bash
+go run . storage reorganize-teacher-documents
+```
+
 ## Features
 
 - **Student management:** Register students, assign teachers, and track status and contact details

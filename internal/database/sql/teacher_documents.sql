@@ -165,3 +165,16 @@ FROM tbl_teacher_documents
 WHERE type = ?
 	AND teacher_id IN (sqlc.slice('teacher_ids'))
 ORDER BY uploaded_at DESC;
+
+-- name: GetTeacherDocumentTypeByStoredFilename :one
+SELECT type
+FROM tbl_teacher_documents
+WHERE stored_filename = ?
+LIMIT 1;
+
+-- name: GetTeacherDocumentsForStorageReorganize :many
+SELECT
+	type,
+	stored_filename
+FROM tbl_teacher_documents
+WHERE type IN ('document', 'resume');

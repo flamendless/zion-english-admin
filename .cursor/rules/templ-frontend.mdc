@@ -91,6 +91,28 @@ Whenever a teacher name is shown in the UI, render it with `@TeacherNameCell(nam
 
 Action icon kinds are typed as `IconKind` in [`icon_kind.go`](icon_kind.go). Use `@IconActionLink`, `@IconActionButton`, and `@IconActionSubmit` with `IconKind` constants: never build action buttons in client-side JavaScript.
 
+## Tooltips
+
+Global `[data-tooltip]` in [`global.templ`](global.templ) renders via `::after` on the trigger. It is **not** portaled to `document.body`, so any ancestor with `overflow: hidden`, `overflow: auto`, or `overflow: scroll` can clip it.
+
+**Do not** put `overflow: hidden` on cards, panels, or rows that contain `@IconActionButton` or other `[data-tooltip]` controls. Round corners on inner children (header, first/last row) instead. Reference: [`settings.templ`](frontend/settings.templ) (`.settings-panel` must not use `overflow: hidden`).
+
+**Edge-positioned icon actions** (right end of a row or panel): the default centered tooltip can extend past the container edge. Add a scoped right-aligned override:
+
+```css
+.my-row-actions [data-tooltip]::after {
+	left: auto;
+	right: 0;
+	transform: none;
+}
+```
+
+Reference: `.settings-sensitive-actions [data-tooltip]::after` in [`settings.templ`](frontend/settings.templ).
+
+**Scrollable or heavily clipped containers** (tables, integration chip rows): pseudo-tooltips are disabled inside `.table-wrapper` and `.day-class-integrations`. Those use the floating tooltip from `ScrFloatingTooltips()` in [`scripts.templ`](frontend/scripts.templ) (`position: fixed`, viewport clamping). When adding tooltips inside a new scroll/clipping context, either avoid clipping ancestors or extend the `tooltipTarget()` selector in `ScrFloatingTooltips()` and disable pseudo-tooltips with a matching `[data-tooltip]::after { content: none; }` rule (same pattern as `.table-wrapper [data-tooltip]::after` in `global.templ`).
+
+**Modal close buttons** already suppress pseudo-tooltips (`.modal-close[data-tooltip]::after`); use visible labels or `aria-label` in modals instead.
+
 ## SSR over client-side DOM building
 
 Prefer server-side rendering with templ components and HTMX partial fetches over complex inline JavaScript.
