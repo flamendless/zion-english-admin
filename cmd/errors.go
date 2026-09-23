@@ -126,4 +126,7 @@ var (
 	ErrIntroVideoReadFailed          = errors.New("[INTRO VIDEO] Failed to read uploaded file")
 	ErrInvalidIntroVideoContent      = errors.New("[INTRO VIDEO] Invalid video file. Please upload a valid video.")
 	ErrEmptyIntroVideoDuration       = errors.New("[INTRO VIDEO] empty duration")
+
+	ErrEmptyNotificationCreatedAt   = errors.New("[NOTIFICATION] empty created at")
+	ErrInvalidNotificationCreatedAt = errors.New("[NOTIFICATION] invalid created at")
 )

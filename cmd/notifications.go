@@ -5,10 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"time"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
-	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/utils"
 )
@@ -31,33 +29,35 @@ func handleNotifications(w http.ResponseWriter, r *http.Request) {
 	notifySvc.ScanMissedClasses(ctx, classOverdueGracePeriodMinutes(ctx))
 
 	unreadOnly := r.URL.Query().Get("filter") == "unread"
+	filters := parseNotificationFilters(r)
 	sort := parseListSort(r, frontend.ListSortKindNotification)
 	page := utils.ParsePageQuery(r)
-	total, err := notifySvc.Count(ctx, user, unreadOnly)
+	dbTotal, err := notifySvc.Count(ctx, user, unreadOnly)
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to count notifications: %v", err), http.StatusInternalServerError)
 		return
 	}
-	page.Total = total
 
-	allRows, err := notifySvc.ListPaged(ctx, user, unreadOnly, total, 0)
+	allRows, err := notifySvc.ListPaged(ctx, user, unreadOnly, dbTotal, 0)
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to load notifications: %v", err), http.StatusInternalServerError)
 		return
 	}
-	sortNotificationRows(allRows, sort)
-	rows := paginateSlice(allRows, page)
+	fromOptions := notificationFromOptions(allRows)
+	filtered := filterNotificationRows(allRows, filters)
+	page.Total = int64(len(filtered))
+	sortNotificationRows(filtered, sort)
+	rows := paginateSlice(filtered, page)
 
-	params := map[string]string{"filter": r.URL.Query().Get("filter")}
-	for k, v := range sort.QueryValues() {
-		if v != "" {
-			params[k] = v
-		}
-	}
+	params := notificationFilterParams(unreadOnly, filters, sort)
 	filterPath := utils.URL("/notifications")
 	data := frontend.NotificationListData{
 		Items:          notificationItems(rows),
 		UnreadOnly:     unreadOnly,
+		MessageFilter:  filters.Message,
+		FromFilter:     filters.From,
+		DateFilter:     filters.Date,
+		FromOptions:    fromOptions,
 		SortBy:         sort.By,
 		SortOrder:      string(sort.Order),
 		PageNumber:     page.Number,
@@ -210,15 +210,12 @@ func notificationItems(rows []queries.TblNotification) []frontend.NotificationIt
 }
 
 func formatNotificationCreatedAt(value string) string {
-	if value == "" {
-		return "-"
-	}
-	layouts := []string{constants.DateTimeSecondsLayout, constants.DateTimeLayout}
-	for _, layout := range layouts {
-		t, err := time.Parse(layout, value)
-		if err == nil {
-			return utils.DateTimeSecondsPHT(t.UTC())
+	t, err := parseNotificationCreatedAt(value)
+	if err != nil {
+		if value == "" {
+			return "-"
 		}
+		return value
 	}
-	return value
+	return utils.DateTimeSecondsPHT(t)
 }

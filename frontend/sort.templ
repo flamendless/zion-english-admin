@@ -52,7 +52,7 @@ func sortOrderIconClass(sortOrder string, isAsc bool) string {
 templ SortToggleScript() {
 	<script>
 		function toggleSortOrder(btn) {
-			const form = btn.closest('form, .toolbar, .list-toolbar, .notification-filter-bar');
+			const form = btn.closest('form, .toolbar, .list-toolbar');
 			const input = form ? form.querySelector('#sortOrder, [name="sortOrder"]') : document.getElementById('sortOrder');
 			if (!input) return;
 			const next = input.value === 'asc' ? 'desc' : 'asc';

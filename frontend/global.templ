@@ -806,20 +806,35 @@ templ GlobalIncludes() {
 			border-color: var(--color-primary-hover);
 		}
 
-		.notification-filter-bar .notification-mark-all-page {
-			margin-left: auto;
-		}
-
-		.notification-filter-bar .notification-sort-form {
+		.notifications-toolbar-row {
 			display: flex;
+			flex-wrap: wrap;
 			align-items: flex-end;
 			gap: var(--space-3);
-			margin-left: auto;
-			flex-wrap: wrap;
+			margin-bottom: var(--space-4);
 		}
 
-		.notification-filter-bar .notification-sort-form .list-toolbar-action {
-			min-width: auto;
+		.notifications-toolbar-row .list-toolbar {
+			flex: 1 1 20rem;
+			margin-bottom: 0;
+		}
+
+		.notifications-toolbar .notifications-message-group {
+			flex: 2 1 240px;
+			min-width: min(100%, 240px);
+		}
+
+		.notifications-toolbar .notifications-message-group input[type="search"] {
+			width: 100%;
+		}
+
+		.notifications-toolbar-secondary {
+			flex: 0 0 auto;
+		}
+
+		.notifications-toolbar-secondary .notification-mark-all-page {
+			margin-top: 0;
+			min-height: 2.5rem;
 		}
 
 		.notification-panel-list {
@@ -890,27 +905,6 @@ templ GlobalIncludes() {
 		.notification-view-all {
 			font-size: 0.9rem;
 			font-weight: 600;
-		}
-
-		.notification-filter-bar {
-			display: flex;
-			align-items: center;
-			gap: var(--space-3);
-			margin-bottom: var(--space-4);
-		}
-
-		.notification-filter-link {
-			padding: var(--space-2) var(--space-3);
-			border-radius: var(--radius-md);
-			text-decoration: none;
-			color: var(--color-muted-foreground);
-			border: 1px solid transparent;
-		}
-
-		.notification-filter-link.is-active {
-			color: var(--color-primary);
-			border-color: var(--color-primary);
-			background: color-mix(in srgb, var(--color-primary) 8%, transparent);
 		}
 
 		.notification-list-item.is-unread td {
@@ -3684,15 +3678,6 @@ templ GlobalIncludes() {
 			min-width: auto;
 		}
 
-		.notification-filter-bar .sort-by-group,
-		.notification-filter-bar .sort-order-group {
-			margin-left: auto;
-		}
-
-		.notification-filter-bar .sort-by-group select {
-			min-width: 120px;
-		}
-
 		.pagination-bar {
 			display: flex;
 			align-items: center;
@@ -4404,6 +4389,24 @@ templ GlobalIncludes() {
 
 			.list-toolbar-action label {
 				display: none;
+			}
+
+			.notifications-toolbar-row {
+				flex-direction: column;
+				align-items: stretch;
+			}
+
+			.notifications-toolbar-row .list-toolbar {
+				flex: 1 1 100%;
+			}
+
+			.notifications-toolbar-secondary {
+				width: 100%;
+			}
+
+			.notifications-toolbar-secondary .notification-mark-all-page {
+				width: 100%;
+				min-height: 44px;
 			}
 
 			.pagination-bar {

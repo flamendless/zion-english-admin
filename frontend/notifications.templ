@@ -21,6 +21,10 @@ type NotificationPanelData struct {
 type NotificationListData struct {
 	Items          []NotificationItem
 	UnreadOnly     bool
+	MessageFilter  string
+	FromFilter     string
+	DateFilter     string
+	FromOptions    []StatusOption
 	SortBy         string
 	SortOrder      string
 	PageNumber     int
@@ -130,34 +134,7 @@ templ Notifications(data NotificationListData) {
 			@HeaderSimple()
 			@HubHeader("Notifications", "", "", false)
 
-			<div class="notification-filter-bar">
-				<a
-					href={ utils.URL("/notifications") }
-					class={ notificationFilterClass(!data.UnreadOnly) }
-				>All</a>
-				<a
-					href={ utils.URL("/notifications?filter=unread") }
-					class={ notificationFilterClass(data.UnreadOnly) }
-				>Unread</a>
-				<form class="notification-sort-form" method="GET" action={ utils.URL("/notifications") }>
-					if data.UnreadOnly {
-						<input type="hidden" name="filter" value="unread"/>
-					}
-					@SortControls(data.SortBy, data.SortOrder, ListSortKindNotification)
-					<div class="form-group list-toolbar-action">
-						<label for="notificationSortSubmit">&nbsp;</label>
-						<button type="submit" id="notificationSortSubmit">Apply</button>
-					</div>
-				</form>
-				if data.UnreadOnly && data.PageTotal > 0 {
-					<button
-						type="button"
-						class="notification-mark-all-page"
-						hx-post={ utils.URL("/notifications/read-all") }
-						hx-swap={ HxSwapNone }
-					>Mark all read</button>
-				}
-			</div>
+			@NotificationListToolbar(data)
 
 			if len(data.Items) > 0 {
 				<div class="table-wrapper">
@@ -187,6 +164,59 @@ templ Notifications(data NotificationListData) {
 		</div>
 	</body>
 	</html>
+}
+
+templ NotificationListToolbar(data NotificationListData) {
+	<div class="notifications-toolbar-row">
+		<form class="list-toolbar notifications-toolbar" method="GET" action={ utils.URL("/notifications") }>
+			<div class="form-group notifications-message-group">
+				<label for="notificationMessageFilter">Message</label>
+				<input
+					type="search"
+					id="notificationMessageFilter"
+					name="message"
+					value={ data.MessageFilter }
+					placeholder="Search message..."
+					autocomplete="off"
+				/>
+			</div>
+			<div class="form-group">
+				<label for="notificationFromFilter">From</label>
+				<select id="notificationFromFilter" name="from">
+					<option value="">All</option>
+					for _, opt := range data.FromOptions {
+						<option value={ opt.Value } selected?={ data.FromFilter == opt.Value }>{ opt.Label }</option>
+					}
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="notificationDateFilter">Date</label>
+				<input type="date" id="notificationDateFilter" name="date" value={ data.DateFilter }/>
+			</div>
+			<div class="form-group">
+				<label for="notificationViewFilter">View</label>
+				<select id="notificationViewFilter" name="filter">
+					<option value="" selected?={ !data.UnreadOnly }>All</option>
+					<option value="unread" selected?={ data.UnreadOnly }>Unread</option>
+				</select>
+			</div>
+			@SortControls(data.SortBy, data.SortOrder, ListSortKindNotification)
+			<div class="form-group list-toolbar-action">
+				<label for="notificationFilterSubmit">&nbsp;</label>
+				<button type="submit" id="notificationFilterSubmit">Filter</button>
+			</div>
+		</form>
+		if data.UnreadOnly && data.PageTotal > 0 {
+			<div class="notifications-toolbar-secondary">
+				<button
+					type="button"
+					class="notification-mark-all-page"
+					hx-post={ utils.URL("/notifications/read-all") }
+					hx-swap={ HxSwapNone }
+				>Mark all read</button>
+			</div>
+		}
+	</div>
 }
 
 templ NotificationListRow(item NotificationItem) {
@@ -228,13 +258,6 @@ func notificationItemClass(read bool, panel bool) string {
 		return "notification-panel-item is-unread"
 	}
 	return "notification-list-item is-unread"
-}
-
-func notificationFilterClass(active bool) string {
-	if active {
-		return "notification-filter-link is-active"
-	}
-	return "notification-filter-link"
 }
 
 templ NotificationBellScript() {
