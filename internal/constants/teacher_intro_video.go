@@ -43,17 +43,21 @@ func ValidTeacherIntroVideoStatus(value string) bool {
 type TeacherIntroVideoSourceType string
 
 const (
+	TeacherIntroVideoSourceUpload     TeacherIntroVideoSourceType = "upload"
 	TeacherIntroVideoSourceGoogleDrive TeacherIntroVideoSourceType = "google_drive"
 	TeacherIntroVideoSourceYouTube     TeacherIntroVideoSourceType = "youtube"
 )
 
 var TeacherIntroVideoSourceTypes = []TeacherIntroVideoSourceType{
+	TeacherIntroVideoSourceUpload,
 	TeacherIntroVideoSourceGoogleDrive,
 	TeacherIntroVideoSourceYouTube,
 }
 
 func (s TeacherIntroVideoSourceType) Label() string {
 	switch s {
+	case TeacherIntroVideoSourceUpload:
+		return "Upload"
 	case TeacherIntroVideoSourceGoogleDrive:
 		return "Google Drive"
 	case TeacherIntroVideoSourceYouTube:
@@ -65,7 +69,7 @@ func (s TeacherIntroVideoSourceType) Label() string {
 
 func ValidTeacherIntroVideoSourceType(value string) bool {
 	switch TeacherIntroVideoSourceType(value) {
-	case TeacherIntroVideoSourceGoogleDrive, TeacherIntroVideoSourceYouTube:
+	case TeacherIntroVideoSourceUpload, TeacherIntroVideoSourceGoogleDrive, TeacherIntroVideoSourceYouTube:
 		return true
 	default:
 		return false

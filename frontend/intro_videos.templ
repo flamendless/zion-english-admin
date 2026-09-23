@@ -20,6 +20,15 @@ type IntroVideoItem struct {
 	CanReview        bool
 }
 
+func introVideoViewLinkLabel(sourceType constants.TeacherIntroVideoSourceType) string {
+	switch sourceType {
+	case constants.TeacherIntroVideoSourceYouTube, constants.TeacherIntroVideoSourceGoogleDrive:
+		return "View video link"
+	default:
+		return "View video"
+	}
+}
+
 func introVideoLinkDisplay(label string) string {
 	const maxLen = 64
 	if len(label) <= maxLen {
@@ -39,12 +48,12 @@ func introVideoRowClass(status constants.TeacherIntroVideoStatus) string {
 	}
 }
 
-func introVideosTableColspan(showUploader bool, showActions bool) int {
+func introVideosTableColspan(showUploader bool, showViewAction bool, showActions bool) int {
 	colspan := 4
 	if showUploader {
 		colspan++
 	}
-	if showActions {
+	if showViewAction || showActions {
 		colspan++
 	}
 	return colspan
@@ -96,10 +105,10 @@ templ IntroVideoSourcePill(sourceType constants.TeacherIntroVideoSourceType) {
 	}
 }
 
-templ IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool) {
+templ IntroVideoTableRow(item IntroVideoItem, showUploader bool, showViewAction bool, showActions bool) {
 	<tr class={ introVideoRowClass(item.Status) }>
-		<td data-label="Link">
-			<a href={ item.ViewURL } class="documents-filename documents-filename-link" title={ item.LinkLabel } target="_blank" rel="noopener noreferrer">{ introVideoLinkDisplay(item.LinkLabel) }</a>
+		<td data-label="Video">
+			<span class="documents-filename" title={ item.LinkLabel }>{ introVideoLinkDisplay(item.LinkLabel) }</span>
 			if item.RejectReason != "" {
 				<div class="intro-video-reject-reason">Reject reason: { item.RejectReason }</div>
 			}
@@ -119,55 +128,59 @@ templ IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions boo
 			</td>
 		}
 		<td data-label="Uploaded at">{ item.UploadedAt }</td>
-		if showActions {
+		if showViewAction || showActions {
 			<td data-label="Actions">
 				<div class="table-actions">
-					@IconActionLinkExternal(item.ViewURL, "View", IconKindExternal)
-					if item.CanReview {
-						<form method="POST" action={ utils.URL("/intro-videos/" + item.ID + "/approve") } class="table-action-form">
-							@IconActionSubmit("Approve", IconKindApprove)
-						</form>
-						@IconActionButton("Reject", IconKindReject, templ.Attributes{
-							"type": "button",
-							"data-intro-video-reject-url": utils.URL("/intro-videos/" + item.ID + "/reject"),
-							"data-intro-video-reject-label": item.LinkLabel,
-						})
+					if showViewAction && item.ViewURL != "" {
+						@IconActionLinkExternal(item.ViewURL, "View", IconKindView)
 					}
-					<form method="POST" action={ utils.URL("/intro-videos/" + item.ID + "/delete") } class="table-action-form" onsubmit="return confirm('Delete this intro video? The teacher can submit a new one.');">
-						@IconActionSubmit("Delete", IconKindWarning)
-					</form>
+					if showActions {
+						if item.CanReview {
+							<form method="POST" action={ utils.URL("/intro-videos/" + item.ID + "/approve") } class="table-action-form">
+								@IconActionSubmit("Approve", IconKindApprove)
+							</form>
+							@IconActionButton("Reject", IconKindReject, templ.Attributes{
+								"type": "button",
+								"data-intro-video-reject-url": utils.URL("/intro-videos/" + item.ID + "/reject"),
+								"data-intro-video-reject-label": item.LinkLabel,
+							})
+						}
+						<form method="POST" action={ utils.URL("/intro-videos/" + item.ID + "/delete") } class="table-action-form" onsubmit="return confirm('Delete this intro video? The teacher can submit a new one.');">
+							@IconActionSubmit("Delete", IconKindWarning)
+						</form>
+					}
 				</div>
 			</td>
 		}
 	</tr>
 }
 
-templ IntroVideosTableBody(items []IntroVideoItem, showUploader bool, showActions bool, emptyMessage string) {
+templ IntroVideosTableBody(items []IntroVideoItem, showUploader bool, showViewAction bool, showActions bool, emptyMessage string) {
 	if len(items) == 0 {
 		<tr>
-			<td colspan={ fmt.Sprintf("%d", introVideosTableColspan(showUploader, showActions)) } class="empty-state">{ emptyMessage }</td>
+			<td colspan={ fmt.Sprintf("%d", introVideosTableColspan(showUploader, showViewAction, showActions)) } class="empty-state">{ emptyMessage }</td>
 		</tr>
 	} else {
 		for _, item := range items {
-			@IntroVideoTableRow(item, showUploader, showActions)
+			@IntroVideoTableRow(item, showUploader, showViewAction, showActions)
 		}
 	}
 }
 
-templ IntroVideosTable(showUploader bool, showActions bool) {
+templ IntroVideosTable(showUploader bool, showViewAction bool, showActions bool) {
 	<div class="table-wrapper documents-table-wrapper">
 		<table class="documents-table table-stack-mobile">
 			<thead>
 				<tr>
-					<th>Link</th>
+					<th>Video</th>
 					<th>Source</th>
 					<th>Status</th>
 					if showUploader {
 						@AdminOnlyTableHeader("Uploaded by")
 					}
 					<th>Uploaded at</th>
-					if showActions {
-						@AdminOnlyTableHeader("Actions")
+					if showViewAction || showActions {
+						<th>Actions</th>
 					}
 				</tr>
 			</thead>
@@ -179,7 +192,7 @@ templ IntroVideosTable(showUploader bool, showActions bool) {
 				hx-swap={ HxSwapInnerHTML }
 			>
 				<tr>
-					<td colspan={ fmt.Sprintf("%d", introVideosTableColspan(showUploader, showActions)) } class="empty-state">Loading intro videos...</td>
+					<td colspan={ fmt.Sprintf("%d", introVideosTableColspan(showUploader, showViewAction, showActions)) } class="empty-state">Loading intro videos...</td>
 				</tr>
 			</tbody>
 		</table>
@@ -190,6 +203,7 @@ type IntroVideosPageData struct {
 	Title             string
 	Description       string
 	ShowUploader      bool
+	ShowViewAction    bool
 	ShowActions       bool
 	ShowTeacherFilter bool
 	Status            constants.TeacherIntroVideoStatus
@@ -223,7 +237,7 @@ templ IntroVideosPage(data IntroVideosPageData) {
 				<p class="documents-page-desc">{ data.Description }</p>
 			}
 			@IntroVideosToolbar(data.ShowTeacherFilter, data.Status)
-			@IntroVideosTable(data.ShowUploader, data.ShowActions)
+			@IntroVideosTable(data.ShowUploader, data.ShowViewAction, data.ShowActions)
 			if data.ShowActions {
 				@IntroVideoRejectModal()
 			}
@@ -261,7 +275,7 @@ templ IntroVideoRejectModal() {
 			>
 				<p class="scheduled-class-modal-lead">The teacher will be able to submit a new intro video after rejection.</p>
 				<div class="form-group">
-					<label>Video link</label>
+					<label>Video</label>
 					<p id="introVideoRejectLabel" class="intro-video-reject-modal-link">-</p>
 				</div>
 				<div class="scheduled-class-modal-fields">
@@ -353,7 +367,7 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 	if !data.IsSuperuser && data.IntroVideoUploadVisible {
 		<div class="profile-card profile-section">
 			<h2>Introduction video</h2>
-			<p class="profile-section-desc">Submit a short introduction video link for students and administrators. Use a Google Drive or YouTube link that reviewers can open without signing in.</p>
+			<p class="profile-section-desc">Upload a short introduction video for students and administrators. You can also submit a YouTube or Google Drive link if you prefer to host the video externally.</p>
 			if data.HasIntroVideo {
 				<div class="profile-detail" style="margin-bottom: var(--space-4);">
 					<span class="profile-detail-label">Current submission</span>
@@ -361,9 +375,11 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 						@StatusPill(data.IntroVideoStatus.Label(), IntroVideoStatusPillTone(data.IntroVideoStatus), true)
 						if data.IntroVideoSourceType != "" {
 							@IntroVideoSourcePill(data.IntroVideoSourceType)
+						} else {
+							@IntroVideoSourcePill("")
 						}
 						if data.IntroVideoViewURL != "" {
-							<a href={ data.IntroVideoViewURL } class="documents-filename-link" target="_blank" rel="noopener noreferrer">View video link</a>
+							@IconActionLinkExternal(data.IntroVideoViewURL, introVideoViewLinkLabel(data.IntroVideoSourceType), IconKindView)
 						}
 					</div>
 					if data.IntroVideoRejectReason != "" {
@@ -392,50 +408,348 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 			}
 			if data.IntroVideoUploadsAllowed {
 				<form
+					id="introVideoForm"
 					method="POST"
 					action={ utils.URL("/profile/intro-video") }
-					onsubmit="return confirm('Once submitted, you will not be able to submit a new intro video unless your current submission is rejected or deleted. Continue?');"
+					enctype="multipart/form-data"
 				>
 					<div class="form-group">
 						<label for="introVideoSourceType">Source *</label>
 						<select id="introVideoSourceType" name="source_type" required disabled?={ !data.CanUploadIntroVideo }>
-							<option value="">Select source...</option>
 							for _, opt := range TeacherIntroVideoSourceTypeOptions {
-								<option value={ opt.Value }>{ opt.Label }</option>
+								<option value={ opt.Value } selected?={ opt.Value == string(constants.TeacherIntroVideoSourceUpload) }>{ opt.Label }</option>
 							}
 						</select>
 					</div>
-					<div class="form-group">
-						<label for="introVideoURL">Video URL *</label>
-						<input
-							type="url"
-							id="introVideoURL"
-							name="url"
-							required
-							disabled?={ !data.CanUploadIntroVideo }
-							placeholder="https://..."
-						/>
+					<div id="introVideoUploadFields">
+						<div class="upload-zone">
+							<label class="upload-zone-label" for="introVideoFile">
+								<span class="upload-zone-icon" aria-hidden="true">
+									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<polygon points="23 7 16 12 23 17 23 7"></polygon>
+										<rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+									</svg>
+								</span>
+								<span class="upload-zone-meta">
+									<span>Choose intro video</span>
+									<span class="upload-zone-hint">MP4, WebM, MOV, AVI, MKV, OGV, M4V, or 3GP (max 20 MB, 60 seconds)</span>
+								</span>
+								<input
+									type="file"
+									id="introVideoFile"
+									name="video"
+									accept=".mp4,.webm,.mov,.avi,.mkv,.ogv,.m4v,.3gp,video/*"
+									disabled?={ !data.CanUploadIntroVideo }
+								/>
+							</label>
+						</div>
+						<div id="introVideoFilePreview" class="intro-video-file-preview" hidden>
+							<div class="intro-video-file-preview-media">
+								<video id="introVideoPreviewPlayer" playsinline preload="auto" controls></video>
+							</div>
+							<dl class="intro-video-file-preview-meta">
+								<div>
+									<dt>File name</dt>
+									<dd id="introVideoPreviewName">-</dd>
+								</div>
+								<div>
+									<dt>File size</dt>
+									<dd id="introVideoPreviewSize">-</dd>
+								</div>
+								<div>
+									<dt>Format</dt>
+									<dd id="introVideoPreviewFormat">-</dd>
+								</div>
+								<div>
+									<dt>Duration</dt>
+									<dd id="introVideoPreviewDuration">-</dd>
+								</div>
+								<div>
+									<dt>Dimensions</dt>
+									<dd id="introVideoPreviewDimensions">-</dd>
+								</div>
+							</dl>
+							<p id="introVideoPreviewDurationWarning" class="intro-video-duration-warning" hidden>Video exceeds the 60 second limit. Choose a shorter clip before submitting.</p>
+						</div>
 					</div>
-					<div class="intro-video-link-info">
-						<p class="field-hint">Make sure the link is publicly accessible. See the steps below for your selected source.</p>
-						<p
-							class="field-hint"
-							id="introVideoSourceHint"
-							data-google-drive="In Google Drive, open Share and set General access to Anyone with the link."
-							data-youtube="In YouTube Studio, set visibility to Unlisted so anyone with the link can watch."
-						></p>
+					<div id="introVideoLinkFields" hidden>
+						<div class="form-group">
+							<label for="introVideoURL">Video URL *</label>
+							<input
+								type="url"
+								id="introVideoURL"
+								name="url"
+								disabled?={ !data.CanUploadIntroVideo }
+								placeholder="https://..."
+							/>
+						</div>
+						<div class="intro-video-link-info">
+							<p class="field-hint">Make sure the link is publicly accessible. See the steps below for your selected source.</p>
+							<p
+								class="field-hint"
+								id="introVideoSourceHint"
+								data-google-drive="In Google Drive, open Share and set General access to Anyone with the link."
+								data-youtube="In YouTube Studio, set visibility to Unlisted so anyone with the link can watch."
+							></p>
+						</div>
 					</div>
+					<p id="introVideoFormError" class="intro-video-form-error" hidden role="alert"></p>
 					<div class="profile-form-actions">
-						<button type="submit" disabled?={ !data.CanUploadIntroVideo }>Submit intro video</button>
+						<button type="submit" id="introVideoSubmitBtn" disabled?={ !data.CanUploadIntroVideo }>Submit intro video</button>
 					</div>
 				</form>
+				<div id="introVideoUploadProgress" class="intro-video-upload-progress" hidden role="presentation">
+					<div class="intro-video-upload-progress-panel" role="status" aria-live="polite">
+						<p id="introVideoUploadProgressMessage" class="intro-video-upload-progress-message">Uploading video, please wait...</p>
+						<div class="intro-video-progress-track">
+							<div id="introVideoUploadProgressBar" class="intro-video-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+						</div>
+					</div>
+				</div>
+				<style>
+					.intro-video-file-preview {
+						margin-top: var(--space-4);
+						padding: var(--space-4);
+						border: 1px solid var(--color-border);
+						border-radius: var(--radius-md);
+						background: var(--color-surface);
+						display: grid;
+						gap: var(--space-4);
+					}
+
+					.intro-video-file-preview[hidden] {
+						display: none !important;
+					}
+
+					.intro-video-file-preview-media video {
+						display: block;
+						width: 100%;
+						max-height: 220px;
+						border-radius: var(--radius-md);
+						background: #000;
+					}
+
+					.intro-video-file-preview-meta {
+						display: grid;
+						grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+						gap: var(--space-3);
+						margin: 0;
+					}
+
+					.intro-video-file-preview-meta dt {
+						margin: 0 0 var(--space-1);
+						font-size: 0.6875rem;
+						font-weight: 600;
+						text-transform: uppercase;
+						letter-spacing: 0.04em;
+						color: var(--color-muted-foreground);
+					}
+
+					.intro-video-file-preview-meta dd {
+						margin: 0;
+						font-size: 0.875rem;
+						color: var(--color-foreground);
+						word-break: break-word;
+					}
+
+					.intro-video-duration-warning {
+						margin: 0;
+						font-size: 0.8125rem;
+						color: var(--color-destructive);
+					}
+
+					.intro-video-form-error {
+						margin-top: var(--space-3);
+						padding: var(--space-3) var(--space-4);
+						border-radius: var(--radius-md);
+						background: color-mix(in srgb, var(--color-destructive) 10%, var(--color-surface));
+						border: 1px solid color-mix(in srgb, var(--color-destructive) 25%, transparent);
+						color: var(--color-foreground);
+						font-size: 0.875rem;
+					}
+
+					.intro-video-upload-progress {
+						position: fixed;
+						inset: 0;
+						z-index: 1200;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						padding: var(--space-4);
+						background: rgba(15, 23, 42, 0.5);
+					}
+
+					.intro-video-upload-progress[hidden] {
+						display: none !important;
+					}
+
+					.intro-video-upload-progress-panel {
+						width: min(100%, 28rem);
+						padding: var(--space-5);
+						border-radius: var(--radius-lg);
+						border: 1px solid var(--color-border);
+						background: var(--color-surface);
+						box-shadow: var(--shadow-lg);
+					}
+
+					.intro-video-upload-progress-message {
+						margin: 0 0 var(--space-4);
+						font-size: 0.9375rem;
+						color: var(--color-foreground);
+					}
+
+					.intro-video-progress-track {
+						height: 0.625rem;
+						border-radius: var(--radius-full);
+						background: var(--color-muted);
+						overflow: hidden;
+					}
+
+					.intro-video-progress-bar {
+						height: 100%;
+						width: 0;
+						border-radius: var(--radius-full);
+						background: var(--color-primary);
+						transition: width 120ms linear;
+					}
+
+					.intro-video-progress-bar.is-indeterminate {
+						width: 35%;
+						animation: introVideoProgressIndeterminate 1.2s ease-in-out infinite;
+					}
+
+					@keyframes introVideoProgressIndeterminate {
+						0% { transform: translateX(-120%); }
+						100% { transform: translateX(320%); }
+					}
+				</style>
 				<script>
 					(function () {
+						const form = document.getElementById('introVideoForm');
 						const sourceSelect = document.getElementById('introVideoSourceType');
+						const uploadFields = document.getElementById('introVideoUploadFields');
+						const linkFields = document.getElementById('introVideoLinkFields');
+						const fileInput = document.getElementById('introVideoFile');
+						const urlInput = document.getElementById('introVideoURL');
 						const hintEl = document.getElementById('introVideoSourceHint');
-						if (!sourceSelect || !hintEl) return;
+						const previewPanel = document.getElementById('introVideoFilePreview');
+						const previewPlayer = document.getElementById('introVideoPreviewPlayer');
+						const previewName = document.getElementById('introVideoPreviewName');
+						const previewSize = document.getElementById('introVideoPreviewSize');
+						const previewFormat = document.getElementById('introVideoPreviewFormat');
+						const previewDuration = document.getElementById('introVideoPreviewDuration');
+						const previewDimensions = document.getElementById('introVideoPreviewDimensions');
+						const durationWarning = document.getElementById('introVideoPreviewDurationWarning');
+						const submitBtn = document.getElementById('introVideoSubmitBtn');
+						const formError = document.getElementById('introVideoFormError');
+						const progressOverlay = document.getElementById('introVideoUploadProgress');
+						const progressMessage = document.getElementById('introVideoUploadProgressMessage');
+						const progressBar = document.getElementById('introVideoUploadProgressBar');
+						if (!form || !sourceSelect || !uploadFields || !linkFields || !fileInput || !urlInput || !submitBtn) return;
+
+						const maxDurationSeconds = 60;
+						let previewObjectURL = '';
+
+						function formatFileSize(bytes) {
+							if (!bytes || bytes <= 0) return '-';
+							const units = ['B', 'KB', 'MB', 'GB'];
+							let value = bytes;
+							let unitIndex = 0;
+							while (value >= 1024 && unitIndex < units.length - 1) {
+								value /= 1024;
+								unitIndex++;
+							}
+							return (unitIndex === 0 ? value.toFixed(0) : value.toFixed(1)) + ' ' + units[unitIndex];
+						}
+
+						function formatDuration(seconds) {
+							if (!seconds || !isFinite(seconds)) return '-';
+							const total = Math.round(seconds);
+							const mins = Math.floor(total / 60);
+							const secs = total % 60;
+							return mins + ':' + String(secs).padStart(2, '0');
+						}
+
+						function updatePreviewMetadata() {
+							if (!previewPlayer) return;
+							const duration = previewPlayer.duration;
+							if (previewDuration) {
+								previewDuration.textContent = isFinite(duration) && duration > 0
+									? formatDuration(duration)
+									: '-';
+							}
+							if (previewDimensions) {
+								const width = previewPlayer.videoWidth;
+								const height = previewPlayer.videoHeight;
+								previewDimensions.textContent = width > 0 && height > 0
+									? width + ' x ' + height
+									: '-';
+							}
+							if (durationWarning) {
+								durationWarning.hidden = !(isFinite(duration) && duration > maxDurationSeconds);
+							}
+							updateSubmitState();
+						}
+
+						function clearPreview() {
+							if (previewPlayer) {
+								previewPlayer.onloadedmetadata = null;
+								previewPlayer.onloadeddata = null;
+								previewPlayer.ondurationchange = null;
+								previewPlayer.oncanplay = null;
+								previewPlayer.pause();
+								previewPlayer.removeAttribute('src');
+								previewPlayer.load();
+							}
+							if (previewObjectURL) {
+								URL.revokeObjectURL(previewObjectURL);
+								previewObjectURL = '';
+							}
+							if (previewPanel) previewPanel.hidden = true;
+							if (previewName) previewName.textContent = '-';
+							if (previewSize) previewSize.textContent = '-';
+							if (previewFormat) previewFormat.textContent = '-';
+							if (previewDuration) previewDuration.textContent = '-';
+							if (previewDimensions) previewDimensions.textContent = '-';
+							if (durationWarning) durationWarning.hidden = true;
+						}
+
+						function setFormError(message) {
+							if (!formError) return;
+							if (!message) {
+								formError.hidden = true;
+								formError.textContent = '';
+								return;
+							}
+							formError.hidden = false;
+							formError.textContent = message;
+						}
+
+						function updateSubmitState() {
+							const sourceType = sourceSelect.value;
+							if (sourceType === 'upload') {
+								const file = fileInput.files && fileInput.files[0];
+								if (!file) {
+									submitBtn.disabled = true;
+									return;
+								}
+								const duration = previewPlayer && previewPlayer.duration;
+								if (isFinite(duration) && duration > maxDurationSeconds) {
+									submitBtn.disabled = true;
+									return;
+								}
+								submitBtn.disabled = false;
+								return;
+							}
+							if (sourceType === 'google_drive' || sourceType === 'youtube') {
+								submitBtn.disabled = !urlInput.value.trim();
+								return;
+							}
+							submitBtn.disabled = true;
+						}
 
 						function updateIntroVideoSourceHint() {
+							if (!hintEl) return;
 							const sourceType = sourceSelect.value;
 							if (sourceType === 'google_drive') {
 								hintEl.textContent = hintEl.getAttribute('data-google-drive') || '';
@@ -448,8 +762,162 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 							hintEl.textContent = '';
 						}
 
-						sourceSelect.addEventListener('change', updateIntroVideoSourceHint);
-						updateIntroVideoSourceHint();
+						function syncSourceFields() {
+							const sourceType = sourceSelect.value;
+							const isUpload = sourceType === 'upload';
+							const isLink = sourceType === 'google_drive' || sourceType === 'youtube';
+							uploadFields.hidden = !isUpload;
+							linkFields.hidden = !isLink;
+							fileInput.required = isUpload;
+							urlInput.required = isLink;
+							if (!isUpload) {
+								fileInput.value = '';
+								clearPreview();
+							}
+							if (!isLink) {
+								urlInput.value = '';
+							}
+							updateIntroVideoSourceHint();
+							updateSubmitState();
+						}
+
+						function bindPreview(file) {
+							clearPreview();
+							if (!file || !previewPanel || !previewPlayer) {
+								updateSubmitState();
+								return;
+							}
+
+							previewObjectURL = URL.createObjectURL(file);
+							if (previewName) previewName.textContent = file.name || '-';
+							if (previewSize) previewSize.textContent = formatFileSize(file.size);
+							const ext = file.name && file.name.includes('.') ? file.name.slice(file.name.lastIndexOf('.')).toLowerCase() : '-';
+							if (previewFormat) previewFormat.textContent = file.type ? file.type + ' (' + ext + ')' : ext;
+							previewPanel.hidden = false;
+
+							previewPlayer.onloadedmetadata = updatePreviewMetadata;
+							previewPlayer.onloadeddata = updatePreviewMetadata;
+							previewPlayer.ondurationchange = updatePreviewMetadata;
+							previewPlayer.oncanplay = updatePreviewMetadata;
+							previewPlayer.src = previewObjectURL;
+							previewPlayer.load();
+
+							if (previewPlayer.readyState >= HTMLMediaElement.HAVE_METADATA) {
+								updatePreviewMetadata();
+							}
+						}
+
+						function setProgressState(mode, percent) {
+							if (!progressOverlay || !progressMessage || !progressBar) return;
+							progressOverlay.hidden = false;
+							progressBar.classList.remove('is-indeterminate');
+							if (mode === 'upload') {
+								progressMessage.textContent = 'Uploading video, please wait...';
+								const safePercent = Math.max(0, Math.min(100, percent || 0));
+								progressBar.style.width = safePercent + '%';
+								progressBar.setAttribute('aria-valuenow', String(Math.round(safePercent)));
+								return;
+							}
+							progressMessage.textContent = 'Processing video, please wait...';
+							progressBar.style.width = '100%';
+							progressBar.classList.add('is-indeterminate');
+							progressBar.setAttribute('aria-valuenow', '100');
+						}
+
+						function hideProgressState() {
+							if (!progressOverlay || !progressBar) return;
+							progressOverlay.hidden = true;
+							progressBar.classList.remove('is-indeterminate');
+							progressBar.style.width = '0%';
+							progressBar.setAttribute('aria-valuenow', '0');
+						}
+
+						function setFormDisabled(disabled) {
+							sourceSelect.disabled = disabled;
+							fileInput.disabled = disabled;
+							urlInput.disabled = disabled;
+							submitBtn.disabled = disabled;
+						}
+
+						fileInput.addEventListener('change', function () {
+							const file = fileInput.files && fileInput.files[0];
+							bindPreview(file || null);
+							setFormError('');
+							updateSubmitState();
+						});
+
+						sourceSelect.addEventListener('change', function () {
+							syncSourceFields();
+							setFormError('');
+						});
+
+						form.addEventListener('submit', function (e) {
+							const sourceType = sourceSelect.value;
+							if (sourceType !== 'upload') {
+								if (!confirm('Once submitted, you will not be able to submit a new intro video unless your current submission is rejected or deleted. Continue?')) {
+									e.preventDefault();
+								}
+								return;
+							}
+
+							e.preventDefault();
+							if (!confirm('Once submitted, you will not be able to submit a new intro video unless your current submission is rejected or deleted. Continue?')) {
+								return;
+							}
+
+							const file = fileInput.files && fileInput.files[0];
+							if (!file) {
+								setFormError('Please choose a video file to upload.');
+								return;
+							}
+
+							setFormError('');
+							const formData = new FormData(form);
+							if (window.getCSRFHeaders) {
+								const headers = window.getCSRFHeaders();
+								if (headers['X-CSRF-Token']) {
+									formData.set('csrf_token', headers['X-CSRF-Token']);
+								}
+							}
+							setFormDisabled(true);
+							setProgressState('upload', 0);
+
+							const xhr = new XMLHttpRequest();
+							xhr.open('POST', form.action);
+							xhr.responseType = 'document';
+
+							xhr.upload.addEventListener('progress', function (evt) {
+								if (!evt.lengthComputable) return;
+								const percent = (evt.loaded / evt.total) * 100;
+								if (percent >= 100) {
+									setProgressState('processing', 100);
+									return;
+								}
+								setProgressState('upload', percent);
+							});
+
+							xhr.addEventListener('load', function () {
+								if (xhr.status >= 200 && xhr.status < 400) {
+									window.location.href = xhr.responseURL || form.action;
+									return;
+								}
+								hideProgressState();
+								setFormDisabled(false);
+								updateSubmitState();
+								setFormError('Failed to upload intro video. Please try again.');
+							});
+
+							xhr.addEventListener('error', function () {
+								hideProgressState();
+								setFormDisabled(false);
+								updateSubmitState();
+								setFormError('Failed to upload intro video. Check your connection and try again.');
+							});
+
+							xhr.send(formData);
+						});
+
+						syncSourceFields();
 					})();
 				</script>
 			}

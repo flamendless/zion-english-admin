@@ -6,8 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/constants"
@@ -120,11 +122,13 @@ func handleIntroVideos(w http.ResponseWriter, r *http.Request) {
 		data.Title = "Intro Videos"
 		data.Description = "Review teacher introduction video submissions."
 		data.ShowUploader = true
+		data.ShowViewAction = true
 		data.ShowActions = true
 		data.ShowTeacherFilter = true
 	case auth.RoleTeacher:
 		data.Title = "My Intro Video"
 		data.Description = "Your submitted introduction video."
+		data.ShowViewAction = true
 	default:
 		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
@@ -158,15 +162,17 @@ func handleIntroVideosPartial(w http.ResponseWriter, r *http.Request) {
 	sort := parseListSort(r, frontend.ListSortKindIntroVideo)
 
 	var (
-		items        []frontend.IntroVideoItem
-		showUploader bool
-		showActions  bool
-		isTeacher    bool
+		items          []frontend.IntroVideoItem
+		showUploader   bool
+		showViewAction bool
+		showActions    bool
+		isTeacher      bool
 	)
 
 	switch role {
 	case auth.RoleSuperuser, auth.RoleAdmin:
 		showUploader = true
+		showViewAction = true
 		showActions = true
 		rows, err := dbRO.GetQueries().GetAllTeacherIntroVideosFiltered(ctx, introVideoAllFilterParams(filters))
 		if err != nil {
@@ -183,6 +189,7 @@ func handleIntroVideosPartial(w http.ResponseWriter, r *http.Request) {
 		}
 	case auth.RoleTeacher:
 		isTeacher = true
+		showViewAction = true
 		rows, err := dbRO.GetQueries().GetTeacherIntroVideosByTeacherIDFiltered(ctx, introVideoTeacherFilterParams(user.ID, filters))
 		if err != nil {
 			logs.Log().Error("get filtered teacher intro videos", zap.Error(err))
@@ -197,7 +204,7 @@ func handleIntroVideosPartial(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeHTML(w)
-	if err := frontend.IntroVideosTableBody(items, showUploader, showActions, introVideosEmptyMessage(filters, isTeacher)).Render(ctx, w); err != nil {
+	if err := frontend.IntroVideosTableBody(items, showUploader, showViewAction, showActions, introVideosEmptyMessage(filters, isTeacher)).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -318,20 +325,30 @@ func handleProfileIntroVideo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := r.ParseForm(); err != nil {
-		setErrorFlash(w, "Invalid form submission")
+	if err := r.ParseMultipartForm(constants.MaxIntroVideoBytes); err != nil {
+		setErrorFlash(w, ErrIntroVideoFileTooLarge.Error())
 		HttpRedirect(w, r, "/profile")
 		return
 	}
 
 	sourceTypeStr := strings.TrimSpace(r.FormValue("source_type"))
 	if !constants.ValidTeacherIntroVideoSourceType(sourceTypeStr) {
-		setErrorFlash(w, "Select Google Drive or YouTube as the video source")
+		setErrorFlash(w, "Select a valid video source")
 		HttpRedirect(w, r, "/profile")
 		return
 	}
+	sourceType := constants.TeacherIntroVideoSourceType(sourceTypeStr)
 
-	parsed, err := teacherintrovideo.ParseURL(constants.TeacherIntroVideoSourceType(sourceTypeStr), r.FormValue("url"))
+	switch sourceType {
+	case constants.TeacherIntroVideoSourceUpload:
+		handleProfileIntroVideoUpload(w, r, ctx, user)
+	default:
+		handleProfileIntroVideoLink(w, r, ctx, user, sourceType)
+	}
+}
+
+func handleProfileIntroVideoLink(w http.ResponseWriter, r *http.Request, ctx context.Context, user auth.User, sourceType constants.TeacherIntroVideoSourceType) {
+	parsed, err := teacherintrovideo.ParseURL(sourceType, r.FormValue("url"))
 	if err != nil {
 		setErrorFlash(w, introVideoSubmitErrorMessage(err))
 		HttpRedirect(w, r, "/profile")
@@ -361,6 +378,58 @@ func handleProfileIntroVideo(w http.ResponseWriter, r *http.Request) {
 	HttpRedirect(w, r, "/profile")
 }
 
+func handleProfileIntroVideoUpload(w http.ResponseWriter, r *http.Request, ctx context.Context, user auth.User) {
+	file, header, err := r.FormFile("video")
+	if err != nil {
+		setErrorFlash(w, "Please choose a video file to upload")
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+	defer file.Close()
+
+	ext, mimeType, err := teacherintrovideo.ValidateUpload(file, header.Filename, header.Size)
+	if err != nil {
+		setErrorFlash(w, introVideoSubmitErrorMessage(err))
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+
+	storedFilename := fmt.Sprintf("%d_%d%s", user.ID, time.Now().UnixNano(), ext)
+	store := storage.Default()
+	if err := store.Put(ctx, storage.CategoryIntroVideos, storedFilename, file, mimeType); err != nil {
+		logs.Log().Error("write intro video file", zap.Error(err))
+		setErrorFlash(w, ErrIntroVideoSaveFailed.Error())
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+
+	if err := dbRW.GetQueries().InsertTeacherIntroVideo(ctx, queries.InsertTeacherIntroVideoParams{
+		TeacherID:        user.ID,
+		OriginalFilename: sql.NullString{String: filepath.Base(header.Filename), Valid: true},
+		StoredFilename:   sql.NullString{String: storedFilename, Valid: true},
+		MimeType:         sql.NullString{String: mimeType, Valid: true},
+		FileSize:         sql.NullInt64{Int64: header.Size, Valid: true},
+		SourceType:       sql.NullString{String: string(constants.TeacherIntroVideoSourceUpload), Valid: true},
+		Status:           string(constants.TeacherIntroVideoStatusSubmitted),
+	}); err != nil {
+		_ = store.Delete(ctx, storage.CategoryIntroVideos, storedFilename)
+		if database.IsUniqueConstraint(err) {
+			setErrorFlash(w, "You already have a submitted or approved intro video. You cannot submit again unless it is rejected or deleted.")
+		} else {
+			logs.Log().Error("insert teacher intro video", zap.Error(err))
+			setErrorFlash(w, "Failed to record intro video")
+		}
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+
+	insertAuditLogAs(ctx, user, "profile", fmt.Sprintf("submitted intro video file for teacher '%s'", user.Name))
+	notifySuperuser(ctx, user, notifications.KindIntroVideoSubmitted,
+		fmt.Sprintf("Teacher '%s' submitted an intro video file", user.Name), "")
+	setSuccessFlash(w, "Intro video submitted successfully. It will be reviewed by an administrator.")
+	HttpRedirect(w, r, "/profile")
+}
+
 func introVideoSubmitErrorMessage(err error) string {
 	switch {
 	case errors.Is(err, teacherintrovideo.ErrURLRequired):
@@ -368,9 +437,30 @@ func introVideoSubmitErrorMessage(err error) string {
 	case errors.Is(err, teacherintrovideo.ErrInvalidURL):
 		return "Enter a valid link for the selected source"
 	case errors.Is(err, teacherintrovideo.ErrUnsupportedSourceType):
-		return "Select Google Drive or YouTube as the video source"
+		return "Select a valid video source"
+	case errors.Is(err, teacherintrovideo.ErrFileEmpty):
+		return ErrIntroVideoFileEmpty.Error()
+	case errors.Is(err, teacherintrovideo.ErrFileTooLarge):
+		return ErrIntroVideoFileTooLarge.Error()
+	case errors.Is(err, teacherintrovideo.ErrUnsupportedFormat):
+		return ErrUnsupportedIntroVideoFormat.Error()
+	case errors.Is(err, teacherintrovideo.ErrUploadPrepareFailed):
+		return ErrIntroVideoUploadPrepareFailed.Error()
+	case errors.Is(err, teacherintrovideo.ErrReadFailed):
+		return ErrIntroVideoReadFailed.Error()
+	case errors.Is(err, teacherintrovideo.ErrInvalidContent):
+		return ErrInvalidIntroVideoContent.Error()
+	case errors.Is(err, teacherintrovideo.ErrEmptyDuration):
+		return ErrEmptyIntroVideoDuration.Error()
+	case errors.Is(err, teacherintrovideo.ErrTooLong):
+		return ErrIntroVideoTooLong.Error()
+	case errors.Is(err, teacherintrovideo.ErrFfprobeUnavailable):
+		return ErrFfprobeUnavailable.Error()
 	default:
-		return "Failed to validate intro video link"
+		if err != nil && err.Error() != "" {
+			return err.Error()
+		}
+		return "Failed to validate intro video"
 	}
 }
 

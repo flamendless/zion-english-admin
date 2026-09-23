@@ -535,7 +535,7 @@ func contentSecurityPolicy(r *http.Request) string {
 			"connect-src 'self'",
 		}, "; ")
 	}
-	return "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+	return "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' blob:"
 }
 
 func isTrainingMaterialWatchRequest(r *http.Request) bool {

@@ -42,4 +42,7 @@ func TestContentSecurityPolicyTrainingWatchAllowsYouTube(t *testing.T) {
 	if defaultCSP == csp {
 		t.Fatalf("expected default CSP to differ from training watch CSP")
 	}
+	if !strings.Contains(defaultCSP, "media-src 'self' blob:") {
+		t.Fatalf("missing media-src blob in default CSP: %q", defaultCSP)
+	}
 }

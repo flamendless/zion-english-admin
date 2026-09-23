@@ -422,7 +422,7 @@ templ GuideIntroVideos() {
 
 			<div class="guides-hero">
 				<p class="guides-subtitle">
-					Submit a short introduction video link from My Profile. Use a Google Drive or YouTube link that reviewers can open without signing in. Track status on My Intro Video.
+					Upload a short introduction video from My Profile. You can also submit a YouTube or Google Drive link if you prefer to host the video externally. Track status on My Intro Video.
 				</p>
 			</div>
 
@@ -431,13 +431,41 @@ templ GuideIntroVideos() {
 					"submit-intro-video",
 					"Submit an intro video",
 					utils.URL("/profile"),
-					"Share a Google Drive or YouTube link from the Introduction video section on My Profile.",
+					"Upload a video file from the Introduction video section on My Profile. File upload is selected by default.",
 					[]string{
 						"Open My Profile from the dashboard or navigation.",
 						"Scroll to the Introduction video section (visible when intro video uploads are enabled for your role).",
-						"Select the source: Google Drive or YouTube.",
-						"Paste the video link and click Submit intro video.",
-						"Confirm in the dialog when prompted. A success message confirms your submission is pending review.",
+						"Keep Source set to Upload, choose your video file, and review the preview (name, size, duration, and dimensions).",
+						"Click Submit intro video and confirm in the dialog.",
+						"Wait for the upload progress bar to finish, then for processing to complete before the page redirects.",
+						"A success message confirms your submission is pending review.",
+					},
+					false,
+				)
+				@GuideSection(
+					"submit-intro-video-link",
+					"Submit a YouTube or Google Drive link",
+					utils.URL("/profile"),
+					"Use an external link instead of uploading a file.",
+					[]string{
+						"Open the Introduction video section on My Profile.",
+						"Change Source to YouTube or Google Drive.",
+						"Paste the video URL and follow the sharing hint shown for your selected source.",
+						"Click Submit intro video and confirm when prompted.",
+					},
+					false,
+				)
+				@GuideSection(
+					"upload-requirements",
+					"Upload requirements",
+					utils.URL("/profile"),
+					"Uploaded files are stored in app storage and validated before review.",
+					[]string{
+						"Accepted formats: MP4, WebM, MOV, AVI, MKV, OGV, M4V, or 3GP.",
+						"Maximum file size: 20 MB.",
+						"Maximum duration: 60 seconds.",
+						"If the preview shows a duration warning, choose a shorter clip before submitting.",
+						"After the upload bar reaches 100%, processing may take a moment while the server validates the video.",
 					},
 					false,
 				)
@@ -471,10 +499,10 @@ templ GuideIntroVideos() {
 					"resubmit-after-rejection",
 					"Resubmit after rejection",
 					utils.URL("/profile"),
-					"You can submit a new link after an administrator rejects your video.",
+					"You can submit a new video or link after an administrator rejects your submission.",
 					[]string{
 						"Open My Profile and check the Introduction video section for the reject reason.",
-						"Fix the link or sharing settings, then submit a new URL.",
+						"Fix the file or link, then submit again.",
 						"You cannot submit again while a Submitted or Approved video is still on file.",
 						"After rejection, the form becomes available for a new submission.",
 					},
@@ -487,8 +515,9 @@ templ GuideIntroVideos() {
 					"Administrators review teacher intro videos on the Intro Videos page.",
 					[]string{
 						"Open Intro Videos from the dashboard Pending Review card or navigation.",
-						"Filter by status, teacher, or URL. Sort by upload date as needed.",
-						"Use View to open the teacher's link in a new tab.",
+						"Filter by status, teacher, or search term. Sort by upload date as needed.",
+						"Source shows Upload, YouTube, or Google Drive. Legacy rows may show Uploaded file.",
+						"Use View to open the teacher's video in a new tab.",
 						"Click Approve for acceptable submissions, or Reject and enter a required reason so the teacher can resubmit.",
 						"Delete removes the submission so the teacher can upload a new one.",
 					},
