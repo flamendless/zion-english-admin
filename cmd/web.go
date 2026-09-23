@@ -28,6 +28,7 @@ import (
 	"zion-english/internal/processor"
 	"zion-english/internal/sheet"
 	"zion-english/internal/startup"
+	"zion-english/internal/storage"
 	"zion-english/internal/utils"
 
 	"github.com/google/uuid"
@@ -56,12 +57,13 @@ var cmdWeb = &cobra.Command{
 	Short: "Start web server",
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg := conf.Conf()
-		if err := os.MkdirAll("tmp", 0755); err != nil {
-			panic(err)
+		if err := storage.Init(cfg); err != nil {
+			panic(fmt.Sprintf("Failed to initialize storage: %v", err))
 		}
-		if err := os.MkdirAll("data/avatars", 0755); err != nil {
-			panic(err)
-		}
+		logs.Log().Info("storage initialized",
+			zap.String("backend", storage.Default().Backend()),
+			zap.String("bucket", cfg.Storage.R2.Bucket),
+		)
 
 		if err := database.Init("data/zion.db"); err != nil {
 			panic(fmt.Sprintf("Failed to initialize database: %v", err))
@@ -777,9 +779,20 @@ func handleDownload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	base := reportOutputBasename(filename)
+	if base == "" {
+		sendErrorLog(w, "invalid path")
+		return
+	}
+
+	auditReportDownload(r.Context(), base)
+
+	if serveReportDownload(w, r, base) {
+		return
+	}
+
 	const baseDir = "tmp"
-	cleanPath := filepath.Clean(filename)
-	fullPath := filepath.Join(baseDir, cleanPath)
+	fullPath := filepath.Join(baseDir, base)
 	if !strings.HasPrefix(fullPath, filepath.Clean(baseDir)+string(os.PathSeparator)) {
 		sendErrorLog(w, "invalid path")
 		return
@@ -790,10 +803,8 @@ func handleDownload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	auditReportDownload(r.Context(), cleanPath)
-
 	w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", base))
 	http.ServeFile(w, r, fullPath)
 }
 

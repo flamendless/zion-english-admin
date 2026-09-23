@@ -30,6 +30,16 @@ Admin portal for Zion English teachers and administrators. Manage students, clas
 
 4. Open [http://localhost:8080/zion-english-admin](http://localhost:8080/zion-english-admin).
 
+### Cloudflare R2 (optional)
+
+Set `R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, and `R2_SECRET_ACCESS_KEY` in `.env` to store uploads in R2 instead of local `data/` and `tmp/`. Use a separate bucket per environment.
+
+To upload existing local files to R2:
+
+```bash
+go run . storage migrate
+```
+
 ## Features
 
 - **Student management:** Register students, assign teachers, and track status and contact details

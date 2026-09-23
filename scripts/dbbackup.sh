@@ -13,7 +13,7 @@ Options:
   -l, --local [DIR]       Save backup locally instead of object storage
                           Default: LOCAL_BACKUP_DIR or ~/backups/zion-english
   -r, --remote <REMOTE>   rclone destination
-                          Default: BACKUP_REMOTE or zion_english_backup:zion-english-assets/backups
+                          Default: BACKUP_REMOTE or zion_english_backup:{R2_BUCKET}/backups
   -h, --help              Show this help message
 
 Examples:
@@ -49,6 +49,18 @@ load_db_url_from_env_file() {
 	[[ -n "$db_line" ]] || return 0
 
 	DB_URL="$(trim_env_value "${db_line#*=}")"
+}
+
+load_r2_bucket_from_env_file() {
+	local env_file="$1"
+	local bucket_line
+
+	[[ -f "$env_file" ]] || return 0
+
+	bucket_line="$(grep -E '^[[:space:]]*R2_BUCKET=' "$env_file" | tail -n 1 || true)"
+	[[ -n "$bucket_line" ]] || return 0
+
+	R2_BUCKET="$(trim_env_value "${bucket_line#*=}")"
 }
 
 sqlite_db_path_from_url() {
@@ -95,7 +107,8 @@ APP_DIR="${APP_DIR:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 DB_URL="${GOOSE_DBSTRING:-${DB_URL:-}}"
 LOGS_DIR_FROM_ENV="${LOGS_DIR:-}"
 LOCAL_BACKUP_DIR="${LOCAL_BACKUP_DIR:-${HOME:-/root}/backups/zion-english}"
-BACKUP_REMOTE="${BACKUP_REMOTE:-zion_english_backup:zion-english-assets/backups}"
+R2_BUCKET="${R2_BUCKET:-zion-english-assets}"
+BACKUP_REMOTE="${BACKUP_REMOTE:-}"
 RCLONE_ARGS="${RCLONE_ARGS:---s3-no-check-bucket}"
 
 USE_LOCAL=false
@@ -153,7 +166,11 @@ LOGS_DIR="${LOGS_DIR_FROM_ENV:-$APP_DIR/logs}"
 if [[ -z "$DB_URL" ]]; then
 	load_db_url_from_env_file "$APP_DIR/.env"
 fi
+load_r2_bucket_from_env_file "$APP_DIR/.env"
 DB_URL="${DB_URL:-file:./data/zion.db}"
+if [[ -z "$BACKUP_REMOTE" ]]; then
+	BACKUP_REMOTE="zion_english_backup:${R2_BUCKET}/backups"
+fi
 
 require_command sqlite3
 require_command tar

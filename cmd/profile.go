@@ -11,8 +11,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -22,6 +20,7 @@ import (
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
+	"zion-english/internal/storage"
 	"zion-english/internal/utils"
 
 	"go.uber.org/zap"
@@ -29,18 +28,9 @@ import (
 )
 
 const (
-	avatarDir         = "data/avatars"
 	maxAvatarBytes    = 2 << 20
 	avatarCacheMaxAge = 3600
 )
-
-func ensureAvatarDir() error {
-	return os.MkdirAll(avatarDir, 0755)
-}
-
-func avatarFilePath(filename string) string {
-	return filepath.Join(avatarDir, filepath.Base(filename))
-}
 
 func teacherPictureURL(teacherID int64, hasPicture bool) string {
 	if !hasPicture {
@@ -636,13 +626,6 @@ func handleProfileAvatar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := ensureAvatarDir(); err != nil {
-		logs.Log().Error("create avatar dir", zap.Error(err))
-		setErrorFlash(w, "Failed to prepare upload")
-		HttpRedirect(w, r, "/profile")
-		return
-	}
-
 	if err := r.ParseMultipartForm(maxAvatarBytes); err != nil {
 		setErrorFlash(w, "File is too large. Maximum size is 2 MB.")
 		HttpRedirect(w, r, "/profile")
@@ -673,24 +656,14 @@ func handleProfileAvatar(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filename := fmt.Sprintf("%d%s", user.ID, ext)
-	destPath := avatarFilePath(filename)
+	store := storage.Default()
 
 	if row.ProfilePicture.Valid && row.ProfilePicture.String != "" && row.ProfilePicture.String != filename {
-		_ = os.Remove(avatarFilePath(row.ProfilePicture.String))
+		_ = store.Delete(ctx, storage.CategoryAvatars, row.ProfilePicture.String)
 	}
 
-	out, err := os.Create(destPath)
-	if err != nil {
-		logs.Log().Error("create avatar file", zap.Error(err))
-		setErrorFlash(w, "Failed to save profile picture")
-		HttpRedirect(w, r, "/profile")
-		return
-	}
-	defer out.Close()
-
-	if _, err := io.Copy(out, file); err != nil {
+	if err := store.Put(ctx, storage.CategoryAvatars, filename, file, avatarContentType(filename)); err != nil {
 		logs.Log().Error("write avatar file", zap.Error(err))
-		_ = os.Remove(destPath)
 		setErrorFlash(w, "Failed to save profile picture")
 		HttpRedirect(w, r, "/profile")
 		return
@@ -701,7 +674,7 @@ func handleProfileAvatar(w http.ResponseWriter, r *http.Request) {
 		ID:             user.ID,
 	}); err != nil {
 		logs.Log().Error("update teacher profile picture", zap.Error(err))
-		_ = os.Remove(destPath)
+		_ = store.Delete(ctx, storage.CategoryAvatars, filename)
 		setErrorFlash(w, "Failed to update profile picture")
 		HttpRedirect(w, r, "/profile")
 		return
@@ -735,14 +708,14 @@ func handleProfilePicture(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	path := avatarFilePath(row.ProfilePicture.String)
-	if _, err := os.Stat(path); err != nil {
+	obj, err := storage.Default().Get(ctx, storage.CategoryAvatars, row.ProfilePicture.String)
+	if err != nil {
 		HttpError(w, "Profile picture not found", http.StatusNotFound)
 		return
 	}
 
 	w.Header().Set("Cache-Control", fmt.Sprintf("private, max-age=%d", avatarCacheMaxAge))
-	http.ServeFile(w, r, path)
+	serveStorageObject(w, obj, avatarContentType(row.ProfilePicture.String), nil)
 }
 
 func handleTeacherPicture(w http.ResponseWriter, r *http.Request) {
@@ -763,14 +736,14 @@ func handleTeacherPicture(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	path := avatarFilePath(row.ProfilePicture.String)
-	if _, err := os.Stat(path); err != nil {
+	obj, err := storage.Default().Get(ctx, storage.CategoryAvatars, row.ProfilePicture.String)
+	if err != nil {
 		HttpError(w, "Profile picture not found", http.StatusNotFound)
 		return
 	}
 
 	w.Header().Set("Cache-Control", fmt.Sprintf("private, max-age=%d", avatarCacheMaxAge))
-	http.ServeFile(w, r, path)
+	serveStorageObject(w, obj, avatarContentType(row.ProfilePicture.String), nil)
 }
 
 func validateAvatarUpload(file io.ReadSeeker, size int64) (string, error) {

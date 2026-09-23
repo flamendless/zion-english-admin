@@ -9,6 +9,8 @@ alwaysApply: true
 
 Singleton via `conf.Conf()`. Required env: `APP_ENV` (`local`|`prod`), `SECRET`, `SUPERUSER_USERNAME`, `SUPERUSER_PASSWORD`. Use `cfg.IsProd()` for URL prefixing.
 
+Optional R2 storage: `R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` (see `storage.mdc`). Without them, uploads use local `data/` and `tmp/`.
+
 ## Auth
 
 Roles: `RoleSuperuser`, `RoleTeacher`. JWT in `session_token` HttpOnly cookie.

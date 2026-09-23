@@ -43,6 +43,8 @@ func LogStartup(opts Options) {
 		zap.String("public_url", ListenURL(opts)),
 		zap.Bool("https", opts.HTTPS),
 		zap.String("database", dbPath),
+		zap.String("storage_backend", storageBackendLabel(cfg)),
+		zap.String("storage_bucket", valueOrUnset(cfg.Storage.R2.Bucket)),
 		zap.String("superuser", valueOrUnset(cfg.SuperuserUsername)),
 		zap.String("meeting_service", integrations.MeetingService),
 		zap.Bool("zoom_configured", integrations.ZoomConfigured),

@@ -11,7 +11,6 @@ import (
 	_ "image/png"
 	"io"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -22,30 +21,13 @@ import (
 	"zion-english/internal/notifications"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
+	"zion-english/internal/storage"
 	"zion-english/internal/utils"
 
 	"go.uber.org/zap"
 )
 
-const (
-	documentDir      = "data/teacher-documents"
-	maxDocumentBytes = 5 << 20
-)
-
-func ensureDocumentDir() error {
-	return os.MkdirAll(documentDir, 0755)
-}
-
-func documentFilePath(filename string) string {
-	return filepath.Join(documentDir, filepath.Base(filename))
-}
-
-func documentStoragePath(row queries.TblTeacherDocument) string {
-	if row.Type == string(constants.TeacherDocumentTypeAvatar) {
-		return avatarFilePath(row.StoredFilename)
-	}
-	return documentFilePath(row.StoredFilename)
-}
+const maxDocumentBytes = 5 << 20
 
 func mapDocumentItems(rows []queries.TblTeacherDocument) []frontend.DocumentItem {
 	items := make([]frontend.DocumentItem, len(rows))
@@ -319,13 +301,6 @@ func handleProfileDocument(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := ensureDocumentDir(); err != nil {
-		logs.Log().Error("create document dir", zap.Error(err))
-		setErrorFlash(w, "Failed to prepare upload")
-		HttpRedirect(w, r, "/profile")
-		return
-	}
-
 	if err := r.ParseMultipartForm(maxDocumentBytes); err != nil {
 		setErrorFlash(w, "File is too large. Maximum size is 5 MB.")
 		HttpRedirect(w, r, "/profile")
@@ -348,24 +323,13 @@ func handleProfileDocument(w http.ResponseWriter, r *http.Request) {
 	}
 
 	storedFilename := fmt.Sprintf("%d_%d%s", user.ID, time.Now().UnixNano(), ext)
-	destPath := documentFilePath(storedFilename)
-
-	out, err := os.Create(destPath)
-	if err != nil {
-		logs.Log().Error("create document file", zap.Error(err))
-		setErrorFlash(w, "Failed to save document")
-		HttpRedirect(w, r, "/profile")
-		return
-	}
-	if _, err := io.Copy(out, file); err != nil {
-		out.Close()
-		_ = os.Remove(destPath)
+	store := storage.Default()
+	if err := store.Put(ctx, storage.CategoryTeacherDocuments, storedFilename, file, documentContentType(strings.TrimPrefix(ext, "."))); err != nil {
 		logs.Log().Error("write document file", zap.Error(err))
 		setErrorFlash(w, "Failed to save document")
 		HttpRedirect(w, r, "/profile")
 		return
 	}
-	out.Close()
 
 	if err := dbRW.GetQueries().InsertTeacherDocument(ctx, queries.InsertTeacherDocumentParams{
 		TeacherID:        user.ID,
@@ -376,7 +340,7 @@ func handleProfileDocument(w http.ResponseWriter, r *http.Request) {
 		FileSize:         header.Size,
 		Status:           string(constants.TeacherDocumentStatusSubmitted),
 	}); err != nil {
-		_ = os.Remove(destPath)
+		_ = store.Delete(ctx, storage.CategoryTeacherDocuments, storedFilename)
 		logs.Log().Error("insert teacher document", zap.Error(err))
 		setErrorFlash(w, "Failed to record document")
 		HttpRedirect(w, r, "/profile")
@@ -418,13 +382,6 @@ func handleProfileResume(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := ensureDocumentDir(); err != nil {
-		logs.Log().Error("create document dir", zap.Error(err))
-		setErrorFlash(w, "Failed to prepare upload")
-		HttpRedirect(w, r, "/profile")
-		return
-	}
-
 	if err := r.ParseMultipartForm(maxDocumentBytes); err != nil {
 		setErrorFlash(w, "File is too large. Maximum size is 5 MB.")
 		HttpRedirect(w, r, "/profile")
@@ -447,24 +404,13 @@ func handleProfileResume(w http.ResponseWriter, r *http.Request) {
 	}
 
 	storedFilename := fmt.Sprintf("%d_%d%s", user.ID, time.Now().UnixNano(), ext)
-	destPath := documentFilePath(storedFilename)
-
-	out, err := os.Create(destPath)
-	if err != nil {
-		logs.Log().Error("create resume file", zap.Error(err))
-		setErrorFlash(w, "Failed to save resume/CV")
-		HttpRedirect(w, r, "/profile")
-		return
-	}
-	if _, err := io.Copy(out, file); err != nil {
-		out.Close()
-		_ = os.Remove(destPath)
+	store := storage.Default()
+	if err := store.Put(ctx, storage.CategoryTeacherDocuments, storedFilename, file, documentContentType(strings.TrimPrefix(ext, "."))); err != nil {
 		logs.Log().Error("write resume file", zap.Error(err))
 		setErrorFlash(w, "Failed to save resume/CV")
 		HttpRedirect(w, r, "/profile")
 		return
 	}
-	out.Close()
 
 	if err := dbRW.GetQueries().InsertTeacherDocument(ctx, queries.InsertTeacherDocumentParams{
 		TeacherID:        user.ID,
@@ -475,7 +421,7 @@ func handleProfileResume(w http.ResponseWriter, r *http.Request) {
 		FileSize:         header.Size,
 		Status:           string(constants.TeacherDocumentStatusApproved),
 	}); err != nil {
-		_ = os.Remove(destPath)
+		_ = store.Delete(ctx, storage.CategoryTeacherDocuments, storedFilename)
 		logs.Log().Error("insert teacher resume", zap.Error(err))
 		setErrorFlash(w, "Failed to record resume/CV")
 		HttpRedirect(w, r, "/profile")
@@ -506,15 +452,15 @@ func handleDocumentFile(w http.ResponseWriter, r *http.Request, documentID int64
 		return
 	}
 
-	path := documentStoragePath(row)
-	if _, err := os.Stat(path); err != nil {
+	obj, err := storage.Default().Get(ctx, documentStorageCategory(row), row.StoredFilename)
+	if err != nil {
 		HttpError(w, "Document not found", http.StatusNotFound)
 		return
 	}
 
-	w.Header().Set("Content-Type", documentContentType(row.FileExtension))
-	w.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=%q", row.OriginalFilename))
-	http.ServeFile(w, r, path)
+	serveStorageObject(w, obj, documentContentType(row.FileExtension), map[string]string{
+		"Content-Disposition": fmt.Sprintf("inline; filename=%q", row.OriginalFilename),
+	})
 }
 
 func handleDocumentReview(w http.ResponseWriter, r *http.Request, documentID int64, status, actionLabel string) {
@@ -603,9 +549,8 @@ func handleDocumentDelete(w http.ResponseWriter, r *http.Request, documentID int
 		}
 	}
 
-	filePath := documentStoragePath(row)
-	if err := os.Remove(filePath); err != nil && !os.IsNotExist(err) {
-		logs.Log().Error("remove document file", zap.Error(err), zap.String("path", filePath))
+	if err := storage.Default().Delete(ctx, documentStorageCategory(row), row.StoredFilename); err != nil {
+		logs.Log().Error("remove document file", zap.Error(err), zap.String("filename", row.StoredFilename))
 	}
 
 	insertAuditLogAs(ctx, user, "teachers", fmt.Sprintf("deleted document '%s' (id %d)", row.OriginalFilename, documentID))

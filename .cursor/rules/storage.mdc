@@ -1,0 +1,36 @@
+# Object Storage (R2)
+
+## Backend selection
+
+`internal/storage` picks the backend at startup via `storage.Init(cfg)`:
+
+- **R2** when `R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, and `R2_SECRET_ACCESS_KEY` are all set (S3-compatible API)
+- **Local filesystem** otherwise (existing `data/*` and `tmp/` paths)
+
+Use a **separate R2 bucket per environment** (e.g. dev vs prod). Set `R2_BUCKET` in each deployment's `.env`.
+
+## Key layout (R2)
+
+```
+avatars/{stored_filename}
+teacher-documents/{stored_filename}
+intro-videos/{stored_filename}
+reports/{stored_filename}
+backups/{backup_name}.tar.gz
+```
+
+## DB fields
+
+Continue storing basename only (`stored_filename`, `profile_picture`). Report cache rows store basename in `output_path` going forward; legacy `tmp/...` paths still resolve during transition.
+
+## Handlers
+
+Use `storage.Default()` for Put/Get/Delete/Exists. Serve files through existing app routes (`serveStorageObject` in `cmd/storage_http.go`), not public R2 URLs.
+
+## Categories
+
+Typed in `internal/storage/category.go`: `CategoryAvatars`, `CategoryTeacherDocuments`, `CategoryIntroVideos`, `CategoryReports`, `CategoryBackups`.
+
+## Scripts
+
+- `go run . storage migrate`: one-time upload of existing local files to R2 using app credentials from `.env`

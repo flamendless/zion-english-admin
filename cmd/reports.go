@@ -17,6 +17,7 @@ import (
 	"zion-english/internal/logs"
 	"zion-english/internal/processor"
 	"zion-english/internal/reports"
+	"zion-english/internal/storage"
 	"zion-english/internal/utils"
 
 	"go.uber.org/zap"
@@ -200,15 +201,21 @@ func handleReportSummary(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := putReportFile(ctx, filename, outputPath); err != nil {
+		logs.Log().Error("upload summary report to storage", zap.Error(err))
+		HttpError(w, "Failed to save summary report", http.StatusInternalServerError)
+		return
+	}
+
 	user := auth.GetUser(ctx)
 	insertAuditLogAs(ctx, user, "reports", fmt.Sprintf(
 		"generated summary report (%s to %s): %s",
 		startDate, endDate, filename,
 	))
 
-	w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename))
-	http.ServeFile(w, r, outputPath)
+	if !serveReportDownload(w, r, filename) {
+		HttpError(w, "Failed to download summary report", http.StatusInternalServerError)
+	}
 }
 
 type reportRoleFilters struct {
@@ -327,7 +334,7 @@ func loadReportRows(ctx context.Context, startDate, endDate, q string, roleFilte
 
 		currentHash := hashesByTeacher[summary.TeacherID]
 		if cache, ok := cacheByTeacher[summary.TeacherID]; ok && cache.ContentHash == currentHash {
-			if filename, ok := reportCacheFilename(cache.OutputPath); ok {
+			if filename, ok := reportCacheAvailable(ctx, cache.OutputPath); ok {
 				item.DownloadReady = true
 				item.Filename = filename
 			}
@@ -568,7 +575,7 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 		EndDate:   endDate,
 	})
 	if cacheErr == nil && cache.ContentHash == currentHash {
-		if _, ok := reportCacheFilename(cache.OutputPath); ok {
+		if _, ok := reportCacheAvailable(ctx, cache.OutputPath); ok {
 			renderReportGenerateRow(w, r, teacherID, startDate, endDate, true)
 			return
 		}
@@ -595,8 +602,18 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 		return
 	}
 
-	if cacheErr == nil && cache.OutputPath != "" && cache.OutputPath != outputPath {
-		_ = os.Remove(cache.OutputPath)
+	if err := putReportFile(ctx, filename, outputPath); err != nil {
+		logs.Log().Error("upload report to storage", zap.Error(err))
+		sendErrorLog(w, "failed to save report")
+		return
+	}
+
+	if cacheErr == nil && cache.OutputPath != "" {
+		oldBase := reportOutputBasename(cache.OutputPath)
+		if oldBase != "" && oldBase != filename {
+			_ = storage.Default().Delete(ctx, storage.CategoryReports, oldBase)
+			_ = os.Remove(filepath.Join("tmp", oldBase))
+		}
 	}
 
 	if err := dbRW.GetQueries().UpsertReportGeneration(ctx, queries.UpsertReportGenerationParams{
@@ -604,7 +621,7 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 		StartDate:   startDate,
 		EndDate:     endDate,
 		ContentHash: currentHash,
-		OutputPath:  outputPath,
+		OutputPath:  filename,
 		RecordCount: int64(len(records)),
 	}); err != nil {
 		logs.Log().Error("upsert report generation", zap.Error(err))
@@ -812,21 +829,6 @@ func formatReportSummaryClassDate(dateStr string) string {
 	return t.Format("January 2")
 }
 
-func reportCacheFilename(outputPath string) (string, bool) {
-	if outputPath == "" {
-		return "", false
-	}
-	cleanPath := filepath.Clean(outputPath)
-	fullPath := filepath.Join("tmp", filepath.Base(cleanPath))
-	if !strings.HasPrefix(fullPath, filepath.Clean("tmp")+string(os.PathSeparator)) {
-		return "", false
-	}
-	if _, err := os.Stat(fullPath); err != nil {
-		return "", false
-	}
-	return filepath.Base(fullPath), true
-}
-
 func formatReportCutoffLabel(startDate, endDate string) string {
 	start, err := time.Parse("2006-01-02", startDate)
 	if err != nil {
@@ -930,8 +932,16 @@ func sqlNumericToFloat64(value interface{}) float64 {
 }
 
 func auditReportDownload(ctx context.Context, filename string) {
-	outputPath := filepath.Join("tmp", filepath.Base(filename))
-	row, err := dbRO.GetQueries().GetReportGenerationByOutputBasename(ctx, outputPath)
+	base := reportOutputBasename(filename)
+	candidates := []string{base, filepath.Join("tmp", base)}
+	var row queries.GetReportGenerationByOutputBasenameRow
+	var err error
+	for _, outputPath := range candidates {
+		row, err = dbRO.GetQueries().GetReportGenerationByOutputBasename(ctx, outputPath)
+		if err == nil {
+			break
+		}
+	}
 	if err != nil {
 		return
 	}

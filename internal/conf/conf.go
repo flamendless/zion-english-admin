@@ -25,6 +25,18 @@ type MeetingConfig struct {
 	Zoom    ZoomConfig
 }
 
+type R2Config struct {
+	AccountID       string `env:"R2_ACCOUNT_ID"`
+	AccessKeyID     string `env:"R2_ACCESS_KEY_ID"`
+	SecretAccessKey string `env:"R2_SECRET_ACCESS_KEY"`
+	Bucket          string `env:"R2_BUCKET"`
+	APIToken        string `env:"CLOUDFLARE_API_TOKEN"`
+}
+
+type StorageConfig struct {
+	R2 R2Config
+}
+
 type Config struct {
 	BasePath          string
 	AppEnv            string `env:"APP_ENV" env-required:""`
@@ -34,6 +46,7 @@ type Config struct {
 	Secret            string `env:"SECRET" env-required:""`
 	Meeting           MeetingConfig
 	Calendar          CalendarConfig
+	Storage           StorageConfig
 }
 
 type GoogleCalendarConfig struct {
@@ -81,4 +94,12 @@ func (c *Config) IsProd() bool {
 
 func (c *Config) IsLocal() bool {
 	return c.AppEnv == EnvLocal
+}
+
+func (c *Config) R2Enabled() bool {
+	r2 := c.Storage.R2
+	return r2.AccountID != "" &&
+		r2.Bucket != "" &&
+		r2.AccessKeyID != "" &&
+		r2.SecretAccessKey != ""
 }

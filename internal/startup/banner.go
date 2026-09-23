@@ -73,6 +73,7 @@ func startupConfigLines(opts Options) []string {
 		fmt.Sprintf("env: %s", cfg.AppEnv),
 		fmt.Sprintf("http: %s  listen=%s  https=%t", ListenURL(opts), listenAddr(opts), opts.HTTPS),
 		fmt.Sprintf("database: sqlite  path=%s", dbPath),
+		fmt.Sprintf("storage: %s  bucket=%s", storageBackendLabel(cfg), valueOrUnset(cfg.Storage.R2.Bucket)),
 		fmt.Sprintf("secret: %s", conf.MaskSecret(cfg.Secret)),
 		fmt.Sprintf("superuser: %s", valueOrUnset(cfg.SuperuserUsername)),
 	}
@@ -137,6 +138,13 @@ func missingZoomFields(cfg *conf.Config) []string {
 		missing = append(missing, "ZOOM_AUTHORIZE_URL")
 	}
 	return missing
+}
+
+func storageBackendLabel(cfg *conf.Config) string {
+	if cfg.R2Enabled() {
+		return "r2"
+	}
+	return "local"
 }
 
 func missingGoogleCalendarFields(cfg *conf.Config) []string {

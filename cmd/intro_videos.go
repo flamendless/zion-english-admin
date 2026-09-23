@@ -6,8 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"zion-english/frontend"
@@ -17,17 +15,12 @@ import (
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
 	"zion-english/internal/notifications"
+	"zion-english/internal/storage"
 	"zion-english/internal/teacherintrovideo"
 	"zion-english/internal/utils"
 
 	"go.uber.org/zap"
 )
-
-const introVideoDir = "data/teacher-intro-videos"
-
-func introVideoFilePath(filename string) string {
-	return filepath.Join(introVideoDir, filepath.Base(filename))
-}
 
 func introVideoLinkLabel(url sql.NullString, filename sql.NullString) string {
 	if url.Valid && url.String != "" {
@@ -408,8 +401,8 @@ func handleIntroVideoFile(w http.ResponseWriter, r *http.Request, videoID int64)
 		return
 	}
 
-	path := introVideoFilePath(row.StoredFilename.String)
-	if _, err := os.Stat(path); err != nil {
+	obj, err := storage.Default().Get(ctx, storage.CategoryIntroVideos, row.StoredFilename.String)
+	if err != nil {
 		HttpError(w, "Intro video not found", http.StatusNotFound)
 		return
 	}
@@ -423,9 +416,9 @@ func handleIntroVideoFile(w http.ResponseWriter, r *http.Request, videoID int64)
 		mimeType = row.MimeType.String
 	}
 
-	w.Header().Set("Content-Type", mimeType)
-	w.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=%q", filename))
-	http.ServeFile(w, r, path)
+	serveStorageObject(w, obj, mimeType, map[string]string{
+		"Content-Disposition": fmt.Sprintf("inline; filename=%q", filename),
+	})
 }
 
 func handleIntroVideoReview(w http.ResponseWriter, r *http.Request, videoID int64, status, actionLabel, rejectReason string) {
@@ -524,9 +517,8 @@ func handleIntroVideoDelete(w http.ResponseWriter, r *http.Request, videoID int6
 	}
 
 	if row.StoredFilename.Valid && row.StoredFilename.String != "" {
-		filePath := introVideoFilePath(row.StoredFilename.String)
-		if err := os.Remove(filePath); err != nil && !os.IsNotExist(err) {
-			logs.Log().Error("remove intro video file", zap.Error(err), zap.String("path", filePath))
+		if err := storage.Default().Delete(ctx, storage.CategoryIntroVideos, row.StoredFilename.String); err != nil {
+			logs.Log().Error("remove intro video file", zap.Error(err), zap.String("filename", row.StoredFilename.String))
 		}
 	}
 
