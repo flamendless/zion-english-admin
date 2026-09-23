@@ -63,6 +63,24 @@ func TestBuildOmitsTrainingWhenNoRequiredPublished(t *testing.T) {
 	}
 }
 
+func TestIncompleteItems(t *testing.T) {
+	items := Build(Input{
+		TeacherStatus:      constants.TeacherStatusApproved,
+		HasProfilePhoto:    false,
+		DocsStatus:         string(constants.TeacherDocumentStatusApproved),
+		ResumeStatus:       string(constants.TeacherDocumentStatusApproved),
+		IntroVideoRequired: false,
+	})
+
+	incomplete := IncompleteItems(items)
+	if len(incomplete) != 1 {
+		t.Fatalf("IncompleteItems() len = %d, want 1", len(incomplete))
+	}
+	if incomplete[0].ID != ItemIDProfilePhoto {
+		t.Fatalf("expected profile photo item, got %s", incomplete[0].ID)
+	}
+}
+
 func TestBuildOmitsIntroVideoWhenNotRequired(t *testing.T) {
 	items := Build(Input{
 		TeacherStatus:      constants.TeacherStatusApproved,

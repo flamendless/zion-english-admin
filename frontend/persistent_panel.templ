@@ -1,0 +1,421 @@
+package frontend
+
+type PersistentPanelLinkTarget string
+
+const (
+	PersistentPanelLinkTargetBlank PersistentPanelLinkTarget = "_blank"
+	PersistentPanelLinkTargetSelf  PersistentPanelLinkTarget = "_self"
+)
+
+type PersistentPanelItem struct {
+	ID          string
+	Label       string
+	Detail      string
+	ActionURL   string
+	ActionLabel string
+	LinkTarget  PersistentPanelLinkTarget
+}
+
+type PersistentPanelData struct {
+	StorageKey     string
+	Title          string
+	AriaLabel      string
+	CompletedCount int
+	TotalCount     int
+	ShowProgress   bool
+	Items          []PersistentPanelItem
+}
+
+type PersistentPanelSlotParams struct {
+	HostID     string
+	PartialURL string
+}
+
+func persistentPanelAriaLabel(data PersistentPanelData) string {
+	if data.AriaLabel != "" {
+		return data.AriaLabel
+	}
+	return data.Title
+}
+
+func persistentPanelActionLabel(item PersistentPanelItem) string {
+	if item.ActionLabel != "" {
+		return item.ActionLabel
+	}
+	return "Open"
+}
+
+func persistentPanelLinkTarget(item PersistentPanelItem) PersistentPanelLinkTarget {
+	if item.LinkTarget != "" {
+		return item.LinkTarget
+	}
+	return PersistentPanelLinkTargetBlank
+}
+
+func persistentPanelStorageKey(data PersistentPanelData) string {
+	if data.StorageKey != "" {
+		return data.StorageKey
+	}
+	return data.Title
+}
+
+templ PersistentPanelSlot(params PersistentPanelSlotParams) {
+	<div
+		id={ params.HostID }
+		class="persistent-panel-host"
+		hx-get={ params.PartialURL }
+		hx-trigger="load"
+		hx-swap={ HxSwapInnerHTML }
+	></div>
+}
+
+templ iconSVGAlertTriangle() {
+	<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+		<line x1="12" y1="9" x2="12" y2="13"></line>
+		<line x1="12" y1="17" x2="12.01" y2="17"></line>
+	</svg>
+}
+
+templ iconSVGMinimize() {
+	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<line x1="5" y1="12" x2="19" y2="12"></line>
+	</svg>
+}
+
+templ PersistentPanel(data PersistentPanelData) {
+	@PersistentPanelStyles()
+	<aside
+		class="persistent-panel"
+		data-persistent-panel
+		data-persistent-panel-key={ persistentPanelStorageKey(data) }
+		aria-label={ persistentPanelAriaLabel(data) }
+	>
+		<button
+			type="button"
+			class="persistent-panel-fab"
+			data-persistent-panel-expand
+			aria-label={ "Expand " + persistentPanelAriaLabel(data) }
+			hidden
+		>
+			@iconSVGAlertTriangle()
+		</button>
+		<div class="persistent-panel-body">
+			<div class="persistent-panel-header">
+				<h3 class="persistent-panel-title">{ data.Title }</h3>
+				<div class="persistent-panel-header-actions">
+					if data.ShowProgress && data.TotalCount > 0 {
+						<span class="persistent-panel-progress">{ data.CompletedCount }/{ data.TotalCount }</span>
+					}
+					<button
+						type="button"
+						class="persistent-panel-minimize"
+						data-persistent-panel-minimize
+						aria-label={ "Minimize " + persistentPanelAriaLabel(data) }
+					>
+						@iconSVGMinimize()
+					</button>
+				</div>
+			</div>
+			if len(data.Items) > 0 {
+				<ul class="persistent-panel-list">
+					for _, item := range data.Items {
+						<li class="persistent-panel-item">
+							<div class="persistent-panel-item-main">
+								<strong class="persistent-panel-item-label">{ item.Label }</strong>
+								if item.Detail != "" {
+									<p class="persistent-panel-item-detail">{ item.Detail }</p>
+								}
+							</div>
+							<div class="persistent-panel-item-action">
+								if persistentPanelLinkTarget(item) == PersistentPanelLinkTargetBlank {
+									<a
+										href={ item.ActionURL }
+										class="btn btn-secondary btn-sm persistent-panel-action"
+										target="_blank"
+										rel="noopener noreferrer"
+									>{ persistentPanelActionLabel(item) }</a>
+								} else {
+									<a
+										href={ item.ActionURL }
+										class="btn btn-secondary btn-sm persistent-panel-action"
+									>{ persistentPanelActionLabel(item) }</a>
+								}
+							</div>
+						</li>
+					}
+				</ul>
+			}
+		</div>
+	</aside>
+	@PersistentPanelScript()
+}
+
+templ PersistentPanelStyles() {
+	<style>
+		.persistent-panel-host {
+			position: fixed;
+			bottom: var(--space-4);
+			right: var(--space-4);
+			z-index: 500;
+			max-width: min(22rem, calc(100vw - 2 * var(--space-4)));
+			pointer-events: none;
+		}
+
+		.persistent-panel-host:empty {
+			display: none;
+		}
+
+		.persistent-panel-host:has(.persistent-panel.is-minimized) {
+			max-width: none;
+		}
+
+		.persistent-panel {
+			pointer-events: auto;
+			background: var(--color-surface);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-lg);
+			box-shadow: var(--shadow-lg);
+			padding: var(--space-4);
+			max-height: min(24rem, calc(100vh - 2 * var(--space-4)));
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-3);
+		}
+
+		.persistent-panel.is-minimized {
+			padding: 0;
+			border: none;
+			background: transparent;
+			box-shadow: none;
+			max-height: none;
+		}
+
+		.persistent-panel-fab {
+			display: none;
+			align-items: center;
+			justify-content: center;
+			width: 4rem;
+			height: 4rem;
+			margin: 0;
+			margin-top: 0;
+			padding: 0;
+			border: 1px solid var(--color-warning);
+			border-radius: var(--radius-full);
+			background: var(--color-warning-bg);
+			color: var(--color-warning);
+			box-shadow: var(--shadow-lg);
+			cursor: pointer;
+			line-height: 1;
+		}
+
+		.persistent-panel-fab svg {
+			width: 1.75rem;
+			height: 1.75rem;
+		}
+
+		.persistent-panel-fab:hover {
+			background: var(--color-warning);
+			color: var(--color-surface);
+		}
+
+		.persistent-panel.is-minimized .persistent-panel-fab {
+			display: inline-flex;
+		}
+
+		.persistent-panel.is-minimized .persistent-panel-body {
+			display: none;
+		}
+
+		.persistent-panel-body {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-3);
+			min-width: 0;
+		}
+
+		.persistent-panel-header {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			gap: var(--space-3);
+		}
+
+		.persistent-panel-header-actions {
+			display: flex;
+			align-items: center;
+			gap: var(--space-2);
+			flex-shrink: 0;
+		}
+
+		.persistent-panel-minimize {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 1.75rem;
+			height: 1.75rem;
+			margin: 0;
+			margin-top: 0;
+			padding: 0;
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-sm);
+			background: var(--color-surface);
+			color: var(--color-muted-foreground);
+			cursor: pointer;
+			line-height: 1;
+			flex-shrink: 0;
+		}
+
+		.persistent-panel-minimize:hover {
+			background: var(--color-muted);
+			color: var(--color-foreground);
+		}
+
+		.persistent-panel-title {
+			margin: 0;
+			font-size: 1rem;
+			font-weight: 600;
+		}
+
+		.persistent-panel-progress {
+			font-size: 0.875rem;
+			font-weight: 600;
+			font-variant-numeric: tabular-nums;
+			color: var(--color-muted-foreground);
+			white-space: nowrap;
+		}
+
+		.persistent-panel-list {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-3);
+			overflow-y: auto;
+		}
+
+		.persistent-panel-item {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			gap: var(--space-3);
+			padding-top: var(--space-3);
+			border-top: 1px solid var(--color-border-subtle);
+		}
+
+		.persistent-panel-item:first-child {
+			padding-top: 0;
+			border-top: none;
+		}
+
+		.persistent-panel-item-main {
+			min-width: 0;
+			flex: 1;
+		}
+
+		.persistent-panel-item-label {
+			display: block;
+			font-size: 0.875rem;
+			line-height: 1.3;
+		}
+
+		.persistent-panel-item-detail {
+			margin: var(--space-1) 0 0;
+			color: var(--color-muted-foreground);
+			font-size: 0.75rem;
+			line-height: 1.35;
+		}
+
+		.persistent-panel-item-action {
+			flex-shrink: 0;
+		}
+
+		.persistent-panel-action {
+			margin-top: 0;
+			padding: 0.35rem 0.75rem;
+			font-size: 0.8125rem;
+			white-space: nowrap;
+		}
+
+		@media (max-width: 640px) {
+			.persistent-panel-host {
+				bottom: var(--space-3);
+				right: var(--space-3);
+				left: auto;
+				max-width: none;
+			}
+
+			.persistent-panel-host:not(:has(.persistent-panel.is-minimized)) {
+				left: var(--space-3);
+			}
+
+			.persistent-panel-item {
+				flex-direction: column;
+				align-items: stretch;
+			}
+
+			.persistent-panel-item-action .persistent-panel-action {
+				width: 100%;
+				text-align: center;
+			}
+		}
+	</style>
+}
+
+templ PersistentPanelScript() {
+	<script>
+		(function () {
+			if (window._persistentPanelBound) return;
+			window._persistentPanelBound = true;
+
+			function setMinimized(panel, minimized) {
+				if (!panel) return;
+				panel.classList.toggle('is-minimized', minimized);
+				const fab = panel.querySelector('[data-persistent-panel-expand]');
+				if (fab) {
+					fab.hidden = !minimized;
+				}
+			}
+
+			function initPanel(panel) {
+				if (!panel || !panel.hasAttribute('data-persistent-panel')) return;
+				setMinimized(panel, false);
+			}
+
+			function initPanels(root) {
+				const scope = root || document;
+				scope.querySelectorAll('[data-persistent-panel]').forEach(initPanel);
+			}
+
+			document.addEventListener('click', function (event) {
+				const minimizeBtn = event.target.closest('[data-persistent-panel-minimize]');
+				if (minimizeBtn) {
+					const panel = minimizeBtn.closest('[data-persistent-panel]');
+					if (panel) {
+						setMinimized(panel, true);
+					}
+					return;
+				}
+
+				const expandBtn = event.target.closest('[data-persistent-panel-expand]');
+				if (expandBtn) {
+					const panel = expandBtn.closest('[data-persistent-panel]');
+					if (panel) {
+						setMinimized(panel, false);
+					}
+				}
+			});
+
+			document.addEventListener('DOMContentLoaded', function () {
+				initPanels();
+			});
+
+			document.body.addEventListener('htmx:afterSwap', function (event) {
+				initPanels(event.detail && event.detail.target ? event.detail.target : document);
+			});
+
+			initPanels();
+		})();
+	</script>
+}

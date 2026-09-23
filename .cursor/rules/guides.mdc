@@ -1,0 +1,43 @@
+---
+description: Add or update Guides entries when shipping user-facing features
+globs: cmd/**/*.go,frontend/**/*.templ
+alwaysApply: false
+---
+
+# Guides for Features
+
+Guides are static SSR help pages at `/guides`. No DB or markdown files.
+
+## Planning prompt
+
+In **plan mode**, when the task is a **substantial user-facing feature** (new page, multi-step workflow, or role-specific flows), use `AskQuestion` before finalizing the plan:
+
+1. **Should this feature get a guides entry?** Options: new guide page / add sections to an existing guide / skip guides
+2. **Who is the primary audience?** Options: teacher / superuser (admin) / both (teacher card + admin-only sections)
+
+Skip for bug fixes, refactors, internal-only changes, or small UI tweaks. If the user chooses a guide, include guide work in plan todos.
+
+## When to add vs extend
+
+| Situation | Action |
+|-----------|--------|
+| New standalone feature with its own nav page | New guide page + index card |
+| Small addition to an existing workflow | Add `@GuideSection` to the existing guide |
+| Single FAQ-style answer | Add `@GuideFAQItem` to FAQ guide |
+| Profile upload tied to onboarding | Optional section in Getting Started only if it fits |
+
+## Checklist (new guide page)
+
+1. **Slug** - `GuideSlug*` in `internal/constants/guide_slug.go`
+2. **Index** - `GuideEntry` in `handleGuides` (`cmd/guides.go`): `Slug`, `Title`, `Description`, `Access` (`"teacher"` or `"superuser"`)
+3. **Router** - `case` in `handleGuidesPath` + thin `handleGuide*` handler
+4. **Content** - page in `frontend/guides.templ`:
+   - Shell: breadcrumb, `@HubHeader`, hero, `@GuideSection` blocks, footer, `@GuideAnchorScript()`
+   - `adminOnly: true` for admin steps on teacher-ribbon guides
+   - Reuse in-app copy; link with `utils.URL("/path")`
+   - Extract `@Guide*Sections()` if sharing with a public `/docs/*` mirror
+5. **Regenerate** - `./run.sh gentempl`
+
+No extra routing for `/guides/{slug}` (handled by `handleGuidesPath`). Public `/docs/*` mirrors are optional.
+
+Reference implementations: `GuideConnectZoom`, `GuideReportsGeneration` in `frontend/guides.templ`.

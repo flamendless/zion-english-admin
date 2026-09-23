@@ -96,6 +96,17 @@ func IsComplete(items []Item) bool {
 	return total > 0 && completed == total
 }
 
+func IncompleteItems(items []Item) []Item {
+	incomplete := make([]Item, 0, len(items))
+	for _, item := range items {
+		if item.Status == ItemStatusComplete || item.Status == ItemStatusNotRequired {
+			continue
+		}
+		incomplete = append(incomplete, item)
+	}
+	return incomplete
+}
+
 func accountItem(status constants.TeacherStatus) Item {
 	item := Item{
 		ID:         ItemIDAccount,

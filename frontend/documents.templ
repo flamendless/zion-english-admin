@@ -476,13 +476,14 @@ templ ProfilePictureUpload(data ProfileData) {
 		<div class="profile-upload-block">
 			<h3 class="profile-upload-block__title">Profile picture</h3>
 			<form
+				id="profileAvatarForm"
 				class="profile-upload-form"
 				method="POST"
 				action={ utils.URL("/profile/avatar") }
 				enctype="multipart/form-data"
 			>
 				<div class="upload-zone">
-					<label class="upload-zone-label" for="avatar">
+					<label class="upload-zone-label" for="profileAvatarInput">
 						<span class="upload-zone-icon" aria-hidden="true">
 							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 								<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -493,16 +494,87 @@ templ ProfilePictureUpload(data ProfileData) {
 							<span>Choose a photo</span>
 							<span class="upload-zone-hint">JPEG or PNG, up to 2 MB</span>
 						</span>
-						<input type="file" id="avatar" name="avatar" accept="image/jpeg,image/png" onchange="this.form.querySelector('.upload-filename').textContent = this.files[0] ? this.files[0].name : ''"/>
+						<input
+							type="file"
+							id="profileAvatarInput"
+							name="avatar"
+							accept="image/jpeg,image/png"
+						/>
 					</label>
 					<p class="upload-filename" aria-live="polite"></p>
 				</div>
 				<div class="profile-form-actions">
-					<button type="submit" class="btn">Upload photo</button>
+					<button type="submit" class="btn" disabled>Upload photo</button>
 				</div>
 			</form>
+			@ProfileAvatarUploadScript()
 		</div>
 	}
+}
+
+templ ProfileAvatarUploadScript() {
+	<script>
+		(function () {
+			function bindProfileAvatarUpload() {
+				const form = document.getElementById('profileAvatarForm');
+				if (!form || form.dataset.avatarUploadBound === '1') {
+					return;
+				}
+
+				const input = document.getElementById('profileAvatarInput');
+				const previewRoot = document.getElementById('profileAvatarPreview');
+				if (!input || !previewRoot) {
+					return;
+				}
+
+				const avatarEl = previewRoot.querySelector('.avatar');
+				if (!avatarEl) {
+					return;
+				}
+
+				form.dataset.avatarUploadBound = '1';
+
+				const filenameEl = form.querySelector('.upload-filename');
+				const submitBtn = form.querySelector('button[type="submit"]');
+				const originalAvatarHTML = avatarEl.innerHTML;
+				const altText = avatarEl.getAttribute('aria-label') || 'Profile photo preview';
+
+				function setCardPreview(file) {
+					if (!file) {
+						avatarEl.innerHTML = originalAvatarHTML;
+						return;
+					}
+
+					const reader = new FileReader();
+					reader.onload = function () {
+						const img = document.createElement('img');
+						img.className = 'avatar-image';
+						img.alt = altText;
+						img.src = reader.result;
+						avatarEl.replaceChildren(img);
+					};
+					reader.readAsDataURL(file);
+				}
+
+				input.addEventListener('change', function () {
+					const file = input.files && input.files[0];
+					if (filenameEl) {
+						filenameEl.textContent = file ? file.name : '';
+					}
+					if (submitBtn) {
+						submitBtn.disabled = !file;
+					}
+					setCardPreview(file || null);
+				});
+			}
+
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', bindProfileAvatarUpload);
+			} else {
+				bindProfileAvatarUpload();
+			}
+		})();
+	</script>
 }
 
 templ ProfileDocumentUpload(data ProfileData) {

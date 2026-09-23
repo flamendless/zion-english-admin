@@ -428,7 +428,9 @@ templ Profile(data ProfileData) {
 			<div class="profile-layout">
 				<div class="profile-card">
 					<div class="profile-identity">
-						@Avatar(data.Avatar)
+						<div id="profileAvatarPreview">
+							@Avatar(data.Avatar)
+						</div>
 						<h2>{ data.Name }</h2>
 						<p class="profile-email">{ data.Email }</p>
 					</div>

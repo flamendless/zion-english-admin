@@ -28,6 +28,7 @@ Go 1.26 admin tool. Module: `zion-english`. Entry: `main.go` → `cmd.Execute()`
 - API/form DTOs → `internal/models`
 - View/display structs → co-located in `frontend/*.templ`
 - DB queries → SQL in `internal/database/sql/`, optional wrapper in `internal/database/`
+- User-facing guides → see `guides.mdc` (slug, handler, templ sections)
 
 ## New authenticated route checklist
 

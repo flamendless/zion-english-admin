@@ -30,6 +30,31 @@ type OnboardingChecklistData struct {
 	EmptyMessage   string
 }
 
+func BuildOnboardingPersistentPanel(checklist []onboarding.Item) PersistentPanelData {
+	completed, total := onboarding.Summary(checklist)
+	incomplete := onboarding.IncompleteItems(checklist)
+	items := make([]PersistentPanelItem, 0, len(incomplete))
+	for _, item := range incomplete {
+		items = append(items, PersistentPanelItem{
+			ID:          string(item.ID),
+			Label:       item.Label,
+			Detail:      item.Detail,
+			ActionURL:   utils.URL(item.ActionPath),
+			ActionLabel: "Open",
+			LinkTarget:  PersistentPanelLinkTargetBlank,
+		})
+	}
+	return PersistentPanelData{
+		StorageKey:     "onboarding",
+		Title:          "Onboarding",
+		AriaLabel:      "Onboarding",
+		CompletedCount: completed,
+		TotalCount:     total,
+		ShowProgress:   true,
+		Items:          items,
+	}
+}
+
 func MapOnboardingItems(items []onboarding.Item) []OnboardingItemView {
 	views := make([]OnboardingItemView, 0, len(items))
 	for _, item := range items {
@@ -112,7 +137,7 @@ func OnboardingChecklist(data OnboardingChecklistData) templ.Component {
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(data.CompletedCount)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 76, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 101, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -125,7 +150,7 @@ func OnboardingChecklist(data OnboardingChecklistData) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.TotalCount)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 76, Col: 83}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 101, Col: 83}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -144,7 +169,7 @@ func OnboardingChecklist(data OnboardingChecklistData) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(data.EmptyMessage)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 80, Col: 50}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 105, Col: 50}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -167,7 +192,7 @@ func OnboardingChecklist(data OnboardingChecklistData) templ.Component {
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(item.Label)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 86, Col: 57}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 111, Col: 57}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -180,7 +205,7 @@ func OnboardingChecklist(data OnboardingChecklistData) templ.Component {
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(item.Detail)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 87, Col: 54}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 112, Col: 54}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
@@ -206,7 +231,7 @@ func OnboardingChecklist(data OnboardingChecklistData) templ.Component {
 					var templ_7745c5c3_Var7 templ.SafeURL
 					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(item.ActionURL)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 94, Col: 32}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 119, Col: 32}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 					if templ_7745c5c3_Err != nil {

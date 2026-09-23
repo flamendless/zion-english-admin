@@ -9,9 +9,18 @@ import (
 
 type FeatureFlagsData struct {
 	ClassOverdueGracePeriodMinutes int64
+	PersistentOnboarding           FeatureFlagBooleanItem
 	IntroVideoUploads              FeatureFlagRoleGatedItem
 	Zoom                           FeatureFlagIntegrationItem
 	GoogleCalendar                 FeatureFlagIntegrationItem
+}
+
+type FeatureFlagBooleanItem struct {
+	Name          string
+	Description   string
+	Enabled       bool
+	FormFieldName string
+	ToggleLabel   string
 }
 
 type FeatureFlagRoleGatedItem struct {
@@ -303,6 +312,7 @@ templ FeatureFlags(data FeatureFlagsData) {
 				<section class="feature-flags-section">
 					<h2 class="feature-flags-section-title">Teacher profile</h2>
 					<div class="integration-list">
+						@FeatureFlagBooleanRow(data.PersistentOnboarding)
 						@FeatureFlagRoleGatedRow(data.IntroVideoUploads)
 					</div>
 				</section>
@@ -371,6 +381,27 @@ templ FeatureFlagClassOverdueGracePeriodRow(minutes int64) {
 				value={ fmt.Sprintf("%d", minutes) }
 				required
 			/>
+		</div>
+	</div>
+}
+
+templ FeatureFlagBooleanRow(item FeatureFlagBooleanItem) {
+	<div class="integration-row">
+		<div class="integration-row-brand">
+			<div class="integration-info">
+				<span class="integration-name">{ item.Name }</span>
+				<p class="integration-desc">{ item.Description }</p>
+			</div>
+		</div>
+		<div class="integration-row-meta">
+			<label class="feature-flag-toggle">
+				<input
+					type="checkbox"
+					name={ item.FormFieldName }
+					checked?={ item.Enabled }
+				/>
+				{ item.ToggleLabel }
+			</label>
 		</div>
 	</div>
 }

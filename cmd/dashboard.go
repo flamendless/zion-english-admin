@@ -13,6 +13,7 @@ import (
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
+	"zion-english/internal/featureflags"
 	"zion-english/internal/onboarding"
 	"zion-english/internal/utils"
 
@@ -191,7 +192,8 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 			checklist, err := loadTeacherOnboardingChecklist(ctx, user.ID)
 			if err == nil {
 				completed, total := onboarding.Summary(checklist)
-				data.ShowOnboarding = total > 0 && completed < total
+				persistentOn := featureflags.PersistentOnboardingEnabled(ctx, dbRO)
+				data.ShowOnboarding = !persistentOn && total > 0 && completed < total
 				data.Onboarding = frontend.OnboardingChecklistData{
 					Items:          frontend.MapOnboardingItems(checklist),
 					CompletedCount: completed,

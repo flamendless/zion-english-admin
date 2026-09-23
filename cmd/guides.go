@@ -37,6 +37,24 @@ func handleGuides(w http.ResponseWriter, r *http.Request) {
 				Access:      "teacher",
 			},
 			{
+				Slug:        constants.GuideSlugResumeCV,
+				Title:       "Resume / CV",
+				Description: "Upload and update your resume from My Profile.",
+				Access:      "teacher",
+			},
+			{
+				Slug:        constants.GuideSlugIntroVideos,
+				Title:       "Intro Videos",
+				Description: "Submit a Google Drive or YouTube intro link and track review status.",
+				Access:      "teacher",
+			},
+			{
+				Slug:        constants.GuideSlugPayments,
+				Title:       "Payments",
+				Description: "Confirm received payroll payments and browse payment history.",
+				Access:      "teacher",
+			},
+			{
 				Slug:        constants.GuideSlugFAQ,
 				Title:       "FAQ",
 				Description: "Answers about scheduled vs recorded classes, absences, earnings, and more.",
@@ -70,6 +88,12 @@ func handleGuidesPath(w http.ResponseWriter, r *http.Request) {
 		handleGuideConnectZoom(w, r)
 	case constants.GuideSlugConnectGoogleCalendar:
 		handleGuideConnectGoogleCalendar(w, r)
+	case constants.GuideSlugResumeCV:
+		handleGuideResumeCV(w, r)
+	case constants.GuideSlugIntroVideos:
+		handleGuideIntroVideos(w, r)
+	case constants.GuideSlugPayments:
+		handleGuidePayments(w, r)
 	case constants.GuideSlugFAQ:
 		handleGuideFAQ(w, r)
 	case constants.GuideSlugReportsAndGeneration:
@@ -106,6 +130,36 @@ func handleGuideConnectGoogleCalendar(w http.ResponseWriter, r *http.Request) {
 
 	if err := frontend.GuideConnectGoogleCalendar().Render(r.Context(), w); err != nil {
 		logs.Log().Error("failed to render connect google calendar guide", zap.Error(err))
+	}
+}
+
+func handleGuideResumeCV(w http.ResponseWriter, r *http.Request) {
+	if !requireMethod(w, r, http.MethodGet) {
+		return
+	}
+
+	if err := frontend.GuideResumeCV().Render(r.Context(), w); err != nil {
+		logs.Log().Error("failed to render resume cv guide", zap.Error(err))
+	}
+}
+
+func handleGuideIntroVideos(w http.ResponseWriter, r *http.Request) {
+	if !requireMethod(w, r, http.MethodGet) {
+		return
+	}
+
+	if err := frontend.GuideIntroVideos().Render(r.Context(), w); err != nil {
+		logs.Log().Error("failed to render intro videos guide", zap.Error(err))
+	}
+}
+
+func handleGuidePayments(w http.ResponseWriter, r *http.Request) {
+	if !requireMethod(w, r, http.MethodGet) {
+		return
+	}
+
+	if err := frontend.GuidePayments().Render(r.Context(), w); err != nil {
+		logs.Log().Error("failed to render payments guide", zap.Error(err))
 	}
 }
 

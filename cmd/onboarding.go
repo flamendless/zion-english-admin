@@ -4,7 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"net/http"
 
+	"zion-english/frontend"
+	"zion-english/internal/auth"
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/featureflags"
@@ -91,4 +94,29 @@ func loadTeacherOnboardingChecklist(ctx context.Context, teacherID int64) ([]onb
 		GoogleShow:             googleConfigured && (googleConnected || googleVisibleToTeacher),
 		GoogleConnected:        googleConnected,
 	}), nil
+}
+
+func handlePersistentOnboardingPartial(w http.ResponseWriter, r *http.Request) {
+	if !requireMethod(w, r, http.MethodGet) {
+		return
+	}
+
+	ctx := r.Context()
+	if auth.GetRole(ctx) != auth.RoleTeacher {
+		return
+	}
+	if !featureflags.PersistentOnboardingEnabled(ctx, dbRO) {
+		return
+	}
+
+	user := auth.GetUser(ctx)
+	checklist, err := loadTeacherOnboardingChecklist(ctx, user.ID)
+	if err != nil || onboarding.IsComplete(checklist) || len(onboarding.IncompleteItems(checklist)) == 0 {
+		return
+	}
+
+	panel := frontend.BuildOnboardingPersistentPanel(checklist)
+	if err := frontend.PersistentPanel(panel).Render(ctx, w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
 }

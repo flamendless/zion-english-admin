@@ -152,6 +152,11 @@ func ClassOverdueGracePeriodMinutes(ctx context.Context, db database.Service) in
 	return value
 }
 
+func PersistentOnboardingEnabled(ctx context.Context, db database.Service) bool {
+	enabled, _, err := GetFlagDefault(ctx, db, constants.FeatureFlagPersistentOnboarding, false)
+	return err == nil && enabled
+}
+
 func IntroVideoUploadAccess(ctx context.Context, db database.Service, roles []constants.TeacherRole) (visible bool, uploadAllowed bool) {
 	enabled, allowedRoles, err := GetFlagDefault(ctx, db, constants.FeatureFlagIntroVideoUploads, false)
 	if err != nil {

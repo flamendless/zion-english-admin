@@ -7,6 +7,7 @@ const (
 	FeatureFlagIntegrationGoogleCalendar FeatureFlagKey = "integration.google_calendar"
 	FeatureFlagClassOverdueGracePeriod     FeatureFlagKey = "class.overdue_grace_period_minutes"
 	FeatureFlagIntroVideoUploads         FeatureFlagKey = "intro_video.uploads"
+	FeatureFlagPersistentOnboarding    FeatureFlagKey = "onboarding.persistent"
 )
 
 const (

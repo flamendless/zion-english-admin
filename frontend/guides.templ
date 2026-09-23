@@ -301,6 +301,337 @@ templ GuideReportsGeneration() {
 	</html>
 }
 
+templ GuideResumeCV() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Resume / CV - Guides - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@GuideStyles()
+	</head>
+	<body>
+		<div class="container guides-page">
+			@HeaderSimple()
+
+			<nav class="guides-breadcrumb" aria-label="Breadcrumb">
+				<a href={ utils.URL("/guides") } class="guides-breadcrumb-link">Guides</a>
+				<span class="guides-breadcrumb-sep" aria-hidden="true">/</span>
+				<span class="guides-breadcrumb-current" aria-current="page">Resume / CV</span>
+			</nav>
+
+			@HubHeader("Resume / CV", "", "", false)
+
+			<div class="guides-hero">
+				<p class="guides-subtitle">
+					Upload your resume or CV from My Profile. You can replace it once per day. Your file appears on My Documents with Approved status.
+				</p>
+			</div>
+
+			<div class="guide-content">
+				@GuideSection(
+					"upload-resume",
+					"Upload resume / CV",
+					utils.URL("/profile"),
+					"Add or replace your resume from the Resume / CV section on My Profile.",
+					[]string{
+						"Open My Profile from the dashboard or navigation.",
+						"Scroll to the Resume / CV section.",
+						"Choose a file in PNG, JPEG, JPG, or PDF format (max 5 MB).",
+						"Click Upload resume/CV.",
+						"A success message confirms the upload. Use View resume/CV to open the current file.",
+					},
+					false,
+				)
+				@GuideSection(
+					"once-per-day",
+					"Once-per-day upload limit",
+					utils.URL("/profile"),
+					"You can upload a new resume or CV at most once every 24 hours.",
+					[]string{
+						"The Resume / CV section shows a Once per day pill as a reminder.",
+						"If you uploaded recently, the form is disabled and shows how long until you can upload again.",
+						"Replacing your resume does not require admin review. The new file is approved immediately.",
+					},
+					false,
+				)
+				@GuideSection(
+					"view-my-documents",
+					"View on My Documents",
+					utils.URL("/documents"),
+					"See your uploaded resume alongside profile photos and ID documents.",
+					[]string{
+						"Open My Documents from the navigation.",
+						"Your resume appears with type Resume/CV and status Approved.",
+						"Use the view action to open or download the file.",
+						"Valid ID documents are uploaded separately on My Profile and may require admin review before approval.",
+					},
+					false,
+				)
+				@GuideSection(
+					"admin-view-resumes",
+					"View teacher resumes",
+					utils.URL("/documents"),
+					"Administrators can browse all teacher resume uploads on the Documents page.",
+					[]string{
+						"Open Documents from the dashboard or navigation.",
+						"Filter by type Resume/CV to see resume uploads only.",
+						"Use the view action to open a teacher's file. Resume/CV entries do not use approve or reject actions.",
+						"Use search and teacher filters to find a specific upload.",
+					},
+					true,
+				)
+			</div>
+
+			<div class="guides-footer-nav">
+				<a href={ utils.URL("/guides") } class="guides-back-link">
+					@GuideBackIcon()
+					All guides
+				</a>
+			</div>
+		</div>
+		@GuideAnchorScript()
+	</body>
+	</html>
+}
+
+templ GuideIntroVideos() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Intro Videos - Guides - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@GuideStyles()
+	</head>
+	<body>
+		<div class="container guides-page">
+			@HeaderSimple()
+
+			<nav class="guides-breadcrumb" aria-label="Breadcrumb">
+				<a href={ utils.URL("/guides") } class="guides-breadcrumb-link">Guides</a>
+				<span class="guides-breadcrumb-sep" aria-hidden="true">/</span>
+				<span class="guides-breadcrumb-current" aria-current="page">Intro Videos</span>
+			</nav>
+
+			@HubHeader("Intro Videos", "", "", false)
+
+			<div class="guides-hero">
+				<p class="guides-subtitle">
+					Submit a short introduction video link from My Profile. Use a Google Drive or YouTube link that reviewers can open without signing in. Track status on My Intro Video.
+				</p>
+			</div>
+
+			<div class="guide-content">
+				@GuideSection(
+					"submit-intro-video",
+					"Submit an intro video",
+					utils.URL("/profile"),
+					"Share a Google Drive or YouTube link from the Introduction video section on My Profile.",
+					[]string{
+						"Open My Profile from the dashboard or navigation.",
+						"Scroll to the Introduction video section (visible when intro video uploads are enabled for your role).",
+						"Select the source: Google Drive or YouTube.",
+						"Paste the video link and click Submit intro video.",
+						"Confirm in the dialog when prompted. A success message confirms your submission is pending review.",
+					},
+					false,
+				)
+				@GuideSection(
+					"link-requirements",
+					"Link sharing requirements",
+					utils.URL("/profile"),
+					"Reviewers must be able to open your link without signing in.",
+					[]string{
+						"For Google Drive, set sharing to Anyone with the link.",
+						"For YouTube, set the video to Unlisted (not Private).",
+						"Test the link in a private browser window before submitting.",
+						"Submissions are blocked while you already have a Submitted or Approved intro video on file.",
+					},
+					false,
+				)
+				@GuideSection(
+					"track-status",
+					"Track submission status",
+					utils.URL("/intro-videos"),
+					"Follow review progress on My Intro Video or from your profile.",
+					[]string{
+						"Open My Intro Video from the navigation to see your submission history.",
+						"Statuses are Submitted (pending review), Approved, or Rejected.",
+						"Your profile also shows the current submission status and a link to open the video.",
+						"If uploads are disabled, the profile section explains that submissions are not available.",
+					},
+					false,
+				)
+				@GuideSection(
+					"resubmit-after-rejection",
+					"Resubmit after rejection",
+					utils.URL("/profile"),
+					"You can submit a new link after an administrator rejects your video.",
+					[]string{
+						"Open My Profile and check the Introduction video section for the reject reason.",
+						"Fix the link or sharing settings, then submit a new URL.",
+						"You cannot submit again while a Submitted or Approved video is still on file.",
+						"After rejection, the form becomes available for a new submission.",
+					},
+					false,
+				)
+				@GuideSection(
+					"admin-review-intro-videos",
+					"Review intro video submissions",
+					utils.URL("/intro-videos"),
+					"Administrators review teacher intro videos on the Intro Videos page.",
+					[]string{
+						"Open Intro Videos from the dashboard Pending Review card or navigation.",
+						"Filter by status, teacher, or URL. Sort by upload date as needed.",
+						"Use View to open the teacher's link in a new tab.",
+						"Click Approve for acceptable submissions, or Reject and enter a required reason so the teacher can resubmit.",
+						"Delete removes the submission so the teacher can upload a new one.",
+					},
+					true,
+				)
+				@GuideSection(
+					"admin-feature-flag",
+					"Enable uploads by teacher role",
+					utils.URL("/feature-flags"),
+					"Superusers control which teacher roles can see and use intro video uploads.",
+					[]string{
+						"Open Feature Flags from the navigation (superuser only).",
+						"Find the intro video uploads flag and enable it.",
+						"Select which teacher roles can submit intro videos.",
+						"Save changes. Teachers with matching roles will see the Introduction video section on My Profile.",
+					},
+					true,
+				)
+			</div>
+
+			<div class="guides-footer-nav">
+				<a href={ utils.URL("/guides") } class="guides-back-link">
+					@GuideBackIcon()
+					All guides
+				</a>
+			</div>
+		</div>
+		@GuideAnchorScript()
+	</body>
+	</html>
+}
+
+templ GuidePayments() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Payments - Guides - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@GuideStyles()
+	</head>
+	<body>
+		<div class="container guides-page">
+			@HeaderSimple()
+
+			<nav class="guides-breadcrumb" aria-label="Breadcrumb">
+				<a href={ utils.URL("/guides") } class="guides-breadcrumb-link">Guides</a>
+				<span class="guides-breadcrumb-sep" aria-hidden="true">/</span>
+				<span class="guides-breadcrumb-current" aria-current="page">Payments</span>
+			</nav>
+
+			@HubHeader("Payments", "", "", false)
+
+			<div class="guides-hero">
+				<p class="guides-subtitle">
+					Administrators record payroll payments sent from Reports. Teachers confirm receipt and browse history on Payment History. See the Reports &amp; Generation guide for cutoff periods and XLSX exports.
+				</p>
+			</div>
+
+			<div class="guide-content">
+				@GuideSection(
+					"payment-overview",
+					"How payments work",
+					utils.URL("/payments"),
+					"Payments track payroll sent for each teacher and cutoff period.",
+					[]string{
+						"Each payment is tied to a report cutoff date range and a single teacher.",
+						"Only one payment can be recorded per teacher per cutoff period.",
+						"Status starts as Pending when an administrator sends payment, then becomes Received when the teacher confirms.",
+						"Payment method is GCash. A reference number is required when sending payment.",
+						"For payroll totals and class details, see the Reports & Generation guide.",
+					},
+					false,
+				)
+				@GuideSection(
+					"confirm-receipt",
+					"Confirm payment received",
+					utils.URL("/payments"),
+					"Teachers confirm when payroll has arrived.",
+					[]string{
+						"When a payment is sent, you may see a prompt on the dashboard asking you to confirm receipt.",
+						"Click Received when the payment has arrived, or Not Yet Received to dismiss the prompt for this login session.",
+						"You can also open My Payment History, find a Pending row, and click Mark as received.",
+						"In the modal, review the period and amount, then click Received to update the status.",
+					},
+					false,
+				)
+				@GuideSection(
+					"payment-history-teacher",
+					"My Payment History",
+					utils.URL("/payments"),
+					"Browse your sent payments and filter by date or status.",
+					[]string{
+						"Open My Payment History from the navigation.",
+						"Use the month picker or date preset to narrow the list.",
+						"Filter by status: All, Pending, or Received.",
+						"Click View on a row to open payment details in a modal.",
+					},
+					false,
+				)
+				@GuideSection(
+					"admin-send-payment",
+					"Send payment from Reports",
+					utils.URL("/reports"),
+					"Administrators record a sent payment from the Reports page for a cutoff period.",
+					[]string{
+						"Open Reports and select the cutoff date range for the payroll period.",
+						"On a teacher row, click Send payment (available when no payment exists for that period).",
+						"In the modal, confirm the teacher, total earnings, period, payment method, reference number, and amount.",
+						"Click Send payment. The teacher is notified and the row shows payment status.",
+						"If payment was already sent for this cutoff, Send payment is disabled until the next cutoff period.",
+					},
+					true,
+				)
+				@GuideSection(
+					"admin-payment-history",
+					"Payment History for all teachers",
+					utils.URL("/payments"),
+					"Administrators can audit all sent payments across teachers.",
+					[]string{
+						"Open Payment History from the dashboard or navigation.",
+						"Filter by month, date preset, and status.",
+						"Search by teacher name to find a specific teacher's payments.",
+						"Click View to open read-only payment details for any row.",
+					},
+					true,
+				)
+			</div>
+
+			<div class="guides-footer-nav">
+				<a href={ utils.URL("/guides") } class="guides-back-link">
+					@GuideBackIcon()
+					All guides
+				</a>
+			</div>
+		</div>
+		@GuideAnchorScript()
+	</body>
+	</html>
+}
+
 templ GuideConnectZoom() {
 	<!DOCTYPE html>
 	<html lang="en">
