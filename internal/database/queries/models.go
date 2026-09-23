@@ -320,6 +320,25 @@ type TblTeacherMeetingAccount struct {
 	ResourceID     string
 }
 
+type TblTeacherPayment struct {
+	ID                int64
+	TeacherID         int64
+	SentByTeacherID   interface{}
+	SentByName        string
+	PaymentMethod     string
+	ReferenceNumber   string
+	Amount            float64
+	Currency          string
+	PeriodStart       string
+	PeriodEnd         string
+	Status            string
+	DismissedAccessID interface{}
+	SentAt            string
+	ReceivedAt        interface{}
+	CreatedAt         string
+	UpdatedAt         string
+}
+
 type TblTeacherRole struct {
 	TeacherID int64
 	Role      string

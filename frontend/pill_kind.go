@@ -82,6 +82,17 @@ func ClassRecordStatusPillTone(status constants.ClassStatus) PillTone {
 	return ClassStatusPillTone(constants.ClassListFilterStatus(status))
 }
 
+func PaymentStatusPillTone(status constants.PaymentStatus) PillTone {
+	switch status {
+	case constants.PaymentStatusPending:
+		return PillToneWarning
+	case constants.PaymentStatusReceived:
+		return PillToneSuccess
+	default:
+		return PillToneNeutral
+	}
+}
+
 func DocumentStatusPillTone(status constants.TeacherDocumentStatus) PillTone {
 	switch status {
 	case constants.TeacherDocumentStatusSubmitted:

@@ -1,0 +1,152 @@
+package frontend
+
+import "zion-english/internal/constants"
+import "zion-english/internal/utils"
+
+type PaymentReceiptData struct {
+	PaymentID       string
+	PaymentMethod   constants.PaymentMethod
+	ReferenceNumber string
+	Amount          float64
+	Currency        string
+	PeriodLabel     string
+	SentAt          string
+	ShowDeferAction bool
+}
+
+templ PaymentReceiptModal(data PaymentReceiptData) {
+	<div class="modal-overlay" id="paymentReceiptModal" hidden role="presentation">
+		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="paymentReceiptTitle">
+			<div class="modal-header">
+				<h3 id="paymentReceiptTitle">Confirm payment received</h3>
+				if !data.ShowDeferAction {
+					<button type="button" class="modal-close payment-receipt-close" data-tooltip="Close" aria-label="Close" onclick="window.closePaymentReceiptModal()">&times;</button>
+				}
+			</div>
+			<div class="modal-body">
+				@PaymentReceiptModalStyles()
+				<p class="payment-receipt-intro">A payment was sent to you. Please confirm once you have received it.</p>
+				<dl class="payment-receipt-details">
+					<div class="payment-receipt-row">
+						<dt>Payment method</dt>
+						<dd>{ data.PaymentMethod.Label() }</dd>
+					</div>
+					<div class="payment-receipt-row">
+						<dt>Reference number</dt>
+						<dd>{ data.ReferenceNumber }</dd>
+					</div>
+					<div class="payment-receipt-row">
+						<dt>Amount</dt>
+						<dd>{ utils.FormatCurrency(data.Amount, data.Currency) }</dd>
+					</div>
+					<div class="payment-receipt-row">
+						<dt>Period</dt>
+						<dd>{ data.PeriodLabel }</dd>
+					</div>
+					<div class="payment-receipt-row">
+						<dt>Sent at</dt>
+						<dd>{ data.SentAt }</dd>
+					</div>
+				</dl>
+			</div>
+			<div class="modal-footer payment-receipt-footer">
+				if data.ShowDeferAction {
+					<button
+						type="button"
+						class="btn btn-secondary"
+						hx-post={ utils.URL("/payments/" + data.PaymentID + "/defer") }
+						hx-swap="none"
+						onclick="window.closePaymentReceiptModal()"
+					>Not Yet Received</button>
+				} else {
+					<button type="button" class="btn btn-secondary payment-receipt-close" onclick="window.closePaymentReceiptModal()">Cancel</button>
+				}
+				if data.ShowDeferAction {
+					<button
+						type="button"
+						class="btn payment-receipt-confirm"
+						hx-post={ utils.URL("/payments/" + data.PaymentID + "/received") }
+						hx-swap="none"
+					>Received</button>
+				} else {
+					<button
+						type="button"
+						class="btn payment-receipt-confirm"
+						hx-post={ utils.URL("/payments/" + data.PaymentID + "/received") }
+						hx-headers='{"X-Payment-Source":"history"}'
+						hx-swap="none"
+					>Received</button>
+				}
+			</div>
+		</div>
+	</div>
+	<script>
+		function openPaymentReceiptModal() {
+			const overlay = document.getElementById('paymentReceiptModal');
+			if (!overlay) return;
+			overlay.hidden = false;
+			document.body.classList.add('modal-open');
+			const primary = overlay.querySelector('.payment-receipt-footer .btn:not(.btn-secondary)');
+			if (primary) primary.focus();
+		}
+
+		window.closePaymentReceiptModal = function () {
+			const host = document.getElementById('paymentReceiptModalHost');
+			if (host) {
+				host.innerHTML = '';
+				document.body.classList.remove('modal-open');
+				return;
+			}
+			const overlay = document.getElementById('paymentReceiptModal');
+			if (overlay) overlay.hidden = true;
+			document.body.classList.remove('modal-open');
+		};
+
+		openPaymentReceiptModal();
+	</script>
+}
+
+templ PaymentReceivedPostResponse(row PaymentRowData, showTeacherColumn bool) {
+	@PaymentTableRow(row, showTeacherColumn, true)
+	<div id="paymentReceiptModalHost" hx-swap-oob="innerHTML"></div>
+}
+
+templ PaymentReceiptModalStyles() {
+	<style>
+		#paymentReceiptModal.modal-overlay {
+			z-index: 1200;
+		}
+
+		.payment-receipt-intro {
+			margin: 0 0 var(--space-4);
+		}
+
+		.payment-receipt-details {
+			margin: 0;
+		}
+
+		.payment-receipt-row {
+			display: grid;
+			grid-template-columns: 9rem 1fr;
+			gap: var(--space-2);
+			padding: var(--space-2) 0;
+			border-bottom: 1px solid var(--color-border-subtle);
+		}
+
+		.payment-receipt-row:last-child {
+			border-bottom: none;
+		}
+
+		.payment-receipt-row dt {
+			margin: 0;
+			color: var(--color-muted-foreground);
+			font-size: 0.875rem;
+		}
+
+		.payment-receipt-row dd {
+			margin: 0;
+			font-weight: 500;
+		}
+
+	</style>
+}

@@ -17,6 +17,7 @@ const (
 	NavIconRecordClass      NavIconKind = "record-class"
 	NavIconReports          NavIconKind = "reports"
 	NavIconAnalytics        NavIconKind = "analytics"
+	NavIconPayments         NavIconKind = "payments"
 	NavIconProcess          NavIconKind = "process"
 	NavIconFeatureFlags     NavIconKind = "feature-flags"
 	NavIconLogs             NavIconKind = "logs"
@@ -54,6 +55,7 @@ var navIconByPath = map[string]NavIconKind{
 	"/my-students":          NavIconMyStudents,
 	"/reports":              NavIconReports,
 	"/analytics":            NavIconAnalytics,
+	"/payments":             NavIconPayments,
 	"/student-relationships": NavIconStudents,
 	"/process":              NavIconProcess,
 	"/feature-flags":        NavIconFeatureFlags,
@@ -85,6 +87,7 @@ var navIconToneByKind = map[NavIconKind]NavIconTone{
 	NavIconRecordClass:      NavIconToneSuccess,
 	NavIconReports:        NavIconToneInfo,
 	NavIconAnalytics:      NavIconToneInfo,
+	NavIconPayments:       NavIconToneSuccess,
 	NavIconProcess:        NavIconToneWarning,
 	NavIconFeatureFlags:   NavIconToneWarning,
 	NavIconLogs:           NavIconToneNeutral,

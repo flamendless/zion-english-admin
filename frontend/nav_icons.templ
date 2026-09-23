@@ -42,6 +42,8 @@ templ NavIconSVG(kind NavIconKind) {
 			@navIconSVGChartColumn()
 		case NavIconAnalytics:
 			@navIconSVGLineChart()
+		case NavIconPayments:
+			@navIconSVGCreditCard()
 		case NavIconProcess:
 			@navIconSVGSettings()
 		case NavIconFeatureFlags:
@@ -169,6 +171,13 @@ templ navIconSVGChartColumn() {
 		<path d="M18 17V9"></path>
 		<path d="M13 17V5"></path>
 		<path d="M8 17v-3"></path>
+	</svg>
+}
+
+templ navIconSVGCreditCard() {
+	<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<rect width="20" height="14" x="2" y="5" rx="2"></rect>
+		<line x1="2" y1="10" x2="22" y2="10"></line>
 	</svg>
 }
 

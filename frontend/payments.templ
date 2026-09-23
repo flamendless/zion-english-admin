@@ -1,0 +1,192 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+type PaymentsData struct {
+	ShowTeacherColumn bool
+}
+
+templ Payments(data PaymentsData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		if data.ShowTeacherColumn {
+			<title>Payment History - Zion English Admin Tool</title>
+		} else {
+			<title>My Payment History - Zion English Admin Tool</title>
+		}
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@AvatarStyles()
+		<style>
+			.payments-filters {
+				display: contents;
+			}
+
+			.payments-teacher-cell {
+				display: flex;
+				align-items: center;
+				gap: var(--space-2);
+				min-width: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@SuccessBanner()
+			if data.ShowTeacherColumn {
+				@HubHeader("Payment History", "", "", false)
+			} else {
+				@HubHeader("My Payment History", "", "", false)
+			}
+
+			<div class="toolbar" id="paymentsToolbar">
+				<div id="paymentsFilters" class="payments-filters">
+					if data.ShowTeacherColumn {
+						<div class="form-group">
+							<label for="paymentSearch">Search</label>
+							<input type="text" id="paymentSearch" name="q" placeholder="Search teacher name..."/>
+						</div>
+					}
+					@MonthPicker("paymentMonth", utils.URL("/payments/partials/date-preset"))
+					@DatePreset(true)
+					<div class="form-group">
+						<label for="paymentStatusFilter">Status</label>
+						<select id="paymentStatusFilter" name="status">
+							<option value="">All</option>
+							for _, opt := range PaymentStatusFilterOptions {
+								<option value={ opt.Value }>{ opt.Label }</option>
+							}
+						</select>
+					</div>
+					<button
+						type="button"
+						id="paymentFilterBtn"
+						hx-get={ utils.URL("/payments/partials/rows") }
+						hx-include="#paymentsFilters"
+						hx-target="#paymentsTableBody"
+						hx-swap="innerHTML"
+					>Filter</button>
+				</div>
+			</div>
+
+			<div class="table-wrapper">
+				<table id="paymentsTable" class="table-stack-mobile">
+					<thead>
+						<tr>
+							if data.ShowTeacherColumn {
+								<th>Teacher</th>
+							}
+							<th>Period</th>
+							<th>Method</th>
+							<th>Reference #</th>
+							<th>Amount</th>
+							<th>Status</th>
+							<th>Sent by</th>
+							<th>Sent at</th>
+							<th>Received at</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody
+						id="paymentsTableBody"
+						hx-get={ utils.URL("/payments/partials/rows") }
+						hx-include="#paymentsFilters"
+						hx-trigger="load"
+						hx-swap="innerHTML"
+					>
+						<tr>
+							<td colspan={ paymentsTableColspan(data.ShowTeacherColumn) } class="empty-state">Loading payments...</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div id="paymentReceiptModalHost"></div>
+		</div>
+
+		<script>
+			window.closePaymentReceiptModal = function () {
+				const host = document.getElementById('paymentReceiptModalHost');
+				if (host) host.innerHTML = '';
+				document.body.classList.remove('modal-open');
+			};
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id !== 'paymentReceiptModalHost') return;
+				const overlay = evt.detail.target.querySelector('.modal-overlay');
+				if (!overlay) return;
+				overlay.hidden = false;
+				document.body.classList.add('modal-open');
+				const closeBtn = overlay.querySelector('.payment-receipt-close, .payment-view-close, .modal-close');
+				if (closeBtn) closeBtn.focus();
+			});
+
+			document.body.addEventListener('click', function (e) {
+				if (e.target.closest('.payment-receipt-close, .payment-view-close')) {
+					window.closePaymentReceiptModal();
+					return;
+				}
+				const overlay = e.target.closest('#paymentReceiptModal, #paymentViewModal');
+				if (overlay && e.target === overlay) window.closePaymentReceiptModal();
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key === 'Escape' && document.getElementById('paymentReceiptModalHost')?.innerHTML) {
+					window.closePaymentReceiptModal();
+				}
+			});
+		</script>
+
+		<script>
+			const paymentSearch = document.getElementById('paymentSearch');
+
+			function setPaymentDateRangeFromPreset(select) {
+				if (!select) return;
+				if (!select.value) {
+					delete select.dataset.startDate;
+					delete select.dataset.endDate;
+					return;
+				}
+				const parts = select.value.split('|');
+				if (parts.length !== 2) return;
+				select.dataset.startDate = parts[0];
+				select.dataset.endDate = parts[1];
+			}
+
+			function bindPaymentDatePresetSelect() {
+				const datePresetSelect = document.getElementById('datePreset');
+				if (!datePresetSelect) return;
+				setPaymentDateRangeFromPreset(datePresetSelect);
+				datePresetSelect.addEventListener('change', () => {
+					setPaymentDateRangeFromPreset(datePresetSelect);
+				});
+			}
+
+			bindPaymentDatePresetSelect();
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id !== 'datePresetGroup') return;
+				bindPaymentDatePresetSelect();
+				if (typeof htmx !== 'undefined') {
+					htmx.trigger('#paymentsTableBody', 'load');
+				}
+			});
+
+			if (paymentSearch) {
+				paymentSearch.addEventListener('keydown', function (e) {
+					if (e.key === 'Enter') {
+						e.preventDefault();
+						if (typeof htmx !== 'undefined') {
+							htmx.trigger('#paymentsTableBody', 'load');
+						}
+					}
+				});
+			}
+		</script>
+	</body>
+	</html>
+}

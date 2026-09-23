@@ -1,0 +1,111 @@
+package frontend
+
+import "zion-english/internal/constants"
+import "zion-english/internal/utils"
+
+type ReportPaymentFormData struct {
+	TeacherID      string
+	TeacherName    string
+	TeacherAvatar  AvatarProps
+	StartDate      string
+	EndDate        string
+	CutoffLabel    string
+	TotalEarnings  []CurrencyTotal
+	Error          string
+}
+
+templ ReportPaymentModal(data ReportPaymentFormData) {
+	<div class="modal-overlay" id="reportPaymentModal" role="presentation">
+		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="reportPaymentTitle">
+			<form
+				hx-post={ utils.URL("/reports/" + data.TeacherID + "/payment") }
+				hx-target="#reportPaymentModalHost"
+				hx-swap="innerHTML"
+			>
+				<input type="hidden" name="startDate" value={ data.StartDate }/>
+				<input type="hidden" name="endDate" value={ data.EndDate }/>
+				<div class="modal-header">
+					<h3 id="reportPaymentTitle">Send payment</h3>
+					<button type="button" class="modal-close report-payment-close" data-tooltip="Close" aria-label="Close" onclick="window.closeReportPaymentModal()">&times;</button>
+				</div>
+				<div class="modal-body">
+					@ReportPaymentModalStyles()
+					if data.Error != "" {
+						<p class="form-error">{ data.Error }</p>
+					}
+					<div class="report-payment-teacher">
+						@TeacherNameCell(data.TeacherName, data.TeacherAvatar)
+					</div>
+					<p class="report-payment-earnings">
+						Total earnings:
+						if len(data.TotalEarnings) > 0 {
+							for i, earning := range data.TotalEarnings {
+								if i > 0 {
+									<br/>
+								}
+								{ utils.FormatCurrency(earning.Total, earning.Currency) }
+							}
+						} else {
+							-
+						}
+					</p>
+					<p class="report-payment-period">{ data.CutoffLabel }</p>
+					<div class="form-group">
+						<label for="paymentMethod">Payment method</label>
+						<select id="paymentMethod" name="paymentMethod" required>
+							for _, opt := range PaymentMethodOptions {
+								<option value={ opt.Value }>{ opt.Label }</option>
+							}
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="referenceNumber">Reference number</label>
+						<input type="text" id="referenceNumber" name="referenceNumber" required placeholder="GCash reference number"/>
+					</div>
+					@CurrencyAmountField(CurrencyAmountFieldParams{
+						Label:             "Amount",
+						AmountID:          "amount",
+						AmountName:        "amount",
+						CurrencyID:        "currency",
+						CurrencyName:      "currency",
+						CurrencyValue:     string(constants.TrialClassCurrency),
+						PlaceholderAmount: "0.00",
+						Required:          true,
+					})
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary report-payment-close" onclick="window.closeReportPaymentModal()">Cancel</button>
+					<button type="submit" class="btn">Send payment</button>
+				</div>
+			</form>
+		</div>
+	</div>
+}
+
+templ ReportPaymentPostResponse(row ReportRowData, startDate string, endDate string) {
+	@ReportTableRow(row, startDate, endDate, true)
+	<div id="reportPaymentModalHost" hx-swap-oob="innerHTML"></div>
+}
+
+templ ReportPaymentModalStyles() {
+	<style>
+		.report-payment-teacher {
+			margin: 0 0 var(--space-1);
+		}
+
+		.report-payment-teacher .teacher-name-cell-text {
+			font-weight: 600;
+		}
+
+		.report-payment-earnings {
+			margin: 0 0 var(--space-1);
+			font-size: 0.875rem;
+		}
+
+		.report-payment-period {
+			margin: 0 0 var(--space-4);
+			color: var(--color-muted-foreground);
+			font-size: 0.875rem;
+		}
+	</style>
+}

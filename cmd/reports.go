@@ -28,6 +28,18 @@ type reportEarningJSON struct {
 }
 
 func handleReportsPath(w http.ResponseWriter, r *http.Request) {
+	if id, ok := extractPathID(r, "reports", "/payment"); ok {
+		if r.Method == http.MethodGet {
+			handleReportPaymentForm(w, r, id)
+			return
+		}
+		if r.Method == http.MethodPost {
+			handleReportPaymentSubmit(w, r, id)
+			return
+		}
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 	if id, ok := extractPathID(r, "reports", "/view"); ok {
 		handleReportView(w, r, id)
 		return
@@ -294,6 +306,11 @@ func loadReportRows(ctx context.Context, startDate, endDate, q string, roleFilte
 		return nil, fmt.Errorf("failed to load teacher roles")
 	}
 
+	paymentStatuses, err := loadPaymentStatusesForPeriod(ctx, startDate, endDate)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load payment statuses")
+	}
+
 	response := make([]frontend.ReportRowData, 0, len(summaries))
 	for _, summary := range summaries {
 		item := frontend.ReportRowData{
@@ -307,6 +324,10 @@ func loadReportRows(ctx context.Context, startDate, endDate, q string, roleFilte
 			CancelledClasses: sqlNumericToInt64(summary.CancelledClasses),
 			TotalClasses:     summary.TotalClasses,
 			Earnings:         reportEarningsToFrontend(earningsByTeacher[summary.TeacherID]),
+			PaymentStatus: paymentStatuses[summary.TeacherID],
+		}
+		if item.HasPaymentStatus() {
+			item.SendPaymentDisabledTooltip = paymentSentDisabledTooltip(startDate, endDate)
 		}
 
 		currentHash := hashesByTeacher[summary.TeacherID]
@@ -387,7 +408,7 @@ func renderReportGenerateRow(w http.ResponseWriter, r *http.Request, teacherID i
 		w.Header().Set("HX-Trigger", `{"showSuccessBanner":"Report is up to date; skipped generation"}`)
 	}
 	w.Header().Set("Content-Type", "text/html")
-	if err := frontend.ReportTableRow(row, startDate, endDate).Render(r.Context(), w); err != nil {
+	if err := frontend.ReportTableRow(row, startDate, endDate, false).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }

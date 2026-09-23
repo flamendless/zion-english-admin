@@ -40,6 +40,8 @@ type DashboardData struct {
 	AllTeachersSecondCutoffParentTotals []CurrencyTotal
 	StudentsWithoutParent             int64
 	StudentsWithoutParentRate         int64
+	ShowPaymentReceipt                bool
+	PaymentReceipt                    PaymentReceiptData
 }
 
 templ Home(data DashboardData) {
@@ -171,6 +173,9 @@ templ Home(data DashboardData) {
 
 			@NavGroupChoiceModals(NavGroups(data.Role))
 			@RecordClassFlowModals(ClassWizardPageDataForContext(ctx))
+			if data.ShowPaymentReceipt {
+				@PaymentReceiptModal(data.PaymentReceipt)
+			}
 		</div>
 	</body>
 	</html>

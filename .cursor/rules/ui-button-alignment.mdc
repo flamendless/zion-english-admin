@@ -9,6 +9,10 @@ Global `button, .btn` in `global.templ` sets `margin-top: var(--space-5)`, large
 
 Mixing those classes in one row is the most common cause of misaligned UI.
 
+Global `.modal-footer` in `global.templ` sets `display: flex`, `gap: var(--space-3)`, `padding: var(--space-3) var(--space-4) var(--space-4)`, `border-top`, and `margin-top: 0` on footer buttons. **Put footer buttons as direct children of `.modal-footer`**. Wrapping them in an inner div breaks the global gap unless that wrapper is also a flex row with gap.
+
+Form-wrapped modals must keep `.modal-footer` as a sibling of `.modal-body` inside the `<form>`. Global `.modal-dialog > form` is already `display: flex; flex-direction: column`.
+
 ## Flex rows with multiple controls
 
 Any horizontal group of buttons or icon actions (modal footers, card actions, toolbars) needs:

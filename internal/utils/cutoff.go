@@ -66,6 +66,33 @@ func ActiveCutoffDates() (startDate, endDate string) {
 	return CutoffDatesFromPreset(active)
 }
 
+// NextCutoffDates returns the payroll cutoff that follows the given period.
+// Returns ok false when the dates do not match a standard first or second cutoff.
+func NextCutoffDates(startDate, endDate string) (nextStart, nextEnd string, ok bool) {
+	startT, err := time.ParseInLocation(constants.DateLayout, startDate, constants.LocationPHT)
+	if err != nil {
+		return "", "", false
+	}
+	if _, err := time.ParseInLocation(constants.DateLayout, endDate, constants.LocationPHT); err != nil {
+		return "", "", false
+	}
+
+	firstPreset, secondPreset := CutoffRangeForMonth(startT.Year(), startT.Month())
+	firstStart, firstEnd := CutoffDatesFromPreset(firstPreset)
+	secondStart, secondEnd := CutoffDatesFromPreset(secondPreset)
+
+	if startDate == firstStart && endDate == firstEnd {
+		return secondStart, secondEnd, true
+	}
+	if startDate == secondStart && endDate == secondEnd {
+		nextMonth := startT.AddDate(0, 1, 0)
+		nextFirst, _ := CutoffRangeForMonth(nextMonth.Year(), nextMonth.Month())
+		nextStart, nextEnd = CutoffDatesFromPreset(nextFirst)
+		return nextStart, nextEnd, nextStart != "" && nextEnd != ""
+	}
+	return "", "", false
+}
+
 // CutoffDatesFromPreset parses a cutoff preset (YYYY-MM-DD|YYYY-MM-DD) into start and end dates.
 func CutoffDatesFromPreset(preset string) (startDate, endDate string) {
 	parts := splitCutoff(preset)

@@ -81,9 +81,10 @@ Modal footer **Cancel** / dismiss buttons must use `btn btn-secondary` (same as 
 
 ## Teacher name display
 
-Whenever a teacher name is shown in the UI, render it with `@TeacherNameCell(name, avatar)` from `avatar.templ` (or a list wrapper like `@EntityViewTeacherList`).
+Whenever a teacher name is shown in the UI, render it with `@TeacherNameCell(name, avatar)` from `avatar.templ` (or a list wrapper like `@EntityViewTeacherList`). **Never render a bare teacher name string** in tables, modals, cards, or detail views.
 
-- Populate `AvatarProps` in handlers via `buildTeacherListAvatarProps` (or equivalent): do not show bare name strings in tables, modals, or detail views.
+- Populate `AvatarProps` in handlers: `buildTeacherListAvatarProps` (lists/rows), `buildReportTeacherAvatarProps` (report modals), `buildTeacherAvatarProps` (profile/detail).
+- View structs that carry a teacher name should also carry `AvatarProps` (e.g. `TeacherAvatar`, `Avatar`).
 - Include `@AvatarStyles()` on pages that render teacher names outside `GlobalIncludes` partials that already load avatar CSS.
 
 ## Icon actions
@@ -110,6 +111,25 @@ Prefer server-side rendering with templ components and HTMX partial fetches over
 ## URLs
 
 Always use `utils.URL("/path")`: prepends `/zion-english-admin` in local dev.
+
+## Currency and amount fields
+
+Use `@CurrencyAmountField` from `currency_amount.templ` whenever a form collects currency + amount together. Do not stack separate currency and amount `.form-group` blocks.
+
+```templ
+@CurrencyAmountField(CurrencyAmountFieldParams{
+	Label:             "Amount",
+	AmountID:          "amount",
+	AmountName:        "amount",
+	CurrencyID:        "currency",
+	CurrencyName:      "currency",
+	CurrencyValue:     "PHP",
+	PlaceholderAmount: "0.00",
+	Required:          true,
+})
+```
+
+For two unrelated fields side by side (not currency+amount), use `.form-row` from `global.templ`.
 
 ## HTMX Forms
 
@@ -157,6 +177,7 @@ Default assigned colors: `constants.DefaultAssignedColor` (`#90C020`) and `const
 - Overlay: cool slate scrim (`rgba(15, 23, 42, 0.5)`)
 - Dialog: white surface, `--color-border`, `--shadow-lg`
 - Dismiss: `btn btn-secondary`; primary/destructive: `btn` / `btn-danger`
+- Footer: put action buttons as **direct children** of `.modal-footer` so global `gap` and `margin-top: 0` apply. Do not wrap buttons in an extra div unless that wrapper is also a flex row with `gap`.
 - Scheduled-class detail summary: `@ScheduledClassDetailCard`: white card with green-tinted header gradient; date/time/rate in a 3-column meta grid (stacks on mobile). Styles live in `global.templ`, not per-modal `<style>` blocks.
 
 ### Do not

@@ -1,0 +1,83 @@
+package frontend
+
+import (
+	"zion-english/internal/constants"
+	"zion-english/internal/utils"
+)
+
+type PaymentRowData struct {
+	ID                 string
+	TeacherName        string
+	TeacherAvatar      AvatarProps
+	PeriodLabel        string
+	PaymentMethod      constants.PaymentMethod
+	ReferenceNumber    string
+	Amount             float64
+	Currency           string
+	Status             constants.PaymentStatus
+	SentByName         string
+	SentAt             string
+	ReceivedAt         string
+	CanConfirmReceived bool
+}
+
+templ PaymentTableRow(row PaymentRowData, showTeacherColumn bool, swapOOB bool) {
+	<tr id={ "payment-row-" + row.ID } if swapOOB { hx-swap-oob="outerHTML" }>
+		if showTeacherColumn {
+			<td data-label="Teacher">
+				<div class="payments-teacher-cell">
+					@Avatar(row.TeacherAvatar)
+					<span>{ row.TeacherName }</span>
+				</div>
+			</td>
+		}
+		<td data-label="Period">{ row.PeriodLabel }</td>
+		<td data-label="Method">{ row.PaymentMethod.Label() }</td>
+		<td data-label="Reference #">{ row.ReferenceNumber }</td>
+		<td data-label="Amount">{ utils.FormatCurrency(row.Amount, row.Currency) }</td>
+		<td data-label="Status">
+			@StatusPill(row.Status.Label(), PaymentStatusPillTone(row.Status), false)
+		</td>
+		<td data-label="Sent by">{ row.SentByName }</td>
+		<td data-label="Sent at">{ row.SentAt }</td>
+		<td data-label="Received at">
+			if row.ReceivedAt != "" {
+				{ row.ReceivedAt }
+			} else {
+				-
+			}
+		</td>
+		<td data-label="Actions">
+			<div class="table-actions">
+				@IconActionButton("View", IconKindView, templ.Attributes{
+					"hx-get":    utils.URL("/payments/" + row.ID + "/view"),
+					"hx-target": "#paymentReceiptModalHost",
+					"hx-swap":   "innerHTML",
+				})
+				if row.CanConfirmReceived {
+					@IconActionButton("Mark as received", IconKindApprove, templ.Attributes{
+						"hx-get":    utils.URL("/payments/" + row.ID + "/receipt"),
+						"hx-target": "#paymentReceiptModalHost",
+						"hx-swap":   "innerHTML",
+					})
+				}
+			</div>
+		</td>
+	</tr>
+}
+
+templ PaymentsTableBody(rows []PaymentRowData, emptyMessage string, showTeacherColumn bool) {
+	if len(rows) == 0 {
+		<tr>
+			<td colspan={ paymentsTableColspan(showTeacherColumn) } class="empty-state">{ emptyMessage }</td>
+		</tr>
+	} else {
+		for _, row := range rows {
+			@PaymentTableRow(row, showTeacherColumn, false)
+		}
+	}
+}
+
+templ PaymentsPartial(rows []PaymentRowData, emptyMessage string, showTeacherColumn bool) {
+	@PaymentsTableBody(rows, emptyMessage, showTeacherColumn)
+}

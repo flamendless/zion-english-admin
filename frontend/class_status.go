@@ -144,3 +144,36 @@ const (
 	TeacherConnectionsFilterZoom           = "zoom"
 	TeacherConnectionsFilterGoogleCalendar = "google_calendar"
 )
+
+var PaymentMethodOptions = func() []StatusOption {
+	opts := make([]StatusOption, 0, len(constants.PaymentMethods))
+	for _, method := range constants.PaymentMethods {
+		opts = append(opts, StatusOption{
+			Value: string(method),
+			Label: method.Label(),
+		})
+	}
+	return opts
+}()
+
+var PaymentStatusFilterOptions = func() []StatusOption {
+	opts := make([]StatusOption, 0, len(constants.PaymentStatuses))
+	for _, status := range constants.PaymentStatuses {
+		opts = append(opts, StatusOption{
+			Value: string(status),
+			Label: status.Label(),
+		})
+	}
+	return opts
+}()
+
+var CurrencyOptions = func() []StatusOption {
+	opts := make([]StatusOption, 0, len(constants.CurrencyCodes))
+	for _, code := range constants.CurrencyCodes {
+		opts = append(opts, StatusOption{
+			Value: code,
+			Label: code,
+		})
+	}
+	return opts
+}()

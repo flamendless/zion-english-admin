@@ -200,6 +200,7 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 					ShowSummary:    true,
 				}
 			}
+			populatePaymentReceipt(ctx, &data, user.ID)
 		}
 		count, err := dbRO.GetQueries().CountStudentsByTeacherID(ctx, user.ID)
 		if err == nil {

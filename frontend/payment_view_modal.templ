@@ -1,0 +1,96 @@
+package frontend
+
+import "zion-english/internal/constants"
+import "zion-english/internal/utils"
+
+type PaymentViewData struct {
+	ShowTeacher     bool
+	TeacherName     string
+	TeacherAvatar   AvatarProps
+	PeriodLabel     string
+	PaymentMethod   constants.PaymentMethod
+	ReferenceNumber string
+	Amount          float64
+	Currency        string
+	Status          constants.PaymentStatus
+	SentByName      string
+	SentAt          string
+	ReceivedAt      string
+}
+
+templ PaymentViewModal(data PaymentViewData) {
+	<div class="modal-overlay" id="paymentViewModal" hidden role="presentation">
+		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="paymentViewTitle">
+			<div class="modal-header">
+				<h3 id="paymentViewTitle">Payment details</h3>
+				<button type="button" class="modal-close payment-view-close" data-tooltip="Close" aria-label="Close" onclick="window.closePaymentReceiptModal()">&times;</button>
+			</div>
+			<div class="modal-body">
+				@PaymentReceiptModalStyles()
+				<dl class="payment-receipt-details">
+					if data.ShowTeacher {
+						<div class="payment-receipt-row">
+							<dt>Teacher</dt>
+							<dd>
+								@TeacherNameCell(data.TeacherName, data.TeacherAvatar)
+							</dd>
+						</div>
+					}
+					<div class="payment-receipt-row">
+						<dt>Period</dt>
+						<dd>{ data.PeriodLabel }</dd>
+					</div>
+					<div class="payment-receipt-row">
+						<dt>Payment method</dt>
+						<dd>{ data.PaymentMethod.Label() }</dd>
+					</div>
+					<div class="payment-receipt-row">
+						<dt>Reference number</dt>
+						<dd>{ data.ReferenceNumber }</dd>
+					</div>
+					<div class="payment-receipt-row">
+						<dt>Amount</dt>
+						<dd>{ utils.FormatCurrency(data.Amount, data.Currency) }</dd>
+					</div>
+					<div class="payment-receipt-row">
+						<dt>Status</dt>
+						<dd>
+							@StatusPill(data.Status.Label(), PaymentStatusPillTone(data.Status), false)
+						</dd>
+					</div>
+					<div class="payment-receipt-row">
+						<dt>Sent by</dt>
+						<dd>{ data.SentByName }</dd>
+					</div>
+					<div class="payment-receipt-row">
+						<dt>Sent at</dt>
+						<dd>{ data.SentAt }</dd>
+					</div>
+					<div class="payment-receipt-row">
+						<dt>Received at</dt>
+						<dd>
+							if data.ReceivedAt != "" {
+								{ data.ReceivedAt }
+							} else {
+								-
+							}
+						</dd>
+					</div>
+				</dl>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary payment-view-close" onclick="window.closePaymentReceiptModal()">Close</button>
+			</div>
+		</div>
+	</div>
+	<script>
+		(function () {
+			const overlay = document.getElementById('paymentViewModal');
+			if (!overlay) return;
+			overlay.hidden = false;
+			document.body.classList.add('modal-open');
+			const closeBtn = overlay.querySelector('.payment-view-close');
+			if (closeBtn) closeBtn.focus();
+		})();
+	</script>
+}

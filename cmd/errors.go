@@ -104,6 +104,12 @@ var (
 
 	ErrTeacherNotFoundInReportSummaries = errors.New("[REPORTS] teacher not found in report summaries")
 
+	ErrInvalidPaymentMethod    = errors.New("[PAYMENTS] invalid payment method")
+	ErrReferenceNumberRequired = errors.New("[PAYMENTS] reference number is required")
+	ErrInvalidPaymentAmount    = errors.New("[PAYMENTS] amount must be greater than zero")
+	ErrPaymentAlreadySent      = errors.New("[PAYMENTS] payment already sent for this cutoff period")
+	ErrPaymentNotFound         = errors.New("[PAYMENTS] payment not found")
+
 	ErrFeatureFlagRoleRequired = errors.New("[FEATURE FLAGS] at least one role must be selected")
 
 	ErrFfprobeUnavailable            = errors.New("[INTRO VIDEO] ffprobe unavailable")

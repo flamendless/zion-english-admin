@@ -49,6 +49,22 @@ func TestCutoffDatesFromPreset(t *testing.T) {
 	}
 }
 
+func TestNextCutoffDates(t *testing.T) {
+	nextStart, nextEnd, ok := NextCutoffDates("2026-09-01", "2026-09-15")
+	if !ok || nextStart != "2026-09-16" || nextEnd != "2026-09-30" {
+		t.Fatalf("unexpected next cutoff after first: %q %q %v", nextStart, nextEnd, ok)
+	}
+
+	nextStart, nextEnd, ok = NextCutoffDates("2026-09-16", "2026-09-30")
+	if !ok || nextStart != "2026-10-01" || nextEnd != "2026-10-15" {
+		t.Fatalf("unexpected next cutoff after second: %q %q %v", nextStart, nextEnd, ok)
+	}
+
+	if _, _, ok := NextCutoffDates("2026-09-02", "2026-09-14"); ok {
+		t.Fatal("expected custom range to fail")
+	}
+}
+
 func TestCurrentCutoffRange(t *testing.T) {
 	first, second, active := CurrentCutoffRange()
 	if first == "" || second == "" || active == "" {

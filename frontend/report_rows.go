@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"zion-english/internal/constants"
 	"zion-english/internal/utils"
 )
 
@@ -21,15 +22,25 @@ type ReportsSummaryData struct {
 }
 
 type ReportRowData struct {
-	TeacherID        string
-	TeacherName      string
-	TeacherAvatar    AvatarProps
-	ConductedClasses int64
-	CancelledClasses int64
-	TotalClasses     int64
-	Earnings         []ReportEarningData
-	DownloadReady    bool
-	Filename         string
+	TeacherID                   string
+	TeacherName                 string
+	TeacherAvatar               AvatarProps
+	PaymentStatus               constants.PaymentStatus
+	SendPaymentDisabledTooltip  string
+	ConductedClasses            int64
+	CancelledClasses            int64
+	TotalClasses                int64
+	Earnings                    []ReportEarningData
+	DownloadReady               bool
+	Filename                    string
+}
+
+func (r ReportRowData) HasPaymentStatus() bool {
+	return r.PaymentStatus != ""
+}
+
+func (r ReportRowData) CanSendPayment() bool {
+	return !r.HasPaymentStatus()
 }
 
 func (r ReportRowData) ClassesLabel() string {

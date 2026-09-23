@@ -87,6 +87,13 @@ templ iconSVGRegenerate() {
 	</svg>
 }
 
+templ iconSVGPayment() {
+	<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<rect width="20" height="14" x="2" y="5" rx="2"></rect>
+		<line x1="2" y1="10" x2="22" y2="10"></line>
+	</svg>
+}
+
 templ iconSVGMarkRead() {
 	<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 		<path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8"></path>
@@ -142,6 +149,8 @@ templ IconSVG(kind IconKind) {
 			@iconSVGGenerate()
 		case IconKindRegenerate:
 			@iconSVGRegenerate()
+		case IconKindPayment:
+			@iconSVGPayment()
 		case IconKindMarkRead:
 			@iconSVGMarkRead()
 		case IconKindSortAsc:

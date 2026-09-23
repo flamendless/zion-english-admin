@@ -36,12 +36,26 @@ templ Reports() {
 				document.body.classList.remove('modal-open');
 			};
 
+			window.closeReportPaymentModal = function () {
+				const host = document.getElementById('reportPaymentModalHost');
+				if (host) host.innerHTML = '';
+				document.body.classList.remove('modal-open');
+			};
+
 			document.body.addEventListener('htmx:afterSwap', function (evt) {
-				if (evt.detail.target.id !== 'reportViewModalHost') return;
-				document.body.classList.add('modal-open');
-				const overlay = evt.detail.target.querySelector('.modal-overlay');
-				const closeBtn = overlay && overlay.querySelector('.report-view-close');
-				if (closeBtn) closeBtn.focus();
+				if (evt.detail.target.id === 'reportViewModalHost') {
+					document.body.classList.add('modal-open');
+					const overlay = evt.detail.target.querySelector('.modal-overlay');
+					const closeBtn = overlay && overlay.querySelector('.report-view-close');
+					if (closeBtn) closeBtn.focus();
+					return;
+				}
+				if (evt.detail.target.id === 'reportPaymentModalHost') {
+					document.body.classList.add('modal-open');
+					const overlay = evt.detail.target.querySelector('.modal-overlay');
+					const closeBtn = overlay && overlay.querySelector('.report-payment-close');
+					if (closeBtn) closeBtn.focus();
+				}
 			});
 
 			document.body.addEventListener('click', function (e) {
@@ -49,13 +63,22 @@ templ Reports() {
 					window.closeReportViewModal();
 					return;
 				}
-				const overlay = e.target.closest('#reportViewModal');
-				if (overlay && e.target === overlay) window.closeReportViewModal();
+				if (e.target.closest('.report-payment-close')) {
+					window.closeReportPaymentModal();
+					return;
+				}
+				const viewOverlay = e.target.closest('#reportViewModal');
+				if (viewOverlay && e.target === viewOverlay) window.closeReportViewModal();
+				const paymentOverlay = e.target.closest('#reportPaymentModal');
+				if (paymentOverlay && e.target === paymentOverlay) window.closeReportPaymentModal();
 			});
 
 			document.addEventListener('keydown', function (e) {
 				if (e.key === 'Escape' && document.getElementById('reportViewModalHost')?.innerHTML) {
 					window.closeReportViewModal();
+				}
+				if (e.key === 'Escape' && document.getElementById('reportPaymentModalHost')?.innerHTML) {
+					window.closeReportPaymentModal();
 				}
 			});
 		</script>
@@ -82,7 +105,7 @@ templ Reports() {
 					@MonthPicker("reportMonth", utils.URL("/reports/partials/date-preset"))
 					@DatePreset(true)
 					@ReportRolesFilterDropdown(true, false)
-					@SortControls("", "asc", ListSortKindReport)
+					@SortControls("earnings", "desc", ListSortKindReport)
 					<button
 						type="button"
 						id="filterBtn"
@@ -112,6 +135,7 @@ templ Reports() {
 					<thead>
 						<tr>
 							<th>Teacher</th>
+							<th>Payment status</th>
 							<th>Total Classes</th>
 							<th>Total Rate/Earnings</th>
 							<th>Actions</th>
@@ -125,13 +149,14 @@ templ Reports() {
 						hx-swap="innerHTML"
 					>
 						<tr>
-							<td colspan="4" class="empty-state">Loading reports...</td>
+							<td colspan="5" class="empty-state">Loading reports...</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 
 			<div id="reportViewModalHost"></div>
+			<div id="reportPaymentModalHost"></div>
 		</div>
 
 		<script>

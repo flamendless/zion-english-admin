@@ -278,4 +278,33 @@ func ScrTableTruncationTooltips() templ.Component {
 	})
 }
 
+func ScrFloatingTooltips() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var13 == nil {
+			templ_7745c5c3_Var13 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<script>\n\t\t(function () {\n\t\t\tif (window._floatingTooltipsBound) return;\n\t\t\twindow._floatingTooltipsBound = true;\n\n\t\t\tlet tipEl = null;\n\t\t\tlet activeTarget = null;\n\n\t\t\tfunction getTip() {\n\t\t\t\tif (!tipEl) {\n\t\t\t\t\ttipEl = document.createElement('div');\n\t\t\t\t\ttipEl.id = 'floatingTooltip';\n\t\t\t\t\ttipEl.className = 'floating-tooltip';\n\t\t\t\t\ttipEl.setAttribute('role', 'tooltip');\n\t\t\t\t\ttipEl.hidden = true;\n\t\t\t\t\tdocument.body.appendChild(tipEl);\n\t\t\t\t}\n\t\t\t\treturn tipEl;\n\t\t\t}\n\n\t\t\tfunction positionTip(target) {\n\t\t\t\tconst tip = getTip();\n\t\t\t\tconst text = target.getAttribute('data-tooltip');\n\t\t\t\tif (!text) return;\n\t\t\t\ttip.textContent = text;\n\t\t\t\ttip.hidden = false;\n\n\t\t\t\ttip.style.left = '0';\n\t\t\t\ttip.style.top = '0';\n\t\t\t\tconst tipRect = tip.getBoundingClientRect();\n\t\t\t\tconst rect = target.getBoundingClientRect();\n\t\t\t\tconst gap = 8;\n\t\t\t\tconst margin = 8;\n\n\t\t\t\tlet top = rect.top - tipRect.height - gap;\n\t\t\t\tlet left = rect.left + rect.width / 2 - tipRect.width / 2;\n\n\t\t\t\tif (top < margin) {\n\t\t\t\t\ttop = rect.bottom + gap;\n\t\t\t\t}\n\n\t\t\t\tconst maxLeft = window.innerWidth - tipRect.width - margin;\n\t\t\t\tleft = Math.max(margin, Math.min(left, maxLeft));\n\n\t\t\t\tif (top + tipRect.height > window.innerHeight - margin) {\n\t\t\t\t\ttop = Math.max(margin, rect.top - tipRect.height - gap);\n\t\t\t\t}\n\n\t\t\t\ttip.style.left = left + 'px';\n\t\t\t\ttip.style.top = top + 'px';\n\t\t\t}\n\n\t\t\tfunction hideTip() {\n\t\t\t\tif (tipEl) tipEl.hidden = true;\n\t\t\t\tactiveTarget = null;\n\t\t\t}\n\n\t\t\tfunction showTip(target) {\n\t\t\t\tactiveTarget = target;\n\t\t\t\tpositionTip(target);\n\t\t\t}\n\n\t\t\tfunction tooltipTarget(node) {\n\t\t\t\treturn node && node.closest('.table-wrapper [data-tooltip]');\n\t\t\t}\n\n\t\t\tdocument.addEventListener('mouseover', function (e) {\n\t\t\t\tconst el = tooltipTarget(e.target);\n\t\t\t\tif (el) showTip(el);\n\t\t\t});\n\n\t\t\tdocument.addEventListener('mouseout', function (e) {\n\t\t\t\tconst el = tooltipTarget(e.target);\n\t\t\t\tif (!el) return;\n\t\t\t\tconst related = e.relatedTarget;\n\t\t\t\tif (related && el.contains(related)) return;\n\t\t\t\thideTip();\n\t\t\t});\n\n\t\t\tdocument.addEventListener('focusin', function (e) {\n\t\t\t\tconst el = tooltipTarget(e.target);\n\t\t\t\tif (el) showTip(el);\n\t\t\t});\n\n\t\t\tdocument.addEventListener('focusout', function (e) {\n\t\t\t\tconst el = tooltipTarget(e.target);\n\t\t\t\tif (el) hideTip();\n\t\t\t});\n\n\t\t\twindow.addEventListener('scroll', function () {\n\t\t\t\tif (activeTarget) positionTip(activeTarget);\n\t\t\t}, true);\n\n\t\t\twindow.addEventListener('resize', function () {\n\t\t\t\tif (activeTarget) positionTip(activeTarget);\n\t\t\t});\n\t\t})();\n\t</script>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
 var _ = templruntime.GeneratedTemplate

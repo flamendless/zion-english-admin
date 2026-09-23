@@ -95,3 +95,104 @@ templ ScrTableTruncationTooltips() {
 		})();
 	</script>
 }
+
+templ ScrFloatingTooltips() {
+	<script>
+		(function () {
+			if (window._floatingTooltipsBound) return;
+			window._floatingTooltipsBound = true;
+
+			let tipEl = null;
+			let activeTarget = null;
+
+			function getTip() {
+				if (!tipEl) {
+					tipEl = document.createElement('div');
+					tipEl.id = 'floatingTooltip';
+					tipEl.className = 'floating-tooltip';
+					tipEl.setAttribute('role', 'tooltip');
+					tipEl.hidden = true;
+					document.body.appendChild(tipEl);
+				}
+				return tipEl;
+			}
+
+			function positionTip(target) {
+				const tip = getTip();
+				const text = target.getAttribute('data-tooltip');
+				if (!text) return;
+				tip.textContent = text;
+				tip.hidden = false;
+
+				tip.style.left = '0';
+				tip.style.top = '0';
+				const tipRect = tip.getBoundingClientRect();
+				const rect = target.getBoundingClientRect();
+				const gap = 8;
+				const margin = 8;
+
+				let top = rect.top - tipRect.height - gap;
+				let left = rect.left + rect.width / 2 - tipRect.width / 2;
+
+				if (top < margin) {
+					top = rect.bottom + gap;
+				}
+
+				const maxLeft = window.innerWidth - tipRect.width - margin;
+				left = Math.max(margin, Math.min(left, maxLeft));
+
+				if (top + tipRect.height > window.innerHeight - margin) {
+					top = Math.max(margin, rect.top - tipRect.height - gap);
+				}
+
+				tip.style.left = left + 'px';
+				tip.style.top = top + 'px';
+			}
+
+			function hideTip() {
+				if (tipEl) tipEl.hidden = true;
+				activeTarget = null;
+			}
+
+			function showTip(target) {
+				activeTarget = target;
+				positionTip(target);
+			}
+
+			function tooltipTarget(node) {
+				return node && node.closest('.table-wrapper [data-tooltip]');
+			}
+
+			document.addEventListener('mouseover', function (e) {
+				const el = tooltipTarget(e.target);
+				if (el) showTip(el);
+			});
+
+			document.addEventListener('mouseout', function (e) {
+				const el = tooltipTarget(e.target);
+				if (!el) return;
+				const related = e.relatedTarget;
+				if (related && el.contains(related)) return;
+				hideTip();
+			});
+
+			document.addEventListener('focusin', function (e) {
+				const el = tooltipTarget(e.target);
+				if (el) showTip(el);
+			});
+
+			document.addEventListener('focusout', function (e) {
+				const el = tooltipTarget(e.target);
+				if (el) hideTip();
+			});
+
+			window.addEventListener('scroll', function () {
+				if (activeTarget) positionTip(activeTarget);
+			}, true);
+
+			window.addEventListener('resize', function () {
+				if (activeTarget) positionTip(activeTarget);
+			});
+		})();
+	</script>
+}

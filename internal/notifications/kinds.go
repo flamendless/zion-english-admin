@@ -15,4 +15,5 @@ const (
 	KindProfileUpdated     = "profile_updated"
 	KindStudentUpdated     = "student_updated"
 	KindMissedClass        = "missed_class"
+	KindPaymentSent        = "payment_sent"
 )

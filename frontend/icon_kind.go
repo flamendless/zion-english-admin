@@ -19,6 +19,7 @@ const (
 	IconKindMarkRead   IconKind = "mark-read"
 	IconKindSortAsc    IconKind = "sort-asc"
 	IconKindSortDesc   IconKind = "sort-desc"
+	IconKindPayment    IconKind = "payment"
 )
 
 func iconActionClass(kind IconKind) string {

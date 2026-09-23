@@ -143,7 +143,7 @@ func DefaultSortFor(kind ListSortKind) (string, utils.SortOrder) {
 	case ListSortKindClass:
 		return "date", utils.SortOrderDesc
 	case ListSortKindReport:
-		return "teacher_name", utils.SortOrderAsc
+		return "earnings", utils.SortOrderDesc
 	case ListSortKindDocument:
 		return "uploaded_at", utils.SortOrderDesc
 	case ListSortKindIntroVideo:
