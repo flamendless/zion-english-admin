@@ -113,8 +113,7 @@ func mapAllIntroVideoItems(ctx context.Context, rows []queries.GetAllTeacherIntr
 }
 
 func handleIntroVideos(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -134,7 +133,7 @@ func handleIntroVideos(w http.ResponseWriter, r *http.Request) {
 		data.Title = "My Intro Video"
 		data.Description = "Your submitted introduction video."
 	default:
-		HttpError(w, "Access denied", http.StatusForbidden)
+		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 
@@ -144,15 +143,14 @@ func handleIntroVideos(w http.ResponseWriter, r *http.Request) {
 	}
 	data.Status = constants.TeacherIntroVideoStatus(status)
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.IntroVideosPage(data).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func handleIntroVideosPartial(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -201,11 +199,11 @@ func handleIntroVideosPartial(w http.ResponseWriter, r *http.Request) {
 		sortTeacherIntroVideoRows(rows, sort)
 		items = mapIntroVideoItems(rows)
 	default:
-		HttpError(w, "Access denied", http.StatusForbidden)
+		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.IntroVideosTableBody(items, showUploader, showActions, introVideosEmptyMessage(filters, isTeacher)).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -293,19 +291,18 @@ func handleIntroVideosPath(w http.ResponseWriter, r *http.Request) {
 		handleIntroVideoDelete(w, r, id)
 		return
 	}
-	HttpError(w, "Not found", http.StatusNotFound)
+	HttpError(w, MsgNotFound, http.StatusNotFound)
 }
 
 func handleProfileIntroVideo(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if auth.GetRole(ctx) != auth.RoleTeacher {
-		HttpError(w, "Access denied", http.StatusForbidden)
+		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 	_, uploadAllowed := introVideoUploadAccessForViewer(ctx)
@@ -385,8 +382,7 @@ func introVideoSubmitErrorMessage(err error) string {
 }
 
 func handleIntroVideoFile(w http.ResponseWriter, r *http.Request, videoID int64) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -400,7 +396,7 @@ func handleIntroVideoFile(w http.ResponseWriter, r *http.Request, videoID int64)
 	role := auth.GetRole(ctx)
 	user := auth.GetUser(ctx)
 	if !auth.HasAdminAccess(role) && user.ID != row.TeacherID {
-		HttpError(w, "Access denied", http.StatusForbidden)
+		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 	if row.Status == string(constants.TeacherIntroVideoStatusDeleted) && !auth.HasAdminAccess(role) {
@@ -433,15 +429,14 @@ func handleIntroVideoFile(w http.ResponseWriter, r *http.Request, videoID int64)
 }
 
 func handleIntroVideoReview(w http.ResponseWriter, r *http.Request, videoID int64, status, actionLabel, rejectReason string) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if !auth.HasAdminAccess(auth.GetRole(ctx)) {
-		HttpError(w, "Access denied", http.StatusForbidden)
+		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 
@@ -479,8 +474,7 @@ func handleIntroVideoReview(w http.ResponseWriter, r *http.Request, videoID int6
 }
 
 func handleIntroVideoReject(w http.ResponseWriter, r *http.Request, videoID int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -501,15 +495,14 @@ func handleIntroVideoReject(w http.ResponseWriter, r *http.Request, videoID int6
 }
 
 func handleIntroVideoDelete(w http.ResponseWriter, r *http.Request, videoID int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if !auth.HasAdminAccess(auth.GetRole(ctx)) {
-		HttpError(w, "Access denied", http.StatusForbidden)
+		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 

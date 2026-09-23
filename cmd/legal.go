@@ -7,8 +7,7 @@ import (
 )
 
 func handlePrivacy(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 	if err := frontend.PrivacyPolicy().Render(r.Context(), w); err != nil {
@@ -17,8 +16,7 @@ func handlePrivacy(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleTerms(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 	if err := frontend.TermsOfUse().Render(r.Context(), w); err != nil {
@@ -27,8 +25,7 @@ func handleTerms(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleSupport(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 	if err := frontend.Support().Render(r.Context(), w); err != nil {
@@ -37,8 +34,7 @@ func handleSupport(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleDocsConnectZoom(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 	if err := frontend.DocsConnectZoom().Render(r.Context(), w); err != nil {
@@ -47,8 +43,7 @@ func handleDocsConnectZoom(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleDocsConnectGoogleCalendar(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 	if err := frontend.DocsConnectGoogleCalendar().Render(r.Context(), w); err != nil {
@@ -57,8 +52,7 @@ func handleDocsConnectGoogleCalendar(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleDocsGuides(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 	if err := frontend.DocsGuides().Render(r.Context(), w); err != nil {

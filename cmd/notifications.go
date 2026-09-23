@@ -18,12 +18,11 @@ func handleNotificationsPath(w http.ResponseWriter, r *http.Request) {
 		handleNotificationRead(w, r, id)
 		return
 	}
-	HttpError(w, "Not found", http.StatusNotFound)
+	HttpError(w, MsgNotFound, http.StatusNotFound)
 }
 
 func handleNotifications(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -71,23 +70,21 @@ func handleNotifications(w http.ResponseWriter, r *http.Request) {
 		FilterPath:     filterPath,
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.Notifications(data).Render(ctx, w); err != nil {
 		HttpError(w, fmt.Sprintf("Failed to render notifications: %v", err), http.StatusInternalServerError)
 	}
 }
 
 func handleNotificationsPanel(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 	renderNotificationsPanel(w, r)
 }
 
 func handleNotificationsUnreadCount(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -99,15 +96,14 @@ func handleNotificationsUnreadCount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.NotificationBadge(count).Render(ctx, w); err != nil {
 		HttpError(w, fmt.Sprintf("Failed to render badge: %v", err), http.StatusInternalServerError)
 	}
 }
 
 func handleNotificationRead(w http.ResponseWriter, r *http.Request, id int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -118,8 +114,8 @@ func handleNotificationRead(w http.ResponseWriter, r *http.Request, id int64) {
 		return
 	}
 
-	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Trigger", `{"notificationUpdated":"body"}`)
+	if r.Header.Get(headerHXRequest) == "true" {
+		w.Header().Set(headerHXTrigger, `{"notificationUpdated":"body"}`)
 		if r.URL.Query().Get("panel") == "1" {
 			renderNotificationsPanel(w, r)
 			return
@@ -129,7 +125,7 @@ func handleNotificationRead(w http.ResponseWriter, r *http.Request, id int64) {
 			HttpError(w, "Notification not found", http.StatusNotFound)
 			return
 		}
-		w.Header().Set("Content-Type", "text/html")
+		writeHTML(w)
 		item := notificationItems([]queries.TblNotification{row})[0]
 		if err := frontend.NotificationListRow(item).Render(ctx, w); err != nil {
 			HttpError(w, fmt.Sprintf("Failed to render notification: %v", err), http.StatusInternalServerError)
@@ -140,8 +136,7 @@ func handleNotificationRead(w http.ResponseWriter, r *http.Request, id int64) {
 }
 
 func handleNotificationsReadAll(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -152,13 +147,13 @@ func handleNotificationsReadAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Trigger", `{"notificationUpdated":"body"}`)
+	if r.Header.Get(headerHXRequest) == "true" {
+		w.Header().Set(headerHXTrigger, `{"notificationUpdated":"body"}`)
 		if r.URL.Query().Get("panel") == "1" {
 			renderNotificationsPanel(w, r)
 			return
 		}
-		w.Header().Set("HX-Redirect", utils.URL("/notifications"))
+		setHXRedirect(w, "/notifications")
 		return
 	}
 	HttpRedirect(w, r, "/notifications")
@@ -180,7 +175,7 @@ func renderNotificationsPanel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.NotificationPanel(frontend.NotificationPanelData{
 		Items:       notificationItems(rows),
 		UnreadCount: unread,

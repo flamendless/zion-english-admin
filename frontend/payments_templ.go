@@ -165,43 +165,82 @@ func Payments(data PaymentsData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" hx-include=\"#paymentsFilters\" hx-target=\"#paymentsTableBody\" hx-swap=\"innerHTML\">Filter</button></div></div><div class=\"table-wrapper\"><table id=\"paymentsTable\" class=\"table-stack-mobile\"><thead><tr>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if data.ShowTeacherColumn {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<th>Teacher</th>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<th>Period</th><th>Method</th><th>Reference #</th><th>Amount</th><th>Status</th><th>Sent by</th><th>Sent at</th><th>Received at</th><th>Actions</th></tr></thead> <tbody id=\"paymentsTableBody\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" hx-include=\"#paymentsFilters\" hx-target=\"#paymentsTableBody\" hx-swap=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/payments/partials/rows"))
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payments.templ`, Line: 96, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payments.templ`, Line: 71, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" hx-include=\"#paymentsFilters\" hx-trigger=\"load\" hx-swap=\"innerHTML\"><tr><td colspan=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\">Filter</button></div></div><div class=\"table-wrapper\"><table id=\"paymentsTable\" class=\"table-stack-mobile\"><thead><tr>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.ShowTeacherColumn {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<th>Teacher</th>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<th>Period</th><th>Method</th><th>Reference #</th><th>Amount</th><th>Status</th><th>Sent by</th><th>Sent at</th><th>Received at</th><th>Actions</th></tr></thead> <tbody id=\"paymentsTableBody\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(paymentsTableColspan(data.ShowTeacherColumn))
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/payments/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payments.templ`, Line: 102, Col: 65}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payments.templ`, Line: 96, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" class=\"empty-state\">Loading payments...</td></tr></tbody></table></div><div id=\"paymentReceiptModalHost\"></div></div><script>\r\n\t\t\twindow.closePaymentReceiptModal = function () {\r\n\t\t\t\tconst host = document.getElementById('paymentReceiptModalHost');\r\n\t\t\t\tif (host) host.innerHTML = '';\r\n\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t};\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tif (evt.detail.target.id !== 'paymentReceiptModalHost') return;\r\n\t\t\t\tconst overlay = evt.detail.target.querySelector('.modal-overlay');\r\n\t\t\t\tif (!overlay) return;\r\n\t\t\t\toverlay.hidden = false;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\tconst closeBtn = overlay.querySelector('.payment-receipt-close, .payment-view-close, .modal-close');\r\n\t\t\t\tif (closeBtn) closeBtn.focus();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tif (e.target.closest('.payment-receipt-close, .payment-view-close')) {\r\n\t\t\t\t\twindow.closePaymentReceiptModal();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst overlay = e.target.closest('#paymentReceiptModal, #paymentViewModal');\r\n\t\t\t\tif (overlay && e.target === overlay) window.closePaymentReceiptModal();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key === 'Escape' && document.getElementById('paymentReceiptModalHost')?.innerHTML) {\r\n\t\t\t\t\twindow.closePaymentReceiptModal();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\t\t</script><script>\r\n\t\t\tconst paymentSearch = document.getElementById('paymentSearch');\r\n\r\n\t\t\tfunction setPaymentDateRangeFromPreset(select) {\r\n\t\t\t\tif (!select) return;\r\n\t\t\t\tif (!select.value) {\r\n\t\t\t\t\tdelete select.dataset.startDate;\r\n\t\t\t\t\tdelete select.dataset.endDate;\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst parts = select.value.split('|');\r\n\t\t\t\tif (parts.length !== 2) return;\r\n\t\t\t\tselect.dataset.startDate = parts[0];\r\n\t\t\t\tselect.dataset.endDate = parts[1];\r\n\t\t\t}\r\n\r\n\t\t\tfunction bindPaymentDatePresetSelect() {\r\n\t\t\t\tconst datePresetSelect = document.getElementById('datePreset');\r\n\t\t\t\tif (!datePresetSelect) return;\r\n\t\t\t\tsetPaymentDateRangeFromPreset(datePresetSelect);\r\n\t\t\t\tdatePresetSelect.addEventListener('change', () => {\r\n\t\t\t\t\tsetPaymentDateRangeFromPreset(datePresetSelect);\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tbindPaymentDatePresetSelect();\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tif (evt.detail.target.id !== 'datePresetGroup') return;\r\n\t\t\t\tbindPaymentDatePresetSelect();\r\n\t\t\t\tif (typeof htmx !== 'undefined') {\r\n\t\t\t\t\thtmx.trigger('#paymentsTableBody', 'load');\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tif (paymentSearch) {\r\n\t\t\t\tpaymentSearch.addEventListener('keydown', function (e) {\r\n\t\t\t\t\tif (e.key === 'Enter') {\r\n\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\r\n\t\t\t\t\t\t\thtmx.trigger('#paymentsTableBody', 'load');\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\t\t\t}\r\n\t\t</script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" hx-include=\"#paymentsFilters\" hx-trigger=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payments.templ`, Line: 98, Col: 32}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" hx-swap=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var9 string
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payments.templ`, Line: 99, Col: 31}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\"><tr><td colspan=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var10 string
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(paymentsTableColspan(data.ShowTeacherColumn))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payments.templ`, Line: 102, Col: 65}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"empty-state\">Loading payments...</td></tr></tbody></table></div><div id=\"paymentReceiptModalHost\"></div></div><script>\r\n\t\t\twindow.closePaymentReceiptModal = function () {\r\n\t\t\t\tconst host = document.getElementById('paymentReceiptModalHost');\r\n\t\t\t\tif (host) host.innerHTML = '';\r\n\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t};\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tif (evt.detail.target.id !== 'paymentReceiptModalHost') return;\r\n\t\t\t\tconst overlay = evt.detail.target.querySelector('.modal-overlay');\r\n\t\t\t\tif (!overlay) return;\r\n\t\t\t\toverlay.hidden = false;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\tconst closeBtn = overlay.querySelector('.payment-receipt-close, .payment-view-close, .modal-close');\r\n\t\t\t\tif (closeBtn) closeBtn.focus();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tif (e.target.closest('.payment-receipt-close, .payment-view-close')) {\r\n\t\t\t\t\twindow.closePaymentReceiptModal();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst overlay = e.target.closest('#paymentReceiptModal, #paymentViewModal');\r\n\t\t\t\tif (overlay && e.target === overlay) window.closePaymentReceiptModal();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key === 'Escape' && document.getElementById('paymentReceiptModalHost')?.innerHTML) {\r\n\t\t\t\t\twindow.closePaymentReceiptModal();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\t\t</script><script>\r\n\t\t\tconst paymentSearch = document.getElementById('paymentSearch');\r\n\r\n\t\t\tfunction setPaymentDateRangeFromPreset(select) {\r\n\t\t\t\tif (!select) return;\r\n\t\t\t\tif (!select.value) {\r\n\t\t\t\t\tdelete select.dataset.startDate;\r\n\t\t\t\t\tdelete select.dataset.endDate;\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst parts = select.value.split('|');\r\n\t\t\t\tif (parts.length !== 2) return;\r\n\t\t\t\tselect.dataset.startDate = parts[0];\r\n\t\t\t\tselect.dataset.endDate = parts[1];\r\n\t\t\t}\r\n\r\n\t\t\tfunction bindPaymentDatePresetSelect() {\r\n\t\t\t\tconst datePresetSelect = document.getElementById('datePreset');\r\n\t\t\t\tif (!datePresetSelect) return;\r\n\t\t\t\tsetPaymentDateRangeFromPreset(datePresetSelect);\r\n\t\t\t\tdatePresetSelect.addEventListener('change', () => {\r\n\t\t\t\t\tsetPaymentDateRangeFromPreset(datePresetSelect);\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tbindPaymentDatePresetSelect();\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tif (evt.detail.target.id !== 'datePresetGroup') return;\r\n\t\t\t\tbindPaymentDatePresetSelect();\r\n\t\t\t\tif (typeof htmx !== 'undefined') {\r\n\t\t\t\t\thtmx.trigger('#paymentsTableBody', 'load');\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tif (paymentSearch) {\r\n\t\t\t\tpaymentSearch.addEventListener('keydown', function (e) {\r\n\t\t\t\t\tif (e.key === 'Enter') {\r\n\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\r\n\t\t\t\t\t\t\thtmx.trigger('#paymentsTableBody', 'load');\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\t\t\t}\r\n\t\t</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

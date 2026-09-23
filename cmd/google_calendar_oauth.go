@@ -27,8 +27,7 @@ const (
 )
 
 func handleGoogleCalendarConnect(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 	if calendarSvc == nil || !calendarSvc.IsConfigured() {
@@ -61,8 +60,7 @@ func handleGoogleCalendarConnect(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGoogleCalendarCallback(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 	if calendarSvc == nil || !calendarSvc.IsConfigured() {
@@ -118,8 +116,7 @@ func handleGoogleCalendarCallback(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGoogleCalendarDisconnect(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 	ctx := r.Context()

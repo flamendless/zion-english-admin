@@ -113,8 +113,7 @@ func populateDashboardEarnings(ctx context.Context, data *frontend.DashboardData
 }
 
 func handleHome(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -243,15 +242,14 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleMyStudents(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if user.ID == 0 {
-		HttpError(w, "Unauthorized", http.StatusUnauthorized)
+		HttpError(w, MsgUnauthorized, http.StatusUnauthorized)
 		return
 	}
 
@@ -285,7 +283,7 @@ func handleMyStudents(w http.ResponseWriter, r *http.Request) {
 		Offset:    0,
 	})
 	if err != nil {
-		HttpError(w, "Failed to fetch students", http.StatusInternalServerError)
+		HttpError(w, MsgFailedToFetchStudents, http.StatusInternalServerError)
 		return
 	}
 	sortMyStudentRows(allStudents, sort)
@@ -306,7 +304,7 @@ func handleMyStudents(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := listQueryParamsWithSort(r, frontend.ListSortKindMyStudent)
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	frontend.MyStudents(frontend.MyStudentsData{
 		Students:       viewStudents,
 		Query:          q,
@@ -325,8 +323,7 @@ func handleMyStudents(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleLogoutWithAccess(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 

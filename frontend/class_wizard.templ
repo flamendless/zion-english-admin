@@ -213,9 +213,9 @@ templ WizardTeacherStudentsDropdown(prefix string) {
 			name={ wizardStudentFieldName(prefix) }
 			required
 			hx-get={ utils.URL("/api/me/students") }
-			hx-trigger="load"
-			hx-swap="innerHTML"
-			hx-target="this"
+			hx-trigger={ HxTriggerLoad }
+			hx-swap={ HxSwapInnerHTML }
+			hx-target={ HxTargetThis }
 		>
 			<option value="">-- Select Student --</option>
 		</select>

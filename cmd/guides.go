@@ -12,8 +12,7 @@ import (
 )
 
 func handleGuides(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -60,7 +59,7 @@ func handleGuides(w http.ResponseWriter, r *http.Request) {
 func handleGuidesPath(w http.ResponseWriter, r *http.Request) {
 	slug, ok := extractGuideSlug(r)
 	if !ok {
-		HttpError(w, "Not found", http.StatusNotFound)
+		HttpError(w, MsgNotFound, http.StatusNotFound)
 		return
 	}
 
@@ -76,13 +75,12 @@ func handleGuidesPath(w http.ResponseWriter, r *http.Request) {
 	case constants.GuideSlugReportsAndGeneration:
 		handleGuideReportsGeneration(w, r)
 	default:
-		HttpError(w, "Not found", http.StatusNotFound)
+		HttpError(w, MsgNotFound, http.StatusNotFound)
 	}
 }
 
 func handleGuideGettingStarted(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -92,8 +90,7 @@ func handleGuideGettingStarted(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGuideConnectZoom(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -103,8 +100,7 @@ func handleGuideConnectZoom(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGuideConnectGoogleCalendar(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -114,8 +110,7 @@ func handleGuideConnectGoogleCalendar(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGuideReportsGeneration(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -125,8 +120,7 @@ func handleGuideReportsGeneration(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGuideFAQ(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 

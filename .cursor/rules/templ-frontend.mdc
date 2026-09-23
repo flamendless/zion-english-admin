@@ -131,10 +131,20 @@ Use `@CurrencyAmountField` from `currency_amount.templ` whenever a form collects
 
 For two unrelated fields side by side (not currency+amount), use `.form-row` from `global.templ`.
 
+## HTMX wire constants
+
+Repeated HTMX attribute **values** live in [`frontend/htmx_attrs.go`](frontend/htmx_attrs.go).
+
+- Templates reference constants: `hx-swap={ HxSwapInnerHTML }`, not `hx-swap="innerHTML"`.
+- **Exception:** inline `<script>` blocks keep literal wire strings (same rule as enum literals in scripts).
+- Custom triggers with event names (e.g. `scheduleRefresh from:body`) stay literal; only shared swap/trigger/target-this **values** are constantized.
+- `hx-target` element IDs stay literal (page-specific DOM).
+- Prefer existing components ([`dropdowns.templ`](dropdowns.templ), [`pagination.templ`](pagination.templ)) over duplicating attribute combos.
+
 ## HTMX Forms
 
 ```templ
-<form hx-post={ utils.URL("/process") } hx-target="#results" hx-swap="innerHTML">
+<form hx-post={ utils.URL("/process") } hx-target="#results" hx-swap={ HxSwapInnerHTML }>
 ```
 
 Dropdowns load via HTMX on page load: `hx-get`, `hx-trigger="load"`, `hx-target="this"`.

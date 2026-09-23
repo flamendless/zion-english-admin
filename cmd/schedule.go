@@ -56,7 +56,7 @@ func handleSchedulePath(w http.ResponseWriter, r *http.Request) {
 		handleDeleteScheduledClass(w, r, id)
 		return
 	}
-	HttpError(w, "Not found", http.StatusNotFound)
+	HttpError(w, MsgNotFound, http.StatusNotFound)
 }
 
 func handleSchedule(w http.ResponseWriter, r *http.Request) {
@@ -72,12 +72,12 @@ func handleSchedule(w http.ResponseWriter, r *http.Request) {
 		} else {
 			data.ShowAllTeachers = true
 		}
-		w.Header().Set("Content-Type", "text/html")
+		writeHTML(w)
 		frontend.Schedule(data).Render(r.Context(), w)
 	case http.MethodPost:
 		handleScheduleCreate(w, r)
 	default:
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, MsgMethodNotAllowed, http.StatusMethodNotAllowed)
 	}
 }
 
@@ -88,7 +88,7 @@ func handleScheduleRecord(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		handleScheduleCreate(w, r)
 	default:
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, MsgMethodNotAllowed, http.StatusMethodNotAllowed)
 	}
 }
 
@@ -310,8 +310,7 @@ func fetchScheduledClassViews(ctx context.Context, q scheduledClassesQuery, limi
 }
 
 func handleScheduleListPartial(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -352,15 +351,14 @@ func handleScheduleListPartial(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.ScheduledClassList(items, emptyMsg, utils.URL("/static/zoom-logo.svg"), utils.URL("/static/google-calendar-logo.svg")).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func handleScheduleDayTimelinePartial(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -402,15 +400,14 @@ func handleScheduleDayTimelinePartial(w http.ResponseWriter, r *http.Request) {
 	timeline := frontend.BuildScheduledClassDayTimeline(items, emptyMsg)
 	timeline.ZoomLogoURL = utils.URL("/static/zoom-logo.svg")
 	timeline.CalendarLogoURL = utils.URL("/static/google-calendar-logo.svg")
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.ScheduledClassDayTimeline(timeline).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func handleGetScheduledClasses(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -441,7 +438,7 @@ func handleGetScheduledClasses(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	writeJSON(w)
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"records": response,
 		"page": map[string]interface{}{
@@ -454,8 +451,7 @@ func handleGetScheduledClasses(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleCancelScheduledClass(w http.ResponseWriter, r *http.Request, scheduleID int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -513,8 +509,7 @@ func handleCancelScheduledClass(w http.ResponseWriter, r *http.Request, schedule
 }
 
 func handleRescheduleScheduledClass(w http.ResponseWriter, r *http.Request, scheduleID int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -626,8 +621,7 @@ func handleRescheduleScheduledClass(w http.ResponseWriter, r *http.Request, sche
 }
 
 func handleDeleteScheduledClass(w http.ResponseWriter, r *http.Request, scheduleID int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -763,8 +757,7 @@ func handleScheduledClassEdit(w http.ResponseWriter, r *http.Request, scheduleID
 		return
 	}
 
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -901,8 +894,7 @@ func handleScheduledClassEdit(w http.ResponseWriter, r *http.Request, scheduleID
 }
 
 func handleScheduledClassEditPreview(w http.ResponseWriter, r *http.Request, scheduleID int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -998,7 +990,7 @@ func handleScheduledClassEditPreview(w http.ResponseWriter, r *http.Request, sch
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.ScheduleSeriesEditPreview(frontend.ScheduleSeriesEditPreviewData{
 		ScheduleID: strconv.FormatInt(scheduleID, 10),
 		Scope:      string(scope),
@@ -1021,8 +1013,7 @@ func handleScheduledClassEditPreview(w http.ResponseWriter, r *http.Request, sch
 }
 
 func handleScheduledClassEditModal(w http.ResponseWriter, r *http.Request, scheduleID int64) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -1055,13 +1046,12 @@ func handleScheduledClassEditModal(w http.ResponseWriter, r *http.Request, sched
 	data.TodayPHT = utils.TodayPHT()
 	data.From = r.URL.Query().Get("from")
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	frontend.EditScheduledClassModalForm(data).Render(ctx, w)
 }
 
 func handleScheduledClassView(w http.ResponseWriter, r *http.Request, scheduleID int64) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -1072,7 +1062,7 @@ func handleScheduledClassView(w http.ResponseWriter, r *http.Request, scheduleID
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	frontend.ClassViewModal(data).Render(ctx, w)
 }
 
@@ -1154,8 +1144,7 @@ func scheduledClassViewData(ctx context.Context, scheduleID int64) (frontend.Edi
 }
 
 func handleConductScheduledClass(w http.ResponseWriter, r *http.Request, scheduleID int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -1270,9 +1259,9 @@ func respondScheduledClassAction(w http.ResponseWriter, from, message string) {
 	setSuccessFlash(w, message)
 	switch from {
 	case "schedule":
-		w.Header().Set("HX-Trigger", `{"scheduleDayOpen":null,"refreshScheduleCalendar":null}`)
+		w.Header().Set(headerHXTrigger, `{"scheduleDayOpen":null,"refreshScheduleCalendar":null}`)
 	case string(frontend.ClassActionContextScheduleSeries):
-		w.Header().Set("HX-Trigger", "scheduleSeriesRefresh")
+		w.Header().Set(headerHXTrigger, "scheduleSeriesRefresh")
 	default:
 		setListRefreshTriggers(w, "classesRefresh")
 	}

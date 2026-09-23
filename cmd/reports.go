@@ -37,7 +37,7 @@ func handleReportsPath(w http.ResponseWriter, r *http.Request) {
 			handleReportPaymentSubmit(w, r, id)
 			return
 		}
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, MsgMethodNotAllowed, http.StatusMethodNotAllowed)
 		return
 	}
 	if id, ok := extractPathID(r, "reports", "/view"); ok {
@@ -48,36 +48,33 @@ func handleReportsPath(w http.ResponseWriter, r *http.Request) {
 		handleReportGenerate(w, r, id)
 		return
 	}
-	HttpError(w, "Not found", http.StatusNotFound)
+	HttpError(w, MsgNotFound, http.StatusNotFound)
 }
 
 func handleReports(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.Reports().Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func handleReportsDatePresetPartial(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
 	month := strings.TrimSpace(r.URL.Query().Get("month"))
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.DatePresetForMonth(month, true).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func handleReportsPartial(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -109,15 +106,14 @@ func handleReportsPartial(w http.ResponseWriter, r *http.Request) {
 		Earnings:     aggregateReportEarnings(rows),
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.ReportsPartial(rows, startDate, endDate, emptyMsg, summary).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func handleReportsAllTeachers(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -152,7 +148,7 @@ func handleReportsAllTeachers(w http.ResponseWriter, r *http.Request) {
 		emptyMsg = "Select a date range."
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.ReportAllTeachersModal(frontend.ReportAllTeachersData{
 		CutoffLabel: formatReportCutoffLabel(startDate, endDate),
 		Rows:        modalRows,
@@ -163,8 +159,7 @@ func handleReportsAllTeachers(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleReportSummary(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -405,17 +400,16 @@ func renderReportGenerateRow(w http.ResponseWriter, r *http.Request, teacherID i
 		return
 	}
 	if skipped {
-		w.Header().Set("HX-Trigger", `{"showSuccessBanner":"Report is up to date; skipped generation"}`)
+		w.Header().Set(headerHXTrigger, `{"showSuccessBanner":"Report is up to date; skipped generation"}`)
 	}
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.ReportTableRow(row, startDate, endDate, false).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func handleReportView(w http.ResponseWriter, r *http.Request, teacherID int64) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -428,7 +422,7 @@ func handleReportView(w http.ResponseWriter, r *http.Request, teacherID int64) {
 	ctx := r.Context()
 	profile, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, teacherID)
 	if err != nil {
-		HttpError(w, "Teacher not found", http.StatusNotFound)
+		HttpError(w, MsgTeacherNotFound, http.StatusNotFound)
 		return
 	}
 
@@ -495,11 +489,11 @@ func handleReportView(w http.ResponseWriter, r *http.Request, teacherID int64) {
 		})
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	teacherName := utils.ComposePersonName(profile.FirstName, profile.MiddleName, profile.LastName)
 	teacherRoles, err := loadTeacherRoles(ctx, teacherID)
 	if err != nil {
-		HttpError(w, "Failed to load teacher roles", http.StatusInternalServerError)
+		HttpError(w, MsgFailedToLoadTeacherRoles, http.StatusInternalServerError)
 		return
 	}
 	frontend.ReportViewModal(frontend.ReportViewData{
@@ -516,8 +510,7 @@ func handleReportView(w http.ResponseWriter, r *http.Request, teacherID int64) {
 }
 
 func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -540,7 +533,7 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 	ctx := r.Context()
 	profile, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, teacherID)
 	if err != nil {
-		sendErrorLog(w, "teacher not found")
+		sendErrorLog(w, MsgTeacherNotFound)
 		return
 	}
 

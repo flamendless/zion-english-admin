@@ -88,7 +88,7 @@ templ ScheduledClassTimelineBarView(bar ScheduledClassTimelineBarData) {
 		aria-label={ "View class for " + bar.Item.StudentName + " at " + bar.Item.TimeRange }
 		hx-get={ ScheduledClassViewURL(bar.Item.ID) }
 		hx-target="#classViewModalHost"
-		hx-swap="innerHTML"
+		hx-swap={ HxSwapInnerHTML }
 	>
 		if bar.ShowLabel {
 			<span class="day-timeline-bar-label" aria-hidden="true">{ bar.Item.StudentName }</span>

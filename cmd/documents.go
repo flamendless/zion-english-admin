@@ -102,8 +102,7 @@ func mapAllDocumentItems(ctx context.Context, rows []queries.GetAllTeacherDocume
 }
 
 func handleDocuments(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -123,7 +122,7 @@ func handleDocuments(w http.ResponseWriter, r *http.Request) {
 		data.Title = "My Documents"
 		data.Description = "Your uploaded profile photos and ID documents."
 	default:
-		HttpError(w, "Access denied", http.StatusForbidden)
+		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 
@@ -133,15 +132,14 @@ func handleDocuments(w http.ResponseWriter, r *http.Request) {
 	}
 	data.Status = constants.TeacherDocumentStatus(status)
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.DocumentsPage(data).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func handleDocumentsPartial(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -190,11 +188,11 @@ func handleDocumentsPartial(w http.ResponseWriter, r *http.Request) {
 		sortTeacherDocumentRows(rows, sort)
 		items = mapDocumentItems(rows)
 	default:
-		HttpError(w, "Access denied", http.StatusForbidden)
+		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.DocumentsTableBody(items, showUploader, showActions, documentsEmptyMessage(filters, isTeacher)).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -290,19 +288,18 @@ func handleDocumentsPath(w http.ResponseWriter, r *http.Request) {
 		handleDocumentDelete(w, r, id)
 		return
 	}
-	HttpError(w, "Not found", http.StatusNotFound)
+	HttpError(w, MsgNotFound, http.StatusNotFound)
 }
 
 func handleProfileDocument(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if auth.GetRole(ctx) != auth.RoleTeacher {
-		HttpError(w, "Access denied", http.StatusForbidden)
+		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 
@@ -394,15 +391,14 @@ func handleProfileDocument(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleProfileResume(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if auth.GetRole(ctx) != auth.RoleTeacher {
-		HttpError(w, "Access denied", http.StatusForbidden)
+		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 
@@ -492,8 +488,7 @@ func handleProfileResume(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleDocumentFile(w http.ResponseWriter, r *http.Request, documentID int64) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -507,7 +502,7 @@ func handleDocumentFile(w http.ResponseWriter, r *http.Request, documentID int64
 	role := auth.GetRole(ctx)
 	user := auth.GetUser(ctx)
 	if !auth.HasAdminAccess(role) && user.ID != row.TeacherID {
-		HttpError(w, "Access denied", http.StatusForbidden)
+		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 
@@ -523,15 +518,14 @@ func handleDocumentFile(w http.ResponseWriter, r *http.Request, documentID int64
 }
 
 func handleDocumentReview(w http.ResponseWriter, r *http.Request, documentID int64, status, actionLabel string) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if !auth.HasAdminAccess(auth.GetRole(ctx)) {
-		HttpError(w, "Access denied", http.StatusForbidden)
+		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 
@@ -572,15 +566,14 @@ func handleDocumentReview(w http.ResponseWriter, r *http.Request, documentID int
 }
 
 func handleDocumentDelete(w http.ResponseWriter, r *http.Request, documentID int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if !auth.HasAdminAccess(auth.GetRole(ctx)) {
-		HttpError(w, "Access denied", http.StatusForbidden)
+		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 

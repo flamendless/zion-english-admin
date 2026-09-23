@@ -161,13 +161,12 @@ func searchLearningMaterialLinks(ctx context.Context, user auth.User, q string) 
 }
 
 func handleSearchLearningMaterials(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
 	q := firstQueryParam(r, "lmQ", "q")
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if q == "" {
 		if err := frontend.LearningMaterialSearchResults(nil).Render(r.Context(), w); err != nil {
 			HttpError(w, err.Error(), http.StatusInternalServerError)

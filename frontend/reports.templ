@@ -112,7 +112,7 @@ templ Reports() {
 						hx-get={ utils.URL("/reports/partials/rows") }
 						hx-include="#reportsFilters"
 						hx-target="#reportsTableBody"
-						hx-swap="innerHTML"
+						hx-swap={ HxSwapInnerHTML }
 					>Filter</button>
 				</div>
 				<form
@@ -145,8 +145,8 @@ templ Reports() {
 						id="reportsTableBody"
 						hx-get={ utils.URL("/reports/partials/rows") }
 						hx-include="#reportsFilters"
-						hx-trigger="load"
-						hx-swap="innerHTML"
+						hx-trigger={ HxTriggerLoad }
+						hx-swap={ HxSwapInnerHTML }
 					>
 						<tr>
 							<td colspan="5" class="empty-state">Loading reports...</td>

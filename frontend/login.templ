@@ -51,7 +51,7 @@ templ Login(successMessage string) {
 						<button
 							hx-post={ utils.URL("/auth/login") }
 							hx-target="#loginError"
-							hx-swap="innerHTML"
+							hx-swap={ HxSwapInnerHTML }
 						>
 							Login
 						</button>

@@ -21,12 +21,11 @@ type studentRelationshipGraphResponse struct {
 }
 
 func handleStudentRelationships(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.StudentRelationships(frontend.StudentRelationshipsData{
 		GraphAPIURL:      utils.URL("/api/student-relationships/graph"),
 		StudentSearchURL: utils.URL("/student-relationships/partials/student-search"),
@@ -36,8 +35,7 @@ func handleStudentRelationships(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGetStudentRelationshipGraph(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -64,7 +62,7 @@ func handleGetStudentRelationshipGraph(w http.ResponseWriter, r *http.Request) {
 		},
 	})
 
-	w.Header().Set("Content-Type", "application/json")
+	writeJSON(w)
 	if err := json.NewEncoder(w).Encode(studentRelationshipGraphResponse{
 		Nodes: graph.Nodes,
 		Links: graph.Links,
@@ -74,13 +72,12 @@ func handleGetStudentRelationshipGraph(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleStudentRelationshipStudentSearch(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
 	q := firstQueryParam(r, "studentQ", "q")
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if q == "" {
 		frontend.StudentDiagramSearchResults(nil).Render(r.Context(), w)
 		return
@@ -88,7 +85,7 @@ func handleStudentRelationshipStudentSearch(w http.ResponseWriter, r *http.Reque
 
 	students, err := dbRO.GetQueries().SearchStudentsByName(r.Context(), sql.NullString{String: q, Valid: true})
 	if err != nil {
-		HttpError(w, "Failed to search students", http.StatusInternalServerError)
+		HttpError(w, MsgFailedToSearchStudents, http.StatusInternalServerError)
 		return
 	}
 

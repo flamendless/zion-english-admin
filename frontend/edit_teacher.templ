@@ -48,7 +48,7 @@ templ EditTeacher(data EditTeacherData) {
 				<p style="color: var(--color-muted-foreground); margin-top: var(--space-2);">Update teacher profile information.</p>
 			</div>
 
-			<form hx-post={ utils.URL("/teachers/" + data.ID + "/edit") } hx-swap="innerHTML" hx-target="#logOutput">
+			<form hx-post={ utils.URL("/teachers/" + data.ID + "/edit") } hx-swap={ HxSwapInnerHTML } hx-target="#logOutput">
 				<div class="form-row-3">
 					<div class="form-group">
 						<label for="firstName">First Name *</label>

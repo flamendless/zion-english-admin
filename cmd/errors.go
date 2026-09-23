@@ -4,8 +4,10 @@ import "errors"
 
 var (
 	ErrInvalidTeacherID          = errors.New("invalid teacher ID")
-	ErrForbidden                 = errors.New("forbidden")
-	ErrUnauthorized              = errors.New("unauthorized")
+	ErrForbidden                 = errors.New(MsgForbidden)
+	ErrUnauthorized              = errors.New(MsgUnauthorized)
+	ErrNotFound                  = errors.New(MsgNotFound)
+	ErrAccessDenied              = errors.New(MsgAccessDenied)
 	ErrMissingRequiredParameters = errors.New("missing required parameters")
 	ErrMissingNumericValue       = errors.New("missing numeric value")
 	ErrMissingIntegerValue       = errors.New("missing integer value")

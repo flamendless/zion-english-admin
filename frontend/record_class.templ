@@ -31,7 +31,7 @@ templ RecordClass(data RecordClassData) {
 				<form
 					id="recordForm"
 					hx-post={ utils.URL("/classes/record") }
-					hx-swap="innerHTML"
+					hx-swap={ HxSwapInnerHTML }
 					hx-target="#logOutput"
 					hx-indicator="#submitBtn"
 					_="
@@ -92,7 +92,7 @@ templ RecordClass(data RecordClassData) {
 				<form
 					id="recordForm"
 					hx-post={ utils.URL("/classes/record") }
-					hx-swap="innerHTML"
+					hx-swap={ HxSwapInnerHTML }
 					hx-target="#logOutput"
 					hx-indicator="#submitBtn"
 					_="

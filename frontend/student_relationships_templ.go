@@ -168,20 +168,33 @@ func StudentRelationships(data StudentRelationshipsData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" hx-trigger=\"input changed delay:300ms\" hx-target=\"#diagramStudentSearchResults\" hx-include=\"this\"><div id=\"diagramStudentSearchResults\"></div></div><p id=\"student-relationships-search-feedback\" class=\"student-relationships-search-feedback\" role=\"alert\" aria-live=\"assertive\"></p></div><div class=\"student-relationships-toolbar__section student-relationships-toolbar__section--nav\"><span class=\"student-relationships-toolbar__label\" id=\"diagramStudentFocusLabel\">Focused student</span><div class=\"student-relationships-nav\"><button type=\"button\" id=\"diagramStudentPrev\" class=\"btn btn-secondary\" disabled aria-label=\"Previous student\">Previous</button> <span id=\"diagramStudentFocusValue\" class=\"student-relationships-nav__focus\" aria-live=\"polite\">No student focused</span> <button type=\"button\" id=\"diagramStudentNext\" class=\"btn btn-secondary\" disabled aria-label=\"Next student\">Next</button></div></div></div><div class=\"student-relationships-graph-card\"><div class=\"student-relationships-graph-wrap\"><div id=\"student-relationship-graph\" class=\"student-relationships-graph\" data-api-url=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" hx-trigger=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.GraphAPIURL)
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerInputDelay)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/student_relationships.templ`, Line: 354, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/student_relationships.templ`, Line: 311, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" role=\"img\" aria-label=\"Student relationship diagram\"><p class=\"student-relationships-loading\">Loading diagram...</p></div><aside class=\"student-relationships-legend-overlay\" aria-label=\"Diagram legend\"><span class=\"student-relationships-legend-overlay__item\"><span class=\"student-relationships-legend-overlay__swatch student-relationships-legend-overlay__swatch--parent\" aria-hidden=\"true\"></span> Parent</span> <span class=\"student-relationships-legend-overlay__item\"><span class=\"student-relationships-legend-overlay__swatch student-relationships-legend-overlay__swatch--student\" aria-hidden=\"true\"></span> Student</span> <span class=\"student-relationships-legend-overlay__item\"><span class=\"student-relationships-legend-overlay__swatch student-relationships-legend-overlay__swatch--inactive\" aria-hidden=\"true\"></span> Inactive</span> <span class=\"student-relationships-legend-overlay__item\"><span class=\"student-relationships-legend-overlay__swatch student-relationships-legend-overlay__swatch--edge\" aria-hidden=\"true\"></span> Link</span></aside><aside class=\"student-relationships-controls-overlay\" aria-label=\"Diagram controls\"><p class=\"student-relationships-controls-overlay__title\">Controls</p><ul class=\"student-relationships-controls-overlay__list\"><li class=\"student-relationships-controls-overlay__item\"><span class=\"student-relationships-controls-overlay__key\">Drag box</span> <span>Move a node</span></li><li class=\"student-relationships-controls-overlay__item\"><span class=\"student-relationships-controls-overlay__key\">Scroll</span> <span>Zoom in or out</span></li><li class=\"student-relationships-controls-overlay__item\"><span class=\"student-relationships-controls-overlay__key\">Drag canvas</span> <span>Pan the diagram</span></li><li class=\"student-relationships-controls-overlay__item\"><span class=\"student-relationships-controls-overlay__key\">Click student</span> <span>Open student details</span></li></ul></aside></div></div><p id=\"student-relationships-empty\" class=\"student-relationships-empty\">No students with parent names or linked relationships yet. Add a parent name or relationship on a student profile to see them here.</p><div id=\"studentViewModalHost\"></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" hx-target=\"#diagramStudentSearchResults\" hx-include=\"this\"><div id=\"diagramStudentSearchResults\"></div></div><p id=\"student-relationships-search-feedback\" class=\"student-relationships-search-feedback\" role=\"alert\" aria-live=\"assertive\"></p></div><div class=\"student-relationships-toolbar__section student-relationships-toolbar__section--nav\"><span class=\"student-relationships-toolbar__label\" id=\"diagramStudentFocusLabel\">Focused student</span><div class=\"student-relationships-nav\"><button type=\"button\" id=\"diagramStudentPrev\" class=\"btn btn-secondary\" disabled aria-label=\"Previous student\">Previous</button> <span id=\"diagramStudentFocusValue\" class=\"student-relationships-nav__focus\" aria-live=\"polite\">No student focused</span> <button type=\"button\" id=\"diagramStudentNext\" class=\"btn btn-secondary\" disabled aria-label=\"Next student\">Next</button></div></div></div><div class=\"student-relationships-graph-card\"><div class=\"student-relationships-graph-wrap\"><div id=\"student-relationship-graph\" class=\"student-relationships-graph\" data-api-url=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var9 string
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.GraphAPIURL)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/student_relationships.templ`, Line: 354, Col: 37}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" role=\"img\" aria-label=\"Student relationship diagram\"><p class=\"student-relationships-loading\">Loading diagram...</p></div><aside class=\"student-relationships-legend-overlay\" aria-label=\"Diagram legend\"><span class=\"student-relationships-legend-overlay__item\"><span class=\"student-relationships-legend-overlay__swatch student-relationships-legend-overlay__swatch--parent\" aria-hidden=\"true\"></span> Parent</span> <span class=\"student-relationships-legend-overlay__item\"><span class=\"student-relationships-legend-overlay__swatch student-relationships-legend-overlay__swatch--student\" aria-hidden=\"true\"></span> Student</span> <span class=\"student-relationships-legend-overlay__item\"><span class=\"student-relationships-legend-overlay__swatch student-relationships-legend-overlay__swatch--inactive\" aria-hidden=\"true\"></span> Inactive</span> <span class=\"student-relationships-legend-overlay__item\"><span class=\"student-relationships-legend-overlay__swatch student-relationships-legend-overlay__swatch--edge\" aria-hidden=\"true\"></span> Link</span></aside><aside class=\"student-relationships-controls-overlay\" aria-label=\"Diagram controls\"><p class=\"student-relationships-controls-overlay__title\">Controls</p><ul class=\"student-relationships-controls-overlay__list\"><li class=\"student-relationships-controls-overlay__item\"><span class=\"student-relationships-controls-overlay__key\">Drag box</span> <span>Move a node</span></li><li class=\"student-relationships-controls-overlay__item\"><span class=\"student-relationships-controls-overlay__key\">Scroll</span> <span>Zoom in or out</span></li><li class=\"student-relationships-controls-overlay__item\"><span class=\"student-relationships-controls-overlay__key\">Drag canvas</span> <span>Pan the diagram</span></li><li class=\"student-relationships-controls-overlay__item\"><span class=\"student-relationships-controls-overlay__key\">Click student</span> <span>Open student details</span></li></ul></aside></div></div><p id=\"student-relationships-empty\" class=\"student-relationships-empty\">No students with parent names or linked relationships yet. Add a parent name or relationship on a student profile to see them here.</p><div id=\"studentViewModalHost\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -189,20 +202,20 @@ func StudentRelationships(data StudentRelationshipsData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<script type=\"text/javascript\" src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<script type=\"text/javascript\" src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var9 string
-		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/js/student-relationships-graph.js"))
+		var templ_7745c5c3_Var10 string
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/js/student-relationships-graph.js"))
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/student_relationships.templ`, Line: 407, Col: 93}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\"></script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\"></script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

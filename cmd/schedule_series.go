@@ -642,8 +642,7 @@ func applySeriesScheduleEdit(ctx context.Context, user auth.User, existing queri
 }
 
 func handleScheduleSeries(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 

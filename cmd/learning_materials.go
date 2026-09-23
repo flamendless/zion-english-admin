@@ -31,8 +31,7 @@ type learningMaterialRow struct {
 }
 
 func handleLearningMaterials(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -144,12 +143,11 @@ func handleLearningMaterialsPath(w http.ResponseWriter, r *http.Request) {
 		handleLearningMaterialDelete(w, r, id)
 		return
 	}
-	HttpError(w, "Not found", http.StatusNotFound)
+	HttpError(w, MsgNotFound, http.StatusNotFound)
 }
 
 func handleLearningMaterialCreate(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -200,8 +198,7 @@ func handleLearningMaterialCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleLearningMaterialView(w http.ResponseWriter, r *http.Request, materialID int64) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -213,7 +210,7 @@ func handleLearningMaterialView(w http.ResponseWriter, r *http.Request, material
 		return
 	}
 	if !learningmaterials.CanView(user, material.OwnerID, material.Status, material.Access) {
-		HttpError(w, "Forbidden", http.StatusForbidden)
+		HttpError(w, MsgForbidden, http.StatusForbidden)
 		return
 	}
 
@@ -265,7 +262,7 @@ func handleLearningMaterialEdit(w http.ResponseWriter, r *http.Request, material
 	}
 	if !learningmaterials.CanEdit(user, material.OwnerID, material.Status) {
 		if r.Method == http.MethodGet {
-			HttpError(w, "Forbidden", http.StatusForbidden)
+			HttpError(w, MsgForbidden, http.StatusForbidden)
 		} else {
 			setErrorFlash(w, "You do not have permission to edit this material")
 			HttpRedirect(w, r, "/learning-materials")
@@ -342,20 +339,19 @@ func handleLearningMaterialEdit(w http.ResponseWriter, r *http.Request, material
 		setSuccessFlash(w, "Learning material updated successfully")
 		HttpRedirect(w, r, "/learning-materials")
 	default:
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, MsgMethodNotAllowed, http.StatusMethodNotAllowed)
 	}
 }
 
 func handleLearningMaterialDelete(w http.ResponseWriter, r *http.Request, materialID int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if !learningmaterials.CanDelete(user) {
-		HttpError(w, "Forbidden", http.StatusForbidden)
+		HttpError(w, MsgForbidden, http.StatusForbidden)
 		return
 	}
 
@@ -414,14 +410,13 @@ func resolveLearningMaterialThumbnail(ctx context.Context, req learningmaterials
 }
 
 func handleLearningMaterialURLPreview(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
 	rawURL := strings.TrimSpace(r.URL.Query().Get("url"))
 	thumb, err := learningmaterials.ResolveThumbnailURL(r.Context(), rawURL)
-	w.Header().Set("Content-Type", "application/json")
+	writeJSON(w)
 	if err != nil {
 		_ = json.NewEncoder(w).Encode(map[string]string{"thumbnail_url": ""})
 		return

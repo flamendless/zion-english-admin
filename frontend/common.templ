@@ -220,7 +220,7 @@ templ MonthPicker(inputID string, partialURL string) {
 			value={ utils.CurrentMonthPHT() }
 			hx-get={ partialURL }
 			hx-target="#datePresetGroup"
-			hx-swap="outerHTML"
+			hx-swap={ HxSwapOuterHTML }
 			hx-include="this"
 			hx-trigger="change"
 		/>

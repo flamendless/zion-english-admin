@@ -444,85 +444,33 @@ func getOrCreateUserAgentID(ctx context.Context, db database.Service, userAgentS
 	return id
 }
 
-func setSuccessFlash(w http.ResponseWriter, msg string) {
-	cfg := conf.Conf()
-	cookie := &http.Cookie{
-		Name:     "success_flash",
-		Value:    url.QueryEscape(msg),
-		Path:     cfg.BasePath,
-		SameSite: http.SameSiteStrictMode,
-	}
-	if cfg.IsProd() {
-		cookie.Secure = true
-	}
-	http.SetCookie(w, cookie)
-}
-
 func setListRefreshTriggers(w http.ResponseWriter, events ...string) {
 	if len(events) == 0 {
 		return
 	}
 	if len(events) == 1 {
-		w.Header().Set("HX-Trigger", events[0])
+		w.Header().Set(headerHXTrigger, events[0])
 		return
 	}
 	parts := make([]string, 0, len(events))
 	for _, event := range events {
 		parts = append(parts, fmt.Sprintf(`"%s":null`, event))
 	}
-	w.Header().Set("HX-Trigger", "{"+strings.Join(parts, ",")+"}")
+	w.Header().Set(headerHXTrigger, "{"+strings.Join(parts, ",")+"}")
 }
 
 func respondFormMutation(w http.ResponseWriter, message, redirectPath string, refreshEvents ...string) error {
 	setSuccessFlash(w, message)
 	setListRefreshTriggers(w, refreshEvents...)
 	if redirectPath != "" {
-		w.Header().Set("HX-Redirect", utils.URL(redirectPath))
+		setHXRedirect(w, redirectPath)
 	}
 	_, err := fmt.Fprint(w, message+"\n")
 	return err
 }
 
-func readFlashCookie(w http.ResponseWriter, r *http.Request, name string) string {
-	cookie, err := r.Cookie(name)
-	if err != nil || cookie.Value == "" {
-		return ""
-	}
-
-	msg, err := url.QueryUnescape(cookie.Value)
-	if err != nil {
-		msg = cookie.Value
-	}
-
-	cfg := conf.Conf()
-	clearCookie := &http.Cookie{
-		Name:     name,
-		Value:    "",
-		Path:     cfg.BasePath,
-		MaxAge:   -1,
-		SameSite: http.SameSiteStrictMode,
-	}
-	if cfg.IsProd() {
-		clearCookie.Secure = true
-	}
-	http.SetCookie(w, clearCookie)
-
-	return msg
-}
-
 func HttpError(w http.ResponseWriter, msg string, code int) {
-	cfg := conf.Conf()
-	cookie := &http.Cookie{
-		Name:     "error_flash",
-		Value:    url.QueryEscape(msg),
-		Path:     cfg.BasePath,
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-	}
-	if cfg.IsProd() {
-		cookie.Secure = true
-	}
-	http.SetCookie(w, cookie)
+	setFlashCookie(w, cookieErrorFlash, msg, true)
 	http.Error(w, msg, code)
 }
 
@@ -588,8 +536,8 @@ func isTrainingMaterialWatchRequest(r *http.Request) bool {
 
 func HttpRedirect(w http.ResponseWriter, r *http.Request, url string) {
 	target := utils.URL(url)
-	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Redirect", target)
+	if r.Header.Get(headerHXRequest) == "true" {
+		w.Header().Set(headerHXRedirect, target)
 		w.WriteHeader(http.StatusFound)
 		return
 	}
@@ -603,8 +551,7 @@ func (l *requestLogs) add(msg string) {
 }
 
 func handleRefreshPage(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 	w.Header().Set("HX-Refresh", "true")
@@ -622,12 +569,11 @@ func handleProcessPage(w http.ResponseWriter, r *http.Request) {
 		handleProcess(w, r)
 		return
 	}
-	HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	HttpError(w, MsgMethodNotAllowed, http.StatusMethodNotAllowed)
 }
 
 func handleProcess(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 	ctx := r.Context()
@@ -819,7 +765,7 @@ func handleProcess(w http.ResponseWriter, r *http.Request) {
 
 func handleDownload(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		sendErrorLog(w, "Method not allowed")
+		sendErrorLog(w, MsgMethodNotAllowed)
 		return
 	}
 
@@ -932,20 +878,19 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	isSuperuser := auth.HasAdminAccess(role)
 
 	if r.Method == http.MethodGet {
-		w.Header().Set("Content-Type", "text/html")
+		writeHTML(w)
 		frontend.RegisterStudent(frontend.RegisterStudentData{
 			IsSuperuser: isSuperuser,
 		}).Render(ctx, w)
 		return
 	}
 
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	if role == auth.RoleTeacher && user.ID == 0 {
-		HttpError(w, "Unauthorized", http.StatusUnauthorized)
+		HttpError(w, MsgUnauthorized, http.StatusUnauthorized)
 		return
 	}
 
@@ -1036,7 +981,7 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 
 	tx, err := dbRW.GetDB().BeginTx(r.Context(), nil)
 	if err != nil {
-		sendErrorLog(w, "Failed to start transaction")
+		sendErrorLog(w, MsgFailedToStartTransaction)
 		return
 	}
 	defer tx.Rollback()
@@ -1152,8 +1097,7 @@ func validateStudentRequest(req *models.StudentRegisterRequest) error {
 }
 
 func handleGetTeacherRow(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 	rowKey := strconv.FormatInt(time.Now().UnixNano(), 10)
@@ -1168,7 +1112,7 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 	if loggedIn && auth.SessionUserValid(r.Context(), dbRO.GetQueries(), user) {
 		role = user.Role
 		if role == auth.RoleTeacher {
-			HttpError(w, "Access denied", http.StatusForbidden)
+			HttpError(w, MsgAccessDenied, http.StatusForbidden)
 			return
 		}
 	}
@@ -1182,8 +1126,7 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -1442,8 +1385,7 @@ func validateTeacherRegisterRequest(req *models.TeacherRegisterRequest) error {
 }
 
 func handleTeacherApprove(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -1461,7 +1403,7 @@ func handleTeacherApprove(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	existing, err := dbRO.GetQueries().GetTeacherFullByID(ctx, teacherID)
 	if err != nil {
-		sendErrorLog(w, "Teacher not found")
+		sendErrorLog(w, MsgTeacherNotFound)
 		return
 	}
 	if existing.Deleted != 0 {
@@ -1486,8 +1428,7 @@ func handleTeacherApprove(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleTeacherUnapprove(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -1505,7 +1446,7 @@ func handleTeacherUnapprove(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	existing, err := dbRO.GetQueries().GetTeacherFullByID(ctx, teacherID)
 	if err != nil {
-		sendErrorLog(w, "Teacher not found")
+		sendErrorLog(w, MsgTeacherNotFound)
 		return
 	}
 	if existing.Deleted != 0 {
@@ -1528,8 +1469,7 @@ func handleTeacherUnapprove(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleTeacherDelete(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -1547,7 +1487,7 @@ func handleTeacherDelete(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	existing, err := dbRO.GetQueries().GetTeacherFullByID(ctx, teacherID)
 	if err != nil {
-		sendErrorLog(w, "Teacher not found")
+		sendErrorLog(w, MsgTeacherNotFound)
 		return
 	}
 	if existing.Deleted != 0 {
@@ -1579,14 +1519,13 @@ func sendErrorLog(w http.ResponseWriter, message string) {
 }
 
 func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
 	teachers, err := dbRO.GetQueries().GetApprovedTeachers(r.Context())
 	if err != nil {
-		HttpError(w, "Failed to fetch teachers", http.StatusInternalServerError)
+		HttpError(w, MsgFailedToFetchTeachers, http.StatusInternalServerError)
 		return
 	}
 
@@ -1684,8 +1623,7 @@ func mapApprovedTeacherFirstLastRows(rows []queries.SearchApprovedTeachersByFirs
 }
 
 func handleSearchTeachers(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -1697,7 +1635,7 @@ func handleSearchTeachers(w http.ResponseWriter, r *http.Request) {
 	inputID := strings.TrimSpace(r.URL.Query().Get("inputId"))
 	resultsID := strings.TrimSpace(r.URL.Query().Get("resultsId"))
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if q == "" {
 		frontend.TeacherSearchResults(nil, hiddenID, inputID, resultsID).Render(r.Context(), w)
 		return
@@ -1705,7 +1643,7 @@ func handleSearchTeachers(w http.ResponseWriter, r *http.Request) {
 
 	teachers, err := searchApprovedTeachersByName(r.Context(), q)
 	if err != nil {
-		HttpError(w, "Failed to search teachers", http.StatusInternalServerError)
+		HttpError(w, MsgFailedToSearchTeachers, http.StatusInternalServerError)
 		return
 	}
 
@@ -1730,8 +1668,7 @@ func handleSearchTeachers(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleLanding(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 	if err := frontend.Landing().Render(r.Context(), w); err != nil {
@@ -1750,21 +1687,20 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodGet {
-		successMsg := readFlashCookie(w, r, "success_flash")
+		successMsg := readFlashCookie(w, r, cookieSuccessFlash)
 		if err := frontend.Login(successMsg).Render(r.Context(), w); err != nil {
 			HttpError(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}
 
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	ip := clientIP(r)
 	if !auth.LoginAllowed(ip) {
-		fmt.Fprint(w, "Too many login attempts. Please try again later.")
+		fmt.Fprint(w, MsgTooManyLoginAttempts)
 		return
 	}
 
@@ -1778,7 +1714,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	password := r.FormValue("password")
 	if email == "" || password == "" {
 		auth.RecordLoginFailure(ip)
-		fmt.Fprint(w, "Invalid email or password")
+		fmt.Fprint(w, MsgInvalidEmailOrPassword)
 		return
 	}
 
@@ -1789,7 +1725,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, err.Error())
 			return
 		}
-		fmt.Fprint(w, "Invalid email or password")
+		fmt.Fprint(w, MsgInvalidEmailOrPassword)
 		return
 	}
 	auth.ResetLoginFailures(ip)
@@ -1876,15 +1812,14 @@ func handleForgotPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodGet {
-		successMsg := readFlashCookie(w, r, "success_flash")
+		successMsg := readFlashCookie(w, r, cookieSuccessFlash)
 		if err := frontend.ForgotPassword(successMsg).Render(ctx, w); err != nil {
 			HttpError(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}
 
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -1936,7 +1871,7 @@ func handleForgotPassword(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		logs.Log().Error(logtag, zap.Error(err))
-		HttpError(w, "Something went wrong", http.StatusInternalServerError)
+		HttpError(w, MsgSomethingWrong, http.StatusInternalServerError)
 		return
 	}
 
@@ -1954,7 +1889,7 @@ func handleForgotPassword(w http.ResponseWriter, r *http.Request) {
 	expiresAt := time.Now().Add(passwordResetTokenTTL).Format("2006-01-02 15:04:05")
 	if err := insertPasswordResetEvent(ctx, email, ip, "token_issued", "token_issued", sql.NullInt64{Int64: teacher.ID, Valid: true}, sql.NullString{String: resetToken, Valid: true}, sql.NullString{String: expiresAt, Valid: true}); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
-		HttpError(w, "Something went wrong", http.StatusInternalServerError)
+		HttpError(w, MsgSomethingWrong, http.StatusInternalServerError)
 		return
 	}
 
@@ -1988,8 +1923,7 @@ func handleResetPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -2006,15 +1940,15 @@ func handleResetPassword(w http.ResponseWriter, r *http.Request) {
 
 	row, err := passwordResetTokenValid(ctx, token)
 	if err != nil {
-		fmt.Fprint(w, "Invalid or expired reset link. Please request a new password reset.")
+		fmt.Fprint(w, MsgInvalidOrExpiredResetLink)
 		return
 	}
 	if row.Email != email {
-		fmt.Fprint(w, "Invalid or expired reset link. Please request a new password reset.")
+		fmt.Fprint(w, MsgInvalidOrExpiredResetLink)
 		return
 	}
 	if !row.TeacherID.Valid {
-		fmt.Fprint(w, "Invalid or expired reset link. Please request a new password reset.")
+		fmt.Fprint(w, MsgInvalidOrExpiredResetLink)
 		return
 	}
 
@@ -2034,7 +1968,7 @@ func handleResetPassword(w http.ResponseWriter, r *http.Request) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
-		fmt.Fprint(w, "Something went wrong")
+		fmt.Fprint(w, MsgSomethingWrong)
 		return
 	}
 
@@ -2043,7 +1977,7 @@ func handleResetPassword(w http.ResponseWriter, r *http.Request) {
 		ID:       row.TeacherID.Int64,
 	}); err != nil {
 		logs.Log().Error(logtag, zap.Error(err))
-		fmt.Fprint(w, "Something went wrong")
+		fmt.Fprint(w, MsgSomethingWrong)
 		return
 	}
 
@@ -2063,8 +1997,7 @@ func handleResetPassword(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGetRole(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -2092,13 +2025,12 @@ func handleGetRole(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleSearchStudents(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
 	q := firstQueryParam(r, "studentQ", "q")
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if q == "" {
 		frontend.StudentSearchResults(nil).Render(r.Context(), w)
 		return
@@ -2106,7 +2038,7 @@ func handleSearchStudents(w http.ResponseWriter, r *http.Request) {
 
 	students, err := dbRO.GetQueries().SearchStudentsByName(r.Context(), sql.NullString{String: q, Valid: true})
 	if err != nil {
-		HttpError(w, "Failed to search students", http.StatusInternalServerError)
+		HttpError(w, MsgFailedToSearchStudents, http.StatusInternalServerError)
 		return
 	}
 
@@ -2126,8 +2058,7 @@ func handleSearchStudents(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGetStudents(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -2148,13 +2079,13 @@ func handleGetStudents(w http.ResponseWriter, r *http.Request) {
 		if role == auth.RoleTeacher {
 			user := auth.GetUser(ctx)
 			if teacherID != user.ID {
-				HttpError(w, "Forbidden", http.StatusForbidden)
+				HttpError(w, MsgForbidden, http.StatusForbidden)
 				return
 			}
 		}
 		students, err := dbRO.GetQueries().GetStudentsByTeacherID(ctx, teacherID)
 		if err != nil {
-			HttpError(w, "Failed to fetch students", http.StatusInternalServerError)
+			HttpError(w, MsgFailedToFetchStudents, http.StatusInternalServerError)
 			return
 		}
 		for _, s := range students {
@@ -2168,7 +2099,7 @@ func handleGetStudents(w http.ResponseWriter, r *http.Request) {
 	} else {
 		students, err := dbRO.GetQueries().GetActiveStudents(ctx)
 		if err != nil {
-			HttpError(w, "Failed to fetch students", http.StatusInternalServerError)
+			HttpError(w, MsgFailedToFetchStudents, http.StatusInternalServerError)
 			return
 		}
 		for _, s := range students {
@@ -2181,7 +2112,7 @@ func handleGetStudents(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 
 	selectedID := r.URL.Query().Get("selected")
 
@@ -2192,20 +2123,19 @@ func handleGetStudents(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGetMyStudents(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
 	user := auth.GetUser(r.Context())
 	if user.ID == 0 {
-		HttpError(w, "Unauthorized", http.StatusUnauthorized)
+		HttpError(w, MsgUnauthorized, http.StatusUnauthorized)
 		return
 	}
 
 	students, err := dbRO.GetQueries().GetStudentsByTeacherID(r.Context(), user.ID)
 	if err != nil {
-		HttpError(w, "Failed to fetch students", http.StatusInternalServerError)
+		HttpError(w, MsgFailedToFetchStudents, http.StatusInternalServerError)
 		return
 	}
 

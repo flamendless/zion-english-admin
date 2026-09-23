@@ -19,7 +19,6 @@ import (
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/notifications"
-	"zion-english/internal/conf"
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
@@ -115,8 +114,7 @@ func buildHeaderAvatarProps(ctx context.Context, user auth.User, role auth.Role)
 }
 
 func handleHeaderAvatar(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -130,15 +128,14 @@ func handleHeaderAvatar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.HeaderAvatar(props).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func handleProfile(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -347,15 +344,14 @@ func profileGoogleCalendarFlashMessage(query url.Values) string {
 }
 
 func handleProfileMobile(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if !auth.IsTeacherScoped(auth.GetRole(ctx)) {
-		HttpError(w, "Access denied", http.StatusForbidden)
+		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 
@@ -422,15 +418,14 @@ func handleProfileMobile(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleProfileNames(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if !auth.IsTeacherScoped(auth.GetRole(ctx)) {
-		HttpError(w, "Access denied", http.StatusForbidden)
+		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 
@@ -531,15 +526,14 @@ func handleProfileNames(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleProfilePassword(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if !auth.IsTeacherScoped(auth.GetRole(ctx)) {
-		HttpError(w, "Access denied", http.StatusForbidden)
+		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 
@@ -626,15 +620,14 @@ func handleProfilePassword(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleProfileAvatar(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if !auth.IsTeacherScoped(auth.GetRole(ctx)) {
-		HttpError(w, "Access denied", http.StatusForbidden)
+		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 
@@ -720,15 +713,14 @@ func handleProfileAvatar(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleProfilePicture(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if !auth.IsTeacherScoped(auth.GetRole(ctx)) {
-		HttpError(w, "Access denied", http.StatusForbidden)
+		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 
@@ -749,8 +741,7 @@ func handleProfilePicture(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleTeacherPicture(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -804,16 +795,3 @@ func validateAvatarUpload(file io.ReadSeeker, size int64) (string, error) {
 	}
 }
 
-func setErrorFlash(w http.ResponseWriter, msg string) {
-	cfg := conf.Conf()
-	cookie := &http.Cookie{
-		Name:     "error_flash",
-		Value:    url.QueryEscape(msg),
-		Path:     cfg.BasePath,
-		SameSite: http.SameSiteStrictMode,
-	}
-	if cfg.IsProd() {
-		cookie.Secure = true
-	}
-	http.SetCookie(w, cookie)
-}

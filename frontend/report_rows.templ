@@ -6,7 +6,7 @@ import (
 )
 
 templ ReportTableRow(row ReportRowData, startDate string, endDate string, swapOOB bool) {
-	<tr data-teacher-id={ row.TeacherID } if swapOOB { hx-swap-oob="outerHTML" }>
+	<tr data-teacher-id={ row.TeacherID } if swapOOB { hx-swap-oob={ HxSwapOuterHTML } }>
 		<td data-label="Teacher">
 			<div class="reports-teacher-cell">
 				@Avatar(row.TeacherAvatar)
@@ -119,7 +119,7 @@ templ ReportsSummaryCards(data ReportsSummaryData) {
 
 templ ReportsPartial(rows []ReportRowData, startDate string, endDate string, emptyMessage string, summary ReportsSummaryData) {
 	@ReportsTableBody(rows, startDate, endDate, emptyMessage)
-	<div id="reportsSummaryCards" class="dashboard-stats reports-summary" hx-swap-oob="outerHTML">
+	<div id="reportsSummaryCards" class="dashboard-stats reports-summary" hx-swap-oob={ HxSwapOuterHTML }>
 		@ReportsSummaryCards(summary)
 	</div>
 }

@@ -362,7 +362,7 @@ templ Schedule(data ScheduleData) {
 						hx-get={ utils.URL("/schedule/partials/list") }
 						hx-include="#listTeacher, #todayListStart, #todayListEnd, #todayListStatus"
 						hx-trigger="scheduleRefresh from:body"
-						hx-swap="innerHTML"
+						hx-swap={ HxSwapInnerHTML }
 					>
 						<p class="day-classes-empty">Loading today's schedule...</p>
 					</div>
@@ -420,7 +420,7 @@ templ Schedule(data ScheduleData) {
 								hx-get={ utils.URL("/schedule/partials/day-timeline") }
 								hx-include="#listTeacher, #dayListStart, #dayListEnd, #dayListStatus"
 								hx-trigger="scheduleDayOpen from:body"
-								hx-swap="innerHTML"
+								hx-swap={ HxSwapInnerHTML }
 							></div>
 						</section>
 						<div id="modalFormOutput" class="form-message" role="alert" aria-live="assertive"></div>

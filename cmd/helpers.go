@@ -54,7 +54,7 @@ func listQueryParams(r *http.Request) map[string]string {
 
 func HttpRedirectToListPage(w http.ResponseWriter, r *http.Request, listPath string) {
 	target := listPath
-	if r.Header.Get("HX-Request") == "true" {
+	if r.Header.Get(headerHXRequest) == "true" {
 		if current := r.Header.Get("HX-Current-URL"); current != "" {
 			if u, err := url.Parse(current); err == nil && u.Path == utils.URL(listPath) && u.RawQuery != "" {
 				target = listPath + "?" + u.RawQuery

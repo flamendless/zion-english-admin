@@ -87,7 +87,7 @@ templ EditClass(data EditClassData) {
 			} else if data.IsSuperuser {
 				<form
 					hx-post={ utils.URL("/classes/" + data.RecordID + "/edit") }
-					hx-swap="innerHTML"
+					hx-swap={ HxSwapInnerHTML }
 					hx-target="#logOutput"
 					_="
 						on submit
@@ -116,7 +116,7 @@ templ EditClass(data EditClassData) {
 			} else {
 				<form
 					hx-post={ utils.URL("/classes/" + data.RecordID + "/edit") }
-					hx-swap="innerHTML"
+					hx-swap={ HxSwapInnerHTML }
 					hx-target="#logOutput"
 					_="
 						on submit

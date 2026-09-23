@@ -93,7 +93,7 @@ templ ProcessResponse(
 			<a
 				id="downloadBtn" class="btn download-btn" disabled
 				href={ utils.URL("/download/processed?filename=" + filename) }
-				hx-swap="none"
+				hx-swap={ HxSwapNone }
 			>
 				Download XLSX
 			</a>

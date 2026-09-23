@@ -208,7 +208,7 @@ templ Teachers(data TeacherData) {
 												class="name-link"
 												hx-get={ utils.URL("/teachers/" + teacher.ID + "/view") }
 												hx-target="#teacherViewModalHost"
-												hx-swap="innerHTML"
+												hx-swap={ HxSwapInnerHTML }
 											>{ teacher.Name }</button>
 										</div>
 									</td>

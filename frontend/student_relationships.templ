@@ -308,7 +308,7 @@ templ StudentRelationships(data StudentRelationshipsData) {
 							placeholder="Search by name..."
 							aria-labelledby="diagramStudentSearchLabel"
 							hx-get={ data.StudentSearchURL }
-							hx-trigger="input changed delay:300ms"
+							hx-trigger={ HxTriggerInputDelay }
 							hx-target="#diagramStudentSearchResults"
 							hx-include="this"
 						/>

@@ -31,7 +31,7 @@ func handleClassesPath(w http.ResponseWriter, r *http.Request) {
 		handleDeleteClassRecord(w, r, id)
 		return
 	}
-	HttpError(w, "Not found", http.StatusNotFound)
+	HttpError(w, MsgNotFound, http.StatusNotFound)
 }
 
 func validateDeletionReason(reason string) error {
@@ -49,8 +49,7 @@ func validateClassReason(reason string) error {
 }
 
 func handleDeleteClassRecord(w http.ResponseWriter, r *http.Request, recordID int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -142,8 +141,7 @@ func classEditClassData(ctx context.Context, recordID int64, readonly bool) (fro
 }
 
 func handleClassView(w http.ResponseWriter, r *http.Request, recordID int64) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -159,7 +157,7 @@ func handleClassView(w http.ResponseWriter, r *http.Request, recordID int64) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	frontend.ClassViewModal(data).Render(ctx, w)
 }
 
@@ -186,13 +184,12 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 			HttpError(w, "Class record not found", http.StatusNotFound)
 			return
 		}
-		w.Header().Set("Content-Type", "text/html")
+		writeHTML(w)
 		frontend.EditClass(data).Render(ctx, w)
 		return
 	}
 
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -584,21 +581,19 @@ func parseClassRecordsQuery(r *http.Request) (classRecordsQuery, error) {
 }
 
 func handleClassesDatePresetPartial(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
 	month := strings.TrimSpace(r.URL.Query().Get("month"))
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.DatePresetForMonth(month, true).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -654,7 +649,7 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 	partialsURL := utils.URL("/classes/partials/rows")
 	includeSelector := "#classesToolbar"
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.ClassRecordsPartial(rows, showTeacher, colspan, "No classes found for the selected criteria", pagination, partialsURL, includeSelector).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -670,13 +665,12 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	if auth.IsTeacherScoped(role) && user.ID == 0 {
-		HttpError(w, "Unauthorized", http.StatusUnauthorized)
+		HttpError(w, MsgUnauthorized, http.StatusUnauthorized)
 		return
 	}
 
@@ -777,12 +771,12 @@ func handleClasses(w http.ResponseWriter, r *http.Request) {
 		} else {
 			data.ShowAllTeachers = true
 		}
-		w.Header().Set("Content-Type", "text/html")
+		writeHTML(w)
 		frontend.Classes(data).Render(r.Context(), w)
 		return
 	}
 
-	HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	HttpError(w, MsgMethodNotAllowed, http.StatusMethodNotAllowed)
 }
 
 func validateClassRecordRequest(req *models.ClassRecordRequest) error {

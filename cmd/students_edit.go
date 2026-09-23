@@ -84,7 +84,7 @@ func handleStudentsPath(w http.ResponseWriter, r *http.Request) {
 		handleStudentDelete(w, r, id)
 		return
 	}
-	HttpError(w, "Not found", http.StatusNotFound)
+	HttpError(w, MsgNotFound, http.StatusNotFound)
 }
 
 func studentEditStudentData(ctx context.Context, studentID int64, readonly bool) (frontend.EditStudentData, error) {
@@ -217,13 +217,12 @@ func saveStudentRelationships(ctx context.Context, studentID int64, r *http.Requ
 }
 
 func handleStudentDelete(w http.ResponseWriter, r *http.Request, studentID int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	if !auth.HasAdminAccess(auth.GetRole(r.Context())) {
-		HttpError(w, "Forbidden", http.StatusForbidden)
+		HttpError(w, MsgForbidden, http.StatusForbidden)
 		return
 	}
 
@@ -243,7 +242,7 @@ func handleStudentDelete(w http.ResponseWriter, r *http.Request, studentID int64
 
 	existing, err := dbRO.GetQueries().GetStudentByID(ctx, studentID)
 	if err != nil {
-		HttpError(w, "Student not found", http.StatusNotFound)
+		HttpError(w, MsgStudentNotFound, http.StatusNotFound)
 		return
 	}
 	if existing.Status == string(constants.StudentStatusDeleted) {
@@ -262,35 +261,33 @@ func handleStudentDelete(w http.ResponseWriter, r *http.Request, studentID int64
 
 	insertAuditLogAs(ctx, user, "students", fmt.Sprintf("deleted student '%s' (id %d, reason: %s)", existing.Name, studentID, reason))
 	setSuccessFlash(w, "Student deleted successfully.")
-	w.Header().Set("HX-Redirect", utils.URL("/students"))
+	setHXRedirect(w, "/students")
 }
 
 func handleStudentView(w http.ResponseWriter, r *http.Request, studentID int64) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
 	if !auth.HasAdminAccess(auth.GetRole(r.Context())) {
-		HttpError(w, "Forbidden", http.StatusForbidden)
+		HttpError(w, MsgForbidden, http.StatusForbidden)
 		return
 	}
 
 	ctx := r.Context()
 	data, err := studentEditStudentData(ctx, studentID, true)
 	if err != nil {
-		HttpError(w, "Student not found", http.StatusNotFound)
+		HttpError(w, MsgStudentNotFound, http.StatusNotFound)
 		return
 	}
 	data.IsSuperuser = true
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	frontend.StudentViewModal(data).Render(ctx, w)
 }
 
 func handleStudents(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -385,7 +382,7 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 			teacherName = utils.ComposePersonName(teacher.FirstName, teacher.MiddleName, teacher.LastName)
 		}
 	}
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	frontend.Students(frontend.StudentData{
 		Students:       viewStudents,
 		Query:          q,
@@ -414,7 +411,7 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 
 	existing, err := dbRO.GetQueries().GetStudentByID(ctx, studentID)
 	if err != nil {
-		HttpError(w, "Student not found", http.StatusNotFound)
+		HttpError(w, MsgStudentNotFound, http.StatusNotFound)
 		return
 	}
 
@@ -426,7 +423,7 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 
 	if !isSuperuser {
 		if user.ID == 0 {
-			HttpError(w, "Unauthorized", http.StatusUnauthorized)
+			HttpError(w, MsgUnauthorized, http.StatusUnauthorized)
 			return
 		}
 		if err := requireStudentAssignedToTeacher(ctx, user.ID, studentID); err != nil {
@@ -438,18 +435,17 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 	if r.Method == http.MethodGet {
 		data, err := studentEditStudentData(ctx, studentID, false)
 		if err != nil {
-			HttpError(w, "Student not found", http.StatusNotFound)
+			HttpError(w, MsgStudentNotFound, http.StatusNotFound)
 			return
 		}
 		data.IsSuperuser = isSuperuser
 
-		w.Header().Set("Content-Type", "text/html")
+		writeHTML(w)
 		frontend.EditStudent(data).Render(ctx, w)
 		return
 	}
 
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 

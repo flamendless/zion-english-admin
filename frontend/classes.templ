@@ -85,7 +85,7 @@ templ Classes(data ClassesData) {
 					hx-get={ utils.URL("/classes/partials/rows") }
 					hx-include="#classesToolbar"
 					hx-target="#classesTableBody"
-					hx-swap="innerHTML"
+					hx-swap={ HxSwapInnerHTML }
 				>Filter</button>
 			</div>
 
@@ -110,7 +110,7 @@ templ Classes(data ClassesData) {
 					hx-get={ utils.URL("/classes/partials/rows") }
 					hx-include="#classesToolbar"
 					hx-trigger="load, classesRefresh from:body"
-					hx-swap="innerHTML"
+					hx-swap={ HxSwapInnerHTML }
 				>
 					<tr>
 						if data.LockTeacher || data.ShowAllTeachers {

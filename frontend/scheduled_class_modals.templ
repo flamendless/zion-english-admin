@@ -76,7 +76,7 @@ templ ConductClassModal() {
 				id="conductClassForm"
 				method="POST"
 				class="modal-body scheduled-class-action-modal"
-				hx-swap="none"
+				hx-swap={ HxSwapNone }
 			>
 				<p class="scheduled-class-modal-lead">Record this session as conducted. Class details are fixed from the schedule.</p>
 				@ScheduledClassDetailCard("conductClassModalDetails", false)
@@ -107,7 +107,7 @@ templ CancelClassModal() {
 				id="cancelClassForm"
 				method="POST"
 				class="modal-body scheduled-class-action-modal"
-				hx-swap="none"
+				hx-swap={ HxSwapNone }
 			>
 				<p class="scheduled-class-modal-lead">This will mark the class as cancelled and keep a record for your history.</p>
 				@ScheduledClassDetailCard("cancelClassModalDetails", false)
@@ -178,7 +178,7 @@ templ EditScheduledClassSimpleForm(data EditScheduleData) {
 		class="scheduled-class-modal-form"
 		method="POST"
 		hx-post={ utils.URL(fmt.Sprintf("/schedule/%s/edit", data.ScheduleID)) }
-		hx-swap="none"
+		hx-swap={ HxSwapNone }
 		data-today-pht={ data.TodayPHT }
 		data-original-date={ data.Date }
 		data-original-start={ data.StartTime }
@@ -235,7 +235,7 @@ templ EditScheduledClassSeriesForm(data EditScheduleData) {
 		method="POST"
 		hx-post={ utils.URL(fmt.Sprintf("/schedule/%s/edit/preview", data.ScheduleID)) }
 		hx-target="#editSeriesPreviewPanel"
-		hx-swap="innerHTML"
+		hx-swap={ HxSwapInnerHTML }
 		hx-indicator="#editSeriesPreviewBtn"
 		data-today-pht={ data.TodayPHT }
 		data-original-date={ data.Date }

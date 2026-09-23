@@ -139,7 +139,20 @@ func ConductClassModal() templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"modal-overlay modal-overlay-front\" id=\"conductClassModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"conductClassModalTitle\"><div class=\"modal-header\"><h3 id=\"conductClassModalTitle\">Conduct Class</h3><button type=\"button\" class=\"modal-close scheduled-class-modal-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><form id=\"conductClassForm\" method=\"POST\" class=\"modal-body scheduled-class-action-modal\" hx-swap=\"none\"><p class=\"scheduled-class-modal-lead\">Record this session as conducted. Class details are fixed from the schedule.</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"modal-overlay modal-overlay-front\" id=\"conductClassModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"conductClassModalTitle\"><div class=\"modal-header\"><h3 id=\"conductClassModalTitle\">Conduct Class</h3><button type=\"button\" class=\"modal-close scheduled-class-modal-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><form id=\"conductClassForm\" method=\"POST\" class=\"modal-body scheduled-class-action-modal\" hx-swap=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var5 string
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapNone)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 79, Col: 24}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\"><p class=\"scheduled-class-modal-lead\">Record this session as conducted. Class details are fixed from the schedule.</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -147,7 +160,7 @@ func ConductClassModal() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<input type=\"hidden\" id=\"conductClassFrom\" name=\"from\" value=\"schedule\"><div class=\"scheduled-class-modal-fields\"><div class=\"form-group\"><label for=\"conductClassNotes\">Notes</label> <textarea id=\"conductClassNotes\" name=\"notes\" rows=\"3\" placeholder=\"Optional notes about this class\"></textarea></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary scheduled-class-modal-close\">Cancel</button> <button type=\"submit\" class=\"btn\" id=\"conductClassSubmitBtn\">Conduct</button></div></form></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<input type=\"hidden\" id=\"conductClassFrom\" name=\"from\" value=\"schedule\"><div class=\"scheduled-class-modal-fields\"><div class=\"form-group\"><label for=\"conductClassNotes\">Notes</label> <textarea id=\"conductClassNotes\" name=\"notes\" rows=\"3\" placeholder=\"Optional notes about this class\"></textarea></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary scheduled-class-modal-close\">Cancel</button> <button type=\"submit\" class=\"btn\" id=\"conductClassSubmitBtn\">Conduct</button></div></form></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -171,12 +184,25 @@ func CancelClassModal() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var5 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var5 == nil {
-			templ_7745c5c3_Var5 = templ.NopComponent
+		templ_7745c5c3_Var6 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var6 == nil {
+			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"modal-overlay modal-overlay-front\" id=\"cancelClassModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"cancelClassModalTitle\"><div class=\"modal-header\"><h3 id=\"cancelClassModalTitle\">Cancel Class</h3><button type=\"button\" class=\"modal-close scheduled-class-modal-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><form id=\"cancelClassForm\" method=\"POST\" class=\"modal-body scheduled-class-action-modal\" hx-swap=\"none\"><p class=\"scheduled-class-modal-lead\">This will mark the class as cancelled and keep a record for your history.</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"modal-overlay modal-overlay-front\" id=\"cancelClassModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"cancelClassModalTitle\"><div class=\"modal-header\"><h3 id=\"cancelClassModalTitle\">Cancel Class</h3><button type=\"button\" class=\"modal-close scheduled-class-modal-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><form id=\"cancelClassForm\" method=\"POST\" class=\"modal-body scheduled-class-action-modal\" hx-swap=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var7 string
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapNone)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 110, Col: 24}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\"><p class=\"scheduled-class-modal-lead\">This will mark the class as cancelled and keep a record for your history.</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -184,7 +210,7 @@ func CancelClassModal() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<input type=\"hidden\" id=\"cancelClassFrom\" name=\"from\" value=\"schedule\"><div class=\"scheduled-class-modal-fields\"><div class=\"form-group\"><label for=\"cancelClassReason\">Reason *</label> <input type=\"text\" id=\"cancelClassReason\" name=\"reason\" required placeholder=\"Reason for cancellation\"></div><div class=\"form-group\"><label for=\"cancelClassNotes\">Notes</label> <textarea id=\"cancelClassNotes\" name=\"notes\" rows=\"3\" placeholder=\"Optional notes\"></textarea></div><div id=\"cancelSeriesScopePanel\" class=\"series-scope-panel\" hidden><fieldset class=\"series-scope-fieldset\"><legend>Apply to</legend> <label class=\"series-scope-option\"><input type=\"radio\" name=\"series_scope\" value=\"single\" checked> This class only</label> <label class=\"series-scope-option\"><input type=\"radio\" name=\"series_scope\" value=\"future\"> <span id=\"cancelSeriesScopeFutureLabel\">This and future classes in this series</span></label></fieldset></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary scheduled-class-modal-close\">Cancel</button> <button type=\"submit\" class=\"btn btn-danger\" id=\"cancelClassSubmitBtn\">Cancel Class</button></div></form></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<input type=\"hidden\" id=\"cancelClassFrom\" name=\"from\" value=\"schedule\"><div class=\"scheduled-class-modal-fields\"><div class=\"form-group\"><label for=\"cancelClassReason\">Reason *</label> <input type=\"text\" id=\"cancelClassReason\" name=\"reason\" required placeholder=\"Reason for cancellation\"></div><div class=\"form-group\"><label for=\"cancelClassNotes\">Notes</label> <textarea id=\"cancelClassNotes\" name=\"notes\" rows=\"3\" placeholder=\"Optional notes\"></textarea></div><div id=\"cancelSeriesScopePanel\" class=\"series-scope-panel\" hidden><fieldset class=\"series-scope-fieldset\"><legend>Apply to</legend> <label class=\"series-scope-option\"><input type=\"radio\" name=\"series_scope\" value=\"single\" checked> This class only</label> <label class=\"series-scope-option\"><input type=\"radio\" name=\"series_scope\" value=\"future\"> <span id=\"cancelSeriesScopeFutureLabel\">This and future classes in this series</span></label></fieldset></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary scheduled-class-modal-close\">Cancel</button> <button type=\"submit\" class=\"btn btn-danger\" id=\"cancelClassSubmitBtn\">Cancel Class</button></div></form></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -208,12 +234,12 @@ func EditScheduledClassModal() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var6 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var6 == nil {
-			templ_7745c5c3_Var6 = templ.NopComponent
+		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var8 == nil {
+			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"modal-overlay modal-overlay-front\" id=\"editScheduledClassModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"editScheduledClassModalTitle\"><div class=\"modal-header\"><h3 id=\"editScheduledClassModalTitle\">Edit Scheduled Class</h3><button type=\"button\" class=\"modal-close scheduled-class-modal-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><div id=\"editScheduledClassModalBody\" class=\"modal-body\"><p class=\"modal-loading\">Loading...</p></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"modal-overlay modal-overlay-front\" id=\"editScheduledClassModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"editScheduledClassModalTitle\"><div class=\"modal-header\"><h3 id=\"editScheduledClassModalTitle\">Edit Scheduled Class</h3><button type=\"button\" class=\"modal-close scheduled-class-modal-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><div id=\"editScheduledClassModalBody\" class=\"modal-body\"><p class=\"modal-loading\">Loading...</p></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -237,9 +263,9 @@ func EditScheduledClassModalForm(data EditScheduleData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var7 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var7 == nil {
-			templ_7745c5c3_Var7 = templ.NopComponent
+		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var9 == nil {
+			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		if EditScheduleUsesSeriesReview(data) {
@@ -273,64 +299,77 @@ func EditScheduledClassSimpleForm(data EditScheduleData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var8 == nil {
-			templ_7745c5c3_Var8 = templ.NopComponent
+		templ_7745c5c3_Var10 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var10 == nil {
+			templ_7745c5c3_Var10 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<form id=\"editScheduledClassForm\" class=\"scheduled-class-modal-form\" method=\"POST\" hx-post=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var9 string
-		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL(fmt.Sprintf("/schedule/%s/edit", data.ScheduleID)))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 180, Col: 72}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" hx-swap=\"none\" data-today-pht=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var10 string
-		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TodayPHT)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 182, Col: 32}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" data-original-date=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<form id=\"editScheduledClassForm\" class=\"scheduled-class-modal-form\" method=\"POST\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var11 string
-		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Date)
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL(fmt.Sprintf("/schedule/%s/edit", data.ScheduleID)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 183, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 180, Col: 72}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" data-original-start=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" hx-swap=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var12 string
-		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.StartTime)
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapNone)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 184, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 181, Col: 22}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" _=\"\r\n\t\t\ton submit\r\n\t\t\t\tset origDate to my @data-original-date\r\n\t\t\t\tset origStart to my @data-original-start\r\n\t\t\t\tset newDate to (#date in me).value\r\n\t\t\t\tset newStart to (first <[name='start_time']/> in me).value\r\n\t\t\t\tif newDate is not origDate or newStart is not origStart\r\n\t\t\t\t\tset today to my @data-today-pht\r\n\t\t\t\t\tif newDate < today\r\n\t\t\t\t\t\talert('Date and time cannot be in the past')\r\n\t\t\t\t\t\thalt\r\n\t\t\t\t\tend\r\n\t\t\t\t\tif newDate is today and newStart is not ''\r\n\t\t\t\t\t\tset now to new Date()\r\n\t\t\t\t\t\tset parts to newStart.split(':')\r\n\t\t\t\t\t\tif parts.length is 2\r\n\t\t\t\t\t\t\tset sel to new Date()\r\n\t\t\t\t\t\t\tset sel.setHours(parseInt(parts[0]), parseInt(parts[1]), 0, 0)\r\n\t\t\t\t\t\t\tif sel < now\r\n\t\t\t\t\t\t\t\talert('Date and time cannot be in the past')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\tend\r\n\t\t\t\t\tend\r\n\t\t\t\tend\r\n\t\t\t\tif (first <[name='start_time']/> in me).value is ''\r\n\t\t\t\t\talert('Please set start time')\r\n\t\t\t\t\thalt\r\n\t\t\t\tend\r\n\t\t\t\tif (first <[name='end_time']/> in me).value is ''\r\n\t\t\t\t\talert('Please set end time')\r\n\t\t\t\t\thalt\r\n\t\t\t\tend\r\n\t\t\tend\r\n\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" data-today-pht=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var13 string
+		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TodayPHT)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 182, Col: 32}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" data-original-date=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var14 string
+		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Date)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 183, Col: 32}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" data-original-start=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var15 string
+		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.StartTime)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 184, Col: 38}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" _=\"\r\n\t\t\ton submit\r\n\t\t\t\tset origDate to my @data-original-date\r\n\t\t\t\tset origStart to my @data-original-start\r\n\t\t\t\tset newDate to (#date in me).value\r\n\t\t\t\tset newStart to (first <[name='start_time']/> in me).value\r\n\t\t\t\tif newDate is not origDate or newStart is not origStart\r\n\t\t\t\t\tset today to my @data-today-pht\r\n\t\t\t\t\tif newDate < today\r\n\t\t\t\t\t\talert('Date and time cannot be in the past')\r\n\t\t\t\t\t\thalt\r\n\t\t\t\t\tend\r\n\t\t\t\t\tif newDate is today and newStart is not ''\r\n\t\t\t\t\t\tset now to new Date()\r\n\t\t\t\t\t\tset parts to newStart.split(':')\r\n\t\t\t\t\t\tif parts.length is 2\r\n\t\t\t\t\t\t\tset sel to new Date()\r\n\t\t\t\t\t\t\tset sel.setHours(parseInt(parts[0]), parseInt(parts[1]), 0, 0)\r\n\t\t\t\t\t\t\tif sel < now\r\n\t\t\t\t\t\t\t\talert('Date and time cannot be in the past')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\tend\r\n\t\t\t\t\tend\r\n\t\t\t\tend\r\n\t\t\t\tif (first <[name='start_time']/> in me).value is ''\r\n\t\t\t\t\talert('Please set start time')\r\n\t\t\t\t\thalt\r\n\t\t\t\tend\r\n\t\t\t\tif (first <[name='end_time']/> in me).value is ''\r\n\t\t\t\t\talert('Please set end time')\r\n\t\t\t\t\thalt\r\n\t\t\t\tend\r\n\t\t\tend\r\n\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -338,7 +377,7 @@ func EditScheduledClassSimpleForm(data EditScheduleData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary scheduled-class-modal-close\">Cancel</button> <button type=\"submit\" class=\"btn\" id=\"editScheduledClassSubmitBtn\">Save Changes</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary scheduled-class-modal-close\">Cancel</button> <button type=\"submit\" class=\"btn\" id=\"editScheduledClassSubmitBtn\">Save Changes</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -370,64 +409,77 @@ func EditScheduledClassSeriesForm(data EditScheduleData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var13 == nil {
-			templ_7745c5c3_Var13 = templ.NopComponent
+		templ_7745c5c3_Var16 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var16 == nil {
+			templ_7745c5c3_Var16 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<form id=\"editScheduledClassForm\" class=\"scheduled-class-modal-form\" method=\"POST\" hx-post=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var14 string
-		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL(fmt.Sprintf("/schedule/%s/edit/preview", data.ScheduleID)))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 236, Col: 80}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" hx-target=\"#editSeriesPreviewPanel\" hx-swap=\"innerHTML\" hx-indicator=\"#editSeriesPreviewBtn\" data-today-pht=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var15 string
-		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TodayPHT)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 240, Col: 32}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" data-original-date=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var16 string
-		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Date)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 241, Col: 32}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" data-original-start=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<form id=\"editScheduledClassForm\" class=\"scheduled-class-modal-form\" method=\"POST\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var17 string
-		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.StartTime)
+		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL(fmt.Sprintf("/schedule/%s/edit/preview", data.ScheduleID)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 242, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 236, Col: 80}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var17)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" _=\"\r\n\t\t\ton submit\r\n\t\t\t\tif (first <[name='start_time']/> in me).value is ''\r\n\t\t\t\t\talert('Please set start time')\r\n\t\t\t\t\thalt\r\n\t\t\t\tend\r\n\t\t\t\tif (first <[name='end_time']/> in me).value is ''\r\n\t\t\t\t\talert('Please set end time')\r\n\t\t\t\t\thalt\r\n\t\t\t\tend\r\n\t\t\tend\r\n\t\t\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" hx-target=\"#editSeriesPreviewPanel\" hx-swap=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var18 string
+		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 238, Col: 27}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" hx-indicator=\"#editSeriesPreviewBtn\" data-today-pht=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var19 string
+		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TodayPHT)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 240, Col: 32}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var19)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\" data-original-date=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var20 string
+		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Date)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 241, Col: 32}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var20)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "\" data-original-start=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var21 string
+		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.StartTime)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 242, Col: 38}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var21)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\" _=\"\r\n\t\t\ton submit\r\n\t\t\t\tif (first <[name='start_time']/> in me).value is ''\r\n\t\t\t\t\talert('Please set start time')\r\n\t\t\t\t\thalt\r\n\t\t\t\tend\r\n\t\t\t\tif (first <[name='end_time']/> in me).value is ''\r\n\t\t\t\t\talert('Please set end time')\r\n\t\t\t\t\thalt\r\n\t\t\t\tend\r\n\t\t\tend\r\n\t\t\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -435,7 +487,7 @@ func EditScheduledClassSeriesForm(data EditScheduleData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary scheduled-class-modal-close\">Cancel</button> <button type=\"submit\" class=\"btn\" id=\"editSeriesPreviewBtn\">Review Dates</button></div></form><div id=\"editSeriesPreviewPanel\" class=\"schedule-repeat-preview-panel\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary scheduled-class-modal-close\">Cancel</button> <button type=\"submit\" class=\"btn\" id=\"editSeriesPreviewBtn\">Review Dates</button></div></form><div id=\"editSeriesPreviewPanel\" class=\"schedule-repeat-preview-panel\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -467,43 +519,43 @@ func EditScheduledClassFormFields(data EditScheduleData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var18 == nil {
-			templ_7745c5c3_Var18 = templ.NopComponent
+		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var22 == nil {
+			templ_7745c5c3_Var22 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<input type=\"hidden\" id=\"editScheduledClassFrom\" name=\"from\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<input type=\"hidden\" id=\"editScheduledClassFrom\" name=\"from\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var19 string
-		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.From)
+		var templ_7745c5c3_Var23 string
+		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.From)
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 268, Col: 79}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var19)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "\"> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "\"> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.SeriesID > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<p class=\"field-hint\">Part of a repeating series (")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<p class=\"field-hint\">Part of a repeating series (")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var20 string
-			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.SeriesTotalCount))
+			var templ_7745c5c3_Var24 string
+			templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.SeriesTotalCount))
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 270, Col: 94}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, " scheduled classes).</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, " scheduled classes).</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -512,20 +564,20 @@ func EditScheduledClassFormFields(data EditScheduleData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<div class=\"form-group\"><label>Teacher</label> <input type=\"text\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div class=\"form-group\"><label>Teacher</label> <input type=\"text\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var21 string
-		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherName)
+		var templ_7745c5c3_Var25 string
+		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherName)
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 275, Col: 45}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var21)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var25)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "\" disabled></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\" disabled></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -545,7 +597,7 @@ func EditScheduledClassFormFields(data EditScheduleData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if data.SeriesID > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<p id=\"editSeriesDateHint\" class=\"field-hint\" hidden>Date changes on the calendar apply to this and future classes in the series.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<p id=\"editSeriesDateHint\" class=\"field-hint\" hidden>Date changes on the calendar apply to this and future classes in the series.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -554,7 +606,7 @@ func EditScheduledClassFormFields(data EditScheduleData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<div class=\"form-row\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<div class=\"form-row\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -562,20 +614,20 @@ func EditScheduledClassFormFields(data EditScheduleData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div class=\"form-group\"><label for=\"rate\">Rate *</label> <input type=\"number\" id=\"rate\" name=\"rate\" required min=\"0\" step=\"0.01\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<div class=\"form-group\"><label for=\"rate\">Rate *</label> <input type=\"number\" id=\"rate\" name=\"rate\" required min=\"0\" step=\"0.01\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var22 string
-		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.ResolveAttributeValue(formatFloat(data.Rate))
+		var templ_7745c5c3_Var26 string
+		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(formatFloat(data.Rate))
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 291, Col: 105}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var22)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\"></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -607,26 +659,26 @@ func EditScheduledClassDateFields(data EditScheduleData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var23 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var23 == nil {
-			templ_7745c5c3_Var23 = templ.NopComponent
+		templ_7745c5c3_Var27 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var27 == nil {
+			templ_7745c5c3_Var27 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		if EditScheduleUsesSeriesReview(data) {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<input type=\"hidden\" id=\"date\" name=\"date\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<input type=\"hidden\" id=\"date\" name=\"date\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var24 string
-			templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Date)
+			var templ_7745c5c3_Var28 string
+			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Date)
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class_modals.templ`, Line: 300, Col: 62}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var28)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "\" data-series-active-date=\"true\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\" data-series-active-date=\"true\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -666,12 +718,12 @@ func ScheduledClassModalsScript() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var25 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var25 == nil {
-			templ_7745c5c3_Var25 = templ.NopComponent
+		templ_7745c5c3_Var29 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var29 == nil {
+			templ_7745c5c3_Var29 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<script>\r\n\t\t(function () {\r\n\t\t\tconst conductModal = document.getElementById('conductClassModal');\r\n\t\t\tconst conductForm = document.getElementById('conductClassForm');\r\n\t\t\tconst conductDetails = document.getElementById('conductClassModalDetails');\r\n\t\t\tconst conductNotes = document.getElementById('conductClassNotes');\r\n\t\t\tconst conductFrom = document.getElementById('conductClassFrom');\r\n\r\n\t\t\tconst cancelModal = document.getElementById('cancelClassModal');\r\n\t\t\tconst cancelForm = document.getElementById('cancelClassForm');\r\n\t\t\tconst cancelDetails = document.getElementById('cancelClassModalDetails');\r\n\t\t\tconst cancelReason = document.getElementById('cancelClassReason');\r\n\t\t\tconst cancelNotes = document.getElementById('cancelClassNotes');\r\n\t\t\tconst cancelFrom = document.getElementById('cancelClassFrom');\r\n\t\t\tconst cancelSeriesScopePanel = document.getElementById('cancelSeriesScopePanel');\r\n\t\t\tconst cancelSeriesScopeFutureLabel = document.getElementById('cancelSeriesScopeFutureLabel');\r\n\r\n\t\t\tconst editModal = document.getElementById('editScheduledClassModal');\r\n\t\t\tconst editBody = document.getElementById('editScheduledClassModalBody');\r\n\r\n\t\t\tfunction setFormPost(form, url) {\r\n\t\t\t\tform.action = url;\r\n\t\t\t\tform.setAttribute('hx-post', url);\r\n\t\t\t\tif (typeof htmx !== 'undefined') {\r\n\t\t\t\t\thtmx.process(form);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction escapeHtml(value) {\r\n\t\t\t\treturn String(value || '')\r\n\t\t\t\t\t.replace(/&/g, '&amp;')\r\n\t\t\t\t\t.replace(/</g, '&lt;')\r\n\t\t\t\t\t.replace(/>/g, '&gt;')\r\n\t\t\t\t\t.replace(/\"/g, '&quot;');\r\n\t\t\t}\r\n\r\n\t\t\tfunction fillTimePill(el, timeRange) {\r\n\t\t\t\tif (!el) return;\r\n\t\t\t\tel.innerHTML =\r\n\t\t\t\t\t'<span class=\"time-range-pill\" aria-label=\"Time: ' + escapeHtml(timeRange) + '\">' +\r\n\t\t\t\t\t'<span class=\"pill pill--primary\">' + escapeHtml(timeRange) + '</span>' +\r\n\t\t\t\t\t'</span>';\r\n\t\t\t}\r\n\r\n\t\t\tfunction fillRatePill(el, rate, currency) {\r\n\t\t\t\tif (!el) return;\r\n\t\t\t\tel.innerHTML =\r\n\t\t\t\t\t'<span class=\"pill pill--info rate-pill\" aria-label=\"' + escapeHtml(rate + ' ' + currency) + '\">' +\r\n\t\t\t\t\t'<span class=\"rate-pill-amount\">' + escapeHtml(rate) + '</span>' +\r\n\t\t\t\t\t'<span class=\"rate-pill-currency\">' + escapeHtml(currency) + '</span>' +\r\n\t\t\t\t\t'</span>';\r\n\t\t\t}\r\n\r\n\t\t\tfunction fillDurationPill(el, label) {\r\n\t\t\t\tif (!el) return;\r\n\t\t\t\tel.innerHTML =\r\n\t\t\t\t\t'<span class=\"duration-pill-wrap\" aria-label=\"Duration: ' + escapeHtml(label) + '\">' +\r\n\t\t\t\t\t'<span class=\"pill pill--neutral duration-pill\">' +\r\n\t\t\t\t\t'<svg class=\"duration-pill-icon\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">' +\r\n\t\t\t\t\t'<circle cx=\"12\" cy=\"12\" r=\"10\"></circle>' +\r\n\t\t\t\t\t'<polyline points=\"12 6 12 12 16 14\"></polyline>' +\r\n\t\t\t\t\t'</svg>' +\r\n\t\t\t\t\t'<span class=\"duration-pill-value\">' + escapeHtml(label) + '</span>' +\r\n\t\t\t\t\t'</span>' +\r\n\t\t\t\t\t'</span>';\r\n\t\t\t}\r\n\r\n\t\t\tfunction fillTeacherCell(el, trigger) {\r\n\t\t\t\tif (!el || !trigger) return;\r\n\t\t\t\tconst name = trigger.getAttribute('data-teacher-name') || '-';\r\n\t\t\t\tconst initials = trigger.getAttribute('data-teacher-initials') || '';\r\n\t\t\t\tconst color = trigger.getAttribute('data-teacher-color') || '#B9D283';\r\n\t\t\t\tconst pictureURL = trigger.getAttribute('data-teacher-picture-url') || '';\r\n\t\t\t\tconst hasPicture = trigger.getAttribute('data-teacher-has-picture') === 'true';\r\n\t\t\t\tconst alt = trigger.getAttribute('data-teacher-alt') || (name + ' avatar');\r\n\t\t\t\tconst roleBadge = trigger.getAttribute('data-teacher-role-badge') || '';\r\n\t\t\t\tconst roleBadgeClass = trigger.getAttribute('data-teacher-role-badge-class') || 'pill pill--neutral';\r\n\t\t\t\tconst avatarContent = hasPicture && pictureURL\r\n\t\t\t\t\t? '<img src=\"' + escapeHtml(pictureURL) + '\" alt=\"' + escapeHtml(alt) + '\" class=\"avatar-image\"/>'\r\n\t\t\t\t\t: '<span class=\"avatar-initials\" aria-hidden=\"true\">' + escapeHtml(initials) + '</span>';\r\n\t\t\t\tlet avatarHTML =\r\n\t\t\t\t\t'<div class=\"avatar avatar-sm\" style=\"background-color: ' + escapeHtml(color) + ';\" aria-label=\"' + escapeHtml(alt) + '\">' +\r\n\t\t\t\t\tavatarContent +\r\n\t\t\t\t\t'</div>';\r\n\t\t\t\tif (roleBadge) {\r\n\t\t\t\t\tavatarHTML =\r\n\t\t\t\t\t\t'<div class=\"avatar-with-role\">' +\r\n\t\t\t\t\t\tavatarHTML +\r\n\t\t\t\t\t\t'<span class=\"avatar-role-badge ' + escapeHtml(roleBadgeClass) + '\">' + escapeHtml(roleBadge) + '</span>' +\r\n\t\t\t\t\t\t'</div>';\r\n\t\t\t\t}\r\n\t\t\t\tel.innerHTML =\r\n\t\t\t\t\t'<div class=\"teacher-name-cell\">' +\r\n\t\t\t\t\tavatarHTML +\r\n\t\t\t\t\t'<span class=\"teacher-name-cell-text\">' + escapeHtml(name) + '</span>' +\r\n\t\t\t\t\t'</div>';\r\n\t\t\t}\r\n\r\n\t\t\tfunction fillScheduledClassDetails(container, trigger) {\r\n\t\t\t\tif (!container || !trigger) return;\r\n\t\t\t\tconst studentEl = container.querySelector('[data-field=\"student\"]');\r\n\t\t\t\tconst teacherCell = container.querySelector('[data-field=\"teacher-cell\"]');\r\n\t\t\t\tconst dateEl = container.querySelector('[data-field=\"date\"]');\r\n\t\t\t\tconst timeEl = container.querySelector('[data-field=\"time\"]');\r\n\t\t\t\tconst durationEl = container.querySelector('[data-field=\"duration\"]');\r\n\t\t\t\tconst rateEl = container.querySelector('[data-field=\"rate\"]');\r\n\t\t\t\tif (studentEl) studentEl.textContent = trigger.getAttribute('data-student-name') || '-';\r\n\t\t\t\tfillTeacherCell(teacherCell, trigger);\r\n\t\t\t\tif (dateEl) dateEl.textContent = trigger.getAttribute('data-scheduled-date') || '-';\r\n\t\t\t\tfillTimePill(timeEl, trigger.getAttribute('data-time-range') || '-');\r\n\t\t\t\tfillDurationPill(durationEl, trigger.getAttribute('data-duration') || '-');\r\n\t\t\t\tfillRatePill(\r\n\t\t\t\t\trateEl,\r\n\t\t\t\t\ttrigger.getAttribute('data-rate') || '-',\r\n\t\t\t\t\ttrigger.getAttribute('data-currency') || ''\r\n\t\t\t\t);\r\n\t\t\t}\r\n\r\n\t\t\tfunction openModal(modal) {\r\n\t\t\t\tmodal.hidden = false;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t}\r\n\r\n\t\t\twindow.closeScheduledClassModals = function () {\r\n\t\t\t\tif (conductModal) conductModal.hidden = true;\r\n\t\t\t\tif (cancelModal) cancelModal.hidden = true;\r\n\t\t\t\tif (editModal) editModal.hidden = true;\r\n\t\t\t\tconst scheduleOpen = typeof window.isScheduleModalOpen === 'function' && window.isScheduleModalOpen();\r\n\t\t\t\tconst classViewOpen = !!document.getElementById('classViewModal');\r\n\t\t\t\tif (!scheduleOpen && !classViewOpen) {\r\n\t\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\t}\r\n\t\t\t\tif (conductNotes) conductNotes.value = '';\r\n\t\t\t\tif (cancelReason) cancelReason.value = '';\r\n\t\t\t\tif (cancelNotes) cancelNotes.value = '';\r\n\t\t\t\tif (editBody) editBody.innerHTML = '<p class=\"modal-loading\">Loading...</p>';\r\n\t\t\t};\r\n\r\n\t\t\twindow.openConductClassModal = function (url, trigger, from) {\r\n\t\t\t\tif (!conductModal || !conductForm) return;\r\n\t\t\t\tsetFormPost(conductForm, url);\r\n\t\t\t\tfillScheduledClassDetails(conductDetails, trigger);\r\n\t\t\t\tif (conductFrom) conductFrom.value = from || 'schedule';\r\n\t\t\t\tif (conductNotes) conductNotes.value = '';\r\n\t\t\t\topenModal(conductModal);\r\n\t\t\t\tif (conductNotes) conductNotes.focus();\r\n\t\t\t};\r\n\r\n\t\t\tfunction configureSeriesScopePanel(panel, futureLabelEl, trigger) {\r\n\t\t\t\tif (!panel) return;\r\n\t\t\t\tconst seriesID = trigger ? trigger.getAttribute('data-series-id') : '';\r\n\t\t\t\tconst totalCount = trigger ? parseInt(trigger.getAttribute('data-series-total-count') || '0', 10) : 0;\r\n\t\t\t\tconst futureCount = trigger ? parseInt(trigger.getAttribute('data-series-future-count') || '0', 10) : 0;\r\n\t\t\t\tconst futureInput = panel.querySelector('input[value=\"future\"]');\r\n\t\t\t\tif (seriesID && totalCount > 1) {\r\n\t\t\t\t\tpanel.hidden = false;\r\n\t\t\t\t\tif (futureLabelEl) {\r\n\t\t\t\t\t\tif (futureCount > 1) {\r\n\t\t\t\t\t\t\tfutureLabelEl.textContent = 'This and ' + futureCount + ' scheduled classes in this series (including this date)';\r\n\t\t\t\t\t\t} else {\r\n\t\t\t\t\t\t\tfutureLabelEl.textContent = 'This and future classes in this series';\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t\tif (futureInput) futureInput.disabled = futureCount <= 1;\r\n\t\t\t\t\tconst singleInput = panel.querySelector('input[value=\"single\"]');\r\n\t\t\t\t\tif (singleInput) singleInput.checked = true;\r\n\t\t\t\t} else {\r\n\t\t\t\t\tpanel.hidden = true;\r\n\t\t\t\t\tif (futureInput) futureInput.disabled = false;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction bindEditSeriesScopeHandlers() {\r\n\t\t\t\tconst form = document.getElementById('editScheduledClassForm');\r\n\t\t\t\tif (!form) return;\r\n\t\t\t\tconst hint = document.getElementById('editSeriesDateHint');\r\n\t\t\t\tconst scopeInputs = form.querySelectorAll('input[name=\"edit_scope\"]');\r\n\t\t\t\tif (!scopeInputs.length) return;\r\n\t\t\t\tfunction syncScopeUi() {\r\n\t\t\t\t\tconst futureSelected = Array.from(scopeInputs).some((input) => input.checked && input.value === 'future');\r\n\t\t\t\t\tif (hint) hint.hidden = !futureSelected;\r\n\t\t\t\t}\r\n\t\t\t\tscopeInputs.forEach((input) => input.addEventListener('change', syncScopeUi));\r\n\t\t\t\tsyncScopeUi();\r\n\t\t\t}\r\n\r\n\t\t\twindow.openCancelClassModal = function (url, trigger, from) {\r\n\t\t\t\tif (!cancelModal || !cancelForm) return;\r\n\t\t\t\tsetFormPost(cancelForm, url);\r\n\t\t\t\tfillScheduledClassDetails(cancelDetails, trigger);\r\n\t\t\t\tif (cancelFrom) cancelFrom.value = from || 'schedule';\r\n\t\t\t\tif (cancelReason) cancelReason.value = '';\r\n\t\t\t\tif (cancelNotes) cancelNotes.value = '';\r\n\t\t\t\tconfigureSeriesScopePanel(cancelSeriesScopePanel, cancelSeriesScopeFutureLabel, trigger);\r\n\t\t\t\topenModal(cancelModal);\r\n\t\t\t\tif (cancelReason) cancelReason.focus();\r\n\t\t\t};\r\n\r\n\t\t\twindow.openEditScheduledClassModal = function (url, from) {\r\n\t\t\t\tif (!editModal || !editBody) return;\r\n\t\t\t\topenModal(editModal);\r\n\t\t\t\tif (typeof htmx !== 'undefined') {\r\n\t\t\t\t\thtmx.ajax('GET', url, { target: '#editScheduledClassModalBody', swap: 'innerHTML' });\r\n\t\t\t\t}\r\n\t\t\t\twindow._editScheduledClassFrom = from || 'schedule';\r\n\t\t\t};\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tconst conductBtn = e.target.closest('[data-conduct-url]');\r\n\t\t\t\tif (conductBtn) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\twindow.openConductClassModal(\r\n\t\t\t\t\t\tconductBtn.getAttribute('data-conduct-url'),\r\n\t\t\t\t\t\tconductBtn,\r\n\t\t\t\t\t\tconductBtn.getAttribute('data-action-from') || 'schedule'\r\n\t\t\t\t\t);\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst cancelBtn = e.target.closest('[data-cancel-url]');\r\n\t\t\t\tif (cancelBtn) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\twindow.openCancelClassModal(\r\n\t\t\t\t\t\tcancelBtn.getAttribute('data-cancel-url'),\r\n\t\t\t\t\t\tcancelBtn,\r\n\t\t\t\t\t\tcancelBtn.getAttribute('data-action-from') || 'schedule'\r\n\t\t\t\t\t);\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst editBtn = e.target.closest('[data-edit-url]');\r\n\t\t\t\tif (editBtn) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\twindow.openEditScheduledClassModal(\r\n\t\t\t\t\t\teditBtn.getAttribute('data-edit-url'),\r\n\t\t\t\t\t\teditBtn.getAttribute('data-action-from') || 'schedule'\r\n\t\t\t\t\t);\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (e.target.closest('.scheduled-class-modal-close')) {\r\n\t\t\t\t\twindow.closeScheduledClassModals();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (e.target === conductModal || e.target === cancelModal || e.target === editModal) {\r\n\t\t\t\t\twindow.closeScheduledClassModals();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key !== 'Escape') return;\r\n\t\t\t\tif (conductModal && !conductModal.hidden) {\r\n\t\t\t\t\twindow.closeScheduledClassModals();\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\te.stopImmediatePropagation();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (cancelModal && !cancelModal.hidden) {\r\n\t\t\t\t\twindow.closeScheduledClassModals();\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\te.stopImmediatePropagation();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (editModal && !editModal.hidden) {\r\n\t\t\t\t\twindow.closeScheduledClassModals();\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\te.stopImmediatePropagation();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tif (conductForm) {\r\n\t\t\t\tconductForm.addEventListener('submit', function () {\r\n\t\t\t\t\tif (conductNotes) conductNotes.value = conductNotes.value.trim();\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tif (cancelForm) {\r\n\t\t\t\tcancelForm.addEventListener('submit', function (e) {\r\n\t\t\t\t\tif (!cancelReason || !cancelReason.value.trim()) {\r\n\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\talert('Reason is required for cancellation');\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\t\t\t\t\tcancelReason.value = cancelReason.value.trim();\r\n\t\t\t\t\tif (cancelNotes) cancelNotes.value = cancelNotes.value.trim();\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tif (evt.detail.target.id === 'editSeriesPreviewPanel') {\r\n\t\t\t\t\tconst confirmForm = document.getElementById('editSeriesConfirmForm');\r\n\t\t\t\t\tif (confirmForm && typeof htmx !== 'undefined') {\r\n\t\t\t\t\t\thtmx.process(confirmForm);\r\n\t\t\t\t\t}\r\n\t\t\t\t\tconst confirmBtn = document.getElementById('editSeriesConfirmBtn');\r\n\t\t\t\t\tif (confirmBtn) confirmBtn.focus();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (evt.detail.target !== editBody) return;\r\n\t\t\t\tconst editForm = document.getElementById('editScheduledClassForm');\r\n\t\t\t\tif (editForm && window.initTimeRangePreview) {\r\n\t\t\t\t\twindow.initTimeRangePreview({ form: editForm });\r\n\t\t\t\t}\r\n\t\t\t\tif (editForm && window.initScheduleRepeatCalendar) {\r\n\t\t\t\t\tconst calRoot = editForm.querySelector('[data-schedule-repeat-calendar]');\r\n\t\t\t\t\tif (calRoot) window.initScheduleRepeatCalendar(calRoot);\r\n\t\t\t\t}\r\n\t\t\t\tif (window.attachTimeRangeFormValidation) {\r\n\t\t\t\t\twindow.attachTimeRangeFormValidation();\r\n\t\t\t\t}\r\n\t\t\t\tif (window.initTimeRangePreview && !editForm) window.initTimeRangePreview();\r\n\t\t\t\tconst fromInput = document.getElementById('editScheduledClassFrom');\r\n\t\t\t\tif (fromInput && window._editScheduledClassFrom) {\r\n\t\t\t\t\tfromInput.value = window._editScheduledClassFrom;\r\n\t\t\t\t}\r\n\t\t\t\tconst studentSelect = document.getElementById('student') || document.getElementById('schedule_student');\r\n\t\t\t\tif (studentSelect) studentSelect.focus();\r\n\t\t\t\tbindEditSeriesScopeHandlers();\r\n\t\t\t});\r\n\r\n\t\t\tfunction handleModalSuccess(form) {\r\n\t\t\t\twindow.closeScheduledClassModals();\r\n\t\t\t\tif (typeof showSuccessBanner === 'function') {\r\n\t\t\t\t\tshowSuccessBanner('Saved successfully');\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterRequest', function (evt) {\r\n\t\t\t\tconst form = evt.detail.elt;\r\n\t\t\t\tif (!evt.detail.successful) return;\r\n\t\t\t\tif (form === conductForm || form === cancelForm || form === document.getElementById('editSeriesConfirmForm')) {\r\n\t\t\t\t\thandleModalSuccess(form);\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst editForm = document.getElementById('editScheduledClassForm');\r\n\t\t\t\tif (form === editForm) {\r\n\t\t\t\t\tconst postURL = form.getAttribute('hx-post') || '';\r\n\t\t\t\t\tif (postURL.indexOf('/edit/preview') === -1) {\r\n\t\t\t\t\t\thandleModalSuccess(form);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<script>\r\n\t\t(function () {\r\n\t\t\tconst conductModal = document.getElementById('conductClassModal');\r\n\t\t\tconst conductForm = document.getElementById('conductClassForm');\r\n\t\t\tconst conductDetails = document.getElementById('conductClassModalDetails');\r\n\t\t\tconst conductNotes = document.getElementById('conductClassNotes');\r\n\t\t\tconst conductFrom = document.getElementById('conductClassFrom');\r\n\r\n\t\t\tconst cancelModal = document.getElementById('cancelClassModal');\r\n\t\t\tconst cancelForm = document.getElementById('cancelClassForm');\r\n\t\t\tconst cancelDetails = document.getElementById('cancelClassModalDetails');\r\n\t\t\tconst cancelReason = document.getElementById('cancelClassReason');\r\n\t\t\tconst cancelNotes = document.getElementById('cancelClassNotes');\r\n\t\t\tconst cancelFrom = document.getElementById('cancelClassFrom');\r\n\t\t\tconst cancelSeriesScopePanel = document.getElementById('cancelSeriesScopePanel');\r\n\t\t\tconst cancelSeriesScopeFutureLabel = document.getElementById('cancelSeriesScopeFutureLabel');\r\n\r\n\t\t\tconst editModal = document.getElementById('editScheduledClassModal');\r\n\t\t\tconst editBody = document.getElementById('editScheduledClassModalBody');\r\n\r\n\t\t\tfunction setFormPost(form, url) {\r\n\t\t\t\tform.action = url;\r\n\t\t\t\tform.setAttribute('hx-post', url);\r\n\t\t\t\tif (typeof htmx !== 'undefined') {\r\n\t\t\t\t\thtmx.process(form);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction escapeHtml(value) {\r\n\t\t\t\treturn String(value || '')\r\n\t\t\t\t\t.replace(/&/g, '&amp;')\r\n\t\t\t\t\t.replace(/</g, '&lt;')\r\n\t\t\t\t\t.replace(/>/g, '&gt;')\r\n\t\t\t\t\t.replace(/\"/g, '&quot;');\r\n\t\t\t}\r\n\r\n\t\t\tfunction fillTimePill(el, timeRange) {\r\n\t\t\t\tif (!el) return;\r\n\t\t\t\tel.innerHTML =\r\n\t\t\t\t\t'<span class=\"time-range-pill\" aria-label=\"Time: ' + escapeHtml(timeRange) + '\">' +\r\n\t\t\t\t\t'<span class=\"pill pill--primary\">' + escapeHtml(timeRange) + '</span>' +\r\n\t\t\t\t\t'</span>';\r\n\t\t\t}\r\n\r\n\t\t\tfunction fillRatePill(el, rate, currency) {\r\n\t\t\t\tif (!el) return;\r\n\t\t\t\tel.innerHTML =\r\n\t\t\t\t\t'<span class=\"pill pill--info rate-pill\" aria-label=\"' + escapeHtml(rate + ' ' + currency) + '\">' +\r\n\t\t\t\t\t'<span class=\"rate-pill-amount\">' + escapeHtml(rate) + '</span>' +\r\n\t\t\t\t\t'<span class=\"rate-pill-currency\">' + escapeHtml(currency) + '</span>' +\r\n\t\t\t\t\t'</span>';\r\n\t\t\t}\r\n\r\n\t\t\tfunction fillDurationPill(el, label) {\r\n\t\t\t\tif (!el) return;\r\n\t\t\t\tel.innerHTML =\r\n\t\t\t\t\t'<span class=\"duration-pill-wrap\" aria-label=\"Duration: ' + escapeHtml(label) + '\">' +\r\n\t\t\t\t\t'<span class=\"pill pill--neutral duration-pill\">' +\r\n\t\t\t\t\t'<svg class=\"duration-pill-icon\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">' +\r\n\t\t\t\t\t'<circle cx=\"12\" cy=\"12\" r=\"10\"></circle>' +\r\n\t\t\t\t\t'<polyline points=\"12 6 12 12 16 14\"></polyline>' +\r\n\t\t\t\t\t'</svg>' +\r\n\t\t\t\t\t'<span class=\"duration-pill-value\">' + escapeHtml(label) + '</span>' +\r\n\t\t\t\t\t'</span>' +\r\n\t\t\t\t\t'</span>';\r\n\t\t\t}\r\n\r\n\t\t\tfunction fillTeacherCell(el, trigger) {\r\n\t\t\t\tif (!el || !trigger) return;\r\n\t\t\t\tconst name = trigger.getAttribute('data-teacher-name') || '-';\r\n\t\t\t\tconst initials = trigger.getAttribute('data-teacher-initials') || '';\r\n\t\t\t\tconst color = trigger.getAttribute('data-teacher-color') || '#B9D283';\r\n\t\t\t\tconst pictureURL = trigger.getAttribute('data-teacher-picture-url') || '';\r\n\t\t\t\tconst hasPicture = trigger.getAttribute('data-teacher-has-picture') === 'true';\r\n\t\t\t\tconst alt = trigger.getAttribute('data-teacher-alt') || (name + ' avatar');\r\n\t\t\t\tconst roleBadge = trigger.getAttribute('data-teacher-role-badge') || '';\r\n\t\t\t\tconst roleBadgeClass = trigger.getAttribute('data-teacher-role-badge-class') || 'pill pill--neutral';\r\n\t\t\t\tconst avatarContent = hasPicture && pictureURL\r\n\t\t\t\t\t? '<img src=\"' + escapeHtml(pictureURL) + '\" alt=\"' + escapeHtml(alt) + '\" class=\"avatar-image\"/>'\r\n\t\t\t\t\t: '<span class=\"avatar-initials\" aria-hidden=\"true\">' + escapeHtml(initials) + '</span>';\r\n\t\t\t\tlet avatarHTML =\r\n\t\t\t\t\t'<div class=\"avatar avatar-sm\" style=\"background-color: ' + escapeHtml(color) + ';\" aria-label=\"' + escapeHtml(alt) + '\">' +\r\n\t\t\t\t\tavatarContent +\r\n\t\t\t\t\t'</div>';\r\n\t\t\t\tif (roleBadge) {\r\n\t\t\t\t\tavatarHTML =\r\n\t\t\t\t\t\t'<div class=\"avatar-with-role\">' +\r\n\t\t\t\t\t\tavatarHTML +\r\n\t\t\t\t\t\t'<span class=\"avatar-role-badge ' + escapeHtml(roleBadgeClass) + '\">' + escapeHtml(roleBadge) + '</span>' +\r\n\t\t\t\t\t\t'</div>';\r\n\t\t\t\t}\r\n\t\t\t\tel.innerHTML =\r\n\t\t\t\t\t'<div class=\"teacher-name-cell\">' +\r\n\t\t\t\t\tavatarHTML +\r\n\t\t\t\t\t'<span class=\"teacher-name-cell-text\">' + escapeHtml(name) + '</span>' +\r\n\t\t\t\t\t'</div>';\r\n\t\t\t}\r\n\r\n\t\t\tfunction fillScheduledClassDetails(container, trigger) {\r\n\t\t\t\tif (!container || !trigger) return;\r\n\t\t\t\tconst studentEl = container.querySelector('[data-field=\"student\"]');\r\n\t\t\t\tconst teacherCell = container.querySelector('[data-field=\"teacher-cell\"]');\r\n\t\t\t\tconst dateEl = container.querySelector('[data-field=\"date\"]');\r\n\t\t\t\tconst timeEl = container.querySelector('[data-field=\"time\"]');\r\n\t\t\t\tconst durationEl = container.querySelector('[data-field=\"duration\"]');\r\n\t\t\t\tconst rateEl = container.querySelector('[data-field=\"rate\"]');\r\n\t\t\t\tif (studentEl) studentEl.textContent = trigger.getAttribute('data-student-name') || '-';\r\n\t\t\t\tfillTeacherCell(teacherCell, trigger);\r\n\t\t\t\tif (dateEl) dateEl.textContent = trigger.getAttribute('data-scheduled-date') || '-';\r\n\t\t\t\tfillTimePill(timeEl, trigger.getAttribute('data-time-range') || '-');\r\n\t\t\t\tfillDurationPill(durationEl, trigger.getAttribute('data-duration') || '-');\r\n\t\t\t\tfillRatePill(\r\n\t\t\t\t\trateEl,\r\n\t\t\t\t\ttrigger.getAttribute('data-rate') || '-',\r\n\t\t\t\t\ttrigger.getAttribute('data-currency') || ''\r\n\t\t\t\t);\r\n\t\t\t}\r\n\r\n\t\t\tfunction openModal(modal) {\r\n\t\t\t\tmodal.hidden = false;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t}\r\n\r\n\t\t\twindow.closeScheduledClassModals = function () {\r\n\t\t\t\tif (conductModal) conductModal.hidden = true;\r\n\t\t\t\tif (cancelModal) cancelModal.hidden = true;\r\n\t\t\t\tif (editModal) editModal.hidden = true;\r\n\t\t\t\tconst scheduleOpen = typeof window.isScheduleModalOpen === 'function' && window.isScheduleModalOpen();\r\n\t\t\t\tconst classViewOpen = !!document.getElementById('classViewModal');\r\n\t\t\t\tif (!scheduleOpen && !classViewOpen) {\r\n\t\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\t}\r\n\t\t\t\tif (conductNotes) conductNotes.value = '';\r\n\t\t\t\tif (cancelReason) cancelReason.value = '';\r\n\t\t\t\tif (cancelNotes) cancelNotes.value = '';\r\n\t\t\t\tif (editBody) editBody.innerHTML = '<p class=\"modal-loading\">Loading...</p>';\r\n\t\t\t};\r\n\r\n\t\t\twindow.openConductClassModal = function (url, trigger, from) {\r\n\t\t\t\tif (!conductModal || !conductForm) return;\r\n\t\t\t\tsetFormPost(conductForm, url);\r\n\t\t\t\tfillScheduledClassDetails(conductDetails, trigger);\r\n\t\t\t\tif (conductFrom) conductFrom.value = from || 'schedule';\r\n\t\t\t\tif (conductNotes) conductNotes.value = '';\r\n\t\t\t\topenModal(conductModal);\r\n\t\t\t\tif (conductNotes) conductNotes.focus();\r\n\t\t\t};\r\n\r\n\t\t\tfunction configureSeriesScopePanel(panel, futureLabelEl, trigger) {\r\n\t\t\t\tif (!panel) return;\r\n\t\t\t\tconst seriesID = trigger ? trigger.getAttribute('data-series-id') : '';\r\n\t\t\t\tconst totalCount = trigger ? parseInt(trigger.getAttribute('data-series-total-count') || '0', 10) : 0;\r\n\t\t\t\tconst futureCount = trigger ? parseInt(trigger.getAttribute('data-series-future-count') || '0', 10) : 0;\r\n\t\t\t\tconst futureInput = panel.querySelector('input[value=\"future\"]');\r\n\t\t\t\tif (seriesID && totalCount > 1) {\r\n\t\t\t\t\tpanel.hidden = false;\r\n\t\t\t\t\tif (futureLabelEl) {\r\n\t\t\t\t\t\tif (futureCount > 1) {\r\n\t\t\t\t\t\t\tfutureLabelEl.textContent = 'This and ' + futureCount + ' scheduled classes in this series (including this date)';\r\n\t\t\t\t\t\t} else {\r\n\t\t\t\t\t\t\tfutureLabelEl.textContent = 'This and future classes in this series';\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t\tif (futureInput) futureInput.disabled = futureCount <= 1;\r\n\t\t\t\t\tconst singleInput = panel.querySelector('input[value=\"single\"]');\r\n\t\t\t\t\tif (singleInput) singleInput.checked = true;\r\n\t\t\t\t} else {\r\n\t\t\t\t\tpanel.hidden = true;\r\n\t\t\t\t\tif (futureInput) futureInput.disabled = false;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction bindEditSeriesScopeHandlers() {\r\n\t\t\t\tconst form = document.getElementById('editScheduledClassForm');\r\n\t\t\t\tif (!form) return;\r\n\t\t\t\tconst hint = document.getElementById('editSeriesDateHint');\r\n\t\t\t\tconst scopeInputs = form.querySelectorAll('input[name=\"edit_scope\"]');\r\n\t\t\t\tif (!scopeInputs.length) return;\r\n\t\t\t\tfunction syncScopeUi() {\r\n\t\t\t\t\tconst futureSelected = Array.from(scopeInputs).some((input) => input.checked && input.value === 'future');\r\n\t\t\t\t\tif (hint) hint.hidden = !futureSelected;\r\n\t\t\t\t}\r\n\t\t\t\tscopeInputs.forEach((input) => input.addEventListener('change', syncScopeUi));\r\n\t\t\t\tsyncScopeUi();\r\n\t\t\t}\r\n\r\n\t\t\twindow.openCancelClassModal = function (url, trigger, from) {\r\n\t\t\t\tif (!cancelModal || !cancelForm) return;\r\n\t\t\t\tsetFormPost(cancelForm, url);\r\n\t\t\t\tfillScheduledClassDetails(cancelDetails, trigger);\r\n\t\t\t\tif (cancelFrom) cancelFrom.value = from || 'schedule';\r\n\t\t\t\tif (cancelReason) cancelReason.value = '';\r\n\t\t\t\tif (cancelNotes) cancelNotes.value = '';\r\n\t\t\t\tconfigureSeriesScopePanel(cancelSeriesScopePanel, cancelSeriesScopeFutureLabel, trigger);\r\n\t\t\t\topenModal(cancelModal);\r\n\t\t\t\tif (cancelReason) cancelReason.focus();\r\n\t\t\t};\r\n\r\n\t\t\twindow.openEditScheduledClassModal = function (url, from) {\r\n\t\t\t\tif (!editModal || !editBody) return;\r\n\t\t\t\topenModal(editModal);\r\n\t\t\t\tif (typeof htmx !== 'undefined') {\r\n\t\t\t\t\thtmx.ajax('GET', url, { target: '#editScheduledClassModalBody', swap: 'innerHTML' });\r\n\t\t\t\t}\r\n\t\t\t\twindow._editScheduledClassFrom = from || 'schedule';\r\n\t\t\t};\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tconst conductBtn = e.target.closest('[data-conduct-url]');\r\n\t\t\t\tif (conductBtn) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\twindow.openConductClassModal(\r\n\t\t\t\t\t\tconductBtn.getAttribute('data-conduct-url'),\r\n\t\t\t\t\t\tconductBtn,\r\n\t\t\t\t\t\tconductBtn.getAttribute('data-action-from') || 'schedule'\r\n\t\t\t\t\t);\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst cancelBtn = e.target.closest('[data-cancel-url]');\r\n\t\t\t\tif (cancelBtn) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\twindow.openCancelClassModal(\r\n\t\t\t\t\t\tcancelBtn.getAttribute('data-cancel-url'),\r\n\t\t\t\t\t\tcancelBtn,\r\n\t\t\t\t\t\tcancelBtn.getAttribute('data-action-from') || 'schedule'\r\n\t\t\t\t\t);\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst editBtn = e.target.closest('[data-edit-url]');\r\n\t\t\t\tif (editBtn) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\twindow.openEditScheduledClassModal(\r\n\t\t\t\t\t\teditBtn.getAttribute('data-edit-url'),\r\n\t\t\t\t\t\teditBtn.getAttribute('data-action-from') || 'schedule'\r\n\t\t\t\t\t);\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (e.target.closest('.scheduled-class-modal-close')) {\r\n\t\t\t\t\twindow.closeScheduledClassModals();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (e.target === conductModal || e.target === cancelModal || e.target === editModal) {\r\n\t\t\t\t\twindow.closeScheduledClassModals();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key !== 'Escape') return;\r\n\t\t\t\tif (conductModal && !conductModal.hidden) {\r\n\t\t\t\t\twindow.closeScheduledClassModals();\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\te.stopImmediatePropagation();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (cancelModal && !cancelModal.hidden) {\r\n\t\t\t\t\twindow.closeScheduledClassModals();\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\te.stopImmediatePropagation();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (editModal && !editModal.hidden) {\r\n\t\t\t\t\twindow.closeScheduledClassModals();\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\te.stopImmediatePropagation();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tif (conductForm) {\r\n\t\t\t\tconductForm.addEventListener('submit', function () {\r\n\t\t\t\t\tif (conductNotes) conductNotes.value = conductNotes.value.trim();\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tif (cancelForm) {\r\n\t\t\t\tcancelForm.addEventListener('submit', function (e) {\r\n\t\t\t\t\tif (!cancelReason || !cancelReason.value.trim()) {\r\n\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\talert('Reason is required for cancellation');\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\t\t\t\t\tcancelReason.value = cancelReason.value.trim();\r\n\t\t\t\t\tif (cancelNotes) cancelNotes.value = cancelNotes.value.trim();\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tif (evt.detail.target.id === 'editSeriesPreviewPanel') {\r\n\t\t\t\t\tconst confirmForm = document.getElementById('editSeriesConfirmForm');\r\n\t\t\t\t\tif (confirmForm && typeof htmx !== 'undefined') {\r\n\t\t\t\t\t\thtmx.process(confirmForm);\r\n\t\t\t\t\t}\r\n\t\t\t\t\tconst confirmBtn = document.getElementById('editSeriesConfirmBtn');\r\n\t\t\t\t\tif (confirmBtn) confirmBtn.focus();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (evt.detail.target !== editBody) return;\r\n\t\t\t\tconst editForm = document.getElementById('editScheduledClassForm');\r\n\t\t\t\tif (editForm && window.initTimeRangePreview) {\r\n\t\t\t\t\twindow.initTimeRangePreview({ form: editForm });\r\n\t\t\t\t}\r\n\t\t\t\tif (editForm && window.initScheduleRepeatCalendar) {\r\n\t\t\t\t\tconst calRoot = editForm.querySelector('[data-schedule-repeat-calendar]');\r\n\t\t\t\t\tif (calRoot) window.initScheduleRepeatCalendar(calRoot);\r\n\t\t\t\t}\r\n\t\t\t\tif (window.attachTimeRangeFormValidation) {\r\n\t\t\t\t\twindow.attachTimeRangeFormValidation();\r\n\t\t\t\t}\r\n\t\t\t\tif (window.initTimeRangePreview && !editForm) window.initTimeRangePreview();\r\n\t\t\t\tconst fromInput = document.getElementById('editScheduledClassFrom');\r\n\t\t\t\tif (fromInput && window._editScheduledClassFrom) {\r\n\t\t\t\t\tfromInput.value = window._editScheduledClassFrom;\r\n\t\t\t\t}\r\n\t\t\t\tconst studentSelect = document.getElementById('student') || document.getElementById('schedule_student');\r\n\t\t\t\tif (studentSelect) studentSelect.focus();\r\n\t\t\t\tbindEditSeriesScopeHandlers();\r\n\t\t\t});\r\n\r\n\t\t\tfunction handleModalSuccess(form) {\r\n\t\t\t\twindow.closeScheduledClassModals();\r\n\t\t\t\tif (typeof showSuccessBanner === 'function') {\r\n\t\t\t\t\tshowSuccessBanner('Saved successfully');\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterRequest', function (evt) {\r\n\t\t\t\tconst form = evt.detail.elt;\r\n\t\t\t\tif (!evt.detail.successful) return;\r\n\t\t\t\tif (form === conductForm || form === cancelForm || form === document.getElementById('editSeriesConfirmForm')) {\r\n\t\t\t\t\thandleModalSuccess(form);\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst editForm = document.getElementById('editScheduledClassForm');\r\n\t\t\t\tif (form === editForm) {\r\n\t\t\t\t\tconst postURL = form.getAttribute('hx-post') || '';\r\n\t\t\t\t\tif (postURL.indexOf('/edit/preview') === -1) {\r\n\t\t\t\t\t\thandleModalSuccess(form);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t})();\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

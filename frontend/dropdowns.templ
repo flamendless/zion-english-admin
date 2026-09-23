@@ -38,7 +38,7 @@ templ TeacherSearch(params TeacherSearchParams) {
 				_={ teacherSearchClearScript(params.HiddenID, params.ResultsID) }
 			}
 			hx-get={ teacherSearchURL(params.HiddenID, params.InputID, params.ResultsID) }
-			hx-trigger="input changed delay:300ms"
+			hx-trigger={ HxTriggerInputDelay }
 			hx-target={ "#" + params.ResultsID }
 			hx-include={ "#" + params.InputID }
 		/>
@@ -124,9 +124,9 @@ templ TeacherStudentsDropdownWithValue(selectedID string) {
 		<label for="student">Student *</label>
 		<select id="student" name="student" required
 			hx-get={ utils.URL("/api/me/students?selected=" + selectedID) }
-			hx-trigger="load"
-			hx-swap="innerHTML"
-			hx-target="this"
+			hx-trigger={ HxTriggerLoad }
+			hx-swap={ HxSwapInnerHTML }
+			hx-target={ HxTargetThis }
 		>
 			<option value="">-- Select Student --</option>
 		</select>
@@ -138,9 +138,9 @@ templ TeacherStudentsDropdown() {
 		<label for="student">Student *</label>
 		<select id="student" name="student" required
 			hx-get={ utils.URL("/api/me/students") }
-			hx-trigger="load"
-			hx-swap="innerHTML"
-			hx-target="this"
+			hx-trigger={ HxTriggerLoad }
+			hx-swap={ HxSwapInnerHTML }
+			hx-target={ HxTargetThis }
 		>
 			//StudentOption
 			<option value="">-- Select Student --</option>
@@ -153,9 +153,9 @@ templ StudentDropdownWithValue(selectedID string) {
 		@AdminOnlyFormLabel("student", "Student *")
 		<select id="student" name="student" required
 			hx-get={ utils.URL("/api/students?selected=" + selectedID) }
-			hx-trigger="load"
-			hx-swap="innerHTML"
-			hx-target="this"
+			hx-trigger={ HxTriggerLoad }
+			hx-swap={ HxSwapInnerHTML }
+			hx-target={ HxTargetThis }
 		>
 			<option value="">-- Select Student --</option>
 		</select>
@@ -167,9 +167,9 @@ templ StudentDropdown() {
 		@AdminOnlyFormLabel("student", "Student *")
 		<select id="student" name="student" required
 			hx-get={ utils.URL("/api/students") }
-			hx-trigger="load"
-			hx-swap="innerHTML"
-			hx-target="this"
+			hx-trigger={ HxTriggerLoad }
+			hx-swap={ HxSwapInnerHTML }
+			hx-target={ HxTargetThis }
 		>
 			//StudentOption
 			<option value="">-- Select Student --</option>
@@ -204,9 +204,9 @@ templ ScheduleEditStudentDropdown(teacherID string, studentID string) {
 		@AdminOnlyFormLabel("schedule_student", "Student *")
 		<select id="schedule_student" name="schedule_student" required
 			hx-get={ utils.URL("/api/students?teacher=" + teacherID + "&selected=" + studentID) }
-			hx-trigger="load"
-			hx-swap="innerHTML"
-			hx-target="this"
+			hx-trigger={ HxTriggerLoad }
+			hx-swap={ HxSwapInnerHTML }
+			hx-target={ HxTargetThis }
 		>
 			<option value="">-- Select Student --</option>
 		</select>
@@ -223,7 +223,7 @@ templ StudentSearchbox() {
 			autocomplete="off"
 			placeholder="Search registered student..."
 			hx-get={ utils.URL("/api/students/search") }
-			hx-trigger="input changed delay:300ms"
+			hx-trigger={ HxTriggerInputDelay }
 			hx-target="#relatedStudentResults"
 			hx-include="this"
 		/>

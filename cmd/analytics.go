@@ -105,8 +105,7 @@ type analyticsResponseJSON struct {
 }
 
 func handleAnalytics(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -120,28 +119,26 @@ func handleAnalytics(w http.ResponseWriter, r *http.Request) {
 		data.TeacherName = user.Name
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.Analytics(data).Render(r.Context(), w); err != nil {
 		logs.Log().Error("render analytics", zap.Error(err))
 	}
 }
 
 func handleAnalyticsDatePresetPartial(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
 	month := strings.TrimSpace(r.URL.Query().Get("month"))
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.DatePresetForMonth(month, true).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -154,7 +151,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 	teacherID, err := analyticsTeacherID(r)
 	if err != nil {
 		if err.Error() == "forbidden" {
-			HttpError(w, "Forbidden", http.StatusForbidden)
+			HttpError(w, MsgForbidden, http.StatusForbidden)
 			return
 		}
 		HttpError(w, err.Error(), http.StatusBadRequest)
@@ -168,7 +165,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 	summaryRow, err := q.GetAnalyticsSummary(ctx, analyticsSummaryParams(startDate, endDate, teacherID))
 	if err != nil {
 		logs.Log().Error("analytics summary", zap.Error(err))
-		HttpError(w, "Failed to load analytics", http.StatusInternalServerError)
+		HttpError(w, MsgFailedToLoadAnalytics, http.StatusInternalServerError)
 		return
 	}
 
@@ -196,7 +193,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 		teacherRows, err := q.GetAnalyticsCancellationByTeacher(ctx, analyticsByTeacherParams(startDate, endDate, teacherID))
 		if err != nil {
 			logs.Log().Error("analytics by teacher", zap.Error(err))
-			HttpError(w, "Failed to load analytics", http.StatusInternalServerError)
+			HttpError(w, MsgFailedToLoadAnalytics, http.StatusInternalServerError)
 			return
 		}
 		resp.ByTeacher = make([]analyticsTeacherRowJSON, 0, len(teacherRows))
@@ -225,7 +222,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 	studentRows, err := q.GetAnalyticsCancellationByStudent(ctx, analyticsByStudentParams(startDate, endDate, teacherID))
 	if err != nil {
 		logs.Log().Error("analytics by student", zap.Error(err))
-		HttpError(w, "Failed to load analytics", http.StatusInternalServerError)
+		HttpError(w, MsgFailedToLoadAnalytics, http.StatusInternalServerError)
 		return
 	}
 	resp.ByStudent = make([]analyticsStudentRowJSON, 0, len(studentRows))
@@ -251,7 +248,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		logs.Log().Error("analytics weekly", zap.Error(err))
-		HttpError(w, "Failed to load analytics", http.StatusInternalServerError)
+		HttpError(w, MsgFailedToLoadAnalytics, http.StatusInternalServerError)
 		return
 	}
 	resp.Weekly = make([]analyticsWeeklyRowJSON, 0, len(weeklyRows))
@@ -280,7 +277,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		logs.Log().Error("analytics no-shows", zap.Error(err))
-		HttpError(w, "Failed to load analytics", http.StatusInternalServerError)
+		HttpError(w, MsgFailedToLoadAnalytics, http.StatusInternalServerError)
 		return
 	}
 	resp.NoShows = make([]analyticsNoShowJSON, 0, len(noShowRows))
@@ -305,7 +302,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		logs.Log().Error("analytics inactive reasons", zap.Error(err))
-		HttpError(w, "Failed to load analytics", http.StatusInternalServerError)
+		HttpError(w, MsgFailedToLoadAnalytics, http.StatusInternalServerError)
 		return
 	}
 	resp.InactiveReasons = make([]analyticsInactiveReasonJSON, 0, len(inactiveReasonRows))
@@ -324,7 +321,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		logs.Log().Error("analytics churned students", zap.Error(err))
-		HttpError(w, "Failed to load analytics", http.StatusInternalServerError)
+		HttpError(w, MsgFailedToLoadAnalytics, http.StatusInternalServerError)
 		return
 	}
 
@@ -344,7 +341,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 	retentionRow, err := q.GetAnalyticsRetentionSummary(ctx, analyticsRetentionParams(startDate, endDate, teacherID))
 	if err != nil {
 		logs.Log().Error("analytics retention summary", zap.Error(err))
-		HttpError(w, "Failed to load analytics", http.StatusInternalServerError)
+		HttpError(w, MsgFailedToLoadAnalytics, http.StatusInternalServerError)
 		return
 	}
 	resp.Retention = analyticsRetentionJSON{
@@ -356,11 +353,11 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 
 	if err := enrichAnalyticsResponseWithRoleBadges(ctx, &resp, noShowTeacherIDs); err != nil {
 		logs.Log().Error("analytics teacher roles", zap.Error(err))
-		HttpError(w, "Failed to load analytics", http.StatusInternalServerError)
+		HttpError(w, MsgFailedToLoadAnalytics, http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	writeJSON(w)
 	if err := json.NewEncoder(w).Encode(resp); err != nil {
 		logs.Log().Error("encode analytics", zap.Error(err))
 	}

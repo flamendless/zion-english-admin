@@ -35,8 +35,7 @@ type trainingMaterialRow struct {
 }
 
 func handleTrainingMaterials(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -176,19 +175,18 @@ func handleTrainingMaterialsPath(w http.ResponseWriter, r *http.Request) {
 		handleTrainingMaterialDelete(w, r, id)
 		return
 	}
-	HttpError(w, "Not found", http.StatusNotFound)
+	HttpError(w, MsgNotFound, http.StatusNotFound)
 }
 
 func handleTrainingMaterialCreate(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if !trainingmaterials.CanCreate(user.Role) {
-		HttpError(w, "Forbidden", http.StatusForbidden)
+		HttpError(w, MsgForbidden, http.StatusForbidden)
 		return
 	}
 	if err := r.ParseForm(); err != nil {
@@ -241,8 +239,7 @@ func handleTrainingMaterialCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleTrainingMaterialView(w http.ResponseWriter, r *http.Request, materialID int64) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -254,7 +251,7 @@ func handleTrainingMaterialView(w http.ResponseWriter, r *http.Request, material
 		return
 	}
 	if !trainingmaterials.CanView(user.Role, material.Status) {
-		HttpError(w, "Forbidden", http.StatusForbidden)
+		HttpError(w, MsgForbidden, http.StatusForbidden)
 		return
 	}
 
@@ -286,7 +283,7 @@ func handleTrainingMaterialEdit(w http.ResponseWriter, r *http.Request, material
 
 	if !trainingmaterials.CanEdit(user.Role) {
 		if r.Method == http.MethodGet {
-			HttpError(w, "Forbidden", http.StatusForbidden)
+			HttpError(w, MsgForbidden, http.StatusForbidden)
 		} else {
 			setErrorFlash(w, "You do not have permission to edit training materials")
 			HttpRedirect(w, r, "/training-materials")
@@ -386,20 +383,19 @@ func handleTrainingMaterialEdit(w http.ResponseWriter, r *http.Request, material
 		setSuccessFlash(w, "Training material updated successfully")
 		HttpRedirect(w, r, "/training-materials")
 	default:
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, MsgMethodNotAllowed, http.StatusMethodNotAllowed)
 	}
 }
 
 func handleTrainingMaterialDelete(w http.ResponseWriter, r *http.Request, materialID int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if !trainingmaterials.CanDelete(user.Role) {
-		HttpError(w, "Forbidden", http.StatusForbidden)
+		HttpError(w, MsgForbidden, http.StatusForbidden)
 		return
 	}
 
@@ -426,8 +422,7 @@ func handleTrainingMaterialDelete(w http.ResponseWriter, r *http.Request, materi
 }
 
 func handleTrainingMaterialWatch(w http.ResponseWriter, r *http.Request, materialID int64) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -439,7 +434,7 @@ func handleTrainingMaterialWatch(w http.ResponseWriter, r *http.Request, materia
 		return
 	}
 	if !trainingmaterials.CanWatch(user.Role, material.Status) {
-		HttpError(w, "Forbidden", http.StatusForbidden)
+		HttpError(w, MsgForbidden, http.StatusForbidden)
 		return
 	}
 
@@ -480,15 +475,14 @@ func handleTrainingMaterialWatch(w http.ResponseWriter, r *http.Request, materia
 }
 
 func handleTrainingMaterialProgress(w http.ResponseWriter, r *http.Request, materialID int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if user.Role != auth.RoleTeacher {
-		HttpError(w, "Forbidden", http.StatusForbidden)
+		HttpError(w, MsgForbidden, http.StatusForbidden)
 		return
 	}
 
@@ -498,7 +492,7 @@ func handleTrainingMaterialProgress(w http.ResponseWriter, r *http.Request, mate
 		return
 	}
 	if !trainingmaterials.CanWatch(user.Role, material.Status) {
-		HttpError(w, "Forbidden", http.StatusForbidden)
+		HttpError(w, MsgForbidden, http.StatusForbidden)
 		return
 	}
 
@@ -565,7 +559,7 @@ func handleTrainingMaterialProgress(w http.ResponseWriter, r *http.Request, mate
 		insertAuditLogAs(ctx, user, "training-materials", fmt.Sprintf("Started training material #%d", materialID))
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	writeJSON(w)
 	_ = json.NewEncoder(w).Encode(map[string]interface{}{
 		"progress_percent": progressPercent,
 		"completed":        completedAt.Valid,
@@ -573,20 +567,19 @@ func handleTrainingMaterialProgress(w http.ResponseWriter, r *http.Request, mate
 }
 
 func handleTrainingMaterialURLPreview(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
 	rawURL := strings.TrimSpace(r.URL.Query().Get("url"))
 	sourceType, err := trainingmaterials.InferSourceType(rawURL)
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
+		writeJSON(w)
 		_ = json.NewEncoder(w).Encode(map[string]string{"thumbnail_url": "", "error": err.Error()})
 		return
 	}
 	parsed, err := trainingmaterials.ParseURL(sourceType, rawURL)
-	w.Header().Set("Content-Type", "application/json")
+	writeJSON(w)
 	if err != nil {
 		_ = json.NewEncoder(w).Encode(map[string]string{"thumbnail_url": ""})
 		return
@@ -599,15 +592,14 @@ func handleTrainingMaterialURLPreview(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleTrainingMaterialsProgressReport(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if !auth.HasAdminAccess(user.Role) {
-		HttpError(w, "Forbidden", http.StatusForbidden)
+		HttpError(w, MsgForbidden, http.StatusForbidden)
 		return
 	}
 

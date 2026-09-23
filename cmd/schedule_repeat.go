@@ -21,13 +21,12 @@ func handleScheduleRepeat(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		handleScheduleRepeatConfirm(w, r)
 	default:
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, MsgMethodNotAllowed, http.StatusMethodNotAllowed)
 	}
 }
 
 func handleScheduleRepeatPreview(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 	if err := r.ParseForm(); err != nil {
@@ -75,7 +74,7 @@ func handleScheduleRepeatPreview(w http.ResponseWriter, r *http.Request) {
 		LearningMaterialIDs: parseLearningMaterialIDs(r),
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.ScheduleRepeatPreview(data).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -93,7 +92,7 @@ func handleScheduleRepeatPage(w http.ResponseWriter, r *http.Request) {
 		data.TeacherID = fmt.Sprintf("%d", user.ID)
 		data.TeacherName = user.Name
 	}
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.ScheduleRepeat(data).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -160,7 +159,7 @@ func handleScheduleRepeatConfirm(w http.ResponseWriter, r *http.Request) {
 	}
 	message := fmt.Sprintf("Created %d classes across %s", len(createdIDs), strings.Join(dateLabels, ", "))
 	setSuccessFlash(w, message)
-	w.Header().Set("HX-Redirect", utils.URL("/schedule/repeat"))
+	setHXRedirect(w, "/schedule/repeat")
 }
 
 func createRepeatScheduledClasses(ctx context.Context, user auth.User, base scheduledClassCreateParams, dates []string) ([]int64, error) {

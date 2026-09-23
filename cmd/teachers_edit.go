@@ -125,19 +125,18 @@ func handleTeachersPath(w http.ResponseWriter, r *http.Request) {
 		handleTeacherView(w, r, id)
 		return
 	}
-	HttpError(w, "Not found", http.StatusNotFound)
+	HttpError(w, MsgNotFound, http.StatusNotFound)
 }
 
 func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
 	ctx := r.Context()
 	row, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, teacherID)
 	if err != nil {
-		HttpError(w, "Teacher not found", http.StatusNotFound)
+		HttpError(w, MsgTeacherNotFound, http.StatusNotFound)
 		return
 	}
 
@@ -152,7 +151,7 @@ func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) 
 
 	roleStrings, err := loadTeacherRoles(ctx, teacherID)
 	if err != nil {
-		HttpError(w, "Failed to load teacher roles", http.StatusInternalServerError)
+		HttpError(w, MsgFailedToLoadTeacherRoles, http.StatusInternalServerError)
 		return
 	}
 
@@ -172,7 +171,7 @@ func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) 
 			ShowSummary:    true,
 		}
 	}
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	frontend.TeacherViewModal(frontend.TeacherViewData{
 		ID:             strconv.FormatInt(teacherID, 10),
 		Name:           teacherName,
@@ -207,8 +206,7 @@ func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) 
 }
 
 func handleTeachers(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -362,7 +360,7 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := listQueryParamsWithSort(r, frontend.ListSortKindTeacher)
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	frontend.Teachers(frontend.TeacherData{
 		Teachers:         viewTeachers,
 		Query:            q,
@@ -390,17 +388,17 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 
 	existing, err := dbRO.GetQueries().GetTeacherFullByID(ctx, teacherID)
 	if err != nil {
-		HttpError(w, "Teacher not found", http.StatusNotFound)
+		HttpError(w, MsgTeacherNotFound, http.StatusNotFound)
 		return
 	}
 	if existing.Deleted != 0 {
-		HttpError(w, "Teacher not found", http.StatusNotFound)
+		HttpError(w, MsgTeacherNotFound, http.StatusNotFound)
 		return
 	}
 
 	existingRoles, err := loadTeacherRoles(ctx, teacherID)
 	if err != nil {
-		HttpError(w, "Failed to load teacher roles", http.StatusInternalServerError)
+		HttpError(w, MsgFailedToLoadTeacherRoles, http.StatusInternalServerError)
 		return
 	}
 	targetHasAdmin := teacherHasAdminRole(existingRoles)
@@ -412,7 +410,7 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		if existing.Template.Valid {
 			template = existing.Template.String
 		}
-		w.Header().Set("Content-Type", "text/html")
+		writeHTML(w)
 		frontend.EditTeacher(frontend.EditTeacherData{
 			ID:             strconv.FormatInt(teacherID, 10),
 			FirstName:      existing.FirstName,
@@ -439,8 +437,7 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		return
 	}
 
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -509,7 +506,7 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 
 	tx, err := dbRW.GetDB().BeginTx(ctx, nil)
 	if err != nil {
-		sendErrorLog(w, "Failed to start transaction")
+		sendErrorLog(w, MsgFailedToStartTransaction)
 		return
 	}
 	defer tx.Rollback()

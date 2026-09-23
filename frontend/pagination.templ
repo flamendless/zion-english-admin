@@ -48,7 +48,7 @@ templ PaginationBarHTMX(loadURL string, includeSelector string, page PaginationD
 				hx-include={ includeSelector }
 				hx-vals={ fmt.Sprintf(`{"page": %d}`, page.PrevPage) }
 				hx-target="#classesTableBody"
-				hx-swap="innerHTML"
+				hx-swap={ HxSwapInnerHTML }
 			>Previous</button>
 		} else {
 			<span class="pagination-btn disabled">Previous</span>
@@ -62,7 +62,7 @@ templ PaginationBarHTMX(loadURL string, includeSelector string, page PaginationD
 				hx-include={ includeSelector }
 				hx-vals={ fmt.Sprintf(`{"page": %d}`, page.NextPage) }
 				hx-target="#classesTableBody"
-				hx-swap="innerHTML"
+				hx-swap={ HxSwapInnerHTML }
 			>Next</button>
 		} else {
 			<span class="pagination-btn disabled">Next</span>

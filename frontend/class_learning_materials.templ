@@ -20,9 +20,9 @@ templ ClassLearningMaterialPicker(links []ClassLearningMaterialLink, prefix stri
 				autocomplete="off"
 				placeholder="Search learning material by title..."
 				hx-get={ utils.URL("/api/learning-materials/search") }
-				hx-trigger="input changed delay:300ms"
+				hx-trigger={ HxTriggerInputDelay }
 				hx-target="next"
-				hx-swap="innerHTML"
+				hx-swap={ HxSwapInnerHTML }
 				hx-include="this"
 			/>
 			<div class="class-lm-results"></div>
@@ -77,7 +77,7 @@ templ ClassLearningMaterialReadonlyList(links []ClassLearningMaterialLink) {
 						role="listitem"
 						hx-get={ utils.URL("/learning-materials/" + link.ID + "/view") }
 						hx-target="#lmViewModalHost"
-						hx-swap="innerHTML"
+						hx-swap={ HxSwapInnerHTML }
 						aria-label={ "View learning material: " + link.Title }
 					>
 						@ClassLearningMaterialPillIcon()

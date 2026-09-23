@@ -108,7 +108,7 @@ templ DocumentsToolbar(showTeacherFilter bool, status constants.TeacherDocumentS
 			hx-get={ utils.URL("/documents/partials/rows") }
 			hx-include="#documentsToolbar"
 			hx-target="#documentsTableBody"
-			hx-swap="innerHTML"
+			hx-swap={ HxSwapInnerHTML }
 		>Filter</button>
 	</div>
 }
@@ -193,8 +193,8 @@ templ DocumentsTable(showUploader bool, showActions bool) {
 				id="documentsTableBody"
 				hx-get={ utils.URL("/documents/partials/rows") }
 				hx-include="#documentsToolbar"
-				hx-trigger="load"
-				hx-swap="innerHTML"
+				hx-trigger={ HxTriggerLoad }
+				hx-swap={ HxSwapInnerHTML }
 			>
 				<tr>
 					<td colspan={ fmt.Sprintf("%d", documentsTableColspan(showUploader, showActions)) } class="empty-state">Loading documents...</td>

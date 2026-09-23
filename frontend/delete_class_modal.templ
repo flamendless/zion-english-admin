@@ -16,7 +16,7 @@ templ DeleteClassModal() {
 				id="deleteClassForm"
 				method="POST"
 				class="modal-body scheduled-class-action-modal"
-				hx-swap="none"
+				hx-swap={ HxSwapNone }
 			>
 				<p id="deleteClassModalMessage" class="scheduled-class-modal-lead">This will remove the class from your lists. The record is kept for audit.</p>
 				@ScheduledClassDetailCard("deleteClassModalDetails", true)

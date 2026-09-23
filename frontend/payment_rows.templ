@@ -22,7 +22,7 @@ type PaymentRowData struct {
 }
 
 templ PaymentTableRow(row PaymentRowData, showTeacherColumn bool, swapOOB bool) {
-	<tr id={ "payment-row-" + row.ID } if swapOOB { hx-swap-oob="outerHTML" }>
+	<tr id={ "payment-row-" + row.ID } if swapOOB { hx-swap-oob={ HxSwapOuterHTML } }>
 		if showTeacherColumn {
 			<td data-label="Teacher">
 				<div class="payments-teacher-cell">

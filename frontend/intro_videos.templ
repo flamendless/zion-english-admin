@@ -83,7 +83,7 @@ templ IntroVideosToolbar(showTeacherFilter bool, status constants.TeacherIntroVi
 			hx-get={ utils.URL("/intro-videos/partials/rows") }
 			hx-include="#introVideosToolbar"
 			hx-target="#introVideosTableBody"
-			hx-swap="innerHTML"
+			hx-swap={ HxSwapInnerHTML }
 		>Filter</button>
 	</div>
 }
@@ -175,8 +175,8 @@ templ IntroVideosTable(showUploader bool, showActions bool) {
 				id="introVideosTableBody"
 				hx-get={ utils.URL("/intro-videos/partials/rows") }
 				hx-include="#introVideosToolbar"
-				hx-trigger="load"
-				hx-swap="innerHTML"
+				hx-trigger={ HxTriggerLoad }
+				hx-swap={ HxSwapInnerHTML }
 			>
 				<tr>
 					<td colspan={ fmt.Sprintf("%d", introVideosTableColspan(showUploader, showActions)) } class="empty-state">Loading intro videos...</td>

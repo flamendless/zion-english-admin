@@ -144,54 +144,93 @@ func PaymentReceiptModal(data PaymentReceiptData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" hx-swap=\"none\" onclick=\"window.closePaymentReceiptModal()\">Not Yet Received</button> ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<button type=\"button\" class=\"btn btn-secondary payment-receipt-close\" onclick=\"window.closePaymentReceiptModal()\">Cancel</button> ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		if data.ShowDeferAction {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<button type=\"button\" class=\"btn payment-receipt-confirm\" hx-post=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" hx-swap=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var8 string
-			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/payments/" + data.PaymentID + "/received"))
+			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapNone)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payment_receipt_modal.templ`, Line: 68, Col: 70}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payment_receipt_modal.templ`, Line: 58, Col: 26}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" hx-swap=\"none\">Received</button>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" onclick=\"window.closePaymentReceiptModal()\">Not Yet Received</button> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<button type=\"button\" class=\"btn payment-receipt-confirm\" hx-post=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<button type=\"button\" class=\"btn btn-secondary payment-receipt-close\" onclick=\"window.closePaymentReceiptModal()\">Cancel</button> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		if data.ShowDeferAction {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<button type=\"button\" class=\"btn payment-receipt-confirm\" hx-post=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/payments/" + data.PaymentID + "/received"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payment_receipt_modal.templ`, Line: 75, Col: 70}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payment_receipt_modal.templ`, Line: 68, Col: 70}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" hx-headers='{\"X-Payment-Source\":\"history\"}' hx-swap=\"none\">Received</button>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" hx-swap=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var10 string
+			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapNone)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payment_receipt_modal.templ`, Line: 69, Col: 26}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\">Received</button>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<button type=\"button\" class=\"btn payment-receipt-confirm\" hx-post=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var11 string
+			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/payments/" + data.PaymentID + "/received"))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payment_receipt_modal.templ`, Line: 75, Col: 70}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" hx-headers='{\"X-Payment-Source\":\"history\"}' hx-swap=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var12 string
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapNone)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payment_receipt_modal.templ`, Line: 77, Col: 26}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\">Received</button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div></div></div><script>\r\n\t\tfunction openPaymentReceiptModal() {\r\n\t\t\tconst overlay = document.getElementById('paymentReceiptModal');\r\n\t\t\tif (!overlay) return;\r\n\t\t\toverlay.hidden = false;\r\n\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\tconst primary = overlay.querySelector('.payment-receipt-footer .btn:not(.btn-secondary)');\r\n\t\t\tif (primary) primary.focus();\r\n\t\t}\r\n\r\n\t\twindow.closePaymentReceiptModal = function () {\r\n\t\t\tconst host = document.getElementById('paymentReceiptModalHost');\r\n\t\t\tif (host) {\r\n\t\t\t\thost.innerHTML = '';\r\n\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tconst overlay = document.getElementById('paymentReceiptModal');\r\n\t\t\tif (overlay) overlay.hidden = true;\r\n\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t};\r\n\r\n\t\topenPaymentReceiptModal();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</div></div></div><script>\r\n\t\tfunction openPaymentReceiptModal() {\r\n\t\t\tconst overlay = document.getElementById('paymentReceiptModal');\r\n\t\t\tif (!overlay) return;\r\n\t\t\toverlay.hidden = false;\r\n\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\tconst primary = overlay.querySelector('.payment-receipt-footer .btn:not(.btn-secondary)');\r\n\t\t\tif (primary) primary.focus();\r\n\t\t}\r\n\r\n\t\twindow.closePaymentReceiptModal = function () {\r\n\t\t\tconst host = document.getElementById('paymentReceiptModalHost');\r\n\t\t\tif (host) {\r\n\t\t\t\thost.innerHTML = '';\r\n\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tconst overlay = document.getElementById('paymentReceiptModal');\r\n\t\t\tif (overlay) overlay.hidden = true;\r\n\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t};\r\n\r\n\t\topenPaymentReceiptModal();\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -215,16 +254,29 @@ func PaymentReceivedPostResponse(row PaymentRowData, showTeacherColumn bool) tem
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var10 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var10 == nil {
-			templ_7745c5c3_Var10 = templ.NopComponent
+		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var13 == nil {
+			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = PaymentTableRow(row, showTeacherColumn, true).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<div id=\"paymentReceiptModalHost\" hx-swap-oob=\"innerHTML\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<div id=\"paymentReceiptModalHost\" hx-swap-oob=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var14 string
+		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payment_receipt_modal.templ`, Line: 111, Col: 64}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -248,12 +300,12 @@ func PaymentReceiptModalStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var11 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var11 == nil {
-			templ_7745c5c3_Var11 = templ.NopComponent
+		templ_7745c5c3_Var15 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var15 == nil {
+			templ_7745c5c3_Var15 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<style>\r\n\t\t#paymentReceiptModal.modal-overlay {\r\n\t\t\tz-index: 1200;\r\n\t\t}\r\n\r\n\t\t.payment-receipt-intro {\r\n\t\t\tmargin: 0 0 var(--space-4);\r\n\t\t}\r\n\r\n\t\t.payment-receipt-details {\r\n\t\t\tmargin: 0;\r\n\t\t}\r\n\r\n\t\t.payment-receipt-row {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: 9rem 1fr;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tpadding: var(--space-2) 0;\r\n\t\t\tborder-bottom: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.payment-receipt-row:last-child {\r\n\t\t\tborder-bottom: none;\r\n\t\t}\r\n\r\n\t\t.payment-receipt-row dt {\r\n\t\t\tmargin: 0;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.payment-receipt-row dd {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-weight: 500;\r\n\t\t}\r\n\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<style>\r\n\t\t#paymentReceiptModal.modal-overlay {\r\n\t\t\tz-index: 1200;\r\n\t\t}\r\n\r\n\t\t.payment-receipt-intro {\r\n\t\t\tmargin: 0 0 var(--space-4);\r\n\t\t}\r\n\r\n\t\t.payment-receipt-details {\r\n\t\t\tmargin: 0;\r\n\t\t}\r\n\r\n\t\t.payment-receipt-row {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: 9rem 1fr;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tpadding: var(--space-2) 0;\r\n\t\t\tborder-bottom: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.payment-receipt-row:last-child {\r\n\t\t\tborder-bottom: none;\r\n\t\t}\r\n\r\n\t\t.payment-receipt-row dt {\r\n\t\t\tmargin: 0;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.payment-receipt-row dd {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-weight: 500;\r\n\t\t}\r\n\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

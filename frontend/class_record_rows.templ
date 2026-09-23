@@ -60,7 +60,7 @@ templ ClassRecordTableRows(records []ClassRecordRowData, showTeacher bool, empty
 
 templ ClassRecordsPartial(records []ClassRecordRowData, showTeacher bool, emptyColspan int, emptyMessage string, page PaginationData, partialsURL string, includeSelector string) {
 	@ClassRecordTableRows(records, showTeacher, emptyColspan, emptyMessage)
-	<div id="paginationBottom" hx-swap-oob="innerHTML">
+	<div id="paginationBottom" hx-swap-oob={ HxSwapInnerHTML }>
 		@PaginationBarHTMX(partialsURL, includeSelector, page)
 	</div>
 }

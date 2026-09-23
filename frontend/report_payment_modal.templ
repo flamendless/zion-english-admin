@@ -20,7 +20,7 @@ templ ReportPaymentModal(data ReportPaymentFormData) {
 			<form
 				hx-post={ utils.URL("/reports/" + data.TeacherID + "/payment") }
 				hx-target="#reportPaymentModalHost"
-				hx-swap="innerHTML"
+				hx-swap={ HxSwapInnerHTML }
 			>
 				<input type="hidden" name="startDate" value={ data.StartDate }/>
 				<input type="hidden" name="endDate" value={ data.EndDate }/>
@@ -84,7 +84,7 @@ templ ReportPaymentModal(data ReportPaymentFormData) {
 
 templ ReportPaymentPostResponse(row ReportRowData, startDate string, endDate string) {
 	@ReportTableRow(row, startDate, endDate, true)
-	<div id="reportPaymentModalHost" hx-swap-oob="innerHTML"></div>
+	<div id="reportPaymentModalHost" hx-swap-oob={ HxSwapInnerHTML }></div>
 }
 
 templ ReportPaymentModalStyles() {

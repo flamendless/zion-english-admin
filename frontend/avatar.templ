@@ -197,6 +197,6 @@ templ HeaderAvatarPlaceholder() {
 		class="header-avatar-slot"
 		hx-get={ utils.URL("/header-avatar") }
 		hx-trigger="load once"
-		hx-swap="outerHTML"
+		hx-swap={ HxSwapOuterHTML }
 	></div>
 }

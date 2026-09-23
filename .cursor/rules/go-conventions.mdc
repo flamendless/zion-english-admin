@@ -53,7 +53,7 @@ const (
 
 ## Handler Pattern (cmd/web.go)
 
-1. Check HTTP method → `HttpError(w, "Method not allowed", 405)`
+1. Check HTTP method → `if !requireMethod(w, r, http.MethodGet) { return }`
 2. Parse form/query params
 3. Validate via `validate*()` → return sentinel `Err…` vars (or propagate from domain packages)
 4. Call `dbRO` (reads) or `dbRW` (writes)
@@ -61,6 +61,15 @@ const (
 6. Render: `frontend.Page(data).Render(r.Context(), w)`
 
 New handlers also need **both** `authMux` and `rootMux` registration in `cmd/web.go` (see project-overview **New authenticated route checklist**). Missing `rootMux.Handle` is the usual cause of nav links that 404.
+
+## Shared wire strings
+
+- **HTTP response text:** [`cmd/http_messages.go`](cmd/http_messages.go) — never inline repeated user-facing HTTP strings (`MsgMethodNotAllowed`, `MsgNotFound`, auth errors, shared `MsgFailedTo…`).
+- **Method guards:** use `requireMethod` from [`cmd/http_helpers.go`](cmd/http_helpers.go); do not copy the 3-line `if r.Method != …` block.
+- **Response helpers:** `writeHTML` / `writeJSON` for `Content-Type`; `setHXRedirect` for HTMX redirects.
+- **Sentinel alignment:** when an `Err*` message is shown via `HttpError` or `sendErrorLog`, its `.Error()` text must match the corresponding `Msg*` constant (single source).
+- **Cookie/header names:** constants in [`cmd/flash.go`](cmd/flash.go) and [`cmd/http_helpers.go`](cmd/http_helpers.go), not string literals.
+- **Extraction threshold:** extract when the same string appears **2+ times** across files, or is part of a documented helper pattern (method guard). Do not create constants for one-off `fmt.Sprintf` operational errors.
 
 ## Error Handling
 

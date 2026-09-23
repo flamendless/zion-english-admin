@@ -7,12 +7,12 @@ import (
 
 func handleHealth(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet && r.Method != http.MethodHead {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, MsgMethodNotAllowed, http.StatusMethodNotAllowed)
 		return
 	}
 
 	stats := dbRO.Health()
-	w.Header().Set("Content-Type", "application/json")
+	writeJSON(w)
 	if stats["status"] != "up" {
 		w.WriteHeader(http.StatusServiceUnavailable)
 	}

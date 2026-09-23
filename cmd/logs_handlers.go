@@ -86,8 +86,7 @@ func getLogsByTeacherParams(teacherID int64, f logFilters, limit, offset int64) 
 }
 
 func handleSystemLogs(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -135,7 +134,7 @@ func handleSystemLogs(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := listQueryParamsWithSort(r, frontend.ListSortKindSystemLog)
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	frontend.SystemLogs(frontend.SystemLogData{
 		Logs:           viewLogs,
 		HideCreatedBy:  hideCreatedBy,
@@ -204,8 +203,7 @@ func processingLogFilterParams(q, startDate, endDate string) queries.CountProces
 }
 
 func handleLogs(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -259,7 +257,7 @@ func handleLogs(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := listQueryParamsWithSort(r, frontend.ListSortKindProcessingLog)
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	frontend.ProcessingLogs(frontend.ProcessingLogData{
 		Logs:           viewLogs,
 		Query:          q,

@@ -23,7 +23,7 @@ templ Process() {
 				<form
 					hx-post={ utils.URL("/process") }
 					hx-target="#results"
-					hx-swap="innerHTML"
+					hx-swap={ HxSwapInnerHTML }
 					hx-indicator="#submitBtn"
 				>
 					<input type="hidden" id="teacherID" name="teacherID" />

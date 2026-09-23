@@ -481,7 +481,46 @@ func WizardTeacherStudentsDropdown(prefix string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\" hx-trigger=\"load\" hx-swap=\"innerHTML\" hx-target=\"this\"><option value=\"\">-- Select Student --</option></select></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\" hx-trigger=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var16 string
+		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 216, Col: 29}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "\" hx-swap=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var17 string
+		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 217, Col: 28}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var17)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" hx-target=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var18 string
+		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTargetThis)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 218, Col: 27}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "\"><option value=\"\">-- Select Student --</option></select></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -505,12 +544,12 @@ func WizardAdminStudentDropdown(prefix string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var16 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var16 == nil {
-			templ_7745c5c3_Var16 = templ.NopComponent
+		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var19 == nil {
+			templ_7745c5c3_Var19 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<div class=\"form-group\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<div class=\"form-group\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -518,33 +557,33 @@ func WizardAdminStudentDropdown(prefix string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<select id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<select id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var17 string
-		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_student")
+		var templ_7745c5c3_Var20 string
+		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_student")
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 229, Col: 27}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var17)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var20)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "\" name=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\" name=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var18 string
-		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue(wizardStudentFieldName(prefix))
+		var templ_7745c5c3_Var21 string
+		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.ResolveAttributeValue(wizardStudentFieldName(prefix))
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 230, Col: 40}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var21)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\" required><option value=\"\">-- Select teacher first --</option></select></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\" required><option value=\"\">-- Select teacher first --</option></select></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -568,12 +607,12 @@ func WizardScheduleStudentDropdown(prefix string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var19 == nil {
-			templ_7745c5c3_Var19 = templ.NopComponent
+		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var22 == nil {
+			templ_7745c5c3_Var22 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<div class=\"form-group\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<div class=\"form-group\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -581,20 +620,20 @@ func WizardScheduleStudentDropdown(prefix string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<select id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "<select id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var20 string
-		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_schedule_student")
+		var templ_7745c5c3_Var23 string
+		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_schedule_student")
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 242, Col: 36}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var20)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\" name=\"schedule_student\" required><option value=\"\">-- Select teacher first --</option></select></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "\" name=\"schedule_student\" required><option value=\"\">-- Select teacher first --</option></select></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -625,51 +664,51 @@ func WizardClassDateField(prefix string, todayPHT string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var21 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var21 == nil {
-			templ_7745c5c3_Var21 = templ.NopComponent
+		templ_7745c5c3_Var24 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var24 == nil {
+			templ_7745c5c3_Var24 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<div class=\"form-group\"><label for=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<div class=\"form-group\"><label for=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var22 string
-		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_date")
+		var templ_7745c5c3_Var25 string
+		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_date")
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 260, Col: 31}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var22)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var25)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "\">Date *</label> <input type=\"date\" id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\">Date *</label> <input type=\"date\" id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var23 string
-		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_date")
+		var templ_7745c5c3_Var26 string
+		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_date")
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 261, Col: 42}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "\" name=\"date\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\" name=\"date\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var24 string
-		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.ResolveAttributeValue(todayPHT)
+		var templ_7745c5c3_Var27 string
+		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.ResolveAttributeValue(todayPHT)
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 261, Col: 73}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "\" required></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "\" required></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -693,64 +732,64 @@ func WizardScheduledDateField(prefix string, todayPHT string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var25 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var25 == nil {
-			templ_7745c5c3_Var25 = templ.NopComponent
+		templ_7745c5c3_Var28 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var28 == nil {
+			templ_7745c5c3_Var28 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<div class=\"form-group\"><label for=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var26 string
-		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_scheduled_date")
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 267, Col: 41}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\">Date *</label> <input type=\"date\" id=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var27 string
-		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_scheduled_date")
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 268, Col: 52}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "\" name=\"scheduled_date\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var28 string
-		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.ResolveAttributeValue(todayPHT)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 268, Col: 93}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var28)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "\" required min=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "<div class=\"form-group\"><label for=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var29 string
-		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.ResolveAttributeValue(todayPHT)
+		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_scheduled_date")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 268, Col: 119}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 267, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var29)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "\">Date *</label> <input type=\"date\" id=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var30 string
+		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_scheduled_date")
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 268, Col: 52}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var30)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "\" name=\"scheduled_date\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var31 string
+		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.ResolveAttributeValue(todayPHT)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 268, Col: 93}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var31)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "\" required min=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var32 string
+		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.ResolveAttributeValue(todayPHT)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 268, Col: 119}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var32)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -774,12 +813,12 @@ func WizardTimeRangeFields(prefix string, startTime string, endTime string, read
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var30 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var30 == nil {
-			templ_7745c5c3_Var30 = templ.NopComponent
+		templ_7745c5c3_Var33 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var33 == nil {
+			templ_7745c5c3_Var33 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<div class=\"time-range-fields\"><div class=\"time-range-group\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "<div class=\"time-range-fields\"><div class=\"time-range-group\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -791,7 +830,7 @@ func WizardTimeRangeFields(prefix string, startTime string, endTime string, read
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -799,7 +838,7 @@ func WizardTimeRangeFields(prefix string, startTime string, endTime string, read
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -823,38 +862,38 @@ func WizardCurrencyDropdown(prefix string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var31 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var31 == nil {
-			templ_7745c5c3_Var31 = templ.NopComponent
+		templ_7745c5c3_Var34 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var34 == nil {
+			templ_7745c5c3_Var34 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "<div class=\"form-group\"><label for=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "<div class=\"form-group\"><label for=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var32 string
-		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_currency")
+		var templ_7745c5c3_Var35 string
+		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_currency")
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 284, Col: 35}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var32)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var35)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "\">Currency *</label> <select id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "\">Currency *</label> <select id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var33 string
-		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_currency")
+		var templ_7745c5c3_Var36 string
+		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_currency")
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 285, Col: 35}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var33)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var36)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "\" name=\"currency\" required><option value=\"\">-- Select Currency --</option> <option value=\"KRW\">KRW (Korean Won)</option> <option value=\"CAD\">CAD (Canadian Dollar)</option> <option value=\"YEN\">YEN (Japanese Yen)</option> <option value=\"PHP\">PHP (Philippine Peso)</option></select></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "\" name=\"currency\" required><option value=\"\">-- Select Currency --</option> <option value=\"KRW\">KRW (Korean Won)</option> <option value=\"CAD\">CAD (Canadian Dollar)</option> <option value=\"YEN\">YEN (Japanese Yen)</option> <option value=\"PHP\">PHP (Philippine Peso)</option></select></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -878,12 +917,12 @@ func WizardRateCurrencyFields(prefix string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var34 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var34 == nil {
-			templ_7745c5c3_Var34 = templ.NopComponent
+		templ_7745c5c3_Var37 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var37 == nil {
+			templ_7745c5c3_Var37 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "<div class=\"form-row\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "<div class=\"form-row\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -891,33 +930,33 @@ func WizardRateCurrencyFields(prefix string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "<div class=\"form-group\"><label for=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "<div class=\"form-group\"><label for=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var35 string
-		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_rate")
+		var templ_7745c5c3_Var38 string
+		templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_rate")
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 299, Col: 32}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var35)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var38)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "\">Rate *</label> <input type=\"number\" id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "\">Rate *</label> <input type=\"number\" id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var36 string
-		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_rate")
+		var templ_7745c5c3_Var39 string
+		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.ResolveAttributeValue(prefix + "_rate")
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 300, Col: 45}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var36)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var39)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "\" name=\"rate\" required min=\"0\" step=\"0.01\" placeholder=\"0.00\"></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "\" name=\"rate\" required min=\"0\" step=\"0.01\" placeholder=\"0.00\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -941,162 +980,162 @@ func WizardTimeInput(id string, name string, label string, value string, readonl
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var37 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var37 == nil {
-			templ_7745c5c3_Var37 = templ.NopComponent
+		templ_7745c5c3_Var40 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var40 == nil {
+			templ_7745c5c3_Var40 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "<div class=\"form-group time-input-wrap\"><label for=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "<div class=\"form-group time-input-wrap\"><label for=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var38 string
-		templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.ResolveAttributeValue(id)
+		var templ_7745c5c3_Var41 string
+		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.ResolveAttributeValue(id)
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 307, Col: 17}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var38)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var41)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var39 string
-		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(label)
+		var templ_7745c5c3_Var42 string
+		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 307, Col: 27}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</label> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "</label> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if readonly && value != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "<input type=\"time\" id=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var40 string
-			templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.ResolveAttributeValue(id)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 309, Col: 29}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var40)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "\" name=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var41 string
-			templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.ResolveAttributeValue(name)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 309, Col: 43}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var41)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "\" step=\"300\" required value=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var42 string
-			templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.ResolveAttributeValue(value)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 309, Col: 79}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var42)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "\" readonly>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		} else if value != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "<input type=\"time\" id=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "<input type=\"time\" id=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var43 string
 			templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.ResolveAttributeValue(id)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 311, Col: 29}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 309, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var43)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "\" name=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "\" name=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var44 string
 			templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.ResolveAttributeValue(name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 311, Col: 43}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 309, Col: 43}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var44)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "\" step=\"300\" required value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "\" step=\"300\" required value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var45 string
 			templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.ResolveAttributeValue(value)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 311, Col: 79}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 309, Col: 79}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var45)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "\" readonly>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "<input type=\"time\" id=\"")
+		} else if value != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "<input type=\"time\" id=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var46 string
 			templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.ResolveAttributeValue(id)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 313, Col: 29}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 311, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var46)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "\" name=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "\" name=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var47 string
 			templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.ResolveAttributeValue(name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 313, Col: 43}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 311, Col: 43}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var47)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "\" step=\"300\" required>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "\" step=\"300\" required value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var48 string
+			templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.ResolveAttributeValue(value)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 311, Col: 79}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var48)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "<input type=\"time\" id=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var49 string
+			templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.ResolveAttributeValue(id)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 313, Col: 29}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var49)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "\" name=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var50 string
+			templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.ResolveAttributeValue(name)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 313, Col: 43}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var50)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "\" step=\"300\" required>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1120,62 +1159,62 @@ func ClassStatusRadioCards() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var48 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var48 == nil {
-			templ_7745c5c3_Var48 = templ.NopComponent
+		templ_7745c5c3_Var51 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var51 == nil {
+			templ_7745c5c3_Var51 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "<fieldset class=\"status-radio-cards\" aria-label=\"Class status\"><legend class=\"sr-only\">Status</legend> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "<fieldset class=\"status-radio-cards\" aria-label=\"Class status\"><legend class=\"sr-only\">Status</legend> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, opt := range ClassRecordStatusOptions {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "<label class=\"status-radio-card\"><input type=\"radio\" name=\"status\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "<label class=\"status-radio-card\"><input type=\"radio\" name=\"status\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var49 string
-			templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
+			var templ_7745c5c3_Var52 string
+			templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 326, Col: 22}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var49)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var52)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "\" class=\"status-radio-card__input\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "\" class=\"status-radio-card__input\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if opt.Value == string(constants.ClassStatusConducted) {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, " checked")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, " checked")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var50 = []any{"status-radio-card__icon status-radio-card__icon--" + opt.Value}
-			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var50...)
+			var templ_7745c5c3_Var53 = []any{"status-radio-card__icon status-radio-card__icon--" + opt.Value}
+			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var53...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "<span class=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "<span class=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var51 string
-			templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var50).String())
+			var templ_7745c5c3_Var54 string
+			templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var53).String())
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 1, Col: 0}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var51)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var54)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "\" aria-hidden=\"true\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "\" aria-hidden=\"true\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1183,38 +1222,38 @@ func ClassStatusRadioCards() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "</span> <span class=\"status-radio-card__body\"><span class=\"status-radio-card__title\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, "</span> <span class=\"status-radio-card__body\"><span class=\"status-radio-card__title\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var52 string
-			templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
+			var templ_7745c5c3_Var55 string
+			templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 334, Col: 55}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var52))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var55))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "</span> <span class=\"status-radio-card__desc\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "</span> <span class=\"status-radio-card__desc\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var53 string
-			templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.JoinStringErrs(classStatusRadioDescription(constants.ClassStatus(opt.Value)))
+			var templ_7745c5c3_Var56 string
+			templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.JoinStringErrs(classStatusRadioDescription(constants.ClassStatus(opt.Value)))
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 335, Col: 106}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var53))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var56))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "</span></span></label>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "</span></span></label>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, "</fieldset>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "</fieldset>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1238,24 +1277,24 @@ func ClassStatusRadioIcon(status constants.ClassStatus) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var54 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var54 == nil {
-			templ_7745c5c3_Var54 = templ.NopComponent
+		templ_7745c5c3_Var57 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var57 == nil {
+			templ_7745c5c3_Var57 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		switch status {
 		case constants.ClassStatusConducted:
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"></path></svg>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"></path></svg>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		case constants.ClassStatusCancelled:
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"></path> <path d=\"m6 6 12 12\"></path></svg>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"></path> <path d=\"m6 6 12 12\"></path></svg>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		case constants.ClassStatusRescheduled:
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\"></path> <path d=\"M3 3v5h5\"></path></svg>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\"></path> <path d=\"M3 3v5h5\"></path></svg>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1293,12 +1332,12 @@ func TrialClassYesNoRadios(prefix string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var55 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var55 == nil {
-			templ_7745c5c3_Var55 = templ.NopComponent
+		templ_7745c5c3_Var58 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var58 == nil {
+			templ_7745c5c3_Var58 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "<fieldset class=\"trial-yesno-cards\" aria-label=\"Trial class\"><legend class=\"sr-only\">Trial class</legend> <label class=\"trial-yesno-card\"><input type=\"radio\" name=\"is_trial_class\" value=\"\" class=\"trial-yesno-card__input\" checked> <span class=\"trial-yesno-card__title\">No</span> <span class=\"trial-yesno-card__desc\">Use the student's regular rate.</span></label> <label class=\"trial-yesno-card\"><input type=\"radio\" name=\"is_trial_class\" value=\"on\" class=\"trial-yesno-card__input\"> <span class=\"trial-yesno-card__title\">Yes</span> <span class=\"trial-yesno-card__desc\">Apply the trial class rate (PHP 50).</span></label></fieldset>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "<fieldset class=\"trial-yesno-cards\" aria-label=\"Trial class\"><legend class=\"sr-only\">Trial class</legend> <label class=\"trial-yesno-card\"><input type=\"radio\" name=\"is_trial_class\" value=\"\" class=\"trial-yesno-card__input\" checked> <span class=\"trial-yesno-card__title\">No</span> <span class=\"trial-yesno-card__desc\">Use the student's regular rate.</span></label> <label class=\"trial-yesno-card\"><input type=\"radio\" name=\"is_trial_class\" value=\"on\" class=\"trial-yesno-card__input\"> <span class=\"trial-yesno-card__title\">Yes</span> <span class=\"trial-yesno-card__desc\">Apply the trial class rate (PHP 50).</span></label></fieldset>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1322,35 +1361,35 @@ func ClassWizardSummaryCard(cardID string, showTeacher bool) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var56 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var56 == nil {
-			templ_7745c5c3_Var56 = templ.NopComponent
+		templ_7745c5c3_Var59 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var59 == nil {
+			templ_7745c5c3_Var59 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, "<div class=\"class-wizard-summary\" id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "<div class=\"class-wizard-summary\" id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var57 string
-		templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.ResolveAttributeValue(cardID)
+		var templ_7745c5c3_Var60 string
+		templ_7745c5c3_Var60, templ_7745c5c3_Err = templ.ResolveAttributeValue(cardID)
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/class_wizard.templ`, Line: 391, Col: 46}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var57)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var60)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "\" aria-label=\"Summary\"><dl class=\"class-wizard-summary-grid\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 94, "\" aria-label=\"Summary\"><dl class=\"class-wizard-summary-grid\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if showTeacher {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "<div class=\"class-wizard-summary-row\"><dt>Teacher</dt><dd data-field=\"teacher\">-</dd></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 95, "<div class=\"class-wizard-summary-row\"><dt>Teacher</dt><dd data-field=\"teacher\">-</dd></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "<div class=\"class-wizard-summary-row\"><dt>Student</dt><dd data-field=\"student\">-</dd></div><div class=\"class-wizard-summary-row\"><dt>Status</dt><dd data-field=\"status\">-</dd></div><div class=\"class-wizard-summary-row\" data-summary-row=\"reason\" hidden><dt>Reason</dt><dd data-field=\"reason\">-</dd></div><div class=\"class-wizard-summary-row\"><dt>Date</dt><dd data-field=\"date\">-</dd></div><div class=\"class-wizard-summary-row\"><dt>Time</dt><dd data-field=\"time\">-</dd></div><div class=\"class-wizard-summary-row\"><dt>Duration</dt><dd data-field=\"duration\">-</dd></div><div class=\"class-wizard-summary-row\"><dt>Rate</dt><dd data-field=\"rate\">-</dd></div><div class=\"class-wizard-summary-row\" data-summary-row=\"materials\" hidden><dt>Learning materials</dt><dd data-field=\"materials\">-</dd></div><div class=\"class-wizard-summary-row\"><dt>Trial class</dt><dd data-field=\"trial\">-</dd></div><div class=\"class-wizard-summary-row\" data-summary-row=\"notes\" hidden><dt>Notes</dt><dd data-field=\"notes\">-</dd></div></dl></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 96, "<div class=\"class-wizard-summary-row\"><dt>Student</dt><dd data-field=\"student\">-</dd></div><div class=\"class-wizard-summary-row\"><dt>Status</dt><dd data-field=\"status\">-</dd></div><div class=\"class-wizard-summary-row\" data-summary-row=\"reason\" hidden><dt>Reason</dt><dd data-field=\"reason\">-</dd></div><div class=\"class-wizard-summary-row\"><dt>Date</dt><dd data-field=\"date\">-</dd></div><div class=\"class-wizard-summary-row\"><dt>Time</dt><dd data-field=\"time\">-</dd></div><div class=\"class-wizard-summary-row\"><dt>Duration</dt><dd data-field=\"duration\">-</dd></div><div class=\"class-wizard-summary-row\"><dt>Rate</dt><dd data-field=\"rate\">-</dd></div><div class=\"class-wizard-summary-row\" data-summary-row=\"materials\" hidden><dt>Learning materials</dt><dd data-field=\"materials\">-</dd></div><div class=\"class-wizard-summary-row\"><dt>Trial class</dt><dd data-field=\"trial\">-</dd></div><div class=\"class-wizard-summary-row\" data-summary-row=\"notes\" hidden><dt>Notes</dt><dd data-field=\"notes\">-</dd></div></dl></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1374,12 +1413,12 @@ func ClassWizardStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var58 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var58 == nil {
-			templ_7745c5c3_Var58 = templ.NopComponent
+		templ_7745c5c3_Var61 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var61 == nil {
+			templ_7745c5c3_Var61 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 94, "<style>\r\n\t\t.modal-dialog-wizard {\r\n\t\t\twidth: min(100%, 56rem);\r\n\t\t\tmax-height: min(90vh, 720px);\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\toverflow: visible;\r\n\t\t}\r\n\r\n\t\t.modal-dialog-wizard > .modal-header {\r\n\t\t\toverflow: visible;\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tposition: relative;\r\n\t\t\tz-index: 2;\r\n\t\t}\r\n\r\n\t\t.modal-dialog-wizard .class-wizard-form {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tflex: 1;\r\n\t\t\tmin-height: 0;\r\n\t\t\toverflow: visible;\r\n\t\t}\r\n\r\n\t\t.wizard-header-text {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-1);\r\n\t\t\tmin-width: 0;\r\n\t\t}\r\n\r\n\t\t.wizard-step-label {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.class-wizard-body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\toverflow: visible;\r\n\t\t}\r\n\r\n\t\t.modal-dialog-wizard .modal-body.class-wizard-body {\r\n\t\t\toverflow: visible;\r\n\t\t}\r\n\r\n\t\t.modal-dialog-wizard .entity-search > [id$=\"SearchResults\"] {\r\n\t\t\theight: 0;\r\n\t\t\toverflow: visible;\r\n\t\t}\r\n\r\n\t\t.entity-search-results.wizard-teacher-results-floating {\r\n\t\t\tposition: fixed;\r\n\t\t\ttop: auto;\r\n\t\t\tleft: auto;\r\n\t\t\tright: auto;\r\n\t\t\tmargin-top: 0;\r\n\t\t\tz-index: 1400;\r\n\t\t\tmax-height: min(220px, calc(100vh - 2rem));\r\n\t\t\toverflow-y: auto;\r\n\t\t}\r\n\r\n\t\t.wizard-step {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\r\n\t\t.wizard-step.is-active {\r\n\t\t\tdisplay: block;\r\n\t\t}\r\n\r\n\t\t.wizard-step-lead {\r\n\t\t\tmargin: 0 0 var(--space-4);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tline-height: 1.45;\r\n\t\t}\r\n\r\n\t\t.wizard-footer {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: flex-end;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t\tmargin: 0;\r\n\t\t}\r\n\r\n\t\t.wizard-footer .wizard-nav-prev:not([hidden]) {\r\n\t\t\tmargin-right: auto;\r\n\t\t}\r\n\r\n\t\t.wizard-footer .wizard-nav-btn[hidden] {\r\n\t\t\tdisplay: none !important;\r\n\t\t}\r\n\r\n\t\t.status-radio-cards,\r\n\t\t.trial-yesno-cards {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tborder: none;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: 0;\r\n\t\t}\r\n\r\n\t\t.status-radio-cards {\r\n\t\t\tgrid-template-columns: 1fr;\r\n\t\t}\r\n\r\n\t\t.trial-yesno-cards {\r\n\t\t\tgrid-template-columns: repeat(2, 1fr);\r\n\t\t}\r\n\r\n\t\t.status-radio-card,\r\n\t\t.trial-yesno-card {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tborder: 2px solid var(--color-border);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tcursor: pointer;\r\n\t\t\ttransition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.status-radio-card__input,\r\n\t\t.trial-yesno-card__input {\r\n\t\t\tposition: absolute;\r\n\t\t\topacity: 0;\r\n\t\t\tpointer-events: none;\r\n\t\t}\r\n\r\n\t\t.status-radio-card:has(.status-radio-card__input:checked),\r\n\t\t.trial-yesno-card:has(.trial-yesno-card__input:checked) {\r\n\t\t\tborder-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border));\r\n\t\t\tbackground: var(--color-primary-light);\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t}\r\n\r\n\t\t.status-radio-card__icon {\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 2.75rem;\r\n\t\t\theight: 2.75rem;\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t}\r\n\r\n\t\t.status-radio-card__icon--conducted {\r\n\t\t\tbackground: var(--color-success-bg);\r\n\t\t\tcolor: var(--color-success);\r\n\t\t}\r\n\r\n\t\t.status-radio-card__icon--cancelled {\r\n\t\t\tbackground: var(--color-error-bg);\r\n\t\t\tcolor: var(--color-destructive);\r\n\t\t}\r\n\r\n\t\t.status-radio-card__icon--rescheduled {\r\n\t\t\tbackground: var(--color-warning-bg);\r\n\t\t\tcolor: var(--color-warning);\r\n\t\t}\r\n\r\n\t\t.status-radio-card__body,\r\n\t\t.trial-yesno-card {\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.status-radio-card__title,\r\n\t\t.trial-yesno-card__title {\r\n\t\t\tdisplay: block;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.status-radio-card__desc,\r\n\t\t.trial-yesno-card__desc {\r\n\t\t\tdisplay: block;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tline-height: 1.45;\r\n\t\t}\r\n\r\n\t\t.class-wizard-summary {\r\n\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.class-wizard-summary-grid {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tmargin: 0;\r\n\t\t}\r\n\r\n\t\t.class-wizard-summary-row {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: 8rem 1fr;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\talign-items: start;\r\n\t\t}\r\n\r\n\t\t.class-wizard-summary-row dt {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.class-wizard-summary-row dd {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.sr-only {\r\n\t\t\tposition: absolute;\r\n\t\t\twidth: 1px;\r\n\t\t\theight: 1px;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: -1px;\r\n\t\t\toverflow: hidden;\r\n\t\t\tclip: rect(0, 0, 0, 0);\r\n\t\t\twhite-space: nowrap;\r\n\t\t\tborder: 0;\r\n\t\t}\r\n\r\n\t\t@media (max-width: 640px) {\r\n\t\t\t.trial-yesno-cards {\r\n\t\t\t\tgrid-template-columns: 1fr;\r\n\t\t\t}\r\n\r\n\t\t\t.class-wizard-summary-row {\r\n\t\t\t\tgrid-template-columns: 1fr;\r\n\t\t\t}\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 97, "<style>\r\n\t\t.modal-dialog-wizard {\r\n\t\t\twidth: min(100%, 56rem);\r\n\t\t\tmax-height: min(90vh, 720px);\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\toverflow: visible;\r\n\t\t}\r\n\r\n\t\t.modal-dialog-wizard > .modal-header {\r\n\t\t\toverflow: visible;\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tposition: relative;\r\n\t\t\tz-index: 2;\r\n\t\t}\r\n\r\n\t\t.modal-dialog-wizard .class-wizard-form {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tflex: 1;\r\n\t\t\tmin-height: 0;\r\n\t\t\toverflow: visible;\r\n\t\t}\r\n\r\n\t\t.wizard-header-text {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-1);\r\n\t\t\tmin-width: 0;\r\n\t\t}\r\n\r\n\t\t.wizard-step-label {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.class-wizard-body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\toverflow: visible;\r\n\t\t}\r\n\r\n\t\t.modal-dialog-wizard .modal-body.class-wizard-body {\r\n\t\t\toverflow: visible;\r\n\t\t}\r\n\r\n\t\t.modal-dialog-wizard .entity-search > [id$=\"SearchResults\"] {\r\n\t\t\theight: 0;\r\n\t\t\toverflow: visible;\r\n\t\t}\r\n\r\n\t\t.entity-search-results.wizard-teacher-results-floating {\r\n\t\t\tposition: fixed;\r\n\t\t\ttop: auto;\r\n\t\t\tleft: auto;\r\n\t\t\tright: auto;\r\n\t\t\tmargin-top: 0;\r\n\t\t\tz-index: 1400;\r\n\t\t\tmax-height: min(220px, calc(100vh - 2rem));\r\n\t\t\toverflow-y: auto;\r\n\t\t}\r\n\r\n\t\t.wizard-step {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\r\n\t\t.wizard-step.is-active {\r\n\t\t\tdisplay: block;\r\n\t\t}\r\n\r\n\t\t.wizard-step-lead {\r\n\t\t\tmargin: 0 0 var(--space-4);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tline-height: 1.45;\r\n\t\t}\r\n\r\n\t\t.wizard-footer {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: flex-end;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t\tmargin: 0;\r\n\t\t}\r\n\r\n\t\t.wizard-footer .wizard-nav-prev:not([hidden]) {\r\n\t\t\tmargin-right: auto;\r\n\t\t}\r\n\r\n\t\t.wizard-footer .wizard-nav-btn[hidden] {\r\n\t\t\tdisplay: none !important;\r\n\t\t}\r\n\r\n\t\t.status-radio-cards,\r\n\t\t.trial-yesno-cards {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tborder: none;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: 0;\r\n\t\t}\r\n\r\n\t\t.status-radio-cards {\r\n\t\t\tgrid-template-columns: 1fr;\r\n\t\t}\r\n\r\n\t\t.trial-yesno-cards {\r\n\t\t\tgrid-template-columns: repeat(2, 1fr);\r\n\t\t}\r\n\r\n\t\t.status-radio-card,\r\n\t\t.trial-yesno-card {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tborder: 2px solid var(--color-border);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tcursor: pointer;\r\n\t\t\ttransition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.status-radio-card__input,\r\n\t\t.trial-yesno-card__input {\r\n\t\t\tposition: absolute;\r\n\t\t\topacity: 0;\r\n\t\t\tpointer-events: none;\r\n\t\t}\r\n\r\n\t\t.status-radio-card:has(.status-radio-card__input:checked),\r\n\t\t.trial-yesno-card:has(.trial-yesno-card__input:checked) {\r\n\t\t\tborder-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border));\r\n\t\t\tbackground: var(--color-primary-light);\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t}\r\n\r\n\t\t.status-radio-card__icon {\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 2.75rem;\r\n\t\t\theight: 2.75rem;\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t}\r\n\r\n\t\t.status-radio-card__icon--conducted {\r\n\t\t\tbackground: var(--color-success-bg);\r\n\t\t\tcolor: var(--color-success);\r\n\t\t}\r\n\r\n\t\t.status-radio-card__icon--cancelled {\r\n\t\t\tbackground: var(--color-error-bg);\r\n\t\t\tcolor: var(--color-destructive);\r\n\t\t}\r\n\r\n\t\t.status-radio-card__icon--rescheduled {\r\n\t\t\tbackground: var(--color-warning-bg);\r\n\t\t\tcolor: var(--color-warning);\r\n\t\t}\r\n\r\n\t\t.status-radio-card__body,\r\n\t\t.trial-yesno-card {\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.status-radio-card__title,\r\n\t\t.trial-yesno-card__title {\r\n\t\t\tdisplay: block;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.status-radio-card__desc,\r\n\t\t.trial-yesno-card__desc {\r\n\t\t\tdisplay: block;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tline-height: 1.45;\r\n\t\t}\r\n\r\n\t\t.class-wizard-summary {\r\n\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.class-wizard-summary-grid {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tmargin: 0;\r\n\t\t}\r\n\r\n\t\t.class-wizard-summary-row {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: 8rem 1fr;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\talign-items: start;\r\n\t\t}\r\n\r\n\t\t.class-wizard-summary-row dt {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.class-wizard-summary-row dd {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.sr-only {\r\n\t\t\tposition: absolute;\r\n\t\t\twidth: 1px;\r\n\t\t\theight: 1px;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: -1px;\r\n\t\t\toverflow: hidden;\r\n\t\t\tclip: rect(0, 0, 0, 0);\r\n\t\t\twhite-space: nowrap;\r\n\t\t\tborder: 0;\r\n\t\t}\r\n\r\n\t\t@media (max-width: 640px) {\r\n\t\t\t.trial-yesno-cards {\r\n\t\t\t\tgrid-template-columns: 1fr;\r\n\t\t\t}\r\n\r\n\t\t\t.class-wizard-summary-row {\r\n\t\t\t\tgrid-template-columns: 1fr;\r\n\t\t\t}\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1403,12 +1442,12 @@ func ClassWizardScript() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var59 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var59 == nil {
-			templ_7745c5c3_Var59 = templ.NopComponent
+		templ_7745c5c3_Var62 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var62 == nil {
+			templ_7745c5c3_Var62 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 95, "<script>\r\n\t\t(function () {\r\n\t\t\tif (window.__classWizardReady) return;\r\n\t\t\twindow.__classWizardReady = true;\r\n\r\n\t\t\tconst ZOOM_MAX_AUTO_MINUTES = 40;\r\n\t\t\tconst ZOOM_MANUAL_WARNING = 'Classes longer than 40 minutes cannot receive an automatic Zoom meeting room on a Basic account. Please create your Zoom meeting manually and share the link with your student.';\r\n\r\n\t\t\tfunction buildURL(path) {\r\n\t\t\t\tconst banner = document.getElementById('errorBanner');\r\n\t\t\t\tif (banner && banner.dataset.basePath) {\r\n\t\t\t\t\treturn banner.dataset.basePath.replace(/\\/$/, '') + path;\r\n\t\t\t\t}\r\n\t\t\t\tconst pathname = window.location.pathname.replace(/\\/$/, '');\r\n\t\t\t\tif (pathname.includes('/zion-english-admin')) {\r\n\t\t\t\t\treturn '/zion-english-admin' + path;\r\n\t\t\t\t}\r\n\t\t\t\treturn path;\r\n\t\t\t}\r\n\r\n\t\t\tfunction findWizardTeacherResults(search) {\r\n\t\t\t\tconst resultsHost = search.querySelector('[id$=\"TeacherSearchResults\"]');\r\n\t\t\t\tif (!resultsHost) return null;\r\n\t\t\t\treturn resultsHost.querySelector('.entity-search-results')\r\n\t\t\t\t\t|| document.querySelector('.entity-search-results[data-wizard-results-host=\"' + resultsHost.id + '\"]');\r\n\t\t\t}\r\n\r\n\t\t\tfunction positionFloatingTeacherResults(search) {\r\n\t\t\t\tif (!search || !search.closest('.modal-dialog-wizard')) return;\r\n\t\t\t\tconst input = search.querySelector('input[name=\"teacherQ\"]');\r\n\t\t\t\tconst resultsHost = search.querySelector('[id$=\"TeacherSearchResults\"]');\r\n\t\t\t\tconst results = findWizardTeacherResults(search);\r\n\t\t\t\tif (!input || !results || !resultsHost) return;\r\n\r\n\t\t\t\tif (results.parentElement !== document.body) {\r\n\t\t\t\t\tresults.dataset.wizardResultsHost = resultsHost.id;\r\n\t\t\t\t\tdocument.body.appendChild(results);\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst rect = input.getBoundingClientRect();\r\n\t\t\t\tconst gap = 4;\r\n\t\t\t\tconst maxHeight = Math.max(120, window.innerHeight - rect.bottom - gap - 16);\r\n\t\t\t\tresults.classList.add('wizard-teacher-results-floating');\r\n\t\t\t\tresults.style.top = Math.round(rect.bottom + gap) + 'px';\r\n\t\t\t\tresults.style.left = Math.round(rect.left) + 'px';\r\n\t\t\t\tresults.style.width = Math.round(rect.width) + 'px';\r\n\t\t\t\tresults.style.maxHeight = Math.round(maxHeight) + 'px';\r\n\t\t\t}\r\n\r\n\t\t\tfunction repositionAllWizardTeacherResults() {\r\n\t\t\t\tdocument.querySelectorAll('.modal-dialog-wizard .entity-search').forEach(positionFloatingTeacherResults);\r\n\t\t\t}\r\n\r\n\t\t\tfunction clearPortaledTeacherResults(search) {\r\n\t\t\t\tconst resultsHost = search.querySelector('[id$=\"TeacherSearchResults\"]');\r\n\t\t\t\tif (!resultsHost) return;\r\n\t\t\t\tconst portaled = document.querySelector('.entity-search-results[data-wizard-results-host=\"' + resultsHost.id + '\"]');\r\n\t\t\t\tif (portaled) portaled.remove();\r\n\t\t\t\tresultsHost.innerHTML = '';\r\n\t\t\t}\r\n\r\n\t\t\tfunction clearAllPortaledTeacherResults() {\r\n\t\t\t\tdocument.querySelectorAll('.entity-search-results[data-wizard-results-host]').forEach(function (el) {\r\n\t\t\t\t\tel.remove();\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tfunction wireWizardTeacherSearchFloating() {\r\n\t\t\t\tif (!document.body) return;\r\n\t\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\t\tconst target = evt.detail.target;\r\n\t\t\t\t\tif (!target || !target.id || !target.id.endsWith('TeacherSearchResults')) return;\r\n\t\t\t\t\tconst search = target.closest('.entity-search');\r\n\t\t\t\t\tif (!search || !search.closest('.modal-dialog-wizard')) return;\r\n\t\t\t\t\tpositionFloatingTeacherResults(search);\r\n\t\t\t\t});\r\n\t\t\t\tdocument.body.addEventListener('focusin', function (evt) {\r\n\t\t\t\t\tconst input = evt.target;\r\n\t\t\t\t\tif (!input || input.name !== 'teacherQ') return;\r\n\t\t\t\t\tconst search = input.closest('.entity-search');\r\n\t\t\t\t\tif (!search || !search.closest('.modal-dialog-wizard')) return;\r\n\t\t\t\t\tpositionFloatingTeacherResults(search);\r\n\t\t\t\t});\r\n\t\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\t\tconst item = e.target.closest('.entity-search-item');\r\n\t\t\t\t\tif (!item) return;\r\n\t\t\t\t\tconst portaled = item.closest('.entity-search-results[data-wizard-results-host]');\r\n\t\t\t\t\tif (!portaled) return;\r\n\t\t\t\t\twindow.setTimeout(function () {\r\n\t\t\t\t\t\tconst hostId = portaled.dataset.wizardResultsHost;\r\n\t\t\t\t\t\tportaled.remove();\r\n\t\t\t\t\t\tconst host = hostId ? document.getElementById(hostId) : null;\r\n\t\t\t\t\t\tif (host) host.innerHTML = '';\r\n\t\t\t\t\t}, 0);\r\n\t\t\t\t});\r\n\t\t\t\twindow.addEventListener('resize', repositionAllWizardTeacherResults);\r\n\t\t\t\twindow.addEventListener('scroll', repositionAllWizardTeacherResults, true);\r\n\t\t\t}\r\n\r\n\t\t\tconst configs = {\r\n\t\t\t\tconduct: {\r\n\t\t\t\t\tmodalId: 'conductClassWizardModal',\r\n\t\t\t\t\tformId: 'conductClassWizardForm',\r\n\t\t\t\t\tstepLabelId: 'conductWizardStepLabel',\r\n\t\t\t\t\tprevId: 'conductWizardPrev',\r\n\t\t\t\t\tnextId: 'conductWizardNext',\r\n\t\t\t\t\tsaveId: 'conductWizardSave',\r\n\t\t\t\t\tmessageId: 'conductWizardMessage',\r\n\t\t\t\t\tsummaryId: 'conductWizardSummary',\r\n\t\t\t\t\ttotalSteps: 8,\r\n\t\t\t\t\tpostURL: buildURL('/classes/record'),\r\n\t\t\t\t\tshowStatus: true,\r\n\t\t\t\t\tshowNotes: true,\r\n\t\t\t\t},\r\n\t\t\t\tschedule: {\r\n\t\t\t\t\tmodalId: 'scheduleClassWizardModal',\r\n\t\t\t\t\tformId: 'scheduleClassWizardForm',\r\n\t\t\t\t\tstepLabelId: 'scheduleWizardStepLabel',\r\n\t\t\t\t\tprevId: 'scheduleWizardPrev',\r\n\t\t\t\t\tnextId: 'scheduleWizardNext',\r\n\t\t\t\t\tsaveId: 'scheduleWizardSave',\r\n\t\t\t\t\tmessageId: 'scheduleWizardMessage',\r\n\t\t\t\t\tsummaryId: 'scheduleWizardSummary',\r\n\t\t\t\t\ttotalSteps: 5,\r\n\t\t\t\t\tpostURL: buildURL('/schedule/record'),\r\n\t\t\t\t\tshowStatus: false,\r\n\t\t\t\t\tshowNotes: false,\r\n\t\t\t\t},\r\n\t\t\t};\r\n\r\n\t\t\tfunction escapeHtml(value) {\r\n\t\t\t\treturn String(value || '')\r\n\t\t\t\t\t.replace(/&/g, '&amp;')\r\n\t\t\t\t\t.replace(/</g, '&lt;')\r\n\t\t\t\t\t.replace(/>/g, '&gt;')\r\n\t\t\t\t\t.replace(/\"/g, '&quot;');\r\n\t\t\t}\r\n\r\n\t\t\tfunction fillTimePill(el, timeRange) {\r\n\t\t\t\tif (!el) return;\r\n\t\t\t\tel.innerHTML =\r\n\t\t\t\t\t'<span class=\"time-range-pill\" aria-label=\"Time: ' + escapeHtml(timeRange) + '\">' +\r\n\t\t\t\t\t'<span class=\"pill pill--primary\">' + escapeHtml(timeRange) + '</span>' +\r\n\t\t\t\t\t'</span>';\r\n\t\t\t}\r\n\r\n\t\t\tfunction fillRatePill(el, rate, currency) {\r\n\t\t\t\tif (!el) return;\r\n\t\t\t\tel.innerHTML =\r\n\t\t\t\t\t'<span class=\"pill pill--info rate-pill\" aria-label=\"' + escapeHtml(rate + ' ' + currency) + '\">' +\r\n\t\t\t\t\t'<span class=\"rate-pill-amount\">' + escapeHtml(rate) + '</span>' +\r\n\t\t\t\t\t'<span class=\"rate-pill-currency\">' + escapeHtml(currency) + '</span>' +\r\n\t\t\t\t\t'</span>';\r\n\t\t\t}\r\n\r\n\t\t\tfunction fillDurationPill(el, label) {\r\n\t\t\t\tif (!el) return;\r\n\t\t\t\tel.innerHTML =\r\n\t\t\t\t\t'<span class=\"duration-pill-wrap\" aria-label=\"Duration: ' + escapeHtml(label) + '\">' +\r\n\t\t\t\t\t'<span class=\"pill pill--neutral duration-pill\">' +\r\n\t\t\t\t\t'<svg class=\"duration-pill-icon\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">' +\r\n\t\t\t\t\t'<circle cx=\"12\" cy=\"12\" r=\"10\"></circle>' +\r\n\t\t\t\t\t'<polyline points=\"12 6 12 12 16 14\"></polyline>' +\r\n\t\t\t\t\t'</svg>' +\r\n\t\t\t\t\t'<span class=\"duration-pill-value\">' + escapeHtml(label) + '</span>' +\r\n\t\t\t\t\t'</span>' +\r\n\t\t\t\t\t'</span>';\r\n\t\t\t}\r\n\r\n\t\t\tfunction formatDurationLabel(minutes) {\r\n\t\t\t\tif (minutes < 60) return minutes + ' min';\r\n\t\t\t\tconst h = Math.floor(minutes / 60);\r\n\t\t\t\tconst m = minutes % 60;\r\n\t\t\t\treturn m === 0 ? h + ' hr' : h + ' hr ' + m + ' min';\r\n\t\t\t}\r\n\r\n\t\t\tfunction updateWizardDurationPreview(form, stepEl) {\r\n\t\t\t\tif (!form) return;\r\n\t\t\t\tconst scope = stepEl || form.querySelector('.wizard-step.is-active') || form;\r\n\t\t\t\tconst bridge = scope.querySelector('.duration-bridge');\r\n\t\t\t\tconst start = scope.querySelector('[name=\"start_time\"]');\r\n\t\t\t\tconst end = scope.querySelector('[name=\"end_time\"]');\r\n\t\t\t\tif (!bridge || !start || !end) return;\r\n\r\n\t\t\t\tconst pill = bridge.querySelector('.duration-pill');\r\n\t\t\t\tconst valueEl = bridge.querySelector('.duration-pill-value');\r\n\t\t\t\tconst icon = bridge.querySelector('.duration-pill-icon');\r\n\t\t\t\tconst startMin = parseTimeToMinutes(start.value);\r\n\t\t\t\tconst endMin = parseTimeToMinutes(end.value);\r\n\r\n\t\t\t\tbridge.removeAttribute('hidden');\r\n\r\n\t\t\t\tif (startMin === null || endMin === null || !start.value || !end.value) {\r\n\t\t\t\t\tbridge.classList.remove('duration-bridge--invalid');\r\n\t\t\t\t\tbridge.setAttribute('aria-label', 'Duration');\r\n\t\t\t\t\tif (pill) pill.className = 'pill pill--neutral duration-pill duration-pill--pending';\r\n\t\t\t\t\tif (icon) icon.hidden = false;\r\n\t\t\t\t\tif (valueEl) valueEl.textContent = '-';\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (endMin <= startMin) {\r\n\t\t\t\t\tbridge.classList.add('duration-bridge--invalid');\r\n\t\t\t\t\tbridge.setAttribute('aria-label', 'End time must be after start time');\r\n\t\t\t\t\tif (pill) pill.className = 'pill pill--error duration-pill';\r\n\t\t\t\t\tif (icon) icon.hidden = true;\r\n\t\t\t\t\tif (valueEl) valueEl.textContent = 'Invalid';\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst label = formatDurationLabel(endMin - startMin);\r\n\t\t\t\tbridge.classList.remove('duration-bridge--invalid');\r\n\t\t\t\tbridge.setAttribute('aria-label', 'Duration: ' + label);\r\n\t\t\t\tif (pill) pill.className = 'pill pill--neutral duration-pill';\r\n\t\t\t\tif (icon) icon.hidden = false;\r\n\t\t\t\tif (valueEl) valueEl.textContent = label;\r\n\t\t\t}\r\n\r\n\t\t\tfunction getSelectedOptionLabel(selectEl) {\r\n\t\t\t\tif (!selectEl || !selectEl.value) return '-';\r\n\t\t\t\tconst opt = selectEl.options[selectEl.selectedIndex];\r\n\t\t\t\treturn opt ? opt.textContent.trim() : '-';\r\n\t\t\t}\r\n\r\n\t\t\tfunction getTeacherName(form, prefix) {\r\n\t\t\t\tconst lockedName = form.querySelector('.form-group input[disabled]');\r\n\t\t\t\tif (lockedName && lockedName.value) return lockedName.value.trim();\r\n\t\t\t\tconst search = form.querySelector('[id$=\"TeacherSearch\"]');\r\n\t\t\t\tif (search && search.value) return search.value.trim();\r\n\t\t\t\treturn '-';\r\n\t\t\t}\r\n\r\n\t\t\tfunction getStudentSelect(form, kind) {\r\n\t\t\t\tif (kind === 'schedule') {\r\n\t\t\t\t\treturn form.querySelector('[name=\"schedule_student\"]') || form.querySelector('[name=\"student\"]');\r\n\t\t\t\t}\r\n\t\t\t\treturn form.querySelector('[name=\"student\"]');\r\n\t\t\t}\r\n\r\n\t\t\tfunction getTeacherHidden(form, kind) {\r\n\t\t\t\tif (kind === 'schedule') {\r\n\t\t\t\t\treturn form.querySelector('[name=\"schedule_teacher\"]') || form.querySelector('[name=\"teacher\"]');\r\n\t\t\t\t}\r\n\t\t\t\treturn form.querySelector('[name=\"teacher\"]');\r\n\t\t\t}\r\n\r\n\t\t\tfunction parseTimeToMinutes(value) {\r\n\t\t\t\tif (!value) return null;\r\n\t\t\t\tconst match = String(value).match(/^(\\d{1,2}):(\\d{2})$/);\r\n\t\t\t\tif (!match) return null;\r\n\t\t\t\treturn parseInt(match[1], 10) * 60 + parseInt(match[2], 10);\r\n\t\t\t}\r\n\r\n\t\t\tfunction formatTimeRange(start, end) {\r\n\t\t\t\tif (!start || !end) return '-';\r\n\t\t\t\treturn start + ' - ' + end;\r\n\t\t\t}\r\n\r\n\t\t\tfunction showWizardMessage(config, text, isError) {\r\n\t\t\t\tconst el = document.getElementById(config.messageId);\r\n\t\t\t\tif (!el) return;\r\n\t\t\t\tif (!text) {\r\n\t\t\t\t\tel.hidden = true;\r\n\t\t\t\t\tel.textContent = '';\r\n\t\t\t\t\tel.classList.remove('is-error');\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tel.hidden = false;\r\n\t\t\t\tel.textContent = text;\r\n\t\t\t\tel.classList.toggle('is-error', !!isError);\r\n\t\t\t}\r\n\r\n\t\t\tfunction validateStep(form, stepEl, kind) {\r\n\t\t\t\tif (!stepEl) return true;\r\n\t\t\t\tconst step = parseInt(stepEl.getAttribute('data-step') || '0', 10);\r\n\t\t\t\tconst required = stepEl.getAttribute('data-required') === 'true';\r\n\r\n\t\t\t\tif (kind === 'conduct' && step === 1) {\r\n\t\t\t\t\tconst teacher = getTeacherHidden(form, kind);\r\n\t\t\t\t\tconst student = getStudentSelect(form, kind);\r\n\t\t\t\t\tif (teacher && !teacher.value) return false;\r\n\t\t\t\t\tif (!student || !student.value) return false;\r\n\t\t\t\t\treturn true;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (kind === 'schedule' && step === 1) {\r\n\t\t\t\t\tconst teacher = getTeacherHidden(form, kind);\r\n\t\t\t\t\tconst student = getStudentSelect(form, kind);\r\n\t\t\t\t\tif (teacher && !teacher.value) return false;\r\n\t\t\t\t\tif (!student || !student.value) return false;\r\n\t\t\t\t\treturn true;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (kind === 'conduct' && step === 2) {\r\n\t\t\t\t\tconst status = form.querySelector('input[name=\"status\"]:checked');\r\n\t\t\t\t\tif (!status) return false;\r\n\t\t\t\t\tif (status.value !== 'conducted') {\r\n\t\t\t\t\t\tconst reason = form.querySelector('[name=\"reason\"]');\r\n\t\t\t\t\t\treturn reason && reason.value.trim() !== '';\r\n\t\t\t\t\t}\r\n\t\t\t\t\treturn true;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (kind === 'conduct' && step === 4) {\r\n\t\t\t\t\tconst rate = form.querySelector('[name=\"rate\"]');\r\n\t\t\t\t\tconst currency = form.querySelector('[name=\"currency\"]');\r\n\t\t\t\t\tif (!currency || !currency.value) return false;\r\n\t\t\t\t\tif (!rate || rate.value === '' || parseFloat(rate.value) < 0) return false;\r\n\t\t\t\t\tconst status = form.querySelector('input[name=\"status\"]:checked');\r\n\t\t\t\t\tif (status && status.value === 'conducted' && parseFloat(rate.value) <= 0) return false;\r\n\t\t\t\t\treturn true;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif ((kind === 'conduct' && step === 3) || (kind === 'schedule' && step === 2)) {\r\n\t\t\t\t\tconst dateInput = form.querySelector('[name=\"date\"]') || form.querySelector('[name=\"scheduled_date\"]');\r\n\t\t\t\t\tconst start = stepEl.querySelector('[name=\"start_time\"]');\r\n\t\t\t\t\tconst end = stepEl.querySelector('[name=\"end_time\"]');\r\n\t\t\t\t\tif (!dateInput || !dateInput.value) return false;\r\n\t\t\t\t\tif (!start || !start.value || !end || !end.value) return false;\r\n\t\t\t\t\tif (window.validateTimeRange) {\r\n\t\t\t\t\t\tconst check = window.validateTimeRange({ startInput: start, endInput: end });\r\n\t\t\t\t\t\tif (!check.ok) return false;\r\n\t\t\t\t\t} else {\r\n\t\t\t\t\t\tconst startMin = parseTimeToMinutes(start.value);\r\n\t\t\t\t\t\tconst endMin = parseTimeToMinutes(end.value);\r\n\t\t\t\t\t\tif (startMin === null || endMin === null || endMin <= startMin) return false;\r\n\t\t\t\t\t}\r\n\t\t\t\t\treturn true;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (!required) return true;\r\n\t\t\t\treturn true;\r\n\t\t\t}\r\n\r\n\t\t\tfunction updateNav(config, state) {\r\n\t\t\t\tconst prev = document.getElementById(config.prevId);\r\n\t\t\t\tconst next = document.getElementById(config.nextId);\r\n\t\t\t\tconst save = document.getElementById(config.saveId);\r\n\t\t\t\tconst stepLabel = document.getElementById(config.stepLabelId);\r\n\t\t\t\tconst form = document.getElementById(config.formId);\r\n\t\t\t\tconst stepEl = form?.querySelector('.wizard-step[data-step=\"' + state.current + '\"]');\r\n\r\n\t\t\t\tif (stepLabel) {\r\n\t\t\t\t\tstepLabel.textContent = 'Step ' + state.current + ' of ' + config.totalSteps;\r\n\t\t\t\t}\r\n\t\t\t\tif (prev) prev.hidden = state.current <= 1;\r\n\t\t\t\tif (next) {\r\n\t\t\t\t\tnext.hidden = state.current >= config.totalSteps;\r\n\t\t\t\t\tnext.disabled = !validateStep(form, stepEl, state.kind);\r\n\t\t\t\t}\r\n\t\t\t\tif (save) {\r\n\t\t\t\t\tsave.hidden = state.current < config.totalSteps;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction showStep(config, state) {\r\n\t\t\t\tconst form = document.getElementById(config.formId);\r\n\t\t\t\tconst kind = state.kind;\r\n\t\t\t\tif (!form) return;\r\n\t\t\t\tform.querySelectorAll('.wizard-step').forEach(function (step) {\r\n\t\t\t\t\tconst stepNum = parseInt(step.getAttribute('data-step') || '0', 10);\r\n\t\t\t\t\tstep.classList.toggle('is-active', stepNum === state.current);\r\n\t\t\t\t});\r\n\t\t\t\tif (kind === 'conduct' && state.current === 4 && window.applyStudentRateToForm) {\r\n\t\t\t\t\twindow.applyStudentRateToForm(form);\r\n\t\t\t\t}\r\n\t\t\t\tif (state.current === config.totalSteps) {\r\n\t\t\t\t\tpopulateSummary(config, state.kind);\r\n\t\t\t\t}\r\n\t\t\t\tupdateNav(config, state);\r\n\t\t\t\tconst stepEl = form.querySelector('.wizard-step[data-step=\"' + state.current + '\"]');\r\n\t\t\t\tif ((kind === 'conduct' && state.current === 3) || (kind === 'schedule' && state.current === 2)) {\r\n\t\t\t\t\tupdateWizardDurationPreview(form, stepEl);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction populateSummary(config, kind) {\r\n\t\t\t\tconst form = document.getElementById(config.formId);\r\n\t\t\t\tconst summary = document.getElementById(config.summaryId);\r\n\t\t\t\tif (!form || !summary) return;\r\n\r\n\t\t\t\tconst student = getStudentSelect(form, kind);\r\n\t\t\t\tconst teacherField = summary.querySelector('[data-field=\"teacher\"]');\r\n\t\t\t\tconst studentField = summary.querySelector('[data-field=\"student\"]');\r\n\t\t\t\tconst statusField = summary.querySelector('[data-field=\"status\"]');\r\n\t\t\t\tconst reasonField = summary.querySelector('[data-field=\"reason\"]');\r\n\t\t\t\tconst reasonRow = summary.querySelector('[data-summary-row=\"reason\"]');\r\n\t\t\t\tconst dateField = summary.querySelector('[data-field=\"date\"]');\r\n\t\t\t\tconst timeField = summary.querySelector('[data-field=\"time\"]');\r\n\t\t\t\tconst durationField = summary.querySelector('[data-field=\"duration\"]');\r\n\t\t\t\tconst rateField = summary.querySelector('[data-field=\"rate\"]');\r\n\t\t\t\tconst materialsField = summary.querySelector('[data-field=\"materials\"]');\r\n\t\t\t\tconst materialsRow = summary.querySelector('[data-summary-row=\"materials\"]');\r\n\t\t\t\tconst trialField = summary.querySelector('[data-field=\"trial\"]');\r\n\t\t\t\tconst notesField = summary.querySelector('[data-field=\"notes\"]');\r\n\t\t\t\tconst notesRow = summary.querySelector('[data-summary-row=\"notes\"]');\r\n\r\n\t\t\t\tif (teacherField) teacherField.textContent = getTeacherName(form, kind);\r\n\t\t\t\tif (studentField) studentField.textContent = getSelectedOptionLabel(student);\r\n\r\n\t\t\t\tconst statusInput = form.querySelector('input[name=\"status\"]:checked');\r\n\t\t\t\tif (statusField) {\r\n\t\t\t\t\tif (config.showStatus && statusInput) {\r\n\t\t\t\t\t\tconst label = statusInput.closest('.status-radio-card')?.querySelector('.status-radio-card__title');\r\n\t\t\t\t\t\tstatusField.textContent = label ? label.textContent.trim() : statusInput.value;\r\n\t\t\t\t\t} else {\r\n\t\t\t\t\t\tstatusField.closest('.class-wizard-summary-row')?.setAttribute('hidden', '');\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst reasonInput = form.querySelector('[name=\"reason\"]');\r\n\t\t\t\tif (reasonRow && reasonField) {\r\n\t\t\t\t\tconst showReason = config.showStatus && statusInput && statusInput.value !== 'conducted' && reasonInput && reasonInput.value.trim();\r\n\t\t\t\t\treasonRow.hidden = !showReason;\r\n\t\t\t\t\tif (showReason) reasonField.textContent = reasonInput.value.trim();\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst dateInput = form.querySelector('[name=\"date\"], [name=\"scheduled_date\"]');\r\n\t\t\t\tif (dateField) dateField.textContent = dateInput && dateInput.value ? dateInput.value : '-';\r\n\r\n\t\t\t\tconst start = form.querySelector('[name=\"start_time\"]');\r\n\t\t\t\tconst end = form.querySelector('[name=\"end_time\"]');\r\n\t\t\t\tif (timeField) {\r\n\t\t\t\t\tfillTimePill(timeField, formatTimeRange(start?.value, end?.value));\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (durationField) {\r\n\t\t\t\t\tconst startMins = parseTimeToMinutes(start?.value);\r\n\t\t\t\t\tconst endMins = parseTimeToMinutes(end?.value);\r\n\t\t\t\t\tif (startMins !== null && endMins !== null && endMins > startMins) {\r\n\t\t\t\t\t\tfillDurationPill(durationField, formatDurationLabel(endMins - startMins));\r\n\t\t\t\t\t} else {\r\n\t\t\t\t\t\tdurationField.textContent = '-';\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst rateInput = form.querySelector('[name=\"rate\"]');\r\n\t\t\t\tconst currencyInput = form.querySelector('[name=\"currency\"]');\r\n\t\t\t\tif (rateField) {\r\n\t\t\t\t\tfillRatePill(rateField, rateInput?.value || '0', currencyInput?.value || '');\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst chips = form.querySelectorAll('.class-lm-chip');\r\n\t\t\t\tif (materialsRow && materialsField) {\r\n\t\t\t\t\tif (chips.length) {\r\n\t\t\t\t\t\tmaterialsRow.hidden = false;\r\n\t\t\t\t\t\tmaterialsField.textContent = Array.from(chips).map(function (chip) {\r\n\t\t\t\t\t\t\treturn chip.getAttribute('data-title') || chip.textContent.trim();\r\n\t\t\t\t\t\t}).join(', ');\r\n\t\t\t\t\t} else {\r\n\t\t\t\t\t\tmaterialsRow.hidden = true;\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst trialYes = form.querySelector('input[name=\"is_trial_class\"][value=\"on\"]');\r\n\t\t\t\tif (trialField) {\r\n\t\t\t\t\ttrialField.textContent = trialYes && trialYes.checked ? 'Yes' : 'No';\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst notesInput = form.querySelector('[name=\"notes\"]');\r\n\t\t\t\tif (notesRow && notesField) {\r\n\t\t\t\t\tconst notes = notesInput && notesInput.value.trim();\r\n\t\t\t\t\tnotesRow.hidden = !notes;\r\n\t\t\t\t\tif (notes) notesField.textContent = notes;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction bindStatusReason(form) {\r\n\t\t\t\tform.querySelectorAll('input[name=\"status\"]').forEach(function (input) {\r\n\t\t\t\t\tinput.addEventListener('change', function () {\r\n\t\t\t\t\t\tconst reasonGroup = form.querySelector('#conductWizard_reasonGroup');\r\n\t\t\t\t\t\tconst reason = form.querySelector('[name=\"reason\"]');\r\n\t\t\t\t\t\tif (!reasonGroup || !reason) return;\r\n\t\t\t\t\t\tif (input.value === 'conducted') {\r\n\t\t\t\t\t\t\treasonGroup.hidden = true;\r\n\t\t\t\t\t\t\treason.value = '';\r\n\t\t\t\t\t\t\tif (window.applyStudentRateToForm) window.applyStudentRateToForm(form);\r\n\t\t\t\t\t\t} else {\r\n\t\t\t\t\t\t\treasonGroup.hidden = false;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tconst state = form._wizardState;\r\n\t\t\t\t\t\tif (state) updateNav(configs.conduct, state);\r\n\t\t\t\t\t});\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tfunction updateScheduleZoomWarning(form) {\r\n\t\t\t\tconst warning = form.querySelector('#scheduleWizard_zoomWarning');\r\n\t\t\t\tif (!warning) return;\r\n\t\t\t\tconst start = form.querySelector('[name=\"start_time\"]');\r\n\t\t\t\tconst end = form.querySelector('[name=\"end_time\"]');\r\n\t\t\t\tconst startMin = parseTimeToMinutes(start?.value);\r\n\t\t\t\tconst endMin = parseTimeToMinutes(end?.value);\r\n\t\t\t\tif (startMin !== null && endMin !== null && endMin > startMin && (endMin - startMin) > ZOOM_MAX_AUTO_MINUTES) {\r\n\t\t\t\t\twarning.textContent = ZOOM_MANUAL_WARNING;\r\n\t\t\t\t\twarning.hidden = false;\r\n\t\t\t\t} else {\r\n\t\t\t\t\twarning.hidden = true;\r\n\t\t\t\t\twarning.textContent = '';\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction resetAdminStudentDropdown(form, kind) {\r\n\t\t\t\tif (form.dataset.lockTeacher === 'true') return;\r\n\t\t\t\tconst student = getStudentSelect(form, kind);\r\n\t\t\t\tif (!student) return;\r\n\t\t\t\tstudent.innerHTML = '<option value=\"\">-- Select teacher first --</option>';\r\n\t\t\t\tstudent.value = '';\r\n\t\t\t}\r\n\r\n\t\t\tasync function loadWizardStudents(form, kind) {\r\n\t\t\t\tconst teacher = getTeacherHidden(form, kind);\r\n\t\t\t\tconst student = getStudentSelect(form, kind);\r\n\t\t\t\tif (!student || form.dataset.lockTeacher === 'true') return;\r\n\t\t\t\tconst teacherId = teacher ? teacher.value : '';\r\n\t\t\t\tif (!teacherId) {\r\n\t\t\t\t\tresetAdminStudentDropdown(form, kind);\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\ttry {\r\n\t\t\t\t\tconst response = await fetch(buildURL('/api/students?teacher=' + encodeURIComponent(teacherId)));\r\n\t\t\t\t\tconst html = await response.text();\r\n\t\t\t\t\tif (!response.ok) throw new Error(html);\r\n\t\t\t\t\tstudent.innerHTML = html;\r\n\t\t\t\t\tstudent.value = '';\r\n\t\t\t\t} catch (err) {\r\n\t\t\t\t\tif (typeof showErrorBanner === 'function') {\r\n\t\t\t\t\t\tshowErrorBanner(err.message || 'Failed to load students');\r\n\t\t\t\t\t}\r\n\t\t\t\t\tresetAdminStudentDropdown(form, kind);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction wireAdminTeacherSearch(form, kind) {\r\n\t\t\t\tif (form.dataset.lockTeacher === 'true') return;\r\n\t\t\t\tconst teacher = getTeacherHidden(form, kind);\r\n\t\t\t\tif (!teacher) return;\r\n\t\t\t\tteacher.addEventListener('change', function () {\r\n\t\t\t\t\tconst search = teacher.closest('.entity-search');\r\n\t\t\t\t\tif (search) clearPortaledTeacherResults(search);\r\n\t\t\t\t\tloadWizardStudents(form, kind);\r\n\t\t\t\t\tif (form._wizardState) updateNav(configs[kind], form._wizardState);\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tfunction openWizard(kind) {\r\n\t\t\t\tconst config = configs[kind];\r\n\t\t\t\tconst modal = document.getElementById(config.modalId);\r\n\t\t\t\tconst form = document.getElementById(config.formId);\r\n\t\t\t\tif (!modal || !form) return;\r\n\r\n\t\t\t\tconst choiceModal = document.getElementById('recordClassesChoiceModal');\r\n\t\t\t\tif (choiceModal) choiceModal.hidden = true;\r\n\r\n\t\t\t\tform.reset();\r\n\t\t\t\tform.querySelectorAll('.class-lm-chips').forEach(function (chips) {\r\n\t\t\t\t\tchips.innerHTML = '';\r\n\t\t\t\t});\r\n\r\n\t\t\t\tconst state = { kind: kind, current: 1 };\r\n\t\t\t\tform._wizardState = state;\r\n\t\t\t\tshowWizardMessage(config, '', false);\r\n\t\t\t\tshowStep(config, state);\r\n\r\n\t\t\t\tif (kind === 'conduct') {\r\n\t\t\t\t\tconst reasonGroup = form.querySelector('#conductWizard_reasonGroup');\r\n\t\t\t\t\tif (reasonGroup) reasonGroup.hidden = true;\r\n\t\t\t\t}\r\n\t\t\t\tresetAdminStudentDropdown(form, kind);\r\n\t\t\t\tform.querySelectorAll('.entity-search').forEach(clearPortaledTeacherResults);\r\n\r\n\t\t\t\tmodal.hidden = false;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\tupdateWizardDurationPreview(form);\r\n\r\n\t\t\t\trequestAnimationFrame(function () {\r\n\t\t\t\t\tconst active = form.querySelector('.wizard-step.is-active input, .wizard-step.is-active select, .wizard-step.is-active textarea, .wizard-step.is-active button');\r\n\t\t\t\t\tif (active && typeof active.focus === 'function') active.focus();\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tfunction closeWizard(kind) {\r\n\t\t\t\tconst config = configs[kind];\r\n\t\t\t\tconst modal = document.getElementById(config.modalId);\r\n\t\t\t\tconst form = document.getElementById(config.formId);\r\n\t\t\t\tif (!modal) return;\r\n\t\t\t\tif (form) {\r\n\t\t\t\t\tform.querySelectorAll('.entity-search').forEach(clearPortaledTeacherResults);\r\n\t\t\t\t}\r\n\t\t\t\tclearAllPortaledTeacherResults();\r\n\t\t\t\tmodal.hidden = true;\r\n\t\t\t\tconst conductOpen = document.getElementById('conductClassWizardModal') && !document.getElementById('conductClassWizardModal').hidden;\r\n\t\t\t\tconst scheduleOpen = document.getElementById('scheduleClassWizardModal') && !document.getElementById('scheduleClassWizardModal').hidden;\r\n\t\t\t\tconst choiceOpen = document.getElementById('recordClassesChoiceModal') && !document.getElementById('recordClassesChoiceModal').hidden;\r\n\t\t\t\tif (!conductOpen && !scheduleOpen && !choiceOpen) {\r\n\t\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tasync function submitWizard(kind) {\r\n\t\t\t\tconst config = configs[kind];\r\n\t\t\t\tconst form = document.getElementById(config.formId);\r\n\t\t\t\tif (!form) return;\r\n\r\n\t\t\t\tconst save = document.getElementById(config.saveId);\r\n\t\t\t\tif (save) {\r\n\t\t\t\t\tsave.disabled = true;\r\n\t\t\t\t\tsave.classList.add('is-loading');\r\n\t\t\t\t}\r\n\r\n\t\t\t\ttry {\r\n\t\t\t\t\tconst formData = new FormData(form);\r\n\t\t\t\t\tconst response = await fetch(config.postURL, {\r\n\t\t\t\t\t\tmethod: 'POST',\r\n\t\t\t\t\t\theaders: Object.assign({}, window.getCSRFHeaders ? window.getCSRFHeaders() : {}),\r\n\t\t\t\t\t\tbody: new URLSearchParams(formData),\r\n\t\t\t\t\t});\r\n\t\t\t\t\tconst text = await response.text();\r\n\t\t\t\t\tif (!response.ok) {\r\n\t\t\t\t\t\tshowWizardMessage(config, text, true);\r\n\t\t\t\t\t\tif (typeof showErrorBanner === 'function') showErrorBanner(text);\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\tif (typeof showSuccessBanner === 'function') {\r\n\t\t\t\t\t\tshowSuccessBanner(kind === 'conduct' ? 'Class recorded' : 'Class scheduled');\r\n\t\t\t\t\t}\r\n\t\t\t\t\tcloseWizard(kind);\r\n\r\n\t\t\t\t\tif (kind === 'conduct') {\r\n\t\t\t\t\t\tif (typeof window.refreshClassesTable === 'function') {\r\n\t\t\t\t\t\t\twindow.refreshClassesTable();\r\n\t\t\t\t\t\t} else if (typeof htmx !== 'undefined') {\r\n\t\t\t\t\t\t\thtmx.trigger(document.body, 'classesRefresh');\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t\tif (kind === 'schedule') {\r\n\t\t\t\t\t\tif (typeof window.refreshScheduleList === 'function') {\r\n\t\t\t\t\t\t\twindow.refreshScheduleList();\r\n\t\t\t\t\t\t} else if (typeof htmx !== 'undefined') {\r\n\t\t\t\t\t\t\thtmx.trigger(document.body, 'scheduleRefresh');\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tif (typeof window.refreshScheduleCalendar === 'function') {\r\n\t\t\t\t\t\t\twindow.refreshScheduleCalendar();\r\n\t\t\t\t\t\t} else if (typeof htmx !== 'undefined') {\r\n\t\t\t\t\t\t\thtmx.trigger(document.body, 'refreshScheduleCalendar');\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t} catch (err) {\r\n\t\t\t\t\tshowWizardMessage(config, err.message || 'Request failed', true);\r\n\t\t\t\t\tif (typeof showErrorBanner === 'function') showErrorBanner(err.message || 'Request failed');\r\n\t\t\t\t} finally {\r\n\t\t\t\t\tif (save) {\r\n\t\t\t\t\t\tsave.disabled = false;\r\n\t\t\t\t\t\tsave.classList.remove('is-loading');\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction initWizard(kind) {\r\n\t\t\t\tconst config = configs[kind];\r\n\t\t\t\tconst form = document.getElementById(config.formId);\r\n\t\t\t\tconst modal = document.getElementById(config.modalId);\r\n\t\t\t\tif (!form || !modal) return;\r\n\r\n\t\t\t\tconst state = { kind: kind, current: 1 };\r\n\t\t\t\tform._wizardState = state;\r\n\r\n\t\t\t\tif (kind === 'conduct') {\r\n\t\t\t\t\tbindStatusReason(form);\r\n\t\t\t\t\twireAdminTeacherSearch(form, kind);\r\n\t\t\t\t}\r\n\t\t\t\tif (kind === 'schedule') {\r\n\t\t\t\t\twireAdminTeacherSearch(form, kind);\r\n\t\t\t\t}\r\n\r\n\t\t\t\tupdateNav(config, state);\r\n\r\n\t\t\t\tform.addEventListener('input', function (e) {\r\n\t\t\t\t\tconst target = e.target;\r\n\t\t\t\t\tif (target && (target.name === 'start_time' || target.name === 'end_time')) {\r\n\t\t\t\t\t\tconst stepEl = target.closest('.wizard-step');\r\n\t\t\t\t\t\tupdateWizardDurationPreview(form, stepEl);\r\n\t\t\t\t\t\tif (kind === 'schedule') updateScheduleZoomWarning(form);\r\n\t\t\t\t\t}\r\n\t\t\t\t\tif (form._wizardState) updateNav(config, form._wizardState);\r\n\t\t\t\t});\r\n\t\t\t\tform.addEventListener('change', function (e) {\r\n\t\t\t\t\tconst target = e.target;\r\n\t\t\t\t\tif (target && (target.name === 'start_time' || target.name === 'end_time')) {\r\n\t\t\t\t\t\tconst stepEl = target.closest('.wizard-step');\r\n\t\t\t\t\t\tupdateWizardDurationPreview(form, stepEl);\r\n\t\t\t\t\t\tif (kind === 'schedule') updateScheduleZoomWarning(form);\r\n\t\t\t\t\t}\r\n\t\t\t\t\tif (form._wizardState) updateNav(config, form._wizardState);\r\n\t\t\t\t\tif (window.applyStudentRateToForm) window.applyStudentRateToForm(form);\r\n\t\t\t\t});\r\n\r\n\t\t\t\tdocument.getElementById(config.prevId)?.addEventListener('click', function () {\r\n\t\t\t\t\tif (!form._wizardState || form._wizardState.current <= 1) return;\r\n\t\t\t\t\tform._wizardState.current -= 1;\r\n\t\t\t\t\tshowWizardMessage(config, '', false);\r\n\t\t\t\t\tshowStep(config, form._wizardState);\r\n\t\t\t\t});\r\n\r\n\t\t\t\tdocument.getElementById(config.nextId)?.addEventListener('click', function () {\r\n\t\t\t\t\tif (!form._wizardState) return;\r\n\t\t\t\t\tconst stepEl = form.querySelector('.wizard-step.is-active');\r\n\t\t\t\t\tif (!validateStep(form, stepEl, kind)) return;\r\n\t\t\t\t\tif (form._wizardState.current >= config.totalSteps) return;\r\n\t\t\t\t\tform._wizardState.current += 1;\r\n\t\t\t\t\tshowWizardMessage(config, '', false);\r\n\t\t\t\t\tshowStep(config, form._wizardState);\r\n\t\t\t\t});\r\n\r\n\t\t\t\tform.addEventListener('submit', function (e) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\tsubmitWizard(kind);\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\twindow.openConductClassWizard = function () {\r\n\t\t\t\topenWizard('conduct');\r\n\t\t\t};\r\n\t\t\twindow.openScheduleClassWizard = function () {\r\n\t\t\t\topenWizard('schedule');\r\n\t\t\t};\r\n\r\n\t\t\twireWizardTeacherSearchFloating();\r\n\t\t\tinitWizard('conduct');\r\n\t\t\tinitWizard('schedule');\r\n\r\n\t\t\tdocument.addEventListener('click', function (e) {\r\n\t\t\t\tconst conductTrigger = e.target.closest('[data-open-conduct-class-wizard]');\r\n\t\t\t\tif (conductTrigger) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\twindow.openConductClassWizard();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst scheduleTrigger = e.target.closest('[data-open-schedule-class-wizard]');\r\n\t\t\t\tif (scheduleTrigger) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\twindow.openScheduleClassWizard();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst closeBtn = e.target.closest('.class-wizard-close');\r\n\t\t\t\tif (closeBtn) {\r\n\t\t\t\t\tcloseWizard(closeBtn.getAttribute('data-wizard'));\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (e.target.id === 'conductClassWizardModal') {\r\n\t\t\t\t\tcloseWizard('conduct');\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (e.target.id === 'scheduleClassWizardModal') {\r\n\t\t\t\t\tcloseWizard('schedule');\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key !== 'Escape') return;\r\n\t\t\t\tif (document.getElementById('conductClassWizardModal') && !document.getElementById('conductClassWizardModal').hidden) {\r\n\t\t\t\t\tcloseWizard('conduct');\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (document.getElementById('scheduleClassWizardModal') && !document.getElementById('scheduleClassWizardModal').hidden) {\r\n\t\t\t\t\tcloseWizard('schedule');\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tconst scheduleParams = new URLSearchParams(window.location.search);\r\n\t\t\tif (scheduleParams.get('openScheduleWizard') === '1') {\r\n\t\t\t\twindow.openScheduleClassWizard();\r\n\t\t\t}\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 98, "<script>\r\n\t\t(function () {\r\n\t\t\tif (window.__classWizardReady) return;\r\n\t\t\twindow.__classWizardReady = true;\r\n\r\n\t\t\tconst ZOOM_MAX_AUTO_MINUTES = 40;\r\n\t\t\tconst ZOOM_MANUAL_WARNING = 'Classes longer than 40 minutes cannot receive an automatic Zoom meeting room on a Basic account. Please create your Zoom meeting manually and share the link with your student.';\r\n\r\n\t\t\tfunction buildURL(path) {\r\n\t\t\t\tconst banner = document.getElementById('errorBanner');\r\n\t\t\t\tif (banner && banner.dataset.basePath) {\r\n\t\t\t\t\treturn banner.dataset.basePath.replace(/\\/$/, '') + path;\r\n\t\t\t\t}\r\n\t\t\t\tconst pathname = window.location.pathname.replace(/\\/$/, '');\r\n\t\t\t\tif (pathname.includes('/zion-english-admin')) {\r\n\t\t\t\t\treturn '/zion-english-admin' + path;\r\n\t\t\t\t}\r\n\t\t\t\treturn path;\r\n\t\t\t}\r\n\r\n\t\t\tfunction findWizardTeacherResults(search) {\r\n\t\t\t\tconst resultsHost = search.querySelector('[id$=\"TeacherSearchResults\"]');\r\n\t\t\t\tif (!resultsHost) return null;\r\n\t\t\t\treturn resultsHost.querySelector('.entity-search-results')\r\n\t\t\t\t\t|| document.querySelector('.entity-search-results[data-wizard-results-host=\"' + resultsHost.id + '\"]');\r\n\t\t\t}\r\n\r\n\t\t\tfunction positionFloatingTeacherResults(search) {\r\n\t\t\t\tif (!search || !search.closest('.modal-dialog-wizard')) return;\r\n\t\t\t\tconst input = search.querySelector('input[name=\"teacherQ\"]');\r\n\t\t\t\tconst resultsHost = search.querySelector('[id$=\"TeacherSearchResults\"]');\r\n\t\t\t\tconst results = findWizardTeacherResults(search);\r\n\t\t\t\tif (!input || !results || !resultsHost) return;\r\n\r\n\t\t\t\tif (results.parentElement !== document.body) {\r\n\t\t\t\t\tresults.dataset.wizardResultsHost = resultsHost.id;\r\n\t\t\t\t\tdocument.body.appendChild(results);\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst rect = input.getBoundingClientRect();\r\n\t\t\t\tconst gap = 4;\r\n\t\t\t\tconst maxHeight = Math.max(120, window.innerHeight - rect.bottom - gap - 16);\r\n\t\t\t\tresults.classList.add('wizard-teacher-results-floating');\r\n\t\t\t\tresults.style.top = Math.round(rect.bottom + gap) + 'px';\r\n\t\t\t\tresults.style.left = Math.round(rect.left) + 'px';\r\n\t\t\t\tresults.style.width = Math.round(rect.width) + 'px';\r\n\t\t\t\tresults.style.maxHeight = Math.round(maxHeight) + 'px';\r\n\t\t\t}\r\n\r\n\t\t\tfunction repositionAllWizardTeacherResults() {\r\n\t\t\t\tdocument.querySelectorAll('.modal-dialog-wizard .entity-search').forEach(positionFloatingTeacherResults);\r\n\t\t\t}\r\n\r\n\t\t\tfunction clearPortaledTeacherResults(search) {\r\n\t\t\t\tconst resultsHost = search.querySelector('[id$=\"TeacherSearchResults\"]');\r\n\t\t\t\tif (!resultsHost) return;\r\n\t\t\t\tconst portaled = document.querySelector('.entity-search-results[data-wizard-results-host=\"' + resultsHost.id + '\"]');\r\n\t\t\t\tif (portaled) portaled.remove();\r\n\t\t\t\tresultsHost.innerHTML = '';\r\n\t\t\t}\r\n\r\n\t\t\tfunction clearAllPortaledTeacherResults() {\r\n\t\t\t\tdocument.querySelectorAll('.entity-search-results[data-wizard-results-host]').forEach(function (el) {\r\n\t\t\t\t\tel.remove();\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tfunction wireWizardTeacherSearchFloating() {\r\n\t\t\t\tif (!document.body) return;\r\n\t\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\t\tconst target = evt.detail.target;\r\n\t\t\t\t\tif (!target || !target.id || !target.id.endsWith('TeacherSearchResults')) return;\r\n\t\t\t\t\tconst search = target.closest('.entity-search');\r\n\t\t\t\t\tif (!search || !search.closest('.modal-dialog-wizard')) return;\r\n\t\t\t\t\tpositionFloatingTeacherResults(search);\r\n\t\t\t\t});\r\n\t\t\t\tdocument.body.addEventListener('focusin', function (evt) {\r\n\t\t\t\t\tconst input = evt.target;\r\n\t\t\t\t\tif (!input || input.name !== 'teacherQ') return;\r\n\t\t\t\t\tconst search = input.closest('.entity-search');\r\n\t\t\t\t\tif (!search || !search.closest('.modal-dialog-wizard')) return;\r\n\t\t\t\t\tpositionFloatingTeacherResults(search);\r\n\t\t\t\t});\r\n\t\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\t\tconst item = e.target.closest('.entity-search-item');\r\n\t\t\t\t\tif (!item) return;\r\n\t\t\t\t\tconst portaled = item.closest('.entity-search-results[data-wizard-results-host]');\r\n\t\t\t\t\tif (!portaled) return;\r\n\t\t\t\t\twindow.setTimeout(function () {\r\n\t\t\t\t\t\tconst hostId = portaled.dataset.wizardResultsHost;\r\n\t\t\t\t\t\tportaled.remove();\r\n\t\t\t\t\t\tconst host = hostId ? document.getElementById(hostId) : null;\r\n\t\t\t\t\t\tif (host) host.innerHTML = '';\r\n\t\t\t\t\t}, 0);\r\n\t\t\t\t});\r\n\t\t\t\twindow.addEventListener('resize', repositionAllWizardTeacherResults);\r\n\t\t\t\twindow.addEventListener('scroll', repositionAllWizardTeacherResults, true);\r\n\t\t\t}\r\n\r\n\t\t\tconst configs = {\r\n\t\t\t\tconduct: {\r\n\t\t\t\t\tmodalId: 'conductClassWizardModal',\r\n\t\t\t\t\tformId: 'conductClassWizardForm',\r\n\t\t\t\t\tstepLabelId: 'conductWizardStepLabel',\r\n\t\t\t\t\tprevId: 'conductWizardPrev',\r\n\t\t\t\t\tnextId: 'conductWizardNext',\r\n\t\t\t\t\tsaveId: 'conductWizardSave',\r\n\t\t\t\t\tmessageId: 'conductWizardMessage',\r\n\t\t\t\t\tsummaryId: 'conductWizardSummary',\r\n\t\t\t\t\ttotalSteps: 8,\r\n\t\t\t\t\tpostURL: buildURL('/classes/record'),\r\n\t\t\t\t\tshowStatus: true,\r\n\t\t\t\t\tshowNotes: true,\r\n\t\t\t\t},\r\n\t\t\t\tschedule: {\r\n\t\t\t\t\tmodalId: 'scheduleClassWizardModal',\r\n\t\t\t\t\tformId: 'scheduleClassWizardForm',\r\n\t\t\t\t\tstepLabelId: 'scheduleWizardStepLabel',\r\n\t\t\t\t\tprevId: 'scheduleWizardPrev',\r\n\t\t\t\t\tnextId: 'scheduleWizardNext',\r\n\t\t\t\t\tsaveId: 'scheduleWizardSave',\r\n\t\t\t\t\tmessageId: 'scheduleWizardMessage',\r\n\t\t\t\t\tsummaryId: 'scheduleWizardSummary',\r\n\t\t\t\t\ttotalSteps: 5,\r\n\t\t\t\t\tpostURL: buildURL('/schedule/record'),\r\n\t\t\t\t\tshowStatus: false,\r\n\t\t\t\t\tshowNotes: false,\r\n\t\t\t\t},\r\n\t\t\t};\r\n\r\n\t\t\tfunction escapeHtml(value) {\r\n\t\t\t\treturn String(value || '')\r\n\t\t\t\t\t.replace(/&/g, '&amp;')\r\n\t\t\t\t\t.replace(/</g, '&lt;')\r\n\t\t\t\t\t.replace(/>/g, '&gt;')\r\n\t\t\t\t\t.replace(/\"/g, '&quot;');\r\n\t\t\t}\r\n\r\n\t\t\tfunction fillTimePill(el, timeRange) {\r\n\t\t\t\tif (!el) return;\r\n\t\t\t\tel.innerHTML =\r\n\t\t\t\t\t'<span class=\"time-range-pill\" aria-label=\"Time: ' + escapeHtml(timeRange) + '\">' +\r\n\t\t\t\t\t'<span class=\"pill pill--primary\">' + escapeHtml(timeRange) + '</span>' +\r\n\t\t\t\t\t'</span>';\r\n\t\t\t}\r\n\r\n\t\t\tfunction fillRatePill(el, rate, currency) {\r\n\t\t\t\tif (!el) return;\r\n\t\t\t\tel.innerHTML =\r\n\t\t\t\t\t'<span class=\"pill pill--info rate-pill\" aria-label=\"' + escapeHtml(rate + ' ' + currency) + '\">' +\r\n\t\t\t\t\t'<span class=\"rate-pill-amount\">' + escapeHtml(rate) + '</span>' +\r\n\t\t\t\t\t'<span class=\"rate-pill-currency\">' + escapeHtml(currency) + '</span>' +\r\n\t\t\t\t\t'</span>';\r\n\t\t\t}\r\n\r\n\t\t\tfunction fillDurationPill(el, label) {\r\n\t\t\t\tif (!el) return;\r\n\t\t\t\tel.innerHTML =\r\n\t\t\t\t\t'<span class=\"duration-pill-wrap\" aria-label=\"Duration: ' + escapeHtml(label) + '\">' +\r\n\t\t\t\t\t'<span class=\"pill pill--neutral duration-pill\">' +\r\n\t\t\t\t\t'<svg class=\"duration-pill-icon\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">' +\r\n\t\t\t\t\t'<circle cx=\"12\" cy=\"12\" r=\"10\"></circle>' +\r\n\t\t\t\t\t'<polyline points=\"12 6 12 12 16 14\"></polyline>' +\r\n\t\t\t\t\t'</svg>' +\r\n\t\t\t\t\t'<span class=\"duration-pill-value\">' + escapeHtml(label) + '</span>' +\r\n\t\t\t\t\t'</span>' +\r\n\t\t\t\t\t'</span>';\r\n\t\t\t}\r\n\r\n\t\t\tfunction formatDurationLabel(minutes) {\r\n\t\t\t\tif (minutes < 60) return minutes + ' min';\r\n\t\t\t\tconst h = Math.floor(minutes / 60);\r\n\t\t\t\tconst m = minutes % 60;\r\n\t\t\t\treturn m === 0 ? h + ' hr' : h + ' hr ' + m + ' min';\r\n\t\t\t}\r\n\r\n\t\t\tfunction updateWizardDurationPreview(form, stepEl) {\r\n\t\t\t\tif (!form) return;\r\n\t\t\t\tconst scope = stepEl || form.querySelector('.wizard-step.is-active') || form;\r\n\t\t\t\tconst bridge = scope.querySelector('.duration-bridge');\r\n\t\t\t\tconst start = scope.querySelector('[name=\"start_time\"]');\r\n\t\t\t\tconst end = scope.querySelector('[name=\"end_time\"]');\r\n\t\t\t\tif (!bridge || !start || !end) return;\r\n\r\n\t\t\t\tconst pill = bridge.querySelector('.duration-pill');\r\n\t\t\t\tconst valueEl = bridge.querySelector('.duration-pill-value');\r\n\t\t\t\tconst icon = bridge.querySelector('.duration-pill-icon');\r\n\t\t\t\tconst startMin = parseTimeToMinutes(start.value);\r\n\t\t\t\tconst endMin = parseTimeToMinutes(end.value);\r\n\r\n\t\t\t\tbridge.removeAttribute('hidden');\r\n\r\n\t\t\t\tif (startMin === null || endMin === null || !start.value || !end.value) {\r\n\t\t\t\t\tbridge.classList.remove('duration-bridge--invalid');\r\n\t\t\t\t\tbridge.setAttribute('aria-label', 'Duration');\r\n\t\t\t\t\tif (pill) pill.className = 'pill pill--neutral duration-pill duration-pill--pending';\r\n\t\t\t\t\tif (icon) icon.hidden = false;\r\n\t\t\t\t\tif (valueEl) valueEl.textContent = '-';\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (endMin <= startMin) {\r\n\t\t\t\t\tbridge.classList.add('duration-bridge--invalid');\r\n\t\t\t\t\tbridge.setAttribute('aria-label', 'End time must be after start time');\r\n\t\t\t\t\tif (pill) pill.className = 'pill pill--error duration-pill';\r\n\t\t\t\t\tif (icon) icon.hidden = true;\r\n\t\t\t\t\tif (valueEl) valueEl.textContent = 'Invalid';\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst label = formatDurationLabel(endMin - startMin);\r\n\t\t\t\tbridge.classList.remove('duration-bridge--invalid');\r\n\t\t\t\tbridge.setAttribute('aria-label', 'Duration: ' + label);\r\n\t\t\t\tif (pill) pill.className = 'pill pill--neutral duration-pill';\r\n\t\t\t\tif (icon) icon.hidden = false;\r\n\t\t\t\tif (valueEl) valueEl.textContent = label;\r\n\t\t\t}\r\n\r\n\t\t\tfunction getSelectedOptionLabel(selectEl) {\r\n\t\t\t\tif (!selectEl || !selectEl.value) return '-';\r\n\t\t\t\tconst opt = selectEl.options[selectEl.selectedIndex];\r\n\t\t\t\treturn opt ? opt.textContent.trim() : '-';\r\n\t\t\t}\r\n\r\n\t\t\tfunction getTeacherName(form, prefix) {\r\n\t\t\t\tconst lockedName = form.querySelector('.form-group input[disabled]');\r\n\t\t\t\tif (lockedName && lockedName.value) return lockedName.value.trim();\r\n\t\t\t\tconst search = form.querySelector('[id$=\"TeacherSearch\"]');\r\n\t\t\t\tif (search && search.value) return search.value.trim();\r\n\t\t\t\treturn '-';\r\n\t\t\t}\r\n\r\n\t\t\tfunction getStudentSelect(form, kind) {\r\n\t\t\t\tif (kind === 'schedule') {\r\n\t\t\t\t\treturn form.querySelector('[name=\"schedule_student\"]') || form.querySelector('[name=\"student\"]');\r\n\t\t\t\t}\r\n\t\t\t\treturn form.querySelector('[name=\"student\"]');\r\n\t\t\t}\r\n\r\n\t\t\tfunction getTeacherHidden(form, kind) {\r\n\t\t\t\tif (kind === 'schedule') {\r\n\t\t\t\t\treturn form.querySelector('[name=\"schedule_teacher\"]') || form.querySelector('[name=\"teacher\"]');\r\n\t\t\t\t}\r\n\t\t\t\treturn form.querySelector('[name=\"teacher\"]');\r\n\t\t\t}\r\n\r\n\t\t\tfunction parseTimeToMinutes(value) {\r\n\t\t\t\tif (!value) return null;\r\n\t\t\t\tconst match = String(value).match(/^(\\d{1,2}):(\\d{2})$/);\r\n\t\t\t\tif (!match) return null;\r\n\t\t\t\treturn parseInt(match[1], 10) * 60 + parseInt(match[2], 10);\r\n\t\t\t}\r\n\r\n\t\t\tfunction formatTimeRange(start, end) {\r\n\t\t\t\tif (!start || !end) return '-';\r\n\t\t\t\treturn start + ' - ' + end;\r\n\t\t\t}\r\n\r\n\t\t\tfunction showWizardMessage(config, text, isError) {\r\n\t\t\t\tconst el = document.getElementById(config.messageId);\r\n\t\t\t\tif (!el) return;\r\n\t\t\t\tif (!text) {\r\n\t\t\t\t\tel.hidden = true;\r\n\t\t\t\t\tel.textContent = '';\r\n\t\t\t\t\tel.classList.remove('is-error');\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tel.hidden = false;\r\n\t\t\t\tel.textContent = text;\r\n\t\t\t\tel.classList.toggle('is-error', !!isError);\r\n\t\t\t}\r\n\r\n\t\t\tfunction validateStep(form, stepEl, kind) {\r\n\t\t\t\tif (!stepEl) return true;\r\n\t\t\t\tconst step = parseInt(stepEl.getAttribute('data-step') || '0', 10);\r\n\t\t\t\tconst required = stepEl.getAttribute('data-required') === 'true';\r\n\r\n\t\t\t\tif (kind === 'conduct' && step === 1) {\r\n\t\t\t\t\tconst teacher = getTeacherHidden(form, kind);\r\n\t\t\t\t\tconst student = getStudentSelect(form, kind);\r\n\t\t\t\t\tif (teacher && !teacher.value) return false;\r\n\t\t\t\t\tif (!student || !student.value) return false;\r\n\t\t\t\t\treturn true;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (kind === 'schedule' && step === 1) {\r\n\t\t\t\t\tconst teacher = getTeacherHidden(form, kind);\r\n\t\t\t\t\tconst student = getStudentSelect(form, kind);\r\n\t\t\t\t\tif (teacher && !teacher.value) return false;\r\n\t\t\t\t\tif (!student || !student.value) return false;\r\n\t\t\t\t\treturn true;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (kind === 'conduct' && step === 2) {\r\n\t\t\t\t\tconst status = form.querySelector('input[name=\"status\"]:checked');\r\n\t\t\t\t\tif (!status) return false;\r\n\t\t\t\t\tif (status.value !== 'conducted') {\r\n\t\t\t\t\t\tconst reason = form.querySelector('[name=\"reason\"]');\r\n\t\t\t\t\t\treturn reason && reason.value.trim() !== '';\r\n\t\t\t\t\t}\r\n\t\t\t\t\treturn true;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (kind === 'conduct' && step === 4) {\r\n\t\t\t\t\tconst rate = form.querySelector('[name=\"rate\"]');\r\n\t\t\t\t\tconst currency = form.querySelector('[name=\"currency\"]');\r\n\t\t\t\t\tif (!currency || !currency.value) return false;\r\n\t\t\t\t\tif (!rate || rate.value === '' || parseFloat(rate.value) < 0) return false;\r\n\t\t\t\t\tconst status = form.querySelector('input[name=\"status\"]:checked');\r\n\t\t\t\t\tif (status && status.value === 'conducted' && parseFloat(rate.value) <= 0) return false;\r\n\t\t\t\t\treturn true;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif ((kind === 'conduct' && step === 3) || (kind === 'schedule' && step === 2)) {\r\n\t\t\t\t\tconst dateInput = form.querySelector('[name=\"date\"]') || form.querySelector('[name=\"scheduled_date\"]');\r\n\t\t\t\t\tconst start = stepEl.querySelector('[name=\"start_time\"]');\r\n\t\t\t\t\tconst end = stepEl.querySelector('[name=\"end_time\"]');\r\n\t\t\t\t\tif (!dateInput || !dateInput.value) return false;\r\n\t\t\t\t\tif (!start || !start.value || !end || !end.value) return false;\r\n\t\t\t\t\tif (window.validateTimeRange) {\r\n\t\t\t\t\t\tconst check = window.validateTimeRange({ startInput: start, endInput: end });\r\n\t\t\t\t\t\tif (!check.ok) return false;\r\n\t\t\t\t\t} else {\r\n\t\t\t\t\t\tconst startMin = parseTimeToMinutes(start.value);\r\n\t\t\t\t\t\tconst endMin = parseTimeToMinutes(end.value);\r\n\t\t\t\t\t\tif (startMin === null || endMin === null || endMin <= startMin) return false;\r\n\t\t\t\t\t}\r\n\t\t\t\t\treturn true;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (!required) return true;\r\n\t\t\t\treturn true;\r\n\t\t\t}\r\n\r\n\t\t\tfunction updateNav(config, state) {\r\n\t\t\t\tconst prev = document.getElementById(config.prevId);\r\n\t\t\t\tconst next = document.getElementById(config.nextId);\r\n\t\t\t\tconst save = document.getElementById(config.saveId);\r\n\t\t\t\tconst stepLabel = document.getElementById(config.stepLabelId);\r\n\t\t\t\tconst form = document.getElementById(config.formId);\r\n\t\t\t\tconst stepEl = form?.querySelector('.wizard-step[data-step=\"' + state.current + '\"]');\r\n\r\n\t\t\t\tif (stepLabel) {\r\n\t\t\t\t\tstepLabel.textContent = 'Step ' + state.current + ' of ' + config.totalSteps;\r\n\t\t\t\t}\r\n\t\t\t\tif (prev) prev.hidden = state.current <= 1;\r\n\t\t\t\tif (next) {\r\n\t\t\t\t\tnext.hidden = state.current >= config.totalSteps;\r\n\t\t\t\t\tnext.disabled = !validateStep(form, stepEl, state.kind);\r\n\t\t\t\t}\r\n\t\t\t\tif (save) {\r\n\t\t\t\t\tsave.hidden = state.current < config.totalSteps;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction showStep(config, state) {\r\n\t\t\t\tconst form = document.getElementById(config.formId);\r\n\t\t\t\tconst kind = state.kind;\r\n\t\t\t\tif (!form) return;\r\n\t\t\t\tform.querySelectorAll('.wizard-step').forEach(function (step) {\r\n\t\t\t\t\tconst stepNum = parseInt(step.getAttribute('data-step') || '0', 10);\r\n\t\t\t\t\tstep.classList.toggle('is-active', stepNum === state.current);\r\n\t\t\t\t});\r\n\t\t\t\tif (kind === 'conduct' && state.current === 4 && window.applyStudentRateToForm) {\r\n\t\t\t\t\twindow.applyStudentRateToForm(form);\r\n\t\t\t\t}\r\n\t\t\t\tif (state.current === config.totalSteps) {\r\n\t\t\t\t\tpopulateSummary(config, state.kind);\r\n\t\t\t\t}\r\n\t\t\t\tupdateNav(config, state);\r\n\t\t\t\tconst stepEl = form.querySelector('.wizard-step[data-step=\"' + state.current + '\"]');\r\n\t\t\t\tif ((kind === 'conduct' && state.current === 3) || (kind === 'schedule' && state.current === 2)) {\r\n\t\t\t\t\tupdateWizardDurationPreview(form, stepEl);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction populateSummary(config, kind) {\r\n\t\t\t\tconst form = document.getElementById(config.formId);\r\n\t\t\t\tconst summary = document.getElementById(config.summaryId);\r\n\t\t\t\tif (!form || !summary) return;\r\n\r\n\t\t\t\tconst student = getStudentSelect(form, kind);\r\n\t\t\t\tconst teacherField = summary.querySelector('[data-field=\"teacher\"]');\r\n\t\t\t\tconst studentField = summary.querySelector('[data-field=\"student\"]');\r\n\t\t\t\tconst statusField = summary.querySelector('[data-field=\"status\"]');\r\n\t\t\t\tconst reasonField = summary.querySelector('[data-field=\"reason\"]');\r\n\t\t\t\tconst reasonRow = summary.querySelector('[data-summary-row=\"reason\"]');\r\n\t\t\t\tconst dateField = summary.querySelector('[data-field=\"date\"]');\r\n\t\t\t\tconst timeField = summary.querySelector('[data-field=\"time\"]');\r\n\t\t\t\tconst durationField = summary.querySelector('[data-field=\"duration\"]');\r\n\t\t\t\tconst rateField = summary.querySelector('[data-field=\"rate\"]');\r\n\t\t\t\tconst materialsField = summary.querySelector('[data-field=\"materials\"]');\r\n\t\t\t\tconst materialsRow = summary.querySelector('[data-summary-row=\"materials\"]');\r\n\t\t\t\tconst trialField = summary.querySelector('[data-field=\"trial\"]');\r\n\t\t\t\tconst notesField = summary.querySelector('[data-field=\"notes\"]');\r\n\t\t\t\tconst notesRow = summary.querySelector('[data-summary-row=\"notes\"]');\r\n\r\n\t\t\t\tif (teacherField) teacherField.textContent = getTeacherName(form, kind);\r\n\t\t\t\tif (studentField) studentField.textContent = getSelectedOptionLabel(student);\r\n\r\n\t\t\t\tconst statusInput = form.querySelector('input[name=\"status\"]:checked');\r\n\t\t\t\tif (statusField) {\r\n\t\t\t\t\tif (config.showStatus && statusInput) {\r\n\t\t\t\t\t\tconst label = statusInput.closest('.status-radio-card')?.querySelector('.status-radio-card__title');\r\n\t\t\t\t\t\tstatusField.textContent = label ? label.textContent.trim() : statusInput.value;\r\n\t\t\t\t\t} else {\r\n\t\t\t\t\t\tstatusField.closest('.class-wizard-summary-row')?.setAttribute('hidden', '');\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst reasonInput = form.querySelector('[name=\"reason\"]');\r\n\t\t\t\tif (reasonRow && reasonField) {\r\n\t\t\t\t\tconst showReason = config.showStatus && statusInput && statusInput.value !== 'conducted' && reasonInput && reasonInput.value.trim();\r\n\t\t\t\t\treasonRow.hidden = !showReason;\r\n\t\t\t\t\tif (showReason) reasonField.textContent = reasonInput.value.trim();\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst dateInput = form.querySelector('[name=\"date\"], [name=\"scheduled_date\"]');\r\n\t\t\t\tif (dateField) dateField.textContent = dateInput && dateInput.value ? dateInput.value : '-';\r\n\r\n\t\t\t\tconst start = form.querySelector('[name=\"start_time\"]');\r\n\t\t\t\tconst end = form.querySelector('[name=\"end_time\"]');\r\n\t\t\t\tif (timeField) {\r\n\t\t\t\t\tfillTimePill(timeField, formatTimeRange(start?.value, end?.value));\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (durationField) {\r\n\t\t\t\t\tconst startMins = parseTimeToMinutes(start?.value);\r\n\t\t\t\t\tconst endMins = parseTimeToMinutes(end?.value);\r\n\t\t\t\t\tif (startMins !== null && endMins !== null && endMins > startMins) {\r\n\t\t\t\t\t\tfillDurationPill(durationField, formatDurationLabel(endMins - startMins));\r\n\t\t\t\t\t} else {\r\n\t\t\t\t\t\tdurationField.textContent = '-';\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst rateInput = form.querySelector('[name=\"rate\"]');\r\n\t\t\t\tconst currencyInput = form.querySelector('[name=\"currency\"]');\r\n\t\t\t\tif (rateField) {\r\n\t\t\t\t\tfillRatePill(rateField, rateInput?.value || '0', currencyInput?.value || '');\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst chips = form.querySelectorAll('.class-lm-chip');\r\n\t\t\t\tif (materialsRow && materialsField) {\r\n\t\t\t\t\tif (chips.length) {\r\n\t\t\t\t\t\tmaterialsRow.hidden = false;\r\n\t\t\t\t\t\tmaterialsField.textContent = Array.from(chips).map(function (chip) {\r\n\t\t\t\t\t\t\treturn chip.getAttribute('data-title') || chip.textContent.trim();\r\n\t\t\t\t\t\t}).join(', ');\r\n\t\t\t\t\t} else {\r\n\t\t\t\t\t\tmaterialsRow.hidden = true;\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst trialYes = form.querySelector('input[name=\"is_trial_class\"][value=\"on\"]');\r\n\t\t\t\tif (trialField) {\r\n\t\t\t\t\ttrialField.textContent = trialYes && trialYes.checked ? 'Yes' : 'No';\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst notesInput = form.querySelector('[name=\"notes\"]');\r\n\t\t\t\tif (notesRow && notesField) {\r\n\t\t\t\t\tconst notes = notesInput && notesInput.value.trim();\r\n\t\t\t\t\tnotesRow.hidden = !notes;\r\n\t\t\t\t\tif (notes) notesField.textContent = notes;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction bindStatusReason(form) {\r\n\t\t\t\tform.querySelectorAll('input[name=\"status\"]').forEach(function (input) {\r\n\t\t\t\t\tinput.addEventListener('change', function () {\r\n\t\t\t\t\t\tconst reasonGroup = form.querySelector('#conductWizard_reasonGroup');\r\n\t\t\t\t\t\tconst reason = form.querySelector('[name=\"reason\"]');\r\n\t\t\t\t\t\tif (!reasonGroup || !reason) return;\r\n\t\t\t\t\t\tif (input.value === 'conducted') {\r\n\t\t\t\t\t\t\treasonGroup.hidden = true;\r\n\t\t\t\t\t\t\treason.value = '';\r\n\t\t\t\t\t\t\tif (window.applyStudentRateToForm) window.applyStudentRateToForm(form);\r\n\t\t\t\t\t\t} else {\r\n\t\t\t\t\t\t\treasonGroup.hidden = false;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tconst state = form._wizardState;\r\n\t\t\t\t\t\tif (state) updateNav(configs.conduct, state);\r\n\t\t\t\t\t});\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tfunction updateScheduleZoomWarning(form) {\r\n\t\t\t\tconst warning = form.querySelector('#scheduleWizard_zoomWarning');\r\n\t\t\t\tif (!warning) return;\r\n\t\t\t\tconst start = form.querySelector('[name=\"start_time\"]');\r\n\t\t\t\tconst end = form.querySelector('[name=\"end_time\"]');\r\n\t\t\t\tconst startMin = parseTimeToMinutes(start?.value);\r\n\t\t\t\tconst endMin = parseTimeToMinutes(end?.value);\r\n\t\t\t\tif (startMin !== null && endMin !== null && endMin > startMin && (endMin - startMin) > ZOOM_MAX_AUTO_MINUTES) {\r\n\t\t\t\t\twarning.textContent = ZOOM_MANUAL_WARNING;\r\n\t\t\t\t\twarning.hidden = false;\r\n\t\t\t\t} else {\r\n\t\t\t\t\twarning.hidden = true;\r\n\t\t\t\t\twarning.textContent = '';\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction resetAdminStudentDropdown(form, kind) {\r\n\t\t\t\tif (form.dataset.lockTeacher === 'true') return;\r\n\t\t\t\tconst student = getStudentSelect(form, kind);\r\n\t\t\t\tif (!student) return;\r\n\t\t\t\tstudent.innerHTML = '<option value=\"\">-- Select teacher first --</option>';\r\n\t\t\t\tstudent.value = '';\r\n\t\t\t}\r\n\r\n\t\t\tasync function loadWizardStudents(form, kind) {\r\n\t\t\t\tconst teacher = getTeacherHidden(form, kind);\r\n\t\t\t\tconst student = getStudentSelect(form, kind);\r\n\t\t\t\tif (!student || form.dataset.lockTeacher === 'true') return;\r\n\t\t\t\tconst teacherId = teacher ? teacher.value : '';\r\n\t\t\t\tif (!teacherId) {\r\n\t\t\t\t\tresetAdminStudentDropdown(form, kind);\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\ttry {\r\n\t\t\t\t\tconst response = await fetch(buildURL('/api/students?teacher=' + encodeURIComponent(teacherId)));\r\n\t\t\t\t\tconst html = await response.text();\r\n\t\t\t\t\tif (!response.ok) throw new Error(html);\r\n\t\t\t\t\tstudent.innerHTML = html;\r\n\t\t\t\t\tstudent.value = '';\r\n\t\t\t\t} catch (err) {\r\n\t\t\t\t\tif (typeof showErrorBanner === 'function') {\r\n\t\t\t\t\t\tshowErrorBanner(err.message || 'Failed to load students');\r\n\t\t\t\t\t}\r\n\t\t\t\t\tresetAdminStudentDropdown(form, kind);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction wireAdminTeacherSearch(form, kind) {\r\n\t\t\t\tif (form.dataset.lockTeacher === 'true') return;\r\n\t\t\t\tconst teacher = getTeacherHidden(form, kind);\r\n\t\t\t\tif (!teacher) return;\r\n\t\t\t\tteacher.addEventListener('change', function () {\r\n\t\t\t\t\tconst search = teacher.closest('.entity-search');\r\n\t\t\t\t\tif (search) clearPortaledTeacherResults(search);\r\n\t\t\t\t\tloadWizardStudents(form, kind);\r\n\t\t\t\t\tif (form._wizardState) updateNav(configs[kind], form._wizardState);\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tfunction openWizard(kind) {\r\n\t\t\t\tconst config = configs[kind];\r\n\t\t\t\tconst modal = document.getElementById(config.modalId);\r\n\t\t\t\tconst form = document.getElementById(config.formId);\r\n\t\t\t\tif (!modal || !form) return;\r\n\r\n\t\t\t\tconst choiceModal = document.getElementById('recordClassesChoiceModal');\r\n\t\t\t\tif (choiceModal) choiceModal.hidden = true;\r\n\r\n\t\t\t\tform.reset();\r\n\t\t\t\tform.querySelectorAll('.class-lm-chips').forEach(function (chips) {\r\n\t\t\t\t\tchips.innerHTML = '';\r\n\t\t\t\t});\r\n\r\n\t\t\t\tconst state = { kind: kind, current: 1 };\r\n\t\t\t\tform._wizardState = state;\r\n\t\t\t\tshowWizardMessage(config, '', false);\r\n\t\t\t\tshowStep(config, state);\r\n\r\n\t\t\t\tif (kind === 'conduct') {\r\n\t\t\t\t\tconst reasonGroup = form.querySelector('#conductWizard_reasonGroup');\r\n\t\t\t\t\tif (reasonGroup) reasonGroup.hidden = true;\r\n\t\t\t\t}\r\n\t\t\t\tresetAdminStudentDropdown(form, kind);\r\n\t\t\t\tform.querySelectorAll('.entity-search').forEach(clearPortaledTeacherResults);\r\n\r\n\t\t\t\tmodal.hidden = false;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\tupdateWizardDurationPreview(form);\r\n\r\n\t\t\t\trequestAnimationFrame(function () {\r\n\t\t\t\t\tconst active = form.querySelector('.wizard-step.is-active input, .wizard-step.is-active select, .wizard-step.is-active textarea, .wizard-step.is-active button');\r\n\t\t\t\t\tif (active && typeof active.focus === 'function') active.focus();\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tfunction closeWizard(kind) {\r\n\t\t\t\tconst config = configs[kind];\r\n\t\t\t\tconst modal = document.getElementById(config.modalId);\r\n\t\t\t\tconst form = document.getElementById(config.formId);\r\n\t\t\t\tif (!modal) return;\r\n\t\t\t\tif (form) {\r\n\t\t\t\t\tform.querySelectorAll('.entity-search').forEach(clearPortaledTeacherResults);\r\n\t\t\t\t}\r\n\t\t\t\tclearAllPortaledTeacherResults();\r\n\t\t\t\tmodal.hidden = true;\r\n\t\t\t\tconst conductOpen = document.getElementById('conductClassWizardModal') && !document.getElementById('conductClassWizardModal').hidden;\r\n\t\t\t\tconst scheduleOpen = document.getElementById('scheduleClassWizardModal') && !document.getElementById('scheduleClassWizardModal').hidden;\r\n\t\t\t\tconst choiceOpen = document.getElementById('recordClassesChoiceModal') && !document.getElementById('recordClassesChoiceModal').hidden;\r\n\t\t\t\tif (!conductOpen && !scheduleOpen && !choiceOpen) {\r\n\t\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tasync function submitWizard(kind) {\r\n\t\t\t\tconst config = configs[kind];\r\n\t\t\t\tconst form = document.getElementById(config.formId);\r\n\t\t\t\tif (!form) return;\r\n\r\n\t\t\t\tconst save = document.getElementById(config.saveId);\r\n\t\t\t\tif (save) {\r\n\t\t\t\t\tsave.disabled = true;\r\n\t\t\t\t\tsave.classList.add('is-loading');\r\n\t\t\t\t}\r\n\r\n\t\t\t\ttry {\r\n\t\t\t\t\tconst formData = new FormData(form);\r\n\t\t\t\t\tconst response = await fetch(config.postURL, {\r\n\t\t\t\t\t\tmethod: 'POST',\r\n\t\t\t\t\t\theaders: Object.assign({}, window.getCSRFHeaders ? window.getCSRFHeaders() : {}),\r\n\t\t\t\t\t\tbody: new URLSearchParams(formData),\r\n\t\t\t\t\t});\r\n\t\t\t\t\tconst text = await response.text();\r\n\t\t\t\t\tif (!response.ok) {\r\n\t\t\t\t\t\tshowWizardMessage(config, text, true);\r\n\t\t\t\t\t\tif (typeof showErrorBanner === 'function') showErrorBanner(text);\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\tif (typeof showSuccessBanner === 'function') {\r\n\t\t\t\t\t\tshowSuccessBanner(kind === 'conduct' ? 'Class recorded' : 'Class scheduled');\r\n\t\t\t\t\t}\r\n\t\t\t\t\tcloseWizard(kind);\r\n\r\n\t\t\t\t\tif (kind === 'conduct') {\r\n\t\t\t\t\t\tif (typeof window.refreshClassesTable === 'function') {\r\n\t\t\t\t\t\t\twindow.refreshClassesTable();\r\n\t\t\t\t\t\t} else if (typeof htmx !== 'undefined') {\r\n\t\t\t\t\t\t\thtmx.trigger(document.body, 'classesRefresh');\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t\tif (kind === 'schedule') {\r\n\t\t\t\t\t\tif (typeof window.refreshScheduleList === 'function') {\r\n\t\t\t\t\t\t\twindow.refreshScheduleList();\r\n\t\t\t\t\t\t} else if (typeof htmx !== 'undefined') {\r\n\t\t\t\t\t\t\thtmx.trigger(document.body, 'scheduleRefresh');\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tif (typeof window.refreshScheduleCalendar === 'function') {\r\n\t\t\t\t\t\t\twindow.refreshScheduleCalendar();\r\n\t\t\t\t\t\t} else if (typeof htmx !== 'undefined') {\r\n\t\t\t\t\t\t\thtmx.trigger(document.body, 'refreshScheduleCalendar');\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t} catch (err) {\r\n\t\t\t\t\tshowWizardMessage(config, err.message || 'Request failed', true);\r\n\t\t\t\t\tif (typeof showErrorBanner === 'function') showErrorBanner(err.message || 'Request failed');\r\n\t\t\t\t} finally {\r\n\t\t\t\t\tif (save) {\r\n\t\t\t\t\t\tsave.disabled = false;\r\n\t\t\t\t\t\tsave.classList.remove('is-loading');\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction initWizard(kind) {\r\n\t\t\t\tconst config = configs[kind];\r\n\t\t\t\tconst form = document.getElementById(config.formId);\r\n\t\t\t\tconst modal = document.getElementById(config.modalId);\r\n\t\t\t\tif (!form || !modal) return;\r\n\r\n\t\t\t\tconst state = { kind: kind, current: 1 };\r\n\t\t\t\tform._wizardState = state;\r\n\r\n\t\t\t\tif (kind === 'conduct') {\r\n\t\t\t\t\tbindStatusReason(form);\r\n\t\t\t\t\twireAdminTeacherSearch(form, kind);\r\n\t\t\t\t}\r\n\t\t\t\tif (kind === 'schedule') {\r\n\t\t\t\t\twireAdminTeacherSearch(form, kind);\r\n\t\t\t\t}\r\n\r\n\t\t\t\tupdateNav(config, state);\r\n\r\n\t\t\t\tform.addEventListener('input', function (e) {\r\n\t\t\t\t\tconst target = e.target;\r\n\t\t\t\t\tif (target && (target.name === 'start_time' || target.name === 'end_time')) {\r\n\t\t\t\t\t\tconst stepEl = target.closest('.wizard-step');\r\n\t\t\t\t\t\tupdateWizardDurationPreview(form, stepEl);\r\n\t\t\t\t\t\tif (kind === 'schedule') updateScheduleZoomWarning(form);\r\n\t\t\t\t\t}\r\n\t\t\t\t\tif (form._wizardState) updateNav(config, form._wizardState);\r\n\t\t\t\t});\r\n\t\t\t\tform.addEventListener('change', function (e) {\r\n\t\t\t\t\tconst target = e.target;\r\n\t\t\t\t\tif (target && (target.name === 'start_time' || target.name === 'end_time')) {\r\n\t\t\t\t\t\tconst stepEl = target.closest('.wizard-step');\r\n\t\t\t\t\t\tupdateWizardDurationPreview(form, stepEl);\r\n\t\t\t\t\t\tif (kind === 'schedule') updateScheduleZoomWarning(form);\r\n\t\t\t\t\t}\r\n\t\t\t\t\tif (form._wizardState) updateNav(config, form._wizardState);\r\n\t\t\t\t\tif (window.applyStudentRateToForm) window.applyStudentRateToForm(form);\r\n\t\t\t\t});\r\n\r\n\t\t\t\tdocument.getElementById(config.prevId)?.addEventListener('click', function () {\r\n\t\t\t\t\tif (!form._wizardState || form._wizardState.current <= 1) return;\r\n\t\t\t\t\tform._wizardState.current -= 1;\r\n\t\t\t\t\tshowWizardMessage(config, '', false);\r\n\t\t\t\t\tshowStep(config, form._wizardState);\r\n\t\t\t\t});\r\n\r\n\t\t\t\tdocument.getElementById(config.nextId)?.addEventListener('click', function () {\r\n\t\t\t\t\tif (!form._wizardState) return;\r\n\t\t\t\t\tconst stepEl = form.querySelector('.wizard-step.is-active');\r\n\t\t\t\t\tif (!validateStep(form, stepEl, kind)) return;\r\n\t\t\t\t\tif (form._wizardState.current >= config.totalSteps) return;\r\n\t\t\t\t\tform._wizardState.current += 1;\r\n\t\t\t\t\tshowWizardMessage(config, '', false);\r\n\t\t\t\t\tshowStep(config, form._wizardState);\r\n\t\t\t\t});\r\n\r\n\t\t\t\tform.addEventListener('submit', function (e) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\tsubmitWizard(kind);\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\twindow.openConductClassWizard = function () {\r\n\t\t\t\topenWizard('conduct');\r\n\t\t\t};\r\n\t\t\twindow.openScheduleClassWizard = function () {\r\n\t\t\t\topenWizard('schedule');\r\n\t\t\t};\r\n\r\n\t\t\twireWizardTeacherSearchFloating();\r\n\t\t\tinitWizard('conduct');\r\n\t\t\tinitWizard('schedule');\r\n\r\n\t\t\tdocument.addEventListener('click', function (e) {\r\n\t\t\t\tconst conductTrigger = e.target.closest('[data-open-conduct-class-wizard]');\r\n\t\t\t\tif (conductTrigger) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\twindow.openConductClassWizard();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst scheduleTrigger = e.target.closest('[data-open-schedule-class-wizard]');\r\n\t\t\t\tif (scheduleTrigger) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\twindow.openScheduleClassWizard();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst closeBtn = e.target.closest('.class-wizard-close');\r\n\t\t\t\tif (closeBtn) {\r\n\t\t\t\t\tcloseWizard(closeBtn.getAttribute('data-wizard'));\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (e.target.id === 'conductClassWizardModal') {\r\n\t\t\t\t\tcloseWizard('conduct');\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (e.target.id === 'scheduleClassWizardModal') {\r\n\t\t\t\t\tcloseWizard('schedule');\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key !== 'Escape') return;\r\n\t\t\t\tif (document.getElementById('conductClassWizardModal') && !document.getElementById('conductClassWizardModal').hidden) {\r\n\t\t\t\t\tcloseWizard('conduct');\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (document.getElementById('scheduleClassWizardModal') && !document.getElementById('scheduleClassWizardModal').hidden) {\r\n\t\t\t\t\tcloseWizard('schedule');\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tconst scheduleParams = new URLSearchParams(window.location.search);\r\n\t\t\tif (scheduleParams.get('openScheduleWizard') === '1') {\r\n\t\t\t\twindow.openScheduleClassWizard();\r\n\t\t\t}\r\n\t\t})();\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

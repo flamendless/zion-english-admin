@@ -37,16 +37,15 @@ func handlePaymentsPath(w http.ResponseWriter, r *http.Request) {
 		handlePaymentDefer(w, r, id)
 		return
 	}
-	HttpError(w, "Not found", http.StatusNotFound)
+	HttpError(w, MsgNotFound, http.StatusNotFound)
 }
 
 func handlePayments(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 	role := auth.GetRole(r.Context())
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.Payments(frontend.PaymentsData{
 		ShowTeacherColumn: auth.HasAdminAccess(role),
 	}).Render(r.Context(), w); err != nil {
@@ -55,20 +54,18 @@ func handlePayments(w http.ResponseWriter, r *http.Request) {
 }
 
 func handlePaymentsDatePresetPartial(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 	month := strings.TrimSpace(r.URL.Query().Get("month"))
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.DatePresetForMonth(month, true).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 func handlePaymentsPartial(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -102,7 +99,7 @@ func handlePaymentsPartial(w http.ResponseWriter, r *http.Request) {
 
 	showTeacherColumn := auth.HasAdminAccess(role)
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.PaymentsPartial(rows, emptyMsg, showTeacherColumn).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -266,8 +263,7 @@ func loadPaymentStatusesForPeriod(ctx context.Context, startDate, endDate string
 }
 
 func handleReportPaymentForm(w http.ResponseWriter, r *http.Request, teacherID int64) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -282,18 +278,18 @@ func handleReportPaymentForm(w http.ResponseWriter, r *http.Request, teacherID i
 		sendErrorLog(w, "failed to check payment status")
 		return
 	} else if hasPayment {
-		w.Header().Set("Content-Type", "text/html")
-		w.Header().Set("HX-Trigger", fmt.Sprintf(`{"showErrorBanner":%q}`, paymentSentDisabledTooltip(startDate, endDate)))
+		writeHTML(w)
+		w.Header().Set(headerHXTrigger, fmt.Sprintf(`{"showErrorBanner":%q}`, paymentSentDisabledTooltip(startDate, endDate)))
 		return
 	}
 
 	profile, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, teacherID)
 	if err != nil {
-		HttpError(w, "Teacher not found", http.StatusNotFound)
+		HttpError(w, MsgTeacherNotFound, http.StatusNotFound)
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	teacherName := utils.ComposePersonName(profile.FirstName, profile.MiddleName, profile.LastName)
 	frontend.ReportPaymentModal(frontend.ReportPaymentFormData{
 		TeacherID:     strconv.FormatInt(teacherID, 10),
@@ -307,8 +303,7 @@ func handleReportPaymentForm(w http.ResponseWriter, r *http.Request, teacherID i
 }
 
 func handleReportPaymentSubmit(w http.ResponseWriter, r *http.Request, teacherID int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -357,7 +352,7 @@ func handleReportPaymentSubmit(w http.ResponseWriter, r *http.Request, teacherID
 
 	profile, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, teacherID)
 	if err != nil {
-		sendErrorLog(w, "teacher not found")
+		sendErrorLog(w, MsgTeacherNotFound)
 		return
 	}
 
@@ -394,13 +389,13 @@ func handleReportPaymentSubmit(w http.ResponseWriter, r *http.Request, teacherID
 
 	row, err := loadReportRow(ctx, teacherID, startDate, endDate)
 	if err != nil {
-		w.Header().Set("HX-Trigger", `{"showSuccessBanner":"Payment sent"}`)
+		w.Header().Set(headerHXTrigger, `{"showSuccessBanner":"Payment sent"}`)
 		windowCloseReportPaymentModal(w)
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/html")
-	w.Header().Set("HX-Trigger", `{"showSuccessBanner":"Payment sent"}`)
+	writeHTML(w)
+	w.Header().Set(headerHXTrigger, `{"showSuccessBanner":"Payment sent"}`)
 	if err := frontend.ReportPaymentPostResponse(row, startDate, endDate).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -410,10 +405,10 @@ func renderReportPaymentError(w http.ResponseWriter, r *http.Request, teacherID 
 	ctx := r.Context()
 	profile, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, teacherID)
 	if err != nil {
-		sendErrorLog(w, "teacher not found")
+		sendErrorLog(w, MsgTeacherNotFound)
 		return
 	}
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	teacherName := utils.ComposePersonName(profile.FirstName, profile.MiddleName, profile.LastName)
 	frontend.ReportPaymentModal(frontend.ReportPaymentFormData{
 		TeacherID:     strconv.FormatInt(teacherID, 10),
@@ -450,13 +445,12 @@ func loadTeacherReportEarnings(ctx context.Context, teacherID int64, startDate, 
 }
 
 func windowCloseReportPaymentModal(w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	fmt.Fprint(w, `<div id="reportPaymentModalHost" hx-swap-oob="innerHTML"></div>`)
 }
 
 func handlePaymentView(w http.ResponseWriter, r *http.Request, paymentID int64) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -470,14 +464,14 @@ func handlePaymentView(w http.ResponseWriter, r *http.Request, paymentID int64) 
 			return
 		}
 		if errors.Is(err, ErrForbidden) {
-			HttpError(w, "Forbidden", http.StatusForbidden)
+			HttpError(w, MsgForbidden, http.StatusForbidden)
 			return
 		}
 		sendErrorLog(w, "failed to load payment")
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.PaymentViewModal(frontend.PaymentViewData{
 		ShowTeacher:     auth.HasAdminAccess(role),
 		TeacherName:     row.TeacherName,
@@ -497,14 +491,13 @@ func handlePaymentView(w http.ResponseWriter, r *http.Request, paymentID int64) 
 }
 
 func handlePaymentReceiptForm(w http.ResponseWriter, r *http.Request, paymentID int64) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
 	user := auth.GetUser(r.Context())
 	if !auth.IsTeacherScoped(user.Role) {
-		HttpError(w, "Forbidden", http.StatusForbidden)
+		HttpError(w, MsgForbidden, http.StatusForbidden)
 		return
 	}
 
@@ -519,7 +512,7 @@ func handlePaymentReceiptForm(w http.ResponseWriter, r *http.Request, paymentID 
 		return
 	}
 	if payment.TeacherID != user.ID {
-		HttpError(w, "Forbidden", http.StatusForbidden)
+		HttpError(w, MsgForbidden, http.StatusForbidden)
 		return
 	}
 	if payment.Status != string(constants.PaymentStatusPending) {
@@ -527,7 +520,7 @@ func handlePaymentReceiptForm(w http.ResponseWriter, r *http.Request, paymentID 
 		return
 	}
 
-	w.Header().Set("Content-Type", "text/html")
+	writeHTML(w)
 	if err := frontend.PaymentReceiptModal(frontend.PaymentReceiptData{
 		PaymentID:       strconv.FormatInt(payment.ID, 10),
 		PaymentMethod:   constants.PaymentMethod(payment.PaymentMethod),
@@ -543,15 +536,14 @@ func handlePaymentReceiptForm(w http.ResponseWriter, r *http.Request, paymentID 
 }
 
 func handlePaymentReceived(w http.ResponseWriter, r *http.Request, paymentID int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if !auth.IsTeacherScoped(user.Role) {
-		HttpError(w, "Forbidden", http.StatusForbidden)
+		HttpError(w, MsgForbidden, http.StatusForbidden)
 		return
 	}
 
@@ -565,11 +557,11 @@ func handlePaymentReceived(w http.ResponseWriter, r *http.Request, paymentID int
 		return
 	}
 	if payment.TeacherID != user.ID {
-		HttpError(w, "Forbidden", http.StatusForbidden)
+		HttpError(w, MsgForbidden, http.StatusForbidden)
 		return
 	}
 	if payment.Status != string(constants.PaymentStatusPending) {
-		if r.Header.Get("HX-Request") != "" {
+		if r.Header.Get(headerHXRequest) != "" {
 			sendErrorLog(w, "payment is not pending")
 			return
 		}
@@ -585,22 +577,22 @@ func handlePaymentReceived(w http.ResponseWriter, r *http.Request, paymentID int
 		return
 	}
 
-	if r.Header.Get("HX-Request") != "" && r.Header.Get("X-Payment-Source") == "history" {
+	if r.Header.Get(headerHXRequest) != "" && r.Header.Get("X-Payment-Source") == "history" {
 		row, err := loadPaymentRow(ctx, paymentID, user.ID)
 		if err != nil {
 			sendErrorLog(w, "failed to load payment row")
 			return
 		}
-		w.Header().Set("Content-Type", "text/html")
-		w.Header().Set("HX-Trigger", `{"showSuccessBanner":"Payment marked as received"}`)
+		writeHTML(w)
+		w.Header().Set(headerHXTrigger, `{"showSuccessBanner":"Payment marked as received"}`)
 		if err := frontend.PaymentReceivedPostResponse(row, false).Render(ctx, w); err != nil {
 			HttpError(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}
 
-	if r.Header.Get("HX-Request") != "" {
-		w.Header().Set("HX-Redirect", utils.URL("/dashboard"))
+	if r.Header.Get(headerHXRequest) != "" {
+		setHXRedirect(w, "/dashboard")
 		return
 	}
 
@@ -608,15 +600,14 @@ func handlePaymentReceived(w http.ResponseWriter, r *http.Request, paymentID int
 }
 
 func handlePaymentDefer(w http.ResponseWriter, r *http.Request, paymentID int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	ctx := r.Context()
 	user := auth.GetUser(ctx)
 	if !auth.IsTeacherScoped(user.Role) {
-		HttpError(w, "Forbidden", http.StatusForbidden)
+		HttpError(w, MsgForbidden, http.StatusForbidden)
 		return
 	}
 
@@ -630,7 +621,7 @@ func handlePaymentDefer(w http.ResponseWriter, r *http.Request, paymentID int64)
 		return
 	}
 	if payment.TeacherID != user.ID {
-		HttpError(w, "Forbidden", http.StatusForbidden)
+		HttpError(w, MsgForbidden, http.StatusForbidden)
 		return
 	}
 	if payment.Status != string(constants.PaymentStatusPending) {

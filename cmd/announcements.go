@@ -21,12 +21,11 @@ func handleAnnouncementsPath(w http.ResponseWriter, r *http.Request) {
 		handleAnnouncementDelete(w, r, id)
 		return
 	}
-	HttpError(w, "Not found", http.StatusNotFound)
+	HttpError(w, MsgNotFound, http.StatusNotFound)
 }
 
 func handleAnnouncements(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -117,7 +116,7 @@ func handleAnnouncementRegister(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		handleAnnouncementCreate(w, r)
 	default:
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, MsgMethodNotAllowed, http.StatusMethodNotAllowed)
 	}
 }
 
@@ -230,7 +229,7 @@ func handleAnnouncementEdit(w http.ResponseWriter, r *http.Request, announcement
 	case http.MethodPost:
 		handleAnnouncementUpdate(w, r, announcementID)
 	default:
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		HttpError(w, MsgMethodNotAllowed, http.StatusMethodNotAllowed)
 	}
 }
 
@@ -304,8 +303,7 @@ func handleAnnouncementUpdate(w http.ResponseWriter, r *http.Request, announceme
 }
 
 func handleAnnouncementDelete(w http.ResponseWriter, r *http.Request, announcementID int64) {
-	if r.Method != http.MethodPost {
-		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+	if !requireMethod(w, r, http.MethodPost) {
 		return
 	}
 

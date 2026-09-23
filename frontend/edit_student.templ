@@ -154,7 +154,7 @@ templ EditStudent(data EditStudentData) {
 				<form
 					id="editStudentForm"
 					hx-post={ utils.URL("/students/" + data.ID + "/edit") }
-					hx-swap="innerHTML"
+					hx-swap={ HxSwapInnerHTML }
 					hx-target="#logOutput"
 				>
 					<div class="form-group">
@@ -242,7 +242,7 @@ templ EditStudent(data EditStudentData) {
 				<form
 					id="editStudentForm"
 					hx-post={ utils.URL("/students/" + data.ID + "/edit") }
-					hx-swap="innerHTML"
+					hx-swap={ HxSwapInnerHTML }
 					hx-target="#logOutput"
 				>
 					<div class="form-group">

@@ -23,7 +23,7 @@ templ RegisterStudent(data RegisterStudentData) {
 			@SuccessBanner()
 			@ErrorBanner()
 
-			<form id="registerForm" hx-post={ utils.URL("/students/register") } hx-swap="innerHTML" hx-target="#logOutput">
+			<form id="registerForm" hx-post={ utils.URL("/students/register") } hx-swap={ HxSwapInnerHTML } hx-target="#logOutput">
 				<div class="form-group">
 					<label for="name">Student Name *</label>
 					<input type="text" id="name" name="name" required
