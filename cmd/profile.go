@@ -263,7 +263,8 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 	if introVideo, err := dbRO.GetQueries().GetLatestTeacherIntroVideoByTeacherID(ctx, user.ID); err == nil {
 		data.HasIntroVideo = true
 		data.IntroVideoStatus = constants.TeacherIntroVideoStatus(introVideo.Status)
-		data.IntroVideoViewURL = utils.URL(fmt.Sprintf("/intro-videos/%d/file", introVideo.ID))
+		data.IntroVideoViewURL = introVideoViewURL(introVideo.ID, introVideo.Url)
+		data.IntroVideoSourceType = introVideoSourceType(introVideo.SourceType)
 		if introVideo.RejectReason.Valid {
 			data.IntroVideoRejectReason = introVideo.RejectReason.String
 		}

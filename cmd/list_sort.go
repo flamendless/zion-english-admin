@@ -203,10 +203,10 @@ func sortTeacherDocumentRows(rows []queries.TblTeacherDocument, sort utils.SortP
 func sortIntroVideoRows(rows []queries.GetAllTeacherIntroVideosFilteredRow, sort utils.SortParams) {
 	utils.SortSlice(rows, sort.Order, func(a, b queries.GetAllTeacherIntroVideosFilteredRow) int {
 		switch sort.By {
-		case "filename":
-			return utils.CompareStrings(a.OriginalFilename, b.OriginalFilename)
-		case "file_size":
-			return utils.CompareInt64(a.FileSize, b.FileSize)
+		case "url":
+			return utils.CompareStrings(nullStringValue(a.Url), nullStringValue(b.Url))
+		case "source_type":
+			return utils.CompareStrings(nullStringValue(a.SourceType), nullStringValue(b.SourceType))
 		case "status":
 			return utils.CompareStrings(a.Status, b.Status)
 		case "uploaded_at":
@@ -220,10 +220,10 @@ func sortIntroVideoRows(rows []queries.GetAllTeacherIntroVideosFilteredRow, sort
 func sortTeacherIntroVideoRows(rows []queries.TblTeacherIntroVideo, sort utils.SortParams) {
 	utils.SortSlice(rows, sort.Order, func(a, b queries.TblTeacherIntroVideo) int {
 		switch sort.By {
-		case "filename":
-			return utils.CompareStrings(a.OriginalFilename, b.OriginalFilename)
-		case "file_size":
-			return utils.CompareInt64(a.FileSize, b.FileSize)
+		case "url":
+			return utils.CompareStrings(nullStringValue(a.Url), nullStringValue(b.Url))
+		case "source_type":
+			return utils.CompareStrings(nullStringValue(a.SourceType), nullStringValue(b.SourceType))
 		case "status":
 			return utils.CompareStrings(a.Status, b.Status)
 		case "uploaded_at":

@@ -40,5 +40,37 @@ func ValidTeacherIntroVideoStatus(value string) bool {
 	}
 }
 
+type TeacherIntroVideoSourceType string
+
+const (
+	TeacherIntroVideoSourceGoogleDrive TeacherIntroVideoSourceType = "google_drive"
+	TeacherIntroVideoSourceYouTube     TeacherIntroVideoSourceType = "youtube"
+)
+
+var TeacherIntroVideoSourceTypes = []TeacherIntroVideoSourceType{
+	TeacherIntroVideoSourceGoogleDrive,
+	TeacherIntroVideoSourceYouTube,
+}
+
+func (s TeacherIntroVideoSourceType) Label() string {
+	switch s {
+	case TeacherIntroVideoSourceGoogleDrive:
+		return "Google Drive"
+	case TeacherIntroVideoSourceYouTube:
+		return "YouTube"
+	default:
+		return string(s)
+	}
+}
+
+func ValidTeacherIntroVideoSourceType(value string) bool {
+	switch TeacherIntroVideoSourceType(value) {
+	case TeacherIntroVideoSourceGoogleDrive, TeacherIntroVideoSourceYouTube:
+		return true
+	default:
+		return false
+	}
+}
+
 const MaxIntroVideoDurationSeconds = 60
 const MaxIntroVideoBytes = 20 << 20

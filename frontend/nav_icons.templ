@@ -24,6 +24,8 @@ templ NavIconSVG(kind NavIconKind) {
 			@navIconSVGTraining()
 		case NavIconDocuments:
 			@navIconSVGFileText()
+		case NavIconIntroVideos:
+			@navIconSVGVideo()
 		case NavIconTeachers:
 			@navIconSVGUsers()
 		case NavIconStudents:
@@ -104,6 +106,13 @@ templ navIconSVGFileText() {
 		<path d="M10 9H8"></path>
 		<path d="M16 13H8"></path>
 		<path d="M16 17H8"></path>
+	</svg>
+}
+
+templ navIconSVGVideo() {
+	<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<circle cx="12" cy="12" r="10"></circle>
+		<polygon points="10 8 16 12 10 16 10 8"></polygon>
 	</svg>
 }
 

@@ -161,14 +161,14 @@ func ScheduledClassMeeting(item ScheduledClassItemData, zoomLogoURL string) temp
 		}
 		ctx = templ.ClearChildren(ctx)
 		if item.RoomURL != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"day-class-meeting\"><button type=\"button\" class=\"zoom-meeting-btn\" data-room-url=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<button type=\"button\" class=\"zoom-meeting-btn\" data-room-url=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.RoomURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class.templ`, Line: 46, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class.templ`, Line: 45, Col: 31}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 			if templ_7745c5c3_Err != nil {
@@ -181,7 +181,7 @@ func ScheduledClassMeeting(item ScheduledClassItemData, zoomLogoURL string) temp
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.RoomPasscode)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class.templ`, Line: 47, Col: 37}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class.templ`, Line: 46, Col: 36}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 			if templ_7745c5c3_Err != nil {
@@ -194,31 +194,31 @@ func ScheduledClassMeeting(item ScheduledClassItemData, zoomLogoURL string) temp
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(zoomLogoURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class.templ`, Line: 51, Col: 26}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class.templ`, Line: 50, Col: 25}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" alt=\"\" width=\"24\" height=\"24\" aria-hidden=\"true\"></button></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" alt=\"\" width=\"24\" height=\"24\" aria-hidden=\"true\"></button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else if item.ShowZoomWarning {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"day-class-meeting\"><div class=\"day-class-meeting-warning\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"day-class-meeting-warning\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(ZoomManualWarning)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class.templ`, Line: 56, Col: 61}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class.templ`, Line: 53, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -249,14 +249,14 @@ func ScheduledClassCalendarEvent(item ScheduledClassItemData, calendarLogoURL st
 		}
 		ctx = templ.ClearChildren(ctx)
 		if item.CalendarEventURL != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"day-class-meeting\"><a href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var10 templ.SafeURL
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinURLErrs(item.CalendarEventURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class.templ`, Line: 65, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class.templ`, Line: 60, Col: 31}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -269,13 +269,13 @@ func ScheduledClassCalendarEvent(item ScheduledClassItemData, calendarLogoURL st
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(calendarLogoURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class.templ`, Line: 72, Col: 30}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class.templ`, Line: 67, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" alt=\"\" width=\"24\" height=\"24\" aria-hidden=\"true\"></a></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" alt=\"\" width=\"24\" height=\"24\" aria-hidden=\"true\"></a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -338,7 +338,7 @@ func ScheduledClassListItem(item ScheduledClassItemData, zoomLogoURL string, cal
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(item.TeacherName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class.templ`, Line: 83, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class.templ`, Line: 77, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
@@ -351,7 +351,7 @@ func ScheduledClassListItem(item ScheduledClassItemData, zoomLogoURL string, cal
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(item.StudentName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class.templ`, Line: 83, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class.templ`, Line: 77, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
@@ -436,7 +436,7 @@ func ScheduledClassList(items []ScheduledClassItemData, emptyMessage string, zoo
 			var templ_7745c5c3_Var18 string
 			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(emptyMessage)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class.templ`, Line: 106, Col: 45}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/scheduled_class.templ`, Line: 100, Col: 45}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 			if templ_7745c5c3_Err != nil {

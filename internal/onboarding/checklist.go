@@ -190,10 +190,10 @@ func introVideoItem(status string) Item {
 		item.Detail = "Submitted, awaiting review"
 	case constants.TeacherIntroVideoStatusRejected:
 		item.Status = ItemStatusRejected
-		item.Detail = "Rejected, re-upload required"
+		item.Detail = "Rejected, resubmit required"
 	default:
 		item.Status = ItemStatusNotStarted
-		item.Detail = "Upload your introduction video"
+		item.Detail = "Submit your introduction video link"
 	}
 	return item
 }

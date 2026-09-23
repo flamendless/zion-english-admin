@@ -83,7 +83,7 @@ var navItemDefs = []navItemDef{
 	{Path: "/learning-materials", LinkID: "learningMaterialsLink", Title: "Learning Library", Description: "Browse and share teaching materials and resources", FeatureCard: true},
 	{Path: "/training-materials", LinkID: "trainingMaterialsLink", Title: "Training Materials", Description: "Watch admin-curated training videos and track your progress", FeatureCard: true},
 	{Path: "/documents", LinkID: "documentsLink", Title: "Documents", TeacherTitle: "My Documents", Description: "Review teacher uploads and ID documents", TeacherDesc: "View your uploaded profile photos and ID documents"},
-	{Path: "/intro-videos", LinkID: "introVideosLink", Title: "Intro Videos", TeacherTitle: "My Intro Video", Description: "Review teacher introduction video uploads", TeacherDesc: "View your submitted introduction video"},
+	{Path: "/intro-videos", LinkID: "introVideosLink", Title: "Intro Videos", TeacherTitle: "My Intro Video", Description: "Review teacher introduction video submissions", TeacherDesc: "View your submitted introduction video"},
 	{Path: "/guides", LinkID: "guidesLink", Title: "Guides", Description: "Step-by-step help for using the admin tool"},
 	{Path: "/teachers", LinkID: "teachersLink", Title: "Teachers", Description: "View and manage teachers", AdminOnlyCard: true},
 	{Path: "/students", LinkID: "studentsLink", Title: "Students", Description: "View and manage students", AdminOnlyCard: true},

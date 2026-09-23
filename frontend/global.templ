@@ -1722,11 +1722,64 @@ templ GlobalIncludes() {
 			margin-top: var(--space-2);
 		}
 
-		.day-class-meeting-warning {
-			margin-top: var(--space-2);
+		.day-class-integrations .day-class-meeting-warning {
+			flex-basis: 100%;
+			margin-top: 0;
 			font-size: 0.8125rem;
 			line-height: 1.45;
 			color: var(--color-muted-foreground);
+		}
+
+		.day-class-integrations .zoom-meeting-btn,
+		.day-class-integrations .calendar-event-btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 44px;
+			height: 44px;
+			margin-top: 0;
+			padding: var(--space-2);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-md);
+			background: var(--color-surface);
+			box-sizing: border-box;
+			cursor: pointer;
+			font-family: inherit;
+			font-size: inherit;
+			font-weight: inherit;
+			line-height: 1;
+			text-decoration: none;
+			transition: background-color var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+		}
+
+		.day-class-integrations .zoom-meeting-btn:hover {
+			background: var(--color-info-bg);
+			border-color: color-mix(in srgb, #0B5CFF 35%, var(--color-border));
+			box-shadow: var(--shadow-sm);
+		}
+
+		.day-class-integrations .calendar-event-btn:hover {
+			background: var(--color-primary-light);
+			border-color: color-mix(in srgb, var(--color-primary) 35%, var(--color-border));
+			box-shadow: var(--shadow-sm);
+		}
+
+		.day-class-integrations .zoom-meeting-btn:focus-visible,
+		.day-class-integrations .calendar-event-btn:focus-visible {
+			outline: 2px solid var(--color-ring);
+			outline-offset: 2px;
+		}
+
+		.day-class-integrations .zoom-meeting-btn img,
+		.day-class-integrations .calendar-event-btn img {
+			display: block;
+			width: 24px;
+			height: 24px;
+		}
+
+		.day-class-integrations [data-tooltip]::after {
+			content: none;
+			display: none;
 		}
 
 		.meeting-link-cell {

@@ -32,25 +32,6 @@ func TestValidateAvatarUploadRejectsUnsupportedFormat(t *testing.T) {
 	}
 }
 
-func TestValidateIntroVideoUploadRejectsBadExtension(t *testing.T) {
-	_, err := validateIntroVideoUpload(bytes.NewReader([]byte("test")), "clip.exe", 4)
-	if err != ErrUnsupportedIntroVideoFormat {
-		t.Fatalf("expected ErrUnsupportedIntroVideoFormat, got %v", err)
-	}
-}
-
-func TestValidateIntroVideoUploadAcceptsMP4Header(t *testing.T) {
-	header := make([]byte, 12)
-	header[4] = 'f'
-	header[5] = 't'
-	header[6] = 'y'
-	header[7] = 'p'
-	_, err := validateIntroVideoUpload(bytes.NewReader(header), "clip.mp4", int64(len(header)))
-	if err != nil {
-		t.Fatalf("expected valid mp4 upload, got %v", err)
-	}
-}
-
 func TestMaterialLibraryFilters(t *testing.T) {
 	rows := []learningMaterialRow{
 		{ID: 1, Title: "Grammar", Description: "Basics", Status: "published", Access: "public"},

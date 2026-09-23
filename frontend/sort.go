@@ -75,8 +75,8 @@ func SortOptionsFor(kind ListSortKind) []SortOption {
 	case ListSortKindIntroVideo:
 		return []SortOption{
 			{Value: "uploaded_at", Label: "Uploaded"},
-			{Value: "filename", Label: "Filename"},
-			{Value: "file_size", Label: "File size"},
+			{Value: "url", Label: "Link"},
+			{Value: "source_type", Label: "Source"},
 			{Value: "status", Label: "Status"},
 		}
 	case ListSortKindProcessingLog:

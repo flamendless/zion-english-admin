@@ -1,7 +1,14 @@
 -- name: InsertTeacherIntroVideo :exec
 INSERT INTO tbl_teacher_intro_videos (
-	teacher_id, original_filename, stored_filename, mime_type, file_size, status
-) VALUES (?, ?, ?, ?, ?, ?);
+	teacher_id,
+	original_filename,
+	stored_filename,
+	mime_type,
+	file_size,
+	url,
+	source_type,
+	status
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 
 -- name: GetTeacherIntroVideoByID :one
 SELECT
@@ -11,6 +18,8 @@ SELECT
 	stored_filename,
 	mime_type,
 	file_size,
+	url,
+	source_type,
 	status,
 	created_at,
 	reviewed_at,
@@ -28,6 +37,8 @@ SELECT
 	stored_filename,
 	mime_type,
 	file_size,
+	url,
+	source_type,
 	status,
 	created_at,
 	reviewed_at,
@@ -77,6 +88,8 @@ SELECT
 	v.stored_filename,
 	v.mime_type,
 	v.file_size,
+	v.url,
+	v.source_type,
 	v.status,
 	v.created_at,
 	v.reviewed_at,
@@ -99,6 +112,7 @@ WHERE t.deleted = 0
 	)
 	AND (
 	? = ''
+	OR v.url LIKE '%' || ? || '%'
 	OR v.original_filename LIKE '%' || ? || '%'
 	OR trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) LIKE '%' || ? || '%'
 	)
@@ -112,6 +126,8 @@ SELECT
 	stored_filename,
 	mime_type,
 	file_size,
+	url,
+	source_type,
 	status,
 	created_at,
 	reviewed_at,
@@ -123,6 +139,7 @@ WHERE teacher_id = ?
 	AND (? = '' OR status = ?)
 	AND (
 	? = ''
+	OR url LIKE '%' || ? || '%'
 	OR original_filename LIKE '%' || ? || '%'
 	)
 ORDER BY created_at DESC;

@@ -39,39 +39,33 @@ templ ScheduledClassManageActions(item ScheduledClassItemData) {
 
 templ ScheduledClassMeeting(item ScheduledClassItemData, zoomLogoURL string) {
 	if item.RoomURL != "" {
-		<div class="day-class-meeting">
-			<button
-				type="button"
-				class="zoom-meeting-btn"
-				data-room-url={ item.RoomURL }
-				data-passcode={ item.RoomPasscode }
-				data-tooltip="View Zoom meeting details"
-				aria-label="View Zoom meeting details"
-			>
-				<img src={ zoomLogoURL } alt="" width="24" height="24" aria-hidden="true"/>
-			</button>
-		</div>
+		<button
+			type="button"
+			class="zoom-meeting-btn"
+			data-room-url={ item.RoomURL }
+			data-passcode={ item.RoomPasscode }
+			data-tooltip="View Zoom meeting details"
+			aria-label="View Zoom meeting details"
+		>
+			<img src={ zoomLogoURL } alt="" width="24" height="24" aria-hidden="true"/>
+		</button>
 	} else if item.ShowZoomWarning {
-		<div class="day-class-meeting">
-			<div class="day-class-meeting-warning">{ ZoomManualWarning }</div>
-		</div>
+		<div class="day-class-meeting-warning">{ ZoomManualWarning }</div>
 	}
 }
 
 templ ScheduledClassCalendarEvent(item ScheduledClassItemData, calendarLogoURL string) {
 	if item.CalendarEventURL != "" {
-		<div class="day-class-meeting">
-			<a
-				href={ item.CalendarEventURL }
-				class="calendar-event-btn"
-				target="_blank"
-				rel="noopener noreferrer"
-				data-tooltip="Open in Google Calendar"
-				aria-label="Open in Google Calendar"
-			>
-				<img src={ calendarLogoURL } alt="" width="24" height="24" aria-hidden="true"/>
-			</a>
-		</div>
+		<a
+			href={ item.CalendarEventURL }
+			class="calendar-event-btn"
+			target="_blank"
+			rel="noopener noreferrer"
+			data-tooltip="Open in Google Calendar"
+			aria-label="Open in Google Calendar"
+		>
+			<img src={ calendarLogoURL } alt="" width="24" height="24" aria-hidden="true"/>
+		</a>
 	}
 }
 

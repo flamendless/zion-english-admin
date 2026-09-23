@@ -1,19 +1,15 @@
 package cmd
 
 import (
-	"bytes"
 	"context"
 	"database/sql"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/constants"
@@ -21,47 +17,61 @@ import (
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
 	"zion-english/internal/notifications"
+	"zion-english/internal/teacherintrovideo"
 	"zion-english/internal/utils"
 
 	"go.uber.org/zap"
-	"gopkg.in/vansante/go-ffprobe.v2"
 )
 
 const introVideoDir = "data/teacher-intro-videos"
-
-var allowedIntroVideoExtensions = map[string]string{
-	".mp4":  "video/mp4",
-	".m4v":  "video/mp4",
-	".webm": "video/webm",
-	".mov":  "video/quicktime",
-	".avi":  "video/x-msvideo",
-	".mkv":  "video/x-matroska",
-	".ogv":  "video/ogg",
-	".3gp":  "video/3gpp",
-}
-
-func ensureIntroVideoDir() error {
-	return os.MkdirAll(introVideoDir, 0755)
-}
 
 func introVideoFilePath(filename string) string {
 	return filepath.Join(introVideoDir, filepath.Base(filename))
 }
 
+func introVideoLinkLabel(url sql.NullString, filename sql.NullString) string {
+	if url.Valid && url.String != "" {
+		return url.String
+	}
+	if filename.Valid && filename.String != "" {
+		return filename.String
+	}
+	return "-"
+}
+
+func introVideoViewURL(id int64, url sql.NullString) string {
+	if url.Valid && url.String != "" {
+		return url.String
+	}
+	return utils.URL(fmt.Sprintf("/intro-videos/%d/file", id))
+}
+
+func introVideoSourceType(sourceType sql.NullString) constants.TeacherIntroVideoSourceType {
+	if !sourceType.Valid {
+		return ""
+	}
+	return constants.TeacherIntroVideoSourceType(sourceType.String)
+}
+
+func mapIntroVideoItem(row queries.TblTeacherIntroVideo) frontend.IntroVideoItem {
+	linkLabel := introVideoLinkLabel(row.Url, row.OriginalFilename)
+	return frontend.IntroVideoItem{
+		ID:           strconv.FormatInt(row.ID, 10),
+		LinkLabel:    linkLabel,
+		URL:          nullStringValue(row.Url),
+		SourceType:   introVideoSourceType(row.SourceType),
+		Status:       constants.TeacherIntroVideoStatus(row.Status),
+		UploadedAt:   utils.FormatNullDateTimePHT(row.CreatedAt),
+		RejectReason: nullStringValue(row.RejectReason),
+		ViewURL:      introVideoViewURL(row.ID, row.Url),
+		CanReview:    false,
+	}
+}
+
 func mapIntroVideoItems(rows []queries.TblTeacherIntroVideo) []frontend.IntroVideoItem {
 	items := make([]frontend.IntroVideoItem, len(rows))
 	for i, row := range rows {
-		items[i] = frontend.IntroVideoItem{
-			ID:           strconv.FormatInt(row.ID, 10),
-			Filename:     row.OriginalFilename,
-			MimeType:     row.MimeType,
-			FileSize:     utils.FormatFileSize(row.FileSize),
-			Status:       constants.TeacherIntroVideoStatus(row.Status),
-			UploadedAt:   utils.FormatNullDateTimePHT(row.CreatedAt),
-			RejectReason: nullStringValue(row.RejectReason),
-			ViewURL:      utils.URL(fmt.Sprintf("/intro-videos/%d/file", row.ID)),
-			CanReview:    false,
-		}
+		items[i] = mapIntroVideoItem(row)
 	}
 	return items
 }
@@ -71,11 +81,12 @@ func mapAllIntroVideoItems(ctx context.Context, rows []queries.GetAllTeacherIntr
 	items := make([]frontend.IntroVideoItem, len(rows))
 	for i, row := range rows {
 		teacherIDs[i] = row.TeacherID
+		linkLabel := introVideoLinkLabel(row.Url, row.OriginalFilename)
 		items[i] = frontend.IntroVideoItem{
 			ID:           strconv.FormatInt(row.ID, 10),
-			Filename:     row.OriginalFilename,
-			MimeType:     row.MimeType,
-			FileSize:     utils.FormatFileSize(row.FileSize),
+			LinkLabel:    linkLabel,
+			URL:          nullStringValue(row.Url),
+			SourceType:   introVideoSourceType(row.SourceType),
 			Status:       constants.TeacherIntroVideoStatus(row.Status),
 			UploadedAt:   utils.FormatNullDateTimePHT(row.CreatedAt),
 			UploadedBy:   row.TeacherName,
@@ -88,7 +99,7 @@ func mapAllIntroVideoItems(ctx context.Context, rows []queries.GetAllTeacherIntr
 				row.TeacherAssignedColor,
 				row.TeacherProfilePicture,
 			),
-			ViewURL:   utils.URL(fmt.Sprintf("/intro-videos/%d/file", row.ID)),
+			ViewURL:   introVideoViewURL(row.ID, row.Url),
 			CanReview: row.Status == string(constants.TeacherIntroVideoStatusSubmitted),
 		}
 	}
@@ -115,7 +126,7 @@ func handleIntroVideos(w http.ResponseWriter, r *http.Request) {
 	switch role {
 	case auth.RoleSuperuser, auth.RoleAdmin:
 		data.Title = "Intro Videos"
-		data.Description = "Review teacher introduction video uploads."
+		data.Description = "Review teacher introduction video submissions."
 		data.ShowUploader = true
 		data.ShowActions = true
 		data.ShowTeacherFilter = true
@@ -230,24 +241,28 @@ func parseIntroVideoFilters(r *http.Request) (introVideoFilters, error) {
 }
 
 func introVideoAllFilterParams(filters introVideoFilters) queries.GetAllTeacherIntroVideosFilteredParams {
+	query := sql.NullString{String: filters.Query, Valid: true}
 	return queries.GetAllTeacherIntroVideosFilteredParams{
 		Column1:   filters.Status,
 		Status:    filters.Status,
 		Column3:   filters.TeacherID,
 		TeacherID: filters.TeacherID,
 		Column5:   filters.Query,
-		Column6:   sql.NullString{String: filters.Query, Valid: true},
-		Column7:   sql.NullString{String: filters.Query, Valid: true},
+		Column6:   query,
+		Column7:   query,
+		Column8:   query,
 	}
 }
 
 func introVideoTeacherFilterParams(teacherID int64, filters introVideoFilters) queries.GetTeacherIntroVideosByTeacherIDFilteredParams {
+	query := sql.NullString{String: filters.Query, Valid: true}
 	return queries.GetTeacherIntroVideosByTeacherIDFilteredParams{
 		TeacherID: teacherID,
 		Column2:   filters.Status,
 		Status:    filters.Status,
 		Column4:   filters.Query,
-		Column5:   sql.NullString{String: filters.Query, Valid: true},
+		Column5:   query,
+		Column6:   query,
 	}
 }
 
@@ -256,9 +271,9 @@ func introVideosEmptyMessage(filters introVideoFilters, isTeacher bool) string {
 		return "No intro videos match your filters."
 	}
 	if isTeacher {
-		return "No intro video uploaded yet. Upload one from My Profile."
+		return "No intro video submitted yet. Submit one from My Profile."
 	}
-	return "No intro videos uploaded yet."
+	return "No intro videos submitted yet."
 }
 
 func handleIntroVideosPath(w http.ResponseWriter, r *http.Request) {
@@ -295,7 +310,7 @@ func handleProfileIntroVideo(w http.ResponseWriter, r *http.Request) {
 	}
 	_, uploadAllowed := introVideoUploadAccessForViewer(ctx)
 	if !uploadAllowed {
-		setErrorFlash(w, "Intro video uploads are currently disabled")
+		setErrorFlash(w, "Intro video submissions are currently disabled")
 		HttpRedirect(w, r, "/profile")
 		return
 	}
@@ -308,80 +323,39 @@ func handleProfileIntroVideo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if blocking > 0 {
-		setErrorFlash(w, "You already have a submitted or approved intro video. You cannot upload again unless it is rejected or deleted.")
+		setErrorFlash(w, "You already have a submitted or approved intro video. You cannot submit again unless it is rejected or deleted.")
 		HttpRedirect(w, r, "/profile")
 		return
 	}
 
-	if err := ensureIntroVideoDir(); err != nil {
-		logs.Log().Error("create intro video dir", zap.Error(err))
-		setErrorFlash(w, "Failed to prepare upload")
+	if err := r.ParseForm(); err != nil {
+		setErrorFlash(w, "Invalid form submission")
 		HttpRedirect(w, r, "/profile")
 		return
 	}
 
-	if err := r.ParseMultipartForm(constants.MaxIntroVideoBytes); err != nil {
-		setErrorFlash(w, "File is too large. Maximum size is 20 MB.")
+	sourceTypeStr := strings.TrimSpace(r.FormValue("source_type"))
+	if !constants.ValidTeacherIntroVideoSourceType(sourceTypeStr) {
+		setErrorFlash(w, "Select Google Drive or YouTube as the video source")
 		HttpRedirect(w, r, "/profile")
 		return
 	}
 
-	file, header, err := r.FormFile("intro_video")
+	parsed, err := teacherintrovideo.ParseURL(constants.TeacherIntroVideoSourceType(sourceTypeStr), r.FormValue("url"))
 	if err != nil {
-		setErrorFlash(w, "Please choose a video to upload")
+		setErrorFlash(w, introVideoSubmitErrorMessage(err))
 		HttpRedirect(w, r, "/profile")
 		return
-	}
-	defer file.Close()
-
-	tempPath, mimeType, err := saveTempIntroVideo(file, header.Filename, header.Size)
-	if err != nil {
-		setErrorFlash(w, err.Error())
-		HttpRedirect(w, r, "/profile")
-		return
-	}
-	defer os.Remove(tempPath)
-
-	duration, err := probeVideoDuration(ctx, tempPath)
-	if err != nil {
-		if errors.Is(err, ErrFfprobeUnavailable) {
-			setErrorFlash(w, "Video duration check requires ffprobe. Install ffmpeg and ensure ffprobe is on PATH.")
-		} else {
-			setErrorFlash(w, "Could not read video duration. Please upload a valid video file.")
-		}
-		HttpRedirect(w, r, "/profile")
-		return
-	}
-	if duration > constants.MaxIntroVideoDurationSeconds {
-		setErrorFlash(w, fmt.Sprintf("Video is too long. Maximum duration is %d seconds.", constants.MaxIntroVideoDurationSeconds))
-		HttpRedirect(w, r, "/profile")
-		return
-	}
-
-	ext := strings.ToLower(filepath.Ext(header.Filename))
-	storedFilename := fmt.Sprintf("%d_%d%s", user.ID, time.Now().UnixNano(), ext)
-	destPath := introVideoFilePath(storedFilename)
-
-	if err := os.Rename(tempPath, destPath); err != nil {
-		if copyErr := copyFile(tempPath, destPath); copyErr != nil {
-			logs.Log().Error("move intro video file", zap.Error(err), zap.Error(copyErr))
-			setErrorFlash(w, "Failed to save video")
-			HttpRedirect(w, r, "/profile")
-			return
-		}
 	}
 
 	if err := dbRW.GetQueries().InsertTeacherIntroVideo(ctx, queries.InsertTeacherIntroVideoParams{
-		TeacherID:        user.ID,
-		OriginalFilename: filepath.Base(header.Filename),
-		StoredFilename:   storedFilename,
-		MimeType:         mimeType,
-		FileSize:         header.Size,
-		Status:           string(constants.TeacherIntroVideoStatusSubmitted),
+		TeacherID:  user.ID,
+		Url:        sql.NullString{String: parsed.URL, Valid: true},
+		SourceType: sql.NullString{String: string(parsed.SourceType), Valid: true},
+		Status:     string(constants.TeacherIntroVideoStatusSubmitted),
 	}); err != nil {
-		_ = os.Remove(destPath)
 		if database.IsUniqueConstraint(err) {
-			setErrorFlash(w, "You already have a submitted or approved intro video. You cannot upload again unless it is rejected or deleted.")
+			setErrorFlash(w, "You already have a submitted or approved intro video. You cannot submit again unless it is rejected or deleted.")
 		} else {
 			logs.Log().Error("insert teacher intro video", zap.Error(err))
 			setErrorFlash(w, "Failed to record intro video")
@@ -390,11 +364,24 @@ func handleProfileIntroVideo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	insertAuditLogAs(ctx, user, "profile", fmt.Sprintf("submitted intro video for teacher '%s'", user.Name))
+	insertAuditLogAs(ctx, user, "profile", fmt.Sprintf("submitted intro video link for teacher '%s'", user.Name))
 	notifySuperuser(ctx, user, notifications.KindIntroVideoSubmitted,
-		fmt.Sprintf("Teacher '%s' submitted intro video '%s'", user.Name, filepath.Base(header.Filename)), "")
+		fmt.Sprintf("Teacher '%s' submitted an intro video link", user.Name), "")
 	setSuccessFlash(w, "Intro video submitted successfully. It will be reviewed by an administrator.")
 	HttpRedirect(w, r, "/profile")
+}
+
+func introVideoSubmitErrorMessage(err error) string {
+	switch {
+	case errors.Is(err, teacherintrovideo.ErrURLRequired):
+		return "Video URL is required"
+	case errors.Is(err, teacherintrovideo.ErrInvalidURL):
+		return "Enter a valid link for the selected source"
+	case errors.Is(err, teacherintrovideo.ErrUnsupportedSourceType):
+		return "Select Google Drive or YouTube as the video source"
+	default:
+		return "Failed to validate intro video link"
+	}
 }
 
 func handleIntroVideoFile(w http.ResponseWriter, r *http.Request, videoID int64) {
@@ -420,15 +407,28 @@ func handleIntroVideoFile(w http.ResponseWriter, r *http.Request, videoID int64)
 		HttpError(w, "Intro video not found", http.StatusNotFound)
 		return
 	}
+	if !row.StoredFilename.Valid || row.StoredFilename.String == "" {
+		HttpError(w, "Intro video not found", http.StatusNotFound)
+		return
+	}
 
-	path := introVideoFilePath(row.StoredFilename)
+	path := introVideoFilePath(row.StoredFilename.String)
 	if _, err := os.Stat(path); err != nil {
 		HttpError(w, "Intro video not found", http.StatusNotFound)
 		return
 	}
 
-	w.Header().Set("Content-Type", row.MimeType)
-	w.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=%q", row.OriginalFilename))
+	filename := "intro-video"
+	if row.OriginalFilename.Valid && row.OriginalFilename.String != "" {
+		filename = row.OriginalFilename.String
+	}
+	mimeType := "video/mp4"
+	if row.MimeType.Valid && row.MimeType.String != "" {
+		mimeType = row.MimeType.String
+	}
+
+	w.Header().Set("Content-Type", mimeType)
+	w.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=%q", filename))
 	http.ServeFile(w, r, path)
 }
 
@@ -469,10 +469,11 @@ func handleIntroVideoReview(w http.ResponseWriter, r *http.Request, videoID int6
 		return
 	}
 
-	insertAuditLogAs(ctx, user, "teachers", fmt.Sprintf("%s intro video '%s' (id %d)", actionLabel, row.OriginalFilename, videoID))
+	linkLabel := introVideoLinkLabel(row.Url, row.OriginalFilename)
+	insertAuditLogAs(ctx, user, "teachers", fmt.Sprintf("%s intro video '%s' (id %d)", actionLabel, linkLabel, videoID))
 	teacherName := teacherNameByID(ctx, row.TeacherID)
 	notifyTeacher(ctx, row.TeacherID, teacherName, user, notifications.KindIntroVideoReviewed,
-		fmt.Sprintf("Your intro video '%s' was %s", row.OriginalFilename, strings.ToLower(actionLabel)), "")
+		fmt.Sprintf("Your intro video '%s' was %s", linkLabel, strings.ToLower(actionLabel)), "")
 	setSuccessFlash(w, fmt.Sprintf("Intro video %s successfully.", actionLabel))
 	HttpRedirect(w, r, "/intro-videos")
 }
@@ -529,122 +530,18 @@ func handleIntroVideoDelete(w http.ResponseWriter, r *http.Request, videoID int6
 		return
 	}
 
-	filePath := introVideoFilePath(row.StoredFilename)
-	if err := os.Remove(filePath); err != nil && !os.IsNotExist(err) {
-		logs.Log().Error("remove intro video file", zap.Error(err), zap.String("path", filePath))
+	if row.StoredFilename.Valid && row.StoredFilename.String != "" {
+		filePath := introVideoFilePath(row.StoredFilename.String)
+		if err := os.Remove(filePath); err != nil && !os.IsNotExist(err) {
+			logs.Log().Error("remove intro video file", zap.Error(err), zap.String("path", filePath))
+		}
 	}
 
-	insertAuditLogAs(ctx, user, "teachers", fmt.Sprintf("deleted intro video '%s' (id %d)", row.OriginalFilename, videoID))
+	linkLabel := introVideoLinkLabel(row.Url, row.OriginalFilename)
+	insertAuditLogAs(ctx, user, "teachers", fmt.Sprintf("deleted intro video '%s' (id %d)", linkLabel, videoID))
 	teacherName := teacherNameByID(ctx, row.TeacherID)
 	notifyTeacher(ctx, row.TeacherID, teacherName, user, notifications.KindIntroVideoDeleted,
-		fmt.Sprintf("Your intro video '%s' was deleted by an administrator. You may upload a new one.", row.OriginalFilename), "")
+		fmt.Sprintf("Your intro video '%s' was deleted by an administrator. You may submit a new one.", linkLabel), "")
 	setSuccessFlash(w, "Intro video deleted successfully.")
 	HttpRedirect(w, r, "/intro-videos")
-}
-
-func saveTempIntroVideo(file io.ReadSeeker, filename string, size int64) (string, string, error) {
-	mimeType, err := validateIntroVideoUpload(file, filename, size)
-	if err != nil {
-		return "", "", err
-	}
-
-	ext := strings.ToLower(filepath.Ext(filename))
-	tempFile, err := os.CreateTemp(introVideoDir, "upload-*"+ext)
-	if err != nil {
-		return "", "", ErrIntroVideoUploadPrepareFailed
-	}
-	tempPath := tempFile.Name()
-
-	if _, err := io.Copy(tempFile, file); err != nil {
-		tempFile.Close()
-		_ = os.Remove(tempPath)
-		return "", "", ErrIntroVideoSaveFailed
-	}
-	if err := tempFile.Close(); err != nil {
-		_ = os.Remove(tempPath)
-		return "", "", ErrIntroVideoSaveFailed
-	}
-
-	return tempPath, mimeType, nil
-}
-
-func validateIntroVideoUpload(file io.ReadSeeker, filename string, size int64) (string, error) {
-	if size <= 0 {
-		return "", ErrIntroVideoFileEmpty
-	}
-	if size > constants.MaxIntroVideoBytes {
-		return "", ErrIntroVideoFileTooLarge
-	}
-
-	ext := strings.ToLower(filepath.Ext(filename))
-	mimeType, ok := allowedIntroVideoExtensions[ext]
-	if !ok {
-		return "", ErrUnsupportedIntroVideoFormat
-	}
-
-	header := make([]byte, 12)
-	if _, err := io.ReadFull(file, header); err != nil {
-		return "", ErrInvalidIntroVideoFile
-	}
-	if _, err := file.Seek(0, io.SeekStart); err != nil {
-		return "", ErrIntroVideoReadFailed
-	}
-	if !looksLikeVideo(header, ext) {
-		return "", ErrInvalidIntroVideoContent
-	}
-
-	return mimeType, nil
-}
-
-func looksLikeVideo(header []byte, ext string) bool {
-	switch ext {
-	case ".mp4", ".m4v", ".mov":
-		return len(header) >= 8 && bytes.Equal(header[4:8], []byte("ftyp"))
-	case ".webm", ".mkv":
-		return len(header) >= 4 && header[0] == 0x1A && header[1] == 0x45 && header[2] == 0xDF && header[3] == 0xA3
-	case ".avi":
-		return len(header) >= 12 && bytes.Equal(header[0:4], []byte("RIFF")) && bytes.Equal(header[8:12], []byte("AVI "))
-	case ".ogv":
-		return len(header) >= 4 && bytes.Equal(header[0:4], []byte("OggS"))
-	case ".3gp":
-		return len(header) >= 8 && bytes.Equal(header[4:8], []byte("ftyp"))
-	default:
-		return false
-	}
-}
-
-func probeVideoDuration(ctx context.Context, path string) (float64, error) {
-	probeCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
-	defer cancel()
-
-	data, err := ffprobe.ProbeURL(probeCtx, path)
-	if err != nil {
-		if _, ok := errors.AsType[*exec.Error](err); ok {
-			return 0, ErrFfprobeUnavailable
-		}
-		return 0, err
-	}
-	if data.Format == nil || data.Format.DurationSeconds <= 0 {
-		return 0, ErrEmptyIntroVideoDuration
-	}
-	return data.Format.DurationSeconds, nil
-}
-
-func copyFile(src, dst string) error {
-	in, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer in.Close()
-
-	out, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	if _, err := io.Copy(out, in); err != nil {
-		return err
-	}
-	return out.Close()
 }

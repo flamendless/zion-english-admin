@@ -8,6 +8,7 @@ const (
 	NavIconLibrary          NavIconKind = "library"
 	NavIconTraining         NavIconKind = "training"
 	NavIconDocuments        NavIconKind = "documents"
+	NavIconIntroVideos      NavIconKind = "intro-videos"
 	NavIconTeachers         NavIconKind = "teachers"
 	NavIconStudents         NavIconKind = "students"
 	NavIconMyStudents       NavIconKind = "my-students"
@@ -46,7 +47,7 @@ var navIconByPath = map[string]NavIconKind{
 	"/learning-materials":   NavIconLibrary,
 	"/training-materials":   NavIconTraining,
 	"/documents":            NavIconDocuments,
-	"/intro-videos":         NavIconDocuments,
+	"/intro-videos":         NavIconIntroVideos,
 	"/teachers":             NavIconTeachers,
 	"/students":             NavIconStudents,
 	"/classes":              NavIconClasses,
@@ -78,6 +79,7 @@ var navIconToneByKind = map[NavIconKind]NavIconTone{
 	NavIconLibrary:        NavIconTonePrimary,
 	NavIconTraining:       NavIconTonePrimary,
 	NavIconDocuments:      NavIconToneInfo,
+	NavIconIntroVideos:    NavIconToneInfo,
 	NavIconTeachers:       NavIconToneSuccess,
 	NavIconStudents:       NavIconToneSuccess,
 	NavIconMyStudents:     NavIconToneSuccess,

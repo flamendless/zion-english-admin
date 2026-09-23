@@ -295,10 +295,12 @@ type TblTeacherDocument struct {
 type TblTeacherIntroVideo struct {
 	ID               int64
 	TeacherID        int64
-	OriginalFilename string
-	StoredFilename   string
-	MimeType         string
-	FileSize         int64
+	OriginalFilename sql.NullString
+	StoredFilename   sql.NullString
+	MimeType         sql.NullString
+	FileSize         sql.NullInt64
+	Url              sql.NullString
+	SourceType       sql.NullString
 	Status           string
 	CreatedAt        sql.NullTime
 	ReviewedAt       sql.NullTime

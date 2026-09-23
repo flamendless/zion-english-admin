@@ -8,9 +8,9 @@ import (
 
 type IntroVideoItem struct {
 	ID               string
-	Filename         string
-	MimeType         string
-	FileSize         string
+	LinkLabel        string
+	URL              string
+	SourceType       constants.TeacherIntroVideoSourceType
 	Status           constants.TeacherIntroVideoStatus
 	UploadedAt       string
 	UploadedBy       string
@@ -18,6 +18,14 @@ type IntroVideoItem struct {
 	RejectReason     string
 	ViewURL          string
 	CanReview        bool
+}
+
+func introVideoLinkDisplay(label string) string {
+	const maxLen = 64
+	if len(label) <= maxLen {
+		return label
+	}
+	return label[:maxLen-1] + "…"
 }
 
 func introVideoRowClass(status constants.TeacherIntroVideoStatus) string {
@@ -32,7 +40,7 @@ func introVideoRowClass(status constants.TeacherIntroVideoStatus) string {
 }
 
 func introVideosTableColspan(showUploader bool, showActions bool) int {
-	colspan := 5
+	colspan := 4
 	if showUploader {
 		colspan++
 	}
@@ -59,9 +67,9 @@ templ IntroVideosToolbar(showTeacherFilter bool, status constants.TeacherIntroVi
 		<div class="form-group">
 			<label for="introVideoSearch">Search</label>
 			if showTeacherFilter {
-				<input type="text" id="introVideoSearch" name="introVideoQ" placeholder="Filename or teacher name..."/>
+				<input type="text" id="introVideoSearch" name="introVideoQ" placeholder="URL or teacher name..."/>
 			} else {
-				<input type="text" id="introVideoSearch" name="introVideoQ" placeholder="Filename..."/>
+				<input type="text" id="introVideoSearch" name="introVideoQ" placeholder="URL..."/>
 			}
 		</div>
 		@IntroVideoStatusFilterDropdownWithValue(status)
@@ -80,18 +88,25 @@ templ IntroVideosToolbar(showTeacherFilter bool, status constants.TeacherIntroVi
 	</div>
 }
 
+templ IntroVideoSourcePill(sourceType constants.TeacherIntroVideoSourceType) {
+	if sourceType != "" {
+		@Pill(sourceType.Label(), PillToneInfo)
+	} else {
+		@Pill("Uploaded file", PillToneNeutral)
+	}
+}
+
 templ IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions bool) {
 	<tr class={ introVideoRowClass(item.Status) }>
-		<td data-label="Filename">
-			<a href={ item.ViewURL } class="documents-filename documents-filename-link" title={ item.Filename } target="_blank" rel="noopener noreferrer">{ item.Filename }</a>
+		<td data-label="Link">
+			<a href={ item.ViewURL } class="documents-filename documents-filename-link" title={ item.LinkLabel } target="_blank" rel="noopener noreferrer">{ introVideoLinkDisplay(item.LinkLabel) }</a>
 			if item.RejectReason != "" {
 				<div class="intro-video-reject-reason">Reject reason: { item.RejectReason }</div>
 			}
 		</td>
-		<td data-label="Type">
-			@Pill(item.MimeType, PillToneInfo)
+		<td data-label="Source">
+			@IntroVideoSourcePill(item.SourceType)
 		</td>
-		<td data-label="File size">{ item.FileSize }</td>
 		<td data-label="Status">
 			@StatusPill(item.Status.Label(), IntroVideoStatusPillTone(item.Status), true)
 		</td>
@@ -115,10 +130,10 @@ templ IntroVideoTableRow(item IntroVideoItem, showUploader bool, showActions boo
 						@IconActionButton("Reject", IconKindReject, templ.Attributes{
 							"type": "button",
 							"data-intro-video-reject-url": utils.URL("/intro-videos/" + item.ID + "/reject"),
-							"data-intro-video-reject-filename": item.Filename,
+							"data-intro-video-reject-label": item.LinkLabel,
 						})
 					}
-					<form method="POST" action={ utils.URL("/intro-videos/" + item.ID + "/delete") } class="table-action-form" onsubmit="return confirm('Delete this intro video? The file will be removed and the teacher can upload a new one.');">
+					<form method="POST" action={ utils.URL("/intro-videos/" + item.ID + "/delete") } class="table-action-form" onsubmit="return confirm('Delete this intro video? The teacher can submit a new one.');">
 						@IconActionSubmit("Delete", IconKindWarning)
 					</form>
 				</div>
@@ -144,9 +159,8 @@ templ IntroVideosTable(showUploader bool, showActions bool) {
 		<table class="documents-table table-stack-mobile">
 			<thead>
 				<tr>
-					<th>Filename</th>
-					<th>Type</th>
-					<th>File size</th>
+					<th>Link</th>
+					<th>Source</th>
 					<th>Status</th>
 					if showUploader {
 						@AdminOnlyTableHeader("Uploaded by")
@@ -245,10 +259,10 @@ templ IntroVideoRejectModal() {
 				method="POST"
 				class="modal-body scheduled-class-action-modal"
 			>
-				<p class="scheduled-class-modal-lead">The teacher will be able to upload a new intro video after rejection.</p>
+				<p class="scheduled-class-modal-lead">The teacher will be able to submit a new intro video after rejection.</p>
 				<div class="form-group">
-					<label>Video</label>
-					<p id="introVideoRejectFilename" class="intro-video-reject-modal-filename">-</p>
+					<label>Video link</label>
+					<p id="introVideoRejectLabel" class="intro-video-reject-modal-link">-</p>
 				</div>
 				<div class="scheduled-class-modal-fields">
 					<div class="form-group">
@@ -270,7 +284,7 @@ templ IntroVideoRejectModal() {
 		</div>
 	</div>
 	<style>
-		.intro-video-reject-modal-filename {
+		.intro-video-reject-modal-link {
 			margin: 0;
 			font-weight: 600;
 			color: var(--color-foreground);
@@ -282,13 +296,13 @@ templ IntroVideoRejectModal() {
 			const modal = document.getElementById('introVideoRejectModal');
 			const form = document.getElementById('introVideoRejectForm');
 			const reasonInput = document.getElementById('introVideoRejectReason');
-			const filenameEl = document.getElementById('introVideoRejectFilename');
-			if (!modal || !form || !reasonInput || !filenameEl) return;
+			const labelEl = document.getElementById('introVideoRejectLabel');
+			if (!modal || !form || !reasonInput || !labelEl) return;
 
-			window.openIntroVideoRejectModal = function (rejectURL, filename) {
+			window.openIntroVideoRejectModal = function (rejectURL, linkLabel) {
 				form.action = rejectURL;
 				reasonInput.value = '';
-				filenameEl.textContent = filename || '-';
+				labelEl.textContent = linkLabel || '-';
 				modal.hidden = false;
 				document.body.classList.add('modal-open');
 				reasonInput.focus();
@@ -298,16 +312,16 @@ templ IntroVideoRejectModal() {
 				modal.hidden = true;
 				document.body.classList.remove('modal-open');
 				reasonInput.value = '';
-				filenameEl.textContent = '-';
+				labelEl.textContent = '-';
 			};
 
 			document.body.addEventListener('click', function (e) {
 				const rejectBtn = e.target.closest('[data-intro-video-reject-url]');
 				if (rejectBtn) {
 					const rejectURL = rejectBtn.getAttribute('data-intro-video-reject-url');
-					const filename = rejectBtn.getAttribute('data-intro-video-reject-filename') || '';
+					const linkLabel = rejectBtn.getAttribute('data-intro-video-reject-label') || '';
 					if (!rejectURL) return;
-					window.openIntroVideoRejectModal(rejectURL, filename);
+					window.openIntroVideoRejectModal(rejectURL, linkLabel);
 					return;
 				}
 				if (e.target.closest('.intro-video-reject-modal-close')) {
@@ -339,14 +353,17 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 	if !data.IsSuperuser && data.IntroVideoUploadVisible {
 		<div class="profile-card profile-section">
 			<h2>Introduction video</h2>
-			<p class="profile-section-desc">Upload a short introduction video for students and administrators. Accepted formats: MP4, WebM, MOV, AVI, MKV, OGV, M4V, or 3GP (max 1 minute, 20 MB).</p>
+			<p class="profile-section-desc">Submit a short introduction video link for students and administrators. Use a Google Drive or YouTube link that reviewers can open without signing in.</p>
 			if data.HasIntroVideo {
 				<div class="profile-detail" style="margin-bottom: var(--space-4);">
-					<span class="profile-detail-label">Current video</span>
+					<span class="profile-detail-label">Current submission</span>
 					<div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-top: var(--space-2);">
 						@StatusPill(data.IntroVideoStatus.Label(), IntroVideoStatusPillTone(data.IntroVideoStatus), true)
+						if data.IntroVideoSourceType != "" {
+							@IntroVideoSourcePill(data.IntroVideoSourceType)
+						}
 						if data.IntroVideoViewURL != "" {
-							<a href={ data.IntroVideoViewURL } class="documents-filename-link" target="_blank" rel="noopener noreferrer">View uploaded video</a>
+							<a href={ data.IntroVideoViewURL } class="documents-filename-link" target="_blank" rel="noopener noreferrer">View video link</a>
 						}
 					</div>
 					if data.IntroVideoRejectReason != "" {
@@ -361,7 +378,7 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 						<line x1="12" y1="8" x2="12" y2="12"></line>
 						<line x1="12" y1="16" x2="12.01" y2="16"></line>
 					</svg>
-					<span>Intro video uploads are currently disabled.</span>
+					<span>Intro video submissions are currently disabled.</span>
 				</div>
 			} else if !data.CanUploadIntroVideo {
 				<div class="upload-locked-notice" role="status">
@@ -370,44 +387,71 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 						<line x1="12" y1="8" x2="12" y2="12"></line>
 						<line x1="12" y1="16" x2="12.01" y2="16"></line>
 					</svg>
-					<span>You already have a submitted or approved intro video on file. You cannot upload again unless it is rejected or deleted by an administrator.</span>
+					<span>You already have a submitted or approved intro video on file. You cannot submit again unless it is rejected or deleted by an administrator.</span>
 				</div>
 			}
 			if data.IntroVideoUploadsAllowed {
 				<form
 					method="POST"
 					action={ utils.URL("/profile/intro-video") }
-					enctype="multipart/form-data"
-					onsubmit="return confirm('Once submitted, you will not be able to upload a new intro video unless your current submission is rejected or deleted. Continue?');"
+					onsubmit="return confirm('Once submitted, you will not be able to submit a new intro video unless your current submission is rejected or deleted. Continue?');"
 				>
-					<div class="upload-zone">
-						<label class="upload-zone-label" for="intro_video">
-							<span class="upload-zone-icon" aria-hidden="true">
-								<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-									<polygon points="23 7 16 12 23 17 23 7"></polygon>
-									<rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
-								</svg>
-							</span>
-							<span class="upload-zone-meta">
-								<span>Choose intro video</span>
-								<span class="upload-zone-hint">MP4, WebM, MOV, AVI, MKV, OGV, M4V, or 3GP (max 1 min, 20 MB)</span>
-							</span>
-							<input
-								type="file"
-								id="intro_video"
-								name="intro_video"
-								accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska,video/ogg,video/3gpp,.mp4,.webm,.mov,.avi,.mkv,.ogv,.m4v,.3gp"
-								required
-								disabled?={ !data.CanUploadIntroVideo }
-								onchange="this.form.querySelector('.upload-filename').textContent = this.files[0] ? this.files[0].name : ''"
-							/>
-						</label>
-						<p class="upload-filename" aria-live="polite"></p>
+					<div class="form-group">
+						<label for="introVideoSourceType">Source *</label>
+						<select id="introVideoSourceType" name="source_type" required disabled?={ !data.CanUploadIntroVideo }>
+							<option value="">Select source...</option>
+							for _, opt := range TeacherIntroVideoSourceTypeOptions {
+								<option value={ opt.Value }>{ opt.Label }</option>
+							}
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="introVideoURL">Video URL *</label>
+						<input
+							type="url"
+							id="introVideoURL"
+							name="url"
+							required
+							disabled?={ !data.CanUploadIntroVideo }
+							placeholder="https://..."
+						/>
+					</div>
+					<div class="intro-video-link-info">
+						<p class="field-hint">Make sure the link is publicly accessible. See the steps below for your selected source.</p>
+						<p
+							class="field-hint"
+							id="introVideoSourceHint"
+							data-google-drive="In Google Drive, open Share and set General access to Anyone with the link."
+							data-youtube="In YouTube Studio, set visibility to Unlisted so anyone with the link can watch."
+						></p>
 					</div>
 					<div class="profile-form-actions">
 						<button type="submit" disabled?={ !data.CanUploadIntroVideo }>Submit intro video</button>
 					</div>
 				</form>
+				<script>
+					(function () {
+						const sourceSelect = document.getElementById('introVideoSourceType');
+						const hintEl = document.getElementById('introVideoSourceHint');
+						if (!sourceSelect || !hintEl) return;
+
+						function updateIntroVideoSourceHint() {
+							const sourceType = sourceSelect.value;
+							if (sourceType === 'google_drive') {
+								hintEl.textContent = hintEl.getAttribute('data-google-drive') || '';
+								return;
+							}
+							if (sourceType === 'youtube') {
+								hintEl.textContent = hintEl.getAttribute('data-youtube') || '';
+								return;
+							}
+							hintEl.textContent = '';
+						}
+
+						sourceSelect.addEventListener('change', updateIntroVideoSourceHint);
+						updateIntroVideoSourceHint();
+					})();
+				</script>
 			}
 		</div>
 	}
