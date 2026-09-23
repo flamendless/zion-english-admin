@@ -149,7 +149,7 @@ func validateAndSaveUpload(file io.ReadSeeker, filename string, size int64) (ext
 }
 
 func probeDurationSeconds(path string) (float64, error) {
-	if _, err := exec.LookPath("ffprobe"); err != nil {
+	if !FfprobeAvailable() {
 		return 0, ErrFfprobeUnavailable
 	}
 

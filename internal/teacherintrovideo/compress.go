@@ -9,7 +9,7 @@ import (
 )
 
 func compressToMP4(ctx context.Context, inputPath, outputPath string) error {
-	if _, err := exec.LookPath("ffmpeg"); err != nil {
+	if !FfmpegAvailable() {
 		return ErrFfmpegUnavailable
 	}
 

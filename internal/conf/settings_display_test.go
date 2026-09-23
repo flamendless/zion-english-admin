@@ -84,6 +84,15 @@ func TestParseSensitiveFieldKey(t *testing.T) {
 	}
 }
 
+func TestSettingsToolIntegrationLine(t *testing.T) {
+	if got := settingsToolIntegrationLine(true); got != "configured" {
+		t.Fatalf("available tool line = %q, want configured", got)
+	}
+	if got := settingsToolIntegrationLine(false); got != "not configured (not found in PATH)" {
+		t.Fatalf("missing tool line = %q", got)
+	}
+}
+
 func TestResolveSensitiveValue(t *testing.T) {
 	cfg := &Config{Secret: "abc"}
 	if got := ResolveSensitiveValue(SensitiveFieldSecret, cfg); got != "abc" {

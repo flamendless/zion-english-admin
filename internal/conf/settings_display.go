@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"zion-english/internal/constants"
+	"zion-english/internal/teacherintrovideo"
 )
 
 type SensitiveFieldKey string
@@ -122,6 +123,8 @@ func buildIntegrationsSection(cfg *Config, runtime SettingsRuntime) SettingsSect
 			plainField(constants.SettingsFieldIntegrationZoom, "", settingsZoomIntegrationLine(cfg, runtime.ZoomConfigured), false),
 			plainField(constants.SettingsFieldIntegrationGoogle, "", settingsGoogleCalendarIntegrationLine(cfg, runtime.GoogleCalendarConfigured), false),
 			plainField(constants.SettingsFieldIntegrationStorage, "", settingsStorageIntegrationLine(cfg), false),
+			plainField(constants.SettingsFieldIntegrationFfmpeg, "", settingsToolIntegrationLine(teacherintrovideo.FfmpegAvailable()), false),
+			plainField(constants.SettingsFieldIntegrationFfprobe, "", settingsToolIntegrationLine(teacherintrovideo.FfprobeAvailable()), false),
 		},
 	}
 }
@@ -212,6 +215,13 @@ func settingsStorageIntegrationLine(cfg *Config) string {
 		return fmt.Sprintf("r2 (bucket=%s)", settingsValueOrUnset(cfg.Storage.R2.Bucket))
 	}
 	return "local (data/ and tmp/)"
+}
+
+func settingsToolIntegrationLine(available bool) string {
+	if available {
+		return "configured"
+	}
+	return "not configured (not found in PATH)"
 }
 
 func settingsMissingZoomFields(cfg *Config) []string {

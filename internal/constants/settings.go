@@ -24,4 +24,6 @@ const (
 	SettingsFieldIntegrationZoom    = "Zoom"
 	SettingsFieldIntegrationGoogle  = "Google Calendar"
 	SettingsFieldIntegrationStorage = "Object storage"
+	SettingsFieldIntegrationFfmpeg  = "ffmpeg"
+	SettingsFieldIntegrationFfprobe = "ffprobe"
 )
