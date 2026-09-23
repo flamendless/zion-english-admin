@@ -1,16 +1,29 @@
 unreleased:
   breaking_changes: []
   new_features: []
-  improvements:
-    - text: "Teacher uploads, cached reports, and database backups can use Cloudflare R2 with a separate bucket per environment via R2_BUCKET."
+  improvements: []
   bug_fixes: []
   removed: []
   security: []
   deprecated: []
-  internal:
-    - text: "Added storage abstraction with local fallback and cloudflare-go R2 backend."
+  internal: []
 
 versions:
+  - version: "2026.09.23.3"
+    date: "2026-09-23"
+    released: true
+    breaking_changes: []
+    new_features: []
+    improvements:
+      - text: "Teacher uploads, cached reports, and database backups can use Cloudflare R2 with a separate bucket per environment via R2_BUCKET."
+        commit: "492a43c"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal:
+      - text: "Added storage abstraction with local fallback and cloudflare-go R2 backend."
+        commit: "492a43c"
   - version: "2026.09.23.2"
     date: "2026-09-23"
     released: true
