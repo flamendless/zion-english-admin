@@ -56,6 +56,7 @@ var navIconByPath = map[string]NavIconKind{
 	"/schedule/series":      NavIconScheduleSeries,
 	"/my-students":          NavIconMyStudents,
 	"/reports":              NavIconReports,
+	"/reports/history":      NavIconReports,
 	"/analytics":            NavIconAnalytics,
 	"/payments":             NavIconPayments,
 	"/student-relationships": NavIconStudents,

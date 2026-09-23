@@ -228,6 +228,102 @@ func (q *Queries) GetReportGenerationByOutputBasename(ctx context.Context, outpu
 	return i, err
 }
 
+const getReportGenerationsFiltered = `-- name: GetReportGenerationsFiltered :many
+SELECT
+	rg.id,
+	rg.teacher_id,
+	rg.start_date,
+	rg.end_date,
+	rg.output_path,
+	rg.record_count,
+	rg.generated_at,
+	t.first_name AS teacher_first_name,
+	t.middle_name AS teacher_middle_name,
+	t.last_name AS teacher_last_name,
+	t.profile_picture AS teacher_profile_picture
+FROM tbl_report_generations rg
+INNER JOIN tbl_teachers t ON t.id = rg.teacher_id
+WHERE t.deleted = 0
+	AND (? = '' OR rg.start_date >= ?)
+	AND (? = '' OR rg.end_date <= ?)
+	AND (
+		? = ''
+		OR t.first_name LIKE '%' || ? || '%'
+		OR t.middle_name LIKE '%' || ? || '%'
+		OR t.last_name LIKE '%' || ? || '%'
+	)
+ORDER BY rg.generated_at DESC
+`
+
+type GetReportGenerationsFilteredParams struct {
+	Column1   interface{}
+	StartDate string
+	Column3   interface{}
+	EndDate   string
+	Column5   interface{}
+	Column6   sql.NullString
+	Column7   sql.NullString
+	Column8   sql.NullString
+}
+
+type GetReportGenerationsFilteredRow struct {
+	ID                    int64
+	TeacherID             int64
+	StartDate             string
+	EndDate               string
+	OutputPath            string
+	RecordCount           int64
+	GeneratedAt           string
+	TeacherFirstName      string
+	TeacherMiddleName     string
+	TeacherLastName       string
+	TeacherProfilePicture sql.NullString
+}
+
+func (q *Queries) GetReportGenerationsFiltered(ctx context.Context, arg GetReportGenerationsFilteredParams) ([]GetReportGenerationsFilteredRow, error) {
+	rows, err := q.db.QueryContext(ctx, getReportGenerationsFiltered,
+		arg.Column1,
+		arg.StartDate,
+		arg.Column3,
+		arg.EndDate,
+		arg.Column5,
+		arg.Column6,
+		arg.Column7,
+		arg.Column8,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetReportGenerationsFilteredRow
+	for rows.Next() {
+		var i GetReportGenerationsFilteredRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.TeacherID,
+			&i.StartDate,
+			&i.EndDate,
+			&i.OutputPath,
+			&i.RecordCount,
+			&i.GeneratedAt,
+			&i.TeacherFirstName,
+			&i.TeacherMiddleName,
+			&i.TeacherLastName,
+			&i.TeacherProfilePicture,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getReportGenerationsForRange = `-- name: GetReportGenerationsForRange :many
 SELECT id, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at
 FROM tbl_report_generations

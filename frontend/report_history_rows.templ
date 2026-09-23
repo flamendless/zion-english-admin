@@ -1,0 +1,51 @@
+package frontend
+
+templ ReportHistoryTableRow(row ReportHistoryRowData) {
+	<tr>
+		<td data-label="Teacher">
+			@TeacherNameCell(row.TeacherName, row.TeacherAvatar)
+		</td>
+		<td data-label="Period">{ row.PeriodLabel }</td>
+		<td data-label="Records">{ row.RecordsLabel() }</td>
+		<td data-label="Generated at">{ row.GeneratedAt }</td>
+		<td data-label="Actions">
+			<div class="table-actions">
+				<span
+					class="download-report-wrap"
+					if !row.DownloadReady {
+						data-tooltip={ reportHistoryDownloadMissingTooltip }
+					}
+				>
+					if row.DownloadReady {
+						@IconActionLink(row.DownloadURL(), "Download XLSX", IconKindDownload)
+					} else {
+						<a
+							class="icon-action-btn icon-action-btn--download download-report-btn is-disabled"
+							href="#"
+							aria-label="Download XLSX"
+							aria-disabled="true"
+						>
+							@IconSVG(IconKindDownload)
+						</a>
+					}
+				</span>
+			</div>
+		</td>
+	</tr>
+}
+
+templ ReportsHistoryTableBody(rows []ReportHistoryRowData, emptyMessage string) {
+	if len(rows) == 0 {
+		<tr>
+			<td colspan="5" class="empty-state">{ emptyMessage }</td>
+		</tr>
+	} else {
+		for _, row := range rows {
+			@ReportHistoryTableRow(row)
+		}
+	}
+}
+
+templ ReportsHistoryPartial(rows []ReportHistoryRowData, emptyMessage string) {
+	@ReportsHistoryTableBody(rows, emptyMessage)
+}

@@ -24,6 +24,18 @@ templ Reports() {
 				min-width: 0;
 			}
 
+			.reports-header-actions .btn {
+				margin-top: 0;
+				width: auto;
+			}
+
+			.hub-header > .btn,
+			.hub-header > a.btn {
+				margin-top: 0;
+				width: auto;
+				flex-shrink: 0;
+			}
+
 			.report-role-excluded {
 				color: var(--color-muted-foreground);
 				cursor: not-allowed;
@@ -87,7 +99,12 @@ templ Reports() {
 		<div class="container">
 			@HeaderSimple()
 			@SuccessBanner()
-			@HubHeader("Reports", "", "", false)
+			<div class="hub-header">
+				<h2 class="hub-title">Reports</h2>
+				<div class="reports-header-actions">
+					<a href={ utils.URL("/reports/history") } class="btn btn-secondary">View History</a>
+				</div>
+			</div>
 
 			<div id="reportsSummaryCards" class="dashboard-stats reports-summary">
 				<div class="stat-card">

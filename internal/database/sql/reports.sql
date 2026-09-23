@@ -154,6 +154,32 @@ FROM tbl_report_generations rg
 JOIN tbl_teachers t ON rg.teacher_id = t.id
 WHERE rg.output_path = ?;
 
+-- name: GetReportGenerationsFiltered :many
+SELECT
+	rg.id,
+	rg.teacher_id,
+	rg.start_date,
+	rg.end_date,
+	rg.output_path,
+	rg.record_count,
+	rg.generated_at,
+	t.first_name AS teacher_first_name,
+	t.middle_name AS teacher_middle_name,
+	t.last_name AS teacher_last_name,
+	t.profile_picture AS teacher_profile_picture
+FROM tbl_report_generations rg
+INNER JOIN tbl_teachers t ON t.id = rg.teacher_id
+WHERE t.deleted = 0
+	AND (? = '' OR rg.start_date >= ?)
+	AND (? = '' OR rg.end_date <= ?)
+	AND (
+		? = ''
+		OR t.first_name LIKE '%' || ? || '%'
+		OR t.middle_name LIKE '%' || ? || '%'
+		OR t.last_name LIKE '%' || ? || '%'
+	)
+ORDER BY rg.generated_at DESC;
+
 -- name: GetReportSummaryRows :many
 SELECT
 	cr.teacher_id,

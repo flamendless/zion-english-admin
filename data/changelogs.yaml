@@ -1,7 +1,8 @@
 unreleased:
   breaking_changes: []
   new_features: []
-  improvements: []
+  improvements:
+    - text: "Admins can browse cached payroll report generations on Reports History under Insights, with a View History link on the Reports page."
   bug_fixes: []
   removed: []
   security: []

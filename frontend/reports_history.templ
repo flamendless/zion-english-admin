@@ -1,0 +1,146 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+templ ReportsHistory() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Reports History - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@AvatarStyles()
+		<style>
+			.reports-history-filters {
+				display: contents;
+			}
+
+			.reports-history-header-actions {
+				display: flex;
+				flex-wrap: wrap;
+				gap: var(--space-2);
+				align-items: center;
+				justify-content: flex-end;
+				flex-shrink: 0;
+			}
+
+			.reports-history-header-actions .btn {
+				margin-top: 0;
+				width: auto;
+			}
+
+			.hub-header > .btn,
+			.hub-header > a.btn {
+				margin-top: 0;
+				width: auto;
+				flex-shrink: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@SuccessBanner()
+			<div class="hub-header">
+				<h2 class="hub-title">Reports History</h2>
+				<div class="reports-history-header-actions">
+					<a href={ utils.URL("/reports") } class="btn btn-secondary">Back to Reports</a>
+				</div>
+			</div>
+
+			<div class="toolbar" id="reportsHistoryToolbar">
+				<div id="reportsHistoryFilters" class="reports-history-filters">
+					<div class="form-group">
+						<label for="reportHistorySearch">Search</label>
+						<input type="text" id="reportHistorySearch" name="q" placeholder="Search teacher name..."/>
+					</div>
+					@MonthPicker("reportHistoryMonth", utils.URL("/reports/history/partials/date-preset"))
+					@DatePreset(true)
+					<button
+						type="button"
+						id="reportHistoryFilterBtn"
+						hx-get={ utils.URL("/reports/history/partials/rows") }
+						hx-include="#reportsHistoryFilters"
+						hx-target="#reportsHistoryTableBody"
+						hx-swap={ HxSwapInnerHTML }
+					>Filter</button>
+				</div>
+			</div>
+
+			<div class="table-wrapper">
+				<table id="reportsHistoryTable" class="table-stack-mobile">
+					<thead>
+						<tr>
+							<th>Teacher</th>
+							<th>Period</th>
+							<th>Records</th>
+							<th>Generated at</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody
+						id="reportsHistoryTableBody"
+						hx-get={ utils.URL("/reports/history/partials/rows") }
+						hx-include="#reportsHistoryFilters"
+						hx-trigger={ HxTriggerLoad }
+						hx-swap={ HxSwapInnerHTML }
+					>
+						<tr>
+							<td colspan="5" class="empty-state">Loading report history...</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<script>
+			const reportHistorySearch = document.getElementById('reportHistorySearch');
+
+			function setReportHistoryDateRangeFromPreset(select) {
+				if (!select) return;
+				if (!select.value) {
+					delete select.dataset.startDate;
+					delete select.dataset.endDate;
+					return;
+				}
+				const parts = select.value.split('|');
+				if (parts.length !== 2) return;
+				select.dataset.startDate = parts[0];
+				select.dataset.endDate = parts[1];
+			}
+
+			function bindReportHistoryDatePresetSelect() {
+				const datePresetSelect = document.getElementById('datePreset');
+				if (!datePresetSelect) return;
+				setReportHistoryDateRangeFromPreset(datePresetSelect);
+				datePresetSelect.addEventListener('change', () => {
+					setReportHistoryDateRangeFromPreset(datePresetSelect);
+				});
+			}
+
+			bindReportHistoryDatePresetSelect();
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id !== 'datePresetGroup') return;
+				bindReportHistoryDatePresetSelect();
+				if (typeof htmx !== 'undefined') {
+					htmx.trigger('#reportsHistoryTableBody', 'load');
+				}
+			});
+
+			if (reportHistorySearch) {
+				reportHistorySearch.addEventListener('keydown', function (e) {
+					if (e.key === 'Enter') {
+						e.preventDefault();
+						if (typeof htmx !== 'undefined') {
+							htmx.trigger('#reportsHistoryTableBody', 'load');
+						}
+					}
+				});
+			}
+		</script>
+	</body>
+	</html>
+}
