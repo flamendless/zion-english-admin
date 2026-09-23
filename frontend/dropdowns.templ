@@ -291,6 +291,17 @@ templ StudentStatusDropdownWithValue(selected constants.StudentStatus) {
 	</div>
 }
 
+templ TeacherStatusDropdownWithValue(selected constants.TeacherStatus) {
+	<div class="form-group">
+		@AdminOnlyFormLabel("status", "Status *")
+		<select id="status" name="status" required>
+			for _, opt := range TeacherStatusOptions {
+				<option value={ opt.Value } selected?={ string(selected) == opt.Value }>{ opt.Label }</option>
+			}
+		</select>
+	</div>
+}
+
 templ CurrencyDropdown() {
 	<div class="form-group">
 		<label for="currency">Currency *</label>

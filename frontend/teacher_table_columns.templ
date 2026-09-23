@@ -143,6 +143,14 @@ templ TeacherTableOptionalRowCells(teacher TeacherItem) {
 					<span>-</span>
 				}
 			</td>
+		case TeacherTableColumnResumeStatus:
+			<td data-teacher-col={ string(col.ID) } data-label={ col.HeaderLabel }>
+				if teacher.ResumeStatus != "" {
+					@StatusPill(ResumeStatusDisplayLabel(teacher.ResumeStatus), ResumeStatusPillTone(teacher.ResumeStatus), false)
+				} else {
+					<span>-</span>
+				}
+			</td>
 		case TeacherTableColumnConnections:
 			<td data-teacher-col={ string(col.ID) } data-label={ col.HeaderLabel }>
 				@TeacherConnectionsCell(teacher.ZoomConnected, teacher.GoogleCalendarConnected)

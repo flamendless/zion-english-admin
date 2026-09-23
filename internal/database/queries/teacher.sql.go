@@ -62,6 +62,26 @@ WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || midd
 	)
 	)
 	AND (
+	? = ''
+	OR (
+		? = 'none'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'resume'
+		)
+	)
+	OR (
+		? != ''
+		AND ? != 'none'
+		AND (
+			SELECT d.status FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'resume'
+			ORDER BY d.uploaded_at DESC
+			LIMIT 1
+		) = ?
+	)
+	)
+	AND (
 	(? = 0 AND ? = 0)
 	OR (? = 1 AND EXISTS (
 		SELECT 1 FROM tbl_teacher_meeting_accounts m
@@ -92,6 +112,11 @@ type CountTeachersFilteredParams struct {
 	Column15 interface{}
 	Column16 interface{}
 	Column17 interface{}
+	Status_3 string
+	Column19 interface{}
+	Column20 interface{}
+	Column21 interface{}
+	Column22 interface{}
 }
 
 func (q *Queries) CountTeachersFiltered(ctx context.Context, arg CountTeachersFilteredParams) (int64, error) {
@@ -113,6 +138,11 @@ func (q *Queries) CountTeachersFiltered(ctx context.Context, arg CountTeachersFi
 		arg.Column15,
 		arg.Column16,
 		arg.Column17,
+		arg.Status_3,
+		arg.Column19,
+		arg.Column20,
+		arg.Column21,
+		arg.Column22,
 	)
 	var count int64
 	err := row.Scan(&count)
@@ -563,6 +593,26 @@ WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || midd
 	)
 	)
 	AND (
+	? = ''
+	OR (
+		? = 'none'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'resume'
+		)
+	)
+	OR (
+		? != ''
+		AND ? != 'none'
+		AND (
+			SELECT d.status FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'resume'
+			ORDER BY d.uploaded_at DESC
+			LIMIT 1
+		) = ?
+	)
+	)
+	AND (
 	(? = 0 AND ? = 0)
 	OR (? = 1 AND EXISTS (
 		SELECT 1 FROM tbl_teacher_meeting_accounts m
@@ -595,6 +645,11 @@ type GetTeachersFilteredParams struct {
 	Column15 interface{}
 	Column16 interface{}
 	Column17 interface{}
+	Status_3 string
+	Column19 interface{}
+	Column20 interface{}
+	Column21 interface{}
+	Column22 interface{}
 	Limit    int64
 	Offset   int64
 }
@@ -644,6 +699,11 @@ func (q *Queries) GetTeachersFiltered(ctx context.Context, arg GetTeachersFilter
 		arg.Column15,
 		arg.Column16,
 		arg.Column17,
+		arg.Status_3,
+		arg.Column19,
+		arg.Column20,
+		arg.Column21,
+		arg.Column22,
 		arg.Limit,
 		arg.Offset,
 	)
@@ -991,6 +1051,20 @@ type UpdateTeacherProfilePictureParams struct {
 
 func (q *Queries) UpdateTeacherProfilePicture(ctx context.Context, arg UpdateTeacherProfilePictureParams) error {
 	_, err := q.db.ExecContext(ctx, updateTeacherProfilePicture, arg.ProfilePicture, arg.ID)
+	return err
+}
+
+const updateTeacherStatus = `-- name: UpdateTeacherStatus :exec
+UPDATE tbl_teachers SET status = ?, updated_at = datetime('now') WHERE id = ?
+`
+
+type UpdateTeacherStatusParams struct {
+	Status string
+	ID     int64
+}
+
+func (q *Queries) UpdateTeacherStatus(ctx context.Context, arg UpdateTeacherStatusParams) error {
+	_, err := q.db.ExecContext(ctx, updateTeacherStatus, arg.Status, arg.ID)
 	return err
 }
 

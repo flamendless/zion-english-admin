@@ -114,6 +114,9 @@ SET first_name = ?, middle_name = ?, last_name = ?, birthdate = ?, address = ?, 
 	drive_url = ?, sex = ?, template = ?, updated_at = datetime('now')
 WHERE id = ?;
 
+-- name: UpdateTeacherStatus :exec
+UPDATE tbl_teachers SET status = ?, updated_at = datetime('now') WHERE id = ?;
+
 -- name: CountTeachersFiltered :one
 SELECT COUNT(*) as count
 FROM tbl_teachers
@@ -140,6 +143,26 @@ WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || midd
 		AND (
 			SELECT d.status FROM tbl_teacher_documents d
 			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'document'
+			ORDER BY d.uploaded_at DESC
+			LIMIT 1
+		) = ?
+	)
+	)
+	AND (
+	? = ''
+	OR (
+		? = 'none'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'resume'
+		)
+	)
+	OR (
+		? != ''
+		AND ? != 'none'
+		AND (
+			SELECT d.status FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'resume'
 			ORDER BY d.uploaded_at DESC
 			LIMIT 1
 		) = ?
@@ -183,6 +206,26 @@ WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || midd
 		AND (
 			SELECT d.status FROM tbl_teacher_documents d
 			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'document'
+			ORDER BY d.uploaded_at DESC
+			LIMIT 1
+		) = ?
+	)
+	)
+	AND (
+	? = ''
+	OR (
+		? = 'none'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'resume'
+		)
+	)
+	OR (
+		? != ''
+		AND ? != 'none'
+		AND (
+			SELECT d.status FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'resume'
 			ORDER BY d.uploaded_at DESC
 			LIMIT 1
 		) = ?

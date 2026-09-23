@@ -31,12 +31,21 @@ func documentRowClass(status constants.TeacherDocumentStatus) string {
 	}
 }
 
+func profileUploadZoneClass(enabled bool) string {
+	if enabled {
+		return "upload-zone"
+	}
+	return "upload-zone is-disabled"
+}
+
 func documentTypeLabel(docType string) string {
 	switch docType {
 	case "avatar":
 		return "Avatar"
 	case "document":
 		return "Document"
+	case "resume":
+		return "Resume/CV"
 	default:
 		return docType
 	}
@@ -60,6 +69,7 @@ templ DocumentTypeFilterDropdown() {
 			<option value="">All</option>
 			<option value="avatar">Avatar</option>
 			<option value="document">Document</option>
+			<option value="resume">Resume/CV</option>
 		</select>
 	</div>
 }
@@ -365,6 +375,23 @@ templ DocumentsStyles() {
 			font-weight: 400;
 		}
 
+		.upload-zone.is-disabled {
+			opacity: 0.72;
+			pointer-events: none;
+			background: var(--color-muted);
+			border-color: var(--color-border-subtle);
+			border-style: solid;
+		}
+
+		.upload-zone.is-disabled .upload-zone-icon {
+			background: var(--color-surface);
+			color: var(--color-muted-foreground);
+		}
+
+		.upload-zone.is-disabled .upload-zone-meta {
+			color: var(--color-muted-foreground);
+		}
+
 		.upload-filename {
 			margin-top: var(--space-2);
 			font-size: 0.8125rem;
@@ -446,33 +473,35 @@ templ DocumentsPage(data DocumentsPageData) {
 
 templ ProfilePictureUpload(data ProfileData) {
 	if !data.IsSuperuser {
-		<form
-			class="profile-upload-form"
-			method="POST"
-			action={ utils.URL("/profile/avatar") }
-			enctype="multipart/form-data"
-		>
-			<label class="upload-zone-label" for="avatar">Profile picture</label>
-			<div class="upload-zone">
-				<label class="upload-zone-label" for="avatar">
-					<span class="upload-zone-icon" aria-hidden="true">
-						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-							<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-							<circle cx="12" cy="7" r="4"></circle>
-						</svg>
-					</span>
-					<span class="upload-zone-meta">
-						<span>Choose a photo</span>
-						<span class="upload-zone-hint">JPEG or PNG, up to 2 MB</span>
-					</span>
-					<input type="file" id="avatar" name="avatar" accept="image/jpeg,image/png" onchange="this.form.querySelector('.upload-filename').textContent = this.files[0] ? this.files[0].name : ''"/>
-				</label>
-				<p class="upload-filename" aria-live="polite"></p>
-			</div>
-			<div class="profile-form-actions">
-				<button type="submit">Upload photo</button>
-			</div>
-		</form>
+		<div class="profile-upload-block">
+			<h3 class="profile-upload-block__title">Profile picture</h3>
+			<form
+				class="profile-upload-form"
+				method="POST"
+				action={ utils.URL("/profile/avatar") }
+				enctype="multipart/form-data"
+			>
+				<div class="upload-zone">
+					<label class="upload-zone-label" for="avatar">
+						<span class="upload-zone-icon" aria-hidden="true">
+							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+								<circle cx="12" cy="7" r="4"></circle>
+							</svg>
+						</span>
+						<span class="upload-zone-meta">
+							<span>Choose a photo</span>
+							<span class="upload-zone-hint">JPEG or PNG, up to 2 MB</span>
+						</span>
+						<input type="file" id="avatar" name="avatar" accept="image/jpeg,image/png" onchange="this.form.querySelector('.upload-filename').textContent = this.files[0] ? this.files[0].name : ''"/>
+					</label>
+					<p class="upload-filename" aria-live="polite"></p>
+				</div>
+				<div class="profile-form-actions">
+					<button type="submit" class="btn">Upload photo</button>
+				</div>
+			</form>
+		</div>
 	}
 }
 
@@ -523,6 +552,66 @@ templ ProfileDocumentUpload(data ProfileData) {
 				</div>
 				<div class="profile-form-actions">
 					<button type="submit" disabled?={ !data.CanUploadDocument }>Submit document</button>
+				</div>
+			</form>
+		</div>
+	}
+}
+
+templ ProfileResumeUpload(data ProfileData) {
+	if !data.IsSuperuser {
+		<div class="profile-upload-block">
+			<div class="profile-upload-block__header">
+				<h3 class="profile-upload-block__title">Resume / CV</h3>
+				<div class="profile-upload-block__actions">
+					if data.HasResume && data.ResumeViewURL != "" {
+						@IconActionLinkExternal(data.ResumeViewURL, "View resume/CV", IconKindView)
+					}
+					<span class="profile-upload-limit-pill">Once per day</span>
+				</div>
+			</div>
+			if data.HasResume && data.ResumeFilename != "" {
+				<div class="profile-upload-current">
+					<span class="profile-upload-current-label">Current file</span>
+					<div class="profile-upload-current-row">
+						<span class="profile-upload-current-name" title={ data.ResumeFilename }>{ data.ResumeFilename }</span>
+					</div>
+				</div>
+			}
+			if !data.CanUploadResume {
+				@UploadCooldownNotice(data.ResumeUploadDaysRemaining)
+			}
+			<form
+				class="profile-upload-form"
+				method="POST"
+				action={ utils.URL("/profile/resume") }
+				enctype="multipart/form-data"
+			>
+				<div class={ profileUploadZoneClass(data.CanUploadResume) }>
+					<label class="upload-zone-label" for="resume">
+						<span class="upload-zone-icon" aria-hidden="true">
+							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+								<polyline points="14 2 14 8 20 8"></polyline>
+							</svg>
+						</span>
+						<span class="upload-zone-meta">
+							<span>Choose resume/CV</span>
+							<span class="upload-zone-hint">PNG, JPEG, JPG, or PDF (max 5 MB)</span>
+						</span>
+						<input
+							type="file"
+							id="resume"
+							name="resume"
+							accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf"
+							disabled?={ !data.CanUploadResume }
+							onchange="this.form.querySelector('.upload-filename').textContent = this.files[0] ? this.files[0].name : ''"
+						/>
+					</label>
+					<p class="upload-filename" aria-live="polite"></p>
+				</div>
+				<div class="profile-form-actions">
+					<button type="submit" class="btn" disabled?={ !data.CanUploadResume }>Upload resume/CV</button>
 				</div>
 			</form>
 		</div>

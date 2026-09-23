@@ -10,8 +10,9 @@ type CurrencyTotal struct {
 }
 
 type DashboardCurrencySection struct {
-	Title  string
-	Totals []CurrencyTotal
+	Title     string
+	Totals    []CurrencyTotal
+	AdminOnly bool
 }
 
 type DashboardData struct {
@@ -29,12 +30,16 @@ type DashboardData struct {
 	ClassesCancelledWeek   int64
 	ClassesRescheduledWeek int64
 	ScheduledToday         int64
-	MonthlyTotals          []CurrencyTotal
-	ParentMonthlyTotals           []CurrencyTotal
-	FirstCutoffTotals             []CurrencyTotal
-	SecondCutoffTotals            []CurrencyTotal
-	StudentsWithoutParent         int64
-	StudentsWithoutParentRate     int64
+	FirstCutoffTotals                 []CurrencyTotal
+	SecondCutoffTotals                []CurrencyTotal
+	FirstCutoffParentTotals           []CurrencyTotal
+	SecondCutoffParentTotals          []CurrencyTotal
+	AllTeachersFirstCutoffTotals      []CurrencyTotal
+	AllTeachersSecondCutoffTotals     []CurrencyTotal
+	AllTeachersFirstCutoffParentTotals  []CurrencyTotal
+	AllTeachersSecondCutoffParentTotals []CurrencyTotal
+	StudentsWithoutParent             int64
+	StudentsWithoutParentRate         int64
 }
 
 templ Home(data DashboardData) {
@@ -188,13 +193,21 @@ templ DashboardStatLinkRow(label string, href string, count int64, tooltip strin
 	}
 }
 
-templ DashboardSectionedCurrencyStatCard(label string, sections []DashboardCurrencySection) {
+templ DashboardSectionedCurrencyStatCard(label string, adminOnly bool, sections []DashboardCurrencySection) {
 	<div class="stat-card">
-		<span class="stat-label">{ label }</span>
+		if adminOnly {
+			@AdminOnlyStatLabel(label)
+		} else {
+			<span class="stat-label">{ label }</span>
+		}
 		for _, section := range sections {
 			<div class="stat-section">
 				if section.Title != "" {
-					<span class="stat-section-title">{ section.Title }</span>
+					if section.AdminOnly {
+						@AdminOnlyStatSectionTitle(section.Title)
+					} else {
+						<span class="stat-section-title">{ section.Title }</span>
+					}
 				}
 				<div class="stat-currency-rows">
 					for _, total := range section.Totals {
@@ -208,7 +221,7 @@ templ DashboardSectionedCurrencyStatCard(label string, sections []DashboardCurre
 
 templ DashboardPendingStatCard(pendingTeachers int64, pendingDocuments int64, pendingIntroVideos int64) {
 	<div class="stat-card">
-		<span class="stat-label">Pending Review</span>
+		@AdminOnlyStatLabel("Pending Review")
 		<div class="stat-link-rows">
 			@DashboardStatLinkRow(
 				"Teachers",
@@ -234,7 +247,7 @@ templ DashboardPendingStatCard(pendingTeachers int64, pendingDocuments int64, pe
 
 templ DashboardParentGapStatCard(withoutParent int64, withoutParentRate int64) {
 	<div class="stat-card">
-		<span class="stat-label">Students Missing Parent Info</span>
+		@AdminOnlyStatLabel("Students Missing Parent Info")
 		<div class="stat-link-rows">
 			@DashboardStatLinkRow(
 				"Without parent name",
@@ -257,7 +270,7 @@ templ DashboardStats(data DashboardData) {
 	<div class="dashboard-stats">
 		if auth.HasAdminAccess(data.Role) {
 			<div class="stat-card">
-				<span class="stat-label">Students</span>
+				@AdminOnlyStatLabel("Students")
 				<span class="stat-value">{ fmt.Sprintf("%d", data.ActiveStudents + data.InactiveStudents) }</span>
 				<span class="stat-sub">{ fmt.Sprintf("%d active, %d inactive", data.ActiveStudents, data.InactiveStudents) }</span>
 			</div>
@@ -277,22 +290,38 @@ templ DashboardStats(data DashboardData) {
 			</div>
 		}
 		<div class="stat-card">
-			<span class="stat-label">Classes This Week</span>
+			if auth.HasAdminAccess(data.Role) {
+				@AdminOnlyStatLabel("Classes This Week")
+			} else {
+				<span class="stat-label">Classes This Week</span>
+			}
 			<span class="stat-value">{ fmt.Sprintf("%d total", data.ClassesConductedWeek + data.ClassesCancelledWeek + data.ClassesRescheduledWeek) }</span>
 			<span class="stat-sub">{ fmt.Sprintf("%d conducted, %d cancelled, %d rescheduled", data.ClassesConductedWeek, data.ClassesCancelledWeek, data.ClassesRescheduledWeek) }</span>
 		</div>
-		@DashboardSectionedCurrencyStatCard("Cutoffs", []DashboardCurrencySection{
-			{Title: "First cutoff", Totals: data.FirstCutoffTotals},
-			{Title: "Second cutoff", Totals: data.SecondCutoffTotals},
-		})
-		if auth.HasAdminAccess(data.Role) {
-			@DashboardSectionedCurrencyStatCard("Month", []DashboardCurrencySection{
-				{Title: "Teacher rates", Totals: data.MonthlyTotals},
-				{Title: "Parent rates", Totals: data.ParentMonthlyTotals},
+		if data.Role == auth.RoleAdmin {
+			@DashboardSectionedCurrencyStatCard("My Cutoffs", false, []DashboardCurrencySection{
+				{Title: "First cutoff · Teacher rates", Totals: data.FirstCutoffTotals},
+				{Title: "First cutoff · Parent rates", Totals: data.FirstCutoffParentTotals, AdminOnly: true},
+				{Title: "Second cutoff · Teacher rates", Totals: data.SecondCutoffTotals},
+				{Title: "Second cutoff · Parent rates", Totals: data.SecondCutoffParentTotals, AdminOnly: true},
+			})
+			@DashboardSectionedCurrencyStatCard("All Teachers Cutoffs", true, []DashboardCurrencySection{
+				{Title: "First cutoff · Teacher rates", Totals: data.AllTeachersFirstCutoffTotals},
+				{Title: "First cutoff · Parent rates", Totals: data.AllTeachersFirstCutoffParentTotals},
+				{Title: "Second cutoff · Teacher rates", Totals: data.AllTeachersSecondCutoffTotals},
+				{Title: "Second cutoff · Parent rates", Totals: data.AllTeachersSecondCutoffParentTotals},
+			})
+		} else if auth.HasAdminAccess(data.Role) {
+			@DashboardSectionedCurrencyStatCard("Cutoffs", true, []DashboardCurrencySection{
+				{Title: "First cutoff · Teacher rates", Totals: data.FirstCutoffTotals},
+				{Title: "First cutoff · Parent rates", Totals: data.FirstCutoffParentTotals},
+				{Title: "Second cutoff · Teacher rates", Totals: data.SecondCutoffTotals},
+				{Title: "Second cutoff · Parent rates", Totals: data.SecondCutoffParentTotals},
 			})
 		} else {
-			@DashboardSectionedCurrencyStatCard("Month", []DashboardCurrencySection{
-				{Totals: data.MonthlyTotals},
+			@DashboardSectionedCurrencyStatCard("Cutoffs", false, []DashboardCurrencySection{
+				{Title: "First cutoff · Teacher rates", Totals: data.FirstCutoffTotals},
+				{Title: "Second cutoff · Teacher rates", Totals: data.SecondCutoffTotals},
 			})
 		}
 	</div>

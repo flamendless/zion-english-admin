@@ -5,8 +5,9 @@ import "strings"
 type TeacherTableColumnID string
 
 const (
-	TeacherTableColumnDocsStatus  TeacherTableColumnID = "docsStatus"
-	TeacherTableColumnConnections TeacherTableColumnID = "connectedTo"
+	TeacherTableColumnDocsStatus    TeacherTableColumnID = "docsStatus"
+	TeacherTableColumnResumeStatus  TeacherTableColumnID = "resumeStatus"
+	TeacherTableColumnConnections   TeacherTableColumnID = "connectedTo"
 )
 
 const (
@@ -26,6 +27,12 @@ var TeacherTableOptionalColumns = []TeacherTableColumnDef{
 		ID:             TeacherTableColumnDocsStatus,
 		Label:          "Doc status",
 		HeaderLabel:    "Docs Status",
+		DefaultVisible: false,
+	},
+	{
+		ID:             TeacherTableColumnResumeStatus,
+		Label:          "Resume",
+		HeaderLabel:    "Resume",
 		DefaultVisible: false,
 	},
 	{

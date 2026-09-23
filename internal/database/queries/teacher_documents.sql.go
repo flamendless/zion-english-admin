@@ -237,16 +237,58 @@ func (q *Queries) GetAllTeacherDocumentsFiltered(ctx context.Context, arg GetAll
 	return items, nil
 }
 
+const getLatestTeacherDocumentByTeacherIDAndType = `-- name: GetLatestTeacherDocumentByTeacherIDAndType :one
+SELECT
+	id,
+	original_filename,
+	uploaded_at,
+	status
+FROM tbl_teacher_documents
+WHERE teacher_id = ?
+	AND type = ?
+ORDER BY uploaded_at DESC
+LIMIT 1
+`
+
+type GetLatestTeacherDocumentByTeacherIDAndTypeParams struct {
+	TeacherID int64
+	Type      string
+}
+
+type GetLatestTeacherDocumentByTeacherIDAndTypeRow struct {
+	ID               int64
+	OriginalFilename string
+	UploadedAt       sql.NullTime
+	Status           string
+}
+
+func (q *Queries) GetLatestTeacherDocumentByTeacherIDAndType(ctx context.Context, arg GetLatestTeacherDocumentByTeacherIDAndTypeParams) (GetLatestTeacherDocumentByTeacherIDAndTypeRow, error) {
+	row := q.db.QueryRowContext(ctx, getLatestTeacherDocumentByTeacherIDAndType, arg.TeacherID, arg.Type)
+	var i GetLatestTeacherDocumentByTeacherIDAndTypeRow
+	err := row.Scan(
+		&i.ID,
+		&i.OriginalFilename,
+		&i.UploadedAt,
+		&i.Status,
+	)
+	return i, err
+}
+
 const getLatestTeacherDocumentStatusesByTeacherIDs = `-- name: GetLatestTeacherDocumentStatusesByTeacherIDs :many
 SELECT
 	teacher_id,
 	status,
 	uploaded_at
 FROM tbl_teacher_documents
-WHERE type = 'document'
+WHERE type = ?
 	AND teacher_id IN (/*SLICE:teacher_ids*/?)
 ORDER BY uploaded_at DESC
 `
+
+type GetLatestTeacherDocumentStatusesByTeacherIDsParams struct {
+	Type       string
+	TeacherIds []int64
+}
 
 type GetLatestTeacherDocumentStatusesByTeacherIDsRow struct {
 	TeacherID  int64
@@ -254,14 +296,15 @@ type GetLatestTeacherDocumentStatusesByTeacherIDsRow struct {
 	UploadedAt sql.NullTime
 }
 
-func (q *Queries) GetLatestTeacherDocumentStatusesByTeacherIDs(ctx context.Context, teacherIds []int64) ([]GetLatestTeacherDocumentStatusesByTeacherIDsRow, error) {
+func (q *Queries) GetLatestTeacherDocumentStatusesByTeacherIDs(ctx context.Context, arg GetLatestTeacherDocumentStatusesByTeacherIDsParams) ([]GetLatestTeacherDocumentStatusesByTeacherIDsRow, error) {
 	query := getLatestTeacherDocumentStatusesByTeacherIDs
 	var queryParams []interface{}
-	if len(teacherIds) > 0 {
-		for _, v := range teacherIds {
+	queryParams = append(queryParams, arg.Type)
+	if len(arg.TeacherIds) > 0 {
+		for _, v := range arg.TeacherIds {
 			queryParams = append(queryParams, v)
 		}
-		query = strings.Replace(query, "/*SLICE:teacher_ids*/?", strings.Repeat(",?", len(teacherIds))[1:], 1)
+		query = strings.Replace(query, "/*SLICE:teacher_ids*/?", strings.Repeat(",?", len(arg.TeacherIds))[1:], 1)
 	} else {
 		query = strings.Replace(query, "/*SLICE:teacher_ids*/?", "NULL", 1)
 	}
@@ -285,6 +328,27 @@ func (q *Queries) GetLatestTeacherDocumentStatusesByTeacherIDs(ctx context.Conte
 		return nil, err
 	}
 	return items, nil
+}
+
+const getLatestTeacherDocumentUploadedAtByTeacherIDAndType = `-- name: GetLatestTeacherDocumentUploadedAtByTeacherIDAndType :one
+SELECT uploaded_at
+FROM tbl_teacher_documents
+WHERE teacher_id = ?
+	AND type = ?
+ORDER BY uploaded_at DESC
+LIMIT 1
+`
+
+type GetLatestTeacherDocumentUploadedAtByTeacherIDAndTypeParams struct {
+	TeacherID int64
+	Type      string
+}
+
+func (q *Queries) GetLatestTeacherDocumentUploadedAtByTeacherIDAndType(ctx context.Context, arg GetLatestTeacherDocumentUploadedAtByTeacherIDAndTypeParams) (sql.NullTime, error) {
+	row := q.db.QueryRowContext(ctx, getLatestTeacherDocumentUploadedAtByTeacherIDAndType, arg.TeacherID, arg.Type)
+	var uploaded_at sql.NullTime
+	err := row.Scan(&uploaded_at)
+	return uploaded_at, err
 }
 
 const getTeacherDocumentByID = `-- name: GetTeacherDocumentByID :one
@@ -454,12 +518,17 @@ const hasBlockingTeacherDocument = `-- name: HasBlockingTeacherDocument :one
 SELECT COUNT(*) AS count
 FROM tbl_teacher_documents
 WHERE teacher_id = ?
-	AND type = 'document'
+	AND type = ?
 	AND status IN ('submitted', 'approved')
 `
 
-func (q *Queries) HasBlockingTeacherDocument(ctx context.Context, teacherID int64) (int64, error) {
-	row := q.db.QueryRowContext(ctx, hasBlockingTeacherDocument, teacherID)
+type HasBlockingTeacherDocumentParams struct {
+	TeacherID int64
+	Type      string
+}
+
+func (q *Queries) HasBlockingTeacherDocument(ctx context.Context, arg HasBlockingTeacherDocumentParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, hasBlockingTeacherDocument, arg.TeacherID, arg.Type)
 	var count int64
 	err := row.Scan(&count)
 	return count, err

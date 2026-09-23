@@ -117,6 +117,9 @@ func formatTeacherAudit(before, after queries.GetTeacherFullByIDRow) string {
 	if before.Template.String != after.Template.String {
 		parts = append(parts, fmt.Sprintf("template '%s' -> '%s'", auditStr(before.Template), auditStr(after.Template)))
 	}
+	if before.Status != after.Status {
+		parts = append(parts, fmt.Sprintf("status '%s' -> '%s'", before.Status, after.Status))
+	}
 	teacherName := utils.ComposePersonName(after.FirstName, after.MiddleName, after.LastName)
 	if len(parts) == 0 {
 		return fmt.Sprintf("updated teacher '%s' (id %d) (no field changes)", teacherName, after.ID)

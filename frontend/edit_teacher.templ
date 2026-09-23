@@ -19,10 +19,12 @@ type EditTeacherData struct {
 	Currency       string
 	DriveUrl       string
 	Sex            string
-	Template       string
-	CanManageRoles bool
-	Roles          []constants.TeacherRole
-	RoleOptions    []constants.TeacherRole
+	Template        string
+	Status          constants.TeacherStatus
+	CanManageRoles  bool
+	CanManageStatus bool
+	Roles           []constants.TeacherRole
+	RoleOptions     []constants.TeacherRole
 }
 
 templ EditTeacher(data EditTeacherData) {
@@ -137,6 +139,9 @@ templ EditTeacher(data EditTeacherData) {
 						</div>
 					</div>
 				</div>
+				if data.CanManageStatus {
+					@TeacherStatusDropdownWithValue(data.Status)
+				}
 				if data.CanManageRoles {
 					@TeacherRoleEditor(data.Roles, data.RoleOptions)
 				} else if len(data.Roles) > 0 {

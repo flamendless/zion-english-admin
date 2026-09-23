@@ -66,3 +66,31 @@ templ ReportsTableBody(rows []ReportRowData, startDate string, endDate string, e
 		}
 	}
 }
+
+templ ReportsSummaryCards(data ReportsSummaryData) {
+	if !data.HasDateRange {
+		<div class="stat-card">
+			<span class="stat-label">Total Earnings</span>
+			<span class="stat-sub">Select a date range</span>
+		</div>
+	} else if len(data.Earnings) == 0 {
+		<div class="stat-card">
+			<span class="stat-label">Total Earnings</span>
+			if data.CutoffLabel != "" {
+				<span class="stat-sub">{ data.CutoffLabel }</span>
+			}
+			<span class="stat-currency-row">-</span>
+		</div>
+	} else {
+		@DashboardSectionedCurrencyStatCard("Total Earnings", true, []DashboardCurrencySection{
+			{Title: data.CutoffLabel, Totals: data.Earnings},
+		})
+	}
+}
+
+templ ReportsPartial(rows []ReportRowData, startDate string, endDate string, emptyMessage string, summary ReportsSummaryData) {
+	@ReportsTableBody(rows, startDate, endDate, emptyMessage)
+	<div id="reportsSummaryCards" class="dashboard-stats reports-summary" hx-swap-oob="outerHTML">
+		@ReportsSummaryCards(summary)
+	</div>
+}

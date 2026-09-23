@@ -116,7 +116,7 @@ WHERE id = ?;
 SELECT COUNT(*) AS count
 FROM tbl_teacher_documents
 WHERE teacher_id = ?
-	AND type = 'document'
+	AND type = ?
 	AND status IN ('submitted', 'approved');
 
 -- name: UpdateTeacherDocumentStatus :exec
@@ -136,12 +136,32 @@ WHERE t.deleted = 0
 -- name: DeleteTeacherDocument :exec
 DELETE FROM tbl_teacher_documents WHERE id = ?;
 
+-- name: GetLatestTeacherDocumentUploadedAtByTeacherIDAndType :one
+SELECT uploaded_at
+FROM tbl_teacher_documents
+WHERE teacher_id = ?
+	AND type = ?
+ORDER BY uploaded_at DESC
+LIMIT 1;
+
+-- name: GetLatestTeacherDocumentByTeacherIDAndType :one
+SELECT
+	id,
+	original_filename,
+	uploaded_at,
+	status
+FROM tbl_teacher_documents
+WHERE teacher_id = ?
+	AND type = ?
+ORDER BY uploaded_at DESC
+LIMIT 1;
+
 -- name: GetLatestTeacherDocumentStatusesByTeacherIDs :many
 SELECT
 	teacher_id,
 	status,
 	uploaded_at
 FROM tbl_teacher_documents
-WHERE type = 'document'
+WHERE type = ?
 	AND teacher_id IN (sqlc.slice('teacher_ids'))
 ORDER BY uploaded_at DESC;

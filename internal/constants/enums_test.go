@@ -36,6 +36,31 @@ func TestValidStudentFilterStatus(t *testing.T) {
 	}
 }
 
+func TestValidTeacherStatus(t *testing.T) {
+	for _, status := range []string{"pending", "approved", "resigned"} {
+		if !ValidTeacherStatus(status) {
+			t.Fatalf("ValidTeacherStatus(%q) = false, want true", status)
+		}
+	}
+	if ValidTeacherStatus("deleted") {
+		t.Fatal("expected deleted to be invalid for form status")
+	}
+}
+
+func TestValidTeacherFilterStatus(t *testing.T) {
+	if !ValidTeacherFilterStatus("") {
+		t.Fatal("expected empty filter to be valid")
+	}
+	for _, status := range []string{"pending", "approved", "resigned", "deleted"} {
+		if !ValidTeacherFilterStatus(status) {
+			t.Fatalf("ValidTeacherFilterStatus(%q) = false, want true", status)
+		}
+	}
+	if ValidTeacherFilterStatus("active") {
+		t.Fatal("expected active to be invalid for filter status")
+	}
+}
+
 func TestValidClassStatus(t *testing.T) {
 	for _, s := range ClassStatuses {
 		if !ValidClassStatus(string(s)) {

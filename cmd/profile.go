@@ -173,10 +173,30 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 
 	canChangeMobile, mobileDays := utils.SensitiveChangeAllowed(row.MobileChangedAt, now)
 	canChangePassword, passwordDays := utils.SensitiveChangeAllowed(row.PasswordChangedAt, now)
-	blockingDocs, err := dbRO.GetQueries().HasBlockingTeacherDocument(ctx, user.ID)
+	blockingDocs, err := dbRO.GetQueries().HasBlockingTeacherDocument(ctx, queries.HasBlockingTeacherDocumentParams{
+		TeacherID: user.ID,
+		Type:      string(constants.TeacherDocumentTypeDocument),
+	})
 	if err != nil {
 		logs.Log().Error("check blocking teacher document", zap.Error(err))
 		blockingDocs = 0
+	}
+	canUploadResume := true
+	resumeUploadDays := 0
+	hasResume := false
+	resumeFilename := ""
+	resumeViewURL := ""
+	resumeDoc, resumeErr := dbRO.GetQueries().GetLatestTeacherDocumentByTeacherIDAndType(ctx, queries.GetLatestTeacherDocumentByTeacherIDAndTypeParams{
+		TeacherID: user.ID,
+		Type:      string(constants.TeacherDocumentTypeResume),
+	})
+	if resumeErr == nil {
+		canUploadResume, resumeUploadDays = utils.ResumeUploadAllowed(resumeDoc.UploadedAt, now)
+		hasResume = true
+		resumeFilename = resumeDoc.OriginalFilename
+		resumeViewURL = utils.URL(fmt.Sprintf("/documents/%d/file", resumeDoc.ID))
+	} else if !errors.Is(resumeErr, sql.ErrNoRows) {
+		logs.Log().Error("get latest teacher resume", zap.Error(resumeErr))
 	}
 	blockingIntroVideo, err := dbRO.GetQueries().HasBlockingTeacherIntroVideo(ctx, user.ID)
 	if err != nil {
@@ -234,6 +254,11 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 		CanEditMiddleName:     utils.ProfileNameEditable(row.MiddleName),
 		CanEditLastName:       utils.ProfileNameEditable(row.LastName),
 		CanUploadDocument:     blockingDocs == 0,
+		CanUploadResume:           canUploadResume,
+		ResumeUploadDaysRemaining: resumeUploadDays,
+		HasResume:                 hasResume,
+		ResumeFilename:            resumeFilename,
+		ResumeViewURL:             resumeViewURL,
 	}
 	if introVideo, err := dbRO.GetQueries().GetLatestTeacherIntroVideoByTeacherID(ctx, user.ID); err == nil {
 		data.HasIntroVideo = true

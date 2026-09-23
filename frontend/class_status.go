@@ -51,6 +51,17 @@ var StudentFilterStatusOptions = func() []StatusOption {
 	return opts
 }()
 
+var TeacherStatusOptions = func() []StatusOption {
+	opts := make([]StatusOption, 0, len(constants.TeacherStatuses))
+	for _, status := range constants.TeacherStatuses {
+		opts = append(opts, StatusOption{
+			Value: string(status),
+			Label: status.Label(),
+		})
+	}
+	return opts
+}()
+
 var TeacherFilterStatusOptions = func() []StatusOption {
 	opts := make([]StatusOption, 0, len(constants.TeacherFilterStatuses))
 	for _, status := range constants.TeacherFilterStatuses {
@@ -106,6 +117,28 @@ var TeacherDocsFilterStatusOptions = func() []StatusOption {
 	opts = append(opts, TeacherDocumentStatusOptions...)
 	return opts
 }()
+
+var TeacherResumeFilterStatusOptions = func() []StatusOption {
+	return []StatusOption{
+		{
+			Value: TeacherDocsFilterStatusNone,
+			Label: "None",
+		},
+		{
+			Value: string(constants.TeacherDocumentStatusApproved),
+			Label: "Uploaded",
+		},
+	}
+}()
+
+func ResumeStatusDisplayLabel(status constants.TeacherDocumentStatus) string {
+	switch status {
+	case constants.TeacherDocumentStatusApproved, constants.TeacherDocumentStatusSubmitted:
+		return "Uploaded"
+	default:
+		return ""
+	}
+}
 
 const (
 	TeacherConnectionsFilterZoom           = "zoom"

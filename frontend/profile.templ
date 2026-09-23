@@ -34,6 +34,11 @@ type ProfileData struct {
 	CanEditMiddleName    bool
 	CanEditLastName      bool
 	CanUploadDocument    bool
+	CanUploadResume              bool
+	ResumeUploadDaysRemaining    int
+	HasResume                    bool
+	ResumeViewURL                string
+	ResumeFilename               string
 	CanUploadIntroVideo  bool
 	IntroVideoUploadVisible bool
 	IntroVideoUploadsAllowed bool
@@ -113,15 +118,115 @@ templ Profile(data ProfileData) {
 				word-break: break-all;
 			}
 
-			.profile-upload-form {
-				margin-top: var(--space-4);
+			.profile-sidebar-uploads {
+				margin-top: var(--space-5);
+				padding-top: var(--space-5);
+				border-top: 1px solid var(--color-border-subtle);
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-5);
 				width: 100%;
 			}
 
-			.profile-upload-form input[type="file"] {
-				width: 100%;
+			.profile-upload-block {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-3);
+			}
+
+			.profile-upload-block + .profile-upload-block {
+				padding-top: var(--space-5);
+				border-top: 1px solid var(--color-border-subtle);
+			}
+
+			.profile-upload-block__header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: var(--space-2);
+				flex-wrap: wrap;
+			}
+
+			.profile-upload-block__actions {
+				display: flex;
+				align-items: center;
+				gap: var(--space-2);
+				flex-shrink: 0;
+			}
+
+			.profile-upload-block__actions .icon-action-btn {
+				margin-top: 0;
+			}
+
+			.profile-upload-current {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-1);
+			}
+
+			.profile-upload-current-label {
+				font-size: 0.75rem;
+				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.04em;
+				color: var(--color-muted-foreground);
+			}
+
+			.profile-upload-current-row {
+				display: flex;
+				align-items: center;
+				gap: var(--space-2);
+				min-width: 0;
+			}
+
+			.profile-upload-current-name {
+				flex: 1;
+				min-width: 0;
 				font-size: 0.8125rem;
-				padding: var(--space-2);
+				color: var(--color-foreground);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.profile-upload-block__title {
+				margin: 0;
+				font-size: 0.8125rem;
+				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.04em;
+				color: var(--color-muted-foreground);
+			}
+
+			.profile-upload-limit-pill {
+				font-size: 0.6875rem;
+				font-weight: 600;
+				padding: 2px 8px;
+				border-radius: var(--radius-full);
+				background: var(--color-info-bg);
+				color: var(--color-info);
+				border: var(--pill-border);
+				white-space: nowrap;
+			}
+
+			.profile-upload-form {
+				width: 100%;
+			}
+
+			.profile-upload-form .profile-form-actions {
+				margin-top: var(--space-3);
+			}
+
+			.profile-upload-form .profile-form-actions button {
+				margin-top: 0;
+				width: 100%;
+			}
+
+			.profile-upload-form .profile-form-actions button:disabled {
+				background: var(--color-surface);
+				border: 1px solid var(--color-border);
+				color: var(--color-muted-foreground);
+				opacity: 1;
 			}
 
 			.profile-upload-hint {
@@ -327,8 +432,10 @@ templ Profile(data ProfileData) {
 						<p class="profile-email">{ data.Email }</p>
 					</div>
 
-					// Profile picture upload
-					@ProfilePictureUpload(data)
+					<div class="profile-sidebar-uploads">
+						@ProfilePictureUpload(data)
+						@ProfileResumeUpload(data)
+					</div>
 				</div>
 
 				<div>
@@ -549,6 +656,18 @@ templ Profile(data ProfileData) {
 		@ErrorBannerHandlers()
 	</body>
 	</html>
+}
+
+templ UploadCooldownNotice(daysRemaining int) {
+	<div class="cooldown-notice" role="status">
+		<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<circle cx="12" cy="12" r="10"></circle>
+			<polyline points="12 6 12 12 16 14"></polyline>
+		</svg>
+		<span>
+			You can upload a new resume/CV again in { fmt.Sprintf("%d", daysRemaining) } day(s).
+		</span>
+	</div>
 }
 
 templ CooldownNotice(daysRemaining int, fieldLabel string) {

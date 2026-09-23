@@ -8,6 +8,7 @@ import (
 )
 
 const SensitiveChangeCooldown = 7 * 24 * time.Hour
+const ResumeUploadCooldown = 24 * time.Hour
 
 func PersonInitials(first, middle, last, fullName string) string {
 	first = strings.TrimSpace(first)
@@ -52,16 +53,24 @@ func initialsFromRunes(first, last []rune) string {
 }
 
 func SensitiveChangeAllowed(lastChanged sql.NullTime, now time.Time) (allowed bool, daysRemaining int) {
+	return changeAllowedAfter(lastChanged, now, SensitiveChangeCooldown)
+}
+
+func ResumeUploadAllowed(lastUploaded sql.NullTime, now time.Time) (allowed bool, daysRemaining int) {
+	return changeAllowedAfter(lastUploaded, now, ResumeUploadCooldown)
+}
+
+func changeAllowedAfter(lastChanged sql.NullTime, now time.Time, cooldown time.Duration) (allowed bool, daysRemaining int) {
 	if !lastChanged.Valid {
 		return true, 0
 	}
 
 	elapsed := now.Sub(lastChanged.Time)
-	if elapsed >= SensitiveChangeCooldown {
+	if elapsed >= cooldown {
 		return true, 0
 	}
 
-	remaining := SensitiveChangeCooldown - elapsed
+	remaining := cooldown - elapsed
 	daysRemaining = max(int(math.Ceil(remaining.Hours()/24)), 1)
 	return false, daysRemaining
 }

@@ -146,6 +146,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/profile/avatar", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleProfileAvatar))
 		authMux.HandleFunc(basePath+"/profile/picture", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleProfilePicture))
 		authMux.HandleFunc(basePath+"/profile/document", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleProfileDocument))
+		authMux.HandleFunc(basePath+"/profile/resume", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleProfileResume))
 		authMux.HandleFunc(basePath+"/profile/intro-video", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleProfileIntroVideo))
 		authMux.HandleFunc(basePath+"/profile/zoom/connect", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleZoomConnect))
 		authMux.HandleFunc(basePath+"/profile/zoom/disconnect", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleZoomDisconnect))

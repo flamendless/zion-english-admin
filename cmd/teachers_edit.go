@@ -21,7 +21,7 @@ import (
 	"zion-english/internal/utils"
 )
 
-func teacherFilterParams(q, status, docsStatus string, connectionZoom, connectionGoogle bool) queries.CountTeachersFilteredParams {
+func teacherFilterParams(q, status, docsStatus, resumeStatus string, connectionZoom, connectionGoogle bool) queries.CountTeachersFilteredParams {
 	qNull := sql.NullString{String: q, Valid: q != ""}
 	zoomFlag := int64(0)
 	if connectionZoom {
@@ -45,10 +45,15 @@ func teacherFilterParams(q, status, docsStatus string, connectionZoom, connectio
 		Column11: docsStatus,
 		Column12: docsStatus,
 		Status_2: docsStatus,
-		Column14: zoomFlag,
-		Column15: googleFlag,
-		Column16: zoomFlag,
-		Column17: googleFlag,
+		Column14: resumeStatus,
+		Column15: resumeStatus,
+		Column16: resumeStatus,
+		Column17: resumeStatus,
+		Status_3: resumeStatus,
+		Column19: zoomFlag,
+		Column20: googleFlag,
+		Column21: zoomFlag,
+		Column22: googleFlag,
 	}
 }
 
@@ -211,12 +216,13 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("q")
 	status := r.URL.Query().Get("status")
 	docsStatus := parseTeacherDocsStatusFilter(r.URL.Query().Get("docsStatus"))
+	resumeStatus := parseTeacherDocsStatusFilter(r.URL.Query().Get("resumeStatus"))
 	connectionZoom := parseConnectionCheckboxFilter(r, "connectionZoom")
 	connectionGoogle := parseConnectionCheckboxFilter(r, "connectionGoogle")
 	sort := parseListSort(r, frontend.ListSortKindTeacher)
 	page := utils.ParsePageQuery(r)
 
-	filter := teacherFilterParams(q, status, docsStatus, connectionZoom, connectionGoogle)
+	filter := teacherFilterParams(q, status, docsStatus, resumeStatus, connectionZoom, connectionGoogle)
 	total, err := dbRO.GetQueries().CountTeachersFiltered(ctx, filter)
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to count teachers: %v", err), http.StatusInternalServerError)
@@ -238,6 +244,11 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 		Column11: filter.Column11,
 		Column12: filter.Column12,
 		Status_2: filter.Status_2,
+		Status_3: filter.Status_3,
+		Column19: filter.Column19,
+		Column20: filter.Column20,
+		Column21: filter.Column21,
+		Column22: filter.Column22,
 		Column14: filter.Column14,
 		Column15: filter.Column15,
 		Column16: filter.Column16,
@@ -262,11 +273,15 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	docsStatusByTeacher := make(map[int64]string)
+	resumeStatusByTeacher := make(map[int64]string)
 	rolesByTeacher := make(map[int64][]constants.TeacherRole)
 	zoomConnectedByTeacher := make(map[int64]bool)
 	googleConnectedByTeacher := make(map[int64]bool)
 	if len(teacherIDs) > 0 {
-		docRows, err := dbRO.GetQueries().GetLatestTeacherDocumentStatusesByTeacherIDs(ctx, teacherIDs)
+		docRows, err := dbRO.GetQueries().GetLatestTeacherDocumentStatusesByTeacherIDs(ctx, queries.GetLatestTeacherDocumentStatusesByTeacherIDsParams{
+			Type:       string(constants.TeacherDocumentTypeDocument),
+			TeacherIds: teacherIDs,
+		})
 		if err != nil {
 			HttpError(w, fmt.Sprintf("Failed to fetch teacher document status: %v", err), http.StatusInternalServerError)
 			return
@@ -274,6 +289,20 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 		for _, row := range docRows {
 			if _, ok := docsStatusByTeacher[row.TeacherID]; !ok {
 				docsStatusByTeacher[row.TeacherID] = row.Status
+			}
+		}
+
+		resumeRows, err := dbRO.GetQueries().GetLatestTeacherDocumentStatusesByTeacherIDs(ctx, queries.GetLatestTeacherDocumentStatusesByTeacherIDsParams{
+			Type:       string(constants.TeacherDocumentTypeResume),
+			TeacherIds: teacherIDs,
+		})
+		if err != nil {
+			HttpError(w, fmt.Sprintf("Failed to fetch teacher resume status: %v", err), http.StatusInternalServerError)
+			return
+		}
+		for _, row := range resumeRows {
+			if _, ok := resumeStatusByTeacher[row.TeacherID]; !ok {
+				resumeStatusByTeacher[row.TeacherID] = row.Status
 			}
 		}
 
@@ -320,6 +349,7 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 			Sex:            t.Sex.String,
 			Status:         constants.TeacherStatus(t.Status),
 			DocsStatus:              constants.TeacherDocumentStatus(docsStatusByTeacher[t.ID]),
+			ResumeStatus:            constants.TeacherDocumentStatus(resumeStatusByTeacher[t.ID]),
 			Roles:                     rolesByTeacher[t.ID],
 			ZoomConnected:             zoomConnectedByTeacher[t.ID],
 			GoogleCalendarConnected:   googleConnectedByTeacher[t.ID],
@@ -338,6 +368,7 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 		Query:            q,
 		Status:           constants.TeacherFilterStatus(status),
 		DocsStatusFilter:       docsStatus,
+		ResumeStatusFilter:     resumeStatus,
 		ConnectionZoomFilter:   connectionZoom,
 		ConnectionGoogleFilter: connectionGoogle,
 		SortBy:         sort.By,
@@ -374,6 +405,7 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 	}
 	targetHasAdmin := teacherHasAdminRole(existingRoles)
 	canManageRoles := teachers.CanManageTeacherRoles(string(actorRole), targetHasAdmin)
+	canManageStatus := auth.HasAdminAccess(actorRole)
 
 	if r.Method == http.MethodGet {
 		template := ""
@@ -398,9 +430,11 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 			DriveUrl:       existing.DriveUrl,
 			Sex:            existing.Sex.String,
 			Template:       template,
-			CanManageRoles: canManageRoles,
-			Roles:          existingRoles,
-			RoleOptions:    availableRoleOptions(existingRoles),
+			CanManageRoles:  canManageRoles,
+			CanManageStatus: canManageStatus,
+			Status:          constants.TeacherStatus(existing.Status),
+			Roles:           existingRoles,
+			RoleOptions:     availableRoleOptions(existingRoles),
 		}).Render(ctx, w)
 		return
 	}
@@ -450,6 +484,16 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		return
 	}
 
+	submittedStatus := existing.Status
+	if canManageStatus {
+		status := strings.TrimSpace(r.FormValue("status"))
+		if !constants.ValidTeacherStatus(status) {
+			sendErrorLog(w, "invalid teacher status")
+			return
+		}
+		submittedStatus = status
+	}
+
 	var submittedRoles []constants.TeacherRole
 	if canManageRoles {
 		submittedRoles, err = teachers.ParseTeacherRoles(r.Form["roles"])
@@ -493,6 +537,16 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 	if err != nil {
 		sendErrorLog(w, err.Error())
 		return
+	}
+
+	if canManageStatus && submittedStatus != existing.Status {
+		if err := qtx.UpdateTeacherStatus(ctx, queries.UpdateTeacherStatusParams{
+			Status: submittedStatus,
+			ID:     teacherID,
+		}); err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
 	}
 
 	if canManageRoles {

@@ -1631,6 +1631,10 @@ templ GlobalIncludes() {
 			background-color: var(--color-warning-bg) !important;
 		}
 
+		.teacher-resigned {
+			background-color: var(--color-muted) !important;
+		}
+
 		.teacher-deleted {
 			background-color: var(--color-error-bg) !important;
 		}
@@ -3486,8 +3490,11 @@ templ GlobalIncludes() {
 			position: absolute;
 			top: calc(100% + 4px);
 			left: 0;
-			right: 0;
+			right: auto;
 			z-index: 30;
+			min-width: 100%;
+			width: max-content;
+			max-width: min(100vw - 2rem, 20rem);
 			padding: var(--space-3);
 			background: var(--color-surface);
 			border: 1px solid var(--color-border);
@@ -3496,11 +3503,19 @@ templ GlobalIncludes() {
 			display: flex;
 			flex-direction: column;
 			gap: var(--space-2);
+			box-sizing: border-box;
 		}
 
 		.toolbar-filter-dropdown-panel .checkbox-label {
+			display: flex;
+			align-items: center;
+			gap: var(--space-2);
 			font-size: 0.875rem;
 			white-space: nowrap;
+		}
+
+		.list-toolbar-extra-filters .toolbar-filter-dropdown {
+			min-width: 11.5rem;
 		}
 
 		.list-toolbar .list-toolbar-action label {
@@ -3954,6 +3969,10 @@ templ GlobalIncludes() {
 			.table-stack-mobile tbody tr.teacher-pending,
 			.table-stack-mobile tbody tr.student-inactive {
 				background: var(--color-warning-bg);
+			}
+
+			.table-stack-mobile tbody tr.teacher-resigned {
+				background: var(--color-muted);
 			}
 
 			.table-stack-mobile tbody tr.teacher-deleted,

@@ -10,6 +10,7 @@ type TeacherData struct {
 	Query               string
 	Status              constants.TeacherFilterStatus
 	DocsStatusFilter      string
+	ResumeStatusFilter    string
 	ConnectionZoomFilter  bool
 	ConnectionGoogleFilter bool
 	SortBy           string
@@ -41,6 +42,7 @@ type TeacherItem struct {
 	Sex                     string
 	Status                  constants.TeacherStatus
 	DocsStatus              constants.TeacherDocumentStatus
+	ResumeStatus            constants.TeacherDocumentStatus
 	Roles                   []constants.TeacherRole
 	ZoomConnected           bool
 	GoogleCalendarConnected bool
@@ -79,6 +81,9 @@ func getTeacherRowClass(status constants.TeacherStatus, deleted bool) string {
 	if status == constants.TeacherStatusApproved {
 		return "teacher-approved"
 	}
+	if status == constants.TeacherStatusResigned {
+		return "teacher-resigned"
+	}
 	return ""
 }
 
@@ -86,7 +91,7 @@ func getTeacherDisplayStatus(status constants.TeacherStatus, deleted bool) strin
 	if deleted {
 		return constants.TeacherDisplayStatusDeleted
 	}
-	return string(status)
+	return status.Label()
 }
 
 templ CopyableTextCell(value string) {
@@ -177,7 +182,7 @@ templ Teachers(data TeacherData) {
 			@HeaderSimple()
 			@HubHeader("Teachers", "New Teacher", utils.URL("/teachers/register"), true)
 
-			@ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindTeacher, "", "", "", "", "", "", false, false, false, false, true, data.DocsStatusFilter, true, data.ConnectionZoomFilter, data.ConnectionGoogleFilter, true, data.SortBy, data.SortOrder, ListSortKindTeacher, true, "")
+			@ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindTeacher, "", "", "", "", "", "", false, false, false, false, true, data.DocsStatusFilter, true, data.ResumeStatusFilter, true, data.ConnectionZoomFilter, data.ConnectionGoogleFilter, true, data.SortBy, data.SortOrder, ListSortKindTeacher, true, "")
 
 			if len(data.Teachers) > 0 {
 				<div class="table-wrapper">

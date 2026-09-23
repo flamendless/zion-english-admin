@@ -11,6 +11,7 @@ func TestBuildSummaryComplete(t *testing.T) {
 		TeacherStatus:          constants.TeacherStatusApproved,
 		HasProfilePhoto:        true,
 		DocsStatus:             string(constants.TeacherDocumentStatusApproved),
+		ResumeStatus:           string(constants.TeacherDocumentStatusApproved),
 		IntroVideoRequired:     true,
 		IntroVideoStatus:       string(constants.TeacherIntroVideoStatusApproved),
 		TrainingRequiredCompleted: 2,
@@ -21,8 +22,8 @@ func TestBuildSummaryComplete(t *testing.T) {
 	})
 
 	completed, total := Summary(items)
-	if completed != 6 || total != 6 {
-		t.Fatalf("Summary() = %d/%d, want 6/6", completed, total)
+	if completed != 7 || total != 7 {
+		t.Fatalf("Summary() = %d/%d, want 7/7", completed, total)
 	}
 	if !IsComplete(items) {
 		t.Fatal("expected checklist to be complete")

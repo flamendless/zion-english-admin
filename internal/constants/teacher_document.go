@@ -5,11 +5,12 @@ type TeacherDocumentType string
 const (
 	TeacherDocumentTypeAvatar   TeacherDocumentType = "avatar"
 	TeacherDocumentTypeDocument TeacherDocumentType = "document"
+	TeacherDocumentTypeResume   TeacherDocumentType = "resume"
 )
 
 func ValidTeacherDocumentType(value string) bool {
 	switch TeacherDocumentType(value) {
-	case TeacherDocumentTypeAvatar, TeacherDocumentTypeDocument:
+	case TeacherDocumentTypeAvatar, TeacherDocumentTypeDocument, TeacherDocumentTypeResume:
 		return true
 	default:
 		return false

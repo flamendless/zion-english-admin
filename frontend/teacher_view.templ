@@ -68,7 +68,7 @@ templ TeacherViewModal(data TeacherViewData) {
 								@ProfileDetailField("First name", data.FirstName)
 								@ProfileDetailField("Middle name", displayOrDash(data.MiddleName))
 								@ProfileDetailField("Last name", data.LastName)
-								@ProfileDetailField("Status", string(data.Status))
+								@ProfileDetailField("Status", data.Status.Label())
 								@ProfileDetailField("Birthdate", data.Birthdate)
 								@ProfileDetailField("Date joined", data.JoiningDate)
 								@ProfileDetailField("Address", data.Address)

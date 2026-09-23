@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"zion-english/internal/constants"
+	"zion-english/internal/database/queries"
 	"zion-english/internal/featureflags"
 	"zion-english/internal/onboarding"
 )
@@ -17,13 +18,31 @@ func loadTeacherOnboardingChecklist(ctx context.Context, teacherID int64) ([]onb
 	}
 
 	docsStatus := ""
-	docRows, err := dbRO.GetQueries().GetLatestTeacherDocumentStatusesByTeacherIDs(ctx, []int64{teacherID})
+	docRows, err := dbRO.GetQueries().GetLatestTeacherDocumentStatusesByTeacherIDs(ctx, queries.GetLatestTeacherDocumentStatusesByTeacherIDsParams{
+		Type:       string(constants.TeacherDocumentTypeDocument),
+		TeacherIds: []int64{teacherID},
+	})
 	if err != nil {
 		return nil, err
 	}
 	for _, docRow := range docRows {
 		if docRow.TeacherID == teacherID {
 			docsStatus = docRow.Status
+			break
+		}
+	}
+
+	resumeStatus := ""
+	resumeRows, err := dbRO.GetQueries().GetLatestTeacherDocumentStatusesByTeacherIDs(ctx, queries.GetLatestTeacherDocumentStatusesByTeacherIDsParams{
+		Type:       string(constants.TeacherDocumentTypeResume),
+		TeacherIds: []int64{teacherID},
+	})
+	if err != nil {
+		return nil, err
+	}
+	for _, resumeRow := range resumeRows {
+		if resumeRow.TeacherID == teacherID {
+			resumeStatus = resumeRow.Status
 			break
 		}
 	}
@@ -62,6 +81,7 @@ func loadTeacherOnboardingChecklist(ctx context.Context, teacherID int64) ([]onb
 		TeacherStatus:          constants.TeacherStatus(row.Status),
 		HasProfilePhoto:        row.ProfilePicture.Valid && row.ProfilePicture.String != "",
 		DocsStatus:             docsStatus,
+		ResumeStatus:           resumeStatus,
 		IntroVideoStatus:       introStatus,
 		IntroVideoRequired:     introRequired,
 		TrainingRequiredCompleted: trainingCompleted,

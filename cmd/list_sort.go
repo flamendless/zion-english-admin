@@ -99,10 +99,12 @@ func teacherStatusRank(status string) int64 {
 		return 0
 	case "pending":
 		return 1
-	case "deleted":
+	case "resigned":
 		return 2
-	default:
+	case "deleted":
 		return 3
+	default:
+		return 4
 	}
 }
 

@@ -86,12 +86,19 @@ func handleReportsPartial(w http.ResponseWriter, r *http.Request) {
 	sortReportRows(rows, sort)
 
 	emptyMsg := "No teachers found."
-	if startDate == "" || endDate == "" {
+	hasDateRange := startDate != "" && endDate != ""
+	if !hasDateRange {
 		emptyMsg = "Select a date range."
 	}
 
+	summary := frontend.ReportsSummaryData{
+		HasDateRange: hasDateRange,
+		CutoffLabel:  formatReportCutoffLabel(startDate, endDate),
+		Earnings:     aggregateReportEarnings(rows),
+	}
+
 	w.Header().Set("Content-Type", "text/html")
-	if err := frontend.ReportsTableBody(rows, startDate, endDate, emptyMsg).Render(r.Context(), w); err != nil {
+	if err := frontend.ReportsPartial(rows, startDate, endDate, emptyMsg, summary).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -327,6 +334,33 @@ func loadReportRow(ctx context.Context, teacherID int64, startDate, endDate stri
 		}
 	}
 	return frontend.ReportRowData{}, ErrTeacherNotFoundInReportSummaries
+}
+
+func aggregateReportEarnings(rows []frontend.ReportRowData) []frontend.CurrencyTotal {
+	totalsByCurrency := map[string]float64{}
+	for _, row := range rows {
+		for _, earning := range row.Earnings {
+			if earning.Total == 0 {
+				continue
+			}
+			totalsByCurrency[earning.Currency] += earning.Total
+		}
+	}
+	if len(totalsByCurrency) == 0 {
+		return nil
+	}
+	out := make([]frontend.CurrencyTotal, 0, len(totalsByCurrency))
+	for _, currency := range constants.CurrencyCodes {
+		total, ok := totalsByCurrency[currency]
+		if !ok || total == 0 {
+			continue
+		}
+		out = append(out, frontend.CurrencyTotal{
+			Currency: currency,
+			Total:    total,
+		})
+	}
+	return out
 }
 
 func reportEarningsToFrontend(earnings []reportEarningJSON) []frontend.ReportEarningData {

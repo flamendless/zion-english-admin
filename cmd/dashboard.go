@@ -30,13 +30,6 @@ func weekRange() (string, string) {
 	return start.Format("2006-01-02"), end.Format("2006-01-02")
 }
 
-func monthRange() (string, string) {
-	now := time.Now()
-	start := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
-	end := start.AddDate(0, 1, -1)
-	return start.Format("2006-01-02"), end.Format("2006-01-02")
-}
-
 func dashboardEarningsTeacherID(role auth.Role, userID int64) int64 {
 	if role == auth.RoleSuperuser {
 		return 0
@@ -69,49 +62,54 @@ func fetchCutoffTotalsByPreset(ctx context.Context, preset string, teacherID int
 	return totals
 }
 
-func populateDashboardEarnings(ctx context.Context, data *frontend.DashboardData, teacherID int64, monthStart, monthEnd string) {
+func fetchCutoffParentTotalsByPreset(ctx context.Context, preset string, teacherID int64) []frontend.CurrencyTotal {
+	startDate, endDate := utils.CutoffDatesFromPreset(preset)
+	if startDate == "" || endDate == "" {
+		return nil
+	}
+	rows, err := dbRO.GetQueries().SumConductedParentRateByCurrencyAndDateRange(ctx, queries.SumConductedParentRateByCurrencyAndDateRangeParams{
+		Date:      startDate,
+		Date_2:    endDate,
+		Column3:   teacherID,
+		TeacherID: teacherID,
+	})
+	if err != nil {
+		return nil
+	}
+	totals := make([]frontend.CurrencyTotal, 0, len(rows))
+	for _, row := range rows {
+		if !row.Currency.Valid || row.Currency.String == "" {
+			continue
+		}
+		total, _ := row.TotalRate.(float64)
+		totals = append(totals, frontend.CurrencyTotal{
+			Currency: row.Currency.String,
+			Total:    total,
+		})
+	}
+	return totals
+}
+
+func populateAllTeachersCutoffTotals(ctx context.Context, data *frontend.DashboardData) {
+	if data.Role != auth.RoleAdmin {
+		return
+	}
+	firstCutoff, secondCutoff, _ := utils.CurrentCutoffRange()
+	data.AllTeachersFirstCutoffTotals = fetchCutoffTotalsByPreset(ctx, firstCutoff, 0)
+	data.AllTeachersSecondCutoffTotals = fetchCutoffTotalsByPreset(ctx, secondCutoff, 0)
+	data.AllTeachersFirstCutoffParentTotals = fetchCutoffParentTotalsByPreset(ctx, firstCutoff, 0)
+	data.AllTeachersSecondCutoffParentTotals = fetchCutoffParentTotalsByPreset(ctx, secondCutoff, 0)
+}
+
+func populateDashboardEarnings(ctx context.Context, data *frontend.DashboardData, teacherID int64) {
 	firstCutoff, secondCutoff, _ := utils.CurrentCutoffRange()
 	data.FirstCutoffTotals = fetchCutoffTotalsByPreset(ctx, firstCutoff, teacherID)
 	data.SecondCutoffTotals = fetchCutoffTotalsByPreset(ctx, secondCutoff, teacherID)
-
-	rates, err := dbRO.GetQueries().SumConductedRateByCurrencyAndDateRange(ctx, queries.SumConductedRateByCurrencyAndDateRangeParams{
-		Date:      monthStart,
-		Date_2:    monthEnd,
-		Column3:   teacherID,
-		TeacherID: teacherID,
-	})
-	if err == nil {
-		for _, row := range rates {
-			total, _ := row.TotalRate.(float64)
-			data.MonthlyTotals = append(data.MonthlyTotals, frontend.CurrencyTotal{
-				Currency: row.Currency,
-				Total:    total,
-			})
-		}
-	}
-
 	if !auth.HasAdminAccess(data.Role) {
 		return
 	}
-
-	parentRates, err := dbRO.GetQueries().SumConductedParentRateByCurrencyAndDateRange(ctx, queries.SumConductedParentRateByCurrencyAndDateRangeParams{
-		Date:      monthStart,
-		Date_2:    monthEnd,
-		Column3:   teacherID,
-		TeacherID: teacherID,
-	})
-	if err == nil {
-		for _, row := range parentRates {
-			if !row.Currency.Valid || row.Currency.String == "" {
-				continue
-			}
-			total, _ := row.TotalRate.(float64)
-			data.ParentMonthlyTotals = append(data.ParentMonthlyTotals, frontend.CurrencyTotal{
-				Currency: row.Currency.String,
-				Total:    total,
-			})
-		}
-	}
+	data.FirstCutoffParentTotals = fetchCutoffParentTotalsByPreset(ctx, firstCutoff, teacherID)
+	data.SecondCutoffParentTotals = fetchCutoffParentTotalsByPreset(ctx, secondCutoff, teacherID)
 }
 
 func handleHome(w http.ResponseWriter, r *http.Request) {
@@ -133,7 +131,6 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 	}
 
 	weekStart, weekEnd := weekRange()
-	monthStart, monthEnd := monthRange()
 	earningsTeacherID := dashboardEarningsTeacherID(role, user.ID)
 
 	switch role {
@@ -187,7 +184,8 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-		populateDashboardEarnings(ctx, &data, earningsTeacherID, monthStart, monthEnd)
+		populateDashboardEarnings(ctx, &data, earningsTeacherID)
+		populateAllTeachersCutoffTotals(ctx, &data)
 	case auth.RoleTeacher, auth.RoleTester:
 		user := auth.GetUser(ctx)
 		if role == auth.RoleTeacher {
@@ -225,7 +223,7 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-		populateDashboardEarnings(ctx, &data, earningsTeacherID, monthStart, monthEnd)
+		populateDashboardEarnings(ctx, &data, earningsTeacherID)
 		today := utils.TodayPHT()
 		scheduledToday, err := dbRO.GetQueries().CountScheduledClassesByStatusAndDate(ctx, queries.CountScheduledClassesByStatusAndDateParams{
 			ScheduledDate: today,

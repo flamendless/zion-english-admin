@@ -56,6 +56,8 @@ func TeacherStatusPillTone(status constants.TeacherStatus, deleted bool) PillTon
 		return PillToneSuccess
 	case constants.TeacherStatusPending:
 		return PillToneWarning
+	case constants.TeacherStatusResigned:
+		return PillToneNeutral
 	default:
 		return PillToneError
 	}
@@ -88,6 +90,15 @@ func DocumentStatusPillTone(status constants.TeacherDocumentStatus) PillTone {
 		return PillToneSuccess
 	case constants.TeacherDocumentStatusRejected:
 		return PillToneError
+	default:
+		return PillToneNeutral
+	}
+}
+
+func ResumeStatusPillTone(status constants.TeacherDocumentStatus) PillTone {
+	switch status {
+	case constants.TeacherDocumentStatusApproved, constants.TeacherDocumentStatusSubmitted:
+		return PillToneSuccess
 	default:
 		return PillToneNeutral
 	}

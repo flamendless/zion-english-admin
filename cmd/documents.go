@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"image"
 	_ "image/jpeg"
@@ -88,7 +89,7 @@ func mapAllDocumentItems(ctx context.Context, rows []queries.GetAllTeacherDocume
 				row.TeacherProfilePicture,
 			),
 			ViewURL:    utils.URL(fmt.Sprintf("/documents/%d/file", row.ID)),
-			CanReview:  row.Status == string(constants.TeacherDocumentStatusSubmitted),
+			CanReview:  row.Type != string(constants.TeacherDocumentTypeResume) && row.Status == string(constants.TeacherDocumentStatusSubmitted),
 		}
 	}
 
@@ -305,7 +306,10 @@ func handleProfileDocument(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	blocking, err := dbRO.GetQueries().HasBlockingTeacherDocument(ctx, user.ID)
+	blocking, err := dbRO.GetQueries().HasBlockingTeacherDocument(ctx, queries.HasBlockingTeacherDocumentParams{
+		TeacherID: user.ID,
+		Type:      string(constants.TeacherDocumentTypeDocument),
+	})
 	if err != nil {
 		logs.Log().Error("check blocking teacher document", zap.Error(err))
 		setErrorFlash(w, "Failed to verify document status")
@@ -389,6 +393,104 @@ func handleProfileDocument(w http.ResponseWriter, r *http.Request) {
 	HttpRedirect(w, r, "/profile")
 }
 
+func handleProfileResume(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx := r.Context()
+	user := auth.GetUser(ctx)
+	if auth.GetRole(ctx) != auth.RoleTeacher {
+		HttpError(w, "Access denied", http.StatusForbidden)
+		return
+	}
+
+	lastUploaded, err := dbRO.GetQueries().GetLatestTeacherDocumentUploadedAtByTeacherIDAndType(ctx, queries.GetLatestTeacherDocumentUploadedAtByTeacherIDAndTypeParams{
+		TeacherID: user.ID,
+		Type:      string(constants.TeacherDocumentTypeResume),
+	})
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		logs.Log().Error("check latest teacher resume upload", zap.Error(err))
+		setErrorFlash(w, "Failed to verify resume upload status")
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+	if allowed, days := utils.ResumeUploadAllowed(lastUploaded, time.Now()); !allowed {
+		setErrorFlash(w, fmt.Sprintf("You can upload a new resume/CV again in %d day(s).", days))
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+
+	if err := ensureDocumentDir(); err != nil {
+		logs.Log().Error("create document dir", zap.Error(err))
+		setErrorFlash(w, "Failed to prepare upload")
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+
+	if err := r.ParseMultipartForm(maxDocumentBytes); err != nil {
+		setErrorFlash(w, "File is too large. Maximum size is 5 MB.")
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+
+	file, header, err := r.FormFile("resume")
+	if err != nil {
+		setErrorFlash(w, "Please choose a resume/CV to upload")
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+	defer file.Close()
+
+	ext, err := validateDocumentUpload(file, header.Filename, header.Size)
+	if err != nil {
+		setErrorFlash(w, err.Error())
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+
+	storedFilename := fmt.Sprintf("%d_%d%s", user.ID, time.Now().UnixNano(), ext)
+	destPath := documentFilePath(storedFilename)
+
+	out, err := os.Create(destPath)
+	if err != nil {
+		logs.Log().Error("create resume file", zap.Error(err))
+		setErrorFlash(w, "Failed to save resume/CV")
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+	if _, err := io.Copy(out, file); err != nil {
+		out.Close()
+		_ = os.Remove(destPath)
+		logs.Log().Error("write resume file", zap.Error(err))
+		setErrorFlash(w, "Failed to save resume/CV")
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+	out.Close()
+
+	if err := dbRW.GetQueries().InsertTeacherDocument(ctx, queries.InsertTeacherDocumentParams{
+		TeacherID:        user.ID,
+		Type:             string(constants.TeacherDocumentTypeResume),
+		OriginalFilename: filepath.Base(header.Filename),
+		StoredFilename:   storedFilename,
+		FileExtension:    strings.TrimPrefix(ext, "."),
+		FileSize:         header.Size,
+		Status:           string(constants.TeacherDocumentStatusApproved),
+	}); err != nil {
+		_ = os.Remove(destPath)
+		logs.Log().Error("insert teacher resume", zap.Error(err))
+		setErrorFlash(w, "Failed to record resume/CV")
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+
+	insertAuditLogAs(ctx, user, "profile", fmt.Sprintf("uploaded resume/CV for teacher '%s'", user.Name))
+	setSuccessFlash(w, "Resume/CV uploaded successfully.")
+	HttpRedirect(w, r, "/profile")
+}
+
 func handleDocumentFile(w http.ResponseWriter, r *http.Request, documentID int64) {
 	if r.Method != http.MethodGet {
 		HttpError(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -436,6 +538,11 @@ func handleDocumentReview(w http.ResponseWriter, r *http.Request, documentID int
 	row, err := dbRO.GetQueries().GetTeacherDocumentByID(ctx, documentID)
 	if err != nil {
 		setErrorFlash(w, "Document not found")
+		HttpRedirect(w, r, "/documents")
+		return
+	}
+	if row.Type == string(constants.TeacherDocumentTypeResume) {
+		setErrorFlash(w, "Resume/CV documents cannot be reviewed")
 		HttpRedirect(w, r, "/documents")
 		return
 	}

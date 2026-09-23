@@ -22,6 +22,7 @@ const (
 	ItemIDAccount         ItemID = "account"
 	ItemIDProfilePhoto    ItemID = "profile_photo"
 	ItemIDDocuments       ItemID = "documents"
+	ItemIDResume          ItemID = "resume"
 	ItemIDIntroVideo      ItemID = "intro_video"
 	ItemIDTraining        ItemID = "training"
 	ItemIDZoom            ItemID = "zoom"
@@ -40,6 +41,7 @@ type Input struct {
 	TeacherStatus          constants.TeacherStatus
 	HasProfilePhoto        bool
 	DocsStatus             string
+	ResumeStatus           string
 	IntroVideoStatus       string
 	IntroVideoRequired     bool
 	TrainingRequiredCompleted int64
@@ -55,6 +57,7 @@ func Build(input Input) []Item {
 		accountItem(input.TeacherStatus),
 		profilePhotoItem(input.HasProfilePhoto),
 		documentsItem(input.DocsStatus),
+		resumeItem(input.ResumeStatus),
 	}
 
 	if input.IntroVideoRequired {
@@ -106,6 +109,9 @@ func accountItem(status constants.TeacherStatus) Item {
 	case constants.TeacherStatusPending:
 		item.Status = ItemStatusInProgress
 		item.Detail = "Pending approval"
+	case constants.TeacherStatusResigned:
+		item.Status = ItemStatusNotStarted
+		item.Detail = "Resigned"
 	default:
 		item.Status = ItemStatusNotStarted
 		item.Detail = "Not approved"
@@ -148,6 +154,23 @@ func documentsItem(status string) Item {
 	default:
 		item.Status = ItemStatusNotStarted
 		item.Detail = "Upload your ID documents"
+	}
+	return item
+}
+
+func resumeItem(status string) Item {
+	item := Item{
+		ID:         ItemIDResume,
+		Label:      "Resume/CV",
+		ActionPath: "/profile",
+	}
+	switch constants.TeacherDocumentStatus(status) {
+	case constants.TeacherDocumentStatusApproved, constants.TeacherDocumentStatusSubmitted:
+		item.Status = ItemStatusComplete
+		item.Detail = "Uploaded"
+	default:
+		item.Status = ItemStatusNotStarted
+		item.Detail = "Upload your resume/CV"
 	}
 	return item
 }

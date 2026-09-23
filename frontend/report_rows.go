@@ -14,6 +14,12 @@ type ReportEarningData struct {
 	Total    float64
 }
 
+type ReportsSummaryData struct {
+	HasDateRange bool
+	CutoffLabel  string
+	Earnings     []CurrencyTotal
+}
+
 type ReportRowData struct {
 	TeacherID        string
 	TeacherName      string

@@ -47,3 +47,24 @@ func TestSensitiveChangeAllowed(t *testing.T) {
 		t.Fatalf("expected allowed after cooldown, got allowed=%v days=%d", allowed, days)
 	}
 }
+
+func TestResumeUploadAllowed(t *testing.T) {
+	now := time.Date(2026, 8, 15, 12, 0, 0, 0, time.UTC)
+
+	allowed, days := ResumeUploadAllowed(sql.NullTime{}, now)
+	if !allowed || days != 0 {
+		t.Fatalf("expected allowed with no prior upload, got allowed=%v days=%d", allowed, days)
+	}
+
+	recent := sql.NullTime{Time: now.Add(-2 * time.Hour), Valid: true}
+	allowed, days = ResumeUploadAllowed(recent, now)
+	if allowed || days != 1 {
+		t.Fatalf("expected locked with 1 day remaining, got allowed=%v days=%d", allowed, days)
+	}
+
+	old := sql.NullTime{Time: now.Add(-25 * time.Hour), Valid: true}
+	allowed, days = ResumeUploadAllowed(old, now)
+	if !allowed || days != 0 {
+		t.Fatalf("expected allowed after daily cooldown, got allowed=%v days=%d", allowed, days)
+	}
+}
