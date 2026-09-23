@@ -1337,6 +1337,9 @@ func validateTeacherFields(req *models.TeacherRegisterRequest) error {
 	if utils.IsBlank(req.MobileNumber) {
 		return ErrMobileNumberRequired
 	}
+	if !utils.ValidMobileNumber(req.MobileNumber) {
+		return ErrInvalidMobileNumber
+	}
 
 	if req.Email == "" {
 		return ErrEmailRequired

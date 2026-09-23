@@ -3,7 +3,8 @@ package constants
 import "regexp"
 
 var (
-	ReSafeName = regexp.MustCompile(`[^a-zA-Z0-9._-]+`)
+	ReMobileNumber = regexp.MustCompile(`^\+?[0-9().\s-]+$`)
+	ReSafeName     = regexp.MustCompile(`[^a-zA-Z0-9._-]+`)
 	ReLower    = regexp.MustCompile(`[a-z]`)
 	ReUpper    = regexp.MustCompile(`[A-Z]`)
 	ReDigit    = regexp.MustCompile(`\d`)

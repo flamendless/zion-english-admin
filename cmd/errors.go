@@ -68,6 +68,7 @@ var (
 	ErrBirthdateRequired    = errors.New("birthdate is required")
 	ErrAddressRequired      = errors.New("address is required")
 	ErrMobileNumberRequired = errors.New("mobile number is required")
+	ErrInvalidMobileNumber  = errors.New("invalid mobile number")
 	ErrEmailRequired        = errors.New("email is required")
 	ErrInvalidEmailAddress  = errors.New("invalid email address")
 	ErrInvalidSex           = errors.New("invalid sex. Must be M or F")

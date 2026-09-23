@@ -367,6 +367,11 @@ func handleProfileMobile(w http.ResponseWriter, r *http.Request) {
 		HttpRedirect(w, r, "/profile")
 		return
 	}
+	if !utils.ValidMobileNumber(mobileNumber) {
+		setErrorFlash(w, ErrInvalidMobileNumber.Error())
+		HttpRedirect(w, r, "/profile")
+		return
+	}
 
 	row, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, user.ID)
 	if err != nil {

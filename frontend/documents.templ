@@ -605,13 +605,13 @@ templ ProfileResumeUpload(data ProfileData) {
 							name="resume"
 							accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf"
 							disabled?={ !data.CanUploadResume }
-							onchange="this.form.querySelector('.upload-filename').textContent = this.files[0] ? this.files[0].name : ''"
+							onchange="var file = this.files[0]; this.form.querySelector('.upload-filename').textContent = file ? file.name : ''; var btn = this.form.querySelector('button[type=submit]'); if (btn) btn.disabled = !file;"
 						/>
 					</label>
 					<p class="upload-filename" aria-live="polite"></p>
 				</div>
 				<div class="profile-form-actions">
-					<button type="submit" class="btn" disabled?={ !data.CanUploadResume }>Upload resume/CV</button>
+					<button type="submit" class="btn" disabled>Upload resume/CV</button>
 				</div>
 			</form>
 		</div>
