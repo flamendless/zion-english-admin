@@ -412,6 +412,8 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 					method="POST"
 					action={ utils.URL("/profile/intro-video") }
 					enctype="multipart/form-data"
+					data-max-bytes={ fmt.Sprintf("%d", constants.MaxIntroVideoBytes) }
+					data-max-duration-seconds={ fmt.Sprintf("%d", constants.MaxIntroVideoDurationSeconds) }
 				>
 					<div class="form-group">
 						<label for="introVideoSourceType">Source *</label>
@@ -432,7 +434,7 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 								</span>
 								<span class="upload-zone-meta">
 									<span>Choose intro video</span>
-									<span class="upload-zone-hint">MP4, WebM, MOV, AVI, MKV, OGV, M4V, or 3GP (max 20 MB, 60 seconds)</span>
+									<span class="upload-zone-hint">MP4, WebM, MOV, AVI, MKV, OGV, M4V, or 3GP (max { fmt.Sprintf("%d", constants.MaxIntroVideoSizeMB()) } MB, { constants.MaxIntroVideoDurationLabel() }). Videos are optimized on upload.</span>
 								</span>
 								<input
 									type="file"
@@ -469,7 +471,7 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 									<dd id="introVideoPreviewDimensions">-</dd>
 								</div>
 							</dl>
-							<p id="introVideoPreviewDurationWarning" class="intro-video-duration-warning" hidden>Video exceeds the 60 second limit. Choose a shorter clip before submitting.</p>
+							<p id="introVideoPreviewDurationWarning" class="intro-video-duration-warning" hidden>Video exceeds the { constants.MaxIntroVideoDurationLabel() } limit. Choose a shorter clip before submitting.</p>
 						</div>
 					</div>
 					<div id="introVideoLinkFields" hidden>
@@ -647,7 +649,8 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 						const progressBar = document.getElementById('introVideoUploadProgressBar');
 						if (!form || !sourceSelect || !uploadFields || !linkFields || !fileInput || !urlInput || !submitBtn) return;
 
-						const maxDurationSeconds = 60;
+						const maxDurationSeconds = parseInt(form.dataset.maxDurationSeconds || '0', 10);
+						const maxBytes = parseInt(form.dataset.maxBytes || '0', 10);
 						let previewObjectURL = '';
 
 						function formatFileSize(bytes) {
@@ -725,11 +728,21 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 							formError.textContent = message;
 						}
 
+						function fileTooLargeMessage() {
+							if (!maxBytes) return 'File is too large.';
+							const mb = Math.round(maxBytes / (1024 * 1024));
+							return 'File is too large. Maximum size is ' + mb + ' MB.';
+						}
+
 						function updateSubmitState() {
 							const sourceType = sourceSelect.value;
 							if (sourceType === 'upload') {
 								const file = fileInput.files && fileInput.files[0];
 								if (!file) {
+									submitBtn.disabled = true;
+									return;
+								}
+								if (maxBytes > 0 && file.size > maxBytes) {
 									submitBtn.disabled = true;
 									return;
 								}
@@ -784,6 +797,12 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 						function bindPreview(file) {
 							clearPreview();
 							if (!file || !previewPanel || !previewPlayer) {
+								updateSubmitState();
+								return;
+							}
+
+							if (maxBytes > 0 && file.size > maxBytes) {
+								setFormError(fileTooLargeMessage());
 								updateSubmitState();
 								return;
 							}
@@ -868,6 +887,10 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 							const file = fileInput.files && fileInput.files[0];
 							if (!file) {
 								setFormError('Please choose a video file to upload.');
+								return;
+							}
+							if (maxBytes > 0 && file.size > maxBytes) {
+								setFormError(fileTooLargeMessage());
 								return;
 							}
 

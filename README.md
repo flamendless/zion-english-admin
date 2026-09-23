@@ -8,7 +8,7 @@ Admin portal for Zion English teachers and administrators. Manage students, clas
 
 ## Setup
 
-**Requirements:** Go 1.26+, [ffmpeg](https://ffmpeg.org/) (provides `ffprobe` for intro video duration checks)
+**Requirements:** Go 1.26+, [ffmpeg](https://ffmpeg.org/) (intro video duration checks and upload compression)
 
 1. Clone the repository and enter the project directory.
 2. Copy the environment file and fill in the required values:

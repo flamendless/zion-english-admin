@@ -1,5 +1,7 @@
 package constants
 
+import "fmt"
+
 type TeacherIntroVideoStatus string
 
 const (
@@ -76,5 +78,33 @@ func ValidTeacherIntroVideoSourceType(value string) bool {
 	}
 }
 
-const MaxIntroVideoDurationSeconds = 60
-const MaxIntroVideoBytes = 20 << 20
+const MaxIntroVideoDurationSeconds = 120
+const MaxIntroVideoBytes = 200 << 20
+
+const IntroVideoStoredExt = ".mp4"
+const IntroVideoStoredMIME = "video/mp4"
+const IntroVideoEncodeCRF = "28"
+const IntroVideoEncodePreset = "medium"
+const IntroVideoEncodeMaxWidth = 1280
+const IntroVideoEncodeAudioBitrate = "128k"
+const IntroVideoCompressTimeoutSeconds = 300
+
+func MaxIntroVideoSizeMB() int {
+	return int(MaxIntroVideoBytes / (1 << 20))
+}
+
+func IntroVideoFileTooLargeMessage() string {
+	return fmt.Sprintf("[INTRO VIDEO] File is too large. Maximum size is %d MB.", MaxIntroVideoSizeMB())
+}
+
+func MaxIntroVideoDurationLabel() string {
+	minutes := MaxIntroVideoDurationSeconds / 60
+	if minutes == 1 {
+		return "1 minute"
+	}
+	return fmt.Sprintf("%d minutes", minutes)
+}
+
+func IntroVideoTooLongMessage() string {
+	return fmt.Sprintf("[INTRO VIDEO] Video is too long. Maximum duration is %s.", MaxIntroVideoDurationLabel())
+}

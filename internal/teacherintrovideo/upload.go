@@ -1,6 +1,7 @@
 package teacherintrovideo
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -22,50 +23,129 @@ var allowedIntroVideoExtensions = map[string]string{
 	".3gp":  "video/3gpp",
 }
 
-func ValidateUpload(file io.ReadSeeker, filename string, size int64) (ext, mimeType string, err error) {
+type ProcessedUpload struct {
+	Path     string
+	Size     int64
+	Ext      string
+	MimeType string
+	Cleanup  func()
+}
+
+func ProcessUpload(ctx context.Context, file io.ReadSeeker, filename string, size int64) (ProcessedUpload, error) {
+	ext, mimeType, inputPath, cleanupInput, err := validateAndSaveUpload(file, filename, size)
+	if err != nil {
+		return ProcessedUpload{}, err
+	}
+
+	compressedPath, err := os.CreateTemp("", "intro-video-compressed-*"+constants.IntroVideoStoredExt)
+	if err != nil {
+		cleanupInput()
+		return ProcessedUpload{}, ErrUploadPrepareFailed
+	}
+	compressedPath.Close()
+
+	outputPath := compressedPath.Name()
+	cleanupOutput := func() { os.Remove(outputPath) }
+
+	if err := compressToMP4(ctx, inputPath, outputPath); err != nil {
+		cleanupInput()
+		cleanupOutput()
+		return ProcessedUpload{}, err
+	}
+
+	compressedInfo, err := os.Stat(outputPath)
+	if err != nil {
+		cleanupInput()
+		cleanupOutput()
+		return ProcessedUpload{}, ErrCompressFailed
+	}
+
+	inputInfo, err := os.Stat(inputPath)
+	if err != nil {
+		cleanupInput()
+		cleanupOutput()
+		return ProcessedUpload{}, ErrReadFailed
+	}
+
+	finalPath := outputPath
+	finalSize := compressedInfo.Size()
+	finalExt := constants.IntroVideoStoredExt
+	finalMIME := constants.IntroVideoStoredMIME
+	cleanupFinal := func() {
+		cleanupInput()
+		cleanupOutput()
+	}
+
+	if compressedInfo.Size() >= inputInfo.Size() {
+		finalPath = inputPath
+		finalSize = inputInfo.Size()
+		finalExt = ext
+		finalMIME = mimeType
+		cleanupFinal = func() {
+			cleanupOutput()
+			cleanupInput()
+		}
+	}
+
+	return ProcessedUpload{
+		Path:     finalPath,
+		Size:     finalSize,
+		Ext:      finalExt,
+		MimeType: finalMIME,
+		Cleanup:  cleanupFinal,
+	}, nil
+}
+
+func validateAndSaveUpload(file io.ReadSeeker, filename string, size int64) (ext, mimeType, tmpPath string, cleanup func(), err error) {
 	if size <= 0 {
-		return "", "", ErrFileEmpty
+		return "", "", "", nil, ErrFileEmpty
 	}
 	if size > constants.MaxIntroVideoBytes {
-		return "", "", ErrFileTooLarge
+		return "", "", "", nil, ErrFileTooLarge
 	}
 
 	ext = strings.ToLower(filepath.Ext(filename))
 	mimeType, ok := allowedIntroVideoExtensions[ext]
 	if !ok {
-		return "", "", ErrUnsupportedFormat
+		return "", "", "", nil, ErrUnsupportedFormat
 	}
 
 	tmpFile, err := os.CreateTemp("", "intro-video-*"+ext)
 	if err != nil {
-		return "", "", ErrUploadPrepareFailed
+		return "", "", "", nil, ErrUploadPrepareFailed
 	}
-	tmpPath := tmpFile.Name()
-	defer os.Remove(tmpPath)
+	tmpPath = tmpFile.Name()
+	cleanup = func() { os.Remove(tmpPath) }
 
 	if _, err := io.Copy(tmpFile, file); err != nil {
 		tmpFile.Close()
-		return "", "", ErrReadFailed
+		cleanup()
+		return "", "", "", nil, ErrReadFailed
 	}
 	if err := tmpFile.Close(); err != nil {
-		return "", "", ErrReadFailed
+		cleanup()
+		return "", "", "", nil, ErrReadFailed
 	}
 	if _, err := file.Seek(0, io.SeekStart); err != nil {
-		return "", "", ErrReadFailed
+		cleanup()
+		return "", "", "", nil, ErrReadFailed
 	}
 
 	duration, err := probeDurationSeconds(tmpPath)
 	if err != nil {
-		return "", "", err
+		cleanup()
+		return "", "", "", nil, err
 	}
 	if duration <= 0 {
-		return "", "", ErrEmptyDuration
+		cleanup()
+		return "", "", "", nil, ErrEmptyDuration
 	}
 	if duration > float64(constants.MaxIntroVideoDurationSeconds) {
-		return "", "", ErrTooLong
+		cleanup()
+		return "", "", "", nil, ErrTooLong
 	}
 
-	return ext, mimeType, nil
+	return ext, mimeType, tmpPath, cleanup, nil
 }
 
 func probeDurationSeconds(path string) (float64, error) {

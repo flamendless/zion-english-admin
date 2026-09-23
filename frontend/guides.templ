@@ -1,5 +1,6 @@
 package frontend
 
+import "fmt"
 import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
@@ -459,13 +460,13 @@ templ GuideIntroVideos() {
 					"upload-requirements",
 					"Upload requirements",
 					utils.URL("/profile"),
-					"Uploaded files are stored in app storage and validated before review.",
+					"Uploaded files are compressed, stored as MP4, and validated before review.",
 					[]string{
 						"Accepted formats: MP4, WebM, MOV, AVI, MKV, OGV, M4V, or 3GP.",
-						"Maximum file size: 20 MB.",
-						"Maximum duration: 60 seconds.",
+						fmt.Sprintf("Maximum file size: %d MB.", constants.MaxIntroVideoSizeMB()),
+						fmt.Sprintf("Maximum duration: %s.", constants.MaxIntroVideoDurationLabel()),
 						"If the preview shows a duration warning, choose a shorter clip before submitting.",
-						"After the upload bar reaches 100%, processing may take a moment while the server validates the video.",
+						"After the upload bar reaches 100%, processing may take a moment while the server compresses and validates the video.",
 					},
 					false,
 				)

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -326,7 +327,7 @@ func handleProfileIntroVideo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := r.ParseMultipartForm(constants.MaxIntroVideoBytes); err != nil {
-		setErrorFlash(w, ErrIntroVideoFileTooLarge.Error())
+		setErrorFlash(w, constants.IntroVideoFileTooLargeMessage())
 		HttpRedirect(w, r, "/profile")
 		return
 	}
@@ -387,16 +388,26 @@ func handleProfileIntroVideoUpload(w http.ResponseWriter, r *http.Request, ctx c
 	}
 	defer file.Close()
 
-	ext, mimeType, err := teacherintrovideo.ValidateUpload(file, header.Filename, header.Size)
+	processed, err := teacherintrovideo.ProcessUpload(ctx, file, header.Filename, header.Size)
 	if err != nil {
 		setErrorFlash(w, introVideoSubmitErrorMessage(err))
 		HttpRedirect(w, r, "/profile")
 		return
 	}
+	defer processed.Cleanup()
 
-	storedFilename := fmt.Sprintf("%d_%d%s", user.ID, time.Now().UnixNano(), ext)
+	uploadFile, err := os.Open(processed.Path)
+	if err != nil {
+		logs.Log().Error("open processed intro video", zap.Error(err))
+		setErrorFlash(w, ErrIntroVideoSaveFailed.Error())
+		HttpRedirect(w, r, "/profile")
+		return
+	}
+	defer uploadFile.Close()
+
+	storedFilename := fmt.Sprintf("%d_%d%s", user.ID, time.Now().UnixNano(), processed.Ext)
 	store := storage.Default()
-	if err := store.Put(ctx, storage.CategoryIntroVideos, storedFilename, file, mimeType); err != nil {
+	if err := store.Put(ctx, storage.CategoryIntroVideos, storedFilename, uploadFile, processed.MimeType); err != nil {
 		logs.Log().Error("write intro video file", zap.Error(err))
 		setErrorFlash(w, ErrIntroVideoSaveFailed.Error())
 		HttpRedirect(w, r, "/profile")
@@ -407,8 +418,8 @@ func handleProfileIntroVideoUpload(w http.ResponseWriter, r *http.Request, ctx c
 		TeacherID:        user.ID,
 		OriginalFilename: sql.NullString{String: filepath.Base(header.Filename), Valid: true},
 		StoredFilename:   sql.NullString{String: storedFilename, Valid: true},
-		MimeType:         sql.NullString{String: mimeType, Valid: true},
-		FileSize:         sql.NullInt64{Int64: header.Size, Valid: true},
+		MimeType:         sql.NullString{String: processed.MimeType, Valid: true},
+		FileSize:         sql.NullInt64{Int64: processed.Size, Valid: true},
 		SourceType:       sql.NullString{String: string(constants.TeacherIntroVideoSourceUpload), Valid: true},
 		Status:           string(constants.TeacherIntroVideoStatusSubmitted),
 	}); err != nil {
@@ -441,7 +452,11 @@ func introVideoSubmitErrorMessage(err error) string {
 	case errors.Is(err, teacherintrovideo.ErrFileEmpty):
 		return ErrIntroVideoFileEmpty.Error()
 	case errors.Is(err, teacherintrovideo.ErrFileTooLarge):
-		return ErrIntroVideoFileTooLarge.Error()
+		return constants.IntroVideoFileTooLargeMessage()
+	case errors.Is(err, teacherintrovideo.ErrFfmpegUnavailable):
+		return ErrIntroVideoFfmpegUnavailable.Error()
+	case errors.Is(err, teacherintrovideo.ErrCompressFailed):
+		return ErrIntroVideoCompressFailed.Error()
 	case errors.Is(err, teacherintrovideo.ErrUnsupportedFormat):
 		return ErrUnsupportedIntroVideoFormat.Error()
 	case errors.Is(err, teacherintrovideo.ErrUploadPrepareFailed):
@@ -453,7 +468,7 @@ func introVideoSubmitErrorMessage(err error) string {
 	case errors.Is(err, teacherintrovideo.ErrEmptyDuration):
 		return ErrEmptyIntroVideoDuration.Error()
 	case errors.Is(err, teacherintrovideo.ErrTooLong):
-		return ErrIntroVideoTooLong.Error()
+		return constants.IntroVideoTooLongMessage()
 	case errors.Is(err, teacherintrovideo.ErrFfprobeUnavailable):
 		return ErrFfprobeUnavailable.Error()
 	default:

@@ -3,6 +3,7 @@ unreleased:
   new_features: []
   improvements:
     - text: "Admins can browse cached payroll report generations on Reports History under Insights, with a View History link on the Reports page."
+    - text: "Intro video uploads now accept up to 200 MB and are compressed server-side to MP4 before storage."
   bug_fixes: []
   removed: []
   security: []
