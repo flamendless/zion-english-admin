@@ -83,11 +83,6 @@ const MaxIntroVideoBytes = 200 << 20
 
 const IntroVideoStoredExt = ".mp4"
 const IntroVideoStoredMIME = "video/mp4"
-const IntroVideoEncodeCRF = "22"
-const IntroVideoEncodePreset = "medium"
-const IntroVideoEncodeMaxWidth = 1920
-const IntroVideoEncodeAudioBitrate = "160k"
-const IntroVideoCompressTimeoutSeconds = 300
 
 func MaxIntroVideoSizeMB() int {
 	return int(MaxIntroVideoBytes / (1 << 20))

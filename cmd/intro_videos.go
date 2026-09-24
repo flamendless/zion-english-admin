@@ -16,6 +16,7 @@ import (
 	"zion-english/internal/constants"
 	"zion-english/internal/database"
 	"zion-english/internal/database/queries"
+	"zion-english/internal/featureflags"
 	"zion-english/internal/logs"
 	"zion-english/internal/notifications"
 	"zion-english/internal/storage"
@@ -388,7 +389,7 @@ func handleProfileIntroVideoUpload(w http.ResponseWriter, r *http.Request, ctx c
 	}
 	defer file.Close()
 
-	processed, err := teacherintrovideo.ProcessUpload(ctx, file, header.Filename, header.Size)
+	processed, err := teacherintrovideo.ProcessUpload(ctx, file, header.Filename, header.Size, featureflags.IntroVideoCompressSettings(ctx, dbRO))
 	if err != nil {
 		setErrorFlash(w, introVideoSubmitErrorMessage(err))
 		HttpRedirect(w, r, "/profile")

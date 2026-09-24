@@ -8,31 +8,31 @@ import (
 	"zion-english/internal/constants"
 )
 
-func compressToMP4(ctx context.Context, inputPath, outputPath string) error {
+func compressToMP4(ctx context.Context, inputPath, outputPath string, settings constants.IntroVideoEncodeSettings) error {
 	if !FfmpegAvailable() {
 		return ErrFfmpegUnavailable
 	}
 
-	scale := fmt.Sprintf("scale='min(%d,iw)':-2", constants.IntroVideoEncodeMaxWidth)
+	scale := fmt.Sprintf("scale='min(%d,iw)':-2", settings.MaxWidth)
 	args := []string{
 		"-y",
 		"-i", inputPath,
 		"-map", "0:v:0",
 		"-map", "0:a:0?",
 		"-c:v", "libx264",
-		"-preset", constants.IntroVideoEncodePreset,
-		"-crf", constants.IntroVideoEncodeCRF,
+		"-preset", settings.Preset,
+		"-crf", settings.CRF,
 		"-pix_fmt", "yuv420p",
 		"-vf", scale,
 		"-c:a", "aac",
-		"-b:a", constants.IntroVideoEncodeAudioBitrate,
+		"-b:a", settings.AudioBitrate,
 		"-movflags", "+faststart",
 		"-map_metadata", "-1",
 		outputPath,
 	}
 
 	if _, ok := ctx.Deadline(); !ok {
-		timeoutCtx, cancel := context.WithTimeout(ctx, time.Duration(constants.IntroVideoCompressTimeoutSeconds)*time.Second)
+		timeoutCtx, cancel := context.WithTimeout(ctx, time.Duration(settings.TimeoutSecs)*time.Second)
 		defer cancel()
 		ctx = timeoutCtx
 	}

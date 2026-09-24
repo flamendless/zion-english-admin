@@ -144,6 +144,28 @@ func SetIntValue(ctx context.Context, db database.Service, key constants.Feature
 	})
 }
 
+func GetStringValue(ctx context.Context, db database.Service, key constants.FeatureFlagKey, defaultValue string) string {
+	row, err := db.GetQueries().GetFeatureFlag(ctx, string(key))
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return defaultValue
+		}
+		return defaultValue
+	}
+	value := strings.TrimSpace(row.ValueText)
+	if value == "" {
+		return defaultValue
+	}
+	return value
+}
+
+func SetStringValue(ctx context.Context, db database.Service, key constants.FeatureFlagKey, value string) error {
+	return db.GetQueries().UpsertFeatureFlagValue(ctx, queries.UpsertFeatureFlagValueParams{
+		Key:       string(key),
+		ValueText: strings.TrimSpace(value),
+	})
+}
+
 func ClassOverdueGracePeriodMinutes(ctx context.Context, db database.Service) int64 {
 	value := GetIntValue(ctx, db, constants.FeatureFlagClassOverdueGracePeriod, constants.DefaultClassOverdueGracePeriodMinutes)
 	if value > constants.MaxClassOverdueGracePeriodMinutes {
@@ -155,6 +177,18 @@ func ClassOverdueGracePeriodMinutes(ctx context.Context, db database.Service) in
 func PersistentOnboardingEnabled(ctx context.Context, db database.Service) bool {
 	enabled, _, err := GetFlagDefault(ctx, db, constants.FeatureFlagPersistentOnboarding, false)
 	return err == nil && enabled
+}
+
+func IntroVideoCompressPreset(ctx context.Context, db database.Service) constants.IntroVideoCompressPreset {
+	value := GetStringValue(ctx, db, constants.FeatureFlagIntroVideoCompressPreset, string(constants.DefaultIntroVideoCompressPreset()))
+	if !constants.ValidIntroVideoCompressPreset(value) {
+		return constants.DefaultIntroVideoCompressPreset()
+	}
+	return constants.IntroVideoCompressPreset(value)
+}
+
+func IntroVideoCompressSettings(ctx context.Context, db database.Service) constants.IntroVideoEncodeSettings {
+	return constants.IntroVideoEncodeSettingsForPreset(IntroVideoCompressPreset(ctx, db))
 }
 
 func IntroVideoUploadAccess(ctx context.Context, db database.Service, roles []constants.TeacherRole) (visible bool, uploadAllowed bool) {

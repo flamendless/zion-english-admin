@@ -38,8 +38,16 @@ func handleFeatureFlagsGet(w http.ResponseWriter, r *http.Request) {
 	zoomEnabled, zoomVisibleRoles, _ := featureflags.GetFlag(ctx, dbRO, constants.FeatureFlagIntegrationZoom)
 	googleEnabled, googleVisibleRoles, _ := featureflags.GetFlag(ctx, dbRO, constants.FeatureFlagIntegrationGoogleCalendar)
 	introVideoEnabled, introVideoVisibleRoles, _ := featureflags.GetFlagDefault(ctx, dbRO, constants.FeatureFlagIntroVideoUploads, false)
+	introVideoCompressPreset := featureflags.IntroVideoCompressPreset(ctx, dbRO)
 	persistentOnboardingEnabled, _, _ := featureflags.GetFlagDefault(ctx, dbRO, constants.FeatureFlagPersistentOnboarding, false)
 	roleOptions := constants.AllTeacherRoles()
+	introVideoCompressPresetOptions := make([]frontend.FeatureFlagSelectOption, 0, len(constants.IntroVideoCompressPresetOptions()))
+	for _, preset := range constants.IntroVideoCompressPresetOptions() {
+		introVideoCompressPresetOptions = append(introVideoCompressPresetOptions, frontend.FeatureFlagSelectOption{
+			Value: string(preset),
+			Label: constants.IntroVideoCompressPresetLabel(preset),
+		})
+	}
 
 	data := frontend.FeatureFlagsData{
 		ClassOverdueGracePeriodMinutes: classOverdueGracePeriodMinutes(ctx),
@@ -58,6 +66,13 @@ func handleFeatureFlagsGet(w http.ResponseWriter, r *http.Request) {
 			RoleOptions:   roleOptions,
 			FormFieldName: "intro_video_uploads_enabled",
 			FormPrefix:    "intro_video",
+		},
+		IntroVideoCompressPreset: frontend.FeatureFlagSelectItem{
+			Name:          "Intro video compression",
+			Description:   "Controls how uploaded intro videos are re-encoded before storage. Original keeps the uploaded file as-is after validation.",
+			Options:       introVideoCompressPresetOptions,
+			SelectedValue: string(introVideoCompressPreset),
+			FormFieldName: "intro_video_compress_preset",
 		},
 		Zoom: frontend.FeatureFlagIntegrationItem{
 			Name:               "Zoom",
@@ -133,10 +148,18 @@ func handleFeatureFlagsUpdate(w http.ResponseWriter, r *http.Request) {
 	prevZoomEnabled, prevZoomRoles, _ := featureflags.GetFlag(ctx, dbRO, constants.FeatureFlagIntegrationZoom)
 	prevGoogleEnabled, prevGoogleRoles, _ := featureflags.GetFlag(ctx, dbRO, constants.FeatureFlagIntegrationGoogleCalendar)
 	prevIntroVideoEnabled, prevIntroVideoRoles, _ := featureflags.GetFlagDefault(ctx, dbRO, constants.FeatureFlagIntroVideoUploads, false)
+	prevIntroVideoCompressPreset := featureflags.IntroVideoCompressPreset(ctx, dbRO)
 	prevPersistentOnboardingEnabled, _, _ := featureflags.GetFlagDefault(ctx, dbRO, constants.FeatureFlagPersistentOnboarding, false)
 	prevGracePeriod := classOverdueGracePeriodMinutes(ctx)
 
 	gracePeriod, err := parseClassOverdueGracePeriodFromForm(r)
+	if err != nil {
+		setErrorFlash(w, err.Error())
+		HttpRedirect(w, r, "/feature-flags")
+		return
+	}
+
+	introVideoCompressPreset, err := parseIntroVideoCompressPresetFromForm(r)
 	if err != nil {
 		setErrorFlash(w, err.Error())
 		HttpRedirect(w, r, "/feature-flags")
@@ -165,6 +188,11 @@ func handleFeatureFlagsUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := featureflags.SetIntValue(ctx, dbRW, constants.FeatureFlagClassOverdueGracePeriod, gracePeriod); err != nil {
 		setErrorFlash(w, fmt.Sprintf("Failed to update class overdue grace period: %v", err))
+		HttpRedirect(w, r, "/feature-flags")
+		return
+	}
+	if err := featureflags.SetStringValue(ctx, dbRW, constants.FeatureFlagIntroVideoCompressPreset, string(introVideoCompressPreset)); err != nil {
+		setErrorFlash(w, fmt.Sprintf("Failed to update intro video compression preset: %v", err))
 		HttpRedirect(w, r, "/feature-flags")
 		return
 	}
@@ -210,9 +238,23 @@ func handleFeatureFlagsUpdate(w http.ResponseWriter, r *http.Request) {
 	if prevGracePeriod != gracePeriod {
 		insertAuditLogAs(ctx, user, "feature-flags", fmt.Sprintf("updated class overdue grace period to %d minutes", gracePeriod))
 	}
+	if prevIntroVideoCompressPreset != introVideoCompressPreset {
+		insertAuditLogAs(ctx, user, "feature-flags", fmt.Sprintf("updated intro video compression preset to %s", introVideoCompressPreset))
+	}
 
 	setSuccessFlash(w, "Feature flags saved successfully")
 	HttpRedirect(w, r, "/feature-flags")
+}
+
+func parseIntroVideoCompressPresetFromForm(r *http.Request) (constants.IntroVideoCompressPreset, error) {
+	raw := strings.TrimSpace(r.FormValue("intro_video_compress_preset"))
+	if raw == "" {
+		return constants.DefaultIntroVideoCompressPreset(), nil
+	}
+	if !constants.ValidIntroVideoCompressPreset(raw) {
+		return "", fmt.Errorf("Select a valid intro video compression preset")
+	}
+	return constants.IntroVideoCompressPreset(raw), nil
 }
 
 func parseClassOverdueGracePeriodFromForm(r *http.Request) (int64, error) {

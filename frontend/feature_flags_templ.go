@@ -15,10 +15,24 @@ import (
 	"zion-english/internal/utils"
 )
 
+type FeatureFlagSelectOption struct {
+	Value string
+	Label string
+}
+
+type FeatureFlagSelectItem struct {
+	Name          string
+	Description   string
+	Options       []FeatureFlagSelectOption
+	SelectedValue string
+	FormFieldName string
+}
+
 type FeatureFlagsData struct {
 	ClassOverdueGracePeriodMinutes int64
 	PersistentOnboarding           FeatureFlagBooleanItem
 	IntroVideoUploads              FeatureFlagRoleGatedItem
+	IntroVideoCompressPreset       FeatureFlagSelectItem
 	Zoom                           FeatureFlagIntegrationItem
 	GoogleCalendar                 FeatureFlagIntegrationItem
 }
@@ -101,7 +115,7 @@ func FeatureFlags(data FeatureFlagsData) templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 75, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 89, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -115,7 +129,7 @@ func FeatureFlags(data FeatureFlagsData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<style>\r\n\t\t\t.feature-flags-hero {\r\n\t\t\t\tmargin-bottom: var(--space-6);\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flags-subtitle {\r\n\t\t\t\tmargin-top: var(--space-2);\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tmax-width: 42rem;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flags-card {\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\t\tpadding: var(--space-6);\r\n\t\t\t\tmax-width: 48rem;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-list {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-4);\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t\tjustify-content: space-between;\r\n\t\t\t\tgap: var(--space-4);\r\n\t\t\t\tpadding: var(--space-4);\r\n\t\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-muted);\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-brand {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t\tgap: var(--space-4);\r\n\t\t\t\tflex: 1 1 16rem;\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-logo-wrap {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tjustify-content: center;\r\n\t\t\t\twidth: 3.5rem;\r\n\t\t\t\theight: 3.5rem;\r\n\t\t\t\tflex-shrink: 0;\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\t}\r\n\r\n\t\t\t.integration-logo {\r\n\t\t\t\tdisplay: block;\r\n\t\t\t\tmax-width: 100%;\r\n\t\t\t\theight: auto;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-logo-calendar {\r\n\t\t\t\twidth: 1.5rem;\r\n\t\t\t\theight: 1.5rem;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-info {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-name {\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tfont-size: 1rem;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-desc {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tline-height: 1.5;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-meta {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: flex-end;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t\tflex-shrink: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-toggle {\r\n\t\t\t\tdisplay: inline-flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\tfont-weight: 500;\r\n\t\t\t\tcursor: pointer;\r\n\t\t\t\tuser-select: none;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-toggle input {\r\n\t\t\t\twidth: 1rem;\r\n\t\t\t\theight: 1rem;\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tcursor: pointer;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-roles {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: flex-end;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-roles-label {\r\n\t\t\t\tfont-size: 0.75rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\ttext-transform: uppercase;\r\n\t\t\t\tletter-spacing: 0.04em;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-role-options {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\tjustify-content: flex-end;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flags-actions {\r\n\t\t\t\tmargin-top: var(--space-6);\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tjustify-content: flex-end;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flags-section {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-4);\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flags-section + .feature-flags-section {\r\n\t\t\t\tmargin-top: var(--space-6);\r\n\t\t\t\tpadding-top: var(--space-6);\r\n\t\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flags-section-title {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tfont-size: 1rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-setting-row {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t\tjustify-content: space-between;\r\n\t\t\t\tgap: var(--space-4);\r\n\t\t\t\tpadding: var(--space-4);\r\n\t\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-muted);\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-setting-copy {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tflex: 1 1 16rem;\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-setting-name {\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tfont-size: 1rem;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-setting-desc {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tline-height: 1.5;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-number-field {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: flex-end;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tflex-shrink: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-number-label {\r\n\t\t\t\tfont-size: 0.75rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\ttext-transform: uppercase;\r\n\t\t\t\tletter-spacing: 0.04em;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-number-input {\r\n\t\t\t\twidth: 7rem;\r\n\t\t\t\tpadding: var(--space-2) var(--space-3);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\tfont: inherit;\r\n\t\t\t\ttext-align: right;\r\n\t\t\t}\r\n\t\t</style></head><body><div class=\"container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<style>\r\n\t\t\t.feature-flags-hero {\r\n\t\t\t\tmargin-bottom: var(--space-6);\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flags-subtitle {\r\n\t\t\t\tmargin-top: var(--space-2);\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tmax-width: 42rem;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flags-card {\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\t\tpadding: var(--space-6);\r\n\t\t\t\tmax-width: 48rem;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-list {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-4);\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t\tjustify-content: space-between;\r\n\t\t\t\tgap: var(--space-4);\r\n\t\t\t\tpadding: var(--space-4);\r\n\t\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-muted);\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-brand {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t\tgap: var(--space-4);\r\n\t\t\t\tflex: 1 1 16rem;\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-logo-wrap {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tjustify-content: center;\r\n\t\t\t\twidth: 3.5rem;\r\n\t\t\t\theight: 3.5rem;\r\n\t\t\t\tflex-shrink: 0;\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\t}\r\n\r\n\t\t\t.integration-logo {\r\n\t\t\t\tdisplay: block;\r\n\t\t\t\tmax-width: 100%;\r\n\t\t\t\theight: auto;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-logo-calendar {\r\n\t\t\t\twidth: 1.5rem;\r\n\t\t\t\theight: 1.5rem;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-info {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-name {\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tfont-size: 1rem;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-desc {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tline-height: 1.5;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-meta {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: flex-end;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t\tflex-shrink: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-toggle {\r\n\t\t\t\tdisplay: inline-flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\tfont-weight: 500;\r\n\t\t\t\tcursor: pointer;\r\n\t\t\t\tuser-select: none;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-toggle input {\r\n\t\t\t\twidth: 1rem;\r\n\t\t\t\theight: 1rem;\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tcursor: pointer;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-roles {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: flex-end;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-roles-label {\r\n\t\t\t\tfont-size: 0.75rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\ttext-transform: uppercase;\r\n\t\t\t\tletter-spacing: 0.04em;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-role-options {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\tjustify-content: flex-end;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flags-actions {\r\n\t\t\t\tmargin-top: var(--space-6);\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tjustify-content: flex-end;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flags-section {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-4);\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flags-section + .feature-flags-section {\r\n\t\t\t\tmargin-top: var(--space-6);\r\n\t\t\t\tpadding-top: var(--space-6);\r\n\t\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flags-section-title {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tfont-size: 1rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-setting-row {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t\tjustify-content: space-between;\r\n\t\t\t\tgap: var(--space-4);\r\n\t\t\t\tpadding: var(--space-4);\r\n\t\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-muted);\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-setting-copy {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tflex: 1 1 16rem;\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-setting-name {\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tfont-size: 1rem;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-setting-desc {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tline-height: 1.5;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-number-field {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: flex-end;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tflex-shrink: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-number-label {\r\n\t\t\t\tfont-size: 0.75rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\ttext-transform: uppercase;\r\n\t\t\t\tletter-spacing: 0.04em;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-number-input {\r\n\t\t\t\twidth: 7rem;\r\n\t\t\t\tpadding: var(--space-2) var(--space-3);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\tfont: inherit;\r\n\t\t\t\ttext-align: right;\r\n\t\t\t}\r\n\r\n\t\t\t.feature-flag-select-input {\r\n\t\t\t\tmin-width: 16rem;\r\n\t\t\t\tmax-width: 20rem;\r\n\t\t\t\tpadding: var(--space-2) var(--space-3);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\tfont: inherit;\r\n\t\t\t}\r\n\t\t</style></head><body><div class=\"container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -142,7 +156,7 @@ func FeatureFlags(data FeatureFlagsData) templ.Component {
 		var templ_7745c5c3_Var3 templ.SafeURL
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/feature-flags"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 307, Col: 59}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 331, Col: 59}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -165,6 +179,10 @@ func FeatureFlags(data FeatureFlagsData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = FeatureFlagRoleGatedRow(data.IntroVideoUploads).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = FeatureFlagSelectRow(data.IntroVideoCompressPreset).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -216,7 +234,7 @@ func FeatureFlagClassOverdueGracePeriodRow(minutes int64) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", constants.MaxClassOverdueGracePeriodMinutes))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 379, Col: 72}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 404, Col: 72}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 		if templ_7745c5c3_Err != nil {
@@ -229,13 +247,153 @@ func FeatureFlagClassOverdueGracePeriodRow(minutes int64) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", minutes))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 381, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 406, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" required></div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func FeatureFlagSelectRow(item FeatureFlagSelectItem) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var7 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var7 == nil {
+			templ_7745c5c3_Var7 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"feature-flag-setting-row\"><div class=\"feature-flag-setting-copy\"><span class=\"feature-flag-setting-name\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(item.Name)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 416, Col: 54}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</span><p class=\"feature-flag-setting-desc\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var9 string
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(item.Description)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 417, Col: 58}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</p></div><div class=\"feature-flag-number-field\"><label class=\"feature-flag-number-label\" for=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var10 string
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.FormFieldName)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 420, Col: 68}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\">Preset</label> <select id=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var11 string
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.FormFieldName)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 422, Col: 27}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" class=\"feature-flag-select-input\" name=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var12 string
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.FormFieldName)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 424, Col: 29}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" required>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		for _, option := range item.Options {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<option value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var13 string
+			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(option.Value)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 428, Col: 33}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if option.Value == item.SelectedValue {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, " selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, ">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var14 string
+			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(option.Label)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 428, Col: 99}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</option>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</select></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -259,74 +417,74 @@ func FeatureFlagBooleanRow(item FeatureFlagBooleanItem) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var7 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var7 == nil {
-			templ_7745c5c3_Var7 = templ.NopComponent
+		templ_7745c5c3_Var15 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var15 == nil {
+			templ_7745c5c3_Var15 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"integration-row\"><div class=\"integration-row-brand\"><div class=\"integration-info\"><span class=\"integration-name\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<div class=\"integration-row\"><div class=\"integration-row-brand\"><div class=\"integration-info\"><span class=\"integration-name\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(item.Name)
+		var templ_7745c5c3_Var16 string
+		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(item.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 392, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 439, Col: 46}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</span><p class=\"integration-desc\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var9 string
-		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(item.Description)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 393, Col: 50}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</span><p class=\"integration-desc\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</p></div></div><div class=\"integration-row-meta\"><label class=\"feature-flag-toggle\"><input type=\"checkbox\" name=\"")
+		var templ_7745c5c3_Var17 string
+		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(item.Description)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 440, Col: 50}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var10 string
-		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.FormFieldName)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 400, Col: 30}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</p></div></div><div class=\"integration-row-meta\"><label class=\"feature-flag-toggle\"><input type=\"checkbox\" name=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\"")
+		var templ_7745c5c3_Var18 string
+		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.FormFieldName)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 447, Col: 30}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if item.Enabled {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, " checked")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, " checked")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var11 string
-		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(item.ToggleLabel)
+		var templ_7745c5c3_Var19 string
+		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(item.ToggleLabel)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 403, Col: 22}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 450, Col: 22}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</label></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</label></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -350,107 +508,107 @@ func FeatureFlagRoleGatedRow(item FeatureFlagRoleGatedItem) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var12 == nil {
-			templ_7745c5c3_Var12 = templ.NopComponent
+		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var20 == nil {
+			templ_7745c5c3_Var20 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<div class=\"integration-row\"><div class=\"integration-row-brand\"><div class=\"integration-info\"><span class=\"integration-name\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div class=\"integration-row\"><div class=\"integration-row-brand\"><div class=\"integration-info\"><span class=\"integration-name\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var13 string
-		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(item.Name)
+		var templ_7745c5c3_Var21 string
+		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(item.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 413, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 460, Col: 46}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</span><p class=\"integration-desc\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var14 string
-		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(item.Description)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 414, Col: 50}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</span><p class=\"integration-desc\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</p></div></div><div class=\"integration-row-meta\"><label class=\"feature-flag-toggle\"><input type=\"checkbox\" name=\"")
+		var templ_7745c5c3_Var22 string
+		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(item.Description)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 461, Col: 50}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var15 string
-		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.FormFieldName)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 421, Col: 30}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</p></div></div><div class=\"integration-row-meta\"><label class=\"feature-flag-toggle\"><input type=\"checkbox\" name=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\"")
+		var templ_7745c5c3_Var23 string
+		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.FormFieldName)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 468, Col: 30}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if item.Enabled {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, " checked")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, " checked")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "> Allow uploads</label><fieldset class=\"feature-flag-roles\"><legend class=\"feature-flag-roles-label\">Visible to</legend><div class=\"feature-flag-role-options\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "> Allow uploads</label><fieldset class=\"feature-flag-roles\"><legend class=\"feature-flag-roles-label\">Visible to</legend><div class=\"feature-flag-role-options\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, role := range item.RoleOptions {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<label class=\"feature-flag-toggle\"><input type=\"checkbox\" name=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<label class=\"feature-flag-toggle\"><input type=\"checkbox\" name=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var16 string
-			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(featureFlagRoleFieldName(item.FormPrefix, role))
+			var templ_7745c5c3_Var24 string
+			templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.ResolveAttributeValue(featureFlagRoleFieldName(item.FormPrefix, role))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 433, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 480, Col: 62}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if featureFlagRoleChecked(item.VisibleRoles, role) {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, " checked")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, " checked")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var17 string
-			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(featureFlagRoleLabel(role))
+			var templ_7745c5c3_Var25 string
+			templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(featureFlagRoleLabel(role))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 436, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 483, Col: 35}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</label>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</label>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</div></fieldset></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</div></fieldset></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -474,99 +632,99 @@ func FeatureFlagIntegrationRow(item FeatureFlagIntegrationItem) templ.Component 
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var18 == nil {
-			templ_7745c5c3_Var18 = templ.NopComponent
+		templ_7745c5c3_Var26 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var26 == nil {
+			templ_7745c5c3_Var26 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div class=\"integration-row\"><div class=\"integration-row-brand\"><div class=\"integration-logo-wrap\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<div class=\"integration-row\"><div class=\"integration-row-brand\"><div class=\"integration-logo-wrap\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var19 = []any{item.LogoClass}
-		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var19...)
+		var templ_7745c5c3_Var27 = []any{item.LogoClass}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var27...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<img class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<img class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var20 string
-		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var19).String())
+		var templ_7745c5c3_Var28 string
+		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var27).String())
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 1, Col: 0}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var20)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var28)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\" src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\" src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var21 string
-		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.LogoURL)
+		var templ_7745c5c3_Var29 string
+		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.LogoURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 451, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 498, Col: 23}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var21)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "\" width=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var29)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var22 string
-		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", item.LogoWidth))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 452, Col: 46}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var22)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\" width=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" height=\"")
+		var templ_7745c5c3_Var30 string
+		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", item.LogoWidth))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 499, Col: 46}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var30)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var23 string
-		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", item.LogoHeight))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 453, Col: 48}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "\" height=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "\" alt=\"\"></div><div class=\"integration-info\"><span class=\"integration-name\">")
+		var templ_7745c5c3_Var31 string
+		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", item.LogoHeight))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 500, Col: 48}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var31)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var24 string
-		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(item.Name)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 458, Col: 46}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "\" alt=\"\"></div><div class=\"integration-info\"><span class=\"integration-name\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "</span><p class=\"integration-desc\">")
+		var templ_7745c5c3_Var32 string
+		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(item.Name)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 505, Col: 46}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var25 string
-		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(item.Description)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 459, Col: 50}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</span><p class=\"integration-desc\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</p></div></div><div class=\"integration-row-meta\">")
+		var templ_7745c5c3_Var33 string
+		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(item.Description)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 506, Col: 50}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "</p></div></div><div class=\"integration-row-meta\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -581,76 +739,76 @@ func FeatureFlagIntegrationRow(item FeatureFlagIntegrationItem) templ.Component 
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<label class=\"feature-flag-toggle\"><input type=\"checkbox\" name=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "<label class=\"feature-flag-toggle\"><input type=\"checkbox\" name=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var26 string
-		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.FormFieldName)
+		var templ_7745c5c3_Var34 string
+		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.FormFieldName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 471, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 518, Col: 30}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var34)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if item.ConnectionsAllowed {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, " checked")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, " checked")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "> Allow new connections</label><fieldset class=\"feature-flag-roles\"><legend class=\"feature-flag-roles-label\">Visible to</legend><div class=\"feature-flag-role-options\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "> Allow new connections</label><fieldset class=\"feature-flag-roles\"><legend class=\"feature-flag-roles-label\">Visible to</legend><div class=\"feature-flag-role-options\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, role := range item.RoleOptions {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<label class=\"feature-flag-toggle\"><input type=\"checkbox\" name=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<label class=\"feature-flag-toggle\"><input type=\"checkbox\" name=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var27 string
-			templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.ResolveAttributeValue(featureFlagRoleFieldName(item.FormPrefix, role))
+			var templ_7745c5c3_Var35 string
+			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.ResolveAttributeValue(featureFlagRoleFieldName(item.FormPrefix, role))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 483, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 530, Col: 62}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var35)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if featureFlagRoleChecked(item.VisibleRoles, role) {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, " checked")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, " checked")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var28 string
-			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(featureFlagRoleLabel(role))
+			var templ_7745c5c3_Var36 string
+			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(featureFlagRoleLabel(role))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 486, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/feature_flags.templ`, Line: 533, Col: 35}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</label>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "</label>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</div></fieldset></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</div></fieldset></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

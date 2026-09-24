@@ -31,10 +31,25 @@ type ProcessedUpload struct {
 	Cleanup  func()
 }
 
-func ProcessUpload(ctx context.Context, file io.ReadSeeker, filename string, size int64) (ProcessedUpload, error) {
+func ProcessUpload(ctx context.Context, file io.ReadSeeker, filename string, size int64, settings constants.IntroVideoEncodeSettings) (ProcessedUpload, error) {
 	ext, mimeType, inputPath, cleanupInput, err := validateAndSaveUpload(file, filename, size)
 	if err != nil {
 		return ProcessedUpload{}, err
+	}
+
+	if settings.SkipCompress {
+		inputInfo, err := os.Stat(inputPath)
+		if err != nil {
+			cleanupInput()
+			return ProcessedUpload{}, ErrReadFailed
+		}
+		return ProcessedUpload{
+			Path:     inputPath,
+			Size:     inputInfo.Size(),
+			Ext:      ext,
+			MimeType: mimeType,
+			Cleanup:  cleanupInput,
+		}, nil
 	}
 
 	compressedPath, err := os.CreateTemp("", "intro-video-compressed-*"+constants.IntroVideoStoredExt)
@@ -47,7 +62,7 @@ func ProcessUpload(ctx context.Context, file io.ReadSeeker, filename string, siz
 	outputPath := compressedPath.Name()
 	cleanupOutput := func() { os.Remove(outputPath) }
 
-	if err := compressToMP4(ctx, inputPath, outputPath); err != nil {
+	if err := compressToMP4(ctx, inputPath, outputPath, settings); err != nil {
 		cleanupInput()
 		cleanupOutput()
 		return ProcessedUpload{}, err
