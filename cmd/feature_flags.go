@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/constants"
@@ -16,6 +17,14 @@ import (
 
 func classOverdueGracePeriodMinutes(ctx context.Context) int64 {
 	return featureflags.ClassOverdueGracePeriodMinutes(ctx, dbRO)
+}
+
+func overdueCutoffPHT(ctx context.Context) string {
+	grace := classOverdueGracePeriodMinutes(ctx)
+	if grace < 0 {
+		grace = 0
+	}
+	return utils.DateTimePHT(time.Now().Add(-time.Duration(grace) * time.Minute))
 }
 
 func handleFeatureFlags(w http.ResponseWriter, r *http.Request) {

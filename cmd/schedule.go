@@ -1181,8 +1181,6 @@ func handleConductScheduledClass(w http.ResponseWriter, r *http.Request, schedul
 
 	insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("marked scheduled class id %d as conducted", scheduleID))
 	insertAuditLogAs(ctx, user, "classes", fmt.Sprintf("recorded class for student id %d (teacher id %d, date %s, status conducted)", existing.StudentID, existing.TeacherID, existing.ScheduledDate))
-	notifyCrossParty(ctx, user, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindClassRecorded,
-		fmt.Sprintf("Class recorded for student on %s (status conducted)", existing.ScheduledDate))
 
 	respondScheduledClassAction(w, r.FormValue("from"), "Class conducted successfully!")
 }

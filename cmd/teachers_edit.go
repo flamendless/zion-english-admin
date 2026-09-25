@@ -21,7 +21,7 @@ import (
 	"zion-english/internal/utils"
 )
 
-func teacherFilterParams(q, status, docsStatus, resumeStatus string, connectionZoom, connectionGoogle bool) queries.CountTeachersFilteredParams {
+func teacherFilterParams(q, status, docsStatus, resumeStatus string, connectionZoom, connectionGoogle bool, connectionFilter, profilePictureFilter string) queries.CountTeachersFilteredParams {
 	qNull := sql.NullString{String: q, Valid: q != ""}
 	zoomFlag := int64(0)
 	if connectionZoom {
@@ -54,7 +54,21 @@ func teacherFilterParams(q, status, docsStatus, resumeStatus string, connectionZ
 		Column20: googleFlag,
 		Column21: zoomFlag,
 		Column22: googleFlag,
+		Column23: connectionFilter,
+		Column24: connectionFilter,
+		Column25: connectionFilter,
+		Column26: connectionFilter,
+		Column27: profilePictureFilter,
+		Column28: profilePictureFilter,
 	}
+}
+
+func teacherDashboardCount(ctx context.Context, connectionFilter, resumeStatus, profilePictureFilter string) int64 {
+	count, err := dbRO.GetQueries().CountTeachersFiltered(ctx, teacherFilterParams("", "", "", resumeStatus, false, false, connectionFilter, profilePictureFilter))
+	if err != nil {
+		return 0
+	}
+	return count
 }
 
 func parseConnectionCheckboxFilter(r *http.Request, name string) bool {
@@ -217,10 +231,22 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 	resumeStatus := parseTeacherDocsStatusFilter(r.URL.Query().Get("resumeStatus"))
 	connectionZoom := parseConnectionCheckboxFilter(r, "connectionZoom")
 	connectionGoogle := parseConnectionCheckboxFilter(r, "connectionGoogle")
+	connectionFilter := strings.TrimSpace(r.URL.Query().Get("connectionFilter"))
+	if connectionFilter != "" && !constants.ValidTeacherConnectionFilter(connectionFilter) {
+		connectionFilter = ""
+	}
+	if connectionFilter != "" {
+		connectionZoom = false
+		connectionGoogle = false
+	}
+	profilePictureFilter := strings.TrimSpace(r.URL.Query().Get("profilePictureFilter"))
+	if profilePictureFilter != "" && !constants.ValidTeacherProfilePictureFilter(profilePictureFilter) {
+		profilePictureFilter = ""
+	}
 	sort := parseListSort(r, frontend.ListSortKindTeacher)
 	page := utils.ParsePageQuery(r)
 
-	filter := teacherFilterParams(q, status, docsStatus, resumeStatus, connectionZoom, connectionGoogle)
+	filter := teacherFilterParams(q, status, docsStatus, resumeStatus, connectionZoom, connectionGoogle, connectionFilter, profilePictureFilter)
 	total, err := dbRO.GetQueries().CountTeachersFiltered(ctx, filter)
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to count teachers: %v", err), http.StatusInternalServerError)
@@ -247,6 +273,12 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 		Column20: filter.Column20,
 		Column21: filter.Column21,
 		Column22: filter.Column22,
+		Column23: filter.Column23,
+		Column24: filter.Column24,
+		Column25: filter.Column25,
+		Column26: filter.Column26,
+		Column27: filter.Column27,
+		Column28: filter.Column28,
 		Column14: filter.Column14,
 		Column15: filter.Column15,
 		Column16: filter.Column16,
@@ -369,6 +401,8 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 		ResumeStatusFilter:     resumeStatus,
 		ConnectionZoomFilter:   connectionZoom,
 		ConnectionGoogleFilter: connectionGoogle,
+		ConnectionFilter:        connectionFilter,
+		ProfilePictureFilter:    profilePictureFilter,
 		SortBy:         sort.By,
 		SortOrder:      string(sort.Order),
 		PageNumber:     page.Number,

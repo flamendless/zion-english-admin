@@ -18,7 +18,7 @@ templ ClassRecordRow(record ClassRecordRowData, showTeacher bool) {
 		</td>
 		<td data-label="Rate">@RatePill(record.Rate, record.Currency)</td>
 		<td data-label="Status">
-			@StatusPill(capitalizeStatus(record.Status), ClassStatusPillTone(record.Status), false)
+			@StatusPill(record.StatusLabel(), record.StatusPillTone(), false)
 		</td>
 		<td class="table-truncate-cell" data-label="Note / Reason">
 			@TableTruncatedText(record.NoteOrReasonDisplay())

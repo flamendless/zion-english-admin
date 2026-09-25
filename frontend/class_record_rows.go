@@ -22,6 +22,7 @@ type ClassRecordRowData struct {
 	Rate            float64
 	Currency        string
 	Status          constants.ClassListFilterStatus
+	Overdue         bool
 	Reason          string
 	Notes           string
 	Source          ClassRecordSource
@@ -107,6 +108,20 @@ func (r ClassRecordRowData) EndTimeDisplay() string {
 
 func (r ClassRecordRowData) TimeRangeDisplay() string {
 	return FormatScheduledClassTimeRange(r.StartTime, r.EndTime, r.DurationMinutes)
+}
+
+func (r ClassRecordRowData) StatusLabel() string {
+	if r.Overdue {
+		return "Overdue"
+	}
+	return capitalizeStatus(r.Status)
+}
+
+func (r ClassRecordRowData) StatusPillTone() PillTone {
+	if r.Overdue {
+		return PillToneError
+	}
+	return ClassStatusPillTone(r.Status)
 }
 
 func (r ClassRecordRowData) NoteOrReasonDisplay() string {

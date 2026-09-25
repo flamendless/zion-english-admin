@@ -147,7 +147,7 @@ func Landing() templ.Component {
 		templ_7745c5c3_Err = LandingFeatureCard(
 			"bell",
 			"Notifications & announcements",
-			"In-app alerts for schedule changes, document reviews, and missed sessions. Superusers publish banners for all or selected teachers.",
+			"In-app alerts for schedule changes and document reviews. Superusers publish banners for all or selected teachers.",
 			320,
 		).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {

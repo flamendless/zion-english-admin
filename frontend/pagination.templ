@@ -155,7 +155,7 @@ templ ReportRolesFilterDropdown(roleTeacher bool, roleAdmin bool) {
 	</div>
 }
 
-templ ListFilterForm(actionPath string, query string, status string, statusType ListFilterKind, teacherID string, teacherName string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool, showStatus bool, docsStatus string, showDocsStatus bool, resumeStatus string, showResumeStatus bool, connectionZoom bool, connectionGoogle bool, showConnections bool, sortBy string, sortOrder string, sortKind ListSortKind, showTeacherTableColumns bool, parentFilter string) {
+templ ListFilterForm(actionPath string, query string, status string, statusType ListFilterKind, teacherID string, teacherName string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool, showStatus bool, docsStatus string, showDocsStatus bool, resumeStatus string, showResumeStatus bool, connectionZoom bool, connectionGoogle bool, showConnections bool, sortBy string, sortOrder string, sortKind ListSortKind, showTeacherTableColumns bool, parentFilter string, connectionFilter string, profilePictureFilter string) {
 	<form class="list-toolbar" method="GET" action={ actionPath }>
 		<div class="form-group">
 			<label for="q">Search</label>
@@ -213,6 +213,12 @@ templ ListFilterForm(actionPath string, query string, status string, statusType 
 		@SortControls(sortBy, sortOrder, sortKind)
 		if parentFilter != "" {
 			<input type="hidden" name="parentFilter" value={ parentFilter }/>
+		}
+		if connectionFilter != "" {
+			<input type="hidden" name="connectionFilter" value={ connectionFilter }/>
+		}
+		if profilePictureFilter != "" {
+			<input type="hidden" name="profilePictureFilter" value={ profilePictureFilter }/>
 		}
 		<div class="form-group list-toolbar-action">
 			<label for="listFilterSubmit">&nbsp;</label>

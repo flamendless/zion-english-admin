@@ -166,6 +166,11 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 			data.StudentsWithoutParentRate = withoutParentRate
 		}
+		data.TotalTeachers = teacherDashboardCount(ctx, "", "", "")
+		data.TeachersWithoutZoom = teacherDashboardCount(ctx, string(constants.TeacherConnectionFilterMissingZoom), "", "")
+		data.TeachersWithoutGoogleCal = teacherDashboardCount(ctx, string(constants.TeacherConnectionFilterMissingGoogle), "", "")
+		data.TeachersWithoutCV = teacherDashboardCount(ctx, "", frontend.TeacherDocsFilterStatusNone, "")
+		data.TeachersWithoutProfileAvatar = teacherDashboardCount(ctx, "", "", string(constants.TeacherProfilePictureFilterMissing))
 		classCounts, err := dbRO.GetQueries().CountClassRecordsByStatusAndDateRange(ctx, queries.CountClassRecordsByStatusAndDateRangeParams{
 			Date:      weekStart,
 			Date_2:    weekEnd,
@@ -224,6 +229,18 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 					data.ClassesRescheduledWeek = row.Count
 				}
 			}
+		}
+		data.ClassesWeekStart = weekStart
+		data.ClassesWeekEnd = weekEnd
+		overdueCount, err := dbRO.GetQueries().CountOverdueScheduledClassesByDateRange(ctx, queries.CountOverdueScheduledClassesByDateRangeParams{
+			Column1:         user.ID,
+			TeacherID:       user.ID,
+			ScheduledDate:   weekStart,
+			ScheduledDate_2: weekEnd,
+			Datetime:        overdueCutoffPHT(ctx),
+		})
+		if err == nil {
+			data.ClassesOverdueWeek = overdueCount
 		}
 		populateDashboardEarnings(ctx, &data, earningsTeacherID)
 		today := utils.TodayPHT()

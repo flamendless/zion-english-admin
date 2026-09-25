@@ -35,6 +35,7 @@ const (
 	ClassListFilterCancelled   ClassListFilterStatus = "cancelled"
 	ClassListFilterRescheduled ClassListFilterStatus = "rescheduled"
 	ClassListFilterDeleted     ClassListFilterStatus = "deleted"
+	ClassListFilterOverdue     ClassListFilterStatus = "overdue"
 )
 
 var ClassListFilterStatuses = []ClassListFilterStatus{
@@ -43,6 +44,7 @@ var ClassListFilterStatuses = []ClassListFilterStatus{
 	ClassListFilterCancelled,
 	ClassListFilterRescheduled,
 	ClassListFilterDeleted,
+	ClassListFilterOverdue,
 }
 
 func (s ClassListFilterStatus) Label() string {
@@ -57,6 +59,8 @@ func (s ClassListFilterStatus) Label() string {
 		return "Rescheduled"
 	case ClassListFilterDeleted:
 		return "Deleted"
+	case ClassListFilterOverdue:
+		return "Overdue"
 	default:
 		return string(s)
 	}

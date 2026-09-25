@@ -2,6 +2,7 @@ package frontend
 
 import (
 	"fmt"
+	"zion-english/internal/constants"
 	"zion-english/internal/utils"
 )
 
@@ -17,6 +18,9 @@ type ClassesData struct {
 	ShowAllTeachers bool
 	TeacherID       string
 	TeacherName     string
+	StatusFilter    constants.ClassListFilterStatus
+	StartDate       string
+	EndDate         string
 }
 
 templ Classes(data ClassesData) {
@@ -76,7 +80,11 @@ templ Classes(data ClassesData) {
 				</div>
 				@MonthPicker("classesMonth", utils.URL("/classes/partials/date-preset"))
 				@DatePreset(true)
-				@ClassesStatusFilterDropdown()
+				if data.StartDate != "" && data.EndDate != "" {
+					<input type="hidden" id="startDate" name="startDate" value={ data.StartDate }/>
+					<input type="hidden" id="endDate" name="endDate" value={ data.EndDate }/>
+				}
+				@ClassesStatusFilterDropdownWithValue(data.StatusFilter)
 				@SortControls("", "desc", ListSortKindClass)
 				<input type="hidden" id="classesPage" name="page" value="1"/>
 				<button

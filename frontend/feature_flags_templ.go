@@ -227,7 +227,7 @@ func FeatureFlagClassOverdueGracePeriodRow(minutes int64) templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"feature-flag-setting-row\"><div class=\"feature-flag-setting-copy\"><span class=\"feature-flag-setting-name\">Overdue grace period</span><p class=\"feature-flag-setting-desc\">Minutes after a scheduled class ends before it is marked overdue on the schedule and included in missed-class notifications.</p></div><div class=\"feature-flag-number-field\"><label class=\"feature-flag-number-label\" for=\"classOverdueGracePeriodMinutes\">Minutes</label> <input id=\"classOverdueGracePeriodMinutes\" class=\"feature-flag-number-input\" type=\"number\" name=\"class_overdue_grace_period_minutes\" min=\"0\" max=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"feature-flag-setting-row\"><div class=\"feature-flag-setting-copy\"><span class=\"feature-flag-setting-name\">Overdue grace period</span><p class=\"feature-flag-setting-desc\">Minutes after a scheduled class ends before it is marked overdue on the schedule.</p></div><div class=\"feature-flag-number-field\"><label class=\"feature-flag-number-label\" for=\"classOverdueGracePeriodMinutes\">Minutes</label> <input id=\"classOverdueGracePeriodMinutes\" class=\"feature-flag-number-input\" type=\"number\" name=\"class_overdue_grace_period_minutes\" min=\"0\" max=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

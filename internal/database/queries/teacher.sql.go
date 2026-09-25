@@ -92,6 +92,41 @@ WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || midd
 		WHERE m.teacher_id = tbl_teachers.id AND m.service = 'google_calendar'
 	))
 	)
+	AND (
+	? = ''
+	OR (
+		? = 'missing_zoom'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_meeting_accounts m
+			WHERE m.teacher_id = tbl_teachers.id AND m.service = 'zoom'
+		)
+	)
+	OR (
+		? = 'missing_google'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_meeting_accounts m
+			WHERE m.teacher_id = tbl_teachers.id AND m.service = 'google_calendar'
+		)
+	)
+	OR (
+		? = 'missing_both'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_meeting_accounts m
+			WHERE m.teacher_id = tbl_teachers.id AND m.service = 'zoom'
+		)
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_meeting_accounts m
+			WHERE m.teacher_id = tbl_teachers.id AND m.service = 'google_calendar'
+		)
+	)
+	)
+	AND (
+	? = ''
+	OR (
+		? = 'missing'
+		AND TRIM(COALESCE(tbl_teachers.profile_picture, '')) = ''
+	)
+	)
 `
 
 type CountTeachersFilteredParams struct {
@@ -117,6 +152,12 @@ type CountTeachersFilteredParams struct {
 	Column20 interface{}
 	Column21 interface{}
 	Column22 interface{}
+	Column23 interface{}
+	Column24 interface{}
+	Column25 interface{}
+	Column26 interface{}
+	Column27 interface{}
+	Column28 interface{}
 }
 
 func (q *Queries) CountTeachersFiltered(ctx context.Context, arg CountTeachersFilteredParams) (int64, error) {
@@ -143,6 +184,12 @@ func (q *Queries) CountTeachersFiltered(ctx context.Context, arg CountTeachersFi
 		arg.Column20,
 		arg.Column21,
 		arg.Column22,
+		arg.Column23,
+		arg.Column24,
+		arg.Column25,
+		arg.Column26,
+		arg.Column27,
+		arg.Column28,
 	)
 	var count int64
 	err := row.Scan(&count)
@@ -623,6 +670,41 @@ WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || midd
 		WHERE m.teacher_id = tbl_teachers.id AND m.service = 'google_calendar'
 	))
 	)
+	AND (
+	? = ''
+	OR (
+		? = 'missing_zoom'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_meeting_accounts m
+			WHERE m.teacher_id = tbl_teachers.id AND m.service = 'zoom'
+		)
+	)
+	OR (
+		? = 'missing_google'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_meeting_accounts m
+			WHERE m.teacher_id = tbl_teachers.id AND m.service = 'google_calendar'
+		)
+	)
+	OR (
+		? = 'missing_both'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_meeting_accounts m
+			WHERE m.teacher_id = tbl_teachers.id AND m.service = 'zoom'
+		)
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_meeting_accounts m
+			WHERE m.teacher_id = tbl_teachers.id AND m.service = 'google_calendar'
+		)
+	)
+	)
+	AND (
+	? = ''
+	OR (
+		? = 'missing'
+		AND TRIM(COALESCE(tbl_teachers.profile_picture, '')) = ''
+	)
+	)
 ORDER BY CASE WHEN deleted = 1 THEN 2 WHEN tbl_teachers.status = 'pending' THEN 0 ELSE 1 END, last_name ASC, first_name ASC, middle_name ASC
 LIMIT ? OFFSET ?
 `
@@ -650,6 +732,12 @@ type GetTeachersFilteredParams struct {
 	Column20 interface{}
 	Column21 interface{}
 	Column22 interface{}
+	Column23 interface{}
+	Column24 interface{}
+	Column25 interface{}
+	Column26 interface{}
+	Column27 interface{}
+	Column28 interface{}
 	Limit    int64
 	Offset   int64
 }
@@ -704,6 +792,12 @@ func (q *Queries) GetTeachersFiltered(ctx context.Context, arg GetTeachersFilter
 		arg.Column20,
 		arg.Column21,
 		arg.Column22,
+		arg.Column23,
+		arg.Column24,
+		arg.Column25,
+		arg.Column26,
+		arg.Column27,
+		arg.Column28,
 		arg.Limit,
 		arg.Offset,
 	)

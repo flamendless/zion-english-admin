@@ -90,27 +90,3 @@ WHERE to_teacher_id IS NULL AND read = 0;
 UPDATE tbl_notifications
 SET read = 1, read_at = datetime('now')
 WHERE to_teacher_id = ? AND read = 0;
-
--- name: GetMissedScheduledClasses :many
-SELECT
-	sc.id,
-	sc.teacher_id,
-	sc.scheduled_date,
-	sc.start_time,
-	sc.duration_minutes,
-	s.name AS student_name,
-	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name
-FROM tbl_scheduled_classes sc
-JOIN tbl_students s ON s.id = sc.student_id
-JOIN tbl_teachers t ON t.id = sc.teacher_id
-WHERE sc.status = 'scheduled'
-	AND sc.deleted_at IS NULL
-	AND (
-		CASE
-			WHEN sc.start_time IS NOT NULL
-				AND TRIM(sc.start_time) != ''
-				AND sc.duration_minutes > 0
-			THEN datetime(sc.scheduled_date || ' ' || sc.start_time, '+' || sc.duration_minutes || ' minutes')
-			ELSE datetime(sc.scheduled_date || ' 23:59:59')
-		END
-	) < sqlc.arg(cutoff);

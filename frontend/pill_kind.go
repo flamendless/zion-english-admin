@@ -73,6 +73,8 @@ func ClassStatusPillTone(status constants.ClassListFilterStatus) PillTone {
 		return PillToneWarning
 	case constants.ClassListFilterScheduled:
 		return PillTonePrimary
+	case constants.ClassListFilterOverdue:
+		return PillToneError
 	default:
 		return PillToneNeutral
 	}

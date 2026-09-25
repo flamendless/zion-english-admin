@@ -258,12 +258,16 @@ templ CurrencyDropdownWithValue(selected string) {
 }
 
 templ ClassesStatusFilterDropdown() {
+	@ClassesStatusFilterDropdownWithValue(constants.ClassListFilterStatus(""))
+}
+
+templ ClassesStatusFilterDropdownWithValue(selected constants.ClassListFilterStatus) {
 	<div class="form-group">
 		<label for="statusFilter">Status</label>
 		<select id="statusFilter" name="status">
-			<option value="">All</option>
+			<option value="" selected?={ selected == constants.ClassListFilterStatus("") }>All</option>
 			for _, opt := range ClassListFilterOptions {
-				<option value={ opt.Value }>{ opt.Label }</option>
+				<option value={ opt.Value } selected?={ string(selected) == opt.Value }>{ opt.Label }</option>
 			}
 		</select>
 	</div>

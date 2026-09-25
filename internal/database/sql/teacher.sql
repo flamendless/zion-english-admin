@@ -178,6 +178,41 @@ WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || midd
 		SELECT 1 FROM tbl_teacher_meeting_accounts m
 		WHERE m.teacher_id = tbl_teachers.id AND m.service = 'google_calendar'
 	))
+	)
+	AND (
+	? = ''
+	OR (
+		? = 'missing_zoom'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_meeting_accounts m
+			WHERE m.teacher_id = tbl_teachers.id AND m.service = 'zoom'
+		)
+	)
+	OR (
+		? = 'missing_google'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_meeting_accounts m
+			WHERE m.teacher_id = tbl_teachers.id AND m.service = 'google_calendar'
+		)
+	)
+	OR (
+		? = 'missing_both'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_meeting_accounts m
+			WHERE m.teacher_id = tbl_teachers.id AND m.service = 'zoom'
+		)
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_meeting_accounts m
+			WHERE m.teacher_id = tbl_teachers.id AND m.service = 'google_calendar'
+		)
+	)
+	)
+	AND (
+	? = ''
+	OR (
+		? = 'missing'
+		AND TRIM(COALESCE(tbl_teachers.profile_picture, '')) = ''
+	)
 	);
 
 -- name: GetTeachersFiltered :many
@@ -241,6 +276,41 @@ WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || midd
 		SELECT 1 FROM tbl_teacher_meeting_accounts m
 		WHERE m.teacher_id = tbl_teachers.id AND m.service = 'google_calendar'
 	))
+	)
+	AND (
+	? = ''
+	OR (
+		? = 'missing_zoom'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_meeting_accounts m
+			WHERE m.teacher_id = tbl_teachers.id AND m.service = 'zoom'
+		)
+	)
+	OR (
+		? = 'missing_google'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_meeting_accounts m
+			WHERE m.teacher_id = tbl_teachers.id AND m.service = 'google_calendar'
+		)
+	)
+	OR (
+		? = 'missing_both'
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_meeting_accounts m
+			WHERE m.teacher_id = tbl_teachers.id AND m.service = 'zoom'
+		)
+		AND NOT EXISTS (
+			SELECT 1 FROM tbl_teacher_meeting_accounts m
+			WHERE m.teacher_id = tbl_teachers.id AND m.service = 'google_calendar'
+		)
+	)
+	)
+	AND (
+	? = ''
+	OR (
+		? = 'missing'
+		AND TRIM(COALESCE(tbl_teachers.profile_picture, '')) = ''
+	)
 	)
 ORDER BY CASE WHEN deleted = 1 THEN 2 WHEN tbl_teachers.status = 'pending' THEN 0 ELSE 1 END, last_name ASC, first_name ASC, middle_name ASC
 LIMIT ? OFFSET ?;

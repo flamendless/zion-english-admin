@@ -134,7 +134,7 @@ SELECT (
 	JOIN tbl_students s ON cr.student_id = s.id
 	WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
 		AND ((? = 'deleted' AND cr.deleted_at IS NOT NULL) OR (? != 'deleted' AND cr.deleted_at IS NULL))
-		AND (? = '' OR ? != 'scheduled')
+		AND (? = '' OR (? != 'scheduled' AND ? != 'overdue'))
 		AND (? = '' OR ? = 'deleted' OR cr.status = ?)
 		AND (? = '' OR s.name LIKE '%' || ? || '%')
 ) + (
@@ -143,7 +143,19 @@ SELECT (
 	JOIN tbl_students s ON sc.student_id = s.id
 	WHERE (? = 0 OR sc.teacher_id = ?) AND sc.scheduled_date >= ? AND sc.scheduled_date <= ?
 		AND ((? = 'deleted' AND sc.deleted_at IS NOT NULL) OR (? != 'deleted' AND sc.deleted_at IS NULL AND sc.status = 'scheduled'))
-		AND (? = '' OR ? = 'scheduled' OR ? = 'deleted')
+		AND (? = '' OR ? = 'scheduled' OR ? = 'deleted' OR ? = 'overdue')
+		AND (
+			? != 'overdue'
+			OR (
+				CASE
+					WHEN sc.start_time IS NOT NULL
+						AND TRIM(sc.start_time) != ''
+						AND sc.duration_minutes > 0
+					THEN datetime(sc.scheduled_date || ' ' || sc.start_time, '+' || sc.duration_minutes || ' minutes')
+					ELSE datetime(sc.scheduled_date || ' 23:59:59')
+				END
+			) < datetime(?)
+		)
 		AND (? = '' OR s.name LIKE '%' || ? || '%')
 ) AS count
 `
@@ -159,20 +171,24 @@ type CountClassesListFilteredParams struct {
 	Column8         interface{}
 	Column9         interface{}
 	Column10        interface{}
+	Column11        interface{}
 	Status          string
-	Column12        interface{}
-	Column13        sql.NullString
-	Column14        interface{}
+	Column13        interface{}
+	Column14        sql.NullString
+	Column15        interface{}
 	TeacherID_2     int64
 	ScheduledDate   string
 	ScheduledDate_2 string
-	Column18        interface{}
 	Column19        interface{}
 	Column20        interface{}
 	Column21        interface{}
 	Column22        interface{}
 	Column23        interface{}
-	Column24        sql.NullString
+	Column24        interface{}
+	Column25        interface{}
+	Datetime        interface{}
+	Column27        interface{}
+	Column28        sql.NullString
 }
 
 func (q *Queries) CountClassesListFiltered(ctx context.Context, arg CountClassesListFilteredParams) (int64, error) {
@@ -187,20 +203,64 @@ func (q *Queries) CountClassesListFiltered(ctx context.Context, arg CountClasses
 		arg.Column8,
 		arg.Column9,
 		arg.Column10,
+		arg.Column11,
 		arg.Status,
-		arg.Column12,
 		arg.Column13,
 		arg.Column14,
+		arg.Column15,
 		arg.TeacherID_2,
 		arg.ScheduledDate,
 		arg.ScheduledDate_2,
-		arg.Column18,
 		arg.Column19,
 		arg.Column20,
 		arg.Column21,
 		arg.Column22,
 		arg.Column23,
 		arg.Column24,
+		arg.Column25,
+		arg.Datetime,
+		arg.Column27,
+		arg.Column28,
+	)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
+const countOverdueScheduledClassesByDateRange = `-- name: CountOverdueScheduledClassesByDateRange :one
+SELECT COUNT(*) as count
+FROM tbl_scheduled_classes sc
+WHERE sc.deleted_at IS NULL
+	AND sc.status = 'scheduled'
+	AND (? = 0 OR sc.teacher_id = ?)
+	AND sc.scheduled_date >= ?
+	AND sc.scheduled_date <= ?
+	AND (
+		CASE
+			WHEN sc.start_time IS NOT NULL
+				AND TRIM(sc.start_time) != ''
+				AND sc.duration_minutes > 0
+			THEN datetime(sc.scheduled_date || ' ' || sc.start_time, '+' || sc.duration_minutes || ' minutes')
+			ELSE datetime(sc.scheduled_date || ' 23:59:59')
+		END
+	) < datetime(?)
+`
+
+type CountOverdueScheduledClassesByDateRangeParams struct {
+	Column1         interface{}
+	TeacherID       int64
+	ScheduledDate   string
+	ScheduledDate_2 string
+	Datetime        interface{}
+}
+
+func (q *Queries) CountOverdueScheduledClassesByDateRange(ctx context.Context, arg CountOverdueScheduledClassesByDateRangeParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countOverdueScheduledClassesByDateRange,
+		arg.Column1,
+		arg.TeacherID,
+		arg.ScheduledDate,
+		arg.ScheduledDate_2,
+		arg.Datetime,
 	)
 	var count int64
 	err := row.Scan(&count)
@@ -545,7 +605,7 @@ SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_
 	JOIN tbl_teachers t ON cr.teacher_id = t.id
 	WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
 		AND ((? = 'deleted' AND cr.deleted_at IS NOT NULL) OR (? != 'deleted' AND cr.deleted_at IS NULL))
-		AND (? = '' OR ? != 'scheduled')
+		AND (? = '' OR (? != 'scheduled' AND ? != 'overdue'))
 		AND (? = '' OR ? = 'deleted' OR cr.status = ?)
 		AND (? = '' OR s.name LIKE '%' || ? || '%')
 
@@ -578,7 +638,19 @@ SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_
 	JOIN tbl_teachers t ON sc.teacher_id = t.id
 	WHERE (? = 0 OR sc.teacher_id = ?) AND sc.scheduled_date >= ? AND sc.scheduled_date <= ?
 		AND ((? = 'deleted' AND sc.deleted_at IS NOT NULL) OR (? != 'deleted' AND sc.deleted_at IS NULL AND sc.status = 'scheduled'))
-		AND (? = '' OR ? = 'scheduled' OR ? = 'deleted')
+		AND (? = '' OR ? = 'scheduled' OR ? = 'deleted' OR ? = 'overdue')
+		AND (
+			? != 'overdue'
+			OR (
+				CASE
+					WHEN sc.start_time IS NOT NULL
+						AND TRIM(sc.start_time) != ''
+						AND sc.duration_minutes > 0
+					THEN datetime(sc.scheduled_date || ' ' || sc.start_time, '+' || sc.duration_minutes || ' minutes')
+					ELSE datetime(sc.scheduled_date || ' 23:59:59')
+				END
+			) < datetime(?)
+		)
 		AND (? = '' OR s.name LIKE '%' || ? || '%')
 ) AS combined
 ORDER BY CASE WHEN combined.date = date('now', 'localtime') THEN 0 ELSE 1 END, combined.date DESC, combined.start_time DESC, combined.created_at DESC
@@ -596,20 +668,24 @@ type GetClassesListFilteredParams struct {
 	Column8         interface{}
 	Column9         interface{}
 	Column10        interface{}
+	Column11        interface{}
 	Status          string
-	Column12        interface{}
-	Column13        sql.NullString
-	Column14        interface{}
+	Column13        interface{}
+	Column14        sql.NullString
+	Column15        interface{}
 	TeacherID_2     int64
 	ScheduledDate   string
 	ScheduledDate_2 string
-	Column18        interface{}
 	Column19        interface{}
 	Column20        interface{}
 	Column21        interface{}
 	Column22        interface{}
 	Column23        interface{}
-	Column24        sql.NullString
+	Column24        interface{}
+	Column25        interface{}
+	Datetime        interface{}
+	Column27        interface{}
+	Column28        sql.NullString
 	Limit           int64
 	Offset          int64
 }
@@ -650,20 +726,24 @@ func (q *Queries) GetClassesListFiltered(ctx context.Context, arg GetClassesList
 		arg.Column8,
 		arg.Column9,
 		arg.Column10,
+		arg.Column11,
 		arg.Status,
-		arg.Column12,
 		arg.Column13,
 		arg.Column14,
+		arg.Column15,
 		arg.TeacherID_2,
 		arg.ScheduledDate,
 		arg.ScheduledDate_2,
-		arg.Column18,
 		arg.Column19,
 		arg.Column20,
 		arg.Column21,
 		arg.Column22,
 		arg.Column23,
 		arg.Column24,
+		arg.Column25,
+		arg.Datetime,
+		arg.Column27,
+		arg.Column28,
 		arg.Limit,
 		arg.Offset,
 	)

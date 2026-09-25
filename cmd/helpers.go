@@ -41,6 +41,8 @@ func listQueryParams(r *http.Request) map[string]string {
 		"resumeStatus":     r.URL.Query().Get("resumeStatus"),
 		"connectionZoom":   r.URL.Query().Get("connectionZoom"),
 		"connectionGoogle": r.URL.Query().Get("connectionGoogle"),
+		"connectionFilter":      r.URL.Query().Get("connectionFilter"),
+		"profilePictureFilter":  r.URL.Query().Get("profilePictureFilter"),
 		"teacherId":  r.URL.Query().Get("teacherId"),
 		"email":      r.URL.Query().Get("email"),
 		"module":     r.URL.Query().Get("module"),

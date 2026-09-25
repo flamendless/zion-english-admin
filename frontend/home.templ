@@ -29,6 +29,9 @@ type DashboardData struct {
 	ClassesConductedWeek   int64
 	ClassesCancelledWeek   int64
 	ClassesRescheduledWeek int64
+	ClassesOverdueWeek     int64
+	ClassesWeekStart       string
+	ClassesWeekEnd         string
 	ScheduledToday         int64
 	FirstCutoffTotals                 []CurrencyTotal
 	SecondCutoffTotals                []CurrencyTotal
@@ -40,6 +43,11 @@ type DashboardData struct {
 	AllTeachersSecondCutoffParentTotals []CurrencyTotal
 	StudentsWithoutParent             int64
 	StudentsWithoutParentRate         int64
+	TotalTeachers                     int64
+	TeachersWithoutZoom               int64
+	TeachersWithoutGoogleCal int64
+	TeachersWithoutCV             int64
+	TeachersWithoutProfileAvatar  int64
 	ShowPaymentReceipt                bool
 	PaymentReceipt                    PaymentReceiptData
 }
@@ -256,6 +264,44 @@ templ DashboardPendingStatCard(pendingTeachers int64, pendingDocuments int64, pe
 	</div>
 }
 
+templ DashboardTeachersStatCard(total int64, withoutZoom int64, withoutGoogleCal int64, withoutCV int64, withoutProfileAvatar int64) {
+	<div class="stat-card">
+		@AdminOnlyStatLabel("Teachers")
+		<div class="stat-link-rows">
+			@DashboardStatLinkRow(
+				"Total teachers",
+				utils.URL("/teachers"),
+				total,
+				"View all teachers",
+			)
+			@DashboardStatLinkRow(
+				"Without Zoom",
+				utils.URL("/teachers?connectionFilter=missing_zoom"),
+				withoutZoom,
+				"View teachers without Zoom",
+			)
+			@DashboardStatLinkRow(
+				"Without Google Calendar",
+				utils.URL("/teachers?connectionFilter=missing_google"),
+				withoutGoogleCal,
+				"View teachers without Google Calendar",
+			)
+			@DashboardStatLinkRow(
+				"Without uploaded CV",
+				utils.URL("/teachers?resumeStatus=none"),
+				withoutCV,
+				"View teachers without an uploaded CV",
+			)
+			@DashboardStatLinkRow(
+				"Without profile avatar",
+				utils.URL("/teachers?profilePictureFilter=missing"),
+				withoutProfileAvatar,
+				"View teachers without an uploaded profile avatar",
+			)
+		</div>
+	</div>
+}
+
 templ DashboardParentGapStatCard(withoutParent int64, withoutParentRate int64) {
 	<div class="stat-card">
 		@AdminOnlyStatLabel("Students Missing Parent Info")
@@ -286,6 +332,7 @@ templ DashboardStats(data DashboardData) {
 				<span class="stat-sub">{ fmt.Sprintf("%d active, %d inactive", data.ActiveStudents, data.InactiveStudents) }</span>
 			</div>
 			@DashboardPendingStatCard(data.PendingTeachers, data.PendingDocuments, data.PendingIntroVideos)
+			@DashboardTeachersStatCard(data.TotalTeachers, data.TeachersWithoutZoom, data.TeachersWithoutGoogleCal, data.TeachersWithoutCV, data.TeachersWithoutProfileAvatar)
 			@DashboardParentGapStatCard(data.StudentsWithoutParent, data.StudentsWithoutParentRate)
 		}
 		if data.Role == auth.RoleTeacher {
@@ -300,15 +347,27 @@ templ DashboardStats(data DashboardData) {
 				<span class="stat-value">{ fmt.Sprintf("%d", data.ScheduledToday) }</span>
 			</div>
 		}
-		<div class="stat-card">
-			if auth.HasAdminAccess(data.Role) {
-				@AdminOnlyStatLabel("Classes This Week")
-			} else {
+		if data.Role == auth.RoleTeacher || data.Role == auth.RoleTester {
+			<div class="stat-card">
 				<span class="stat-label">Classes This Week</span>
-			}
-			<span class="stat-value">{ fmt.Sprintf("%d total", data.ClassesConductedWeek + data.ClassesCancelledWeek + data.ClassesRescheduledWeek) }</span>
-			<span class="stat-sub">{ fmt.Sprintf("%d conducted, %d cancelled, %d rescheduled", data.ClassesConductedWeek, data.ClassesCancelledWeek, data.ClassesRescheduledWeek) }</span>
-		</div>
+				<span class="stat-value">{ fmt.Sprintf("%d total", data.ClassesConductedWeek + data.ClassesCancelledWeek + data.ClassesRescheduledWeek) }</span>
+				<span class="stat-sub">{ fmt.Sprintf("%d conducted, %d cancelled, %d rescheduled", data.ClassesConductedWeek, data.ClassesCancelledWeek, data.ClassesRescheduledWeek) }</span>
+				<div class="stat-link-rows">
+					@DashboardStatLinkRow(
+						"Overdue",
+						utils.URL(fmt.Sprintf("/classes?status=overdue&startDate=%s&endDate=%s", data.ClassesWeekStart, data.ClassesWeekEnd)),
+						data.ClassesOverdueWeek,
+						"View overdue scheduled classes this week",
+					)
+				</div>
+			</div>
+		} else {
+			<div class="stat-card">
+				@AdminOnlyStatLabel("Classes This Week")
+				<span class="stat-value">{ fmt.Sprintf("%d total", data.ClassesConductedWeek + data.ClassesCancelledWeek + data.ClassesRescheduledWeek) }</span>
+				<span class="stat-sub">{ fmt.Sprintf("%d conducted, %d cancelled, %d rescheduled", data.ClassesConductedWeek, data.ClassesCancelledWeek, data.ClassesRescheduledWeek) }</span>
+			</div>
+		}
 		if data.Role == auth.RoleAdmin {
 			@DashboardSectionedCurrencyStatCard("My Cutoffs", false, []DashboardCurrencySection{
 				{Title: "First cutoff · Teacher rates", Totals: data.FirstCutoffTotals},

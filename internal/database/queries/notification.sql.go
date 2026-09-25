@@ -7,7 +7,6 @@ package queries
 
 import (
 	"context"
-	"database/sql"
 )
 
 const countNotificationsForSuperuser = `-- name: CountNotificationsForSuperuser :one
@@ -63,72 +62,6 @@ func (q *Queries) CountUnreadNotificationsForTeacher(ctx context.Context, toTeac
 	var count int64
 	err := row.Scan(&count)
 	return count, err
-}
-
-const getMissedScheduledClasses = `-- name: GetMissedScheduledClasses :many
-SELECT
-	sc.id,
-	sc.teacher_id,
-	sc.scheduled_date,
-	sc.start_time,
-	sc.duration_minutes,
-	s.name AS student_name,
-	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name
-FROM tbl_scheduled_classes sc
-JOIN tbl_students s ON s.id = sc.student_id
-JOIN tbl_teachers t ON t.id = sc.teacher_id
-WHERE sc.status = 'scheduled'
-	AND sc.deleted_at IS NULL
-	AND (
-		CASE
-			WHEN sc.start_time IS NOT NULL
-				AND TRIM(sc.start_time) != ''
-				AND sc.duration_minutes > 0
-			THEN datetime(sc.scheduled_date || ' ' || sc.start_time, '+' || sc.duration_minutes || ' minutes')
-			ELSE datetime(sc.scheduled_date || ' 23:59:59')
-		END
-	) < ?1
-`
-
-type GetMissedScheduledClassesRow struct {
-	ID              int64
-	TeacherID       int64
-	ScheduledDate   string
-	StartTime       sql.NullString
-	DurationMinutes int64
-	StudentName     string
-	TeacherName     string
-}
-
-func (q *Queries) GetMissedScheduledClasses(ctx context.Context, cutoff sql.NullString) ([]GetMissedScheduledClassesRow, error) {
-	rows, err := q.db.QueryContext(ctx, getMissedScheduledClasses, cutoff)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetMissedScheduledClassesRow
-	for rows.Next() {
-		var i GetMissedScheduledClassesRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.TeacherID,
-			&i.ScheduledDate,
-			&i.StartTime,
-			&i.DurationMinutes,
-			&i.StudentName,
-			&i.TeacherName,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
 }
 
 const getNotificationForSuperuser = `-- name: GetNotificationForSuperuser :one

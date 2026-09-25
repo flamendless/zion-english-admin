@@ -8,13 +8,14 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/classrules"
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/models"
-	"zion-english/internal/notifications"
+	"zion-english/internal/scheduledclass"
 	"zion-english/internal/utils"
 )
 
@@ -283,9 +284,6 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 	updated, err := dbRW.GetQueries().GetClassRecordByID(ctx, recordID)
 	if err == nil {
 		insertAuditLogAs(ctx, auth.GetUser(ctx), "classes", formatClassRecordAudit(existing, updated))
-		actor := auth.GetUser(ctx)
-		notifyCrossParty(ctx, actor, updated.TeacherID, teacherNameByID(ctx, updated.TeacherID), notifications.KindClassUpdated,
-			fmt.Sprintf("Class record updated for student on %s (status %s)", updated.Date, updated.Status))
 	}
 
 	if err := respondFormMutation(w, "Class updated successfully!", "/classes", "classesRefresh"); err != nil {
@@ -429,7 +427,8 @@ func classesListViewFromRow(row queries.GetClassesListFilteredRow) models.ClassR
 	}
 }
 
-func classesListCountParams(teacherID int64, startDate, endDate, statusFilter, nameFilter string) queries.CountClassesListFilteredParams {
+func classesListCountParams(teacherID int64, startDate, endDate, statusFilter, nameFilter, overdueCutoff string) queries.CountClassesListFilteredParams {
+	nameNull := sql.NullString{String: nameFilter, Valid: nameFilter != ""}
 	return queries.CountClassesListFilteredParams{
 		Column1:         teacherID,
 		TeacherID:       teacherID,
@@ -441,24 +440,29 @@ func classesListCountParams(teacherID int64, startDate, endDate, statusFilter, n
 		Column8:         statusFilter,
 		Column9:         statusFilter,
 		Column10:        statusFilter,
+		Column11:        statusFilter,
 		Status:          statusFilter,
-		Column12:        nameFilter,
-		Column13:        sql.NullString{String: nameFilter, Valid: nameFilter != ""},
-		Column14:        teacherID,
+		Column13:        nameFilter,
+		Column14:        nameNull,
+		Column15:        nameFilter,
 		TeacherID_2:     teacherID,
 		ScheduledDate:   startDate,
 		ScheduledDate_2: endDate,
-		Column18:        statusFilter,
 		Column19:        statusFilter,
 		Column20:        statusFilter,
 		Column21:        statusFilter,
 		Column22:        statusFilter,
-		Column23:        nameFilter,
-		Column24:        sql.NullString{String: nameFilter, Valid: nameFilter != ""},
+		Column23:        statusFilter,
+		Column24:        statusFilter,
+		Column25:        statusFilter,
+		Datetime:        overdueCutoff,
+		Column27:        nameFilter,
+		Column28:        nameNull,
 	}
 }
 
-func classesListListParams(teacherID int64, startDate, endDate, statusFilter, nameFilter string, limit, offset int64) queries.GetClassesListFilteredParams {
+func classesListListParams(teacherID int64, startDate, endDate, statusFilter, nameFilter, overdueCutoff string, limit, offset int64) queries.GetClassesListFilteredParams {
+	nameNull := sql.NullString{String: nameFilter, Valid: nameFilter != ""}
 	return queries.GetClassesListFilteredParams{
 		Column1:         teacherID,
 		TeacherID:       teacherID,
@@ -470,20 +474,24 @@ func classesListListParams(teacherID int64, startDate, endDate, statusFilter, na
 		Column8:         statusFilter,
 		Column9:         statusFilter,
 		Column10:        statusFilter,
+		Column11:        statusFilter,
 		Status:          statusFilter,
-		Column12:        nameFilter,
-		Column13:        sql.NullString{String: nameFilter, Valid: nameFilter != ""},
-		Column14:        teacherID,
+		Column13:        nameFilter,
+		Column14:        nameNull,
+		Column15:        nameFilter,
 		TeacherID_2:     teacherID,
 		ScheduledDate:   startDate,
 		ScheduledDate_2: endDate,
-		Column18:        statusFilter,
 		Column19:        statusFilter,
 		Column20:        statusFilter,
 		Column21:        statusFilter,
 		Column22:        statusFilter,
-		Column23:        nameFilter,
-		Column24:        sql.NullString{String: nameFilter, Valid: nameFilter != ""},
+		Column23:        statusFilter,
+		Column24:        statusFilter,
+		Column25:        statusFilter,
+		Datetime:        overdueCutoff,
+		Column27:        nameFilter,
+		Column28:        nameNull,
 		Limit:           limit,
 		Offset:          offset,
 	}
@@ -611,14 +619,15 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 	page := utils.ParsePageQuery(r)
 	ctx := r.Context()
 
-	total, err := dbRO.GetQueries().CountClassesListFiltered(ctx, classesListCountParams(q.teacherID, q.startDate, q.endDate, q.statusFilter, q.nameFilter))
+	overdueCutoff := overdueCutoffPHT(ctx)
+	total, err := dbRO.GetQueries().CountClassesListFiltered(ctx, classesListCountParams(q.teacherID, q.startDate, q.endDate, q.statusFilter, q.nameFilter, overdueCutoff))
 	if err != nil {
 		HttpError(w, "Failed to count class records", http.StatusInternalServerError)
 		return
 	}
 	page.Total = total
 
-	allRecords, err := dbRO.GetQueries().GetClassesListFiltered(ctx, classesListListParams(q.teacherID, q.startDate, q.endDate, q.statusFilter, q.nameFilter, total, 0))
+	allRecords, err := dbRO.GetQueries().GetClassesListFiltered(ctx, classesListListParams(q.teacherID, q.startDate, q.endDate, q.statusFilter, q.nameFilter, overdueCutoff, total, 0))
 	if err != nil {
 		HttpError(w, "Failed to fetch class records", http.StatusInternalServerError)
 		return
@@ -626,6 +635,8 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 	sortClassListRows(allRecords, sort)
 	records := paginateSlice(allRecords, page)
 
+	gracePeriod := classOverdueGracePeriodMinutes(ctx)
+	now := time.Now()
 	views := make([]models.ClassRecordView, 0, len(records))
 	teacherIDs := make([]int64, 0, len(records))
 	for _, cr := range records {
@@ -639,6 +650,23 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 	}
 	enrichClassRecordViewsWithRoleBadges(views, rolesMap)
 	rows := frontend.ClassRecordRowFromViews(views)
+	for i, cr := range records {
+		if cr.Source != "scheduled" {
+			continue
+		}
+		startTime := ""
+		if cr.StartTime.Valid {
+			startTime = cr.StartTime.String
+		}
+		rows[i].Overdue = scheduledclass.IsOverdue(
+			constants.ScheduledClassStatusScheduled,
+			cr.Date,
+			startTime,
+			cr.DurationMinutes,
+			now,
+			gracePeriod,
+		)
+	}
 
 	showTeacher := auth.HasAdminAccess(auth.GetRole(ctx))
 	colspan := 7
@@ -741,9 +769,6 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 	}
 
 	insertAuditLogAs(ctx, auth.GetUser(ctx), "classes", fmt.Sprintf("recorded class for student id %d (teacher id %d, date %s, status %s)", req.StudentID, req.TeacherID, req.Date, req.Status))
-	actor := auth.GetUser(ctx)
-	notifyCrossParty(ctx, actor, req.TeacherID, teacherNameByID(ctx, req.TeacherID), notifications.KindClassRecorded,
-		fmt.Sprintf("Class recorded for student on %s (status %s)", req.Date, req.Status))
 
 	if err := respondFormMutation(w, "Class recorded successfully!", "", "classesRefresh"); err != nil {
 		sendErrorLog(w, err.Error())
@@ -761,7 +786,11 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 
 func handleClasses(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		data := frontend.ClassesData{}
+		data := frontend.ClassesData{
+			StatusFilter: constants.ClassListFilterStatus(strings.TrimSpace(r.URL.Query().Get("status"))),
+			StartDate:    strings.TrimSpace(r.URL.Query().Get("startDate")),
+			EndDate:      strings.TrimSpace(r.URL.Query().Get("endDate")),
+		}
 		role := auth.GetRole(r.Context())
 		if auth.IsTeacherScoped(role) {
 			user := auth.GetUser(r.Context())
