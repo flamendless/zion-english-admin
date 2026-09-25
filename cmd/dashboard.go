@@ -189,6 +189,18 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
+		data.ClassesWeekStart = weekStart
+		data.ClassesWeekEnd = weekEnd
+		overdueCount, err := dbRO.GetQueries().CountOverdueScheduledClassesByDateRange(ctx, queries.CountOverdueScheduledClassesByDateRangeParams{
+			Column1:         int64(0),
+			TeacherID:       0,
+			ScheduledDate:   weekStart,
+			ScheduledDate_2: weekEnd,
+			Datetime:        overdueCutoffPHT(ctx),
+		})
+		if err == nil {
+			data.ClassesOverdueWeek = overdueCount
+		}
 		populateDashboardEarnings(ctx, &data, earningsTeacherID)
 		populateAllTeachersCutoffTotals(ctx, &data)
 	case auth.RoleTeacher, auth.RoleTester:

@@ -347,27 +347,23 @@ templ DashboardStats(data DashboardData) {
 				<span class="stat-value">{ fmt.Sprintf("%d", data.ScheduledToday) }</span>
 			</div>
 		}
-		if data.Role == auth.RoleTeacher || data.Role == auth.RoleTester {
-			<div class="stat-card">
-				<span class="stat-label">Classes This Week</span>
-				<span class="stat-value">{ fmt.Sprintf("%d total", data.ClassesConductedWeek + data.ClassesCancelledWeek + data.ClassesRescheduledWeek) }</span>
-				<span class="stat-sub">{ fmt.Sprintf("%d conducted, %d cancelled, %d rescheduled", data.ClassesConductedWeek, data.ClassesCancelledWeek, data.ClassesRescheduledWeek) }</span>
-				<div class="stat-link-rows">
-					@DashboardStatLinkRow(
-						"Overdue",
-						utils.URL(fmt.Sprintf("/classes?status=overdue&startDate=%s&endDate=%s", data.ClassesWeekStart, data.ClassesWeekEnd)),
-						data.ClassesOverdueWeek,
-						"View overdue scheduled classes this week",
-					)
-				</div>
-			</div>
-		} else {
-			<div class="stat-card">
+		<div class="stat-card">
+			if auth.HasAdminAccess(data.Role) {
 				@AdminOnlyStatLabel("Classes This Week")
-				<span class="stat-value">{ fmt.Sprintf("%d total", data.ClassesConductedWeek + data.ClassesCancelledWeek + data.ClassesRescheduledWeek) }</span>
-				<span class="stat-sub">{ fmt.Sprintf("%d conducted, %d cancelled, %d rescheduled", data.ClassesConductedWeek, data.ClassesCancelledWeek, data.ClassesRescheduledWeek) }</span>
+			} else {
+				<span class="stat-label">Classes This Week</span>
+			}
+			<span class="stat-value">{ fmt.Sprintf("%d total", data.ClassesConductedWeek + data.ClassesCancelledWeek + data.ClassesRescheduledWeek) }</span>
+			<span class="stat-sub">{ fmt.Sprintf("%d conducted, %d cancelled, %d rescheduled", data.ClassesConductedWeek, data.ClassesCancelledWeek, data.ClassesRescheduledWeek) }</span>
+			<div class="stat-link-rows">
+				@DashboardStatLinkRow(
+					"Overdue",
+					utils.URL(fmt.Sprintf("/classes?status=overdue&startDate=%s&endDate=%s", data.ClassesWeekStart, data.ClassesWeekEnd)),
+					data.ClassesOverdueWeek,
+					"View overdue scheduled classes this week",
+				)
 			</div>
-		}
+		</div>
 		if data.Role == auth.RoleAdmin {
 			@DashboardSectionedCurrencyStatCard("My Cutoffs", false, []DashboardCurrencySection{
 				{Title: "First cutoff · Teacher rates", Totals: data.FirstCutoffTotals},
