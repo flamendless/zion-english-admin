@@ -203,7 +203,11 @@ func PersistentPanelStack() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\"></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\"></div></div><div id=\"classViewModalHost\"></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = ClassViewModalScripts().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -238,7 +242,7 @@ func PersistentPanelStackStyles() templ.Component {
 			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<style>\r\n\t\t.persistent-panel-stack {\r\n\t\t\tposition: fixed;\r\n\t\t\tbottom: var(--space-4);\r\n\t\t\tright: var(--space-4);\r\n\t\t\tz-index: 500;\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: flex-end;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tmax-width: min(22rem, calc(100vw - 2 * var(--space-4)));\r\n\t\t\tpointer-events: none;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-stack:empty {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-stack > .persistent-panel-host,\r\n\t\t.persistent-panel-stack > #persistentOverdueClassesHost,\r\n\t\t.persistent-panel-stack > .persistent-client-jobs-host,\r\n\t\t.persistent-panel-stack > .persistent-background-jobs-host,\r\n\t\t.persistent-panel-stack > #persistentBackgroundJobsPoll {\r\n\t\t\tpointer-events: auto;\r\n\t\t\twidth: 100%;\r\n\t\t}\r\n\r\n\t\t.persistent-client-jobs-host:empty,\r\n\t\t.persistent-background-jobs-host:empty {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\r\n\t\t@media (max-width: 640px) {\r\n\t\t\t.persistent-panel-stack {\r\n\t\t\t\tbottom: var(--space-3);\r\n\t\t\t\tright: var(--space-3);\r\n\t\t\t\tleft: var(--space-3);\r\n\t\t\t\tmax-width: none;\r\n\t\t\t\talign-items: stretch;\r\n\t\t\t}\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<style>\r\n\t\t.persistent-panel-stack {\r\n\t\t\tposition: fixed;\r\n\t\t\tbottom: var(--space-4);\r\n\t\t\tright: var(--space-4);\r\n\t\t\tz-index: 500;\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: flex-end;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tmax-width: min(22rem, calc(100vw - 2 * var(--space-4)));\r\n\t\t\tpointer-events: none;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-stack:empty {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-stack > .persistent-panel-host,\r\n\t\t.persistent-panel-stack > #persistentOverdueClassesHost,\r\n\t\t.persistent-panel-stack > .persistent-client-jobs-host,\r\n\t\t.persistent-panel-stack > .persistent-background-jobs-host,\r\n\t\t.persistent-panel-stack > #persistentBackgroundJobsPoll {\r\n\t\t\tpointer-events: auto;\r\n\t\t\twidth: 100%;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-stack > .persistent-panel-host:has(.persistent-panel.is-minimized),\r\n\t\t.persistent-panel-stack > .persistent-client-jobs-host:has(.persistent-panel.is-minimized),\r\n\t\t.persistent-panel-stack > .persistent-background-jobs-host:has(.persistent-panel.is-minimized),\r\n\t\t.persistent-panel-stack > #persistentBackgroundJobsPoll:has(.persistent-panel.is-minimized) {\r\n\t\t\twidth: auto;\r\n\t\t\talign-self: flex-end;\r\n\t\t}\r\n\r\n\t\t.persistent-client-jobs-host:empty,\r\n\t\t.persistent-background-jobs-host:empty {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\r\n\t\t@media (max-width: 640px) {\r\n\t\t\t.persistent-panel-stack {\r\n\t\t\t\tbottom: var(--space-3);\r\n\t\t\t\tright: var(--space-3);\r\n\t\t\t\tleft: var(--space-3);\r\n\t\t\t\tmax-width: none;\r\n\t\t\t\talign-items: stretch;\r\n\t\t\t}\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -278,7 +282,7 @@ func PersistentJobPanel(data PersistentJobPanelData) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(persistentPanelStorageKey(PersistentPanelData{StorageKey: data.StorageKey, Title: data.Title, AriaLabel: data.AriaLabel}))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 130, Col: 151}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 140, Col: 151}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 		if templ_7745c5c3_Err != nil {
@@ -291,7 +295,7 @@ func PersistentJobPanel(data PersistentJobPanelData) templ.Component {
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(persistentPanelAriaLabel(PersistentPanelData{StorageKey: data.StorageKey, Title: data.Title, AriaLabel: data.AriaLabel}))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 131, Col: 135}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 141, Col: 135}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 		if templ_7745c5c3_Err != nil {
@@ -304,7 +308,7 @@ func PersistentJobPanel(data PersistentJobPanelData) templ.Component {
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue("Expand " + persistentPanelAriaLabel(PersistentPanelData{StorageKey: data.StorageKey, Title: data.Title, AriaLabel: data.AriaLabel}))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 137, Col: 148}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 147, Col: 148}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 		if templ_7745c5c3_Err != nil {
@@ -325,7 +329,7 @@ func PersistentJobPanel(data PersistentJobPanelData) templ.Component {
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(data.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 144, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 154, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -338,7 +342,7 @@ func PersistentJobPanel(data PersistentJobPanelData) templ.Component {
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue("Minimize " + persistentPanelAriaLabel(PersistentPanelData{StorageKey: data.StorageKey, Title: data.Title, AriaLabel: data.AriaLabel}))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 150, Col: 153}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 160, Col: 153}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
 		if templ_7745c5c3_Err != nil {
@@ -369,7 +373,7 @@ func PersistentJobPanel(data PersistentJobPanelData) templ.Component {
 				var templ_7745c5c3_Var15 string
 				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(job.ID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 159, Col: 80}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 169, Col: 80}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
 				if templ_7745c5c3_Err != nil {
@@ -382,7 +386,7 @@ func PersistentJobPanel(data PersistentJobPanelData) templ.Component {
 				var templ_7745c5c3_Var16 string
 				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(job.Label)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 161, Col: 63}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 171, Col: 63}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 				if templ_7745c5c3_Err != nil {
@@ -400,7 +404,7 @@ func PersistentJobPanel(data PersistentJobPanelData) templ.Component {
 					var templ_7745c5c3_Var17 string
 					templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(job.Detail)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 163, Col: 61}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 173, Col: 61}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 					if templ_7745c5c3_Err != nil {
@@ -428,7 +432,7 @@ func PersistentJobPanel(data PersistentJobPanelData) templ.Component {
 					var templ_7745c5c3_Var18 string
 					templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", job.Percent))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 174, Col: 57}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 184, Col: 57}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
 					if templ_7745c5c3_Err != nil {
@@ -441,7 +445,7 @@ func PersistentJobPanel(data PersistentJobPanelData) templ.Component {
 					var templ_7745c5c3_Var19 string
 					templ_7745c5c3_Var19, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("width: " + fmt.Sprintf("%d", job.Percent) + "%")
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 175, Col: 67}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 185, Col: 67}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 					if templ_7745c5c3_Err != nil {
@@ -459,7 +463,7 @@ func PersistentJobPanel(data PersistentJobPanelData) templ.Component {
 				var templ_7745c5c3_Var20 string
 				templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(persistentJobPhaseLabel(job))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 179, Col: 76}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/background_jobs.templ`, Line: 189, Col: 76}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 				if templ_7745c5c3_Err != nil {

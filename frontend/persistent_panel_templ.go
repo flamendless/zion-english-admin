@@ -24,13 +24,14 @@ const (
 )
 
 type PersistentPanelItem struct {
-	ID          string
-	Label       string
-	Detail      string
-	ActionURL   string
-	ActionLabel string
-	LinkTarget  PersistentPanelLinkTarget
-	RowStatus   PersistentPanelRowStatus
+	ID                   string
+	Label                string
+	Detail               string
+	ActionURL            string
+	ActionLabel          string
+	LinkTarget           PersistentPanelLinkTarget
+	RowStatus            PersistentPanelRowStatus
+	OpenInClassViewModal bool
 }
 
 type PersistentPanelData struct {
@@ -133,7 +134,7 @@ func PersistentPanelSlot(params PersistentPanelSlotParams) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(params.HostID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 102, Col: 20}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 103, Col: 20}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
 		if templ_7745c5c3_Err != nil {
@@ -146,7 +147,7 @@ func PersistentPanelSlot(params PersistentPanelSlotParams) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(params.PartialURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 104, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 105, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 		if templ_7745c5c3_Err != nil {
@@ -159,7 +160,7 @@ func PersistentPanelSlot(params PersistentPanelSlotParams) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(persistentPanelSlotHxTrigger(params))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 105, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 106, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 		if templ_7745c5c3_Err != nil {
@@ -172,7 +173,7 @@ func PersistentPanelSlot(params PersistentPanelSlotParams) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 106, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 107, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 		if templ_7745c5c3_Err != nil {
@@ -346,7 +347,7 @@ func PersistentPanel(data PersistentPanelData) templ.Component {
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(persistentPanelStorageKey(data))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 144, Col: 61}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 145, Col: 61}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 		if templ_7745c5c3_Err != nil {
@@ -359,7 +360,7 @@ func PersistentPanel(data PersistentPanelData) templ.Component {
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(persistentPanelAriaLabel(data))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 145, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 146, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
 		if templ_7745c5c3_Err != nil {
@@ -372,7 +373,7 @@ func PersistentPanel(data PersistentPanelData) templ.Component {
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue("Expand " + persistentPanelAriaLabel(data))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 151, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 152, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
 		if templ_7745c5c3_Err != nil {
@@ -393,7 +394,7 @@ func PersistentPanel(data PersistentPanelData) templ.Component {
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(data.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 159, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 160, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
@@ -411,7 +412,7 @@ func PersistentPanel(data PersistentPanelData) templ.Component {
 			var templ_7745c5c3_Var16 string
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(data.TitleMeta)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 161, Col: 64}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 162, Col: 64}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {
@@ -434,7 +435,7 @@ func PersistentPanel(data PersistentPanelData) templ.Component {
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(data.CompletedCount)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 166, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 167, Col: 67}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
@@ -447,7 +448,7 @@ func PersistentPanel(data PersistentPanelData) templ.Component {
 			var templ_7745c5c3_Var18 string
 			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(data.TotalCount)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 166, Col: 87}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 167, Col: 87}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 			if templ_7745c5c3_Err != nil {
@@ -465,7 +466,7 @@ func PersistentPanel(data PersistentPanelData) templ.Component {
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.ResolveAttributeValue("Minimize " + persistentPanelAriaLabel(data))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 172, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 173, Col: 63}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var19)
 		if templ_7745c5c3_Err != nil {
@@ -532,7 +533,7 @@ func PersistentPanel(data PersistentPanelData) templ.Component {
 				var templ_7745c5c3_Var22 string
 				templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(item.Label)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 188, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 189, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 				if templ_7745c5c3_Err != nil {
@@ -550,7 +551,7 @@ func PersistentPanel(data PersistentPanelData) templ.Component {
 					var templ_7745c5c3_Var23 string
 					templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(item.Detail)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 190, Col: 62}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 191, Col: 62}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 					if templ_7745c5c3_Err != nil {
@@ -565,80 +566,124 @@ func PersistentPanel(data PersistentPanelData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				if persistentPanelLinkTarget(item) == PersistentPanelLinkTargetBlank {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<a href=\"")
+				if item.OpenInClassViewModal {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<button type=\"button\" class=\"btn btn-secondary btn-sm persistent-panel-action\" hx-get=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var24 templ.SafeURL
-					templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinURLErrs(item.ActionURL)
+					var templ_7745c5c3_Var24 string
+					templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ActionURL)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 196, Col: 31}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 199, Col: 33}
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\" class=\"btn btn-secondary btn-sm persistent-panel-action\" target=\"_blank\" rel=\"noopener noreferrer\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\" hx-target=\"#classViewModalHost\" hx-swap=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var25 string
-					templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(persistentPanelActionLabel(item))
+					templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 200, Col: 44}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 201, Col: 35}
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var25)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</a>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-				} else {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<a href=\"")
+					var templ_7745c5c3_Var26 string
+					templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(persistentPanelActionLabel(item))
 					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					var templ_7745c5c3_Var26 templ.SafeURL
-					templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinURLErrs(item.ActionURL)
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 203, Col: 31}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 202, Col: 44}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\" class=\"btn btn-secondary btn-sm persistent-panel-action\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</button>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var27 string
-					templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(persistentPanelActionLabel(item))
+				} else if persistentPanelLinkTarget(item) == PersistentPanelLinkTargetBlank {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "<a href=\"")
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 205, Col: 44}
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var27 templ.SafeURL
+					templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinURLErrs(item.ActionURL)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 205, Col: 31}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</a>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" class=\"btn btn-secondary btn-sm persistent-panel-action\" target=\"_blank\" rel=\"noopener noreferrer\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var28 string
+					templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(persistentPanelActionLabel(item))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 209, Col: 44}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</a>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				} else {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<a href=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var29 templ.SafeURL
+					templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinURLErrs(item.ActionURL)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 212, Col: 31}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "\" class=\"btn btn-secondary btn-sm persistent-panel-action\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var30 string
+					templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(persistentPanelActionLabel(item))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/persistent_panel.templ`, Line: 214, Col: 44}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "</a>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</div></li>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "</div></li>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</ul>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</ul>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</div></aside>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</div></aside>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -666,12 +711,12 @@ func PersistentPanelStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var28 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var28 == nil {
-			templ_7745c5c3_Var28 = templ.NopComponent
+		templ_7745c5c3_Var31 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var31 == nil {
+			templ_7745c5c3_Var31 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<style>\r\n\t\t.persistent-panel-host {\r\n\t\t\tmax-width: min(22rem, calc(100vw - 2 * var(--space-4)));\r\n\t\t\tpointer-events: none;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-host:empty {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-host:has(.persistent-panel.is-minimized) {\r\n\t\t\tmax-width: none;\r\n\t\t}\r\n\r\n\t\t.persistent-panel {\r\n\t\t\tpointer-events: auto;\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tbox-shadow: var(--shadow-lg);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tmax-height: min(24rem, calc(100vh - 2 * var(--space-4)));\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.persistent-panel.is-minimized {\r\n\t\t\tpadding: 0;\r\n\t\t\tborder: none;\r\n\t\t\tbackground: transparent;\r\n\t\t\tbox-shadow: none;\r\n\t\t\tmax-height: none;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-fab {\r\n\t\t\tdisplay: none;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 4rem;\r\n\t\t\theight: 4rem;\r\n\t\t\tmargin: 0;\r\n\t\t\tmargin-top: 0;\r\n\t\t\tpadding: 0;\r\n\t\t\tborder: 1px solid var(--color-warning);\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: var(--color-warning-bg);\r\n\t\t\tcolor: var(--color-warning);\r\n\t\t\tbox-shadow: var(--shadow-lg);\r\n\t\t\tcursor: pointer;\r\n\t\t\tline-height: 1;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-fab svg {\r\n\t\t\twidth: 1.75rem;\r\n\t\t\theight: 1.75rem;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-fab:hover {\r\n\t\t\tbackground: var(--color-warning);\r\n\t\t\tcolor: var(--color-surface);\r\n\t\t}\r\n\r\n\t\t.persistent-panel.is-minimized .persistent-panel-fab {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t}\r\n\r\n\t\t.persistent-panel.is-minimized .persistent-panel-body {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tmin-width: 0;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-header {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.persistent-panel-header-actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-minimize {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 1.75rem;\r\n\t\t\theight: 1.75rem;\r\n\t\t\tmargin: 0;\r\n\t\t\tmargin-top: 0;\r\n\t\t\tpadding: 0;\r\n\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\tborder-radius: var(--radius-sm);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tcursor: pointer;\r\n\t\t\tline-height: 1;\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-minimize:hover {\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.persistent-panel-title {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: baseline;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 1rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-title-meta {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\tfont-variant-numeric: tabular-nums;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.persistent-panel-progress {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tfont-variant-numeric: tabular-nums;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\twhite-space: nowrap;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-list {\r\n\t\t\tlist-style: none;\r\n\t\t\tmargin: 0;\r\n\t\t\tpadding: 0;\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\toverflow-y: auto;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding-top: var(--space-3);\r\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item:first-child {\r\n\t\t\tpadding-top: 0;\r\n\t\t\tborder-top: none;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item--rejected {\r\n\t\t\tbackground: var(--color-error-bg);\r\n\t\t\tborder: 1px solid color-mix(in srgb, var(--color-destructive) 25%, var(--color-border));\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tpadding: var(--space-2) var(--space-3);\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item--rejected:first-child {\r\n\t\t\tmargin-top: 0;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item--rejected .persistent-panel-item-label,\r\n\t\t.persistent-panel-item--rejected .persistent-panel-item-detail {\r\n\t\t\tcolor: var(--color-destructive);\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item-leading {\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tpadding-top: 0.0625rem;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-status-icon {\r\n\t\t\tdisplay: block;\r\n\t\t\twidth: 1.125rem;\r\n\t\t\theight: 1.125rem;\r\n\t\t\tline-height: 0;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-status-icon svg {\r\n\t\t\twidth: 100%;\r\n\t\t\theight: 100%;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-status-icon--needs-action,\r\n\t\t.persistent-panel-status-icon--waiting {\r\n\t\t\tcolor: var(--color-warning);\r\n\t\t}\r\n\r\n\t\t.persistent-panel-status-icon--rejected {\r\n\t\t\tcolor: var(--color-destructive);\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item-main {\r\n\t\t\tmin-width: 0;\r\n\t\t\tflex: 1;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item-label {\r\n\t\t\tdisplay: block;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tline-height: 1.3;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item-detail {\r\n\t\t\tmargin: var(--space-1) 0 0;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tline-height: 1.35;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item-action {\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-action {\r\n\t\t\tmargin-top: 0;\r\n\t\t\tpadding: 0.35rem 0.75rem;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\twhite-space: nowrap;\r\n\t\t}\r\n\r\n\t\t@media (max-width: 640px) {\r\n\t\t\t.persistent-panel-host:not(:has(.persistent-panel.is-minimized)) {\r\n\t\t\t\tmax-width: none;\r\n\t\t\t}\r\n\r\n\t\t\t.persistent-panel-item {\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: stretch;\r\n\t\t\t}\r\n\r\n\t\t\t.persistent-panel-item-action .persistent-panel-action {\r\n\t\t\t\twidth: 100%;\r\n\t\t\t\ttext-align: center;\r\n\t\t\t}\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "<style>\r\n\t\t.persistent-panel-host {\r\n\t\t\tmax-width: min(22rem, calc(100vw - 2 * var(--space-4)));\r\n\t\t\tpointer-events: none;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-host:empty {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-host:has(.persistent-panel.is-minimized) {\r\n\t\t\tmax-width: none;\r\n\t\t\twidth: auto;\r\n\t\t\talign-self: flex-end;\r\n\t\t}\r\n\r\n\t\t.persistent-panel {\r\n\t\t\tpointer-events: auto;\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tbox-shadow: var(--shadow-lg);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tmax-height: min(24rem, calc(100vh - 2 * var(--space-4)));\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.persistent-panel.is-minimized {\r\n\t\t\tpadding: 0;\r\n\t\t\tborder: none;\r\n\t\t\tbackground: transparent;\r\n\t\t\tbox-shadow: none;\r\n\t\t\tmax-height: none;\r\n\t\t\talign-items: flex-end;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-fab {\r\n\t\t\tdisplay: none;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 4rem;\r\n\t\t\theight: 4rem;\r\n\t\t\tmargin: 0;\r\n\t\t\tmargin-top: 0;\r\n\t\t\tpadding: 0;\r\n\t\t\tborder: 1px solid var(--color-warning);\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: var(--color-warning-bg);\r\n\t\t\tcolor: var(--color-warning);\r\n\t\t\tbox-shadow: var(--shadow-lg);\r\n\t\t\tcursor: pointer;\r\n\t\t\tline-height: 1;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-fab svg {\r\n\t\t\twidth: 1.75rem;\r\n\t\t\theight: 1.75rem;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-fab:hover {\r\n\t\t\tbackground: var(--color-warning);\r\n\t\t\tcolor: var(--color-surface);\r\n\t\t}\r\n\r\n\t\t.persistent-panel.is-minimized .persistent-panel-fab {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t}\r\n\r\n\t\t.persistent-panel.is-minimized .persistent-panel-body {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tmin-width: 0;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-header {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.persistent-panel-header-actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-minimize {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 1.75rem;\r\n\t\t\theight: 1.75rem;\r\n\t\t\tmargin: 0;\r\n\t\t\tmargin-top: 0;\r\n\t\t\tpadding: 0;\r\n\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\tborder-radius: var(--radius-sm);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tcursor: pointer;\r\n\t\t\tline-height: 1;\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-minimize:hover {\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.persistent-panel-title {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: baseline;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 1rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-title-meta {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tfont-weight: 500;\r\n\t\t\tfont-variant-numeric: tabular-nums;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.persistent-panel-progress {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tfont-variant-numeric: tabular-nums;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\twhite-space: nowrap;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-list {\r\n\t\t\tlist-style: none;\r\n\t\t\tmargin: 0;\r\n\t\t\tpadding: 0;\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\toverflow-y: auto;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding-top: var(--space-3);\r\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item:first-child {\r\n\t\t\tpadding-top: 0;\r\n\t\t\tborder-top: none;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item--rejected {\r\n\t\t\tbackground: var(--color-error-bg);\r\n\t\t\tborder: 1px solid color-mix(in srgb, var(--color-destructive) 25%, var(--color-border));\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tpadding: var(--space-2) var(--space-3);\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item--rejected:first-child {\r\n\t\t\tmargin-top: 0;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item--rejected .persistent-panel-item-label,\r\n\t\t.persistent-panel-item--rejected .persistent-panel-item-detail {\r\n\t\t\tcolor: var(--color-destructive);\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item-leading {\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tpadding-top: 0.0625rem;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-status-icon {\r\n\t\t\tdisplay: block;\r\n\t\t\twidth: 1.125rem;\r\n\t\t\theight: 1.125rem;\r\n\t\t\tline-height: 0;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-status-icon svg {\r\n\t\t\twidth: 100%;\r\n\t\t\theight: 100%;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-status-icon--needs-action,\r\n\t\t.persistent-panel-status-icon--waiting {\r\n\t\t\tcolor: var(--color-warning);\r\n\t\t}\r\n\r\n\t\t.persistent-panel-status-icon--rejected {\r\n\t\t\tcolor: var(--color-destructive);\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item-main {\r\n\t\t\tmin-width: 0;\r\n\t\t\tflex: 1;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item-label {\r\n\t\t\tdisplay: block;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tline-height: 1.3;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item-detail {\r\n\t\t\tmargin: var(--space-1) 0 0;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tline-height: 1.35;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-item-action {\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.persistent-panel-action {\r\n\t\t\tmargin-top: 0;\r\n\t\t\tpadding: 0.35rem 0.75rem;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\twhite-space: nowrap;\r\n\t\t}\r\n\r\n\t\t@media (max-width: 640px) {\r\n\t\t\t.persistent-panel-host:not(:has(.persistent-panel.is-minimized)) {\r\n\t\t\t\tmax-width: none;\r\n\t\t\t}\r\n\r\n\t\t\t.persistent-panel-item {\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: stretch;\r\n\t\t\t}\r\n\r\n\t\t\t.persistent-panel-item-action .persistent-panel-action {\r\n\t\t\t\twidth: 100%;\r\n\t\t\t\ttext-align: center;\r\n\t\t\t}\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -695,12 +740,12 @@ func PersistentPanelScript() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var29 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var29 == nil {
-			templ_7745c5c3_Var29 = templ.NopComponent
+		templ_7745c5c3_Var32 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var32 == nil {
+			templ_7745c5c3_Var32 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "<script>\r\n\t\t(function () {\r\n\t\t\tif (window._persistentPanelBound) return;\r\n\t\t\twindow._persistentPanelBound = true;\r\n\r\n\t\t\tfunction setMinimized(panel, minimized) {\r\n\t\t\t\tif (!panel) return;\r\n\t\t\t\tpanel.classList.toggle('is-minimized', minimized);\r\n\t\t\t\tconst fab = panel.querySelector('[data-persistent-panel-expand]');\r\n\t\t\t\tif (fab) {\r\n\t\t\t\t\tfab.hidden = !minimized;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction initPanel(panel) {\r\n\t\t\t\tif (!panel || !panel.hasAttribute('data-persistent-panel')) return;\r\n\t\t\t\tsetMinimized(panel, false);\r\n\t\t\t}\r\n\r\n\t\t\tfunction initPanels(root) {\r\n\t\t\t\tconst scope = root || document;\r\n\t\t\t\tscope.querySelectorAll('[data-persistent-panel]').forEach(initPanel);\r\n\t\t\t}\r\n\r\n\t\t\tdocument.addEventListener('click', function (event) {\r\n\t\t\t\tconst minimizeBtn = event.target.closest('[data-persistent-panel-minimize]');\r\n\t\t\t\tif (minimizeBtn) {\r\n\t\t\t\t\tconst panel = minimizeBtn.closest('[data-persistent-panel]');\r\n\t\t\t\t\tif (panel) {\r\n\t\t\t\t\t\tsetMinimized(panel, true);\r\n\t\t\t\t\t}\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst expandBtn = event.target.closest('[data-persistent-panel-expand]');\r\n\t\t\t\tif (expandBtn) {\r\n\t\t\t\t\tconst panel = expandBtn.closest('[data-persistent-panel]');\r\n\t\t\t\t\tif (panel) {\r\n\t\t\t\t\t\tsetMinimized(panel, false);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('DOMContentLoaded', function () {\r\n\t\t\t\tinitPanels();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (event) {\r\n\t\t\t\tinitPanels(event.detail && event.detail.target ? event.detail.target : document);\r\n\t\t\t});\r\n\r\n\t\t\tinitPanels();\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<script>\r\n\t\t(function () {\r\n\t\t\tif (window._persistentPanelBound) return;\r\n\t\t\twindow._persistentPanelBound = true;\r\n\r\n\t\t\tfunction setMinimized(panel, minimized) {\r\n\t\t\t\tif (!panel) return;\r\n\t\t\t\tpanel.classList.toggle('is-minimized', minimized);\r\n\t\t\t\tconst fab = panel.querySelector('[data-persistent-panel-expand]');\r\n\t\t\t\tif (fab) {\r\n\t\t\t\t\tfab.hidden = !minimized;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction initPanel(panel) {\r\n\t\t\t\tif (!panel || !panel.hasAttribute('data-persistent-panel')) return;\r\n\t\t\t\tsetMinimized(panel, false);\r\n\t\t\t}\r\n\r\n\t\t\tfunction initPanels(root) {\r\n\t\t\t\tconst scope = root || document;\r\n\t\t\t\tscope.querySelectorAll('[data-persistent-panel]').forEach(initPanel);\r\n\t\t\t}\r\n\r\n\t\t\tdocument.addEventListener('click', function (event) {\r\n\t\t\t\tconst minimizeBtn = event.target.closest('[data-persistent-panel-minimize]');\r\n\t\t\t\tif (minimizeBtn) {\r\n\t\t\t\t\tconst panel = minimizeBtn.closest('[data-persistent-panel]');\r\n\t\t\t\t\tif (panel) {\r\n\t\t\t\t\t\tsetMinimized(panel, true);\r\n\t\t\t\t\t}\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst expandBtn = event.target.closest('[data-persistent-panel-expand]');\r\n\t\t\t\tif (expandBtn) {\r\n\t\t\t\t\tconst panel = expandBtn.closest('[data-persistent-panel]');\r\n\t\t\t\t\tif (panel) {\r\n\t\t\t\t\t\tsetMinimized(panel, false);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('DOMContentLoaded', function () {\r\n\t\t\t\tinitPanels();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (event) {\r\n\t\t\t\tinitPanels(event.detail && event.detail.target ? event.detail.target : document);\r\n\t\t\t});\r\n\r\n\t\t\tinitPanels();\r\n\t\t})();\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

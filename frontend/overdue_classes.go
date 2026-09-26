@@ -28,13 +28,13 @@ func BuildOverdueClassesPersistentPanel(
 			detail += " · " + timeRange
 		}
 		items = append(items, PersistentPanelItem{
-			ID:          fmt.Sprintf("overdue-%d", row.ID),
-			Label:       row.StudentName,
-			Detail:      detail,
-			ActionURL:   ScheduledClassViewURL(row.ID),
-			ActionLabel: "Open",
-			LinkTarget:  PersistentPanelLinkTargetSelf,
-			RowStatus:   PersistentPanelRowStatusNeedsAction,
+			ID:                   fmt.Sprintf("overdue-%d", row.ID),
+			Label:                row.StudentName,
+			Detail:               detail,
+			ActionURL:            ScheduledClassViewURL(row.ID),
+			ActionLabel:          "Open",
+			RowStatus:            PersistentPanelRowStatusNeedsAction,
+			OpenInClassViewModal: true,
 		})
 	}
 	if total > int64(PersistentOverdueClassesPanelCap) {

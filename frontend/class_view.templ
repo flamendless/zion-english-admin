@@ -179,6 +179,10 @@ templ ClassViewModalStyles() {
 
 templ ClassViewModalScripts() {
 	<script>
+		(function () {
+			if (window.__classViewModalScriptsBound) return;
+			window.__classViewModalScriptsBound = true;
+
 		window.closeClassViewModal = function () {
 			const host = document.getElementById('classViewModalHost');
 			if (host) host.innerHTML = '';
@@ -227,5 +231,6 @@ templ ClassViewModalScripts() {
 				return el && !el.hidden;
 			});
 		};
+		})();
 	</script>
 }

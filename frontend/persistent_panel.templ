@@ -16,13 +16,14 @@ const (
 )
 
 type PersistentPanelItem struct {
-	ID          string
-	Label       string
-	Detail      string
-	ActionURL   string
-	ActionLabel string
-	LinkTarget  PersistentPanelLinkTarget
-	RowStatus   PersistentPanelRowStatus
+	ID                   string
+	Label                string
+	Detail               string
+	ActionURL            string
+	ActionLabel          string
+	LinkTarget           PersistentPanelLinkTarget
+	RowStatus            PersistentPanelRowStatus
+	OpenInClassViewModal bool
 }
 
 type PersistentPanelData struct {
@@ -191,7 +192,15 @@ templ PersistentPanel(data PersistentPanelData) {
 								}
 							</div>
 							<div class="persistent-panel-item-action">
-								if persistentPanelLinkTarget(item) == PersistentPanelLinkTargetBlank {
+								if item.OpenInClassViewModal {
+									<button
+										type="button"
+										class="btn btn-secondary btn-sm persistent-panel-action"
+										hx-get={ item.ActionURL }
+										hx-target="#classViewModalHost"
+										hx-swap={ HxSwapInnerHTML }
+									>{ persistentPanelActionLabel(item) }</button>
+								} else if persistentPanelLinkTarget(item) == PersistentPanelLinkTargetBlank {
 									<a
 										href={ item.ActionURL }
 										class="btn btn-secondary btn-sm persistent-panel-action"
@@ -227,6 +236,8 @@ templ PersistentPanelStyles() {
 
 		.persistent-panel-host:has(.persistent-panel.is-minimized) {
 			max-width: none;
+			width: auto;
+			align-self: flex-end;
 		}
 
 		.persistent-panel {
@@ -248,6 +259,7 @@ templ PersistentPanelStyles() {
 			background: transparent;
 			box-shadow: none;
 			max-height: none;
+			align-items: flex-end;
 		}
 
 		.persistent-panel-fab {

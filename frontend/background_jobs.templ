@@ -72,6 +72,8 @@ templ PersistentPanelStack() {
 			hx-swap={ HxSwapInnerHTML }
 		></div>
 	</div>
+	<div id="classViewModalHost"></div>
+	@ClassViewModalScripts()
 	@ScrBackgroundJobsClient()
 }
 
@@ -103,6 +105,14 @@ templ PersistentPanelStackStyles() {
 		.persistent-panel-stack > #persistentBackgroundJobsPoll {
 			pointer-events: auto;
 			width: 100%;
+		}
+
+		.persistent-panel-stack > .persistent-panel-host:has(.persistent-panel.is-minimized),
+		.persistent-panel-stack > .persistent-client-jobs-host:has(.persistent-panel.is-minimized),
+		.persistent-panel-stack > .persistent-background-jobs-host:has(.persistent-panel.is-minimized),
+		.persistent-panel-stack > #persistentBackgroundJobsPoll:has(.persistent-panel.is-minimized) {
+			width: auto;
+			align-self: flex-end;
 		}
 
 		.persistent-client-jobs-host:empty,
