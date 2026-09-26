@@ -17,6 +17,7 @@ import (
 	"time"
 	"zion-english/frontend"
 	"zion-english/internal/announcements"
+	"zion-english/internal/metatags"
 	"zion-english/internal/auth"
 	"zion-english/internal/conf"
 	"zion-english/internal/constants"
@@ -191,6 +192,8 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/announcements", auth.RequireRole(auth.AdminAccessRoles()...)(handleAnnouncements))
 		authMux.HandleFunc(basePath+"/announcements/register", auth.RequireRole(auth.AdminAccessRoles()...)(handleAnnouncementRegister))
 		authMux.HandleFunc(basePath+"/announcements/", auth.RequireRole(auth.AdminAccessRoles()...)(handleAnnouncementsPath))
+		authMux.HandleFunc(basePath+"/meta", auth.RequireRole(auth.AdminAccessRoles()...)(handleMeta))
+		authMux.HandleFunc(basePath+"/meta/", auth.RequireRole(auth.AdminAccessRoles()...)(handleMetaPath))
 		lmRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)
 		authMux.HandleFunc(basePath+"/learning-materials/preview", lmRole(handleLearningMaterialURLPreview))
 		authMux.HandleFunc(basePath+"/learning-materials/create", lmRole(handleLearningMaterialCreate))
@@ -302,6 +305,8 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/api/me/students", authHandler)
 		rootMux.Handle(basePath+"/announcements", authHandler)
 		rootMux.Handle(basePath+"/announcements/", authHandler)
+		rootMux.Handle(basePath+"/meta", authHandler)
+		rootMux.Handle(basePath+"/meta/", authHandler)
 		rootMux.Handle(basePath+"/learning-materials", authHandler)
 		rootMux.Handle(basePath+"/learning-materials/", authHandler)
 		rootMux.Handle(basePath+"/training-materials", authHandler)
@@ -309,7 +314,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/notifications", authHandler)
 		rootMux.Handle(basePath+"/notifications/", authHandler)
 
-		handler := logRequests(securityHeaders(rootMux))
+		handler := logRequests(securityHeaders(metatags.Middleware(dbRO.GetQueries(), rootMux)))
 
 		port := webFlags.port
 		if !cmd.Flags().Changed("port") {

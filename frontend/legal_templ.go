@@ -31,33 +31,41 @@ func LegalPage(title string, effectiveDate string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"landing-html\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"landing-html\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = HeadMetaTags().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 11, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 12, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " | Zion English</title><link rel=\"icon\" type=\"image/x-icon\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, " | Zion English</title><link rel=\"icon\" type=\"image/x-icon\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 templ.SafeURL
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 12, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 13, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap\" rel=\"stylesheet\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap\" rel=\"stylesheet\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -69,72 +77,72 @@ func LegalPage(title string, effectiveDate string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</head><body class=\"landing-page legal-page\"><div class=\"landing-bg\" aria-hidden=\"true\"><div class=\"landing-orb landing-orb--green\"></div><div class=\"landing-orb landing-orb--blue\"></div></div><header class=\"landing-nav\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</head><body class=\"landing-page legal-page\"><div class=\"landing-bg\" aria-hidden=\"true\"><div class=\"landing-orb landing-orb--green\"></div><div class=\"landing-orb landing-orb--blue\"></div></div><header class=\"landing-nav\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 templ.SafeURL
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 26, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 27, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"landing-nav__brand\"><img src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"landing-nav__brand\"><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/logo.png"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 27, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 28, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" alt=\"Zion English\" class=\"landing-nav__logo\"> <span>Zion English</span></a><nav class=\"landing-nav__links\" aria-label=\"Primary\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" alt=\"Zion English\" class=\"landing-nav__logo\"> <span>Zion English</span></a><nav class=\"landing-nav__links\" aria-label=\"Primary\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 templ.SafeURL
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/auth/login"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 31, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 32, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"landing-btn landing-btn--primary landing-btn--sm\">Sign in</a></nav></header><main class=\"legal-main\"><article class=\"legal-content\"><h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" class=\"landing-btn landing-btn--primary landing-btn--sm\">Sign in</a></nav></header><main class=\"legal-main\"><article class=\"legal-content\"><h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 37, Col: 15}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 38, Col: 15}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</h1><p class=\"legal-effective\">Effective date: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</h1><p class=\"legal-effective\">Effective date: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(effectiveDate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 38, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 39, Col: 62}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -142,7 +150,7 @@ func LegalPage(title string, effectiveDate string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</article></main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</article></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -150,7 +158,7 @@ func LegalPage(title string, effectiveDate string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -179,33 +187,41 @@ func LegalInfoPage(title string) templ.Component {
 			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<!doctype html><html lang=\"en\" class=\"landing-html\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<!doctype html><html lang=\"en\" class=\"landing-html\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = HeadMetaTags().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 54, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 56, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, " | Zion English</title><link rel=\"icon\" type=\"image/x-icon\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, " | Zion English</title><link rel=\"icon\" type=\"image/x-icon\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var11 templ.SafeURL
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 55, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 57, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\"><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap\" rel=\"stylesheet\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\"><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap\" rel=\"stylesheet\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -217,59 +233,59 @@ func LegalInfoPage(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</head><body class=\"landing-page legal-page\"><div class=\"landing-bg\" aria-hidden=\"true\"><div class=\"landing-orb landing-orb--green\"></div><div class=\"landing-orb landing-orb--blue\"></div></div><header class=\"landing-nav\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</head><body class=\"landing-page legal-page\"><div class=\"landing-bg\" aria-hidden=\"true\"><div class=\"landing-orb landing-orb--green\"></div><div class=\"landing-orb landing-orb--blue\"></div></div><header class=\"landing-nav\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var12 templ.SafeURL
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 69, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 71, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" class=\"landing-nav__brand\"><img src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" class=\"landing-nav__brand\"><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/logo.png"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 70, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 72, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" alt=\"Zion English\" class=\"landing-nav__logo\"> <span>Zion English</span></a><nav class=\"landing-nav__links\" aria-label=\"Primary\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" alt=\"Zion English\" class=\"landing-nav__logo\"> <span>Zion English</span></a><nav class=\"landing-nav__links\" aria-label=\"Primary\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var14 templ.SafeURL
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/auth/login"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 74, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 76, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" class=\"landing-btn landing-btn--primary landing-btn--sm\">Sign in</a></nav></header><main class=\"legal-main\"><article class=\"legal-content\"><h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" class=\"landing-btn landing-btn--primary landing-btn--sm\">Sign in</a></nav></header><main class=\"legal-main\"><article class=\"legal-content\"><h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 80, Col: 15}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 82, Col: 15}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -277,7 +293,7 @@ func LegalInfoPage(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</article></main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</article></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -285,7 +301,7 @@ func LegalInfoPage(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -314,33 +330,41 @@ func LegalDocPage(title string, subtitle string) templ.Component {
 			templ_7745c5c3_Var16 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<!doctype html><html lang=\"en\" class=\"landing-html\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<!doctype html><html lang=\"en\" class=\"landing-html\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = HeadMetaTags().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 96, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 99, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, " | Zion English</title><link rel=\"icon\" type=\"image/x-icon\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, " | Zion English</title><link rel=\"icon\" type=\"image/x-icon\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var18 templ.SafeURL
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 97, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 100, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "\"><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap\" rel=\"stylesheet\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\"><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap\" rel=\"stylesheet\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -360,72 +384,72 @@ func LegalDocPage(title string, subtitle string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</head><body class=\"landing-page legal-page\"><div class=\"landing-bg\" aria-hidden=\"true\"><div class=\"landing-orb landing-orb--green\"></div><div class=\"landing-orb landing-orb--blue\"></div></div><header class=\"landing-nav\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</head><body class=\"landing-page legal-page\"><div class=\"landing-bg\" aria-hidden=\"true\"><div class=\"landing-orb landing-orb--green\"></div><div class=\"landing-orb landing-orb--blue\"></div></div><header class=\"landing-nav\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var19 templ.SafeURL
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 113, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 116, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" class=\"landing-nav__brand\"><img src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "\" class=\"landing-nav__brand\"><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/logo.png"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 114, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 117, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var20)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\" alt=\"Zion English\" class=\"landing-nav__logo\"> <span>Zion English</span></a><nav class=\"landing-nav__links\" aria-label=\"Primary\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\" alt=\"Zion English\" class=\"landing-nav__logo\"> <span>Zion English</span></a><nav class=\"landing-nav__links\" aria-label=\"Primary\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var21 templ.SafeURL
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/auth/login"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 118, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 121, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "\" class=\"landing-btn landing-btn--primary landing-btn--sm\">Sign in</a></nav></header><main class=\"legal-main\"><article class=\"legal-content legal-content--doc\"><h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\" class=\"landing-btn landing-btn--primary landing-btn--sm\">Sign in</a></nav></header><main class=\"legal-main\"><article class=\"legal-content legal-content--doc\"><h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var22 string
 		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 124, Col: 15}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 127, Col: 15}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</h1><p class=\"legal-doc-subtitle\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</h1><p class=\"legal-doc-subtitle\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var23 string
 		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(subtitle)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 125, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/legal.templ`, Line: 128, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</p><div class=\"guide-content\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</p><div class=\"guide-content\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -433,7 +457,7 @@ func LegalDocPage(title string, subtitle string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</div></article></main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</div></article></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -449,7 +473,7 @@ func LegalDocPage(title string, subtitle string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -490,7 +514,7 @@ func PrivacyPolicy() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<section><h2>Introduction</h2><p>Zion English (\"we\", \"us\", or \"our\") operates the Zion English Admin Portal, an internal management system for ESL teaching operations. This Privacy Policy explains how we collect, use, store, and protect information when authorized teachers and administrators use the portal.</p></section><section><h2>Information We Collect</h2><p>We collect information necessary to operate the admin portal, including:</p><ul><li><strong>Teacher accounts:</strong> name, email address, password (stored hashed), profile details, uploaded documents and avatars, and optional Zoom or Google Calendar OAuth tokens when a teacher connects those integrations.</li><li><strong>Student records:</strong> names, contact details, rates, currency, status (active or inactive), and assigned teachers.</li><li><strong>Class and schedule data:</strong> class dates, times, duration, status (conducted, cancelled, or rescheduled), and related notes.</li><li><strong>Sheet processing:</strong> Google Sheet URLs provided by teachers and the class data extracted from those sheets for payroll processing.</li><li><strong>System logs:</strong> audit logs of user actions and processing logs for sheet imports.</li><li><strong>Session data:</strong> a secure HttpOnly cookie (<code>session_token</code>) used to keep you signed in.</li></ul></section><section><h2>How We Use Information</h2><p>We use collected information to:</p><ul><li>Authenticate users and enforce role-based access (superuser or teacher).</li><li>Manage students, teachers, classes, and schedules.</li><li>Process class sheets from Google Drive and generate payroll exports.</li><li>Create Zoom meetings when teachers have connected Zoom and schedule classes that require a meeting room.</li><li>Create Google Calendar events when teachers have connected Google Calendar and schedule classes with a start time.</li><li>Maintain audit trails for accountability and troubleshooting.</li><li>Send in-app announcements and notifications to authorized users.</li></ul></section><section><h2>Third-Party Services</h2><p>The portal integrates with third-party services that may process data on our behalf:</p><ul><li><strong>Google Drive / Google Sheets:</strong> Teachers provide sheet URLs; class data is downloaded from Google for processing. Use of Google services is subject to Google's privacy policies.</li><li><strong>Zoom:</strong> Teachers may optionally connect Zoom via OAuth to enable automatic meeting creation. Zoom's use of data is governed by Zoom's privacy policy.</li><li><strong>Google Calendar:</strong> Teachers may optionally connect Google Calendar via OAuth to sync scheduled classes to a dedicated Zion English calendar. Google's use of data is governed by Google's privacy policy.</li></ul><p>We do not sell personal information to third parties. See <strong>Sharing, Transfer, and Disclosure of Google and Zoom User Data</strong> below for who may receive Google or Zoom user data obtained through these integrations.</p></section><section><h2>Sharing, Transfer, and Disclosure of Google and Zoom User Data</h2><p>This section describes how we share, transfer, or disclose Google user data and Zoom user data collected when teachers connect Google Calendar or Zoom, or when teachers provide Google Sheet URLs for payroll processing.</p><h3>Google user data we handle</h3><ul><li><strong>Google Calendar (OAuth):</strong> Google account email address, OAuth access and refresh tokens, and calendar events created or updated in a dedicated Zion English calendar (event title, date, time, and duration tied to scheduled classes).</li></ul><h3>Zoom user data we handle</h3><ul><li>Zoom account user ID, OAuth access and refresh tokens, and meeting details created through the portal (meeting ID, join URL, passcode, topic, start time, and duration tied to scheduled classes).</li></ul><h3>With whom we share, transfer, or disclose this data</h3><ul><li><strong>Google (Google LLC):</strong> We transfer Google user data to Google only as needed to operate the integrations: OAuth authentication, creating and managing calendar events in the teacher's Google account, and downloading sheet data from URLs teachers provide. Google's handling of data is governed by <a href=\"https://policies.google.com/privacy\" rel=\"noopener noreferrer\" target=\"_blank\">Google's Privacy Policy</a>.</li><li><strong>Zoom (Zoom Video Communications, Inc.):</strong> We transfer Zoom user data to Zoom only as needed to operate the integration: OAuth authentication and creating, updating, or deleting meetings on the teacher's Zoom account. Zoom's handling of data is governed by <a href=\"https://explore.zoom.us/en/privacy/\" rel=\"noopener noreferrer\" target=\"_blank\">Zoom's Privacy Policy</a>.</li><li><strong>Zion English administrators:</strong> Authorized superusers may access operational data related to these integrations, such as connection status, class schedules, and Zoom meeting links, to manage teaching operations and provide support within the organization.</li></ul><p>We do not sell, rent, or share Google or Zoom user data with advertisers, data brokers, or other third parties for their own purposes. We do not use Google or Zoom user data for advertising, creditworthiness, or lending decisions.</p><p>Google OAuth tokens are encrypted and stored in the portal database on infrastructure controlled by Zion English. Zoom OAuth tokens are encrypted and stored the same way. We disclose or transfer Google or Zoom user data only to the parties listed above and only to provide the portal's teaching-operations features described in this policy.</p><p>Zion English Admin's use of information received from Google APIs adheres to the <a href=\"https://developers.google.com/terms/api-services-user-data-policy\" rel=\"noopener noreferrer\" target=\"_blank\">Google API Services User Data Policy</a>, including the Limited Use requirements.</p></section><section><h2>Data Storage and Security</h2><p>Data is stored in a SQLite database on servers we control. Access to the portal is restricted to authorized users with valid credentials. Passwords are hashed; session tokens are signed and transmitted via secure cookies. While we take reasonable measures to protect information, no system is completely secure.</p></section><section><h2>Data Retention</h2><p>We retain operational data for as long as needed to support Zion English's teaching operations, comply with legal obligations, and resolve disputes. Logs may be retained for auditing and troubleshooting purposes.</p></section><section><h2>Your Rights</h2><p>Authorized users may request access to or correction of their account information through Zion English administrators. If you believe your data has been handled incorrectly, contact us using the details below.</p></section><section><h2>Changes to This Policy</h2><p>We may update this Privacy Policy from time to time. The effective date at the top of this page indicates when the policy was last revised. Continued use of the portal after changes constitutes acceptance of the updated policy.</p></section><section><h2>Contact</h2><p>For privacy questions or technical support related to the admin portal, contact InnovaTech at <a href=\"mailto:itservices.innovatech@gmail.com\">itservices.innovatech@gmail.com</a>.</p></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<section><h2>Introduction</h2><p>Zion English (\"we\", \"us\", or \"our\") operates the Zion English Admin Portal, an internal management system for ESL teaching operations. This Privacy Policy explains how we collect, use, store, and protect information when authorized teachers and administrators use the portal.</p></section><section><h2>Information We Collect</h2><p>We collect information necessary to operate the admin portal, including:</p><ul><li><strong>Teacher accounts:</strong> name, email address, password (stored hashed), profile details, uploaded documents and avatars, and optional Zoom or Google Calendar OAuth tokens when a teacher connects those integrations.</li><li><strong>Student records:</strong> names, contact details, rates, currency, status (active or inactive), and assigned teachers.</li><li><strong>Class and schedule data:</strong> class dates, times, duration, status (conducted, cancelled, or rescheduled), and related notes.</li><li><strong>Sheet processing:</strong> Google Sheet URLs provided by teachers and the class data extracted from those sheets for payroll processing.</li><li><strong>System logs:</strong> audit logs of user actions and processing logs for sheet imports.</li><li><strong>Session data:</strong> a secure HttpOnly cookie (<code>session_token</code>) used to keep you signed in.</li></ul></section><section><h2>How We Use Information</h2><p>We use collected information to:</p><ul><li>Authenticate users and enforce role-based access (superuser or teacher).</li><li>Manage students, teachers, classes, and schedules.</li><li>Process class sheets from Google Drive and generate payroll exports.</li><li>Create Zoom meetings when teachers have connected Zoom and schedule classes that require a meeting room.</li><li>Create Google Calendar events when teachers have connected Google Calendar and schedule classes with a start time.</li><li>Maintain audit trails for accountability and troubleshooting.</li><li>Send in-app announcements and notifications to authorized users.</li></ul></section><section><h2>Third-Party Services</h2><p>The portal integrates with third-party services that may process data on our behalf:</p><ul><li><strong>Google Drive / Google Sheets:</strong> Teachers provide sheet URLs; class data is downloaded from Google for processing. Use of Google services is subject to Google's privacy policies.</li><li><strong>Zoom:</strong> Teachers may optionally connect Zoom via OAuth to enable automatic meeting creation. Zoom's use of data is governed by Zoom's privacy policy.</li><li><strong>Google Calendar:</strong> Teachers may optionally connect Google Calendar via OAuth to sync scheduled classes to a dedicated Zion English calendar. Google's use of data is governed by Google's privacy policy.</li></ul><p>We do not sell personal information to third parties. See <strong>Sharing, Transfer, and Disclosure of Google and Zoom User Data</strong> below for who may receive Google or Zoom user data obtained through these integrations.</p></section><section><h2>Sharing, Transfer, and Disclosure of Google and Zoom User Data</h2><p>This section describes how we share, transfer, or disclose Google user data and Zoom user data collected when teachers connect Google Calendar or Zoom, or when teachers provide Google Sheet URLs for payroll processing.</p><h3>Google user data we handle</h3><ul><li><strong>Google Calendar (OAuth):</strong> Google account email address, OAuth access and refresh tokens, and calendar events created or updated in a dedicated Zion English calendar (event title, date, time, and duration tied to scheduled classes).</li></ul><h3>Zoom user data we handle</h3><ul><li>Zoom account user ID, OAuth access and refresh tokens, and meeting details created through the portal (meeting ID, join URL, passcode, topic, start time, and duration tied to scheduled classes).</li></ul><h3>With whom we share, transfer, or disclose this data</h3><ul><li><strong>Google (Google LLC):</strong> We transfer Google user data to Google only as needed to operate the integrations: OAuth authentication, creating and managing calendar events in the teacher's Google account, and downloading sheet data from URLs teachers provide. Google's handling of data is governed by <a href=\"https://policies.google.com/privacy\" rel=\"noopener noreferrer\" target=\"_blank\">Google's Privacy Policy</a>.</li><li><strong>Zoom (Zoom Video Communications, Inc.):</strong> We transfer Zoom user data to Zoom only as needed to operate the integration: OAuth authentication and creating, updating, or deleting meetings on the teacher's Zoom account. Zoom's handling of data is governed by <a href=\"https://explore.zoom.us/en/privacy/\" rel=\"noopener noreferrer\" target=\"_blank\">Zoom's Privacy Policy</a>.</li><li><strong>Zion English administrators:</strong> Authorized superusers may access operational data related to these integrations, such as connection status, class schedules, and Zoom meeting links, to manage teaching operations and provide support within the organization.</li></ul><p>We do not sell, rent, or share Google or Zoom user data with advertisers, data brokers, or other third parties for their own purposes. We do not use Google or Zoom user data for advertising, creditworthiness, or lending decisions.</p><p>Google OAuth tokens are encrypted and stored in the portal database on infrastructure controlled by Zion English. Zoom OAuth tokens are encrypted and stored the same way. We disclose or transfer Google or Zoom user data only to the parties listed above and only to provide the portal's teaching-operations features described in this policy.</p><p>Zion English Admin's use of information received from Google APIs adheres to the <a href=\"https://developers.google.com/terms/api-services-user-data-policy\" rel=\"noopener noreferrer\" target=\"_blank\">Google API Services User Data Policy</a>, including the Limited Use requirements.</p></section><section><h2>Data Storage and Security</h2><p>Data is stored in a SQLite database on servers we control. Access to the portal is restricted to authorized users with valid credentials. Passwords are hashed; session tokens are signed and transmitted via secure cookies. While we take reasonable measures to protect information, no system is completely secure.</p></section><section><h2>Data Retention</h2><p>We retain operational data for as long as needed to support Zion English's teaching operations, comply with legal obligations, and resolve disputes. Logs may be retained for auditing and troubleshooting purposes.</p></section><section><h2>Your Rights</h2><p>Authorized users may request access to or correction of their account information through Zion English administrators. If you believe your data has been handled incorrectly, contact us using the details below.</p></section><section><h2>Changes to This Policy</h2><p>We may update this Privacy Policy from time to time. The effective date at the top of this page indicates when the policy was last revised. Continued use of the portal after changes constitutes acceptance of the updated policy.</p></section><section><h2>Contact</h2><p>For privacy questions or technical support related to the admin portal, contact InnovaTech at <a href=\"mailto:itservices.innovatech@gmail.com\">itservices.innovatech@gmail.com</a>.</p></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -537,7 +561,7 @@ func TermsOfUse() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<section><h2>Acceptance of Terms</h2><p>By accessing or using the Zion English Admin Portal (\"the portal\"), you agree to these Terms of Use. If you do not agree, do not use the portal. The portal is intended for authorized Zion English teachers and administrators only.</p></section><section><h2>Authorized Users</h2><p>Access is granted only to individuals who have been approved by Zion English administrators. Roles include superusers (full organizational access) and teachers (access to their own students, classes, and schedules). You must not share your login credentials or allow unauthorized persons to use your account.</p></section><section><h2>Account Security</h2><p>You are responsible for maintaining the confidentiality of your password and for all activity under your account. Notify Zion English administrators immediately if you suspect unauthorized access. We may suspend or terminate accounts that violate these terms or pose a security risk.</p></section><section><h2>Acceptable Use</h2><p>You agree not to:</p><ul><li>Use the portal for any unlawful purpose or in violation of applicable laws.</li><li>Access data belonging to other teachers or students without authorization.</li><li>Misuse, export, or disclose student or teacher personal information outside legitimate Zion English operations.</li><li>Attempt to probe, scan, or compromise the security of the portal or its infrastructure.</li><li>Interfere with or disrupt the portal's operation or other users' access.</li></ul></section><section><h2>Service Description</h2><p>The portal provides tools for managing ESL teaching operations, including student and teacher records, class scheduling, sheet processing, and related administrative functions. Features may change over time. The portal is provided for internal business use and is not a public consumer service.</p></section><section><h2>Third-Party Services</h2><p>The portal may integrate with Google Drive/Sheets, Google Calendar, and Zoom. Your use of those services through the portal is also subject to their respective terms and policies. We are not responsible for third-party service availability or practices.</p></section><section><h2>Disclaimer</h2><p>The portal is provided \"as is\" and \"as available\" for Zion English's internal operations. We do not warrant uninterrupted or error-free service. To the extent permitted by law, we disclaim liability for indirect, incidental, or consequential damages arising from use of the portal.</p></section><section><h2>Changes to Terms</h2><p>We may modify these Terms of Use at any time. The effective date at the top of this page reflects the latest revision. Continued use after changes constitutes acceptance of the updated terms.</p></section><section><h2>Contact</h2><p>For questions about these Terms of Use or technical support, contact InnovaTech at <a href=\"mailto:itservices.innovatech@gmail.com\">itservices.innovatech@gmail.com</a>.</p></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<section><h2>Acceptance of Terms</h2><p>By accessing or using the Zion English Admin Portal (\"the portal\"), you agree to these Terms of Use. If you do not agree, do not use the portal. The portal is intended for authorized Zion English teachers and administrators only.</p></section><section><h2>Authorized Users</h2><p>Access is granted only to individuals who have been approved by Zion English administrators. Roles include superusers (full organizational access) and teachers (access to their own students, classes, and schedules). You must not share your login credentials or allow unauthorized persons to use your account.</p></section><section><h2>Account Security</h2><p>You are responsible for maintaining the confidentiality of your password and for all activity under your account. Notify Zion English administrators immediately if you suspect unauthorized access. We may suspend or terminate accounts that violate these terms or pose a security risk.</p></section><section><h2>Acceptable Use</h2><p>You agree not to:</p><ul><li>Use the portal for any unlawful purpose or in violation of applicable laws.</li><li>Access data belonging to other teachers or students without authorization.</li><li>Misuse, export, or disclose student or teacher personal information outside legitimate Zion English operations.</li><li>Attempt to probe, scan, or compromise the security of the portal or its infrastructure.</li><li>Interfere with or disrupt the portal's operation or other users' access.</li></ul></section><section><h2>Service Description</h2><p>The portal provides tools for managing ESL teaching operations, including student and teacher records, class scheduling, sheet processing, and related administrative functions. Features may change over time. The portal is provided for internal business use and is not a public consumer service.</p></section><section><h2>Third-Party Services</h2><p>The portal may integrate with Google Drive/Sheets, Google Calendar, and Zoom. Your use of those services through the portal is also subject to their respective terms and policies. We are not responsible for third-party service availability or practices.</p></section><section><h2>Disclaimer</h2><p>The portal is provided \"as is\" and \"as available\" for Zion English's internal operations. We do not warrant uninterrupted or error-free service. To the extent permitted by law, we disclaim liability for indirect, incidental, or consequential damages arising from use of the portal.</p></section><section><h2>Changes to Terms</h2><p>We may modify these Terms of Use at any time. The effective date at the top of this page reflects the latest revision. Continued use after changes constitutes acceptance of the updated terms.</p></section><section><h2>Contact</h2><p>For questions about these Terms of Use or technical support, contact InnovaTech at <a href=\"mailto:itservices.innovatech@gmail.com\">itservices.innovatech@gmail.com</a>.</p></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -572,7 +596,7 @@ func LegalStyles() templ.Component {
 			templ_7745c5c3_Var28 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<style>\r\n\t\t.legal-page {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tmin-height: 100vh;\r\n\t\t}\r\n\r\n\t\t.legal-main {\r\n\t\t\tposition: relative;\r\n\t\t\tz-index: 1;\r\n\t\t\tflex: 1;\r\n\t\t\tpadding: 32px 24px 48px;\r\n\t\t}\r\n\r\n\t\t.legal-content {\r\n\t\t\tmax-width: 720px;\r\n\t\t\tmargin: 0 auto;\r\n\t\t}\r\n\r\n\t\t.legal-content h1 {\r\n\t\t\tfont-size: clamp(1.75rem, 4vw, 2.25rem);\r\n\t\t\tmargin: 0 0 8px;\r\n\t\t}\r\n\r\n\t\t.legal-effective {\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tfont-size: 0.9rem;\r\n\t\t\tmargin: 0 0 32px;\r\n\t\t}\r\n\r\n\t\t.legal-content section {\r\n\t\t\tmargin-bottom: 28px;\r\n\t\t}\r\n\r\n\t\t.legal-content h2 {\r\n\t\t\tfont-size: 1.15rem;\r\n\t\t\tmargin: 0 0 10px;\r\n\t\t}\r\n\r\n\t\t.legal-content h3 {\r\n\t\t\tfont-size: 1rem;\r\n\t\t\tmargin: 16px 0 8px;\r\n\t\t}\r\n\r\n\t\t.legal-content p {\r\n\t\t\tmargin: 0 0 12px;\r\n\t\t\tline-height: 1.65;\r\n\t\t\tcolor: var(--lp-fg);\r\n\t\t}\r\n\r\n\t\t.legal-content ul {\r\n\t\t\tmargin: 0 0 12px;\r\n\t\t\tpadding-left: 1.35rem;\r\n\t\t\tline-height: 1.65;\r\n\t\t}\r\n\r\n\t\t.legal-content li {\r\n\t\t\tmargin-bottom: 6px;\r\n\t\t}\r\n\r\n\t\t.legal-content a {\r\n\t\t\tcolor: var(--lp-primary-dark);\r\n\t\t\tfont-weight: 500;\r\n\t\t}\r\n\r\n\t\t.legal-content a:hover {\r\n\t\t\ttext-decoration: underline;\r\n\t\t}\r\n\r\n\t\t.legal-content code {\r\n\t\t\tfont-size: 0.875em;\r\n\t\t\tbackground: rgba(45, 45, 45, 0.06);\r\n\t\t\tpadding: 2px 6px;\r\n\t\t\tborder-radius: 4px;\r\n\t\t}\r\n\r\n\t\t.legal-content--doc {\r\n\t\t\tmax-width: 52rem;\r\n\t\t}\r\n\r\n\t\t.legal-doc-subtitle {\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tfont-size: 1rem;\r\n\t\t\tline-height: 1.65;\r\n\t\t\tmargin: 0 0 28px;\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<style>\r\n\t\t.legal-page {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tmin-height: 100vh;\r\n\t\t}\r\n\r\n\t\t.legal-main {\r\n\t\t\tposition: relative;\r\n\t\t\tz-index: 1;\r\n\t\t\tflex: 1;\r\n\t\t\tpadding: 32px 24px 48px;\r\n\t\t}\r\n\r\n\t\t.legal-content {\r\n\t\t\tmax-width: 720px;\r\n\t\t\tmargin: 0 auto;\r\n\t\t}\r\n\r\n\t\t.legal-content h1 {\r\n\t\t\tfont-size: clamp(1.75rem, 4vw, 2.25rem);\r\n\t\t\tmargin: 0 0 8px;\r\n\t\t}\r\n\r\n\t\t.legal-effective {\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tfont-size: 0.9rem;\r\n\t\t\tmargin: 0 0 32px;\r\n\t\t}\r\n\r\n\t\t.legal-content section {\r\n\t\t\tmargin-bottom: 28px;\r\n\t\t}\r\n\r\n\t\t.legal-content h2 {\r\n\t\t\tfont-size: 1.15rem;\r\n\t\t\tmargin: 0 0 10px;\r\n\t\t}\r\n\r\n\t\t.legal-content h3 {\r\n\t\t\tfont-size: 1rem;\r\n\t\t\tmargin: 16px 0 8px;\r\n\t\t}\r\n\r\n\t\t.legal-content p {\r\n\t\t\tmargin: 0 0 12px;\r\n\t\t\tline-height: 1.65;\r\n\t\t\tcolor: var(--lp-fg);\r\n\t\t}\r\n\r\n\t\t.legal-content ul {\r\n\t\t\tmargin: 0 0 12px;\r\n\t\t\tpadding-left: 1.35rem;\r\n\t\t\tline-height: 1.65;\r\n\t\t}\r\n\r\n\t\t.legal-content li {\r\n\t\t\tmargin-bottom: 6px;\r\n\t\t}\r\n\r\n\t\t.legal-content a {\r\n\t\t\tcolor: var(--lp-primary-dark);\r\n\t\t\tfont-weight: 500;\r\n\t\t}\r\n\r\n\t\t.legal-content a:hover {\r\n\t\t\ttext-decoration: underline;\r\n\t\t}\r\n\r\n\t\t.legal-content code {\r\n\t\t\tfont-size: 0.875em;\r\n\t\t\tbackground: rgba(45, 45, 45, 0.06);\r\n\t\t\tpadding: 2px 6px;\r\n\t\t\tborder-radius: 4px;\r\n\t\t}\r\n\r\n\t\t.legal-content--doc {\r\n\t\t\tmax-width: 52rem;\r\n\t\t}\r\n\r\n\t\t.legal-doc-subtitle {\r\n\t\t\tcolor: var(--lp-muted);\r\n\t\t\tfont-size: 1rem;\r\n\t\t\tline-height: 1.65;\r\n\t\t\tmargin: 0 0 28px;\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

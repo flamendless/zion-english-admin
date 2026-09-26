@@ -133,6 +133,16 @@ type TblLog struct {
 	CreatedByName sql.NullString
 }
 
+type TblMetaTag struct {
+	ID        int64
+	Name      string
+	Content   string
+	Value     string
+	SortOrder int64
+	CreatedAt string
+	UpdatedAt string
+}
+
 type TblNotification struct {
 	ID            int64
 	FromTeacherID interface{}

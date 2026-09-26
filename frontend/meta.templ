@@ -1,0 +1,259 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/metatags"
+	"zion-english/internal/utils"
+)
+
+type MetaTagListItem struct {
+	ID          string
+	Name        string
+	Content     string
+	Value       string
+	SortOrder   int64
+	ContentDisp string
+	ValueDisp   string
+}
+
+type MetaTagsListData struct {
+	Tags []MetaTagListItem
+}
+
+type MetaTagFormData struct {
+	ID        string
+	Name      string
+	Content   string
+	Value     string
+	SortOrder int64
+	IsEdit    bool
+}
+
+func MetaTagPreview(s string) string {
+	if s == "" {
+		return "-"
+	}
+	if len(s) > 48 {
+		return s[:45] + "..."
+	}
+	return s
+}
+
+templ HeadMetaTags() {
+	{{
+		tags := metatags.Get(ctx)
+	}}
+	for _, tag := range tags {
+		if tag.Content != "" && tag.Value != "" {
+			<meta name={ tag.Name } content={ tag.Content } value={ tag.Value }/>
+		} else if tag.Content != "" {
+			<meta name={ tag.Name } content={ tag.Content }/>
+		} else if tag.Value != "" {
+			<meta name={ tag.Name } value={ tag.Value }/>
+		}
+	}
+}
+
+templ MetaTagsPage(data MetaTagsListData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>Meta - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@MetaTagsPageStyles()
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@HubHeader("Meta", "", "", false)
+			@SuccessBanner()
+			@ErrorBanner()
+
+			<p class="meta-tags-subtitle">
+				Configure extra <code>&lt;meta&gt;</code> tags injected into every page head (landing, login, and admin pages). Use for site verification and similar integrations.
+			</p>
+
+			<div class="meta-tags-card">
+				<h2 class="meta-tags-card-title">Add meta tag</h2>
+				@MetaTagForm(MetaTagFormData{IsEdit: false})
+			</div>
+
+			if len(data.Tags) > 0 {
+				<div class="table-wrapper meta-tags-table-wrap">
+					<table class="table-stack-mobile">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Content</th>
+								<th>Value</th>
+								<th>Order</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							for _, item := range data.Tags {
+								<tr>
+									<td data-label="Name"><code>{ item.Name }</code></td>
+									<td data-label="Content">{ item.ContentDisp }</td>
+									<td data-label="Value">{ item.ValueDisp }</td>
+									<td data-label="Order">{ item.SortOrder }</td>
+									<td data-label="Actions">
+										<div class="table-actions">
+											@IconActionLink(utils.URL("/meta/" + item.ID + "/edit"), "Edit", IconKindEdit)
+											<form method="POST" action={ utils.URL("/meta/" + item.ID + "/delete") } class="table-action-form" onsubmit="return confirm('Delete this meta tag?');">
+												@IconActionSubmit("Delete", IconKindDelete)
+											</form>
+										</div>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			} else {
+				<p class="meta-tags-empty">No meta tags yet. Add one above.</p>
+			}
+		</div>
+	</body>
+	</html>
+}
+
+templ MetaTagEditPage(data MetaTagFormData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>Edit Meta Tag - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@MetaTagsPageStyles()
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@HubHeader("Edit meta tag", "", "", false)
+			@SuccessBanner()
+			@ErrorBanner()
+
+			<div class="meta-tags-card">
+				@MetaTagForm(data)
+			</div>
+
+			<p class="meta-tags-back">
+				<a href={ utils.URL("/meta") }>Back to Meta</a>
+			</p>
+		</div>
+	</body>
+	</html>
+}
+
+templ MetaTagForm(data MetaTagFormData) {
+	if data.IsEdit {
+		<form method="POST" action={ utils.URL("/meta/" + data.ID + "/edit") } class="meta-tag-form">
+			@metaTagFormFields(data)
+			<div class="meta-tag-form-actions">
+				<button type="submit" class="btn">Save changes</button>
+				<a href={ utils.URL("/meta") } class="btn btn-secondary">Cancel</a>
+			</div>
+		</form>
+	} else {
+		<form method="POST" action={ utils.URL("/meta") } class="meta-tag-form">
+			@metaTagFormFields(data)
+			<div class="meta-tag-form-actions">
+				<button type="submit" class="btn">Add meta tag</button>
+			</div>
+		</form>
+	}
+}
+
+templ metaTagFormFields(data MetaTagFormData) {
+	<div class="form-group">
+		<label for="metaName">Name</label>
+		<input type="text" id="metaName" name="name" value={ data.Name } required maxlength="120" placeholder="impact-site-verification"/>
+		<p class="form-hint">The <code>name</code> attribute on the meta tag.</p>
+	</div>
+	<div class="form-row">
+		<div class="form-group">
+			<label for="metaContent">Content</label>
+			<input type="text" id="metaContent" name="content" value={ data.Content } maxlength="2048" placeholder="Optional"/>
+			<p class="form-hint">Rendered as <code>content="..."</code> when set.</p>
+		</div>
+		<div class="form-group">
+			<label for="metaValue">Value</label>
+			<input type="text" id="metaValue" name="value" value={ data.Value } maxlength="2048" placeholder="Optional"/>
+			<p class="form-hint">Rendered as <code>value="..."</code> when set.</p>
+		</div>
+	</div>
+	<div class="form-group meta-tag-sort-field">
+		<label for="metaSortOrder">Sort order</label>
+		<input type="number" id="metaSortOrder" name="sort_order" value={ fmt.Sprintf("%d", data.SortOrder) } min="0" step="1"/>
+		<p class="form-hint">Lower numbers appear first in the document head.</p>
+	</div>
+}
+
+templ MetaTagsPageStyles() {
+	<style>
+		.meta-tags-subtitle {
+			margin-top: var(--space-2);
+			margin-bottom: var(--space-6);
+			color: var(--color-muted-foreground);
+			max-width: 42rem;
+			line-height: 1.5;
+		}
+
+		.meta-tags-subtitle code {
+			font-family: "Fira Code", monospace;
+			font-size: 0.875em;
+		}
+
+		.meta-tags-card {
+			background: var(--color-surface);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-lg);
+			padding: var(--space-6);
+			max-width: 48rem;
+			margin-bottom: var(--space-6);
+		}
+
+		.meta-tags-card-title {
+			font-size: 1.125rem;
+			margin-bottom: var(--space-4);
+		}
+
+		.meta-tag-form-actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-2);
+		}
+
+		.meta-tag-form-actions .btn,
+		.meta-tag-form-actions .btn-secondary {
+			margin-top: 0;
+		}
+
+		.meta-tag-sort-field {
+			max-width: 12rem;
+		}
+
+		.meta-tags-table-wrap {
+			margin-top: var(--space-4);
+		}
+
+		.meta-tags-empty {
+			color: var(--color-muted-foreground);
+		}
+
+		.meta-tags-back {
+			margin-top: var(--space-4);
+		}
+
+		.meta-tags-back a {
+			color: var(--color-secondary);
+		}
+	</style>
+}

@@ -8,6 +8,7 @@ templ LegalPage(title string, effectiveDate string) {
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		@HeadMetaTags()
 		<title>{ title } | Zion English</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		<link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -51,6 +52,7 @@ templ LegalInfoPage(title string) {
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		@HeadMetaTags()
 		<title>{ title } | Zion English</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		<link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -93,6 +95,7 @@ templ LegalDocPage(title string, subtitle string) {
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		@HeadMetaTags()
 		<title>{ title } | Zion English</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		<link rel="preconnect" href="https://fonts.googleapis.com"/>

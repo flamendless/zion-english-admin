@@ -63,6 +63,7 @@ var navIconByPath = map[string]NavIconKind{
 	"/process":              NavIconProcess,
 	"/feature-flags":        NavIconFeatureFlags,
 	"/settings":             NavIconSettings,
+	"/meta":                 NavIconSettings,
 	"/logs":                 NavIconLogs,
 	"/upload-logs":          NavIconDocuments,
 	"/announcements":        NavIconAnnouncements,
