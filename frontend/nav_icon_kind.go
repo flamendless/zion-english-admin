@@ -64,6 +64,7 @@ var navIconByPath = map[string]NavIconKind{
 	"/feature-flags":        NavIconFeatureFlags,
 	"/settings":             NavIconSettings,
 	"/logs":                 NavIconLogs,
+	"/upload-logs":          NavIconDocuments,
 	"/announcements":        NavIconAnnouncements,
 	"/changelogs":           NavIconChangelogs,
 }

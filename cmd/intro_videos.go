@@ -50,11 +50,23 @@ func introVideoSourceType(sourceType sql.NullString) constants.TeacherIntroVideo
 	return constants.TeacherIntroVideoSourceType(sourceType.String)
 }
 
-func mapIntroVideoItem(row queries.TblTeacherIntroVideo) frontend.IntroVideoItem {
+func formatIntroVideoFileSizes(original, stored sql.NullInt64) string {
+	if !stored.Valid {
+		return "-"
+	}
+	storedLabel := utils.FormatFileSize(stored.Int64)
+	if !original.Valid || original.Int64 == stored.Int64 {
+		return storedLabel
+	}
+	return fmt.Sprintf("%s stored (%s original)", storedLabel, utils.FormatFileSize(original.Int64))
+}
+
+func mapIntroVideoItem(row queries.GetTeacherIntroVideosByTeacherIDFilteredRow) frontend.IntroVideoItem {
 	linkLabel := introVideoLinkLabel(row.Url, row.OriginalFilename)
 	return frontend.IntroVideoItem{
-		ID:           strconv.FormatInt(row.ID, 10),
-		LinkLabel:    linkLabel,
+		ID:            strconv.FormatInt(row.ID, 10),
+		LinkLabel:     linkLabel,
+		FileSizeLabel: formatIntroVideoFileSizes(row.OriginalFileSize, row.FileSize),
 		URL:          nullStringValue(row.Url),
 		SourceType:   introVideoSourceType(row.SourceType),
 		Status:       constants.TeacherIntroVideoStatus(row.Status),
@@ -65,7 +77,7 @@ func mapIntroVideoItem(row queries.TblTeacherIntroVideo) frontend.IntroVideoItem
 	}
 }
 
-func mapIntroVideoItems(rows []queries.TblTeacherIntroVideo) []frontend.IntroVideoItem {
+func mapIntroVideoItems(rows []queries.GetTeacherIntroVideosByTeacherIDFilteredRow) []frontend.IntroVideoItem {
 	items := make([]frontend.IntroVideoItem, len(rows))
 	for i, row := range rows {
 		items[i] = mapIntroVideoItem(row)
@@ -80,14 +92,15 @@ func mapAllIntroVideoItems(ctx context.Context, rows []queries.GetAllTeacherIntr
 		teacherIDs[i] = row.TeacherID
 		linkLabel := introVideoLinkLabel(row.Url, row.OriginalFilename)
 		items[i] = frontend.IntroVideoItem{
-			ID:           strconv.FormatInt(row.ID, 10),
-			LinkLabel:    linkLabel,
-			URL:          nullStringValue(row.Url),
-			SourceType:   introVideoSourceType(row.SourceType),
-			Status:       constants.TeacherIntroVideoStatus(row.Status),
-			UploadedAt:   utils.FormatNullDateTimePHT(row.CreatedAt),
-			UploadedBy:   row.TeacherName,
-			RejectReason: nullStringValue(row.RejectReason),
+			ID:            strconv.FormatInt(row.ID, 10),
+			LinkLabel:     linkLabel,
+			FileSizeLabel: formatIntroVideoFileSizes(row.OriginalFileSize, row.FileSize),
+			URL:           nullStringValue(row.Url),
+			SourceType:    introVideoSourceType(row.SourceType),
+			Status:        constants.TeacherIntroVideoStatus(row.Status),
+			UploadedAt:    utils.FormatNullDateTimePHT(row.CreatedAt),
+			UploadedBy:    row.TeacherName,
+			RejectReason:  nullStringValue(row.RejectReason),
 			UploadedByAvatar: buildTeacherListAvatarProps(
 				row.TeacherID,
 				row.TeacherFirstName,
@@ -391,6 +404,7 @@ func handleProfileIntroVideoUpload(w http.ResponseWriter, r *http.Request, ctx c
 
 	processed, err := teacherintrovideo.ProcessUpload(ctx, file, header.Filename, header.Size, featureflags.IntroVideoCompressSettings(ctx, dbRO))
 	if err != nil {
+		insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeFailed, fmt.Sprintf("intro video processing failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err))
 		setErrorFlash(w, introVideoSubmitErrorMessage(err))
 		HttpRedirect(w, r, "/profile")
 		return
@@ -400,6 +414,7 @@ func handleProfileIntroVideoUpload(w http.ResponseWriter, r *http.Request, ctx c
 	uploadFile, err := os.Open(processed.Path)
 	if err != nil {
 		logs.Log().Error("open processed intro video", zap.Error(err))
+		insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeFailed, fmt.Sprintf("intro video open processed file failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err))
 		setErrorFlash(w, ErrIntroVideoSaveFailed.Error())
 		HttpRedirect(w, r, "/profile")
 		return
@@ -410,6 +425,7 @@ func handleProfileIntroVideoUpload(w http.ResponseWriter, r *http.Request, ctx c
 	store := storage.Default()
 	if err := store.Put(ctx, storage.CategoryIntroVideos, storedFilename, uploadFile, processed.MimeType); err != nil {
 		logs.Log().Error("write intro video file", zap.Error(err))
+		insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeFailed, fmt.Sprintf("intro video storage failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err))
 		setErrorFlash(w, ErrIntroVideoSaveFailed.Error())
 		HttpRedirect(w, r, "/profile")
 		return
@@ -420,6 +436,7 @@ func handleProfileIntroVideoUpload(w http.ResponseWriter, r *http.Request, ctx c
 		OriginalFilename: sql.NullString{String: filepath.Base(header.Filename), Valid: true},
 		StoredFilename:   sql.NullString{String: storedFilename, Valid: true},
 		MimeType:         sql.NullString{String: processed.MimeType, Valid: true},
+		OriginalFileSize: sql.NullInt64{Int64: processed.OriginalSize, Valid: true},
 		FileSize:         sql.NullInt64{Int64: processed.Size, Valid: true},
 		SourceType:       sql.NullString{String: string(constants.TeacherIntroVideoSourceUpload), Valid: true},
 		Status:           string(constants.TeacherIntroVideoStatusSubmitted),
@@ -429,12 +446,14 @@ func handleProfileIntroVideoUpload(w http.ResponseWriter, r *http.Request, ctx c
 			setErrorFlash(w, "You already have a submitted or approved intro video. You cannot submit again unless it is rejected or deleted.")
 		} else {
 			logs.Log().Error("insert teacher intro video", zap.Error(err))
+			insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeFailed, fmt.Sprintf("intro video database insert failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err))
 			setErrorFlash(w, "Failed to record intro video")
 		}
 		HttpRedirect(w, r, "/profile")
 		return
 	}
 
+	insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeSucceeded, fmt.Sprintf("intro video file for teacher '%s' (id %d), file '%s'", user.Name, user.ID, filepath.Base(header.Filename)))
 	insertAuditLogAs(ctx, user, "profile", fmt.Sprintf("submitted intro video file for teacher '%s'", user.Name))
 	notifySuperuser(ctx, user, notifications.KindIntroVideoSubmitted,
 		fmt.Sprintf("Teacher '%s' submitted an intro video file", user.Name), "")

@@ -155,6 +155,92 @@ func handleSystemLogs(w http.ResponseWriter, r *http.Request) {
 	}).Render(ctx, w)
 }
 
+func countUploadLogsParams(f logFilters) queries.CountUploadLogsFilteredParams {
+	return queries.CountUploadLogsFilteredParams{
+		Column1:     f.module,
+		Module:      f.module,
+		Column3:     f.message,
+		Column4:     sql.NullString{String: f.message, Valid: true},
+		Column5:     f.startDate,
+		CreatedAt:   f.startDate,
+		Column7:     f.endDate,
+		CreatedAt_2: f.endDate,
+	}
+}
+
+func getUploadLogsParams(f logFilters, limit, offset int64) queries.GetUploadLogsFilteredParams {
+	return queries.GetUploadLogsFilteredParams{
+		Column1:     f.module,
+		Module:      f.module,
+		Column3:     f.message,
+		Column4:     sql.NullString{String: f.message, Valid: true},
+		Column5:     f.startDate,
+		CreatedAt:   f.startDate,
+		Column7:     f.endDate,
+		CreatedAt_2: f.endDate,
+		Limit:       limit,
+		Offset:      offset,
+	}
+}
+
+func handleUploadLogs(w http.ResponseWriter, r *http.Request) {
+	if !requireMethod(w, r, http.MethodGet) {
+		return
+	}
+
+	ctx := r.Context()
+	sort := parseListSort(r, frontend.ListSortKindUploadLog)
+	page := utils.ParsePageQuery(r)
+	filters := parseLogFilters(r)
+
+	countParams := countUploadLogsParams(filters)
+	total, err := dbRO.GetQueries().CountUploadLogsFiltered(ctx, countParams)
+	if err != nil {
+		HttpError(w, fmt.Sprintf("Failed to count upload logs: %v", err), http.StatusInternalServerError)
+		return
+	}
+	page.Total = total
+
+	allRows, err := dbRO.GetQueries().GetUploadLogsFiltered(ctx, getUploadLogsParams(filters, total, 0))
+	if err != nil {
+		HttpError(w, fmt.Sprintf("Failed to fetch upload logs: %v", err), http.StatusInternalServerError)
+		return
+	}
+	sortUploadLogRows(allRows, sort)
+	rows := paginateSlice(allRows, page)
+
+	viewLogs := make([]frontend.SystemLogItem, len(rows))
+	for i, l := range rows {
+		viewLogs[i] = frontend.SystemLogItem{
+			ID:        strconv.FormatInt(l.ID, 10),
+			Module:    l.Module,
+			Message:   l.Message,
+			CreatedBy: l.CreatedByName,
+			CreatedAt: l.CreatedAt,
+		}
+	}
+
+	params := listQueryParamsWithSort(r, frontend.ListSortKindUploadLog)
+	writeHTML(w)
+	frontend.UploadLogs(frontend.UploadLogData{
+		Logs:           viewLogs,
+		Query:          filters.message,
+		Module:         filters.module,
+		StartDate:      filters.startDate,
+		EndDate:        filters.endDate,
+		SortBy:         sort.By,
+		SortOrder:      string(sort.Order),
+		PageNumber:     page.Number,
+		PageTotalPages: page.TotalPages(),
+		PageTotal:      page.Total,
+		PrevURL:        utils.BuildPageURLAt(utils.URL("/upload-logs"), page.Number-1, page.Size, params),
+		NextURL:        utils.BuildPageURLAt(utils.URL("/upload-logs"), page.Number+1, page.Size, params),
+		HasPrev:        page.HasPrev(),
+		HasNext:        page.HasNext(),
+		FilterPath:     utils.URL("/upload-logs"),
+	}).Render(ctx, w)
+}
+
 func systemLogItemsFromAllRows(rows []queries.GetAllLogsFilteredRow) []frontend.SystemLogItem {
 	viewLogs := make([]frontend.SystemLogItem, len(rows))
 	for i, l := range rows {

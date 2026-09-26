@@ -217,8 +217,8 @@ func sortIntroVideoRows(rows []queries.GetAllTeacherIntroVideosFilteredRow, sort
 	})
 }
 
-func sortTeacherIntroVideoRows(rows []queries.TblTeacherIntroVideo, sort utils.SortParams) {
-	utils.SortSlice(rows, sort.Order, func(a, b queries.TblTeacherIntroVideo) int {
+func sortTeacherIntroVideoRows(rows []queries.GetTeacherIntroVideosByTeacherIDFilteredRow, sort utils.SortParams) {
+	utils.SortSlice(rows, sort.Order, func(a, b queries.GetTeacherIntroVideosByTeacherIDFilteredRow) int {
 		switch sort.By {
 		case "url":
 			return utils.CompareStrings(nullStringValue(a.Url), nullStringValue(b.Url))
@@ -251,6 +251,21 @@ func sortProcessingLogRows(rows []queries.TblProcessingLog, sort utils.SortParam
 
 func sortSystemLogRows(rows []queries.GetAllLogsFilteredRow, sort utils.SortParams) {
 	utils.SortSlice(rows, sort.Order, func(a, b queries.GetAllLogsFilteredRow) int {
+		switch sort.By {
+		case "id":
+			return utils.CompareInt64(a.ID, b.ID)
+		case "module":
+			return utils.CompareStrings(a.Module, b.Module)
+		case "created_at":
+			return utils.CompareStrings(a.CreatedAt, b.CreatedAt)
+		default:
+			return utils.CompareStrings(a.CreatedAt, b.CreatedAt)
+		}
+	})
+}
+
+func sortUploadLogRows(rows []queries.GetUploadLogsFilteredRow, sort utils.SortParams) {
+	utils.SortSlice(rows, sort.Order, func(a, b queries.GetUploadLogsFilteredRow) int {
 		switch sort.By {
 		case "id":
 			return utils.CompareInt64(a.ID, b.ID)

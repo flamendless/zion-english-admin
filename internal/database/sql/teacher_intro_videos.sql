@@ -5,10 +5,11 @@ INSERT INTO tbl_teacher_intro_videos (
 	stored_filename,
 	mime_type,
 	file_size,
+	original_file_size,
 	url,
 	source_type,
 	status
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 -- name: GetTeacherIntroVideoByID :one
 SELECT
@@ -18,6 +19,7 @@ SELECT
 	stored_filename,
 	mime_type,
 	file_size,
+	original_file_size,
 	url,
 	source_type,
 	status,
@@ -37,6 +39,7 @@ SELECT
 	stored_filename,
 	mime_type,
 	file_size,
+	original_file_size,
 	url,
 	source_type,
 	status,
@@ -88,6 +91,7 @@ SELECT
 	v.stored_filename,
 	v.mime_type,
 	v.file_size,
+	v.original_file_size,
 	v.url,
 	v.source_type,
 	v.status,
@@ -126,6 +130,7 @@ SELECT
 	stored_filename,
 	mime_type,
 	file_size,
+	original_file_size,
 	url,
 	source_type,
 	status,

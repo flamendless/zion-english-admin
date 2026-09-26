@@ -24,11 +24,12 @@ var allowedIntroVideoExtensions = map[string]string{
 }
 
 type ProcessedUpload struct {
-	Path     string
-	Size     int64
-	Ext      string
-	MimeType string
-	Cleanup  func()
+	Path         string
+	OriginalSize int64
+	Size         int64
+	Ext          string
+	MimeType     string
+	Cleanup      func()
 }
 
 func ProcessUpload(ctx context.Context, file io.ReadSeeker, filename string, size int64, settings constants.IntroVideoEncodeSettings) (ProcessedUpload, error) {
@@ -44,11 +45,12 @@ func ProcessUpload(ctx context.Context, file io.ReadSeeker, filename string, siz
 			return ProcessedUpload{}, ErrReadFailed
 		}
 		return ProcessedUpload{
-			Path:     inputPath,
-			Size:     inputInfo.Size(),
-			Ext:      ext,
-			MimeType: mimeType,
-			Cleanup:  cleanupInput,
+			Path:         inputPath,
+			OriginalSize: inputInfo.Size(),
+			Size:         inputInfo.Size(),
+			Ext:          ext,
+			MimeType:     mimeType,
+			Cleanup:      cleanupInput,
 		}, nil
 	}
 
@@ -103,11 +105,12 @@ func ProcessUpload(ctx context.Context, file io.ReadSeeker, filename string, siz
 	}
 
 	return ProcessedUpload{
-		Path:     finalPath,
-		Size:     finalSize,
-		Ext:      finalExt,
-		MimeType: finalMIME,
-		Cleanup:  cleanupFinal,
+		Path:         finalPath,
+		OriginalSize: inputInfo.Size(),
+		Size:         finalSize,
+		Ext:          finalExt,
+		MimeType:     finalMIME,
+		Cleanup:      cleanupFinal,
 	}, nil
 }
 

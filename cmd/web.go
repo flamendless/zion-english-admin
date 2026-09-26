@@ -122,6 +122,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/schedule", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleSchedule))
 		authMux.HandleFunc(basePath+"/my-students", auth.RequireRole(auth.RoleTeacher)(handleMyStudents))
 		authMux.HandleFunc(basePath+"/logs", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleSystemLogs))
+		authMux.HandleFunc(basePath+"/upload-logs", auth.RequireRole(auth.AdminAccessRoles()...)(handleUploadLogs))
 		authMux.HandleFunc(basePath+"/changelogs", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleChangelogs))
 		authMux.HandleFunc(basePath+"/feature-flags", auth.RequireRole(auth.RoleSuperuser)(handleFeatureFlags))
 		authMux.HandleFunc(basePath+"/settings/reveal", auth.RequireRole(auth.RoleSuperuser)(handleSettingsReveal))
@@ -239,6 +240,7 @@ var cmdWeb = &cobra.Command{
 		// protected routes
 		rootMux.Handle(basePath+"/dashboard", authHandler)
 		rootMux.Handle(basePath+"/logs", authHandler)
+		rootMux.Handle(basePath+"/upload-logs", authHandler)
 		rootMux.Handle(basePath+"/changelogs", authHandler)
 		rootMux.Handle(basePath+"/feature-flags", authHandler)
 		rootMux.Handle(basePath+"/settings/reveal", authHandler)

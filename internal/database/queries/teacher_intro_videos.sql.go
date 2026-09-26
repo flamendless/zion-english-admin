@@ -33,6 +33,7 @@ SELECT
 	v.stored_filename,
 	v.mime_type,
 	v.file_size,
+	v.original_file_size,
 	v.url,
 	v.source_type,
 	v.status,
@@ -82,6 +83,7 @@ type GetAllTeacherIntroVideosFilteredRow struct {
 	StoredFilename        sql.NullString
 	MimeType              sql.NullString
 	FileSize              sql.NullInt64
+	OriginalFileSize      sql.NullInt64
 	Url                   sql.NullString
 	SourceType            sql.NullString
 	Status                string
@@ -123,6 +125,7 @@ func (q *Queries) GetAllTeacherIntroVideosFiltered(ctx context.Context, arg GetA
 			&i.StoredFilename,
 			&i.MimeType,
 			&i.FileSize,
+			&i.OriginalFileSize,
 			&i.Url,
 			&i.SourceType,
 			&i.Status,
@@ -159,6 +162,7 @@ SELECT
 	stored_filename,
 	mime_type,
 	file_size,
+	original_file_size,
 	url,
 	source_type,
 	status,
@@ -174,9 +178,27 @@ ORDER BY created_at DESC
 LIMIT 1
 `
 
-func (q *Queries) GetLatestTeacherIntroVideoByTeacherID(ctx context.Context, teacherID int64) (TblTeacherIntroVideo, error) {
+type GetLatestTeacherIntroVideoByTeacherIDRow struct {
+	ID               int64
+	TeacherID        int64
+	OriginalFilename sql.NullString
+	StoredFilename   sql.NullString
+	MimeType         sql.NullString
+	FileSize         sql.NullInt64
+	OriginalFileSize sql.NullInt64
+	Url              sql.NullString
+	SourceType       sql.NullString
+	Status           string
+	CreatedAt        sql.NullTime
+	ReviewedAt       sql.NullTime
+	ReviewedBy       sql.NullInt64
+	DeletedAt        sql.NullTime
+	RejectReason     sql.NullString
+}
+
+func (q *Queries) GetLatestTeacherIntroVideoByTeacherID(ctx context.Context, teacherID int64) (GetLatestTeacherIntroVideoByTeacherIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getLatestTeacherIntroVideoByTeacherID, teacherID)
-	var i TblTeacherIntroVideo
+	var i GetLatestTeacherIntroVideoByTeacherIDRow
 	err := row.Scan(
 		&i.ID,
 		&i.TeacherID,
@@ -184,6 +206,7 @@ func (q *Queries) GetLatestTeacherIntroVideoByTeacherID(ctx context.Context, tea
 		&i.StoredFilename,
 		&i.MimeType,
 		&i.FileSize,
+		&i.OriginalFileSize,
 		&i.Url,
 		&i.SourceType,
 		&i.Status,
@@ -204,6 +227,7 @@ SELECT
 	stored_filename,
 	mime_type,
 	file_size,
+	original_file_size,
 	url,
 	source_type,
 	status,
@@ -216,9 +240,27 @@ FROM tbl_teacher_intro_videos
 WHERE id = ?
 `
 
-func (q *Queries) GetTeacherIntroVideoByID(ctx context.Context, id int64) (TblTeacherIntroVideo, error) {
+type GetTeacherIntroVideoByIDRow struct {
+	ID               int64
+	TeacherID        int64
+	OriginalFilename sql.NullString
+	StoredFilename   sql.NullString
+	MimeType         sql.NullString
+	FileSize         sql.NullInt64
+	OriginalFileSize sql.NullInt64
+	Url              sql.NullString
+	SourceType       sql.NullString
+	Status           string
+	CreatedAt        sql.NullTime
+	ReviewedAt       sql.NullTime
+	ReviewedBy       sql.NullInt64
+	DeletedAt        sql.NullTime
+	RejectReason     sql.NullString
+}
+
+func (q *Queries) GetTeacherIntroVideoByID(ctx context.Context, id int64) (GetTeacherIntroVideoByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getTeacherIntroVideoByID, id)
-	var i TblTeacherIntroVideo
+	var i GetTeacherIntroVideoByIDRow
 	err := row.Scan(
 		&i.ID,
 		&i.TeacherID,
@@ -226,6 +268,7 @@ func (q *Queries) GetTeacherIntroVideoByID(ctx context.Context, id int64) (TblTe
 		&i.StoredFilename,
 		&i.MimeType,
 		&i.FileSize,
+		&i.OriginalFileSize,
 		&i.Url,
 		&i.SourceType,
 		&i.Status,
@@ -246,6 +289,7 @@ SELECT
 	stored_filename,
 	mime_type,
 	file_size,
+	original_file_size,
 	url,
 	source_type,
 	status,
@@ -274,7 +318,25 @@ type GetTeacherIntroVideosByTeacherIDFilteredParams struct {
 	Column6   sql.NullString
 }
 
-func (q *Queries) GetTeacherIntroVideosByTeacherIDFiltered(ctx context.Context, arg GetTeacherIntroVideosByTeacherIDFilteredParams) ([]TblTeacherIntroVideo, error) {
+type GetTeacherIntroVideosByTeacherIDFilteredRow struct {
+	ID               int64
+	TeacherID        int64
+	OriginalFilename sql.NullString
+	StoredFilename   sql.NullString
+	MimeType         sql.NullString
+	FileSize         sql.NullInt64
+	OriginalFileSize sql.NullInt64
+	Url              sql.NullString
+	SourceType       sql.NullString
+	Status           string
+	CreatedAt        sql.NullTime
+	ReviewedAt       sql.NullTime
+	ReviewedBy       sql.NullInt64
+	DeletedAt        sql.NullTime
+	RejectReason     sql.NullString
+}
+
+func (q *Queries) GetTeacherIntroVideosByTeacherIDFiltered(ctx context.Context, arg GetTeacherIntroVideosByTeacherIDFilteredParams) ([]GetTeacherIntroVideosByTeacherIDFilteredRow, error) {
 	rows, err := q.db.QueryContext(ctx, getTeacherIntroVideosByTeacherIDFiltered,
 		arg.TeacherID,
 		arg.Column2,
@@ -287,9 +349,9 @@ func (q *Queries) GetTeacherIntroVideosByTeacherIDFiltered(ctx context.Context, 
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TblTeacherIntroVideo
+	var items []GetTeacherIntroVideosByTeacherIDFilteredRow
 	for rows.Next() {
-		var i TblTeacherIntroVideo
+		var i GetTeacherIntroVideosByTeacherIDFilteredRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.TeacherID,
@@ -297,6 +359,7 @@ func (q *Queries) GetTeacherIntroVideosByTeacherIDFiltered(ctx context.Context, 
 			&i.StoredFilename,
 			&i.MimeType,
 			&i.FileSize,
+			&i.OriginalFileSize,
 			&i.Url,
 			&i.SourceType,
 			&i.Status,
@@ -340,10 +403,11 @@ INSERT INTO tbl_teacher_intro_videos (
 	stored_filename,
 	mime_type,
 	file_size,
+	original_file_size,
 	url,
 	source_type,
 	status
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 type InsertTeacherIntroVideoParams struct {
@@ -352,6 +416,7 @@ type InsertTeacherIntroVideoParams struct {
 	StoredFilename   sql.NullString
 	MimeType         sql.NullString
 	FileSize         sql.NullInt64
+	OriginalFileSize sql.NullInt64
 	Url              sql.NullString
 	SourceType       sql.NullString
 	Status           string
@@ -364,6 +429,7 @@ func (q *Queries) InsertTeacherIntroVideo(ctx context.Context, arg InsertTeacher
 		arg.StoredFilename,
 		arg.MimeType,
 		arg.FileSize,
+		arg.OriginalFileSize,
 		arg.Url,
 		arg.SourceType,
 		arg.Status,

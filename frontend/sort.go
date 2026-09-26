@@ -19,6 +19,7 @@ const (
 	ListSortKindIntroVideo    ListSortKind = "intro_video"
 	ListSortKindProcessingLog ListSortKind = "processing_log"
 	ListSortKindSystemLog     ListSortKind = "system_log"
+	ListSortKindUploadLog     ListSortKind = "upload_log"
 	ListSortKindNotification  ListSortKind = "notification"
 	ListSortKindAnnouncement  ListSortKind = "announcement"
 	ListSortKindAnalytics        ListSortKind = "analytics"
@@ -91,6 +92,12 @@ func SortOptionsFor(kind ListSortKind) []SortOption {
 			{Value: "module", Label: "Module"},
 			{Value: "id", Label: "ID"},
 		}
+	case ListSortKindUploadLog:
+		return []SortOption{
+			{Value: "created_at", Label: "Created at"},
+			{Value: "module", Label: "Module"},
+			{Value: "id", Label: "ID"},
+		}
 	case ListSortKindNotification:
 		return []SortOption{
 			{Value: "created_at", Label: "Date"},
@@ -148,7 +155,7 @@ func DefaultSortFor(kind ListSortKind) (string, utils.SortOrder) {
 		return "uploaded_at", utils.SortOrderDesc
 	case ListSortKindIntroVideo:
 		return "uploaded_at", utils.SortOrderDesc
-	case ListSortKindProcessingLog, ListSortKindSystemLog, ListSortKindNotification:
+	case ListSortKindProcessingLog, ListSortKindSystemLog, ListSortKindUploadLog, ListSortKindNotification:
 		return "created_at", utils.SortOrderDesc
 	case ListSortKindAnnouncement:
 		return "start_date", utils.SortOrderDesc

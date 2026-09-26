@@ -1,0 +1,116 @@
+package frontend
+
+import "strings"
+import "zion-english/internal/constants"
+import "zion-english/internal/utils"
+
+type UploadLogData struct {
+	Logs           []SystemLogItem
+	Query          string
+	Module         string
+	StartDate      string
+	EndDate        string
+	SortBy         string
+	SortOrder      string
+	PageNumber     int
+	PageTotalPages int
+	PageTotal      int64
+	PrevURL        string
+	NextURL        string
+	HasPrev        bool
+	HasNext        bool
+	FilterPath     string
+}
+
+func uploadLogDetail(message string) string {
+	if strings.HasPrefix(message, constants.SystemLogUploadLogPrefix) {
+		return strings.TrimPrefix(message, constants.SystemLogUploadLogPrefix)
+	}
+	if strings.HasPrefix(message, constants.SystemLogUploadLegacyErrorPrefix) {
+		return "failed: " + strings.TrimPrefix(message, constants.SystemLogUploadLegacyErrorPrefix)
+	}
+	return message
+}
+
+func uploadLogOutcomeLabel(message string) string {
+	detail := uploadLogDetail(message)
+	if strings.HasPrefix(detail, string(constants.SystemLogUploadOutcomeSucceeded)+":") {
+		return "Succeeded"
+	}
+	return "Failed"
+}
+
+func uploadLogOutcomeClass(message string) string {
+	if uploadLogOutcomeLabel(message) == "Succeeded" {
+		return "success-cell"
+	}
+	return "error-cell"
+}
+
+func uploadLogSummary(message string) string {
+	detail := uploadLogDetail(message)
+	for _, prefix := range []string{
+		string(constants.SystemLogUploadOutcomeSucceeded) + ": ",
+		string(constants.SystemLogUploadOutcomeFailed) + ": ",
+	} {
+		if strings.HasPrefix(detail, prefix) {
+			return strings.TrimPrefix(detail, prefix)
+		}
+	}
+	return detail
+}
+
+templ UploadLogs(data UploadLogData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Upload Logs - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@HubHeader("Upload Logs", "Teacher file uploads (intro video, documents, profile picture).", "", false)
+
+			@ListFilterForm(data.FilterPath, data.Query, "", "", "", "", "", data.Module, data.StartDate, data.EndDate, false, false, true, true, false, "", false, "", false, false, false, false, data.SortBy, data.SortOrder, ListSortKindUploadLog, false, "", "", "")
+
+			if len(data.Logs) > 0 {
+				<div class="table-wrapper">
+					<table id="uploadLogsTable" class="table-stack-mobile">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Module</th>
+								<th>Status</th>
+								<th>Details</th>
+								@AdminOnlyTableHeader("Teacher")
+								<th>Created At</th>
+							</tr>
+						</thead>
+						<tbody>
+							for _, log := range data.Logs {
+								<tr>
+									<td data-label="ID">{ log.ID }</td>
+									<td data-label="Module">{ log.Module }</td>
+									<td class={ uploadLogOutcomeClass(log.Message) } data-label="Status">{ uploadLogOutcomeLabel(log.Message) }</td>
+									<td data-label="Details">{ uploadLogSummary(log.Message) }</td>
+									<td data-label="Teacher">{ getDisplayValue(log.CreatedBy) }</td>
+									<td class="date-cell" data-label="Created">{ log.CreatedAt }</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+				@PaginationBar(data.HasPrev, data.PrevURL, data.HasNext, data.NextURL, data.PageNumber, data.PageTotalPages, data.PageTotal)
+			} else {
+				<div class="empty-state">
+					<p>No upload logs recorded yet.</p>
+				</div>
+			}
+		</div>
+	</body>
+	</html>
+}

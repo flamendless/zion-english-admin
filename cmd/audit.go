@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"zion-english/internal/auth"
+	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
 	"zion-english/internal/utils"
@@ -26,6 +27,10 @@ func insertAuditLogAs(ctx context.Context, actor auth.User, module, message stri
 	}); err != nil {
 		logs.Log().Info("system logs", zap.Error(err))
 	}
+}
+
+func insertUploadLog(ctx context.Context, actor auth.User, module string, outcome constants.SystemLogUploadOutcome, summary string) {
+	insertAuditLogAs(ctx, actor, module, constants.SystemLogUploadLogPrefix+string(outcome)+": "+summary)
 }
 
 func auditStr(v sql.NullString) string {

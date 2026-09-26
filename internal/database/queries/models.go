@@ -307,6 +307,7 @@ type TblTeacherIntroVideo struct {
 	ReviewedBy       sql.NullInt64
 	DeletedAt        sql.NullTime
 	RejectReason     sql.NullString
+	OriginalFileSize sql.NullInt64
 }
 
 type TblTeacherMeetingAccount struct {

@@ -100,6 +100,7 @@ var navItemDefs = []navItemDef{
 	{Path: "/feature-flags", LinkID: "featureFlagsLink", Title: "Feature Flags", Description: "Toggle integration connection availability", AdminOnlyCard: true},
 	{Path: "/settings", LinkID: "settingsLink", Title: "Settings", Description: "View runtime configuration and server settings", AdminOnlyCard: true},
 	{Path: "/logs", LinkID: "logsLink", Title: "Logs", TeacherTitle: "My Activity", Description: "View system logs", TeacherDesc: "View your recent actions"},
+	{Path: "/upload-logs", LinkID: "uploadLogsLink", Title: "Upload Logs", Description: "Teacher file upload activity", AdminOnlyCard: true},
 }
 
 var navGroupDefs = []navGroupDef{
@@ -107,7 +108,7 @@ var navGroupDefs = []navGroupDef{
 	{ID: "people", Label: "People", Description: "Manage teachers and students", AdminOnlyCard: true, Paths: []string{"/teachers", "/students"}},
 	{ID: "resources", Label: "Resources", Description: "Guides, documents, learning materials, and training videos", TeacherDesc: "Guides, your documents, learning materials, and training videos", FeatureCard: true, Paths: []string{"/guides", "/documents", "/intro-videos", "/learning-materials", "/training-materials"}},
 	{ID: "insights", Label: "Insights", Description: "Payroll reports and analytics", AdminOnlyCard: true, Paths: []string{"/reports", "/reports/history", "/analytics", "/payments", "/student-relationships"}},
-	{ID: "admin", Label: "Admin", Description: "Process CSV files, feature flags, settings, and system logs", AdminOnlyCard: true, Paths: []string{"/process", "/feature-flags", "/settings", "/logs"}},
+	{ID: "admin", Label: "Admin", Description: "Process CSV files, feature flags, settings, logs, and upload logs", AdminOnlyCard: true, Paths: []string{"/process", "/feature-flags", "/settings", "/logs", "/upload-logs"}},
 }
 
 var adminNavLayout = []navLayoutEntry{

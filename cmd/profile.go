@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -664,6 +665,7 @@ func handleProfileAvatar(w http.ResponseWriter, r *http.Request) {
 
 	if err := store.Put(ctx, storage.CategoryAvatars, filename, file, avatarContentType(filename)); err != nil {
 		logs.Log().Error("write avatar file", zap.Error(err))
+		insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeFailed, fmt.Sprintf("profile picture storage failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err))
 		setErrorFlash(w, "Failed to save profile picture")
 		HttpRedirect(w, r, "/profile")
 		return
@@ -675,6 +677,7 @@ func handleProfileAvatar(w http.ResponseWriter, r *http.Request) {
 	}); err != nil {
 		logs.Log().Error("update teacher profile picture", zap.Error(err))
 		_ = store.Delete(ctx, storage.CategoryAvatars, filename)
+		insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeFailed, fmt.Sprintf("profile picture database update failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err))
 		setErrorFlash(w, "Failed to update profile picture")
 		HttpRedirect(w, r, "/profile")
 		return
@@ -684,6 +687,7 @@ func handleProfileAvatar(w http.ResponseWriter, r *http.Request) {
 		logs.Log().Error("log avatar document", zap.Error(err))
 	}
 
+	insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeSucceeded, fmt.Sprintf("profile picture for teacher '%s' (id %d), file '%s'", user.Name, user.ID, filepath.Base(header.Filename)))
 	insertAuditLogAs(ctx, user, "profile", fmt.Sprintf("updated profile picture for teacher '%s'", user.Name))
 	notifySuperuser(ctx, user, notifications.KindProfileUpdated, fmt.Sprintf("Teacher '%s' updated their profile picture", user.Name), "")
 	setSuccessFlash(w, "Profile picture updated successfully.")
