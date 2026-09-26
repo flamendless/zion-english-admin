@@ -1,7 +1,9 @@
 unreleased:
   breaking_changes: []
-  new_features: []
-  improvements: []
+  new_features:
+    - text: "Teachers see a persistent Overdue classes panel for the current week until scheduled classes are conducted, cancelled, or rescheduled."
+  improvements:
+    - text: "Large intro video uploads get a longer ffmpeg encode timeout scaled by file size (up to one hour) so high-bitrate files can finish on the server."
   bug_fixes: []
   removed: []
   security: []

@@ -9,7 +9,10 @@ import (
 	"zion-english/internal/constants"
 )
 
-func compressToMP4(ctx context.Context, inputPath, outputPath string, settings constants.IntroVideoEncodeSettings) error {
+func compressToMP4(ctx context.Context, inputPath, outputPath string, settings constants.IntroVideoEncodeSettings, timeoutSecs int) error {
+	if timeoutSecs <= 0 {
+		timeoutSecs = settings.TimeoutSecs
+	}
 	if !FfmpegAvailable() {
 		return ErrFfmpegUnavailable
 	}
@@ -33,7 +36,7 @@ func compressToMP4(ctx context.Context, inputPath, outputPath string, settings c
 	}
 
 	if _, ok := ctx.Deadline(); !ok {
-		timeoutCtx, cancel := context.WithTimeout(ctx, time.Duration(settings.TimeoutSecs)*time.Second)
+		timeoutCtx, cancel := context.WithTimeout(ctx, time.Duration(timeoutSecs)*time.Second)
 		defer cancel()
 		ctx = timeoutCtx
 	}
@@ -44,7 +47,7 @@ func compressToMP4(ctx context.Context, inputPath, outputPath string, settings c
 		return nil
 	}
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-		return fmt.Errorf("%w: ffmpeg timed out after %ds", ErrCompressFailed, settings.TimeoutSecs)
+		return fmt.Errorf("%w: ffmpeg timed out after %ds", ErrCompressFailed, timeoutSecs)
 	}
 	if ctx.Err() != nil {
 		return fmt.Errorf("%w: ffmpeg stopped (%v)", ErrCompressFailed, ctx.Err())

@@ -38,6 +38,7 @@ func runIntroVideoUploadJob(params introVideoUploadJobParams) {
 
 	processed, err := teacherintrovideo.ProcessStagedFile(ctx, params.StagedPath, params.Ext, params.MimeType, params.Settings)
 	if err != nil {
+		encodeTimeoutSecs := constants.IntroVideoCompressTimeoutSecs(params.OriginalFileSize, params.Settings)
 		logs.Log().Error("intro video background processing failed",
 			zap.Error(err),
 			zap.Int64("video_id", params.VideoID),
@@ -45,7 +46,8 @@ func runIntroVideoUploadJob(params introVideoUploadJobParams) {
 			zap.String("original_filename", originalBase),
 			zap.Int64("original_file_size", params.OriginalFileSize),
 			zap.String("compress_preset", params.CompressPreset),
-			zap.Int("encode_timeout_secs", params.Settings.TimeoutSecs),
+			zap.Int("encode_timeout_secs", encodeTimeoutSecs),
+			zap.Int("encode_timeout_preset_secs", params.Settings.TimeoutSecs),
 			zap.Bool("skip_compress", params.Settings.SkipCompress),
 		)
 		failIntroVideoUploadJob(ctx, user, params, originalBase, err)

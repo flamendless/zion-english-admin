@@ -58,6 +58,11 @@ templ PersistentPanelStack() {
 			HostID:     "persistentOnboardingHost",
 			PartialURL: utils.URL("/onboarding/persistent"),
 		})
+		@PersistentPanelSlot(PersistentPanelSlotParams{
+			HostID:     "persistentOverdueClassesHost",
+			PartialURL: utils.URL("/classes/overdue/persistent"),
+			HxTrigger:  "load, scheduleRefresh from:body, classesRefresh from:body, every 60s",
+		})
 		<div id="persistentClientJobsHost" class="persistent-client-jobs-host"></div>
 		<div
 			id="persistentBackgroundJobsHost"
@@ -92,6 +97,7 @@ templ PersistentPanelStackStyles() {
 		}
 
 		.persistent-panel-stack > .persistent-panel-host,
+		.persistent-panel-stack > #persistentOverdueClassesHost,
 		.persistent-panel-stack > .persistent-client-jobs-host,
 		.persistent-panel-stack > .persistent-background-jobs-host,
 		.persistent-panel-stack > #persistentBackgroundJobsPoll {

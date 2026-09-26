@@ -13,6 +13,9 @@ const (
 const (
 	introVideoCompressTimeoutDefaultSeconds = 300
 	introVideoCompressTimeoutHighSeconds    = 600
+	// Extra encode budget per MB above IntroVideoCompressMinBytes.
+	introVideoCompressTimeoutSecondsPerMB = 15
+	introVideoCompressTimeoutMaxSeconds   = 3600
 )
 
 type IntroVideoEncodeSettings struct {
@@ -125,4 +128,23 @@ func IntroVideoShouldCompress(fileSize int64, settings IntroVideoEncodeSettings)
 		return false
 	}
 	return true
+}
+
+// IntroVideoCompressTimeoutSecs returns the ffmpeg time limit for a staged upload.
+// Large files get extra time above the preset base timeout, capped at introVideoCompressTimeoutMaxSeconds.
+func IntroVideoCompressTimeoutSecs(fileSize int64, settings IntroVideoEncodeSettings) int {
+	base := settings.TimeoutSecs
+	if base <= 0 {
+		base = introVideoCompressTimeoutDefaultSeconds
+	}
+	if fileSize <= IntroVideoCompressMinBytes {
+		return base
+	}
+	extraBytes := fileSize - IntroVideoCompressMinBytes
+	extraMB := (extraBytes + (1<<20) - 1) / (1 << 20)
+	scaled := base + int(extraMB)*introVideoCompressTimeoutSecondsPerMB
+	if scaled > introVideoCompressTimeoutMaxSeconds {
+		return introVideoCompressTimeoutMaxSeconds
+	}
+	return scaled
 }

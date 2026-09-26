@@ -223,6 +223,32 @@ WHERE sc.deleted_at IS NULL
 		END
 	) < datetime(?);
 
+-- name: ListOverdueScheduledClassesByDateRange :many
+SELECT
+	sc.id,
+	sc.scheduled_date,
+	sc.start_time,
+	sc.duration_minutes,
+	s.name AS student_name
+FROM tbl_scheduled_classes sc
+INNER JOIN tbl_students s ON s.id = sc.student_id
+WHERE sc.deleted_at IS NULL
+	AND sc.status = 'scheduled'
+	AND (? = 0 OR sc.teacher_id = ?)
+	AND sc.scheduled_date >= ?
+	AND sc.scheduled_date <= ?
+	AND (
+		CASE
+			WHEN sc.start_time IS NOT NULL
+				AND TRIM(sc.start_time) != ''
+				AND sc.duration_minutes > 0
+			THEN datetime(sc.scheduled_date || ' ' || sc.start_time, '+' || sc.duration_minutes || ' minutes')
+			ELSE datetime(sc.scheduled_date || ' 23:59:59')
+		END
+	) < datetime(?)
+ORDER BY sc.scheduled_date ASC, sc.start_time ASC
+LIMIT ?;
+
 -- name: CountClassRecordsByStatusAndDateRange :many
 SELECT cr.status, COUNT(*) as count
 FROM tbl_class_records cr

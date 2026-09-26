@@ -79,7 +79,8 @@ func processStagedPath(ctx context.Context, inputPath, ext, mimeType string, cle
 	outputPath := compressedPath.Name()
 	cleanupOutput := func() { os.Remove(outputPath) }
 
-	if err := compressToMP4(ctx, inputPath, outputPath, settings); err != nil {
+	timeoutSecs := constants.IntroVideoCompressTimeoutSecs(inputInfo.Size(), settings)
+	if err := compressToMP4(ctx, inputPath, outputPath, settings, timeoutSecs); err != nil {
 		cleanupInput()
 		cleanupOutput()
 		return ProcessedUpload{}, err

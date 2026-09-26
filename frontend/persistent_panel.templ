@@ -28,6 +28,7 @@ type PersistentPanelItem struct {
 type PersistentPanelData struct {
 	StorageKey     string
 	Title          string
+	TitleMeta      string
 	AriaLabel      string
 	CompletedCount int
 	TotalCount     int
@@ -38,6 +39,14 @@ type PersistentPanelData struct {
 type PersistentPanelSlotParams struct {
 	HostID     string
 	PartialURL string
+	HxTrigger  string
+}
+
+func persistentPanelSlotHxTrigger(params PersistentPanelSlotParams) string {
+	if params.HxTrigger != "" {
+		return params.HxTrigger
+	}
+	return "load"
 }
 
 func persistentPanelAriaLabel(data PersistentPanelData) string {
@@ -93,7 +102,7 @@ templ PersistentPanelSlot(params PersistentPanelSlotParams) {
 		id={ params.HostID }
 		class="persistent-panel-host"
 		hx-get={ params.PartialURL }
-		hx-trigger="load"
+		hx-trigger={ persistentPanelSlotHxTrigger(params) }
 		hx-swap={ HxSwapInnerHTML }
 	></div>
 }
@@ -146,7 +155,12 @@ templ PersistentPanel(data PersistentPanelData) {
 		</button>
 		<div class="persistent-panel-body">
 			<div class="persistent-panel-header">
-				<h3 class="persistent-panel-title">{ data.Title }</h3>
+				<h3 class="persistent-panel-title">
+					{ data.Title }
+					if data.TitleMeta != "" {
+						<span class="persistent-panel-title-meta">{ data.TitleMeta }</span>
+					}
+				</h3>
 				<div class="persistent-panel-header-actions">
 					if data.ShowProgress && data.TotalCount > 0 {
 						<span class="persistent-panel-progress">{ data.CompletedCount }/{ data.TotalCount }</span>
@@ -317,9 +331,20 @@ templ PersistentPanelStyles() {
 		}
 
 		.persistent-panel-title {
+			display: flex;
+			align-items: baseline;
+			flex-wrap: wrap;
+			gap: var(--space-2);
 			margin: 0;
 			font-size: 1rem;
 			font-weight: 600;
+		}
+
+		.persistent-panel-title-meta {
+			font-size: 0.875rem;
+			font-weight: 500;
+			font-variant-numeric: tabular-nums;
+			color: var(--color-muted-foreground);
 		}
 
 		.persistent-panel-progress {

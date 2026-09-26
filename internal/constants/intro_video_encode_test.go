@@ -53,6 +53,37 @@ func TestIntroVideoEncodeSettingsForPresetValueFallback(t *testing.T) {
 	}
 }
 
+func TestIntroVideoCompressTimeoutSecs(t *testing.T) {
+	fine := IntroVideoEncodeSettingsForPreset(IntroVideoCompressPresetFine)
+	high := IntroVideoEncodeSettingsForPreset(IntroVideoCompressPresetHigh)
+
+	if got := IntroVideoCompressTimeoutSecs(IntroVideoCompressMinBytes, fine); got != 300 {
+		t.Fatalf("at threshold: got %d, want 300", got)
+	}
+	if got := IntroVideoCompressTimeoutSecs(IntroVideoCompressMinBytes-1, fine); got != 300 {
+		t.Fatalf("below threshold: got %d, want 300", got)
+	}
+
+	// ~177 MB upload on high preset: base 600 + 147 MB * 15s, capped at 3600.
+	large := int64(177 << 20)
+	got := IntroVideoCompressTimeoutSecs(large, high)
+	want := 600 + 147*15
+	if got != want {
+		t.Fatalf("large high preset: got %d, want %d", got, want)
+	}
+
+	maxFile := int64(MaxIntroVideoBytes)
+	wantMaxUpload := 300 + 170*15
+	if got := IntroVideoCompressTimeoutSecs(maxFile, fine); got != wantMaxUpload {
+		t.Fatalf("200 MB fine preset: got %d, want %d", got, wantMaxUpload)
+	}
+
+	overCapSize := IntroVideoCompressMinBytes + int64(250<<20)
+	if got := IntroVideoCompressTimeoutSecs(overCapSize, high); got != introVideoCompressTimeoutMaxSeconds {
+		t.Fatalf("scaled timeout should cap: got %d, want %d", got, introVideoCompressTimeoutMaxSeconds)
+	}
+}
+
 func TestIntroVideoShouldCompress(t *testing.T) {
 	fine := IntroVideoEncodeSettingsForPreset(IntroVideoCompressPresetFine)
 	original := IntroVideoEncodeSettingsForPreset(IntroVideoCompressPresetOriginal)

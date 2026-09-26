@@ -361,7 +361,7 @@ templ Schedule(data ScheduleData) {
 						class="day-classes-list"
 						hx-get={ utils.URL("/schedule/partials/list") }
 						hx-include="#listTeacher, #todayListStart, #todayListEnd, #todayListStatus"
-						hx-trigger="scheduleRefresh from:body"
+						hx-trigger="load, scheduleRefresh from:body"
 						hx-swap={ HxSwapInnerHTML }
 					>
 						<p class="day-classes-empty">Loading today's schedule...</p>
@@ -757,7 +757,7 @@ templ Schedule(data ScheduleData) {
 				if (todayListStart) todayListStart.value = todayStr;
 				if (todayListEnd) todayListEnd.value = todayStr;
 				if (typeof htmx !== 'undefined') {
-					htmx.trigger(todayScheduleList, 'scheduleRefresh');
+					htmx.trigger(todayScheduleList, 'load');
 				}
 			}
 

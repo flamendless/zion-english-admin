@@ -40,11 +40,8 @@ func introVideoLinkDisplay(label string) string {
 	return label[:maxLen-1] + "…"
 }
 
-func introVideoSizeDisplay(original, processed string) string {
-	if original == "-" && processed == "-" {
-		return "-"
-	}
-	return original + " -> " + processed
+func introVideoSizesEqual(original, processed string) bool {
+	return original != "-" && processed != "-" && original == processed
 }
 
 func introVideoRowClass(status constants.TeacherIntroVideoStatus) string {
@@ -125,6 +122,23 @@ templ IntroVideoCompressPresetPill(preset constants.IntroVideoCompressPreset) {
 	}
 }
 
+templ IntroVideoSizeBadges(original, processed string) {
+	if original == "-" && processed == "-" {
+		<span>-</span>
+	} else if introVideoSizesEqual(original, processed) {
+		@Pill(original, PillToneInfo)
+	} else {
+		<div class="intro-video-size-badges">
+			if original != "-" {
+				@Pill(original, PillToneWarning)
+			}
+			if processed != "-" {
+				@Pill(processed, PillToneSuccess)
+			}
+		</div>
+	}
+}
+
 templ IntroVideoTableRow(item IntroVideoItem, showUploader bool, showViewAction bool, showActions bool) {
 	<tr class={ introVideoRowClass(item.Status) }>
 		<td data-label="Video">
@@ -139,7 +153,9 @@ templ IntroVideoTableRow(item IntroVideoItem, showUploader bool, showViewAction 
 		<td data-label="Status">
 			@StatusPill(item.Status.Label(), IntroVideoStatusPillTone(item.Status), true)
 		</td>
-		<td class="intro-video-size-cell" data-label="Size">{ introVideoSizeDisplay(item.OriginalFileSize, item.ProcessedFileSize) }</td>
+		<td class="intro-video-size-cell" data-label="Size">
+			@IntroVideoSizeBadges(item.OriginalFileSize, item.ProcessedFileSize)
+		</td>
 		<td data-label="Preset">
 			@IntroVideoCompressPresetPill(item.CompressPreset)
 		</td>
@@ -255,7 +271,14 @@ templ IntroVideosPage(data IntroVideosPageData) {
 			.intro-video-size-cell {
 				white-space: normal;
 				word-break: break-word;
-				max-width: 10rem;
+				max-width: 12rem;
+			}
+
+			.intro-video-size-badges {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: var(--space-2);
 			}
 		</style>
 	</head>

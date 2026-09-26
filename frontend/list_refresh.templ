@@ -40,7 +40,7 @@ templ ListRefreshHandlers() {
 			window.refreshScheduleList = function () {
 				const todayScheduleList = document.getElementById('todayScheduleList');
 				if (todayScheduleList && typeof htmx !== 'undefined') {
-					htmx.trigger(todayScheduleList, 'scheduleRefresh');
+					htmx.trigger(todayScheduleList, 'load');
 				}
 			};
 
@@ -71,7 +71,10 @@ templ ListRefreshHandlers() {
 					window.refreshReportsTable();
 				});
 
-				document.addEventListener('scheduleRefresh', function () {
+				document.addEventListener('scheduleRefresh', function (event) {
+					if (event.target === document.body) {
+						return;
+					}
 					window.refreshScheduleList();
 				});
 
