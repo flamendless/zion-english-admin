@@ -140,7 +140,7 @@ templ LegalDocPage(title string, subtitle string) {
 }
 
 templ PrivacyPolicy() {
-	@LegalPage("Privacy Policy", "September 7, 2026") {
+	@LegalPage("Privacy Policy", "September 26, 2026") {
 		<section>
 			<h2>Introduction</h2>
 			<p>
@@ -157,8 +157,16 @@ templ PrivacyPolicy() {
 				<li><strong>Class and schedule data:</strong> class dates, times, duration, status (conducted, cancelled, or rescheduled), and related notes.</li>
 				<li><strong>Sheet processing:</strong> Google Sheet URLs provided by teachers and the class data extracted from those sheets for payroll processing.</li>
 				<li><strong>System logs:</strong> audit logs of user actions and processing logs for sheet imports.</li>
+				<li><strong>Affiliate product imports (superuser):</strong> Shopee affiliate batch CSV filenames, file sizes, and product metadata from those files (names, prices, shop names, product links, and offer links). Commission fields in the CSV are stored for internal admin use only and are not shown on public product cards.</li>
 				<li><strong>Session data:</strong> a secure HttpOnly cookie (<code>session_token</code>) used to keep you signed in.</li>
 			</ul>
+		</section>
+
+		<section>
+			<h2>Affiliate Links and Product Images</h2>
+			<p>
+				The portal may display Shopee affiliate product recommendations with an "Affiliated" label. Product images may be loaded from Shopee content delivery networks when you view those cards. Clicking a product opens a third-party Shopee page using an affiliate (offer) link. We do not sell your personal data through these links. Affiliate commissions may be earned by the developer to help support operation and maintenance of the system.
+			</p>
 		</section>
 
 		<section>
@@ -259,7 +267,7 @@ templ PrivacyPolicy() {
 }
 
 templ TermsOfUse() {
-	@LegalPage("Terms of Use", "August 25, 2026") {
+	@LegalPage("Terms of Use", "September 26, 2026") {
 		<section>
 			<h2>Acceptance of Terms</h2>
 			<p>
@@ -304,6 +312,13 @@ templ TermsOfUse() {
 			<h2>Third-Party Services</h2>
 			<p>
 				The portal may integrate with Google Drive/Sheets, Google Calendar, and Zoom. Your use of those services through the portal is also subject to their respective terms and policies. We are not responsible for third-party service availability or practices.
+			</p>
+		</section>
+
+		<section>
+			<h2>Affiliated Product Recommendations</h2>
+			<p>
+				The portal may show affiliated Shopee product cards labeled "Affiliated." These links are provided to help support development and maintenance of the system. Purchases made through affiliate links are handled by Shopee under Shopee's terms and policies. Product details and availability are controlled by the seller and Shopee. Use the disclosure control on each card for more information.
 			</p>
 		</section>
 

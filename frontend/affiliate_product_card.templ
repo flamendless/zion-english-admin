@@ -1,0 +1,437 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/utils"
+)
+
+const affiliateProductDisclosureTooltip = "This is an affiliated product. This is a simple way for the developer to earn commission for keeping this system available to use. Thank you."
+
+type AffiliateProductCardData struct {
+	ProductID    int64
+	Name         string
+	ShopName     string
+	PriceDisplay string
+	Sales        string
+	ThumbnailURL string
+	AffiliateURL string
+	IncludeInSave bool
+	FormIndex     int
+}
+
+func AffiliateProductLinkHref(productID int64, affiliateURL string) string {
+	if productID <= 0 {
+		return affiliateURL
+	}
+	return utils.URL(fmt.Sprintf("/affiliate-link/%d", productID))
+}
+
+templ AffiliateProductCard(card AffiliateProductCardData) {
+	<article class="affiliate-product-card">
+		<div class="affiliate-product-card-image-wrap">
+			if card.IncludeInSave {
+				<label class="affiliate-product-card-include" title="Include when saving">
+					<input
+						type="checkbox"
+						class="affiliate-product-card-include-input"
+						name="include"
+						value={ fmt.Sprintf("%d", card.FormIndex) }
+						checked
+					/>
+					<span class="affiliate-product-card-include-box" aria-hidden="true"></span>
+				</label>
+			}
+			<a
+				class="affiliate-product-card-image-link"
+				href={ AffiliateProductLinkHref(card.ProductID, card.AffiliateURL) }
+				target="_blank"
+				rel="noopener noreferrer sponsored"
+				aria-label={ "View " + card.Name }
+			>
+				if card.ThumbnailURL != "" {
+					<img
+						class="affiliate-product-card-image"
+						src={ card.ThumbnailURL }
+						alt=""
+						loading="lazy"
+						referrerpolicy="no-referrer"
+					/>
+				} else {
+					<div class="affiliate-product-card-image-placeholder" aria-hidden="true">
+						<span>No image</span>
+					</div>
+				}
+			</a>
+			<span class="affiliate-product-card-badge">Affiliated</span>
+		</div>
+		<div class="affiliate-product-card-body">
+			<div class="affiliate-product-card-shop-row">
+				if card.ShopName != "" {
+					<p class="affiliate-product-card-shop">{ card.ShopName }</p>
+				} else {
+					<p class="affiliate-product-card-shop affiliate-product-card-shop--empty"></p>
+				}
+				<button
+					type="button"
+					class="affiliate-product-card-help"
+					aria-label="About affiliated products"
+					data-tooltip={ affiliateProductDisclosureTooltip }
+				>
+					?
+				</button>
+			</div>
+			<h4 class="affiliate-product-card-title">
+				<a href={ AffiliateProductLinkHref(card.ProductID, card.AffiliateURL) } target="_blank" rel="noopener noreferrer sponsored">{ card.Name }</a>
+			</h4>
+			<div class="affiliate-product-card-meta">
+				if card.PriceDisplay != "" {
+					<span class="affiliate-product-card-price">{ card.PriceDisplay }</span>
+				}
+				if card.Sales != "" {
+					<span class="affiliate-product-card-sales">{ card.Sales } sold</span>
+				}
+			</div>
+			<a
+				class="btn affiliate-product-card-cta"
+				href={ AffiliateProductLinkHref(card.ProductID, card.AffiliateURL) }
+				target="_blank"
+				rel="noopener noreferrer sponsored"
+			>
+				Shop now
+			</a>
+		</div>
+	</article>
+}
+
+templ AffiliateProductViewModal(card AffiliateProductCardData) {
+	<div class="modal-overlay" id="affiliateViewModal" role="presentation">
+		<div class="modal-dialog affiliates-product-view-modal" role="dialog" aria-modal="true" aria-labelledby="affiliateViewModalTitle">
+			<div class="modal-header">
+				<h3 id="affiliateViewModalTitle">Product preview</h3>
+				<button type="button" class="modal-close affiliate-view-modal-close" aria-label="Close">&times;</button>
+			</div>
+			<div class="modal-body affiliates-product-view-modal-body">
+				@AffiliateProductCard(card)
+			</div>
+			<div class="modal-footer affiliates-modal-footer">
+				<button type="button" class="btn btn-secondary affiliate-view-modal-close">Close</button>
+			</div>
+		</div>
+	</div>
+}
+
+templ AffiliateProductCardGrid(cards []AffiliateProductCardData) {
+	<div class="affiliate-product-card-grid">
+		for _, card := range cards {
+			@AffiliateProductCard(card)
+		}
+	</div>
+}
+
+templ AffiliateProductCardStyles() {
+	<style>
+		.affiliate-product-card-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+			gap: var(--space-4);
+		}
+
+		.affiliate-product-card {
+			display: flex;
+			flex-direction: column;
+			background: var(--color-surface);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-lg);
+			box-shadow: var(--shadow-sm);
+			height: 100%;
+		}
+
+		.affiliate-product-card-image-wrap {
+			position: relative;
+			flex-shrink: 0;
+		}
+
+		.affiliate-product-card-include {
+			position: absolute;
+			top: var(--space-2);
+			left: var(--space-2);
+			z-index: 2;
+			display: inline-flex;
+			margin: 0;
+			cursor: pointer;
+		}
+
+		.affiliate-product-card-include-input {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			padding: 0;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			border: 0;
+		}
+
+		.affiliate-product-card-include-box {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 1.25rem;
+			height: 1.25rem;
+			border-radius: var(--radius-sm);
+			border: var(--pill-border);
+			background: var(--color-surface);
+			box-shadow: var(--shadow-sm);
+		}
+
+		.affiliate-product-card-include-box::after {
+			content: "";
+			width: 0.35rem;
+			height: 0.625rem;
+			border: solid var(--color-primary-hover);
+			border-width: 0 2px 2px 0;
+			transform: rotate(45deg) scale(0);
+			margin-top: -2px;
+			transition: transform var(--transition-fast);
+		}
+
+		.affiliate-product-card-include-input:checked + .affiliate-product-card-include-box::after {
+			transform: rotate(45deg) scale(1);
+		}
+
+		.affiliate-product-card-include-input:focus-visible + .affiliate-product-card-include-box {
+			outline: 2px solid var(--color-primary);
+			outline-offset: 2px;
+		}
+
+		.affiliate-product-card-image-link {
+			display: block;
+			aspect-ratio: 1 / 1;
+			background: var(--color-muted);
+			border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+			overflow: hidden;
+		}
+
+		.affiliate-product-card-badge {
+			position: absolute;
+			top: var(--space-2);
+			right: var(--space-2);
+			z-index: 1;
+			padding: 0.2rem 0.5rem;
+			font-size: 0.6875rem;
+			font-weight: 700;
+			letter-spacing: 0.03em;
+			text-transform: uppercase;
+			color: #fff;
+			background: rgba(15, 23, 42, 0.82);
+			border: var(--pill-border);
+			border-radius: var(--radius-full);
+			pointer-events: none;
+		}
+
+		.affiliate-product-card-image {
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+			object-position: center;
+			display: block;
+		}
+
+		.affiliate-product-card-image-placeholder {
+			width: 100%;
+			height: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: var(--color-muted-foreground);
+			font-size: 0.8125rem;
+		}
+
+		.affiliate-product-card-body {
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			gap: var(--space-2);
+			padding: var(--space-3);
+		}
+
+		.affiliate-product-card-shop-row {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: var(--space-2);
+			min-height: 1.25rem;
+		}
+
+		.affiliate-product-card-shop {
+			margin: 0;
+			font-size: 0.75rem;
+			font-weight: 600;
+			color: var(--color-muted-foreground);
+			text-transform: uppercase;
+			letter-spacing: 0.02em;
+			line-height: 1.3;
+			min-width: 0;
+			flex: 1;
+		}
+
+		.affiliate-product-card-shop--empty {
+			min-height: 0;
+		}
+
+		.affiliate-product-card-help {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 1.25rem;
+			height: 1.25rem;
+			padding: 0;
+			margin: 0;
+			margin-top: 0;
+			flex-shrink: 0;
+			border: var(--pill-border);
+			border-radius: var(--radius-full);
+			background: var(--color-surface);
+			color: var(--color-muted-foreground);
+			font-size: 0.75rem;
+			font-weight: 700;
+			line-height: 1;
+			cursor: help;
+		}
+
+		.affiliate-product-card-help:hover {
+			color: var(--color-foreground);
+			background: var(--color-muted);
+		}
+
+		.affiliate-product-card-title {
+			margin: 0;
+			font-size: 0.9375rem;
+			font-weight: 600;
+			line-height: 1.35;
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+		}
+
+		.affiliate-product-card-title a {
+			color: inherit;
+			text-decoration: none;
+		}
+
+		.affiliate-product-card-title a:hover {
+			color: var(--color-primary-hover);
+		}
+
+		.affiliate-product-card-meta {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: baseline;
+			gap: var(--space-2);
+		}
+
+		.affiliate-product-card-price {
+			font-size: 1.125rem;
+			font-weight: 700;
+			color: var(--color-primary-hover);
+		}
+
+		.affiliate-product-card-sales {
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+		}
+
+		.affiliate-product-card-cta {
+			margin-top: auto;
+			width: 100%;
+			text-align: center;
+			text-decoration: none;
+			box-sizing: border-box;
+		}
+
+		.affiliates-import-preview-modal {
+			max-width: min(56rem, 96vw);
+			width: 100%;
+		}
+
+		.affiliates-import-preview-modal .modal-body {
+			max-height: min(70vh, 720px);
+			overflow-y: auto;
+		}
+
+		.affiliates-product-view-modal {
+			max-width: 22rem;
+			width: 100%;
+		}
+
+		.affiliates-product-view-modal-body {
+			padding-top: var(--space-2);
+		}
+
+		.affiliates-product-view-modal-body .affiliate-product-card {
+			max-width: 100%;
+		}
+
+		.affiliates-product-view-modal .modal-footer {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: flex-end;
+			gap: var(--space-2);
+		}
+
+		.affiliates-product-view-modal .modal-footer .btn,
+		.affiliates-product-view-modal .modal-footer .btn-secondary {
+			margin-top: 0;
+		}
+
+		.affiliates-import-preview-modal [data-tooltip]::after {
+			content: none;
+		}
+
+		.affiliate-product-card-shop-row [data-tooltip]::after {
+			content: none;
+		}
+
+		#affiliateViewModalHost .modal-overlay {
+			display: flex;
+		}
+	</style>
+}
+
+templ AffiliatesViewModalScripts() {
+	<script>
+		(function () {
+			if (window.__affiliateViewModalScriptsBound) return;
+			window.__affiliateViewModalScriptsBound = true;
+
+			window.closeAffiliateViewModal = function () {
+				const host = document.getElementById('affiliateViewModalHost');
+				if (host) host.innerHTML = '';
+				document.body.classList.remove('modal-open');
+			};
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (!evt.detail.target || evt.detail.target.id !== 'affiliateViewModalHost') return;
+				document.body.classList.add('modal-open');
+				const closeBtn = evt.detail.target.querySelector('.affiliate-view-modal-close');
+				if (closeBtn) closeBtn.focus();
+			});
+
+			document.body.addEventListener('click', function (e) {
+				if (e.target.closest('.affiliate-view-modal-close')) {
+					window.closeAffiliateViewModal();
+					return;
+				}
+				const overlay = e.target.closest('#affiliateViewModal');
+				if (overlay && e.target === overlay) window.closeAffiliateViewModal();
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key !== 'Escape' || !document.getElementById('affiliateViewModal')) return;
+				window.closeAffiliateViewModal();
+			});
+		})();
+	</script>
+}

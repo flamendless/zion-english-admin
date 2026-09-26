@@ -19,6 +19,43 @@ type TblAccess struct {
 	UpdatedAt   string
 }
 
+type TblAffiliateImportBatch struct {
+	ID            int64
+	Filename      string
+	ProductCount  int64
+	CreatedAt     string
+	CreatedBy     sql.NullInt64
+	CreatedByName string
+	FileSizeBytes int64
+	CsvRowCount   int64
+}
+
+type TblAffiliateProduct struct {
+	ID               int64
+	AffiliateUrl     string
+	ProductUrl       string
+	ShopID           string
+	ItemID           string
+	Name             string
+	Brand            string
+	PriceDisplay     string
+	ThumbnailUrl     string
+	SortOrder        int64
+	CreatedAt        string
+	UpdatedAt        string
+	ImportBatchID    int64
+	Sales            string
+	CommissionRate   string
+	Commission       string
+	AffiliatedShopID sql.NullInt64
+	ClickCount       int64
+}
+
+type TblAffiliatedProductShop struct {
+	ID        int64
+	BrandName string
+}
+
 type TblAnnouncement struct {
 	ID           int64
 	Title        string

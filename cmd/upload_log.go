@@ -98,6 +98,8 @@ func inferUploadLogKindFromSummary(summary string) constants.UploadLogKind {
 		return constants.UploadLogKindAvatar
 	case strings.Contains(lower, "id document"), strings.Contains(lower, "resume/cv"):
 		return constants.UploadLogKindDocument
+	case strings.Contains(lower, "affiliate") && strings.Contains(lower, "csv"):
+		return constants.UploadLogKindAffiliateCSV
 	default:
 		return constants.UploadLogKindOther
 	}

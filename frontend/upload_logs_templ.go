@@ -65,6 +65,8 @@ func uploadLogKindPillTone(kind constants.UploadLogKind) PillTone {
 		return PillToneInfo
 	case constants.UploadLogKindDocument:
 		return PillToneNeutral
+	case constants.UploadLogKindAffiliateCSV:
+		return PillTonePrimary
 	default:
 		return PillToneNeutral
 	}
@@ -113,7 +115,7 @@ func UploadLogs(data UploadLogData) templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 76, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 78, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -173,7 +175,7 @@ func UploadLogs(data UploadLogData) templ.Component {
 				var templ_7745c5c3_Var3 string
 				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(log.ID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 110, Col: 37}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 112, Col: 37}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 				if templ_7745c5c3_Err != nil {
@@ -186,7 +188,7 @@ func UploadLogs(data UploadLogData) templ.Component {
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(log.Module)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 111, Col: 45}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 113, Col: 45}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -221,7 +223,7 @@ func UploadLogs(data UploadLogData) templ.Component {
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(uploadLogOutcomeLabel(log.Outcome))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 112, Col: 114}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 114, Col: 114}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -242,7 +244,7 @@ func UploadLogs(data UploadLogData) templ.Component {
 				var templ_7745c5c3_Var8 string
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(log.Summary)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 116, Col: 47}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 118, Col: 47}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
@@ -260,7 +262,7 @@ func UploadLogs(data UploadLogData) templ.Component {
 					var templ_7745c5c3_Var9 string
 					templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(log.CreatedBy))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 118, Col: 67}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 120, Col: 67}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 					if templ_7745c5c3_Err != nil {
@@ -278,7 +280,7 @@ func UploadLogs(data UploadLogData) templ.Component {
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(log.CreatedAt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 120, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 122, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {

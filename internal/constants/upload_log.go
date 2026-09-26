@@ -12,8 +12,9 @@ type UploadLogKind string
 const (
 	UploadLogKindIntroVideo UploadLogKind = "intro_video"
 	UploadLogKindAvatar     UploadLogKind = "avatar"
-	UploadLogKindDocument   UploadLogKind = "document"
-	UploadLogKindOther      UploadLogKind = "other"
+	UploadLogKindDocument     UploadLogKind = "document"
+	UploadLogKindAffiliateCSV UploadLogKind = "affiliate_csv"
+	UploadLogKindOther        UploadLogKind = "other"
 )
 
 func (k UploadLogKind) Label() string {
@@ -24,6 +25,8 @@ func (k UploadLogKind) Label() string {
 		return "Avatar"
 	case UploadLogKindDocument:
 		return "Document"
+	case UploadLogKindAffiliateCSV:
+		return "Affiliate CSV"
 	default:
 		return "Other"
 	}
@@ -31,7 +34,7 @@ func (k UploadLogKind) Label() string {
 
 func ValidUploadLogKind(value string) bool {
 	switch UploadLogKind(value) {
-	case UploadLogKindIntroVideo, UploadLogKindAvatar, UploadLogKindDocument, UploadLogKindOther:
+	case UploadLogKindIntroVideo, UploadLogKindAvatar, UploadLogKindDocument, UploadLogKindAffiliateCSV, UploadLogKindOther:
 		return true
 	default:
 		return false

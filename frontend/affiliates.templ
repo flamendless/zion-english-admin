@@ -1,0 +1,1047 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/utils"
+)
+
+type AffiliateListItem struct {
+	ID            string
+	Name          string
+	ShopName      string
+	PriceDisplay  string
+	ClickCount    int64
+	ThumbnailURL  string
+	AffiliateURL  string
+	AffiliateDisp string
+}
+
+type AffiliateFormData struct {
+	ID             string
+	AffiliateURL   string
+	ProductURL     string
+	ShopID         string
+	ItemID         string
+	Name           string
+	Brand          string
+	PriceDisplay   string
+	ThumbnailURL   string
+	SortOrder      int64
+	Sales          string
+	ShopName       string
+	CommissionRate string
+	Commission     string
+	IsEdit         bool
+}
+
+type AffiliateStagedImportItem struct {
+	Index          int
+	Card           AffiliateProductCardData
+	ItemID         string
+	ItemName       string
+	Price          string
+	Sales          string
+	ShopName       string
+	CommissionRate string
+	Commission     string
+	ProductLink    string
+	OfferLink      string
+	ShopeeShopID   string
+	ThumbnailURL   string
+	PriceDisplay   string
+}
+
+type AffiliateImportLogEntry struct {
+	ItemID  string
+	Message string
+}
+
+type AffiliateImportPreviewData struct {
+	Filename        string
+	FileSizeDisplay string
+	FileSizeBytes   int64
+	ProcessedCount  int
+	TotalCount      int
+	ThumbnailsFound int
+	PendingSave     bool
+	ImportLogs      []AffiliateImportLogEntry
+	StagedItems     []AffiliateStagedImportItem
+}
+
+type AffiliatesPageData struct {
+	Items            []AffiliateListItem
+	Query            string
+	SortBy           string
+	SortOrder        string
+	FilterPath       string
+	Form             AffiliateFormData
+	OpenEditModal    bool
+	ImportPreview    AffiliateImportPreviewData
+	OpenPreviewModal bool
+}
+
+func AffiliateURLPreview(s string) string {
+	if s == "" {
+		return "-"
+	}
+	if len(s) > 56 {
+		return s[:53] + "..."
+	}
+	return s
+}
+
+templ AffiliatesPage(data AffiliatesPageData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>Affiliates - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@AffiliatesPageStyles()
+		@AffiliateProductCardStyles()
+	</head>
+	<body>
+		<div class="container affiliates-page">
+			@HeaderSimple()
+			<div class="hub-header affiliates-hub-header">
+				<div class="affiliates-page-heading">
+					<h2 class="hub-title">Affiliates</h2>
+					<p class="affiliates-page-subtitle">
+						Upload a Shopee affiliate product links CSV. Offer Link is saved as the affiliate URL; thumbnails are fetched from Product Link.
+					</p>
+				</div>
+				<div class="affiliates-header-actions">
+					<button type="button" class="add-btn" id="openAffiliateUploadModalBtn">Upload CSV</button>
+				</div>
+			</div>
+			@SuccessBanner()
+			@ErrorBanner()
+
+			<form class="list-toolbar affiliates-toolbar" method="GET" action={ data.FilterPath }>
+				<div class="form-group affiliates-search-group">
+					<label for="affiliatesQ">Search</label>
+					<input
+						type="search"
+						id="affiliatesQ"
+						name="q"
+						value={ data.Query }
+						placeholder="Name or shop..."
+						autocomplete="off"
+					/>
+				</div>
+				@SortControls(data.SortBy, data.SortOrder, ListSortKindAffiliate)
+				<div class="form-group list-toolbar-action">
+					<label for="affiliatesFilterSubmit">&nbsp;</label>
+					<button type="submit" id="affiliatesFilterSubmit">Filter</button>
+				</div>
+			</form>
+			@SortToggleScript()
+
+			if len(data.Items) > 0 {
+				<div class="table-wrapper">
+					<table class="table-stack-mobile affiliates-table">
+						<thead>
+							<tr>
+								<th>Image</th>
+								<th class="col-name">Name</th>
+								<th>Shop</th>
+								<th>Price</th>
+								<th class="col-clicks">Clicks</th>
+								<th>Affiliate link</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							for _, item := range data.Items {
+								<tr>
+									<td data-label="Image">
+										if item.ThumbnailURL != "" {
+											<img src={ item.ThumbnailURL } alt="" class="affiliates-thumb" referrerpolicy="no-referrer"/>
+										} else {
+											<span class="affiliates-thumb-empty">-</span>
+										}
+									</td>
+									<td class="col-name" data-label="Name" title={ item.Name }>{ item.Name }</td>
+									<td data-label="Shop">{ affiliateCellText(item.ShopName) }</td>
+									<td data-label="Price">{ affiliateCellText(item.PriceDisplay) }</td>
+									<td class="col-clicks" data-label="Clicks">{ fmt.Sprintf("%d", item.ClickCount) }</td>
+									<td data-label="Affiliate link">
+										<a href={ item.AffiliateURL } target="_blank" rel="noopener noreferrer sponsored">{ item.AffiliateDisp }</a>
+									</td>
+									<td data-label="Actions">
+										<div class="table-actions">
+											@IconActionButton("View", IconKindView, templ.Attributes{
+												"hx-get":    utils.URL("/affiliates/" + item.ID + "/view"),
+												"hx-target": "#affiliateViewModalHost",
+												"hx-swap":   HxSwapInnerHTML,
+											})
+											@IconActionButton("Edit", IconKindEdit, templ.Attributes{
+												"hx-get":    utils.URL("/affiliates/" + item.ID + "/edit"),
+												"hx-target": "#affiliateEditModalHost",
+												"hx-swap":   HxSwapInnerHTML,
+											})
+											<form method="POST" action={ utils.URL("/affiliates/" + item.ID + "/delete") } class="table-action-form" onsubmit="return confirm('Delete this affiliate product?');">
+												@IconActionSubmit("Delete", IconKindDelete)
+											</form>
+										</div>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			} else {
+				<p class="affiliates-empty">No affiliate products yet. Upload a CSV to get started.</p>
+			}
+		</div>
+
+		@AffiliateUploadModal()
+		@AffiliateImportPreviewModal(data.ImportPreview, data.OpenPreviewModal)
+		<div id="affiliateEditModalHost">
+			if data.OpenEditModal {
+				@AffiliateEditModal(data.Form, true)
+			}
+		</div>
+		<div id="affiliateViewModalHost"></div>
+		@AffiliatesViewModalScripts()
+		@AffiliatesEditModalScripts()
+		@AffiliatesScripts()
+	</body>
+	</html>
+}
+
+func affiliateCellText(s string) string {
+	if s == "" {
+		return "-"
+	}
+	return s
+}
+
+templ AffiliateUploadModal() {
+	<div class="modal-overlay" id="affiliateUploadModal" hidden role="presentation">
+		<div class="modal-dialog affiliates-modal affiliates-upload-modal" role="dialog" aria-modal="true" aria-labelledby="affiliateUploadModalTitle" aria-describedby="affiliateUploadModalDesc">
+			<div class="modal-header">
+				<h3 id="affiliateUploadModalTitle">Upload product links CSV</h3>
+				<button type="button" class="modal-close affiliate-upload-modal-close" aria-label="Close">&times;</button>
+			</div>
+			<form
+				id="affiliateUploadForm"
+				method="POST"
+				action={ utils.URL("/affiliates/upload") }
+				enctype="multipart/form-data"
+			>
+				<div class="modal-body" id="affiliateUploadModalDesc">
+					<div class="affiliates-upload-callout">
+						<p class="affiliates-upload-callout-title">Shopee batch export</p>
+						<ul class="affiliates-upload-steps">
+							<li>Offer Link is saved as the affiliate URL.</li>
+							<li>Thumbnails are fetched from each Product Link.</li>
+							<li>All rows are stored as an import snapshot in the database.</li>
+						</ul>
+					</div>
+					<p class="affiliates-upload-columns-label">Expected columns</p>
+					<p class="affiliates-upload-columns">Item Id, Item Name, Price, Sales, Shop Name, Commission Rate, Commission, Product Link, Offer Link</p>
+					<div class="upload-zone affiliates-csv-upload-zone" id="affiliateCSVUploadZone">
+						<label class="upload-zone-label" for="affiliateCSVInput">
+							<span class="upload-zone-icon affiliates-csv-upload-icon" aria-hidden="true">
+								<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+									<polyline points="14 2 14 8 20 8"></polyline>
+									<line x1="12" y1="18" x2="12" y2="12"></line>
+									<line x1="9" y1="15" x2="15" y2="15"></line>
+								</svg>
+							</span>
+							<span class="upload-zone-meta">
+								<span id="affiliateCSVUploadPrompt">Choose a CSV file or drop it here</span>
+								<span class="upload-zone-hint">Comma-separated values, up to 2 MB</span>
+							</span>
+							<input
+								type="file"
+								id="affiliateCSVInput"
+								name="csv"
+								accept=".csv,text/csv"
+								required
+							/>
+						</label>
+						<p class="upload-filename" id="affiliateCSVFilename" aria-live="polite"></p>
+					</div>
+				</div>
+				<div class="modal-footer affiliates-modal-footer affiliates-upload-modal-footer">
+					<button type="button" class="btn btn-secondary affiliate-upload-modal-close">Cancel</button>
+					<button type="submit" class="btn" id="affiliateUploadSubmitBtn" disabled>Import products</button>
+				</div>
+			</form>
+		</div>
+	</div>
+}
+
+templ AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad bool) {
+	<div class="modal-overlay" id="affiliatePreviewModal" hidden?={ !openOnLoad } role="presentation">
+		<div class="modal-dialog affiliates-import-preview-modal" role="dialog" aria-modal="true" aria-labelledby="affiliatePreviewModalTitle">
+			if preview.PendingSave {
+				<form method="POST" action={ utils.URL("/affiliates/import/save") } id="affiliateImportSaveForm">
+					<div class="modal-header">
+						<h3 id="affiliatePreviewModalTitle">Review import</h3>
+						<button type="button" class="modal-close affiliate-preview-modal-close" aria-label="Close">&times;</button>
+					</div>
+					<div class="modal-body">
+						<input type="hidden" name="import_filename" value={ preview.Filename }/>
+						<input type="hidden" name="import_file_size" value={ fmt.Sprintf("%d", preview.FileSizeBytes) }/>
+						<input type="hidden" name="import_csv_row_count" value={ fmt.Sprintf("%d", preview.TotalCount) }/>
+						<input type="hidden" name="staged_count" value={ fmt.Sprintf("%d", len(preview.StagedItems)) }/>
+						<section class="affiliates-import-summary" aria-labelledby="affiliateImportSummaryTitle">
+							<h4 class="affiliates-import-summary-title" id="affiliateImportSummaryTitle">Import summary</h4>
+							<dl class="affiliates-import-summary-grid">
+								<div class="affiliates-import-summary-item">
+									<dt>Filename</dt>
+									<dd>{ affiliateImportSummaryText(preview.Filename) }</dd>
+								</div>
+								<div class="affiliates-import-summary-item">
+									<dt>File size</dt>
+									<dd>{ affiliateImportSummaryText(preview.FileSizeDisplay) }</dd>
+								</div>
+								<div class="affiliates-import-summary-item">
+									<dt>Products processed</dt>
+									<dd>{ fmt.Sprintf("%d / %d", preview.ProcessedCount, preview.TotalCount) }</dd>
+								</div>
+								<div class="affiliates-import-summary-item">
+									<dt>Thumbnails found</dt>
+									<dd>{ fmt.Sprintf("%d / %d", preview.ThumbnailsFound, preview.ProcessedCount) }</dd>
+								</div>
+							</dl>
+						</section>
+						<details class="affiliates-import-logs" open?={ len(preview.ImportLogs) > 0 }>
+							<summary class="affiliates-import-logs-summary">
+								Logs
+								<span class="affiliates-import-logs-count">({ fmt.Sprintf("%d", len(preview.ImportLogs)) })</span>
+							</summary>
+							<div class="affiliates-import-logs-panel">
+								if len(preview.ImportLogs) > 0 {
+									<div class="table-wrapper">
+										<table class="affiliates-import-logs-table">
+											<thead>
+												<tr>
+													<th>Item ID</th>
+													<th>Error</th>
+												</tr>
+											</thead>
+											<tbody>
+												for _, entry := range preview.ImportLogs {
+													<tr>
+														<td>{ affiliateImportLogItemID(entry.ItemID) }</td>
+														<td>{ entry.Message }</td>
+													</tr>
+												}
+											</tbody>
+										</table>
+									</div>
+								} else {
+									<p class="affiliates-import-logs-empty">No processing issues.</p>
+								}
+							</div>
+						</details>
+						if len(preview.StagedItems) > 0 {
+							<details class="affiliates-import-products">
+								<summary class="affiliates-import-products-summary">
+									Products
+									<span class="affiliates-import-products-count">({ fmt.Sprintf("%d", len(preview.StagedItems)) })</span>
+								</summary>
+								<div class="affiliates-import-products-panel">
+									<p class="affiliates-import-select-hint">Uncheck any product you do not want to save.</p>
+									<div class="affiliate-product-card-grid">
+										for _, item := range preview.StagedItems {
+											<div class="affiliate-staged-import-item">
+												@AffiliateProductCard(item.Card)
+												@AffiliateStagedImportHiddenFields(item)
+											</div>
+										}
+									</div>
+								</div>
+							</details>
+						} else {
+							<p class="affiliates-empty">No products in this import.</p>
+						}
+					</div>
+					<div class="modal-footer affiliates-modal-footer affiliates-import-save-footer">
+						<button type="button" class="btn btn-secondary affiliate-preview-modal-close">Cancel</button>
+						if len(preview.StagedItems) > 0 {
+							<button type="submit" class="btn" id="affiliateImportSaveBtn">Save to database</button>
+						}
+					</div>
+				</form>
+			}
+		</div>
+	</div>
+}
+
+templ AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) {
+	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "item_id") } value={ item.ItemID }/>
+	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "item_name") } value={ item.ItemName }/>
+	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "price") } value={ item.Price }/>
+	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "sales") } value={ item.Sales }/>
+	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "shop_name") } value={ item.ShopName }/>
+	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "commission_rate") } value={ item.CommissionRate }/>
+	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "commission") } value={ item.Commission }/>
+	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "product_link") } value={ item.ProductLink }/>
+	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "offer_link") } value={ item.OfferLink }/>
+	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "shopee_shop_id") } value={ item.ShopeeShopID }/>
+	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "thumbnail_url") } value={ item.ThumbnailURL }/>
+	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "price_display") } value={ item.PriceDisplay }/>
+}
+
+func affiliateStagedFieldName(index int, field string) string {
+	return fmt.Sprintf("staged_%d_%s", index, field)
+}
+
+func affiliateImportSummaryText(s string) string {
+	if s == "" {
+		return "-"
+	}
+	return s
+}
+
+func affiliateImportLogItemID(id string) string {
+	if id == "" {
+		return "-"
+	}
+	return id
+}
+
+templ AffiliateEditModal(form AffiliateFormData, openOnLoad bool) {
+	<div class="modal-overlay" id="affiliateEditModal" hidden?={ !openOnLoad } role="presentation">
+		<div class="modal-dialog affiliates-modal" role="dialog" aria-modal="true" aria-labelledby="affiliateEditModalTitle">
+			<div class="modal-header">
+				<h3 id="affiliateEditModalTitle">Edit affiliate product</h3>
+				<button type="button" class="modal-close affiliate-edit-modal-close" aria-label="Close">&times;</button>
+			</div>
+			<form
+				id="affiliateEditForm"
+				method="POST"
+				action={ affiliateFormAction(form) }
+				class="affiliates-form"
+			>
+				<div class="modal-body">
+					if form.ThumbnailURL != "" {
+						<div class="affiliates-preview-thumb">
+							<img src={ form.ThumbnailURL } alt="Product thumbnail" referrerpolicy="no-referrer"/>
+						</div>
+					}
+					<div class="form-group">
+						<label for="affiliateName">Name</label>
+						<input type="text" id="affiliateName" name="name" value={ form.Name } required maxlength="256"/>
+					</div>
+					<div class="form-row">
+						<div class="form-group">
+							<label for="affiliateShopName">Shop</label>
+							<input type="text" id="affiliateShopName" name="shop_name" value={ form.ShopName } maxlength="256"/>
+						</div>
+						<div class="form-group">
+							<label for="affiliatePrice">Price</label>
+							<input type="text" id="affiliatePrice" name="price_display" value={ form.PriceDisplay } maxlength="64"/>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="form-group">
+							<label for="affiliateSales">Sales</label>
+							<input type="text" id="affiliateSales" name="sales" value={ form.Sales } maxlength="64"/>
+						</div>
+						<div class="form-group">
+							<label for="affiliateCommissionRate">Commission rate</label>
+							<input type="text" id="affiliateCommissionRate" name="commission_rate" value={ form.CommissionRate } maxlength="32"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="affiliateCommission">Commission</label>
+						<input type="text" id="affiliateCommission" name="commission" value={ form.Commission } maxlength="32"/>
+					</div>
+					<div class="form-group">
+						<label for="affiliateLinkInput">Affiliate link (Offer Link)</label>
+						<input type="url" id="affiliateLinkInput" name="affiliate_url" value={ form.AffiliateURL } required/>
+					</div>
+					<div class="form-group">
+						<label for="affiliateProductURL">Product link</label>
+						<input type="url" id="affiliateProductURL" name="product_url" value={ form.ProductURL }/>
+					</div>
+					<div class="form-group">
+						<label for="affiliateThumbnail">Thumbnail URL</label>
+						<input type="url" id="affiliateThumbnail" name="thumbnail_url" value={ form.ThumbnailURL }/>
+					</div>
+					<div class="form-group">
+						<label for="affiliateSortOrder">Sort order</label>
+						<input type="number" id="affiliateSortOrder" name="sort_order" value={ fmt.Sprintf("%d", form.SortOrder) } min="0" step="1"/>
+					</div>
+					<input type="hidden" name="shop_id" value={ form.ShopID }/>
+					<input type="hidden" name="item_id" value={ form.ItemID }/>
+					<input type="hidden" name="brand" value={ form.Brand }/>
+				</div>
+				<div class="modal-footer affiliates-modal-footer">
+					<button type="button" class="btn btn-secondary affiliate-edit-modal-close">Cancel</button>
+					<button type="submit" class="btn">Save changes</button>
+				</div>
+			</form>
+		</div>
+	</div>
+}
+
+func affiliateFormAction(form AffiliateFormData) string {
+	if form.IsEdit && form.ID != "" {
+		return utils.URL("/affiliates/" + form.ID + "/edit")
+	}
+	return utils.URL("/affiliates")
+}
+
+templ AffiliatesPageStyles() {
+	<style>
+		.affiliates-page {
+			padding-bottom: var(--space-10);
+		}
+
+		.affiliates-hub-header {
+			align-items: flex-start;
+		}
+
+		.affiliates-page-heading {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-1);
+		}
+
+		.affiliates-page-subtitle {
+			color: var(--color-muted-foreground);
+			font-size: 0.9375rem;
+			line-height: 1.5;
+			max-width: 40rem;
+			margin: 0;
+		}
+
+		.affiliates-header-actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-2);
+			flex-shrink: 0;
+		}
+
+		.affiliates-header-actions .add-btn {
+			margin-top: 0;
+		}
+
+		.affiliates-upload-modal {
+			max-width: 28rem;
+		}
+
+		.affiliates-upload-callout {
+			padding: var(--space-3) var(--space-4);
+			margin-bottom: var(--space-4);
+			border-radius: var(--radius-md);
+			border: 1px solid var(--color-border-subtle);
+			background: linear-gradient(180deg, var(--color-primary-light) 0%, var(--color-surface) 100%);
+		}
+
+		.affiliates-upload-callout-title {
+			margin: 0 0 var(--space-2);
+			font-size: 0.8125rem;
+			font-weight: 600;
+			color: var(--color-foreground);
+		}
+
+		.affiliates-upload-steps {
+			margin: 0;
+			padding-left: 1.125rem;
+			font-size: 0.8125rem;
+			line-height: 1.55;
+			color: var(--color-muted-foreground);
+		}
+
+		.affiliates-upload-steps li {
+			margin-bottom: var(--space-1);
+		}
+
+		.affiliates-upload-steps li:last-child {
+			margin-bottom: 0;
+		}
+
+		.affiliates-upload-columns-label {
+			margin: 0 0 var(--space-1);
+			font-size: 0.75rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+			color: var(--color-muted-foreground);
+		}
+
+		.affiliates-upload-columns {
+			margin: 0 0 var(--space-4);
+			font-size: 0.75rem;
+			line-height: 1.45;
+			color: var(--color-muted-foreground);
+		}
+
+		.affiliates-csv-upload-zone.upload-zone {
+			position: relative;
+			margin-bottom: 0;
+		}
+
+		.affiliates-csv-upload-zone.upload-zone.is-dragover {
+			border-color: var(--color-primary);
+			background: var(--color-primary-light);
+		}
+
+		.affiliates-csv-upload-icon {
+			background: var(--color-primary-light);
+			color: var(--color-primary-hover);
+		}
+
+		.upload-zone {
+			border: 2px dashed var(--color-border);
+			border-radius: var(--radius-md);
+			padding: var(--space-4);
+			background: var(--color-surface);
+			transition: border-color var(--transition-fast), background-color var(--transition-fast);
+		}
+
+		.upload-zone:focus-within {
+			border-color: var(--color-primary);
+			background: var(--color-primary-light);
+		}
+
+		.upload-zone-label {
+			display: flex;
+			align-items: center;
+			gap: var(--space-3);
+			cursor: pointer;
+			font-weight: 500;
+			font-size: 0.875rem;
+		}
+
+		.upload-zone-icon {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 44px;
+			height: 44px;
+			border-radius: var(--radius-md);
+			flex-shrink: 0;
+		}
+
+		.upload-zone input[type="file"] {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			padding: 0;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			border: 0;
+		}
+
+		.upload-zone-meta {
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+			min-width: 0;
+		}
+
+		.upload-zone-hint {
+			font-size: 0.75rem;
+			color: var(--color-muted-foreground);
+			font-weight: 400;
+		}
+
+		.upload-filename {
+			margin: var(--space-3) 0 0;
+			padding-top: var(--space-3);
+			border-top: 1px solid var(--color-border-subtle);
+			font-size: 0.8125rem;
+			color: var(--color-foreground);
+			word-break: break-all;
+		}
+
+		.upload-filename:empty {
+			display: none;
+			margin: 0;
+			padding: 0;
+			border: none;
+		}
+
+		.affiliates-upload-modal-footer {
+			justify-content: flex-end;
+		}
+
+		.affiliates-toolbar .affiliates-search-group {
+			flex: 2 1 280px;
+			min-width: min(100%, 280px);
+		}
+
+		.affiliates-thumb {
+			width: 48px;
+			height: 48px;
+			object-fit: contain;
+			object-position: center;
+			border-radius: var(--radius-md);
+			border: 1px solid var(--color-border-subtle);
+			background: var(--color-muted);
+			display: block;
+		}
+
+		.affiliates-thumb-empty {
+			color: var(--color-muted-foreground);
+		}
+
+		.affiliates-table th.col-name,
+		.affiliates-table td.col-name {
+			max-width: 9rem;
+			width: 14%;
+		}
+
+		.affiliates-table td.col-name {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.affiliates-table th.col-clicks,
+		.affiliates-table td.col-clicks {
+			width: 4.5rem;
+			text-align: right;
+			white-space: nowrap;
+		}
+
+		.affiliates-empty {
+			text-align: center;
+			padding: var(--space-8);
+			color: var(--color-muted-foreground);
+		}
+
+		.affiliates-modal {
+			max-width: 32rem;
+		}
+
+		.affiliates-preview-thumb {
+			margin-bottom: var(--space-4);
+		}
+
+		.affiliates-preview-thumb img {
+			max-width: 120px;
+			max-height: 120px;
+			border-radius: var(--radius-md);
+			border: 1px solid var(--color-border-subtle);
+			background: var(--color-muted);
+			object-fit: contain;
+			object-position: center;
+		}
+
+		.affiliates-modal-footer {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-2);
+		}
+
+		.affiliates-modal-footer .btn,
+		.affiliates-modal-footer .btn-secondary {
+			margin-top: 0;
+		}
+
+		.affiliates-import-summary {
+			margin-bottom: var(--space-4);
+			padding: var(--space-4);
+			border: 1px solid var(--color-border-subtle);
+			border-radius: var(--radius-md);
+			background: var(--color-surface);
+		}
+
+		.affiliates-import-summary-title {
+			margin: 0 0 var(--space-3);
+			font-size: 0.875rem;
+			font-weight: 600;
+		}
+
+		.affiliates-import-summary-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+			gap: var(--space-3);
+			margin: 0;
+		}
+
+		.affiliates-import-summary-item {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-1);
+			min-width: 0;
+		}
+
+		.affiliates-import-summary-item dt {
+			margin: 0;
+			font-size: 0.75rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.03em;
+			color: var(--color-muted-foreground);
+		}
+
+		.affiliates-import-summary-item dd {
+			margin: 0;
+			font-size: 0.875rem;
+			line-height: 1.4;
+			word-break: break-word;
+		}
+
+		.affiliates-import-logs,
+		.affiliates-import-products {
+			border: 1px solid var(--color-border-subtle);
+			border-radius: var(--radius-md);
+			background: var(--color-surface);
+		}
+
+		.affiliates-import-logs {
+			margin-bottom: var(--space-3);
+		}
+
+		.affiliates-import-logs-summary,
+		.affiliates-import-products-summary {
+			display: flex;
+			align-items: center;
+			gap: var(--space-2);
+			padding: var(--space-3) var(--space-4);
+			font-size: 0.875rem;
+			font-weight: 600;
+			cursor: pointer;
+			list-style: none;
+		}
+
+		.affiliates-import-logs-summary::-webkit-details-marker,
+		.affiliates-import-products-summary::-webkit-details-marker {
+			display: none;
+		}
+
+		.affiliates-import-logs-summary::before,
+		.affiliates-import-products-summary::before {
+			content: "";
+			width: 0.5rem;
+			height: 0.5rem;
+			border-right: 2px solid var(--color-muted-foreground);
+			border-bottom: 2px solid var(--color-muted-foreground);
+			transform: rotate(-45deg);
+			transition: transform var(--transition-fast);
+			flex-shrink: 0;
+		}
+
+		.affiliates-import-logs[open] .affiliates-import-logs-summary::before,
+		.affiliates-import-products[open] .affiliates-import-products-summary::before {
+			transform: rotate(45deg);
+		}
+
+		.affiliates-import-logs-count,
+		.affiliates-import-products-count {
+			font-weight: 500;
+			color: var(--color-muted-foreground);
+		}
+
+		.affiliates-import-logs-panel,
+		.affiliates-import-products-panel {
+			padding: var(--space-4);
+			border-top: 1px solid var(--color-border-subtle);
+		}
+
+		.affiliates-import-logs-empty {
+			margin: 0;
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+		}
+
+		.affiliates-import-logs-table {
+			width: 100%;
+		}
+
+		.affiliates-import-logs-table th,
+		.affiliates-import-logs-table td {
+			font-size: 0.8125rem;
+			vertical-align: top;
+		}
+
+		.affiliates-import-logs-table td:first-child {
+			width: 8rem;
+			white-space: nowrap;
+		}
+
+		.affiliates-import-products {
+			margin-top: var(--space-3);
+		}
+
+		.affiliates-import-select-hint {
+			margin: 0 0 var(--space-3);
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+		}
+
+		.affiliate-staged-import-item {
+			min-width: 0;
+		}
+
+		.affiliates-import-save-footer {
+			justify-content: flex-end;
+		}
+
+		.affiliates-import-save-footer .btn,
+		.affiliates-import-save-footer .btn-secondary {
+			margin-top: 0;
+		}
+	</style>
+}
+
+templ AffiliatesEditModalScripts() {
+	<script>
+		(function () {
+			if (window.__affiliateEditModalScriptsBound) return;
+			window.__affiliateEditModalScriptsBound = true;
+
+			window.closeAffiliateEditModal = function () {
+				const host = document.getElementById('affiliateEditModalHost');
+				if (host) host.innerHTML = '';
+				document.body.classList.remove('modal-open');
+			};
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (!evt.detail.target || evt.detail.target.id !== 'affiliateEditModalHost') return;
+				document.body.classList.add('modal-open');
+				const closeBtn = evt.detail.target.querySelector('.affiliate-edit-modal-close');
+				if (closeBtn) closeBtn.focus();
+			});
+
+			document.body.addEventListener('click', function (e) {
+				if (e.target.closest('.affiliate-edit-modal-close')) {
+					window.closeAffiliateEditModal();
+					return;
+				}
+				const overlay = e.target.closest('#affiliateEditModal');
+				if (overlay && e.target === overlay) window.closeAffiliateEditModal();
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key !== 'Escape' || !document.getElementById('affiliateEditModal')) return;
+				window.closeAffiliateEditModal();
+			});
+
+			const editModal = document.getElementById('affiliateEditModal');
+			if (editModal && !editModal.hidden) {
+				document.body.classList.add('modal-open');
+			}
+		})();
+	</script>
+}
+
+templ AffiliatesScripts() {
+	<script>
+		(function () {
+			function wireModal(modalId, closeClass) {
+				const modal = document.getElementById(modalId);
+				if (!modal) return;
+				function closeModal() {
+					modal.hidden = true;
+					document.body.classList.remove('modal-open');
+				}
+				modal.querySelectorAll('.' + closeClass).forEach(function (btn) {
+					btn.addEventListener('click', closeModal);
+				});
+				modal.addEventListener('click', function (e) {
+					if (e.target === modal) closeModal();
+				});
+				if (!modal.hidden) {
+					document.body.classList.add('modal-open');
+				}
+			}
+			function openModal(modalId) {
+				const modal = document.getElementById(modalId);
+				if (!modal) return;
+				modal.hidden = false;
+				document.body.classList.add('modal-open');
+			}
+
+			wireModal('affiliateUploadModal', 'affiliate-upload-modal-close');
+			wireModal('affiliatePreviewModal', 'affiliate-preview-modal-close');
+			document.getElementById('affiliateImportSaveForm')?.addEventListener('submit', function () {
+				const btn = document.getElementById('affiliateImportSaveBtn');
+				if (btn) {
+					btn.disabled = true;
+					btn.textContent = 'Saving…';
+				}
+			});
+			function resetAffiliateUploadForm() {
+				const form = document.getElementById('affiliateUploadForm');
+				const input = document.getElementById('affiliateCSVInput');
+				const filenameEl = document.getElementById('affiliateCSVFilename');
+				const submitBtn = document.getElementById('affiliateUploadSubmitBtn');
+				const zone = document.getElementById('affiliateCSVUploadZone');
+				if (form) form.reset();
+				if (filenameEl) filenameEl.textContent = '';
+				if (submitBtn) {
+					submitBtn.disabled = true;
+					submitBtn.textContent = 'Import products';
+				}
+				if (zone) zone.classList.remove('is-dragover');
+			}
+
+			function bindAffiliateCSVUpload() {
+				const form = document.getElementById('affiliateUploadForm');
+				const input = document.getElementById('affiliateCSVInput');
+				const filenameEl = document.getElementById('affiliateCSVFilename');
+				const submitBtn = document.getElementById('affiliateUploadSubmitBtn');
+				const zone = document.getElementById('affiliateCSVUploadZone');
+				if (!form || !input || form.dataset.csvUploadBound === '1') return;
+				form.dataset.csvUploadBound = '1';
+
+				function syncFileState() {
+					const file = input.files && input.files[0];
+					if (filenameEl) {
+						filenameEl.textContent = file ? file.name : '';
+					}
+					if (submitBtn) submitBtn.disabled = !file;
+				}
+
+				input.addEventListener('change', syncFileState);
+
+				if (zone) {
+					['dragenter', 'dragover'].forEach(function (name) {
+						zone.addEventListener(name, function (e) {
+							e.preventDefault();
+							zone.classList.add('is-dragover');
+						});
+					});
+					['dragleave', 'drop'].forEach(function (name) {
+						zone.addEventListener(name, function (e) {
+							e.preventDefault();
+							if (name === 'drop' && e.dataTransfer?.files?.length) {
+								const dropped = e.dataTransfer.files[0];
+								if (dropped) {
+									const dt = new DataTransfer();
+									dt.items.add(dropped);
+									input.files = dt.files;
+									syncFileState();
+								}
+							}
+							zone.classList.remove('is-dragover');
+						});
+					});
+				}
+
+				form.addEventListener('submit', function () {
+					if (submitBtn) {
+						submitBtn.disabled = true;
+						submitBtn.textContent = 'Importing…';
+					}
+				});
+			}
+
+			bindAffiliateCSVUpload();
+
+			document.getElementById('openAffiliateUploadModalBtn')?.addEventListener('click', function () {
+				resetAffiliateUploadForm();
+				openModal('affiliateUploadModal');
+				document.getElementById('affiliateCSVInput')?.focus();
+			});
+		})();
+	</script>
+}

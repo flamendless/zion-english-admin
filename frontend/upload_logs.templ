@@ -57,6 +57,8 @@ func uploadLogKindPillTone(kind constants.UploadLogKind) PillTone {
 		return PillToneInfo
 	case constants.UploadLogKindDocument:
 		return PillToneNeutral
+	case constants.UploadLogKindAffiliateCSV:
+		return PillTonePrimary
 	default:
 		return PillToneNeutral
 	}

@@ -194,6 +194,13 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/announcements/", auth.RequireRole(auth.AdminAccessRoles()...)(handleAnnouncementsPath))
 		authMux.HandleFunc(basePath+"/meta", auth.RequireRole(auth.AdminAccessRoles()...)(handleMeta))
 		authMux.HandleFunc(basePath+"/meta/", auth.RequireRole(auth.AdminAccessRoles()...)(handleMetaPath))
+		affiliatesRole := auth.RequireRole(auth.RoleSuperuser)
+		affiliateLinkRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)
+		authMux.HandleFunc(basePath+"/affiliate-link/", affiliateLinkRole(handleAffiliateLink))
+		authMux.HandleFunc(basePath+"/affiliates/import/save", affiliatesRole(handleAffiliateImportSave))
+		authMux.HandleFunc(basePath+"/affiliates/upload", affiliatesRole(handleAffiliateUpload))
+		authMux.HandleFunc(basePath+"/affiliates", affiliatesRole(handleAffiliates))
+		authMux.HandleFunc(basePath+"/affiliates/", affiliatesRole(handleAffiliatesPath))
 		lmRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)
 		authMux.HandleFunc(basePath+"/learning-materials/preview", lmRole(handleLearningMaterialURLPreview))
 		authMux.HandleFunc(basePath+"/learning-materials/create", lmRole(handleLearningMaterialCreate))
@@ -307,6 +314,9 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/announcements/", authHandler)
 		rootMux.Handle(basePath+"/meta", authHandler)
 		rootMux.Handle(basePath+"/meta/", authHandler)
+		rootMux.Handle(basePath+"/affiliate-link/", authHandler)
+		rootMux.Handle(basePath+"/affiliates", authHandler)
+		rootMux.Handle(basePath+"/affiliates/", authHandler)
 		rootMux.Handle(basePath+"/learning-materials", authHandler)
 		rootMux.Handle(basePath+"/learning-materials/", authHandler)
 		rootMux.Handle(basePath+"/training-materials", authHandler)
@@ -551,7 +561,13 @@ func contentSecurityPolicy(r *http.Request) string {
 			"connect-src 'self'",
 		}, "; ")
 	}
-	return "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' blob:"
+	return strings.Join([]string{
+		"default-src 'self'",
+		"script-src 'self' 'unsafe-inline'",
+		"style-src 'self' 'unsafe-inline'",
+		"img-src 'self' data: https://down-ph.img.susercontent.com https://cf.shopee.ph",
+		"media-src 'self' blob:",
+	}, "; ")
 }
 
 func isTrainingMaterialWatchRequest(r *http.Request) bool {

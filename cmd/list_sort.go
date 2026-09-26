@@ -376,6 +376,56 @@ func sortNotificationRows(rows []queries.TblNotification, sort utils.SortParams)
 	})
 }
 
+func sortAffiliateRows(rows []queries.GetAllAffiliateProductsRow, sort utils.SortParams) {
+	utils.SortSlice(rows, sort.Order, func(a, b queries.GetAllAffiliateProductsRow) int {
+		switch sort.By {
+		case "name":
+			return utils.CompareStrings(a.Name, b.Name)
+		case "brand", "shop_name":
+			return utils.CompareStrings(affiliateShopSortKey(a), affiliateShopSortKey(b))
+		case "price_display":
+			return utils.CompareStrings(a.PriceDisplay, b.PriceDisplay)
+		case "click_count":
+			return utils.CompareInt64(a.ClickCount, b.ClickCount)
+		case "updated_at":
+			return utils.CompareStrings(a.UpdatedAt, b.UpdatedAt)
+		case "sort_order":
+			if c := utils.CompareInt64(a.SortOrder, b.SortOrder); c != 0 {
+				return c
+			}
+			return utils.CompareInt64(a.ID, b.ID)
+		default:
+			if c := utils.CompareInt64(a.SortOrder, b.SortOrder); c != 0 {
+				return c
+			}
+			return utils.CompareInt64(a.ID, b.ID)
+		}
+	})
+}
+
+func affiliateShopSortKey(row queries.GetAllAffiliateProductsRow) string {
+	if row.ShopBrandName != "" {
+		return row.ShopBrandName
+	}
+	return row.Brand
+}
+
+func filterAffiliateRows(rows []queries.GetAllAffiliateProductsRow, query string) []queries.GetAllAffiliateProductsRow {
+	query = strings.ToLower(strings.TrimSpace(query))
+	if query == "" {
+		return rows
+	}
+	out := make([]queries.GetAllAffiliateProductsRow, 0, len(rows))
+	for _, row := range rows {
+		if strings.Contains(strings.ToLower(row.Name), query) ||
+			strings.Contains(strings.ToLower(row.Brand), query) ||
+			strings.Contains(strings.ToLower(row.ShopBrandName), query) {
+			out = append(out, row)
+		}
+	}
+	return out
+}
+
 func sortAnnouncementRows(rows []queries.GetAnnouncementsPagedRow, sort utils.SortParams) {
 	utils.SortSlice(rows, sort.Order, func(a, b queries.GetAnnouncementsPagedRow) int {
 		switch sort.By {
