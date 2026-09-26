@@ -31,6 +31,7 @@ versions:
         commit: "e944aab"
       - text: "Intro video encoding defaults to higher quality compression settings."
         commit: "76d6c4a"
+      - text: "The persistent onboarding panel shows a status icon beside each step and highlights rejected items in red."
     bug_fixes: []
     removed: []
     security: []

@@ -30,6 +30,17 @@ type OnboardingChecklistData struct {
 	EmptyMessage   string
 }
 
+func persistentPanelRowStatusFromOnboarding(status onboarding.ItemStatus) PersistentPanelRowStatus {
+	switch status {
+	case onboarding.ItemStatusRejected:
+		return PersistentPanelRowStatusRejected
+	case onboarding.ItemStatusInProgress:
+		return PersistentPanelRowStatusWaiting
+	default:
+		return PersistentPanelRowStatusNeedsAction
+	}
+}
+
 func BuildOnboardingPersistentPanel(checklist []onboarding.Item) PersistentPanelData {
 	completed, total := onboarding.Summary(checklist)
 	incomplete := onboarding.IncompleteItems(checklist)
@@ -42,6 +53,7 @@ func BuildOnboardingPersistentPanel(checklist []onboarding.Item) PersistentPanel
 			ActionURL:   utils.URL(item.ActionPath),
 			ActionLabel: "Open",
 			LinkTarget:  PersistentPanelLinkTargetBlank,
+			RowStatus:   persistentPanelRowStatusFromOnboarding(item.Status),
 		})
 	}
 	return PersistentPanelData{
@@ -137,7 +149,7 @@ func OnboardingChecklist(data OnboardingChecklistData) templ.Component {
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(data.CompletedCount)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 101, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 113, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -150,7 +162,7 @@ func OnboardingChecklist(data OnboardingChecklistData) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.TotalCount)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 101, Col: 83}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 113, Col: 83}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -169,7 +181,7 @@ func OnboardingChecklist(data OnboardingChecklistData) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(data.EmptyMessage)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 105, Col: 50}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 117, Col: 50}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -192,7 +204,7 @@ func OnboardingChecklist(data OnboardingChecklistData) templ.Component {
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(item.Label)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 111, Col: 57}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 123, Col: 57}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -205,7 +217,7 @@ func OnboardingChecklist(data OnboardingChecklistData) templ.Component {
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(item.Detail)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 112, Col: 54}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 124, Col: 54}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
@@ -231,7 +243,7 @@ func OnboardingChecklist(data OnboardingChecklistData) templ.Component {
 					var templ_7745c5c3_Var7 templ.SafeURL
 					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(item.ActionURL)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 119, Col: 32}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/onboarding.templ`, Line: 131, Col: 32}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 					if templ_7745c5c3_Err != nil {

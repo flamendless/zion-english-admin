@@ -22,6 +22,17 @@ type OnboardingChecklistData struct {
 	EmptyMessage   string
 }
 
+func persistentPanelRowStatusFromOnboarding(status onboarding.ItemStatus) PersistentPanelRowStatus {
+	switch status {
+	case onboarding.ItemStatusRejected:
+		return PersistentPanelRowStatusRejected
+	case onboarding.ItemStatusInProgress:
+		return PersistentPanelRowStatusWaiting
+	default:
+		return PersistentPanelRowStatusNeedsAction
+	}
+}
+
 func BuildOnboardingPersistentPanel(checklist []onboarding.Item) PersistentPanelData {
 	completed, total := onboarding.Summary(checklist)
 	incomplete := onboarding.IncompleteItems(checklist)
@@ -34,6 +45,7 @@ func BuildOnboardingPersistentPanel(checklist []onboarding.Item) PersistentPanel
 			ActionURL:   utils.URL(item.ActionPath),
 			ActionLabel: "Open",
 			LinkTarget:  PersistentPanelLinkTargetBlank,
+			RowStatus:   persistentPanelRowStatusFromOnboarding(item.Status),
 		})
 	}
 	return PersistentPanelData{

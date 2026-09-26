@@ -7,6 +7,14 @@ const (
 	PersistentPanelLinkTargetSelf  PersistentPanelLinkTarget = "_self"
 )
 
+type PersistentPanelRowStatus string
+
+const (
+	PersistentPanelRowStatusNeedsAction PersistentPanelRowStatus = "needs_action"
+	PersistentPanelRowStatusWaiting     PersistentPanelRowStatus = "waiting"
+	PersistentPanelRowStatusRejected    PersistentPanelRowStatus = "rejected"
+)
+
 type PersistentPanelItem struct {
 	ID          string
 	Label       string
@@ -14,6 +22,7 @@ type PersistentPanelItem struct {
 	ActionURL   string
 	ActionLabel string
 	LinkTarget  PersistentPanelLinkTarget
+	RowStatus   PersistentPanelRowStatus
 }
 
 type PersistentPanelData struct {
@@ -59,6 +68,26 @@ func persistentPanelStorageKey(data PersistentPanelData) string {
 	return data.Title
 }
 
+func persistentPanelItemListClass(item PersistentPanelItem) string {
+	if item.RowStatus == PersistentPanelRowStatusRejected {
+		return "persistent-panel-item persistent-panel-item--rejected"
+	}
+	return "persistent-panel-item"
+}
+
+func persistentPanelRowStatusIconClass(status PersistentPanelRowStatus) string {
+	switch status {
+	case PersistentPanelRowStatusNeedsAction:
+		return "persistent-panel-status-icon persistent-panel-status-icon--needs-action"
+	case PersistentPanelRowStatusWaiting:
+		return "persistent-panel-status-icon persistent-panel-status-icon--waiting"
+	case PersistentPanelRowStatusRejected:
+		return "persistent-panel-status-icon persistent-panel-status-icon--rejected"
+	default:
+		return "persistent-panel-status-icon"
+	}
+}
+
 templ PersistentPanelSlot(params PersistentPanelSlotParams) {
 	<div
 		id={ params.HostID }
@@ -81,6 +110,21 @@ templ iconSVGMinimize() {
 	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 		<line x1="5" y1="12" x2="19" y2="12"></line>
 	</svg>
+}
+
+templ PersistentPanelRowStatusIcon(status PersistentPanelRowStatus) {
+	if status != "" {
+		<span class={ persistentPanelRowStatusIconClass(status) } aria-hidden="true">
+			switch status {
+			case PersistentPanelRowStatusNeedsAction:
+				@iconSVGAlertCircle()
+			case PersistentPanelRowStatusWaiting:
+				@iconSVGHourglass()
+			case PersistentPanelRowStatusRejected:
+				@iconSVGCancel()
+			}
+		</span>
+	}
 }
 
 templ PersistentPanel(data PersistentPanelData) {
@@ -120,7 +164,12 @@ templ PersistentPanel(data PersistentPanelData) {
 			if len(data.Items) > 0 {
 				<ul class="persistent-panel-list">
 					for _, item := range data.Items {
-						<li class="persistent-panel-item">
+						<li class={ persistentPanelItemListClass(item) }>
+							if item.RowStatus != "" {
+								<div class="persistent-panel-item-leading">
+									@PersistentPanelRowStatusIcon(item.RowStatus)
+								</div>
+							}
 							<div class="persistent-panel-item-main">
 								<strong class="persistent-panel-item-label">{ item.Label }</strong>
 								if item.Detail != "" {
@@ -303,6 +352,49 @@ templ PersistentPanelStyles() {
 		.persistent-panel-item:first-child {
 			padding-top: 0;
 			border-top: none;
+		}
+
+		.persistent-panel-item--rejected {
+			background: var(--color-error-bg);
+			border: 1px solid color-mix(in srgb, var(--color-destructive) 25%, var(--color-border));
+			border-radius: var(--radius-md);
+			padding: var(--space-2) var(--space-3);
+			margin-top: var(--space-2);
+		}
+
+		.persistent-panel-item--rejected:first-child {
+			margin-top: 0;
+		}
+
+		.persistent-panel-item--rejected .persistent-panel-item-label,
+		.persistent-panel-item--rejected .persistent-panel-item-detail {
+			color: var(--color-destructive);
+		}
+
+		.persistent-panel-item-leading {
+			flex-shrink: 0;
+			padding-top: 0.0625rem;
+		}
+
+		.persistent-panel-status-icon {
+			display: block;
+			width: 1.125rem;
+			height: 1.125rem;
+			line-height: 0;
+		}
+
+		.persistent-panel-status-icon svg {
+			width: 100%;
+			height: 100%;
+		}
+
+		.persistent-panel-status-icon--needs-action,
+		.persistent-panel-status-icon--waiting {
+			color: var(--color-warning);
+		}
+
+		.persistent-panel-status-icon--rejected {
+			color: var(--color-destructive);
 		}
 
 		.persistent-panel-item-main {
