@@ -362,29 +362,35 @@ templ DashboardStats(data DashboardData) {
 			</div>
 		</div>
 		if data.Role == auth.RoleAdmin {
-			@DashboardSectionedCurrencyStatCard("My Cutoffs", false, []DashboardCurrencySection{
-				{Title: "First cutoff · Teacher rates", Totals: data.FirstCutoffTotals},
-				{Title: "First cutoff · Parent rates", Totals: data.FirstCutoffParentTotals, AdminOnly: true},
-				{Title: "Second cutoff · Teacher rates", Totals: data.SecondCutoffTotals},
-				{Title: "Second cutoff · Parent rates", Totals: data.SecondCutoffParentTotals, AdminOnly: true},
+			@DashboardSectionedCurrencyStatCard("My Cutoffs · Teacher rates", false, []DashboardCurrencySection{
+				{Title: "First cutoff", Totals: data.FirstCutoffTotals},
+				{Title: "Second cutoff", Totals: data.SecondCutoffTotals},
 			})
-			@DashboardSectionedCurrencyStatCard("All Teachers Cutoffs", true, []DashboardCurrencySection{
-				{Title: "First cutoff · Teacher rates", Totals: data.AllTeachersFirstCutoffTotals},
-				{Title: "First cutoff · Parent rates", Totals: data.AllTeachersFirstCutoffParentTotals},
-				{Title: "Second cutoff · Teacher rates", Totals: data.AllTeachersSecondCutoffTotals},
-				{Title: "Second cutoff · Parent rates", Totals: data.AllTeachersSecondCutoffParentTotals},
+			@DashboardSectionedCurrencyStatCard("My Cutoffs · Parent rates", false, []DashboardCurrencySection{
+				{Title: "First cutoff", Totals: data.FirstCutoffParentTotals, AdminOnly: true},
+				{Title: "Second cutoff", Totals: data.SecondCutoffParentTotals, AdminOnly: true},
+			})
+			@DashboardSectionedCurrencyStatCard("All Teachers · Teacher rates", true, []DashboardCurrencySection{
+				{Title: "First cutoff", Totals: data.AllTeachersFirstCutoffTotals},
+				{Title: "Second cutoff", Totals: data.AllTeachersSecondCutoffTotals},
+			})
+			@DashboardSectionedCurrencyStatCard("All Teachers · Parent rates", true, []DashboardCurrencySection{
+				{Title: "First cutoff", Totals: data.AllTeachersFirstCutoffParentTotals},
+				{Title: "Second cutoff", Totals: data.AllTeachersSecondCutoffParentTotals},
 			})
 		} else if auth.HasAdminAccess(data.Role) {
-			@DashboardSectionedCurrencyStatCard("Cutoffs", true, []DashboardCurrencySection{
-				{Title: "First cutoff · Teacher rates", Totals: data.FirstCutoffTotals},
-				{Title: "First cutoff · Parent rates", Totals: data.FirstCutoffParentTotals},
-				{Title: "Second cutoff · Teacher rates", Totals: data.SecondCutoffTotals},
-				{Title: "Second cutoff · Parent rates", Totals: data.SecondCutoffParentTotals},
+			@DashboardSectionedCurrencyStatCard("Cutoffs · Teacher rates", true, []DashboardCurrencySection{
+				{Title: "First cutoff", Totals: data.FirstCutoffTotals},
+				{Title: "Second cutoff", Totals: data.SecondCutoffTotals},
+			})
+			@DashboardSectionedCurrencyStatCard("Cutoffs · Parent rates", true, []DashboardCurrencySection{
+				{Title: "First cutoff", Totals: data.FirstCutoffParentTotals},
+				{Title: "Second cutoff", Totals: data.SecondCutoffParentTotals},
 			})
 		} else {
-			@DashboardSectionedCurrencyStatCard("Cutoffs", false, []DashboardCurrencySection{
-				{Title: "First cutoff · Teacher rates", Totals: data.FirstCutoffTotals},
-				{Title: "Second cutoff · Teacher rates", Totals: data.SecondCutoffTotals},
+			@DashboardSectionedCurrencyStatCard("Cutoffs · Teacher rates", false, []DashboardCurrencySection{
+				{Title: "First cutoff", Totals: data.FirstCutoffTotals},
+				{Title: "Second cutoff", Totals: data.SecondCutoffTotals},
 			})
 		}
 	</div>

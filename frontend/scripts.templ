@@ -160,7 +160,9 @@ templ ScrFloatingTooltips() {
 			}
 
 			function tooltipTarget(node) {
-				return node && node.closest('.table-wrapper [data-tooltip], .day-class-integrations [data-tooltip]');
+				return node && node.closest(
+					'.table-wrapper [data-tooltip], .day-class-integrations [data-tooltip], .notification-panel [data-tooltip], .modal-body [data-tooltip]'
+				);
 			}
 
 			document.addEventListener('mouseover', function (e) {

@@ -874,11 +874,9 @@ func DashboardStats(data DashboardData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if data.Role == auth.RoleAdmin {
-			templ_7745c5c3_Err = DashboardSectionedCurrencyStatCard("My Cutoffs", false, []DashboardCurrencySection{
-				{Title: "First cutoff · Teacher rates", Totals: data.FirstCutoffTotals},
-				{Title: "First cutoff · Parent rates", Totals: data.FirstCutoffParentTotals, AdminOnly: true},
-				{Title: "Second cutoff · Teacher rates", Totals: data.SecondCutoffTotals},
-				{Title: "Second cutoff · Parent rates", Totals: data.SecondCutoffParentTotals, AdminOnly: true},
+			templ_7745c5c3_Err = DashboardSectionedCurrencyStatCard("My Cutoffs · Teacher rates", false, []DashboardCurrencySection{
+				{Title: "First cutoff", Totals: data.FirstCutoffTotals},
+				{Title: "Second cutoff", Totals: data.SecondCutoffTotals},
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -887,35 +885,64 @@ func DashboardStats(data DashboardData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = DashboardSectionedCurrencyStatCard("All Teachers Cutoffs", true, []DashboardCurrencySection{
-				{Title: "First cutoff · Teacher rates", Totals: data.AllTeachersFirstCutoffTotals},
-				{Title: "First cutoff · Parent rates", Totals: data.AllTeachersFirstCutoffParentTotals},
-				{Title: "Second cutoff · Teacher rates", Totals: data.AllTeachersSecondCutoffTotals},
-				{Title: "Second cutoff · Parent rates", Totals: data.AllTeachersSecondCutoffParentTotals},
+			templ_7745c5c3_Err = DashboardSectionedCurrencyStatCard("My Cutoffs · Parent rates", false, []DashboardCurrencySection{
+				{Title: "First cutoff", Totals: data.FirstCutoffParentTotals, AdminOnly: true},
+				{Title: "Second cutoff", Totals: data.SecondCutoffParentTotals, AdminOnly: true},
+			}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = DashboardSectionedCurrencyStatCard("All Teachers · Teacher rates", true, []DashboardCurrencySection{
+				{Title: "First cutoff", Totals: data.AllTeachersFirstCutoffTotals},
+				{Title: "Second cutoff", Totals: data.AllTeachersSecondCutoffTotals},
+			}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = DashboardSectionedCurrencyStatCard("All Teachers · Parent rates", true, []DashboardCurrencySection{
+				{Title: "First cutoff", Totals: data.AllTeachersFirstCutoffParentTotals},
+				{Title: "Second cutoff", Totals: data.AllTeachersSecondCutoffParentTotals},
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else if auth.HasAdminAccess(data.Role) {
-			templ_7745c5c3_Err = DashboardSectionedCurrencyStatCard("Cutoffs", true, []DashboardCurrencySection{
-				{Title: "First cutoff · Teacher rates", Totals: data.FirstCutoffTotals},
-				{Title: "First cutoff · Parent rates", Totals: data.FirstCutoffParentTotals},
-				{Title: "Second cutoff · Teacher rates", Totals: data.SecondCutoffTotals},
-				{Title: "Second cutoff · Parent rates", Totals: data.SecondCutoffParentTotals},
+			templ_7745c5c3_Err = DashboardSectionedCurrencyStatCard("Cutoffs · Teacher rates", true, []DashboardCurrencySection{
+				{Title: "First cutoff", Totals: data.FirstCutoffTotals},
+				{Title: "Second cutoff", Totals: data.SecondCutoffTotals},
+			}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = DashboardSectionedCurrencyStatCard("Cutoffs · Parent rates", true, []DashboardCurrencySection{
+				{Title: "First cutoff", Totals: data.FirstCutoffParentTotals},
+				{Title: "Second cutoff", Totals: data.SecondCutoffParentTotals},
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = DashboardSectionedCurrencyStatCard("Cutoffs", false, []DashboardCurrencySection{
-				{Title: "First cutoff · Teacher rates", Totals: data.FirstCutoffTotals},
-				{Title: "Second cutoff · Teacher rates", Totals: data.SecondCutoffTotals},
+			templ_7745c5c3_Err = DashboardSectionedCurrencyStatCard("Cutoffs · Teacher rates", false, []DashboardCurrencySection{
+				{Title: "First cutoff", Totals: data.FirstCutoffTotals},
+				{Title: "Second cutoff", Totals: data.SecondCutoffTotals},
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

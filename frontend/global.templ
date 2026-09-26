@@ -759,7 +759,7 @@ templ GlobalIncludes() {
 			border: 1px solid var(--color-border);
 			border-radius: var(--radius-md);
 			box-shadow: var(--shadow-lg);
-			overflow: hidden;
+			overflow: visible;
 			width: 100%;
 		}
 
@@ -771,6 +771,7 @@ templ GlobalIncludes() {
 			padding: var(--space-3) var(--space-4);
 			border-bottom: 1px solid var(--color-border);
 			background: var(--color-surface);
+			border-radius: var(--radius-md) var(--radius-md) 0 0;
 		}
 
 		.notification-panel-header h3 {
@@ -900,6 +901,7 @@ templ GlobalIncludes() {
 			border-top: 1px solid var(--color-border);
 			text-align: center;
 			background: var(--color-surface);
+			border-radius: 0 0 var(--radius-md) var(--radius-md);
 		}
 
 		.notification-view-all {
@@ -1990,7 +1992,9 @@ templ GlobalIncludes() {
 			visibility: visible;
 		}
 
-		.table-wrapper [data-tooltip]::after {
+		.table-wrapper [data-tooltip]::after,
+		.notification-panel [data-tooltip]::after,
+		.modal-body [data-tooltip]::after {
 			content: none;
 			display: none;
 		}
