@@ -42,6 +42,11 @@ func runIntroVideoUploadJob(params introVideoUploadJobParams) {
 			zap.Error(err),
 			zap.Int64("video_id", params.VideoID),
 			zap.Int64("teacher_id", user.ID),
+			zap.String("original_filename", originalBase),
+			zap.Int64("original_file_size", params.OriginalFileSize),
+			zap.String("compress_preset", params.CompressPreset),
+			zap.Int("encode_timeout_secs", params.Settings.TimeoutSecs),
+			zap.Bool("skip_compress", params.Settings.SkipCompress),
 		)
 		failIntroVideoUploadJob(ctx, user, params, originalBase, err)
 		return

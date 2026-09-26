@@ -185,9 +185,9 @@ func probeDurationSeconds(path string) (float64, error) {
 		"-of", "default=noprint_wrappers=1:nokey=1",
 		path,
 	)
-	out, err := cmd.Output()
+	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return 0, ErrInvalidContent
+		return 0, fmt.Errorf("%w: %s", ErrInvalidContent, trimExecOutput(out))
 	}
 
 	raw := strings.TrimSpace(string(out))

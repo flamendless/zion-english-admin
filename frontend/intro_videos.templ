@@ -40,6 +40,13 @@ func introVideoLinkDisplay(label string) string {
 	return label[:maxLen-1] + "…"
 }
 
+func introVideoSizeDisplay(original, processed string) string {
+	if original == "-" && processed == "-" {
+		return "-"
+	}
+	return original + " -> " + processed
+}
+
 func introVideoRowClass(status constants.TeacherIntroVideoStatus) string {
 	switch status {
 	case constants.TeacherIntroVideoStatusSubmitted:
@@ -52,7 +59,7 @@ func introVideoRowClass(status constants.TeacherIntroVideoStatus) string {
 }
 
 func introVideosTableColspan(showUploader bool, showViewAction bool, showActions bool) int {
-	colspan := 7
+	colspan := 6
 	if showUploader {
 		colspan++
 	}
@@ -132,8 +139,7 @@ templ IntroVideoTableRow(item IntroVideoItem, showUploader bool, showViewAction 
 		<td data-label="Status">
 			@StatusPill(item.Status.Label(), IntroVideoStatusPillTone(item.Status), true)
 		</td>
-		<td data-label="Original size">{ item.OriginalFileSize }</td>
-		<td data-label="Processed size">{ item.ProcessedFileSize }</td>
+		<td class="intro-video-size-cell" data-label="Size">{ introVideoSizeDisplay(item.OriginalFileSize, item.ProcessedFileSize) }</td>
 		<td data-label="Preset">
 			@IntroVideoCompressPresetPill(item.CompressPreset)
 		</td>
@@ -193,8 +199,7 @@ templ IntroVideosTable(showUploader bool, showViewAction bool, showActions bool)
 					<th>Video</th>
 					<th>Source</th>
 					<th>Status</th>
-					<th>Original size</th>
-					<th>Processed size</th>
+					<th>Size</th>
 					<th>Preset</th>
 					if showUploader {
 						@AdminOnlyTableHeader("Uploaded by")
@@ -245,6 +250,12 @@ templ IntroVideosPage(data IntroVideosPageData) {
 			.intro-video-reject-reason {
 				font-size: 0.8125rem;
 				color: var(--color-muted-foreground);
+			}
+
+			.intro-video-size-cell {
+				white-space: normal;
+				word-break: break-word;
+				max-width: 10rem;
 			}
 		</style>
 	</head>

@@ -174,9 +174,6 @@ func handleScheduleCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("scheduled class for student id %d (teacher id %d, date %s)", req.StudentID, req.TeacherID, req.ScheduledDate))
-	actor := auth.GetUser(ctx)
-	notifyCrossParty(ctx, actor, req.TeacherID, teacherNameByID(ctx, req.TeacherID), notifications.KindScheduleChanged,
-		fmt.Sprintf("Class scheduled for %s", req.ScheduledDate))
 
 	if err := respondFormMutation(w, "Class scheduled successfully!", "", "scheduleRefresh", "refreshScheduleCalendar"); err != nil {
 		sendErrorLog(w, err.Error())

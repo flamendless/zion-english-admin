@@ -2,6 +2,7 @@ package teacherintrovideo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"time"
@@ -38,12 +39,15 @@ func compressToMP4(ctx context.Context, inputPath, outputPath string, settings c
 	}
 
 	cmd := exec.CommandContext(ctx, "ffmpeg", args...)
-	if out, err := cmd.CombinedOutput(); err != nil {
-		if ctx.Err() != nil {
-			return ErrCompressFailed
-		}
-		_ = out
-		return ErrCompressFailed
+	out, err := cmd.CombinedOutput()
+	if err == nil {
+		return nil
 	}
-	return nil
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+		return fmt.Errorf("%w: ffmpeg timed out after %ds", ErrCompressFailed, settings.TimeoutSecs)
+	}
+	if ctx.Err() != nil {
+		return fmt.Errorf("%w: ffmpeg stopped (%v)", ErrCompressFailed, ctx.Err())
+	}
+	return fmt.Errorf("%w: %s", ErrCompressFailed, trimExecOutput(out))
 }

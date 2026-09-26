@@ -9,6 +9,33 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.09.26"
+    date: "2026-09-26"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Superusers can open Upload Logs under Admin to review teacher file upload successes and failures, with search and date filters; teachers have My Upload Logs for their own uploads."
+        commit: "3273114"
+      - text: "Introduction video file uploads run in the background with a progress panel at the bottom-right; you can leave the page while compression and validation finish."
+        commit: "b5a6da0"
+      - text: "Superusers can choose the intro video compression preset from Feature Flags, from smaller file size through original quality."
+        commit: "d6cb409"
+    improvements:
+      - text: "The superuser dashboard adds a Teachers card with counts and links for teachers missing Zoom, Google Calendar, an uploaded CV, or a profile avatar."
+        commit: "fddcd95"
+      - text: "The Classes This Week dashboard card shows overdue scheduled classes for teachers and admins, with a link to the filtered classes list."
+        commit: "87be1f6"
+      - text: "Intro Videos and upload logs show the original file size before server-side compression."
+        commit: "3273114"
+      - text: "Settings shows which ffmpeg and ffprobe binaries are used for intro video compression."
+        commit: "e944aab"
+      - text: "Intro video encoding defaults to higher quality compression settings."
+        commit: "76d6c4a"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
   - version: "2026.09.24"
     date: "2026-09-24"
     released: true
