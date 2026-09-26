@@ -100,7 +100,7 @@ var navItemDefs = []navItemDef{
 	{Path: "/feature-flags", LinkID: "featureFlagsLink", Title: "Feature Flags", Description: "Toggle integration connection availability", AdminOnlyCard: true},
 	{Path: "/settings", LinkID: "settingsLink", Title: "Settings", Description: "View runtime configuration and server settings", AdminOnlyCard: true},
 	{Path: "/logs", LinkID: "logsLink", Title: "Logs", TeacherTitle: "My Activity", Description: "View system logs", TeacherDesc: "View your recent actions"},
-	{Path: "/upload-logs", LinkID: "uploadLogsLink", Title: "Upload Logs", Description: "Teacher file upload activity", AdminOnlyCard: true},
+	{Path: "/upload-logs", LinkID: "uploadLogsLink", Title: "Upload Logs", TeacherTitle: "My Upload Logs", Description: "Teacher file upload activity", TeacherDesc: "View success and failure for your file uploads", AdminOnlyCard: true},
 }
 
 var navGroupDefs = []navGroupDef{
@@ -130,6 +130,7 @@ var teacherNavLayout = []navLayoutEntry{
 	{LinkPath: "/analytics"},
 	{LinkPath: "/payments"},
 	{LinkPath: "/logs"},
+	{LinkPath: "/upload-logs"},
 }
 
 var testerNavLayout = []navLayoutEntry{
@@ -394,7 +395,7 @@ func IsNavAccessible(role auth.Role, path string) bool {
 		return false
 	case "/students/register":
 		return true
-	case "/classes", "/classes/record", "/schedule", "/schedule/record", "/schedule/repeat", "/schedule/series", "/profile", "/logs", "/my-students", "/documents", "/intro-videos", "/analytics", "/payments", "/guides", "/learning-materials", "/training-materials":
+	case "/classes", "/classes/record", "/schedule", "/schedule/record", "/schedule/repeat", "/schedule/series", "/profile", "/logs", "/upload-logs", "/my-students", "/documents", "/intro-videos", "/analytics", "/payments", "/guides", "/learning-materials", "/training-materials":
 		return true
 	default:
 		return false

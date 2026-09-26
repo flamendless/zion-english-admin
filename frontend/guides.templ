@@ -438,8 +438,8 @@ templ GuideIntroVideos() {
 						"Scroll to the Introduction video section (visible when intro video uploads are enabled for your role).",
 						"Keep Source set to Upload, choose your video file, and review the preview (name, size, duration, and dimensions).",
 						"Click Submit intro video and confirm in the dialog.",
-						"Wait for the upload progress bar to finish, then for processing to complete before the page redirects.",
-						"A success message confirms your submission is pending review.",
+						"Upload progress appears in the panel at the bottom-right of the screen. You may leave the page while processing continues.",
+						"You will get an in-app notification when the video is ready for administrator review.",
 					},
 					false,
 				)
@@ -460,13 +460,14 @@ templ GuideIntroVideos() {
 					"upload-requirements",
 					"Upload requirements",
 					utils.URL("/profile"),
-					"Uploaded files are compressed, stored as MP4, and validated before review.",
+					"Uploaded files are validated before review. Larger uploads are compressed to MP4; smaller uploads are stored as uploaded.",
 					[]string{
 						"Accepted formats: MP4, WebM, MOV, AVI, MKV, OGV, M4V, or 3GP.",
 						fmt.Sprintf("Maximum file size: %d MB.", constants.MaxIntroVideoSizeMB()),
 						fmt.Sprintf("Maximum duration: %s.", constants.MaxIntroVideoDurationLabel()),
+						fmt.Sprintf("Files under %d MB are not re-encoded; larger files are compressed to MP4 in the background.", constants.IntroVideoCompressMinSizeMB()),
 						"If the preview shows a duration warning, choose a shorter clip before submitting.",
-						"After the upload bar reaches 100%, processing may take a moment while the server compresses and validates the video.",
+						"After upload, the server validates the video in the background. Status shows as Processing on My Profile until it is ready.",
 					},
 					false,
 				)
@@ -479,7 +480,7 @@ templ GuideIntroVideos() {
 						"For Google Drive, set sharing to Anyone with the link.",
 						"For YouTube, set the video to Unlisted (not Private).",
 						"Test the link in a private browser window before submitting.",
-						"Submissions are blocked while you already have a Submitted or Approved intro video on file.",
+						"Submissions are blocked while you already have a Processing, Submitted, or Approved intro video on file.",
 					},
 					false,
 				)

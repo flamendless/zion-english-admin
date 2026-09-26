@@ -6,11 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/constants"
@@ -36,7 +34,10 @@ func introVideoLinkLabel(url sql.NullString, filename sql.NullString) string {
 	return "-"
 }
 
-func introVideoViewURL(id int64, url sql.NullString) string {
+func introVideoViewURL(id int64, url sql.NullString, status string) string {
+	if status == string(constants.TeacherIntroVideoStatusProcessing) {
+		return ""
+	}
 	if url.Valid && url.String != "" {
 		return url.String
 	}
@@ -50,15 +51,18 @@ func introVideoSourceType(sourceType sql.NullString) constants.TeacherIntroVideo
 	return constants.TeacherIntroVideoSourceType(sourceType.String)
 }
 
-func formatIntroVideoFileSizes(original, stored sql.NullInt64) string {
-	if !stored.Valid {
+func formatIntroVideoFileSize(size sql.NullInt64) string {
+	if !size.Valid {
 		return "-"
 	}
-	storedLabel := utils.FormatFileSize(stored.Int64)
-	if !original.Valid || original.Int64 == stored.Int64 {
-		return storedLabel
+	return utils.FormatFileSize(size.Int64)
+}
+
+func introVideoCompressPresetFromDB(preset sql.NullString) constants.IntroVideoCompressPreset {
+	if !preset.Valid || preset.String == "" {
+		return ""
 	}
-	return fmt.Sprintf("%s stored (%s original)", storedLabel, utils.FormatFileSize(original.Int64))
+	return constants.IntroVideoCompressPreset(preset.String)
 }
 
 func mapIntroVideoItem(row queries.GetTeacherIntroVideosByTeacherIDFilteredRow) frontend.IntroVideoItem {
@@ -66,13 +70,15 @@ func mapIntroVideoItem(row queries.GetTeacherIntroVideosByTeacherIDFilteredRow) 
 	return frontend.IntroVideoItem{
 		ID:            strconv.FormatInt(row.ID, 10),
 		LinkLabel:     linkLabel,
-		FileSizeLabel: formatIntroVideoFileSizes(row.OriginalFileSize, row.FileSize),
-		URL:          nullStringValue(row.Url),
+		OriginalFileSize:  formatIntroVideoFileSize(row.OriginalFileSize),
+		ProcessedFileSize: formatIntroVideoFileSize(row.FileSize),
+		CompressPreset:    introVideoCompressPresetFromDB(row.CompressPreset),
+		URL:               nullStringValue(row.Url),
 		SourceType:   introVideoSourceType(row.SourceType),
 		Status:       constants.TeacherIntroVideoStatus(row.Status),
 		UploadedAt:   utils.FormatNullDateTimePHT(row.CreatedAt),
 		RejectReason: nullStringValue(row.RejectReason),
-		ViewURL:      introVideoViewURL(row.ID, row.Url),
+		ViewURL:      introVideoViewURL(row.ID, row.Url, row.Status),
 		CanReview:    false,
 	}
 }
@@ -94,8 +100,10 @@ func mapAllIntroVideoItems(ctx context.Context, rows []queries.GetAllTeacherIntr
 		items[i] = frontend.IntroVideoItem{
 			ID:            strconv.FormatInt(row.ID, 10),
 			LinkLabel:     linkLabel,
-			FileSizeLabel: formatIntroVideoFileSizes(row.OriginalFileSize, row.FileSize),
-			URL:           nullStringValue(row.Url),
+			OriginalFileSize:  formatIntroVideoFileSize(row.OriginalFileSize),
+			ProcessedFileSize: formatIntroVideoFileSize(row.FileSize),
+			CompressPreset:    introVideoCompressPresetFromDB(row.CompressPreset),
+			URL:               nullStringValue(row.Url),
 			SourceType:    introVideoSourceType(row.SourceType),
 			Status:        constants.TeacherIntroVideoStatus(row.Status),
 			UploadedAt:    utils.FormatNullDateTimePHT(row.CreatedAt),
@@ -109,7 +117,7 @@ func mapAllIntroVideoItems(ctx context.Context, rows []queries.GetAllTeacherIntr
 				row.TeacherAssignedColor,
 				row.TeacherProfilePicture,
 			),
-			ViewURL:   introVideoViewURL(row.ID, row.Url),
+			ViewURL:   introVideoViewURL(row.ID, row.Url, row.Status),
 			CanReview: row.Status == string(constants.TeacherIntroVideoStatusSubmitted),
 		}
 	}
@@ -335,7 +343,7 @@ func handleProfileIntroVideo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if blocking > 0 {
-		setErrorFlash(w, "You already have a submitted or approved intro video. You cannot submit again unless it is rejected or deleted.")
+		setErrorFlash(w, "You already have a submitted, processing, or approved intro video. You cannot submit again unless it is rejected or deleted.")
 		HttpRedirect(w, r, "/profile")
 		return
 	}
@@ -377,7 +385,7 @@ func handleProfileIntroVideoLink(w http.ResponseWriter, r *http.Request, ctx con
 		Status:     string(constants.TeacherIntroVideoStatusSubmitted),
 	}); err != nil {
 		if database.IsUniqueConstraint(err) {
-			setErrorFlash(w, "You already have a submitted or approved intro video. You cannot submit again unless it is rejected or deleted.")
+			setErrorFlash(w, "You already have a submitted, processing, or approved intro video. You cannot submit again unless it is rejected or deleted.")
 		} else {
 			logs.Log().Error("insert teacher intro video", zap.Error(err))
 			setErrorFlash(w, "Failed to record intro video")
@@ -402,62 +410,72 @@ func handleProfileIntroVideoUpload(w http.ResponseWriter, r *http.Request, ctx c
 	}
 	defer file.Close()
 
-	processed, err := teacherintrovideo.ProcessUpload(ctx, file, header.Filename, header.Size, featureflags.IntroVideoCompressSettings(ctx, dbRO))
+	ext, mimeType, stagedPath, cleanupStage, err := teacherintrovideo.StageUpload(file, header.Filename, header.Size)
 	if err != nil {
-		insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeFailed, fmt.Sprintf("intro video processing failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err))
+		insertUploadLog(ctx, user, uploadLogEntry{
+			Module:        "profile",
+			Outcome:       constants.UploadLogOutcomeFailed,
+			Kind:          constants.UploadLogKindIntroVideo,
+			Summary:       fmt.Sprintf("intro video processing failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err),
+			Filename:      filepath.Base(header.Filename),
+			FileSize:      header.Size,
+			FileSizeValid: true,
+		})
 		setErrorFlash(w, introVideoSubmitErrorMessage(err))
 		HttpRedirect(w, r, "/profile")
 		return
 	}
-	defer processed.Cleanup()
 
-	uploadFile, err := os.Open(processed.Path)
-	if err != nil {
-		logs.Log().Error("open processed intro video", zap.Error(err))
-		insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeFailed, fmt.Sprintf("intro video open processed file failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err))
-		setErrorFlash(w, ErrIntroVideoSaveFailed.Error())
-		HttpRedirect(w, r, "/profile")
-		return
-	}
-	defer uploadFile.Close()
-
-	storedFilename := fmt.Sprintf("%d_%d%s", user.ID, time.Now().UnixNano(), processed.Ext)
-	store := storage.Default()
-	if err := store.Put(ctx, storage.CategoryIntroVideos, storedFilename, uploadFile, processed.MimeType); err != nil {
-		logs.Log().Error("write intro video file", zap.Error(err))
-		insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeFailed, fmt.Sprintf("intro video storage failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err))
-		setErrorFlash(w, ErrIntroVideoSaveFailed.Error())
-		HttpRedirect(w, r, "/profile")
-		return
-	}
-
-	if err := dbRW.GetQueries().InsertTeacherIntroVideo(ctx, queries.InsertTeacherIntroVideoParams{
+	compressPreset := featureflags.IntroVideoCompressPreset(ctx, dbRO)
+	videoID, err := dbRW.GetQueries().InsertTeacherIntroVideoReturningID(ctx, queries.InsertTeacherIntroVideoReturningIDParams{
 		TeacherID:        user.ID,
 		OriginalFilename: sql.NullString{String: filepath.Base(header.Filename), Valid: true},
-		StoredFilename:   sql.NullString{String: storedFilename, Valid: true},
-		MimeType:         sql.NullString{String: processed.MimeType, Valid: true},
-		OriginalFileSize: sql.NullInt64{Int64: processed.OriginalSize, Valid: true},
-		FileSize:         sql.NullInt64{Int64: processed.Size, Valid: true},
+		StoredFilename:   sql.NullString{},
+		MimeType:         sql.NullString{},
+		FileSize:         sql.NullInt64{},
+		OriginalFileSize: sql.NullInt64{Int64: header.Size, Valid: true},
+		CompressPreset:   sql.NullString{String: string(compressPreset), Valid: true},
+		Url:              sql.NullString{},
 		SourceType:       sql.NullString{String: string(constants.TeacherIntroVideoSourceUpload), Valid: true},
-		Status:           string(constants.TeacherIntroVideoStatusSubmitted),
-	}); err != nil {
-		_ = store.Delete(ctx, storage.CategoryIntroVideos, storedFilename)
+		Status:           string(constants.TeacherIntroVideoStatusProcessing),
+	})
+	if err != nil {
+		cleanupStage()
 		if database.IsUniqueConstraint(err) {
-			setErrorFlash(w, "You already have a submitted or approved intro video. You cannot submit again unless it is rejected or deleted.")
+			setErrorFlash(w, "You already have a submitted, processing, or approved intro video. You cannot submit again unless it is rejected or deleted.")
 		} else {
 			logs.Log().Error("insert teacher intro video", zap.Error(err))
-			insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeFailed, fmt.Sprintf("intro video database insert failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err))
+			insertUploadLog(ctx, user, uploadLogEntry{
+				Module:         "profile",
+				Outcome:        constants.UploadLogOutcomeFailed,
+				Kind:           constants.UploadLogKindIntroVideo,
+				Summary:        fmt.Sprintf("intro video database insert failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err),
+				Filename:       filepath.Base(header.Filename),
+				FileSize:       header.Size,
+				FileSizeValid:  true,
+				CompressPreset: string(compressPreset),
+			})
 			setErrorFlash(w, "Failed to record intro video")
 		}
 		HttpRedirect(w, r, "/profile")
 		return
 	}
 
-	insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeSucceeded, fmt.Sprintf("intro video file for teacher '%s' (id %d), file '%s'", user.Name, user.ID, filepath.Base(header.Filename)))
-	insertAuditLogAs(ctx, user, "profile", fmt.Sprintf("submitted intro video file for teacher '%s'", user.Name))
-	notifySuperuser(ctx, user, notifications.KindIntroVideoSubmitted,
-		fmt.Sprintf("Teacher '%s' submitted an intro video file", user.Name), "")
-	setSuccessFlash(w, "Intro video submitted successfully. It will be reviewed by an administrator.")
+	settings := introVideoEncodeSettings(ctx)
+	startIntroVideoUploadJob(introVideoUploadJobParams{
+		VideoID:          videoID,
+		User:             user,
+		StagedPath:       stagedPath,
+		Ext:              ext,
+		MimeType:         mimeType,
+		OriginalFilename: header.Filename,
+		OriginalFileSize: header.Size,
+		CompressPreset:   string(compressPreset),
+		Settings:         settings,
+	})
+
+	triggerBackgroundJobsRefresh(w)
+	setSuccessFlash(w, "Your intro video is processing. Watch the progress in the bottom-right panel; we will notify you when it is ready for review.")
 	HttpRedirect(w, r, "/profile")
 }
 

@@ -5,13 +5,15 @@ import "fmt"
 type TeacherIntroVideoStatus string
 
 const (
-	TeacherIntroVideoStatusSubmitted TeacherIntroVideoStatus = "submitted"
-	TeacherIntroVideoStatusApproved  TeacherIntroVideoStatus = "approved"
-	TeacherIntroVideoStatusRejected  TeacherIntroVideoStatus = "rejected"
-	TeacherIntroVideoStatusDeleted   TeacherIntroVideoStatus = "deleted"
+	TeacherIntroVideoStatusProcessing TeacherIntroVideoStatus = "processing"
+	TeacherIntroVideoStatusSubmitted  TeacherIntroVideoStatus = "submitted"
+	TeacherIntroVideoStatusApproved   TeacherIntroVideoStatus = "approved"
+	TeacherIntroVideoStatusRejected   TeacherIntroVideoStatus = "rejected"
+	TeacherIntroVideoStatusDeleted    TeacherIntroVideoStatus = "deleted"
 )
 
 var TeacherIntroVideoStatuses = []TeacherIntroVideoStatus{
+	TeacherIntroVideoStatusProcessing,
 	TeacherIntroVideoStatusSubmitted,
 	TeacherIntroVideoStatusApproved,
 	TeacherIntroVideoStatusRejected,
@@ -20,6 +22,8 @@ var TeacherIntroVideoStatuses = []TeacherIntroVideoStatus{
 
 func (s TeacherIntroVideoStatus) Label() string {
 	switch s {
+	case TeacherIntroVideoStatusProcessing:
+		return "Processing"
 	case TeacherIntroVideoStatusSubmitted:
 		return "Submitted"
 	case TeacherIntroVideoStatusApproved:
@@ -35,7 +39,7 @@ func (s TeacherIntroVideoStatus) Label() string {
 
 func ValidTeacherIntroVideoStatus(value string) bool {
 	switch TeacherIntroVideoStatus(value) {
-	case TeacherIntroVideoStatusSubmitted, TeacherIntroVideoStatusApproved, TeacherIntroVideoStatusRejected, TeacherIntroVideoStatusDeleted:
+	case TeacherIntroVideoStatusProcessing, TeacherIntroVideoStatusSubmitted, TeacherIntroVideoStatusApproved, TeacherIntroVideoStatusRejected, TeacherIntroVideoStatusDeleted:
 		return true
 	default:
 		return false
@@ -80,12 +84,17 @@ func ValidTeacherIntroVideoSourceType(value string) bool {
 
 const MaxIntroVideoDurationSeconds = 120
 const MaxIntroVideoBytes = 200 << 20
+const IntroVideoCompressMinBytes = 30 << 20
 
 const IntroVideoStoredExt = ".mp4"
 const IntroVideoStoredMIME = "video/mp4"
 
 func MaxIntroVideoSizeMB() int {
 	return int(MaxIntroVideoBytes / (1 << 20))
+}
+
+func IntroVideoCompressMinSizeMB() int {
+	return int(IntroVideoCompressMinBytes / (1 << 20))
 }
 
 func IntroVideoFileTooLargeMessage() string {

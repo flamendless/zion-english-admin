@@ -119,6 +119,8 @@ func ResumeStatusPillTone(status constants.TeacherDocumentStatus) PillTone {
 
 func IntroVideoStatusPillTone(status constants.TeacherIntroVideoStatus) PillTone {
 	switch status {
+	case constants.TeacherIntroVideoStatusProcessing:
+		return PillToneInfo
 	case constants.TeacherIntroVideoStatusSubmitted:
 		return PillToneWarning
 	case constants.TeacherIntroVideoStatusApproved:
@@ -126,6 +128,23 @@ func IntroVideoStatusPillTone(status constants.TeacherIntroVideoStatus) PillTone
 	case constants.TeacherIntroVideoStatusRejected:
 		return PillToneError
 	case constants.TeacherIntroVideoStatusDeleted:
+		return PillToneNeutral
+	default:
+		return PillToneNeutral
+	}
+}
+
+func IntroVideoCompressPresetPillTone(preset constants.IntroVideoCompressPreset) PillTone {
+	switch preset {
+	case constants.IntroVideoCompressPresetVeryLow:
+		return PillToneWarning
+	case constants.IntroVideoCompressPresetMedium:
+		return PillToneInfo
+	case constants.IntroVideoCompressPresetFine:
+		return PillTonePrimary
+	case constants.IntroVideoCompressPresetHigh:
+		return PillToneSuccess
+	case constants.IntroVideoCompressPresetOriginal:
 		return PillToneNeutral
 	default:
 		return PillToneNeutral

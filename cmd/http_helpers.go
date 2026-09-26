@@ -33,3 +33,9 @@ func writeJSON(w http.ResponseWriter) {
 func setHXRedirect(w http.ResponseWriter, path string) {
 	w.Header().Set(headerHXRedirect, utils.URL(path))
 }
+
+const hxTriggerBackgroundJobsRefresh = "backgroundJobsRefresh"
+
+func triggerBackgroundJobsRefresh(w http.ResponseWriter) {
+	w.Header().Set(headerHXTrigger, hxTriggerBackgroundJobsRefresh)
+}

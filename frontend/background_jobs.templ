@@ -1,0 +1,301 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/utils"
+)
+
+type PersistentJobPhase string
+
+const (
+	PersistentJobPhaseUpload     PersistentJobPhase = "upload"
+	PersistentJobPhaseProcessing PersistentJobPhase = "processing"
+)
+
+type PersistentJobView struct {
+	ID            string
+	Label         string
+	Detail        string
+	Phase         PersistentJobPhase
+	Percent       int
+	Indeterminate bool
+}
+
+type PersistentJobPanelData struct {
+	StorageKey string
+	Title      string
+	AriaLabel  string
+	Jobs       []PersistentJobView
+}
+
+func BuildPersistentJobPanel(jobs []PersistentJobView) PersistentJobPanelData {
+	return PersistentJobPanelData{
+		StorageKey: "background-jobs",
+		Title:      "Uploads in progress",
+		AriaLabel:  "Background uploads",
+		Jobs:       jobs,
+	}
+}
+
+templ PersistentBackgroundJobsPoll(partialURL string, panel PersistentJobPanelData) {
+	<div
+		id="persistentBackgroundJobsPoll"
+		hx-get={ partialURL }
+		hx-trigger="every 3s"
+		hx-swap={ HxSwapOuterHTML }
+	>
+		@PersistentJobPanel(panel)
+	</div>
+}
+
+templ PersistentPanelStack() {
+	@PersistentPanelStackStyles()
+	@PersistentPanelStyles()
+	@PersistentJobPanelStyles()
+	@PersistentPanelScript()
+	<div class="persistent-panel-stack">
+		@PersistentPanelSlot(PersistentPanelSlotParams{
+			HostID:     "persistentOnboardingHost",
+			PartialURL: utils.URL("/onboarding/persistent"),
+		})
+		<div id="persistentClientJobsHost" class="persistent-client-jobs-host"></div>
+		<div
+			id="persistentBackgroundJobsHost"
+			class="persistent-background-jobs-host"
+			hx-get={ utils.URL("/background-jobs/persistent") }
+			hx-trigger={ "load, " + hxTriggerBackgroundJobsRefresh }
+			hx-swap={ HxSwapInnerHTML }
+		></div>
+	</div>
+	@ScrBackgroundJobsClient()
+}
+
+const hxTriggerBackgroundJobsRefresh = "backgroundJobsRefresh from:body"
+
+templ PersistentPanelStackStyles() {
+	<style>
+		.persistent-panel-stack {
+			position: fixed;
+			bottom: var(--space-4);
+			right: var(--space-4);
+			z-index: 500;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-end;
+			gap: var(--space-3);
+			max-width: min(22rem, calc(100vw - 2 * var(--space-4)));
+			pointer-events: none;
+		}
+
+		.persistent-panel-stack:empty {
+			display: none;
+		}
+
+		.persistent-panel-stack > .persistent-panel-host,
+		.persistent-panel-stack > .persistent-client-jobs-host,
+		.persistent-panel-stack > .persistent-background-jobs-host,
+		.persistent-panel-stack > #persistentBackgroundJobsPoll {
+			pointer-events: auto;
+			width: 100%;
+		}
+
+		.persistent-client-jobs-host:empty,
+		.persistent-background-jobs-host:empty {
+			display: none;
+		}
+
+		@media (max-width: 640px) {
+			.persistent-panel-stack {
+				bottom: var(--space-3);
+				right: var(--space-3);
+				left: var(--space-3);
+				max-width: none;
+				align-items: stretch;
+			}
+		}
+	</style>
+}
+
+templ PersistentJobPanel(data PersistentJobPanelData) {
+	@PersistentJobPanelStyles()
+	<aside
+		class="persistent-panel persistent-job-panel"
+		data-persistent-panel
+		data-persistent-panel-key={ persistentPanelStorageKey(PersistentPanelData{StorageKey: data.StorageKey, Title: data.Title, AriaLabel: data.AriaLabel}) }
+		aria-label={ persistentPanelAriaLabel(PersistentPanelData{StorageKey: data.StorageKey, Title: data.Title, AriaLabel: data.AriaLabel}) }
+	>
+		<button
+			type="button"
+			class="persistent-panel-fab"
+			data-persistent-panel-expand
+			aria-label={ "Expand " + persistentPanelAriaLabel(PersistentPanelData{StorageKey: data.StorageKey, Title: data.Title, AriaLabel: data.AriaLabel}) }
+			hidden
+		>
+			@iconSVGAlertTriangle()
+		</button>
+		<div class="persistent-panel-body">
+			<div class="persistent-panel-header">
+				<h3 class="persistent-panel-title">{ data.Title }</h3>
+				<div class="persistent-panel-header-actions">
+					<button
+						type="button"
+						class="persistent-panel-minimize"
+						data-persistent-panel-minimize
+						aria-label={ "Minimize " + persistentPanelAriaLabel(PersistentPanelData{StorageKey: data.StorageKey, Title: data.Title, AriaLabel: data.AriaLabel}) }
+					>
+						@iconSVGMinimize()
+					</button>
+				</div>
+			</div>
+			if len(data.Jobs) > 0 {
+				<ul class="persistent-panel-list persistent-job-list">
+					for _, job := range data.Jobs {
+						<li class="persistent-panel-item persistent-job-item" data-job-id={ job.ID }>
+							<div class="persistent-panel-item-main">
+								<strong class="persistent-panel-item-label">{ job.Label }</strong>
+								if job.Detail != "" {
+									<p class="persistent-panel-item-detail">{ job.Detail }</p>
+								}
+								<div class="persistent-job-progress-track">
+									if job.Indeterminate {
+										<div class="persistent-job-progress-bar is-indeterminate" role="progressbar" aria-valuetext="Processing"></div>
+									} else {
+										<div
+											class="persistent-job-progress-bar"
+											role="progressbar"
+											aria-valuemin="0"
+											aria-valuemax="100"
+											aria-valuenow={ fmt.Sprintf("%d", job.Percent) }
+											style={ "width: " + fmt.Sprintf("%d", job.Percent) + "%" }
+										></div>
+									}
+								</div>
+								<p class="persistent-job-phase-label">{ persistentJobPhaseLabel(job) }</p>
+							</div>
+						</li>
+					}
+				</ul>
+			}
+		</div>
+	</aside>
+}
+
+func persistentJobPhaseLabel(job PersistentJobView) string {
+	switch job.Phase {
+	case PersistentJobPhaseUpload:
+		return "Uploading..."
+	case PersistentJobPhaseProcessing:
+		return "Processing..."
+	default:
+		return "Working..."
+	}
+}
+
+templ PersistentJobPanelStyles() {
+	<style>
+		.persistent-job-progress-track {
+			height: 0.625rem;
+			margin-top: var(--space-2);
+			border-radius: var(--radius-full);
+			background: var(--color-muted);
+			overflow: hidden;
+		}
+
+		.persistent-job-progress-bar {
+			height: 100%;
+			border-radius: var(--radius-full);
+			background: var(--color-primary);
+			transition: width 120ms linear;
+		}
+
+		.persistent-job-progress-bar.is-indeterminate {
+			width: 35%;
+			animation: persistentJobProgressIndeterminate 1.2s ease-in-out infinite;
+		}
+
+		@keyframes persistentJobProgressIndeterminate {
+			0% { transform: translateX(-120%); }
+			100% { transform: translateX(320%); }
+		}
+
+		.persistent-job-phase-label {
+			margin: var(--space-1) 0 0;
+			font-size: 0.75rem;
+			color: var(--color-muted-foreground);
+		}
+
+		.persistent-job-list {
+			margin: 0;
+		}
+	</style>
+}
+
+templ ScrBackgroundJobsClient() {
+	<script>
+		(function () {
+			if (window.ZionBackgroundJobs) return;
+
+			const clientHostId = 'persistentClientJobsHost';
+			const serverHostId = 'persistentBackgroundJobsHost';
+
+			function clientHost() {
+				return document.getElementById(clientHostId);
+			}
+
+			function serverHost() {
+				return document.getElementById(serverHostId);
+			}
+
+			function refreshServerJobs() {
+				const host = serverHost();
+				if (host && window.htmx) {
+					window.htmx.trigger(host, 'load');
+				}
+				document.body.dispatchEvent(new CustomEvent('backgroundJobsRefresh'));
+			}
+
+			function renderClientJob(job) {
+				const percent = Math.max(0, Math.min(100, job.percent || 0));
+				const indeterminate = !!job.indeterminate;
+				const barClass = indeterminate ? 'persistent-job-progress-bar is-indeterminate' : 'persistent-job-progress-bar';
+				const barAttrs = indeterminate
+					? 'role="progressbar" aria-valuetext="Processing"'
+					: 'role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(percent) + '" style="width:' + percent + '%"';
+				const phaseLabel = job.phase === 'upload' ? 'Uploading...' : 'Processing...';
+				return (
+					'<aside class="persistent-panel persistent-job-panel" data-client-job-panel data-job-id="' + (job.id || '') + '" aria-label="Background uploads">' +
+					'<div class="persistent-panel-body">' +
+					'<div class="persistent-panel-header"><h3 class="persistent-panel-title">Uploads in progress</h3></div>' +
+					'<ul class="persistent-panel-list persistent-job-list">' +
+					'<li class="persistent-panel-item persistent-job-item">' +
+					'<div class="persistent-panel-item-main">' +
+					'<strong class="persistent-panel-item-label">' + (job.label || 'Upload') + '</strong>' +
+					(job.detail ? '<p class="persistent-panel-item-detail">' + job.detail + '</p>' : '') +
+					'<div class="persistent-job-progress-track"><div class="' + barClass + '" ' + barAttrs + '></div></div>' +
+					'<p class="persistent-job-phase-label">' + phaseLabel + '</p>' +
+					'</div></li></ul></div></aside>'
+				);
+			}
+
+			window.ZionBackgroundJobs = {
+				registerClientJob: function (job) {
+					const host = clientHost();
+					if (!host || !job) return;
+					host.innerHTML = renderClientJob(job);
+				},
+				updateClientJob: function (job) {
+					window.ZionBackgroundJobs.registerClientJob(job);
+				},
+				clearClientJob: function () {
+					const host = clientHost();
+					if (host) host.innerHTML = '';
+				},
+				refreshServerJobs: refreshServerJobs
+			};
+
+			document.body.addEventListener('backgroundJobsRefresh', function () {
+				refreshServerJobs();
+			});
+		})();
+	</script>
+}

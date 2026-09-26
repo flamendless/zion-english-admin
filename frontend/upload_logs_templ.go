@@ -8,12 +8,12 @@ package frontend
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "strings"
 import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 type UploadLogData struct {
-	Logs           []SystemLogItem
+	Logs           []UploadLogItem
+	HideTeacher    bool
 	Query          string
 	Module         string
 	StartDate      string
@@ -30,42 +30,44 @@ type UploadLogData struct {
 	FilterPath     string
 }
 
-func uploadLogDetail(message string) string {
-	if strings.HasPrefix(message, constants.SystemLogUploadLogPrefix) {
-		return strings.TrimPrefix(message, constants.SystemLogUploadLogPrefix)
-	}
-	if strings.HasPrefix(message, constants.SystemLogUploadLegacyErrorPrefix) {
-		return "failed: " + strings.TrimPrefix(message, constants.SystemLogUploadLegacyErrorPrefix)
-	}
-	return message
+type UploadLogItem struct {
+	ID              string
+	Module          string
+	Outcome         constants.UploadLogOutcome
+	Kind            constants.UploadLogKind
+	Summary         string
+	Filename        string
+	FileSizeDisplay string
+	PresetDisplay   string
+	CreatedBy       string
+	CreatedAt       string
 }
 
-func uploadLogOutcomeLabel(message string) string {
-	detail := uploadLogDetail(message)
-	if strings.HasPrefix(detail, string(constants.SystemLogUploadOutcomeSucceeded)+":") {
+func uploadLogOutcomeLabel(outcome constants.UploadLogOutcome) string {
+	if outcome == constants.UploadLogOutcomeSucceeded {
 		return "Succeeded"
 	}
 	return "Failed"
 }
 
-func uploadLogOutcomeClass(message string) string {
-	if uploadLogOutcomeLabel(message) == "Succeeded" {
+func uploadLogOutcomeClass(outcome constants.UploadLogOutcome) string {
+	if outcome == constants.UploadLogOutcomeSucceeded {
 		return "success-cell"
 	}
 	return "error-cell"
 }
 
-func uploadLogSummary(message string) string {
-	detail := uploadLogDetail(message)
-	for _, prefix := range []string{
-		string(constants.SystemLogUploadOutcomeSucceeded) + ": ",
-		string(constants.SystemLogUploadOutcomeFailed) + ": ",
-	} {
-		if strings.HasPrefix(detail, prefix) {
-			return strings.TrimPrefix(detail, prefix)
-		}
+func uploadLogKindPillTone(kind constants.UploadLogKind) PillTone {
+	switch kind {
+	case constants.UploadLogKindIntroVideo:
+		return PillTonePrimary
+	case constants.UploadLogKindAvatar:
+		return PillToneInfo
+	case constants.UploadLogKindDocument:
+		return PillToneNeutral
+	default:
+		return PillToneNeutral
 	}
-	return detail
 }
 
 func UploadLogs(data UploadLogData) templ.Component {
@@ -89,20 +91,35 @@ func UploadLogs(data UploadLogData) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Upload Logs - Zion English Admin Tool</title><link rel=\"icon\" type=\"image/x-icon\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.HideTeacher {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<title>My Upload Logs - Zion English Admin Tool</title>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<title>Upload Logs - Zion English Admin Tool</title>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<link rel=\"icon\" type=\"image/x-icon\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 70, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 76, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -110,7 +127,7 @@ func UploadLogs(data UploadLogData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</head><body><div class=\"container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</head><body><div class=\"container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -118,64 +135,73 @@ func UploadLogs(data UploadLogData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = HubHeader("Upload Logs", "Teacher file uploads (intro video, documents, profile picture).", "", false).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
+		if data.HideTeacher {
+			templ_7745c5c3_Err = HubHeader("My Upload Logs", "Success and failure for your intro video, documents, and profile picture uploads.", "", false).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = HubHeader("Upload Logs", "Teacher file uploads (intro video, documents, profile picture).", "", false).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
 		templ_7745c5c3_Err = ListFilterForm(data.FilterPath, data.Query, "", "", "", "", "", data.Module, data.StartDate, data.EndDate, false, false, true, true, false, "", false, "", false, false, false, false, data.SortBy, data.SortOrder, ListSortKindUploadLog, false, "", "", "").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(data.Logs) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"table-wrapper\"><table id=\"uploadLogsTable\" class=\"table-stack-mobile\"><thead><tr><th>ID</th><th>Module</th><th>Status</th><th>Details</th>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"table-wrapper\"><table id=\"uploadLogsTable\" class=\"table-stack-mobile\"><thead><tr><th>ID</th><th>Module</th><th>Status</th><th>Type</th><th>Details</th>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = AdminOnlyTableHeader("Teacher").Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
+			if !data.HideTeacher {
+				templ_7745c5c3_Err = AdminOnlyTableHeader("Teacher").Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<th>Created At</th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<th>Created At</th><th>Actions</th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, log := range data.Logs {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<tr><td data-label=\"ID\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<tr><td data-label=\"ID\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var3 string
 				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(log.ID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 96, Col: 37}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 110, Col: 37}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</td><td data-label=\"Module\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</td><td data-label=\"Module\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(log.Module)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 97, Col: 45}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 111, Col: 45}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</td>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</td>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var5 = []any{uploadLogOutcomeClass(log.Message)}
+				var templ_7745c5c3_Var5 = []any{uploadLogOutcomeClass(log.Outcome)}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var5...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<td class=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<td class=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -188,64 +214,99 @@ func UploadLogs(data UploadLogData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" data-label=\"Status\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" data-label=\"Status\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var7 string
-				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(uploadLogOutcomeLabel(log.Message))
+				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(uploadLogOutcomeLabel(log.Outcome))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 98, Col: 114}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 112, Col: 114}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</td><td data-label=\"Details\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</td><td data-label=\"Type\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = Pill(log.Kind.Label(), uploadLogKindPillTone(log.Kind)).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</td><td data-label=\"Details\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var8 string
-				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(uploadLogSummary(log.Message))
+				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(log.Summary)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 99, Col: 65}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 116, Col: 47}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</td><td data-label=\"Teacher\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</td>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var9 string
-				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(log.CreatedBy))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 100, Col: 66}
+				if !data.HideTeacher {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<td data-label=\"Teacher\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var9 string
+					templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(log.CreatedBy))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 118, Col: 67}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</td>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</td><td class=\"date-cell\" data-label=\"Created\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<td class=\"date-cell\" data-label=\"Created\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(log.CreatedAt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 101, Col: 67}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/upload_logs.templ`, Line: 120, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</td><td data-label=\"Actions\"><div class=\"table-actions upload-log-row-actions\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = IconActionButton("View", IconKindView, templ.Attributes{
+					"type":                     "button",
+					"data-upload-log-view":     "true",
+					"data-upload-log-filename": log.Filename,
+					"data-upload-log-filesize": log.FileSizeDisplay,
+					"data-upload-log-preset":   log.PresetDisplay,
+					"data-upload-log-type":     log.Kind.Label(),
+					"data-upload-log-status":   uploadLogOutcomeLabel(log.Outcome),
+					"data-upload-log-summary":  log.Summary,
+				}).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div></td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</tbody></table></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</tbody></table></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -254,12 +315,49 @@ func UploadLogs(data UploadLogData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"empty-state\"><p>No upload logs recorded yet.</p></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<div class=\"empty-state\"><p>No upload logs recorded yet.</p></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = UploadLogDetailModal().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</body></html>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func UploadLogDetailModal() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var11 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var11 == nil {
+			templ_7745c5c3_Var11 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<div class=\"modal-overlay\" id=\"uploadLogDetailModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"uploadLogDetailModalTitle\"><div class=\"modal-header\"><h2 id=\"uploadLogDetailModalTitle\">Upload details</h2><button type=\"button\" class=\"modal-close upload-log-detail-modal-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><div class=\"modal-body\"><dl class=\"upload-log-detail-meta\"><div><dt>Type</dt><dd id=\"uploadLogDetailType\">-</dd></div><div><dt>Status</dt><dd id=\"uploadLogDetailStatus\">-</dd></div><div><dt>Filename</dt><dd id=\"uploadLogDetailFilename\">-</dd></div><div><dt>File size</dt><dd id=\"uploadLogDetailFilesize\">-</dd></div><div><dt>Preset</dt><dd id=\"uploadLogDetailPreset\">-</dd></div></dl><div class=\"upload-log-detail-summary\"><span class=\"upload-log-detail-summary-label\">Details</span><p id=\"uploadLogDetailSummary\" class=\"upload-log-detail-summary-text\">-</p></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary upload-log-detail-modal-close\">Close</button></div></div></div><style>\r\n\t\t.upload-log-row-actions [data-tooltip]::after {\r\n\t\t\tleft: auto;\r\n\t\t\tright: 0;\r\n\t\t\ttransform: none;\r\n\t\t}\r\n\r\n\t\t.upload-log-detail-meta {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: repeat(auto-fit, minmax(140px, 1fr));\r\n\t\t\tgap: var(--space-3) var(--space-4);\r\n\t\t\tmargin: 0;\r\n\t\t}\r\n\r\n\t\t.upload-log-detail-meta dt {\r\n\t\t\tmargin: 0 0 var(--space-1);\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.upload-log-detail-meta dd {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tword-break: break-word;\r\n\t\t}\r\n\r\n\t\t.upload-log-detail-summary {\r\n\t\t\tmargin-top: var(--space-4);\r\n\t\t\tpadding-top: var(--space-4);\r\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.upload-log-detail-summary-label {\r\n\t\t\tdisplay: block;\r\n\t\t\tmargin-bottom: var(--space-2);\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.upload-log-detail-summary-text {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tword-break: break-word;\r\n\t\t}\r\n\r\n\t\t.upload-log-row-actions .icon-action-btn {\r\n\t\t\tmargin-top: 0;\r\n\t\t}\r\n\t</style><script>\r\n\t\t(function () {\r\n\t\t\tconst modal = document.getElementById('uploadLogDetailModal');\r\n\t\t\tconst typeEl = document.getElementById('uploadLogDetailType');\r\n\t\t\tconst statusEl = document.getElementById('uploadLogDetailStatus');\r\n\t\t\tconst filenameEl = document.getElementById('uploadLogDetailFilename');\r\n\t\t\tconst filesizeEl = document.getElementById('uploadLogDetailFilesize');\r\n\t\t\tconst presetEl = document.getElementById('uploadLogDetailPreset');\r\n\t\t\tconst summaryEl = document.getElementById('uploadLogDetailSummary');\r\n\t\t\tif (!modal || !typeEl || !statusEl || !filenameEl || !filesizeEl || !presetEl || !summaryEl) return;\r\n\r\n\t\t\tfunction setText(el, value) {\r\n\t\t\t\tel.textContent = value && value.trim() ? value.trim() : '-';\r\n\t\t\t}\r\n\r\n\t\t\twindow.openUploadLogDetailModal = function (btn) {\r\n\t\t\t\tif (!btn) return;\r\n\t\t\t\tsetText(typeEl, btn.getAttribute('data-upload-log-type'));\r\n\t\t\t\tsetText(statusEl, btn.getAttribute('data-upload-log-status'));\r\n\t\t\t\tsetText(filenameEl, btn.getAttribute('data-upload-log-filename'));\r\n\t\t\t\tsetText(filesizeEl, btn.getAttribute('data-upload-log-filesize'));\r\n\t\t\t\tsetText(presetEl, btn.getAttribute('data-upload-log-preset'));\r\n\t\t\t\tsetText(summaryEl, btn.getAttribute('data-upload-log-summary'));\r\n\t\t\t\tmodal.hidden = false;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t};\r\n\r\n\t\t\twindow.closeUploadLogDetailModal = function () {\r\n\t\t\t\tmodal.hidden = true;\r\n\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t};\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tconst viewBtn = e.target.closest('[data-upload-log-view]');\r\n\t\t\t\tif (viewBtn) {\r\n\t\t\t\t\twindow.openUploadLogDetailModal(viewBtn);\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (e.target.closest('.upload-log-detail-modal-close')) {\r\n\t\t\t\t\twindow.closeUploadLogDetailModal();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (e.target === modal) {\r\n\t\t\t\t\twindow.closeUploadLogDetailModal();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key === 'Escape' && modal && !modal.hidden) {\r\n\t\t\t\t\twindow.closeUploadLogDetailModal();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

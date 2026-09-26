@@ -941,8 +941,8 @@ func GuideIntroVideos() templ.Component {
 				"Scroll to the Introduction video section (visible when intro video uploads are enabled for your role).",
 				"Keep Source set to Upload, choose your video file, and review the preview (name, size, duration, and dimensions).",
 				"Click Submit intro video and confirm in the dialog.",
-				"Wait for the upload progress bar to finish, then for processing to complete before the page redirects.",
-				"A success message confirms your submission is pending review.",
+				"Upload progress appears in the panel at the bottom-right of the screen. You may leave the page while processing continues.",
+				"You will get an in-app notification when the video is ready for administrator review.",
 			},
 			false,
 		).Render(ctx, templ_7745c5c3_Buffer)
@@ -969,13 +969,14 @@ func GuideIntroVideos() templ.Component {
 			"upload-requirements",
 			"Upload requirements",
 			utils.URL("/profile"),
-			"Uploaded files are compressed, stored as MP4, and validated before review.",
+			"Uploaded files are validated before review. Larger uploads are compressed to MP4; smaller uploads are stored as uploaded.",
 			[]string{
 				"Accepted formats: MP4, WebM, MOV, AVI, MKV, OGV, M4V, or 3GP.",
 				fmt.Sprintf("Maximum file size: %d MB.", constants.MaxIntroVideoSizeMB()),
 				fmt.Sprintf("Maximum duration: %s.", constants.MaxIntroVideoDurationLabel()),
+				fmt.Sprintf("Files under %d MB are not re-encoded; larger files are compressed to MP4 in the background.", constants.IntroVideoCompressMinSizeMB()),
 				"If the preview shows a duration warning, choose a shorter clip before submitting.",
-				"After the upload bar reaches 100%, processing may take a moment while the server compresses and validates the video.",
+				"After upload, the server validates the video in the background. Status shows as Processing on My Profile until it is ready.",
 			},
 			false,
 		).Render(ctx, templ_7745c5c3_Buffer)
@@ -991,7 +992,7 @@ func GuideIntroVideos() templ.Component {
 				"For Google Drive, set sharing to Anyone with the link.",
 				"For YouTube, set the video to Unlisted (not Private).",
 				"Test the link in a private browser window before submitting.",
-				"Submissions are blocked while you already have a Submitted or Approved intro video on file.",
+				"Submissions are blocked while you already have a Processing, Submitted, or Approved intro video on file.",
 			},
 			false,
 		).Render(ctx, templ_7745c5c3_Buffer)
@@ -1071,7 +1072,7 @@ func GuideIntroVideos() templ.Component {
 		var templ_7745c5c3_Var27 templ.SafeURL
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/guides"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 543, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 544, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
@@ -1129,7 +1130,7 @@ func GuidePayments() templ.Component {
 		var templ_7745c5c3_Var29 templ.SafeURL
 		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 561, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 562, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 		if templ_7745c5c3_Err != nil {
@@ -1162,7 +1163,7 @@ func GuidePayments() templ.Component {
 		var templ_7745c5c3_Var30 templ.SafeURL
 		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/guides"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 570, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 571, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 		if templ_7745c5c3_Err != nil {
@@ -1269,7 +1270,7 @@ func GuidePayments() templ.Component {
 		var templ_7745c5c3_Var31 templ.SafeURL
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/guides"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 654, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 655, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 		if templ_7745c5c3_Err != nil {
@@ -1327,7 +1328,7 @@ func GuideConnectZoom() templ.Component {
 		var templ_7745c5c3_Var33 templ.SafeURL
 		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 672, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 673, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 		if templ_7745c5c3_Err != nil {
@@ -1360,7 +1361,7 @@ func GuideConnectZoom() templ.Component {
 		var templ_7745c5c3_Var34 templ.SafeURL
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/guides"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 681, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 682, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {
@@ -1389,7 +1390,7 @@ func GuideConnectZoom() templ.Component {
 		var templ_7745c5c3_Var35 templ.SafeURL
 		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/guides"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 699, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 700, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 		if templ_7745c5c3_Err != nil {
@@ -1648,7 +1649,7 @@ func GuideConnectGoogleCalendar() templ.Component {
 		var templ_7745c5c3_Var40 templ.SafeURL
 		templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 831, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 832, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 		if templ_7745c5c3_Err != nil {
@@ -1681,7 +1682,7 @@ func GuideConnectGoogleCalendar() templ.Component {
 		var templ_7745c5c3_Var41 templ.SafeURL
 		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/guides"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 840, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 841, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 		if templ_7745c5c3_Err != nil {
@@ -1710,7 +1711,7 @@ func GuideConnectGoogleCalendar() templ.Component {
 		var templ_7745c5c3_Var42 templ.SafeURL
 		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/guides"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 858, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 859, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
 		if templ_7745c5c3_Err != nil {
@@ -1957,7 +1958,7 @@ func GuideFAQ() templ.Component {
 		var templ_7745c5c3_Var47 templ.SafeURL
 		templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 981, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 982, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var47))
 		if templ_7745c5c3_Err != nil {
@@ -1990,7 +1991,7 @@ func GuideFAQ() templ.Component {
 		var templ_7745c5c3_Var48 templ.SafeURL
 		templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/guides"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 990, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 991, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var48))
 		if templ_7745c5c3_Err != nil {
@@ -2019,7 +2020,7 @@ func GuideFAQ() templ.Component {
 		var templ_7745c5c3_Var49 templ.SafeURL
 		templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/guides"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1008, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1009, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var49))
 		if templ_7745c5c3_Err != nil {
@@ -2285,7 +2286,7 @@ func GuideFAQItem(anchor string, question string, answer string, bullets []strin
 		var templ_7745c5c3_Var54 string
 		templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.ResolveAttributeValue(anchor)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1135, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1136, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var54)
 		if templ_7745c5c3_Err != nil {
@@ -2298,7 +2299,7 @@ func GuideFAQItem(anchor string, question string, answer string, bullets []strin
 		var templ_7745c5c3_Var55 templ.SafeURL
 		templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.JoinURLErrs("#" + anchor)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1138, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1139, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var55))
 		if templ_7745c5c3_Err != nil {
@@ -2311,7 +2312,7 @@ func GuideFAQItem(anchor string, question string, answer string, bullets []strin
 		var templ_7745c5c3_Var56 string
 		templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.ResolveAttributeValue("Link to " + question)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1140, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1141, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var56)
 		if templ_7745c5c3_Err != nil {
@@ -2324,7 +2325,7 @@ func GuideFAQItem(anchor string, question string, answer string, bullets []strin
 		var templ_7745c5c3_Var57 string
 		templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.JoinStringErrs(question)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1142, Col: 13}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1143, Col: 13}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var57))
 		if templ_7745c5c3_Err != nil {
@@ -2337,7 +2338,7 @@ func GuideFAQItem(anchor string, question string, answer string, bullets []strin
 		var templ_7745c5c3_Var58 string
 		templ_7745c5c3_Var58, templ_7745c5c3_Err = templ.JoinStringErrs(answer)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1144, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1145, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var58))
 		if templ_7745c5c3_Err != nil {
@@ -2360,7 +2361,7 @@ func GuideFAQItem(anchor string, question string, answer string, bullets []strin
 				var templ_7745c5c3_Var59 string
 				templ_7745c5c3_Var59, templ_7745c5c3_Err = templ.JoinStringErrs(bullet)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1148, Col: 17}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1149, Col: 17}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var59))
 				if templ_7745c5c3_Err != nil {
@@ -2441,7 +2442,7 @@ func GuideSection(anchor string, title string, href string, summary string, step
 		var templ_7745c5c3_Var62 string
 		templ_7745c5c3_Var62, templ_7745c5c3_Err = templ.ResolveAttributeValue(anchor)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1172, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1173, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var62)
 		if templ_7745c5c3_Err != nil {
@@ -2454,7 +2455,7 @@ func GuideSection(anchor string, title string, href string, summary string, step
 		var templ_7745c5c3_Var63 templ.SafeURL
 		templ_7745c5c3_Var63, templ_7745c5c3_Err = templ.JoinURLErrs("#" + anchor)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1175, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1176, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var63))
 		if templ_7745c5c3_Err != nil {
@@ -2467,7 +2468,7 @@ func GuideSection(anchor string, title string, href string, summary string, step
 		var templ_7745c5c3_Var64 string
 		templ_7745c5c3_Var64, templ_7745c5c3_Err = templ.ResolveAttributeValue("Link to " + title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1177, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1178, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var64)
 		if templ_7745c5c3_Err != nil {
@@ -2480,7 +2481,7 @@ func GuideSection(anchor string, title string, href string, summary string, step
 		var templ_7745c5c3_Var65 templ.SafeURL
 		templ_7745c5c3_Var65, templ_7745c5c3_Err = templ.JoinURLErrs(href)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1181, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1182, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var65))
 		if templ_7745c5c3_Err != nil {
@@ -2493,7 +2494,7 @@ func GuideSection(anchor string, title string, href string, summary string, step
 		var templ_7745c5c3_Var66 string
 		templ_7745c5c3_Var66, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1186, Col: 12}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1187, Col: 12}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var66))
 		if templ_7745c5c3_Err != nil {
@@ -2524,7 +2525,7 @@ func GuideSection(anchor string, title string, href string, summary string, step
 		var templ_7745c5c3_Var67 string
 		templ_7745c5c3_Var67, templ_7745c5c3_Err = templ.JoinStringErrs(summary)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1196, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1197, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var67))
 		if templ_7745c5c3_Err != nil {
@@ -2542,7 +2543,7 @@ func GuideSection(anchor string, title string, href string, summary string, step
 			var templ_7745c5c3_Var68 string
 			templ_7745c5c3_Var68, templ_7745c5c3_Err = templ.JoinStringErrs(step)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1199, Col: 14}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/guides.templ`, Line: 1200, Col: 14}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var68))
 			if templ_7745c5c3_Err != nil {

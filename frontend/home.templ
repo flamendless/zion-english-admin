@@ -185,10 +185,7 @@ templ Home(data DashboardData) {
 				@PaymentReceiptModal(data.PaymentReceipt)
 			}
 			if data.Role == auth.RoleTeacher {
-				@PersistentPanelSlot(PersistentPanelSlotParams{
-					HostID:     "persistentOnboardingHost",
-					PartialURL: utils.URL("/onboarding/persistent"),
-				})
+				@PersistentPanelStack()
 			}
 		</div>
 	</body>

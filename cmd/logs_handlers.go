@@ -183,47 +183,107 @@ func getUploadLogsParams(f logFilters, limit, offset int64) queries.GetUploadLog
 	}
 }
 
+func countUploadLogsByTeacherParams(teacherID int64, f logFilters) queries.CountUploadLogsByCreatedByFilteredParams {
+	return queries.CountUploadLogsByCreatedByFilteredParams{
+		CreatedBy:   sql.NullInt64{Int64: teacherID, Valid: true},
+		Column2:     f.module,
+		Module:      f.module,
+		Column4:     f.message,
+		Column5:     sql.NullString{String: f.message, Valid: true},
+		Column6:     f.startDate,
+		CreatedAt:   f.startDate,
+		Column8:     f.endDate,
+		CreatedAt_2: f.endDate,
+	}
+}
+
+func getUploadLogsByTeacherParams(teacherID int64, f logFilters, limit, offset int64) queries.GetUploadLogsByCreatedByFilteredParams {
+	return queries.GetUploadLogsByCreatedByFilteredParams{
+		CreatedBy:   sql.NullInt64{Int64: teacherID, Valid: true},
+		Column2:     f.module,
+		Module:      f.module,
+		Column4:     f.message,
+		Column5:     sql.NullString{String: f.message, Valid: true},
+		Column6:     f.startDate,
+		CreatedAt:   f.startDate,
+		Column8:     f.endDate,
+		CreatedAt_2: f.endDate,
+		Limit:       limit,
+		Offset:      offset,
+	}
+}
+
+func uploadLogItemsFromAllRows(rows []queries.GetUploadLogsFilteredRow) []frontend.UploadLogItem {
+	viewLogs := make([]frontend.UploadLogItem, len(rows))
+	for i, l := range rows {
+		viewLogs[i] = mapUploadLogItemFromFiltered(l)
+	}
+	return viewLogs
+}
+
+func uploadLogItemsFromTeacherRows(rows []queries.GetUploadLogsByCreatedByFilteredRow) []frontend.UploadLogItem {
+	viewLogs := make([]frontend.UploadLogItem, len(rows))
+	for i, l := range rows {
+		viewLogs[i] = mapUploadLogItemFromTeacherFiltered(l)
+	}
+	return viewLogs
+}
+
 func handleUploadLogs(w http.ResponseWriter, r *http.Request) {
 	if !requireMethod(w, r, http.MethodGet) {
 		return
 	}
 
 	ctx := r.Context()
+	role := auth.GetRole(ctx)
 	sort := parseListSort(r, frontend.ListSortKindUploadLog)
 	page := utils.ParsePageQuery(r)
 	filters := parseLogFilters(r)
+	hideTeacher := role == auth.RoleTeacher
 
-	countParams := countUploadLogsParams(filters)
-	total, err := dbRO.GetQueries().CountUploadLogsFiltered(ctx, countParams)
-	if err != nil {
-		HttpError(w, fmt.Sprintf("Failed to count upload logs: %v", err), http.StatusInternalServerError)
-		return
-	}
-	page.Total = total
+	var viewLogs []frontend.UploadLogItem
 
-	allRows, err := dbRO.GetQueries().GetUploadLogsFiltered(ctx, getUploadLogsParams(filters, total, 0))
-	if err != nil {
-		HttpError(w, fmt.Sprintf("Failed to fetch upload logs: %v", err), http.StatusInternalServerError)
-		return
-	}
-	sortUploadLogRows(allRows, sort)
-	rows := paginateSlice(allRows, page)
-
-	viewLogs := make([]frontend.SystemLogItem, len(rows))
-	for i, l := range rows {
-		viewLogs[i] = frontend.SystemLogItem{
-			ID:        strconv.FormatInt(l.ID, 10),
-			Module:    l.Module,
-			Message:   l.Message,
-			CreatedBy: l.CreatedByName,
-			CreatedAt: l.CreatedAt,
+	if role == auth.RoleTeacher {
+		user := auth.GetUser(ctx)
+		countParams := countUploadLogsByTeacherParams(user.ID, filters)
+		total, err := dbRO.GetQueries().CountUploadLogsByCreatedByFiltered(ctx, countParams)
+		if err != nil {
+			HttpError(w, fmt.Sprintf("Failed to count upload logs: %v", err), http.StatusInternalServerError)
+			return
 		}
+		page.Total = total
+		allRows, err := dbRO.GetQueries().GetUploadLogsByCreatedByFiltered(ctx, getUploadLogsByTeacherParams(user.ID, filters, total, 0))
+		if err != nil {
+			HttpError(w, fmt.Sprintf("Failed to fetch upload logs: %v", err), http.StatusInternalServerError)
+			return
+		}
+		sortUploadLogByUserRows(allRows, sort)
+		rows := paginateSlice(allRows, page)
+		viewLogs = uploadLogItemsFromTeacherRows(rows)
+	} else {
+		countParams := countUploadLogsParams(filters)
+		total, err := dbRO.GetQueries().CountUploadLogsFiltered(ctx, countParams)
+		if err != nil {
+			HttpError(w, fmt.Sprintf("Failed to count upload logs: %v", err), http.StatusInternalServerError)
+			return
+		}
+		page.Total = total
+
+		allRows, err := dbRO.GetQueries().GetUploadLogsFiltered(ctx, getUploadLogsParams(filters, total, 0))
+		if err != nil {
+			HttpError(w, fmt.Sprintf("Failed to fetch upload logs: %v", err), http.StatusInternalServerError)
+			return
+		}
+		sortUploadLogRows(allRows, sort)
+		rows := paginateSlice(allRows, page)
+		viewLogs = uploadLogItemsFromAllRows(rows)
 	}
 
 	params := listQueryParamsWithSort(r, frontend.ListSortKindUploadLog)
 	writeHTML(w)
 	frontend.UploadLogs(frontend.UploadLogData{
 		Logs:           viewLogs,
+		HideTeacher:    hideTeacher,
 		Query:          filters.message,
 		Module:         filters.module,
 		StartDate:      filters.startDate,

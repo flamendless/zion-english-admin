@@ -85,46 +85,6 @@ func (q *Queries) CountLogsByCreatedByFiltered(ctx context.Context, arg CountLog
 	return count, err
 }
 
-const countUploadLogsFiltered = `-- name: CountUploadLogsFiltered :one
-SELECT COUNT(*) as count
-FROM tbl_logs l
-WHERE (
-		l.message LIKE 'upload log:%'
-		OR l.message LIKE 'upload error:%'
-	)
-	AND (? = '' OR l.module = ?)
-	AND (? = '' OR l.message LIKE '%' || ? || '%')
-	AND (? = '' OR l.created_at >= ?)
-	AND (? = '' OR l.created_at <= ?)
-`
-
-type CountUploadLogsFilteredParams struct {
-	Column1     interface{}
-	Module      string
-	Column3     interface{}
-	Column4     sql.NullString
-	Column5     interface{}
-	CreatedAt   string
-	Column7     interface{}
-	CreatedAt_2 string
-}
-
-func (q *Queries) CountUploadLogsFiltered(ctx context.Context, arg CountUploadLogsFilteredParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, countUploadLogsFiltered,
-		arg.Column1,
-		arg.Module,
-		arg.Column3,
-		arg.Column4,
-		arg.Column5,
-		arg.CreatedAt,
-		arg.Column7,
-		arg.CreatedAt_2,
-	)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
-
 const getAllLogs = `-- name: GetAllLogs :many
 SELECT l.id, l.module, l.message, l.created_by, l.created_at,
 	COALESCE(trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END), l.created_by_name, '') as created_by_name
@@ -354,86 +314,6 @@ func (q *Queries) GetLogsByCreatedByFiltered(ctx context.Context, arg GetLogsByC
 	var items []GetLogsByCreatedByFilteredRow
 	for rows.Next() {
 		var i GetLogsByCreatedByFilteredRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.Module,
-			&i.Message,
-			&i.CreatedBy,
-			&i.CreatedAt,
-			&i.CreatedByName,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getUploadLogsFiltered = `-- name: GetUploadLogsFiltered :many
-SELECT l.id, l.module, l.message, l.created_by, l.created_at,
-	COALESCE(trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END), l.created_by_name, '') as created_by_name
-FROM tbl_logs l
-LEFT JOIN tbl_teachers t ON l.created_by = t.id
-WHERE (
-		l.message LIKE 'upload log:%'
-		OR l.message LIKE 'upload error:%'
-	)
-	AND (? = '' OR l.module = ?)
-	AND (? = '' OR l.message LIKE '%' || ? || '%')
-	AND (? = '' OR l.created_at >= ?)
-	AND (? = '' OR l.created_at <= ?)
-ORDER BY l.created_at DESC
-LIMIT ? OFFSET ?
-`
-
-type GetUploadLogsFilteredParams struct {
-	Column1     interface{}
-	Module      string
-	Column3     interface{}
-	Column4     sql.NullString
-	Column5     interface{}
-	CreatedAt   string
-	Column7     interface{}
-	CreatedAt_2 string
-	Limit       int64
-	Offset      int64
-}
-
-type GetUploadLogsFilteredRow struct {
-	ID            int64
-	Module        string
-	Message       string
-	CreatedBy     sql.NullInt64
-	CreatedAt     string
-	CreatedByName string
-}
-
-func (q *Queries) GetUploadLogsFiltered(ctx context.Context, arg GetUploadLogsFilteredParams) ([]GetUploadLogsFilteredRow, error) {
-	rows, err := q.db.QueryContext(ctx, getUploadLogsFiltered,
-		arg.Column1,
-		arg.Module,
-		arg.Column3,
-		arg.Column4,
-		arg.Column5,
-		arg.CreatedAt,
-		arg.Column7,
-		arg.CreatedAt_2,
-		arg.Limit,
-		arg.Offset,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetUploadLogsFilteredRow
-	for rows.Next() {
-		var i GetUploadLogsFilteredRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Module,

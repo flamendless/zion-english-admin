@@ -8,7 +8,7 @@ import (
 	"zion-english/internal/constants"
 )
 
-func TestProcessUploadSkipCompressReturnsOriginalFile(t *testing.T) {
+func TestProcessUploadSkipsCompressWhenFileSmall(t *testing.T) {
 	if !FfmpegAvailable() || !FfprobeAvailable() {
 		t.Skip("ffmpeg or ffprobe unavailable")
 	}
@@ -47,9 +47,8 @@ func TestProcessUploadSkipCompressReturnsOriginalFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	processed, err := ProcessUpload(context.Background(), file, "intro.mp4", info.Size(), constants.IntroVideoEncodeSettings{
-		SkipCompress: true,
-	})
+	settings := constants.IntroVideoEncodeSettingsForPreset(constants.IntroVideoCompressPresetFine)
+	processed, err := ProcessUpload(context.Background(), file, "intro.mp4", info.Size(), settings)
 	if err != nil {
 		t.Fatalf("ProcessUpload() error: %v", err)
 	}

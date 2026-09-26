@@ -271,6 +271,29 @@ func sortUploadLogRows(rows []queries.GetUploadLogsFilteredRow, sort utils.SortP
 			return utils.CompareInt64(a.ID, b.ID)
 		case "module":
 			return utils.CompareStrings(a.Module, b.Module)
+		case "kind":
+			return utils.CompareStrings(a.Kind, b.Kind)
+		case "outcome":
+			return utils.CompareStrings(a.Outcome, b.Outcome)
+		case "created_at":
+			return utils.CompareStrings(a.CreatedAt, b.CreatedAt)
+		default:
+			return utils.CompareStrings(a.CreatedAt, b.CreatedAt)
+		}
+	})
+}
+
+func sortUploadLogByUserRows(rows []queries.GetUploadLogsByCreatedByFilteredRow, sort utils.SortParams) {
+	utils.SortSlice(rows, sort.Order, func(a, b queries.GetUploadLogsByCreatedByFilteredRow) int {
+		switch sort.By {
+		case "id":
+			return utils.CompareInt64(a.ID, b.ID)
+		case "module":
+			return utils.CompareStrings(a.Module, b.Module)
+		case "kind":
+			return utils.CompareStrings(a.Kind, b.Kind)
+		case "outcome":
+			return utils.CompareStrings(a.Outcome, b.Outcome)
 		case "created_at":
 			return utils.CompareStrings(a.CreatedAt, b.CreatedAt)
 		default:

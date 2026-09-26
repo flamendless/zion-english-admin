@@ -29,8 +29,47 @@ func insertAuditLogAs(ctx context.Context, actor auth.User, module, message stri
 	}
 }
 
-func insertUploadLog(ctx context.Context, actor auth.User, module string, outcome constants.SystemLogUploadOutcome, summary string) {
-	insertAuditLogAs(ctx, actor, module, constants.SystemLogUploadLogPrefix+string(outcome)+": "+summary)
+type uploadLogEntry struct {
+	Module         string
+	Outcome        constants.UploadLogOutcome
+	Kind           constants.UploadLogKind
+	Summary        string
+	Filename       string
+	FileSize       int64
+	FileSizeValid  bool
+	CompressPreset string
+}
+
+func insertUploadLog(ctx context.Context, actor auth.User, entry uploadLogEntry) {
+	var createdBy sql.NullInt64
+	if actor.ID > 0 {
+		createdBy = sql.NullInt64{Int64: actor.ID, Valid: true}
+	}
+	var filename sql.NullString
+	if entry.Filename != "" {
+		filename = sql.NullString{String: entry.Filename, Valid: true}
+	}
+	var fileSize sql.NullInt64
+	if entry.FileSizeValid {
+		fileSize = sql.NullInt64{Int64: entry.FileSize, Valid: true}
+	}
+	var compressPreset sql.NullString
+	if entry.CompressPreset != "" {
+		compressPreset = sql.NullString{String: entry.CompressPreset, Valid: true}
+	}
+	if err := dbRW.GetQueries().InsertUploadLog(ctx, queries.InsertUploadLogParams{
+		Module:         entry.Module,
+		Outcome:        string(entry.Outcome),
+		Kind:           string(entry.Kind),
+		Summary:        entry.Summary,
+		Filename:       filename,
+		FileSize:       fileSize,
+		CompressPreset: compressPreset,
+		CreatedBy:      createdBy,
+		CreatedByName:  sql.NullString{String: actor.Name, Valid: actor.Name != ""},
+	}); err != nil {
+		logs.Log().Info("upload logs", zap.Error(err))
+	}
 }
 
 func auditStr(v sql.NullString) string {

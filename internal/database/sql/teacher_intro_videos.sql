@@ -6,10 +6,26 @@ INSERT INTO tbl_teacher_intro_videos (
 	mime_type,
 	file_size,
 	original_file_size,
+	compress_preset,
 	url,
 	source_type,
 	status
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+-- name: InsertTeacherIntroVideoReturningID :one
+INSERT INTO tbl_teacher_intro_videos (
+	teacher_id,
+	original_filename,
+	stored_filename,
+	mime_type,
+	file_size,
+	original_file_size,
+	compress_preset,
+	url,
+	source_type,
+	status
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+RETURNING id;
 
 -- name: GetTeacherIntroVideoByID :one
 SELECT
@@ -20,6 +36,7 @@ SELECT
 	mime_type,
 	file_size,
 	original_file_size,
+	compress_preset,
 	url,
 	source_type,
 	status,
@@ -40,6 +57,7 @@ SELECT
 	mime_type,
 	file_size,
 	original_file_size,
+	compress_preset,
 	url,
 	source_type,
 	status,
@@ -58,7 +76,44 @@ LIMIT 1;
 SELECT COUNT(*) AS count
 FROM tbl_teacher_intro_videos
 WHERE teacher_id = ?
-	AND status IN ('submitted', 'approved');
+	AND status IN ('processing', 'submitted', 'approved');
+
+-- name: GetProcessingTeacherIntroVideosByTeacherID :many
+SELECT
+	id,
+	teacher_id,
+	original_filename,
+	stored_filename,
+	mime_type,
+	file_size,
+	original_file_size,
+	compress_preset,
+	url,
+	source_type,
+	status,
+	created_at,
+	reviewed_at,
+	reviewed_by,
+	deleted_at,
+	reject_reason
+FROM tbl_teacher_intro_videos
+WHERE teacher_id = ?
+	AND status = 'processing'
+ORDER BY created_at DESC;
+
+-- name: CompleteTeacherIntroVideoUpload :exec
+UPDATE tbl_teacher_intro_videos
+SET stored_filename = ?,
+	mime_type = ?,
+	file_size = ?,
+	original_file_size = ?,
+	status = 'submitted'
+WHERE id = ?
+	AND status = 'processing';
+
+-- name: DeleteTeacherIntroVideoByID :exec
+DELETE FROM tbl_teacher_intro_videos
+WHERE id = ?;
 
 -- name: UpdateTeacherIntroVideoStatus :exec
 UPDATE tbl_teacher_intro_videos
@@ -92,6 +147,7 @@ SELECT
 	v.mime_type,
 	v.file_size,
 	v.original_file_size,
+	v.compress_preset,
 	v.url,
 	v.source_type,
 	v.status,
@@ -131,6 +187,7 @@ SELECT
 	mime_type,
 	file_size,
 	original_file_size,
+	compress_preset,
 	url,
 	source_type,
 	status,

@@ -55,34 +55,6 @@ WHERE l.created_by = ?
 ORDER BY l.created_at DESC
 LIMIT ? OFFSET ?;
 
--- name: CountUploadLogsFiltered :one
-SELECT COUNT(*) as count
-FROM tbl_logs l
-WHERE (
-		l.message LIKE 'upload log:%'
-		OR l.message LIKE 'upload error:%'
-	)
-	AND (? = '' OR l.module = ?)
-	AND (? = '' OR l.message LIKE '%' || ? || '%')
-	AND (? = '' OR l.created_at >= ?)
-	AND (? = '' OR l.created_at <= ?);
-
--- name: GetUploadLogsFiltered :many
-SELECT l.id, l.module, l.message, l.created_by, l.created_at,
-	COALESCE(trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END), l.created_by_name, '') as created_by_name
-FROM tbl_logs l
-LEFT JOIN tbl_teachers t ON l.created_by = t.id
-WHERE (
-		l.message LIKE 'upload log:%'
-		OR l.message LIKE 'upload error:%'
-	)
-	AND (? = '' OR l.module = ?)
-	AND (? = '' OR l.message LIKE '%' || ? || '%')
-	AND (? = '' OR l.created_at >= ?)
-	AND (? = '' OR l.created_at <= ?)
-ORDER BY l.created_at DESC
-LIMIT ? OFFSET ?;
-
 -- name: InsertLog :exec
 INSERT INTO tbl_logs (
 	module,

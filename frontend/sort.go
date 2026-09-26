@@ -95,6 +95,7 @@ func SortOptionsFor(kind ListSortKind) []SortOption {
 	case ListSortKindUploadLog:
 		return []SortOption{
 			{Value: "created_at", Label: "Created at"},
+			{Value: "kind", Label: "Type"},
 			{Value: "module", Label: "Module"},
 			{Value: "id", Label: "ID"},
 		}

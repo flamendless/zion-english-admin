@@ -10,6 +10,36 @@ import (
 	"database/sql"
 )
 
+const completeTeacherIntroVideoUpload = `-- name: CompleteTeacherIntroVideoUpload :exec
+UPDATE tbl_teacher_intro_videos
+SET stored_filename = ?,
+	mime_type = ?,
+	file_size = ?,
+	original_file_size = ?,
+	status = 'submitted'
+WHERE id = ?
+	AND status = 'processing'
+`
+
+type CompleteTeacherIntroVideoUploadParams struct {
+	StoredFilename   sql.NullString
+	MimeType         sql.NullString
+	FileSize         sql.NullInt64
+	OriginalFileSize sql.NullInt64
+	ID               int64
+}
+
+func (q *Queries) CompleteTeacherIntroVideoUpload(ctx context.Context, arg CompleteTeacherIntroVideoUploadParams) error {
+	_, err := q.db.ExecContext(ctx, completeTeacherIntroVideoUpload,
+		arg.StoredFilename,
+		arg.MimeType,
+		arg.FileSize,
+		arg.OriginalFileSize,
+		arg.ID,
+	)
+	return err
+}
+
 const countTeacherIntroVideosByStatus = `-- name: CountTeacherIntroVideosByStatus :one
 SELECT COUNT(*) AS count
 FROM tbl_teacher_intro_videos v
@@ -25,6 +55,16 @@ func (q *Queries) CountTeacherIntroVideosByStatus(ctx context.Context, status st
 	return count, err
 }
 
+const deleteTeacherIntroVideoByID = `-- name: DeleteTeacherIntroVideoByID :exec
+DELETE FROM tbl_teacher_intro_videos
+WHERE id = ?
+`
+
+func (q *Queries) DeleteTeacherIntroVideoByID(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteTeacherIntroVideoByID, id)
+	return err
+}
+
 const getAllTeacherIntroVideosFiltered = `-- name: GetAllTeacherIntroVideosFiltered :many
 SELECT
 	v.id,
@@ -34,6 +74,7 @@ SELECT
 	v.mime_type,
 	v.file_size,
 	v.original_file_size,
+	v.compress_preset,
 	v.url,
 	v.source_type,
 	v.status,
@@ -84,6 +125,7 @@ type GetAllTeacherIntroVideosFilteredRow struct {
 	MimeType              sql.NullString
 	FileSize              sql.NullInt64
 	OriginalFileSize      sql.NullInt64
+	CompressPreset        sql.NullString
 	Url                   sql.NullString
 	SourceType            sql.NullString
 	Status                string
@@ -126,6 +168,7 @@ func (q *Queries) GetAllTeacherIntroVideosFiltered(ctx context.Context, arg GetA
 			&i.MimeType,
 			&i.FileSize,
 			&i.OriginalFileSize,
+			&i.CompressPreset,
 			&i.Url,
 			&i.SourceType,
 			&i.Status,
@@ -163,6 +206,7 @@ SELECT
 	mime_type,
 	file_size,
 	original_file_size,
+	compress_preset,
 	url,
 	source_type,
 	status,
@@ -186,6 +230,7 @@ type GetLatestTeacherIntroVideoByTeacherIDRow struct {
 	MimeType         sql.NullString
 	FileSize         sql.NullInt64
 	OriginalFileSize sql.NullInt64
+	CompressPreset   sql.NullString
 	Url              sql.NullString
 	SourceType       sql.NullString
 	Status           string
@@ -207,6 +252,7 @@ func (q *Queries) GetLatestTeacherIntroVideoByTeacherID(ctx context.Context, tea
 		&i.MimeType,
 		&i.FileSize,
 		&i.OriginalFileSize,
+		&i.CompressPreset,
 		&i.Url,
 		&i.SourceType,
 		&i.Status,
@@ -219,6 +265,89 @@ func (q *Queries) GetLatestTeacherIntroVideoByTeacherID(ctx context.Context, tea
 	return i, err
 }
 
+const getProcessingTeacherIntroVideosByTeacherID = `-- name: GetProcessingTeacherIntroVideosByTeacherID :many
+SELECT
+	id,
+	teacher_id,
+	original_filename,
+	stored_filename,
+	mime_type,
+	file_size,
+	original_file_size,
+	compress_preset,
+	url,
+	source_type,
+	status,
+	created_at,
+	reviewed_at,
+	reviewed_by,
+	deleted_at,
+	reject_reason
+FROM tbl_teacher_intro_videos
+WHERE teacher_id = ?
+	AND status = 'processing'
+ORDER BY created_at DESC
+`
+
+type GetProcessingTeacherIntroVideosByTeacherIDRow struct {
+	ID               int64
+	TeacherID        int64
+	OriginalFilename sql.NullString
+	StoredFilename   sql.NullString
+	MimeType         sql.NullString
+	FileSize         sql.NullInt64
+	OriginalFileSize sql.NullInt64
+	CompressPreset   sql.NullString
+	Url              sql.NullString
+	SourceType       sql.NullString
+	Status           string
+	CreatedAt        sql.NullTime
+	ReviewedAt       sql.NullTime
+	ReviewedBy       sql.NullInt64
+	DeletedAt        sql.NullTime
+	RejectReason     sql.NullString
+}
+
+func (q *Queries) GetProcessingTeacherIntroVideosByTeacherID(ctx context.Context, teacherID int64) ([]GetProcessingTeacherIntroVideosByTeacherIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getProcessingTeacherIntroVideosByTeacherID, teacherID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProcessingTeacherIntroVideosByTeacherIDRow
+	for rows.Next() {
+		var i GetProcessingTeacherIntroVideosByTeacherIDRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.TeacherID,
+			&i.OriginalFilename,
+			&i.StoredFilename,
+			&i.MimeType,
+			&i.FileSize,
+			&i.OriginalFileSize,
+			&i.CompressPreset,
+			&i.Url,
+			&i.SourceType,
+			&i.Status,
+			&i.CreatedAt,
+			&i.ReviewedAt,
+			&i.ReviewedBy,
+			&i.DeletedAt,
+			&i.RejectReason,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getTeacherIntroVideoByID = `-- name: GetTeacherIntroVideoByID :one
 SELECT
 	id,
@@ -228,6 +357,7 @@ SELECT
 	mime_type,
 	file_size,
 	original_file_size,
+	compress_preset,
 	url,
 	source_type,
 	status,
@@ -248,6 +378,7 @@ type GetTeacherIntroVideoByIDRow struct {
 	MimeType         sql.NullString
 	FileSize         sql.NullInt64
 	OriginalFileSize sql.NullInt64
+	CompressPreset   sql.NullString
 	Url              sql.NullString
 	SourceType       sql.NullString
 	Status           string
@@ -269,6 +400,7 @@ func (q *Queries) GetTeacherIntroVideoByID(ctx context.Context, id int64) (GetTe
 		&i.MimeType,
 		&i.FileSize,
 		&i.OriginalFileSize,
+		&i.CompressPreset,
 		&i.Url,
 		&i.SourceType,
 		&i.Status,
@@ -290,6 +422,7 @@ SELECT
 	mime_type,
 	file_size,
 	original_file_size,
+	compress_preset,
 	url,
 	source_type,
 	status,
@@ -326,6 +459,7 @@ type GetTeacherIntroVideosByTeacherIDFilteredRow struct {
 	MimeType         sql.NullString
 	FileSize         sql.NullInt64
 	OriginalFileSize sql.NullInt64
+	CompressPreset   sql.NullString
 	Url              sql.NullString
 	SourceType       sql.NullString
 	Status           string
@@ -360,6 +494,7 @@ func (q *Queries) GetTeacherIntroVideosByTeacherIDFiltered(ctx context.Context, 
 			&i.MimeType,
 			&i.FileSize,
 			&i.OriginalFileSize,
+			&i.CompressPreset,
 			&i.Url,
 			&i.SourceType,
 			&i.Status,
@@ -386,7 +521,7 @@ const hasBlockingTeacherIntroVideo = `-- name: HasBlockingTeacherIntroVideo :one
 SELECT COUNT(*) AS count
 FROM tbl_teacher_intro_videos
 WHERE teacher_id = ?
-	AND status IN ('submitted', 'approved')
+	AND status IN ('processing', 'submitted', 'approved')
 `
 
 func (q *Queries) HasBlockingTeacherIntroVideo(ctx context.Context, teacherID int64) (int64, error) {
@@ -404,10 +539,11 @@ INSERT INTO tbl_teacher_intro_videos (
 	mime_type,
 	file_size,
 	original_file_size,
+	compress_preset,
 	url,
 	source_type,
 	status
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 type InsertTeacherIntroVideoParams struct {
@@ -417,6 +553,7 @@ type InsertTeacherIntroVideoParams struct {
 	MimeType         sql.NullString
 	FileSize         sql.NullInt64
 	OriginalFileSize sql.NullInt64
+	CompressPreset   sql.NullString
 	Url              sql.NullString
 	SourceType       sql.NullString
 	Status           string
@@ -430,11 +567,59 @@ func (q *Queries) InsertTeacherIntroVideo(ctx context.Context, arg InsertTeacher
 		arg.MimeType,
 		arg.FileSize,
 		arg.OriginalFileSize,
+		arg.CompressPreset,
 		arg.Url,
 		arg.SourceType,
 		arg.Status,
 	)
 	return err
+}
+
+const insertTeacherIntroVideoReturningID = `-- name: InsertTeacherIntroVideoReturningID :one
+INSERT INTO tbl_teacher_intro_videos (
+	teacher_id,
+	original_filename,
+	stored_filename,
+	mime_type,
+	file_size,
+	original_file_size,
+	compress_preset,
+	url,
+	source_type,
+	status
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+RETURNING id
+`
+
+type InsertTeacherIntroVideoReturningIDParams struct {
+	TeacherID        int64
+	OriginalFilename sql.NullString
+	StoredFilename   sql.NullString
+	MimeType         sql.NullString
+	FileSize         sql.NullInt64
+	OriginalFileSize sql.NullInt64
+	CompressPreset   sql.NullString
+	Url              sql.NullString
+	SourceType       sql.NullString
+	Status           string
+}
+
+func (q *Queries) InsertTeacherIntroVideoReturningID(ctx context.Context, arg InsertTeacherIntroVideoReturningIDParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, insertTeacherIntroVideoReturningID,
+		arg.TeacherID,
+		arg.OriginalFilename,
+		arg.StoredFilename,
+		arg.MimeType,
+		arg.FileSize,
+		arg.OriginalFileSize,
+		arg.CompressPreset,
+		arg.Url,
+		arg.SourceType,
+		arg.Status,
+	)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
 const softDeleteTeacherIntroVideo = `-- name: SoftDeleteTeacherIntroVideo :exec

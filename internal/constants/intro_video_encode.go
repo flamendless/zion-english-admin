@@ -119,3 +119,10 @@ func IntroVideoEncodeSettingsForPresetValue(value string) IntroVideoEncodeSettin
 	}
 	return IntroVideoEncodeSettingsForPreset(IntroVideoCompressPreset(value))
 }
+
+func IntroVideoShouldCompress(fileSize int64, settings IntroVideoEncodeSettings) bool {
+	if settings.SkipCompress || fileSize < IntroVideoCompressMinBytes {
+		return false
+	}
+	return true
+}

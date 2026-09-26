@@ -52,3 +52,26 @@ func TestIntroVideoEncodeSettingsForPresetValueFallback(t *testing.T) {
 		t.Fatalf("unexpected fallback settings: %+v", settings)
 	}
 }
+
+func TestIntroVideoShouldCompress(t *testing.T) {
+	fine := IntroVideoEncodeSettingsForPreset(IntroVideoCompressPresetFine)
+	original := IntroVideoEncodeSettingsForPreset(IntroVideoCompressPresetOriginal)
+
+	cases := []struct {
+		name     string
+		fileSize int64
+		settings IntroVideoEncodeSettings
+		want     bool
+	}{
+		{"below threshold compresses with fine preset", IntroVideoCompressMinBytes - 1, fine, false},
+		{"at threshold compresses", IntroVideoCompressMinBytes, fine, true},
+		{"above threshold compresses", IntroVideoCompressMinBytes + 1, fine, true},
+		{"skip compress preset", IntroVideoCompressMinBytes + 1, original, false},
+		{"small file with skip compress", 1, original, false},
+	}
+	for _, tc := range cases {
+		if got := IntroVideoShouldCompress(tc.fileSize, tc.settings); got != tc.want {
+			t.Fatalf("%s: IntroVideoShouldCompress(%d, ...) = %v, want %v", tc.name, tc.fileSize, got, tc.want)
+		}
+	}
+}

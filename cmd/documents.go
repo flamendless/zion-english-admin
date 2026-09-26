@@ -327,7 +327,15 @@ func handleProfileDocument(w http.ResponseWriter, r *http.Request) {
 	store := storage.Default()
 	if err := store.Put(ctx, storage.CategoryTeacherDocuments, storageKey, file, documentContentType(strings.TrimPrefix(ext, "."))); err != nil {
 		logs.Log().Error("write document file", zap.Error(err))
-		insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeFailed, fmt.Sprintf("ID document storage failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err))
+		insertUploadLog(ctx, user, uploadLogEntry{
+			Module:        "profile",
+			Outcome:       constants.UploadLogOutcomeFailed,
+			Kind:          constants.UploadLogKindDocument,
+			Summary:       fmt.Sprintf("ID document storage failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err),
+			Filename:      filepath.Base(header.Filename),
+			FileSize:      header.Size,
+			FileSizeValid: true,
+		})
 		setErrorFlash(w, "Failed to save document")
 		HttpRedirect(w, r, "/profile")
 		return
@@ -344,13 +352,29 @@ func handleProfileDocument(w http.ResponseWriter, r *http.Request) {
 	}); err != nil {
 		_ = store.Delete(ctx, storage.CategoryTeacherDocuments, storageKey)
 		logs.Log().Error("insert teacher document", zap.Error(err))
-		insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeFailed, fmt.Sprintf("ID document database insert failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err))
+		insertUploadLog(ctx, user, uploadLogEntry{
+			Module:        "profile",
+			Outcome:       constants.UploadLogOutcomeFailed,
+			Kind:          constants.UploadLogKindDocument,
+			Summary:       fmt.Sprintf("ID document database insert failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err),
+			Filename:      filepath.Base(header.Filename),
+			FileSize:      header.Size,
+			FileSizeValid: true,
+		})
 		setErrorFlash(w, "Failed to record document")
 		HttpRedirect(w, r, "/profile")
 		return
 	}
 
-	insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeSucceeded, fmt.Sprintf("ID document for teacher '%s' (id %d), file '%s'", user.Name, user.ID, filepath.Base(header.Filename)))
+	insertUploadLog(ctx, user, uploadLogEntry{
+		Module:        "profile",
+		Outcome:       constants.UploadLogOutcomeSucceeded,
+		Kind:          constants.UploadLogKindDocument,
+		Summary:       fmt.Sprintf("ID document for teacher '%s' (id %d), file '%s'", user.Name, user.ID, filepath.Base(header.Filename)),
+		Filename:      filepath.Base(header.Filename),
+		FileSize:      header.Size,
+		FileSizeValid: true,
+	})
 	insertAuditLogAs(ctx, user, "profile", fmt.Sprintf("submitted ID document for teacher '%s'", user.Name))
 	notifySuperuser(ctx, user, notifications.KindDocumentSubmitted,
 		fmt.Sprintf("Teacher '%s' submitted ID document '%s'", user.Name, filepath.Base(header.Filename)), "")
@@ -412,7 +436,15 @@ func handleProfileResume(w http.ResponseWriter, r *http.Request) {
 	store := storage.Default()
 	if err := store.Put(ctx, storage.CategoryTeacherDocuments, storageKey, file, documentContentType(strings.TrimPrefix(ext, "."))); err != nil {
 		logs.Log().Error("write resume file", zap.Error(err))
-		insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeFailed, fmt.Sprintf("resume/CV storage failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err))
+		insertUploadLog(ctx, user, uploadLogEntry{
+			Module:        "profile",
+			Outcome:       constants.UploadLogOutcomeFailed,
+			Kind:          constants.UploadLogKindDocument,
+			Summary:       fmt.Sprintf("resume/CV storage failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err),
+			Filename:      filepath.Base(header.Filename),
+			FileSize:      header.Size,
+			FileSizeValid: true,
+		})
 		setErrorFlash(w, "Failed to save resume/CV")
 		HttpRedirect(w, r, "/profile")
 		return
@@ -429,13 +461,29 @@ func handleProfileResume(w http.ResponseWriter, r *http.Request) {
 	}); err != nil {
 		_ = store.Delete(ctx, storage.CategoryTeacherDocuments, storageKey)
 		logs.Log().Error("insert teacher resume", zap.Error(err))
-		insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeFailed, fmt.Sprintf("resume/CV database insert failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err))
+		insertUploadLog(ctx, user, uploadLogEntry{
+			Module:        "profile",
+			Outcome:       constants.UploadLogOutcomeFailed,
+			Kind:          constants.UploadLogKindDocument,
+			Summary:       fmt.Sprintf("resume/CV database insert failed for teacher '%s' (id %d), file '%s': %v", user.Name, user.ID, filepath.Base(header.Filename), err),
+			Filename:      filepath.Base(header.Filename),
+			FileSize:      header.Size,
+			FileSizeValid: true,
+		})
 		setErrorFlash(w, "Failed to record resume/CV")
 		HttpRedirect(w, r, "/profile")
 		return
 	}
 
-	insertUploadLog(ctx, user, "profile", constants.SystemLogUploadOutcomeSucceeded, fmt.Sprintf("resume/CV for teacher '%s' (id %d), file '%s'", user.Name, user.ID, filepath.Base(header.Filename)))
+	insertUploadLog(ctx, user, uploadLogEntry{
+		Module:        "profile",
+		Outcome:       constants.UploadLogOutcomeSucceeded,
+		Kind:          constants.UploadLogKindDocument,
+		Summary:       fmt.Sprintf("resume/CV for teacher '%s' (id %d), file '%s'", user.Name, user.ID, filepath.Base(header.Filename)),
+		Filename:      filepath.Base(header.Filename),
+		FileSize:      header.Size,
+		FileSizeValid: true,
+	})
 	insertAuditLogAs(ctx, user, "profile", fmt.Sprintf("uploaded resume/CV for teacher '%s'", user.Name))
 	setSuccessFlash(w, "Resume/CV uploaded successfully.")
 	HttpRedirect(w, r, "/profile")

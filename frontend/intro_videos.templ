@@ -8,9 +8,11 @@ import (
 
 type IntroVideoItem struct {
 	ID               string
-	LinkLabel        string
-	FileSizeLabel    string
-	URL              string
+	LinkLabel         string
+	OriginalFileSize  string
+	ProcessedFileSize string
+	CompressPreset    constants.IntroVideoCompressPreset
+	URL               string
 	SourceType       constants.TeacherIntroVideoSourceType
 	Status           constants.TeacherIntroVideoStatus
 	UploadedAt       string
@@ -50,9 +52,9 @@ func introVideoRowClass(status constants.TeacherIntroVideoStatus) string {
 }
 
 func introVideosTableColspan(showUploader bool, showViewAction bool, showActions bool) int {
-	colspan := 4
+	colspan := 7
 	if showUploader {
-		colspan += 2
+		colspan++
 	}
 	if showViewAction || showActions {
 		colspan++
@@ -106,6 +108,16 @@ templ IntroVideoSourcePill(sourceType constants.TeacherIntroVideoSourceType) {
 	}
 }
 
+templ IntroVideoCompressPresetPill(preset constants.IntroVideoCompressPreset) {
+	if preset == "" {
+		<span>-</span>
+	} else if constants.ValidIntroVideoCompressPreset(string(preset)) {
+		@Pill(constants.IntroVideoCompressPresetLabel(preset), IntroVideoCompressPresetPillTone(preset))
+	} else {
+		@Pill(string(preset), PillToneNeutral)
+	}
+}
+
 templ IntroVideoTableRow(item IntroVideoItem, showUploader bool, showViewAction bool, showActions bool) {
 	<tr class={ introVideoRowClass(item.Status) }>
 		<td data-label="Video">
@@ -120,9 +132,11 @@ templ IntroVideoTableRow(item IntroVideoItem, showUploader bool, showViewAction 
 		<td data-label="Status">
 			@StatusPill(item.Status.Label(), IntroVideoStatusPillTone(item.Status), true)
 		</td>
-		if showUploader {
-			<td data-label="Size">{ item.FileSizeLabel }</td>
-		}
+		<td data-label="Original size">{ item.OriginalFileSize }</td>
+		<td data-label="Processed size">{ item.ProcessedFileSize }</td>
+		<td data-label="Preset">
+			@IntroVideoCompressPresetPill(item.CompressPreset)
+		</td>
 		if showUploader {
 			<td data-label="Uploaded by">
 				<div class="documents-uploader-cell">
@@ -179,8 +193,10 @@ templ IntroVideosTable(showUploader bool, showViewAction bool, showActions bool)
 					<th>Video</th>
 					<th>Source</th>
 					<th>Status</th>
+					<th>Original size</th>
+					<th>Processed size</th>
+					<th>Preset</th>
 					if showUploader {
-						<th>Size</th>
 						@AdminOnlyTableHeader("Uploaded by")
 					}
 					<th>Uploaded at</th>
@@ -387,6 +403,9 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 							@IconActionLinkExternal(data.IntroVideoViewURL, introVideoViewLinkLabel(data.IntroVideoSourceType), IconKindView)
 						}
 					</div>
+					if data.IntroVideoStatus == constants.TeacherIntroVideoStatusProcessing {
+						<p class="profile-section-desc" style="margin-top: var(--space-2); margin-bottom: 0;">Processing in the background. Track progress in the panel at the bottom-right of the screen.</p>
+					}
 					if data.IntroVideoRejectReason != "" {
 						<p class="profile-section-desc" style="margin-top: var(--space-2); margin-bottom: 0;">Reject reason: { data.IntroVideoRejectReason }</p>
 					}
@@ -408,7 +427,7 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 						<line x1="12" y1="8" x2="12" y2="12"></line>
 						<line x1="12" y1="16" x2="12.01" y2="16"></line>
 					</svg>
-					<span>You already have a submitted or approved intro video on file. You cannot submit again unless it is rejected or deleted by an administrator.</span>
+					<span>You already have a submitted, processing, or approved intro video on file. You cannot submit again unless it is rejected or deleted by an administrator.</span>
 				</div>
 			}
 			if data.IntroVideoUploadsAllowed {
@@ -505,15 +524,6 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 						<button type="submit" id="introVideoSubmitBtn" disabled?={ !data.CanUploadIntroVideo }>Submit intro video</button>
 					</div>
 				</form>
-				<div id="introVideoUploadProgress" class="intro-video-upload-progress" hidden role="presentation">
-					<div class="intro-video-upload-progress-panel" role="status" aria-live="polite">
-						<p id="introVideoUploadProgressMessage" class="intro-video-upload-progress-message">Uploading video, please wait...</p>
-						<div class="intro-video-progress-track">
-							<div id="introVideoUploadProgressBar" class="intro-video-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
-						</div>
-						<p class="intro-video-upload-progress-hint">Do not refresh or close this tab.</p>
-					</div>
-				</div>
 				<style>
 					.intro-video-file-preview {
 						margin-top: var(--space-4);
@@ -575,69 +585,6 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 						color: var(--color-foreground);
 						font-size: 0.875rem;
 					}
-
-					.intro-video-upload-progress {
-						position: fixed;
-						inset: 0;
-						z-index: 1200;
-						display: flex;
-						align-items: center;
-						justify-content: center;
-						padding: var(--space-4);
-						background: rgba(15, 23, 42, 0.5);
-					}
-
-					.intro-video-upload-progress[hidden] {
-						display: none !important;
-					}
-
-					.intro-video-upload-progress-panel {
-						width: min(100%, 28rem);
-						padding: var(--space-5);
-						border-radius: var(--radius-lg);
-						border: 1px solid var(--color-border);
-						background: var(--color-surface);
-						box-shadow: var(--shadow-lg);
-					}
-
-					.intro-video-upload-progress-message {
-						margin: 0 0 var(--space-4);
-						font-size: 0.9375rem;
-						color: var(--color-foreground);
-					}
-
-					.intro-video-upload-progress-hint {
-						margin: var(--space-4) 0 0;
-						font-size: 0.8125rem;
-						color: var(--color-muted-foreground);
-						text-align: center;
-					}
-
-					.intro-video-progress-track {
-						height: 0.625rem;
-						border-radius: var(--radius-full);
-						background: var(--color-muted);
-						overflow: hidden;
-					}
-
-					.intro-video-progress-bar {
-						height: 100%;
-						width: 0;
-						border-radius: var(--radius-full);
-						background: var(--color-primary);
-						transition: width 120ms linear;
-					}
-
-					.intro-video-progress-bar.is-indeterminate {
-						width: 35%;
-						transition: none;
-						animation: introVideoProgressIndeterminate 1.2s ease-in-out infinite;
-					}
-
-					@keyframes introVideoProgressIndeterminate {
-						0% { transform: translateX(-120%); }
-						100% { transform: translateX(320%); }
-					}
 				</style>
 				<script>
 					(function () {
@@ -658,9 +605,6 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 						const durationWarning = document.getElementById('introVideoPreviewDurationWarning');
 						const submitBtn = document.getElementById('introVideoSubmitBtn');
 						const formError = document.getElementById('introVideoFormError');
-						const progressOverlay = document.getElementById('introVideoUploadProgress');
-						const progressMessage = document.getElementById('introVideoUploadProgressMessage');
-						const progressBar = document.getElementById('introVideoUploadProgressBar');
 						if (!form || !sourceSelect || !uploadFields || !linkFields || !fileInput || !urlInput || !submitBtn) return;
 
 						const maxDurationSeconds = parseInt(form.dataset.maxDurationSeconds || '0', 10);
@@ -840,32 +784,21 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 							}
 						}
 
-						function setProgressState(mode, percent) {
-							if (!progressOverlay || !progressMessage || !progressBar) return;
-							progressOverlay.hidden = false;
-							progressBar.classList.remove('is-indeterminate');
-							if (mode === 'upload') {
-								progressMessage.textContent = 'Uploading video, please wait...';
-								const safePercent = Math.max(0, Math.min(100, percent || 0));
-								progressBar.style.width = safePercent + '%';
-								progressBar.removeAttribute('aria-valuetext');
-								progressBar.setAttribute('aria-valuenow', String(Math.round(safePercent)));
-								return;
-							}
-							progressMessage.textContent = 'Processing video, please wait...';
-							progressBar.style.removeProperty('width');
-							progressBar.classList.add('is-indeterminate');
-							progressBar.removeAttribute('aria-valuenow');
-							progressBar.setAttribute('aria-valuetext', 'Processing');
+						function updateBackgroundJobUpload(file, percent) {
+							if (!window.ZionBackgroundJobs) return;
+							window.ZionBackgroundJobs.updateClientJob({
+								id: 'intro-video-upload',
+								label: 'Intro video',
+								detail: file && file.name ? file.name : '',
+								phase: 'upload',
+								percent: percent || 0
+							});
 						}
 
-						function hideProgressState() {
-							if (!progressOverlay || !progressBar) return;
-							progressOverlay.hidden = true;
-							progressBar.classList.remove('is-indeterminate');
-							progressBar.style.width = '0%';
-							progressBar.removeAttribute('aria-valuetext');
-							progressBar.setAttribute('aria-valuenow', '0');
+						function clearBackgroundJobUpload() {
+							if (window.ZionBackgroundJobs) {
+								window.ZionBackgroundJobs.clearClientJob();
+							}
 						}
 
 						function setFormDisabled(disabled) {
@@ -920,7 +853,7 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 								}
 							}
 							setFormDisabled(true);
-							setProgressState('upload', 0);
+							updateBackgroundJobUpload(file, 0);
 
 							const xhr = new XMLHttpRequest();
 							xhr.open('POST', form.action);
@@ -929,30 +862,26 @@ templ ProfileIntroVideoUpload(data ProfileData) {
 							xhr.upload.addEventListener('progress', function (evt) {
 								if (!evt.lengthComputable) return;
 								const percent = (evt.loaded / evt.total) * 100;
-								if (percent >= 100) {
-									setProgressState('processing');
-									return;
-								}
-								setProgressState('upload', percent);
-							});
-
-							xhr.upload.addEventListener('load', function () {
-								setProgressState('processing');
+								updateBackgroundJobUpload(file, percent);
 							});
 
 							xhr.addEventListener('load', function () {
 								if (xhr.status >= 200 && xhr.status < 400) {
+									clearBackgroundJobUpload();
+									if (window.ZionBackgroundJobs) {
+										window.ZionBackgroundJobs.refreshServerJobs();
+									}
 									window.location.href = xhr.responseURL || form.action;
 									return;
 								}
-								hideProgressState();
+								clearBackgroundJobUpload();
 								setFormDisabled(false);
 								updateSubmitState();
 								setFormError('Failed to upload intro video. Please try again.');
 							});
 
 							xhr.addEventListener('error', function () {
-								hideProgressState();
+								clearBackgroundJobUpload();
 								setFormDisabled(false);
 								updateSubmitState();
 								setFormError('Failed to upload intro video. Check your connection and try again.');

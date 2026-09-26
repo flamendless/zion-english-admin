@@ -299,6 +299,7 @@ type TblTeacherIntroVideo struct {
 	StoredFilename   sql.NullString
 	MimeType         sql.NullString
 	FileSize         sql.NullInt64
+	OriginalFileSize sql.NullInt64
 	Url              sql.NullString
 	SourceType       sql.NullString
 	Status           string
@@ -307,7 +308,7 @@ type TblTeacherIntroVideo struct {
 	ReviewedBy       sql.NullInt64
 	DeletedAt        sql.NullTime
 	RejectReason     sql.NullString
-	OriginalFileSize sql.NullInt64
+	CompressPreset   sql.NullString
 }
 
 type TblTeacherMeetingAccount struct {
@@ -393,6 +394,20 @@ type TblTrainingMaterialsTagsM2m struct {
 	MaterialID int64
 	TagID      int64
 	CreatedAt  string
+}
+
+type TblUploadLog struct {
+	ID             int64
+	Module         string
+	Outcome        string
+	Kind           string
+	Summary        string
+	Filename       sql.NullString
+	FileSize       sql.NullInt64
+	CompressPreset sql.NullString
+	CreatedBy      sql.NullInt64
+	CreatedByName  sql.NullString
+	CreatedAt      string
 }
 
 type TblUseragent struct {

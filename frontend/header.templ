@@ -68,10 +68,7 @@ templ HeaderSimple() {
 		@RecordClassFlowModals(classWizard)
 	}
 	if role == auth.RoleTeacher {
-		@PersistentPanelSlot(PersistentPanelSlotParams{
-			HostID:     "persistentOnboardingHost",
-			PartialURL: utils.URL("/onboarding/persistent"),
-		})
+		@PersistentPanelStack()
 	}
 }
 

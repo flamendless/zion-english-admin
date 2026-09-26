@@ -1,11 +1,11 @@
 package frontend
 
-import "strings"
 import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 type UploadLogData struct {
-	Logs           []SystemLogItem
+	Logs           []UploadLogItem
+	HideTeacher    bool
 	Query          string
 	Module         string
 	StartDate      string
@@ -22,42 +22,44 @@ type UploadLogData struct {
 	FilterPath     string
 }
 
-func uploadLogDetail(message string) string {
-	if strings.HasPrefix(message, constants.SystemLogUploadLogPrefix) {
-		return strings.TrimPrefix(message, constants.SystemLogUploadLogPrefix)
-	}
-	if strings.HasPrefix(message, constants.SystemLogUploadLegacyErrorPrefix) {
-		return "failed: " + strings.TrimPrefix(message, constants.SystemLogUploadLegacyErrorPrefix)
-	}
-	return message
+type UploadLogItem struct {
+	ID              string
+	Module          string
+	Outcome         constants.UploadLogOutcome
+	Kind            constants.UploadLogKind
+	Summary         string
+	Filename        string
+	FileSizeDisplay string
+	PresetDisplay   string
+	CreatedBy       string
+	CreatedAt       string
 }
 
-func uploadLogOutcomeLabel(message string) string {
-	detail := uploadLogDetail(message)
-	if strings.HasPrefix(detail, string(constants.SystemLogUploadOutcomeSucceeded)+":") {
+func uploadLogOutcomeLabel(outcome constants.UploadLogOutcome) string {
+	if outcome == constants.UploadLogOutcomeSucceeded {
 		return "Succeeded"
 	}
 	return "Failed"
 }
 
-func uploadLogOutcomeClass(message string) string {
-	if uploadLogOutcomeLabel(message) == "Succeeded" {
+func uploadLogOutcomeClass(outcome constants.UploadLogOutcome) string {
+	if outcome == constants.UploadLogOutcomeSucceeded {
 		return "success-cell"
 	}
 	return "error-cell"
 }
 
-func uploadLogSummary(message string) string {
-	detail := uploadLogDetail(message)
-	for _, prefix := range []string{
-		string(constants.SystemLogUploadOutcomeSucceeded) + ": ",
-		string(constants.SystemLogUploadOutcomeFailed) + ": ",
-	} {
-		if strings.HasPrefix(detail, prefix) {
-			return strings.TrimPrefix(detail, prefix)
-		}
+func uploadLogKindPillTone(kind constants.UploadLogKind) PillTone {
+	switch kind {
+	case constants.UploadLogKindIntroVideo:
+		return PillTonePrimary
+	case constants.UploadLogKindAvatar:
+		return PillToneInfo
+	case constants.UploadLogKindDocument:
+		return PillToneNeutral
+	default:
+		return PillToneNeutral
 	}
-	return detail
 }
 
 templ UploadLogs(data UploadLogData) {
@@ -66,14 +68,22 @@ templ UploadLogs(data UploadLogData) {
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Upload Logs - Zion English Admin Tool</title>
+		if data.HideTeacher {
+			<title>My Upload Logs - Zion English Admin Tool</title>
+		} else {
+			<title>Upload Logs - Zion English Admin Tool</title>
+		}
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
 	</head>
 	<body>
 		<div class="container">
 			@HeaderSimple()
-			@HubHeader("Upload Logs", "Teacher file uploads (intro video, documents, profile picture).", "", false)
+			if data.HideTeacher {
+				@HubHeader("My Upload Logs", "Success and failure for your intro video, documents, and profile picture uploads.", "", false)
+			} else {
+				@HubHeader("Upload Logs", "Teacher file uploads (intro video, documents, profile picture).", "", false)
+			}
 
 			@ListFilterForm(data.FilterPath, data.Query, "", "", "", "", "", data.Module, data.StartDate, data.EndDate, false, false, true, true, false, "", false, "", false, false, false, false, data.SortBy, data.SortOrder, ListSortKindUploadLog, false, "", "", "")
 
@@ -85,9 +95,13 @@ templ UploadLogs(data UploadLogData) {
 								<th>ID</th>
 								<th>Module</th>
 								<th>Status</th>
+								<th>Type</th>
 								<th>Details</th>
-								@AdminOnlyTableHeader("Teacher")
+								if !data.HideTeacher {
+									@AdminOnlyTableHeader("Teacher")
+								}
 								<th>Created At</th>
+								<th>Actions</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -95,10 +109,29 @@ templ UploadLogs(data UploadLogData) {
 								<tr>
 									<td data-label="ID">{ log.ID }</td>
 									<td data-label="Module">{ log.Module }</td>
-									<td class={ uploadLogOutcomeClass(log.Message) } data-label="Status">{ uploadLogOutcomeLabel(log.Message) }</td>
-									<td data-label="Details">{ uploadLogSummary(log.Message) }</td>
-									<td data-label="Teacher">{ getDisplayValue(log.CreatedBy) }</td>
+									<td class={ uploadLogOutcomeClass(log.Outcome) } data-label="Status">{ uploadLogOutcomeLabel(log.Outcome) }</td>
+									<td data-label="Type">
+										@Pill(log.Kind.Label(), uploadLogKindPillTone(log.Kind))
+									</td>
+									<td data-label="Details">{ log.Summary }</td>
+									if !data.HideTeacher {
+										<td data-label="Teacher">{ getDisplayValue(log.CreatedBy) }</td>
+									}
 									<td class="date-cell" data-label="Created">{ log.CreatedAt }</td>
+									<td data-label="Actions">
+										<div class="table-actions upload-log-row-actions">
+											@IconActionButton("View", IconKindView, templ.Attributes{
+												"type": "button",
+												"data-upload-log-view": "true",
+												"data-upload-log-filename": log.Filename,
+												"data-upload-log-filesize": log.FileSizeDisplay,
+												"data-upload-log-preset": log.PresetDisplay,
+												"data-upload-log-type": log.Kind.Label(),
+												"data-upload-log-status": uploadLogOutcomeLabel(log.Outcome),
+												"data-upload-log-summary": log.Summary,
+											})
+										</div>
+									</td>
 								</tr>
 							}
 						</tbody>
@@ -111,6 +144,160 @@ templ UploadLogs(data UploadLogData) {
 				</div>
 			}
 		</div>
+		@UploadLogDetailModal()
 	</body>
 	</html>
+}
+
+templ UploadLogDetailModal() {
+	<div class="modal-overlay" id="uploadLogDetailModal" hidden role="presentation">
+		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="uploadLogDetailModalTitle">
+			<div class="modal-header">
+				<h2 id="uploadLogDetailModalTitle">Upload details</h2>
+				<button type="button" class="modal-close upload-log-detail-modal-close" data-tooltip="Close" aria-label="Close">&times;</button>
+			</div>
+			<div class="modal-body">
+				<dl class="upload-log-detail-meta">
+					<div>
+						<dt>Type</dt>
+						<dd id="uploadLogDetailType">-</dd>
+					</div>
+					<div>
+						<dt>Status</dt>
+						<dd id="uploadLogDetailStatus">-</dd>
+					</div>
+					<div>
+						<dt>Filename</dt>
+						<dd id="uploadLogDetailFilename">-</dd>
+					</div>
+					<div>
+						<dt>File size</dt>
+						<dd id="uploadLogDetailFilesize">-</dd>
+					</div>
+					<div>
+						<dt>Preset</dt>
+						<dd id="uploadLogDetailPreset">-</dd>
+					</div>
+				</dl>
+				<div class="upload-log-detail-summary">
+					<span class="upload-log-detail-summary-label">Details</span>
+					<p id="uploadLogDetailSummary" class="upload-log-detail-summary-text">-</p>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary upload-log-detail-modal-close">Close</button>
+			</div>
+		</div>
+	</div>
+	<style>
+		.upload-log-row-actions [data-tooltip]::after {
+			left: auto;
+			right: 0;
+			transform: none;
+		}
+
+		.upload-log-detail-meta {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+			gap: var(--space-3) var(--space-4);
+			margin: 0;
+		}
+
+		.upload-log-detail-meta dt {
+			margin: 0 0 var(--space-1);
+			font-size: 0.75rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+			color: var(--color-muted-foreground);
+		}
+
+		.upload-log-detail-meta dd {
+			margin: 0;
+			font-size: 0.875rem;
+			color: var(--color-foreground);
+			word-break: break-word;
+		}
+
+		.upload-log-detail-summary {
+			margin-top: var(--space-4);
+			padding-top: var(--space-4);
+			border-top: 1px solid var(--color-border-subtle);
+		}
+
+		.upload-log-detail-summary-label {
+			display: block;
+			margin-bottom: var(--space-2);
+			font-size: 0.75rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+			color: var(--color-muted-foreground);
+		}
+
+		.upload-log-detail-summary-text {
+			margin: 0;
+			font-size: 0.875rem;
+			color: var(--color-foreground);
+			word-break: break-word;
+		}
+
+		.upload-log-row-actions .icon-action-btn {
+			margin-top: 0;
+		}
+	</style>
+	<script>
+		(function () {
+			const modal = document.getElementById('uploadLogDetailModal');
+			const typeEl = document.getElementById('uploadLogDetailType');
+			const statusEl = document.getElementById('uploadLogDetailStatus');
+			const filenameEl = document.getElementById('uploadLogDetailFilename');
+			const filesizeEl = document.getElementById('uploadLogDetailFilesize');
+			const presetEl = document.getElementById('uploadLogDetailPreset');
+			const summaryEl = document.getElementById('uploadLogDetailSummary');
+			if (!modal || !typeEl || !statusEl || !filenameEl || !filesizeEl || !presetEl || !summaryEl) return;
+
+			function setText(el, value) {
+				el.textContent = value && value.trim() ? value.trim() : '-';
+			}
+
+			window.openUploadLogDetailModal = function (btn) {
+				if (!btn) return;
+				setText(typeEl, btn.getAttribute('data-upload-log-type'));
+				setText(statusEl, btn.getAttribute('data-upload-log-status'));
+				setText(filenameEl, btn.getAttribute('data-upload-log-filename'));
+				setText(filesizeEl, btn.getAttribute('data-upload-log-filesize'));
+				setText(presetEl, btn.getAttribute('data-upload-log-preset'));
+				setText(summaryEl, btn.getAttribute('data-upload-log-summary'));
+				modal.hidden = false;
+				document.body.classList.add('modal-open');
+			};
+
+			window.closeUploadLogDetailModal = function () {
+				modal.hidden = true;
+				document.body.classList.remove('modal-open');
+			};
+
+			document.body.addEventListener('click', function (e) {
+				const viewBtn = e.target.closest('[data-upload-log-view]');
+				if (viewBtn) {
+					window.openUploadLogDetailModal(viewBtn);
+					return;
+				}
+				if (e.target.closest('.upload-log-detail-modal-close')) {
+					window.closeUploadLogDetailModal();
+					return;
+				}
+				if (e.target === modal) {
+					window.closeUploadLogDetailModal();
+				}
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key === 'Escape' && modal && !modal.hidden) {
+					window.closeUploadLogDetailModal();
+				}
+			});
+		})();
+	</script>
 }

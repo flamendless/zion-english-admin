@@ -15,18 +15,20 @@ import (
 )
 
 type IntroVideoItem struct {
-	ID               string
-	LinkLabel        string
-	FileSizeLabel    string
-	URL              string
-	SourceType       constants.TeacherIntroVideoSourceType
-	Status           constants.TeacherIntroVideoStatus
-	UploadedAt       string
-	UploadedBy       string
-	UploadedByAvatar AvatarProps
-	RejectReason     string
-	ViewURL          string
-	CanReview        bool
+	ID                string
+	LinkLabel         string
+	OriginalFileSize  string
+	ProcessedFileSize string
+	CompressPreset    constants.IntroVideoCompressPreset
+	URL               string
+	SourceType        constants.TeacherIntroVideoSourceType
+	Status            constants.TeacherIntroVideoStatus
+	UploadedAt        string
+	UploadedBy        string
+	UploadedByAvatar  AvatarProps
+	RejectReason      string
+	ViewURL           string
+	CanReview         bool
 }
 
 func introVideoViewLinkLabel(sourceType constants.TeacherIntroVideoSourceType) string {
@@ -58,9 +60,9 @@ func introVideoRowClass(status constants.TeacherIntroVideoStatus) string {
 }
 
 func introVideosTableColspan(showUploader bool, showViewAction bool, showActions bool) int {
-	colspan := 4
+	colspan := 7
 	if showUploader {
-		colspan += 2
+		colspan++
 	}
 	if showViewAction || showActions {
 		colspan++
@@ -111,7 +113,7 @@ func IntroVideoStatusFilterDropdownWithValue(selected constants.TeacherIntroVide
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 69, Col: 29}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 71, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
 			if templ_7745c5c3_Err != nil {
@@ -134,7 +136,7 @@ func IntroVideoStatusFilterDropdownWithValue(selected constants.TeacherIntroVide
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 69, Col: 87}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 71, Col: 87}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -214,7 +216,7 @@ func IntroVideosToolbar(showTeacherFilter bool, status constants.TeacherIntroVid
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/intro-videos/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 93, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 95, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 		if templ_7745c5c3_Err != nil {
@@ -227,7 +229,7 @@ func IntroVideosToolbar(showTeacherFilter bool, status constants.TeacherIntroVid
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 96, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 98, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 		if templ_7745c5c3_Err != nil {
@@ -277,7 +279,7 @@ func IntroVideoSourcePill(sourceType constants.TeacherIntroVideoSourceType) temp
 	})
 }
 
-func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showViewAction bool, showActions bool) templ.Component {
+func IntroVideoCompressPresetPill(preset constants.IntroVideoCompressPreset) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -298,74 +300,115 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showViewAction b
 			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var9 = []any{introVideoRowClass(item.Status)}
-		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var9...)
+		if preset == "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<span>-</span>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else if constants.ValidIntroVideoCompressPreset(string(preset)) {
+			templ_7745c5c3_Err = Pill(constants.IntroVideoCompressPresetLabel(preset), IntroVideoCompressPresetPillTone(preset)).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = Pill(string(preset), PillToneNeutral).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		return nil
+	})
+}
+
+func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showViewAction bool, showActions bool) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var9 == nil {
+			templ_7745c5c3_Var9 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		var templ_7745c5c3_Var10 = []any{introVideoRowClass(item.Status)}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var10...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<tr class=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var10 string
-		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var9).String())
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 1, Col: 0}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\"><td data-label=\"Video\"><span class=\"documents-filename\" title=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<tr class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var11 string
-		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.LinkLabel)
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var10).String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 112, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 1, Col: 0}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\"><td data-label=\"Video\"><span class=\"documents-filename\" title=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var12 string
-		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(introVideoLinkDisplay(item.LinkLabel))
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.LinkLabel)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 112, Col: 100}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 124, Col: 58}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</span> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var13 string
+		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(introVideoLinkDisplay(item.LinkLabel))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 124, Col: 100}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</span> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if item.RejectReason != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<div class=\"intro-video-reject-reason\">Reject reason: ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"intro-video-reject-reason\">Reject reason: ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var13 string
-			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(item.RejectReason)
+			var templ_7745c5c3_Var14 string
+			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(item.RejectReason)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 114, Col: 77}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 126, Col: 77}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</td><td data-label=\"Source\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</td><td data-label=\"Source\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -373,7 +416,7 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showViewAction b
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</td><td data-label=\"Status\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</td><td data-label=\"Status\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -381,31 +424,46 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showViewAction b
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</td>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</td><td data-label=\"Original size\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var15 string
+		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(item.OriginalFileSize)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 135, Col: 56}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</td><td data-label=\"Processed size\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var16 string
+		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(item.ProcessedFileSize)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 136, Col: 58}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</td><td data-label=\"Preset\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = IntroVideoCompressPresetPill(item.CompressPreset).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</td>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if showUploader {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<td data-label=\"Size\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var14 string
-			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(item.FileSizeLabel)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 124, Col: 45}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</td>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		if showUploader {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<td data-label=\"Uploaded by\"><div class=\"documents-uploader-cell\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<td data-label=\"Uploaded by\"><div class=\"documents-uploader-cell\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -413,43 +471,43 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showViewAction b
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var15 string
-			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(item.UploadedBy)
+			var templ_7745c5c3_Var17 string
+			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(item.UploadedBy)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 130, Col: 28}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 144, Col: 28}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</span></div></td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</span></div></td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<td data-label=\"Uploaded at\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<td data-label=\"Uploaded at\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var16 string
-		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(item.UploadedAt)
+		var templ_7745c5c3_Var18 string
+		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(item.UploadedAt)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 134, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 148, Col: 48}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</td>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</td>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if showViewAction || showActions {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<td data-label=\"Actions\"><div class=\"table-actions\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<td data-label=\"Actions\"><div class=\"table-actions\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -461,20 +519,20 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showViewAction b
 			}
 			if showActions {
 				if item.CanReview {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<form method=\"POST\" action=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<form method=\"POST\" action=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var17 templ.SafeURL
-					templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/intro-videos/" + item.ID + "/approve"))
+					var templ_7745c5c3_Var19 templ.SafeURL
+					templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/intro-videos/" + item.ID + "/approve"))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 143, Col: 86}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 157, Col: 86}
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" class=\"table-action-form\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\" class=\"table-action-form\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -482,7 +540,7 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showViewAction b
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "</form>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</form>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -495,20 +553,20 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showViewAction b
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, " <form method=\"POST\" action=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, " <form method=\"POST\" action=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var18 templ.SafeURL
-				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/intro-videos/" + item.ID + "/delete"))
+				var templ_7745c5c3_Var20 templ.SafeURL
+				templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/intro-videos/" + item.ID + "/delete"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 152, Col: 84}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 166, Col: 84}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\" class=\"table-action-form\" onsubmit=\"return confirm('Delete this intro video? The teacher can submit a new one.');\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\" class=\"table-action-form\" onsubmit=\"return confirm('Delete this intro video? The teacher can submit a new one.');\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -516,17 +574,17 @@ func IntroVideoTableRow(item IntroVideoItem, showUploader bool, showViewAction b
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</form>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</form>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</div></td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</div></td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</tr>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</tr>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -550,39 +608,39 @@ func IntroVideosTableBody(items []IntroVideoItem, showUploader bool, showViewAct
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var19 == nil {
-			templ_7745c5c3_Var19 = templ.NopComponent
+		templ_7745c5c3_Var21 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var21 == nil {
+			templ_7745c5c3_Var21 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		if len(items) == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "<tr><td colspan=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<tr><td colspan=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var20 string
-			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", introVideosTableColspan(showUploader, showViewAction, showActions)))
+			var templ_7745c5c3_Var22 string
+			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", introVideosTableColspan(showUploader, showViewAction, showActions)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 165, Col: 102}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 179, Col: 102}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var20)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "\" class=\"empty-state\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var22)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var21 string
-			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(emptyMessage)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 165, Col: 139}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\" class=\"empty-state\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</td></tr>")
+			var templ_7745c5c3_Var23 string
+			templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(emptyMessage)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 179, Col: 139}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "</td></tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -614,88 +672,84 @@ func IntroVideosTable(showUploader bool, showViewAction bool, showActions bool) 
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var22 == nil {
-			templ_7745c5c3_Var22 = templ.NopComponent
+		templ_7745c5c3_Var24 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var24 == nil {
+			templ_7745c5c3_Var24 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<div class=\"table-wrapper documents-table-wrapper\"><table class=\"documents-table table-stack-mobile\"><thead><tr><th>Video</th><th>Source</th><th>Status</th>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "<div class=\"table-wrapper documents-table-wrapper\"><table class=\"documents-table table-stack-mobile\"><thead><tr><th>Video</th><th>Source</th><th>Status</th><th>Original size</th><th>Processed size</th><th>Preset</th>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if showUploader {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "<th>Size</th>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
 			templ_7745c5c3_Err = AdminOnlyTableHeader("Uploaded by").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "<th>Uploaded at</th>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "<th>Uploaded at</th>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if showViewAction || showActions {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "<th>Actions</th>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "<th>Actions</th>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</tr></thead> <tbody id=\"introVideosTableBody\" hx-get=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var23 string
-		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/intro-videos/partials/rows"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 194, Col: 53}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "\" hx-include=\"#introVideosToolbar\" hx-trigger=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var24 string
-		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 196, Col: 30}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "\" hx-swap=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "</tr></thead> <tbody id=\"introVideosTableBody\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var25 string
-		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/intro-videos/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 197, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 210, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var25)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "\"><tr><td colspan=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "\" hx-include=\"#introVideosToolbar\" hx-trigger=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var26 string
-		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", introVideosTableColspan(showUploader, showViewAction, showActions)))
+		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 200, Col: 104}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 212, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "\" class=\"empty-state\">Loading intro videos...</td></tr></tbody></table></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "\" hx-swap=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var27 string
+		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 213, Col: 29}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "\"><tr><td colspan=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var28 string
+		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", introVideosTableColspan(showUploader, showViewAction, showActions)))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 216, Col: 104}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var28)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "\" class=\"empty-state\">Loading intro videos...</td></tr></tbody></table></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -729,38 +783,38 @@ func IntroVideosPage(data IntroVideosPageData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var27 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var27 == nil {
-			templ_7745c5c3_Var27 = templ.NopComponent
+		templ_7745c5c3_Var29 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var29 == nil {
+			templ_7745c5c3_Var29 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var28 string
-		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(data.Title)
+		var templ_7745c5c3_Var30 string
+		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(data.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 223, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 239, Col: 21}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, " - Zion English Admin Tool</title><link rel=\"icon\" type=\"image/x-icon\" href=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var29 templ.SafeURL
-		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 224, Col: 78}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, " - Zion English Admin Tool</title><link rel=\"icon\" type=\"image/x-icon\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\">")
+		var templ_7745c5c3_Var31 templ.SafeURL
+		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 240, Col: 78}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -776,7 +830,7 @@ func IntroVideosPage(data IntroVideosPageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "<style>\r\n\t\t\t.intro-video-reject-reason {\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t}\r\n\t\t</style></head><body><div class=\"container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "<style>\r\n\t\t\t.intro-video-reject-reason {\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t}\r\n\t\t</style></head><body><div class=\"container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -797,20 +851,20 @@ func IntroVideosPage(data IntroVideosPageData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if data.Description != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "<p class=\"documents-page-desc\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "<p class=\"documents-page-desc\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var30 string
-			templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
+			var templ_7745c5c3_Var32 string
+			templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 242, Col: 53}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 258, Col: 53}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -829,7 +883,7 @@ func IntroVideosPage(data IntroVideosPageData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -841,7 +895,7 @@ func IntroVideosPage(data IntroVideosPageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "<script>\r\n\t\t\tconst introVideoSearch = document.getElementById('introVideoSearch');\r\n\t\t\tif (introVideoSearch) {\r\n\t\t\t\tintroVideoSearch.addEventListener('keydown', function (e) {\r\n\t\t\t\t\tif (e.key === 'Enter') {\r\n\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\r\n\t\t\t\t\t\t\thtmx.trigger('#introVideosTableBody', 'load');\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\t\t\t}\r\n\t\t</script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "<script>\r\n\t\t\tconst introVideoSearch = document.getElementById('introVideoSearch');\r\n\t\t\tif (introVideoSearch) {\r\n\t\t\t\tintroVideoSearch.addEventListener('keydown', function (e) {\r\n\t\t\t\t\tif (e.key === 'Enter') {\r\n\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\r\n\t\t\t\t\t\t\thtmx.trigger('#introVideosTableBody', 'load');\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\t\t\t}\r\n\t\t</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -865,12 +919,12 @@ func IntroVideoRejectModal() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var31 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var31 == nil {
-			templ_7745c5c3_Var31 = templ.NopComponent
+		templ_7745c5c3_Var33 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var33 == nil {
+			templ_7745c5c3_Var33 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "<div class=\"modal-overlay\" id=\"introVideoRejectModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"introVideoRejectModalTitle\"><div class=\"modal-header\"><h3 id=\"introVideoRejectModalTitle\">Reject intro video</h3><button type=\"button\" class=\"modal-close intro-video-reject-modal-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><form id=\"introVideoRejectForm\" method=\"POST\" class=\"modal-body scheduled-class-action-modal\"><p class=\"scheduled-class-modal-lead\">The teacher will be able to submit a new intro video after rejection.</p><div class=\"form-group\"><label>Video</label><p id=\"introVideoRejectLabel\" class=\"intro-video-reject-modal-link\">-</p></div><div class=\"scheduled-class-modal-fields\"><div class=\"form-group\"><label for=\"introVideoRejectReason\">Reject reason *</label> <textarea id=\"introVideoRejectReason\" name=\"reject_reason\" required rows=\"3\" placeholder=\"Explain what the teacher should fix before resubmitting\"></textarea></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary intro-video-reject-modal-close\">Cancel</button> <button type=\"submit\" class=\"btn btn-danger\">Reject video</button></div></form></div></div><style>\r\n\t\t.intro-video-reject-modal-link {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tword-break: break-word;\r\n\t\t}\r\n\t</style><script>\r\n\t\t(function () {\r\n\t\t\tconst modal = document.getElementById('introVideoRejectModal');\r\n\t\t\tconst form = document.getElementById('introVideoRejectForm');\r\n\t\t\tconst reasonInput = document.getElementById('introVideoRejectReason');\r\n\t\t\tconst labelEl = document.getElementById('introVideoRejectLabel');\r\n\t\t\tif (!modal || !form || !reasonInput || !labelEl) return;\r\n\r\n\t\t\twindow.openIntroVideoRejectModal = function (rejectURL, linkLabel) {\r\n\t\t\t\tform.action = rejectURL;\r\n\t\t\t\treasonInput.value = '';\r\n\t\t\t\tlabelEl.textContent = linkLabel || '-';\r\n\t\t\t\tmodal.hidden = false;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\treasonInput.focus();\r\n\t\t\t};\r\n\r\n\t\t\twindow.closeIntroVideoRejectModal = function () {\r\n\t\t\t\tmodal.hidden = true;\r\n\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\treasonInput.value = '';\r\n\t\t\t\tlabelEl.textContent = '-';\r\n\t\t\t};\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tconst rejectBtn = e.target.closest('[data-intro-video-reject-url]');\r\n\t\t\t\tif (rejectBtn) {\r\n\t\t\t\t\tconst rejectURL = rejectBtn.getAttribute('data-intro-video-reject-url');\r\n\t\t\t\t\tconst linkLabel = rejectBtn.getAttribute('data-intro-video-reject-label') || '';\r\n\t\t\t\t\tif (!rejectURL) return;\r\n\t\t\t\t\twindow.openIntroVideoRejectModal(rejectURL, linkLabel);\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (e.target.closest('.intro-video-reject-modal-close')) {\r\n\t\t\t\t\twindow.closeIntroVideoRejectModal();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (e.target === modal) {\r\n\t\t\t\t\twindow.closeIntroVideoRejectModal();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key === 'Escape' && modal && !modal.hidden) {\r\n\t\t\t\t\twindow.closeIntroVideoRejectModal();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tform.addEventListener('submit', function (e) {\r\n\t\t\t\tif (!reasonInput.value.trim()) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\treasonInput.focus();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "<div class=\"modal-overlay\" id=\"introVideoRejectModal\" hidden role=\"presentation\"><div class=\"modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"introVideoRejectModalTitle\"><div class=\"modal-header\"><h3 id=\"introVideoRejectModalTitle\">Reject intro video</h3><button type=\"button\" class=\"modal-close intro-video-reject-modal-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><form id=\"introVideoRejectForm\" method=\"POST\" class=\"modal-body scheduled-class-action-modal\"><p class=\"scheduled-class-modal-lead\">The teacher will be able to submit a new intro video after rejection.</p><div class=\"form-group\"><label>Video</label><p id=\"introVideoRejectLabel\" class=\"intro-video-reject-modal-link\">-</p></div><div class=\"scheduled-class-modal-fields\"><div class=\"form-group\"><label for=\"introVideoRejectReason\">Reject reason *</label> <textarea id=\"introVideoRejectReason\" name=\"reject_reason\" required rows=\"3\" placeholder=\"Explain what the teacher should fix before resubmitting\"></textarea></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary intro-video-reject-modal-close\">Cancel</button> <button type=\"submit\" class=\"btn btn-danger\">Reject video</button></div></form></div></div><style>\r\n\t\t.intro-video-reject-modal-link {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tword-break: break-word;\r\n\t\t}\r\n\t</style><script>\r\n\t\t(function () {\r\n\t\t\tconst modal = document.getElementById('introVideoRejectModal');\r\n\t\t\tconst form = document.getElementById('introVideoRejectForm');\r\n\t\t\tconst reasonInput = document.getElementById('introVideoRejectReason');\r\n\t\t\tconst labelEl = document.getElementById('introVideoRejectLabel');\r\n\t\t\tif (!modal || !form || !reasonInput || !labelEl) return;\r\n\r\n\t\t\twindow.openIntroVideoRejectModal = function (rejectURL, linkLabel) {\r\n\t\t\t\tform.action = rejectURL;\r\n\t\t\t\treasonInput.value = '';\r\n\t\t\t\tlabelEl.textContent = linkLabel || '-';\r\n\t\t\t\tmodal.hidden = false;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\treasonInput.focus();\r\n\t\t\t};\r\n\r\n\t\t\twindow.closeIntroVideoRejectModal = function () {\r\n\t\t\t\tmodal.hidden = true;\r\n\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\treasonInput.value = '';\r\n\t\t\t\tlabelEl.textContent = '-';\r\n\t\t\t};\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tconst rejectBtn = e.target.closest('[data-intro-video-reject-url]');\r\n\t\t\t\tif (rejectBtn) {\r\n\t\t\t\t\tconst rejectURL = rejectBtn.getAttribute('data-intro-video-reject-url');\r\n\t\t\t\t\tconst linkLabel = rejectBtn.getAttribute('data-intro-video-reject-label') || '';\r\n\t\t\t\t\tif (!rejectURL) return;\r\n\t\t\t\t\twindow.openIntroVideoRejectModal(rejectURL, linkLabel);\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (e.target.closest('.intro-video-reject-modal-close')) {\r\n\t\t\t\t\twindow.closeIntroVideoRejectModal();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (e.target === modal) {\r\n\t\t\t\t\twindow.closeIntroVideoRejectModal();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key === 'Escape' && modal && !modal.hidden) {\r\n\t\t\t\t\twindow.closeIntroVideoRejectModal();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tform.addEventListener('submit', function (e) {\r\n\t\t\t\tif (!reasonInput.value.trim()) {\r\n\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\treasonInput.focus();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -894,18 +948,18 @@ func ProfileIntroVideoUpload(data ProfileData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var32 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var32 == nil {
-			templ_7745c5c3_Var32 = templ.NopComponent
+		templ_7745c5c3_Var34 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var34 == nil {
+			templ_7745c5c3_Var34 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		if !data.IsSuperuser && data.IntroVideoUploadVisible {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "<div class=\"profile-card profile-section\"><h2>Introduction video</h2><p class=\"profile-section-desc\">Upload a short introduction video for students and administrators. You can also submit a YouTube or Google Drive link if you prefer to host the video externally.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "<div class=\"profile-card profile-section\"><h2>Introduction video</h2><p class=\"profile-section-desc\">Upload a short introduction video for students and administrators. You can also submit a YouTube or Google Drive link if you prefer to host the video externally.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.HasIntroVideo {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "<div class=\"profile-detail\" style=\"margin-bottom: var(--space-4);\"><span class=\"profile-detail-label\">Current submission</span><div style=\"display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-top: var(--space-2);\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "<div class=\"profile-detail\" style=\"margin-bottom: var(--space-4);\"><span class=\"profile-detail-label\">Current submission</span><div style=\"display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-top: var(--space-2);\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -930,201 +984,197 @@ func ProfileIntroVideoUpload(data ProfileData) templ.Component {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "</div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				if data.IntroVideoRejectReason != "" {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "<p class=\"profile-section-desc\" style=\"margin-top: var(--space-2); margin-bottom: 0;\">Reject reason: ")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					var templ_7745c5c3_Var33 string
-					templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(data.IntroVideoRejectReason)
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 391, Col: 136}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "</p>")
+				if data.IntroVideoStatus == constants.TeacherIntroVideoStatusProcessing {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "<p class=\"profile-section-desc\" style=\"margin-top: var(--space-2); margin-bottom: 0;\">Processing in the background. Track progress in the panel at the bottom-right of the screen.</p>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "</div>")
+				if data.IntroVideoRejectReason != "" {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "<p class=\"profile-section-desc\" style=\"margin-top: var(--space-2); margin-bottom: 0;\">Reject reason: ")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var35 string
+					templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(data.IntroVideoRejectReason)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 410, Col: 136}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "</p>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 			if !data.IntroVideoUploadsAllowed {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "<div class=\"upload-locked-notice\" role=\"status\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle> <line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line> <line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg> <span>Intro video submissions are currently disabled.</span></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "<div class=\"upload-locked-notice\" role=\"status\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle> <line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line> <line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg> <span>Intro video submissions are currently disabled.</span></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else if !data.CanUploadIntroVideo {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "<div class=\"upload-locked-notice\" role=\"status\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle> <line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line> <line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg> <span>You already have a submitted or approved intro video on file. You cannot submit again unless it is rejected or deleted by an administrator.</span></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "<div class=\"upload-locked-notice\" role=\"status\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle> <line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line> <line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg> <span>You already have a submitted, processing, or approved intro video on file. You cannot submit again unless it is rejected or deleted by an administrator.</span></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 			if data.IntroVideoUploadsAllowed {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "<form id=\"introVideoForm\" method=\"POST\" action=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "<form id=\"introVideoForm\" method=\"POST\" action=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var34 templ.SafeURL
-				templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/intro-video"))
+				var templ_7745c5c3_Var36 templ.SafeURL
+				templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/intro-video"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 418, Col: 47}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 437, Col: 47}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "\" enctype=\"multipart/form-data\" data-max-bytes=\"")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var35 string
-				templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", constants.MaxIntroVideoBytes))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 420, Col: 69}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var35)
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "\" enctype=\"multipart/form-data\" data-max-bytes=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "\" data-max-duration-seconds=\"")
+				var templ_7745c5c3_Var37 string
+				templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", constants.MaxIntroVideoBytes))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 439, Col: 69}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var37)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var36 string
-				templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", constants.MaxIntroVideoDurationSeconds))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 421, Col: 90}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var36)
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "\" data-max-duration-seconds=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "\"><div class=\"form-group\"><label for=\"introVideoSourceType\">Source *</label> <select id=\"introVideoSourceType\" name=\"source_type\" required")
+				var templ_7745c5c3_Var38 string
+				templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", constants.MaxIntroVideoDurationSeconds))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 440, Col: 90}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var38)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "\"><div class=\"form-group\"><label for=\"introVideoSourceType\">Source *</label> <select id=\"introVideoSourceType\" name=\"source_type\" required")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if !data.CanUploadIntroVideo {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, " disabled")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, " disabled")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, ">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, ">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				for _, opt := range TeacherIntroVideoSourceTypeOptions {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "<option value=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "<option value=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var37 string
-					templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
+					var templ_7745c5c3_Var39 string
+					templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 427, Col: 33}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 446, Col: 33}
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var37)
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var39)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					if opt.Value == string(constants.TeacherIntroVideoSourceUpload) {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, " selected")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, " selected")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, ">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, ">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var38 string
-					templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
+					var templ_7745c5c3_Var40 string
+					templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 427, Col: 122}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 446, Col: 122}
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "</option>")
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "</select></div><div id=\"introVideoUploadFields\"><div class=\"upload-zone\"><label class=\"upload-zone-label\" for=\"introVideoFile\"><span class=\"upload-zone-icon\" aria-hidden=\"true\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"23 7 16 12 23 17 23 7\"></polygon> <rect x=\"1\" y=\"5\" width=\"15\" height=\"14\" rx=\"2\" ry=\"2\"></rect></svg></span> <span class=\"upload-zone-meta\"><span>Choose intro video</span> <span class=\"upload-zone-hint\">MP4, WebM, MOV, AVI, MKV, OGV, M4V, or 3GP (max ")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var39 string
-				templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", constants.MaxIntroVideoSizeMB()))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 442, Col: 140}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, " MB, ")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var40 string
-				templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(constants.MaxIntroVideoDurationLabel())
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 442, Col: 187}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "). Videos are optimized on upload.</span></span> <input type=\"file\" id=\"introVideoFile\" name=\"video\" accept=\".mp4,.webm,.mov,.avi,.mkv,.ogv,.m4v,.3gp,video/*\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				if !data.CanUploadIntroVideo {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, " disabled")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "</option>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "></label></div><div id=\"introVideoFilePreview\" class=\"intro-video-file-preview\" hidden><div class=\"intro-video-file-preview-media\"><video id=\"introVideoPreviewPlayer\" playsinline preload=\"auto\" controls></video></div><dl class=\"intro-video-file-preview-meta\"><div><dt>File name</dt><dd id=\"introVideoPreviewName\">-</dd></div><div><dt>File size</dt><dd id=\"introVideoPreviewSize\">-</dd></div><div><dt>Format</dt><dd id=\"introVideoPreviewFormat\">-</dd></div><div><dt>Duration</dt><dd id=\"introVideoPreviewDuration\">-</dd></div><div><dt>Dimensions</dt><dd id=\"introVideoPreviewDimensions\">-</dd></div></dl><p id=\"introVideoPreviewDurationWarning\" class=\"intro-video-duration-warning\" hidden>Video exceeds the ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "</select></div><div id=\"introVideoUploadFields\"><div class=\"upload-zone\"><label class=\"upload-zone-label\" for=\"introVideoFile\"><span class=\"upload-zone-icon\" aria-hidden=\"true\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"23 7 16 12 23 17 23 7\"></polygon> <rect x=\"1\" y=\"5\" width=\"15\" height=\"14\" rx=\"2\" ry=\"2\"></rect></svg></span> <span class=\"upload-zone-meta\"><span>Choose intro video</span> <span class=\"upload-zone-hint\">MP4, WebM, MOV, AVI, MKV, OGV, M4V, or 3GP (max ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var41 string
-				templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(constants.MaxIntroVideoDurationLabel())
+				templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", constants.MaxIntroVideoSizeMB()))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 479, Col: 150}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 461, Col: 140}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, " limit. Choose a shorter clip before submitting.</p></div></div><div id=\"introVideoLinkFields\" hidden><div class=\"form-group\"><label for=\"introVideoURL\">Video URL *</label> <input type=\"url\" id=\"introVideoURL\" name=\"url\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, " MB, ")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var42 string
+				templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(constants.MaxIntroVideoDurationLabel())
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 461, Col: 187}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "). Videos are optimized on upload.</span></span> <input type=\"file\" id=\"introVideoFile\" name=\"video\" accept=\".mp4,.webm,.mov,.avi,.mkv,.ogv,.m4v,.3gp,video/*\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if !data.CanUploadIntroVideo {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, " disabled")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, " disabled")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, " placeholder=\"https://...\"></div><div class=\"intro-video-link-info\"><p class=\"field-hint\">Make sure the link is publicly accessible. See the steps below for your selected source.</p><p class=\"field-hint\" id=\"introVideoSourceHint\" data-google-drive=\"In Google Drive, open Share and set General access to Anyone with the link.\" data-youtube=\"In YouTube Studio, set visibility to Unlisted so anyone with the link can watch.\"></p></div></div><p id=\"introVideoFormError\" class=\"intro-video-form-error\" hidden role=\"alert\"></p><div class=\"profile-form-actions\"><button type=\"submit\" id=\"introVideoSubmitBtn\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "></label></div><div id=\"introVideoFilePreview\" class=\"intro-video-file-preview\" hidden><div class=\"intro-video-file-preview-media\"><video id=\"introVideoPreviewPlayer\" playsinline preload=\"auto\" controls></video></div><dl class=\"intro-video-file-preview-meta\"><div><dt>File name</dt><dd id=\"introVideoPreviewName\">-</dd></div><div><dt>File size</dt><dd id=\"introVideoPreviewSize\">-</dd></div><div><dt>Format</dt><dd id=\"introVideoPreviewFormat\">-</dd></div><div><dt>Duration</dt><dd id=\"introVideoPreviewDuration\">-</dd></div><div><dt>Dimensions</dt><dd id=\"introVideoPreviewDimensions\">-</dd></div></dl><p id=\"introVideoPreviewDurationWarning\" class=\"intro-video-duration-warning\" hidden>Video exceeds the ")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var43 string
+				templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(constants.MaxIntroVideoDurationLabel())
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/intro_videos.templ`, Line: 498, Col: 150}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, " limit. Choose a shorter clip before submitting.</p></div></div><div id=\"introVideoLinkFields\" hidden><div class=\"form-group\"><label for=\"introVideoURL\">Video URL *</label> <input type=\"url\" id=\"introVideoURL\" name=\"url\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1134,12 +1184,22 @@ func ProfileIntroVideoUpload(data ProfileData) templ.Component {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, ">Submit intro video</button></div></form><div id=\"introVideoUploadProgress\" class=\"intro-video-upload-progress\" hidden role=\"presentation\"><div class=\"intro-video-upload-progress-panel\" role=\"status\" aria-live=\"polite\"><p id=\"introVideoUploadProgressMessage\" class=\"intro-video-upload-progress-message\">Uploading video, please wait...</p><div class=\"intro-video-progress-track\"><div id=\"introVideoUploadProgressBar\" class=\"intro-video-progress-bar\" role=\"progressbar\" aria-valuemin=\"0\" aria-valuemax=\"100\" aria-valuenow=\"0\"></div></div><p class=\"intro-video-upload-progress-hint\">Do not refresh or close this tab.</p></div></div><style>\r\n\t\t\t\t\t.intro-video-file-preview {\r\n\t\t\t\t\t\tmargin-top: var(--space-4);\r\n\t\t\t\t\t\tpadding: var(--space-4);\r\n\t\t\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\t\t\tdisplay: grid;\r\n\t\t\t\t\t\tgap: var(--space-4);\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-file-preview[hidden] {\r\n\t\t\t\t\t\tdisplay: none !important;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-file-preview-media video {\r\n\t\t\t\t\t\tdisplay: block;\r\n\t\t\t\t\t\twidth: 100%;\r\n\t\t\t\t\t\tmax-height: 220px;\r\n\t\t\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\t\t\tbackground: #000;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-file-preview-meta {\r\n\t\t\t\t\t\tdisplay: grid;\r\n\t\t\t\t\t\tgrid-template-columns: repeat(auto-fit, minmax(140px, 1fr));\r\n\t\t\t\t\t\tgap: var(--space-3);\r\n\t\t\t\t\t\tmargin: 0;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-file-preview-meta dt {\r\n\t\t\t\t\t\tmargin: 0 0 var(--space-1);\r\n\t\t\t\t\t\tfont-size: 0.6875rem;\r\n\t\t\t\t\t\tfont-weight: 600;\r\n\t\t\t\t\t\ttext-transform: uppercase;\r\n\t\t\t\t\t\tletter-spacing: 0.04em;\r\n\t\t\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-file-preview-meta dd {\r\n\t\t\t\t\t\tmargin: 0;\r\n\t\t\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\t\t\tword-break: break-word;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-duration-warning {\r\n\t\t\t\t\t\tmargin: 0;\r\n\t\t\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\t\t\tcolor: var(--color-destructive);\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-form-error {\r\n\t\t\t\t\t\tmargin-top: var(--space-3);\r\n\t\t\t\t\t\tpadding: var(--space-3) var(--space-4);\r\n\t\t\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\t\t\tbackground: color-mix(in srgb, var(--color-destructive) 10%, var(--color-surface));\r\n\t\t\t\t\t\tborder: 1px solid color-mix(in srgb, var(--color-destructive) 25%, transparent);\r\n\t\t\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-upload-progress {\r\n\t\t\t\t\t\tposition: fixed;\r\n\t\t\t\t\t\tinset: 0;\r\n\t\t\t\t\t\tz-index: 1200;\r\n\t\t\t\t\t\tdisplay: flex;\r\n\t\t\t\t\t\talign-items: center;\r\n\t\t\t\t\t\tjustify-content: center;\r\n\t\t\t\t\t\tpadding: var(--space-4);\r\n\t\t\t\t\t\tbackground: rgba(15, 23, 42, 0.5);\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-upload-progress[hidden] {\r\n\t\t\t\t\t\tdisplay: none !important;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-upload-progress-panel {\r\n\t\t\t\t\t\twidth: min(100%, 28rem);\r\n\t\t\t\t\t\tpadding: var(--space-5);\r\n\t\t\t\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\t\t\tbox-shadow: var(--shadow-lg);\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-upload-progress-message {\r\n\t\t\t\t\t\tmargin: 0 0 var(--space-4);\r\n\t\t\t\t\t\tfont-size: 0.9375rem;\r\n\t\t\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-upload-progress-hint {\r\n\t\t\t\t\t\tmargin: var(--space-4) 0 0;\r\n\t\t\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\t\t\ttext-align: center;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-progress-track {\r\n\t\t\t\t\t\theight: 0.625rem;\r\n\t\t\t\t\t\tborder-radius: var(--radius-full);\r\n\t\t\t\t\t\tbackground: var(--color-muted);\r\n\t\t\t\t\t\toverflow: hidden;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-progress-bar {\r\n\t\t\t\t\t\theight: 100%;\r\n\t\t\t\t\t\twidth: 0;\r\n\t\t\t\t\t\tborder-radius: var(--radius-full);\r\n\t\t\t\t\t\tbackground: var(--color-primary);\r\n\t\t\t\t\t\ttransition: width 120ms linear;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-progress-bar.is-indeterminate {\r\n\t\t\t\t\t\twidth: 35%;\r\n\t\t\t\t\t\ttransition: none;\r\n\t\t\t\t\t\tanimation: introVideoProgressIndeterminate 1.2s ease-in-out infinite;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t@keyframes introVideoProgressIndeterminate {\r\n\t\t\t\t\t\t0% { transform: translateX(-120%); }\r\n\t\t\t\t\t\t100% { transform: translateX(320%); }\r\n\t\t\t\t\t}\r\n\t\t\t\t</style> <script>\r\n\t\t\t\t\t(function () {\r\n\t\t\t\t\t\tconst form = document.getElementById('introVideoForm');\r\n\t\t\t\t\t\tconst sourceSelect = document.getElementById('introVideoSourceType');\r\n\t\t\t\t\t\tconst uploadFields = document.getElementById('introVideoUploadFields');\r\n\t\t\t\t\t\tconst linkFields = document.getElementById('introVideoLinkFields');\r\n\t\t\t\t\t\tconst fileInput = document.getElementById('introVideoFile');\r\n\t\t\t\t\t\tconst urlInput = document.getElementById('introVideoURL');\r\n\t\t\t\t\t\tconst hintEl = document.getElementById('introVideoSourceHint');\r\n\t\t\t\t\t\tconst previewPanel = document.getElementById('introVideoFilePreview');\r\n\t\t\t\t\t\tconst previewPlayer = document.getElementById('introVideoPreviewPlayer');\r\n\t\t\t\t\t\tconst previewName = document.getElementById('introVideoPreviewName');\r\n\t\t\t\t\t\tconst previewSize = document.getElementById('introVideoPreviewSize');\r\n\t\t\t\t\t\tconst previewFormat = document.getElementById('introVideoPreviewFormat');\r\n\t\t\t\t\t\tconst previewDuration = document.getElementById('introVideoPreviewDuration');\r\n\t\t\t\t\t\tconst previewDimensions = document.getElementById('introVideoPreviewDimensions');\r\n\t\t\t\t\t\tconst durationWarning = document.getElementById('introVideoPreviewDurationWarning');\r\n\t\t\t\t\t\tconst submitBtn = document.getElementById('introVideoSubmitBtn');\r\n\t\t\t\t\t\tconst formError = document.getElementById('introVideoFormError');\r\n\t\t\t\t\t\tconst progressOverlay = document.getElementById('introVideoUploadProgress');\r\n\t\t\t\t\t\tconst progressMessage = document.getElementById('introVideoUploadProgressMessage');\r\n\t\t\t\t\t\tconst progressBar = document.getElementById('introVideoUploadProgressBar');\r\n\t\t\t\t\t\tif (!form || !sourceSelect || !uploadFields || !linkFields || !fileInput || !urlInput || !submitBtn) return;\r\n\r\n\t\t\t\t\t\tconst maxDurationSeconds = parseInt(form.dataset.maxDurationSeconds || '0', 10);\r\n\t\t\t\t\t\tconst maxBytes = parseInt(form.dataset.maxBytes || '0', 10);\r\n\t\t\t\t\t\tlet previewObjectURL = '';\r\n\r\n\t\t\t\t\t\tfunction formatFileSize(bytes) {\r\n\t\t\t\t\t\t\tif (!bytes || bytes <= 0) return '-';\r\n\t\t\t\t\t\t\tconst units = ['B', 'KB', 'MB', 'GB'];\r\n\t\t\t\t\t\t\tlet value = bytes;\r\n\t\t\t\t\t\t\tlet unitIndex = 0;\r\n\t\t\t\t\t\t\twhile (value >= 1024 && unitIndex < units.length - 1) {\r\n\t\t\t\t\t\t\t\tvalue /= 1024;\r\n\t\t\t\t\t\t\t\tunitIndex++;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\treturn (unitIndex === 0 ? value.toFixed(0) : value.toFixed(1)) + ' ' + units[unitIndex];\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction formatDuration(seconds) {\r\n\t\t\t\t\t\t\tif (!seconds || !isFinite(seconds)) return '-';\r\n\t\t\t\t\t\t\tconst total = Math.round(seconds);\r\n\t\t\t\t\t\t\tconst mins = Math.floor(total / 60);\r\n\t\t\t\t\t\t\tconst secs = total % 60;\r\n\t\t\t\t\t\t\treturn mins + ':' + String(secs).padStart(2, '0');\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction updatePreviewMetadata() {\r\n\t\t\t\t\t\t\tif (!previewPlayer) return;\r\n\t\t\t\t\t\t\tconst duration = previewPlayer.duration;\r\n\t\t\t\t\t\t\tif (previewDuration) {\r\n\t\t\t\t\t\t\t\tpreviewDuration.textContent = isFinite(duration) && duration > 0\r\n\t\t\t\t\t\t\t\t\t? formatDuration(duration)\r\n\t\t\t\t\t\t\t\t\t: '-';\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tif (previewDimensions) {\r\n\t\t\t\t\t\t\t\tconst width = previewPlayer.videoWidth;\r\n\t\t\t\t\t\t\t\tconst height = previewPlayer.videoHeight;\r\n\t\t\t\t\t\t\t\tpreviewDimensions.textContent = width > 0 && height > 0\r\n\t\t\t\t\t\t\t\t\t? width + ' x ' + height\r\n\t\t\t\t\t\t\t\t\t: '-';\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tif (durationWarning) {\r\n\t\t\t\t\t\t\t\tdurationWarning.hidden = !(isFinite(duration) && duration > maxDurationSeconds);\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tupdateSubmitState();\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction clearPreview() {\r\n\t\t\t\t\t\t\tif (previewPlayer) {\r\n\t\t\t\t\t\t\t\tpreviewPlayer.onloadedmetadata = null;\r\n\t\t\t\t\t\t\t\tpreviewPlayer.onloadeddata = null;\r\n\t\t\t\t\t\t\t\tpreviewPlayer.ondurationchange = null;\r\n\t\t\t\t\t\t\t\tpreviewPlayer.oncanplay = null;\r\n\t\t\t\t\t\t\t\tpreviewPlayer.pause();\r\n\t\t\t\t\t\t\t\tpreviewPlayer.removeAttribute('src');\r\n\t\t\t\t\t\t\t\tpreviewPlayer.load();\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tif (previewObjectURL) {\r\n\t\t\t\t\t\t\t\tURL.revokeObjectURL(previewObjectURL);\r\n\t\t\t\t\t\t\t\tpreviewObjectURL = '';\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tif (previewPanel) previewPanel.hidden = true;\r\n\t\t\t\t\t\t\tif (previewName) previewName.textContent = '-';\r\n\t\t\t\t\t\t\tif (previewSize) previewSize.textContent = '-';\r\n\t\t\t\t\t\t\tif (previewFormat) previewFormat.textContent = '-';\r\n\t\t\t\t\t\t\tif (previewDuration) previewDuration.textContent = '-';\r\n\t\t\t\t\t\t\tif (previewDimensions) previewDimensions.textContent = '-';\r\n\t\t\t\t\t\t\tif (durationWarning) durationWarning.hidden = true;\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction setFormError(message) {\r\n\t\t\t\t\t\t\tif (!formError) return;\r\n\t\t\t\t\t\t\tif (!message) {\r\n\t\t\t\t\t\t\t\tformError.hidden = true;\r\n\t\t\t\t\t\t\t\tformError.textContent = '';\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tformError.hidden = false;\r\n\t\t\t\t\t\t\tformError.textContent = message;\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction fileTooLargeMessage() {\r\n\t\t\t\t\t\t\tif (!maxBytes) return 'File is too large.';\r\n\t\t\t\t\t\t\tconst mb = Math.round(maxBytes / (1024 * 1024));\r\n\t\t\t\t\t\t\treturn 'File is too large. Maximum size is ' + mb + ' MB.';\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction updateSubmitState() {\r\n\t\t\t\t\t\t\tconst sourceType = sourceSelect.value;\r\n\t\t\t\t\t\t\tif (sourceType === 'upload') {\r\n\t\t\t\t\t\t\t\tconst file = fileInput.files && fileInput.files[0];\r\n\t\t\t\t\t\t\t\tif (!file) {\r\n\t\t\t\t\t\t\t\t\tsubmitBtn.disabled = true;\r\n\t\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\tif (maxBytes > 0 && file.size > maxBytes) {\r\n\t\t\t\t\t\t\t\t\tsubmitBtn.disabled = true;\r\n\t\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\tconst duration = previewPlayer && previewPlayer.duration;\r\n\t\t\t\t\t\t\t\tif (isFinite(duration) && duration > maxDurationSeconds) {\r\n\t\t\t\t\t\t\t\t\tsubmitBtn.disabled = true;\r\n\t\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\tsubmitBtn.disabled = false;\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tif (sourceType === 'google_drive' || sourceType === 'youtube') {\r\n\t\t\t\t\t\t\t\tsubmitBtn.disabled = !urlInput.value.trim();\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tsubmitBtn.disabled = true;\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction updateIntroVideoSourceHint() {\r\n\t\t\t\t\t\t\tif (!hintEl) return;\r\n\t\t\t\t\t\t\tconst sourceType = sourceSelect.value;\r\n\t\t\t\t\t\t\tif (sourceType === 'google_drive') {\r\n\t\t\t\t\t\t\t\thintEl.textContent = hintEl.getAttribute('data-google-drive') || '';\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tif (sourceType === 'youtube') {\r\n\t\t\t\t\t\t\t\thintEl.textContent = hintEl.getAttribute('data-youtube') || '';\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\thintEl.textContent = '';\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction syncSourceFields() {\r\n\t\t\t\t\t\t\tconst sourceType = sourceSelect.value;\r\n\t\t\t\t\t\t\tconst isUpload = sourceType === 'upload';\r\n\t\t\t\t\t\t\tconst isLink = sourceType === 'google_drive' || sourceType === 'youtube';\r\n\t\t\t\t\t\t\tuploadFields.hidden = !isUpload;\r\n\t\t\t\t\t\t\tlinkFields.hidden = !isLink;\r\n\t\t\t\t\t\t\tfileInput.required = isUpload;\r\n\t\t\t\t\t\t\turlInput.required = isLink;\r\n\t\t\t\t\t\t\tif (!isUpload) {\r\n\t\t\t\t\t\t\t\tfileInput.value = '';\r\n\t\t\t\t\t\t\t\tclearPreview();\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tif (!isLink) {\r\n\t\t\t\t\t\t\t\turlInput.value = '';\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tupdateIntroVideoSourceHint();\r\n\t\t\t\t\t\t\tupdateSubmitState();\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction bindPreview(file) {\r\n\t\t\t\t\t\t\tclearPreview();\r\n\t\t\t\t\t\t\tif (!file || !previewPanel || !previewPlayer) {\r\n\t\t\t\t\t\t\t\tupdateSubmitState();\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\t\tif (maxBytes > 0 && file.size > maxBytes) {\r\n\t\t\t\t\t\t\t\tsetFormError(fileTooLargeMessage());\r\n\t\t\t\t\t\t\t\tupdateSubmitState();\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\t\tpreviewObjectURL = URL.createObjectURL(file);\r\n\t\t\t\t\t\t\tif (previewName) previewName.textContent = file.name || '-';\r\n\t\t\t\t\t\t\tif (previewSize) previewSize.textContent = formatFileSize(file.size);\r\n\t\t\t\t\t\t\tconst ext = file.name && file.name.includes('.') ? file.name.slice(file.name.lastIndexOf('.')).toLowerCase() : '-';\r\n\t\t\t\t\t\t\tif (previewFormat) previewFormat.textContent = file.type ? file.type + ' (' + ext + ')' : ext;\r\n\t\t\t\t\t\t\tpreviewPanel.hidden = false;\r\n\r\n\t\t\t\t\t\t\tpreviewPlayer.onloadedmetadata = updatePreviewMetadata;\r\n\t\t\t\t\t\t\tpreviewPlayer.onloadeddata = updatePreviewMetadata;\r\n\t\t\t\t\t\t\tpreviewPlayer.ondurationchange = updatePreviewMetadata;\r\n\t\t\t\t\t\t\tpreviewPlayer.oncanplay = updatePreviewMetadata;\r\n\t\t\t\t\t\t\tpreviewPlayer.src = previewObjectURL;\r\n\t\t\t\t\t\t\tpreviewPlayer.load();\r\n\r\n\t\t\t\t\t\t\tif (previewPlayer.readyState >= HTMLMediaElement.HAVE_METADATA) {\r\n\t\t\t\t\t\t\t\tupdatePreviewMetadata();\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction setProgressState(mode, percent) {\r\n\t\t\t\t\t\t\tif (!progressOverlay || !progressMessage || !progressBar) return;\r\n\t\t\t\t\t\t\tprogressOverlay.hidden = false;\r\n\t\t\t\t\t\t\tprogressBar.classList.remove('is-indeterminate');\r\n\t\t\t\t\t\t\tif (mode === 'upload') {\r\n\t\t\t\t\t\t\t\tprogressMessage.textContent = 'Uploading video, please wait...';\r\n\t\t\t\t\t\t\t\tconst safePercent = Math.max(0, Math.min(100, percent || 0));\r\n\t\t\t\t\t\t\t\tprogressBar.style.width = safePercent + '%';\r\n\t\t\t\t\t\t\t\tprogressBar.removeAttribute('aria-valuetext');\r\n\t\t\t\t\t\t\t\tprogressBar.setAttribute('aria-valuenow', String(Math.round(safePercent)));\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tprogressMessage.textContent = 'Processing video, please wait...';\r\n\t\t\t\t\t\t\tprogressBar.style.removeProperty('width');\r\n\t\t\t\t\t\t\tprogressBar.classList.add('is-indeterminate');\r\n\t\t\t\t\t\t\tprogressBar.removeAttribute('aria-valuenow');\r\n\t\t\t\t\t\t\tprogressBar.setAttribute('aria-valuetext', 'Processing');\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction hideProgressState() {\r\n\t\t\t\t\t\t\tif (!progressOverlay || !progressBar) return;\r\n\t\t\t\t\t\t\tprogressOverlay.hidden = true;\r\n\t\t\t\t\t\t\tprogressBar.classList.remove('is-indeterminate');\r\n\t\t\t\t\t\t\tprogressBar.style.width = '0%';\r\n\t\t\t\t\t\t\tprogressBar.removeAttribute('aria-valuetext');\r\n\t\t\t\t\t\t\tprogressBar.setAttribute('aria-valuenow', '0');\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction setFormDisabled(disabled) {\r\n\t\t\t\t\t\t\tsourceSelect.disabled = disabled;\r\n\t\t\t\t\t\t\tfileInput.disabled = disabled;\r\n\t\t\t\t\t\t\turlInput.disabled = disabled;\r\n\t\t\t\t\t\t\tsubmitBtn.disabled = disabled;\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfileInput.addEventListener('change', function () {\r\n\t\t\t\t\t\t\tconst file = fileInput.files && fileInput.files[0];\r\n\t\t\t\t\t\t\tbindPreview(file || null);\r\n\t\t\t\t\t\t\tsetFormError('');\r\n\t\t\t\t\t\t\tupdateSubmitState();\r\n\t\t\t\t\t\t});\r\n\r\n\t\t\t\t\t\tsourceSelect.addEventListener('change', function () {\r\n\t\t\t\t\t\t\tsyncSourceFields();\r\n\t\t\t\t\t\t\tsetFormError('');\r\n\t\t\t\t\t\t});\r\n\r\n\t\t\t\t\t\tform.addEventListener('submit', function (e) {\r\n\t\t\t\t\t\t\tconst sourceType = sourceSelect.value;\r\n\t\t\t\t\t\t\tif (sourceType !== 'upload') {\r\n\t\t\t\t\t\t\t\tif (!confirm('Once submitted, you will not be able to submit a new intro video unless your current submission is rejected or deleted. Continue?')) {\r\n\t\t\t\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\t\tif (!confirm('Once submitted, you will not be able to submit a new intro video unless your current submission is rejected or deleted. Continue?')) {\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\t\tconst file = fileInput.files && fileInput.files[0];\r\n\t\t\t\t\t\t\tif (!file) {\r\n\t\t\t\t\t\t\t\tsetFormError('Please choose a video file to upload.');\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tif (maxBytes > 0 && file.size > maxBytes) {\r\n\t\t\t\t\t\t\t\tsetFormError(fileTooLargeMessage());\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\t\tsetFormError('');\r\n\t\t\t\t\t\t\tconst formData = new FormData(form);\r\n\t\t\t\t\t\t\tif (window.getCSRFHeaders) {\r\n\t\t\t\t\t\t\t\tconst headers = window.getCSRFHeaders();\r\n\t\t\t\t\t\t\t\tif (headers['X-CSRF-Token']) {\r\n\t\t\t\t\t\t\t\t\tformData.set('csrf_token', headers['X-CSRF-Token']);\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tsetFormDisabled(true);\r\n\t\t\t\t\t\t\tsetProgressState('upload', 0);\r\n\r\n\t\t\t\t\t\t\tconst xhr = new XMLHttpRequest();\r\n\t\t\t\t\t\t\txhr.open('POST', form.action);\r\n\t\t\t\t\t\t\txhr.responseType = 'document';\r\n\r\n\t\t\t\t\t\t\txhr.upload.addEventListener('progress', function (evt) {\r\n\t\t\t\t\t\t\t\tif (!evt.lengthComputable) return;\r\n\t\t\t\t\t\t\t\tconst percent = (evt.loaded / evt.total) * 100;\r\n\t\t\t\t\t\t\t\tif (percent >= 100) {\r\n\t\t\t\t\t\t\t\t\tsetProgressState('processing');\r\n\t\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\tsetProgressState('upload', percent);\r\n\t\t\t\t\t\t\t});\r\n\r\n\t\t\t\t\t\t\txhr.upload.addEventListener('load', function () {\r\n\t\t\t\t\t\t\t\tsetProgressState('processing');\r\n\t\t\t\t\t\t\t});\r\n\r\n\t\t\t\t\t\t\txhr.addEventListener('load', function () {\r\n\t\t\t\t\t\t\t\tif (xhr.status >= 200 && xhr.status < 400) {\r\n\t\t\t\t\t\t\t\t\twindow.location.href = xhr.responseURL || form.action;\r\n\t\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\thideProgressState();\r\n\t\t\t\t\t\t\t\tsetFormDisabled(false);\r\n\t\t\t\t\t\t\t\tupdateSubmitState();\r\n\t\t\t\t\t\t\t\tsetFormError('Failed to upload intro video. Please try again.');\r\n\t\t\t\t\t\t\t});\r\n\r\n\t\t\t\t\t\t\txhr.addEventListener('error', function () {\r\n\t\t\t\t\t\t\t\thideProgressState();\r\n\t\t\t\t\t\t\t\tsetFormDisabled(false);\r\n\t\t\t\t\t\t\t\tupdateSubmitState();\r\n\t\t\t\t\t\t\t\tsetFormError('Failed to upload intro video. Check your connection and try again.');\r\n\t\t\t\t\t\t\t});\r\n\r\n\t\t\t\t\t\t\txhr.send(formData);\r\n\t\t\t\t\t\t});\r\n\r\n\t\t\t\t\t\tsyncSourceFields();\r\n\t\t\t\t\t})();\r\n\t\t\t\t</script>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, " placeholder=\"https://...\"></div><div class=\"intro-video-link-info\"><p class=\"field-hint\">Make sure the link is publicly accessible. See the steps below for your selected source.</p><p class=\"field-hint\" id=\"introVideoSourceHint\" data-google-drive=\"In Google Drive, open Share and set General access to Anyone with the link.\" data-youtube=\"In YouTube Studio, set visibility to Unlisted so anyone with the link can watch.\"></p></div></div><p id=\"introVideoFormError\" class=\"intro-video-form-error\" hidden role=\"alert\"></p><div class=\"profile-form-actions\"><button type=\"submit\" id=\"introVideoSubmitBtn\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				if !data.CanUploadIntroVideo {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, " disabled")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, ">Submit intro video</button></div></form><style>\r\n\t\t\t\t\t.intro-video-file-preview {\r\n\t\t\t\t\t\tmargin-top: var(--space-4);\r\n\t\t\t\t\t\tpadding: var(--space-4);\r\n\t\t\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\t\t\tdisplay: grid;\r\n\t\t\t\t\t\tgap: var(--space-4);\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-file-preview[hidden] {\r\n\t\t\t\t\t\tdisplay: none !important;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-file-preview-media video {\r\n\t\t\t\t\t\tdisplay: block;\r\n\t\t\t\t\t\twidth: 100%;\r\n\t\t\t\t\t\tmax-height: 220px;\r\n\t\t\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\t\t\tbackground: #000;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-file-preview-meta {\r\n\t\t\t\t\t\tdisplay: grid;\r\n\t\t\t\t\t\tgrid-template-columns: repeat(auto-fit, minmax(140px, 1fr));\r\n\t\t\t\t\t\tgap: var(--space-3);\r\n\t\t\t\t\t\tmargin: 0;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-file-preview-meta dt {\r\n\t\t\t\t\t\tmargin: 0 0 var(--space-1);\r\n\t\t\t\t\t\tfont-size: 0.6875rem;\r\n\t\t\t\t\t\tfont-weight: 600;\r\n\t\t\t\t\t\ttext-transform: uppercase;\r\n\t\t\t\t\t\tletter-spacing: 0.04em;\r\n\t\t\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-file-preview-meta dd {\r\n\t\t\t\t\t\tmargin: 0;\r\n\t\t\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\t\t\tword-break: break-word;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-duration-warning {\r\n\t\t\t\t\t\tmargin: 0;\r\n\t\t\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\t\t\tcolor: var(--color-destructive);\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\t.intro-video-form-error {\r\n\t\t\t\t\t\tmargin-top: var(--space-3);\r\n\t\t\t\t\t\tpadding: var(--space-3) var(--space-4);\r\n\t\t\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\t\t\tbackground: color-mix(in srgb, var(--color-destructive) 10%, var(--color-surface));\r\n\t\t\t\t\t\tborder: 1px solid color-mix(in srgb, var(--color-destructive) 25%, transparent);\r\n\t\t\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\t\t}\r\n\t\t\t\t</style> <script>\r\n\t\t\t\t\t(function () {\r\n\t\t\t\t\t\tconst form = document.getElementById('introVideoForm');\r\n\t\t\t\t\t\tconst sourceSelect = document.getElementById('introVideoSourceType');\r\n\t\t\t\t\t\tconst uploadFields = document.getElementById('introVideoUploadFields');\r\n\t\t\t\t\t\tconst linkFields = document.getElementById('introVideoLinkFields');\r\n\t\t\t\t\t\tconst fileInput = document.getElementById('introVideoFile');\r\n\t\t\t\t\t\tconst urlInput = document.getElementById('introVideoURL');\r\n\t\t\t\t\t\tconst hintEl = document.getElementById('introVideoSourceHint');\r\n\t\t\t\t\t\tconst previewPanel = document.getElementById('introVideoFilePreview');\r\n\t\t\t\t\t\tconst previewPlayer = document.getElementById('introVideoPreviewPlayer');\r\n\t\t\t\t\t\tconst previewName = document.getElementById('introVideoPreviewName');\r\n\t\t\t\t\t\tconst previewSize = document.getElementById('introVideoPreviewSize');\r\n\t\t\t\t\t\tconst previewFormat = document.getElementById('introVideoPreviewFormat');\r\n\t\t\t\t\t\tconst previewDuration = document.getElementById('introVideoPreviewDuration');\r\n\t\t\t\t\t\tconst previewDimensions = document.getElementById('introVideoPreviewDimensions');\r\n\t\t\t\t\t\tconst durationWarning = document.getElementById('introVideoPreviewDurationWarning');\r\n\t\t\t\t\t\tconst submitBtn = document.getElementById('introVideoSubmitBtn');\r\n\t\t\t\t\t\tconst formError = document.getElementById('introVideoFormError');\r\n\t\t\t\t\t\tif (!form || !sourceSelect || !uploadFields || !linkFields || !fileInput || !urlInput || !submitBtn) return;\r\n\r\n\t\t\t\t\t\tconst maxDurationSeconds = parseInt(form.dataset.maxDurationSeconds || '0', 10);\r\n\t\t\t\t\t\tconst maxBytes = parseInt(form.dataset.maxBytes || '0', 10);\r\n\t\t\t\t\t\tlet previewObjectURL = '';\r\n\r\n\t\t\t\t\t\tfunction formatFileSize(bytes) {\r\n\t\t\t\t\t\t\tif (!bytes || bytes <= 0) return '-';\r\n\t\t\t\t\t\t\tconst units = ['B', 'KB', 'MB', 'GB'];\r\n\t\t\t\t\t\t\tlet value = bytes;\r\n\t\t\t\t\t\t\tlet unitIndex = 0;\r\n\t\t\t\t\t\t\twhile (value >= 1024 && unitIndex < units.length - 1) {\r\n\t\t\t\t\t\t\t\tvalue /= 1024;\r\n\t\t\t\t\t\t\t\tunitIndex++;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\treturn (unitIndex === 0 ? value.toFixed(0) : value.toFixed(1)) + ' ' + units[unitIndex];\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction formatDuration(seconds) {\r\n\t\t\t\t\t\t\tif (!seconds || !isFinite(seconds)) return '-';\r\n\t\t\t\t\t\t\tconst total = Math.round(seconds);\r\n\t\t\t\t\t\t\tconst mins = Math.floor(total / 60);\r\n\t\t\t\t\t\t\tconst secs = total % 60;\r\n\t\t\t\t\t\t\treturn mins + ':' + String(secs).padStart(2, '0');\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction updatePreviewMetadata() {\r\n\t\t\t\t\t\t\tif (!previewPlayer) return;\r\n\t\t\t\t\t\t\tconst duration = previewPlayer.duration;\r\n\t\t\t\t\t\t\tif (previewDuration) {\r\n\t\t\t\t\t\t\t\tpreviewDuration.textContent = isFinite(duration) && duration > 0\r\n\t\t\t\t\t\t\t\t\t? formatDuration(duration)\r\n\t\t\t\t\t\t\t\t\t: '-';\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tif (previewDimensions) {\r\n\t\t\t\t\t\t\t\tconst width = previewPlayer.videoWidth;\r\n\t\t\t\t\t\t\t\tconst height = previewPlayer.videoHeight;\r\n\t\t\t\t\t\t\t\tpreviewDimensions.textContent = width > 0 && height > 0\r\n\t\t\t\t\t\t\t\t\t? width + ' x ' + height\r\n\t\t\t\t\t\t\t\t\t: '-';\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tif (durationWarning) {\r\n\t\t\t\t\t\t\t\tdurationWarning.hidden = !(isFinite(duration) && duration > maxDurationSeconds);\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tupdateSubmitState();\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction clearPreview() {\r\n\t\t\t\t\t\t\tif (previewPlayer) {\r\n\t\t\t\t\t\t\t\tpreviewPlayer.onloadedmetadata = null;\r\n\t\t\t\t\t\t\t\tpreviewPlayer.onloadeddata = null;\r\n\t\t\t\t\t\t\t\tpreviewPlayer.ondurationchange = null;\r\n\t\t\t\t\t\t\t\tpreviewPlayer.oncanplay = null;\r\n\t\t\t\t\t\t\t\tpreviewPlayer.pause();\r\n\t\t\t\t\t\t\t\tpreviewPlayer.removeAttribute('src');\r\n\t\t\t\t\t\t\t\tpreviewPlayer.load();\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tif (previewObjectURL) {\r\n\t\t\t\t\t\t\t\tURL.revokeObjectURL(previewObjectURL);\r\n\t\t\t\t\t\t\t\tpreviewObjectURL = '';\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tif (previewPanel) previewPanel.hidden = true;\r\n\t\t\t\t\t\t\tif (previewName) previewName.textContent = '-';\r\n\t\t\t\t\t\t\tif (previewSize) previewSize.textContent = '-';\r\n\t\t\t\t\t\t\tif (previewFormat) previewFormat.textContent = '-';\r\n\t\t\t\t\t\t\tif (previewDuration) previewDuration.textContent = '-';\r\n\t\t\t\t\t\t\tif (previewDimensions) previewDimensions.textContent = '-';\r\n\t\t\t\t\t\t\tif (durationWarning) durationWarning.hidden = true;\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction setFormError(message) {\r\n\t\t\t\t\t\t\tif (!formError) return;\r\n\t\t\t\t\t\t\tif (!message) {\r\n\t\t\t\t\t\t\t\tformError.hidden = true;\r\n\t\t\t\t\t\t\t\tformError.textContent = '';\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tformError.hidden = false;\r\n\t\t\t\t\t\t\tformError.textContent = message;\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction fileTooLargeMessage() {\r\n\t\t\t\t\t\t\tif (!maxBytes) return 'File is too large.';\r\n\t\t\t\t\t\t\tconst mb = Math.round(maxBytes / (1024 * 1024));\r\n\t\t\t\t\t\t\treturn 'File is too large. Maximum size is ' + mb + ' MB.';\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction updateSubmitState() {\r\n\t\t\t\t\t\t\tconst sourceType = sourceSelect.value;\r\n\t\t\t\t\t\t\tif (sourceType === 'upload') {\r\n\t\t\t\t\t\t\t\tconst file = fileInput.files && fileInput.files[0];\r\n\t\t\t\t\t\t\t\tif (!file) {\r\n\t\t\t\t\t\t\t\t\tsubmitBtn.disabled = true;\r\n\t\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\tif (maxBytes > 0 && file.size > maxBytes) {\r\n\t\t\t\t\t\t\t\t\tsubmitBtn.disabled = true;\r\n\t\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\tconst duration = previewPlayer && previewPlayer.duration;\r\n\t\t\t\t\t\t\t\tif (isFinite(duration) && duration > maxDurationSeconds) {\r\n\t\t\t\t\t\t\t\t\tsubmitBtn.disabled = true;\r\n\t\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\tsubmitBtn.disabled = false;\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tif (sourceType === 'google_drive' || sourceType === 'youtube') {\r\n\t\t\t\t\t\t\t\tsubmitBtn.disabled = !urlInput.value.trim();\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tsubmitBtn.disabled = true;\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction updateIntroVideoSourceHint() {\r\n\t\t\t\t\t\t\tif (!hintEl) return;\r\n\t\t\t\t\t\t\tconst sourceType = sourceSelect.value;\r\n\t\t\t\t\t\t\tif (sourceType === 'google_drive') {\r\n\t\t\t\t\t\t\t\thintEl.textContent = hintEl.getAttribute('data-google-drive') || '';\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tif (sourceType === 'youtube') {\r\n\t\t\t\t\t\t\t\thintEl.textContent = hintEl.getAttribute('data-youtube') || '';\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\thintEl.textContent = '';\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction syncSourceFields() {\r\n\t\t\t\t\t\t\tconst sourceType = sourceSelect.value;\r\n\t\t\t\t\t\t\tconst isUpload = sourceType === 'upload';\r\n\t\t\t\t\t\t\tconst isLink = sourceType === 'google_drive' || sourceType === 'youtube';\r\n\t\t\t\t\t\t\tuploadFields.hidden = !isUpload;\r\n\t\t\t\t\t\t\tlinkFields.hidden = !isLink;\r\n\t\t\t\t\t\t\tfileInput.required = isUpload;\r\n\t\t\t\t\t\t\turlInput.required = isLink;\r\n\t\t\t\t\t\t\tif (!isUpload) {\r\n\t\t\t\t\t\t\t\tfileInput.value = '';\r\n\t\t\t\t\t\t\t\tclearPreview();\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tif (!isLink) {\r\n\t\t\t\t\t\t\t\turlInput.value = '';\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tupdateIntroVideoSourceHint();\r\n\t\t\t\t\t\t\tupdateSubmitState();\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction bindPreview(file) {\r\n\t\t\t\t\t\t\tclearPreview();\r\n\t\t\t\t\t\t\tif (!file || !previewPanel || !previewPlayer) {\r\n\t\t\t\t\t\t\t\tupdateSubmitState();\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\t\tif (maxBytes > 0 && file.size > maxBytes) {\r\n\t\t\t\t\t\t\t\tsetFormError(fileTooLargeMessage());\r\n\t\t\t\t\t\t\t\tupdateSubmitState();\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\t\tpreviewObjectURL = URL.createObjectURL(file);\r\n\t\t\t\t\t\t\tif (previewName) previewName.textContent = file.name || '-';\r\n\t\t\t\t\t\t\tif (previewSize) previewSize.textContent = formatFileSize(file.size);\r\n\t\t\t\t\t\t\tconst ext = file.name && file.name.includes('.') ? file.name.slice(file.name.lastIndexOf('.')).toLowerCase() : '-';\r\n\t\t\t\t\t\t\tif (previewFormat) previewFormat.textContent = file.type ? file.type + ' (' + ext + ')' : ext;\r\n\t\t\t\t\t\t\tpreviewPanel.hidden = false;\r\n\r\n\t\t\t\t\t\t\tpreviewPlayer.onloadedmetadata = updatePreviewMetadata;\r\n\t\t\t\t\t\t\tpreviewPlayer.onloadeddata = updatePreviewMetadata;\r\n\t\t\t\t\t\t\tpreviewPlayer.ondurationchange = updatePreviewMetadata;\r\n\t\t\t\t\t\t\tpreviewPlayer.oncanplay = updatePreviewMetadata;\r\n\t\t\t\t\t\t\tpreviewPlayer.src = previewObjectURL;\r\n\t\t\t\t\t\t\tpreviewPlayer.load();\r\n\r\n\t\t\t\t\t\t\tif (previewPlayer.readyState >= HTMLMediaElement.HAVE_METADATA) {\r\n\t\t\t\t\t\t\t\tupdatePreviewMetadata();\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction updateBackgroundJobUpload(file, percent) {\r\n\t\t\t\t\t\t\tif (!window.ZionBackgroundJobs) return;\r\n\t\t\t\t\t\t\twindow.ZionBackgroundJobs.updateClientJob({\r\n\t\t\t\t\t\t\t\tid: 'intro-video-upload',\r\n\t\t\t\t\t\t\t\tlabel: 'Intro video',\r\n\t\t\t\t\t\t\t\tdetail: file && file.name ? file.name : '',\r\n\t\t\t\t\t\t\t\tphase: 'upload',\r\n\t\t\t\t\t\t\t\tpercent: percent || 0\r\n\t\t\t\t\t\t\t});\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction clearBackgroundJobUpload() {\r\n\t\t\t\t\t\t\tif (window.ZionBackgroundJobs) {\r\n\t\t\t\t\t\t\t\twindow.ZionBackgroundJobs.clearClientJob();\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfunction setFormDisabled(disabled) {\r\n\t\t\t\t\t\t\tsourceSelect.disabled = disabled;\r\n\t\t\t\t\t\t\tfileInput.disabled = disabled;\r\n\t\t\t\t\t\t\turlInput.disabled = disabled;\r\n\t\t\t\t\t\t\tsubmitBtn.disabled = disabled;\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tfileInput.addEventListener('change', function () {\r\n\t\t\t\t\t\t\tconst file = fileInput.files && fileInput.files[0];\r\n\t\t\t\t\t\t\tbindPreview(file || null);\r\n\t\t\t\t\t\t\tsetFormError('');\r\n\t\t\t\t\t\t\tupdateSubmitState();\r\n\t\t\t\t\t\t});\r\n\r\n\t\t\t\t\t\tsourceSelect.addEventListener('change', function () {\r\n\t\t\t\t\t\t\tsyncSourceFields();\r\n\t\t\t\t\t\t\tsetFormError('');\r\n\t\t\t\t\t\t});\r\n\r\n\t\t\t\t\t\tform.addEventListener('submit', function (e) {\r\n\t\t\t\t\t\t\tconst sourceType = sourceSelect.value;\r\n\t\t\t\t\t\t\tif (sourceType !== 'upload') {\r\n\t\t\t\t\t\t\t\tif (!confirm('Once submitted, you will not be able to submit a new intro video unless your current submission is rejected or deleted. Continue?')) {\r\n\t\t\t\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\t\tif (!confirm('Once submitted, you will not be able to submit a new intro video unless your current submission is rejected or deleted. Continue?')) {\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\t\tconst file = fileInput.files && fileInput.files[0];\r\n\t\t\t\t\t\t\tif (!file) {\r\n\t\t\t\t\t\t\t\tsetFormError('Please choose a video file to upload.');\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tif (maxBytes > 0 && file.size > maxBytes) {\r\n\t\t\t\t\t\t\t\tsetFormError(fileTooLargeMessage());\r\n\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\t\tsetFormError('');\r\n\t\t\t\t\t\t\tconst formData = new FormData(form);\r\n\t\t\t\t\t\t\tif (window.getCSRFHeaders) {\r\n\t\t\t\t\t\t\t\tconst headers = window.getCSRFHeaders();\r\n\t\t\t\t\t\t\t\tif (headers['X-CSRF-Token']) {\r\n\t\t\t\t\t\t\t\t\tformData.set('csrf_token', headers['X-CSRF-Token']);\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tsetFormDisabled(true);\r\n\t\t\t\t\t\t\tupdateBackgroundJobUpload(file, 0);\r\n\r\n\t\t\t\t\t\t\tconst xhr = new XMLHttpRequest();\r\n\t\t\t\t\t\t\txhr.open('POST', form.action);\r\n\t\t\t\t\t\t\txhr.responseType = 'document';\r\n\r\n\t\t\t\t\t\t\txhr.upload.addEventListener('progress', function (evt) {\r\n\t\t\t\t\t\t\t\tif (!evt.lengthComputable) return;\r\n\t\t\t\t\t\t\t\tconst percent = (evt.loaded / evt.total) * 100;\r\n\t\t\t\t\t\t\t\tupdateBackgroundJobUpload(file, percent);\r\n\t\t\t\t\t\t\t});\r\n\r\n\t\t\t\t\t\t\txhr.addEventListener('load', function () {\r\n\t\t\t\t\t\t\t\tif (xhr.status >= 200 && xhr.status < 400) {\r\n\t\t\t\t\t\t\t\t\tclearBackgroundJobUpload();\r\n\t\t\t\t\t\t\t\t\tif (window.ZionBackgroundJobs) {\r\n\t\t\t\t\t\t\t\t\t\twindow.ZionBackgroundJobs.refreshServerJobs();\r\n\t\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\t\twindow.location.href = xhr.responseURL || form.action;\r\n\t\t\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\tclearBackgroundJobUpload();\r\n\t\t\t\t\t\t\t\tsetFormDisabled(false);\r\n\t\t\t\t\t\t\t\tupdateSubmitState();\r\n\t\t\t\t\t\t\t\tsetFormError('Failed to upload intro video. Please try again.');\r\n\t\t\t\t\t\t\t});\r\n\r\n\t\t\t\t\t\t\txhr.addEventListener('error', function () {\r\n\t\t\t\t\t\t\t\tclearBackgroundJobUpload();\r\n\t\t\t\t\t\t\t\tsetFormDisabled(false);\r\n\t\t\t\t\t\t\t\tupdateSubmitState();\r\n\t\t\t\t\t\t\t\tsetFormError('Failed to upload intro video. Check your connection and try again.');\r\n\t\t\t\t\t\t\t});\r\n\r\n\t\t\t\t\t\t\txhr.send(formData);\r\n\t\t\t\t\t\t});\r\n\r\n\t\t\t\t\t\tsyncSourceFields();\r\n\t\t\t\t\t})();\r\n\t\t\t\t</script>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 94, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

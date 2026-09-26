@@ -37,13 +37,28 @@ func ProcessUpload(ctx context.Context, file io.ReadSeeker, filename string, siz
 	if err != nil {
 		return ProcessedUpload{}, err
 	}
+	return processStagedPath(ctx, inputPath, ext, mimeType, cleanupInput, settings)
+}
 
-	if settings.SkipCompress {
-		inputInfo, err := os.Stat(inputPath)
-		if err != nil {
-			cleanupInput()
-			return ProcessedUpload{}, ErrReadFailed
-		}
+// StageUpload validates the upload, saves it to a temp file, and returns paths for async processing.
+func StageUpload(file io.ReadSeeker, filename string, size int64) (ext, mimeType, tmpPath string, cleanup func(), err error) {
+	return validateAndSaveUpload(file, filename, size)
+}
+
+// ProcessStagedFile runs compression on a file already saved to inputPath (from StageUpload).
+func ProcessStagedFile(ctx context.Context, inputPath, ext, mimeType string, settings constants.IntroVideoEncodeSettings) (ProcessedUpload, error) {
+	cleanupInput := func() { os.Remove(inputPath) }
+	return processStagedPath(ctx, inputPath, ext, mimeType, cleanupInput, settings)
+}
+
+func processStagedPath(ctx context.Context, inputPath, ext, mimeType string, cleanupInput func(), settings constants.IntroVideoEncodeSettings) (ProcessedUpload, error) {
+	inputInfo, err := os.Stat(inputPath)
+	if err != nil {
+		cleanupInput()
+		return ProcessedUpload{}, ErrReadFailed
+	}
+
+	if !constants.IntroVideoShouldCompress(inputInfo.Size(), settings) {
 		return ProcessedUpload{
 			Path:         inputPath,
 			OriginalSize: inputInfo.Size(),
@@ -75,13 +90,6 @@ func ProcessUpload(ctx context.Context, file io.ReadSeeker, filename string, siz
 		cleanupInput()
 		cleanupOutput()
 		return ProcessedUpload{}, ErrCompressFailed
-	}
-
-	inputInfo, err := os.Stat(inputPath)
-	if err != nil {
-		cleanupInput()
-		cleanupOutput()
-		return ProcessedUpload{}, ErrReadFailed
 	}
 
 	finalPath := outputPath

@@ -154,10 +154,6 @@ templ PersistentPanel(data PersistentPanelData) {
 templ PersistentPanelStyles() {
 	<style>
 		.persistent-panel-host {
-			position: fixed;
-			bottom: var(--space-4);
-			right: var(--space-4);
-			z-index: 500;
 			max-width: min(22rem, calc(100vw - 2 * var(--space-4)));
 			pointer-events: none;
 		}
@@ -339,15 +335,8 @@ templ PersistentPanelStyles() {
 		}
 
 		@media (max-width: 640px) {
-			.persistent-panel-host {
-				bottom: var(--space-3);
-				right: var(--space-3);
-				left: auto;
-				max-width: none;
-			}
-
 			.persistent-panel-host:not(:has(.persistent-panel.is-minimized)) {
-				left: var(--space-3);
+				max-width: none;
 			}
 
 			.persistent-panel-item {
