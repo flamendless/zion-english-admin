@@ -164,8 +164,8 @@ func mapPaymentRow(row queries.GetTeacherPaymentsFilteredRow, rolesMap map[int64
 	}
 	status := constants.PaymentStatus(row.Status)
 	return frontend.PaymentRowData{
-		ID:              strconv.FormatInt(row.ID, 10),
-		TeacherName:     teacherName,
+		ID:          strconv.FormatInt(row.ID, 10),
+		TeacherName: teacherName,
 		TeacherAvatar: avatarWithTeacherRoles(
 			buildTeacherListAvatarProps(row.TeacherID, row.TeacherFirstName, row.TeacherMiddleName, row.TeacherLastName, constants.DefaultTeacherAssignedColor, row.TeacherProfilePicture),
 			rolesMap[row.TeacherID],
@@ -206,21 +206,21 @@ func loadPaymentRow(ctx context.Context, paymentID int64, scopedTeacherID int64)
 	}
 
 	filteredRow := queries.GetTeacherPaymentsFilteredRow{
-		ID:                  payment.ID,
-		TeacherID:           payment.TeacherID,
-		SentByName:          payment.SentByName,
-		PaymentMethod:       payment.PaymentMethod,
-		ReferenceNumber:     payment.ReferenceNumber,
-		Amount:              payment.Amount,
-		Currency:            payment.Currency,
-		PeriodStart:         payment.PeriodStart,
-		PeriodEnd:           payment.PeriodEnd,
-		Status:              payment.Status,
-		SentAt:              payment.SentAt,
-		ReceivedAt:          payment.ReceivedAt,
-		TeacherFirstName:    profile.FirstName,
-		TeacherMiddleName:   profile.MiddleName,
-		TeacherLastName:     profile.LastName,
+		ID:                    payment.ID,
+		TeacherID:             payment.TeacherID,
+		SentByName:            payment.SentByName,
+		PaymentMethod:         payment.PaymentMethod,
+		ReferenceNumber:       payment.ReferenceNumber,
+		Amount:                payment.Amount,
+		Currency:              payment.Currency,
+		PeriodStart:           payment.PeriodStart,
+		PeriodEnd:             payment.PeriodEnd,
+		Status:                payment.Status,
+		SentAt:                payment.SentAt,
+		ReceivedAt:            payment.ReceivedAt,
+		TeacherFirstName:      profile.FirstName,
+		TeacherMiddleName:     profile.MiddleName,
+		TeacherLastName:       profile.LastName,
 		TeacherProfilePicture: profile.ProfilePicture,
 	}
 	return mapPaymentRow(filteredRow, rolesMap, scopedTeacherID), nil

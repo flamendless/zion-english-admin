@@ -13,7 +13,7 @@ import (
 
 var uploadLogFilenameFromSummaryRE = regexp.MustCompile(`file '([^']*)'`)
 
-func mapUploadLogItemFromFiltered(row queries.GetUploadLogsFilteredRow) frontend.UploadLogItem {
+func mapUploadLogItemFromFiltered(row queries.GetUploadLogsFilteredRow, cache map[int64]frontend.AvatarProps) frontend.UploadLogItem {
 	return mapUploadLogFields(
 		row.ID,
 		row.Module,
@@ -23,12 +23,14 @@ func mapUploadLogItemFromFiltered(row queries.GetUploadLogsFilteredRow) frontend
 		row.Filename,
 		row.FileSize,
 		row.CompressPreset,
+		row.CreatedBy,
 		row.CreatedByName,
 		row.CreatedAt,
+		cache,
 	)
 }
 
-func mapUploadLogItemFromTeacherFiltered(row queries.GetUploadLogsByCreatedByFilteredRow) frontend.UploadLogItem {
+func mapUploadLogItemFromTeacherFiltered(row queries.GetUploadLogsByCreatedByFilteredRow, cache map[int64]frontend.AvatarProps) frontend.UploadLogItem {
 	return mapUploadLogFields(
 		row.ID,
 		row.Module,
@@ -38,8 +40,10 @@ func mapUploadLogItemFromTeacherFiltered(row queries.GetUploadLogsByCreatedByFil
 		row.Filename,
 		row.FileSize,
 		row.CompressPreset,
+		row.CreatedBy,
 		row.CreatedByName,
 		row.CreatedAt,
+		cache,
 	)
 }
 
@@ -52,8 +56,10 @@ func mapUploadLogFields(
 	filename sql.NullString,
 	fileSize sql.NullInt64,
 	compressPreset sql.NullString,
+	createdByID sql.NullInt64,
 	createdBy string,
 	createdAt string,
+	cache map[int64]frontend.AvatarProps,
 ) frontend.UploadLogItem {
 	kindEnum := constants.UploadLogKind(kind)
 	if !constants.ValidUploadLogKind(kind) {
@@ -85,6 +91,7 @@ func mapUploadLogFields(
 		FileSizeDisplay: formatUploadLogFileSize(fileSize),
 		PresetDisplay:   formatUploadLogCompressPreset(compressPreset),
 		CreatedBy:       createdBy,
+		CreatedByAvatar: avatarForLogCreator(createdByID, createdBy, cache),
 		CreatedAt:       createdAt,
 	}
 }

@@ -145,18 +145,18 @@ type ClassRecordResponse struct {
 }
 
 type ClassRecordView struct {
-	ID              int64   `json:"id"`
-	StudentID       int64   `json:"studentId"`
-	TeacherID       int64   `json:"teacherId"`
-	StudentName     string  `json:"studentName"`
-	TeacherName     string  `json:"teacherName"`
-	Date            string  `json:"date"`
-	StartTime       string  `json:"startTime"`
-	EndTime         string  `json:"endTime"`
-	DurationMinutes int64   `json:"durationMinutes"`
-	Rate            float64 `json:"rate"`
-	Currency        string  `json:"currency"`
-	Status          string  `json:"status"`
+	ID              int64      `json:"id"`
+	StudentID       int64      `json:"studentId"`
+	TeacherID       int64      `json:"teacherId"`
+	StudentName     string     `json:"studentName"`
+	TeacherName     string     `json:"teacherName"`
+	Date            string     `json:"date"`
+	StartTime       string     `json:"startTime"`
+	EndTime         string     `json:"endTime"`
+	DurationMinutes int64      `json:"durationMinutes"`
+	Rate            float64    `json:"rate"`
+	Currency        string     `json:"currency"`
+	Status          string     `json:"status"`
 	Reason          string     `json:"reason"`
 	Notes           string     `json:"notes"`
 	TeacherAvatar   AvatarView `json:"teacherAvatar"`
@@ -185,27 +185,27 @@ type AvatarView struct {
 }
 
 type ScheduledClassView struct {
-	ID              int64   `json:"id"`
-	StudentID       int64   `json:"studentId"`
-	TeacherID       int64   `json:"teacherId"`
-	StudentName     string  `json:"studentName"`
-	TeacherName     string  `json:"teacherName"`
-	TeacherAvatar   AvatarView `json:"teacherAvatar"`
-	ScheduledDate   string  `json:"scheduledDate"`
-	StartTime       string  `json:"startTime"`
-	EndTime         string  `json:"endTime"`
-	DurationMinutes int64   `json:"durationMinutes"`
-	Rate            float64 `json:"rate"`
-	Currency        string  `json:"currency"`
-	Status          string  `json:"status"`
-	Reason          string  `json:"reason"`
-	CreatedAt       string  `json:"createdAt"`
-	SeriesID        int64   `json:"seriesId"`
-	RoomURL          string  `json:"roomUrl"`
-	RoomPasscode     string  `json:"roomPasscode"`
-	MeetingService   string  `json:"meetingService"`
-	CalendarEventURL string  `json:"calendarEventUrl"`
-	CalendarService  string  `json:"calendarService"`
+	ID               int64      `json:"id"`
+	StudentID        int64      `json:"studentId"`
+	TeacherID        int64      `json:"teacherId"`
+	StudentName      string     `json:"studentName"`
+	TeacherName      string     `json:"teacherName"`
+	TeacherAvatar    AvatarView `json:"teacherAvatar"`
+	ScheduledDate    string     `json:"scheduledDate"`
+	StartTime        string     `json:"startTime"`
+	EndTime          string     `json:"endTime"`
+	DurationMinutes  int64      `json:"durationMinutes"`
+	Rate             float64    `json:"rate"`
+	Currency         string     `json:"currency"`
+	Status           string     `json:"status"`
+	Reason           string     `json:"reason"`
+	CreatedAt        string     `json:"createdAt"`
+	SeriesID         int64      `json:"seriesId"`
+	RoomURL          string     `json:"roomUrl"`
+	RoomPasscode     string     `json:"roomPasscode"`
+	MeetingService   string     `json:"meetingService"`
+	CalendarEventURL string     `json:"calendarEventUrl"`
+	CalendarService  string     `json:"calendarService"`
 }
 
 type RecordClassPrefill struct {

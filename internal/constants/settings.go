@@ -4,9 +4,9 @@ const (
 	SettingsPageTitle    = "Settings"
 	SettingsPageSubtitle = "View runtime configuration, integrations, and environment variables for this instance."
 
-	SettingsSectionConfiguration    = "Configuration"
-	SettingsSectionIntegrations     = "Services and integrations"
-	SettingsSectionEnvironmentVars  = "Environment variables"
+	SettingsSectionConfiguration   = "Configuration"
+	SettingsSectionIntegrations    = "Services and integrations"
+	SettingsSectionEnvironmentVars = "Environment variables"
 
 	SettingsFieldVersion            = "Version"
 	SettingsFieldEnvironment        = "Environment"

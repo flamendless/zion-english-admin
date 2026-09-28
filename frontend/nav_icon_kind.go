@@ -3,33 +3,33 @@ package frontend
 type NavIconKind string
 
 const (
-	NavIconProfile          NavIconKind = "profile"
-	NavIconGuides           NavIconKind = "guides"
-	NavIconLibrary          NavIconKind = "library"
-	NavIconTraining         NavIconKind = "training"
-	NavIconDocuments        NavIconKind = "documents"
-	NavIconIntroVideos      NavIconKind = "intro-videos"
-	NavIconTeachers         NavIconKind = "teachers"
-	NavIconStudents         NavIconKind = "students"
-	NavIconMyStudents       NavIconKind = "my-students"
-	NavIconClasses          NavIconKind = "classes"
-	NavIconSchedule         NavIconKind = "schedule"
-	NavIconScheduleSeries   NavIconKind = "schedule-series"
-	NavIconRecordClass      NavIconKind = "record-class"
-	NavIconReports          NavIconKind = "reports"
-	NavIconAnalytics        NavIconKind = "analytics"
-	NavIconPayments         NavIconKind = "payments"
-	NavIconProcess          NavIconKind = "process"
-	NavIconFeatureFlags     NavIconKind = "feature-flags"
-	NavIconSettings         NavIconKind = "settings"
-	NavIconLogs             NavIconKind = "logs"
-	NavIconAnnouncements    NavIconKind = "announcements"
-	NavIconChangelogs       NavIconKind = "changelogs"
-	NavIconPeopleGroup      NavIconKind = "people-group"
-	NavIconResourcesGroup   NavIconKind = "resources-group"
-	NavIconInsightsGroup    NavIconKind = "insights-group"
-	NavIconAdminGroup       NavIconKind = "admin-group"
-	NavIconDefault          NavIconKind = "default"
+	NavIconProfile        NavIconKind = "profile"
+	NavIconGuides         NavIconKind = "guides"
+	NavIconLibrary        NavIconKind = "library"
+	NavIconTraining       NavIconKind = "training"
+	NavIconDocuments      NavIconKind = "documents"
+	NavIconIntroVideos    NavIconKind = "intro-videos"
+	NavIconTeachers       NavIconKind = "teachers"
+	NavIconStudents       NavIconKind = "students"
+	NavIconMyStudents     NavIconKind = "my-students"
+	NavIconClasses        NavIconKind = "classes"
+	NavIconSchedule       NavIconKind = "schedule"
+	NavIconScheduleSeries NavIconKind = "schedule-series"
+	NavIconRecordClass    NavIconKind = "record-class"
+	NavIconReports        NavIconKind = "reports"
+	NavIconAnalytics      NavIconKind = "analytics"
+	NavIconPayments       NavIconKind = "payments"
+	NavIconProcess        NavIconKind = "process"
+	NavIconFeatureFlags   NavIconKind = "feature-flags"
+	NavIconSettings       NavIconKind = "settings"
+	NavIconLogs           NavIconKind = "logs"
+	NavIconAnnouncements  NavIconKind = "announcements"
+	NavIconChangelogs     NavIconKind = "changelogs"
+	NavIconPeopleGroup    NavIconKind = "people-group"
+	NavIconResourcesGroup NavIconKind = "resources-group"
+	NavIconInsightsGroup  NavIconKind = "insights-group"
+	NavIconAdminGroup     NavIconKind = "admin-group"
+	NavIconDefault        NavIconKind = "default"
 )
 
 type NavIconTone string
@@ -43,32 +43,32 @@ const (
 )
 
 var navIconByPath = map[string]NavIconKind{
-	"/profile":            NavIconProfile,
-	"/guides":             NavIconGuides,
-	"/learning-materials":   NavIconLibrary,
-	"/training-materials":   NavIconTraining,
-	"/documents":            NavIconDocuments,
-	"/intro-videos":         NavIconIntroVideos,
-	"/teachers":             NavIconTeachers,
-	"/students":             NavIconStudents,
-	"/classes":              NavIconClasses,
-	"/schedule":             NavIconSchedule,
-	"/schedule/series":      NavIconScheduleSeries,
-	"/my-students":          NavIconMyStudents,
-	"/reports":              NavIconReports,
-	"/reports/history":      NavIconReports,
+	"/profile":               NavIconProfile,
+	"/guides":                NavIconGuides,
+	"/learning-materials":    NavIconLibrary,
+	"/training-materials":    NavIconTraining,
+	"/documents":             NavIconDocuments,
+	"/intro-videos":          NavIconIntroVideos,
+	"/teachers":              NavIconTeachers,
+	"/students":              NavIconStudents,
+	"/classes":               NavIconClasses,
+	"/schedule":              NavIconSchedule,
+	"/schedule/series":       NavIconScheduleSeries,
+	"/my-students":           NavIconMyStudents,
+	"/reports":               NavIconReports,
+	"/reports/history":       NavIconReports,
 	"/affiliate-ads/reports": NavIconAnalytics,
-	"/analytics":            NavIconAnalytics,
-	"/payments":             NavIconPayments,
+	"/analytics":             NavIconAnalytics,
+	"/payments":              NavIconPayments,
 	"/student-relationships": NavIconStudents,
-	"/process":              NavIconProcess,
-	"/feature-flags":        NavIconFeatureFlags,
-	"/settings":             NavIconSettings,
-	"/meta":                 NavIconSettings,
-	"/logs":                 NavIconLogs,
-	"/upload-logs":          NavIconDocuments,
-	"/announcements":        NavIconAnnouncements,
-	"/changelogs":           NavIconChangelogs,
+	"/process":               NavIconProcess,
+	"/feature-flags":         NavIconFeatureFlags,
+	"/settings":              NavIconSettings,
+	"/meta":                  NavIconSettings,
+	"/logs":                  NavIconLogs,
+	"/upload-logs":           NavIconDocuments,
+	"/announcements":         NavIconAnnouncements,
+	"/changelogs":            NavIconChangelogs,
 }
 
 var navIconByGroupID = map[string]NavIconKind{
@@ -92,7 +92,7 @@ var navIconToneByKind = map[NavIconKind]NavIconTone{
 	NavIconClasses:        NavIconTonePrimary,
 	NavIconSchedule:       NavIconTonePrimary,
 	NavIconScheduleSeries: NavIconToneInfo,
-	NavIconRecordClass:      NavIconToneSuccess,
+	NavIconRecordClass:    NavIconToneSuccess,
 	NavIconReports:        NavIconToneInfo,
 	NavIconAnalytics:      NavIconToneInfo,
 	NavIconPayments:       NavIconToneSuccess,

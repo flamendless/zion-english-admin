@@ -19,14 +19,14 @@ const (
 type ItemID string
 
 const (
-	ItemIDAccount         ItemID = "account"
-	ItemIDProfilePhoto    ItemID = "profile_photo"
-	ItemIDDocuments       ItemID = "documents"
-	ItemIDResume          ItemID = "resume"
-	ItemIDIntroVideo      ItemID = "intro_video"
-	ItemIDTraining        ItemID = "training"
-	ItemIDZoom            ItemID = "zoom"
-	ItemIDGoogleCalendar  ItemID = "google_calendar"
+	ItemIDAccount        ItemID = "account"
+	ItemIDProfilePhoto   ItemID = "profile_photo"
+	ItemIDDocuments      ItemID = "documents"
+	ItemIDResume         ItemID = "resume"
+	ItemIDIntroVideo     ItemID = "intro_video"
+	ItemIDTraining       ItemID = "training"
+	ItemIDZoom           ItemID = "zoom"
+	ItemIDGoogleCalendar ItemID = "google_calendar"
 )
 
 type Item struct {
@@ -38,18 +38,18 @@ type Item struct {
 }
 
 type Input struct {
-	TeacherStatus          constants.TeacherStatus
-	HasProfilePhoto        bool
-	DocsStatus             string
-	ResumeStatus           string
-	IntroVideoStatus       string
-	IntroVideoRequired     bool
+	TeacherStatus             constants.TeacherStatus
+	HasProfilePhoto           bool
+	DocsStatus                string
+	ResumeStatus              string
+	IntroVideoStatus          string
+	IntroVideoRequired        bool
 	TrainingRequiredCompleted int64
-	TrainingRequiredTotal   int64
-	ZoomShow               bool
-	ZoomConnected          bool
-	GoogleShow             bool
-	GoogleConnected        bool
+	TrainingRequiredTotal     int64
+	ZoomShow                  bool
+	ZoomConnected             bool
+	GoogleShow                bool
+	GoogleConnected           bool
 }
 
 func Build(input Input) []Item {

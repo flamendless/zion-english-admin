@@ -273,12 +273,12 @@ func loadReportRows(ctx context.Context, startDate, endDate, q string, roleFilte
 
 	teacherRoleFlag, adminRoleFlag := reportRoleFilterFlags(roleFilters)
 	fingerprintRows, err := dbRO.GetQueries().GetClassRecordFingerprintRowsForRange(ctx, queries.GetClassRecordFingerprintRowsForRangeParams{
-		Date:     startDate,
-		Date_2:   endDate,
-		Column3:  teacherRoleFlag,
-		Column4:  adminRoleFlag,
-		Column5:  teacherRoleFlag,
-		Column6:  adminRoleFlag,
+		Date:    startDate,
+		Date_2:  endDate,
+		Column3: teacherRoleFlag,
+		Column4: adminRoleFlag,
+		Column5: teacherRoleFlag,
+		Column6: adminRoleFlag,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to load report fingerprints")
@@ -324,8 +324,8 @@ func loadReportRows(ctx context.Context, startDate, endDate, q string, roleFilte
 	response := make([]frontend.ReportRowData, 0, len(summaries))
 	for _, summary := range summaries {
 		item := frontend.ReportRowData{
-			TeacherID:        strconv.FormatInt(summary.TeacherID, 10),
-			TeacherName:      summary.TeacherName,
+			TeacherID:   strconv.FormatInt(summary.TeacherID, 10),
+			TeacherName: summary.TeacherName,
 			TeacherAvatar: avatarWithTeacherRoles(
 				buildReportSummaryAvatarProps(summary),
 				rolesMap[summary.TeacherID],
@@ -334,7 +334,7 @@ func loadReportRows(ctx context.Context, startDate, endDate, q string, roleFilte
 			CancelledClasses: sqlNumericToInt64(summary.CancelledClasses),
 			TotalClasses:     summary.TotalClasses,
 			Earnings:         reportEarningsToFrontend(earningsByTeacher[summary.TeacherID]),
-			PaymentStatus: paymentStatuses[summary.TeacherID],
+			PaymentStatus:    paymentStatuses[summary.TeacherID],
 		}
 		if item.HasPaymentStatus() {
 			item.SendPaymentDisabledTooltip = paymentSentDisabledTooltip(startDate, endDate)

@@ -5,9 +5,9 @@ import "strings"
 type TeacherTableColumnID string
 
 const (
-	TeacherTableColumnDocsStatus    TeacherTableColumnID = "docsStatus"
-	TeacherTableColumnResumeStatus  TeacherTableColumnID = "resumeStatus"
-	TeacherTableColumnConnections   TeacherTableColumnID = "connectedTo"
+	TeacherTableColumnDocsStatus   TeacherTableColumnID = "docsStatus"
+	TeacherTableColumnResumeStatus TeacherTableColumnID = "resumeStatus"
+	TeacherTableColumnConnections  TeacherTableColumnID = "connectedTo"
 )
 
 const (

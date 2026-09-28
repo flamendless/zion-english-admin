@@ -22,17 +22,17 @@ type ReportsSummaryData struct {
 }
 
 type ReportRowData struct {
-	TeacherID                   string
-	TeacherName                 string
-	TeacherAvatar               AvatarProps
-	PaymentStatus               constants.PaymentStatus
-	SendPaymentDisabledTooltip  string
-	ConductedClasses            int64
-	CancelledClasses            int64
-	TotalClasses                int64
-	Earnings                    []ReportEarningData
-	DownloadReady               bool
-	Filename                    string
+	TeacherID                  string
+	TeacherName                string
+	TeacherAvatar              AvatarProps
+	PaymentStatus              constants.PaymentStatus
+	SendPaymentDisabledTooltip string
+	ConductedClasses           int64
+	CancelledClasses           int64
+	TotalClasses               int64
+	Earnings                   []ReportEarningData
+	DownloadReady              bool
+	Filename                   string
 }
 
 func (r ReportRowData) HasPaymentStatus() bool {

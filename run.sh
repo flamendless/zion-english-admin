@@ -77,6 +77,22 @@ test() {
 	go test ./...
 }
 
+gofmt() {
+	mapfile -t go_files < <(git ls-files '*.go' | grep -Ev '^(internal/database/queries/|frontend/.*_templ\.go$)' || true)
+	if ((${#go_files[@]} == 0)); then
+		echo "gofmt: no Go sources to format"
+		exit 0
+	fi
+	unformatted="$(command gofmt -l "${go_files[@]}")"
+	if [[ -z "$unformatted" ]]; then
+		echo "gofmt: all Go sources already formatted"
+		exit 0
+	fi
+	echo "gofmt: formatting:"
+	echo "$unformatted"
+	command gofmt -w "${go_files[@]}"
+}
+
 if [ "$#" -eq 0 ]; then
 	echo "First use: chmod +x ${0}"
 	echo "Usage: ${0}"
@@ -85,6 +101,7 @@ if [ "$#" -eq 0 ]; then
 	echo "    prod"
 	echo "    gentempl"
 	echo "    gensql"
+	echo "    gofmt"
 	echo "    test"
 else
 	echo "Running ${1}"

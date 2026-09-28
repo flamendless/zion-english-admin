@@ -23,9 +23,9 @@ type StudentRow struct {
 }
 
 type EdgeRow struct {
-	StudentID          int64
-	RelatedStudentID   int64
-	Relationship       string
+	StudentID        int64
+	RelatedStudentID int64
+	Relationship     string
 }
 
 type Node struct {

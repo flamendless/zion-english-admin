@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"net/http"
@@ -115,7 +116,7 @@ func handleSystemLogs(w http.ResponseWriter, r *http.Request) {
 		}
 		sortSystemLogByUserRows(allRows, sort)
 		rows := paginateSlice(allRows, page)
-		viewLogs = systemLogItemsFromTeacherRows(rows)
+		viewLogs = systemLogItemsFromTeacherRows(ctx, rows)
 	} else {
 		total, err := dbRO.GetQueries().CountAllLogsFiltered(ctx, countAllLogsParams(filters))
 		if err != nil {
@@ -130,7 +131,7 @@ func handleSystemLogs(w http.ResponseWriter, r *http.Request) {
 		}
 		sortSystemLogRows(allRows, sort)
 		rows := paginateSlice(allRows, page)
-		viewLogs = systemLogItemsFromAllRows(rows)
+		viewLogs = systemLogItemsFromAllRows(ctx, rows)
 	}
 
 	params := listQueryParamsWithSort(r, frontend.ListSortKindSystemLog)
@@ -213,18 +214,20 @@ func getUploadLogsByTeacherParams(teacherID int64, f logFilters, limit, offset i
 	}
 }
 
-func uploadLogItemsFromAllRows(rows []queries.GetUploadLogsFilteredRow) []frontend.UploadLogItem {
+func uploadLogItemsFromAllRows(ctx context.Context, rows []queries.GetUploadLogsFilteredRow) []frontend.UploadLogItem {
+	cache := logCreatorAvatarCache(ctx, uploadLogCreatorIDsFromAllRows(rows))
 	viewLogs := make([]frontend.UploadLogItem, len(rows))
 	for i, l := range rows {
-		viewLogs[i] = mapUploadLogItemFromFiltered(l)
+		viewLogs[i] = mapUploadLogItemFromFiltered(l, cache)
 	}
 	return viewLogs
 }
 
-func uploadLogItemsFromTeacherRows(rows []queries.GetUploadLogsByCreatedByFilteredRow) []frontend.UploadLogItem {
+func uploadLogItemsFromTeacherRows(ctx context.Context, rows []queries.GetUploadLogsByCreatedByFilteredRow) []frontend.UploadLogItem {
+	cache := logCreatorAvatarCache(ctx, uploadLogCreatorIDsFromTeacherRows(rows))
 	viewLogs := make([]frontend.UploadLogItem, len(rows))
 	for i, l := range rows {
-		viewLogs[i] = mapUploadLogItemFromTeacherFiltered(l)
+		viewLogs[i] = mapUploadLogItemFromTeacherFiltered(l, cache)
 	}
 	return viewLogs
 }
@@ -259,7 +262,7 @@ func handleUploadLogs(w http.ResponseWriter, r *http.Request) {
 		}
 		sortUploadLogByUserRows(allRows, sort)
 		rows := paginateSlice(allRows, page)
-		viewLogs = uploadLogItemsFromTeacherRows(rows)
+		viewLogs = uploadLogItemsFromTeacherRows(ctx, rows)
 	} else {
 		countParams := countUploadLogsParams(filters)
 		total, err := dbRO.GetQueries().CountUploadLogsFiltered(ctx, countParams)
@@ -276,7 +279,7 @@ func handleUploadLogs(w http.ResponseWriter, r *http.Request) {
 		}
 		sortUploadLogRows(allRows, sort)
 		rows := paginateSlice(allRows, page)
-		viewLogs = uploadLogItemsFromAllRows(rows)
+		viewLogs = uploadLogItemsFromAllRows(ctx, rows)
 	}
 
 	params := listQueryParamsWithSort(r, frontend.ListSortKindUploadLog)
@@ -301,29 +304,33 @@ func handleUploadLogs(w http.ResponseWriter, r *http.Request) {
 	}).Render(ctx, w)
 }
 
-func systemLogItemsFromAllRows(rows []queries.GetAllLogsFilteredRow) []frontend.SystemLogItem {
+func systemLogItemsFromAllRows(ctx context.Context, rows []queries.GetAllLogsFilteredRow) []frontend.SystemLogItem {
+	cache := logCreatorAvatarCache(ctx, systemLogCreatorIDsFromAllRows(rows))
 	viewLogs := make([]frontend.SystemLogItem, len(rows))
 	for i, l := range rows {
 		viewLogs[i] = frontend.SystemLogItem{
-			ID:        strconv.FormatInt(l.ID, 10),
-			Module:    l.Module,
-			Message:   l.Message,
-			CreatedBy: l.CreatedByName,
-			CreatedAt: l.CreatedAt,
+			ID:              strconv.FormatInt(l.ID, 10),
+			Module:          l.Module,
+			Message:         l.Message,
+			CreatedBy:       l.CreatedByName,
+			CreatedByAvatar: avatarForLogCreator(l.CreatedBy, l.CreatedByName, cache),
+			CreatedAt:       l.CreatedAt,
 		}
 	}
 	return viewLogs
 }
 
-func systemLogItemsFromTeacherRows(rows []queries.GetLogsByCreatedByFilteredRow) []frontend.SystemLogItem {
+func systemLogItemsFromTeacherRows(ctx context.Context, rows []queries.GetLogsByCreatedByFilteredRow) []frontend.SystemLogItem {
+	cache := logCreatorAvatarCache(ctx, systemLogCreatorIDsFromTeacherRows(rows))
 	viewLogs := make([]frontend.SystemLogItem, len(rows))
 	for i, l := range rows {
 		viewLogs[i] = frontend.SystemLogItem{
-			ID:        strconv.FormatInt(l.ID, 10),
-			Module:    l.Module,
-			Message:   l.Message,
-			CreatedBy: l.CreatedByName,
-			CreatedAt: l.CreatedAt,
+			ID:              strconv.FormatInt(l.ID, 10),
+			Module:          l.Module,
+			Message:         l.Message,
+			CreatedBy:       l.CreatedByName,
+			CreatedByAvatar: avatarForLogCreator(l.CreatedBy, l.CreatedByName, cache),
+			CreatedAt:       l.CreatedAt,
 		}
 	}
 	return viewLogs

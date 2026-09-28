@@ -118,6 +118,7 @@ var TeacherIntroVideoSourceTypeOptions = func() []StatusOption {
 }()
 
 const TeacherDocsFilterStatusNone = "none"
+const TeacherDocsFilterStatusMissingValid = "missing_valid"
 
 var TeacherDocsFilterStatusOptions = func() []StatusOption {
 	opts := make([]StatusOption, 0, len(TeacherDocumentStatusOptions)+1)

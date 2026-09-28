@@ -12,13 +12,13 @@ import (
 type SensitiveFieldKey string
 
 const (
-	SensitiveFieldSecret                 SensitiveFieldKey = "secret"
-	SensitiveFieldSuperuserPassword      SensitiveFieldKey = "superuser_password"
-	SensitiveFieldZoomClientSecret       SensitiveFieldKey = "zoom_client_secret"
-	SensitiveFieldGoogleCalendarSecret   SensitiveFieldKey = "google_calendar_client_secret"
-	SensitiveFieldR2AccessKeyID          SensitiveFieldKey = "r2_access_key_id"
-	SensitiveFieldR2SecretAccessKey      SensitiveFieldKey = "r2_secret_access_key"
-	SensitiveFieldCloudflareAPIToken     SensitiveFieldKey = "cloudflare_api_token"
+	SensitiveFieldSecret               SensitiveFieldKey = "secret"
+	SensitiveFieldSuperuserPassword    SensitiveFieldKey = "superuser_password"
+	SensitiveFieldZoomClientSecret     SensitiveFieldKey = "zoom_client_secret"
+	SensitiveFieldGoogleCalendarSecret SensitiveFieldKey = "google_calendar_client_secret"
+	SensitiveFieldR2AccessKeyID        SensitiveFieldKey = "r2_access_key_id"
+	SensitiveFieldR2SecretAccessKey    SensitiveFieldKey = "r2_secret_access_key"
+	SensitiveFieldCloudflareAPIToken   SensitiveFieldKey = "cloudflare_api_token"
 )
 
 type SettingsField struct {

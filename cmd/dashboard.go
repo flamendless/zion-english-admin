@@ -12,8 +12,8 @@ import (
 	"zion-english/internal/conf"
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
-	"zion-english/internal/logs"
 	"zion-english/internal/featureflags"
+	"zion-english/internal/logs"
 	"zion-english/internal/onboarding"
 	"zion-english/internal/utils"
 
@@ -166,11 +166,12 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 			data.StudentsWithoutParentRate = withoutParentRate
 		}
-		data.TotalTeachers = teacherDashboardCount(ctx, "", "", "")
-		data.TeachersWithoutZoom = teacherDashboardCount(ctx, string(constants.TeacherConnectionFilterMissingZoom), "", "")
-		data.TeachersWithoutGoogleCal = teacherDashboardCount(ctx, string(constants.TeacherConnectionFilterMissingGoogle), "", "")
-		data.TeachersWithoutCV = teacherDashboardCount(ctx, "", frontend.TeacherDocsFilterStatusNone, "")
-		data.TeachersWithoutProfileAvatar = teacherDashboardCount(ctx, "", "", string(constants.TeacherProfilePictureFilterMissing))
+		data.TotalTeachers = teacherDashboardCount(ctx, "", "", "", "")
+		data.TeachersWithoutZoom = teacherDashboardCount(ctx, string(constants.TeacherConnectionFilterMissingZoom), "", "", "")
+		data.TeachersWithoutGoogleCal = teacherDashboardCount(ctx, string(constants.TeacherConnectionFilterMissingGoogle), "", "", "")
+		data.TeachersWithoutCV = teacherDashboardCount(ctx, "", "", frontend.TeacherDocsFilterStatusNone, "")
+		data.TeachersWithoutValidDocuments = teacherDashboardCount(ctx, "", frontend.TeacherDocsFilterStatusMissingValid, "", "")
+		data.TeachersWithoutProfileAvatar = teacherDashboardCount(ctx, "", "", "", string(constants.TeacherProfilePictureFilterMissing))
 		classCounts, err := dbRO.GetQueries().CountClassRecordsByStatusAndDateRange(ctx, queries.CountClassRecordsByStatusAndDateRangeParams{
 			Date:      weekStart,
 			Date_2:    weekEnd,

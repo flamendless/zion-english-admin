@@ -21,7 +21,7 @@ type ZoomConfig struct {
 }
 
 type MeetingConfig struct {
-	Service string     `env:"MEETING_SERVICE" env-default:"zoom"`
+	Service string `env:"MEETING_SERVICE" env-default:"zoom"`
 	Zoom    ZoomConfig
 }
 

@@ -17,4 +17,3 @@ func ApplyScheduledTrialClassRate(req *ScheduledClassRequest) {
 	req.Rate = constants.TrialClassRate
 	req.Currency = constants.TrialClassCurrency
 }
-

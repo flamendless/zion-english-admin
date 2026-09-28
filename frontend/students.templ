@@ -36,7 +36,7 @@ type StudentItem struct {
 	HasParentRate    bool
 	AssignedColor    string
 	Status           constants.StudentStatus
-	TeacherDisplay   string
+	Teachers         []TeacherListItem
 	RelatedToDisplay string
 	CreatedAt        string
 	UpdatedAt        string
@@ -58,6 +58,7 @@ templ Students(data StudentData) {
 	<html lang="en">
 	<head>
 		@AdminPageHead("Students - Zion English Admin Tool")
+		@AvatarStyles()
 		@StudentViewModalScripts()
 		<style>
 			.student-deleted td {
@@ -91,6 +92,14 @@ templ Students(data StudentData) {
 
 			.list-active-filter-note a {
 				margin-left: var(--space-2);
+			}
+
+			.student-teachers-cell {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
+				gap: var(--space-2);
+				min-width: 0;
 			}
 		</style>
 	</head>
@@ -128,7 +137,17 @@ templ Students(data StudentData) {
 								<tr class={ getStudentRowClass(student.Status) }>
 									<td data-label="Name">{ student.Name }</td>
 									<td data-label="Parent">{ getDisplayValue(student.ParentName) }</td>
-									<td data-label="Teacher">{ getDisplayValue(student.TeacherDisplay) }</td>
+									<td data-label="Teacher">
+										if len(student.Teachers) > 0 {
+											<div class="student-teachers-cell">
+												for _, teacher := range student.Teachers {
+													@TeacherNameCell(teacher.Name, teacher.Avatar)
+												}
+											</div>
+										} else {
+											-
+										}
+									</td>
 									<td class="rate-cell" data-label="Rate">
 										<span class="rate-value">
 											<span class="rate-amount">{ utils.FormatCurrencyAmountFixed(student.RatePerClass, student.Currency) }</span>

@@ -60,16 +60,16 @@ func handleScheduleRepeatPreview(w http.ResponseWriter, r *http.Request) {
 
 	data := frontend.ScheduleRepeatPreviewData{
 		Base: frontend.ScheduleRepeatFormSnapshot{
-			TeacherID:   fmt.Sprintf("%d", base.TeacherID),
-			StudentID:   fmt.Sprintf("%d", base.StudentID),
-			StartTime:   base.StartTime,
-			EndTime:     utils.EndTimeFromStartAndDuration(base.StartTime, base.DurationMinutes),
-			Rate:        base.Rate,
-			Currency:    base.Currency,
+			TeacherID:    fmt.Sprintf("%d", base.TeacherID),
+			StudentID:    fmt.Sprintf("%d", base.StudentID),
+			StartTime:    base.StartTime,
+			EndTime:      utils.EndTimeFromStartAndDuration(base.StartTime, base.DurationMinutes),
+			Rate:         base.Rate,
+			Currency:     base.Currency,
 			IsTrialClass: base.IsTrialClass,
-			LockTeacher: auth.IsTeacherScoped(role),
+			LockTeacher:  auth.IsTeacherScoped(role),
 		},
-		Rows:              previewRows,
+		Rows:                previewRows,
 		LearningMaterialIDs: parseLearningMaterialIDs(r),
 	}
 

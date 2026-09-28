@@ -162,10 +162,7 @@ templ IntroVideoTableRow(item IntroVideoItem, showUploader bool, showViewAction 
 		</td>
 		if showUploader {
 			<td data-label="Uploaded by">
-				<div class="documents-uploader-cell">
-					@Avatar(item.UploadedByAvatar)
-					<span>{ item.UploadedBy }</span>
-				</div>
+				@TeacherNameCell(item.UploadedBy, item.UploadedByAvatar)
 			</td>
 		}
 		<td data-label="Uploaded at">{ item.UploadedAt }</td>

@@ -138,8 +138,18 @@ WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || midd
 		)
 	)
 	OR (
+		? = 'missing_valid'
+		AND COALESCE((
+			SELECT d.status FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'document'
+			ORDER BY d.uploaded_at DESC
+			LIMIT 1
+		), '') != 'approved'
+	)
+	OR (
 		? != ''
 		AND ? != 'none'
+		AND ? != 'missing_valid'
 		AND (
 			SELECT d.status FROM tbl_teacher_documents d
 			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'document'
@@ -236,8 +246,18 @@ WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || midd
 		)
 	)
 	OR (
+		? = 'missing_valid'
+		AND COALESCE((
+			SELECT d.status FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'document'
+			ORDER BY d.uploaded_at DESC
+			LIMIT 1
+		), '') != 'approved'
+	)
+	OR (
 		? != ''
 		AND ? != 'none'
+		AND ? != 'missing_valid'
 		AND (
 			SELECT d.status FROM tbl_teacher_documents d
 			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'document'

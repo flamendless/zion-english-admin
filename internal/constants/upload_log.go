@@ -10,8 +10,8 @@ const (
 type UploadLogKind string
 
 const (
-	UploadLogKindIntroVideo UploadLogKind = "intro_video"
-	UploadLogKindAvatar     UploadLogKind = "avatar"
+	UploadLogKindIntroVideo   UploadLogKind = "intro_video"
+	UploadLogKindAvatar       UploadLogKind = "avatar"
 	UploadLogKindDocument     UploadLogKind = "document"
 	UploadLogKindAffiliateCSV UploadLogKind = "affiliate_csv"
 	UploadLogKindOther        UploadLogKind = "other"

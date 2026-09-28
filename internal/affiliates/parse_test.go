@@ -4,10 +4,10 @@ import "testing"
 
 func TestParseProductIDsFromURL(t *testing.T) {
 	tests := []struct {
-		url      string
-		shop     string
-		item     string
-		wantOK   bool
+		url    string
+		shop   string
+		item   string
+		wantOK bool
 	}{
 		{
 			url:    "https://shopee.ph/product/123/456",

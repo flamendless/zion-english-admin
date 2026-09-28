@@ -49,7 +49,14 @@ WHERE m2m.student_id = ?
 ORDER BY t.last_name ASC, t.first_name ASC, t.middle_name ASC;
 
 -- name: GetAllStudentTeacherNames :many
-SELECT m2m.student_id,
+SELECT
+	m2m.student_id,
+	t.id as teacher_id,
+	t.first_name,
+	t.middle_name,
+	t.last_name,
+	t.assigned_color,
+	t.profile_picture,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_teachers_students_m2m m2m
 INNER JOIN tbl_teachers t ON t.id = m2m.teacher_id

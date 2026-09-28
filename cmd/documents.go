@@ -18,9 +18,9 @@ import (
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/constants"
-	"zion-english/internal/notifications"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
+	"zion-english/internal/notifications"
 	"zion-english/internal/storage"
 	"zion-english/internal/utils"
 
@@ -70,8 +70,8 @@ func mapAllDocumentItems(ctx context.Context, rows []queries.GetAllTeacherDocume
 				row.TeacherAssignedColor,
 				row.TeacherProfilePicture,
 			),
-			ViewURL:    utils.URL(fmt.Sprintf("/documents/%d/file", row.ID)),
-			CanReview:  row.Type != string(constants.TeacherDocumentTypeResume) && row.Status == string(constants.TeacherDocumentStatusSubmitted),
+			ViewURL:   utils.URL(fmt.Sprintf("/documents/%d/file", row.ID)),
+			CanReview: row.Type != string(constants.TeacherDocumentTypeResume) && row.Status == string(constants.TeacherDocumentStatusSubmitted),
 		}
 	}
 

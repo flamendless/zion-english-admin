@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"go.uber.org/zap"
 	"strconv"
 	"strings"
 	"zion-english/internal/auth"
@@ -11,7 +12,6 @@ import (
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
 	"zion-english/internal/utils"
-	"go.uber.org/zap"
 )
 
 func insertAuditLogAs(ctx context.Context, actor auth.User, module, message string) {

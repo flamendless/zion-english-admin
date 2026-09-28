@@ -25,13 +25,13 @@ type SaveRequest struct {
 
 func NormalizeSaveRequest(req SaveRequest) SaveRequest {
 	return SaveRequest{
-		AffiliateURL: strings.TrimSpace(req.AffiliateURL),
-		ProductURL:   strings.TrimSpace(req.ProductURL),
-		ShopID:       strings.TrimSpace(req.ShopID),
-		ItemID:       strings.TrimSpace(req.ItemID),
-		Name:         strings.TrimSpace(req.Name),
-		Brand:        strings.TrimSpace(req.Brand),
-		PriceDisplay: strings.TrimSpace(req.PriceDisplay),
+		AffiliateURL:   strings.TrimSpace(req.AffiliateURL),
+		ProductURL:     strings.TrimSpace(req.ProductURL),
+		ShopID:         strings.TrimSpace(req.ShopID),
+		ItemID:         strings.TrimSpace(req.ItemID),
+		Name:           strings.TrimSpace(req.Name),
+		Brand:          strings.TrimSpace(req.Brand),
+		PriceDisplay:   strings.TrimSpace(req.PriceDisplay),
 		ThumbnailURL:   strings.TrimSpace(req.ThumbnailURL),
 		SortOrder:      req.SortOrder,
 		Sales:          strings.TrimSpace(req.Sales),

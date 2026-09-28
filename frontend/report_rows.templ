@@ -8,10 +8,7 @@ import (
 templ ReportTableRow(row ReportRowData, startDate string, endDate string, swapOOB bool) {
 	<tr data-teacher-id={ row.TeacherID } if swapOOB { hx-swap-oob={ HxSwapOuterHTML } }>
 		<td data-label="Teacher">
-			<div class="reports-teacher-cell">
-				@Avatar(row.TeacherAvatar)
-				<span>{ row.TeacherName }</span>
-			</div>
+			@TeacherNameCell(row.TeacherName, row.TeacherAvatar)
 		</td>
 		<td data-label="Payment status">
 			if row.HasPaymentStatus() {

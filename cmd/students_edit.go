@@ -348,9 +348,23 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	teachersByStudent := make(map[int64][]string)
+	teachersByStudent := make(map[int64][]frontend.TeacherListItem)
 	for _, assignment := range teacherAssignments {
-		teachersByStudent[assignment.StudentID] = append(teachersByStudent[assignment.StudentID], assignment.TeacherName)
+		name := assignment.TeacherName
+		if name == "" {
+			name = utils.ComposePersonName(assignment.FirstName, assignment.MiddleName, assignment.LastName)
+		}
+		teachersByStudent[assignment.StudentID] = append(teachersByStudent[assignment.StudentID], frontend.TeacherListItem{
+			Name: name,
+			Avatar: buildTeacherListAvatarProps(
+				assignment.TeacherID,
+				assignment.FirstName,
+				assignment.MiddleName,
+				assignment.LastName,
+				assignment.AssignedColor,
+				assignment.ProfilePicture,
+			),
+		})
 	}
 
 	viewStudents := make([]frontend.StudentItem, len(students))
@@ -368,7 +382,7 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 			HasParentRate:    hasParentRate,
 			AssignedColor:    s.AssignedColor,
 			Status:           constants.StudentStatus(s.Status),
-			TeacherDisplay:   strings.Join(teachersByStudent[s.ID], ", "),
+			Teachers:         teachersByStudent[s.ID],
 			RelatedToDisplay: formatStudentRelationships(relationshipsByStudent[s.ID]),
 			CreatedAt:        utils.FormatNullDateTimeSecondsPHT(s.CreatedAt),
 			UpdatedAt:        utils.FormatNullDateTimeSecondsPHT(s.UpdatedAt),

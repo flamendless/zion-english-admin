@@ -64,7 +64,14 @@ func (q *Queries) DeleteTeacherStudentLinksByStudentID(ctx context.Context, stud
 }
 
 const getAllStudentTeacherNames = `-- name: GetAllStudentTeacherNames :many
-SELECT m2m.student_id,
+SELECT
+	m2m.student_id,
+	t.id as teacher_id,
+	t.first_name,
+	t.middle_name,
+	t.last_name,
+	t.assigned_color,
+	t.profile_picture,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_teachers_students_m2m m2m
 INNER JOIN tbl_teachers t ON t.id = m2m.teacher_id
@@ -73,8 +80,14 @@ ORDER BY m2m.student_id ASC, t.last_name ASC, t.first_name ASC, t.middle_name AS
 `
 
 type GetAllStudentTeacherNamesRow struct {
-	StudentID   int64
-	TeacherName string
+	StudentID      int64
+	TeacherID      int64
+	FirstName      string
+	MiddleName     string
+	LastName       string
+	AssignedColor  string
+	ProfilePicture sql.NullString
+	TeacherName    string
 }
 
 func (q *Queries) GetAllStudentTeacherNames(ctx context.Context) ([]GetAllStudentTeacherNamesRow, error) {
@@ -86,7 +99,16 @@ func (q *Queries) GetAllStudentTeacherNames(ctx context.Context) ([]GetAllStuden
 	var items []GetAllStudentTeacherNamesRow
 	for rows.Next() {
 		var i GetAllStudentTeacherNamesRow
-		if err := rows.Scan(&i.StudentID, &i.TeacherName); err != nil {
+		if err := rows.Scan(
+			&i.StudentID,
+			&i.TeacherID,
+			&i.FirstName,
+			&i.MiddleName,
+			&i.LastName,
+			&i.AssignedColor,
+			&i.ProfilePicture,
+			&i.TeacherName,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

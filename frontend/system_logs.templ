@@ -20,11 +20,12 @@ type SystemLogData struct {
 }
 
 type SystemLogItem struct {
-	ID        string
-	Module    string
-	Message   string
-	CreatedBy string
-	CreatedAt string
+	ID              string
+	Module          string
+	Message         string
+	CreatedBy       string
+	CreatedByAvatar AvatarProps
+	CreatedAt       string
 }
 
 templ SystemLogs(data SystemLogData) {
@@ -36,6 +37,7 @@ templ SystemLogs(data SystemLogData) {
 		} else {
 			@AdminPageHead("Logs - Zion English Admin Tool")
 		}
+		@AvatarStyles()
 	</head>
 	<body>
 		<div class="container">
@@ -69,7 +71,9 @@ templ SystemLogs(data SystemLogData) {
 									<td data-label="Module">{ log.Module }</td>
 									<td data-label="Message">{ log.Message }</td>
 									if !data.HideCreatedBy {
-										<td data-label="Created By">{ getDisplayValue(log.CreatedBy) }</td>
+										<td data-label="Created By">
+											@TeacherNameCell(getDisplayValue(log.CreatedBy), log.CreatedByAvatar)
+										</td>
 									}
 									<td class="date-cell" data-label="Created">{ log.CreatedAt }</td>
 								</tr>

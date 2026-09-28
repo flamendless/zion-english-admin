@@ -21,21 +21,7 @@ import (
 )
 
 type analyticsSummaryJSON struct {
-	Conducted         int64   `json:"conducted"`
-	Cancelled         int64   `json:"cancelled"`
-	Rescheduled       int64   `json:"rescheduled"`
-	CancellationRate  float64 `json:"cancellationRate"`
-	ScheduledMinutes  int64   `json:"scheduledMinutes"`
-	ConductedMinutes  int64   `json:"conductedMinutes"`
-	UtilizationPct    float64 `json:"utilizationPct"`
-	NoShowCount       int64   `json:"noShowCount"`
-}
-
-type analyticsTeacherRowJSON struct {
-	TeacherID        string            `json:"teacherId"`
-	TeacherName      string            `json:"teacherName"`
-	TeacherAvatar    models.AvatarView `json:"teacherAvatar"`
-	Conducted        int64             `json:"conducted"`
+	Conducted        int64   `json:"conducted"`
 	Cancelled        int64   `json:"cancelled"`
 	Rescheduled      int64   `json:"rescheduled"`
 	CancellationRate float64 `json:"cancellationRate"`
@@ -43,6 +29,20 @@ type analyticsTeacherRowJSON struct {
 	ConductedMinutes int64   `json:"conductedMinutes"`
 	UtilizationPct   float64 `json:"utilizationPct"`
 	NoShowCount      int64   `json:"noShowCount"`
+}
+
+type analyticsTeacherRowJSON struct {
+	TeacherID        string            `json:"teacherId"`
+	TeacherName      string            `json:"teacherName"`
+	TeacherAvatar    models.AvatarView `json:"teacherAvatar"`
+	Conducted        int64             `json:"conducted"`
+	Cancelled        int64             `json:"cancelled"`
+	Rescheduled      int64             `json:"rescheduled"`
+	CancellationRate float64           `json:"cancellationRate"`
+	ScheduledMinutes int64             `json:"scheduledMinutes"`
+	ConductedMinutes int64             `json:"conductedMinutes"`
+	UtilizationPct   float64           `json:"utilizationPct"`
+	NoShowCount      int64             `json:"noShowCount"`
 }
 
 type analyticsStudentRowJSON struct {
@@ -106,16 +106,16 @@ type analyticsTrialWeeklyRowJSON struct {
 }
 
 type analyticsResponseJSON struct {
-	Summary    analyticsSummaryJSON        `json:"summary"`
-	TrialSummary analyticsTrialSummaryJSON `json:"trialSummary"`
-	TrialWeekly []analyticsTrialWeeklyRowJSON `json:"trialWeekly"`
-	ByTeacher  []analyticsTeacherRowJSON   `json:"byTeacher"`
-	ByStudent  []analyticsStudentRowJSON   `json:"byStudent"`
-	Weekly     []analyticsWeeklyRowJSON    `json:"weekly"`
-	NoShows    []analyticsNoShowJSON       `json:"noShows"`
-	Retention        analyticsRetentionJSON        `json:"retention"`
-	InactiveReasons  []analyticsInactiveReasonJSON `json:"inactiveReasons"`
-	ChurnedStudents  []analyticsChurnedStudentJSON `json:"churnedStudents"`
+	Summary         analyticsSummaryJSON          `json:"summary"`
+	TrialSummary    analyticsTrialSummaryJSON     `json:"trialSummary"`
+	TrialWeekly     []analyticsTrialWeeklyRowJSON `json:"trialWeekly"`
+	ByTeacher       []analyticsTeacherRowJSON     `json:"byTeacher"`
+	ByStudent       []analyticsStudentRowJSON     `json:"byStudent"`
+	Weekly          []analyticsWeeklyRowJSON      `json:"weekly"`
+	NoShows         []analyticsNoShowJSON         `json:"noShows"`
+	Retention       analyticsRetentionJSON        `json:"retention"`
+	InactiveReasons []analyticsInactiveReasonJSON `json:"inactiveReasons"`
+	ChurnedStudents []analyticsChurnedStudentJSON `json:"churnedStudents"`
 }
 
 func handleAnalytics(w http.ResponseWriter, r *http.Request) {

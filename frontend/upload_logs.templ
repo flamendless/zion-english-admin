@@ -31,6 +31,7 @@ type UploadLogItem struct {
 	FileSizeDisplay string
 	PresetDisplay   string
 	CreatedBy       string
+	CreatedByAvatar AvatarProps
 	CreatedAt       string
 }
 
@@ -72,6 +73,7 @@ templ UploadLogs(data UploadLogData) {
 		} else {
 			@AdminPageHead("Upload Logs - Zion English Admin Tool")
 		}
+		@AvatarStyles()
 	</head>
 	<body>
 		<div class="container">
@@ -112,7 +114,9 @@ templ UploadLogs(data UploadLogData) {
 									</td>
 									<td data-label="Details">{ log.Summary }</td>
 									if !data.HideTeacher {
-										<td data-label="Teacher">{ getDisplayValue(log.CreatedBy) }</td>
+										<td data-label="Teacher">
+											@TeacherNameCell(getDisplayValue(log.CreatedBy), log.CreatedByAvatar)
+										</td>
 									}
 									<td class="date-cell" data-label="Created">{ log.CreatedAt }</td>
 									<td data-label="Actions">

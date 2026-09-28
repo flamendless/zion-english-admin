@@ -141,7 +141,7 @@ func IntroVideoCompressTimeoutSecs(fileSize int64, settings IntroVideoEncodeSett
 		return base
 	}
 	extraBytes := fileSize - IntroVideoCompressMinBytes
-	extraMB := (extraBytes + (1<<20) - 1) / (1 << 20)
+	extraMB := (extraBytes + (1 << 20) - 1) / (1 << 20)
 	scaled := base + int(extraMB)*introVideoCompressTimeoutSecondsPerMB
 	if scaled > introVideoCompressTimeoutMaxSeconds {
 		return introVideoCompressTimeoutMaxSeconds

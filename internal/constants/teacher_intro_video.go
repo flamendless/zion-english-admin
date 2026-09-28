@@ -49,7 +49,7 @@ func ValidTeacherIntroVideoStatus(value string) bool {
 type TeacherIntroVideoSourceType string
 
 const (
-	TeacherIntroVideoSourceUpload     TeacherIntroVideoSourceType = "upload"
+	TeacherIntroVideoSourceUpload      TeacherIntroVideoSourceType = "upload"
 	TeacherIntroVideoSourceGoogleDrive TeacherIntroVideoSourceType = "google_drive"
 	TeacherIntroVideoSourceYouTube     TeacherIntroVideoSourceType = "youtube"
 )

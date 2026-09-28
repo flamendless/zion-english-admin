@@ -3,13 +3,13 @@ package constants
 type AdPlacement string
 
 const (
-	AdPlacementTop           AdPlacement = "top"
-	AdPlacementLeft          AdPlacement = "left"
-	AdPlacementRight         AdPlacement = "right"
-	AdPlacementBottom        AdPlacement = "bottom"
-	AdPlacementTopAndBottom  AdPlacement = "top_and_bottom"
-	AdPlacementLeftAndRight  AdPlacement = "left_and_right"
-	AdPlacementAllSides      AdPlacement = "all_sides"
+	AdPlacementTop          AdPlacement = "top"
+	AdPlacementLeft         AdPlacement = "left"
+	AdPlacementRight        AdPlacement = "right"
+	AdPlacementBottom       AdPlacement = "bottom"
+	AdPlacementTopAndBottom AdPlacement = "top_and_bottom"
+	AdPlacementLeftAndRight AdPlacement = "left_and_right"
+	AdPlacementAllSides     AdPlacement = "all_sides"
 )
 
 func ValidAdPlacement(placement string) bool {

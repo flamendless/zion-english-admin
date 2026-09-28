@@ -68,18 +68,18 @@ func introVideoCompressPresetFromDB(preset sql.NullString) constants.IntroVideoC
 func mapIntroVideoItem(row queries.GetTeacherIntroVideosByTeacherIDFilteredRow) frontend.IntroVideoItem {
 	linkLabel := introVideoLinkLabel(row.Url, row.OriginalFilename)
 	return frontend.IntroVideoItem{
-		ID:            strconv.FormatInt(row.ID, 10),
-		LinkLabel:     linkLabel,
+		ID:                strconv.FormatInt(row.ID, 10),
+		LinkLabel:         linkLabel,
 		OriginalFileSize:  formatIntroVideoFileSize(row.OriginalFileSize),
 		ProcessedFileSize: formatIntroVideoFileSize(row.FileSize),
 		CompressPreset:    introVideoCompressPresetFromDB(row.CompressPreset),
 		URL:               nullStringValue(row.Url),
-		SourceType:   introVideoSourceType(row.SourceType),
-		Status:       constants.TeacherIntroVideoStatus(row.Status),
-		UploadedAt:   utils.FormatNullDateTimePHT(row.CreatedAt),
-		RejectReason: nullStringValue(row.RejectReason),
-		ViewURL:      introVideoViewURL(row.ID, row.Url, row.Status),
-		CanReview:    false,
+		SourceType:        introVideoSourceType(row.SourceType),
+		Status:            constants.TeacherIntroVideoStatus(row.Status),
+		UploadedAt:        utils.FormatNullDateTimePHT(row.CreatedAt),
+		RejectReason:      nullStringValue(row.RejectReason),
+		ViewURL:           introVideoViewURL(row.ID, row.Url, row.Status),
+		CanReview:         false,
 	}
 }
 
@@ -98,17 +98,17 @@ func mapAllIntroVideoItems(ctx context.Context, rows []queries.GetAllTeacherIntr
 		teacherIDs[i] = row.TeacherID
 		linkLabel := introVideoLinkLabel(row.Url, row.OriginalFilename)
 		items[i] = frontend.IntroVideoItem{
-			ID:            strconv.FormatInt(row.ID, 10),
-			LinkLabel:     linkLabel,
+			ID:                strconv.FormatInt(row.ID, 10),
+			LinkLabel:         linkLabel,
 			OriginalFileSize:  formatIntroVideoFileSize(row.OriginalFileSize),
 			ProcessedFileSize: formatIntroVideoFileSize(row.FileSize),
 			CompressPreset:    introVideoCompressPresetFromDB(row.CompressPreset),
 			URL:               nullStringValue(row.Url),
-			SourceType:    introVideoSourceType(row.SourceType),
-			Status:        constants.TeacherIntroVideoStatus(row.Status),
-			UploadedAt:    utils.FormatNullDateTimePHT(row.CreatedAt),
-			UploadedBy:    row.TeacherName,
-			RejectReason:  nullStringValue(row.RejectReason),
+			SourceType:        introVideoSourceType(row.SourceType),
+			Status:            constants.TeacherIntroVideoStatus(row.Status),
+			UploadedAt:        utils.FormatNullDateTimePHT(row.CreatedAt),
+			UploadedBy:        row.TeacherName,
+			RejectReason:      nullStringValue(row.RejectReason),
 			UploadedByAvatar: buildTeacherListAvatarProps(
 				row.TeacherID,
 				row.TeacherFirstName,

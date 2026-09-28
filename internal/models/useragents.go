@@ -6,4 +6,3 @@ type UserAgentInfo struct {
 	OS             string
 	Device         string
 }
-

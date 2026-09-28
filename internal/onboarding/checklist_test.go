@@ -8,17 +8,17 @@ import (
 
 func TestBuildSummaryComplete(t *testing.T) {
 	items := Build(Input{
-		TeacherStatus:          constants.TeacherStatusApproved,
-		HasProfilePhoto:        true,
-		DocsStatus:             string(constants.TeacherDocumentStatusApproved),
-		ResumeStatus:           string(constants.TeacherDocumentStatusApproved),
-		IntroVideoRequired:     true,
-		IntroVideoStatus:       string(constants.TeacherIntroVideoStatusApproved),
+		TeacherStatus:             constants.TeacherStatusApproved,
+		HasProfilePhoto:           true,
+		DocsStatus:                string(constants.TeacherDocumentStatusApproved),
+		ResumeStatus:              string(constants.TeacherDocumentStatusApproved),
+		IntroVideoRequired:        true,
+		IntroVideoStatus:          string(constants.TeacherIntroVideoStatusApproved),
 		TrainingRequiredCompleted: 2,
-		TrainingRequiredTotal:   2,
-		ZoomShow:               true,
-		ZoomConnected:          true,
-		GoogleShow:             false,
+		TrainingRequiredTotal:     2,
+		ZoomShow:                  true,
+		ZoomConnected:             true,
+		GoogleShow:                false,
 	})
 
 	completed, total := Summary(items)
@@ -49,10 +49,10 @@ func TestDocumentsRejected(t *testing.T) {
 
 func TestBuildOmitsTrainingWhenNoRequiredPublished(t *testing.T) {
 	items := Build(Input{
-		TeacherStatus:           constants.TeacherStatusApproved,
-		HasProfilePhoto:         true,
-		DocsStatus:              string(constants.TeacherDocumentStatusApproved),
-		TrainingRequiredTotal:   0,
+		TeacherStatus:             constants.TeacherStatusApproved,
+		HasProfilePhoto:           true,
+		DocsStatus:                string(constants.TeacherDocumentStatusApproved),
+		TrainingRequiredTotal:     0,
 		TrainingRequiredCompleted: 0,
 	})
 

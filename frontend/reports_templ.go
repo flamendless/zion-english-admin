@@ -43,7 +43,7 @@ func Reports() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t.reports-filters {\n\t\t\t\tdisplay: contents;\n\t\t\t}\n\n\t\t\t.reports-teacher-cell {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: center;\n\t\t\t\tgap: var(--space-2);\n\t\t\t\tmin-width: 0;\n\t\t\t}\n\n\t\t\t.reports-header-actions .btn {\n\t\t\t\tmargin-top: 0;\n\t\t\t\twidth: auto;\n\t\t\t}\n\n\t\t\t.hub-header > .btn,\n\t\t\t.hub-header > a.btn {\n\t\t\t\tmargin-top: 0;\n\t\t\t\twidth: auto;\n\t\t\t\tflex-shrink: 0;\n\t\t\t}\n\n\t\t\t.report-role-excluded {\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tcursor: not-allowed;\n\t\t\t}\n\t\t</style><script>\n\t\t\twindow.closeReportViewModal = function () {\n\t\t\t\tconst host = document.getElementById('reportViewModalHost');\n\t\t\t\tif (host) host.innerHTML = '';\n\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t};\n\n\t\t\twindow.closeReportPaymentModal = function () {\n\t\t\t\tconst host = document.getElementById('reportPaymentModalHost');\n\t\t\t\tif (host) host.innerHTML = '';\n\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t};\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.id === 'reportViewModalHost') {\n\t\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\t\tconst overlay = evt.detail.target.querySelector('.modal-overlay');\n\t\t\t\t\tconst closeBtn = overlay && overlay.querySelector('.report-view-close');\n\t\t\t\t\tif (closeBtn) closeBtn.focus();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (evt.detail.target.id === 'reportPaymentModalHost') {\n\t\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\t\tconst overlay = evt.detail.target.querySelector('.modal-overlay');\n\t\t\t\t\tconst closeBtn = overlay && overlay.querySelector('.report-payment-close');\n\t\t\t\t\tif (closeBtn) closeBtn.focus();\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tif (e.target.closest('.report-view-close')) {\n\t\t\t\t\twindow.closeReportViewModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (e.target.closest('.report-payment-close')) {\n\t\t\t\t\twindow.closeReportPaymentModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst viewOverlay = e.target.closest('#reportViewModal');\n\t\t\t\tif (viewOverlay && e.target === viewOverlay) window.closeReportViewModal();\n\t\t\t\tconst paymentOverlay = e.target.closest('#reportPaymentModal');\n\t\t\t\tif (paymentOverlay && e.target === paymentOverlay) window.closeReportPaymentModal();\n\t\t\t});\n\n\t\t\tdocument.addEventListener('keydown', function (e) {\n\t\t\t\tif (e.key === 'Escape' && document.getElementById('reportViewModalHost')?.innerHTML) {\n\t\t\t\t\twindow.closeReportViewModal();\n\t\t\t\t}\n\t\t\t\tif (e.key === 'Escape' && document.getElementById('reportPaymentModalHost')?.innerHTML) {\n\t\t\t\t\twindow.closeReportPaymentModal();\n\t\t\t\t}\n\t\t\t});\n\t\t</script></head><body><div class=\"container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t.reports-filters {\n\t\t\t\tdisplay: contents;\n\t\t\t}\n\n\t\t\t.reports-header-actions .btn {\n\t\t\t\tmargin-top: 0;\n\t\t\t\twidth: auto;\n\t\t\t}\n\n\t\t\t.hub-header > .btn,\n\t\t\t.hub-header > a.btn {\n\t\t\t\tmargin-top: 0;\n\t\t\t\twidth: auto;\n\t\t\t\tflex-shrink: 0;\n\t\t\t}\n\n\t\t\t.report-role-excluded {\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tcursor: not-allowed;\n\t\t\t}\n\t\t</style><script>\n\t\t\twindow.closeReportViewModal = function () {\n\t\t\t\tconst host = document.getElementById('reportViewModalHost');\n\t\t\t\tif (host) host.innerHTML = '';\n\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t};\n\n\t\t\twindow.closeReportPaymentModal = function () {\n\t\t\t\tconst host = document.getElementById('reportPaymentModalHost');\n\t\t\t\tif (host) host.innerHTML = '';\n\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t};\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.id === 'reportViewModalHost') {\n\t\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\t\tconst overlay = evt.detail.target.querySelector('.modal-overlay');\n\t\t\t\t\tconst closeBtn = overlay && overlay.querySelector('.report-view-close');\n\t\t\t\t\tif (closeBtn) closeBtn.focus();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (evt.detail.target.id === 'reportPaymentModalHost') {\n\t\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\t\tconst overlay = evt.detail.target.querySelector('.modal-overlay');\n\t\t\t\t\tconst closeBtn = overlay && overlay.querySelector('.report-payment-close');\n\t\t\t\t\tif (closeBtn) closeBtn.focus();\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tif (e.target.closest('.report-view-close')) {\n\t\t\t\t\twindow.closeReportViewModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (e.target.closest('.report-payment-close')) {\n\t\t\t\t\twindow.closeReportPaymentModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst viewOverlay = e.target.closest('#reportViewModal');\n\t\t\t\tif (viewOverlay && e.target === viewOverlay) window.closeReportViewModal();\n\t\t\t\tconst paymentOverlay = e.target.closest('#reportPaymentModal');\n\t\t\t\tif (paymentOverlay && e.target === paymentOverlay) window.closeReportPaymentModal();\n\t\t\t});\n\n\t\t\tdocument.addEventListener('keydown', function (e) {\n\t\t\t\tif (e.key === 'Escape' && document.getElementById('reportViewModalHost')?.innerHTML) {\n\t\t\t\t\twindow.closeReportViewModal();\n\t\t\t\t}\n\t\t\t\tif (e.key === 'Escape' && document.getElementById('reportPaymentModalHost')?.innerHTML) {\n\t\t\t\t\twindow.closeReportPaymentModal();\n\t\t\t\t}\n\t\t\t});\n\t\t</script></head><body><div class=\"container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -62,7 +62,7 @@ func Reports() templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/reports/history"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 101, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 94, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -95,7 +95,7 @@ func Reports() templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 126, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 119, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 		if templ_7745c5c3_Err != nil {
@@ -108,7 +108,7 @@ func Reports() templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 129, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 122, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 		if templ_7745c5c3_Err != nil {
@@ -121,7 +121,7 @@ func Reports() templ.Component {
 		var templ_7745c5c3_Var5 templ.SafeURL
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/reports/summary"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 134, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 127, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -134,7 +134,7 @@ func Reports() templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 160, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 153, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 		if templ_7745c5c3_Err != nil {
@@ -147,7 +147,7 @@ func Reports() templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 162, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 155, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 		if templ_7745c5c3_Err != nil {
@@ -160,7 +160,7 @@ func Reports() templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 163, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 156, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 		if templ_7745c5c3_Err != nil {

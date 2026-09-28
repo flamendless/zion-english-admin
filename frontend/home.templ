@@ -47,6 +47,7 @@ type DashboardData struct {
 	TeachersWithoutZoom               int64
 	TeachersWithoutGoogleCal int64
 	TeachersWithoutCV             int64
+	TeachersWithoutValidDocuments int64
 	TeachersWithoutProfileAvatar  int64
 	ShowPaymentReceipt                bool
 	PaymentReceipt                    PaymentReceiptData
@@ -259,7 +260,7 @@ templ DashboardPendingStatCard(pendingTeachers int64, pendingDocuments int64, pe
 	</div>
 }
 
-templ DashboardTeachersStatCard(total int64, withoutZoom int64, withoutGoogleCal int64, withoutCV int64, withoutProfileAvatar int64) {
+templ DashboardTeachersStatCard(total int64, withoutZoom int64, withoutGoogleCal int64, withoutCV int64, withoutValidDocuments int64, withoutProfileAvatar int64) {
 	<div class="stat-card">
 		@AdminOnlyStatLabel("Teachers")
 		<div class="stat-link-rows">
@@ -286,6 +287,12 @@ templ DashboardTeachersStatCard(total int64, withoutZoom int64, withoutGoogleCal
 				utils.URL("/teachers?resumeStatus=none"),
 				withoutCV,
 				"View teachers without an uploaded CV",
+			)
+			@DashboardStatLinkRow(
+				"Without valid ID documents",
+				utils.URL("/teachers?docsStatus=missing_valid"),
+				withoutValidDocuments,
+				"View teachers without approved ID documents",
 			)
 			@DashboardStatLinkRow(
 				"Without profile avatar",
@@ -327,7 +334,7 @@ templ DashboardStats(data DashboardData) {
 				<span class="stat-sub">{ fmt.Sprintf("%d active, %d inactive", data.ActiveStudents, data.InactiveStudents) }</span>
 			</div>
 			@DashboardPendingStatCard(data.PendingTeachers, data.PendingDocuments, data.PendingIntroVideos)
-			@DashboardTeachersStatCard(data.TotalTeachers, data.TeachersWithoutZoom, data.TeachersWithoutGoogleCal, data.TeachersWithoutCV, data.TeachersWithoutProfileAvatar)
+			@DashboardTeachersStatCard(data.TotalTeachers, data.TeachersWithoutZoom, data.TeachersWithoutGoogleCal, data.TeachersWithoutCV, data.TeachersWithoutValidDocuments, data.TeachersWithoutProfileAvatar)
 			@DashboardParentGapStatCard(data.StudentsWithoutParent, data.StudentsWithoutParentRate)
 		}
 		if data.Role == auth.RoleTeacher {

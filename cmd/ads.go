@@ -10,10 +10,10 @@ import (
 	"strings"
 	"zion-english/frontend"
 	"zion-english/internal/ads"
-	"zion-english/internal/featureflags"
 	"zion-english/internal/auth"
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
+	"zion-english/internal/featureflags"
 	"zion-english/internal/logs"
 	"zion-english/internal/utils"
 
@@ -23,7 +23,7 @@ import (
 const adAffiliateSearchPageSize = 20
 
 type adsListPageState struct {
-	Form           frontend.AdFormData
+	Form            frontend.AdFormData
 	OpenCreateModal bool
 	OpenEditModal   bool
 }
@@ -105,16 +105,16 @@ func handleAdsList(w http.ResponseWriter, r *http.Request, state adsListPageStat
 func mapAdListItem(row queries.TblAd, productCount int64) frontend.AdListItem {
 	status := constants.AdStatus(row.Status)
 	return frontend.AdListItem{
-		ID:              strconv.FormatInt(row.ID, 10),
-		Name:            row.Name,
-		Status:          status,
-		StatusLabel:     frontend.AdStatusLabel(status),
-		StatusTone:      frontend.AdStatusPillTone(status),
-		Placement:       constants.AdPlacement(row.Placement),
-		PlacementLabel:  frontend.AdPlacementLabel(constants.AdPlacement(row.Placement)),
-		AdType:          constants.AdType(row.AdType),
-		TypeLabel:       frontend.AdTypeLabel(constants.AdType(row.AdType)),
-		ProductCount:    productCount,
+		ID:             strconv.FormatInt(row.ID, 10),
+		Name:           row.Name,
+		Status:         status,
+		StatusLabel:    frontend.AdStatusLabel(status),
+		StatusTone:     frontend.AdStatusPillTone(status),
+		Placement:      constants.AdPlacement(row.Placement),
+		PlacementLabel: frontend.AdPlacementLabel(constants.AdPlacement(row.Placement)),
+		AdType:         constants.AdType(row.AdType),
+		TypeLabel:      frontend.AdTypeLabel(constants.AdType(row.AdType)),
+		ProductCount:   productCount,
 		RandomizeSummary: frontend.AdRandomizeSummary(
 			constants.AdRandomizeKind(row.RandomizeKind),
 			constants.AdTimerInterval(row.TimerInterval),
@@ -416,13 +416,13 @@ func saveAd(ctx context.Context, adID int64, req ads.Request) (int64, error) {
 
 	if adID == 0 {
 		id, err := dbRW.GetQueries().InsertAd(ctx, queries.InsertAdParams{
-			Name:           req.Name,
-			Placement:      req.Placement,
-			AdType:         req.AdType,
-			Status:         req.Status,
-			RandomizeKind:  req.RandomizeKind,
-			TimerInterval:  req.TimerInterval,
-			SortOrder:      req.SortOrder,
+			Name:          req.Name,
+			Placement:     req.Placement,
+			AdType:        req.AdType,
+			Status:        req.Status,
+			RandomizeKind: req.RandomizeKind,
+			TimerInterval: req.TimerInterval,
+			SortOrder:     req.SortOrder,
 		})
 		if err != nil {
 			return 0, fmt.Errorf("failed to save ad: %w", err)
@@ -448,9 +448,9 @@ func saveAd(ctx context.Context, adID int64, req ads.Request) (int64, error) {
 	}
 	for i, pid := range req.AffiliateProductIDs {
 		if err := dbRW.GetQueries().InsertAdAffiliateProduct(ctx, queries.InsertAdAffiliateProductParams{
-			AdID:                adID,
-			AffiliateProductID:  pid,
-			SortOrder:           int64(i),
+			AdID:               adID,
+			AffiliateProductID: pid,
+			SortOrder:          int64(i),
 		}); err != nil {
 			return 0, fmt.Errorf("failed to link affiliate product: %w", err)
 		}
@@ -514,17 +514,17 @@ func adFormFromID(ctx context.Context, adID int64) (frontend.AdFormData, error) 
 		})
 	}
 	return frontend.AdFormData{
-		ID:              strconv.FormatInt(row.ID, 10),
-		Name:            row.Name,
-		Placement:       constants.AdPlacement(row.Placement),
-		AdType:          constants.AdType(row.AdType),
-		Status:          constants.AdStatus(row.Status),
-		RandomizeKind:   constants.AdRandomizeKind(row.RandomizeKind),
-		TimerInterval:   constants.AdTimerInterval(row.TimerInterval),
-		SortOrder:       row.SortOrder,
+		ID:               strconv.FormatInt(row.ID, 10),
+		Name:             row.Name,
+		Placement:        constants.AdPlacement(row.Placement),
+		AdType:           constants.AdType(row.AdType),
+		Status:           constants.AdStatus(row.Status),
+		RandomizeKind:    constants.AdRandomizeKind(row.RandomizeKind),
+		TimerInterval:    constants.AdTimerInterval(row.TimerInterval),
+		SortOrder:        row.SortOrder,
 		SelectedProducts: selected,
-		IsEdit:          true,
-		IsDeleted:       row.Status == string(constants.AdStatusDeleted),
+		IsEdit:           true,
+		IsDeleted:        row.Status == string(constants.AdStatusDeleted),
 	}, nil
 }
 
@@ -559,11 +559,11 @@ func adViewFromID(ctx context.Context, adID int64) (frontend.AdViewData, error) 
 	}
 	status := constants.AdStatus(row.Status)
 	return frontend.AdViewData{
-		Name:             row.Name,
-		StatusLabel:      frontend.AdStatusLabel(status),
-		StatusTone:       frontend.AdStatusPillTone(status),
-		PlacementLabel:   frontend.AdPlacementLabel(constants.AdPlacement(row.Placement)),
-		TypeLabel:        frontend.AdTypeLabel(constants.AdType(row.AdType)),
+		Name:           row.Name,
+		StatusLabel:    frontend.AdStatusLabel(status),
+		StatusTone:     frontend.AdStatusPillTone(status),
+		PlacementLabel: frontend.AdPlacementLabel(constants.AdPlacement(row.Placement)),
+		TypeLabel:      frontend.AdTypeLabel(constants.AdType(row.AdType)),
 		RandomizeSummary: frontend.AdRandomizeSummary(
 			constants.AdRandomizeKind(row.RandomizeKind),
 			constants.AdTimerInterval(row.TimerInterval),

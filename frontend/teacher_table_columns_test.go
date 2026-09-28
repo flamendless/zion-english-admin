@@ -8,9 +8,9 @@ func TestTeacherTableColumnsSummary(t *testing.T) {
 	}
 
 	visible := map[TeacherTableColumnID]bool{
-		TeacherTableColumnDocsStatus:    true,
-		TeacherTableColumnResumeStatus:  true,
-		TeacherTableColumnConnections:   true,
+		TeacherTableColumnDocsStatus:   true,
+		TeacherTableColumnResumeStatus: true,
+		TeacherTableColumnConnections:  true,
 	}
 	if got := teacherTableColumnsSummary(visible); got != TeacherTableColumnsSummaryAll {
 		t.Fatalf("expected All, got %q", got)

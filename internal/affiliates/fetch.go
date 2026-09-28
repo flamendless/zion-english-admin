@@ -26,14 +26,14 @@ const (
 )
 
 type PreviewResult struct {
-	AffiliateURL  string
-	ProductURL    string
-	ShopID        string
-	ItemID        string
-	Name          string
-	Brand         string
-	PriceDisplay  string
-	ThumbnailURL  string
+	AffiliateURL string
+	ProductURL   string
+	ShopID       string
+	ItemID       string
+	Name         string
+	Brand        string
+	PriceDisplay string
+	ThumbnailURL string
 }
 
 var fetchClient = &http.Client{

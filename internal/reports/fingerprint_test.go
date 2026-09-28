@@ -9,8 +9,8 @@ func TestFingerprintStableForSameRecords(t *testing.T) {
 	rows := []FingerprintRow{
 		{
 			ID: 1, StudentID: 10, Date: "2026-08-01",
-			StartTime: sql.NullString{String: "09:00", Valid: true},
-			EndTime:   sql.NullString{String: "10:00", Valid: true},
+			StartTime:       sql.NullString{String: "09:00", Valid: true},
+			EndTime:         sql.NullString{String: "10:00", Valid: true},
 			DurationMinutes: 60, Rate: 100.5, Currency: "KRW",
 			Status: "conducted", UpdatedAt: "2026-08-01 10:00:00",
 		},

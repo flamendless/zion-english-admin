@@ -704,15 +704,15 @@ func editScheduleData(ctx context.Context, scheduleID int64, lockTeacher, isSupe
 	}
 
 	return frontend.EditScheduleData{
-		ScheduleID:  strconv.FormatInt(scheduleID, 10),
-		LockTeacher: lockTeacher,
-		IsSuperuser: isSuperuser,
-		TeacherID:   strconv.FormatInt(existing.TeacherID, 10),
-		TeacherName: existing.TeacherName,
-		StudentID:   strconv.FormatInt(existing.StudentID, 10),
-		Date:        existing.ScheduledDate,
-		StartTime:   startTime,
-		EndTime:     utils.EndTimeFromStartAndDuration(startTime, existing.DurationMinutes),
+		ScheduleID:        strconv.FormatInt(scheduleID, 10),
+		LockTeacher:       lockTeacher,
+		IsSuperuser:       isSuperuser,
+		TeacherID:         strconv.FormatInt(existing.TeacherID, 10),
+		TeacherName:       existing.TeacherName,
+		StudentID:         strconv.FormatInt(existing.StudentID, 10),
+		Date:              existing.ScheduledDate,
+		StartTime:         startTime,
+		EndTime:           utils.EndTimeFromStartAndDuration(startTime, existing.DurationMinutes),
 		Rate:              existing.Rate,
 		Currency:          existing.Currency,
 		IsTrialClass:      existing.IsTrialClass != 0,
@@ -980,9 +980,9 @@ func handleScheduledClassEditPreview(w http.ResponseWriter, r *http.Request, sch
 
 	writeHTML(w)
 	if err := frontend.ScheduleSeriesEditPreview(frontend.ScheduleSeriesEditPreviewData{
-		ScheduleID: strconv.FormatInt(scheduleID, 10),
-		Scope:      string(scope),
-		From:       r.FormValue("from"),
+		ScheduleID:  strconv.FormatInt(scheduleID, 10),
+		Scope:       string(scope),
+		From:        r.FormValue("from"),
 		LockTeacher: auth.IsTeacherScoped(role),
 		Base: frontend.ScheduleRepeatFormSnapshot{
 			TeacherID:    strconv.FormatInt(existing.TeacherID, 10),
@@ -1097,13 +1097,13 @@ func scheduledClassViewData(ctx context.Context, scheduleID int64) (frontend.Edi
 	}
 	return frontend.EditClassData{
 		OverdueGracePeriodMinutes: classOverdueGracePeriodMinutes(ctx),
-		RecordID:        strconv.FormatInt(scheduleID, 10),
-		Readonly:        true,
-		IsSuperuser:     auth.HasAdminAccess(role),
-		StudentID:       strconv.FormatInt(existing.StudentID, 10),
-		TeacherID:       strconv.FormatInt(existing.TeacherID, 10),
-		StudentName:     existing.StudentName,
-		TeacherName:     existing.TeacherName,
+		RecordID:                  strconv.FormatInt(scheduleID, 10),
+		Readonly:                  true,
+		IsSuperuser:               auth.HasAdminAccess(role),
+		StudentID:                 strconv.FormatInt(existing.StudentID, 10),
+		TeacherID:                 strconv.FormatInt(existing.TeacherID, 10),
+		StudentName:               existing.StudentName,
+		TeacherName:               existing.TeacherName,
 		TeacherAvatar: avatarWithTeacherRoles(
 			buildTeacherListAvatarProps(
 				teacher.ID,

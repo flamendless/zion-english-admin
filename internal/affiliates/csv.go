@@ -9,15 +9,15 @@ import (
 const maxCSVRows = 500
 
 type CSVRow struct {
-	ItemID          string
-	ItemName        string
-	Price           string
-	Sales           string
-	ShopName        string
-	CommissionRate  string
-	Commission      string
-	ProductLink     string
-	OfferLink       string
+	ItemID         string
+	ItemName       string
+	Price          string
+	Sales          string
+	ShopName       string
+	CommissionRate string
+	Commission     string
+	ProductLink    string
+	OfferLink      string
 }
 
 var expectedCSVHeaders = []string{

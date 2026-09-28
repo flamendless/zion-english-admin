@@ -17,10 +17,10 @@ import (
 	"time"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
-	"zion-english/internal/notifications"
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
+	"zion-english/internal/notifications"
 	"zion-english/internal/storage"
 	"zion-english/internal/utils"
 
@@ -214,34 +214,34 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := frontend.ProfileData{
-		IsSuperuser:           false,
-		Name:                  utils.ComposePersonName(row.FirstName, row.MiddleName, row.LastName),
-		Email:                 row.Email,
-		Roles:                 roleStrings,
-		FirstName:             row.FirstName,
-		MiddleName:            row.MiddleName,
-		LastName:              row.LastName,
-		Birthdate:             row.Birthdate,
-		Address:               row.Address,
-		JoiningDate:           row.JoiningDate,
-		MobileNumber:          row.MobileNumber,
-		Certifications:        certifications,
-		AssignedColor:         row.AssignedColor,
-		RatePerClass:          row.RatePerClass,
-		Currency:              row.Currency,
-		DriveUrl:              row.DriveUrl,
-		Sex:                   sex,
-		Status:                constants.TeacherStatus(row.Status),
-		HasProfilePicture:     row.ProfilePicture.Valid && row.ProfilePicture.String != "",
-		Avatar:                avatarWithTeacherRoles(buildTeacherAvatarProps(row), roleStrings),
-		CanChangeMobile:       canChangeMobile,
-		MobileDaysRemaining:   mobileDays,
-		CanChangePassword:     canChangePassword,
-		PasswordDaysRemaining: passwordDays,
-		CanEditFirstName:      utils.ProfileNameEditable(row.FirstName),
-		CanEditMiddleName:     utils.ProfileNameEditable(row.MiddleName),
-		CanEditLastName:       utils.ProfileNameEditable(row.LastName),
-		CanUploadDocument:     blockingDocs == 0,
+		IsSuperuser:               false,
+		Name:                      utils.ComposePersonName(row.FirstName, row.MiddleName, row.LastName),
+		Email:                     row.Email,
+		Roles:                     roleStrings,
+		FirstName:                 row.FirstName,
+		MiddleName:                row.MiddleName,
+		LastName:                  row.LastName,
+		Birthdate:                 row.Birthdate,
+		Address:                   row.Address,
+		JoiningDate:               row.JoiningDate,
+		MobileNumber:              row.MobileNumber,
+		Certifications:            certifications,
+		AssignedColor:             row.AssignedColor,
+		RatePerClass:              row.RatePerClass,
+		Currency:                  row.Currency,
+		DriveUrl:                  row.DriveUrl,
+		Sex:                       sex,
+		Status:                    constants.TeacherStatus(row.Status),
+		HasProfilePicture:         row.ProfilePicture.Valid && row.ProfilePicture.String != "",
+		Avatar:                    avatarWithTeacherRoles(buildTeacherAvatarProps(row), roleStrings),
+		CanChangeMobile:           canChangeMobile,
+		MobileDaysRemaining:       mobileDays,
+		CanChangePassword:         canChangePassword,
+		PasswordDaysRemaining:     passwordDays,
+		CanEditFirstName:          utils.ProfileNameEditable(row.FirstName),
+		CanEditMiddleName:         utils.ProfileNameEditable(row.MiddleName),
+		CanEditLastName:           utils.ProfileNameEditable(row.LastName),
+		CanUploadDocument:         blockingDocs == 0,
 		CanUploadResume:           canUploadResume,
 		ResumeUploadDaysRemaining: resumeUploadDays,
 		HasResume:                 hasResume,
@@ -807,4 +807,3 @@ func validateAvatarUpload(file io.ReadSeeker, size int64) (string, error) {
 		return "", ErrUnsupportedAvatarImageFormat
 	}
 }
-

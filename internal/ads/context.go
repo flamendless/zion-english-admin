@@ -30,14 +30,14 @@ type CatalogAd struct {
 }
 
 type ProductOption struct {
-	ProductID     int64
-	Name          string
-	ShopName      string
-	PriceDisplay  string
-	ThumbnailURL  string
-	AffiliateURL  string
-	Sales         string
-	SortOrder     int64
+	ProductID    int64
+	Name         string
+	ShopName     string
+	PriceDisplay string
+	ThumbnailURL string
+	AffiliateURL string
+	Sales        string
+	SortOrder    int64
 }
 
 func GetCatalog(ctx context.Context) []CatalogAd {

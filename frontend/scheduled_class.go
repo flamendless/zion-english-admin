@@ -19,38 +19,38 @@ const (
 )
 
 type ScheduledClassItemData struct {
-	ID              int64
-	StudentID       int64
-	TeacherID       int64
-	StudentName     string
-	TeacherName     string
-	TeacherAvatar   AvatarProps
-	ScheduledDate   string
-	StartTime       string
-	EndTime         string
-	DurationMinutes int64
-	Rate            float64
-	Currency        string
-	Status          constants.ScheduledClassStatus
+	ID                int64
+	StudentID         int64
+	TeacherID         int64
+	StudentName       string
+	TeacherName       string
+	TeacherAvatar     AvatarProps
+	ScheduledDate     string
+	StartTime         string
+	EndTime           string
+	DurationMinutes   int64
+	Rate              float64
+	Currency          string
+	Status            constants.ScheduledClassStatus
 	RoomURL           string
 	RoomPasscode      string
 	CalendarEventURL  string
 	TimeRange         string
-	Overdue         bool
-	ShowZoomWarning bool
-	DeleteFrom      ClassActionContext
-	SeriesID        int64
-	SeriesTotalCount int64
+	Overdue           bool
+	ShowZoomWarning   bool
+	DeleteFrom        ClassActionContext
+	SeriesID          int64
+	SeriesTotalCount  int64
 	SeriesFutureCount int64
 }
 
 func ScheduledClassItemFromView(v models.ScheduledClassView, gracePeriodMinutes int64) ScheduledClassItemData {
 	item := ScheduledClassItemData{
-		ID:              v.ID,
-		StudentID:       v.StudentID,
-		TeacherID:       v.TeacherID,
-		StudentName:     v.StudentName,
-		TeacherName:     v.TeacherName,
+		ID:          v.ID,
+		StudentID:   v.StudentID,
+		TeacherID:   v.TeacherID,
+		StudentName: v.StudentName,
+		TeacherName: v.TeacherName,
 		TeacherAvatar: AvatarProps{
 			Size:          "sm",
 			Initials:      v.TeacherAvatar.Initials,
@@ -60,20 +60,20 @@ func ScheduledClassItemFromView(v models.ScheduledClassView, gracePeriodMinutes 
 			Alt:           v.TeacherAvatar.Alt,
 			RoleBadge:     v.TeacherAvatar.RoleBadge,
 		},
-		ScheduledDate:   v.ScheduledDate,
-		StartTime:       v.StartTime,
-		EndTime:         v.EndTime,
-		DurationMinutes: v.DurationMinutes,
-		Rate:            v.Rate,
-		Currency:        v.Currency,
-		Status:          constants.ScheduledClassStatus(v.Status),
+		ScheduledDate:    v.ScheduledDate,
+		StartTime:        v.StartTime,
+		EndTime:          v.EndTime,
+		DurationMinutes:  v.DurationMinutes,
+		Rate:             v.Rate,
+		Currency:         v.Currency,
+		Status:           constants.ScheduledClassStatus(v.Status),
 		RoomURL:          v.RoomURL,
 		RoomPasscode:     v.RoomPasscode,
 		CalendarEventURL: v.CalendarEventURL,
-		TimeRange:       FormatScheduledClassTimeRange(v.StartTime, v.EndTime, v.DurationMinutes),
-		ShowZoomWarning: v.RoomURL == "" && v.DurationMinutes > ZoomMaxAutoMinutes,
-		DeleteFrom:      ClassActionContextSchedule,
-		SeriesID:        v.SeriesID,
+		TimeRange:        FormatScheduledClassTimeRange(v.StartTime, v.EndTime, v.DurationMinutes),
+		ShowZoomWarning:  v.RoomURL == "" && v.DurationMinutes > ZoomMaxAutoMinutes,
+		DeleteFrom:       ClassActionContextSchedule,
+		SeriesID:         v.SeriesID,
 	}
 	item.Overdue = scheduledclass.IsOverdue(
 		item.Status,
@@ -209,22 +209,22 @@ func ScheduledClassItemFromEditClassData(data EditClassData) ScheduledClassItemD
 	studentID, _ := strconv.ParseInt(data.StudentID, 10, 64)
 	teacherID, _ := strconv.ParseInt(data.TeacherID, 10, 64)
 	item := ScheduledClassItemData{
-		ID:              id,
-		StudentID:       studentID,
-		TeacherID:       teacherID,
-		StudentName:     data.StudentName,
-		TeacherName:     data.TeacherName,
-		TeacherAvatar:   data.TeacherAvatar,
-		ScheduledDate:   data.Date,
-		StartTime:       data.StartTime,
-		EndTime:         data.EndTime,
-		DurationMinutes: data.DurationMinutes,
-		Rate:            data.Rate,
-		Currency:        data.Currency,
-		Status:          constants.ScheduledClassStatusScheduled,
-		TimeRange:       data.TimeRangeLabel(),
-		DeleteFrom:      data.ActionFrom,
-		SeriesID:        data.SeriesID,
+		ID:                id,
+		StudentID:         studentID,
+		TeacherID:         teacherID,
+		StudentName:       data.StudentName,
+		TeacherName:       data.TeacherName,
+		TeacherAvatar:     data.TeacherAvatar,
+		ScheduledDate:     data.Date,
+		StartTime:         data.StartTime,
+		EndTime:           data.EndTime,
+		DurationMinutes:   data.DurationMinutes,
+		Rate:              data.Rate,
+		Currency:          data.Currency,
+		Status:            constants.ScheduledClassStatusScheduled,
+		TimeRange:         data.TimeRangeLabel(),
+		DeleteFrom:        data.ActionFrom,
+		SeriesID:          data.SeriesID,
 		SeriesFutureCount: data.SeriesFutureCount,
 	}
 	item.Overdue = scheduledclass.IsOverdue(
@@ -332,18 +332,18 @@ func FormatScheduledClassRate(rate float64, currency string) string {
 
 func scheduledClassDetailAttrs(item ScheduledClassItemData) templ.Attributes {
 	attrs := templ.Attributes{
-		"data-student-name":   item.StudentName,
-		"data-teacher-name":   item.TeacherName,
-		"data-scheduled-date": FormatScheduledClassDateDisplay(item.ScheduledDate),
-		"data-time-range":     item.TimeRange,
-		"data-duration":       formatDurationMinutes(item.DurationMinutes),
-		"data-rate":           formatRateAmount(item.Rate, item.Currency),
-		"data-currency":       item.Currency,
-		"data-teacher-initials":      item.TeacherAvatar.Initials,
-		"data-teacher-color":         item.TeacherAvatar.AssignedColor,
-		"data-teacher-picture-url":   item.TeacherAvatar.PictureURL,
-		"data-teacher-has-picture":   strconv.FormatBool(item.TeacherAvatar.HasPicture),
-		"data-teacher-alt":           item.TeacherAvatar.Alt,
+		"data-student-name":        item.StudentName,
+		"data-teacher-name":        item.TeacherName,
+		"data-scheduled-date":      FormatScheduledClassDateDisplay(item.ScheduledDate),
+		"data-time-range":          item.TimeRange,
+		"data-duration":            formatDurationMinutes(item.DurationMinutes),
+		"data-rate":                formatRateAmount(item.Rate, item.Currency),
+		"data-currency":            item.Currency,
+		"data-teacher-initials":    item.TeacherAvatar.Initials,
+		"data-teacher-color":       item.TeacherAvatar.AssignedColor,
+		"data-teacher-picture-url": item.TeacherAvatar.PictureURL,
+		"data-teacher-has-picture": strconv.FormatBool(item.TeacherAvatar.HasPicture),
+		"data-teacher-alt":         item.TeacherAvatar.Alt,
 	}
 	if item.TeacherAvatar.RoleBadge != "" {
 		attrs["data-teacher-role-badge"] = item.TeacherAvatar.RoleBadge

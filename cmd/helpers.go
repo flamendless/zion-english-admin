@@ -35,22 +35,22 @@ func extractPathID(r *http.Request, segment, suffix string) (int64, bool) {
 
 func listQueryParams(r *http.Request) map[string]string {
 	return map[string]string{
-		"q":          r.URL.Query().Get("q"),
-		"status":     r.URL.Query().Get("status"),
-		"docsStatus":       r.URL.Query().Get("docsStatus"),
-		"resumeStatus":     r.URL.Query().Get("resumeStatus"),
-		"connectionZoom":   r.URL.Query().Get("connectionZoom"),
-		"connectionGoogle": r.URL.Query().Get("connectionGoogle"),
-		"connectionFilter":      r.URL.Query().Get("connectionFilter"),
-		"profilePictureFilter":  r.URL.Query().Get("profilePictureFilter"),
-		"teacherId":  r.URL.Query().Get("teacherId"),
-		"email":      r.URL.Query().Get("email"),
-		"module":     r.URL.Query().Get("module"),
-		"startDate":  r.URL.Query().Get("startDate"),
-		"endDate":   r.URL.Query().Get("endDate"),
-		"parentFilter": r.URL.Query().Get("parentFilter"),
-		"sortBy":     r.URL.Query().Get("sortBy"),
-		"sortOrder":  r.URL.Query().Get("sortOrder"),
+		"q":                    r.URL.Query().Get("q"),
+		"status":               r.URL.Query().Get("status"),
+		"docsStatus":           r.URL.Query().Get("docsStatus"),
+		"resumeStatus":         r.URL.Query().Get("resumeStatus"),
+		"connectionZoom":       r.URL.Query().Get("connectionZoom"),
+		"connectionGoogle":     r.URL.Query().Get("connectionGoogle"),
+		"connectionFilter":     r.URL.Query().Get("connectionFilter"),
+		"profilePictureFilter": r.URL.Query().Get("profilePictureFilter"),
+		"teacherId":            r.URL.Query().Get("teacherId"),
+		"email":                r.URL.Query().Get("email"),
+		"module":               r.URL.Query().Get("module"),
+		"startDate":            r.URL.Query().Get("startDate"),
+		"endDate":              r.URL.Query().Get("endDate"),
+		"parentFilter":         r.URL.Query().Get("parentFilter"),
+		"sortBy":               r.URL.Query().Get("sortBy"),
+		"sortOrder":            r.URL.Query().Get("sortOrder"),
 	}
 }
 

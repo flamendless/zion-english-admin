@@ -30,11 +30,11 @@ type ClassRecordRowData struct {
 
 func ClassRecordRowFromView(v models.ClassRecordView) ClassRecordRowData {
 	return ClassRecordRowData{
-		ID:              v.ID,
-		StudentID:       v.StudentID,
-		TeacherID:       v.TeacherID,
-		StudentName:     v.StudentName,
-		TeacherName:     v.TeacherName,
+		ID:          v.ID,
+		StudentID:   v.StudentID,
+		TeacherID:   v.TeacherID,
+		StudentName: v.StudentName,
+		TeacherName: v.TeacherName,
 		TeacherAvatar: AvatarProps{
 			Size:          "sm",
 			Initials:      v.TeacherAvatar.Initials,

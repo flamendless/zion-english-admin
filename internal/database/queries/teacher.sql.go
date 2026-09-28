@@ -51,8 +51,18 @@ WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || midd
 		)
 	)
 	OR (
+		? = 'missing_valid'
+		AND COALESCE((
+			SELECT d.status FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'document'
+			ORDER BY d.uploaded_at DESC
+			LIMIT 1
+		), '') != 'approved'
+	)
+	OR (
 		? != ''
 		AND ? != 'none'
+		AND ? != 'missing_valid'
 		AND (
 			SELECT d.status FROM tbl_teacher_documents d
 			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'document'
@@ -142,14 +152,14 @@ type CountTeachersFilteredParams struct {
 	Column10 interface{}
 	Column11 interface{}
 	Column12 interface{}
-	Status_2 string
+	Column13 interface{}
 	Column14 interface{}
-	Column15 interface{}
+	Status_2 string
 	Column16 interface{}
 	Column17 interface{}
-	Status_3 string
+	Column18 interface{}
 	Column19 interface{}
-	Column20 interface{}
+	Status_3 string
 	Column21 interface{}
 	Column22 interface{}
 	Column23 interface{}
@@ -158,6 +168,8 @@ type CountTeachersFilteredParams struct {
 	Column26 interface{}
 	Column27 interface{}
 	Column28 interface{}
+	Column29 interface{}
+	Column30 interface{}
 }
 
 func (q *Queries) CountTeachersFiltered(ctx context.Context, arg CountTeachersFilteredParams) (int64, error) {
@@ -174,14 +186,14 @@ func (q *Queries) CountTeachersFiltered(ctx context.Context, arg CountTeachersFi
 		arg.Column10,
 		arg.Column11,
 		arg.Column12,
-		arg.Status_2,
+		arg.Column13,
 		arg.Column14,
-		arg.Column15,
+		arg.Status_2,
 		arg.Column16,
 		arg.Column17,
-		arg.Status_3,
+		arg.Column18,
 		arg.Column19,
-		arg.Column20,
+		arg.Status_3,
 		arg.Column21,
 		arg.Column22,
 		arg.Column23,
@@ -190,6 +202,8 @@ func (q *Queries) CountTeachersFiltered(ctx context.Context, arg CountTeachersFi
 		arg.Column26,
 		arg.Column27,
 		arg.Column28,
+		arg.Column29,
+		arg.Column30,
 	)
 	var count int64
 	err := row.Scan(&count)
@@ -629,8 +643,18 @@ WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || midd
 		)
 	)
 	OR (
+		? = 'missing_valid'
+		AND COALESCE((
+			SELECT d.status FROM tbl_teacher_documents d
+			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'document'
+			ORDER BY d.uploaded_at DESC
+			LIMIT 1
+		), '') != 'approved'
+	)
+	OR (
 		? != ''
 		AND ? != 'none'
+		AND ? != 'missing_valid'
 		AND (
 			SELECT d.status FROM tbl_teacher_documents d
 			WHERE d.teacher_id = tbl_teachers.id AND d.type = 'document'
@@ -722,14 +746,14 @@ type GetTeachersFilteredParams struct {
 	Column10 interface{}
 	Column11 interface{}
 	Column12 interface{}
-	Status_2 string
+	Column13 interface{}
 	Column14 interface{}
-	Column15 interface{}
+	Status_2 string
 	Column16 interface{}
 	Column17 interface{}
-	Status_3 string
+	Column18 interface{}
 	Column19 interface{}
-	Column20 interface{}
+	Status_3 string
 	Column21 interface{}
 	Column22 interface{}
 	Column23 interface{}
@@ -738,6 +762,8 @@ type GetTeachersFilteredParams struct {
 	Column26 interface{}
 	Column27 interface{}
 	Column28 interface{}
+	Column29 interface{}
+	Column30 interface{}
 	Limit    int64
 	Offset   int64
 }
@@ -782,14 +808,14 @@ func (q *Queries) GetTeachersFiltered(ctx context.Context, arg GetTeachersFilter
 		arg.Column10,
 		arg.Column11,
 		arg.Column12,
-		arg.Status_2,
+		arg.Column13,
 		arg.Column14,
-		arg.Column15,
+		arg.Status_2,
 		arg.Column16,
 		arg.Column17,
-		arg.Status_3,
+		arg.Column18,
 		arg.Column19,
-		arg.Column20,
+		arg.Status_3,
 		arg.Column21,
 		arg.Column22,
 		arg.Column23,
@@ -798,6 +824,8 @@ func (q *Queries) GetTeachersFiltered(ctx context.Context, arg GetTeachersFilter
 		arg.Column26,
 		arg.Column27,
 		arg.Column28,
+		arg.Column29,
+		arg.Column30,
 		arg.Limit,
 		arg.Offset,
 	)

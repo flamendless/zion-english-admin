@@ -81,18 +81,18 @@ func loadTeacherOnboardingChecklist(ctx context.Context, teacherID int64) ([]onb
 	googleVisibleToTeacher := featureflags.IsVisibleToTeacherRoles(ctx, dbRO, constants.FeatureFlagIntegrationGoogleCalendar, roles)
 
 	return onboarding.Build(onboarding.Input{
-		TeacherStatus:          constants.TeacherStatus(row.Status),
-		HasProfilePhoto:        row.ProfilePicture.Valid && row.ProfilePicture.String != "",
-		DocsStatus:             docsStatus,
-		ResumeStatus:           resumeStatus,
-		IntroVideoStatus:       introStatus,
-		IntroVideoRequired:     introRequired,
+		TeacherStatus:             constants.TeacherStatus(row.Status),
+		HasProfilePhoto:           row.ProfilePicture.Valid && row.ProfilePicture.String != "",
+		DocsStatus:                docsStatus,
+		ResumeStatus:              resumeStatus,
+		IntroVideoStatus:          introStatus,
+		IntroVideoRequired:        introRequired,
 		TrainingRequiredCompleted: trainingCompleted,
-		TrainingRequiredTotal:   trainingTotal,
-		ZoomShow:               zoomConfigured && (zoomConnected || zoomVisibleToTeacher),
-		ZoomConnected:          zoomConnected,
-		GoogleShow:             googleConfigured && (googleConnected || googleVisibleToTeacher),
-		GoogleConnected:        googleConnected,
+		TrainingRequiredTotal:     trainingTotal,
+		ZoomShow:                  zoomConfigured && (zoomConnected || zoomVisibleToTeacher),
+		ZoomConnected:             zoomConnected,
+		GoogleShow:                googleConfigured && (googleConnected || googleVisibleToTeacher),
+		GoogleConnected:           googleConnected,
 	}), nil
 }
 

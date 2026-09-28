@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"zion-english/internal/logs"
 	"time"
+	"zion-english/internal/logs"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
