@@ -17,6 +17,7 @@ import (
 	"time"
 	"zion-english/frontend"
 	"zion-english/internal/announcements"
+	"zion-english/internal/ads"
 	"zion-english/internal/metatags"
 	"zion-english/internal/auth"
 	"zion-english/internal/conf"
@@ -201,6 +202,10 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/affiliates/upload", affiliatesRole(handleAffiliateUpload))
 		authMux.HandleFunc(basePath+"/affiliates", affiliatesRole(handleAffiliates))
 		authMux.HandleFunc(basePath+"/affiliates/", affiliatesRole(handleAffiliatesPath))
+		adsRole := auth.RequireRole(auth.RoleSuperuser)
+		authMux.HandleFunc(basePath+"/ads/partials/affiliate-search", adsRole(handleAdAffiliateSearch))
+		authMux.HandleFunc(basePath+"/ads", adsRole(handleAds))
+		authMux.HandleFunc(basePath+"/ads/", adsRole(handleAdsPath))
 		lmRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)
 		authMux.HandleFunc(basePath+"/learning-materials/preview", lmRole(handleLearningMaterialURLPreview))
 		authMux.HandleFunc(basePath+"/learning-materials/create", lmRole(handleLearningMaterialCreate))
@@ -317,6 +322,8 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/affiliate-link/", authHandler)
 		rootMux.Handle(basePath+"/affiliates", authHandler)
 		rootMux.Handle(basePath+"/affiliates/", authHandler)
+		rootMux.Handle(basePath+"/ads", authHandler)
+		rootMux.Handle(basePath+"/ads/", authHandler)
 		rootMux.Handle(basePath+"/learning-materials", authHandler)
 		rootMux.Handle(basePath+"/learning-materials/", authHandler)
 		rootMux.Handle(basePath+"/training-materials", authHandler)
@@ -324,7 +331,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/notifications", authHandler)
 		rootMux.Handle(basePath+"/notifications/", authHandler)
 
-		handler := logRequests(securityHeaders(metatags.Middleware(dbRO.GetQueries(), rootMux)))
+		handler := logRequests(securityHeaders(metatags.Middleware(dbRO.GetQueries(), ads.Middleware(dbRO.GetQueries(), rootMux))))
 
 		port := webFlags.port
 		if !cmd.Flags().Changed("port") {

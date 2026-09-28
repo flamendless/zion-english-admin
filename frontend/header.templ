@@ -64,6 +64,7 @@ templ HeaderSimple() {
 		classWizard := ClassWizardPageDataForContext(ctx)
 	}}
 	@Header(loggedIn, role)
+	@AdPlacementChrome()
 	if loggedIn {
 		@RecordClassFlowModals(classWizard)
 	}

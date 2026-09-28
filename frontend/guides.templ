@@ -47,6 +47,7 @@ templ Guides(data GuidesData) {
 				</div>
 			}
 		</div>
+	@LayoutEnd()
 	</body>
 	</html>
 }
@@ -198,6 +199,7 @@ templ GuideGettingStarted() {
 			</div>
 		</div>
 		@GuideAnchorScript()
+	@LayoutEnd()
 	</body>
 	</html>
 }
@@ -298,6 +300,93 @@ templ GuideReportsGeneration() {
 			</div>
 		</div>
 		@GuideAnchorScript()
+	@LayoutEnd()
+	</body>
+	</html>
+}
+
+templ GuideAds() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Ads - Guides - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@GuideStyles()
+	</head>
+	<body>
+		<div class="container guides-page">
+			@HeaderSimple()
+
+			<nav class="guides-breadcrumb" aria-label="Breadcrumb">
+				<a href={ utils.URL("/guides") } class="guides-breadcrumb-link">Guides</a>
+				<span class="guides-breadcrumb-sep" aria-hidden="true">/</span>
+				<span class="guides-breadcrumb-current" aria-current="page">Ads</span>
+			</nav>
+
+			<div class="hub-header">
+				<h2 class="hub-title admin-only-label-wrap">
+					Ads
+					@AdminOnlyIndicator()
+				</h2>
+			</div>
+
+			<div class="guides-hero">
+				<p class="guides-subtitle">
+					How superusers configure affiliate ad slots, rotation, and status. Published ads appear on landing, login, legal, dashboard, and authenticated pages.
+				</p>
+			</div>
+
+			<div class="guide-content">
+				@GuideSection(
+					"ads-overview",
+					"Ads overview",
+					utils.URL("/ads"),
+					"Open Ads under Admin to manage placement slots.",
+					[]string{
+						"Create an ad with a name, placement, and affiliate products from your Affiliates catalog.",
+						"Draft ads are visible only in the admin list. Published ads render on site pages.",
+						"Delete marks an ad as deleted; it stops showing but remains in the list when you filter by Deleted.",
+					},
+					false,
+				)
+				@GuideSection(
+					"placements",
+					"Placements",
+					utils.URL("/ads"),
+					"Choose where the ad chrome appears on each page.",
+					[]string{
+						"Top, left, right, or bottom show the same affiliated product preview card used on the Affiliates page.",
+						"Combined placements expand to multiple zones on the same page.",
+						"Side rails hide on narrow viewports so mobile layouts stay readable.",
+					},
+					false,
+				)
+				@GuideSection(
+					"products-and-rotation",
+					"Products and rotation",
+					utils.URL("/ads"),
+					"Link one or more affiliate products to each ad.",
+					[]string{
+						"Search by product or shop name and check the products to include.",
+						"With multiple products, choose per page, per session, or timer rotation.",
+						"Timer rotation uses an hourly or daily cookie to pick which product to show.",
+					},
+					false,
+				)
+			</div>
+
+			<div class="guides-footer">
+				<a href={ utils.URL("/guides") } class="guides-back-link">
+					@GuideBackIcon()
+					All guides
+				</a>
+			</div>
+		</div>
+		@GuideAnchorScript()
+	@LayoutEnd()
 	</body>
 	</html>
 }
@@ -394,6 +483,7 @@ templ GuideResumeCV() {
 			</div>
 		</div>
 		@GuideAnchorScript()
+	@LayoutEnd()
 	</body>
 	</html>
 }
@@ -548,6 +638,7 @@ templ GuideIntroVideos() {
 			</div>
 		</div>
 		@GuideAnchorScript()
+	@LayoutEnd()
 	</body>
 	</html>
 }
@@ -659,6 +750,7 @@ templ GuidePayments() {
 			</div>
 		</div>
 		@GuideAnchorScript()
+	@LayoutEnd()
 	</body>
 	</html>
 }
@@ -704,6 +796,7 @@ templ GuideConnectZoom() {
 			</div>
 		</div>
 		@GuideAnchorScript()
+	@LayoutEnd()
 	</body>
 	</html>
 }
@@ -863,6 +956,7 @@ templ GuideConnectGoogleCalendar() {
 			</div>
 		</div>
 		@GuideAnchorScript()
+	@LayoutEnd()
 	</body>
 	</html>
 }
@@ -1013,6 +1107,7 @@ templ GuideFAQ() {
 			</div>
 		</div>
 		@GuideAnchorScript()
+	@LayoutEnd()
 	</body>
 	</html>
 }

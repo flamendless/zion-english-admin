@@ -19,6 +19,25 @@ type TblAccess struct {
 	UpdatedAt   string
 }
 
+type TblAd struct {
+	ID            int64
+	Name          string
+	Placement     string
+	AdType        string
+	Status        string
+	RandomizeKind string
+	TimerInterval string
+	SortOrder     int64
+	CreatedAt     string
+	UpdatedAt     string
+}
+
+type TblAdAffiliateProduct struct {
+	AdID               int64
+	AffiliateProductID int64
+	SortOrder          int64
+}
+
 type TblAffiliateImportBatch struct {
 	ID            int64
 	Filename      string

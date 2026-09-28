@@ -133,6 +133,7 @@ templ Home(data DashboardData) {
 		</style>
 	</head>
 	<body>
+		@AdPlacementChrome()
 		<div class="home-container">
 			<div class="home-title">
 				<img src={utils.URL("/static/logo.png")} alt="Zion English" class="home-logo">
@@ -188,6 +189,7 @@ templ Home(data DashboardData) {
 				@PersistentPanelStack()
 			}
 		</div>
+	@LayoutEnd()
 	</body>
 	</html>
 }

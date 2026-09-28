@@ -5,6 +5,7 @@ import (
 	"slices"
 	"strings"
 	"zion-english/frontend"
+	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/utils"
 )
@@ -422,6 +423,56 @@ func filterAffiliateRows(rows []queries.GetAllAffiliateProductsRow, query string
 			strings.Contains(strings.ToLower(row.ShopBrandName), query) {
 			out = append(out, row)
 		}
+	}
+	return out
+}
+
+func sortAdsRows(rows []queries.TblAd, productCounts map[int64]int64, sort utils.SortParams) {
+	utils.SortSlice(rows, sort.Order, func(a, b queries.TblAd) int {
+		switch sort.By {
+		case "name":
+			return utils.CompareStrings(a.Name, b.Name)
+		case "status":
+			return utils.CompareStrings(a.Status, b.Status)
+		case "placement":
+			return utils.CompareStrings(a.Placement, b.Placement)
+		case "ad_type":
+			return utils.CompareStrings(a.AdType, b.AdType)
+		case "updated_at":
+			return utils.CompareStrings(a.UpdatedAt, b.UpdatedAt)
+		case "sort_order":
+			if c := utils.CompareInt64(a.SortOrder, b.SortOrder); c != 0 {
+				return c
+			}
+			return utils.CompareInt64(a.ID, b.ID)
+		default:
+			if c := utils.CompareInt64(a.SortOrder, b.SortOrder); c != 0 {
+				return c
+			}
+			return utils.CompareInt64(a.ID, b.ID)
+		}
+	})
+	_ = productCounts
+}
+
+func filterAdsRows(rows []queries.TblAd, query, statusFilter string) []queries.TblAd {
+	query = strings.ToLower(strings.TrimSpace(query))
+	statusFilter = strings.TrimSpace(statusFilter)
+	out := make([]queries.TblAd, 0, len(rows))
+	for _, row := range rows {
+		if statusFilter == "" {
+			if row.Status == string(constants.AdStatusDeleted) {
+				continue
+			}
+		} else if row.Status != statusFilter {
+			continue
+		}
+		if query != "" {
+			if !strings.Contains(strings.ToLower(row.Name), query) {
+				continue
+			}
+		}
+		out = append(out, row)
 	}
 	return out
 }

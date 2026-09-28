@@ -1,0 +1,194 @@
+package frontend
+
+import (
+	"zion-english/internal/ads"
+)
+
+templ AdPlacementChrome() {
+	{{
+		slots := ads.GetResolvedSlots(ctx)
+		bodyClass := ""
+		if slots.HasSideRails {
+			bodyClass = "has-ad-rails"
+		}
+	}}
+	if bodyClass != "" {
+		<script>
+			document.documentElement.classList.add('has-ad-rails');
+		</script>
+	}
+	@AffiliateProductCardStyles()
+	@AdPlacementChromeStyles()
+	if len(slots.Top) > 0 || len(slots.Left) > 0 || len(slots.Right) > 0 {
+		<div class="ad-chrome ad-chrome--fixed" aria-hidden="false">
+			if len(slots.Top) > 0 {
+				<div class="ad-zone ad-zone--top">
+					for _, item := range slots.Top {
+						@AffiliateProductCard(AffiliateProductCardFromResolved(item))
+					}
+				</div>
+			}
+			if len(slots.Left) > 0 {
+				<div class="ad-zone ad-zone--left">
+					for _, item := range slots.Left {
+						@AffiliateProductCard(AffiliateProductCardFromResolved(item))
+					}
+				</div>
+			}
+			if len(slots.Right) > 0 {
+				<div class="ad-zone ad-zone--right">
+					for _, item := range slots.Right {
+						@AffiliateProductCard(AffiliateProductCardFromResolved(item))
+					}
+				</div>
+			}
+		</div>
+	}
+}
+
+templ AdPlacementBottom() {
+	{{
+		slots := ads.GetResolvedSlots(ctx)
+	}}
+	if len(slots.Bottom) > 0 {
+		<div class="ad-chrome ad-chrome--bottom" aria-label="Sponsored recommendations">
+			<div class="ad-zone ad-zone--bottom">
+				for _, item := range slots.Bottom {
+					@AffiliateProductCard(AffiliateProductCardFromResolved(item))
+				}
+			</div>
+		</div>
+	}
+}
+
+templ AdPlacementChromeStyles() {
+	<style>
+		.ad-chrome {
+			pointer-events: none;
+		}
+		.ad-chrome a,
+		.ad-chrome button {
+			pointer-events: auto;
+		}
+		.ad-zone--top {
+			width: 100%;
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			gap: var(--space-3);
+			padding: var(--space-2) 0;
+			margin-bottom: var(--space-2);
+		}
+		.ad-zone--top .affiliate-product-card {
+			width: min(100%, 14rem);
+		}
+		.ad-chrome--bottom {
+			pointer-events: none;
+			width: 100%;
+			margin-top: var(--space-6);
+			padding: var(--space-3) 0 var(--space-4);
+			border-top: 1px solid var(--color-border-subtle);
+		}
+		.ad-chrome--bottom .ad-zone--bottom {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			gap: var(--space-3);
+			max-width: 56rem;
+			margin: 0 auto;
+			padding: 0 var(--space-3);
+		}
+		.ad-chrome--bottom .affiliate-product-card {
+			width: min(100%, 14rem);
+		}
+		.ad-zone--left,
+		.ad-zone--right {
+			position: fixed;
+			top: 4.75rem;
+			bottom: 0;
+			width: 11rem;
+			z-index: 850;
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-2);
+			overflow: hidden;
+			padding: var(--space-2) var(--space-1);
+			box-sizing: border-box;
+		}
+		.ad-zone--left { left: 0; }
+		.ad-zone--right { right: 0; }
+		.ad-zone--left .affiliate-product-card,
+		.ad-zone--right .affiliate-product-card {
+			width: 100%;
+			flex: 1 1 0;
+			min-height: 0;
+		}
+		.ad-zone--left .affiliate-product-card-image-wrap,
+		.ad-zone--right .affiliate-product-card-image-wrap {
+			flex: 1 1 0;
+			min-height: 0;
+			display: flex;
+			flex-direction: column;
+		}
+		.ad-zone--left .affiliate-product-card-image-link,
+		.ad-zone--right .affiliate-product-card-image-link {
+			flex: 1 1 0;
+			min-height: 0;
+			aspect-ratio: auto;
+			height: 100%;
+		}
+		.ad-zone--left .affiliate-product-card-image,
+		.ad-zone--right .affiliate-product-card-image {
+			object-fit: cover;
+		}
+		.ad-zone--left .affiliate-product-card-body,
+		.ad-zone--right .affiliate-product-card-body {
+			flex: 0 0 auto;
+			padding: var(--space-2);
+			gap: var(--space-1);
+		}
+		.ad-zone--left .affiliate-product-card-title,
+		.ad-zone--right .affiliate-product-card-title {
+			font-size: 0.8125rem;
+		}
+		.ad-zone--left .affiliate-product-card-price,
+		.ad-zone--right .affiliate-product-card-price {
+			font-size: 0.9375rem;
+		}
+		.ad-zone--left .affiliate-product-card-cta,
+		.ad-zone--right .affiliate-product-card-cta {
+			padding: 0.4375rem var(--space-2);
+			font-size: 0.6875rem;
+			gap: 0.25rem;
+		}
+		.ad-zone--left .affiliate-product-card-cta-logo,
+		.ad-zone--right .affiliate-product-card-cta-logo {
+			width: 0.875rem;
+			height: 0.875rem;
+		}
+		.ad-zone--left .affiliate-product-card-sales,
+		.ad-zone--right .affiliate-product-card-sales {
+			display: none;
+		}
+		.ad-zone--left [data-tooltip]::after,
+		.ad-zone--right [data-tooltip]::after {
+			left: auto;
+			right: 0;
+			transform: none;
+		}
+		html.has-ad-rails body {
+			padding-left: 11.5rem;
+			padding-right: 11.5rem;
+		}
+		@media (max-width: 960px) {
+			.ad-zone--left,
+			.ad-zone--right {
+				display: none;
+			}
+			html.has-ad-rails body {
+				padding-left: 0;
+				padding-right: 0;
+			}
+		}
+	</style>
+}

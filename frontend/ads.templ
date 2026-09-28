@@ -1,0 +1,909 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/constants"
+	"zion-english/internal/utils"
+)
+
+type AdListItem struct {
+	ID               string
+	Name             string
+	Status           constants.AdStatus
+	StatusLabel      string
+	StatusTone       PillTone
+	Placement        constants.AdPlacement
+	PlacementLabel   string
+	AdType           constants.AdType
+	TypeLabel        string
+	ProductCount     int64
+	RandomizeSummary string
+	IsDeleted        bool
+}
+
+type AdSelectedProduct struct {
+	ID           string
+	Name         string
+	ShopName     string
+	PriceDisplay string
+}
+
+type AdFormData struct {
+	ID               string
+	Name             string
+	Placement        constants.AdPlacement
+	AdType           constants.AdType
+	Status           constants.AdStatus
+	RandomizeKind    constants.AdRandomizeKind
+	TimerInterval    constants.AdTimerInterval
+	SortOrder        int64
+	SelectedProducts []AdSelectedProduct
+	IsEdit           bool
+	IsDeleted        bool
+}
+
+type AdViewData struct {
+	Name             string
+	StatusLabel      string
+	StatusTone       PillTone
+	PlacementLabel   string
+	TypeLabel        string
+	RandomizeSummary string
+	ProductCards     []AffiliateProductCardData
+}
+
+type AdAffiliateSearchItem struct {
+	ID           string
+	Name         string
+	ShopName     string
+	PriceDisplay string
+	ThumbnailURL string
+	Checked      bool
+}
+
+type AdAffiliateSearchPanelData struct {
+	Items         []AdAffiliateSearchItem
+	Query         string
+	Page          int
+	TotalPages    int
+	Total         int64
+	SelectedCount int
+	FormID        string
+}
+
+type AdsPageData struct {
+	Items           []AdListItem
+	Query           string
+	StatusFilter    string
+	SortBy          string
+	SortOrder       string
+	FilterPath      string
+	Form            AdFormData
+	OpenCreateModal bool
+	OpenEditModal   bool
+}
+
+func adFormAction(data AdFormData) string {
+	if data.IsEdit {
+		return utils.URL("/ads/" + data.ID + "/edit")
+	}
+	return utils.URL("/ads")
+}
+
+templ AdsPage(data AdsPageData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>Ads - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@AffiliateProductCardStyles()
+		@AdsPageStyles()
+	</head>
+	<body>
+		<div class="container ads-page">
+			@HeaderSimple()
+			<div class="hub-header ads-hub-header">
+				<div class="ads-page-heading">
+					<h2 class="hub-title">Ads</h2>
+					<p class="ads-page-subtitle">
+						Configure affiliate ad placements shown across portal pages. Only published ads appear on the site.
+					</p>
+				</div>
+				<div class="ads-header-actions">
+					<button type="button" class="add-btn" id="openAdCreateModalBtn">Create ad</button>
+				</div>
+			</div>
+			@SuccessBanner()
+			@ErrorBanner()
+
+			<form class="list-toolbar ads-toolbar" method="GET" action={ data.FilterPath }>
+				<div class="form-group ads-search-group">
+					<label for="adsQ">Search</label>
+					<input type="search" id="adsQ" name="q" value={ data.Query } placeholder="Ad name..." autocomplete="off"/>
+				</div>
+				<div class="form-group">
+					<label for="adsStatus">Status</label>
+					<select id="adsStatus" name="status">
+						<option value="">Active (no deleted)</option>
+						<option value="published" selected?={ data.StatusFilter == "published" }>Published</option>
+						<option value="draft" selected?={ data.StatusFilter == "draft" }>Draft</option>
+						<option value="deleted" selected?={ data.StatusFilter == "deleted" }>Deleted</option>
+					</select>
+				</div>
+				@SortControls(data.SortBy, data.SortOrder, ListSortKindAds)
+				<div class="form-group list-toolbar-action">
+					<label for="adsFilterSubmit">&nbsp;</label>
+					<button type="submit" id="adsFilterSubmit">Filter</button>
+				</div>
+			</form>
+			@SortToggleScript()
+
+			if len(data.Items) > 0 {
+				<div class="table-wrapper">
+					<table class="table-stack-mobile ads-table">
+						<thead>
+							<tr>
+								<th class="col-name">Name</th>
+								<th>Status</th>
+								<th>Placement</th>
+								<th>Type</th>
+								<th>Products</th>
+								<th>Rotation</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							for _, item := range data.Items {
+								<tr>
+									<td class="col-name" data-label="Name" title={ item.Name }>{ item.Name }</td>
+									<td data-label="Status">
+										@StatusPill(item.StatusLabel, item.StatusTone, false)
+									</td>
+									<td data-label="Placement">{ item.PlacementLabel }</td>
+									<td data-label="Type">{ item.TypeLabel }</td>
+									<td data-label="Products">{ fmt.Sprintf("%d", item.ProductCount) }</td>
+									<td data-label="Rotation">{ item.RandomizeSummary }</td>
+									<td data-label="Actions">
+										<div class="table-actions">
+											@IconActionButton("View", IconKindView, templ.Attributes{
+												"hx-get":    utils.URL("/ads/" + item.ID + "/view"),
+												"hx-target": "#adViewModalHost",
+												"hx-swap":   HxSwapInnerHTML,
+											})
+											if !item.IsDeleted {
+												@IconActionButton("Edit", IconKindEdit, templ.Attributes{
+													"hx-get":    utils.URL("/ads/" + item.ID + "/edit"),
+													"hx-target": "#adEditModalHost",
+													"hx-swap":   HxSwapInnerHTML,
+												})
+												@IconActionButton("Delete", IconKindDelete, templ.Attributes{
+													"hx-get":    utils.URL("/ads/" + item.ID + "/delete"),
+													"hx-target": "#adDeleteModalHost",
+													"hx-swap":   HxSwapInnerHTML,
+												})
+											}
+										</div>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			} else {
+				<p class="ads-empty">No ads yet. Create one to get started.</p>
+			}
+		</div>
+
+		@AdCreateModal(AdFormData{IsEdit: false})
+		<div id="adEditModalHost">
+			if data.OpenEditModal {
+				@AdEditModal(data.Form, true)
+			}
+		</div>
+		<div id="adViewModalHost"></div>
+		<div id="adDeleteModalHost"></div>
+		@AdsPageScripts(data.OpenCreateModal)
+	@LayoutEnd()
+	</body>
+	</html>
+}
+
+templ AdCreateModal(data AdFormData) {
+	<div class="modal-overlay" id="adCreateModal" hidden role="presentation">
+		<div class="modal-dialog ads-modal" role="dialog" aria-modal="true" aria-labelledby="adCreateModalTitle">
+			<div class="modal-header">
+				<div class="ads-modal-header-text">
+					<h3 id="adCreateModalTitle">Create ad</h3>
+					<p class="ads-wizard-step-label" id="adCreateFormStepLabel" aria-live="polite">Step 1 of 3</p>
+				</div>
+				<button type="button" class="modal-close ad-create-modal-close" aria-label="Close">&times;</button>
+			</div>
+			@AdForm(data, "adCreateForm")
+		</div>
+	</div>
+}
+
+templ AdEditModal(data AdFormData, open bool) {
+	<div class="modal-overlay" id="adEditModal" role="presentation" hidden?={ !open }>
+		<div class="modal-dialog ads-modal" role="dialog" aria-modal="true" aria-labelledby="adEditModalTitle">
+			<div class="modal-header">
+				<div class="ads-modal-header-text">
+					<h3 id="adEditModalTitle">Edit ad</h3>
+					<p class="ads-wizard-step-label" id="adEditFormStepLabel" aria-live="polite">Step 1 of 3</p>
+				</div>
+				<button type="button" class="modal-close ad-edit-modal-close" aria-label="Close">&times;</button>
+			</div>
+			@AdForm(data, "adEditForm")
+		</div>
+	</div>
+}
+
+templ AdForm(data AdFormData, formID string) {
+	<form id={ formID } method="POST" action={ adFormAction(data) } class="ads-form ads-form-wizard" data-ad-wizard="1">
+		<div class="modal-body ads-form-wizard-body">
+			<div class="ads-wizard-step is-active" data-ad-step="1">
+				<p class="ads-wizard-step-lead">Name the ad and choose where it appears.</p>
+				<div class="form-group">
+					<label for={ formID + "Name" }>Name</label>
+					<input type="text" id={ formID + "Name" } name="name" value={ data.Name } required maxlength="200" disabled?={ data.IsDeleted }/>
+				</div>
+				<div class="form-row">
+					<div class="form-group">
+						<label for={ formID + "Status" }>Status</label>
+						if data.IsDeleted {
+							<input type="text" id={ formID + "Status" } value={ AdStatusLabel(data.Status) } readonly/>
+							<input type="hidden" name="status" value={ string(data.Status) }/>
+						} else {
+							<select id={ formID + "Status" } name="status" required>
+								<option value={ string(constants.AdStatusDraft) } selected?={ data.Status == constants.AdStatusDraft || data.Status == "" }>Draft</option>
+								<option value={ string(constants.AdStatusPublished) } selected?={ data.Status == constants.AdStatusPublished }>Published</option>
+							</select>
+						}
+					</div>
+					<div class="form-group">
+						<label for={ formID + "SortOrder" }>Sort order</label>
+						<input type="number" id={ formID + "SortOrder" } name="sort_order" value={ fmt.Sprintf("%d", data.SortOrder) } min="0" step="1" disabled?={ data.IsDeleted }/>
+					</div>
+				</div>
+				<div class="form-row">
+					<div class="form-group">
+						<label for={ formID + "Placement" }>Placement</label>
+						<select id={ formID + "Placement" } name="placement" required disabled?={ data.IsDeleted }>
+							@adPlacementOptions(data.Placement)
+						</select>
+					</div>
+					<div class="form-group">
+						<label for={ formID + "AdType" }>Ad type</label>
+						<select id={ formID + "AdType" } name="ad_type" required disabled?={ data.IsDeleted }>
+							<option value={ string(constants.AdTypeAffiliate) } selected?={ data.AdType == constants.AdTypeAffiliate || data.AdType == "" }>Affiliate</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="ads-wizard-step" data-ad-step="2" hidden>
+				<p class="ads-wizard-step-lead">Search and select affiliate products to show in this ad.</p>
+				<div class="ads-affiliate-picker" id={ formID + "AffiliatePicker" }>
+					<div class="form-group">
+						<label for={ formID + "ProductSearch" }>Affiliate products</label>
+						<input
+							type="search"
+							id={ formID + "ProductSearch" }
+							name="q"
+							placeholder="Search products by name or shop..."
+							autocomplete="off"
+							disabled?={ data.IsDeleted }
+							hx-get={ utils.URL("/ads/partials/affiliate-search?form_id=" + formID) }
+							hx-trigger="input changed delay:300ms, loadAffiliateProducts from:body"
+							hx-target={ "#" + formID + "SearchResults" }
+							hx-include={ "#" + formID + "ProductSearch, #" + formID + "SelectedIDs" }
+						/>
+					</div>
+					<p class="ads-selection-count" id={ formID + "SelectionCount" }>
+						<span class="ads-selection-count-n">{ fmt.Sprintf("%d", len(data.SelectedProducts)) }</span>
+						<span class="ads-selection-count-sep"> / </span>
+						<span class="ads-selection-count-total">-</span>
+						<span> selected</span>
+					</p>
+					<div id={ formID + "SelectedIDs" } class="ads-selected-product-inputs">
+						for _, p := range data.SelectedProducts {
+							<input type="hidden" name="affiliate_product_ids" value={ p.ID }/>
+						}
+					</div>
+					<p class="ads-products-required-hint" id={ formID + "ProductsHint" } role="alert" hidden>Select at least one affiliate product.</p>
+					<div id={ formID + "SearchResults" } class="ads-search-results"></div>
+				</div>
+			</div>
+			<div class="ads-wizard-step" data-ad-step="3" hidden>
+				<p class="ads-wizard-step-lead">Choose how to rotate products when more than one is linked.</p>
+				<div class="ads-randomize-fields" id={ formID + "RandomizeFields" } hidden?={ len(data.SelectedProducts) <= 1 }>
+					<div class="form-row">
+						<div class="form-group">
+							<label for={ formID + "RandomizeKind" }>Randomize</label>
+							<select id={ formID + "RandomizeKind" } name="randomize_kind" disabled?={ data.IsDeleted }>
+								<option value={ string(constants.AdRandomizePerPage) } selected?={ data.RandomizeKind == constants.AdRandomizePerPage || data.RandomizeKind == "" }>Per page</option>
+								<option value={ string(constants.AdRandomizePerSession) } selected?={ data.RandomizeKind == constants.AdRandomizePerSession }>Per session</option>
+								<option value={ string(constants.AdRandomizeTimer) } selected?={ data.RandomizeKind == constants.AdRandomizeTimer }>Timer</option>
+							</select>
+						</div>
+						<div class="form-group" id={ formID + "TimerIntervalGroup" } hidden?={ data.RandomizeKind != constants.AdRandomizeTimer }>
+							<label for={ formID + "TimerInterval" }>Timer interval</label>
+							<select
+								id={ formID + "TimerInterval" }
+								name="timer_interval"
+								disabled?={ data.IsDeleted || data.RandomizeKind != constants.AdRandomizeTimer }
+							>
+								<option value={ string(constants.AdTimerIntervalHourly) } selected?={ data.TimerInterval == constants.AdTimerIntervalHourly }>Hourly</option>
+								<option value={ string(constants.AdTimerIntervalDaily) } selected?={ data.TimerInterval == constants.AdTimerIntervalDaily }>Daily</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<p class="ads-wizard-step-note" id={ formID + "SingleProductNote" } hidden?={ len(data.SelectedProducts) != 1 }>
+					Only one product is selected. It will be shown every time.
+				</p>
+			</div>
+		</div>
+		if !data.IsDeleted {
+			<div class="modal-footer ads-modal-footer ads-form-wizard-footer">
+				<div class="ads-wizard-footer-start">
+					<button type="button" class="btn btn-secondary ad-form-modal-close">Cancel</button>
+					<button type="button" class="btn btn-secondary ads-wizard-prev ads-wizard-nav-hidden" aria-hidden="true">Previous</button>
+				</div>
+				<div class="ads-wizard-footer-end">
+					<button type="button" class="btn ads-wizard-next" disabled>Next</button>
+					<button type="submit" class="btn ads-wizard-save ads-wizard-nav-hidden" aria-hidden="true">Save ad</button>
+				</div>
+			</div>
+		} else {
+			<div class="modal-footer ads-modal-footer">
+				<button type="button" class="btn btn-secondary ad-form-modal-close">Close</button>
+			</div>
+		}
+	</form>
+}
+
+templ adPlacementOptions(selected constants.AdPlacement) {
+	<option value={ string(constants.AdPlacementTop) } selected?={ selected == constants.AdPlacementTop }>Top</option>
+	<option value={ string(constants.AdPlacementLeft) } selected?={ selected == constants.AdPlacementLeft }>Left</option>
+	<option value={ string(constants.AdPlacementRight) } selected?={ selected == constants.AdPlacementRight }>Right</option>
+	<option value={ string(constants.AdPlacementBottom) } selected?={ selected == constants.AdPlacementBottom }>Bottom</option>
+	<option value={ string(constants.AdPlacementTopAndSide) } selected?={ selected == constants.AdPlacementTopAndSide }>Top and side</option>
+	<option value={ string(constants.AdPlacementLeftAndRight) } selected?={ selected == constants.AdPlacementLeftAndRight }>Left and right sides</option>
+	<option value={ string(constants.AdPlacementAllSides) } selected?={ selected == constants.AdPlacementAllSides }>All sides</option>
+}
+
+templ AdAffiliateSearchPanel(data AdAffiliateSearchPanelData) {
+	<div class="ads-search-panel" data-total={ fmt.Sprintf("%d", data.Total) }>
+		if len(data.Items) == 0 {
+			<p class="ads-search-empty">No products match your search.</p>
+		} else {
+			<ul class="ads-search-list">
+				for _, item := range data.Items {
+					<li class="ads-search-item">
+						<label class="ads-search-item-label">
+							<input type="checkbox" class="ads-product-checkbox" name="pick" value={ item.ID } data-name={ item.Name } data-shop={ item.ShopName } checked?={ item.Checked }/>
+							if item.ThumbnailURL != "" {
+								<img src={ item.ThumbnailURL } alt="" class="ads-search-thumb" referrerpolicy="no-referrer"/>
+							}
+							<span class="ads-search-item-text">
+								<span class="ads-search-item-name">{ item.Name }</span>
+								if item.ShopName != "" {
+									<span class="ads-search-item-shop">{ item.ShopName }</span>
+								}
+								if item.PriceDisplay != "" {
+									<span class="ads-search-item-price">{ item.PriceDisplay }</span>
+								}
+							</span>
+						</label>
+					</li>
+				}
+			</ul>
+		}
+		if data.TotalPages > 1 {
+			<div class="ads-search-pagination pagination-bar">
+				if data.Page > 1 {
+					<button
+						type="button"
+						class="pagination-btn"
+						hx-get={ utils.URL("/ads/partials/affiliate-search?form_id=" + data.FormID) }
+						hx-include={ "#" + data.FormID + "ProductSearch, #" + data.FormID + "SelectedIDs" }
+						hx-vals={ fmt.Sprintf(`{"page": %d}`, data.Page-1) }
+						hx-target={ "#" + data.FormID + "SearchResults" }
+						hx-swap={ HxSwapInnerHTML }
+					>
+						Previous
+					</button>
+				} else {
+					<span class="pagination-btn disabled">Previous</span>
+				}
+				<span class="pagination-info">Page { fmt.Sprintf("%d", data.Page) } of { fmt.Sprintf("%d", data.TotalPages) }</span>
+				if data.Page < data.TotalPages {
+					<button
+						type="button"
+						class="pagination-btn"
+						hx-get={ utils.URL("/ads/partials/affiliate-search?form_id=" + data.FormID) }
+						hx-include={ "#" + data.FormID + "ProductSearch, #" + data.FormID + "SelectedIDs" }
+						hx-vals={ fmt.Sprintf(`{"page": %d}`, data.Page+1) }
+						hx-target={ "#" + data.FormID + "SearchResults" }
+						hx-swap={ HxSwapInnerHTML }
+					>
+						Next
+					</button>
+				} else {
+					<span class="pagination-btn disabled">Next</span>
+				}
+			</div>
+		}
+	</div>
+}
+
+templ AdViewModal(data AdViewData) {
+	<div class="modal-overlay" id="adViewModal" role="presentation">
+		<div class="modal-dialog ads-modal ads-view-modal" role="dialog" aria-modal="true" aria-labelledby="adViewModalTitle">
+			<div class="modal-header">
+				<h3 id="adViewModalTitle">{ data.Name }</h3>
+				<button type="button" class="modal-close ad-view-modal-close" aria-label="Close">&times;</button>
+			</div>
+			<div class="modal-body">
+				<dl class="ads-view-meta">
+					<div><dt>Status</dt><dd>@StatusPill(data.StatusLabel, data.StatusTone, false)</dd></div>
+					<div><dt>Placement</dt><dd>{ data.PlacementLabel }</dd></div>
+					<div><dt>Type</dt><dd>{ data.TypeLabel }</dd></div>
+					<div><dt>Rotation</dt><dd>{ data.RandomizeSummary }</dd></div>
+				</dl>
+				if len(data.ProductCards) > 0 {
+					<div class="affiliate-product-card-grid ads-view-products">
+						for _, card := range data.ProductCards {
+							@AffiliateProductCard(card)
+						}
+					</div>
+				}
+			</div>
+			<div class="modal-footer ads-modal-footer">
+				<button type="button" class="btn btn-secondary ad-view-modal-close">Close</button>
+			</div>
+		</div>
+	</div>
+}
+
+templ AdDeleteModal(adID string, name string) {
+	<div class="modal-overlay" id="adDeleteModal" role="presentation">
+		<div class="modal-dialog ads-modal" role="dialog" aria-modal="true" aria-labelledby="adDeleteModalTitle">
+			<div class="modal-header">
+				<h3 id="adDeleteModalTitle">Delete ad</h3>
+				<button type="button" class="modal-close ad-delete-modal-close" aria-label="Close">&times;</button>
+			</div>
+			<form method="POST" action={ utils.URL("/ads/" + adID + "/delete") }>
+				<div class="modal-body">
+					<p class="ads-delete-lead">This marks <strong>{ name }</strong> as deleted. It will stop showing on all pages. You can still find it with the Deleted status filter.</p>
+				</div>
+				<div class="modal-footer ads-modal-footer">
+					<button type="button" class="btn btn-secondary ad-delete-modal-close">Cancel</button>
+					<button type="submit" class="btn btn-danger">Delete ad</button>
+				</div>
+			</form>
+		</div>
+	</div>
+}
+
+templ AdsPageStyles() {
+	<style>
+		.ads-page { padding-bottom: var(--space-10); }
+		.ads-hub-header { align-items: flex-start; }
+		.ads-page-heading { display: flex; flex-direction: column; gap: var(--space-1); }
+		.ads-page-subtitle {
+			color: var(--color-muted-foreground);
+			font-size: 0.9375rem;
+			line-height: 1.5;
+			max-width: 40rem;
+			margin: 0;
+		}
+		.ads-header-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); flex-shrink: 0; }
+		.ads-header-actions .add-btn { margin-top: 0; }
+		.ads-toolbar .ads-search-group { min-width: 12rem; flex: 1 1 12rem; }
+		.ads-table .col-name { max-width: 14rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+		.ads-empty { color: var(--color-muted-foreground); margin-top: var(--space-4); }
+		.ads-modal { max-width: 56rem; width: calc(100% - var(--space-4)); }
+		.ads-form-wizard-body { max-height: min(70vh, 36rem); overflow: auto; }
+		.ads-modal-header-text { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+		.ads-wizard-step-label {
+			margin: 0;
+			font-size: 0.8125rem;
+			font-weight: 500;
+			color: var(--color-muted-foreground);
+		}
+		.ads-wizard-step-lead {
+			margin: 0 0 var(--space-3);
+			font-size: 0.875rem;
+			color: var(--color-muted-foreground);
+			line-height: 1.5;
+		}
+		.ads-wizard-step { display: none; }
+		.ads-wizard-step.is-active { display: block; }
+		.ads-form-wizard-footer {
+			display: flex;
+			flex-wrap: nowrap;
+			align-items: center;
+			justify-content: space-between;
+			gap: var(--space-3);
+		}
+		.ads-wizard-footer-start,
+		.ads-wizard-footer-end {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-2);
+		}
+		.ads-wizard-footer-end {
+			margin-left: auto;
+			flex-shrink: 0;
+		}
+		.ads-form-wizard-footer .ads-wizard-nav-hidden {
+			display: none !important;
+		}
+		.ads-form-wizard-footer .btn:disabled {
+			opacity: 0.55;
+			cursor: not-allowed;
+		}
+		.ads-products-required-hint {
+			margin: var(--space-2) 0 0;
+			font-size: 0.8125rem;
+			color: var(--color-destructive);
+		}
+		.ads-products-required-hint[hidden] { display: none; }
+		.ads-view-modal { max-width: 36rem; }
+		.ads-modal-footer { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+		.ads-modal-footer .btn, .ads-modal-footer .btn-secondary, .ads-modal-footer .btn-danger { margin-top: 0; }
+		.ads-search-results { margin-top: var(--space-2); max-height: 22rem; overflow: auto; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); }
+		.ads-selection-count {
+			margin: var(--space-2) 0 0;
+			font-size: 0.875rem;
+			font-weight: 600;
+			color: var(--color-muted-foreground);
+		}
+		.ads-selection-count-n { color: var(--color-primary); }
+		.ads-wizard-step-note {
+			margin: var(--space-3) 0 0;
+			font-size: 0.875rem;
+			color: var(--color-muted-foreground);
+		}
+		.ads-search-pagination { margin-top: var(--space-2); padding: var(--space-2); border-top: 1px solid var(--color-border-subtle); }
+		.ads-search-list { list-style: none; margin: 0; padding: 0; }
+		.ads-search-item { border-bottom: 1px solid var(--color-border-subtle); }
+		.ads-search-item:last-child { border-bottom: none; }
+		.ads-search-item-label { display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-2) var(--space-3); cursor: pointer; }
+		.ads-search-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: var(--radius-sm); flex-shrink: 0; }
+		.ads-search-item-text { display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; }
+		.ads-search-item-name { font-weight: 600; font-size: 0.875rem; }
+		.ads-search-item-shop, .ads-search-item-price { font-size: 0.75rem; color: var(--color-muted-foreground); }
+		.ads-search-empty { padding: var(--space-3); margin: 0; font-size: 0.875rem; color: var(--color-muted-foreground); }
+		.ads-view-meta { display: grid; gap: var(--space-2); margin: 0 0 var(--space-4); }
+		.ads-view-meta div { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+		.ads-view-meta dt { font-weight: 600; margin: 0; min-width: 5rem; }
+		.ads-view-meta dd { margin: 0; }
+		.ads-view-products { margin-top: var(--space-3); }
+		.ads-delete-lead { margin: 0; line-height: 1.5; }
+		.table-wrapper .table-actions [data-tooltip]::after { content: none; }
+		.ads-page .table-actions [data-tooltip]::after { left: auto; right: 0; transform: none; }
+	</style>
+}
+
+templ AdsPageScripts(openCreate bool) {
+	<script>
+		(function () {
+			function wireModal(modal, closeSelector) {
+				if (!modal) return;
+				function closeModal() {
+					modal.hidden = true;
+					document.body.classList.remove('modal-open');
+				}
+				modal.querySelectorAll(closeSelector).forEach(function (btn) {
+					btn.addEventListener('click', closeModal);
+				});
+				modal.addEventListener('click', function (e) {
+					if (e.target === modal) closeModal();
+				});
+				if (!modal.hidden) document.body.classList.add('modal-open');
+				return { open: function () { modal.hidden = false; document.body.classList.add('modal-open'); }, close: closeModal };
+			}
+
+			const createModal = document.getElementById('adCreateModal');
+			const createCtl = wireModal(createModal, '.ad-create-modal-close, .ad-form-modal-close');
+			const openCreateBtn = document.getElementById('openAdCreateModalBtn');
+			if (openCreateBtn && createCtl) {
+				openCreateBtn.addEventListener('click', function () {
+					const form = document.getElementById('adCreateForm');
+					if (form) resetAdWizard(form);
+					createCtl.open();
+				});
+			}
+			if (createModal && !createModal.hidden) document.body.classList.add('modal-open');
+
+			wireModal(document.getElementById('adEditModal'), '.ad-edit-modal-close, .ad-form-modal-close');
+			wireModal(document.getElementById('adViewModal'), '.ad-view-modal-close');
+			wireModal(document.getElementById('adDeleteModal'), '.ad-delete-modal-close');
+
+			document.body.addEventListener('htmx:afterSwap', function (e) {
+				const t = e.detail.target;
+				if (!t) return;
+				if (t.id === 'adEditModalHost' || t.id === 'adViewModalHost' || t.id === 'adDeleteModalHost') {
+					const modal = t.querySelector('.modal-overlay');
+					if (modal) {
+						modal.hidden = false;
+						document.body.classList.add('modal-open');
+						wireModal(modal, '.modal-close, .ad-view-modal-close, .ad-delete-modal-close, .ad-edit-modal-close, .ad-form-modal-close');
+						initAdForms(modal);
+					}
+				}
+			});
+
+			function resetAdWizard(form) {
+				if (!form || form.dataset.adWizard !== '1') return;
+				form.dataset.adsCurrentStep = '1';
+				setAdWizardStep(form, 1);
+				const hint = form.querySelector('[id$="ProductsHint"]');
+				if (hint) hint.hidden = true;
+			}
+
+			function adWizardStepLabel(form) {
+				if (!form || !form.id) return null;
+				return document.getElementById(form.id + 'StepLabel');
+			}
+
+			function setAdWizardNavButton(btn, hide) {
+				if (!btn) return;
+				btn.classList.toggle('ads-wizard-nav-hidden', hide);
+				btn.hidden = hide;
+				btn.setAttribute('aria-hidden', hide ? 'true' : 'false');
+			}
+
+			function isAdWizardStep1Complete(form) {
+				const step = form.querySelector('.ads-wizard-step[data-ad-step="1"]');
+				if (!step) return false;
+				const fields = step.querySelectorAll('input, select, textarea');
+				for (let i = 0; i < fields.length; i++) {
+					const field = fields[i];
+					if (field.disabled || field.type === 'hidden') continue;
+					if (!field.checkValidity()) return false;
+				}
+				return true;
+			}
+
+			function syncAdWizardNextButton(form) {
+				const nextBtn = form.querySelector('.ads-wizard-next');
+				if (!nextBtn) return;
+				const step = parseInt(form.dataset.adsCurrentStep || '1', 10);
+				if (step === 1) {
+					nextBtn.disabled = !isAdWizardStep1Complete(form);
+					return;
+				}
+				if (step === 2) {
+					const selectedInputs = form.querySelector('[id$="SelectedIDs"]');
+					const count = selectedInputs ? selectedInputs.querySelectorAll('input[name="affiliate_product_ids"]').length : 0;
+					nextBtn.disabled = count < 1;
+					return;
+				}
+				nextBtn.disabled = false;
+			}
+
+			function setAdWizardStep(form, step) {
+				const total = 3;
+				step = step < 1 ? 1 : step > total ? total : step;
+				form.dataset.adsCurrentStep = String(step);
+				form.querySelectorAll('.ads-wizard-step').forEach(function (el) {
+					const n = parseInt(el.getAttribute('data-ad-step'), 10);
+					const active = n === step;
+					el.classList.toggle('is-active', active);
+					el.hidden = !active;
+				});
+				const label = adWizardStepLabel(form);
+				if (label) label.textContent = 'Step ' + step + ' of ' + total;
+				const prevBtn = form.querySelector('.ads-wizard-prev');
+				const nextBtn = form.querySelector('.ads-wizard-next');
+				const saveBtn = form.querySelector('.ads-wizard-save');
+				setAdWizardNavButton(prevBtn, step <= 1);
+				setAdWizardNavButton(nextBtn, step >= total);
+				setAdWizardNavButton(saveBtn, step < total);
+				syncAdWizardNextButton(form);
+			}
+
+			function validateAdWizardStep1(form) {
+				const step = form.querySelector('.ads-wizard-step[data-ad-step="1"]');
+				if (!step) return true;
+				const fields = step.querySelectorAll('input, select, textarea');
+				for (let i = 0; i < fields.length; i++) {
+					const field = fields[i];
+					if (field.disabled || field.type === 'hidden') continue;
+					if (!field.checkValidity()) {
+						field.reportValidity();
+						return false;
+					}
+				}
+				return true;
+			}
+
+			function validateAdWizardStep2(form) {
+				const selectedInputs = form.querySelector('[id$="SelectedIDs"]');
+				const count = selectedInputs ? selectedInputs.querySelectorAll('input[name="affiliate_product_ids"]').length : 0;
+				const hint = form.querySelector('[id$="ProductsHint"]');
+				if (count < 1) {
+					if (hint) hint.hidden = false;
+					return false;
+				}
+				if (hint) hint.hidden = true;
+				return true;
+			}
+
+			function syncAdSelectionCount(form) {
+				if (!form) return;
+				const selectedInputs = form.querySelector('[id$="SelectedIDs"]');
+				const count = selectedInputs ? selectedInputs.querySelectorAll('input[name="affiliate_product_ids"]').length : 0;
+				const countRoot = form.querySelector('[id$="SelectionCount"]');
+				if (countRoot) {
+					const nSpan = countRoot.querySelector('.ads-selection-count-n');
+					if (nSpan) nSpan.textContent = String(count);
+				}
+			}
+
+			function syncAdSearchTotalFromPanel(form, panelEl) {
+				if (!form || !panelEl) return;
+				const total = panelEl.getAttribute('data-total');
+				const totalSpan = form.querySelector('[id$="SelectionCount"] .ads-selection-count-total');
+				if (totalSpan && total) totalSpan.textContent = total;
+			}
+
+			function loadAffiliateProductsForForm(form) {
+				if (!form || typeof htmx === 'undefined') return;
+				const body = document.body;
+				if (body) htmx.trigger(body, 'loadAffiliateProducts');
+			}
+
+			function syncAdSingleProductNote(form) {
+				const note = form.querySelector('[id$="SingleProductNote"]');
+				const selectedInputs = form.querySelector('[id$="SelectedIDs"]');
+				const count = selectedInputs ? selectedInputs.querySelectorAll('input[name="affiliate_product_ids"]').length : 0;
+				if (note) note.hidden = count !== 1;
+			}
+
+			document.body.addEventListener('htmx:afterSwap', function (e) {
+				const t = e.detail.target;
+				if (!t || !t.id || t.id.indexOf('SearchResults') < 0) return;
+				const form = t.closest('form.ads-form-wizard');
+				if (!form) return;
+				const panel = t.querySelector('.ads-search-panel');
+				syncAdSearchTotalFromPanel(form, panel);
+				syncAdSelectionCount(form);
+				syncAdWizardNextButton(form);
+			});
+
+			function initAdForms(root) {
+				const forms = (root || document).querySelectorAll('.ads-form-wizard');
+				forms.forEach(function (form) {
+					if (form.dataset.adsWired === '1') return;
+					form.dataset.adsWired = '1';
+					resetAdWizard(form);
+
+					const randomizeFields = form.querySelector('[id$="RandomizeFields"]');
+					const timerGroup = form.querySelector('[id$="TimerIntervalGroup"]');
+					const kindSelect = form.querySelector('[id$="RandomizeKind"]');
+					const selectedInputs = form.querySelector('[id$="SelectedIDs"]');
+					const results = form.querySelector('[id$="SearchResults"]');
+					const nextBtn = form.querySelector('.ads-wizard-next');
+					const prevBtn = form.querySelector('.ads-wizard-prev');
+
+					function syncRandomizeVisibility() {
+						const count = selectedInputs ? selectedInputs.querySelectorAll('input[name="affiliate_product_ids"]').length : 0;
+						if (randomizeFields) randomizeFields.hidden = count <= 1;
+						syncAdSingleProductNote(form);
+					}
+					const timerSelect = form.querySelector('[id$="TimerInterval"]');
+					function syncTimerVisibility() {
+						if (!kindSelect) return;
+						const isTimer = kindSelect.value === 'timer';
+						if (timerGroup) timerGroup.hidden = !isTimer;
+						if (timerSelect) timerSelect.disabled = dataIsDeleted(form) || !isTimer;
+					}
+					function dataIsDeleted(formEl) {
+						const status = formEl.querySelector('[name="status"]');
+						return status && status.tagName === 'INPUT' && status.readOnly;
+					}
+					if (kindSelect) kindSelect.addEventListener('change', syncTimerVisibility);
+					syncRandomizeVisibility();
+					syncTimerVisibility();
+
+					const step1 = form.querySelector('.ads-wizard-step[data-ad-step="1"]');
+					if (step1) {
+						step1.addEventListener('input', function () { syncAdWizardNextButton(form); });
+						step1.addEventListener('change', function () { syncAdWizardNextButton(form); });
+					}
+					syncAdWizardNextButton(form);
+
+					if (nextBtn) {
+						nextBtn.addEventListener('click', function () {
+							const step = parseInt(form.dataset.adsCurrentStep || '1', 10);
+							if (step === 1) {
+								if (!validateAdWizardStep1(form)) return;
+								setAdWizardStep(form, 2);
+								loadAffiliateProductsForForm(form);
+								return;
+							}
+							if (step === 2) {
+								if (!validateAdWizardStep2(form)) return;
+								setAdWizardStep(form, 3);
+								syncRandomizeVisibility();
+								syncTimerVisibility();
+								return;
+							}
+						});
+					}
+					if (prevBtn) {
+						prevBtn.addEventListener('click', function () {
+							const step = parseInt(form.dataset.adsCurrentStep || '1', 10);
+							if (step > 1) setAdWizardStep(form, step - 1);
+						});
+					}
+
+					form.addEventListener('submit', function (e) {
+						const step = parseInt(form.dataset.adsCurrentStep || '1', 10);
+						if (step < 3) {
+							e.preventDefault();
+							if (step === 1 && validateAdWizardStep1(form)) {
+								setAdWizardStep(form, 2);
+								loadAffiliateProductsForForm(form);
+							} else if (step === 2 && validateAdWizardStep2(form)) {
+								setAdWizardStep(form, 3);
+								syncRandomizeVisibility();
+								syncTimerVisibility();
+							}
+							return;
+						}
+						if (!validateAdWizardStep2(form)) {
+							e.preventDefault();
+						}
+					});
+
+					function appendSelectedProduct(id) {
+						if (!selectedInputs || selectedInputs.querySelector('input[value="' + id + '"]')) return;
+						const hidden = document.createElement('input');
+						hidden.type = 'hidden';
+						hidden.name = 'affiliate_product_ids';
+						hidden.value = id;
+						selectedInputs.appendChild(hidden);
+					}
+
+					function removeSelectedProduct(id) {
+						if (!selectedInputs) return;
+						const h = selectedInputs.querySelector('input[value="' + id + '"]');
+						if (h) h.remove();
+					}
+
+					if (results) {
+						results.addEventListener('change', function (e) {
+							const cb = e.target;
+							if (!cb || !cb.classList || !cb.classList.contains('ads-product-checkbox')) return;
+							const id = cb.value;
+							if (cb.checked) {
+								appendSelectedProduct(id);
+							} else {
+								removeSelectedProduct(id);
+							}
+							syncRandomizeVisibility();
+							syncAdSelectionCount(form);
+							syncAdWizardNextButton(form);
+							const hint = form.querySelector('[id$="ProductsHint"]');
+							if (hint && selectedInputs.querySelectorAll('input[name="affiliate_product_ids"]').length > 0) {
+								hint.hidden = true;
+							}
+						});
+					}
+					syncAdSelectionCount(form);
+				});
+			}
+
+			initAdForms(document);
+		})();
+	</script>
+}

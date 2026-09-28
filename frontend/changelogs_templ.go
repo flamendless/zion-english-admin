@@ -81,7 +81,7 @@ func Changelogs(data ChangelogsData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<style>\r\n\t\t\t.changelogs-hero {\r\n\t\t\t\tmargin-bottom: var(--space-6);\r\n\t\t\t}\r\n\r\n\t\t\t.changelogs-subtitle {\r\n\t\t\t\tmargin-top: var(--space-2);\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tfont-size: 1rem;\r\n\t\t\t\tline-height: 1.5;\r\n\t\t\t\tmax-width: 42rem;\r\n\t\t\t}\r\n\r\n\t\t\t.changelogs-deployed {\r\n\t\t\t\tdisplay: inline-flex;\r\n\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tmargin-top: var(--space-4);\r\n\t\t\t\tpadding: var(--space-3) var(--space-4);\r\n\t\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t}\r\n\r\n\t\t\t.changelogs-deployed-label {\r\n\t\t\t\tfont-size: 0.75rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\ttext-transform: uppercase;\r\n\t\t\t\tletter-spacing: 0.04em;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t}\r\n\r\n\t\t\t.changelogs-deployed-value {\r\n\t\t\t\tfont-size: 0.95rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t}\r\n\r\n\t\t\t.changelogs-deployed-link {\r\n\t\t\t\tfont-size: 0.95rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tcolor: var(--color-primary);\r\n\t\t\t\ttext-decoration: none;\r\n\t\t\t}\r\n\r\n\t\t\t.changelogs-deployed-link:hover {\r\n\t\t\t\ttext-decoration: underline;\r\n\t\t\t}\r\n\r\n\t\t\t.changelogs-empty {\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tfont-size: 1rem;\r\n\t\t\t}\r\n\r\n\t\t\t.changelogs-list {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-6);\r\n\t\t\t\tmax-width: 48rem;\r\n\t\t\t}\r\n\t\t</style></head><body><div class=\"container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<style>\n\t\t\t.changelogs-hero {\n\t\t\t\tmargin-bottom: var(--space-6);\n\t\t\t}\n\n\t\t\t.changelogs-subtitle {\n\t\t\t\tmargin-top: var(--space-2);\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tfont-size: 1rem;\n\t\t\t\tline-height: 1.5;\n\t\t\t\tmax-width: 42rem;\n\t\t\t}\n\n\t\t\t.changelogs-deployed {\n\t\t\t\tdisplay: inline-flex;\n\t\t\t\tflex-wrap: wrap;\n\t\t\t\talign-items: center;\n\t\t\t\tgap: var(--space-2);\n\t\t\t\tmargin-top: var(--space-4);\n\t\t\t\tpadding: var(--space-3) var(--space-4);\n\t\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\t\tborder-radius: var(--radius-md);\n\t\t\t\tbackground: var(--color-surface);\n\t\t\t}\n\n\t\t\t.changelogs-deployed-label {\n\t\t\t\tfont-size: 0.75rem;\n\t\t\t\tfont-weight: 600;\n\t\t\t\ttext-transform: uppercase;\n\t\t\t\tletter-spacing: 0.04em;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t}\n\n\t\t\t.changelogs-deployed-value {\n\t\t\t\tfont-size: 0.95rem;\n\t\t\t\tfont-weight: 600;\n\t\t\t\tcolor: var(--color-foreground);\n\t\t\t}\n\n\t\t\t.changelogs-deployed-link {\n\t\t\t\tfont-size: 0.95rem;\n\t\t\t\tfont-weight: 600;\n\t\t\t\tcolor: var(--color-primary);\n\t\t\t\ttext-decoration: none;\n\t\t\t}\n\n\t\t\t.changelogs-deployed-link:hover {\n\t\t\t\ttext-decoration: underline;\n\t\t\t}\n\n\t\t\t.changelogs-empty {\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tfont-size: 1rem;\n\t\t\t}\n\n\t\t\t.changelogs-list {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\tgap: var(--space-6);\n\t\t\t\tmax-width: 48rem;\n\t\t\t}\n\t\t</style></head><body><div class=\"container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -211,7 +211,15 @@ func Changelogs(data ChangelogsData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = LayoutEnd().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

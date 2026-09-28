@@ -102,7 +102,7 @@ func EditStudent(data EditStudentData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<style>\r\n\t\t\t.relationship-list {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tmargin-bottom: var(--space-3);\r\n\t\t\t}\r\n\t\t\t.relationship-row {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tjustify-content: space-between;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t\tpadding: var(--space-2) var(--space-3);\r\n\t\t\t\tbackground: var(--color-muted);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t}\r\n\t\t\t.inactive-reason-group {\r\n\t\t\t\tdisplay: none;\r\n\t\t\t}\r\n\t\t\t.inactive-reason-group.is-visible {\r\n\t\t\t\tdisplay: block;\r\n\t\t\t}\r\n\t\t\t.edit-student-form-actions {\r\n\t\t\t\tmargin-bottom: var(--space-6);\r\n\t\t\t}\r\n\t\t</style></head><body><div class=\"container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<style>\n\t\t\t.relationship-list {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\tgap: var(--space-2);\n\t\t\t\tmargin-bottom: var(--space-3);\n\t\t\t}\n\t\t\t.relationship-row {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: center;\n\t\t\t\tjustify-content: space-between;\n\t\t\t\tgap: var(--space-3);\n\t\t\t\tpadding: var(--space-2) var(--space-3);\n\t\t\t\tbackground: var(--color-muted);\n\t\t\t\tborder-radius: var(--radius-md);\n\t\t\t}\n\t\t\t.inactive-reason-group {\n\t\t\t\tdisplay: none;\n\t\t\t}\n\t\t\t.inactive-reason-group.is-visible {\n\t\t\t\tdisplay: block;\n\t\t\t}\n\t\t\t.edit-student-form-actions {\n\t\t\t\tmargin-bottom: var(--space-6);\n\t\t\t}\n\t\t</style></head><body><div class=\"container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -640,7 +640,7 @@ func EditStudent(data EditStudentData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</div></div><div class=\"edit-student-form-actions\"><button type=\"submit\">Save Changes</button></div></form><div id=\"logOutput\"></div><script>\r\n\t\t\t\t\t(function () {\r\n\t\t\t\t\t\tconst statusEl = document.getElementById('status');\r\n\t\t\t\t\t\tconst reasonGroup = document.getElementById('inactiveReasonGroup');\r\n\t\t\t\t\t\tconst reasonEl = document.getElementById('inactiveReason');\r\n\t\t\t\t\t\tif (!statusEl || !reasonGroup) return;\r\n\t\t\t\t\t\tfunction syncInactiveReason() {\r\n\t\t\t\t\t\t\tconst inactive = statusEl.value === 'inactive';\r\n\t\t\t\t\t\t\treasonGroup.classList.toggle('is-visible', inactive);\r\n\t\t\t\t\t\t\tif (reasonEl) reasonEl.required = inactive;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tstatusEl.addEventListener('change', syncInactiveReason);\r\n\t\t\t\t\t\tsyncInactiveReason();\r\n\t\t\t\t\t})();\r\n\t\t\t\t</script>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</div></div><div class=\"edit-student-form-actions\"><button type=\"submit\">Save Changes</button></div></form><div id=\"logOutput\"></div><script>\n\t\t\t\t\t(function () {\n\t\t\t\t\t\tconst statusEl = document.getElementById('status');\n\t\t\t\t\t\tconst reasonGroup = document.getElementById('inactiveReasonGroup');\n\t\t\t\t\t\tconst reasonEl = document.getElementById('inactiveReason');\n\t\t\t\t\t\tif (!statusEl || !reasonGroup) return;\n\t\t\t\t\t\tfunction syncInactiveReason() {\n\t\t\t\t\t\t\tconst inactive = statusEl.value === 'inactive';\n\t\t\t\t\t\t\treasonGroup.classList.toggle('is-visible', inactive);\n\t\t\t\t\t\t\tif (reasonEl) reasonEl.required = inactive;\n\t\t\t\t\t\t}\n\t\t\t\t\t\tstatusEl.addEventListener('change', syncInactiveReason);\n\t\t\t\t\t\tsyncInactiveReason();\n\t\t\t\t\t})();\n\t\t\t\t</script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -749,7 +749,15 @@ func EditStudent(data EditStudentData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "</div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = LayoutEnd().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

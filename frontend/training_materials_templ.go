@@ -447,6 +447,10 @@ func TrainingMaterials(data TrainingMaterialsData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = LayoutEnd().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -509,7 +513,7 @@ func TrainingMaterialCard(item TrainingMaterialListItem) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(item.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 334, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 335, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -522,7 +526,7 @@ func TrainingMaterialCard(item TrainingMaterialListItem) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(trainingMaterialDescriptionPreview(item.Description))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 335, Col: 87}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 336, Col: 87}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -580,7 +584,7 @@ func TrainingMaterialCard(item TrainingMaterialListItem) templ.Component {
 			var templ_7745c5c3_Var9 templ.SafeURL
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/training-materials/" + item.ID + "/watch"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 355, Col: 69}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 356, Col: 69}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
@@ -645,7 +649,7 @@ func TrainingMaterialTagPill(tag TrainingMaterialTag) templ.Component {
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color: " + tag.Color + "33; color: #2D2D2D;")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 375, Col: 91}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 376, Col: 91}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -658,7 +662,7 @@ func TrainingMaterialTagPill(tag TrainingMaterialTag) templ.Component {
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(tag.Label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 376, Col: 13}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 377, Col: 13}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -705,7 +709,7 @@ func TrainingMaterialThumbnail(thumbnailURL string, title string) templ.Componen
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(thumbnailURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 384, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 385, Col: 22}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
 			if templ_7745c5c3_Err != nil {
@@ -718,7 +722,7 @@ func TrainingMaterialThumbnail(thumbnailURL string, title string) templ.Componen
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue("Preview for " + title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 386, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 387, Col: 32}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
 			if templ_7745c5c3_Err != nil {
@@ -786,7 +790,7 @@ func TrainingMaterialViewModal(data TrainingMaterialViewData) templ.Component {
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(data.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 406, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 407, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
@@ -807,7 +811,7 @@ func TrainingMaterialViewModal(data TrainingMaterialViewData) templ.Component {
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 413, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 414, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
@@ -820,7 +824,7 @@ func TrainingMaterialViewModal(data TrainingMaterialViewData) templ.Component {
 		var templ_7745c5c3_Var19 templ.SafeURL
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinURLErrs(data.URL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 417, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 418, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
@@ -833,7 +837,7 @@ func TrainingMaterialViewModal(data TrainingMaterialViewData) templ.Component {
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(data.URL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 417, Col: 99}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 418, Col: 99}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
@@ -854,7 +858,7 @@ func TrainingMaterialViewModal(data TrainingMaterialViewData) templ.Component {
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(trainingMaterialRequiredLabel(data.Required))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 425, Col: 75}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 426, Col: 75}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
@@ -910,7 +914,7 @@ func TrainingMaterialViewModal(data TrainingMaterialViewData) templ.Component {
 			var templ_7745c5c3_Var22 templ.SafeURL
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/training-materials/" + data.ID + "/watch"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 448, Col: 70}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 449, Col: 70}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
@@ -957,7 +961,7 @@ func TrainingMaterialMetaItem(label string, value string) templ.Component {
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 459, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 460, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
@@ -970,7 +974,7 @@ func TrainingMaterialMetaItem(label string, value string) templ.Component {
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 460, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 461, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {
@@ -1012,7 +1016,7 @@ func TrainingMaterialFormModal(data TrainingMaterialFormData) templ.Component {
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.ResolveAttributeValue(trainingMaterialModalID(data))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 465, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 466, Col: 62}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
 		if templ_7745c5c3_Err != nil {
@@ -1035,7 +1039,7 @@ func TrainingMaterialFormModal(data TrainingMaterialFormData) templ.Component {
 		var templ_7745c5c3_Var28 string
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(trainingMaterialFormTitle(data))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 468, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 469, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 		if templ_7745c5c3_Err != nil {
@@ -1048,7 +1052,7 @@ func TrainingMaterialFormModal(data TrainingMaterialFormData) templ.Component {
 		var templ_7745c5c3_Var29 templ.SafeURL
 		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinURLErrs(trainingMaterialFormAction(data))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 474, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 475, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 		if templ_7745c5c3_Err != nil {
@@ -1061,7 +1065,7 @@ func TrainingMaterialFormModal(data TrainingMaterialFormData) templ.Component {
 		var templ_7745c5c3_Var30 string
 		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 479, Col: 92}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 480, Col: 92}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var30)
 		if templ_7745c5c3_Err != nil {
@@ -1074,7 +1078,7 @@ func TrainingMaterialFormModal(data TrainingMaterialFormData) templ.Component {
 		var templ_7745c5c3_Var31 string
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 483, Col: 146}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 484, Col: 146}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 		if templ_7745c5c3_Err != nil {
@@ -1087,7 +1091,7 @@ func TrainingMaterialFormModal(data TrainingMaterialFormData) templ.Component {
 		var templ_7745c5c3_Var32 string
 		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.URL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 487, Col: 90}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 488, Col: 90}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var32)
 		if templ_7745c5c3_Err != nil {
@@ -1121,7 +1125,7 @@ func TrainingMaterialFormModal(data TrainingMaterialFormData) templ.Component {
 			var templ_7745c5c3_Var33 string
 			templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.ThumbnailURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 497, Col: 31}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 498, Col: 31}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var33)
 			if templ_7745c5c3_Err != nil {
@@ -1157,7 +1161,7 @@ func TrainingMaterialFormModal(data TrainingMaterialFormData) templ.Component {
 		var templ_7745c5c3_Var34 string
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.SourceType)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 505, Col: 86}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 506, Col: 86}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var34)
 		if templ_7745c5c3_Err != nil {
@@ -1180,7 +1184,7 @@ func TrainingMaterialFormModal(data TrainingMaterialFormData) templ.Component {
 		var templ_7745c5c3_Var35 string
 		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.ResolveAttributeValue(trainingmaterials.StatusDraft)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 513, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 514, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var35)
 		if templ_7745c5c3_Err != nil {
@@ -1203,7 +1207,7 @@ func TrainingMaterialFormModal(data TrainingMaterialFormData) templ.Component {
 		var templ_7745c5c3_Var36 string
 		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.ResolveAttributeValue(trainingmaterials.StatusPublished)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 514, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 515, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var36)
 		if templ_7745c5c3_Err != nil {
@@ -1231,7 +1235,7 @@ func TrainingMaterialFormModal(data TrainingMaterialFormData) templ.Component {
 			var templ_7745c5c3_Var37 string
 			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.ResolveAttributeValue(trainingmaterials.StatusDeleted)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 516, Col: 54}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 517, Col: 54}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var37)
 			if templ_7745c5c3_Err != nil {
@@ -1274,7 +1278,7 @@ func TrainingMaterialFormModal(data TrainingMaterialFormData) templ.Component {
 			var templ_7745c5c3_Var38 string
 			templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.ResolveAttributeValue(tag.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 534, Col: 33}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 535, Col: 33}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var38)
 			if templ_7745c5c3_Err != nil {
@@ -1297,7 +1301,7 @@ func TrainingMaterialFormModal(data TrainingMaterialFormData) templ.Component {
 			var templ_7745c5c3_Var39 string
 			templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.ResolveAttributeValue(tag.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 540, Col: 56}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 541, Col: 56}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var39)
 			if templ_7745c5c3_Err != nil {
@@ -1315,7 +1319,7 @@ func TrainingMaterialFormModal(data TrainingMaterialFormData) templ.Component {
 		var templ_7745c5c3_Var40 string
 		templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(trainingMaterialSubmitLabel(data))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 546, Col: 93}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 547, Col: 93}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 		if templ_7745c5c3_Err != nil {
@@ -1364,7 +1368,7 @@ func TrainingMaterialWatch(data TrainingMaterialWatchData) templ.Component {
 		var templ_7745c5c3_Var42 string
 		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(data.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 567, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 568, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
 		if templ_7745c5c3_Err != nil {
@@ -1377,7 +1381,7 @@ func TrainingMaterialWatch(data TrainingMaterialWatchData) templ.Component {
 		var templ_7745c5c3_Var43 templ.SafeURL
 		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 568, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 569, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 		if templ_7745c5c3_Err != nil {
@@ -1410,7 +1414,7 @@ func TrainingMaterialWatch(data TrainingMaterialWatchData) templ.Component {
 		var templ_7745c5c3_Var44 templ.SafeURL
 		templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinURLErrs(data.BackURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 576, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 577, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
 		if templ_7745c5c3_Err != nil {
@@ -1423,7 +1427,7 @@ func TrainingMaterialWatch(data TrainingMaterialWatchData) templ.Component {
 		var templ_7745c5c3_Var45 string
 		templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(data.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 577, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 578, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 		if templ_7745c5c3_Err != nil {
@@ -1436,7 +1440,7 @@ func TrainingMaterialWatch(data TrainingMaterialWatchData) templ.Component {
 		var templ_7745c5c3_Var46 string
 		templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 578, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 579, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var46))
 		if templ_7745c5c3_Err != nil {
@@ -1459,7 +1463,7 @@ func TrainingMaterialWatch(data TrainingMaterialWatchData) templ.Component {
 		var templ_7745c5c3_Var47 string
 		templ_7745c5c3_Var47, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(fmt.Sprintf("width: %.1f%%", data.Progress.ProgressPercent))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 589, Col: 122}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 590, Col: 122}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var47))
 		if templ_7745c5c3_Err != nil {
@@ -1472,7 +1476,7 @@ func TrainingMaterialWatch(data TrainingMaterialWatchData) templ.Component {
 		var templ_7745c5c3_Var48 string
 		templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.JoinStringErrs(trainingMaterialProgressPercentLabel(data.Progress.ProgressPercent))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 591, Col: 123}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 592, Col: 123}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var48))
 		if templ_7745c5c3_Err != nil {
@@ -1517,6 +1521,10 @@ func TrainingMaterialWatch(data TrainingMaterialWatchData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = LayoutEnd().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 117, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1553,7 +1561,7 @@ func TrainingMaterialsProgressReport(data TrainingMaterialsProgressData) templ.C
 		var templ_7745c5c3_Var50 templ.SafeURL
 		templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 623, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 625, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var50))
 		if templ_7745c5c3_Err != nil {
@@ -1590,7 +1598,7 @@ func TrainingMaterialsProgressReport(data TrainingMaterialsProgressData) templ.C
 		var templ_7745c5c3_Var51 templ.SafeURL
 		templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.JoinURLErrs(data.BackURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 636, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 638, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var51))
 		if templ_7745c5c3_Err != nil {
@@ -1603,7 +1611,7 @@ func TrainingMaterialsProgressReport(data TrainingMaterialsProgressData) templ.C
 		var templ_7745c5c3_Var52 templ.SafeURL
 		templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/training-materials/progress"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 639, Col: 95}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 641, Col: 95}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var52))
 		if templ_7745c5c3_Err != nil {
@@ -1621,7 +1629,7 @@ func TrainingMaterialsProgressReport(data TrainingMaterialsProgressData) templ.C
 			var templ_7745c5c3_Var53 string
 			templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 645, Col: 29}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 647, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var53)
 			if templ_7745c5c3_Err != nil {
@@ -1644,7 +1652,7 @@ func TrainingMaterialsProgressReport(data TrainingMaterialsProgressData) templ.C
 			var templ_7745c5c3_Var54 string
 			templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 645, Col: 89}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 647, Col: 89}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var54))
 			if templ_7745c5c3_Err != nil {
@@ -1720,7 +1728,7 @@ func TrainingMaterialsProgressReport(data TrainingMaterialsProgressData) templ.C
 				var templ_7745c5c3_Var55 string
 				templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.JoinStringErrs(item.MaterialTitle)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 677, Col: 33}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 679, Col: 33}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var55))
 				if templ_7745c5c3_Err != nil {
@@ -1748,7 +1756,7 @@ func TrainingMaterialsProgressReport(data TrainingMaterialsProgressData) templ.C
 				var templ_7745c5c3_Var56 string
 				templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.JoinStringErrs(item.CompletedAt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 685, Col: 31}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 687, Col: 31}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var56))
 				if templ_7745c5c3_Err != nil {
@@ -1761,7 +1769,7 @@ func TrainingMaterialsProgressReport(data TrainingMaterialsProgressData) templ.C
 				var templ_7745c5c3_Var57 string
 				templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.JoinStringErrs(item.LastViewedAt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 686, Col: 32}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 688, Col: 32}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var57))
 				if templ_7745c5c3_Err != nil {
@@ -1786,7 +1794,15 @@ func TrainingMaterialsProgressReport(data TrainingMaterialsProgressData) templ.C
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 147, "</div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 147, "</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = LayoutEnd().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 148, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1815,7 +1831,7 @@ func TrainingMaterialPlusIcon() templ.Component {
 			templ_7745c5c3_Var58 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 148, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14\"></path> <path d=\"M5 12h14\"></path></svg>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 149, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14\"></path> <path d=\"M5 12h14\"></path></svg>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1844,7 +1860,7 @@ func TrainingMaterialVideoIcon() templ.Component {
 			templ_7745c5c3_Var59 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 149, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m16 13 5.223-3.482a.5.5 0 0 1 .777.416V14.87a.5.5 0 0 1-.777.416L16 11.87\"></path> <rect width=\"14\" height=\"12\" x=\"2\" y=\"6\" rx=\"2\"></rect></svg>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 150, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m16 13 5.223-3.482a.5.5 0 0 1 .777.416V14.87a.5.5 0 0 1-.777.416L16 11.87\"></path> <rect width=\"14\" height=\"12\" x=\"2\" y=\"6\" rx=\"2\"></rect></svg>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1873,7 +1889,7 @@ func TrainingMaterialsStyles() templ.Component {
 			templ_7745c5c3_Var60 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 150, "<style>\r\n\t\t.tm-page { padding-bottom: var(--space-10); }\r\n\t\t.tm-page-heading { display: flex; flex-direction: column; gap: var(--space-1); }\r\n\t\t.tm-page-subtitle { color: var(--color-muted-foreground); font-size: 0.9375rem; line-height: 1.5; max-width: 36rem; }\r\n\t\t.tm-header-actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: flex-end;\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\t\t.tm-header-actions .btn,\r\n\t\t.tm-header-actions .add-btn,\r\n\t\t.tm-header-actions button {\r\n\t\t\tmargin-top: 0;\r\n\t\t\twidth: auto;\r\n\t\t}\r\n\t\t.hub-header > .btn,\r\n\t\t.hub-header > a.btn {\r\n\t\t\tmargin-top: 0;\r\n\t\t\twidth: auto;\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\t\t.tm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-4); margin-top: var(--space-4); }\r\n\t\t.tm-card { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); box-shadow: var(--shadow-sm); }\r\n\t\t.tm-card-title { font-size: 1.0625rem; font-weight: 600; line-height: 1.35; }\r\n\t\t.tm-card-description { color: var(--color-muted-foreground); font-size: 0.875rem; line-height: 1.5; }\r\n\t\t.tm-card-badges { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }\r\n\t\t.tm-card-actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: flex-end;\r\n\t\t\tgap: var(--space-1);\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\t\t.tm-card-actions .btn {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\theight: 36px;\r\n\t\t\tmargin-top: 0;\r\n\t\t\tpadding: 0 var(--space-3);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tline-height: 1;\r\n\t\t\tbox-sizing: border-box;\r\n\t\t}\r\n\t\t.tm-card-footer { margin-top: auto; display: flex; justify-content: flex-end; }\r\n\t\t.tm-thumb { width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-md); overflow: hidden; background: linear-gradient(180deg, #F0FDFA 0%, #E6FFFA 100%); border: 1px solid var(--color-border-subtle); position: relative; }\r\n\t\t.tm-thumb-img { width: 100%; height: 100%; object-fit: cover; display: block; }\r\n\t\t.tm-thumb-placeholder { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: var(--color-muted-foreground); }\r\n\t\t.tm-tag-list { display: flex; flex-wrap: wrap; gap: var(--space-2); }\r\n\t\t.tm-tag-pill { display: inline-flex; align-items: center; padding: 0.2rem 0.55rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600; border: var(--pill-border); }\r\n\t\t.tm-empty { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); padding: var(--space-10) var(--space-4); color: var(--color-muted-foreground); text-align: center; }\r\n\t\t.tm-empty-icon { color: var(--color-primary); }\r\n\t\t.tm-view-body, .tm-form-body { display: flex; flex-direction: column; gap: var(--space-4); }\r\n\t\t.tm-view-label { font-size: 0.8125rem; font-weight: 600; color: var(--color-muted-foreground); text-transform: uppercase; letter-spacing: 0.04em; }\r\n\t\t.tm-view-text { font-size: 0.9375rem; line-height: 1.6; white-space: pre-wrap; }\r\n\t\t.tm-view-link { word-break: break-all; font-size: 0.875rem; }\r\n\t\t.tm-view-meta { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); border-radius: var(--radius-md); background: var(--color-muted); }\r\n\t\t.tm-meta-item { display: flex; flex-direction: column; gap: 2px; }\r\n\t\t.tm-meta-label { font-size: 0.75rem; font-weight: 600; color: var(--color-muted-foreground); text-transform: uppercase; }\r\n\t\t.tm-meta-value { font-size: 0.875rem; }\r\n\t\t.tm-form-footer {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tjustify-content: flex-end;\r\n\t\t}\r\n\t\t.tm-view-footer {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-2) var(--space-4) var(--space-4);\r\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\t\t.tm-form-footer-actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: flex-end;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\twidth: 100%;\r\n\t\t}\r\n\t\t.tm-view-footer-actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: flex-end;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\twidth: 100%;\r\n\t\t}\r\n\t\t.tm-view-footer button,\r\n\t\t.tm-view-footer .btn,\r\n\t\t.tm-view-footer .add-btn,\r\n\t\t.tm-form-footer button,\r\n\t\t.tm-form-footer .btn,\r\n\t\t.tm-form-footer .add-btn {\r\n\t\t\tmargin-top: 0;\r\n\t\t}\r\n\t\t.tm-tag-input-wrap { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; padding: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); min-height: 2.75rem; }\r\n\t\t.tm-tag-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }\r\n\t\t.tm-tag-chip { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.15rem 0.5rem; border-radius: var(--radius-full); background: var(--color-muted); font-size: 0.8125rem; border: var(--pill-border); }\r\n\t\t.tm-tag-text-input { flex: 1; min-width: 8rem; border: none; outline: none; background: transparent; font-size: 0.875rem; }\r\n\t\t.tm-url-preview-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.75); font-size: 0.8125rem; color: var(--color-muted-foreground); }\r\n\t\t.tm-url-preview.is-loading .tm-url-preview-loading { display: flex; }\r\n\t\t.tm-url-preview:not(.is-loading) .tm-url-preview-loading { display: none; }\r\n\t\t.tm-watch-page { padding-bottom: var(--space-10); }\r\n\t\t.tm-watch-header {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t}\r\n\t\t.tm-watch-header .btn {\r\n\t\t\tmargin-top: 0;\r\n\t\t\twidth: auto;\r\n\t\t}\r\n\t\t.tm-player-wrap { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--color-border); background: #000; }\r\n\t\t.tm-player-wrap iframe, #tmYouTubePlayer { width: 100%; height: 100%; }\r\n\t\t.tm-watch-progress { margin-top: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); }\r\n\t\t.tm-progress-bar { width: 100%; height: 0.5rem; border-radius: var(--radius-full); background: var(--color-muted); overflow: hidden; }\r\n\t\t.tm-progress-fill { height: 100%; background: var(--color-primary); transition: width 0.3s ease; }\r\n\t\t.tm-progress-label { font-size: 0.875rem; color: var(--color-muted-foreground); }\r\n\t\t.tm-filter-form { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: flex-end; margin: var(--space-4) 0; }\r\n\t\t.tm-filter-form .form-group { margin: 0; min-width: 12rem; }\r\n\t\t#tmViewModalHost .modal-overlay, #tmEditModalHost .modal-overlay { z-index: 1100; }\r\n\t\t@media (max-width: 768px) {\r\n\t\t\t.hub-header { flex-direction: column; align-items: stretch; }\r\n\t\t\t.hub-header > .btn,\r\n\t\t\t.hub-header > a.btn {\r\n\t\t\t\talign-self: flex-start;\r\n\t\t\t}\r\n\t\t\t.tm-header-actions .btn,\r\n\t\t\t.tm-header-actions .add-btn {\r\n\t\t\t\twidth: auto;\r\n\t\t\t}\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 151, "<style>\n\t\t.tm-page { padding-bottom: var(--space-10); }\n\t\t.tm-page-heading { display: flex; flex-direction: column; gap: var(--space-1); }\n\t\t.tm-page-subtitle { color: var(--color-muted-foreground); font-size: 0.9375rem; line-height: 1.5; max-width: 36rem; }\n\t\t.tm-header-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\tgap: var(--space-2);\n\t\t\talign-items: center;\n\t\t\tjustify-content: flex-end;\n\t\t\tflex-shrink: 0;\n\t\t}\n\t\t.tm-header-actions .btn,\n\t\t.tm-header-actions .add-btn,\n\t\t.tm-header-actions button {\n\t\t\tmargin-top: 0;\n\t\t\twidth: auto;\n\t\t}\n\t\t.hub-header > .btn,\n\t\t.hub-header > a.btn {\n\t\t\tmargin-top: 0;\n\t\t\twidth: auto;\n\t\t\tflex-shrink: 0;\n\t\t}\n\t\t.tm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-4); margin-top: var(--space-4); }\n\t\t.tm-card { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); box-shadow: var(--shadow-sm); }\n\t\t.tm-card-title { font-size: 1.0625rem; font-weight: 600; line-height: 1.35; }\n\t\t.tm-card-description { color: var(--color-muted-foreground); font-size: 0.875rem; line-height: 1.5; }\n\t\t.tm-card-badges { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }\n\t\t.tm-card-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tjustify-content: flex-end;\n\t\t\tgap: var(--space-1);\n\t\t\tflex-shrink: 0;\n\t\t}\n\t\t.tm-card-actions .btn {\n\t\t\tdisplay: inline-flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\theight: 36px;\n\t\t\tmargin-top: 0;\n\t\t\tpadding: 0 var(--space-3);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tline-height: 1;\n\t\t\tbox-sizing: border-box;\n\t\t}\n\t\t.tm-card-footer { margin-top: auto; display: flex; justify-content: flex-end; }\n\t\t.tm-thumb { width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-md); overflow: hidden; background: linear-gradient(180deg, #F0FDFA 0%, #E6FFFA 100%); border: 1px solid var(--color-border-subtle); position: relative; }\n\t\t.tm-thumb-img { width: 100%; height: 100%; object-fit: cover; display: block; }\n\t\t.tm-thumb-placeholder { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: var(--color-muted-foreground); }\n\t\t.tm-tag-list { display: flex; flex-wrap: wrap; gap: var(--space-2); }\n\t\t.tm-tag-pill { display: inline-flex; align-items: center; padding: 0.2rem 0.55rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600; border: var(--pill-border); }\n\t\t.tm-empty { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); padding: var(--space-10) var(--space-4); color: var(--color-muted-foreground); text-align: center; }\n\t\t.tm-empty-icon { color: var(--color-primary); }\n\t\t.tm-view-body, .tm-form-body { display: flex; flex-direction: column; gap: var(--space-4); }\n\t\t.tm-view-label { font-size: 0.8125rem; font-weight: 600; color: var(--color-muted-foreground); text-transform: uppercase; letter-spacing: 0.04em; }\n\t\t.tm-view-text { font-size: 0.9375rem; line-height: 1.6; white-space: pre-wrap; }\n\t\t.tm-view-link { word-break: break-all; font-size: 0.875rem; }\n\t\t.tm-view-meta { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); border-radius: var(--radius-md); background: var(--color-muted); }\n\t\t.tm-meta-item { display: flex; flex-direction: column; gap: 2px; }\n\t\t.tm-meta-label { font-size: 0.75rem; font-weight: 600; color: var(--color-muted-foreground); text-transform: uppercase; }\n\t\t.tm-meta-value { font-size: 0.875rem; }\n\t\t.tm-form-footer {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-3);\n\t\t\tjustify-content: flex-end;\n\t\t}\n\t\t.tm-view-footer {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-3);\n\t\t\tpadding: var(--space-2) var(--space-4) var(--space-4);\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\n\t\t}\n\t\t.tm-form-footer-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tjustify-content: flex-end;\n\t\t\tgap: var(--space-3);\n\t\t\twidth: 100%;\n\t\t}\n\t\t.tm-view-footer-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tjustify-content: flex-end;\n\t\t\tgap: var(--space-3);\n\t\t\twidth: 100%;\n\t\t}\n\t\t.tm-view-footer button,\n\t\t.tm-view-footer .btn,\n\t\t.tm-view-footer .add-btn,\n\t\t.tm-form-footer button,\n\t\t.tm-form-footer .btn,\n\t\t.tm-form-footer .add-btn {\n\t\t\tmargin-top: 0;\n\t\t}\n\t\t.tm-tag-input-wrap { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; padding: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); min-height: 2.75rem; }\n\t\t.tm-tag-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }\n\t\t.tm-tag-chip { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.15rem 0.5rem; border-radius: var(--radius-full); background: var(--color-muted); font-size: 0.8125rem; border: var(--pill-border); }\n\t\t.tm-tag-text-input { flex: 1; min-width: 8rem; border: none; outline: none; background: transparent; font-size: 0.875rem; }\n\t\t.tm-url-preview-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.75); font-size: 0.8125rem; color: var(--color-muted-foreground); }\n\t\t.tm-url-preview.is-loading .tm-url-preview-loading { display: flex; }\n\t\t.tm-url-preview:not(.is-loading) .tm-url-preview-loading { display: none; }\n\t\t.tm-watch-page { padding-bottom: var(--space-10); }\n\t\t.tm-watch-header {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\talign-items: flex-start;\n\t\t\tgap: var(--space-3);\n\t\t\tmargin-bottom: var(--space-4);\n\t\t}\n\t\t.tm-watch-header .btn {\n\t\t\tmargin-top: 0;\n\t\t\twidth: auto;\n\t\t}\n\t\t.tm-player-wrap { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--color-border); background: #000; }\n\t\t.tm-player-wrap iframe, #tmYouTubePlayer { width: 100%; height: 100%; }\n\t\t.tm-watch-progress { margin-top: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); }\n\t\t.tm-progress-bar { width: 100%; height: 0.5rem; border-radius: var(--radius-full); background: var(--color-muted); overflow: hidden; }\n\t\t.tm-progress-fill { height: 100%; background: var(--color-primary); transition: width 0.3s ease; }\n\t\t.tm-progress-label { font-size: 0.875rem; color: var(--color-muted-foreground); }\n\t\t.tm-filter-form { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: flex-end; margin: var(--space-4) 0; }\n\t\t.tm-filter-form .form-group { margin: 0; min-width: 12rem; }\n\t\t#tmViewModalHost .modal-overlay, #tmEditModalHost .modal-overlay { z-index: 1100; }\n\t\t@media (max-width: 768px) {\n\t\t\t.hub-header { flex-direction: column; align-items: stretch; }\n\t\t\t.hub-header > .btn,\n\t\t\t.hub-header > a.btn {\n\t\t\t\talign-self: flex-start;\n\t\t\t}\n\t\t\t.tm-header-actions .btn,\n\t\t\t.tm-header-actions .add-btn {\n\t\t\t\twidth: auto;\n\t\t\t}\n\t\t}\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1906,7 +1922,7 @@ func TrainingMaterialsScripts() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 151, "<script>\r\n\t\t(function () {\r\n\t\t\tif (window._tmScriptsBound) return;\r\n\t\t\twindow._tmScriptsBound = true;\r\n\r\n\t\t\tconst MAX_TAGS = 7;\r\n\t\t\tconst MIN_TAGS = 1;\r\n\t\t\tconst previewURLScript = document.getElementById('tmPreviewURL');\r\n\t\t\tconst PREVIEW_URL = previewURLScript ? JSON.parse(previewURLScript.textContent) : '/training-materials/preview';\r\n\r\n\t\t\tfunction normalizeTag(value) {\r\n\t\t\t\treturn (value || '').trim().toLowerCase();\r\n\t\t\t}\r\n\r\n\t\t\tfunction bindTagInput(form) {\r\n\t\t\t\tconst wrap = form.querySelector('#tmTagInputWrap');\r\n\t\t\t\tconst chips = form.querySelector('#tmTagChips');\r\n\t\t\t\tconst input = form.querySelector('#tmTagInput');\r\n\t\t\t\tconst limitWarning = form.querySelector('.tm-tag-limit-warning');\r\n\t\t\t\tif (!wrap || !chips || !input) return;\r\n\r\n\t\t\t\tfunction currentTags() {\r\n\t\t\t\t\treturn Array.from(form.querySelectorAll('input[name=\"tags\"]')).map(function (el) { return el.value; });\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction renderChips() {\r\n\t\t\t\t\tchips.innerHTML = '';\r\n\t\t\t\t\tcurrentTags().forEach(function (label) {\r\n\t\t\t\t\t\tconst chip = document.createElement('span');\r\n\t\t\t\t\t\tchip.className = 'tm-tag-chip';\r\n\t\t\t\t\t\tchip.textContent = label;\r\n\t\t\t\t\t\tconst remove = document.createElement('button');\r\n\t\t\t\t\t\tremove.type = 'button';\r\n\t\t\t\t\t\tremove.className = 'chip-remove';\r\n\t\t\t\t\t\tremove.setAttribute('aria-label', 'Remove tag');\r\n\t\t\t\t\t\tremove.textContent = '×';\r\n\t\t\t\t\t\tremove.addEventListener('click', function () {\r\n\t\t\t\t\t\t\tform.querySelectorAll('input[name=\"tags\"]').forEach(function (el) {\r\n\t\t\t\t\t\t\t\tif (el.value === label) el.remove();\r\n\t\t\t\t\t\t\t});\r\n\t\t\t\t\t\t\trenderChips();\r\n\t\t\t\t\t\t\tif (limitWarning) limitWarning.hidden = currentTags().length < MAX_TAGS;\r\n\t\t\t\t\t\t});\r\n\t\t\t\t\t\tchip.appendChild(remove);\r\n\t\t\t\t\t\tchips.appendChild(chip);\r\n\t\t\t\t\t});\r\n\t\t\t\t\tif (limitWarning) limitWarning.hidden = currentTags().length < MAX_TAGS;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tfunction addTag(value) {\r\n\t\t\t\t\tconst label = normalizeTag(value);\r\n\t\t\t\t\tif (!label || currentTags().includes(label)) return;\r\n\t\t\t\t\tif (currentTags().length >= MAX_TAGS) return;\r\n\t\t\t\t\tconst hidden = document.createElement('input');\r\n\t\t\t\t\thidden.type = 'hidden';\r\n\t\t\t\t\thidden.name = 'tags';\r\n\t\t\t\t\thidden.value = label;\r\n\t\t\t\t\tform.appendChild(hidden);\r\n\t\t\t\t\tinput.value = '';\r\n\t\t\t\t\trenderChips();\r\n\t\t\t\t}\r\n\r\n\t\t\t\tinput.addEventListener('keydown', function (e) {\r\n\t\t\t\t\tif (e.key === 'Enter' || e.key === ',') {\r\n\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\taddTag(input.value);\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\r\n\t\t\t\trenderChips();\r\n\t\t\t}\r\n\r\n\t\t\tlet previewTimer = null;\r\n\t\t\tfunction bindUrlPreview(form) {\r\n\t\t\t\tconst urlInput = form.querySelector('#tmURL');\r\n\t\t\t\tconst preview = form.querySelector('#tmUrlPreview');\r\n\t\t\t\tconst img = form.querySelector('#tmUrlPreviewImg');\r\n\t\t\t\tconst placeholder = form.querySelector('#tmUrlPreviewPlaceholder');\r\n\t\t\t\tconst sourceTypeInput = form.querySelector('#tmSourceType');\r\n\t\t\t\tif (!urlInput || !preview) return;\r\n\r\n\t\t\t\turlInput.addEventListener('input', function () {\r\n\t\t\t\t\tclearTimeout(previewTimer);\r\n\t\t\t\t\tpreviewTimer = setTimeout(function () {\r\n\t\t\t\t\t\tconst url = (urlInput.value || '').trim();\r\n\t\t\t\t\t\tif (!url) {\r\n\t\t\t\t\t\t\tpreview.hidden = true;\r\n\t\t\t\t\t\t\treturn;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tpreview.hidden = false;\r\n\t\t\t\t\t\tpreview.classList.add('is-loading');\r\n\t\t\t\t\t\tfetch(PREVIEW_URL + '?url=' + encodeURIComponent(url))\r\n\t\t\t\t\t\t\t.then(function (r) { return r.json(); })\r\n\t\t\t\t\t\t\t.then(function (data) {\r\n\t\t\t\t\t\t\t\tpreview.classList.remove('is-loading');\r\n\t\t\t\t\t\t\t\tif (data.thumbnail_url && img) {\r\n\t\t\t\t\t\t\t\t\timg.src = data.thumbnail_url;\r\n\t\t\t\t\t\t\t\t\timg.hidden = false;\r\n\t\t\t\t\t\t\t\t\tif (placeholder) placeholder.hidden = true;\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\tif (data.source_type && sourceTypeInput) {\r\n\t\t\t\t\t\t\t\t\tsourceTypeInput.value = data.source_type;\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t})\r\n\t\t\t\t\t\t\t.catch(function () { preview.classList.remove('is-loading'); });\r\n\t\t\t\t\t}, 400);\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tfunction openModal(overlay) {\r\n\t\t\t\tif (!overlay) return;\r\n\t\t\t\toverlay.hidden = false;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\tconst form = overlay.querySelector('form');\r\n\t\t\t\tif (form) {\r\n\t\t\t\t\tbindTagInput(form);\r\n\t\t\t\t\tbindUrlPreview(form);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction closeModal(overlay) {\r\n\t\t\t\tif (!overlay) return;\r\n\t\t\t\toverlay.hidden = true;\r\n\t\t\t\tif (!document.getElementById('tmViewModal') && !document.getElementById('tmEditModal')) {\r\n\t\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tdocument.getElementById('openCreateTrainingBtn')?.addEventListener('click', function () {\r\n\t\t\t\topenModal(document.getElementById('tmFormModal'));\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tif (e.target.closest('.tm-form-close')) {\r\n\t\t\t\t\tconst overlay = e.target.closest('.modal-overlay');\r\n\t\t\t\t\tif (overlay?.id === 'tmEditModal') {\r\n\t\t\t\t\t\tdocument.getElementById('tmEditModalHost').innerHTML = '';\r\n\t\t\t\t\t} else {\r\n\t\t\t\t\t\tcloseModal(overlay);\r\n\t\t\t\t\t}\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst overlay = e.target.closest('#tmFormModal, #tmEditModal');\r\n\t\t\t\tif (overlay && e.target === overlay) {\r\n\t\t\t\t\tif (overlay.id === 'tmEditModal') {\r\n\t\t\t\t\t\tdocument.getElementById('tmEditModalHost').innerHTML = '';\r\n\t\t\t\t\t} else {\r\n\t\t\t\t\t\tcloseModal(overlay);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tif (evt.detail.target.id === 'tmEditModalHost') {\r\n\t\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\t\tconst form = evt.detail.target.querySelector('form');\r\n\t\t\t\t\tif (form) {\r\n\t\t\t\t\t\tbindTagInput(form);\r\n\t\t\t\t\t\tbindUrlPreview(form);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 152, "<script>\n\t\t(function () {\n\t\t\tif (window._tmScriptsBound) return;\n\t\t\twindow._tmScriptsBound = true;\n\n\t\t\tconst MAX_TAGS = 7;\n\t\t\tconst MIN_TAGS = 1;\n\t\t\tconst previewURLScript = document.getElementById('tmPreviewURL');\n\t\t\tconst PREVIEW_URL = previewURLScript ? JSON.parse(previewURLScript.textContent) : '/training-materials/preview';\n\n\t\t\tfunction normalizeTag(value) {\n\t\t\t\treturn (value || '').trim().toLowerCase();\n\t\t\t}\n\n\t\t\tfunction bindTagInput(form) {\n\t\t\t\tconst wrap = form.querySelector('#tmTagInputWrap');\n\t\t\t\tconst chips = form.querySelector('#tmTagChips');\n\t\t\t\tconst input = form.querySelector('#tmTagInput');\n\t\t\t\tconst limitWarning = form.querySelector('.tm-tag-limit-warning');\n\t\t\t\tif (!wrap || !chips || !input) return;\n\n\t\t\t\tfunction currentTags() {\n\t\t\t\t\treturn Array.from(form.querySelectorAll('input[name=\"tags\"]')).map(function (el) { return el.value; });\n\t\t\t\t}\n\n\t\t\t\tfunction renderChips() {\n\t\t\t\t\tchips.innerHTML = '';\n\t\t\t\t\tcurrentTags().forEach(function (label) {\n\t\t\t\t\t\tconst chip = document.createElement('span');\n\t\t\t\t\t\tchip.className = 'tm-tag-chip';\n\t\t\t\t\t\tchip.textContent = label;\n\t\t\t\t\t\tconst remove = document.createElement('button');\n\t\t\t\t\t\tremove.type = 'button';\n\t\t\t\t\t\tremove.className = 'chip-remove';\n\t\t\t\t\t\tremove.setAttribute('aria-label', 'Remove tag');\n\t\t\t\t\t\tremove.textContent = '×';\n\t\t\t\t\t\tremove.addEventListener('click', function () {\n\t\t\t\t\t\t\tform.querySelectorAll('input[name=\"tags\"]').forEach(function (el) {\n\t\t\t\t\t\t\t\tif (el.value === label) el.remove();\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\trenderChips();\n\t\t\t\t\t\t\tif (limitWarning) limitWarning.hidden = currentTags().length < MAX_TAGS;\n\t\t\t\t\t\t});\n\t\t\t\t\t\tchip.appendChild(remove);\n\t\t\t\t\t\tchips.appendChild(chip);\n\t\t\t\t\t});\n\t\t\t\t\tif (limitWarning) limitWarning.hidden = currentTags().length < MAX_TAGS;\n\t\t\t\t}\n\n\t\t\t\tfunction addTag(value) {\n\t\t\t\t\tconst label = normalizeTag(value);\n\t\t\t\t\tif (!label || currentTags().includes(label)) return;\n\t\t\t\t\tif (currentTags().length >= MAX_TAGS) return;\n\t\t\t\t\tconst hidden = document.createElement('input');\n\t\t\t\t\thidden.type = 'hidden';\n\t\t\t\t\thidden.name = 'tags';\n\t\t\t\t\thidden.value = label;\n\t\t\t\t\tform.appendChild(hidden);\n\t\t\t\t\tinput.value = '';\n\t\t\t\t\trenderChips();\n\t\t\t\t}\n\n\t\t\t\tinput.addEventListener('keydown', function (e) {\n\t\t\t\t\tif (e.key === 'Enter' || e.key === ',') {\n\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\taddTag(input.value);\n\t\t\t\t\t}\n\t\t\t\t});\n\n\t\t\t\trenderChips();\n\t\t\t}\n\n\t\t\tlet previewTimer = null;\n\t\t\tfunction bindUrlPreview(form) {\n\t\t\t\tconst urlInput = form.querySelector('#tmURL');\n\t\t\t\tconst preview = form.querySelector('#tmUrlPreview');\n\t\t\t\tconst img = form.querySelector('#tmUrlPreviewImg');\n\t\t\t\tconst placeholder = form.querySelector('#tmUrlPreviewPlaceholder');\n\t\t\t\tconst sourceTypeInput = form.querySelector('#tmSourceType');\n\t\t\t\tif (!urlInput || !preview) return;\n\n\t\t\t\turlInput.addEventListener('input', function () {\n\t\t\t\t\tclearTimeout(previewTimer);\n\t\t\t\t\tpreviewTimer = setTimeout(function () {\n\t\t\t\t\t\tconst url = (urlInput.value || '').trim();\n\t\t\t\t\t\tif (!url) {\n\t\t\t\t\t\t\tpreview.hidden = true;\n\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t}\n\t\t\t\t\t\tpreview.hidden = false;\n\t\t\t\t\t\tpreview.classList.add('is-loading');\n\t\t\t\t\t\tfetch(PREVIEW_URL + '?url=' + encodeURIComponent(url))\n\t\t\t\t\t\t\t.then(function (r) { return r.json(); })\n\t\t\t\t\t\t\t.then(function (data) {\n\t\t\t\t\t\t\t\tpreview.classList.remove('is-loading');\n\t\t\t\t\t\t\t\tif (data.thumbnail_url && img) {\n\t\t\t\t\t\t\t\t\timg.src = data.thumbnail_url;\n\t\t\t\t\t\t\t\t\timg.hidden = false;\n\t\t\t\t\t\t\t\t\tif (placeholder) placeholder.hidden = true;\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\tif (data.source_type && sourceTypeInput) {\n\t\t\t\t\t\t\t\t\tsourceTypeInput.value = data.source_type;\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t})\n\t\t\t\t\t\t\t.catch(function () { preview.classList.remove('is-loading'); });\n\t\t\t\t\t}, 400);\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tfunction openModal(overlay) {\n\t\t\t\tif (!overlay) return;\n\t\t\t\toverlay.hidden = false;\n\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\tconst form = overlay.querySelector('form');\n\t\t\t\tif (form) {\n\t\t\t\t\tbindTagInput(form);\n\t\t\t\t\tbindUrlPreview(form);\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tfunction closeModal(overlay) {\n\t\t\t\tif (!overlay) return;\n\t\t\t\toverlay.hidden = true;\n\t\t\t\tif (!document.getElementById('tmViewModal') && !document.getElementById('tmEditModal')) {\n\t\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tdocument.getElementById('openCreateTrainingBtn')?.addEventListener('click', function () {\n\t\t\t\topenModal(document.getElementById('tmFormModal'));\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tif (e.target.closest('.tm-form-close')) {\n\t\t\t\t\tconst overlay = e.target.closest('.modal-overlay');\n\t\t\t\t\tif (overlay?.id === 'tmEditModal') {\n\t\t\t\t\t\tdocument.getElementById('tmEditModalHost').innerHTML = '';\n\t\t\t\t\t} else {\n\t\t\t\t\t\tcloseModal(overlay);\n\t\t\t\t\t}\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst overlay = e.target.closest('#tmFormModal, #tmEditModal');\n\t\t\t\tif (overlay && e.target === overlay) {\n\t\t\t\t\tif (overlay.id === 'tmEditModal') {\n\t\t\t\t\t\tdocument.getElementById('tmEditModalHost').innerHTML = '';\n\t\t\t\t\t} else {\n\t\t\t\t\t\tcloseModal(overlay);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.id === 'tmEditModalHost') {\n\t\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\t\tconst form = evt.detail.target.querySelector('form');\n\t\t\t\t\tif (form) {\n\t\t\t\t\t\tbindTagInput(form);\n\t\t\t\t\t\tbindUrlPreview(form);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1935,7 +1951,7 @@ func TrainingMaterialViewModalScripts() templ.Component {
 			templ_7745c5c3_Var62 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 152, "<script>\r\n\t\t(function () {\r\n\t\t\tif (window._tmViewModalBound) return;\r\n\t\t\twindow._tmViewModalBound = true;\r\n\r\n\t\t\tfunction isOpenModalOverlay(id) {\r\n\t\t\t\tconst el = document.getElementById(id);\r\n\t\t\t\treturn !!(el && !el.hidden);\r\n\t\t\t}\r\n\r\n\t\t\tfunction hasOpenModalLayer() {\r\n\t\t\t\treturn (\r\n\t\t\t\t\tisOpenModalOverlay('tmViewModal') ||\r\n\t\t\t\t\tisOpenModalOverlay('tmEditModal') ||\r\n\t\t\t\t\tisOpenModalOverlay('tmFormModal')\r\n\t\t\t\t);\r\n\t\t\t}\r\n\r\n\t\t\twindow.closeTrainingMaterialViewModal = function () {\r\n\t\t\t\tconst host = document.getElementById('tmViewModalHost');\r\n\t\t\t\tif (host) host.innerHTML = '';\r\n\t\t\t\tif (!hasOpenModalLayer()) {\r\n\t\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t\t}\r\n\t\t\t};\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tif (e.target.closest('.tm-view-close')) {\r\n\t\t\t\t\twindow.closeTrainingMaterialViewModal();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst viewOverlay = e.target.closest('#tmViewModal');\r\n\t\t\t\tif (viewOverlay && e.target === viewOverlay) {\r\n\t\t\t\t\twindow.closeTrainingMaterialViewModal();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key === 'Escape' && document.getElementById('tmViewModal')) {\r\n\t\t\t\t\twindow.closeTrainingMaterialViewModal();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tif (evt.detail.target.id !== 'tmViewModalHost') return;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 153, "<script>\n\t\t(function () {\n\t\t\tif (window._tmViewModalBound) return;\n\t\t\twindow._tmViewModalBound = true;\n\n\t\t\tfunction isOpenModalOverlay(id) {\n\t\t\t\tconst el = document.getElementById(id);\n\t\t\t\treturn !!(el && !el.hidden);\n\t\t\t}\n\n\t\t\tfunction hasOpenModalLayer() {\n\t\t\t\treturn (\n\t\t\t\t\tisOpenModalOverlay('tmViewModal') ||\n\t\t\t\t\tisOpenModalOverlay('tmEditModal') ||\n\t\t\t\t\tisOpenModalOverlay('tmFormModal')\n\t\t\t\t);\n\t\t\t}\n\n\t\t\twindow.closeTrainingMaterialViewModal = function () {\n\t\t\t\tconst host = document.getElementById('tmViewModalHost');\n\t\t\t\tif (host) host.innerHTML = '';\n\t\t\t\tif (!hasOpenModalLayer()) {\n\t\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t\t}\n\t\t\t};\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tif (e.target.closest('.tm-view-close')) {\n\t\t\t\t\twindow.closeTrainingMaterialViewModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst viewOverlay = e.target.closest('#tmViewModal');\n\t\t\t\tif (viewOverlay && e.target === viewOverlay) {\n\t\t\t\t\twindow.closeTrainingMaterialViewModal();\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.addEventListener('keydown', function (e) {\n\t\t\t\tif (e.key === 'Escape' && document.getElementById('tmViewModal')) {\n\t\t\t\t\twindow.closeTrainingMaterialViewModal();\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.id !== 'tmViewModalHost') return;\n\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t});\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1964,7 +1980,7 @@ func TrainingMaterialWatchScripts() templ.Component {
 			templ_7745c5c3_Var63 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 153, "<script>\r\n\t\t(function () {\r\n\t\t\tconst configEl = document.getElementById('tmWatchConfig');\r\n\t\t\tif (!configEl) return;\r\n\t\t\tconst config = JSON.parse(configEl.textContent);\r\n\t\t\tconst playerHost = document.getElementById('tmYouTubePlayer');\r\n\t\t\tlet player = null;\r\n\t\t\tlet durationSeconds = config.durationSeconds || 0;\r\n\t\t\tlet lastReportedSeconds = 0;\r\n\t\t\tlet heartbeatTimer = null;\r\n\r\n\t\t\tfunction updateProgressUI(percent) {\r\n\t\t\t\tconst fill = document.getElementById('tmProgressFill');\r\n\t\t\t\tconst label = document.getElementById('tmProgressLabel');\r\n\t\t\t\tif (fill) fill.style.width = percent + '%';\r\n\t\t\t\tif (label) label.textContent = Math.round(percent) + '% complete';\r\n\t\t\t}\r\n\r\n\t\t\tfunction sendProgress() {\r\n\t\t\t\tif (!player || !config.progressUrl) return;\r\n\t\t\t\tconst current = Math.floor(player.getCurrentTime() || 0);\r\n\t\t\t\tif (current < lastReportedSeconds) return;\r\n\t\t\t\tlastReportedSeconds = current;\r\n\t\t\t\tconst duration = Math.floor(player.getDuration() || durationSeconds || 0);\r\n\t\t\t\tif (duration > 0) durationSeconds = duration;\r\n\t\t\t\tconst percent = duration > 0 ? Math.min(100, (current / duration) * 100) : 0;\r\n\t\t\t\tupdateProgressUI(percent);\r\n\t\t\t\tfetch(config.progressUrl, {\r\n\t\t\t\t\tmethod: 'POST',\r\n\t\t\t\t\tcredentials: 'same-origin',\r\n\t\t\t\t\theaders: Object.assign(\r\n\t\t\t\t\t\t{ 'Content-Type': 'application/json' },\r\n\t\t\t\t\t\twindow.getCSRFHeaders ? window.getCSRFHeaders() : {}\r\n\t\t\t\t\t),\r\n\t\t\t\t\tbody: JSON.stringify({\r\n\t\t\t\t\t\twatch_seconds: current,\r\n\t\t\t\t\t\tprogress_percent: percent,\r\n\t\t\t\t\t\tduration_seconds: duration\r\n\t\t\t\t\t})\r\n\t\t\t\t}).catch(function () {});\r\n\t\t\t}\r\n\r\n\t\t\tfunction pauseOnFocusLoss() {\r\n\t\t\t\tif (player && typeof player.pauseVideo === 'function') {\r\n\t\t\t\t\tplayer.pauseVideo();\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tdocument.addEventListener('visibilitychange', function () {\r\n\t\t\t\tif (document.hidden) pauseOnFocusLoss();\r\n\t\t\t});\r\n\t\t\twindow.addEventListener('blur', pauseOnFocusLoss);\r\n\r\n\t\t\tfunction initYouTubePlayer() {\r\n\t\t\t\tif (config.sourceType !== 'youtube' || !config.videoId || !playerHost) return;\r\n\t\t\t\tplayer = new YT.Player('tmYouTubePlayer', {\r\n\t\t\t\t\tvideoId: config.videoId,\r\n\t\t\t\t\tplayerVars: { enablejsapi: 1, rel: 0, modestbranding: 1 },\r\n\t\t\t\t\tevents: {\r\n\t\t\t\t\t\tonReady: function () {\r\n\t\t\t\t\t\t\tupdateProgressUI(config.initialProgress || 0);\r\n\t\t\t\t\t\t\theartbeatTimer = setInterval(sendProgress, 15000);\r\n\t\t\t\t\t\t},\r\n\t\t\t\t\t\tonStateChange: function (event) {\r\n\t\t\t\t\t\t\tif (event.data === YT.PlayerState.PLAYING) {\r\n\t\t\t\t\t\t\t\tsendProgress();\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\twindow.onYouTubeIframeAPIReady = initYouTubePlayer;\r\n\r\n\t\t\tfunction loadYouTubeAPI() {\r\n\t\t\t\tif (config.sourceType !== 'youtube' || !config.videoId || !playerHost) return;\r\n\t\t\t\tif (window.YT && window.YT.Player) {\r\n\t\t\t\t\tinitYouTubePlayer();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst existing = document.querySelector('script[data-tm-youtube-api]');\r\n\t\t\t\tif (existing) return;\r\n\t\t\t\tconst tag = document.createElement('script');\r\n\t\t\t\ttag.src = 'https://www.youtube.com/iframe_api';\r\n\t\t\t\ttag.async = true;\r\n\t\t\t\ttag.setAttribute('data-tm-youtube-api', '1');\r\n\t\t\t\tdocument.head.appendChild(tag);\r\n\t\t\t}\r\n\r\n\t\t\tloadYouTubeAPI();\r\n\r\n\t\t\twindow.addEventListener('beforeunload', function () {\r\n\t\t\t\tif (heartbeatTimer) clearInterval(heartbeatTimer);\r\n\t\t\t\tsendProgress();\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 154, "<script>\n\t\t(function () {\n\t\t\tconst configEl = document.getElementById('tmWatchConfig');\n\t\t\tif (!configEl) return;\n\t\t\tconst config = JSON.parse(configEl.textContent);\n\t\t\tconst playerHost = document.getElementById('tmYouTubePlayer');\n\t\t\tlet player = null;\n\t\t\tlet durationSeconds = config.durationSeconds || 0;\n\t\t\tlet lastReportedSeconds = 0;\n\t\t\tlet heartbeatTimer = null;\n\n\t\t\tfunction updateProgressUI(percent) {\n\t\t\t\tconst fill = document.getElementById('tmProgressFill');\n\t\t\t\tconst label = document.getElementById('tmProgressLabel');\n\t\t\t\tif (fill) fill.style.width = percent + '%';\n\t\t\t\tif (label) label.textContent = Math.round(percent) + '% complete';\n\t\t\t}\n\n\t\t\tfunction sendProgress() {\n\t\t\t\tif (!player || !config.progressUrl) return;\n\t\t\t\tconst current = Math.floor(player.getCurrentTime() || 0);\n\t\t\t\tif (current < lastReportedSeconds) return;\n\t\t\t\tlastReportedSeconds = current;\n\t\t\t\tconst duration = Math.floor(player.getDuration() || durationSeconds || 0);\n\t\t\t\tif (duration > 0) durationSeconds = duration;\n\t\t\t\tconst percent = duration > 0 ? Math.min(100, (current / duration) * 100) : 0;\n\t\t\t\tupdateProgressUI(percent);\n\t\t\t\tfetch(config.progressUrl, {\n\t\t\t\t\tmethod: 'POST',\n\t\t\t\t\tcredentials: 'same-origin',\n\t\t\t\t\theaders: Object.assign(\n\t\t\t\t\t\t{ 'Content-Type': 'application/json' },\n\t\t\t\t\t\twindow.getCSRFHeaders ? window.getCSRFHeaders() : {}\n\t\t\t\t\t),\n\t\t\t\t\tbody: JSON.stringify({\n\t\t\t\t\t\twatch_seconds: current,\n\t\t\t\t\t\tprogress_percent: percent,\n\t\t\t\t\t\tduration_seconds: duration\n\t\t\t\t\t})\n\t\t\t\t}).catch(function () {});\n\t\t\t}\n\n\t\t\tfunction pauseOnFocusLoss() {\n\t\t\t\tif (player && typeof player.pauseVideo === 'function') {\n\t\t\t\t\tplayer.pauseVideo();\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tdocument.addEventListener('visibilitychange', function () {\n\t\t\t\tif (document.hidden) pauseOnFocusLoss();\n\t\t\t});\n\t\t\twindow.addEventListener('blur', pauseOnFocusLoss);\n\n\t\t\tfunction initYouTubePlayer() {\n\t\t\t\tif (config.sourceType !== 'youtube' || !config.videoId || !playerHost) return;\n\t\t\t\tplayer = new YT.Player('tmYouTubePlayer', {\n\t\t\t\t\tvideoId: config.videoId,\n\t\t\t\t\tplayerVars: { enablejsapi: 1, rel: 0, modestbranding: 1 },\n\t\t\t\t\tevents: {\n\t\t\t\t\t\tonReady: function () {\n\t\t\t\t\t\t\tupdateProgressUI(config.initialProgress || 0);\n\t\t\t\t\t\t\theartbeatTimer = setInterval(sendProgress, 15000);\n\t\t\t\t\t\t},\n\t\t\t\t\t\tonStateChange: function (event) {\n\t\t\t\t\t\t\tif (event.data === YT.PlayerState.PLAYING) {\n\t\t\t\t\t\t\t\tsendProgress();\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\twindow.onYouTubeIframeAPIReady = initYouTubePlayer;\n\n\t\t\tfunction loadYouTubeAPI() {\n\t\t\t\tif (config.sourceType !== 'youtube' || !config.videoId || !playerHost) return;\n\t\t\t\tif (window.YT && window.YT.Player) {\n\t\t\t\t\tinitYouTubePlayer();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst existing = document.querySelector('script[data-tm-youtube-api]');\n\t\t\t\tif (existing) return;\n\t\t\t\tconst tag = document.createElement('script');\n\t\t\t\ttag.src = 'https://www.youtube.com/iframe_api';\n\t\t\t\ttag.async = true;\n\t\t\t\ttag.setAttribute('data-tm-youtube-api', '1');\n\t\t\t\tdocument.head.appendChild(tag);\n\t\t\t}\n\n\t\t\tloadYouTubeAPI();\n\n\t\t\twindow.addEventListener('beforeunload', function () {\n\t\t\t\tif (heartbeatTimer) clearInterval(heartbeatTimer);\n\t\t\t\tsendProgress();\n\t\t\t});\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

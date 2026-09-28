@@ -260,7 +260,7 @@ func EditClass(data EditClassData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" hx-target=\"#logOutput\" _=\"\r\n\t\t\t\t\t\ton submit\r\n\t\t\t\t\t\t\tif #start_time.value is ''\r\n\t\t\t\t\t\t\t\talert('Please set start time')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\t\tif #end_time.value is ''\r\n\t\t\t\t\t\t\t\talert('Please set end time')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\t\tif #status.value is not 'conducted' and #reason.value.trim() is ''\r\n\t\t\t\t\t\t\t\talert('Reason is required for cancelled or rescheduled classes')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\tend\r\n\t\t\t\t\t\"><div class=\"form-row\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" hx-target=\"#logOutput\" _=\"\n\t\t\t\t\t\ton submit\n\t\t\t\t\t\t\tif #start_time.value is ''\n\t\t\t\t\t\t\t\talert('Please set start time')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #end_time.value is ''\n\t\t\t\t\t\t\t\talert('Please set end time')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #status.value is not 'conducted' and #reason.value.trim() is ''\n\t\t\t\t\t\t\t\talert('Reason is required for cancelled or rescheduled classes')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\tend\n\t\t\t\t\t\"><div class=\"form-row\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -315,7 +315,7 @@ func EditClass(data EditClassData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" hx-target=\"#logOutput\" _=\"\r\n\t\t\t\t\t\ton submit\r\n\t\t\t\t\t\t\tif #start_time.value is ''\r\n\t\t\t\t\t\t\t\talert('Please set start time')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\t\tif #end_time.value is ''\r\n\t\t\t\t\t\t\t\talert('Please set end time')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\t\tif #status.value is not 'conducted' and #reason.value.trim() is ''\r\n\t\t\t\t\t\t\t\talert('Reason is required for cancelled or rescheduled classes')\r\n\t\t\t\t\t\t\t\thalt\r\n\t\t\t\t\t\t\tend\r\n\t\t\t\t\t\tend\r\n\t\t\t\t\t\"><input type=\"hidden\" name=\"teacher\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" hx-target=\"#logOutput\" _=\"\n\t\t\t\t\t\ton submit\n\t\t\t\t\t\t\tif #start_time.value is ''\n\t\t\t\t\t\t\t\talert('Please set start time')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #end_time.value is ''\n\t\t\t\t\t\t\t\talert('Please set end time')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #status.value is not 'conducted' and #reason.value.trim() is ''\n\t\t\t\t\t\t\t\talert('Reason is required for cancelled or rescheduled classes')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\tend\n\t\t\t\t\t\"><input type=\"hidden\" name=\"teacher\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -375,6 +375,10 @@ func EditClass(data EditClassData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = LayoutEnd().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -416,7 +420,7 @@ func EditClassFields(data EditClassData, readonly bool) templ.Component {
 			var templ_7745c5c3_Var13 string
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Currency)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 169, Col: 58}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 170, Col: 58}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
 			if templ_7745c5c3_Err != nil {
@@ -429,7 +433,7 @@ func EditClassFields(data EditClassData, readonly bool) templ.Component {
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(formatFloat(data.Rate))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 173, Col: 63}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 174, Col: 63}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
 			if templ_7745c5c3_Err != nil {
@@ -452,7 +456,7 @@ func EditClassFields(data EditClassData, readonly bool) templ.Component {
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(data.Status))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 185, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 186, Col: 62}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
 			if templ_7745c5c3_Err != nil {
@@ -470,7 +474,7 @@ func EditClassFields(data EditClassData, readonly bool) templ.Component {
 				var templ_7745c5c3_Var16 string
 				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Reason)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 190, Col: 55}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 191, Col: 55}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
 				if templ_7745c5c3_Err != nil {
@@ -488,7 +492,7 @@ func EditClassFields(data EditClassData, readonly bool) templ.Component {
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(data.Notes)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 196, Col: 54}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 197, Col: 54}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
@@ -518,7 +522,7 @@ func EditClassFields(data EditClassData, readonly bool) templ.Component {
 			var templ_7745c5c3_Var18 string
 			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue(formatFloat(data.Rate))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 204, Col: 106}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 205, Col: 106}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
 			if templ_7745c5c3_Err != nil {
@@ -532,7 +536,7 @@ func EditClassFields(data EditClassData, readonly bool) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, " <div class=\"form-row\" _=\"\r\n\t\t\t\ton change from #status\r\n\t\t\t\t\tif #status.value is 'conducted'\r\n\t\t\t\t\t\tadd @hidden to #reasonGroup\r\n\t\t\t\t\t\tremove @required from #reason\r\n\t\t\t\t\t\tset #reason.value to ''\r\n\t\t\t\t\telse\r\n\t\t\t\t\t\tremove @hidden from #reasonGroup\r\n\t\t\t\t\t\tadd @required to #reason\r\n\t\t\t\t\tend\r\n\t\t\t\tend\r\n\t\t\t\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, " <div class=\"form-row\" _=\"\n\t\t\t\ton change from #status\n\t\t\t\t\tif #status.value is 'conducted'\n\t\t\t\t\t\tadd @hidden to #reasonGroup\n\t\t\t\t\t\tremove @required from #reason\n\t\t\t\t\t\tset #reason.value to ''\n\t\t\t\t\telse\n\t\t\t\t\t\tremove @hidden from #reasonGroup\n\t\t\t\t\t\tadd @required to #reason\n\t\t\t\t\tend\n\t\t\t\tend\n\t\t\t\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -557,7 +561,7 @@ func EditClassFields(data EditClassData, readonly bool) templ.Component {
 			var templ_7745c5c3_Var19 string
 			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Reason)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 230, Col: 24}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 231, Col: 24}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var19)
 			if templ_7745c5c3_Err != nil {
@@ -580,7 +584,7 @@ func EditClassFields(data EditClassData, readonly bool) templ.Component {
 			var templ_7745c5c3_Var20 string
 			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(data.Notes)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 238, Col: 88}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/edit_class.templ`, Line: 239, Col: 88}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {

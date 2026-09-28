@@ -347,6 +347,10 @@ func ScheduleRepeat(data ScheduleRepeatData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = LayoutEnd().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -383,7 +387,7 @@ func ScheduleRepeatDatePicker(cfg ScheduleRepeatDatePickerConfig) templ.Componen
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(cfg.TodayPHT)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 159, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 160, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
 		if templ_7745c5c3_Err != nil {
@@ -396,7 +400,7 @@ func ScheduleRepeatDatePicker(cfg ScheduleRepeatDatePickerConfig) templ.Componen
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", cfg.MinDates))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 160, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 161, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
 		if templ_7745c5c3_Err != nil {
@@ -409,7 +413,7 @@ func ScheduleRepeatDatePicker(cfg ScheduleRepeatDatePickerConfig) templ.Componen
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(joinCalendarInitialDates(cfg.InitialDates))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 161, Col: 65}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 162, Col: 65}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
 		if templ_7745c5c3_Err != nil {
@@ -422,7 +426,7 @@ func ScheduleRepeatDatePicker(cfg ScheduleRepeatDatePickerConfig) templ.Componen
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(cfg.SubmitMessage)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 162, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 163, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
 		if templ_7745c5c3_Err != nil {
@@ -435,7 +439,7 @@ func ScheduleRepeatDatePicker(cfg ScheduleRepeatDatePickerConfig) templ.Componen
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(cfg.Hint)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 165, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 166, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
@@ -470,7 +474,7 @@ func ScheduleRepeatDatePickerStyles() templ.Component {
 			templ_7745c5c3_Var18 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<style>\r\n\t\t.schedule-repeat-intro {\r\n\t\t\tmax-width: 42rem;\r\n\t\t\tmargin-bottom: var(--space-3);\r\n\t\t}\r\n\t\t.schedule-repeat-calendar {\r\n\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tpadding: var(--space-3);\r\n\t\t\tmax-width: 24rem;\r\n\t\t}\r\n\t\t.schedule-repeat-calendar-nav {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmargin-bottom: var(--space-3);\r\n\t\t}\r\n\t\t.schedule-repeat-calendar-label {\r\n\t\t\tfont-weight: 600;\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t}\r\n\t\t.schedule-repeat-calendar-grid {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: repeat(7, 1fr);\r\n\t\t\tgap: 0.25rem;\r\n\t\t}\r\n\t\t.schedule-repeat-weekday {\r\n\t\t\ttext-align: center;\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tpadding: 0.25rem 0;\r\n\t\t}\r\n\t\t.schedule-repeat-day {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\tmin-height: 2rem;\r\n\t\t\tborder: 1px solid transparent;\r\n\t\t\tborder-radius: var(--radius-sm);\r\n\t\t\tbackground: transparent;\r\n\t\t\tcolor: inherit;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tcursor: pointer;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: 0;\r\n\t\t\tmargin-top: 0;\r\n\t\t}\r\n\t\t.schedule-repeat-day.is-empty {\r\n\t\t\tvisibility: hidden;\r\n\t\t\tpointer-events: none;\r\n\t\t}\r\n\t\t.schedule-repeat-day.is-disabled {\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tcursor: not-allowed;\r\n\t\t\topacity: 0.45;\r\n\t\t}\r\n\t\t.schedule-repeat-day.is-selected {\r\n\t\t\tbackground: var(--color-primary-light);\r\n\t\t\tborder-color: var(--color-primary);\r\n\t\t\tfont-weight: 600;\r\n\t\t}\r\n\t\t.schedule-repeat-day:not(.is-disabled):not(.is-empty):hover {\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t}\r\n\t\t.schedule-repeat-selected-dates {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmargin-top: var(--space-3);\r\n\t\t\tmin-height: 1.5rem;\r\n\t\t}\r\n\t\t.schedule-repeat-date-chip {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: 0.375rem;\r\n\t\t\tpadding: 0.25rem 0.5rem;\r\n\t\t\tborder: var(--pill-border);\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t}\r\n\t\t.schedule-repeat-preview-panel {\r\n\t\t\tmargin-top: var(--space-5);\r\n\t\t}\r\n\t\t.schedule-repeat-preview-table {\r\n\t\t\twidth: 100%;\r\n\t\t\tborder-collapse: collapse;\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t}\r\n\t\t.schedule-repeat-preview-table th,\r\n\t\t.schedule-repeat-preview-table td {\r\n\t\t\tpadding: var(--space-2) var(--space-3);\r\n\t\t\tborder-bottom: 1px solid var(--color-border-subtle);\r\n\t\t\ttext-align: left;\r\n\t\t\tvertical-align: top;\r\n\t\t}\r\n\t\t.schedule-repeat-preview-table th {\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\t\t.schedule-repeat-status-ready {\r\n\t\t\tcolor: var(--color-success);\r\n\t\t}\r\n\t\t.schedule-repeat-status-conflict {\r\n\t\t\tcolor: var(--color-destructive);\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<style>\n\t\t.schedule-repeat-intro {\n\t\t\tmax-width: 42rem;\n\t\t\tmargin-bottom: var(--space-3);\n\t\t}\n\t\t.schedule-repeat-calendar {\n\t\t\tborder: 1px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tbackground: var(--color-surface);\n\t\t\tpadding: var(--space-3);\n\t\t\tmax-width: 24rem;\n\t\t}\n\t\t.schedule-repeat-calendar-nav {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: space-between;\n\t\t\tgap: var(--space-2);\n\t\t\tmargin-bottom: var(--space-3);\n\t\t}\n\t\t.schedule-repeat-calendar-label {\n\t\t\tfont-weight: 600;\n\t\t\tfont-size: 0.9375rem;\n\t\t}\n\t\t.schedule-repeat-calendar-grid {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: repeat(7, 1fr);\n\t\t\tgap: 0.25rem;\n\t\t}\n\t\t.schedule-repeat-weekday {\n\t\t\ttext-align: center;\n\t\t\tfont-size: 0.75rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tpadding: 0.25rem 0;\n\t\t}\n\t\t.schedule-repeat-day {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\tmin-height: 2rem;\n\t\t\tborder: 1px solid transparent;\n\t\t\tborder-radius: var(--radius-sm);\n\t\t\tbackground: transparent;\n\t\t\tcolor: inherit;\n\t\t\tfont-size: 0.875rem;\n\t\t\tcursor: pointer;\n\t\t\tpadding: 0;\n\t\t\tmargin: 0;\n\t\t\tmargin-top: 0;\n\t\t}\n\t\t.schedule-repeat-day.is-empty {\n\t\t\tvisibility: hidden;\n\t\t\tpointer-events: none;\n\t\t}\n\t\t.schedule-repeat-day.is-disabled {\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tcursor: not-allowed;\n\t\t\topacity: 0.45;\n\t\t}\n\t\t.schedule-repeat-day.is-selected {\n\t\t\tbackground: var(--color-primary-light);\n\t\t\tborder-color: var(--color-primary);\n\t\t\tfont-weight: 600;\n\t\t}\n\t\t.schedule-repeat-day:not(.is-disabled):not(.is-empty):hover {\n\t\t\tbackground: var(--color-muted);\n\t\t}\n\t\t.schedule-repeat-selected-dates {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\tgap: var(--space-2);\n\t\t\tmargin-top: var(--space-3);\n\t\t\tmin-height: 1.5rem;\n\t\t}\n\t\t.schedule-repeat-date-chip {\n\t\t\tdisplay: inline-flex;\n\t\t\talign-items: center;\n\t\t\tgap: 0.375rem;\n\t\t\tpadding: 0.25rem 0.5rem;\n\t\t\tborder: var(--pill-border);\n\t\t\tborder-radius: var(--radius-full);\n\t\t\tbackground: var(--color-surface);\n\t\t\tfont-size: 0.8125rem;\n\t\t}\n\t\t.schedule-repeat-preview-panel {\n\t\t\tmargin-top: var(--space-5);\n\t\t}\n\t\t.schedule-repeat-preview-table {\n\t\t\twidth: 100%;\n\t\t\tborder-collapse: collapse;\n\t\t\tmargin-bottom: var(--space-4);\n\t\t}\n\t\t.schedule-repeat-preview-table th,\n\t\t.schedule-repeat-preview-table td {\n\t\t\tpadding: var(--space-2) var(--space-3);\n\t\t\tborder-bottom: 1px solid var(--color-border-subtle);\n\t\t\ttext-align: left;\n\t\t\tvertical-align: top;\n\t\t}\n\t\t.schedule-repeat-preview-table th {\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\t\t.schedule-repeat-status-ready {\n\t\t\tcolor: var(--color-success);\n\t\t}\n\t\t.schedule-repeat-status-conflict {\n\t\t\tcolor: var(--color-destructive);\n\t\t}\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -506,7 +510,7 @@ func ScheduleRepeatPreview(data ScheduleRepeatPreviewData) templ.Component {
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/schedule/repeat"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 297, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 298, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var20)
 		if templ_7745c5c3_Err != nil {
@@ -519,7 +523,7 @@ func ScheduleRepeatPreview(data ScheduleRepeatPreviewData) templ.Component {
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapNone)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 298, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 299, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var21)
 		if templ_7745c5c3_Err != nil {
@@ -537,7 +541,7 @@ func ScheduleRepeatPreview(data ScheduleRepeatPreviewData) templ.Component {
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Base.TeacherID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 302, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 303, Col: 67}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var22)
 			if templ_7745c5c3_Err != nil {
@@ -550,7 +554,7 @@ func ScheduleRepeatPreview(data ScheduleRepeatPreviewData) templ.Component {
 			var templ_7745c5c3_Var23 string
 			templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Base.StudentID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 303, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 304, Col: 67}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
 			if templ_7745c5c3_Err != nil {
@@ -568,7 +572,7 @@ func ScheduleRepeatPreview(data ScheduleRepeatPreviewData) templ.Component {
 			var templ_7745c5c3_Var24 string
 			templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Base.TeacherID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 305, Col: 76}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 306, Col: 76}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
 			if templ_7745c5c3_Err != nil {
@@ -581,7 +585,7 @@ func ScheduleRepeatPreview(data ScheduleRepeatPreviewData) templ.Component {
 			var templ_7745c5c3_Var25 string
 			templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Base.StudentID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 306, Col: 76}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 307, Col: 76}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var25)
 			if templ_7745c5c3_Err != nil {
@@ -599,7 +603,7 @@ func ScheduleRepeatPreview(data ScheduleRepeatPreviewData) templ.Component {
 		var templ_7745c5c3_Var26 string
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Base.StartTime)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 308, Col: 69}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 309, Col: 69}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 		if templ_7745c5c3_Err != nil {
@@ -612,7 +616,7 @@ func ScheduleRepeatPreview(data ScheduleRepeatPreviewData) templ.Component {
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Base.EndTime)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 309, Col: 65}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 310, Col: 65}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
 		if templ_7745c5c3_Err != nil {
@@ -625,7 +629,7 @@ func ScheduleRepeatPreview(data ScheduleRepeatPreviewData) templ.Component {
 		var templ_7745c5c3_Var28 string
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.ResolveAttributeValue(formatFloat(data.Base.Rate))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 310, Col: 71}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 311, Col: 71}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var28)
 		if templ_7745c5c3_Err != nil {
@@ -638,7 +642,7 @@ func ScheduleRepeatPreview(data ScheduleRepeatPreviewData) templ.Component {
 		var templ_7745c5c3_Var29 string
 		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Base.Currency)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 311, Col: 66}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 312, Col: 66}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var29)
 		if templ_7745c5c3_Err != nil {
@@ -662,7 +666,7 @@ func ScheduleRepeatPreview(data ScheduleRepeatPreviewData) templ.Component {
 			var templ_7745c5c3_Var30 string
 			templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", materialID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 316, Col: 91}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 317, Col: 91}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var30)
 			if templ_7745c5c3_Err != nil {
@@ -685,7 +689,7 @@ func ScheduleRepeatPreview(data ScheduleRepeatPreviewData) templ.Component {
 			var templ_7745c5c3_Var31 string
 			templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(FormatScheduledClassDateDisplay(row.Date))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 329, Col: 54}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 330, Col: 54}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 			if templ_7745c5c3_Err != nil {
@@ -703,7 +707,7 @@ func ScheduleRepeatPreview(data ScheduleRepeatPreviewData) templ.Component {
 				var templ_7745c5c3_Var32 string
 				templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(row.Message)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 331, Col: 62}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 332, Col: 62}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 				if templ_7745c5c3_Err != nil {
@@ -721,7 +725,7 @@ func ScheduleRepeatPreview(data ScheduleRepeatPreviewData) templ.Component {
 				var templ_7745c5c3_Var33 string
 				templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(row.Message)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 333, Col: 65}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 334, Col: 65}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 				if templ_7745c5c3_Err != nil {
@@ -739,7 +743,7 @@ func ScheduleRepeatPreview(data ScheduleRepeatPreviewData) templ.Component {
 			var templ_7745c5c3_Var34 string
 			templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.ResolveAttributeValue(row.Date)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 339, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 340, Col: 25}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var34)
 			if templ_7745c5c3_Err != nil {
@@ -796,7 +800,7 @@ func ScheduleSeriesEditPreview(data ScheduleSeriesEditPreviewData) templ.Compone
 		var templ_7745c5c3_Var36 string
 		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/schedule/" + data.ScheduleID + "/edit"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 358, Col: 64}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 359, Col: 64}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var36)
 		if templ_7745c5c3_Err != nil {
@@ -809,7 +813,7 @@ func ScheduleSeriesEditPreview(data ScheduleSeriesEditPreviewData) templ.Compone
 		var templ_7745c5c3_Var37 string
 		templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapNone)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 359, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 360, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var37)
 		if templ_7745c5c3_Err != nil {
@@ -822,7 +826,7 @@ func ScheduleSeriesEditPreview(data ScheduleSeriesEditPreviewData) templ.Compone
 		var templ_7745c5c3_Var38 string
 		templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Scope)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 362, Col: 60}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 363, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var38)
 		if templ_7745c5c3_Err != nil {
@@ -835,7 +839,7 @@ func ScheduleSeriesEditPreview(data ScheduleSeriesEditPreviewData) templ.Compone
 		var templ_7745c5c3_Var39 string
 		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.From)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 363, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 364, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var39)
 		if templ_7745c5c3_Err != nil {
@@ -853,7 +857,7 @@ func ScheduleSeriesEditPreview(data ScheduleSeriesEditPreviewData) templ.Compone
 			var templ_7745c5c3_Var40 string
 			templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Base.TeacherID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 365, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 366, Col: 67}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var40)
 			if templ_7745c5c3_Err != nil {
@@ -866,7 +870,7 @@ func ScheduleSeriesEditPreview(data ScheduleSeriesEditPreviewData) templ.Compone
 			var templ_7745c5c3_Var41 string
 			templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Base.StudentID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 366, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 367, Col: 67}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var41)
 			if templ_7745c5c3_Err != nil {
@@ -884,7 +888,7 @@ func ScheduleSeriesEditPreview(data ScheduleSeriesEditPreviewData) templ.Compone
 			var templ_7745c5c3_Var42 string
 			templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Base.TeacherID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 368, Col: 76}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 369, Col: 76}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var42)
 			if templ_7745c5c3_Err != nil {
@@ -897,7 +901,7 @@ func ScheduleSeriesEditPreview(data ScheduleSeriesEditPreviewData) templ.Compone
 			var templ_7745c5c3_Var43 string
 			templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Base.StudentID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 369, Col: 76}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 370, Col: 76}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var43)
 			if templ_7745c5c3_Err != nil {
@@ -915,7 +919,7 @@ func ScheduleSeriesEditPreview(data ScheduleSeriesEditPreviewData) templ.Compone
 		var templ_7745c5c3_Var44 string
 		templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Base.StartTime)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 371, Col: 69}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 372, Col: 69}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var44)
 		if templ_7745c5c3_Err != nil {
@@ -928,7 +932,7 @@ func ScheduleSeriesEditPreview(data ScheduleSeriesEditPreviewData) templ.Compone
 		var templ_7745c5c3_Var45 string
 		templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Base.EndTime)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 372, Col: 65}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 373, Col: 65}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var45)
 		if templ_7745c5c3_Err != nil {
@@ -941,7 +945,7 @@ func ScheduleSeriesEditPreview(data ScheduleSeriesEditPreviewData) templ.Compone
 		var templ_7745c5c3_Var46 string
 		templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.ResolveAttributeValue(formatFloat(data.Base.Rate))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 373, Col: 71}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 374, Col: 71}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var46)
 		if templ_7745c5c3_Err != nil {
@@ -954,7 +958,7 @@ func ScheduleSeriesEditPreview(data ScheduleSeriesEditPreviewData) templ.Compone
 		var templ_7745c5c3_Var47 string
 		templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Base.Currency)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 374, Col: 66}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 375, Col: 66}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var47)
 		if templ_7745c5c3_Err != nil {
@@ -978,7 +982,7 @@ func ScheduleSeriesEditPreview(data ScheduleSeriesEditPreviewData) templ.Compone
 			var templ_7745c5c3_Var48 string
 			templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", materialID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 379, Col: 91}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 380, Col: 91}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var48)
 			if templ_7745c5c3_Err != nil {
@@ -1001,7 +1005,7 @@ func ScheduleSeriesEditPreview(data ScheduleSeriesEditPreviewData) templ.Compone
 			var templ_7745c5c3_Var49 string
 			templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.JoinStringErrs(FormatScheduledClassDateDisplay(row.Date))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 393, Col: 54}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 394, Col: 54}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var49))
 			if templ_7745c5c3_Err != nil {
@@ -1014,7 +1018,7 @@ func ScheduleSeriesEditPreview(data ScheduleSeriesEditPreviewData) templ.Compone
 			var templ_7745c5c3_Var50 string
 			templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.JoinStringErrs(row.Action)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 394, Col: 23}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 395, Col: 23}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var50))
 			if templ_7745c5c3_Err != nil {
@@ -1032,7 +1036,7 @@ func ScheduleSeriesEditPreview(data ScheduleSeriesEditPreviewData) templ.Compone
 				var templ_7745c5c3_Var51 string
 				templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.JoinStringErrs(row.Message)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 396, Col: 62}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 397, Col: 62}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var51))
 				if templ_7745c5c3_Err != nil {
@@ -1050,7 +1054,7 @@ func ScheduleSeriesEditPreview(data ScheduleSeriesEditPreviewData) templ.Compone
 				var templ_7745c5c3_Var52 string
 				templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.JoinStringErrs(row.Message)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 398, Col: 65}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 399, Col: 65}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var52))
 				if templ_7745c5c3_Err != nil {
@@ -1078,7 +1082,7 @@ func ScheduleSeriesEditPreview(data ScheduleSeriesEditPreviewData) templ.Compone
 				var templ_7745c5c3_Var53 string
 				templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.ResolveAttributeValue(row.Date)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 407, Col: 26}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 408, Col: 26}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var53)
 				if templ_7745c5c3_Err != nil {
@@ -1141,7 +1145,7 @@ func SeriesScopeFields(scopeName string, totalCount int64, futureCount int64) te
 			var templ_7745c5c3_Var55 string
 			templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.ResolveAttributeValue(scopeName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 426, Col: 40}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 427, Col: 40}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var55)
 			if templ_7745c5c3_Err != nil {
@@ -1154,7 +1158,7 @@ func SeriesScopeFields(scopeName string, totalCount int64, futureCount int64) te
 			var templ_7745c5c3_Var56 string
 			templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.SeriesScopeSingle))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 426, Col: 86}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 427, Col: 86}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var56)
 			if templ_7745c5c3_Err != nil {
@@ -1167,7 +1171,7 @@ func SeriesScopeFields(scopeName string, totalCount int64, futureCount int64) te
 			var templ_7745c5c3_Var57 string
 			templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.ResolveAttributeValue(scopeName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 432, Col: 21}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 433, Col: 21}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var57)
 			if templ_7745c5c3_Err != nil {
@@ -1180,7 +1184,7 @@ func SeriesScopeFields(scopeName string, totalCount int64, futureCount int64) te
 			var templ_7745c5c3_Var58 string
 			templ_7745c5c3_Var58, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.SeriesScopeFuture))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 433, Col: 48}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 434, Col: 48}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var58)
 			if templ_7745c5c3_Err != nil {
@@ -1208,7 +1212,7 @@ func SeriesScopeFields(scopeName string, totalCount int64, futureCount int64) te
 				var templ_7745c5c3_Var59 string
 				templ_7745c5c3_Var59, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", futureCount))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 437, Col: 46}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_repeat.templ`, Line: 438, Col: 46}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var59))
 				if templ_7745c5c3_Err != nil {
@@ -1254,7 +1258,7 @@ func ScheduleRepeatPageScript() templ.Component {
 			templ_7745c5c3_Var60 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "<script>\r\n\t\t(function () {\r\n\t\t\tconst pageRoot = document.querySelector('.schedule-repeat-page');\r\n\t\t\tif (!pageRoot) return;\r\n\t\t\tif (window.bootScheduleRepeatCalendars) window.bootScheduleRepeatCalendars();\r\n\r\n\t\t\tconst lockTeacher = pageRoot.dataset.lockTeacher === 'true';\r\n\t\t\tfunction getTeacherEl() {\r\n\t\t\t\treturn lockTeacher ? document.getElementById('modal_teacher') : document.getElementById('schedule_teacher');\r\n\t\t\t}\r\n\t\t\tfunction getStudentEl() {\r\n\t\t\t\treturn lockTeacher ? document.getElementById('student') : document.getElementById('schedule_student');\r\n\t\t\t}\r\n\t\t\tasync function loadStudentsForTeacher(teacherId) {\r\n\t\t\t\tconst studentEl = getStudentEl();\r\n\t\t\t\tif (!studentEl || lockTeacher) return;\r\n\t\t\t\tif (!teacherId) {\r\n\t\t\t\t\tstudentEl.innerHTML = '<option value=\"\">-- Select teacher first --</option>';\r\n\t\t\t\t\tstudentEl.value = '';\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\ttry {\r\n\t\t\t\t\tconst banner = document.getElementById('errorBanner');\r\n\t\t\t\t\tconst basePath = banner && banner.dataset.basePath ? banner.dataset.basePath.replace(/\\/$/, '') : '';\r\n\t\t\t\t\tconst response = await fetch(basePath + '/api/students?teacher=' + encodeURIComponent(teacherId));\r\n\t\t\t\t\tconst html = await response.text();\r\n\t\t\t\t\tif (!response.ok) throw new Error(html);\r\n\t\t\t\t\tstudentEl.innerHTML = html;\r\n\t\t\t\t\tstudentEl.value = '';\r\n\t\t\t\t} catch (err) {\r\n\t\t\t\t\tif (typeof showErrorBanner === 'function') {\r\n\t\t\t\t\t\tshowErrorBanner(err.message || 'Failed to load students');\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tconst teacherEl = getTeacherEl();\r\n\t\t\tif (teacherEl && !lockTeacher) {\r\n\t\t\t\tteacherEl.addEventListener('change', () => loadStudentsForTeacher(teacherEl.value));\r\n\t\t\t\tloadStudentsForTeacher('');\r\n\t\t\t}\r\n\t\t\tconst studentEl = getStudentEl();\r\n\t\t\tif (studentEl) {\r\n\t\t\t\tstudentEl.addEventListener('change', () => {\r\n\t\t\t\t\tif (typeof applyStudentRateToForm === 'function') applyStudentRateToForm();\r\n\t\t\t\t});\r\n\t\t\t}\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "<script>\n\t\t(function () {\n\t\t\tconst pageRoot = document.querySelector('.schedule-repeat-page');\n\t\t\tif (!pageRoot) return;\n\t\t\tif (window.bootScheduleRepeatCalendars) window.bootScheduleRepeatCalendars();\n\n\t\t\tconst lockTeacher = pageRoot.dataset.lockTeacher === 'true';\n\t\t\tfunction getTeacherEl() {\n\t\t\t\treturn lockTeacher ? document.getElementById('modal_teacher') : document.getElementById('schedule_teacher');\n\t\t\t}\n\t\t\tfunction getStudentEl() {\n\t\t\t\treturn lockTeacher ? document.getElementById('student') : document.getElementById('schedule_student');\n\t\t\t}\n\t\t\tasync function loadStudentsForTeacher(teacherId) {\n\t\t\t\tconst studentEl = getStudentEl();\n\t\t\t\tif (!studentEl || lockTeacher) return;\n\t\t\t\tif (!teacherId) {\n\t\t\t\t\tstudentEl.innerHTML = '<option value=\"\">-- Select teacher first --</option>';\n\t\t\t\t\tstudentEl.value = '';\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\ttry {\n\t\t\t\t\tconst banner = document.getElementById('errorBanner');\n\t\t\t\t\tconst basePath = banner && banner.dataset.basePath ? banner.dataset.basePath.replace(/\\/$/, '') : '';\n\t\t\t\t\tconst response = await fetch(basePath + '/api/students?teacher=' + encodeURIComponent(teacherId));\n\t\t\t\t\tconst html = await response.text();\n\t\t\t\t\tif (!response.ok) throw new Error(html);\n\t\t\t\t\tstudentEl.innerHTML = html;\n\t\t\t\t\tstudentEl.value = '';\n\t\t\t\t} catch (err) {\n\t\t\t\t\tif (typeof showErrorBanner === 'function') {\n\t\t\t\t\t\tshowErrorBanner(err.message || 'Failed to load students');\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t\tconst teacherEl = getTeacherEl();\n\t\t\tif (teacherEl && !lockTeacher) {\n\t\t\t\tteacherEl.addEventListener('change', () => loadStudentsForTeacher(teacherEl.value));\n\t\t\t\tloadStudentsForTeacher('');\n\t\t\t}\n\t\t\tconst studentEl = getStudentEl();\n\t\t\tif (studentEl) {\n\t\t\t\tstudentEl.addEventListener('change', () => {\n\t\t\t\t\tif (typeof applyStudentRateToForm === 'function') applyStudentRateToForm();\n\t\t\t\t});\n\t\t\t}\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

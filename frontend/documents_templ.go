@@ -798,7 +798,7 @@ func DocumentsStyles() templ.Component {
 			templ_7745c5c3_Var32 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "<style>\r\n\t\t.documents-page-desc {\r\n\t\t\tmargin-bottom: var(--space-6);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t}\r\n\r\n\t\t.documents-card {\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tpadding: var(--space-6);\r\n\t\t\tmargin-top: var(--space-6);\r\n\t\t}\r\n\r\n\t\t.documents-card-header {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: var(--space-4);\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.documents-card h2 {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 1.125rem;\r\n\t\t}\r\n\r\n\t\t.documents-card-desc {\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.documents-table-wrapper {\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.documents-uploader-cell {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmin-width: 0;\r\n\t\t}\r\n\r\n\t\t.documents-table .documents-filename {\r\n\t\t\tdisplay: inline;\r\n\t\t\tword-break: break-all;\r\n\t\t\toverflow-wrap: anywhere;\r\n\t\t}\r\n\r\n\t\t.documents-filename-link {\r\n\t\t\tcolor: var(--color-accent);\r\n\t\t\ttext-decoration: none;\r\n\t\t}\r\n\r\n\t\t.documents-filename-link:hover {\r\n\t\t\tcolor: var(--color-accent-hover);\r\n\t\t\ttext-decoration: underline;\r\n\t\t}\r\n\r\n\t\t.documents-ext {\r\n\t\t\tfont-family: 'Fira Code', monospace;\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tpadding: 2px 8px;\r\n\t\t\tborder-radius: var(--radius-sm);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\r\n\t\t.document-row-submitted {\r\n\t\t\tbackground-color: var(--color-warning-bg) !important;\r\n\t\t}\r\n\r\n\t\t.document-row-rejected {\r\n\t\t\tbackground-color: var(--color-error-bg) !important;\r\n\t\t}\r\n\r\n\t\t.documents-empty {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tpadding: var(--space-8) var(--space-4);\r\n\t\t\ttext-align: center;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.documents-empty svg {\r\n\t\t\tcolor: var(--color-border);\r\n\t\t}\r\n\r\n\t\t.documents-empty-hint {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.upload-zone {\r\n\t\t\tborder: 2px dashed var(--color-border);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\ttransition: border-color var(--transition-fast), background-color var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.upload-zone:focus-within {\r\n\t\t\tborder-color: var(--color-primary);\r\n\t\t\tbackground: var(--color-primary-light);\r\n\t\t}\r\n\r\n\t\t.upload-zone-label {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tcursor: pointer;\r\n\t\t\tfont-weight: 500;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.upload-zone-icon {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 40px;\r\n\t\t\theight: 40px;\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-info-bg);\r\n\t\t\tcolor: var(--color-accent);\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.upload-zone input[type=\"file\"] {\r\n\t\t\tposition: absolute;\r\n\t\t\twidth: 1px;\r\n\t\t\theight: 1px;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: -1px;\r\n\t\t\toverflow: hidden;\r\n\t\t\tclip: rect(0, 0, 0, 0);\r\n\t\t\tborder: 0;\r\n\t\t}\r\n\r\n\t\t.upload-zone-meta {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: 2px;\r\n\t\t\tmin-width: 0;\r\n\t\t}\r\n\r\n\t\t.upload-zone-hint {\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-weight: 400;\r\n\t\t}\r\n\r\n\t\t.upload-zone.is-disabled {\r\n\t\t\topacity: 0.72;\r\n\t\t\tpointer-events: none;\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t\tborder-color: var(--color-border-subtle);\r\n\t\t\tborder-style: solid;\r\n\t\t}\r\n\r\n\t\t.upload-zone.is-disabled .upload-zone-icon {\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.upload-zone.is-disabled .upload-zone-meta {\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.upload-filename {\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tword-break: break-all;\r\n\t\t}\r\n\r\n\t\t.upload-locked-notice {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tpadding: var(--space-3) var(--space-4);\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbackground: var(--color-info-bg);\r\n\t\t\tborder: 1px solid color-mix(in srgb, var(--color-info) 25%, transparent);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.upload-locked-notice svg {\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tmargin-top: 2px;\r\n\t\t\tcolor: var(--color-info);\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "<style>\n\t\t.documents-page-desc {\n\t\t\tmargin-bottom: var(--space-6);\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-size: 0.9375rem;\n\t\t}\n\n\t\t.documents-card {\n\t\t\tbackground: var(--color-muted);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tborder-radius: var(--radius-lg);\n\t\t\tpadding: var(--space-6);\n\t\t\tmargin-top: var(--space-6);\n\t\t}\n\n\t\t.documents-card-header {\n\t\t\tdisplay: flex;\n\t\t\talign-items: flex-start;\n\t\t\tjustify-content: space-between;\n\t\t\tgap: var(--space-4);\n\t\t\tmargin-bottom: var(--space-4);\n\t\t}\n\n\t\t.documents-card h2 {\n\t\t\tmargin: 0;\n\t\t\tfont-size: 1.125rem;\n\t\t}\n\n\t\t.documents-card-desc {\n\t\t\tmargin-top: var(--space-2);\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-size: 0.875rem;\n\t\t}\n\n\t\t.documents-table-wrapper {\n\t\t\tmargin-top: var(--space-2);\n\t\t}\n\n\t\t.documents-uploader-cell {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tmin-width: 0;\n\t\t}\n\n\t\t.documents-table .documents-filename {\n\t\t\tdisplay: inline;\n\t\t\tword-break: break-all;\n\t\t\toverflow-wrap: anywhere;\n\t\t}\n\n\t\t.documents-filename-link {\n\t\t\tcolor: var(--color-accent);\n\t\t\ttext-decoration: none;\n\t\t}\n\n\t\t.documents-filename-link:hover {\n\t\t\tcolor: var(--color-accent-hover);\n\t\t\ttext-decoration: underline;\n\t\t}\n\n\t\t.documents-ext {\n\t\t\tfont-family: 'Fira Code', monospace;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tbackground: var(--color-surface);\n\t\t\tpadding: 2px 8px;\n\t\t\tborder-radius: var(--radius-sm);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t}\n\n\t\t.document-row-submitted {\n\t\t\tbackground-color: var(--color-warning-bg) !important;\n\t\t}\n\n\t\t.document-row-rejected {\n\t\t\tbackground-color: var(--color-error-bg) !important;\n\t\t}\n\n\t\t.documents-empty {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\tgap: var(--space-3);\n\t\t\tpadding: var(--space-8) var(--space-4);\n\t\t\ttext-align: center;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.documents-empty svg {\n\t\t\tcolor: var(--color-border);\n\t\t}\n\n\t\t.documents-empty-hint {\n\t\t\tfont-size: 0.875rem;\n\t\t}\n\n\t\t.upload-zone {\n\t\t\tborder: 2px dashed var(--color-border);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tpadding: var(--space-4);\n\t\t\tbackground: var(--color-surface);\n\t\t\ttransition: border-color var(--transition-fast), background-color var(--transition-fast);\n\t\t}\n\n\t\t.upload-zone:focus-within {\n\t\t\tborder-color: var(--color-primary);\n\t\t\tbackground: var(--color-primary-light);\n\t\t}\n\n\t\t.upload-zone-label {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-3);\n\t\t\tcursor: pointer;\n\t\t\tfont-weight: 500;\n\t\t\tfont-size: 0.875rem;\n\t\t}\n\n\t\t.upload-zone-icon {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\twidth: 40px;\n\t\t\theight: 40px;\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tbackground: var(--color-info-bg);\n\t\t\tcolor: var(--color-accent);\n\t\t\tflex-shrink: 0;\n\t\t}\n\n\t\t.upload-zone input[type=\"file\"] {\n\t\t\tposition: absolute;\n\t\t\twidth: 1px;\n\t\t\theight: 1px;\n\t\t\tpadding: 0;\n\t\t\tmargin: -1px;\n\t\t\toverflow: hidden;\n\t\t\tclip: rect(0, 0, 0, 0);\n\t\t\tborder: 0;\n\t\t}\n\n\t\t.upload-zone-meta {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tgap: 2px;\n\t\t\tmin-width: 0;\n\t\t}\n\n\t\t.upload-zone-hint {\n\t\t\tfont-size: 0.75rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-weight: 400;\n\t\t}\n\n\t\t.upload-zone.is-disabled {\n\t\t\topacity: 0.72;\n\t\t\tpointer-events: none;\n\t\t\tbackground: var(--color-muted);\n\t\t\tborder-color: var(--color-border-subtle);\n\t\t\tborder-style: solid;\n\t\t}\n\n\t\t.upload-zone.is-disabled .upload-zone-icon {\n\t\t\tbackground: var(--color-surface);\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.upload-zone.is-disabled .upload-zone-meta {\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.upload-filename {\n\t\t\tmargin-top: var(--space-2);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-foreground);\n\t\t\tword-break: break-all;\n\t\t}\n\n\t\t.upload-locked-notice {\n\t\t\tdisplay: flex;\n\t\t\talign-items: flex-start;\n\t\t\tgap: var(--space-2);\n\t\t\tpadding: var(--space-3) var(--space-4);\n\t\t\tmargin-bottom: var(--space-4);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tbackground: var(--color-info-bg);\n\t\t\tborder: 1px solid color-mix(in srgb, var(--color-info) 25%, transparent);\n\t\t\tfont-size: 0.875rem;\n\t\t}\n\n\t\t.upload-locked-notice svg {\n\t\t\tflex-shrink: 0;\n\t\t\tmargin-top: 2px;\n\t\t\tcolor: var(--color-info);\n\t\t}\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -937,7 +937,15 @@ func DocumentsPage(data DocumentsPageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "<script>\r\n\t\t\tconst documentSearch = document.getElementById('documentSearch');\r\n\t\t\tif (documentSearch) {\r\n\t\t\t\tdocumentSearch.addEventListener('keydown', function (e) {\r\n\t\t\t\t\tif (e.key === 'Enter') {\r\n\t\t\t\t\t\te.preventDefault();\r\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\r\n\t\t\t\t\t\t\thtmx.trigger('#documentsTableBody', 'load');\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\t\t\t}\r\n\t\t</script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "<script>\n\t\t\tconst documentSearch = document.getElementById('documentSearch');\n\t\t\tif (documentSearch) {\n\t\t\t\tdocumentSearch.addEventListener('keydown', function (e) {\n\t\t\t\t\tif (e.key === 'Enter') {\n\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\t\t\thtmx.trigger('#documentsTableBody', 'load');\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\t\t</script>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = LayoutEnd().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -967,20 +975,20 @@ func ProfilePictureUpload(data ProfileData) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		if !data.IsSuperuser {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "<div class=\"profile-upload-block\"><h3 class=\"profile-upload-block__title\">Profile picture</h3><form id=\"profileAvatarForm\" class=\"profile-upload-form\" method=\"POST\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "<div class=\"profile-upload-block\"><h3 class=\"profile-upload-block__title\">Profile picture</h3><form id=\"profileAvatarForm\" class=\"profile-upload-form\" method=\"POST\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var38 templ.SafeURL
 			templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/avatar"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 482, Col: 41}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 483, Col: 41}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "\" enctype=\"multipart/form-data\"><div class=\"upload-zone\"><label class=\"upload-zone-label\" for=\"profileAvatarInput\"><span class=\"upload-zone-icon\" aria-hidden=\"true\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2\"></path> <circle cx=\"12\" cy=\"7\" r=\"4\"></circle></svg></span> <span class=\"upload-zone-meta\"><span>Choose a photo</span> <span class=\"upload-zone-hint\">JPEG or PNG, up to 2 MB</span></span> <input type=\"file\" id=\"profileAvatarInput\" name=\"avatar\" accept=\"image/jpeg,image/png\"></label><p class=\"upload-filename\" aria-live=\"polite\"></p></div><div class=\"profile-form-actions\"><button type=\"submit\" class=\"btn\" disabled>Upload photo</button></div></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "\" enctype=\"multipart/form-data\"><div class=\"upload-zone\"><label class=\"upload-zone-label\" for=\"profileAvatarInput\"><span class=\"upload-zone-icon\" aria-hidden=\"true\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2\"></path> <circle cx=\"12\" cy=\"7\" r=\"4\"></circle></svg></span> <span class=\"upload-zone-meta\"><span>Choose a photo</span> <span class=\"upload-zone-hint\">JPEG or PNG, up to 2 MB</span></span> <input type=\"file\" id=\"profileAvatarInput\" name=\"avatar\" accept=\"image/jpeg,image/png\"></label><p class=\"upload-filename\" aria-live=\"polite\"></p></div><div class=\"profile-form-actions\"><button type=\"submit\" class=\"btn\" disabled>Upload photo</button></div></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -988,7 +996,7 @@ func ProfilePictureUpload(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1018,7 +1026,7 @@ func ProfileAvatarUploadScript() templ.Component {
 			templ_7745c5c3_Var39 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "<script>\r\n\t\t(function () {\r\n\t\t\tfunction bindProfileAvatarUpload() {\r\n\t\t\t\tconst form = document.getElementById('profileAvatarForm');\r\n\t\t\t\tif (!form || form.dataset.avatarUploadBound === '1') {\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst input = document.getElementById('profileAvatarInput');\r\n\t\t\t\tconst previewRoot = document.getElementById('profileAvatarPreview');\r\n\t\t\t\tif (!input || !previewRoot) {\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tconst avatarEl = previewRoot.querySelector('.avatar');\r\n\t\t\t\tif (!avatarEl) {\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tform.dataset.avatarUploadBound = '1';\r\n\r\n\t\t\t\tconst filenameEl = form.querySelector('.upload-filename');\r\n\t\t\t\tconst submitBtn = form.querySelector('button[type=\"submit\"]');\r\n\t\t\t\tconst originalAvatarHTML = avatarEl.innerHTML;\r\n\t\t\t\tconst altText = avatarEl.getAttribute('aria-label') || 'Profile photo preview';\r\n\r\n\t\t\t\tfunction setCardPreview(file) {\r\n\t\t\t\t\tif (!file) {\r\n\t\t\t\t\t\tavatarEl.innerHTML = originalAvatarHTML;\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\tconst reader = new FileReader();\r\n\t\t\t\t\treader.onload = function () {\r\n\t\t\t\t\t\tconst img = document.createElement('img');\r\n\t\t\t\t\t\timg.className = 'avatar-image';\r\n\t\t\t\t\t\timg.alt = altText;\r\n\t\t\t\t\t\timg.src = reader.result;\r\n\t\t\t\t\t\tavatarEl.replaceChildren(img);\r\n\t\t\t\t\t};\r\n\t\t\t\t\treader.readAsDataURL(file);\r\n\t\t\t\t}\r\n\r\n\t\t\t\tinput.addEventListener('change', function () {\r\n\t\t\t\t\tconst file = input.files && input.files[0];\r\n\t\t\t\t\tif (filenameEl) {\r\n\t\t\t\t\t\tfilenameEl.textContent = file ? file.name : '';\r\n\t\t\t\t\t}\r\n\t\t\t\t\tif (submitBtn) {\r\n\t\t\t\t\t\tsubmitBtn.disabled = !file;\r\n\t\t\t\t\t}\r\n\t\t\t\t\tsetCardPreview(file || null);\r\n\t\t\t\t});\r\n\t\t\t}\r\n\r\n\t\t\tif (document.readyState === 'loading') {\r\n\t\t\t\tdocument.addEventListener('DOMContentLoaded', bindProfileAvatarUpload);\r\n\t\t\t} else {\r\n\t\t\t\tbindProfileAvatarUpload();\r\n\t\t\t}\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "<script>\n\t\t(function () {\n\t\t\tfunction bindProfileAvatarUpload() {\n\t\t\t\tconst form = document.getElementById('profileAvatarForm');\n\t\t\t\tif (!form || form.dataset.avatarUploadBound === '1') {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tconst input = document.getElementById('profileAvatarInput');\n\t\t\t\tconst previewRoot = document.getElementById('profileAvatarPreview');\n\t\t\t\tif (!input || !previewRoot) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tconst avatarEl = previewRoot.querySelector('.avatar');\n\t\t\t\tif (!avatarEl) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tform.dataset.avatarUploadBound = '1';\n\n\t\t\t\tconst filenameEl = form.querySelector('.upload-filename');\n\t\t\t\tconst submitBtn = form.querySelector('button[type=\"submit\"]');\n\t\t\t\tconst originalAvatarHTML = avatarEl.innerHTML;\n\t\t\t\tconst altText = avatarEl.getAttribute('aria-label') || 'Profile photo preview';\n\n\t\t\t\tfunction setCardPreview(file) {\n\t\t\t\t\tif (!file) {\n\t\t\t\t\t\tavatarEl.innerHTML = originalAvatarHTML;\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\n\t\t\t\t\tconst reader = new FileReader();\n\t\t\t\t\treader.onload = function () {\n\t\t\t\t\t\tconst img = document.createElement('img');\n\t\t\t\t\t\timg.className = 'avatar-image';\n\t\t\t\t\t\timg.alt = altText;\n\t\t\t\t\t\timg.src = reader.result;\n\t\t\t\t\t\tavatarEl.replaceChildren(img);\n\t\t\t\t\t};\n\t\t\t\t\treader.readAsDataURL(file);\n\t\t\t\t}\n\n\t\t\t\tinput.addEventListener('change', function () {\n\t\t\t\t\tconst file = input.files && input.files[0];\n\t\t\t\t\tif (filenameEl) {\n\t\t\t\t\t\tfilenameEl.textContent = file ? file.name : '';\n\t\t\t\t\t}\n\t\t\t\t\tif (submitBtn) {\n\t\t\t\t\t\tsubmitBtn.disabled = !file;\n\t\t\t\t\t}\n\t\t\t\t\tsetCardPreview(file || null);\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tif (document.readyState === 'loading') {\n\t\t\t\tdocument.addEventListener('DOMContentLoaded', bindProfileAvatarUpload);\n\t\t\t} else {\n\t\t\t\tbindProfileAvatarUpload();\n\t\t\t}\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1048,50 +1056,50 @@ func ProfileDocumentUpload(data ProfileData) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		if !data.IsSuperuser {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "<div class=\"profile-card profile-section\"><h2>Valid ID document</h2><p class=\"profile-section-desc\">Submit a government-issued ID for verification. Accepted formats: PNG, JPEG, JPG, or PDF (max 5 MB).</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "<div class=\"profile-card profile-section\"><h2>Valid ID document</h2><p class=\"profile-section-desc\">Submit a government-issued ID for verification. Accepted formats: PNG, JPEG, JPG, or PDF (max 5 MB).</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if !data.CanUploadDocument {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "<div class=\"upload-locked-notice\" role=\"status\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle> <line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line> <line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg> <span>You already have a submitted or approved ID on file. You cannot upload again unless it is rejected by an administrator.</span></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "<div class=\"upload-locked-notice\" role=\"status\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle> <line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line> <line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg> <span>You already have a submitted or approved ID on file. You cannot upload again unless it is rejected by an administrator.</span></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "<form method=\"POST\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "<form method=\"POST\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var41 templ.SafeURL
 			templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/document"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 597, Col: 43}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 598, Col: 43}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "\" enctype=\"multipart/form-data\" onsubmit=\"return confirm('Once submitted, you will not be able to upload a new ID unless your current submission is rejected. Continue?');\"><div class=\"upload-zone\"><label class=\"upload-zone-label\" for=\"document\"><span class=\"upload-zone-icon\" aria-hidden=\"true\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path> <polyline points=\"14 2 14 8 20 8\"></polyline></svg></span> <span class=\"upload-zone-meta\"><span>Choose ID document</span> <span class=\"upload-zone-hint\">PNG, JPEG, JPG, or PDF (max 5 MB)</span></span> <input type=\"file\" id=\"document\" name=\"document\" accept=\".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf\" required")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "\" enctype=\"multipart/form-data\" onsubmit=\"return confirm('Once submitted, you will not be able to upload a new ID unless your current submission is rejected. Continue?');\"><div class=\"upload-zone\"><label class=\"upload-zone-label\" for=\"document\"><span class=\"upload-zone-icon\" aria-hidden=\"true\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path> <polyline points=\"14 2 14 8 20 8\"></polyline></svg></span> <span class=\"upload-zone-meta\"><span>Choose ID document</span> <span class=\"upload-zone-hint\">PNG, JPEG, JPG, or PDF (max 5 MB)</span></span> <input type=\"file\" id=\"document\" name=\"document\" accept=\".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf\" required")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if !data.CanUploadDocument {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, " disabled")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, " disabled")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, " onchange=\"this.form.querySelector('.upload-filename').textContent = this.files[0] ? this.files[0].name : ''\"></label><p class=\"upload-filename\" aria-live=\"polite\"></p></div><div class=\"profile-form-actions\"><button type=\"submit\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, " onchange=\"this.form.querySelector('.upload-filename').textContent = this.files[0] ? this.files[0].name : ''\"></label><p class=\"upload-filename\" aria-live=\"polite\"></p></div><div class=\"profile-form-actions\"><button type=\"submit\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if !data.CanUploadDocument {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, " disabled")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, " disabled")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, ">Submit document</button></div></form></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, ">Submit document</button></div></form></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1122,7 +1130,7 @@ func ProfileResumeUpload(data ProfileData) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		if !data.IsSuperuser {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "<div class=\"profile-upload-block\"><div class=\"profile-upload-block__header\"><h3 class=\"profile-upload-block__title\">Resume / CV</h3><div class=\"profile-upload-block__actions\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "<div class=\"profile-upload-block\"><div class=\"profile-upload-block__header\"><h3 class=\"profile-upload-block__title\">Resume / CV</h3><div class=\"profile-upload-block__actions\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1132,38 +1140,38 @@ func ProfileResumeUpload(data ProfileData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "<span class=\"profile-upload-limit-pill\">Once per day</span></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "<span class=\"profile-upload-limit-pill\">Once per day</span></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.HasResume && data.ResumeFilename != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "<div class=\"profile-upload-current\"><span class=\"profile-upload-current-label\">Current file</span><div class=\"profile-upload-current-row\"><span class=\"profile-upload-current-name\" title=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "<div class=\"profile-upload-current\"><span class=\"profile-upload-current-label\">Current file</span><div class=\"profile-upload-current-row\"><span class=\"profile-upload-current-name\" title=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var43 string
 				templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.ResumeFilename)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 649, Col: 75}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 650, Col: 75}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var43)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var44 string
 				templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs(data.ResumeFilename)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 649, Col: 99}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 650, Col: 99}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "</span></div></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "</span></div></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1174,20 +1182,20 @@ func ProfileResumeUpload(data ProfileData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "<form class=\"profile-upload-form\" method=\"POST\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, "<form class=\"profile-upload-form\" method=\"POST\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var45 templ.SafeURL
 			templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/resume"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 659, Col: 41}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 660, Col: 41}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, "\" enctype=\"multipart/form-data\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "\" enctype=\"multipart/form-data\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1196,7 +1204,7 @@ func ProfileResumeUpload(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "<div class=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "<div class=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1209,17 +1217,17 @@ func ProfileResumeUpload(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "\"><label class=\"upload-zone-label\" for=\"resume\"><span class=\"upload-zone-icon\" aria-hidden=\"true\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path> <polyline points=\"14 2 14 8 20 8\"></polyline></svg></span> <span class=\"upload-zone-meta\"><span>Choose resume/CV</span> <span class=\"upload-zone-hint\">PNG, JPEG, JPG, or PDF (max 5 MB)</span></span> <input type=\"file\" id=\"resume\" name=\"resume\" accept=\".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "\"><label class=\"upload-zone-label\" for=\"resume\"><span class=\"upload-zone-icon\" aria-hidden=\"true\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path> <polyline points=\"14 2 14 8 20 8\"></polyline></svg></span> <span class=\"upload-zone-meta\"><span>Choose resume/CV</span> <span class=\"upload-zone-hint\">PNG, JPEG, JPG, or PDF (max 5 MB)</span></span> <input type=\"file\" id=\"resume\" name=\"resume\" accept=\".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if !data.CanUploadResume {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, " disabled")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, " disabled")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, " onchange=\"var file = this.files[0]; this.form.querySelector('.upload-filename').textContent = file ? file.name : ''; var btn = this.form.querySelector('button[type=submit]'); if (btn) btn.disabled = !file;\"></label><p class=\"upload-filename\" aria-live=\"polite\"></p></div><div class=\"profile-form-actions\"><button type=\"submit\" class=\"btn\" disabled>Upload resume/CV</button></div></form></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, " onchange=\"var file = this.files[0]; this.form.querySelector('.upload-filename').textContent = file ? file.name : ''; var btn = this.form.querySelector('button[type=submit]'); if (btn) btn.disabled = !file;\"></label><p class=\"upload-filename\" aria-live=\"polite\"></p></div><div class=\"profile-form-actions\"><button type=\"submit\" class=\"btn\" disabled>Upload resume/CV</button></div></form></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

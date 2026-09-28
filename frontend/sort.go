@@ -26,6 +26,7 @@ const (
 	ListSortKindLearningMaterial ListSortKind = "learning_material"
 	ListSortKindTrainingMaterial ListSortKind = "training_material"
 	ListSortKindAffiliate        ListSortKind = "affiliate"
+	ListSortKindAds              ListSortKind = "ads"
 )
 
 func SortOptionsFor(kind ListSortKind) []SortOption {
@@ -145,6 +146,15 @@ func SortOptionsFor(kind ListSortKind) []SortOption {
 			{Value: "click_count", Label: "Clicks"},
 			{Value: "updated_at", Label: "Last updated"},
 		}
+	case ListSortKindAds:
+		return []SortOption{
+			{Value: "sort_order", Label: "Sort order"},
+			{Value: "name", Label: "Name"},
+			{Value: "status", Label: "Status"},
+			{Value: "placement", Label: "Placement"},
+			{Value: "ad_type", Label: "Type"},
+			{Value: "updated_at", Label: "Last updated"},
+		}
 	default:
 		return nil
 	}
@@ -175,6 +185,8 @@ func DefaultSortFor(kind ListSortKind) (string, utils.SortOrder) {
 	case ListSortKindLearningMaterial, ListSortKindTrainingMaterial:
 		return "created_at", utils.SortOrderDesc
 	case ListSortKindAffiliate:
+		return "sort_order", utils.SortOrderAsc
+	case ListSortKindAds:
 		return "sort_order", utils.SortOrderAsc
 	default:
 		return "created_at", utils.SortOrderDesc

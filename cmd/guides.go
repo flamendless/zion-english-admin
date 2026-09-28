@@ -66,6 +66,12 @@ func handleGuides(w http.ResponseWriter, r *http.Request) {
 				Description: "Review teacher payroll summaries, preview class records, and export XLSX reports.",
 				Access:      "superuser",
 			},
+			{
+				Slug:        constants.GuideSlugAds,
+				Title:       "Ads",
+				Description: "Configure affiliate ad placements, rotation, and draft or published status.",
+				Access:      "superuser",
+			},
 		},
 	}
 
@@ -98,6 +104,8 @@ func handleGuidesPath(w http.ResponseWriter, r *http.Request) {
 		handleGuideFAQ(w, r)
 	case constants.GuideSlugReportsAndGeneration:
 		handleGuideReportsGeneration(w, r)
+	case constants.GuideSlugAds:
+		handleGuideAds(w, r)
 	default:
 		HttpError(w, MsgNotFound, http.StatusNotFound)
 	}
@@ -170,6 +178,16 @@ func handleGuideReportsGeneration(w http.ResponseWriter, r *http.Request) {
 
 	if err := frontend.GuideReportsGeneration().Render(r.Context(), w); err != nil {
 		logs.Log().Error("failed to render reports and generation guide", zap.Error(err))
+	}
+}
+
+func handleGuideAds(w http.ResponseWriter, r *http.Request) {
+	if !requireMethod(w, r, http.MethodGet) {
+		return
+	}
+
+	if err := frontend.GuideAds().Render(r.Context(), w); err != nil {
+		logs.Log().Error("failed to render ads guide", zap.Error(err))
 	}
 }
 

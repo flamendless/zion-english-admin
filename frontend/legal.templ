@@ -18,6 +18,7 @@ templ LegalPage(title string, effectiveDate string) {
 		@LegalStyles()
 	</head>
 	<body class="landing-page legal-page">
+		@AdPlacementChrome()
 		<div class="landing-bg" aria-hidden="true">
 			<div class="landing-orb landing-orb--green"></div>
 			<div class="landing-orb landing-orb--blue"></div>
@@ -42,6 +43,7 @@ templ LegalPage(title string, effectiveDate string) {
 		</main>
 
 		@LandingFooter()
+	@LayoutEnd()
 	</body>
 	</html>
 }
@@ -62,6 +64,7 @@ templ LegalInfoPage(title string) {
 		@LegalStyles()
 	</head>
 	<body class="landing-page legal-page">
+		@AdPlacementChrome()
 		<div class="landing-bg" aria-hidden="true">
 			<div class="landing-orb landing-orb--green"></div>
 			<div class="landing-orb landing-orb--blue"></div>
@@ -85,6 +88,7 @@ templ LegalInfoPage(title string) {
 		</main>
 
 		@LandingFooter()
+	@LayoutEnd()
 	</body>
 	</html>
 }
@@ -107,6 +111,7 @@ templ LegalDocPage(title string, subtitle string) {
 		@GuideStyles()
 	</head>
 	<body class="landing-page legal-page">
+		@AdPlacementChrome()
 		<div class="landing-bg" aria-hidden="true">
 			<div class="landing-orb landing-orb--green"></div>
 			<div class="landing-orb landing-orb--blue"></div>
@@ -135,6 +140,7 @@ templ LegalDocPage(title string, subtitle string) {
 		@LandingFooter()
 		@GuideAnchorScript()
 		@AdminOnlyTooltipScript()
+	@LayoutEnd()
 	</body>
 	</html>
 }
@@ -165,7 +171,7 @@ templ PrivacyPolicy() {
 		<section>
 			<h2>Affiliate Links and Product Images</h2>
 			<p>
-				The portal may display Shopee affiliate product recommendations with an "Affiliated" label. Product images may be loaded from Shopee content delivery networks when you view those cards. Clicking a product opens a third-party Shopee page using an affiliate (offer) link. We do not sell your personal data through these links. Affiliate commissions may be earned by the developer to help support operation and maintenance of the system.
+				The portal may display Shopee affiliate product recommendations with an "Affiliated" label, including compact placements configured by superusers (for example top, side, or bottom slots on portal pages). Product images may be loaded from Shopee content delivery networks when you view those cards. Clicking a product opens a third-party Shopee page using an affiliate (offer) link. We do not sell your personal data through these links. Affiliate commissions may be earned by the developer to help support operation and maintenance of the system.
 			</p>
 		</section>
 

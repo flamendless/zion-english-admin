@@ -1,6 +1,9 @@
 unreleased:
   breaking_changes: []
-  new_features: []
+  new_features:
+    - text: "Superusers get an Ads page under Admin to configure affiliate ad placements (draft, published, or deleted), link affiliate products with rotation rules, and show compact affiliated cards on landing, login, legal, dashboard, and authenticated pages."
+    - text: "Admins can manage HTML head meta tags from a new Meta page under Admin; tags render on landing, login, and app pages for site verification and similar tools."
+    - text: "Superusers get an Affiliates page under Admin to upload Shopee batch product link CSVs, store import snapshots, fetch thumbnails from product links, log uploads in My Uploads, and preview reusable product cards."
   improvements: []
   bug_fixes: []
   removed: []

@@ -123,7 +123,7 @@ func Profile(data ProfileData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<style>\r\n\t\t\t.profile-layout {\r\n\t\t\t\tdisplay: grid;\r\n\t\t\t\tgap: var(--space-6);\r\n\t\t\t}\r\n\r\n\t\t\t@media (min-width: 900px) {\r\n\t\t\t\t.profile-layout {\r\n\t\t\t\t\tgrid-template-columns: 280px 1fr;\r\n\t\t\t\t\talign-items: start;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\t.profile-card {\r\n\t\t\t\tbackground: var(--color-muted);\r\n\t\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\t\tpadding: var(--space-6);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-card h2 {\r\n\t\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\t\tfont-size: 1.125rem;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-identity {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\ttext-align: center;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-identity h2 {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-email {\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\tword-break: break-all;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-sidebar-uploads {\r\n\t\t\t\tmargin-top: var(--space-5);\r\n\t\t\t\tpadding-top: var(--space-5);\r\n\t\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-5);\r\n\t\t\t\twidth: 100%;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-block {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-block + .profile-upload-block {\r\n\t\t\t\tpadding-top: var(--space-5);\r\n\t\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-block__header {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tjustify-content: space-between;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tflex-wrap: wrap;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-block__actions {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tflex-shrink: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-block__actions .icon-action-btn {\r\n\t\t\t\tmargin-top: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-current {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-1);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-current-label {\r\n\t\t\t\tfont-size: 0.75rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\ttext-transform: uppercase;\r\n\t\t\t\tletter-spacing: 0.04em;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-current-row {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-current-name {\r\n\t\t\t\tflex: 1;\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\toverflow: hidden;\r\n\t\t\t\ttext-overflow: ellipsis;\r\n\t\t\t\twhite-space: nowrap;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-block__title {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\ttext-transform: uppercase;\r\n\t\t\t\tletter-spacing: 0.04em;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-limit-pill {\r\n\t\t\t\tfont-size: 0.6875rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tpadding: 2px 8px;\r\n\t\t\t\tborder-radius: var(--radius-full);\r\n\t\t\t\tbackground: var(--color-info-bg);\r\n\t\t\t\tcolor: var(--color-info);\r\n\t\t\t\tborder: var(--pill-border);\r\n\t\t\t\twhite-space: nowrap;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-form {\r\n\t\t\t\twidth: 100%;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-form .profile-form-actions {\r\n\t\t\t\tmargin-top: var(--space-3);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-form .profile-form-actions button {\r\n\t\t\t\tmargin-top: 0;\r\n\t\t\t\twidth: 100%;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-form .profile-form-actions button:disabled {\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\topacity: 1;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-upload-hint {\r\n\t\t\t\tmargin-top: var(--space-2);\r\n\t\t\t\tfont-size: 0.75rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-details {\r\n\t\t\t\tdisplay: grid;\r\n\t\t\t\tgap: var(--space-4);\r\n\t\t\t}\r\n\r\n\t\t\t@media (min-width: 640px) {\r\n\t\t\t\t.profile-details {\r\n\t\t\t\t\tgrid-template-columns: 1fr 1fr;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\t.profile-detail {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-1);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-detail-label {\r\n\t\t\t\tfont-size: 0.75rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\ttext-transform: uppercase;\r\n\t\t\t\tletter-spacing: 0.04em;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-detail-value {\r\n\t\t\t\tfont-size: 0.9375rem;\r\n\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\tword-break: break-word;\r\n\t\t\t}\r\n\r\n\t\t\t.profile-section {\r\n\t\t\t\tmargin-top: var(--space-6);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-section + .profile-section {\r\n\t\t\t\tpadding-top: var(--space-6);\r\n\t\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-section-desc {\r\n\t\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t}\r\n\r\n\t\t\t.cooldown-notice {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tpadding: var(--space-3) var(--space-4);\r\n\t\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-warning-bg);\r\n\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\tborder: 1px solid color-mix(in srgb, var(--color-warning) 35%, transparent);\r\n\t\t\t}\r\n\r\n\t\t\t.cooldown-notice svg {\r\n\t\t\t\tflex-shrink: 0;\r\n\t\t\t\tmargin-top: 2px;\r\n\t\t\t\tcolor: var(--color-warning);\r\n\t\t\t}\r\n\r\n\t\t\t.profile-form-actions {\r\n\t\t\t\tmargin-top: var(--space-4);\r\n\t\t\t}\r\n\r\n\t\t\t.superuser-note {\r\n\t\t\t\tpadding: var(--space-4);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-info-bg);\r\n\t\t\t\tborder: 1px solid color-mix(in srgb, var(--color-info) 25%, transparent);\r\n\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-list {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t\tpadding: var(--space-3) var(--space-4);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-brand {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t\tflex: 1;\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-logo-wrap {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tjustify-content: center;\r\n\t\t\t\twidth: 3.5rem;\r\n\t\t\t\theight: 3.5rem;\r\n\t\t\t\tpadding: var(--space-2);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: #E8F1FF;\r\n\t\t\t\tflex-shrink: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-logo {\r\n\t\t\t\tdisplay: block;\r\n\t\t\t\twidth: 100%;\r\n\t\t\t\theight: 100%;\r\n\t\t\t\tobject-fit: contain;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-info {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: 2px;\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-name {\r\n\t\t\t\tfont-size: 0.9375rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\tline-height: 1.3;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-desc {\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tline-height: 1.45;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-meta {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t\tflex-shrink: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-action {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-action form {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tmargin: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.integration-row-action .btn {\r\n\t\t\t\tmargin-top: 0;\r\n\t\t\t\twhite-space: nowrap;\r\n\t\t\t}\r\n\r\n\t\t\t@media (max-width: 520px) {\r\n\t\t\t\t.integration-row {\r\n\t\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\t\talign-items: flex-start;\r\n\t\t\t\t}\r\n\r\n\t\t\t\t.integration-row-meta {\r\n\t\t\t\t\twidth: 100%;\r\n\t\t\t\t\tjustify-content: space-between;\r\n\t\t\t\t\tpadding-left: calc(80px + var(--space-3));\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t</style></head><body><div class=\"container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<style>\n\t\t\t.profile-layout {\n\t\t\t\tdisplay: grid;\n\t\t\t\tgap: var(--space-6);\n\t\t\t}\n\n\t\t\t@media (min-width: 900px) {\n\t\t\t\t.profile-layout {\n\t\t\t\t\tgrid-template-columns: 280px 1fr;\n\t\t\t\t\talign-items: start;\n\t\t\t\t}\n\t\t\t}\n\n\t\t\t.profile-card {\n\t\t\t\tbackground: var(--color-muted);\n\t\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\t\tborder-radius: var(--radius-lg);\n\t\t\t\tpadding: var(--space-6);\n\t\t\t}\n\n\t\t\t.profile-card h2 {\n\t\t\t\tmargin-bottom: var(--space-4);\n\t\t\t\tfont-size: 1.125rem;\n\t\t\t}\n\n\t\t\t.profile-identity {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\talign-items: center;\n\t\t\t\ttext-align: center;\n\t\t\t\tgap: var(--space-3);\n\t\t\t}\n\n\t\t\t.profile-identity h2 {\n\t\t\t\tmargin: 0;\n\t\t\t}\n\n\t\t\t.profile-email {\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tfont-size: 0.875rem;\n\t\t\t\tword-break: break-all;\n\t\t\t}\n\n\t\t\t.profile-sidebar-uploads {\n\t\t\t\tmargin-top: var(--space-5);\n\t\t\t\tpadding-top: var(--space-5);\n\t\t\t\tborder-top: 1px solid var(--color-border-subtle);\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\tgap: var(--space-5);\n\t\t\t\twidth: 100%;\n\t\t\t}\n\n\t\t\t.profile-upload-block {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\tgap: var(--space-3);\n\t\t\t}\n\n\t\t\t.profile-upload-block + .profile-upload-block {\n\t\t\t\tpadding-top: var(--space-5);\n\t\t\t\tborder-top: 1px solid var(--color-border-subtle);\n\t\t\t}\n\n\t\t\t.profile-upload-block__header {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: center;\n\t\t\t\tjustify-content: space-between;\n\t\t\t\tgap: var(--space-2);\n\t\t\t\tflex-wrap: wrap;\n\t\t\t}\n\n\t\t\t.profile-upload-block__actions {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: center;\n\t\t\t\tgap: var(--space-2);\n\t\t\t\tflex-shrink: 0;\n\t\t\t}\n\n\t\t\t.profile-upload-block__actions .icon-action-btn {\n\t\t\t\tmargin-top: 0;\n\t\t\t}\n\n\t\t\t.profile-upload-current {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\tgap: var(--space-1);\n\t\t\t}\n\n\t\t\t.profile-upload-current-label {\n\t\t\t\tfont-size: 0.75rem;\n\t\t\t\tfont-weight: 600;\n\t\t\t\ttext-transform: uppercase;\n\t\t\t\tletter-spacing: 0.04em;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t}\n\n\t\t\t.profile-upload-current-row {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: center;\n\t\t\t\tgap: var(--space-2);\n\t\t\t\tmin-width: 0;\n\t\t\t}\n\n\t\t\t.profile-upload-current-name {\n\t\t\t\tflex: 1;\n\t\t\t\tmin-width: 0;\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t\tcolor: var(--color-foreground);\n\t\t\t\toverflow: hidden;\n\t\t\t\ttext-overflow: ellipsis;\n\t\t\t\twhite-space: nowrap;\n\t\t\t}\n\n\t\t\t.profile-upload-block__title {\n\t\t\t\tmargin: 0;\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t\tfont-weight: 600;\n\t\t\t\ttext-transform: uppercase;\n\t\t\t\tletter-spacing: 0.04em;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t}\n\n\t\t\t.profile-upload-limit-pill {\n\t\t\t\tfont-size: 0.6875rem;\n\t\t\t\tfont-weight: 600;\n\t\t\t\tpadding: 2px 8px;\n\t\t\t\tborder-radius: var(--radius-full);\n\t\t\t\tbackground: var(--color-info-bg);\n\t\t\t\tcolor: var(--color-info);\n\t\t\t\tborder: var(--pill-border);\n\t\t\t\twhite-space: nowrap;\n\t\t\t}\n\n\t\t\t.profile-upload-form {\n\t\t\t\twidth: 100%;\n\t\t\t}\n\n\t\t\t.profile-upload-form .profile-form-actions {\n\t\t\t\tmargin-top: var(--space-3);\n\t\t\t}\n\n\t\t\t.profile-upload-form .profile-form-actions button {\n\t\t\t\tmargin-top: 0;\n\t\t\t\twidth: 100%;\n\t\t\t}\n\n\t\t\t.profile-upload-form .profile-form-actions button:disabled {\n\t\t\t\tbackground: var(--color-surface);\n\t\t\t\tborder: 1px solid var(--color-border);\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\topacity: 1;\n\t\t\t}\n\n\t\t\t.profile-upload-hint {\n\t\t\t\tmargin-top: var(--space-2);\n\t\t\t\tfont-size: 0.75rem;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t}\n\n\t\t\t.profile-details {\n\t\t\t\tdisplay: grid;\n\t\t\t\tgap: var(--space-4);\n\t\t\t}\n\n\t\t\t@media (min-width: 640px) {\n\t\t\t\t.profile-details {\n\t\t\t\t\tgrid-template-columns: 1fr 1fr;\n\t\t\t\t}\n\t\t\t}\n\n\t\t\t.profile-detail {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\tgap: var(--space-1);\n\t\t\t}\n\n\t\t\t.profile-detail-label {\n\t\t\t\tfont-size: 0.75rem;\n\t\t\t\tfont-weight: 600;\n\t\t\t\ttext-transform: uppercase;\n\t\t\t\tletter-spacing: 0.04em;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t}\n\n\t\t\t.profile-detail-value {\n\t\t\t\tfont-size: 0.9375rem;\n\t\t\t\tcolor: var(--color-foreground);\n\t\t\t\tword-break: break-word;\n\t\t\t}\n\n\t\t\t.profile-section {\n\t\t\t\tmargin-top: var(--space-6);\n\t\t\t}\n\n\t\t\t.profile-section + .profile-section {\n\t\t\t\tpadding-top: var(--space-6);\n\t\t\t\tborder-top: 1px solid var(--color-border-subtle);\n\t\t\t}\n\n\t\t\t.profile-section-desc {\n\t\t\t\tmargin-bottom: var(--space-4);\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tfont-size: 0.875rem;\n\t\t\t}\n\n\t\t\t.cooldown-notice {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: flex-start;\n\t\t\t\tgap: var(--space-2);\n\t\t\t\tpadding: var(--space-3) var(--space-4);\n\t\t\t\tmargin-bottom: var(--space-4);\n\t\t\t\tborder-radius: var(--radius-md);\n\t\t\t\tbackground: var(--color-warning-bg);\n\t\t\t\tcolor: var(--color-foreground);\n\t\t\t\tfont-size: 0.875rem;\n\t\t\t\tborder: 1px solid color-mix(in srgb, var(--color-warning) 35%, transparent);\n\t\t\t}\n\n\t\t\t.cooldown-notice svg {\n\t\t\t\tflex-shrink: 0;\n\t\t\t\tmargin-top: 2px;\n\t\t\t\tcolor: var(--color-warning);\n\t\t\t}\n\n\t\t\t.profile-form-actions {\n\t\t\t\tmargin-top: var(--space-4);\n\t\t\t}\n\n\t\t\t.superuser-note {\n\t\t\t\tpadding: var(--space-4);\n\t\t\t\tborder-radius: var(--radius-md);\n\t\t\t\tbackground: var(--color-info-bg);\n\t\t\t\tborder: 1px solid color-mix(in srgb, var(--color-info) 25%, transparent);\n\t\t\t\tcolor: var(--color-foreground);\n\t\t\t\tfont-size: 0.875rem;\n\t\t\t}\n\n\t\t\t.integration-list {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\tgap: var(--space-2);\n\t\t\t}\n\n\t\t\t.integration-row {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: center;\n\t\t\t\tgap: var(--space-3);\n\t\t\t\tpadding: var(--space-3) var(--space-4);\n\t\t\t\tborder: 1px solid var(--color-border);\n\t\t\t\tborder-radius: var(--radius-md);\n\t\t\t\tbackground: var(--color-surface);\n\t\t\t}\n\n\t\t\t.integration-row-brand {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: flex-start;\n\t\t\t\tgap: var(--space-3);\n\t\t\t\tflex: 1;\n\t\t\t\tmin-width: 0;\n\t\t\t}\n\n\t\t\t.integration-logo-wrap {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: center;\n\t\t\t\tjustify-content: center;\n\t\t\t\twidth: 3.5rem;\n\t\t\t\theight: 3.5rem;\n\t\t\t\tpadding: var(--space-2);\n\t\t\t\tborder-radius: var(--radius-md);\n\t\t\t\tbackground: #E8F1FF;\n\t\t\t\tflex-shrink: 0;\n\t\t\t}\n\n\t\t\t.integration-logo {\n\t\t\t\tdisplay: block;\n\t\t\t\twidth: 100%;\n\t\t\t\theight: 100%;\n\t\t\t\tobject-fit: contain;\n\t\t\t}\n\n\t\t\t.integration-info {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\tgap: 2px;\n\t\t\t\tmin-width: 0;\n\t\t\t}\n\n\t\t\t.integration-name {\n\t\t\t\tfont-size: 0.9375rem;\n\t\t\t\tfont-weight: 600;\n\t\t\t\tcolor: var(--color-foreground);\n\t\t\t\tline-height: 1.3;\n\t\t\t}\n\n\t\t\t.integration-desc {\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tline-height: 1.45;\n\t\t\t}\n\n\t\t\t.integration-row-meta {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: center;\n\t\t\t\tgap: var(--space-3);\n\t\t\t\tflex-shrink: 0;\n\t\t\t}\n\n\t\t\t.integration-row-action {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: center;\n\t\t\t}\n\n\t\t\t.integration-row-action form {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: center;\n\t\t\t\tmargin: 0;\n\t\t\t}\n\n\t\t\t.integration-row-action .btn {\n\t\t\t\tmargin-top: 0;\n\t\t\t\twhite-space: nowrap;\n\t\t\t}\n\n\t\t\t@media (max-width: 520px) {\n\t\t\t\t.integration-row {\n\t\t\t\t\tflex-wrap: wrap;\n\t\t\t\t\talign-items: flex-start;\n\t\t\t\t}\n\n\t\t\t\t.integration-row-meta {\n\t\t\t\t\twidth: 100%;\n\t\t\t\t\tjustify-content: space-between;\n\t\t\t\t\tpadding-left: calc(80px + var(--space-3));\n\t\t\t\t}\n\t\t\t}\n\t\t</style></head><body><div class=\"container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -601,6 +601,10 @@ func Profile(data ProfileData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = LayoutEnd().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -637,7 +641,7 @@ func UploadCooldownNotice(daysRemaining int) templ.Component {
 		var templ_7745c5c3_Var22 string
 		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", daysRemaining))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 671, Col: 77}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 672, Col: 77}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {
@@ -679,7 +683,7 @@ func CooldownNotice(daysRemaining int, fieldLabel string) templ.Component {
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(fieldLabel)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 683, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 684, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
@@ -692,7 +696,7 @@ func CooldownNotice(daysRemaining int, fieldLabel string) templ.Component {
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", daysRemaining))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 683, Col: 81}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 684, Col: 81}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {
@@ -740,7 +744,7 @@ func ProfileIntegrations(data ProfileData) templ.Component {
 				var templ_7745c5c3_Var27 string
 				templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(data.ZoomStatusMessage)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 693, Col: 68}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 694, Col: 68}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 				if templ_7745c5c3_Err != nil {
@@ -759,7 +763,7 @@ func ProfileIntegrations(data ProfileData) templ.Component {
 				var templ_7745c5c3_Var28 string
 				templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(data.GoogleCalendarStatusMessage)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 696, Col: 78}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 697, Col: 78}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 				if templ_7745c5c3_Err != nil {
@@ -823,7 +827,7 @@ func ProfileZoomIntegrationRow(data ProfileData) templ.Component {
 		var templ_7745c5c3_Var30 string
 		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/zoom-logo.svg"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 716, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 717, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var30)
 		if templ_7745c5c3_Err != nil {
@@ -836,7 +840,7 @@ func ProfileZoomIntegrationRow(data ProfileData) templ.Component {
 		var templ_7745c5c3_Var31 templ.SafeURL
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinURLErrs(data.ZoomGuideURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 724, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 725, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 		if templ_7745c5c3_Err != nil {
@@ -869,7 +873,7 @@ func ProfileZoomIntegrationRow(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var32 templ.SafeURL
 			templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinURLErrs(data.ZoomDisconnectURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 736, Col: 56}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 737, Col: 56}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 			if templ_7745c5c3_Err != nil {
@@ -887,7 +891,7 @@ func ProfileZoomIntegrationRow(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var33 templ.SafeURL
 			templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinURLErrs(data.ZoomConnectURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 740, Col: 34}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 741, Col: 34}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 			if templ_7745c5c3_Err != nil {
@@ -934,7 +938,7 @@ func ProfileGoogleCalendarIntegrationRow(data ProfileData) templ.Component {
 		var templ_7745c5c3_Var35 string
 		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/google-calendar-logo.svg"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 753, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 754, Col: 56}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var35)
 		if templ_7745c5c3_Err != nil {
@@ -947,7 +951,7 @@ func ProfileGoogleCalendarIntegrationRow(data ProfileData) templ.Component {
 		var templ_7745c5c3_Var36 templ.SafeURL
 		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinURLErrs(data.GoogleCalendarGuideURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 761, Col: 42}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 762, Col: 42}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 		if templ_7745c5c3_Err != nil {
@@ -980,7 +984,7 @@ func ProfileGoogleCalendarIntegrationRow(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var37 templ.SafeURL
 			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinURLErrs(data.GoogleCalendarDisconnectURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 773, Col: 66}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 774, Col: 66}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 			if templ_7745c5c3_Err != nil {
@@ -998,7 +1002,7 @@ func ProfileGoogleCalendarIntegrationRow(data ProfileData) templ.Component {
 			var templ_7745c5c3_Var38 templ.SafeURL
 			templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinURLErrs(data.GoogleCalendarConnectURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 777, Col: 44}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/profile.templ`, Line: 778, Col: 44}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 			if templ_7745c5c3_Err != nil {

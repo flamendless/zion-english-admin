@@ -219,11 +219,15 @@ func EditSchedule(data EditScheduleData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<button type=\"submit\" class=\"btn\">Save Changes</button></form><div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div></div><script>\r\n\t\t\tconst studentSelect = document.getElementById('student') || document.getElementById('schedule_student');\r\n\t\t\tif (studentSelect) {\r\n\t\t\t\tstudentSelect.addEventListener('change', () => {\r\n\t\t\t\t\tapplyStudentRateToForm();\r\n\t\t\t\t});\r\n\t\t\t}\r\n\t\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<button type=\"submit\" class=\"btn\">Save Changes</button></form><div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div></div><script>\n\t\t\tconst studentSelect = document.getElementById('student') || document.getElementById('schedule_student');\n\t\t\tif (studentSelect) {\n\t\t\t\tstudentSelect.addEventListener('change', () => {\n\t\t\t\t\tapplyStudentRateToForm();\n\t\t\t\t});\n\t\t\t}\n\t\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = ScrTrialClassJS().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = LayoutEnd().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -158,6 +158,10 @@ func ScheduleSeries(data ScheduleSeriesData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = LayoutEnd().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -194,7 +198,7 @@ func ScheduledClassSeriesTableRow(series ScheduledClassSeriesItem, showTeacher b
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(series.Item.StudentName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_series.templ`, Line: 79, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_series.templ`, Line: 80, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -241,7 +245,7 @@ func ScheduledClassSeriesTableRow(series ScheduledClassSeriesItem, showTeacher b
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(FormatScheduledClassSeriesDates(series.Dates))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_series.templ`, Line: 91, Col: 72}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_series.templ`, Line: 92, Col: 72}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -338,7 +342,7 @@ func ScheduleSeriesScripts() templ.Component {
 			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<script>\r\n\t\t(function () {\r\n\t\t\tif (window._scheduleSeriesPageBound) return;\r\n\t\t\twindow._scheduleSeriesPageBound = true;\r\n\r\n\t\t\tdocument.body.addEventListener('scheduleSeriesRefresh', function () {\r\n\t\t\t\twindow.location.reload();\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<script>\n\t\t(function () {\n\t\t\tif (window._scheduleSeriesPageBound) return;\n\t\t\twindow._scheduleSeriesPageBound = true;\n\n\t\t\tdocument.body.addEventListener('scheduleSeriesRefresh', function () {\n\t\t\t\twindow.location.reload();\n\t\t\t});\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

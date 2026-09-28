@@ -445,7 +445,15 @@ func Notifications(data NotificationListData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = LayoutEnd().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -474,112 +482,112 @@ func NotificationListToolbar(data NotificationListData) templ.Component {
 			templ_7745c5c3_Var19 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<div class=\"notifications-toolbar-row\"><form class=\"list-toolbar notifications-toolbar\" method=\"GET\" action=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<div class=\"notifications-toolbar-row\"><form class=\"list-toolbar notifications-toolbar\" method=\"GET\" action=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var20 templ.SafeURL
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/notifications"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 171, Col: 100}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 172, Col: 100}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\"><div class=\"form-group notifications-message-group\"><label for=\"notificationMessageFilter\">Message</label> <input type=\"search\" id=\"notificationMessageFilter\" name=\"message\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\"><div class=\"form-group notifications-message-group\"><label for=\"notificationMessageFilter\">Message</label> <input type=\"search\" id=\"notificationMessageFilter\" name=\"message\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.MessageFilter)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 178, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 179, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var21)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\" placeholder=\"Search message...\" autocomplete=\"off\"></div><div class=\"form-group\"><label for=\"notificationFromFilter\">From</label> <select id=\"notificationFromFilter\" name=\"from\"><option value=\"\">All</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\" placeholder=\"Search message...\" autocomplete=\"off\"></div><div class=\"form-group\"><label for=\"notificationFromFilter\">From</label> <select id=\"notificationFromFilter\" name=\"from\"><option value=\"\">All</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, opt := range data.FromOptions {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<option value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<option value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 188, Col: 31}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 189, Col: 31}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var22)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.FromFilter == opt.Value {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, " selected")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, " selected")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, ">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, ">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var23 string
 			templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 188, Col: 88}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 189, Col: 88}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "</option>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "</option>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "</select></div><div class=\"form-group\"><label for=\"notificationDateFilter\">Date</label> <input type=\"date\" id=\"notificationDateFilter\" name=\"date\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</select></div><div class=\"form-group\"><label for=\"notificationDateFilter\">Date</label> <input type=\"date\" id=\"notificationDateFilter\" name=\"date\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.DateFilter)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 194, Col: 86}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 195, Col: 86}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\"></div><div class=\"form-group\"><label for=\"notificationViewFilter\">View</label> <select id=\"notificationViewFilter\" name=\"filter\"><option value=\"\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\"></div><div class=\"form-group\"><label for=\"notificationViewFilter\">View</label> <select id=\"notificationViewFilter\" name=\"filter\"><option value=\"\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if !data.UnreadOnly {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, " selected")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, " selected")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, ">All</option> <option value=\"unread\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, ">All</option> <option value=\"unread\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.UnreadOnly {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, " selected")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, " selected")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, ">Unread</option></select></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, ">Unread</option></select></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -587,43 +595,43 @@ func NotificationListToolbar(data NotificationListData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<div class=\"form-group list-toolbar-action\"><label for=\"notificationFilterSubmit\">&nbsp;</label> <button type=\"submit\" id=\"notificationFilterSubmit\">Filter</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<div class=\"form-group list-toolbar-action\"><label for=\"notificationFilterSubmit\">&nbsp;</label> <button type=\"submit\" id=\"notificationFilterSubmit\">Filter</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.UnreadOnly && data.PageTotal > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<div class=\"notifications-toolbar-secondary\"><button type=\"button\" class=\"notification-mark-all-page\" hx-post=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<div class=\"notifications-toolbar-secondary\"><button type=\"button\" class=\"notification-mark-all-page\" hx-post=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var25 string
 			templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/notifications/read-all"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 214, Col: 51}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 215, Col: 51}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var25)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\" hx-swap=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\" hx-swap=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var26 string
 			templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapNone)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 215, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 216, Col: 25}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\">Mark all read</button></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "\">Mark all read</button></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -657,7 +665,7 @@ func NotificationListRow(item NotificationItem) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "<tr class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "<tr class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -670,59 +678,59 @@ func NotificationListRow(item NotificationItem) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "\" id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "\" id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var30 string
 		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.ResolveAttributeValue("notification-" + item.ID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 223, Col: 85}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 224, Col: 85}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var30)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "\"><td data-label=\"Message\" class=\"notification-message-cell\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "\"><td data-label=\"Message\" class=\"notification-message-cell\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var31 string
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(item.Message)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 224, Col: 75}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 225, Col: 75}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</td><td data-label=\"From\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</td><td data-label=\"From\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var32 string
 		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(item.From)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 225, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 226, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</td><td data-label=\"Date\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "</td><td data-label=\"Date\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var33 string
 		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(item.CreatedAt)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 226, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/notifications.templ`, Line: 227, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "</td><td data-label=\"Status\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "</td><td data-label=\"Status\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -737,12 +745,12 @@ func NotificationListRow(item NotificationItem) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "</td><td data-label=\"Actions\" class=\"notification-actions-cell\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "</td><td data-label=\"Actions\" class=\"notification-actions-cell\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if !item.Read {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<div class=\"table-actions\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "<div class=\"table-actions\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -754,17 +762,17 @@ func NotificationListRow(item NotificationItem) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "<span class=\"notification-no-action\">-</span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "<span class=\"notification-no-action\">-</span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "</td></tr>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "</td></tr>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -806,7 +814,7 @@ func NotificationBellScript() templ.Component {
 			templ_7745c5c3_Var34 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "<script>\r\n\t\t(function () {\r\n\t\t\tfunction refreshNotificationBadges() {\r\n\t\t\t\tif (typeof htmx !== 'undefined') {\r\n\t\t\t\t\thtmx.trigger(document.body, 'notificationUpdated');\r\n\t\t\t\t}\r\n\t\t\t}\r\n\r\n\t\t\tfunction updateBellAriaLabel() {\r\n\t\t\t\tconst btn = document.getElementById('notificationBellBtn');\r\n\t\t\t\tif (!btn) return;\r\n\t\t\t\tconst badge = btn.parentElement?.querySelector('.badge-count');\r\n\t\t\t\tconst count = badge ? badge.textContent.trim() : '';\r\n\t\t\t\tconst label = count ? 'Notifications, ' + count + ' unread' : 'Notifications';\r\n\t\t\t\tbtn.setAttribute('aria-label', label);\r\n\t\t\t\tbtn.setAttribute('data-tooltip', label);\r\n\t\t\t}\r\n\r\n\t\t\tfunction closeNotificationPanel() {\r\n\t\t\t\tconst host = document.getElementById('notificationPanelHost');\r\n\t\t\t\tif (host) host.innerHTML = '';\r\n\t\t\t\tconst btn = document.getElementById('notificationBellBtn');\r\n\t\t\t\tif (btn) btn.setAttribute('aria-expanded', 'false');\r\n\t\t\t}\r\n\r\n\t\t\twindow.closeNotificationPanel = closeNotificationPanel;\r\n\t\t\twindow.refreshNotificationBadges = refreshNotificationBadges;\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tif (evt.detail.target.classList && evt.detail.target.classList.contains('notification-badge-host')) {\r\n\t\t\t\t\tupdateBellAriaLabel();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tif (evt.detail.target.id !== 'notificationPanelHost') return;\r\n\t\t\t\tconst btn = document.getElementById('notificationBellBtn');\r\n\t\t\t\tif (btn) btn.setAttribute('aria-expanded', 'true');\r\n\t\t\t\trefreshNotificationBadges();\r\n\t\t\t\tconst panel = document.getElementById('notificationPanel');\r\n\t\t\t\tif (panel) {\r\n\t\t\t\t\tconst first = panel.querySelector('button, a');\r\n\t\t\t\t\tif (first) first.focus();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('click', function (e) {\r\n\t\t\t\tconst host = document.getElementById('notificationPanelHost');\r\n\t\t\t\tif (!host || !host.innerHTML.trim()) return;\r\n\t\t\t\tif (e.target.closest('.notification-bell-wrap')) return;\r\n\t\t\t\tcloseNotificationPanel();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key === 'Escape' && document.getElementById('notificationPanel')) {\r\n\t\t\t\t\tcloseNotificationPanel();\r\n\t\t\t\t}\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "<script>\n\t\t(function () {\n\t\t\tfunction refreshNotificationBadges() {\n\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\thtmx.trigger(document.body, 'notificationUpdated');\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tfunction updateBellAriaLabel() {\n\t\t\t\tconst btn = document.getElementById('notificationBellBtn');\n\t\t\t\tif (!btn) return;\n\t\t\t\tconst badge = btn.parentElement?.querySelector('.badge-count');\n\t\t\t\tconst count = badge ? badge.textContent.trim() : '';\n\t\t\t\tconst label = count ? 'Notifications, ' + count + ' unread' : 'Notifications';\n\t\t\t\tbtn.setAttribute('aria-label', label);\n\t\t\t\tbtn.setAttribute('data-tooltip', label);\n\t\t\t}\n\n\t\t\tfunction closeNotificationPanel() {\n\t\t\t\tconst host = document.getElementById('notificationPanelHost');\n\t\t\t\tif (host) host.innerHTML = '';\n\t\t\t\tconst btn = document.getElementById('notificationBellBtn');\n\t\t\t\tif (btn) btn.setAttribute('aria-expanded', 'false');\n\t\t\t}\n\n\t\t\twindow.closeNotificationPanel = closeNotificationPanel;\n\t\t\twindow.refreshNotificationBadges = refreshNotificationBadges;\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.classList && evt.detail.target.classList.contains('notification-badge-host')) {\n\t\t\t\t\tupdateBellAriaLabel();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (evt.detail.target.id !== 'notificationPanelHost') return;\n\t\t\t\tconst btn = document.getElementById('notificationBellBtn');\n\t\t\t\tif (btn) btn.setAttribute('aria-expanded', 'true');\n\t\t\t\trefreshNotificationBadges();\n\t\t\t\tconst panel = document.getElementById('notificationPanel');\n\t\t\t\tif (panel) {\n\t\t\t\t\tconst first = panel.querySelector('button, a');\n\t\t\t\t\tif (first) first.focus();\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.addEventListener('click', function (e) {\n\t\t\t\tconst host = document.getElementById('notificationPanelHost');\n\t\t\t\tif (!host || !host.innerHTML.trim()) return;\n\t\t\t\tif (e.target.closest('.notification-bell-wrap')) return;\n\t\t\t\tcloseNotificationPanel();\n\t\t\t});\n\n\t\t\tdocument.addEventListener('keydown', function (e) {\n\t\t\t\tif (e.key === 'Escape' && document.getElementById('notificationPanel')) {\n\t\t\t\t\tcloseNotificationPanel();\n\t\t\t\t}\n\t\t\t});\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

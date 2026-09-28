@@ -362,7 +362,15 @@ func MetaTagsPage(data MetaTagsListData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = LayoutEnd().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -391,20 +399,20 @@ func MetaTagEditPage(data MetaTagFormData) templ.Component {
 			templ_7745c5c3_Var16 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Edit Meta Tag - Zion English Admin Tool</title><link rel=\"icon\" type=\"image/x-icon\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Edit Meta Tag - Zion English Admin Tool</title><link rel=\"icon\" type=\"image/x-icon\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var17 templ.SafeURL
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/meta.templ`, Line: 131, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/meta.templ`, Line: 132, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -416,7 +424,7 @@ func MetaTagEditPage(data MetaTagFormData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</head><body><div class=\"container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</head><body><div class=\"container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -436,7 +444,7 @@ func MetaTagEditPage(data MetaTagFormData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div class=\"meta-tags-card\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<div class=\"meta-tags-card\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -444,20 +452,28 @@ func MetaTagEditPage(data MetaTagFormData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</div><p class=\"meta-tags-back\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</div><p class=\"meta-tags-back\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var18 templ.SafeURL
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/meta"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/meta.templ`, Line: 147, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/meta.templ`, Line: 148, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\">Back to Meta</a></p></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "\">Back to Meta</a></p></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = LayoutEnd().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -487,20 +503,20 @@ func MetaTagForm(data MetaTagFormData) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		if data.IsEdit {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<form method=\"POST\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<form method=\"POST\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var20 templ.SafeURL
 			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/meta/" + data.ID + "/edit"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/meta.templ`, Line: 156, Col: 70}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/meta.templ`, Line: 158, Col: 70}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" class=\"meta-tag-form\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\" class=\"meta-tag-form\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -508,38 +524,38 @@ func MetaTagForm(data MetaTagFormData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<div class=\"meta-tag-form-actions\"><button type=\"submit\" class=\"btn\">Save changes</button> <a href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<div class=\"meta-tag-form-actions\"><button type=\"submit\" class=\"btn\">Save changes</button> <a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var21 templ.SafeURL
 			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/meta"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/meta.templ`, Line: 160, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/meta.templ`, Line: 162, Col: 32}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\" class=\"btn btn-secondary\">Cancel</a></div></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\" class=\"btn btn-secondary\">Cancel</a></div></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<form method=\"POST\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "<form method=\"POST\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var22 templ.SafeURL
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/meta"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/meta.templ`, Line: 164, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/meta.templ`, Line: 166, Col: 49}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\" class=\"meta-tag-form\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "\" class=\"meta-tag-form\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -547,7 +563,7 @@ func MetaTagForm(data MetaTagFormData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "<div class=\"meta-tag-form-actions\"><button type=\"submit\" class=\"btn\">Add meta tag</button></div></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "<div class=\"meta-tag-form-actions\"><button type=\"submit\" class=\"btn\">Add meta tag</button></div></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -577,59 +593,59 @@ func metaTagFormFields(data MetaTagFormData) templ.Component {
 			templ_7745c5c3_Var23 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<div class=\"form-group\"><label for=\"metaName\">Name</label> <input type=\"text\" id=\"metaName\" name=\"name\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<div class=\"form-group\"><label for=\"metaName\">Name</label> <input type=\"text\" id=\"metaName\" name=\"name\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/meta.templ`, Line: 176, Col: 64}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/meta.templ`, Line: 178, Col: 64}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "\" required maxlength=\"120\" placeholder=\"impact-site-verification\"><p class=\"form-hint\">The <code>name</code> attribute on the meta tag.</p></div><div class=\"form-row\"><div class=\"form-group\"><label for=\"metaContent\">Content</label> <input type=\"text\" id=\"metaContent\" name=\"content\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "\" required maxlength=\"120\" placeholder=\"impact-site-verification\"><p class=\"form-hint\">The <code>name</code> attribute on the meta tag.</p></div><div class=\"form-row\"><div class=\"form-group\"><label for=\"metaContent\">Content</label> <input type=\"text\" id=\"metaContent\" name=\"content\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Content)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/meta.templ`, Line: 182, Col: 74}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/meta.templ`, Line: 184, Col: 74}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var25)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "\" maxlength=\"2048\" placeholder=\"Optional\"><p class=\"form-hint\">Rendered as <code>content=\"...\"</code> when set.</p></div><div class=\"form-group\"><label for=\"metaValue\">Value</label> <input type=\"text\" id=\"metaValue\" name=\"value\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\" maxlength=\"2048\" placeholder=\"Optional\"><p class=\"form-hint\">Rendered as <code>content=\"...\"</code> when set.</p></div><div class=\"form-group\"><label for=\"metaValue\">Value</label> <input type=\"text\" id=\"metaValue\" name=\"value\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var26 string
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/meta.templ`, Line: 187, Col: 68}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/meta.templ`, Line: 189, Col: 68}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "\" maxlength=\"2048\" placeholder=\"Optional\"><p class=\"form-hint\">Rendered as <code>value=\"...\"</code> when set.</p></div></div><div class=\"form-group meta-tag-sort-field\"><label for=\"metaSortOrder\">Sort order</label> <input type=\"number\" id=\"metaSortOrder\" name=\"sort_order\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\" maxlength=\"2048\" placeholder=\"Optional\"><p class=\"form-hint\">Rendered as <code>value=\"...\"</code> when set.</p></div></div><div class=\"form-group meta-tag-sort-field\"><label for=\"metaSortOrder\">Sort order</label> <input type=\"number\" id=\"metaSortOrder\" name=\"sort_order\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", data.SortOrder))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/meta.templ`, Line: 193, Col: 101}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/meta.templ`, Line: 195, Col: 101}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\" min=\"0\" step=\"1\"><p class=\"form-hint\">Lower numbers appear first in the document head.</p></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "\" min=\"0\" step=\"1\"><p class=\"form-hint\">Lower numbers appear first in the document head.</p></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -658,7 +674,7 @@ func MetaTagsPageStyles() templ.Component {
 			templ_7745c5c3_Var28 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "<style>\r\n\t\t.meta-tags-subtitle {\r\n\t\t\tmargin-top: var(--space-2);\r\n\t\t\tmargin-bottom: var(--space-6);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tmax-width: 42rem;\r\n\t\t\tline-height: 1.5;\r\n\t\t}\r\n\r\n\t\t.meta-tags-subtitle code {\r\n\t\t\tfont-family: \"Fira Code\", monospace;\r\n\t\t\tfont-size: 0.875em;\r\n\t\t}\r\n\r\n\t\t.meta-tags-card {\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tpadding: var(--space-6);\r\n\t\t\tmax-width: 48rem;\r\n\t\t\tmargin-bottom: var(--space-6);\r\n\t\t}\r\n\r\n\t\t.meta-tags-card-title {\r\n\t\t\tfont-size: 1.125rem;\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.meta-tag-form-actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.meta-tag-form-actions .btn,\r\n\t\t.meta-tag-form-actions .btn-secondary {\r\n\t\t\tmargin-top: 0;\r\n\t\t}\r\n\r\n\t\t.meta-tag-sort-field {\r\n\t\t\tmax-width: 12rem;\r\n\t\t}\r\n\r\n\t\t.meta-tags-table-wrap {\r\n\t\t\tmargin-top: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.meta-tags-empty {\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.meta-tags-back {\r\n\t\t\tmargin-top: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.meta-tags-back a {\r\n\t\t\tcolor: var(--color-secondary);\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "<style>\n\t\t.meta-tags-subtitle {\n\t\t\tmargin-top: var(--space-2);\n\t\t\tmargin-bottom: var(--space-6);\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tmax-width: 42rem;\n\t\t\tline-height: 1.5;\n\t\t}\n\n\t\t.meta-tags-subtitle code {\n\t\t\tfont-family: \"Fira Code\", monospace;\n\t\t\tfont-size: 0.875em;\n\t\t}\n\n\t\t.meta-tags-card {\n\t\t\tbackground: var(--color-surface);\n\t\t\tborder: 1px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-lg);\n\t\t\tpadding: var(--space-6);\n\t\t\tmax-width: 48rem;\n\t\t\tmargin-bottom: var(--space-6);\n\t\t}\n\n\t\t.meta-tags-card-title {\n\t\t\tfont-size: 1.125rem;\n\t\t\tmargin-bottom: var(--space-4);\n\t\t}\n\n\t\t.meta-tag-form-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t}\n\n\t\t.meta-tag-form-actions .btn,\n\t\t.meta-tag-form-actions .btn-secondary {\n\t\t\tmargin-top: 0;\n\t\t}\n\n\t\t.meta-tag-sort-field {\n\t\t\tmax-width: 12rem;\n\t\t}\n\n\t\t.meta-tags-table-wrap {\n\t\t\tmargin-top: var(--space-4);\n\t\t}\n\n\t\t.meta-tags-empty {\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.meta-tags-back {\n\t\t\tmargin-top: var(--space-4);\n\t\t}\n\n\t\t.meta-tags-back a {\n\t\t\tcolor: var(--color-secondary);\n\t\t}\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
