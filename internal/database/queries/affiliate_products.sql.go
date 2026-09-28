@@ -95,6 +95,158 @@ func (q *Queries) GetAffiliateProductByID(ctx context.Context, id int64) (GetAff
 	return i, err
 }
 
+const getAffiliateProductByItemID = `-- name: GetAffiliateProductByItemID :one
+SELECT
+	p.id,
+	p.affiliate_url,
+	p.product_url,
+	p.shop_id,
+	p.item_id,
+	p.name,
+	p.brand,
+	p.price_display,
+	p.thumbnail_url,
+	p.sort_order,
+	p.import_batch_id,
+	p.sales,
+	p.affiliated_shop_id,
+	COALESCE(s.brand_name, '') AS shop_brand_name,
+	p.commission_rate,
+	p.commission,
+	p.click_count,
+	p.created_at,
+	p.updated_at
+FROM tbl_affiliate_products p
+LEFT JOIN tbl_affiliated_product_shops s ON s.id = p.affiliated_shop_id
+WHERE p.item_id = ?
+	AND TRIM(p.item_id) != ''
+`
+
+type GetAffiliateProductByItemIDRow struct {
+	ID               int64
+	AffiliateUrl     string
+	ProductUrl       string
+	ShopID           string
+	ItemID           string
+	Name             string
+	Brand            string
+	PriceDisplay     string
+	ThumbnailUrl     string
+	SortOrder        int64
+	ImportBatchID    int64
+	Sales            string
+	AffiliatedShopID sql.NullInt64
+	ShopBrandName    string
+	CommissionRate   string
+	Commission       string
+	ClickCount       int64
+	CreatedAt        string
+	UpdatedAt        string
+}
+
+func (q *Queries) GetAffiliateProductByItemID(ctx context.Context, itemID string) (GetAffiliateProductByItemIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getAffiliateProductByItemID, itemID)
+	var i GetAffiliateProductByItemIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.AffiliateUrl,
+		&i.ProductUrl,
+		&i.ShopID,
+		&i.ItemID,
+		&i.Name,
+		&i.Brand,
+		&i.PriceDisplay,
+		&i.ThumbnailUrl,
+		&i.SortOrder,
+		&i.ImportBatchID,
+		&i.Sales,
+		&i.AffiliatedShopID,
+		&i.ShopBrandName,
+		&i.CommissionRate,
+		&i.Commission,
+		&i.ClickCount,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getAffiliateProductsCatalogKeys = `-- name: GetAffiliateProductsCatalogKeys :many
+SELECT
+	p.id,
+	p.affiliate_url,
+	p.product_url,
+	p.shop_id,
+	p.item_id,
+	p.name,
+	p.brand,
+	p.price_display,
+	p.thumbnail_url,
+	p.sales,
+	p.commission_rate,
+	p.commission,
+	p.click_count,
+	COALESCE(s.brand_name, '') AS shop_brand_name
+FROM tbl_affiliate_products p
+LEFT JOIN tbl_affiliated_product_shops s ON s.id = p.affiliated_shop_id
+ORDER BY p.id ASC
+`
+
+type GetAffiliateProductsCatalogKeysRow struct {
+	ID             int64
+	AffiliateUrl   string
+	ProductUrl     string
+	ShopID         string
+	ItemID         string
+	Name           string
+	Brand          string
+	PriceDisplay   string
+	ThumbnailUrl   string
+	Sales          string
+	CommissionRate string
+	Commission     string
+	ClickCount     int64
+	ShopBrandName  string
+}
+
+func (q *Queries) GetAffiliateProductsCatalogKeys(ctx context.Context) ([]GetAffiliateProductsCatalogKeysRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAffiliateProductsCatalogKeys)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAffiliateProductsCatalogKeysRow
+	for rows.Next() {
+		var i GetAffiliateProductsCatalogKeysRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.AffiliateUrl,
+			&i.ProductUrl,
+			&i.ShopID,
+			&i.ItemID,
+			&i.Name,
+			&i.Brand,
+			&i.PriceDisplay,
+			&i.ThumbnailUrl,
+			&i.Sales,
+			&i.CommissionRate,
+			&i.Commission,
+			&i.ClickCount,
+			&i.ShopBrandName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getAllAffiliateProducts = `-- name: GetAllAffiliateProducts :many
 SELECT
 	p.id,

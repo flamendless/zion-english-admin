@@ -9,6 +9,7 @@ import (
 	"strings"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
+	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/metatags"
 )
@@ -46,12 +47,24 @@ func handleMetaList(w http.ResponseWriter, r *http.Request) {
 
 	items := make([]frontend.MetaTagListItem, 0, len(rows))
 	for _, row := range rows {
+		attr := constants.MetaTagAttr(row.Attr)
+		if !constants.ValidMetaTagAttr(string(attr)) {
+			attr = constants.MetaTagAttrName
+		}
+		scope := constants.MetaTagScope(row.Scope)
+		if !constants.ValidMetaTagScope(string(scope)) {
+			scope = constants.MetaTagScopeSiteWide
+		}
 		items = append(items, frontend.MetaTagListItem{
 			ID:          strconv.FormatInt(row.ID, 10),
 			Name:        row.Name,
 			Content:     row.Content,
 			Value:       row.Value,
 			SortOrder:   row.SortOrder,
+			Attr:        attr,
+			Scope:       scope,
+			AttrLabel:   constants.MetaTagAttrLabel(attr),
+			ScopeLabel:  constants.MetaTagScopeLabel(scope),
 			ContentDisp: frontend.MetaTagPreview(row.Content),
 			ValueDisp:   frontend.MetaTagPreview(row.Value),
 		})
@@ -99,6 +112,8 @@ func handleMetaCreate(w http.ResponseWriter, r *http.Request) {
 		Content:   req.Content,
 		Value:     req.Value,
 		SortOrder: req.SortOrder,
+		Attr:      string(req.Attr),
+		Scope:     string(req.Scope),
 	})
 	if err != nil {
 		if strings.Contains(err.Error(), "UNIQUE") {
@@ -126,12 +141,22 @@ func handleMetaEdit(w http.ResponseWriter, r *http.Request, metaID int64) {
 			return
 		}
 
+		attr := constants.MetaTagAttr(row.Attr)
+		if !constants.ValidMetaTagAttr(string(attr)) {
+			attr = constants.MetaTagAttrName
+		}
+		scope := constants.MetaTagScope(row.Scope)
+		if !constants.ValidMetaTagScope(string(scope)) {
+			scope = constants.MetaTagScopeSiteWide
+		}
 		if err := frontend.MetaTagEditPage(frontend.MetaTagFormData{
 			ID:        strconv.FormatInt(metaID, 10),
 			Name:      row.Name,
 			Content:   row.Content,
 			Value:     row.Value,
 			SortOrder: row.SortOrder,
+			Attr:      attr,
+			Scope:     scope,
 			IsEdit:    true,
 		}).Render(ctx, w); err != nil {
 			HttpError(w, err.Error(), http.StatusInternalServerError)
@@ -187,6 +212,8 @@ func handleMetaUpdate(w http.ResponseWriter, r *http.Request, metaID int64) {
 		Content:   req.Content,
 		Value:     req.Value,
 		SortOrder: req.SortOrder,
+		Attr:      string(req.Attr),
+		Scope:     string(req.Scope),
 		ID:        metaID,
 	}); err != nil {
 		if strings.Contains(err.Error(), "UNIQUE") {
@@ -238,5 +265,7 @@ func parseMetaTagRequest(r *http.Request) metatags.Request {
 		Content:   r.FormValue("content"),
 		Value:     r.FormValue("value"),
 		SortOrder: sortOrder,
+		Attr:      constants.MetaTagAttr(strings.TrimSpace(r.FormValue("attr"))),
+		Scope:     constants.MetaTagScope(strings.TrimSpace(r.FormValue("scope"))),
 	}
 }

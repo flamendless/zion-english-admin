@@ -2,6 +2,8 @@ package frontend
 
 import (
 	"fmt"
+	"strings"
+	"zion-english/internal/constants"
 	"zion-english/internal/utils"
 )
 
@@ -35,20 +37,38 @@ type AffiliateFormData struct {
 }
 
 type AffiliateStagedImportItem struct {
-	Index          int
-	Card           AffiliateProductCardData
-	ItemID         string
-	ItemName       string
-	Price          string
-	Sales          string
-	ShopName       string
-	CommissionRate string
-	Commission     string
-	ProductLink    string
-	OfferLink      string
-	ShopeeShopID   string
-	ThumbnailURL   string
-	PriceDisplay   string
+	Index             int
+	Card              AffiliateProductCardData
+	ItemID            string
+	ItemName          string
+	Price             string
+	Sales             string
+	ShopName          string
+	CommissionRate    string
+	Commission        string
+	ProductLink       string
+	OfferLink         string
+	ShopeeShopID      string
+	ThumbnailURL      string
+	PriceDisplay      string
+	DiffStatus        constants.AffiliateImportDiffStatus
+	ExistingProductID int64
+	ChangedFields     []string
+}
+
+type AffiliateImportDiffSummary struct {
+	NewCount            int
+	ChangedCount        int
+	UnchangedCount      int
+	DuplicateInCSVCount int
+	MissingItemKeyCount int
+	RemovedFromCSVCount int
+}
+
+type AffiliateRemovedFromCSVItem struct {
+	ID     string
+	ItemID string
+	Name   string
 }
 
 type AffiliateImportLogEntry struct {
@@ -66,6 +86,8 @@ type AffiliateImportPreviewData struct {
 	PendingSave     bool
 	ImportLogs      []AffiliateImportLogEntry
 	StagedItems     []AffiliateStagedImportItem
+	DiffSummary     AffiliateImportDiffSummary
+	RemovedFromCSV  []AffiliateRemovedFromCSVItem
 }
 
 type AffiliatesPageData struct {
@@ -315,8 +337,58 @@ templ AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad
 									<dt>Thumbnails found</dt>
 									<dd>{ fmt.Sprintf("%d / %d", preview.ThumbnailsFound, preview.ProcessedCount) }</dd>
 								</div>
+								<div class="affiliates-import-summary-item">
+									<dt>New</dt>
+									<dd>{ fmt.Sprintf("%d", preview.DiffSummary.NewCount) }</dd>
+								</div>
+								<div class="affiliates-import-summary-item">
+									<dt>Changed</dt>
+									<dd>{ fmt.Sprintf("%d", preview.DiffSummary.ChangedCount) }</dd>
+								</div>
+								<div class="affiliates-import-summary-item">
+									<dt>Unchanged</dt>
+									<dd>{ fmt.Sprintf("%d", preview.DiffSummary.UnchangedCount) }</dd>
+								</div>
+								<div class="affiliates-import-summary-item">
+									<dt>Duplicate in CSV</dt>
+									<dd>{ fmt.Sprintf("%d", preview.DiffSummary.DuplicateInCSVCount) }</dd>
+								</div>
+								<div class="affiliates-import-summary-item">
+									<dt>Not in file</dt>
+									<dd>{ fmt.Sprintf("%d", preview.DiffSummary.RemovedFromCSVCount) }</dd>
+								</div>
 							</dl>
 						</section>
+						if len(preview.RemovedFromCSV) > 0 {
+							<details class="affiliates-import-removed">
+								<summary class="affiliates-import-removed-summary">
+									In catalog but not in this CSV
+									<span class="affiliates-import-removed-count">({ fmt.Sprintf("%d", len(preview.RemovedFromCSV)) })</span>
+								</summary>
+								<div class="table-wrapper">
+									<table class="affiliates-import-removed-table">
+										<thead>
+											<tr>
+												<th>Item ID</th>
+												<th>Name</th>
+												<th>View</th>
+											</tr>
+										</thead>
+										<tbody>
+											for _, row := range preview.RemovedFromCSV {
+												<tr>
+													<td>{ row.ItemID }</td>
+													<td>{ row.Name }</td>
+													<td>
+														<a href={ utils.URL("/affiliates/" + row.ID + "/view") }>Open</a>
+													</td>
+												</tr>
+											}
+										</tbody>
+									</table>
+								</div>
+							</details>
+						}
 						<details class="affiliates-import-logs" open?={ len(preview.ImportLogs) > 0 }>
 							<summary class="affiliates-import-logs-summary">
 								Logs
@@ -357,7 +429,13 @@ templ AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad
 									<p class="affiliates-import-select-hint">Uncheck any product you do not want to save.</p>
 									<div class="affiliate-product-card-grid">
 										for _, item := range preview.StagedItems {
-											<div class="affiliate-staged-import-item">
+											<div class={ "affiliate-staged-import-item affiliate-staged-import-item--" + string(item.DiffStatus) }>
+												<div class="affiliate-staged-import-item-meta">
+													@StatusPill(affiliateImportDiffPillLabel(item.DiffStatus), affiliateImportDiffPillTone(item.DiffStatus), false)
+													if len(item.ChangedFields) > 0 {
+														<span class="affiliate-staged-import-changed-fields">{ strings.Join(item.ChangedFields, ", ") }</span>
+													}
+												</div>
 												@AffiliateProductCard(item.Card)
 												@AffiliateStagedImportHiddenFields(item)
 											</div>
@@ -381,7 +459,31 @@ templ AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad
 	</div>
 }
 
+func affiliateImportDiffPillLabel(status constants.AffiliateImportDiffStatus) string {
+	return constants.AffiliateImportDiffStatusLabel(status)
+}
+
+func affiliateImportDiffPillTone(status constants.AffiliateImportDiffStatus) PillTone {
+	switch status {
+	case constants.AffiliateImportDiffNew:
+		return PillToneSuccess
+	case constants.AffiliateImportDiffChanged:
+		return PillToneWarning
+	case constants.AffiliateImportDiffUnchanged:
+		return PillToneNeutral
+	case constants.AffiliateImportDiffDuplicateInCSV:
+		return PillToneError
+	case constants.AffiliateImportDiffMissingItemKey:
+		return PillToneError
+	default:
+		return PillToneNeutral
+	}
+}
+
 templ AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) {
+	if item.ExistingProductID > 0 {
+		<input type="hidden" name={ affiliateStagedFieldName(item.Index, "existing_id") } value={ fmt.Sprintf("%d", item.ExistingProductID) }/>
+	}
 	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "item_id") } value={ item.ItemID }/>
 	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "item_name") } value={ item.ItemName }/>
 	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "price") } value={ item.Price }/>
@@ -792,6 +894,33 @@ templ AffiliatesPageStyles() {
 			font-size: 0.875rem;
 			line-height: 1.4;
 			word-break: break-word;
+		}
+
+		.affiliate-staged-import-item-meta {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-2);
+			margin-bottom: var(--space-2);
+		}
+
+		.affiliate-staged-import-changed-fields {
+			font-size: 0.75rem;
+			color: var(--color-muted-foreground);
+		}
+
+		.affiliates-import-removed {
+			margin-bottom: var(--space-3);
+			border: 1px solid var(--color-border-subtle);
+			border-radius: var(--radius-md);
+			background: var(--color-surface);
+		}
+
+		.affiliates-import-removed-summary {
+			padding: var(--space-3) var(--space-4);
+			font-size: 0.875rem;
+			font-weight: 600;
+			cursor: pointer;
 		}
 
 		.affiliates-import-logs,

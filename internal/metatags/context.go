@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 )
 
@@ -16,6 +17,8 @@ type Tag struct {
 	Name    string
 	Content string
 	Value   string
+	Attr    constants.MetaTagAttr
+	Scope   constants.MetaTagScope
 }
 
 func Get(ctx context.Context) []Tag {
@@ -35,10 +38,20 @@ func Middleware(db *queries.Queries, next http.Handler) http.Handler {
 		if err == nil {
 			tags := make([]Tag, 0, len(rows))
 			for _, row := range rows {
+				attr := constants.MetaTagAttr(row.Attr)
+				if !constants.ValidMetaTagAttr(string(attr)) {
+					attr = constants.MetaTagAttrName
+				}
+				scope := constants.MetaTagScope(row.Scope)
+				if !constants.ValidMetaTagScope(string(scope)) {
+					scope = constants.MetaTagScopeSiteWide
+				}
 				tags = append(tags, Tag{
 					Name:    row.Name,
 					Content: row.Content,
 					Value:   row.Value,
+					Attr:    attr,
+					Scope:   scope,
 				})
 			}
 			ctx = context.WithValue(ctx, tagsKey, tags)

@@ -26,27 +26,43 @@ SELECT
 	content,
 	value,
 	sort_order,
+	attr,
+	scope,
 	created_at,
 	updated_at
 FROM tbl_meta_tags
 ORDER BY sort_order ASC, id ASC
 `
 
-func (q *Queries) GetAllMetaTags(ctx context.Context) ([]TblMetaTag, error) {
+type GetAllMetaTagsRow struct {
+	ID        int64
+	Name      string
+	Content   string
+	Value     string
+	SortOrder int64
+	Attr      string
+	Scope     string
+	CreatedAt string
+	UpdatedAt string
+}
+
+func (q *Queries) GetAllMetaTags(ctx context.Context) ([]GetAllMetaTagsRow, error) {
 	rows, err := q.db.QueryContext(ctx, getAllMetaTags)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []TblMetaTag
+	var items []GetAllMetaTagsRow
 	for rows.Next() {
-		var i TblMetaTag
+		var i GetAllMetaTagsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
 			&i.Content,
 			&i.Value,
 			&i.SortOrder,
+			&i.Attr,
+			&i.Scope,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -70,21 +86,37 @@ SELECT
 	content,
 	value,
 	sort_order,
+	attr,
+	scope,
 	created_at,
 	updated_at
 FROM tbl_meta_tags
 WHERE id = ?
 `
 
-func (q *Queries) GetMetaTagByID(ctx context.Context, id int64) (TblMetaTag, error) {
+type GetMetaTagByIDRow struct {
+	ID        int64
+	Name      string
+	Content   string
+	Value     string
+	SortOrder int64
+	Attr      string
+	Scope     string
+	CreatedAt string
+	UpdatedAt string
+}
+
+func (q *Queries) GetMetaTagByID(ctx context.Context, id int64) (GetMetaTagByIDRow, error) {
 	row := q.db.QueryRowContext(ctx, getMetaTagByID, id)
-	var i TblMetaTag
+	var i GetMetaTagByIDRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Content,
 		&i.Value,
 		&i.SortOrder,
+		&i.Attr,
+		&i.Scope,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -98,21 +130,37 @@ SELECT
 	content,
 	value,
 	sort_order,
+	attr,
+	scope,
 	created_at,
 	updated_at
 FROM tbl_meta_tags
 WHERE name = ?
 `
 
-func (q *Queries) GetMetaTagByName(ctx context.Context, name string) (TblMetaTag, error) {
+type GetMetaTagByNameRow struct {
+	ID        int64
+	Name      string
+	Content   string
+	Value     string
+	SortOrder int64
+	Attr      string
+	Scope     string
+	CreatedAt string
+	UpdatedAt string
+}
+
+func (q *Queries) GetMetaTagByName(ctx context.Context, name string) (GetMetaTagByNameRow, error) {
 	row := q.db.QueryRowContext(ctx, getMetaTagByName, name)
-	var i TblMetaTag
+	var i GetMetaTagByNameRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Content,
 		&i.Value,
 		&i.SortOrder,
+		&i.Attr,
+		&i.Scope,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -120,8 +168,8 @@ func (q *Queries) GetMetaTagByName(ctx context.Context, name string) (TblMetaTag
 }
 
 const insertMetaTag = `-- name: InsertMetaTag :one
-INSERT INTO tbl_meta_tags (name, content, value, sort_order)
-VALUES (?, ?, ?, ?)
+INSERT INTO tbl_meta_tags (name, content, value, sort_order, attr, scope)
+VALUES (?, ?, ?, ?, ?, ?)
 RETURNING id
 `
 
@@ -130,6 +178,8 @@ type InsertMetaTagParams struct {
 	Content   string
 	Value     string
 	SortOrder int64
+	Attr      string
+	Scope     string
 }
 
 func (q *Queries) InsertMetaTag(ctx context.Context, arg InsertMetaTagParams) (int64, error) {
@@ -138,6 +188,8 @@ func (q *Queries) InsertMetaTag(ctx context.Context, arg InsertMetaTagParams) (i
 		arg.Content,
 		arg.Value,
 		arg.SortOrder,
+		arg.Attr,
+		arg.Scope,
 	)
 	var id int64
 	err := row.Scan(&id)
@@ -151,6 +203,8 @@ SET
 	content = ?,
 	value = ?,
 	sort_order = ?,
+	attr = ?,
+	scope = ?,
 	updated_at = datetime('now')
 WHERE id = ?
 `
@@ -160,6 +214,8 @@ type UpdateMetaTagParams struct {
 	Content   string
 	Value     string
 	SortOrder int64
+	Attr      string
+	Scope     string
 	ID        int64
 }
 
@@ -169,6 +225,8 @@ func (q *Queries) UpdateMetaTag(ctx context.Context, arg UpdateMetaTagParams) er
 		arg.Content,
 		arg.Value,
 		arg.SortOrder,
+		arg.Attr,
+		arg.Scope,
 		arg.ID,
 	)
 	return err

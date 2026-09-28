@@ -316,6 +316,40 @@ func (q *Queries) GetRecentNotificationsForTeacher(ctx context.Context, arg GetR
 	return items, nil
 }
 
+const getTeacherNotificationPreferences = `-- name: GetTeacherNotificationPreferences :many
+SELECT category, enabled
+FROM tbl_teacher_notification_preferences
+WHERE teacher_id = ?
+`
+
+type GetTeacherNotificationPreferencesRow struct {
+	Category string
+	Enabled  int64
+}
+
+func (q *Queries) GetTeacherNotificationPreferences(ctx context.Context, teacherID int64) ([]GetTeacherNotificationPreferencesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTeacherNotificationPreferences, teacherID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTeacherNotificationPreferencesRow
+	for rows.Next() {
+		var i GetTeacherNotificationPreferencesRow
+		if err := rows.Scan(&i.Category, &i.Enabled); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const insertNotification = `-- name: InsertNotification :exec
 INSERT OR IGNORE INTO tbl_notifications (
 	from_teacher_id,
@@ -401,5 +435,24 @@ type MarkNotificationReadForTeacherParams struct {
 
 func (q *Queries) MarkNotificationReadForTeacher(ctx context.Context, arg MarkNotificationReadForTeacherParams) error {
 	_, err := q.db.ExecContext(ctx, markNotificationReadForTeacher, arg.ID, arg.ToTeacherID)
+	return err
+}
+
+const upsertTeacherNotificationPreference = `-- name: UpsertTeacherNotificationPreference :exec
+INSERT INTO tbl_teacher_notification_preferences (teacher_id, category, enabled, updated_at)
+VALUES (?, ?, ?, datetime('now'))
+ON CONFLICT(teacher_id, category) DO UPDATE SET
+	enabled = excluded.enabled,
+	updated_at = datetime('now')
+`
+
+type UpsertTeacherNotificationPreferenceParams struct {
+	TeacherID int64
+	Category  string
+	Enabled   int64
+}
+
+func (q *Queries) UpsertTeacherNotificationPreference(ctx context.Context, arg UpsertTeacherNotificationPreferenceParams) error {
+	_, err := q.db.ExecContext(ctx, upsertTeacherNotificationPreference, arg.TeacherID, arg.Category, arg.Enabled)
 	return err
 }

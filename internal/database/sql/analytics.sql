@@ -252,3 +252,56 @@ SELECT
 			WHERE m.student_id = s.id AND m.teacher_id = ?
 		))
 	), 0) AS churned_in_period;
+
+-- name: GetAnalyticsTrialSummary :one
+SELECT
+	COALESCE((
+		SELECT SUM(CASE WHEN cr.is_trial_class = 1 AND cr.status = 'conducted' THEN 1 ELSE 0 END)
+		FROM tbl_class_records cr
+		WHERE cr.date >= ? AND cr.date <= ?
+			AND cr.deleted_at IS NULL
+			AND (? = 0 OR cr.teacher_id = ?)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_teacher_roles tr
+				WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
+			)
+	), 0) AS trial_conducted,
+	COALESCE((
+		SELECT SUM(CASE WHEN cr.is_trial_class = 0 AND cr.status = 'conducted' THEN 1 ELSE 0 END)
+		FROM tbl_class_records cr
+		WHERE cr.date >= ? AND cr.date <= ?
+			AND cr.deleted_at IS NULL
+			AND (? = 0 OR cr.teacher_id = ?)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_teacher_roles tr
+				WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
+			)
+	), 0) AS regular_conducted,
+	COALESCE((
+		SELECT COUNT(*)
+		FROM tbl_scheduled_classes sc
+		WHERE sc.scheduled_date >= ? AND sc.scheduled_date <= ?
+			AND sc.is_trial_class = 1
+			AND sc.status = 'scheduled'
+			AND sc.deleted_at IS NULL
+			AND (? = 0 OR sc.teacher_id = ?)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_teacher_roles tr
+				WHERE tr.teacher_id = sc.teacher_id AND tr.role IN ('tester', 'developer')
+			)
+	), 0) AS trial_scheduled;
+
+-- name: GetAnalyticsTrialWeekly :many
+SELECT
+	strftime('%Y-W%W', cr.date) AS week_label,
+	COALESCE(SUM(CASE WHEN cr.is_trial_class = 1 AND cr.status = 'conducted' THEN 1 ELSE 0 END), 0) AS trial_conducted
+FROM tbl_class_records cr
+WHERE cr.date >= ? AND cr.date <= ?
+	AND cr.deleted_at IS NULL
+	AND (? = 0 OR cr.teacher_id = ?)
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
+	)
+GROUP BY week_label
+ORDER BY week_label ASC;

@@ -113,6 +113,18 @@ templ Analytics(data AnalyticsData) {
 
 				<div class="analytics-summary" id="summaryCards"></div>
 
+				<div class="analytics-section">
+					<h2>Trial classes</h2>
+					<p class="analytics-hint">Trial classes are recorded at the PHP 50 trial rate. Counts use conducted class records and upcoming scheduled trials in the selected period.</p>
+					<div class="analytics-summary" id="trialSummaryCards"></div>
+					<div class="analytics-chart-card">
+						<h2>Conducted trials by week</h2>
+						<div class="analytics-chart-wrap">
+							<canvas id="trialWeeklyChart"></canvas>
+						</div>
+					</div>
+				</div>
+
 				<div class="analytics-charts">
 					<div class="analytics-chart-card">
 						<h2>Class Status</h2>
@@ -404,6 +416,20 @@ templ Analytics(data AnalyticsData) {
 				return '<div class="analytics-teacher-cell">' + renderAvatarHTML(avatar) + '<span>' + escapeHTML(name) + '</span></div>';
 			}
 
+			function renderTrialSummary(trial) {
+				if (!trial) return;
+				const cards = [
+					{ label: 'Conducted trials', value: trial.trialConducted, sub: trial.regularConducted + ' regular conducted' },
+					{ label: 'Trial share', value: formatPct(trial.trialSharePct), sub: 'of conducted classes' },
+					{ label: 'Scheduled trials', value: trial.trialScheduled, sub: 'upcoming in period' }
+				];
+				document.getElementById('trialSummaryCards').innerHTML = cards.map(function (card) {
+					return '<div class="stat-card"><span class="stat-label">' + escapeHTML(card.label) +
+						'</span><span class="stat-value">' + escapeHTML(String(card.value)) +
+						'</span><span class="stat-sub">' + escapeHTML(card.sub) + '</span></div>';
+				}).join('');
+			}
+
 			function renderSummary(summary) {
 				const cards = [
 					{ label: 'Utilization', value: formatPct(summary.utilizationPct), sub: formatMinutes(summary.conductedMinutes) + ' / ' + formatMinutes(summary.scheduledMinutes) },
@@ -608,6 +634,7 @@ templ Analytics(data AnalyticsData) {
 				teacherPage = 1;
 				studentPage = 1;
 				renderSummary(data.summary);
+				renderTrialSummary(data.trialSummary);
 				if (window.analyticsCharts) {
 					window.analyticsCharts.renderAll(data);
 				}

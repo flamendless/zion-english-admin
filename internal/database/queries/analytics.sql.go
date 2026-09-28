@@ -640,6 +640,142 @@ func (q *Queries) GetAnalyticsSummary(ctx context.Context, arg GetAnalyticsSumma
 	return i, err
 }
 
+const getAnalyticsTrialSummary = `-- name: GetAnalyticsTrialSummary :one
+SELECT
+	COALESCE((
+		SELECT SUM(CASE WHEN cr.is_trial_class = 1 AND cr.status = 'conducted' THEN 1 ELSE 0 END)
+		FROM tbl_class_records cr
+		WHERE cr.date >= ? AND cr.date <= ?
+			AND cr.deleted_at IS NULL
+			AND (? = 0 OR cr.teacher_id = ?)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_teacher_roles tr
+				WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
+			)
+	), 0) AS trial_conducted,
+	COALESCE((
+		SELECT SUM(CASE WHEN cr.is_trial_class = 0 AND cr.status = 'conducted' THEN 1 ELSE 0 END)
+		FROM tbl_class_records cr
+		WHERE cr.date >= ? AND cr.date <= ?
+			AND cr.deleted_at IS NULL
+			AND (? = 0 OR cr.teacher_id = ?)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_teacher_roles tr
+				WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
+			)
+	), 0) AS regular_conducted,
+	COALESCE((
+		SELECT COUNT(*)
+		FROM tbl_scheduled_classes sc
+		WHERE sc.scheduled_date >= ? AND sc.scheduled_date <= ?
+			AND sc.is_trial_class = 1
+			AND sc.status = 'scheduled'
+			AND sc.deleted_at IS NULL
+			AND (? = 0 OR sc.teacher_id = ?)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_teacher_roles tr
+				WHERE tr.teacher_id = sc.teacher_id AND tr.role IN ('tester', 'developer')
+			)
+	), 0) AS trial_scheduled
+`
+
+type GetAnalyticsTrialSummaryParams struct {
+	Date            string
+	Date_2          string
+	Column3         interface{}
+	TeacherID       int64
+	Date_3          string
+	Date_4          string
+	Column7         interface{}
+	TeacherID_2     int64
+	ScheduledDate   string
+	ScheduledDate_2 string
+	Column11        interface{}
+	TeacherID_3     int64
+}
+
+type GetAnalyticsTrialSummaryRow struct {
+	TrialConducted   interface{}
+	RegularConducted interface{}
+	TrialScheduled   interface{}
+}
+
+func (q *Queries) GetAnalyticsTrialSummary(ctx context.Context, arg GetAnalyticsTrialSummaryParams) (GetAnalyticsTrialSummaryRow, error) {
+	row := q.db.QueryRowContext(ctx, getAnalyticsTrialSummary,
+		arg.Date,
+		arg.Date_2,
+		arg.Column3,
+		arg.TeacherID,
+		arg.Date_3,
+		arg.Date_4,
+		arg.Column7,
+		arg.TeacherID_2,
+		arg.ScheduledDate,
+		arg.ScheduledDate_2,
+		arg.Column11,
+		arg.TeacherID_3,
+	)
+	var i GetAnalyticsTrialSummaryRow
+	err := row.Scan(&i.TrialConducted, &i.RegularConducted, &i.TrialScheduled)
+	return i, err
+}
+
+const getAnalyticsTrialWeekly = `-- name: GetAnalyticsTrialWeekly :many
+SELECT
+	strftime('%Y-W%W', cr.date) AS week_label,
+	COALESCE(SUM(CASE WHEN cr.is_trial_class = 1 AND cr.status = 'conducted' THEN 1 ELSE 0 END), 0) AS trial_conducted
+FROM tbl_class_records cr
+WHERE cr.date >= ? AND cr.date <= ?
+	AND cr.deleted_at IS NULL
+	AND (? = 0 OR cr.teacher_id = ?)
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_teacher_roles tr
+		WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
+	)
+GROUP BY week_label
+ORDER BY week_label ASC
+`
+
+type GetAnalyticsTrialWeeklyParams struct {
+	Date      string
+	Date_2    string
+	Column3   interface{}
+	TeacherID int64
+}
+
+type GetAnalyticsTrialWeeklyRow struct {
+	WeekLabel      interface{}
+	TrialConducted interface{}
+}
+
+func (q *Queries) GetAnalyticsTrialWeekly(ctx context.Context, arg GetAnalyticsTrialWeeklyParams) ([]GetAnalyticsTrialWeeklyRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAnalyticsTrialWeekly,
+		arg.Date,
+		arg.Date_2,
+		arg.Column3,
+		arg.TeacherID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAnalyticsTrialWeeklyRow
+	for rows.Next() {
+		var i GetAnalyticsTrialWeeklyRow
+		if err := rows.Scan(&i.WeekLabel, &i.TrialConducted); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getAnalyticsWeeklyTrend = `-- name: GetAnalyticsWeeklyTrend :many
 SELECT
 	strftime('%Y-W%W', cr.date) AS week_label,

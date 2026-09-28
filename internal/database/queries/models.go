@@ -206,6 +206,8 @@ type TblMetaTag struct {
 	SortOrder int64
 	CreatedAt string
 	UpdatedAt string
+	Attr      string
+	Scope     string
 }
 
 type TblNotification struct {
@@ -397,6 +399,13 @@ type TblTeacherMeetingAccount struct {
 	ConnectedAt    string
 	UpdatedAt      string
 	ResourceID     string
+}
+
+type TblTeacherNotificationPreference struct {
+	TeacherID int64
+	Category  string
+	Enabled   int64
+	UpdatedAt string
 }
 
 type TblTeacherPayment struct {

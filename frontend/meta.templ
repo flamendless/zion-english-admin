@@ -3,6 +3,7 @@ package frontend
 import (
 	"fmt"
 	"strings"
+	"zion-english/internal/constants"
 	"zion-english/internal/metatags"
 	"zion-english/internal/utils"
 )
@@ -13,6 +14,10 @@ type MetaTagListItem struct {
 	Content     string
 	Value       string
 	SortOrder   int64
+	Attr        constants.MetaTagAttr
+	Scope       constants.MetaTagScope
+	AttrLabel   string
+	ScopeLabel  string
 	ContentDisp string
 	ValueDisp   string
 }
@@ -27,6 +32,8 @@ type MetaTagFormData struct {
 	Content   string
 	Value     string
 	SortOrder int64
+	Attr      constants.MetaTagAttr
+	Scope     constants.MetaTagScope
 	IsEdit    bool
 }
 
@@ -40,15 +47,19 @@ func MetaTagPreview(s string) string {
 	return s
 }
 
-templ HeadMetaTags() {
+templ HeadMetaTagsForScopes(scopes []constants.MetaTagScope) {
 	{{
-		tags := metatags.Get(ctx)
+		tags := metatags.FilterTagsByScopeList(metatags.Get(ctx), scopes)
 	}}
 	for _, tag := range tags {
-		if strings.EqualFold(strings.TrimSpace(tag.Name), "title") || strings.EqualFold(strings.TrimSpace(tag.Name), "viewport") {
+		if tag.Attr == constants.MetaTagAttrName && (strings.EqualFold(strings.TrimSpace(tag.Name), "title") || strings.EqualFold(strings.TrimSpace(tag.Name), "viewport")) {
 			continue
 		}
-		if tag.Content != "" && tag.Value != "" {
+		if tag.Attr == constants.MetaTagAttrProperty {
+			if tag.Content != "" {
+				<meta property={ tag.Name } content={ tag.Content }/>
+			}
+		} else if tag.Content != "" && tag.Value != "" {
 			<meta name={ tag.Name } content={ tag.Content } value={ tag.Value }/>
 		} else if tag.Content != "" {
 			<meta name={ tag.Name } content={ tag.Content }/>
@@ -56,6 +67,10 @@ templ HeadMetaTags() {
 			<meta name={ tag.Name } value={ tag.Value }/>
 		}
 	}
+}
+
+templ HeadMetaTags() {
+	@HeadMetaTagsForScopes(MetaTagScopesSiteWide())
 }
 
 templ MetaTagsPage(data MetaTagsListData) {
@@ -73,7 +88,7 @@ templ MetaTagsPage(data MetaTagsListData) {
 			@ErrorBanner()
 
 			<p class="meta-tags-subtitle">
-				Configure extra <code>&lt;meta&gt;</code> tags injected into every page head (landing, login, and admin pages). Use for site verification and similar integrations. Names <code>title</code> and <code>viewport</code> are reserved; each page sets its own document title.
+				Configure extra <code>&lt;meta&gt;</code> tags in page heads. Site-wide tags (verification, and similar) render on admin and public pages. Public-page tags render on landing and login only, for Open Graph previews such as <code>og:title</code> and <code>og:image</code>. Names <code>title</code> and <code>viewport</code> are reserved for name attributes; each page sets its own document title.
 			</p>
 
 			<div class="meta-tags-card">
@@ -87,6 +102,8 @@ templ MetaTagsPage(data MetaTagsListData) {
 						<thead>
 							<tr>
 								<th>Name</th>
+								<th>Attr</th>
+								<th>Scope</th>
 								<th>Content</th>
 								<th>Value</th>
 								<th>Order</th>
@@ -97,6 +114,8 @@ templ MetaTagsPage(data MetaTagsListData) {
 							for _, item := range data.Tags {
 								<tr>
 									<td data-label="Name"><code>{ item.Name }</code></td>
+									<td data-label="Attr"><code>{ item.AttrLabel }</code></td>
+									<td data-label="Scope">{ item.ScopeLabel }</td>
 									<td data-label="Content">{ item.ContentDisp }</td>
 									<td data-label="Value">{ item.ValueDisp }</td>
 									<td data-label="Order">{ item.SortOrder }</td>
@@ -169,10 +188,27 @@ templ MetaTagForm(data MetaTagFormData) {
 }
 
 templ metaTagFormFields(data MetaTagFormData) {
+	<div class="form-row">
+		<div class="form-group">
+			<label for="metaAttr">Attribute</label>
+			<select id="metaAttr" name="attr" required>
+				<option value={ string(constants.MetaTagAttrName) } selected?={ data.Attr == constants.MetaTagAttrName || data.Attr == "" }>name</option>
+				<option value={ string(constants.MetaTagAttrProperty) } selected?={ data.Attr == constants.MetaTagAttrProperty }>property</option>
+			</select>
+			<p class="form-hint">Use <code>property</code> on Open Graph tags such as <code>og:title</code>.</p>
+		</div>
+		<div class="form-group">
+			<label for="metaScope">Scope</label>
+			<select id="metaScope" name="scope" required>
+				<option value={ string(constants.MetaTagScopeSiteWide) } selected?={ data.Scope == constants.MetaTagScopeSiteWide || data.Scope == "" }>Site-wide</option>
+				<option value={ string(constants.MetaTagScopePublicPages) } selected?={ data.Scope == constants.MetaTagScopePublicPages }>Public pages (landing and login)</option>
+			</select>
+		</div>
+	</div>
 	<div class="form-group">
 		<label for="metaName">Name</label>
 		<input type="text" id="metaName" name="name" value={ data.Name } required maxlength="120" placeholder="impact-site-verification"/>
-		<p class="form-hint">The <code>name</code> attribute on the meta tag.</p>
+		<p class="form-hint">The tag name or property value (e.g. <code>og:title</code> or <code>og:image</code>).</p>
 	</div>
 	<div class="form-row">
 		<div class="form-group">

@@ -8,7 +8,10 @@ package frontend
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "zion-english/internal/utils"
+import (
+	"zion-english/internal/metatags"
+	"zion-english/internal/utils"
+)
 
 func Landing() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -35,11 +38,28 @@ func Landing() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = HeadMetaTags().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = HeadMetaTagsForScopes(MetaTagScopesLanding()).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<title>Zion English | Admin Portal</title>")
+		landingTitle := "Zion English | Admin Portal"
+		if og := metatags.OgTitle(metatags.FilterTagsByScopeList(metatags.Get(ctx), MetaTagScopesLanding())); og != "" {
+			landingTitle = og
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<title>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var2 string
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(landingTitle)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 21, Col: 23}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -47,20 +67,20 @@ func Landing() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<meta name=\"description\" content=\"The admin portal for Zion English teachers and administrators. Manage students, classes, schedules, learning materials, analytics, and payroll in one place.\"><link rel=\"icon\" type=\"image/x-icon\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<meta name=\"description\" content=\"The admin portal for Zion English teachers and administrators. Manage students, classes, schedules, learning materials, analytics, and payroll in one place.\"><link rel=\"icon\" type=\"image/x-icon\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var2 templ.SafeURL
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
+		var templ_7745c5c3_Var3 templ.SafeURL
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 15, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 24, Col: 78}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap\" rel=\"stylesheet\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\"><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap\" rel=\"stylesheet\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -68,59 +88,59 @@ func Landing() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</head><body class=\"landing-page\"><div class=\"landing-bg\" aria-hidden=\"true\"><div class=\"landing-orb landing-orb--green\"></div><div class=\"landing-orb landing-orb--blue\"></div><div class=\"landing-orb landing-orb--coral\"></div><div class=\"landing-orb landing-orb--amber\"></div></div><header class=\"landing-nav reveal\" data-reveal=\"fade-down\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</head><body class=\"landing-page\"><div class=\"landing-bg\" aria-hidden=\"true\"><div class=\"landing-orb landing-orb--green\"></div><div class=\"landing-orb landing-orb--blue\"></div><div class=\"landing-orb landing-orb--coral\"></div><div class=\"landing-orb landing-orb--amber\"></div></div><header class=\"landing-nav reveal\" data-reveal=\"fade-down\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var3 templ.SafeURL
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/"))
+		var templ_7745c5c3_Var4 templ.SafeURL
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 30, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 39, Col: 27}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"landing-nav__brand\"><img src=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/logo.png"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 31, Col: 44}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"landing-nav__brand\"><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" alt=\"Zion English\" class=\"landing-nav__logo\"> <span>Zion English</span></a><nav class=\"landing-nav__links\" aria-label=\"Primary\"><a href=\"#features\" class=\"landing-nav__link\">Features</a> <a href=\"")
+		var templ_7745c5c3_Var5 string
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/logo.png"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 40, Col: 44}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var5 templ.SafeURL
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/auth/login"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 36, Col: 38}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" class=\"landing-btn landing-btn--primary landing-btn--sm\">Sign in</a></nav></header><main><section class=\"landing-hero\"><div class=\"landing-hero__content\"><h1 class=\"landing-hero__brand reveal\" data-reveal=\"fade-up\" data-delay=\"0\">Zion English</h1><p class=\"landing-eyebrow reveal\" data-reveal=\"fade-up\" data-delay=\"40\">Admin portal</p><h2 class=\"landing-hero__title reveal\" data-reveal=\"fade-up\" data-delay=\"80\">Run your English classes with clarity and confidence</h2><p class=\"landing-hero__subtitle reveal\" data-reveal=\"fade-up\" data-delay=\"160\">Schedule classes with Zoom, attach learning materials, track analytics, and process payroll. Everything your teaching team needs in one dedicated workspace for Zion English.</p><div class=\"landing-hero__actions reveal\" data-reveal=\"fade-up\" data-delay=\"240\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" alt=\"Zion English\" class=\"landing-nav__logo\"> <span>Zion English</span></a><nav class=\"landing-nav__links\" aria-label=\"Primary\"><a href=\"#features\" class=\"landing-nav__link\">Features</a> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 templ.SafeURL
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/auth/login"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 52, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 45, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"landing-btn landing-btn--primary\">Sign in to dashboard</a></div></div><div class=\"landing-hero__panel reveal\" data-reveal=\"fade-left\" data-delay=\"320\"><div class=\"landing-glass landing-glass--hero\"><div class=\"landing-stat landing-stat--accent\"><span class=\"landing-stat__value\">Learning Library</span> <span class=\"landing-stat__label\">Share resources and attach materials to classes</span></div><div class=\"landing-stat\"><span class=\"landing-stat__value\">Class schedule</span> <span class=\"landing-stat__label\">Plan lessons with Zoom links and material attachments</span></div><div class=\"landing-stat\"><span class=\"landing-stat__value\">Analytics</span> <span class=\"landing-stat__label\">Utilization, attendance, and retention insights</span></div><div class=\"landing-stat\"><span class=\"landing-stat__value\">Reports</span> <span class=\"landing-stat__label\">Payroll summaries and XLSX exports by cutoff</span></div></div></div></section><section id=\"features\" class=\"landing-features\"><div class=\"landing-section-header reveal\" data-reveal=\"fade-up\"><p class=\"landing-eyebrow\">Built for teachers &amp; admins</p><h2>Everything you need to stay on top of teaching ops</h2><p class=\"landing-section-header__desc\">From lesson planning to payroll, a focused toolkit for day-to-day teaching operations.</p></div><div class=\"landing-features__grid\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"landing-btn landing-btn--primary landing-btn--sm\">Sign in</a></nav></header><main><section class=\"landing-hero\"><div class=\"landing-hero__content\"><h1 class=\"landing-hero__brand reveal\" data-reveal=\"fade-up\" data-delay=\"0\">Zion English</h1><p class=\"landing-eyebrow reveal\" data-reveal=\"fade-up\" data-delay=\"40\">Admin portal</p><h2 class=\"landing-hero__title reveal\" data-reveal=\"fade-up\" data-delay=\"80\">Run your English classes with clarity and confidence</h2><p class=\"landing-hero__subtitle reveal\" data-reveal=\"fade-up\" data-delay=\"160\">Schedule classes with Zoom, attach learning materials, track analytics, and process payroll. Everything your teaching team needs in one dedicated workspace for Zion English.</p><div class=\"landing-hero__actions reveal\" data-reveal=\"fade-up\" data-delay=\"240\"><a href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var7 templ.SafeURL
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/auth/login"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 61, Col: 40}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"landing-btn landing-btn--primary\">Sign in to dashboard</a></div></div><div class=\"landing-hero__panel reveal\" data-reveal=\"fade-left\" data-delay=\"320\"><div class=\"landing-glass landing-glass--hero\"><div class=\"landing-stat landing-stat--accent\"><span class=\"landing-stat__value\">Learning Library</span> <span class=\"landing-stat__label\">Share resources and attach materials to classes</span></div><div class=\"landing-stat\"><span class=\"landing-stat__value\">Class schedule</span> <span class=\"landing-stat__label\">Plan lessons with Zoom links and material attachments</span></div><div class=\"landing-stat\"><span class=\"landing-stat__value\">Analytics</span> <span class=\"landing-stat__label\">Utilization, attendance, and retention insights</span></div><div class=\"landing-stat\"><span class=\"landing-stat__value\">Reports</span> <span class=\"landing-stat__label\">Payroll summaries and XLSX exports by cutoff</span></div></div></div></section><section id=\"features\" class=\"landing-features\"><div class=\"landing-section-header reveal\" data-reveal=\"fade-up\"><p class=\"landing-eyebrow\">Built for teachers &amp; admins</p><h2>Everything you need to stay on top of teaching ops</h2><p class=\"landing-section-header__desc\">From lesson planning to payroll, a focused toolkit for day-to-day teaching operations.</p></div><div class=\"landing-features__grid\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -178,20 +198,20 @@ func Landing() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></section><section class=\"landing-cta reveal\" data-reveal=\"scale-up\"><div class=\"landing-glass landing-glass--cta\"><h2>Ready to get started?</h2><p>Sign in to your dashboard to manage students, classes, learning materials, and more.</p><div class=\"landing-cta__actions\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div></section><section class=\"landing-cta reveal\" data-reveal=\"scale-up\"><div class=\"landing-glass landing-glass--cta\"><h2>Ready to get started?</h2><p>Sign in to your dashboard to manage students, classes, learning materials, and more.</p><div class=\"landing-cta__actions\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var7 templ.SafeURL
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/auth/login"))
+		var templ_7745c5c3_Var8 templ.SafeURL
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/auth/login"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 130, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 139, Col: 40}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" class=\"landing-btn landing-btn--primary\">Sign in</a></div></div></section></main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" class=\"landing-btn landing-btn--primary\">Sign in</a></div></div></section></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -203,7 +223,7 @@ func Landing() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -227,90 +247,90 @@ func LandingFooter() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var8 == nil {
-			templ_7745c5c3_Var8 = templ.NopComponent
+		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var9 == nil {
+			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<footer class=\"landing-footer reveal\" data-reveal=\"fade-up\"><div class=\"landing-footer__inner\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<footer class=\"landing-footer reveal\" data-reveal=\"fade-up\"><div class=\"landing-footer__inner\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var9 templ.SafeURL
-		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/"))
+		var templ_7745c5c3_Var10 templ.SafeURL
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 146, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 155, Col: 27}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" class=\"landing-footer__brand\"><img src=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var10 string
-		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/logo.png"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 147, Col: 44}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" class=\"landing-footer__brand\"><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" alt=\"Zion English\" class=\"landing-footer__logo\"></a><nav class=\"landing-footer__legal\" aria-label=\"Legal\"><a href=\"")
+		var templ_7745c5c3_Var11 string
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/logo.png"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 156, Col: 44}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var11 templ.SafeURL
-		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/privacy"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 150, Col: 35}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" class=\"landing-footer__legal-link\">Privacy Policy</a> <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" alt=\"Zion English\" class=\"landing-footer__logo\"></a><nav class=\"landing-footer__legal\" aria-label=\"Legal\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var12 templ.SafeURL
-		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/terms"))
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/privacy"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 151, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 159, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" class=\"landing-footer__legal-link\">Terms of Use</a> <a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" class=\"landing-footer__legal-link\">Privacy Policy</a> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var13 templ.SafeURL
-		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/support"))
+		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/terms"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 152, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 160, Col: 33}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" class=\"landing-footer__legal-link\">Support</a></nav><div class=\"landing-footer__partner\"><div class=\"landing-footer__meta\"><p class=\"landing-footer__credit\">made by <a href=\"https://innova-tech.services\" target=\"_blank\" rel=\"noopener noreferrer\">InnovaTech</a></p><div class=\"landing-footer__links\"><a href=\"https://innova-tech.services\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"landing-footer__link\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5a17.92 17.92 0 0 1-8.716-2.247m0 0A8.966 8.966 0 0 1 3 12c0-1.264.26-2.47.732-3.565\"></path></svg> Website</a> <a href=\"https://www.facebook.com/profile.php?id=61584134420643\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"landing-footer__link\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"currentColor\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z\"></path></svg> Facebook</a></div></div><a href=\"https://innova-tech.services\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"landing-footer__partner-logo\"><img src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" class=\"landing-footer__legal-link\">Terms of Use</a> <a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var14 string
-		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/innovatech-logo.png"))
+		var templ_7745c5c3_Var14 templ.SafeURL
+		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/support"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 176, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 161, Col: 35}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" alt=\"InnovaTech\" class=\"landing-footer__partner-logo-img\"></a></div></div></footer>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" class=\"landing-footer__legal-link\">Support</a></nav><div class=\"landing-footer__partner\"><div class=\"landing-footer__meta\"><p class=\"landing-footer__credit\">made by <a href=\"https://innova-tech.services\" target=\"_blank\" rel=\"noopener noreferrer\">InnovaTech</a></p><div class=\"landing-footer__links\"><a href=\"https://innova-tech.services\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"landing-footer__link\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5a17.92 17.92 0 0 1-8.716-2.247m0 0A8.966 8.966 0 0 1 3 12c0-1.264.26-2.47.732-3.565\"></path></svg> Website</a> <a href=\"https://www.facebook.com/profile.php?id=61584134420643\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"landing-footer__link\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"currentColor\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z\"></path></svg> Facebook</a></div></div><a href=\"https://innova-tech.services\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"landing-footer__partner-logo\"><img src=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var15 string
+		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/innovatech-logo.png"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 185, Col: 56}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" alt=\"InnovaTech\" class=\"landing-footer__partner-logo-img\"></a></div></div></footer>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -334,92 +354,92 @@ func LandingFeatureCard(icon string, title string, desc string, delay int) templ
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var15 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var15 == nil {
-			templ_7745c5c3_Var15 = templ.NopComponent
+		templ_7745c5c3_Var16 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var16 == nil {
+			templ_7745c5c3_Var16 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<article class=\"landing-feature reveal\" data-reveal=\"fade-up\" data-delay=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<article class=\"landing-feature reveal\" data-reveal=\"fade-up\" data-delay=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var16 string
-		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(delay)
+		var templ_7745c5c3_Var17 string
+		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue(delay)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 184, Col: 81}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 193, Col: 81}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var17)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\"><div class=\"landing-feature__icon\" aria-hidden=\"true\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\"><div class=\"landing-feature__icon\" aria-hidden=\"true\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		switch icon {
 		case "students":
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z\"></path></svg>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z\"></path></svg>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		case "calendar":
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5\"></path></svg>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5\"></path></svg>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		case "sheet":
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z\"></path></svg>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z\"></path></svg>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		case "library":
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25\"></path></svg>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25\"></path></svg>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		case "chart":
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z\"></path></svg>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z\"></path></svg>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		case "bell":
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0\"></path></svg>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0\"></path></svg>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		default:
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z\"></path></svg>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z\"></path></svg>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</div><h3>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var17 string
-		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(title)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 217, Col: 13}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</h3><p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</div><h3>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var18 string
-		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(desc)
+		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 218, Col: 11}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 226, Col: 13}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</p></article>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</h3><p>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var19 string
+		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(desc)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/landing.templ`, Line: 227, Col: 11}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</p></article>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -443,12 +463,12 @@ func LandingStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var19 == nil {
-			templ_7745c5c3_Var19 = templ.NopComponent
+		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var20 == nil {
+			templ_7745c5c3_Var20 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<style>\n\t\t.landing-html {\n\t\t\tscroll-behavior: smooth;\n\t\t}\n\n\t\t.landing-page {\n\t\t\t--lp-primary: #90C020;\n\t\t\t--lp-primary-dark: #7A9F18;\n\t\t\t--lp-secondary: #20A0E0;\n\t\t\t--lp-tertiary: #F06060;\n\t\t\t--lp-amber: #F0B030;\n\t\t\t--lp-bg: #FAFAF7;\n\t\t\t--lp-fg: #2D2D2D;\n\t\t\t--lp-muted: #6B6560;\n\t\t\t--lp-glass: rgba(255, 255, 255, 0.55);\n\t\t\t--lp-glass-border: rgba(255, 255, 255, 0.65);\n\t\t\t--lp-shadow: 0 8px 32px rgba(45, 45, 45, 0.08);\n\n\t\t\tmin-height: 100vh;\n\t\t\tfont-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\n\t\t\tcolor: var(--lp-fg);\n\t\t\tbackground: var(--lp-bg);\n\t\t\toverflow-x: hidden;\n\t\t\tposition: relative;\n\t\t}\n\n\t\t/* Landing page always plays reveal animations, regardless of OS motion settings. */\n\t\t@media (prefers-reduced-motion: reduce) {\n\t\t\t.landing-page *,\n\t\t\t.landing-page *::before,\n\t\t\t.landing-page *::after {\n\t\t\t\tanimation-duration: revert !important;\n\t\t\t\tanimation-iteration-count: revert !important;\n\t\t\t\ttransition-duration: revert !important;\n\t\t\t}\n\t\t}\n\n\t\t.landing-page h1,\n\t\t.landing-page h2,\n\t\t.landing-page h3 {\n\t\t\tfont-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\n\t\t\tfont-weight: 600;\n\t\t\tline-height: 1.2;\n\t\t}\n\n\t\t.landing-bg {\n\t\t\tposition: fixed;\n\t\t\tinset: 0;\n\t\t\tz-index: 0;\n\t\t\tpointer-events: none;\n\t\t\toverflow: hidden;\n\t\t}\n\n\t\t.landing-orb {\n\t\t\tposition: absolute;\n\t\t\tborder-radius: 50%;\n\t\t\tfilter: blur(80px);\n\t\t\topacity: 0.45;\n\t\t\tanimation: landing-float 18s ease-in-out infinite;\n\t\t}\n\n\t\t.landing-orb--green {\n\t\t\twidth: 420px;\n\t\t\theight: 420px;\n\t\t\tbackground: var(--lp-primary);\n\t\t\ttop: -120px;\n\t\t\tright: -80px;\n\t\t}\n\n\t\t.landing-orb--blue {\n\t\t\twidth: 360px;\n\t\t\theight: 360px;\n\t\t\tbackground: var(--lp-secondary);\n\t\t\tbottom: 10%;\n\t\t\tleft: -100px;\n\t\t\tanimation-delay: -6s;\n\t\t}\n\n\t\t.landing-orb--coral {\n\t\t\twidth: 280px;\n\t\t\theight: 280px;\n\t\t\tbackground: var(--lp-tertiary);\n\t\t\ttop: 40%;\n\t\t\tright: 15%;\n\t\t\tanimation-delay: -12s;\n\t\t}\n\n\t\t.landing-orb--amber {\n\t\t\twidth: 200px;\n\t\t\theight: 200px;\n\t\t\tbackground: var(--lp-amber);\n\t\t\tbottom: -60px;\n\t\t\tright: 30%;\n\t\t\tanimation-delay: -3s;\n\t\t}\n\n\t\t@keyframes landing-float {\n\t\t\t0%, 100% { transform: translate(0, 0) scale(1); }\n\t\t\t33% { transform: translate(24px, -18px) scale(1.04); }\n\t\t\t66% { transform: translate(-16px, 12px) scale(0.96); }\n\t\t}\n\n\t\t.landing-nav {\n\t\t\tposition: relative;\n\t\t\tz-index: 10;\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: space-between;\n\t\t\tgap: 24px;\n\t\t\tmax-width: 1120px;\n\t\t\tmargin: 0 auto;\n\t\t\tpadding: 24px 24px 0;\n\t\t}\n\n\t\t.landing-nav__brand {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: 12px;\n\t\t\ttext-decoration: none;\n\t\t\tcolor: var(--lp-fg);\n\t\t\tfont-family: 'Poppins', sans-serif;\n\t\t\tfont-weight: 600;\n\t\t\tfont-size: 1.05rem;\n\t\t}\n\n\t\t.landing-nav__logo {\n\t\t\theight: 40px;\n\t\t\twidth: auto;\n\t\t}\n\n\t\t.landing-nav__links {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: 20px;\n\t\t}\n\n\t\t.landing-nav__link {\n\t\t\tcolor: var(--lp-muted);\n\t\t\ttext-decoration: none;\n\t\t\tfont-size: 0.95rem;\n\t\t\tfont-weight: 500;\n\t\t\ttransition: color 200ms ease;\n\t\t}\n\n\t\t.landing-nav__link:hover {\n\t\t\tcolor: var(--lp-fg);\n\t\t}\n\n\t\t.landing-btn {\n\t\t\tdisplay: inline-flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\tpadding: 14px 28px;\n\t\t\tborder-radius: 10px;\n\t\t\tfont-family: 'Poppins', sans-serif;\n\t\t\tfont-weight: 600;\n\t\t\tfont-size: 0.95rem;\n\t\t\ttext-decoration: none;\n\t\t\tcursor: pointer;\n\t\t\tborder: 1px solid transparent;\n\t\t\ttransition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease, color 200ms ease, border-color 200ms ease;\n\t\t}\n\n\t\t.landing-btn:hover {\n\t\t\ttransform: translateY(-2px);\n\t\t}\n\n\t\t.landing-btn--sm {\n\t\t\tpadding: 10px 20px;\n\t\t\tfont-size: 0.875rem;\n\t\t}\n\n\t\t.landing-btn--primary {\n\t\t\tbackground: var(--lp-primary);\n\t\t\tcolor: #fff;\n\t\t\tbox-shadow: 0 4px 14px rgba(144, 192, 32, 0.35);\n\t\t}\n\n\t\t.landing-btn--primary:hover {\n\t\t\tbackground: var(--lp-primary-dark);\n\t\t\tbox-shadow: 0 6px 20px rgba(144, 192, 32, 0.4);\n\t\t}\n\n\t\t.landing-btn--ghost {\n\t\t\tbackground: var(--lp-glass);\n\t\t\tbackdrop-filter: blur(12px);\n\t\t\t-webkit-backdrop-filter: blur(12px);\n\t\t\tborder-color: var(--lp-glass-border);\n\t\t\tcolor: var(--lp-fg);\n\t\t}\n\n\t\t.landing-btn--ghost:hover {\n\t\t\tbackground: rgba(255, 255, 255, 0.75);\n\t\t}\n\n\t\t.landing-btn--outline {\n\t\t\tbackground: transparent;\n\t\t\tborder-color: rgba(45, 45, 45, 0.2);\n\t\t\tcolor: var(--lp-fg);\n\t\t}\n\n\t\t.landing-btn--outline:hover {\n\t\t\tborder-color: var(--lp-primary);\n\t\t\tcolor: var(--lp-primary-dark);\n\t\t}\n\n\t\t.landing-hero {\n\t\t\tposition: relative;\n\t\t\tz-index: 1;\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: 1fr 1fr;\n\t\t\tgap: 48px;\n\t\t\talign-items: center;\n\t\t\tmax-width: 1120px;\n\t\t\tmargin: 0 auto;\n\t\t\tpadding: 72px 24px 96px;\n\t\t}\n\n\t\t.landing-eyebrow {\n\t\t\tdisplay: inline-block;\n\t\t\tfont-size: 0.8rem;\n\t\t\tfont-weight: 600;\n\t\t\tletter-spacing: 0.08em;\n\t\t\ttext-transform: uppercase;\n\t\t\tcolor: var(--lp-primary-dark);\n\t\t\tmargin-bottom: 16px;\n\t\t}\n\n\t\t.landing-hero__brand {\n\t\t\tfont-size: clamp(2.75rem, 7vw, 4rem);\n\t\t\tmargin: 0 0 8px;\n\t\t\tletter-spacing: -0.03em;\n\t\t\tline-height: 1.05;\n\t\t}\n\n\t\t.landing-hero__title {\n\t\t\tfont-size: clamp(1.75rem, 4vw, 2.5rem);\n\t\t\tmargin-bottom: 20px;\n\t\t\tletter-spacing: -0.02em;\n\t\t}\n\n\t\t.landing-hero__subtitle {\n\t\t\tfont-size: 1.125rem;\n\t\t\tline-height: 1.7;\n\t\t\tcolor: var(--lp-muted);\n\t\t\tmax-width: 520px;\n\t\t\tmargin-bottom: 32px;\n\t\t}\n\n\t\t.landing-hero__actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\tgap: 14px;\n\t\t}\n\n\t\t.landing-glass {\n\t\t\tbackground: var(--lp-glass);\n\t\t\tbackdrop-filter: blur(16px);\n\t\t\t-webkit-backdrop-filter: blur(16px);\n\t\t\tborder: 1px solid var(--lp-glass-border);\n\t\t\tborder-radius: 20px;\n\t\t\tbox-shadow: var(--lp-shadow);\n\t\t}\n\n\t\t.landing-glass--hero {\n\t\t\tpadding: 28px;\n\t\t\tdisplay: grid;\n\t\t\tgap: 16px;\n\t\t}\n\n\t\t.landing-stat {\n\t\t\tpadding: 18px 20px;\n\t\t\tborder-radius: 12px;\n\t\t\tbackground: rgba(255, 255, 255, 0.5);\n\t\t\tborder: 1px solid rgba(255, 255, 255, 0.6);\n\t\t}\n\n\t\t.landing-stat--accent {\n\t\t\tbackground: rgba(144, 192, 32, 0.12);\n\t\t\tborder-color: rgba(144, 192, 32, 0.25);\n\t\t}\n\n\t\t.landing-stat__value {\n\t\t\tdisplay: block;\n\t\t\tfont-family: 'Poppins', sans-serif;\n\t\t\tfont-weight: 600;\n\t\t\tfont-size: 1.05rem;\n\t\t\tmargin-bottom: 4px;\n\t\t}\n\n\t\t.landing-stat__label {\n\t\t\tfont-size: 0.875rem;\n\t\t\tcolor: var(--lp-muted);\n\t\t\tline-height: 1.5;\n\t\t}\n\n\t\t.landing-features {\n\t\t\tposition: relative;\n\t\t\tz-index: 1;\n\t\t\tmax-width: 1120px;\n\t\t\tmargin: 0 auto;\n\t\t\tpadding: 0 24px 96px;\n\t\t}\n\n\t\t.landing-section-header {\n\t\t\ttext-align: center;\n\t\t\tmax-width: 640px;\n\t\t\tmargin: 0 auto 56px;\n\t\t}\n\n\t\t.landing-section-header h2 {\n\t\t\tfont-size: clamp(1.75rem, 4vw, 2.5rem);\n\t\t\tmargin-bottom: 16px;\n\t\t\tletter-spacing: -0.02em;\n\t\t}\n\n\t\t.landing-section-header__desc {\n\t\t\tcolor: var(--lp-muted);\n\t\t\tfont-size: 1.05rem;\n\t\t\tline-height: 1.6;\n\t\t}\n\n\t\t.landing-features__grid {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: 1fr;\n\t\t\tgap: 24px;\n\t\t}\n\n\t\t@media (min-width: 640px) {\n\t\t\t.landing-features__grid {\n\t\t\t\tgrid-template-columns: repeat(2, 1fr);\n\t\t\t}\n\t\t}\n\n\t\t@media (min-width: 1024px) {\n\t\t\t.landing-features__grid {\n\t\t\t\tgrid-template-columns: repeat(3, 1fr);\n\t\t\t}\n\t\t}\n\n\t\t.landing-feature {\n\t\t\tpadding: 32px;\n\t\t\tborder-radius: 16px;\n\t\t\tbackground: var(--lp-glass);\n\t\t\tbackdrop-filter: blur(14px);\n\t\t\t-webkit-backdrop-filter: blur(14px);\n\t\t\tborder: 1px solid var(--lp-glass-border);\n\t\t\tbox-shadow: var(--lp-shadow);\n\t\t\ttransition: transform 250ms ease, box-shadow 250ms ease;\n\t\t}\n\n\t\t.landing-feature:hover {\n\t\t\ttransform: translateY(-4px);\n\t\t\tbox-shadow: 0 12px 40px rgba(45, 45, 45, 0.1);\n\t\t}\n\n\t\t.landing-feature__icon {\n\t\t\twidth: 48px;\n\t\t\theight: 48px;\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\tborder-radius: 12px;\n\t\t\tbackground: rgba(144, 192, 32, 0.15);\n\t\t\tcolor: var(--lp-primary-dark);\n\t\t\tmargin-bottom: 20px;\n\t\t}\n\n\t\t.landing-feature__icon svg {\n\t\t\twidth: 24px;\n\t\t\theight: 24px;\n\t\t}\n\n\t\t.landing-feature h3 {\n\t\t\tfont-size: 1.15rem;\n\t\t\tmargin-bottom: 10px;\n\t\t}\n\n\t\t.landing-feature p {\n\t\t\tcolor: var(--lp-muted);\n\t\t\tline-height: 1.65;\n\t\t\tfont-size: 0.95rem;\n\t\t}\n\n\t\t.landing-cta {\n\t\t\tposition: relative;\n\t\t\tz-index: 1;\n\t\t\tmax-width: 800px;\n\t\t\tmargin: 0 auto;\n\t\t\tpadding: 0 24px 96px;\n\t\t}\n\n\t\t.landing-glass--cta {\n\t\t\tpadding: 56px 48px;\n\t\t\ttext-align: center;\n\t\t}\n\n\t\t.landing-glass--cta h2 {\n\t\t\tfont-size: clamp(1.5rem, 3vw, 2rem);\n\t\t\tmargin-bottom: 12px;\n\t\t}\n\n\t\t.landing-glass--cta p {\n\t\t\tcolor: var(--lp-muted);\n\t\t\tline-height: 1.65;\n\t\t\tmax-width: 520px;\n\t\t\tmargin: 0 auto 28px;\n\t\t}\n\n\t\t.landing-cta__actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\tgap: 14px;\n\t\t\tjustify-content: center;\n\t\t}\n\n\t\t.landing-footer {\n\t\t\tposition: relative;\n\t\t\tz-index: 1;\n\t\t\tpadding: 32px 24px 40px;\n\t\t\tborder-top: 1px solid rgba(45, 45, 45, 0.08);\n\t\t}\n\n\t\t.landing-footer__inner {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: space-between;\n\t\t\tgap: 24px;\n\t\t\tmax-width: 1120px;\n\t\t\tmargin: 0 auto;\n\t\t}\n\n\t\t.landing-footer__brand {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tflex-shrink: 0;\n\t\t}\n\n\t\t.landing-footer__logo {\n\t\t\theight: 36px;\n\t\t\twidth: auto;\n\t\t}\n\n\t\t.landing-footer__partner {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: 20px;\n\t\t}\n\n\t\t.landing-footer__meta {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\talign-items: flex-end;\n\t\t\tgap: 10px;\n\t\t}\n\n\t\t.landing-footer__credit {\n\t\t\tcolor: var(--lp-muted);\n\t\t\tfont-size: 0.875rem;\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.landing-footer__credit a {\n\t\t\tcolor: var(--lp-fg);\n\t\t\tfont-weight: 600;\n\t\t\ttext-decoration: none;\n\t\t\ttransition: color 200ms ease;\n\t\t}\n\n\t\t.landing-footer__credit a:hover {\n\t\t\tcolor: var(--lp-primary-dark);\n\t\t}\n\n\t\t.landing-footer__legal {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tflex-wrap: wrap;\n\t\t\tgap: 8px 16px;\n\t\t}\n\n\t\t.landing-footer__legal-link {\n\t\t\tcolor: var(--lp-muted);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tfont-weight: 500;\n\t\t\ttext-decoration: none;\n\t\t\ttransition: color 200ms ease;\n\t\t}\n\n\t\t.landing-footer__legal-link:hover {\n\t\t\tcolor: var(--lp-fg);\n\t\t}\n\n\t\t.landing-footer__links {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: 16px;\n\t\t}\n\n\t\t.landing-footer__link {\n\t\t\tdisplay: inline-flex;\n\t\t\talign-items: center;\n\t\t\tgap: 6px;\n\t\t\tcolor: var(--lp-muted);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tfont-weight: 500;\n\t\t\ttext-decoration: none;\n\t\t\ttransition: color 200ms ease;\n\t\t}\n\n\t\t.landing-footer__link svg {\n\t\t\twidth: 16px;\n\t\t\theight: 16px;\n\t\t\tflex-shrink: 0;\n\t\t}\n\n\t\t.landing-footer__link:hover {\n\t\t\tcolor: var(--lp-primary-dark);\n\t\t}\n\n\t\t.landing-footer__partner-logo {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tflex-shrink: 0;\n\t\t\topacity: 0.92;\n\t\t\ttransition: opacity 200ms ease;\n\t\t}\n\n\t\t.landing-footer__partner-logo:hover {\n\t\t\topacity: 1;\n\t\t}\n\n\t\t.landing-footer__partner-logo-img {\n\t\t\theight: 40px;\n\t\t\twidth: auto;\n\t\t\tdisplay: block;\n\t\t}\n\n\t\t/* Reveal animations */\n\t\t.reveal {\n\t\t\topacity: 0;\n\t\t\ttransition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),\n\t\t\t            transform 700ms cubic-bezier(0.22, 1, 0.36, 1);\n\t\t\twill-change: opacity, transform;\n\t\t}\n\n\t\t.reveal[data-reveal=\"fade-up\"] {\n\t\t\ttransform: translateY(32px);\n\t\t}\n\n\t\t.reveal[data-reveal=\"fade-down\"] {\n\t\t\ttransform: translateY(-24px);\n\t\t}\n\n\t\t.reveal[data-reveal=\"fade-left\"] {\n\t\t\ttransform: translateX(40px);\n\t\t}\n\n\t\t.reveal[data-reveal=\"scale-up\"] {\n\t\t\ttransform: scale(0.94);\n\t\t}\n\n\t\t.reveal.is-visible {\n\t\t\topacity: 1;\n\t\t\ttransform: none;\n\t\t}\n\n\t\t@media (max-width: 900px) {\n\t\t\t.landing-hero {\n\t\t\t\tgrid-template-columns: 1fr;\n\t\t\t\tpadding-top: 48px;\n\t\t\t}\n\n\t\t\t.landing-hero__panel {\n\t\t\t\torder: -1;\n\t\t\t}\n\n\t\t\t.landing-nav__links .landing-nav__link:first-child {\n\t\t\t\tdisplay: none;\n\t\t\t}\n\t\t}\n\n\t\t@media (max-width: 480px) {\n\t\t\t.landing-nav {\n\t\t\t\tpadding-top: 16px;\n\t\t\t}\n\n\t\t\t.landing-nav__brand span {\n\t\t\t\tdisplay: none;\n\t\t\t}\n\n\t\t\t.landing-hero__actions,\n\t\t\t.landing-cta__actions {\n\t\t\t\tflex-direction: column;\n\t\t\t\twidth: 100%;\n\t\t\t}\n\n\t\t\t.landing-btn {\n\t\t\t\twidth: 100%;\n\t\t\t}\n\n\t\t\t.landing-glass--cta {\n\t\t\t\tpadding: 40px 24px;\n\t\t\t}\n\n\t\t\t.landing-footer__inner {\n\t\t\t\tflex-direction: column;\n\t\t\t\talign-items: flex-start;\n\t\t\t}\n\n\t\t\t.landing-footer__legal {\n\t\t\t\torder: 2;\n\t\t\t}\n\n\t\t\t.landing-footer__partner {\n\t\t\t\tflex-direction: column;\n\t\t\t\talign-items: flex-start;\n\t\t\t\twidth: 100%;\n\t\t\t}\n\n\t\t\t.landing-footer__meta {\n\t\t\t\talign-items: flex-start;\n\t\t\t}\n\t\t}\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<style>\n\t\t.landing-html {\n\t\t\tscroll-behavior: smooth;\n\t\t}\n\n\t\t.landing-page {\n\t\t\t--lp-primary: #90C020;\n\t\t\t--lp-primary-dark: #7A9F18;\n\t\t\t--lp-secondary: #20A0E0;\n\t\t\t--lp-tertiary: #F06060;\n\t\t\t--lp-amber: #F0B030;\n\t\t\t--lp-bg: #FAFAF7;\n\t\t\t--lp-fg: #2D2D2D;\n\t\t\t--lp-muted: #6B6560;\n\t\t\t--lp-glass: rgba(255, 255, 255, 0.55);\n\t\t\t--lp-glass-border: rgba(255, 255, 255, 0.65);\n\t\t\t--lp-shadow: 0 8px 32px rgba(45, 45, 45, 0.08);\n\n\t\t\tmin-height: 100vh;\n\t\t\tfont-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\n\t\t\tcolor: var(--lp-fg);\n\t\t\tbackground: var(--lp-bg);\n\t\t\toverflow-x: hidden;\n\t\t\tposition: relative;\n\t\t}\n\n\t\t/* Landing page always plays reveal animations, regardless of OS motion settings. */\n\t\t@media (prefers-reduced-motion: reduce) {\n\t\t\t.landing-page *,\n\t\t\t.landing-page *::before,\n\t\t\t.landing-page *::after {\n\t\t\t\tanimation-duration: revert !important;\n\t\t\t\tanimation-iteration-count: revert !important;\n\t\t\t\ttransition-duration: revert !important;\n\t\t\t}\n\t\t}\n\n\t\t.landing-page h1,\n\t\t.landing-page h2,\n\t\t.landing-page h3 {\n\t\t\tfont-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\n\t\t\tfont-weight: 600;\n\t\t\tline-height: 1.2;\n\t\t}\n\n\t\t.landing-bg {\n\t\t\tposition: fixed;\n\t\t\tinset: 0;\n\t\t\tz-index: 0;\n\t\t\tpointer-events: none;\n\t\t\toverflow: hidden;\n\t\t}\n\n\t\t.landing-orb {\n\t\t\tposition: absolute;\n\t\t\tborder-radius: 50%;\n\t\t\tfilter: blur(80px);\n\t\t\topacity: 0.45;\n\t\t\tanimation: landing-float 18s ease-in-out infinite;\n\t\t}\n\n\t\t.landing-orb--green {\n\t\t\twidth: 420px;\n\t\t\theight: 420px;\n\t\t\tbackground: var(--lp-primary);\n\t\t\ttop: -120px;\n\t\t\tright: -80px;\n\t\t}\n\n\t\t.landing-orb--blue {\n\t\t\twidth: 360px;\n\t\t\theight: 360px;\n\t\t\tbackground: var(--lp-secondary);\n\t\t\tbottom: 10%;\n\t\t\tleft: -100px;\n\t\t\tanimation-delay: -6s;\n\t\t}\n\n\t\t.landing-orb--coral {\n\t\t\twidth: 280px;\n\t\t\theight: 280px;\n\t\t\tbackground: var(--lp-tertiary);\n\t\t\ttop: 40%;\n\t\t\tright: 15%;\n\t\t\tanimation-delay: -12s;\n\t\t}\n\n\t\t.landing-orb--amber {\n\t\t\twidth: 200px;\n\t\t\theight: 200px;\n\t\t\tbackground: var(--lp-amber);\n\t\t\tbottom: -60px;\n\t\t\tright: 30%;\n\t\t\tanimation-delay: -3s;\n\t\t}\n\n\t\t@keyframes landing-float {\n\t\t\t0%, 100% { transform: translate(0, 0) scale(1); }\n\t\t\t33% { transform: translate(24px, -18px) scale(1.04); }\n\t\t\t66% { transform: translate(-16px, 12px) scale(0.96); }\n\t\t}\n\n\t\t.landing-nav {\n\t\t\tposition: relative;\n\t\t\tz-index: 10;\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: space-between;\n\t\t\tgap: 24px;\n\t\t\tmax-width: 1120px;\n\t\t\tmargin: 0 auto;\n\t\t\tpadding: 24px 24px 0;\n\t\t}\n\n\t\t.landing-nav__brand {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: 12px;\n\t\t\ttext-decoration: none;\n\t\t\tcolor: var(--lp-fg);\n\t\t\tfont-family: 'Poppins', sans-serif;\n\t\t\tfont-weight: 600;\n\t\t\tfont-size: 1.05rem;\n\t\t}\n\n\t\t.landing-nav__logo {\n\t\t\theight: 40px;\n\t\t\twidth: auto;\n\t\t}\n\n\t\t.landing-nav__links {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: 20px;\n\t\t}\n\n\t\t.landing-nav__link {\n\t\t\tcolor: var(--lp-muted);\n\t\t\ttext-decoration: none;\n\t\t\tfont-size: 0.95rem;\n\t\t\tfont-weight: 500;\n\t\t\ttransition: color 200ms ease;\n\t\t}\n\n\t\t.landing-nav__link:hover {\n\t\t\tcolor: var(--lp-fg);\n\t\t}\n\n\t\t.landing-btn {\n\t\t\tdisplay: inline-flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\tpadding: 14px 28px;\n\t\t\tborder-radius: 10px;\n\t\t\tfont-family: 'Poppins', sans-serif;\n\t\t\tfont-weight: 600;\n\t\t\tfont-size: 0.95rem;\n\t\t\ttext-decoration: none;\n\t\t\tcursor: pointer;\n\t\t\tborder: 1px solid transparent;\n\t\t\ttransition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease, color 200ms ease, border-color 200ms ease;\n\t\t}\n\n\t\t.landing-btn:hover {\n\t\t\ttransform: translateY(-2px);\n\t\t}\n\n\t\t.landing-btn--sm {\n\t\t\tpadding: 10px 20px;\n\t\t\tfont-size: 0.875rem;\n\t\t}\n\n\t\t.landing-btn--primary {\n\t\t\tbackground: var(--lp-primary);\n\t\t\tcolor: #fff;\n\t\t\tbox-shadow: 0 4px 14px rgba(144, 192, 32, 0.35);\n\t\t}\n\n\t\t.landing-btn--primary:hover {\n\t\t\tbackground: var(--lp-primary-dark);\n\t\t\tbox-shadow: 0 6px 20px rgba(144, 192, 32, 0.4);\n\t\t}\n\n\t\t.landing-btn--ghost {\n\t\t\tbackground: var(--lp-glass);\n\t\t\tbackdrop-filter: blur(12px);\n\t\t\t-webkit-backdrop-filter: blur(12px);\n\t\t\tborder-color: var(--lp-glass-border);\n\t\t\tcolor: var(--lp-fg);\n\t\t}\n\n\t\t.landing-btn--ghost:hover {\n\t\t\tbackground: rgba(255, 255, 255, 0.75);\n\t\t}\n\n\t\t.landing-btn--outline {\n\t\t\tbackground: transparent;\n\t\t\tborder-color: rgba(45, 45, 45, 0.2);\n\t\t\tcolor: var(--lp-fg);\n\t\t}\n\n\t\t.landing-btn--outline:hover {\n\t\t\tborder-color: var(--lp-primary);\n\t\t\tcolor: var(--lp-primary-dark);\n\t\t}\n\n\t\t.landing-hero {\n\t\t\tposition: relative;\n\t\t\tz-index: 1;\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: 1fr 1fr;\n\t\t\tgap: 48px;\n\t\t\talign-items: center;\n\t\t\tmax-width: 1120px;\n\t\t\tmargin: 0 auto;\n\t\t\tpadding: 72px 24px 96px;\n\t\t}\n\n\t\t.landing-eyebrow {\n\t\t\tdisplay: inline-block;\n\t\t\tfont-size: 0.8rem;\n\t\t\tfont-weight: 600;\n\t\t\tletter-spacing: 0.08em;\n\t\t\ttext-transform: uppercase;\n\t\t\tcolor: var(--lp-primary-dark);\n\t\t\tmargin-bottom: 16px;\n\t\t}\n\n\t\t.landing-hero__brand {\n\t\t\tfont-size: clamp(2.75rem, 7vw, 4rem);\n\t\t\tmargin: 0 0 8px;\n\t\t\tletter-spacing: -0.03em;\n\t\t\tline-height: 1.05;\n\t\t}\n\n\t\t.landing-hero__title {\n\t\t\tfont-size: clamp(1.75rem, 4vw, 2.5rem);\n\t\t\tmargin-bottom: 20px;\n\t\t\tletter-spacing: -0.02em;\n\t\t}\n\n\t\t.landing-hero__subtitle {\n\t\t\tfont-size: 1.125rem;\n\t\t\tline-height: 1.7;\n\t\t\tcolor: var(--lp-muted);\n\t\t\tmax-width: 520px;\n\t\t\tmargin-bottom: 32px;\n\t\t}\n\n\t\t.landing-hero__actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\tgap: 14px;\n\t\t}\n\n\t\t.landing-glass {\n\t\t\tbackground: var(--lp-glass);\n\t\t\tbackdrop-filter: blur(16px);\n\t\t\t-webkit-backdrop-filter: blur(16px);\n\t\t\tborder: 1px solid var(--lp-glass-border);\n\t\t\tborder-radius: 20px;\n\t\t\tbox-shadow: var(--lp-shadow);\n\t\t}\n\n\t\t.landing-glass--hero {\n\t\t\tpadding: 28px;\n\t\t\tdisplay: grid;\n\t\t\tgap: 16px;\n\t\t}\n\n\t\t.landing-stat {\n\t\t\tpadding: 18px 20px;\n\t\t\tborder-radius: 12px;\n\t\t\tbackground: rgba(255, 255, 255, 0.5);\n\t\t\tborder: 1px solid rgba(255, 255, 255, 0.6);\n\t\t}\n\n\t\t.landing-stat--accent {\n\t\t\tbackground: rgba(144, 192, 32, 0.12);\n\t\t\tborder-color: rgba(144, 192, 32, 0.25);\n\t\t}\n\n\t\t.landing-stat__value {\n\t\t\tdisplay: block;\n\t\t\tfont-family: 'Poppins', sans-serif;\n\t\t\tfont-weight: 600;\n\t\t\tfont-size: 1.05rem;\n\t\t\tmargin-bottom: 4px;\n\t\t}\n\n\t\t.landing-stat__label {\n\t\t\tfont-size: 0.875rem;\n\t\t\tcolor: var(--lp-muted);\n\t\t\tline-height: 1.5;\n\t\t}\n\n\t\t.landing-features {\n\t\t\tposition: relative;\n\t\t\tz-index: 1;\n\t\t\tmax-width: 1120px;\n\t\t\tmargin: 0 auto;\n\t\t\tpadding: 0 24px 96px;\n\t\t}\n\n\t\t.landing-section-header {\n\t\t\ttext-align: center;\n\t\t\tmax-width: 640px;\n\t\t\tmargin: 0 auto 56px;\n\t\t}\n\n\t\t.landing-section-header h2 {\n\t\t\tfont-size: clamp(1.75rem, 4vw, 2.5rem);\n\t\t\tmargin-bottom: 16px;\n\t\t\tletter-spacing: -0.02em;\n\t\t}\n\n\t\t.landing-section-header__desc {\n\t\t\tcolor: var(--lp-muted);\n\t\t\tfont-size: 1.05rem;\n\t\t\tline-height: 1.6;\n\t\t}\n\n\t\t.landing-features__grid {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: 1fr;\n\t\t\tgap: 24px;\n\t\t}\n\n\t\t@media (min-width: 640px) {\n\t\t\t.landing-features__grid {\n\t\t\t\tgrid-template-columns: repeat(2, 1fr);\n\t\t\t}\n\t\t}\n\n\t\t@media (min-width: 1024px) {\n\t\t\t.landing-features__grid {\n\t\t\t\tgrid-template-columns: repeat(3, 1fr);\n\t\t\t}\n\t\t}\n\n\t\t.landing-feature {\n\t\t\tpadding: 32px;\n\t\t\tborder-radius: 16px;\n\t\t\tbackground: var(--lp-glass);\n\t\t\tbackdrop-filter: blur(14px);\n\t\t\t-webkit-backdrop-filter: blur(14px);\n\t\t\tborder: 1px solid var(--lp-glass-border);\n\t\t\tbox-shadow: var(--lp-shadow);\n\t\t\ttransition: transform 250ms ease, box-shadow 250ms ease;\n\t\t}\n\n\t\t.landing-feature:hover {\n\t\t\ttransform: translateY(-4px);\n\t\t\tbox-shadow: 0 12px 40px rgba(45, 45, 45, 0.1);\n\t\t}\n\n\t\t.landing-feature__icon {\n\t\t\twidth: 48px;\n\t\t\theight: 48px;\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\tborder-radius: 12px;\n\t\t\tbackground: rgba(144, 192, 32, 0.15);\n\t\t\tcolor: var(--lp-primary-dark);\n\t\t\tmargin-bottom: 20px;\n\t\t}\n\n\t\t.landing-feature__icon svg {\n\t\t\twidth: 24px;\n\t\t\theight: 24px;\n\t\t}\n\n\t\t.landing-feature h3 {\n\t\t\tfont-size: 1.15rem;\n\t\t\tmargin-bottom: 10px;\n\t\t}\n\n\t\t.landing-feature p {\n\t\t\tcolor: var(--lp-muted);\n\t\t\tline-height: 1.65;\n\t\t\tfont-size: 0.95rem;\n\t\t}\n\n\t\t.landing-cta {\n\t\t\tposition: relative;\n\t\t\tz-index: 1;\n\t\t\tmax-width: 800px;\n\t\t\tmargin: 0 auto;\n\t\t\tpadding: 0 24px 96px;\n\t\t}\n\n\t\t.landing-glass--cta {\n\t\t\tpadding: 56px 48px;\n\t\t\ttext-align: center;\n\t\t}\n\n\t\t.landing-glass--cta h2 {\n\t\t\tfont-size: clamp(1.5rem, 3vw, 2rem);\n\t\t\tmargin-bottom: 12px;\n\t\t}\n\n\t\t.landing-glass--cta p {\n\t\t\tcolor: var(--lp-muted);\n\t\t\tline-height: 1.65;\n\t\t\tmax-width: 520px;\n\t\t\tmargin: 0 auto 28px;\n\t\t}\n\n\t\t.landing-cta__actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\tgap: 14px;\n\t\t\tjustify-content: center;\n\t\t}\n\n\t\t.landing-footer {\n\t\t\tposition: relative;\n\t\t\tz-index: 1;\n\t\t\tpadding: 32px 24px 40px;\n\t\t\tborder-top: 1px solid rgba(45, 45, 45, 0.08);\n\t\t}\n\n\t\t.landing-footer__inner {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: space-between;\n\t\t\tgap: 24px;\n\t\t\tmax-width: 1120px;\n\t\t\tmargin: 0 auto;\n\t\t}\n\n\t\t.landing-footer__brand {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tflex-shrink: 0;\n\t\t}\n\n\t\t.landing-footer__logo {\n\t\t\theight: 36px;\n\t\t\twidth: auto;\n\t\t}\n\n\t\t.landing-footer__partner {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: 20px;\n\t\t}\n\n\t\t.landing-footer__meta {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\talign-items: flex-end;\n\t\t\tgap: 10px;\n\t\t}\n\n\t\t.landing-footer__credit {\n\t\t\tcolor: var(--lp-muted);\n\t\t\tfont-size: 0.875rem;\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.landing-footer__credit a {\n\t\t\tcolor: var(--lp-fg);\n\t\t\tfont-weight: 600;\n\t\t\ttext-decoration: none;\n\t\t\ttransition: color 200ms ease;\n\t\t}\n\n\t\t.landing-footer__credit a:hover {\n\t\t\tcolor: var(--lp-primary-dark);\n\t\t}\n\n\t\t.landing-footer__legal {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tflex-wrap: wrap;\n\t\t\tgap: 8px 16px;\n\t\t}\n\n\t\t.landing-footer__legal-link {\n\t\t\tcolor: var(--lp-muted);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tfont-weight: 500;\n\t\t\ttext-decoration: none;\n\t\t\ttransition: color 200ms ease;\n\t\t}\n\n\t\t.landing-footer__legal-link:hover {\n\t\t\tcolor: var(--lp-fg);\n\t\t}\n\n\t\t.landing-footer__links {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: 16px;\n\t\t}\n\n\t\t.landing-footer__link {\n\t\t\tdisplay: inline-flex;\n\t\t\talign-items: center;\n\t\t\tgap: 6px;\n\t\t\tcolor: var(--lp-muted);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tfont-weight: 500;\n\t\t\ttext-decoration: none;\n\t\t\ttransition: color 200ms ease;\n\t\t}\n\n\t\t.landing-footer__link svg {\n\t\t\twidth: 16px;\n\t\t\theight: 16px;\n\t\t\tflex-shrink: 0;\n\t\t}\n\n\t\t.landing-footer__link:hover {\n\t\t\tcolor: var(--lp-primary-dark);\n\t\t}\n\n\t\t.landing-footer__partner-logo {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tflex-shrink: 0;\n\t\t\topacity: 0.92;\n\t\t\ttransition: opacity 200ms ease;\n\t\t}\n\n\t\t.landing-footer__partner-logo:hover {\n\t\t\topacity: 1;\n\t\t}\n\n\t\t.landing-footer__partner-logo-img {\n\t\t\theight: 40px;\n\t\t\twidth: auto;\n\t\t\tdisplay: block;\n\t\t}\n\n\t\t/* Reveal animations */\n\t\t.reveal {\n\t\t\topacity: 0;\n\t\t\ttransition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),\n\t\t\t            transform 700ms cubic-bezier(0.22, 1, 0.36, 1);\n\t\t\twill-change: opacity, transform;\n\t\t}\n\n\t\t.reveal[data-reveal=\"fade-up\"] {\n\t\t\ttransform: translateY(32px);\n\t\t}\n\n\t\t.reveal[data-reveal=\"fade-down\"] {\n\t\t\ttransform: translateY(-24px);\n\t\t}\n\n\t\t.reveal[data-reveal=\"fade-left\"] {\n\t\t\ttransform: translateX(40px);\n\t\t}\n\n\t\t.reveal[data-reveal=\"scale-up\"] {\n\t\t\ttransform: scale(0.94);\n\t\t}\n\n\t\t.reveal.is-visible {\n\t\t\topacity: 1;\n\t\t\ttransform: none;\n\t\t}\n\n\t\t@media (max-width: 900px) {\n\t\t\t.landing-hero {\n\t\t\t\tgrid-template-columns: 1fr;\n\t\t\t\tpadding-top: 48px;\n\t\t\t}\n\n\t\t\t.landing-hero__panel {\n\t\t\t\torder: -1;\n\t\t\t}\n\n\t\t\t.landing-nav__links .landing-nav__link:first-child {\n\t\t\t\tdisplay: none;\n\t\t\t}\n\t\t}\n\n\t\t@media (max-width: 480px) {\n\t\t\t.landing-nav {\n\t\t\t\tpadding-top: 16px;\n\t\t\t}\n\n\t\t\t.landing-nav__brand span {\n\t\t\t\tdisplay: none;\n\t\t\t}\n\n\t\t\t.landing-hero__actions,\n\t\t\t.landing-cta__actions {\n\t\t\t\tflex-direction: column;\n\t\t\t\twidth: 100%;\n\t\t\t}\n\n\t\t\t.landing-btn {\n\t\t\t\twidth: 100%;\n\t\t\t}\n\n\t\t\t.landing-glass--cta {\n\t\t\t\tpadding: 40px 24px;\n\t\t\t}\n\n\t\t\t.landing-footer__inner {\n\t\t\t\tflex-direction: column;\n\t\t\t\talign-items: flex-start;\n\t\t\t}\n\n\t\t\t.landing-footer__legal {\n\t\t\t\torder: 2;\n\t\t\t}\n\n\t\t\t.landing-footer__partner {\n\t\t\t\tflex-direction: column;\n\t\t\t\talign-items: flex-start;\n\t\t\t\twidth: 100%;\n\t\t\t}\n\n\t\t\t.landing-footer__meta {\n\t\t\t\talign-items: flex-start;\n\t\t\t}\n\t\t}\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -472,12 +492,12 @@ func LandingRevealScript() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var20 == nil {
-			templ_7745c5c3_Var20 = templ.NopComponent
+		templ_7745c5c3_Var21 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var21 == nil {
+			templ_7745c5c3_Var21 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<script>\n\t\t(function () {\n\t\t\tvar reveals = document.querySelectorAll('.reveal');\n\t\t\tif (!reveals.length) return;\n\n\t\t\tvar observer = new IntersectionObserver(function (entries) {\n\t\t\t\tentries.forEach(function (entry) {\n\t\t\t\t\tif (!entry.isIntersecting) return;\n\t\t\t\t\tvar el = entry.target;\n\t\t\t\t\tvar delay = parseInt(el.getAttribute('data-delay') || '0', 10);\n\t\t\t\t\tsetTimeout(function () {\n\t\t\t\t\t\tel.classList.add('is-visible');\n\t\t\t\t\t}, delay);\n\t\t\t\t\tobserver.unobserve(el);\n\t\t\t\t});\n\t\t\t}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });\n\n\t\t\treveals.forEach(function (el) { observer.observe(el); });\n\t\t})();\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<script>\n\t\t(function () {\n\t\t\tvar reveals = document.querySelectorAll('.reveal');\n\t\t\tif (!reveals.length) return;\n\n\t\t\tvar observer = new IntersectionObserver(function (entries) {\n\t\t\t\tentries.forEach(function (entry) {\n\t\t\t\t\tif (!entry.isIntersecting) return;\n\t\t\t\t\tvar el = entry.target;\n\t\t\t\t\tvar delay = parseInt(el.getAttribute('data-delay') || '0', 10);\n\t\t\t\t\tsetTimeout(function () {\n\t\t\t\t\t\tel.classList.add('is-visible');\n\t\t\t\t\t}, delay);\n\t\t\t\t\tobserver.unobserve(el);\n\t\t\t\t});\n\t\t\t}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });\n\n\t\t\treveals.forEach(function (el) { observer.observe(el); });\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

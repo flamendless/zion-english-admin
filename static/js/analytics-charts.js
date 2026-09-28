@@ -251,6 +251,32 @@
 		});
 	}
 
+	function renderTrialWeekly(rows) {
+		destroyChart('trialWeekly');
+		const canvas = document.getElementById('trialWeeklyChart');
+		if (!canvas || !window.Chart) return;
+		const colors = chartColors();
+		const labels = (rows || []).map(function (row) { return row.weekLabel; });
+		const values = (rows || []).map(function (row) { return row.trialConducted; });
+		instances.trialWeekly = new Chart(canvas, {
+			type: 'bar',
+			data: {
+				labels: labels,
+				datasets: [{
+					label: 'Conducted trials',
+					data: values,
+					backgroundColor: colors.success,
+					borderRadius: 4
+				}]
+			},
+			options: Object.assign({}, baseOptions(colors), {
+				plugins: Object.assign({}, baseOptions(colors).plugins, {
+					legend: { display: false }
+				})
+			})
+		});
+	}
+
 	window.analyticsCharts = {
 		destroyAll: function () {
 			Object.keys(instances).forEach(function (key) {
@@ -261,6 +287,7 @@
 			if (!window.Chart) return;
 			renderClassStatus(data && data.summary);
 			renderWeeklyTrend(data && data.weekly);
+			renderTrialWeekly(data && data.trialWeekly);
 			renderInactiveReasons(data && data.inactiveReasons);
 		}
 	};

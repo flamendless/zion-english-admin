@@ -90,3 +90,15 @@ WHERE to_teacher_id IS NULL AND read = 0;
 UPDATE tbl_notifications
 SET read = 1, read_at = datetime('now')
 WHERE to_teacher_id = ? AND read = 0;
+
+-- name: GetTeacherNotificationPreferences :many
+SELECT category, enabled
+FROM tbl_teacher_notification_preferences
+WHERE teacher_id = ?;
+
+-- name: UpsertTeacherNotificationPreference :exec
+INSERT INTO tbl_teacher_notification_preferences (teacher_id, category, enabled, updated_at)
+VALUES (?, ?, ?, datetime('now'))
+ON CONFLICT(teacher_id, category) DO UPDATE SET
+	enabled = excluded.enabled,
+	updated_at = datetime('now');

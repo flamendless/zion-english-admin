@@ -168,6 +168,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/profile/zoom/disconnect", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleZoomDisconnect))
 		authMux.HandleFunc(basePath+"/profile/google-calendar/connect", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleGoogleCalendarConnect))
 		authMux.HandleFunc(basePath+"/profile/google-calendar/disconnect", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleGoogleCalendarDisconnect))
+		authMux.HandleFunc(basePath+"/profile/notifications", auth.RequireRole(auth.RoleTeacher, auth.RoleAdmin, auth.RoleTester)(handleProfileNotificationPreferences))
 		documentsRole := auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)
 		authMux.HandleFunc(basePath+"/documents/partials/rows", documentsRole(handleDocumentsPartial))
 		authMux.HandleFunc(basePath+"/documents", documentsRole(handleDocuments))

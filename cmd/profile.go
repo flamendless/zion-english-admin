@@ -283,6 +283,13 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 	data.GoogleCalendarGuideURL = utils.URL("/guides/" + string(constants.GuideSlugConnectGoogleCalendar))
 	data.GoogleCalendarStatusMessage = profileGoogleCalendarFlashMessage(r.URL.Query())
 
+	prefRows, prefErr := dbRO.GetQueries().GetTeacherNotificationPreferences(ctx, user.ID)
+	if prefErr != nil {
+		logs.Log().Error("get teacher notification preferences", zap.Error(prefErr))
+		prefRows = nil
+	}
+	data.NotificationPreferences = buildNotificationPreferenceItems(prefRows)
+
 	if err := frontend.Profile(data).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}

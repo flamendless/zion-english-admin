@@ -5,6 +5,8 @@ SELECT
 	content,
 	value,
 	sort_order,
+	attr,
+	scope,
 	created_at,
 	updated_at
 FROM tbl_meta_tags
@@ -17,6 +19,8 @@ SELECT
 	content,
 	value,
 	sort_order,
+	attr,
+	scope,
 	created_at,
 	updated_at
 FROM tbl_meta_tags
@@ -29,14 +33,16 @@ SELECT
 	content,
 	value,
 	sort_order,
+	attr,
+	scope,
 	created_at,
 	updated_at
 FROM tbl_meta_tags
 WHERE name = ?;
 
 -- name: InsertMetaTag :one
-INSERT INTO tbl_meta_tags (name, content, value, sort_order)
-VALUES (?, ?, ?, ?)
+INSERT INTO tbl_meta_tags (name, content, value, sort_order, attr, scope)
+VALUES (?, ?, ?, ?, ?, ?)
 RETURNING id;
 
 -- name: UpdateMetaTag :exec
@@ -46,6 +52,8 @@ SET
 	content = ?,
 	value = ?,
 	sort_order = ?,
+	attr = ?,
+	scope = ?,
 	updated_at = datetime('now')
 WHERE id = ?;
 

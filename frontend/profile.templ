@@ -63,6 +63,14 @@ type ProfileData struct {
 	GoogleCalendarDisconnectURL string
 	GoogleCalendarGuideURL      string
 	GoogleCalendarStatusMessage string
+	NotificationPreferences   []NotificationPreferenceItem
+}
+
+type NotificationPreferenceItem struct {
+	Category    string
+	Label       string
+	Description string
+	Enabled     bool
 }
 
 templ Profile(data ProfileData) {
@@ -73,28 +81,97 @@ templ Profile(data ProfileData) {
 		@AvatarStyles()
 		@DocumentsStyles()
 		<style>
+			.profile-page {
+				max-width: 72rem;
+				margin: 0 auto;
+			}
+
+			.profile-page-header {
+				margin-bottom: var(--space-6);
+			}
+
+			.profile-page-header h1 {
+				margin: 0;
+			}
+
+			.profile-page-subtitle {
+				color: var(--color-muted-foreground);
+				margin: var(--space-2) 0 0;
+				font-size: 0.9375rem;
+				line-height: 1.5;
+				max-width: 40rem;
+			}
+
 			.profile-layout {
 				display: grid;
-				gap: var(--space-6);
+				gap: var(--space-5);
 			}
 
 			@media (min-width: 900px) {
 				.profile-layout {
-					grid-template-columns: 280px 1fr;
+					grid-template-columns: minmax(260px, 300px) 1fr;
 					align-items: start;
+					gap: var(--space-6);
 				}
 			}
 
 			.profile-card {
-				background: var(--color-muted);
-				border: 1px solid var(--color-border-subtle);
+				background: var(--color-surface);
+				border: 1px solid var(--color-border);
 				border-radius: var(--radius-lg);
-				padding: var(--space-6);
+				padding: var(--space-5);
+				box-shadow: var(--shadow-sm, 0 1px 2px rgba(15, 23, 42, 0.05));
 			}
 
-			.profile-card h2 {
+			.profile-card--sidebar {
+				padding: 0;
+				overflow: hidden;
+			}
+
+			.profile-card--sidebar .profile-sidebar-body {
+				padding: var(--space-5);
+			}
+
+			.profile-card--main {
+				padding: var(--space-5) var(--space-5) var(--space-6);
+			}
+
+			.profile-identity-band {
+				padding: var(--space-5) var(--space-5) var(--space-4);
+				background: linear-gradient(180deg, var(--color-primary-light) 0%, var(--color-surface) 100%);
+				border-bottom: 1px solid var(--color-border-subtle);
+			}
+
+			.profile-card h2,
+			.profile-panel-head h2 {
+				margin: 0 0 var(--space-1);
+				font-size: 1.0625rem;
+				font-weight: 600;
+				color: var(--color-foreground);
+			}
+
+			.profile-panel-head {
 				margin-bottom: var(--space-4);
-				font-size: 1.125rem;
+			}
+
+			.profile-panel-desc {
+				margin: 0;
+				color: var(--color-muted-foreground);
+				font-size: 0.875rem;
+				line-height: 1.5;
+				max-width: 42rem;
+			}
+
+			.profile-sidebar-roles {
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: center;
+				gap: var(--space-2);
+				margin-top: var(--space-2);
+			}
+
+			.profile-sidebar-status {
+				margin-top: var(--space-2);
 			}
 
 			.profile-identity {
@@ -116,9 +193,9 @@ templ Profile(data ProfileData) {
 			}
 
 			.profile-sidebar-uploads {
-				margin-top: var(--space-5);
-				padding-top: var(--space-5);
-				border-top: 1px solid var(--color-border-subtle);
+				margin-top: 0;
+				padding-top: 0;
+				border-top: none;
 				display: flex;
 				flex-direction: column;
 				gap: var(--space-5);
@@ -247,6 +324,11 @@ templ Profile(data ProfileData) {
 				display: flex;
 				flex-direction: column;
 				gap: var(--space-1);
+				padding: var(--space-3) var(--space-4);
+				background: var(--color-muted);
+				border: 1px solid var(--color-border-subtle);
+				border-radius: var(--radius-md);
+				min-height: 3.25rem;
 			}
 
 			.profile-detail-label {
@@ -267,9 +349,38 @@ templ Profile(data ProfileData) {
 				margin-top: var(--space-6);
 			}
 
+			.profile-section:first-child {
+				margin-top: 0;
+			}
+
 			.profile-section + .profile-section {
 				padding-top: var(--space-6);
 				border-top: 1px solid var(--color-border-subtle);
+			}
+
+			.profile-security-block {
+				padding: var(--space-4);
+				border: 1px solid var(--color-border-subtle);
+				border-radius: var(--radius-md);
+				background: var(--color-muted);
+			}
+
+			.profile-security-block + .profile-security-block {
+				margin-top: var(--space-4);
+			}
+
+			.profile-security-block h2 {
+				margin-top: 0;
+			}
+
+			#myProfileRoot .profile-tab-panel .profile-card {
+				background: var(--color-muted);
+				border-color: var(--color-border-subtle);
+				box-shadow: none;
+			}
+
+			#myProfileRoot .profile-tab-panel .profile-section {
+				margin-top: 0;
 			}
 
 			.profile-section-desc {
@@ -408,246 +519,409 @@ templ Profile(data ProfileData) {
 					padding-left: calc(80px + var(--space-3));
 				}
 			}
+
+			.profile-pref-toggle {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--space-2);
+				font-size: 0.8125rem;
+				font-weight: 500;
+				color: var(--color-muted-foreground);
+				cursor: pointer;
+				user-select: none;
+			}
+
+			.profile-pref-switch {
+				position: relative;
+				display: inline-flex;
+				align-items: center;
+				width: 2.5rem;
+				height: 1.375rem;
+				flex-shrink: 0;
+			}
+
+			.profile-pref-switch input {
+				position: absolute;
+				opacity: 0;
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				cursor: pointer;
+				z-index: 1;
+			}
+
+			.profile-pref-switch-track {
+				width: 100%;
+				height: 100%;
+				border-radius: var(--radius-full);
+				background: var(--color-border);
+				transition: background-color 0.15s ease;
+			}
+
+			.profile-pref-switch-track::after {
+				content: "";
+				position: absolute;
+				top: 2px;
+				left: 2px;
+				width: 1.125rem;
+				height: 1.125rem;
+				border-radius: var(--radius-full);
+				background: var(--color-surface);
+				box-shadow: 0 1px 2px rgba(15, 23, 42, 0.15);
+				transition: transform 0.15s ease;
+			}
+
+			.profile-pref-switch input:checked + .profile-pref-switch-track {
+				background: var(--color-primary);
+			}
+
+			.profile-pref-switch input:checked + .profile-pref-switch-track::after {
+				transform: translateX(1.125rem);
+			}
+
+			.profile-pref-switch input:focus-visible + .profile-pref-switch-track {
+				outline: 2px solid var(--color-primary);
+				outline-offset: 2px;
+			}
+
+			.profile-notifications-form .profile-form-actions {
+				display: flex;
+				justify-content: flex-end;
+				padding-top: var(--space-4);
+				border-top: 1px solid var(--color-border-subtle);
+				margin-top: var(--space-4);
+			}
+
+			.profile-notifications-form .profile-form-actions button {
+				margin-top: 0;
+			}
+
+			.profile-empty-hint {
+				margin: 0;
+				padding: var(--space-4);
+				border-radius: var(--radius-md);
+				background: var(--color-muted);
+				border: 1px dashed var(--color-border);
+				color: var(--color-muted-foreground);
+				font-size: 0.875rem;
+				text-align: center;
+			}
 		</style>
+		<script>
+			window.switchMyProfileTab = function (targetTab) {
+				const root = document.getElementById('myProfileRoot');
+				if (!root || !targetTab) return;
+				root.querySelectorAll('[data-profile-tab]').forEach(function (t) {
+					const active = t.getAttribute('data-profile-tab') === targetTab;
+					t.classList.toggle('is-active', active);
+					t.setAttribute('aria-selected', active ? 'true' : 'false');
+				});
+				root.querySelectorAll('[data-profile-panel]').forEach(function (panel) {
+					const active = panel.getAttribute('data-profile-panel') === targetTab;
+					panel.classList.toggle('is-active', active);
+				});
+				if (window.history && window.history.replaceState) {
+					const url = new URL(window.location.href);
+					url.searchParams.set('tab', targetTab);
+					window.history.replaceState({}, '', url);
+				}
+			};
+
+			document.addEventListener('DOMContentLoaded', function () {
+				const params = new URLSearchParams(window.location.search);
+				let tab = params.get('tab');
+				if (!tab) {
+					if (
+						params.get('zoom_error') ||
+						params.get('zoom_connected') ||
+						params.get('zoom_disconnected') ||
+						params.get('google_calendar_error') ||
+						params.get('google_calendar_connected') ||
+						params.get('google_calendar_disconnected')
+					) {
+						tab = 'integrations';
+					}
+				}
+				if (tab) {
+					window.switchMyProfileTab(tab);
+				}
+			});
+		</script>
 	</head>
 	<body>
-		<div class="container">
+		<div class="container profile-page">
 			@HeaderSimple()
 			@SuccessBanner()
 			@ErrorBanner()
 
-			<div class="page-header" style="margin-bottom: var(--space-6);">
+			<header class="profile-page-header">
 				<h1>My Profile</h1>
-				<p style="color: var(--color-muted-foreground); margin-top: var(--space-2);">View your account details and manage security settings.</p>
-			</div>
+				<p class="profile-page-subtitle">Manage your account, security, integrations, uploads, and in-app notification preferences.</p>
+			</header>
 
 			<div class="profile-layout">
-				<div class="profile-card">
-					<div class="profile-identity">
-						<div id="profileAvatarPreview">
-							@Avatar(data.Avatar)
+				<div class="profile-card profile-card--sidebar">
+					<div class="profile-identity-band">
+						<div class="profile-identity">
+							<div id="profileAvatarPreview">
+								@Avatar(data.Avatar)
+							</div>
+							<h2>{ data.Name }</h2>
+							if !data.IsSuperuser {
+								<div class="profile-sidebar-status">
+									@StatusPill(getTeacherDisplayStatus(data.Status, false), TeacherStatusPillTone(data.Status, false), true)
+								</div>
+								if len(data.Roles) > 0 {
+									<div class="profile-sidebar-roles">
+										@RolePills(data.Roles)
+									</div>
+								}
+							}
+							<p class="profile-email">{ data.Email }</p>
 						</div>
-						<h2>{ data.Name }</h2>
-						<p class="profile-email">{ data.Email }</p>
 					</div>
-
-					<div class="profile-sidebar-uploads">
-						@ProfilePictureUpload(data)
-						@ProfileResumeUpload(data)
+					<div class="profile-sidebar-body">
+						<div class="profile-sidebar-uploads">
+							@ProfilePictureUpload(data)
+							@ProfileResumeUpload(data)
+						</div>
 					</div>
 				</div>
 
 				<div>
-					<div class="profile-card">
-						<h2>Account information</h2>
-						if data.IsSuperuser {
+					if data.IsSuperuser {
+						<div class="profile-card">
+							<h2>Account information</h2>
 							<div class="superuser-note">
 								Superuser credentials are managed by your system administrator and cannot be changed here.
 							</div>
-						}
-						<div class="profile-details">
-							if !data.IsSuperuser {
+							<div class="profile-details">
 								<div class="profile-detail">
-									<span class="profile-detail-label">First name</span>
-									<span class="profile-detail-value">{ displayProfileName(data.FirstName, data.CanEditFirstName) }</span>
+									<span class="profile-detail-label">Email</span>
+									<span class="profile-detail-value">{ data.Email }</span>
 								</div>
-								<div class="profile-detail">
-									<span class="profile-detail-label">Middle name</span>
-									<span class="profile-detail-value">{ displayProfileName(data.MiddleName, data.CanEditMiddleName) }</span>
-								</div>
-								<div class="profile-detail">
-									<span class="profile-detail-label">Last name</span>
-									<span class="profile-detail-value">{ displayProfileName(data.LastName, data.CanEditLastName) }</span>
-								</div>
-								<div class="profile-detail">
-									<span class="profile-detail-label">Status</span>
-									<span class="profile-detail-value">{ data.Status }</span>
-								</div>
-								<div class="profile-detail">
-									<span class="profile-detail-label">Birthdate</span>
-									<span class="profile-detail-value">{ data.Birthdate }</span>
-								</div>
-								<div class="profile-detail">
-									<span class="profile-detail-label">Date joined</span>
-									<span class="profile-detail-value">{ data.JoiningDate }</span>
-								</div>
-								<div class="profile-detail">
-									<span class="profile-detail-label">Address</span>
-									<span class="profile-detail-value">{ data.Address }</span>
-								</div>
-								<div class="profile-detail">
-									<span class="profile-detail-label">Sex</span>
-									<span class="profile-detail-value">{ displayOrDash(data.Sex) }</span>
-								</div>
-								<div class="profile-detail">
-									<span class="profile-detail-label">Rate per class</span>
-									<span class="profile-detail-value">{ utils.FormatCurrency(data.RatePerClass, data.Currency) }</span>
-								</div>
-								<div class="profile-detail">
-									<span class="profile-detail-label">Certifications</span>
-									<span class="profile-detail-value">{ displayOrDash(data.Certifications) }</span>
-								</div>
-								<div class="profile-detail">
-									<span class="profile-detail-label">Google Sheet</span>
-									<span class="profile-detail-value">
-										@displayURL(data.DriveUrl)
-									</span>
-								</div>
-							}
-							<div class="profile-detail">
-								<span class="profile-detail-label">Email</span>
-								<span class="profile-detail-value">{ data.Email }</span>
 							</div>
-							if !data.IsSuperuser {
-								<div class="profile-detail">
-									<span class="profile-detail-label">Mobile number</span>
-									<span class="profile-detail-value">{ data.MobileNumber }</span>
-								</div>
-							}
 						</div>
-					</div>
-
-					if !data.IsSuperuser {
-						@ProfileIntegrations(data)
-						if data.CanEditFirstName || data.CanEditMiddleName || data.CanEditLastName {
-							<div class="profile-card profile-section">
-								<h2>Name</h2>
-								<p class="profile-section-desc">Complete your name. Each field can only be set once.</p>
-								<form method="POST" action={ utils.URL("/profile/names") }>
-									if data.CanEditFirstName {
-										<div class="form-group">
-											<label for="firstName">First name</label>
-											<input
-												type="text"
-												id="firstName"
-												name="firstName"
-												required
-												pattern=".*\S.*"
-												title="First name cannot be empty or whitespace only"
-												autocomplete="given-name"
-												placeholder="Enter first name"
-											/>
-										</div>
-									}
-									if data.CanEditMiddleName {
-										<div class="form-group">
-											<label for="middleName">Middle name</label>
-											<input
-												type="text"
-												id="middleName"
-												name="middleName"
-												autocomplete="additional-name"
-												placeholder="Enter middle name (optional)"
-											/>
-										</div>
-									}
-									if data.CanEditLastName {
-										<div class="form-group">
-											<label for="lastName">Last name</label>
-											<input
-												type="text"
-												id="lastName"
-												name="lastName"
-												required
-												pattern=".*\S.*"
-												title="Last name cannot be empty or whitespace only"
-												autocomplete="family-name"
-												placeholder="Enter last name"
-											/>
-										</div>
-									}
-									<div class="profile-form-actions">
-										<button type="submit">Save name</button>
-									</div>
-								</form>
+					} else {
+						<div class="profile-card profile-card--main" id="myProfileRoot">
+							<div class="profile-tablist" role="tablist" aria-label="My profile sections">
+								<button type="button" class="profile-tab is-active" role="tab" aria-selected="true" data-profile-tab="profile" onclick="window.switchMyProfileTab('profile')">Profile</button>
+								<button type="button" class="profile-tab" role="tab" aria-selected="false" data-profile-tab="security" onclick="window.switchMyProfileTab('security')">Security</button>
+								<button type="button" class="profile-tab" role="tab" aria-selected="false" data-profile-tab="integrations" onclick="window.switchMyProfileTab('integrations')">Integrations</button>
+								<button type="button" class="profile-tab" role="tab" aria-selected="false" data-profile-tab="files" onclick="window.switchMyProfileTab('files')">Files</button>
+								<button type="button" class="profile-tab" role="tab" aria-selected="false" data-profile-tab="notifications" onclick="window.switchMyProfileTab('notifications')">Notifications</button>
 							</div>
-						}
-
-						<div class="profile-card profile-section">
-							<h2>Mobile number</h2>
-							<p class="profile-section-desc">Update your contact number. Changes are limited to once every 7 days.</p>
-							if !data.CanChangeMobile {
-								@CooldownNotice(data.MobileDaysRemaining, "mobile number")
-							}
-							<form method="POST" action={ utils.URL("/profile/mobile") }>
-								<div class="form-group">
-									<label for="mobileNumber">New mobile number</label>
-									<input
-										type="tel"
-										id="mobileNumber"
-										name="mobileNumber"
-										inputmode="tel"
-										autocomplete="tel"
-										value={ data.MobileNumber }
-										required
-										disabled?={ !data.CanChangeMobile }
-										placeholder="Enter mobile number"
-									/>
-								</div>
-								<div class="profile-form-actions">
-									<button type="submit" disabled?={ !data.CanChangeMobile }>Update mobile number</button>
-								</div>
-							</form>
-						</div>
-
-						<div class="profile-card profile-section">
-							<h2>Password</h2>
-							<p class="profile-section-desc">Choose a strong password. Changes are limited to once every 7 days.</p>
-							if !data.CanChangePassword {
-								@CooldownNotice(data.PasswordDaysRemaining, "password")
-							}
-							<form method="POST" action={ utils.URL("/profile/password") }>
-								<div class="form-group">
-									<label for="currentPassword">Current password</label>
-									<div class="password-wrapper">
-										<input
-											type="password"
-											id="currentPassword"
-											name="currentPassword"
-											required
-											disabled?={ !data.CanChangePassword }
-											autocomplete="current-password"
-										/>
-										@ShowPassword("currentPassword")
+							<div class="profile-tab-panel is-active" role="tabpanel" data-profile-panel="profile">
+								@ProfilePanelHead("Account information", "Details on file for your teacher account. Contact an administrator to change read-only fields.")
+								<div class="profile-details">
+									<div class="profile-detail">
+										<span class="profile-detail-label">First name</span>
+										<span class="profile-detail-value">{ displayProfileName(data.FirstName, data.CanEditFirstName) }</span>
+									</div>
+									<div class="profile-detail">
+										<span class="profile-detail-label">Middle name</span>
+										<span class="profile-detail-value">{ displayProfileName(data.MiddleName, data.CanEditMiddleName) }</span>
+									</div>
+									<div class="profile-detail">
+										<span class="profile-detail-label">Last name</span>
+										<span class="profile-detail-value">{ displayProfileName(data.LastName, data.CanEditLastName) }</span>
+									</div>
+									<div class="profile-detail">
+										<span class="profile-detail-label">Status</span>
+										<span class="profile-detail-value">
+											@StatusPill(getTeacherDisplayStatus(data.Status, false), TeacherStatusPillTone(data.Status, false), true)
+										</span>
+									</div>
+									<div class="profile-detail">
+										<span class="profile-detail-label">Birthdate</span>
+										<span class="profile-detail-value">{ data.Birthdate }</span>
+									</div>
+									<div class="profile-detail">
+										<span class="profile-detail-label">Date joined</span>
+										<span class="profile-detail-value">{ data.JoiningDate }</span>
+									</div>
+									<div class="profile-detail">
+										<span class="profile-detail-label">Address</span>
+										<span class="profile-detail-value">{ data.Address }</span>
+									</div>
+									<div class="profile-detail">
+										<span class="profile-detail-label">Sex</span>
+										<span class="profile-detail-value">{ displayOrDash(data.Sex) }</span>
+									</div>
+									<div class="profile-detail">
+										<span class="profile-detail-label">Rate per class</span>
+										<span class="profile-detail-value">{ utils.FormatCurrency(data.RatePerClass, data.Currency) }</span>
+									</div>
+									<div class="profile-detail">
+										<span class="profile-detail-label">Certifications</span>
+										<span class="profile-detail-value">{ displayOrDash(data.Certifications) }</span>
+									</div>
+									<div class="profile-detail">
+										<span class="profile-detail-label">Google Sheet</span>
+										<span class="profile-detail-value">
+											@displayURL(data.DriveUrl)
+										</span>
+									</div>
+									<div class="profile-detail">
+										<span class="profile-detail-label">Email</span>
+										<span class="profile-detail-value">{ data.Email }</span>
+									</div>
+									<div class="profile-detail">
+										<span class="profile-detail-label">Mobile number</span>
+										<span class="profile-detail-value">{ data.MobileNumber }</span>
 									</div>
 								</div>
-								<div class="form-group">
-									<label for="newPassword">New password</label>
-									<div class="password-wrapper">
-										<input
-											type="password"
-											id="newPassword"
-											name="newPassword"
-											required
-											disabled?={ !data.CanChangePassword }
-											autocomplete="new-password"
-										/>
-										@ShowPassword("newPassword")
+							</div>
+							<div class="profile-tab-panel" role="tabpanel" data-profile-panel="security">
+								@ProfilePanelHead("Security", "Update your sign-in details. Some changes are rate-limited to protect your account.")
+								if data.CanEditFirstName || data.CanEditMiddleName || data.CanEditLastName {
+									<div class="profile-security-block">
+										<h2>Name</h2>
+										<p class="profile-section-desc">Complete your name. Each field can only be set once.</p>
+										<form method="POST" action={ utils.URL("/profile/names") }>
+											if data.CanEditFirstName {
+												<div class="form-group">
+													<label for="firstName">First name</label>
+													<input
+														type="text"
+														id="firstName"
+														name="firstName"
+														required
+														pattern=".*\S.*"
+														title="First name cannot be empty or whitespace only"
+														autocomplete="given-name"
+														placeholder="Enter first name"
+													/>
+												</div>
+											}
+											if data.CanEditMiddleName {
+												<div class="form-group">
+													<label for="middleName">Middle name</label>
+													<input
+														type="text"
+														id="middleName"
+														name="middleName"
+														autocomplete="additional-name"
+														placeholder="Enter middle name (optional)"
+													/>
+												</div>
+											}
+											if data.CanEditLastName {
+												<div class="form-group">
+													<label for="lastName">Last name</label>
+													<input
+														type="text"
+														id="lastName"
+														name="lastName"
+														required
+														pattern=".*\S.*"
+														title="Last name cannot be empty or whitespace only"
+														autocomplete="family-name"
+														placeholder="Enter last name"
+													/>
+												</div>
+											}
+											<div class="profile-form-actions">
+												<button type="submit">Save name</button>
+											</div>
+										</form>
 									</div>
+								}
+								<div class="profile-security-block">
+									<h2>Mobile number</h2>
+									<p class="profile-section-desc">Update your contact number. Changes are limited to once every 7 days.</p>
+									if !data.CanChangeMobile {
+										@CooldownNotice(data.MobileDaysRemaining, "mobile number")
+									}
+									<form method="POST" action={ utils.URL("/profile/mobile") }>
+										<div class="form-group">
+											<label for="mobileNumber">New mobile number</label>
+											<input
+												type="tel"
+												id="mobileNumber"
+												name="mobileNumber"
+												inputmode="tel"
+												autocomplete="tel"
+												value={ data.MobileNumber }
+												required
+												disabled?={ !data.CanChangeMobile }
+												placeholder="Enter mobile number"
+											/>
+										</div>
+										<div class="profile-form-actions">
+											<button type="submit" disabled?={ !data.CanChangeMobile }>Update mobile number</button>
+										</div>
+									</form>
 								</div>
-								<div class="form-group">
-									<label for="confirmPassword">Confirm new password</label>
-									<div class="password-wrapper">
-										<input
-											type="password"
-											id="confirmPassword"
-											name="confirmPassword"
-											required
-											disabled?={ !data.CanChangePassword }
-											autocomplete="new-password"
-										/>
-										@ShowPassword("confirmPassword")
-									</div>
+								<div class="profile-security-block">
+									<h2>Password</h2>
+									<p class="profile-section-desc">Choose a strong password. Changes are limited to once every 7 days.</p>
+									if !data.CanChangePassword {
+										@CooldownNotice(data.PasswordDaysRemaining, "password")
+									}
+									<form method="POST" action={ utils.URL("/profile/password") }>
+										<div class="form-group">
+											<label for="currentPassword">Current password</label>
+											<div class="password-wrapper">
+												<input
+													type="password"
+													id="currentPassword"
+													name="currentPassword"
+													required
+													disabled?={ !data.CanChangePassword }
+													autocomplete="current-password"
+												/>
+												@ShowPassword("currentPassword")
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="newPassword">New password</label>
+											<div class="password-wrapper">
+												<input
+													type="password"
+													id="newPassword"
+													name="newPassword"
+													required
+													disabled?={ !data.CanChangePassword }
+													autocomplete="new-password"
+												/>
+												@ShowPassword("newPassword")
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="confirmPassword">Confirm new password</label>
+											<div class="password-wrapper">
+												<input
+													type="password"
+													id="confirmPassword"
+													name="confirmPassword"
+													required
+													disabled?={ !data.CanChangePassword }
+													autocomplete="new-password"
+												/>
+												@ShowPassword("confirmPassword")
+											</div>
+										</div>
+										<div class="profile-form-actions">
+											<button type="submit" disabled?={ !data.CanChangePassword }>Update password</button>
+										</div>
+									</form>
 								</div>
-								<div class="profile-form-actions">
-									<button type="submit" disabled?={ !data.CanChangePassword }>Update password</button>
-								</div>
-							</form>
+							</div>
+							<div class="profile-tab-panel" role="tabpanel" data-profile-panel="integrations">
+								@ProfilePanelHead("Integrations", "Connect Zoom and Google Calendar for automatic meeting links and calendar events.")
+								@ProfileIntegrations(data)
+							</div>
+							<div class="profile-tab-panel" role="tabpanel" data-profile-panel="files">
+								@ProfilePanelHead("Files", "Upload verification documents and your introduction video for administrators.")
+								@ProfileDocumentUpload(data)
+								@ProfileIntroVideoUpload(data)
+							</div>
+							<div class="profile-tab-panel" role="tabpanel" data-profile-panel="notifications">
+								@ProfileNotificationPreferences(data)
+							</div>
 						</div>
 					}
-
-					@ProfileDocumentUpload(data)
-					@ProfileIntroVideoUpload(data)
 				</div>
 			</div>
 		</div>
@@ -682,10 +956,58 @@ templ CooldownNotice(daysRemaining int, fieldLabel string) {
 	</div>
 }
 
+templ ProfilePanelHead(title string, description string) {
+	<div class="profile-panel-head">
+		<h2>{ title }</h2>
+		if description != "" {
+			<p class="profile-panel-desc">{ description }</p>
+		}
+	</div>
+}
+
+templ ProfileNotificationPreferences(data ProfileData) {
+	@ProfilePanelHead("Notification preferences", "Choose which in-app notification categories you receive. Turning off a category stops new notifications only; existing items in your bell and Notifications page stay visible.")
+	<form class="profile-notifications-form" method="POST" action={ utils.URL("/profile/notifications") }>
+		<div class="integration-list">
+			for _, item := range data.NotificationPreferences {
+				<div class="integration-row">
+					<div class="integration-row-brand">
+						<div class="integration-info">
+							<span class="integration-name">{ item.Label }</span>
+							<p class="integration-desc">{ item.Description }</p>
+						</div>
+					</div>
+					<div class="integration-row-meta">
+						<label class="profile-pref-toggle">
+							<span class="profile-pref-switch">
+								<input
+									type="checkbox"
+									name={ notificationPrefFieldName(item.Category) }
+									value="1"
+									checked?={ item.Enabled }
+									aria-label={ "Enable " + item.Label + " notifications" }
+								/>
+								<span class="profile-pref-switch-track" aria-hidden="true"></span>
+							</span>
+							<span class="profile-pref-toggle-label">Enabled</span>
+						</label>
+					</div>
+				</div>
+			}
+		</div>
+		<div class="profile-form-actions">
+			<button type="submit">Save preferences</button>
+		</div>
+	</form>
+}
+
+func notificationPrefFieldName(category string) string {
+	return "pref_" + category
+}
+
 templ ProfileIntegrations(data ProfileData) {
 	if (data.ZoomConfigured && (data.ZoomConnected || data.ZoomIntegrationVisible)) || (data.GoogleCalendarConfigured && (data.GoogleCalendarConnected || data.GoogleCalendarIntegrationVisible)) {
-		<div class="profile-card profile-section">
-			<h2>Integrations</h2>
+		<div class="profile-section" style="margin-top: 0;">
 			if data.ZoomStatusMessage != "" {
 				<div class="form-warning" role="status">{ data.ZoomStatusMessage }</div>
 			}
@@ -701,6 +1023,8 @@ templ ProfileIntegrations(data ProfileData) {
 				}
 			</div>
 		</div>
+	} else {
+		<p class="profile-empty-hint">No integrations are available for your account right now.</p>
 	}
 }
 

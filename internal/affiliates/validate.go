@@ -55,6 +55,9 @@ func ValidateSave(req SaveRequest) error {
 	if len(req.Name) > MaxNameLen {
 		return ErrNameTooLong
 	}
+	if strings.TrimSpace(req.ItemID) == "" && strings.TrimSpace(req.ProductURL) == "" {
+		return ErrProductKeyRequired
+	}
 	if req.ProductURL != "" && !isValidHTTPSURL(req.ProductURL) {
 		return ErrInvalidProductURL
 	}

@@ -7,6 +7,7 @@ templ Login(successMessage string) {
 	<html lang="en">
 		<head>
 			@AdminPageHead("Login - Zion English Admin")
+			@HeadMetaTagsForScopes(MetaTagScopesLoginPublic())
 			@SuccessBanner()
 			@ErrorBanner()
 		</head>

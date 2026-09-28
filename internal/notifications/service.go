@@ -30,6 +30,9 @@ func (s *Service) NotifyTeacher(ctx context.Context, teacherID int64, teacherNam
 	if teacherID <= 0 {
 		return
 	}
+	if !s.teacherAcceptsKind(ctx, teacherID, kind) {
+		return
+	}
 	s.insert(ctx, from, teacherID, teacherName, kind, message, dedupeKey)
 }
 

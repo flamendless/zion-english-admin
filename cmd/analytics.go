@@ -93,8 +93,22 @@ type analyticsRetentionJSON struct {
 	MedianTenureDays int64 `json:"medianTenureDays"`
 }
 
+type analyticsTrialSummaryJSON struct {
+	TrialConducted   int64   `json:"trialConducted"`
+	RegularConducted int64   `json:"regularConducted"`
+	TrialScheduled   int64   `json:"trialScheduled"`
+	TrialSharePct    float64 `json:"trialSharePct"`
+}
+
+type analyticsTrialWeeklyRowJSON struct {
+	WeekLabel      string `json:"weekLabel"`
+	TrialConducted int64  `json:"trialConducted"`
+}
+
 type analyticsResponseJSON struct {
 	Summary    analyticsSummaryJSON        `json:"summary"`
+	TrialSummary analyticsTrialSummaryJSON `json:"trialSummary"`
+	TrialWeekly []analyticsTrialWeeklyRowJSON `json:"trialWeekly"`
 	ByTeacher  []analyticsTeacherRowJSON   `json:"byTeacher"`
 	ByStudent  []analyticsStudentRowJSON   `json:"byStudent"`
 	Weekly     []analyticsWeeklyRowJSON    `json:"weekly"`
@@ -176,6 +190,43 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 	conductedMinutes := sqlNumericToInt64(summaryRow.ConductedMinutes)
 	noShowCount := sqlNumericToInt64(summaryRow.NoShowCount)
 
+	trialRow, err := q.GetAnalyticsTrialSummary(ctx, analyticsTrialSummaryParams(startDate, endDate, teacherID))
+	if err != nil {
+		logs.Log().Error("analytics trial summary", zap.Error(err))
+		HttpError(w, MsgFailedToLoadAnalytics, http.StatusInternalServerError)
+		return
+	}
+	trialConducted := sqlNumericToInt64(trialRow.TrialConducted)
+	regularConducted := sqlNumericToInt64(trialRow.RegularConducted)
+	trialScheduled := sqlNumericToInt64(trialRow.TrialScheduled)
+	trialShare := 0.0
+	if totalConducted := trialConducted + regularConducted; totalConducted > 0 {
+		trialShare = float64(trialConducted) * 100 / float64(totalConducted)
+	}
+
+	trialWeeklyRows, err := q.GetAnalyticsTrialWeekly(ctx, queries.GetAnalyticsTrialWeeklyParams{
+		Date:      startDate,
+		Date_2:    endDate,
+		Column3:   int64(0),
+		TeacherID: teacherID,
+	})
+	if err != nil {
+		logs.Log().Error("analytics trial weekly", zap.Error(err))
+		HttpError(w, MsgFailedToLoadAnalytics, http.StatusInternalServerError)
+		return
+	}
+	trialWeekly := make([]analyticsTrialWeeklyRowJSON, 0, len(trialWeeklyRows))
+	for _, row := range trialWeeklyRows {
+		weekLabel := ""
+		if row.WeekLabel != nil {
+			weekLabel = sqlNumericToString(row.WeekLabel)
+		}
+		trialWeekly = append(trialWeekly, analyticsTrialWeeklyRowJSON{
+			WeekLabel:      weekLabel,
+			TrialConducted: sqlNumericToInt64(row.TrialConducted),
+		})
+	}
+
 	resp := analyticsResponseJSON{
 		Summary: analyticsSummaryJSON{
 			Conducted:        conducted,
@@ -187,6 +238,13 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 			UtilizationPct:   utilizationPct(conductedMinutes, scheduledMinutes),
 			NoShowCount:      noShowCount,
 		},
+		TrialSummary: analyticsTrialSummaryJSON{
+			TrialConducted:   trialConducted,
+			RegularConducted: regularConducted,
+			TrialScheduled:   trialScheduled,
+			TrialSharePct:    trialShare,
+		},
+		TrialWeekly: trialWeekly,
 	}
 
 	if isSuperuser {
@@ -420,6 +478,23 @@ func analyticsTeacherID(r *http.Request) (int64, error) {
 		return 0, ErrInvalidTeacherID
 	}
 	return parsedID, nil
+}
+
+func analyticsTrialSummaryParams(startDate, endDate string, teacherID int64) queries.GetAnalyticsTrialSummaryParams {
+	return queries.GetAnalyticsTrialSummaryParams{
+		Date:            startDate,
+		Date_2:          endDate,
+		Column3:         int64(0),
+		TeacherID:       teacherID,
+		Date_3:          startDate,
+		Date_4:          endDate,
+		Column7:         int64(0),
+		TeacherID_2:     teacherID,
+		ScheduledDate:   startDate,
+		ScheduledDate_2: endDate,
+		Column11:        int64(0),
+		TeacherID_3:     teacherID,
+	}
 }
 
 func analyticsSummaryParams(startDate, endDate string, teacherID int64) queries.GetAnalyticsSummaryParams {

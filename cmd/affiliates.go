@@ -143,7 +143,15 @@ func handleAffiliateUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	staged, thumbsFound, importLogs := buildStagedAffiliateImportItems(ctx, rows)
+	catalog, catalogIndex, err := loadAffiliateCatalog(ctx)
+	if err != nil {
+		logAffiliateUploadFailure(ctx, user, filename, fileSize, err)
+		setErrorFlash(w, "Failed to load affiliate catalog")
+		HttpRedirect(w, r, "/affiliates")
+		return
+	}
+
+	staged, thumbsFound, importLogs, diffSummary, removed := buildStagedAffiliateImportItems(ctx, catalog, catalogIndex, rows)
 	if len(staged) == 0 {
 		logAffiliateUploadFailure(ctx, user, filename, fileSize, fmt.Errorf("no products to review"))
 		setErrorFlash(w, "No products found in CSV")
@@ -172,15 +180,21 @@ func handleAffiliateUpload(w http.ResponseWriter, r *http.Request) {
 			PendingSave:     true,
 			ImportLogs:      importLogs,
 			StagedItems:     staged,
+			DiffSummary:     diffSummary,
+			RemovedFromCSV:  removed,
 		},
 		OpenPreviewModal: true,
 	})
 }
 
-func buildStagedAffiliateImportItems(ctx context.Context, rows []affiliates.CSVRow) ([]frontend.AffiliateStagedImportItem, int, []frontend.AffiliateImportLogEntry) {
+func buildStagedAffiliateImportItems(ctx context.Context, catalog []affiliates.CatalogRow, catalogIndex map[string]affiliates.CatalogRow, rows []affiliates.CSVRow) ([]frontend.AffiliateStagedImportItem, int, []frontend.AffiliateImportLogEntry, frontend.AffiliateImportDiffSummary, []frontend.AffiliateRemovedFromCSVItem) {
 	staged := make([]frontend.AffiliateStagedImportItem, 0, len(rows))
 	importLogs := make([]frontend.AffiliateImportLogEntry, 0)
 	thumbsFound := 0
+	seenKeys := make(map[string]bool)
+	diffSummary := frontend.AffiliateImportDiffSummary{}
+	importInputs := make([]affiliates.ImportRowInput, 0, len(rows))
+
 	for i, row := range rows {
 		shopeeShopID, itemID := "", row.ItemID
 		if ids, ok := affiliates.ParseProductIDsFromURL(row.ProductLink); ok {
@@ -201,6 +215,33 @@ func buildStagedAffiliateImportItems(ctx context.Context, rows []affiliates.CSVR
 		}
 		priceDisplay := affiliates.FormatPriceDisplay(row.Price)
 
+		importInput := affiliates.ImportRowInput{
+			ItemID:         itemID,
+			ProductURL:     row.ProductLink,
+			OfferLink:      row.OfferLink,
+			ItemName:       row.ItemName,
+			PriceDisplay:   priceDisplay,
+			Sales:          row.Sales,
+			ShopName:       row.ShopName,
+			CommissionRate: row.CommissionRate,
+			Commission:     row.Commission,
+			ThumbnailURL:   thumb,
+		}
+		importInputs = append(importInputs, importInput)
+		diff := affiliates.DiffImportRow(importInput, catalogIndex, seenKeys)
+		switch diff.Status {
+		case constants.AffiliateImportDiffNew:
+			diffSummary.NewCount++
+		case constants.AffiliateImportDiffChanged:
+			diffSummary.ChangedCount++
+		case constants.AffiliateImportDiffUnchanged:
+			diffSummary.UnchangedCount++
+		case constants.AffiliateImportDiffDuplicateInCSV:
+			diffSummary.DuplicateInCSVCount++
+		case constants.AffiliateImportDiffMissingItemKey:
+			diffSummary.MissingItemKeyCount++
+		}
+
 		staged = append(staged, frontend.AffiliateStagedImportItem{
 			Index: i,
 			Card: frontend.AffiliateProductCardData{
@@ -210,24 +251,37 @@ func buildStagedAffiliateImportItems(ctx context.Context, rows []affiliates.CSVR
 				Sales:         row.Sales,
 				ThumbnailURL:  thumb,
 				AffiliateURL:  row.OfferLink,
-				IncludeInSave: true,
+				IncludeInSave: diff.IncludeByDefault,
 				FormIndex:     i,
 			},
-			ItemID:         itemID,
-			ItemName:       row.ItemName,
-			Price:          row.Price,
-			Sales:          row.Sales,
-			ShopName:       row.ShopName,
-			CommissionRate: row.CommissionRate,
-			Commission:     row.Commission,
-			ProductLink:    row.ProductLink,
-			OfferLink:      row.OfferLink,
-			ShopeeShopID:   shopeeShopID,
-			ThumbnailURL:   thumb,
-			PriceDisplay:   priceDisplay,
+			ItemID:          itemID,
+			ItemName:        row.ItemName,
+			Price:           row.Price,
+			Sales:           row.Sales,
+			ShopName:        row.ShopName,
+			CommissionRate:  row.CommissionRate,
+			Commission:      row.Commission,
+			ProductLink:     row.ProductLink,
+			OfferLink:       row.OfferLink,
+			ShopeeShopID:    shopeeShopID,
+			ThumbnailURL:    thumb,
+			PriceDisplay:    priceDisplay,
+			DiffStatus:      diff.Status,
+			ExistingProductID: diff.ExistingID,
+			ChangedFields:   diff.ChangedFields,
 		})
 	}
-	return staged, thumbsFound, importLogs
+	removedRows := affiliates.RemovedFromCSV(catalog, affiliates.CollectCSVItemIDs(importInputs))
+	removed := make([]frontend.AffiliateRemovedFromCSVItem, 0, len(removedRows))
+	for _, row := range removedRows {
+		removed = append(removed, frontend.AffiliateRemovedFromCSVItem{
+			ID:     strconv.FormatInt(row.ID, 10),
+			ItemID: row.ItemID,
+			Name:   row.Name,
+		})
+	}
+	diffSummary.RemovedFromCSVCount = len(removed)
+	return staged, thumbsFound, importLogs, diffSummary, removed
 }
 
 func handleAffiliateImportSave(w http.ResponseWriter, r *http.Request) {
@@ -285,7 +339,15 @@ func handleAffiliateImportSave(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	_, catalogIndex, err := loadAffiliateCatalog(ctx)
+	if err != nil {
+		setErrorFlash(w, "Failed to load affiliate catalog")
+		HttpRedirect(w, r, "/affiliates")
+		return
+	}
+
 	inserted := 0
+	updated := 0
 	sortOrder := 0
 	for i := 0; i < stagedCount; i++ {
 		if !included[i] {
@@ -305,45 +367,61 @@ func handleAffiliateImportSave(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		_, err = dbRW.GetQueries().InsertAffiliateProduct(ctx, queries.InsertAffiliateProductParams{
-			AffiliateUrl:     offerLink,
-			ProductUrl:       productLink,
+		itemID := strings.TrimSpace(r.FormValue(prefix + "item_id"))
+		existingID := parseStagedExistingID(r, i)
+		write := affiliateProductWriteParams{
+			AffiliateURL:     offerLink,
+			ProductURL:       productLink,
 			ShopID:           strings.TrimSpace(r.FormValue(prefix + "shopee_shop_id")),
-			ItemID:           strings.TrimSpace(r.FormValue(prefix + "item_id")),
+			ItemID:           itemID,
 			Name:             itemName,
 			Brand:            "",
 			PriceDisplay:     strings.TrimSpace(r.FormValue(prefix + "price_display")),
-			ThumbnailUrl:     strings.TrimSpace(r.FormValue(prefix + "thumbnail_url")),
+			ThumbnailURL:     strings.TrimSpace(r.FormValue(prefix + "thumbnail_url")),
 			SortOrder:        int64(sortOrder),
 			ImportBatchID:    batchID,
 			Sales:            strings.TrimSpace(r.FormValue(prefix + "sales")),
 			AffiliatedShopID: affiliatedShopID,
 			CommissionRate:   strings.TrimSpace(r.FormValue(prefix + "commission_rate")),
 			Commission:       strings.TrimSpace(r.FormValue(prefix + "commission")),
-		})
+		}
+		if existingID == 0 {
+			existingID = resolveAffiliateUpsertTargetID(catalogIndex, itemID, productLink, 0)
+		}
+		id, isUpdate, _, err := upsertAffiliateProduct(ctx, dbRW, catalogIndex, existingID, write)
 		if err != nil {
-			logs.Log().Error("insert affiliate product from import save", zap.Error(err))
+			logs.Log().Error("upsert affiliate product from import save", zap.Error(err))
 			continue
 		}
-		inserted++
+		if isUpdate {
+			updated++
+		} else {
+			inserted++
+		}
+		if id > 0 {
+			if row, ok := catalogIndex[affiliates.CatalogKey(itemID, productLink)]; ok {
+				row.ID = id
+				catalogIndex[affiliates.CatalogKey(itemID, productLink)] = row
+			}
+		}
 		sortOrder++
 	}
 
-	if inserted == 0 {
+	if inserted == 0 && updated == 0 {
 		setErrorFlash(w, "Failed to save any products")
 		HttpRedirect(w, r, "/affiliates")
 		return
 	}
 
 	if err := dbRW.GetQueries().UpdateAffiliateImportBatchCount(ctx, queries.UpdateAffiliateImportBatchCountParams{
-		ProductCount: int64(inserted),
+		ProductCount: int64(inserted + updated),
 		ID:           batchID,
 	}); err != nil {
 		logs.Log().Error("update affiliate import batch count", zap.Error(err))
 	}
 
-	insertAuditLogAs(ctx, user, "affiliates", fmt.Sprintf("Saved %d products from CSV batch #%d (%s)", inserted, batchID, filename))
-	setSuccessFlash(w, fmt.Sprintf("Saved %d affiliate products.", inserted))
+	insertAuditLogAs(ctx, user, "affiliates", fmt.Sprintf("Saved %d new and %d updated products from CSV batch #%d (%s)", inserted, updated, batchID, filename))
+	setSuccessFlash(w, fmt.Sprintf("Saved %d new and %d updated affiliate products.", inserted, updated))
 	HttpRedirect(w, r, "/affiliates")
 }
 
@@ -520,15 +598,22 @@ func handleAffiliateCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := dbRW.GetQueries().InsertAffiliateProduct(ctx, queries.InsertAffiliateProductParams{
-		AffiliateUrl:     req.AffiliateURL,
-		ProductUrl:       req.ProductURL,
+	_, catalogIndex, err := loadAffiliateCatalog(ctx)
+	if err != nil {
+		setErrorFlash(w, "Failed to load affiliate catalog")
+		HttpRedirect(w, r, "/affiliates")
+		return
+	}
+
+	id, isUpdate, _, err := upsertAffiliateProduct(ctx, dbRW, catalogIndex, 0, affiliateProductWriteParams{
+		AffiliateURL:     req.AffiliateURL,
+		ProductURL:       req.ProductURL,
 		ShopID:           req.ShopID,
 		ItemID:           req.ItemID,
 		Name:             req.Name,
 		Brand:            req.Brand,
 		PriceDisplay:     req.PriceDisplay,
-		ThumbnailUrl:     req.ThumbnailURL,
+		ThumbnailURL:     req.ThumbnailURL,
 		SortOrder:        req.SortOrder,
 		ImportBatchID:    0,
 		Sales:            req.Sales,
@@ -542,8 +627,14 @@ func handleAffiliateCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	insertAuditLogAs(ctx, auth.GetUser(ctx), "affiliates", fmt.Sprintf("Added affiliate product #%d: %s", id, req.Name))
-	setSuccessFlash(w, "Affiliate product saved")
+	user := auth.GetUser(ctx)
+	if isUpdate {
+		insertAuditLogAs(ctx, user, "affiliates", fmt.Sprintf("Updated existing affiliate product #%d: %s", id, req.Name))
+		setSuccessFlash(w, "Affiliate product updated (matched existing item)")
+	} else {
+		insertAuditLogAs(ctx, user, "affiliates", fmt.Sprintf("Added affiliate product #%d: %s", id, req.Name))
+		setSuccessFlash(w, "Affiliate product saved")
+	}
 	HttpRedirect(w, r, "/affiliates")
 }
 
@@ -612,29 +703,40 @@ func handleAffiliateUpdate(w http.ResponseWriter, r *http.Request, affiliateID i
 		return
 	}
 
-	if err := dbRW.GetQueries().UpdateAffiliateProduct(ctx, queries.UpdateAffiliateProductParams{
-		AffiliateUrl:     req.AffiliateURL,
-		ProductUrl:       req.ProductURL,
+	_, catalogIndex, err := loadAffiliateCatalog(ctx)
+	if err != nil {
+		setErrorFlash(w, "Failed to load affiliate catalog")
+		HttpRedirect(w, r, editPath)
+		return
+	}
+
+	targetID, _, merged, err := upsertAffiliateProduct(ctx, dbRW, catalogIndex, affiliateID, affiliateProductWriteParams{
+		AffiliateURL:     req.AffiliateURL,
+		ProductURL:       req.ProductURL,
 		ShopID:           req.ShopID,
 		ItemID:           req.ItemID,
 		Name:             req.Name,
 		Brand:            req.Brand,
 		PriceDisplay:     req.PriceDisplay,
-		ThumbnailUrl:     req.ThumbnailURL,
+		ThumbnailURL:     req.ThumbnailURL,
 		SortOrder:        req.SortOrder,
 		Sales:            req.Sales,
 		AffiliatedShopID: affiliatedShopID,
 		CommissionRate:   req.CommissionRate,
 		Commission:       req.Commission,
-		ID:               affiliateID,
-	}); err != nil {
+	})
+	if err != nil {
 		setErrorFlash(w, fmt.Sprintf("Failed to update affiliate product: %v", err))
 		HttpRedirect(w, r, editPath)
 		return
 	}
 
-	insertAuditLogAs(ctx, auth.GetUser(ctx), "affiliates", fmt.Sprintf("Updated affiliate product #%d: %s", affiliateID, req.Name))
-	setSuccessFlash(w, "Affiliate product updated")
+	msg := "Affiliate product updated"
+	if merged && targetID != affiliateID {
+		msg = fmt.Sprintf("Affiliate product merged into #%d", targetID)
+	}
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "affiliates", fmt.Sprintf("Updated affiliate product #%d: %s", targetID, req.Name))
+	setSuccessFlash(w, msg)
 	HttpRedirect(w, r, "/affiliates")
 }
 

@@ -11,5 +11,6 @@ const (
 	GuideSlugPayments              GuideSlug = "payments"
 	GuideSlugReportsAndGeneration  GuideSlug = "reports-and-generation"
 	GuideSlugAds                   GuideSlug = "ads"
+	GuideSlugAffiliates            GuideSlug = "affiliates"
 	GuideSlugFAQ                   GuideSlug = "faq"
 )

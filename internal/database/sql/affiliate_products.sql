@@ -97,3 +97,49 @@ SET
 	click_count = click_count + 1,
 	updated_at = datetime('now')
 WHERE id = ?;
+
+-- name: GetAffiliateProductsCatalogKeys :many
+SELECT
+	p.id,
+	p.affiliate_url,
+	p.product_url,
+	p.shop_id,
+	p.item_id,
+	p.name,
+	p.brand,
+	p.price_display,
+	p.thumbnail_url,
+	p.sales,
+	p.commission_rate,
+	p.commission,
+	p.click_count,
+	COALESCE(s.brand_name, '') AS shop_brand_name
+FROM tbl_affiliate_products p
+LEFT JOIN tbl_affiliated_product_shops s ON s.id = p.affiliated_shop_id
+ORDER BY p.id ASC;
+
+-- name: GetAffiliateProductByItemID :one
+SELECT
+	p.id,
+	p.affiliate_url,
+	p.product_url,
+	p.shop_id,
+	p.item_id,
+	p.name,
+	p.brand,
+	p.price_display,
+	p.thumbnail_url,
+	p.sort_order,
+	p.import_batch_id,
+	p.sales,
+	p.affiliated_shop_id,
+	COALESCE(s.brand_name, '') AS shop_brand_name,
+	p.commission_rate,
+	p.commission,
+	p.click_count,
+	p.created_at,
+	p.updated_at
+FROM tbl_affiliate_products p
+LEFT JOIN tbl_affiliated_product_shops s ON s.id = p.affiliated_shop_id
+WHERE p.item_id = ?
+	AND TRIM(p.item_id) != '';

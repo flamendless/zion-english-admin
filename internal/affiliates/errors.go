@@ -14,6 +14,7 @@ var (
 	ErrNameTooLong          = errors.New("[AFFILIATES] product name must be 256 characters or fewer")
 	ErrInvalidThumbnailURL  = errors.New("[AFFILIATES] thumbnail url must be a valid http or https link")
 	ErrInvalidProductURL    = errors.New("[AFFILIATES] product url must be a valid http or https link")
+	ErrProductKeyRequired   = errors.New("[AFFILIATES] item id or product url is required")
 	ErrNotProductPage       = errors.New("[AFFILIATES] link does not resolve to a Shopee product page")
 	ErrFetchBlocked         = errors.New("[AFFILIATES] could not load product page from Shopee")
 	ErrPreviewUnavailable   = errors.New("[AFFILIATES] product preview is unavailable; fill in fields manually")

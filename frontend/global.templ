@@ -3082,7 +3082,7 @@ templ GlobalIncludes() {
 			}
 		}
 
-		/* Teacher view modal tabs */
+		/* Profile section tabs (teacher view modal, My Profile) */
 		#teacherViewModal .profile-tablist {
 			display: flex;
 			flex-wrap: wrap;
@@ -3092,7 +3092,22 @@ templ GlobalIncludes() {
 			padding-bottom: var(--space-2);
 		}
 
-		#teacherViewModal .profile-tab {
+		#myProfileRoot .profile-tablist {
+			display: flex;
+			flex-wrap: nowrap;
+			gap: var(--space-1);
+			margin: calc(-1 * var(--space-2)) calc(-1 * var(--space-2)) var(--space-5);
+			padding: var(--space-2);
+			overflow-x: auto;
+			-webkit-overflow-scrolling: touch;
+			scrollbar-width: thin;
+			background: var(--color-muted);
+			border-bottom: 1px solid var(--color-border-subtle);
+			border-radius: var(--radius-md) var(--radius-md) 0 0;
+		}
+
+		#teacherViewModal .profile-tab,
+		#myProfileRoot .profile-tab {
 			margin: 0;
 			margin-top: 0;
 			padding: var(--space-2) var(--space-3);
@@ -3107,7 +3122,8 @@ templ GlobalIncludes() {
 			cursor: pointer;
 		}
 
-		#teacherViewModal .profile-tab:hover {
+		#teacherViewModal .profile-tab:hover,
+		#myProfileRoot .profile-tab:hover {
 			background: var(--color-surface);
 			color: var(--color-foreground);
 		}
@@ -3117,11 +3133,24 @@ templ GlobalIncludes() {
 			color: var(--color-primary-hover);
 		}
 
-		#teacherViewModal .profile-tab-panel {
+		#myProfileRoot .profile-tab.is-active {
+			background: var(--color-surface);
+			color: var(--color-foreground);
+			box-shadow: var(--shadow-sm, 0 1px 2px rgba(15, 23, 42, 0.06));
+		}
+
+		#myProfileRoot .profile-tab:focus-visible {
+			outline: 2px solid var(--color-primary);
+			outline-offset: 2px;
+		}
+
+		#teacherViewModal .profile-tab-panel,
+		#myProfileRoot .profile-tab-panel {
 			display: none;
 		}
 
-		#teacherViewModal .profile-tab-panel.is-active {
+		#teacherViewModal .profile-tab-panel.is-active,
+		#myProfileRoot .profile-tab-panel.is-active {
 			display: block;
 		}
 
@@ -4381,6 +4410,7 @@ templ GlobalIncludes() {
 			.modal-close,
 			.action-btn,
 			#teacherViewModal .profile-tab,
+			#myProfileRoot .profile-tab,
 			button.lm-tag-chip-remove,
 			button.tm-tag-chip-remove,
 			button.class-lm-chip-remove,

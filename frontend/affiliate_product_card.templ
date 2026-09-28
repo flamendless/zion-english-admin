@@ -67,7 +67,7 @@ templ AffiliateProductCard(card AffiliateProductCardData) {
 						class="affiliate-product-card-include-input"
 						name="include"
 						value={ fmt.Sprintf("%d", card.FormIndex) }
-						checked
+						checked?={ card.IncludeInSave }
 					/>
 					<span class="affiliate-product-card-include-box" aria-hidden="true"></span>
 				</label>

@@ -72,6 +72,12 @@ func handleGuides(w http.ResponseWriter, r *http.Request) {
 				Description: "Configure affiliate ad placements, rotation, and draft or published status.",
 				Access:      "superuser",
 			},
+			{
+				Slug:        constants.GuideSlugAffiliates,
+				Title:       "Affiliates",
+				Description: "Import Shopee product CSVs, manage the catalog, and track affiliate link clicks.",
+				Access:      "superuser",
+			},
 		},
 	}
 
@@ -106,6 +112,8 @@ func handleGuidesPath(w http.ResponseWriter, r *http.Request) {
 		handleGuideReportsGeneration(w, r)
 	case constants.GuideSlugAds:
 		handleGuideAds(w, r)
+	case constants.GuideSlugAffiliates:
+		handleGuideAffiliates(w, r)
 	default:
 		HttpError(w, MsgNotFound, http.StatusNotFound)
 	}
@@ -188,6 +196,16 @@ func handleGuideAds(w http.ResponseWriter, r *http.Request) {
 
 	if err := frontend.GuideAds().Render(r.Context(), w); err != nil {
 		logs.Log().Error("failed to render ads guide", zap.Error(err))
+	}
+}
+
+func handleGuideAffiliates(w http.ResponseWriter, r *http.Request) {
+	if !requireMethod(w, r, http.MethodGet) {
+		return
+	}
+
+	if err := frontend.GuideAffiliates().Render(r.Context(), w); err != nil {
+		logs.Log().Error("failed to render affiliates guide", zap.Error(err))
 	}
 }
 
