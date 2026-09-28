@@ -187,27 +187,36 @@ templ ClassViewModalScripts() {
 			const host = document.getElementById('classViewModalHost');
 			if (host) host.innerHTML = '';
 			const scheduleOpen = typeof window.isScheduleModalOpen === 'function' && window.isScheduleModalOpen();
-			if (!scheduleOpen) {
+			if (!scheduleOpen && document.body) {
 				document.body.classList.remove('modal-open');
 			}
 		};
 
-		document.body.addEventListener('htmx:afterSwap', function (evt) {
-			if (evt.detail.target.id !== 'classViewModalHost') return;
-			document.body.classList.add('modal-open');
-			const overlay = evt.detail.target.querySelector('#classViewModal');
-			const closeBtn = overlay && overlay.querySelector('.class-view-close');
-			if (closeBtn) closeBtn.focus();
-		});
+		function bindClassViewModalBodyListeners() {
+			if (!document.body) return;
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id !== 'classViewModalHost') return;
+				document.body.classList.add('modal-open');
+				const overlay = evt.detail.target.querySelector('#classViewModal');
+				const closeBtn = overlay && overlay.querySelector('.class-view-close');
+				if (closeBtn) closeBtn.focus();
+			});
 
-		document.body.addEventListener('click', function (e) {
-			if (e.target.closest('.class-view-close')) {
-				window.closeClassViewModal();
-				return;
-			}
-			const overlay = e.target.closest('#classViewModal');
-			if (overlay && e.target === overlay) window.closeClassViewModal();
-		});
+			document.body.addEventListener('click', function (e) {
+				if (e.target.closest('.class-view-close')) {
+					window.closeClassViewModal();
+					return;
+				}
+				const overlay = e.target.closest('#classViewModal');
+				if (overlay && e.target === overlay) window.closeClassViewModal();
+			});
+		}
+
+		if (document.body) {
+			bindClassViewModalBodyListeners();
+		} else {
+			document.addEventListener('DOMContentLoaded', bindClassViewModalBodyListeners);
+		}
 
 		document.addEventListener('keydown', function (e) {
 			if (e.key !== 'Escape' || !document.getElementById('classViewModal')) return;

@@ -60,28 +60,20 @@ func Login(successMessage string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</head><body class=\"auth-page\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = AdPlacementChrome().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"auth-card\"><img src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</head><body class=\"auth-page\"><div class=\"auth-card\"><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/logo.png"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/login.templ`, Line: 21, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/login.templ`, Line: 20, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" alt=\"Zion English\" class=\"auth-logo\"><h1 class=\"auth-title\">Login</h1><div id=\"loginError\" class=\"login-error\" role=\"alert\"></div><div id=\"loginSuccess\" class=\"login-success\"></div><form><div class=\"form-group\"><label for=\"email\">Email</label> <input type=\"email\" id=\"email\" name=\"email\" required placeholder=\"Enter your email\" autocomplete=\"email\"></div><div class=\"form-group\"><label for=\"password\">Password</label><div class=\"password-wrapper\"><input type=\"password\" id=\"password\" name=\"password\" required placeholder=\"Enter your password\" autocomplete=\"current-password\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" alt=\"Zion English\" class=\"auth-logo\"><h1 class=\"auth-title\">Login</h1><div id=\"loginError\" class=\"login-error\" role=\"alert\"></div><div id=\"loginSuccess\" class=\"login-success\"></div><form><div class=\"form-group\"><label for=\"email\">Email</label> <input type=\"email\" id=\"email\" name=\"email\" required placeholder=\"Enter your email\" autocomplete=\"email\"></div><div class=\"form-group\"><label for=\"password\">Password</label><div class=\"password-wrapper\"><input type=\"password\" id=\"password\" name=\"password\" required placeholder=\"Enter your password\" autocomplete=\"current-password\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -89,59 +81,59 @@ func Login(successMessage string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div></div><div class=\"form-group\"><button hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></div><div class=\"form-group\"><button hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/auth/login"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/login.templ`, Line: 53, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/login.templ`, Line: 52, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" hx-target=\"#loginError\" hx-swap=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" hx-target=\"#loginError\" hx-swap=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/login.templ`, Line: 55, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/login.templ`, Line: 54, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\">Login</button></div></form><p class=\"auth-links\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\">Login</button></div></form><p class=\"auth-links\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 templ.SafeURL
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/teachers/register"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/login.templ`, Line: 62, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/login.templ`, Line: 61, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\">Register as a teacher</a><br><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\">Register as a teacher</a><br><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 templ.SafeURL
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/auth/forgot-password"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/login.templ`, Line: 64, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/login.templ`, Line: 63, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\">Forgot password?</a></p><div class=\"auth-footer\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\">Forgot password?</a></p><div class=\"auth-footer\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -149,7 +141,7 @@ func Login(successMessage string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -159,7 +151,7 @@ func Login(successMessage string) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<script>\n\t\t\t\tdocument.body.addEventListener('htmx:afterSwap', function(evt) {\n\t\t\t\t\tif (evt.detail.target.id === 'loginError' && evt.detail.target.textContent.trim()) {\n\t\t\t\t\t\tshowErrorBanner(evt.detail.target.textContent.trim());\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<script>\n\t\t\t\tdocument.body.addEventListener('htmx:afterSwap', function(evt) {\n\t\t\t\t\tif (evt.detail.target.id === 'loginError' && evt.detail.target.textContent.trim()) {\n\t\t\t\t\t\tshowErrorBanner(evt.detail.target.textContent.trim());\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -167,7 +159,7 @@ func Login(successMessage string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

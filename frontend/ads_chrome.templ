@@ -160,11 +160,27 @@ templ AdPlacementBottom() {
 templ AdPlacementChromeStyles() {
 	<style>
 		.ad-chrome {
+			--ad-placement-card-max-width: 11rem;
+			--ad-placement-image-size: 6.5rem;
 			pointer-events: none;
 		}
 		.ad-chrome a,
 		.ad-chrome button {
 			pointer-events: auto;
+		}
+		.ad-chrome .affiliate-product-card {
+			box-sizing: border-box;
+			max-width: var(--ad-placement-card-max-width);
+			width: min(100%, var(--ad-placement-card-max-width));
+			flex: 0 0 auto;
+			align-self: center;
+		}
+		.ad-chrome .affiliate-product-card-image-link {
+			width: 100%;
+			max-width: var(--ad-placement-image-size);
+			max-height: var(--ad-placement-image-size);
+			margin: 0 auto;
+			aspect-ratio: 1 / 1;
 		}
 		.ad-zone--top {
 			width: 100%;
@@ -177,10 +193,7 @@ templ AdPlacementChromeStyles() {
 			margin-bottom: var(--space-2);
 		}
 		.ad-zone--top .affiliate-product-card {
-			width: min(100%, 10.5rem);
-			flex: 1 1 10.5rem;
-			max-width: 10.5rem;
-			height: auto;
+			--ad-placement-card-max-width: 10.5rem;
 		}
 		.ad-zone--top .affiliate-product-card-shop {
 			display: -webkit-box;
@@ -234,10 +247,7 @@ templ AdPlacementChromeStyles() {
 			padding: 0 var(--space-3);
 		}
 		.ad-chrome--bottom .affiliate-product-card {
-			width: min(100%, 14rem);
-			flex: 1 1 14rem;
-			max-width: 14rem;
-			height: auto;
+			--ad-placement-card-max-width: 11rem;
 		}
 		.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card-shop {
 			display: -webkit-box;
@@ -276,9 +286,7 @@ templ AdPlacementChromeStyles() {
 		.ad-zone--right { right: 0; }
 		.ad-zone--left .affiliate-product-card,
 		.ad-zone--right .affiliate-product-card {
-			width: 100%;
-			flex: 0 0 auto;
-			height: auto;
+			width: min(100%, var(--ad-placement-card-max-width));
 		}
 		.ad-zone--left .affiliate-product-card-body,
 		.ad-zone--right .affiliate-product-card-body {
@@ -334,10 +342,8 @@ templ AdPlacementChromeStyles() {
 			}
 			.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card,
 			.ad-zone--mobile-sides .affiliate-product-card {
-				width: min(calc(50% - var(--space-1)), 11rem);
-				flex: 1 1 min(calc(50% - var(--space-1)), 11rem);
-				max-width: 11rem;
-				height: auto;
+				--ad-placement-card-max-width: min(calc(50% - var(--space-1)), 11rem);
+				width: min(100%, var(--ad-placement-card-max-width));
 			}
 			.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card-shop,
 			.ad-zone--mobile-sides .affiliate-product-card-shop {

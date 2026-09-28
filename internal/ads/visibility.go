@@ -18,8 +18,7 @@ func suppressAdsForViewer(user auth.User, teacherRoles []constants.TeacherRole) 
 	if user.ID == 0 {
 		return false
 	}
-	return teachers.HasRole(teacherRoles, constants.TeacherRoleDeveloper) ||
-		teachers.HasRole(teacherRoles, constants.TeacherRoleTester)
+	return teachers.HasRole(teacherRoles, constants.TeacherRoleTester)
 }
 
 func suppressAdsForRequest(ctx context.Context, r *http.Request, db *queries.Queries) bool {

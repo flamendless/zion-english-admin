@@ -24,7 +24,7 @@ func TestSuppressAdsForViewer(t *testing.T) {
 			name:  "developer teacher role",
 			user:  teacher,
 			roles: []constants.TeacherRole{constants.TeacherRoleTeacher, constants.TeacherRoleDeveloper},
-			want:  true,
+			want:  false,
 		},
 		{
 			name:  "tester teacher role on teacher session",
