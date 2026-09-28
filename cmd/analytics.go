@@ -207,7 +207,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 	trialWeeklyRows, err := q.GetAnalyticsTrialWeekly(ctx, queries.GetAnalyticsTrialWeeklyParams{
 		Date:      startDate,
 		Date_2:    endDate,
-		Column3:   int64(0),
+		Column3:   analyticsScopeSentinel(teacherID),
 		TeacherID: teacherID,
 	})
 	if err != nil {
@@ -301,7 +301,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 	weeklyRows, err := q.GetAnalyticsWeeklyTrend(ctx, queries.GetAnalyticsWeeklyTrendParams{
 		Date:      startDate,
 		Date_2:    endDate,
-		Column3:   int64(0),
+		Column3:   analyticsScopeSentinel(teacherID),
 		TeacherID: teacherID,
 	})
 	if err != nil {
@@ -330,7 +330,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 	noShowRows, err := q.GetAnalyticsNoShows(ctx, queries.GetAnalyticsNoShowsParams{
 		ScheduledDate:   startDate,
 		ScheduledDate_2: endDate,
-		Column3:         int64(0),
+		Column3:         analyticsScopeSentinel(teacherID),
 		TeacherID:       teacherID,
 	})
 	if err != nil {
@@ -355,7 +355,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 	}
 
 	inactiveReasonRows, err := q.GetAnalyticsInactiveReasons(ctx, queries.GetAnalyticsInactiveReasonsParams{
-		Column1:   int64(0),
+		Column1:   analyticsScopeSentinel(teacherID),
 		TeacherID: teacherID,
 	})
 	if err != nil {
@@ -374,7 +374,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 	churnedRows, err := q.GetAnalyticsChurnedStudents(ctx, queries.GetAnalyticsChurnedStudentsParams{
 		UpdatedAt:   analyticsDateNullTime(startDate),
 		UpdatedAt_2: analyticsDateNullTime(endDate),
-		Column3:     int64(0),
+		Column3:     analyticsScopeSentinel(teacherID),
 		TeacherID:   teacherID,
 	})
 	if err != nil {
@@ -450,9 +450,13 @@ func enrichAnalyticsResponseWithRoleBadges(ctx context.Context, resp *analyticsR
 	return nil
 }
 
+func analyticsScopeSentinel(teacherID int64) int64 {
+	return teacherID
+}
+
 func analyticsTeacherID(r *http.Request) (int64, error) {
 	role := auth.GetRole(r.Context())
-	if role == auth.RoleTeacher {
+	if auth.IsTeacherScoped(role) {
 		user := auth.GetUser(r.Context())
 		if user.ID == 0 {
 			return 0, ErrUnauthorized
@@ -481,52 +485,55 @@ func analyticsTeacherID(r *http.Request) (int64, error) {
 }
 
 func analyticsTrialSummaryParams(startDate, endDate string, teacherID int64) queries.GetAnalyticsTrialSummaryParams {
+	scope := analyticsScopeSentinel(teacherID)
 	return queries.GetAnalyticsTrialSummaryParams{
 		Date:            startDate,
 		Date_2:          endDate,
-		Column3:         int64(0),
+		Column3:         scope,
 		TeacherID:       teacherID,
 		Date_3:          startDate,
 		Date_4:          endDate,
-		Column7:         int64(0),
+		Column7:         scope,
 		TeacherID_2:     teacherID,
 		ScheduledDate:   startDate,
 		ScheduledDate_2: endDate,
-		Column11:        int64(0),
+		Column11:        scope,
 		TeacherID_3:     teacherID,
 	}
 }
 
 func analyticsSummaryParams(startDate, endDate string, teacherID int64) queries.GetAnalyticsSummaryParams {
+	scope := analyticsScopeSentinel(teacherID)
 	return queries.GetAnalyticsSummaryParams{
 		Date:            startDate,
 		Date_2:          endDate,
-		Column3:         int64(0),
+		Column3:         scope,
 		TeacherID:       teacherID,
 		Date_3:          startDate,
 		Date_4:          endDate,
-		Column7:         int64(0),
+		Column7:         scope,
 		TeacherID_2:     teacherID,
 		Date_5:          startDate,
 		Date_6:          endDate,
-		Column11:        int64(0),
+		Column11:        scope,
 		TeacherID_3:     teacherID,
 		ScheduledDate:   startDate,
 		ScheduledDate_2: endDate,
-		Column15:        int64(0),
+		Column15:        scope,
 		TeacherID_4:     teacherID,
 		Date_7:          startDate,
 		Date_8:          endDate,
-		Column19:        int64(0),
+		Column19:        scope,
 		TeacherID_5:     teacherID,
 		ScheduledDate_3: startDate,
 		ScheduledDate_4: endDate,
-		Column23:        int64(0),
+		Column23:        scope,
 		TeacherID_6:     teacherID,
 	}
 }
 
 func analyticsByTeacherParams(startDate, endDate string, teacherID int64) queries.GetAnalyticsCancellationByTeacherParams {
+	scope := analyticsScopeSentinel(teacherID)
 	return queries.GetAnalyticsCancellationByTeacherParams{
 		ScheduledDate:   startDate,
 		ScheduledDate_2: endDate,
@@ -536,31 +543,33 @@ func analyticsByTeacherParams(startDate, endDate string, teacherID int64) querie
 		ScheduledDate_4: endDate,
 		Date_3:          startDate,
 		Date_4:          endDate,
-		Column9:         int64(0),
+		Column9:         scope,
 		ID:              teacherID,
 	}
 }
 
 func analyticsByStudentParams(startDate, endDate string, teacherID int64) queries.GetAnalyticsCancellationByStudentParams {
+	scope := analyticsScopeSentinel(teacherID)
 	return queries.GetAnalyticsCancellationByStudentParams{
 		Date:        startDate,
 		Date_2:      endDate,
-		Column3:     int64(0),
+		Column3:     scope,
 		TeacherID:   teacherID,
-		Column5:     int64(0),
+		Column5:     scope,
 		TeacherID_2: teacherID,
 	}
 }
 
 func analyticsRetentionParams(startDate, endDate string, teacherID int64) queries.GetAnalyticsRetentionSummaryParams {
+	scope := analyticsScopeSentinel(teacherID)
 	return queries.GetAnalyticsRetentionSummaryParams{
-		Column1:     int64(0),
+		Column1:     scope,
 		TeacherID:   teacherID,
-		Column3:     int64(0),
+		Column3:     scope,
 		TeacherID_2: teacherID,
 		UpdatedAt:   analyticsDateNullTime(startDate),
 		UpdatedAt_2: analyticsDateNullTime(endDate),
-		Column7:     int64(0),
+		Column7:     scope,
 		TeacherID_3: teacherID,
 	}
 }
