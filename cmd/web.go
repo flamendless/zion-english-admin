@@ -98,6 +98,7 @@ var cmdWeb = &cobra.Command{
 			basePath+"/static/",
 			http.StripPrefix(basePath+"/static/", http.FileServer(http.Dir("static"))),
 		)
+		publicMux.HandleFunc(basePath+"/ads/partials/chrome", handleAdChromePartial)
 
 		authMux := http.NewServeMux()
 		authMux.HandleFunc(basePath+"/dashboard", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleHome))
@@ -255,6 +256,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/health", publicMux)
 		rootMux.Handle(basePath+"/profile/zoom/callback", publicMux)
 		rootMux.Handle(basePath+"/profile/google-calendar/callback", publicMux)
+		rootMux.Handle(basePath+"/ads/partials/chrome", publicMux)
 
 		// protected routes
 		rootMux.Handle(basePath+"/dashboard", authHandler)

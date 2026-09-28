@@ -40,8 +40,8 @@ func AdPlacementLabel(placement constants.AdPlacement) string {
 		return "Right"
 	case constants.AdPlacementBottom:
 		return "Bottom"
-	case constants.AdPlacementTopAndSide:
-		return "Top and side"
+	case constants.AdPlacementTopAndBottom:
+		return "Top and bottom"
 	case constants.AdPlacementLeftAndRight:
 		return "Left and right sides"
 	case constants.AdPlacementAllSides:
@@ -83,6 +83,8 @@ func AdRandomizeSummary(kind constants.AdRandomizeKind, interval constants.AdTim
 		return "Per session"
 	case constants.AdRandomizeTimer:
 		switch interval {
+		case constants.AdTimerIntervalFiveSeconds:
+			return "Timer · 5 seconds"
 		case constants.AdTimerIntervalHourly:
 			return "Timer · Hourly"
 		case constants.AdTimerIntervalDaily:

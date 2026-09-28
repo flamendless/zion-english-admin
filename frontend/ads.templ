@@ -347,6 +347,7 @@ templ AdForm(data AdFormData, formID string) {
 								name="timer_interval"
 								disabled?={ data.IsDeleted || data.RandomizeKind != constants.AdRandomizeTimer }
 							>
+								<option value={ string(constants.AdTimerIntervalFiveSeconds) } selected?={ data.TimerInterval == constants.AdTimerIntervalFiveSeconds }>5 seconds</option>
 								<option value={ string(constants.AdTimerIntervalHourly) } selected?={ data.TimerInterval == constants.AdTimerIntervalHourly }>Hourly</option>
 								<option value={ string(constants.AdTimerIntervalDaily) } selected?={ data.TimerInterval == constants.AdTimerIntervalDaily }>Daily</option>
 							</select>
@@ -382,7 +383,7 @@ templ adPlacementOptions(selected constants.AdPlacement) {
 	<option value={ string(constants.AdPlacementLeft) } selected?={ selected == constants.AdPlacementLeft }>Left</option>
 	<option value={ string(constants.AdPlacementRight) } selected?={ selected == constants.AdPlacementRight }>Right</option>
 	<option value={ string(constants.AdPlacementBottom) } selected?={ selected == constants.AdPlacementBottom }>Bottom</option>
-	<option value={ string(constants.AdPlacementTopAndSide) } selected?={ selected == constants.AdPlacementTopAndSide }>Top and side</option>
+	<option value={ string(constants.AdPlacementTopAndBottom) } selected?={ selected == constants.AdPlacementTopAndBottom }>Top and bottom</option>
 	<option value={ string(constants.AdPlacementLeftAndRight) } selected?={ selected == constants.AdPlacementLeftAndRight }>Left and right sides</option>
 	<option value={ string(constants.AdPlacementAllSides) } selected?={ selected == constants.AdPlacementAllSides }>All sides</option>
 }

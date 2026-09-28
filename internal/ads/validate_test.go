@@ -28,6 +28,12 @@ func TestValidateRequest(t *testing.T) {
 		t.Fatalf("expected valid multi timer: %v", err)
 	}
 
+	multiFiveSec := multi
+	multiFiveSec.TimerInterval = string(constants.AdTimerIntervalFiveSeconds)
+	if err := ValidateRequest(multiFiveSec); err != nil {
+		t.Fatalf("expected valid multi 5 second timer: %v", err)
+	}
+
 	singleSession := base
 	singleSession.RandomizeKind = string(constants.AdRandomizePerSession)
 	normalizedSingle := NormalizeRequest(singleSession)
@@ -55,5 +61,9 @@ func TestAdPlacementZones(t *testing.T) {
 	zones := constants.AdPlacementAllSides.Zones()
 	if len(zones) != 4 {
 		t.Fatalf("expected 4 zones, got %d", len(zones))
+	}
+	topBottom := constants.AdPlacementTopAndBottom.Zones()
+	if len(topBottom) != 2 || topBottom[0] != constants.AdZoneTop || topBottom[1] != constants.AdZoneBottom {
+		t.Fatalf("unexpected top and bottom zones: %v", topBottom)
 	}
 }

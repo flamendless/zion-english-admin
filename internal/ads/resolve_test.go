@@ -1,6 +1,7 @@
 package ads
 
 import (
+	"context"
 	"net/http/httptest"
 	"testing"
 
@@ -36,17 +37,109 @@ func TestComputeRotationPicksPerZone(t *testing.T) {
 		constants.AdZoneRight,
 		constants.AdZoneBottom,
 	}
+	seen := make(map[int64]bool)
 	for _, zone := range zones {
 		name := cookieNameForAdZone(1, zone)
 		id, ok := picks[name]
 		if !ok {
-			t.Fatalf("missing pick for zone %s", zone)
+			continue
 		}
 		if id != 10 && id != 20 && id != 30 {
 			t.Fatalf("unexpected product id %d for zone %s", id, zone)
 		}
+		if seen[id] {
+			t.Fatalf("duplicate product id %d across zones", id)
+		}
+		seen[id] = true
 	}
-	if len(picks) != 4 {
-		t.Fatalf("pick count = %d, want 4", len(picks))
+	if len(picks) != 3 {
+		t.Fatalf("pick count = %d, want 3 unique products for 4 zones", len(picks))
 	}
+}
+
+func TestResolveCatalogDedupesProductsOnPage(t *testing.T) {
+	t.Parallel()
+	catalog := []CatalogAd{
+		{
+			ID:            1,
+			Placement:     constants.AdPlacementAllSides,
+			RandomizeKind: constants.AdRandomizePerPage,
+			ProductOptions: []ProductOption{
+				{ProductID: 10, Name: "A"},
+				{ProductID: 20, Name: "B"},
+			},
+		},
+		{
+			ID:            2,
+			Placement:     constants.AdPlacementTop,
+			RandomizeKind: constants.AdRandomizePerPage,
+			ProductOptions: []ProductOption{
+				{ProductID: 10, Name: "A"},
+				{ProductID: 30, Name: "C"},
+			},
+		},
+	}
+	r := httptest.NewRequest("GET", "/", nil)
+	slots, _ := resolveCatalog(context.Background(), r, catalog, false)
+	ids := collectResolvedProductIDs(slots)
+	if len(ids) != 3 {
+		t.Fatalf("expected 3 slot products, got %d (%v)", len(ids), ids)
+	}
+	if len(uniqueInts(ids)) != len(ids) {
+		t.Fatalf("expected unique product ids on page, got %v", ids)
+	}
+}
+
+func TestResolveCatalogSkipsSlotsWhenPoolExhausted(t *testing.T) {
+	t.Parallel()
+	catalog := []CatalogAd{
+		{
+			ID:            1,
+			Placement:     constants.AdPlacementAllSides,
+			RandomizeKind: constants.AdRandomizePerPage,
+			ProductOptions: []ProductOption{
+				{ProductID: 10},
+				{ProductID: 20},
+			},
+		},
+	}
+	r := httptest.NewRequest("GET", "/", nil)
+	slots, _ := resolveCatalog(context.Background(), r, catalog, false)
+	ids := collectResolvedProductIDs(slots)
+	if len(ids) != 2 {
+		t.Fatalf("expected 2 products with 2 options and 4 zones, got %d", len(ids))
+	}
+	if len(uniqueInts(ids)) != 2 {
+		t.Fatalf("expected unique ids, got %v", ids)
+	}
+}
+
+func collectResolvedProductIDs(slots ResolvedSlots) []int64 {
+	var ids []int64
+	for _, p := range slots.Top {
+		ids = append(ids, p.ProductID)
+	}
+	for _, p := range slots.Left {
+		ids = append(ids, p.ProductID)
+	}
+	for _, p := range slots.Right {
+		ids = append(ids, p.ProductID)
+	}
+	for _, p := range slots.Bottom {
+		ids = append(ids, p.ProductID)
+	}
+	return ids
+}
+
+func uniqueInts(vals []int64) []int64 {
+	seen := make(map[int64]bool)
+	var out []int64
+	for _, v := range vals {
+		if seen[v] {
+			continue
+		}
+		seen[v] = true
+		out = append(out, v)
+	}
+	return out
 }

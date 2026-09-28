@@ -1,17 +1,22 @@
 package frontend
 
 import (
+	"fmt"
 	"zion-english/internal/ads"
 )
 
 templ AdPlacementChrome() {
 	{{
 		slots := ads.GetResolvedSlots(ctx)
+		fastRefreshSeconds := ads.CatalogFastTimerRefreshSeconds(ads.GetCatalog(ctx))
 		bodyClass := ""
 		if slots.HasSideRails {
 			bodyClass = "has-ad-rails"
 		}
 	}}
+	if fastRefreshSeconds > 0 {
+		@ScrAdFastRotation(fastRefreshSeconds)
+	}
 	if bodyClass != "" {
 		<script>
 			document.documentElement.classList.add('has-ad-rails');
@@ -20,30 +25,126 @@ templ AdPlacementChrome() {
 	@AffiliateProductCardStyles()
 	@AdPlacementChromeStyles()
 	if len(slots.Top) > 0 || len(slots.Left) > 0 || len(slots.Right) > 0 {
-		<div class="ad-chrome ad-chrome--fixed" aria-hidden="false">
-			if len(slots.Top) > 0 {
-				<div class="ad-zone ad-zone--top">
-					for _, item := range slots.Top {
-						@AffiliateProductCard(AffiliateProductCardFromResolved(item))
-					}
-				</div>
-			}
-			if len(slots.Left) > 0 {
-				<div class="ad-zone ad-zone--left">
-					for _, item := range slots.Left {
-						@AffiliateProductCard(AffiliateProductCardFromResolved(item))
-					}
-				</div>
-			}
-			if len(slots.Right) > 0 {
-				<div class="ad-zone ad-zone--right">
-					for _, item := range slots.Right {
-						@AffiliateProductCard(AffiliateProductCardFromResolved(item))
-					}
-				</div>
-			}
-		</div>
+		@AdPlacementChromeInner(slots)
 	}
+}
+
+templ AdChromeRefreshFragment() {
+	{{
+		slots := ads.GetResolvedSlots(ctx)
+		hasMobileSides := len(slots.Left) > 0 || len(slots.Right) > 0
+	}}
+	if len(slots.Top) > 0 || len(slots.Left) > 0 || len(slots.Right) > 0 {
+		@AdPlacementChromeInner(slots)
+	}
+	if len(slots.Bottom) > 0 || hasMobileSides {
+		@AdPlacementBottomInner(slots, hasMobileSides)
+	}
+}
+
+templ AdPlacementChromeInner(slots ads.ResolvedSlots) {
+	<div class="ad-chrome ad-chrome--fixed" aria-hidden="false">
+		if len(slots.Top) > 0 {
+			<div class="ad-zone ad-zone--top">
+				for _, item := range slots.Top {
+					@AffiliateProductCard(AffiliateProductCardFromResolved(item))
+				}
+			</div>
+		}
+		if len(slots.Left) > 0 {
+			<div class="ad-zone ad-zone--left">
+				for _, item := range slots.Left {
+					@AffiliateProductCard(AffiliateProductCardFromResolved(item))
+				}
+			</div>
+		}
+		if len(slots.Right) > 0 {
+			<div class="ad-zone ad-zone--right">
+				for _, item := range slots.Right {
+					@AffiliateProductCard(AffiliateProductCardFromResolved(item))
+				}
+			</div>
+		}
+	</div>
+}
+
+templ AdPlacementBottomInner(slots ads.ResolvedSlots, hasMobileSides bool) {
+	<div class="ad-chrome ad-chrome--bottom" aria-label="Sponsored recommendations">
+		if len(slots.Bottom) > 0 {
+			<div class="ad-zone ad-zone--bottom">
+				for _, item := range slots.Bottom {
+					@AffiliateProductCard(AffiliateProductCardFromResolved(item))
+				}
+			</div>
+		}
+		if hasMobileSides {
+			<div class="ad-zone ad-zone--mobile-sides" aria-label="Sponsored recommendations">
+				for _, item := range slots.Left {
+					@AffiliateProductCard(AffiliateProductCardFromResolved(item))
+				}
+				for _, item := range slots.Right {
+					@AffiliateProductCard(AffiliateProductCardFromResolved(item))
+				}
+			</div>
+		}
+	</div>
+}
+
+templ ScrAdFastRotation(intervalSeconds int) {
+	<span id="adFastRotationConfig" data-interval-ms={ fmt.Sprintf("%d", intervalSeconds*1000) } hidden aria-hidden="true"></span>
+	<script>
+		(function () {
+			if (window._adFastRotationBound) return;
+			window._adFastRotationBound = true;
+			const cfg = document.getElementById('adFastRotationConfig');
+			const intervalMs = cfg ? parseInt(cfg.getAttribute('data-interval-ms') || '5000', 10) : 5000;
+			function buildURL(path) {
+				const banner = document.getElementById('errorBanner');
+				if (banner && banner.dataset.basePath) {
+					return banner.dataset.basePath.replace(/\/$/, '') + path;
+				}
+				const pathname = window.location.pathname.replace(/\/$/, '');
+				if (pathname.includes('/zion-english-admin')) {
+					return '/zion-english-admin' + path;
+				}
+				return path;
+			}
+			function replaceAdChrome(html) {
+				const tpl = document.createElement('template');
+				tpl.innerHTML = html.trim();
+				const nextFixed = tpl.content.querySelector('.ad-chrome--fixed');
+				const nextBottom = tpl.content.querySelector('.ad-chrome--bottom');
+				const fixed = document.querySelector('.ad-chrome--fixed');
+				const bottom = document.querySelector('.ad-chrome--bottom');
+				if (nextFixed && fixed) {
+					fixed.replaceWith(nextFixed);
+				} else if (nextFixed && !fixed) {
+					document.body.insertBefore(nextFixed, document.body.firstChild);
+				} else if (!nextFixed && fixed) {
+					fixed.remove();
+				}
+				if (nextBottom && bottom) {
+					bottom.replaceWith(nextBottom);
+				} else if (nextBottom && !bottom) {
+					document.body.appendChild(nextBottom);
+				} else if (!nextBottom && bottom) {
+					bottom.remove();
+				}
+			}
+			function refreshAds() {
+				fetch(buildURL('/ads/partials/chrome'), { credentials: 'same-origin' })
+					.then(function (res) {
+						if (!res.ok) return '';
+						return res.text();
+					})
+					.then(function (html) {
+						if (html) replaceAdChrome(html);
+					})
+					.catch(function () {});
+			}
+			window.setInterval(refreshAds, intervalMs);
+		})();
+	</script>
 }
 
 templ AdPlacementBottom() {
@@ -52,25 +153,7 @@ templ AdPlacementBottom() {
 		hasMobileSides := len(slots.Left) > 0 || len(slots.Right) > 0
 	}}
 	if len(slots.Bottom) > 0 || hasMobileSides {
-		<div class="ad-chrome ad-chrome--bottom" aria-label="Sponsored recommendations">
-			if len(slots.Bottom) > 0 {
-				<div class="ad-zone ad-zone--bottom">
-					for _, item := range slots.Bottom {
-						@AffiliateProductCard(AffiliateProductCardFromResolved(item))
-					}
-				</div>
-			}
-			if hasMobileSides {
-				<div class="ad-zone ad-zone--mobile-sides" aria-label="Sponsored recommendations">
-					for _, item := range slots.Left {
-						@AffiliateProductCard(AffiliateProductCardFromResolved(item))
-					}
-					for _, item := range slots.Right {
-						@AffiliateProductCard(AffiliateProductCardFromResolved(item))
-					}
-				</div>
-			}
-		</div>
+		@AdPlacementBottomInner(slots, hasMobileSides)
 	}
 }
 
@@ -88,13 +171,28 @@ templ AdPlacementChromeStyles() {
 			display: flex;
 			flex-wrap: wrap;
 			justify-content: center;
+			align-items: stretch;
 			gap: var(--space-2);
 			padding: var(--space-2) 0;
 			margin-bottom: var(--space-2);
 		}
 		.ad-zone--top .affiliate-product-card {
 			width: min(100%, 10.5rem);
-			flex: 0 0 auto;
+			flex: 1 1 10.5rem;
+			max-width: 10.5rem;
+			height: auto;
+		}
+		.ad-zone--top .affiliate-product-card-shop {
+			display: -webkit-box;
+			-webkit-line-clamp: 1;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+		}
+		.ad-zone--top .affiliate-product-card-body {
+			flex: 1;
+		}
+		.ad-zone--top .affiliate-product-card-cta {
+			margin-top: auto;
 		}
 		.ad-zone--top .affiliate-product-card-body {
 			padding: var(--space-2);
@@ -129,6 +227,7 @@ templ AdPlacementChromeStyles() {
 			display: flex;
 			flex-wrap: wrap;
 			justify-content: center;
+			align-items: stretch;
 			gap: var(--space-3);
 			max-width: 56rem;
 			margin: 0 auto;
@@ -136,6 +235,21 @@ templ AdPlacementChromeStyles() {
 		}
 		.ad-chrome--bottom .affiliate-product-card {
 			width: min(100%, 14rem);
+			flex: 1 1 14rem;
+			max-width: 14rem;
+			height: auto;
+		}
+		.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card-shop {
+			display: -webkit-box;
+			-webkit-line-clamp: 1;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+		}
+		.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card-body {
+			flex: 1;
+		}
+		.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card-cta {
+			margin-top: auto;
 		}
 		.ad-zone--mobile-sides {
 			display: none;
@@ -221,7 +335,24 @@ templ AdPlacementChromeStyles() {
 			.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card,
 			.ad-zone--mobile-sides .affiliate-product-card {
 				width: min(calc(50% - var(--space-1)), 11rem);
-				flex: 0 0 auto;
+				flex: 1 1 min(calc(50% - var(--space-1)), 11rem);
+				max-width: 11rem;
+				height: auto;
+			}
+			.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card-shop,
+			.ad-zone--mobile-sides .affiliate-product-card-shop {
+				display: -webkit-box;
+				-webkit-line-clamp: 1;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+			}
+			.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card-body,
+			.ad-zone--mobile-sides .affiliate-product-card-body {
+				flex: 1;
+			}
+			.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card-cta,
+			.ad-zone--mobile-sides .affiliate-product-card-cta {
+				margin-top: auto;
 			}
 			.ad-chrome--bottom .ad-zone--bottom + .ad-zone--mobile-sides {
 				padding-top: var(--space-3);

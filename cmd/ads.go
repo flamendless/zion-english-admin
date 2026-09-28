@@ -570,3 +570,25 @@ func adViewFromID(ctx context.Context, adID int64) (frontend.AdViewData, error) 
 		ProductCards: cards,
 	}, nil
 }
+
+func handleAdChromePartial(w http.ResponseWriter, r *http.Request) {
+	if !requireMethod(w, r, http.MethodGet) {
+		return
+	}
+	ctx := r.Context()
+	if ads.SuppressAdsForRequest(ctx, r, dbRO.GetQueries()) {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+	ctx = ads.LoadRequestContext(ctx, w, r, dbRO.GetQueries(), true)
+	slots := ads.GetResolvedSlots(ctx)
+	if len(slots.Top) == 0 && len(slots.Left) == 0 && len(slots.Right) == 0 &&
+		len(slots.Bottom) == 0 {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+	writeHTML(w)
+	if err := frontend.AdChromeRefreshFragment().Render(ctx, w); err != nil {
+		logs.Log().Error("render ad chrome partial", zap.Error(err))
+	}
+}

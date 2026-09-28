@@ -60,16 +60,7 @@ func Middleware(db *queries.Queries, next http.Handler) http.Handler {
 			return
 		}
 
-		rows, err := db.GetPublishedAdsWithProducts(ctx)
-		if err == nil {
-			catalog := buildCatalog(rows)
-			ctx = context.WithValue(ctx, catalogKey, catalog)
-			picks := ComputeRotationPicks(r, catalog)
-			ctx = context.WithValue(ctx, rotationPicksKey, picks)
-			ApplyRotationCookies(w, r, catalog, picks)
-			slots := ResolveSlots(ctx, r)
-			ctx = context.WithValue(ctx, slotsKey, slots)
-		}
+		ctx = LoadRequestContext(ctx, w, r, db, false)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

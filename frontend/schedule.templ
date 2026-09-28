@@ -11,6 +11,7 @@ type ScheduleData struct {
 	ShowAllTeachers bool
 	TeacherID       string
 	TeacherName     string
+	TodayDate       string
 }
 
 templ Schedule(data ScheduleData) {
@@ -345,8 +346,8 @@ templ Schedule(data ScheduleData) {
 				}
 			</div>
 
-			<input type="hidden" id="todayListStart" name="startDate" value=""/>
-			<input type="hidden" id="todayListEnd" name="endDate" value=""/>
+			<input type="hidden" id="todayListStart" name="startDate" value={ data.TodayDate }/>
+			<input type="hidden" id="todayListEnd" name="endDate" value={ data.TodayDate }/>
 			<input type="hidden" id="todayListStatus" name="status" value={ string(constants.ScheduledClassStatusScheduled) }/>
 			<input type="hidden" id="dayListStart" name="startDate" value=""/>
 			<input type="hidden" id="dayListEnd" name="endDate" value=""/>

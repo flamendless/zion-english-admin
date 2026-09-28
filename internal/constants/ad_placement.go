@@ -7,7 +7,7 @@ const (
 	AdPlacementLeft          AdPlacement = "left"
 	AdPlacementRight         AdPlacement = "right"
 	AdPlacementBottom        AdPlacement = "bottom"
-	AdPlacementTopAndSide    AdPlacement = "top_and_side"
+	AdPlacementTopAndBottom  AdPlacement = "top_and_bottom"
 	AdPlacementLeftAndRight  AdPlacement = "left_and_right"
 	AdPlacementAllSides      AdPlacement = "all_sides"
 )
@@ -15,7 +15,7 @@ const (
 func ValidAdPlacement(placement string) bool {
 	switch AdPlacement(placement) {
 	case AdPlacementTop, AdPlacementLeft, AdPlacementRight, AdPlacementBottom,
-		AdPlacementTopAndSide, AdPlacementLeftAndRight, AdPlacementAllSides:
+		AdPlacementTopAndBottom, AdPlacementLeftAndRight, AdPlacementAllSides:
 		return true
 	default:
 		return false
@@ -32,8 +32,8 @@ func (p AdPlacement) Zones() []AdZone {
 		return []AdZone{AdZoneRight}
 	case AdPlacementBottom:
 		return []AdZone{AdZoneBottom}
-	case AdPlacementTopAndSide:
-		return []AdZone{AdZoneTop, AdZoneLeft, AdZoneRight}
+	case AdPlacementTopAndBottom:
+		return []AdZone{AdZoneTop, AdZoneBottom}
 	case AdPlacementLeftAndRight:
 		return []AdZone{AdZoneLeft, AdZoneRight}
 	case AdPlacementAllSides:

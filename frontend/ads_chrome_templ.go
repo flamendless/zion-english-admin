@@ -9,6 +9,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
+	"fmt"
 	"zion-english/internal/ads"
 )
 
@@ -34,9 +35,16 @@ func AdPlacementChrome() templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		slots := ads.GetResolvedSlots(ctx)
+		fastRefreshSeconds := ads.CatalogFastTimerRefreshSeconds(ads.GetCatalog(ctx))
 		bodyClass := ""
 		if slots.HasSideRails {
 			bodyClass = "has-ad-rails"
+		}
+		if fastRefreshSeconds > 0 {
+			templ_7745c5c3_Err = ScrAdFastRotation(fastRefreshSeconds).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
 		if bodyClass != "" {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<script>\r\n\t\t\tdocument.documentElement.classList.add('has-ad-rails');\r\n\t\t</script>")
@@ -53,59 +61,7 @@ func AdPlacementChrome() templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if len(slots.Top) > 0 || len(slots.Left) > 0 || len(slots.Right) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"ad-chrome ad-chrome--fixed\" aria-hidden=\"false\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			if len(slots.Top) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"ad-zone ad-zone--top\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				for _, item := range slots.Top {
-					templ_7745c5c3_Err = AffiliateProductCard(AffiliateProductCardFromResolved(item)).Render(ctx, templ_7745c5c3_Buffer)
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			}
-			if len(slots.Left) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"ad-zone ad-zone--left\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				for _, item := range slots.Left {
-					templ_7745c5c3_Err = AffiliateProductCard(AffiliateProductCardFromResolved(item)).Render(ctx, templ_7745c5c3_Buffer)
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			}
-			if len(slots.Right) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"ad-zone ad-zone--right\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				for _, item := range slots.Right {
-					templ_7745c5c3_Err = AffiliateProductCard(AffiliateProductCardFromResolved(item)).Render(ctx, templ_7745c5c3_Buffer)
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div>")
+			templ_7745c5c3_Err = AdPlacementChromeInner(slots).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -114,7 +70,7 @@ func AdPlacementChrome() templ.Component {
 	})
 }
 
-func AdPlacementBottom() templ.Component {
+func AdChromeRefreshFragment() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -137,50 +93,241 @@ func AdPlacementBottom() templ.Component {
 		ctx = templ.ClearChildren(ctx)
 		slots := ads.GetResolvedSlots(ctx)
 		hasMobileSides := len(slots.Left) > 0 || len(slots.Right) > 0
-		if len(slots.Bottom) > 0 || hasMobileSides {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"ad-chrome ad-chrome--bottom\" aria-label=\"Sponsored recommendations\">")
+		if len(slots.Top) > 0 || len(slots.Left) > 0 || len(slots.Right) > 0 {
+			templ_7745c5c3_Err = AdPlacementChromeInner(slots).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if len(slots.Bottom) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"ad-zone ad-zone--bottom\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
+		}
+		if len(slots.Bottom) > 0 || hasMobileSides {
+			templ_7745c5c3_Err = AdPlacementBottomInner(slots, hasMobileSides).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		return nil
+	})
+}
+
+func AdPlacementChromeInner(slots ads.ResolvedSlots) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
 				}
-				for _, item := range slots.Bottom {
-					templ_7745c5c3_Err = AffiliateProductCard(AffiliateProductCardFromResolved(item)).Render(ctx, templ_7745c5c3_Buffer)
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div>")
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var3 == nil {
+			templ_7745c5c3_Var3 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"ad-chrome ad-chrome--fixed\" aria-hidden=\"false\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if len(slots.Top) > 0 {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"ad-zone ad-zone--top\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			for _, item := range slots.Top {
+				templ_7745c5c3_Err = AffiliateProductCard(AffiliateProductCardFromResolved(item)).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			if hasMobileSides {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"ad-zone ad-zone--mobile-sides\" aria-label=\"Sponsored recommendations\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				for _, item := range slots.Left {
-					templ_7745c5c3_Err = AffiliateProductCard(AffiliateProductCardFromResolved(item)).Render(ctx, templ_7745c5c3_Buffer)
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-				}
-				for _, item := range slots.Right {
-					templ_7745c5c3_Err = AffiliateProductCard(AffiliateProductCardFromResolved(item)).Render(ctx, templ_7745c5c3_Buffer)
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		if len(slots.Left) > 0 {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"ad-zone ad-zone--left\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			for _, item := range slots.Left {
+				templ_7745c5c3_Err = AffiliateProductCard(AffiliateProductCardFromResolved(item)).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		if len(slots.Right) > 0 {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"ad-zone ad-zone--right\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			for _, item := range slots.Right {
+				templ_7745c5c3_Err = AffiliateProductCard(AffiliateProductCardFromResolved(item)).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func AdPlacementBottomInner(slots ads.ResolvedSlots, hasMobileSides bool) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var4 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var4 == nil {
+			templ_7745c5c3_Var4 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"ad-chrome ad-chrome--bottom\" aria-label=\"Sponsored recommendations\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if len(slots.Bottom) > 0 {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"ad-zone ad-zone--bottom\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			for _, item := range slots.Bottom {
+				templ_7745c5c3_Err = AffiliateProductCard(AffiliateProductCardFromResolved(item)).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		if hasMobileSides {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"ad-zone ad-zone--mobile-sides\" aria-label=\"Sponsored recommendations\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			for _, item := range slots.Left {
+				templ_7745c5c3_Err = AffiliateProductCard(AffiliateProductCardFromResolved(item)).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			for _, item := range slots.Right {
+				templ_7745c5c3_Err = AffiliateProductCard(AffiliateProductCardFromResolved(item)).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func ScrAdFastRotation(intervalSeconds int) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var5 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var5 == nil {
+			templ_7745c5c3_Var5 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<span id=\"adFastRotationConfig\" data-interval-ms=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", intervalSeconds*1000))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads_chrome.templ`, Line: 94, Col: 91}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" hidden aria-hidden=\"true\"></span><script>\r\n\t\t(function () {\r\n\t\t\tif (window._adFastRotationBound) return;\r\n\t\t\twindow._adFastRotationBound = true;\r\n\t\t\tconst cfg = document.getElementById('adFastRotationConfig');\r\n\t\t\tconst intervalMs = cfg ? parseInt(cfg.getAttribute('data-interval-ms') || '5000', 10) : 5000;\r\n\t\t\tfunction buildURL(path) {\r\n\t\t\t\tconst banner = document.getElementById('errorBanner');\r\n\t\t\t\tif (banner && banner.dataset.basePath) {\r\n\t\t\t\t\treturn banner.dataset.basePath.replace(/\\/$/, '') + path;\r\n\t\t\t\t}\r\n\t\t\t\tconst pathname = window.location.pathname.replace(/\\/$/, '');\r\n\t\t\t\tif (pathname.includes('/zion-english-admin')) {\r\n\t\t\t\t\treturn '/zion-english-admin' + path;\r\n\t\t\t\t}\r\n\t\t\t\treturn path;\r\n\t\t\t}\r\n\t\t\tfunction replaceAdChrome(html) {\r\n\t\t\t\tconst tpl = document.createElement('template');\r\n\t\t\t\ttpl.innerHTML = html.trim();\r\n\t\t\t\tconst nextFixed = tpl.content.querySelector('.ad-chrome--fixed');\r\n\t\t\t\tconst nextBottom = tpl.content.querySelector('.ad-chrome--bottom');\r\n\t\t\t\tconst fixed = document.querySelector('.ad-chrome--fixed');\r\n\t\t\t\tconst bottom = document.querySelector('.ad-chrome--bottom');\r\n\t\t\t\tif (nextFixed && fixed) {\r\n\t\t\t\t\tfixed.replaceWith(nextFixed);\r\n\t\t\t\t} else if (nextFixed && !fixed) {\r\n\t\t\t\t\tdocument.body.insertBefore(nextFixed, document.body.firstChild);\r\n\t\t\t\t} else if (!nextFixed && fixed) {\r\n\t\t\t\t\tfixed.remove();\r\n\t\t\t\t}\r\n\t\t\t\tif (nextBottom && bottom) {\r\n\t\t\t\t\tbottom.replaceWith(nextBottom);\r\n\t\t\t\t} else if (nextBottom && !bottom) {\r\n\t\t\t\t\tdocument.body.appendChild(nextBottom);\r\n\t\t\t\t} else if (!nextBottom && bottom) {\r\n\t\t\t\t\tbottom.remove();\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tfunction refreshAds() {\r\n\t\t\t\tfetch(buildURL('/ads/partials/chrome'), { credentials: 'same-origin' })\r\n\t\t\t\t\t.then(function (res) {\r\n\t\t\t\t\t\tif (!res.ok) return '';\r\n\t\t\t\t\t\treturn res.text();\r\n\t\t\t\t\t})\r\n\t\t\t\t\t.then(function (html) {\r\n\t\t\t\t\t\tif (html) replaceAdChrome(html);\r\n\t\t\t\t\t})\r\n\t\t\t\t\t.catch(function () {});\r\n\t\t\t}\r\n\t\t\twindow.setInterval(refreshAds, intervalMs);\r\n\t\t})();\r\n\t</script>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func AdPlacementBottom() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var7 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var7 == nil {
+			templ_7745c5c3_Var7 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		slots := ads.GetResolvedSlots(ctx)
+		hasMobileSides := len(slots.Left) > 0 || len(slots.Right) > 0
+		if len(slots.Bottom) > 0 || hasMobileSides {
+			templ_7745c5c3_Err = AdPlacementBottomInner(slots, hasMobileSides).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -205,12 +352,12 @@ func AdPlacementChromeStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var3 == nil {
-			templ_7745c5c3_Var3 = templ.NopComponent
+		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var8 == nil {
+			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<style>\r\n\t\t.ad-chrome {\r\n\t\t\tpointer-events: none;\r\n\t\t}\r\n\t\t.ad-chrome a,\r\n\t\t.ad-chrome button {\r\n\t\t\tpointer-events: auto;\r\n\t\t}\r\n\t\t.ad-zone--top {\r\n\t\t\twidth: 100%;\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tjustify-content: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tpadding: var(--space-2) 0;\r\n\t\t\tmargin-bottom: var(--space-2);\r\n\t\t}\r\n\t\t.ad-zone--top .affiliate-product-card {\r\n\t\t\twidth: min(100%, 10.5rem);\r\n\t\t\tflex: 0 0 auto;\r\n\t\t}\r\n\t\t.ad-zone--top .affiliate-product-card-body {\r\n\t\t\tpadding: var(--space-2);\r\n\t\t\tgap: var(--space-1);\r\n\t\t}\r\n\t\t.ad-zone--top .affiliate-product-card-title {\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t}\r\n\t\t.ad-zone--top .affiliate-product-card-price {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\t\t.ad-zone--top .affiliate-product-card-cta {\r\n\t\t\tpadding: 0.4375rem var(--space-2);\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t\tgap: 0.25rem;\r\n\t\t}\r\n\t\t.ad-zone--top .affiliate-product-card-cta-logo {\r\n\t\t\twidth: 0.875rem;\r\n\t\t\theight: 0.875rem;\r\n\t\t}\r\n\t\t.ad-zone--top .affiliate-product-card-sales {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\t\t.ad-chrome--bottom {\r\n\t\t\tpointer-events: none;\r\n\t\t\twidth: 100%;\r\n\t\t\tmargin-top: var(--space-6);\r\n\t\t\tpadding: var(--space-3) 0 var(--space-4);\r\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\t\t.ad-chrome--bottom .ad-zone--bottom {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tjustify-content: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tmax-width: 56rem;\r\n\t\t\tmargin: 0 auto;\r\n\t\t\tpadding: 0 var(--space-3);\r\n\t\t}\r\n\t\t.ad-chrome--bottom .affiliate-product-card {\r\n\t\t\twidth: min(100%, 14rem);\r\n\t\t}\r\n\t\t.ad-zone--mobile-sides {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\t\t.ad-zone--left,\r\n\t\t.ad-zone--right {\r\n\t\t\tposition: fixed;\r\n\t\t\ttop: 4.75rem;\r\n\t\t\twidth: 11rem;\r\n\t\t\tmax-height: calc(100vh - 4.75rem - var(--space-2));\r\n\t\t\tz-index: 850;\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: stretch;\r\n\t\t\tjustify-content: flex-start;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\toverflow-x: hidden;\r\n\t\t\toverflow-y: auto;\r\n\t\t\tpadding: var(--space-2) var(--space-1);\r\n\t\t\tbox-sizing: border-box;\r\n\t\t\tscrollbar-width: thin;\r\n\t\t}\r\n\t\t.ad-zone--left { left: 0; }\r\n\t\t.ad-zone--right { right: 0; }\r\n\t\t.ad-zone--left .affiliate-product-card,\r\n\t\t.ad-zone--right .affiliate-product-card {\r\n\t\t\twidth: 100%;\r\n\t\t\tflex: 0 0 auto;\r\n\t\t\theight: auto;\r\n\t\t}\r\n\t\t.ad-zone--left .affiliate-product-card-body,\r\n\t\t.ad-zone--right .affiliate-product-card-body {\r\n\t\t\tpadding: var(--space-2);\r\n\t\t\tgap: var(--space-1);\r\n\t\t}\r\n\t\t.ad-zone--left .affiliate-product-card-title,\r\n\t\t.ad-zone--right .affiliate-product-card-title {\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t}\r\n\t\t.ad-zone--left .affiliate-product-card-price,\r\n\t\t.ad-zone--right .affiliate-product-card-price {\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t}\r\n\t\t.ad-zone--left .affiliate-product-card-cta,\r\n\t\t.ad-zone--right .affiliate-product-card-cta {\r\n\t\t\tpadding: 0.4375rem var(--space-2);\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t\tgap: 0.25rem;\r\n\t\t}\r\n\t\t.ad-zone--left .affiliate-product-card-cta-logo,\r\n\t\t.ad-zone--right .affiliate-product-card-cta-logo {\r\n\t\t\twidth: 0.875rem;\r\n\t\t\theight: 0.875rem;\r\n\t\t}\r\n\t\t.ad-zone--left .affiliate-product-card-sales,\r\n\t\t.ad-zone--right .affiliate-product-card-sales {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\t\t.ad-zone [data-tooltip]::after {\r\n\t\t\tcontent: none;\r\n\t\t}\r\n\t\thtml.has-ad-rails body {\r\n\t\t\tpadding-left: 11.5rem;\r\n\t\t\tpadding-right: 11.5rem;\r\n\t\t}\r\n\t\t@media (max-width: 960px) {\r\n\t\t\t.ad-zone--left,\r\n\t\t\t.ad-zone--right {\r\n\t\t\t\tdisplay: none;\r\n\t\t\t}\r\n\t\t\t.ad-chrome--bottom .ad-zone--bottom,\r\n\t\t\t.ad-zone--mobile-sides {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: row;\r\n\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\tjustify-content: center;\r\n\t\t\t\talign-items: stretch;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tmax-width: none;\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tpadding: var(--space-3);\r\n\t\t\t}\r\n\t\t\t.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card,\r\n\t\t\t.ad-zone--mobile-sides .affiliate-product-card {\r\n\t\t\t\twidth: min(calc(50% - var(--space-1)), 11rem);\r\n\t\t\t\tflex: 0 0 auto;\r\n\t\t\t}\r\n\t\t\t.ad-chrome--bottom .ad-zone--bottom + .ad-zone--mobile-sides {\r\n\t\t\t\tpadding-top: var(--space-3);\r\n\t\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t\t\tmargin-top: 0;\r\n\t\t\t}\r\n\t\t\thtml.has-ad-rails body {\r\n\t\t\t\tpadding-left: 0;\r\n\t\t\t\tpadding-right: 0;\r\n\t\t\t}\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<style>\r\n\t\t.ad-chrome {\r\n\t\t\tpointer-events: none;\r\n\t\t}\r\n\t\t.ad-chrome a,\r\n\t\t.ad-chrome button {\r\n\t\t\tpointer-events: auto;\r\n\t\t}\r\n\t\t.ad-zone--top {\r\n\t\t\twidth: 100%;\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tjustify-content: center;\r\n\t\t\talign-items: stretch;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tpadding: var(--space-2) 0;\r\n\t\t\tmargin-bottom: var(--space-2);\r\n\t\t}\r\n\t\t.ad-zone--top .affiliate-product-card {\r\n\t\t\twidth: min(100%, 10.5rem);\r\n\t\t\tflex: 1 1 10.5rem;\r\n\t\t\tmax-width: 10.5rem;\r\n\t\t\theight: auto;\r\n\t\t}\r\n\t\t.ad-zone--top .affiliate-product-card-shop {\r\n\t\t\tdisplay: -webkit-box;\r\n\t\t\t-webkit-line-clamp: 1;\r\n\t\t\t-webkit-box-orient: vertical;\r\n\t\t\toverflow: hidden;\r\n\t\t}\r\n\t\t.ad-zone--top .affiliate-product-card-body {\r\n\t\t\tflex: 1;\r\n\t\t}\r\n\t\t.ad-zone--top .affiliate-product-card-cta {\r\n\t\t\tmargin-top: auto;\r\n\t\t}\r\n\t\t.ad-zone--top .affiliate-product-card-body {\r\n\t\t\tpadding: var(--space-2);\r\n\t\t\tgap: var(--space-1);\r\n\t\t}\r\n\t\t.ad-zone--top .affiliate-product-card-title {\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t}\r\n\t\t.ad-zone--top .affiliate-product-card-price {\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\t\t.ad-zone--top .affiliate-product-card-cta {\r\n\t\t\tpadding: 0.4375rem var(--space-2);\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t\tgap: 0.25rem;\r\n\t\t}\r\n\t\t.ad-zone--top .affiliate-product-card-cta-logo {\r\n\t\t\twidth: 0.875rem;\r\n\t\t\theight: 0.875rem;\r\n\t\t}\r\n\t\t.ad-zone--top .affiliate-product-card-sales {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\t\t.ad-chrome--bottom {\r\n\t\t\tpointer-events: none;\r\n\t\t\twidth: 100%;\r\n\t\t\tmargin-top: var(--space-6);\r\n\t\t\tpadding: var(--space-3) 0 var(--space-4);\r\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t}\r\n\t\t.ad-chrome--bottom .ad-zone--bottom {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tjustify-content: center;\r\n\t\t\talign-items: stretch;\r\n\t\t\tgap: var(--space-3);\r\n\t\t\tmax-width: 56rem;\r\n\t\t\tmargin: 0 auto;\r\n\t\t\tpadding: 0 var(--space-3);\r\n\t\t}\r\n\t\t.ad-chrome--bottom .affiliate-product-card {\r\n\t\t\twidth: min(100%, 14rem);\r\n\t\t\tflex: 1 1 14rem;\r\n\t\t\tmax-width: 14rem;\r\n\t\t\theight: auto;\r\n\t\t}\r\n\t\t.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card-shop {\r\n\t\t\tdisplay: -webkit-box;\r\n\t\t\t-webkit-line-clamp: 1;\r\n\t\t\t-webkit-box-orient: vertical;\r\n\t\t\toverflow: hidden;\r\n\t\t}\r\n\t\t.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card-body {\r\n\t\t\tflex: 1;\r\n\t\t}\r\n\t\t.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card-cta {\r\n\t\t\tmargin-top: auto;\r\n\t\t}\r\n\t\t.ad-zone--mobile-sides {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\t\t.ad-zone--left,\r\n\t\t.ad-zone--right {\r\n\t\t\tposition: fixed;\r\n\t\t\ttop: 4.75rem;\r\n\t\t\twidth: 11rem;\r\n\t\t\tmax-height: calc(100vh - 4.75rem - var(--space-2));\r\n\t\t\tz-index: 850;\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: stretch;\r\n\t\t\tjustify-content: flex-start;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\toverflow-x: hidden;\r\n\t\t\toverflow-y: auto;\r\n\t\t\tpadding: var(--space-2) var(--space-1);\r\n\t\t\tbox-sizing: border-box;\r\n\t\t\tscrollbar-width: thin;\r\n\t\t}\r\n\t\t.ad-zone--left { left: 0; }\r\n\t\t.ad-zone--right { right: 0; }\r\n\t\t.ad-zone--left .affiliate-product-card,\r\n\t\t.ad-zone--right .affiliate-product-card {\r\n\t\t\twidth: 100%;\r\n\t\t\tflex: 0 0 auto;\r\n\t\t\theight: auto;\r\n\t\t}\r\n\t\t.ad-zone--left .affiliate-product-card-body,\r\n\t\t.ad-zone--right .affiliate-product-card-body {\r\n\t\t\tpadding: var(--space-2);\r\n\t\t\tgap: var(--space-1);\r\n\t\t}\r\n\t\t.ad-zone--left .affiliate-product-card-title,\r\n\t\t.ad-zone--right .affiliate-product-card-title {\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t}\r\n\t\t.ad-zone--left .affiliate-product-card-price,\r\n\t\t.ad-zone--right .affiliate-product-card-price {\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t}\r\n\t\t.ad-zone--left .affiliate-product-card-cta,\r\n\t\t.ad-zone--right .affiliate-product-card-cta {\r\n\t\t\tpadding: 0.4375rem var(--space-2);\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t\tgap: 0.25rem;\r\n\t\t}\r\n\t\t.ad-zone--left .affiliate-product-card-cta-logo,\r\n\t\t.ad-zone--right .affiliate-product-card-cta-logo {\r\n\t\t\twidth: 0.875rem;\r\n\t\t\theight: 0.875rem;\r\n\t\t}\r\n\t\t.ad-zone--left .affiliate-product-card-sales,\r\n\t\t.ad-zone--right .affiliate-product-card-sales {\r\n\t\t\tdisplay: none;\r\n\t\t}\r\n\t\t.ad-zone [data-tooltip]::after {\r\n\t\t\tcontent: none;\r\n\t\t}\r\n\t\thtml.has-ad-rails body {\r\n\t\t\tpadding-left: 11.5rem;\r\n\t\t\tpadding-right: 11.5rem;\r\n\t\t}\r\n\t\t@media (max-width: 960px) {\r\n\t\t\t.ad-zone--left,\r\n\t\t\t.ad-zone--right {\r\n\t\t\t\tdisplay: none;\r\n\t\t\t}\r\n\t\t\t.ad-chrome--bottom .ad-zone--bottom,\r\n\t\t\t.ad-zone--mobile-sides {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: row;\r\n\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\tjustify-content: center;\r\n\t\t\t\talign-items: stretch;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tmax-width: none;\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tpadding: var(--space-3);\r\n\t\t\t}\r\n\t\t\t.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card,\r\n\t\t\t.ad-zone--mobile-sides .affiliate-product-card {\r\n\t\t\t\twidth: min(calc(50% - var(--space-1)), 11rem);\r\n\t\t\t\tflex: 1 1 min(calc(50% - var(--space-1)), 11rem);\r\n\t\t\t\tmax-width: 11rem;\r\n\t\t\t\theight: auto;\r\n\t\t\t}\r\n\t\t\t.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card-shop,\r\n\t\t\t.ad-zone--mobile-sides .affiliate-product-card-shop {\r\n\t\t\t\tdisplay: -webkit-box;\r\n\t\t\t\t-webkit-line-clamp: 1;\r\n\t\t\t\t-webkit-box-orient: vertical;\r\n\t\t\t\toverflow: hidden;\r\n\t\t\t}\r\n\t\t\t.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card-body,\r\n\t\t\t.ad-zone--mobile-sides .affiliate-product-card-body {\r\n\t\t\t\tflex: 1;\r\n\t\t\t}\r\n\t\t\t.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card-cta,\r\n\t\t\t.ad-zone--mobile-sides .affiliate-product-card-cta {\r\n\t\t\t\tmargin-top: auto;\r\n\t\t\t}\r\n\t\t\t.ad-chrome--bottom .ad-zone--bottom + .ad-zone--mobile-sides {\r\n\t\t\t\tpadding-top: var(--space-3);\r\n\t\t\t\tborder-top: 1px solid var(--color-border-subtle);\r\n\t\t\t\tmargin-top: 0;\r\n\t\t\t}\r\n\t\t\thtml.has-ad-rails body {\r\n\t\t\t\tpadding-left: 0;\r\n\t\t\t\tpadding-right: 0;\r\n\t\t\t}\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

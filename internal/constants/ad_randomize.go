@@ -20,8 +20,9 @@ func ValidAdRandomizeKind(kind string) bool {
 type AdTimerInterval string
 
 const (
-	AdTimerIntervalHourly AdTimerInterval = "hourly"
-	AdTimerIntervalDaily  AdTimerInterval = "daily"
+	AdTimerIntervalFiveSeconds AdTimerInterval = "5_seconds"
+	AdTimerIntervalHourly      AdTimerInterval = "hourly"
+	AdTimerIntervalDaily       AdTimerInterval = "daily"
 )
 
 func ValidAdTimerInterval(interval string) bool {
@@ -29,7 +30,7 @@ func ValidAdTimerInterval(interval string) bool {
 		return true
 	}
 	switch AdTimerInterval(interval) {
-	case AdTimerIntervalHourly, AdTimerIntervalDaily:
+	case AdTimerIntervalFiveSeconds, AdTimerIntervalHourly, AdTimerIntervalDaily:
 		return true
 	default:
 		return false

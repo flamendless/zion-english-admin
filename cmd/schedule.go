@@ -62,7 +62,9 @@ func handleSchedulePath(w http.ResponseWriter, r *http.Request) {
 func handleSchedule(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		data := frontend.ScheduleData{}
+		data := frontend.ScheduleData{
+			TodayDate: utils.TodayPHT(),
+		}
 		role := auth.GetRole(r.Context())
 		if auth.IsTeacherScoped(role) {
 			user := auth.GetUser(r.Context())
