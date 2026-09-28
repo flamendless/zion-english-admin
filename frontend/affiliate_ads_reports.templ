@@ -1,0 +1,582 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/constants"
+	"zion-english/internal/utils"
+)
+
+type AffiliateAdsReportSummary struct {
+	ProductCount          int64
+	TotalClicks           int64
+	ProductsWithClicks    int64
+	ProductsWithoutClicks int64
+	PublishedAdsCount     int64
+	AttributedAdClicks    int64
+}
+
+type AffiliateAdsReportTeacherItem struct {
+	TeacherID   int64
+	TeacherName string
+	Avatar      AvatarProps
+	ClickCount  int64
+}
+
+type AffiliateAdsReportAdZoneItem struct {
+	AdName     string
+	Zone       constants.AdZone
+	ZoneLabel  string
+	ClickCount int64
+}
+
+type AffiliateAdsReportProductItem struct {
+	ID           string
+	Name         string
+	ShopName     string
+	ThumbnailURL string
+	ClickCount   int64
+}
+
+type AffiliateAdsReportAdItem struct {
+	ID               string
+	Name             string
+	Status           constants.AdStatus
+	StatusLabel      string
+	StatusTone       PillTone
+	PlacementLabel   string
+	ProductCount     int64
+	LinkedClickTotal int64
+}
+
+type AffiliateAdsReportChartPoint struct {
+	Label  string `json:"label"`
+	Clicks int64  `json:"clicks"`
+}
+
+type AffiliateAdsReportsChartSummary struct {
+	ProductsWithClicks    int64 `json:"productsWithClicks"`
+	ProductsWithoutClicks int64 `json:"productsWithoutClicks"`
+}
+
+type AffiliateAdsReportsChartData struct {
+	TopProducts    []AffiliateAdsReportChartPoint  `json:"topProducts"`
+	TopAds         []AffiliateAdsReportChartPoint  `json:"topAds"`
+	TopTeachers    []AffiliateAdsReportChartPoint  `json:"topTeachers"`
+	ClicksByAdZone []AffiliateAdsReportChartPoint  `json:"clicksByAdZone"`
+	Summary        AffiliateAdsReportsChartSummary `json:"summary"`
+}
+
+type AffiliateAdsReportsPageData struct {
+	Summary     AffiliateAdsReportSummary
+	TopProducts []AffiliateAdsReportProductItem
+	TopAds      []AffiliateAdsReportAdItem
+	TopTeachers []AffiliateAdsReportTeacherItem
+	TopAdZones  []AffiliateAdsReportAdZoneItem
+	Charts      AffiliateAdsReportsChartData
+}
+
+templ AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>Ads/Affiliates Reports - Zion English Admin Tool</title>
+		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+		@GlobalIncludes()
+		@AvatarStyles()
+		@ScrChartJS()
+		@AffiliateAdsReportsPageStyles()
+	</head>
+	<body>
+		<div class="container affiliate-ads-reports-page">
+			@HeaderSimple()
+			<div class="hub-header affiliate-ads-reports-header">
+				<div class="affiliate-ads-reports-heading">
+					<h2 class="hub-title">Ads/Affiliates reports</h2>
+					<p class="affiliate-ads-reports-subtitle">
+						Lifetime click totals per affiliate product, plus per-click attribution when teachers open tracked links from ad placements (teacher and screen zone).
+					</p>
+				</div>
+				<div class="affiliate-ads-reports-header-actions">
+					<a href={ utils.URL("/affiliates") } class="btn btn-secondary">Manage affiliates</a>
+					<a href={ utils.URL("/ads") } class="btn btn-secondary">Manage ads</a>
+				</div>
+			</div>
+
+			<div class="dashboard-stats affiliate-ads-reports-summary">
+				<div class="stat-card stat-card-accent">
+					<span class="stat-label">Total clicks</span>
+					<span class="stat-value">{ fmt.Sprintf("%d", data.Summary.TotalClicks) }</span>
+				</div>
+				<div class="stat-card">
+					<span class="stat-label">Affiliate products</span>
+					<span class="stat-value">{ fmt.Sprintf("%d", data.Summary.ProductCount) }</span>
+				</div>
+				<div class="stat-card">
+					<span class="stat-label">Products with clicks</span>
+					<span class="stat-value">{ fmt.Sprintf("%d", data.Summary.ProductsWithClicks) }</span>
+				</div>
+				<div class="stat-card">
+					<span class="stat-label">Published ads</span>
+					<span class="stat-value">{ fmt.Sprintf("%d", data.Summary.PublishedAdsCount) }</span>
+				</div>
+				<div class="stat-card">
+					<span class="stat-label">Attributed ad clicks</span>
+					<span class="stat-value">{ fmt.Sprintf("%d", data.Summary.AttributedAdClicks) }</span>
+				</div>
+			</div>
+
+			<section class="affiliate-ads-reports-block" aria-labelledby="affiliateAdsReportsChartsTitle">
+				<h3 class="affiliate-ads-reports-block-title" id="affiliateAdsReportsChartsTitle">Performance charts</h3>
+				<div class="affiliate-ads-reports-charts">
+					<div class="affiliate-ads-reports-chart-card affiliate-ads-reports-chart-card--hero">
+						<div class="affiliate-ads-reports-chart-card-head">
+							<h4 class="affiliate-ads-reports-chart-title">Top affiliate links</h4>
+							<p class="affiliate-ads-reports-chart-hint">Highest lifetime click counts among tracked product links.</p>
+						</div>
+						<div class="affiliate-ads-reports-chart-wrap affiliate-ads-reports-chart-wrap--bars">
+							<canvas id="topAffiliateProductsChart" role="img" aria-label="Bar chart of top affiliate links by clicks"></canvas>
+						</div>
+					</div>
+					<div class="affiliate-ads-reports-chart-card affiliate-ads-reports-chart-card--compact">
+						<div class="affiliate-ads-reports-chart-card-head">
+							<h4 class="affiliate-ads-reports-chart-title">Product click activity</h4>
+							<p class="affiliate-ads-reports-chart-hint">Catalog with at least one recorded click.</p>
+						</div>
+						<div class="affiliate-ads-reports-chart-wrap affiliate-ads-reports-chart-wrap--donut">
+							<canvas id="affiliateProductActivityChart" role="img" aria-label="Donut chart of products with clicks versus none"></canvas>
+						</div>
+					</div>
+					<div class="affiliate-ads-reports-chart-card">
+						<div class="affiliate-ads-reports-chart-card-head">
+							<h4 class="affiliate-ads-reports-chart-title">Top ads by linked clicks</h4>
+							<p class="affiliate-ads-reports-chart-hint">Sum of linked product lifetime clicks per ad.</p>
+						</div>
+						<div class="affiliate-ads-reports-chart-wrap affiliate-ads-reports-chart-wrap--bars">
+							<canvas id="topAdsChart" role="img" aria-label="Bar chart of top ads by linked clicks"></canvas>
+						</div>
+					</div>
+					<div class="affiliate-ads-reports-chart-card">
+						<div class="affiliate-ads-reports-chart-card-head">
+							<h4 class="affiliate-ads-reports-chart-title">Top teachers by clicks</h4>
+							<p class="affiliate-ads-reports-chart-hint">Teachers with the most tracked link opens.</p>
+						</div>
+						<div class="affiliate-ads-reports-chart-wrap affiliate-ads-reports-chart-wrap--bars">
+							<canvas id="topTeachersChart" role="img" aria-label="Bar chart of top teachers by clicks"></canvas>
+						</div>
+					</div>
+					<div class="affiliate-ads-reports-chart-card affiliate-ads-reports-chart-card--wide">
+						<div class="affiliate-ads-reports-chart-card-head">
+							<h4 class="affiliate-ads-reports-chart-title">Clicks by ad zone</h4>
+							<p class="affiliate-ads-reports-chart-hint">Attributed clicks per published ad and screen zone.</p>
+						</div>
+						<div class="affiliate-ads-reports-chart-wrap affiliate-ads-reports-chart-wrap--bars">
+							<canvas id="clicksByAdZoneChart" role="img" aria-label="Bar chart of clicks by ad zone"></canvas>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="affiliate-ads-reports-block" aria-labelledby="affiliateAdsReportsLeaderboardsTitle">
+				<h3 class="affiliate-ads-reports-block-title" id="affiliateAdsReportsLeaderboardsTitle">Top performers</h3>
+				<div class="affiliate-ads-reports-leaderboards">
+				<section class="affiliate-ads-reports-section affiliate-ads-reports-panel">
+					<h3 class="affiliate-ads-reports-section-title">Top performing affiliate links</h3>
+					if len(data.TopProducts) > 0 {
+						<ol class="affiliate-ads-reports-leaderboard">
+							for i, item := range data.TopProducts {
+								<li class="affiliate-ads-reports-leaderboard-item">
+									<span class="affiliate-ads-reports-rank">{ fmt.Sprintf("%d", i+1) }</span>
+									if item.ThumbnailURL != "" {
+										<img src={ item.ThumbnailURL } alt="" class="affiliate-ads-reports-leaderboard-thumb" referrerpolicy="no-referrer"/>
+									} else {
+										<span class="affiliate-ads-reports-leaderboard-thumb-empty" aria-hidden="true">-</span>
+									}
+									<div class="affiliate-ads-reports-leaderboard-body">
+										<span class="affiliate-ads-reports-leaderboard-name" title={ item.Name }>{ item.Name }</span>
+										<span class="affiliate-ads-reports-leaderboard-meta">{ affiliateAdsReportCellText(item.ShopName) }</span>
+									</div>
+									@Pill(fmt.Sprintf("%d clicks", item.ClickCount), PillToneInfo)
+								</li>
+							}
+						</ol>
+					} else {
+						<p class="affiliate-ads-reports-empty">No affiliate link clicks recorded yet.</p>
+					}
+				</section>
+
+				<section class="affiliate-ads-reports-section affiliate-ads-reports-panel">
+					<h3 class="affiliate-ads-reports-section-title">Top performing ads</h3>
+					<p class="affiliate-ads-reports-hint">
+						Linked click totals sum lifetime product clicks for each ad's products. The same product in multiple ads is counted in each row.
+					</p>
+					if len(data.TopAds) > 0 {
+						<ol class="affiliate-ads-reports-leaderboard">
+							for i, item := range data.TopAds {
+								<li class="affiliate-ads-reports-leaderboard-item">
+									<span class="affiliate-ads-reports-rank">{ fmt.Sprintf("%d", i+1) }</span>
+									<div class="affiliate-ads-reports-leaderboard-body affiliate-ads-reports-leaderboard-body--ads">
+										<span class="affiliate-ads-reports-leaderboard-name" title={ item.Name }>{ item.Name }</span>
+										<span class="affiliate-ads-reports-leaderboard-meta">
+											@StatusPill(item.StatusLabel, item.StatusTone, false)
+											<span>{ item.PlacementLabel }</span>
+											<span>{ fmt.Sprintf("%d products", item.ProductCount) }</span>
+										</span>
+									</div>
+									@Pill(fmt.Sprintf("%d linked clicks", item.LinkedClickTotal), PillToneInfo)
+								</li>
+							}
+						</ol>
+					} else {
+						<p class="affiliate-ads-reports-empty">No ad linked click totals yet.</p>
+					}
+				</section>
+
+				<section class="affiliate-ads-reports-section affiliate-ads-reports-panel">
+					<h3 class="affiliate-ads-reports-section-title">Top teachers</h3>
+					<p class="affiliate-ads-reports-hint">Counted when a teacher opens any tracked affiliate link while logged in.</p>
+					if len(data.TopTeachers) > 0 {
+						<ol class="affiliate-ads-reports-leaderboard">
+							for i, item := range data.TopTeachers {
+								<li class="affiliate-ads-reports-leaderboard-item">
+									<span class="affiliate-ads-reports-rank">{ fmt.Sprintf("%d", i+1) }</span>
+									<div class="affiliate-ads-reports-leaderboard-body affiliate-ads-reports-leaderboard-body--teacher">
+										@TeacherNameCell(item.TeacherName, item.Avatar)
+									</div>
+									@Pill(fmt.Sprintf("%d clicks", item.ClickCount), PillToneInfo)
+								</li>
+							}
+						</ol>
+					} else {
+						<p class="affiliate-ads-reports-empty">No teacher click events recorded yet.</p>
+					}
+				</section>
+
+				<section class="affiliate-ads-reports-section affiliate-ads-reports-panel">
+					<h3 class="affiliate-ads-reports-section-title">Clicks by ad zone</h3>
+					<p class="affiliate-ads-reports-hint">Attributed clicks from ad placement chrome only (validated ad and zone on each link).</p>
+					if len(data.TopAdZones) > 0 {
+						<ol class="affiliate-ads-reports-leaderboard">
+							for i, item := range data.TopAdZones {
+								<li class="affiliate-ads-reports-leaderboard-item">
+									<span class="affiliate-ads-reports-rank">{ fmt.Sprintf("%d", i+1) }</span>
+									<div class="affiliate-ads-reports-leaderboard-body">
+										<span class="affiliate-ads-reports-leaderboard-name" title={ item.AdName }>{ item.AdName }</span>
+										<span class="affiliate-ads-reports-leaderboard-meta">{ item.ZoneLabel }</span>
+									</div>
+									@Pill(fmt.Sprintf("%d clicks", item.ClickCount), PillToneInfo)
+								</li>
+							}
+						</ol>
+					} else {
+						<p class="affiliate-ads-reports-empty">No attributed ad zone clicks yet.</p>
+					}
+				</section>
+				</div>
+			</section>
+		</div>
+		@templ.JSONScript("affiliateAdsReportsChartData", data.Charts)
+		<script type="text/javascript" src={ utils.URL("/static/js/affiliate-ads-reports-charts.js") }></script>
+		<script>
+			(function () {
+				const el = document.getElementById('affiliateAdsReportsChartData');
+				if (!el || !window.affiliateAdsReportsCharts) return;
+				try {
+					const data = JSON.parse(el.textContent);
+					window.affiliateAdsReportsCharts.renderAll(data);
+				} catch (e) {
+					console.error('affiliate ads reports charts', e);
+				}
+			})();
+		</script>
+	</body>
+	</html>
+}
+
+func affiliateAdsReportCellText(s string) string {
+	if s == "" {
+		return "-"
+	}
+	return s
+}
+
+templ AffiliateAdsReportsPageStyles() {
+	<style>
+		.affiliate-ads-reports-page {
+			padding-bottom: var(--space-10);
+		}
+
+		.affiliate-ads-reports-header {
+			align-items: flex-start;
+		}
+
+		.affiliate-ads-reports-heading {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-1);
+		}
+
+		.affiliate-ads-reports-subtitle {
+			color: var(--color-muted-foreground);
+			font-size: 0.9375rem;
+			line-height: 1.5;
+			max-width: 42rem;
+			margin: 0;
+		}
+
+		.affiliate-ads-reports-header-actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-2);
+			flex-shrink: 0;
+		}
+
+		.affiliate-ads-reports-header-actions .btn {
+			margin-top: 0;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			height: 36px;
+			padding: 0 var(--space-3);
+			font-size: 0.8125rem;
+			line-height: 1;
+			box-sizing: border-box;
+		}
+
+		.affiliate-ads-reports-summary {
+			margin-bottom: var(--space-8);
+		}
+
+		.affiliate-ads-reports-block {
+			margin-bottom: var(--space-8);
+		}
+
+		.affiliate-ads-reports-block-title {
+			margin: 0 0 var(--space-4);
+			font-size: 1.125rem;
+			font-weight: 600;
+			color: var(--color-foreground);
+		}
+
+		.affiliate-ads-reports-charts {
+			display: grid;
+			grid-template-columns: repeat(12, minmax(0, 1fr));
+			gap: var(--space-4);
+		}
+
+		.affiliate-ads-reports-chart-card {
+			grid-column: span 6;
+			display: flex;
+			flex-direction: column;
+			background: var(--color-surface);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-lg);
+			box-shadow: var(--shadow-sm);
+			padding: var(--space-4);
+			min-width: 0;
+		}
+
+		.affiliate-ads-reports-chart-card--hero {
+			grid-column: span 8;
+		}
+
+		.affiliate-ads-reports-chart-card--compact {
+			grid-column: span 4;
+		}
+
+		.affiliate-ads-reports-chart-card--wide {
+			grid-column: 1 / -1;
+		}
+
+		.affiliate-ads-reports-chart-card-head {
+			margin-bottom: var(--space-3);
+			padding-bottom: var(--space-3);
+			border-bottom: 1px solid var(--color-border-subtle);
+		}
+
+		.affiliate-ads-reports-chart-title {
+			margin: 0 0 var(--space-1);
+			font-size: 1rem;
+			font-weight: 600;
+		}
+
+		.affiliate-ads-reports-chart-hint {
+			margin: 0;
+			font-size: 0.8125rem;
+			line-height: 1.45;
+			color: var(--color-muted-foreground);
+		}
+
+		.affiliate-ads-reports-chart-wrap {
+			position: relative;
+			flex: 1;
+			min-height: 120px;
+		}
+
+		.affiliate-ads-reports-chart-wrap--bars {
+			height: auto;
+		}
+
+		.affiliate-ads-reports-chart-wrap--donut {
+			height: 220px;
+		}
+
+		.affiliate-ads-reports-chart-empty {
+			margin: 0;
+			padding: var(--space-6) var(--space-4);
+			text-align: center;
+			color: var(--color-muted-foreground);
+			font-size: 0.875rem;
+		}
+
+		.affiliate-ads-reports-leaderboards {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: var(--space-4);
+		}
+
+		.affiliate-ads-reports-panel {
+			background: var(--color-surface);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-lg);
+			box-shadow: var(--shadow-sm);
+			padding: var(--space-4);
+			min-width: 0;
+		}
+
+		.affiliate-ads-reports-section {
+			margin-bottom: 0;
+		}
+
+		.affiliate-ads-reports-section-title {
+			margin: 0 0 var(--space-3);
+			font-size: 0.9375rem;
+			font-weight: 600;
+		}
+
+		.affiliate-ads-reports-hint {
+			font-size: 0.8125rem;
+			line-height: 1.45;
+			color: var(--color-muted-foreground);
+			margin: 0 0 var(--space-3);
+		}
+
+		.affiliate-ads-reports-leaderboard {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-2);
+		}
+
+		.affiliate-ads-reports-leaderboard-item {
+			display: flex;
+			align-items: center;
+			gap: var(--space-3);
+			padding: var(--space-2) var(--space-3);
+			background: var(--color-muted);
+			border: 1px solid var(--color-border-subtle);
+			border-radius: var(--radius-md);
+			transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+		}
+
+		.affiliate-ads-reports-leaderboard-item:hover {
+			border-color: var(--color-border);
+			box-shadow: var(--shadow-sm);
+		}
+
+		.affiliate-ads-reports-leaderboard-item .pill {
+			flex-shrink: 0;
+			margin: 0;
+		}
+
+		.affiliate-ads-reports-rank {
+			flex-shrink: 0;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 1.625rem;
+			height: 1.625rem;
+			font-size: 0.75rem;
+			font-weight: 700;
+			font-variant-numeric: tabular-nums;
+			color: var(--color-primary-hover);
+			background: var(--color-primary-light);
+			border-radius: var(--radius-full);
+		}
+
+		.affiliate-ads-reports-leaderboard-thumb {
+			width: 2.25rem;
+			height: 2.25rem;
+			object-fit: cover;
+			border-radius: var(--radius-sm);
+			border: 1px solid var(--color-border-subtle);
+			flex-shrink: 0;
+		}
+
+		.affiliate-ads-reports-leaderboard-thumb-empty {
+			width: 2.25rem;
+			flex-shrink: 0;
+			text-align: center;
+			color: var(--color-muted-foreground);
+			font-size: 0.8125rem;
+		}
+
+		.affiliate-ads-reports-leaderboard-body {
+			flex: 1;
+			min-width: 0;
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+		}
+
+		.affiliate-ads-reports-leaderboard-body--teacher {
+			flex: 1;
+			min-width: 0;
+		}
+
+		.affiliate-ads-reports-leaderboard-body--ads .affiliate-ads-reports-leaderboard-meta {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-2);
+		}
+
+		.affiliate-ads-reports-leaderboard-name {
+			font-weight: 600;
+			font-size: 0.875rem;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.affiliate-ads-reports-leaderboard-meta {
+			font-size: 0.75rem;
+			color: var(--color-muted-foreground);
+		}
+
+		.affiliate-ads-reports-empty {
+			color: var(--color-muted-foreground);
+			font-size: 0.875rem;
+			margin: var(--space-2) 0 0;
+		}
+
+		@media (max-width: 1024px) {
+			.affiliate-ads-reports-chart-card,
+			.affiliate-ads-reports-chart-card--hero,
+			.affiliate-ads-reports-chart-card--compact,
+			.affiliate-ads-reports-chart-card--wide {
+				grid-column: 1 / -1;
+			}
+		}
+
+		@media (max-width: 900px) {
+			.affiliate-ads-reports-leaderboards {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+}

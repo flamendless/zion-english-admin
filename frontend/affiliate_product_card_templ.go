@@ -10,7 +10,10 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"fmt"
+	"net/url"
+	"strconv"
 	"zion-english/internal/ads"
+	"zion-english/internal/constants"
 	"zion-english/internal/utils"
 )
 
@@ -24,15 +27,28 @@ type AffiliateProductCardData struct {
 	Sales         string
 	ThumbnailURL  string
 	AffiliateURL  string
+	TrackAdID     int64
+	TrackAdZone   constants.AdZone
 	IncludeInSave bool
 	FormIndex     int
 }
 
-func AffiliateProductLinkHref(productID int64, affiliateURL string) string {
+func AffiliateProductLinkHref(productID int64, affiliateURL string, trackAdID int64, trackAdZone constants.AdZone) string {
 	if productID <= 0 {
 		return affiliateURL
 	}
-	return utils.URL(fmt.Sprintf("/affiliate-link/%d", productID))
+	path := utils.URL(fmt.Sprintf("/affiliate-link/%d", productID))
+	if trackAdID > 0 && trackAdZone != "" {
+		u, err := url.Parse(path)
+		if err == nil {
+			q := u.Query()
+			q.Set("ad_id", strconv.FormatInt(trackAdID, 10))
+			q.Set("zone", string(trackAdZone))
+			u.RawQuery = q.Encode()
+			return u.String()
+		}
+	}
+	return path
 }
 
 func AffiliateProductCardFromResolved(item ads.ResolvedProduct) AffiliateProductCardData {
@@ -44,6 +60,8 @@ func AffiliateProductCardFromResolved(item ads.ResolvedProduct) AffiliateProduct
 		Sales:        item.Sales,
 		ThumbnailURL: item.ThumbnailURL,
 		AffiliateURL: item.AffiliateURL,
+		TrackAdID:    item.AdID,
+		TrackAdZone:  item.Zone,
 	}
 }
 
@@ -80,7 +98,7 @@ func AffiliateProductCard(card AffiliateProductCardData) templ.Component {
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", card.FormIndex))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 51, Col: 47}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 69, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
 			if templ_7745c5c3_Err != nil {
@@ -96,9 +114,9 @@ func AffiliateProductCard(card AffiliateProductCardData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 templ.SafeURL
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(AffiliateProductLinkHref(card.ProductID, card.AffiliateURL))
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(AffiliateProductLinkHref(card.ProductID, card.AffiliateURL, card.TrackAdID, card.TrackAdZone))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 59, Col: 70}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 77, Col: 104}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -111,7 +129,7 @@ func AffiliateProductCard(card AffiliateProductCardData) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue("View " + card.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 62, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 80, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 		if templ_7745c5c3_Err != nil {
@@ -129,7 +147,7 @@ func AffiliateProductCard(card AffiliateProductCardData) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(card.ThumbnailURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 67, Col: 29}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 85, Col: 29}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 			if templ_7745c5c3_Err != nil {
@@ -157,7 +175,7 @@ func AffiliateProductCard(card AffiliateProductCardData) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(card.ShopName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 83, Col: 59}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 101, Col: 59}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -180,7 +198,7 @@ func AffiliateProductCard(card AffiliateProductCardData) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateProductDisclosureTooltip)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 91, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 109, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 		if templ_7745c5c3_Err != nil {
@@ -191,9 +209,9 @@ func AffiliateProductCard(card AffiliateProductCardData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 templ.SafeURL
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(AffiliateProductLinkHref(card.ProductID, card.AffiliateURL))
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(AffiliateProductLinkHref(card.ProductID, card.AffiliateURL, card.TrackAdID, card.TrackAdZone))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 97, Col: 73}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 115, Col: 107}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -206,7 +224,7 @@ func AffiliateProductCard(card AffiliateProductCardData) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(card.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 97, Col: 139}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 115, Col: 173}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -224,7 +242,7 @@ func AffiliateProductCard(card AffiliateProductCardData) templ.Component {
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(card.PriceDisplay)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 101, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 119, Col: 67}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -243,7 +261,7 @@ func AffiliateProductCard(card AffiliateProductCardData) templ.Component {
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(card.Sales)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 104, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 122, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -259,9 +277,9 @@ func AffiliateProductCard(card AffiliateProductCardData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var12 templ.SafeURL
-		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinURLErrs(AffiliateProductLinkHref(card.ProductID, card.AffiliateURL))
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinURLErrs(AffiliateProductLinkHref(card.ProductID, card.AffiliateURL, card.TrackAdID, card.TrackAdZone))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 109, Col: 70}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 127, Col: 104}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -274,7 +292,7 @@ func AffiliateProductCard(card AffiliateProductCardData) templ.Component {
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/shopee-logo-white.svg"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 115, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 133, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
 		if templ_7745c5c3_Err != nil {

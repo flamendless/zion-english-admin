@@ -18,6 +18,7 @@ const cookiePrefix = "zion_ad_"
 type ResolvedProduct struct {
 	AdID          int64
 	AdName        string
+	Zone          constants.AdZone
 	ProductID     int64
 	Name          string
 	ShopName      string
@@ -87,6 +88,7 @@ func resolveProductForAdZone(ctx context.Context, ad CatalogAd, zone constants.A
 	return &ResolvedProduct{
 		AdID:         ad.ID,
 		AdName:       ad.Name,
+		Zone:         zone,
 		ProductID:    chosen.ProductID,
 		Name:         chosen.Name,
 		ShopName:     chosen.ShopName,

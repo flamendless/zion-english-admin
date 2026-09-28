@@ -74,6 +74,13 @@ type AffiliatesPageData struct {
 	SortBy           string
 	SortOrder        string
 	FilterPath       string
+	PageNumber       int
+	PageTotalPages   int
+	PageTotal        int64
+	PrevURL          string
+	NextURL          string
+	HasPrev          bool
+	HasNext          bool
 	Form             AffiliateFormData
 	OpenEditModal    bool
 	ImportPreview    AffiliateImportPreviewData
@@ -192,6 +199,7 @@ templ AffiliatesPage(data AffiliatesPageData) {
 						</tbody>
 					</table>
 				</div>
+				@PaginationBar(data.HasPrev, data.PrevURL, data.HasNext, data.NextURL, data.PageNumber, data.PageTotalPages, data.PageTotal)
 			} else {
 				<p class="affiliates-empty">No affiliate products yet. Upload a CSV to get started.</p>
 			}

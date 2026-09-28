@@ -51,6 +51,21 @@ func AdPlacementLabel(placement constants.AdPlacement) string {
 	}
 }
 
+func AdZoneLabel(zone constants.AdZone) string {
+	switch zone {
+	case constants.AdZoneTop:
+		return "Top"
+	case constants.AdZoneLeft:
+		return "Left"
+	case constants.AdZoneRight:
+		return "Right"
+	case constants.AdZoneBottom:
+		return "Bottom"
+	default:
+		return string(zone)
+	}
+}
+
 func AdTypeLabel(adType constants.AdType) string {
 	switch adType {
 	case constants.AdTypeAffiliate:

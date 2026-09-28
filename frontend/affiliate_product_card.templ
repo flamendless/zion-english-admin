@@ -2,7 +2,10 @@ package frontend
 
 import (
 	"fmt"
+	"net/url"
+	"strconv"
 	"zion-english/internal/ads"
+	"zion-english/internal/constants"
 	"zion-english/internal/utils"
 )
 
@@ -16,15 +19,28 @@ type AffiliateProductCardData struct {
 	Sales        string
 	ThumbnailURL string
 	AffiliateURL string
+	TrackAdID    int64
+	TrackAdZone  constants.AdZone
 	IncludeInSave bool
 	FormIndex     int
 }
 
-func AffiliateProductLinkHref(productID int64, affiliateURL string) string {
+func AffiliateProductLinkHref(productID int64, affiliateURL string, trackAdID int64, trackAdZone constants.AdZone) string {
 	if productID <= 0 {
 		return affiliateURL
 	}
-	return utils.URL(fmt.Sprintf("/affiliate-link/%d", productID))
+	path := utils.URL(fmt.Sprintf("/affiliate-link/%d", productID))
+	if trackAdID > 0 && trackAdZone != "" {
+		u, err := url.Parse(path)
+		if err == nil {
+			q := u.Query()
+			q.Set("ad_id", strconv.FormatInt(trackAdID, 10))
+			q.Set("zone", string(trackAdZone))
+			u.RawQuery = q.Encode()
+			return u.String()
+		}
+	}
+	return path
 }
 
 func AffiliateProductCardFromResolved(item ads.ResolvedProduct) AffiliateProductCardData {
@@ -36,6 +52,8 @@ func AffiliateProductCardFromResolved(item ads.ResolvedProduct) AffiliateProduct
 		Sales:        item.Sales,
 		ThumbnailURL: item.ThumbnailURL,
 		AffiliateURL: item.AffiliateURL,
+		TrackAdID:    item.AdID,
+		TrackAdZone:  item.Zone,
 	}
 }
 
@@ -56,7 +74,7 @@ templ AffiliateProductCard(card AffiliateProductCardData) {
 			}
 			<a
 				class="affiliate-product-card-image-link"
-				href={ AffiliateProductLinkHref(card.ProductID, card.AffiliateURL) }
+				href={ AffiliateProductLinkHref(card.ProductID, card.AffiliateURL, card.TrackAdID, card.TrackAdZone) }
 				target="_blank"
 				rel="noopener noreferrer sponsored"
 				aria-label={ "View " + card.Name }
@@ -94,7 +112,7 @@ templ AffiliateProductCard(card AffiliateProductCardData) {
 				</button>
 			</div>
 			<h4 class="affiliate-product-card-title">
-				<a href={ AffiliateProductLinkHref(card.ProductID, card.AffiliateURL) } target="_blank" rel="noopener noreferrer sponsored">{ card.Name }</a>
+				<a href={ AffiliateProductLinkHref(card.ProductID, card.AffiliateURL, card.TrackAdID, card.TrackAdZone) } target="_blank" rel="noopener noreferrer sponsored">{ card.Name }</a>
 			</h4>
 			<div class="affiliate-product-card-meta">
 				if card.PriceDisplay != "" {
@@ -106,7 +124,7 @@ templ AffiliateProductCard(card AffiliateProductCardData) {
 			</div>
 			<a
 				class="affiliate-product-card-cta"
-				href={ AffiliateProductLinkHref(card.ProductID, card.AffiliateURL) }
+				href={ AffiliateProductLinkHref(card.ProductID, card.AffiliateURL, card.TrackAdID, card.TrackAdZone) }
 				target="_blank"
 				rel="noopener noreferrer sponsored"
 			>

@@ -49,6 +49,15 @@ type TblAffiliateImportBatch struct {
 	CsvRowCount   int64
 }
 
+type TblAffiliateLinkClickEvent struct {
+	ID                 int64
+	AffiliateProductID int64
+	TeacherID          sql.NullInt64
+	AdID               sql.NullInt64
+	AdZone             sql.NullString
+	ClickedAt          string
+}
+
 type TblAffiliateProduct struct {
 	ID               int64
 	AffiliateUrl     string

@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -372,6 +373,35 @@ func handleAdAffiliateSearch(w http.ResponseWriter, r *http.Request) {
 	writeHTML(w)
 	if err := frontend.AdAffiliateSearchPanel(panel).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+type adAffiliateProductIDsResponse struct {
+	IDs []string `json:"ids"`
+}
+
+func handleAdAffiliateProductIDs(w http.ResponseWriter, r *http.Request) {
+	if !requireMethod(w, r, http.MethodGet) {
+		return
+	}
+	ctx := r.Context()
+	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	rows, err := dbRO.GetQueries().ListAffiliateProductIDsForAds(ctx, queries.ListAffiliateProductIDsForAdsParams{
+		Column1: q,
+		Column2: sql.NullString{String: q, Valid: q != ""},
+		Column3: sql.NullString{String: q, Valid: q != ""},
+	})
+	if err != nil {
+		HttpError(w, fmt.Sprintf("Search failed: %v", err), http.StatusInternalServerError)
+		return
+	}
+	ids := make([]string, 0, len(rows))
+	for _, id := range rows {
+		ids = append(ids, strconv.FormatInt(id, 10))
+	}
+	writeJSON(w)
+	if err := json.NewEncoder(w).Encode(adAffiliateProductIDsResponse{IDs: ids}); err != nil {
+		logs.Log().Error("encode affiliate product ids", zap.Error(err))
 	}
 }
 

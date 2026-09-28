@@ -965,14 +965,14 @@ func AdForm(data AdFormData, formID string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "\"></div><p class=\"ads-selection-count\" id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "\"></div><div class=\"ads-selection-row\"><p class=\"ads-selection-count\" id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var40 string
 		templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "SelectionCount")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 304, Col: 66}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 305, Col: 67}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var40)
 		if templ_7745c5c3_Err != nil {
@@ -985,346 +985,395 @@ func AdForm(data AdFormData, formID string) templ.Component {
 		var templ_7745c5c3_Var41 string
 		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", len(data.SelectedProducts)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 305, Col: 89}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 306, Col: 90}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "</span> <span class=\"ads-selection-count-sep\">/ </span> <span class=\"ads-selection-count-total\">-</span> <span>selected</span></p><div id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "</span> <span class=\"ads-selection-count-sep\">/ </span> <span class=\"ads-selection-count-total\">-</span> <span>selected</span></p><label class=\"ads-select-all-toggle checkbox-label\" for=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var42 string
-		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "SelectedIDs")
+		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "SelectAll")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 310, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 311, Col: 84}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var42)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "\" class=\"ads-selected-product-inputs\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "\"><input type=\"checkbox\" id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, p := range data.SelectedProducts {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "<input type=\"hidden\" name=\"affiliate_product_ids\" value=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var43 string
-			templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.ID)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 312, Col: 69}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var43)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "\">")
+		var templ_7745c5c3_Var43 string
+		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "SelectAll")
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 314, Col: 33}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var43)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "\" class=\"ads-select-all-checkbox\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.IsDeleted {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, " disabled")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, "</div><p class=\"ads-products-required-hint\" id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, " data-ids-url=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var44 string
-		templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "ProductsHint")
+		templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/ads/partials/affiliate-product-ids"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 315, Col: 71}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 317, Col: 71}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var44)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "\" role=\"alert\" hidden>Select at least one affiliate product.</p><div id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "\"> Select all</label></div><div id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var45 string
-		templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "SearchResults")
+		templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "SelectedIDs")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 316, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 322, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var45)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "\" class=\"ads-search-results\"></div></div></div><div class=\"ads-wizard-step\" data-ad-step=\"3\" hidden><p class=\"ads-wizard-step-lead\">Choose how to rotate products when more than one is linked.</p><div class=\"ads-randomize-fields\" id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "\" class=\"ads-selected-product-inputs\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var46 string
-		templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "RandomizeFields")
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 321, Col: 69}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var46)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if len(data.SelectedProducts) <= 1 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 94, " hidden")
+		for _, p := range data.SelectedProducts {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "<input type=\"hidden\" name=\"affiliate_product_ids\" value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var46 string
+			templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.ID)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 324, Col: 69}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var46)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 94, "\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 95, "><div class=\"form-row\"><div class=\"form-group\"><label for=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 95, "</div><p class=\"ads-products-required-hint\" id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var47 string
-		templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "RandomizeKind")
+		templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "ProductsHint")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 324, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 327, Col: 71}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var47)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 96, "\">Randomize</label> <select id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 96, "\" role=\"alert\" hidden>Select at least one affiliate product.</p><div id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var48 string
-		templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "RandomizeKind")
+		templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "SearchResults")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 325, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 328, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var48)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 97, "\" name=\"randomize_kind\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if data.IsDeleted {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 98, " disabled")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 99, "><option value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 97, "\" class=\"ads-search-results\"></div></div></div><div class=\"ads-wizard-step\" data-ad-step=\"3\" hidden><p class=\"ads-wizard-step-lead\">Choose how to rotate products when more than one is linked.</p><div class=\"ads-randomize-fields\" id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var49 string
-		templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdRandomizePerPage))
+		templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "RandomizeFields")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 326, Col: 60}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 333, Col: 69}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var49)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 100, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 98, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if data.RandomizeKind == constants.AdRandomizePerPage || data.RandomizeKind == "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 101, " selected")
+		if len(data.SelectedProducts) <= 1 {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 99, " hidden")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, ">Per page</option> <option value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 100, "><div class=\"form-row\"><div class=\"form-group\"><label for=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var50 string
-		templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdRandomizePerSession))
+		templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "RandomizeKind")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 327, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 336, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var50)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, "\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if data.RandomizeKind == constants.AdRandomizePerSession {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 105, ">Per session</option> <option value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 101, "\">Randomize</label> <select id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var51 string
-		templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdRandomizeTimer))
+		templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "RandomizeKind")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 328, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 337, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var51)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 106, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "\" name=\"randomize_kind\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if data.RandomizeKind == constants.AdRandomizeTimer {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 107, " selected")
+		if data.IsDeleted {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, " disabled")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 108, ">Timer</option></select></div><div class=\"form-group\" id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "><option value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var52 string
-		templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "TimerIntervalGroup")
+		templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdRandomizePerPage))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 331, Col: 64}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 338, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var52)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 109, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 105, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if data.RandomizeKind != constants.AdRandomizeTimer {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 110, " hidden")
+		if data.RandomizeKind == constants.AdRandomizePerPage || data.RandomizeKind == "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 106, " selected")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 111, "><label for=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 107, ">Per page</option> <option value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var53 string
-		templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "TimerInterval")
+		templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdRandomizePerSession))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 332, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 339, Col: 63}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var53)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 112, "\">Timer interval</label> <select id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 108, "\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.RandomizeKind == constants.AdRandomizePerSession {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 109, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 110, ">Per session</option> <option value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var54 string
-		templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "TimerInterval")
+		templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdRandomizeTimer))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 334, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 340, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var54)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 113, "\" name=\"timer_interval\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 111, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if data.IsDeleted || data.RandomizeKind != constants.AdRandomizeTimer {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 114, " disabled")
+		if data.RandomizeKind == constants.AdRandomizeTimer {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 112, " selected")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 115, "><option value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 113, ">Timer</option></select></div><div class=\"form-group\" id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var55 string
-		templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdTimerIntervalHourly))
+		templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "TimerIntervalGroup")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 338, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 343, Col: 64}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var55)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 116, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 114, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if data.TimerInterval == constants.AdTimerIntervalHourly {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 117, " selected")
+		if data.RandomizeKind != constants.AdRandomizeTimer {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 115, " hidden")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 118, ">Hourly</option> <option value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 116, "><label for=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var56 string
-		templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdTimerIntervalDaily))
+		templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "TimerInterval")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 339, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 344, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var56)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 119, "\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if data.TimerInterval == constants.AdTimerIntervalDaily {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 120, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 121, ">Daily</option></select></div></div></div><p class=\"ads-wizard-step-note\" id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 117, "\">Timer interval</label> <select id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var57 string
-		templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "SingleProductNote")
+		templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "TimerInterval")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 344, Col: 69}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 346, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var57)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 122, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 118, "\" name=\"timer_interval\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.IsDeleted || data.RandomizeKind != constants.AdRandomizeTimer {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 119, " disabled")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 120, "><option value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var58 string
+		templ_7745c5c3_Var58, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdTimerIntervalHourly))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 350, Col: 63}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var58)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 121, "\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.TimerInterval == constants.AdTimerIntervalHourly {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 122, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 123, ">Hourly</option> <option value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var59 string
+		templ_7745c5c3_Var59, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdTimerIntervalDaily))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 351, Col: 62}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var59)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 124, "\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.TimerInterval == constants.AdTimerIntervalDaily {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 125, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 126, ">Daily</option></select></div></div></div><p class=\"ads-wizard-step-note\" id=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var60 string
+		templ_7745c5c3_Var60, templ_7745c5c3_Err = templ.ResolveAttributeValue(formID + "SingleProductNote")
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 356, Col: 69}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var60)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 127, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(data.SelectedProducts) != 1 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 123, " hidden")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 128, " hidden")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 124, ">Only one product is selected. It will be shown every time.</p></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 129, ">Only one product is selected. It will be shown every time.</p></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if !data.IsDeleted {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 125, "<div class=\"modal-footer ads-modal-footer ads-form-wizard-footer\"><div class=\"ads-wizard-footer-start\"><button type=\"button\" class=\"btn btn-secondary ad-form-modal-close\">Cancel</button> <button type=\"button\" class=\"btn btn-secondary ads-wizard-prev ads-wizard-nav-hidden\" aria-hidden=\"true\">Previous</button></div><div class=\"ads-wizard-footer-end\"><button type=\"button\" class=\"btn ads-wizard-next\" disabled>Next</button> <button type=\"submit\" class=\"btn ads-wizard-save ads-wizard-nav-hidden\" aria-hidden=\"true\">Save ad</button></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 130, "<div class=\"modal-footer ads-modal-footer ads-form-wizard-footer\"><div class=\"ads-wizard-footer-start\"><button type=\"button\" class=\"btn btn-secondary ad-form-modal-close\">Cancel</button> <button type=\"button\" class=\"btn btn-secondary ads-wizard-prev ads-wizard-nav-hidden\" aria-hidden=\"true\">Previous</button></div><div class=\"ads-wizard-footer-end\"><button type=\"button\" class=\"btn ads-wizard-next\" disabled>Next</button> <button type=\"submit\" class=\"btn ads-wizard-save ads-wizard-nav-hidden\" aria-hidden=\"true\">Save ad</button></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 126, "<div class=\"modal-footer ads-modal-footer\"><button type=\"button\" class=\"btn btn-secondary ad-form-modal-close\">Close</button></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 131, "<div class=\"modal-footer ads-modal-footer\"><button type=\"button\" class=\"btn btn-secondary ad-form-modal-close\">Close</button></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 127, "</form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 132, "</form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1348,173 +1397,173 @@ func adPlacementOptions(selected constants.AdPlacement) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var58 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var58 == nil {
-			templ_7745c5c3_Var58 = templ.NopComponent
+		templ_7745c5c3_Var61 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var61 == nil {
+			templ_7745c5c3_Var61 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 128, "<option value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var59 string
-		templ_7745c5c3_Var59, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdPlacementTop))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 369, Col: 49}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var59)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 129, "\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if selected == constants.AdPlacementTop {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 130, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 131, ">Top</option> <option value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var60 string
-		templ_7745c5c3_Var60, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdPlacementLeft))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 370, Col: 50}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var60)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 132, "\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if selected == constants.AdPlacementLeft {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 133, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 134, ">Left</option> <option value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var61 string
-		templ_7745c5c3_Var61, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdPlacementRight))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 371, Col: 51}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var61)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 135, "\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if selected == constants.AdPlacementRight {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 136, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 137, ">Right</option> <option value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 133, "<option value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var62 string
-		templ_7745c5c3_Var62, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdPlacementBottom))
+		templ_7745c5c3_Var62, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdPlacementTop))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 372, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 381, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var62)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 138, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 134, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if selected == constants.AdPlacementBottom {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 139, " selected")
+		if selected == constants.AdPlacementTop {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 135, " selected")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 140, ">Bottom</option> <option value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 136, ">Top</option> <option value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var63 string
-		templ_7745c5c3_Var63, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdPlacementTopAndSide))
+		templ_7745c5c3_Var63, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdPlacementLeft))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 373, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 382, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var63)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 141, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 137, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if selected == constants.AdPlacementTopAndSide {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 142, " selected")
+		if selected == constants.AdPlacementLeft {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 138, " selected")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 143, ">Top and side</option> <option value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 139, ">Left</option> <option value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var64 string
-		templ_7745c5c3_Var64, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdPlacementLeftAndRight))
+		templ_7745c5c3_Var64, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdPlacementRight))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 374, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 383, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var64)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 144, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 140, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if selected == constants.AdPlacementLeftAndRight {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 145, " selected")
+		if selected == constants.AdPlacementRight {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 141, " selected")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 146, ">Left and right sides</option> <option value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 142, ">Right</option> <option value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var65 string
-		templ_7745c5c3_Var65, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdPlacementAllSides))
+		templ_7745c5c3_Var65, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdPlacementBottom))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 375, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 384, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var65)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 147, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 143, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if selected == constants.AdPlacementAllSides {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 148, " selected")
+		if selected == constants.AdPlacementBottom {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 144, " selected")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 149, ">All sides</option>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 145, ">Bottom</option> <option value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var66 string
+		templ_7745c5c3_Var66, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdPlacementTopAndSide))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 385, Col: 56}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var66)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 146, "\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if selected == constants.AdPlacementTopAndSide {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 147, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 148, ">Top and side</option> <option value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var67 string
+		templ_7745c5c3_Var67, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdPlacementLeftAndRight))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 386, Col: 58}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var67)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 149, "\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if selected == constants.AdPlacementLeftAndRight {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 150, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 151, ">Left and right sides</option> <option value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var68 string
+		templ_7745c5c3_Var68, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(constants.AdPlacementAllSides))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 387, Col: 54}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var68)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 152, "\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if selected == constants.AdPlacementAllSides {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 153, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 154, ">All sides</option>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1538,369 +1587,369 @@ func AdAffiliateSearchPanel(data AdAffiliateSearchPanelData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var66 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var66 == nil {
-			templ_7745c5c3_Var66 = templ.NopComponent
+		templ_7745c5c3_Var69 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var69 == nil {
+			templ_7745c5c3_Var69 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 150, "<div class=\"ads-search-panel\" data-total=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 155, "<div class=\"ads-search-panel\" data-total=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var67 string
-		templ_7745c5c3_Var67, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", data.Total))
+		var templ_7745c5c3_Var70 string
+		templ_7745c5c3_Var70, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", data.Total))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 379, Col: 73}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 391, Col: 73}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var67)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var70)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 151, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 156, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(data.Items) == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 152, "<p class=\"ads-search-empty\">No products match your search.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 157, "<p class=\"ads-search-empty\">No products match your search.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 153, "<ul class=\"ads-search-list\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 158, "<ul class=\"ads-search-list\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, item := range data.Items {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 154, "<li class=\"ads-search-item\"><label class=\"ads-search-item-label\"><input type=\"checkbox\" class=\"ads-product-checkbox\" name=\"pick\" value=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 159, "<li class=\"ads-search-item\"><label class=\"ads-search-item-label\"><input type=\"checkbox\" class=\"ads-product-checkbox\" name=\"pick\" value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var68 string
-				templ_7745c5c3_Var68, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ID)
+				var templ_7745c5c3_Var71 string
+				templ_7745c5c3_Var71, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ID)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 387, Col: 86}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 399, Col: 86}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var68)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 155, "\" data-name=\"")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var71)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var69 string
-				templ_7745c5c3_Var69, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.Name)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 387, Col: 110}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var69)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 156, "\" data-shop=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var70 string
-				templ_7745c5c3_Var70, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ShopName)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 387, Col: 138}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var70)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 157, "\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				if item.Checked {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 158, " checked")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 159, "> ")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				if item.ThumbnailURL != "" {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 160, "<img src=\"")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					var templ_7745c5c3_Var71 string
-					templ_7745c5c3_Var71, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ThumbnailURL)
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 389, Col: 36}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var71)
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 161, "\" alt=\"\" class=\"ads-search-thumb\" referrerpolicy=\"no-referrer\"> ")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 162, "<span class=\"ads-search-item-text\"><span class=\"ads-search-item-name\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 160, "\" data-name=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var72 string
-				templ_7745c5c3_Var72, templ_7745c5c3_Err = templ.JoinStringErrs(item.Name)
+				templ_7745c5c3_Var72, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 392, Col: 54}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 399, Col: 110}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var72))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var72)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 163, "</span> ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 161, "\" data-shop=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var73 string
+				templ_7745c5c3_Var73, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ShopName)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 399, Col: 138}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var73)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 162, "\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				if item.Checked {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 163, " checked")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 164, "> ")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				if item.ThumbnailURL != "" {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 165, "<img src=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var74 string
+					templ_7745c5c3_Var74, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ThumbnailURL)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 401, Col: 36}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var74)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 166, "\" alt=\"\" class=\"ads-search-thumb\" referrerpolicy=\"no-referrer\"> ")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 167, "<span class=\"ads-search-item-text\"><span class=\"ads-search-item-name\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var75 string
+				templ_7745c5c3_Var75, templ_7745c5c3_Err = templ.JoinStringErrs(item.Name)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 404, Col: 54}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var75))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 168, "</span> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if item.ShopName != "" {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 164, "<span class=\"ads-search-item-shop\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 169, "<span class=\"ads-search-item-shop\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var73 string
-					templ_7745c5c3_Var73, templ_7745c5c3_Err = templ.JoinStringErrs(item.ShopName)
+					var templ_7745c5c3_Var76 string
+					templ_7745c5c3_Var76, templ_7745c5c3_Err = templ.JoinStringErrs(item.ShopName)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 394, Col: 59}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 406, Col: 59}
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var73))
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var76))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 165, "</span> ")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 170, "</span> ")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
 				if item.PriceDisplay != "" {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 166, "<span class=\"ads-search-item-price\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 171, "<span class=\"ads-search-item-price\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var74 string
-					templ_7745c5c3_Var74, templ_7745c5c3_Err = templ.JoinStringErrs(item.PriceDisplay)
+					var templ_7745c5c3_Var77 string
+					templ_7745c5c3_Var77, templ_7745c5c3_Err = templ.JoinStringErrs(item.PriceDisplay)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 397, Col: 64}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 409, Col: 64}
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var74))
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var77))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 167, "</span>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 172, "</span>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 168, "</span></label></li>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 173, "</span></label></li>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 169, "</ul>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 174, "</ul>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
 		if data.TotalPages > 1 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 170, "<div class=\"ads-search-pagination pagination-bar\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 175, "<div class=\"ads-search-pagination pagination-bar\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.Page > 1 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 171, "<button type=\"button\" class=\"pagination-btn\" hx-get=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var75 string
-				templ_7745c5c3_Var75, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/ads/partials/affiliate-search?form_id=" + data.FormID))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 411, Col: 81}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var75)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 172, "\" hx-include=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var76 string
-				templ_7745c5c3_Var76, templ_7745c5c3_Err = templ.ResolveAttributeValue("#" + data.FormID + "ProductSearch, #" + data.FormID + "SelectedIDs")
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 412, Col: 87}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var76)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 173, "\" hx-vals=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var77 string
-				templ_7745c5c3_Var77, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf(`{"page": %d}`, data.Page-1))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 413, Col: 56}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var77)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 174, "\" hx-target=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 176, "<button type=\"button\" class=\"pagination-btn\" hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var78 string
-				templ_7745c5c3_Var78, templ_7745c5c3_Err = templ.ResolveAttributeValue("#" + data.FormID + "SearchResults")
+				templ_7745c5c3_Var78, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/ads/partials/affiliate-search?form_id=" + data.FormID))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 414, Col: 53}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 423, Col: 81}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var78)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 175, "\" hx-swap=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 177, "\" hx-include=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var79 string
-				templ_7745c5c3_Var79, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+				templ_7745c5c3_Var79, templ_7745c5c3_Err = templ.ResolveAttributeValue("#" + data.FormID + "ProductSearch, #" + data.FormID + "SelectedIDs")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 415, Col: 31}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 424, Col: 87}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var79)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 176, "\">Previous</button> ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 178, "\" hx-vals=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 177, "<span class=\"pagination-btn disabled\">Previous</span> ")
+				var templ_7745c5c3_Var80 string
+				templ_7745c5c3_Var80, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf(`{"page": %d}`, data.Page-1))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 425, Col: 56}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var80)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 178, "<span class=\"pagination-info\">Page ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var80 string
-			templ_7745c5c3_Var80, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.Page))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 422, Col: 69}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var80))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 179, " of ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var81 string
-			templ_7745c5c3_Var81, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.TotalPages))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 422, Col: 111}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var81))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 180, "</span> ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			if data.Page < data.TotalPages {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 181, "<button type=\"button\" class=\"pagination-btn\" hx-get=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 179, "\" hx-target=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var81 string
+				templ_7745c5c3_Var81, templ_7745c5c3_Err = templ.ResolveAttributeValue("#" + data.FormID + "SearchResults")
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 426, Col: 53}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var81)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 180, "\" hx-swap=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var82 string
-				templ_7745c5c3_Var82, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/ads/partials/affiliate-search?form_id=" + data.FormID))
+				templ_7745c5c3_Var82, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 427, Col: 81}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 427, Col: 31}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var82)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 182, "\" hx-include=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 181, "\">Previous</button> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var83 string
-				templ_7745c5c3_Var83, templ_7745c5c3_Err = templ.ResolveAttributeValue("#" + data.FormID + "ProductSearch, #" + data.FormID + "SelectedIDs")
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 428, Col: 87}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var83)
+			} else {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 182, "<span class=\"pagination-btn disabled\">Previous</span> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 183, "\" hx-vals=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var84 string
-				templ_7745c5c3_Var84, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf(`{"page": %d}`, data.Page+1))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 429, Col: 56}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var84)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 184, "\" hx-target=\"")
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 183, "<span class=\"pagination-info\">Page ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var83 string
+			templ_7745c5c3_Var83, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.Page))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 434, Col: 69}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var83))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 184, " of ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var84 string
+			templ_7745c5c3_Var84, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.TotalPages))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 434, Col: 111}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var84))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 185, "</span> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if data.Page < data.TotalPages {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 186, "<button type=\"button\" class=\"pagination-btn\" hx-get=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var85 string
-				templ_7745c5c3_Var85, templ_7745c5c3_Err = templ.ResolveAttributeValue("#" + data.FormID + "SearchResults")
+				templ_7745c5c3_Var85, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/ads/partials/affiliate-search?form_id=" + data.FormID))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 430, Col: 53}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 439, Col: 81}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var85)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 185, "\" hx-swap=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 187, "\" hx-include=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var86 string
-				templ_7745c5c3_Var86, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+				templ_7745c5c3_Var86, templ_7745c5c3_Err = templ.ResolveAttributeValue("#" + data.FormID + "ProductSearch, #" + data.FormID + "SelectedIDs")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 431, Col: 31}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 440, Col: 87}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var86)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 186, "\">Next</button>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 188, "\" hx-vals=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var87 string
+				templ_7745c5c3_Var87, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf(`{"page": %d}`, data.Page+1))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 441, Col: 56}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var87)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 189, "\" hx-target=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var88 string
+				templ_7745c5c3_Var88, templ_7745c5c3_Err = templ.ResolveAttributeValue("#" + data.FormID + "SearchResults")
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 442, Col: 53}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var88)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 190, "\" hx-swap=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var89 string
+				templ_7745c5c3_Var89, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 443, Col: 31}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var89)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 191, "\">Next</button>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 187, "<span class=\"pagination-btn disabled\">Next</span>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 192, "<span class=\"pagination-btn disabled\">Next</span>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 188, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 193, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 189, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 194, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1924,25 +1973,25 @@ func AdViewModal(data AdViewData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var87 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var87 == nil {
-			templ_7745c5c3_Var87 = templ.NopComponent
+		templ_7745c5c3_Var90 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var90 == nil {
+			templ_7745c5c3_Var90 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 190, "<div class=\"modal-overlay\" id=\"adViewModal\" role=\"presentation\"><div class=\"modal-dialog ads-modal ads-view-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"adViewModalTitle\"><div class=\"modal-header\"><h3 id=\"adViewModalTitle\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 195, "<div class=\"modal-overlay\" id=\"adViewModal\" role=\"presentation\"><div class=\"modal-dialog ads-modal ads-view-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"adViewModalTitle\"><div class=\"modal-header\"><h3 id=\"adViewModalTitle\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var88 string
-		templ_7745c5c3_Var88, templ_7745c5c3_Err = templ.JoinStringErrs(data.Name)
+		var templ_7745c5c3_Var91 string
+		templ_7745c5c3_Var91, templ_7745c5c3_Err = templ.JoinStringErrs(data.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 447, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 459, Col: 41}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var88))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var91))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 191, "</h3><button type=\"button\" class=\"modal-close ad-view-modal-close\" aria-label=\"Close\">&times;</button></div><div class=\"modal-body\"><dl class=\"ads-view-meta\"><div><dt>Status</dt><dd>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 196, "</h3><button type=\"button\" class=\"modal-close ad-view-modal-close\" aria-label=\"Close\">&times;</button></div><div class=\"modal-body\"><dl class=\"ads-view-meta\"><div><dt>Status</dt><dd>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1950,51 +1999,51 @@ func AdViewModal(data AdViewData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 192, "</dd></div><div><dt>Placement</dt><dd>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 197, "</dd></div><div><dt>Placement</dt><dd>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var89 string
-		templ_7745c5c3_Var89, templ_7745c5c3_Err = templ.JoinStringErrs(data.PlacementLabel)
+		var templ_7745c5c3_Var92 string
+		templ_7745c5c3_Var92, templ_7745c5c3_Err = templ.JoinStringErrs(data.PlacementLabel)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 453, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 465, Col: 53}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var89))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 193, "</dd></div><div><dt>Type</dt><dd>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var92))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var90 string
-		templ_7745c5c3_Var90, templ_7745c5c3_Err = templ.JoinStringErrs(data.TypeLabel)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 454, Col: 43}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var90))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 198, "</dd></div><div><dt>Type</dt><dd>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 194, "</dd></div><div><dt>Rotation</dt><dd>")
+		var templ_7745c5c3_Var93 string
+		templ_7745c5c3_Var93, templ_7745c5c3_Err = templ.JoinStringErrs(data.TypeLabel)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 466, Col: 43}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var93))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var91 string
-		templ_7745c5c3_Var91, templ_7745c5c3_Err = templ.JoinStringErrs(data.RandomizeSummary)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 455, Col: 54}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var91))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 199, "</dd></div><div><dt>Rotation</dt><dd>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 195, "</dd></div></dl>")
+		var templ_7745c5c3_Var94 string
+		templ_7745c5c3_Var94, templ_7745c5c3_Err = templ.JoinStringErrs(data.RandomizeSummary)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 467, Col: 54}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var94))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 200, "</dd></div></dl>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(data.ProductCards) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 196, "<div class=\"affiliate-product-card-grid ads-view-products\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 201, "<div class=\"affiliate-product-card-grid ads-view-products\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2004,12 +2053,12 @@ func AdViewModal(data AdViewData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 197, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 202, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 198, "</div><div class=\"modal-footer ads-modal-footer\"><button type=\"button\" class=\"btn btn-secondary ad-view-modal-close\">Close</button></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 203, "</div><div class=\"modal-footer ads-modal-footer\"><button type=\"button\" class=\"btn btn-secondary ad-view-modal-close\">Close</button></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -2033,38 +2082,38 @@ func AdDeleteModal(adID string, name string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var92 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var92 == nil {
-			templ_7745c5c3_Var92 = templ.NopComponent
+		templ_7745c5c3_Var95 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var95 == nil {
+			templ_7745c5c3_Var95 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 199, "<div class=\"modal-overlay\" id=\"adDeleteModal\" role=\"presentation\"><div class=\"modal-dialog ads-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"adDeleteModalTitle\"><div class=\"modal-header\"><h3 id=\"adDeleteModalTitle\">Delete ad</h3><button type=\"button\" class=\"modal-close ad-delete-modal-close\" aria-label=\"Close\">&times;</button></div><form method=\"POST\" action=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 204, "<div class=\"modal-overlay\" id=\"adDeleteModal\" role=\"presentation\"><div class=\"modal-dialog ads-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"adDeleteModalTitle\"><div class=\"modal-header\"><h3 id=\"adDeleteModalTitle\">Delete ad</h3><button type=\"button\" class=\"modal-close ad-delete-modal-close\" aria-label=\"Close\">&times;</button></div><form method=\"POST\" action=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var93 templ.SafeURL
-		templ_7745c5c3_Var93, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/ads/" + adID + "/delete"))
+		var templ_7745c5c3_Var96 templ.SafeURL
+		templ_7745c5c3_Var96, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/ads/" + adID + "/delete"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 479, Col: 69}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 491, Col: 69}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var93))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 200, "\"><div class=\"modal-body\"><p class=\"ads-delete-lead\">This marks <strong>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var96))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var94 string
-		templ_7745c5c3_Var94, templ_7745c5c3_Err = templ.JoinStringErrs(name)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 481, Col: 57}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var94))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 205, "\"><div class=\"modal-body\"><p class=\"ads-delete-lead\">This marks <strong>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 201, "</strong> as deleted. It will stop showing on all pages. You can still find it with the Deleted status filter.</p></div><div class=\"modal-footer ads-modal-footer\"><button type=\"button\" class=\"btn btn-secondary ad-delete-modal-close\">Cancel</button> <button type=\"submit\" class=\"btn btn-danger\">Delete ad</button></div></form></div></div>")
+		var templ_7745c5c3_Var97 string
+		templ_7745c5c3_Var97, templ_7745c5c3_Err = templ.JoinStringErrs(name)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/ads.templ`, Line: 493, Col: 57}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var97))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 206, "</strong> as deleted. It will stop showing on all pages. You can still find it with the Deleted status filter.</p></div><div class=\"modal-footer ads-modal-footer\"><button type=\"button\" class=\"btn btn-secondary ad-delete-modal-close\">Cancel</button> <button type=\"submit\" class=\"btn btn-danger\">Delete ad</button></div></form></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -2088,12 +2137,12 @@ func AdsPageStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var95 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var95 == nil {
-			templ_7745c5c3_Var95 = templ.NopComponent
+		templ_7745c5c3_Var98 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var98 == nil {
+			templ_7745c5c3_Var98 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 202, "<style>\n\t\t.ads-page { padding-bottom: var(--space-10); }\n\t\t.ads-hub-header { align-items: flex-start; }\n\t\t.ads-page-heading { display: flex; flex-direction: column; gap: var(--space-1); }\n\t\t.ads-page-subtitle {\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-size: 0.9375rem;\n\t\t\tline-height: 1.5;\n\t\t\tmax-width: 40rem;\n\t\t\tmargin: 0;\n\t\t}\n\t\t.ads-header-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); flex-shrink: 0; }\n\t\t.ads-header-actions .add-btn { margin-top: 0; }\n\t\t.ads-toolbar .ads-search-group { min-width: 12rem; flex: 1 1 12rem; }\n\t\t.ads-table .col-name { max-width: 14rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n\t\t.ads-empty { color: var(--color-muted-foreground); margin-top: var(--space-4); }\n\t\t.ads-modal { max-width: 56rem; width: calc(100% - var(--space-4)); }\n\t\t.ads-form-wizard-body { max-height: min(70vh, 36rem); overflow: auto; }\n\t\t.ads-modal-header-text { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }\n\t\t.ads-wizard-step-label {\n\t\t\tmargin: 0;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tfont-weight: 500;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\t\t.ads-wizard-step-lead {\n\t\t\tmargin: 0 0 var(--space-3);\n\t\t\tfont-size: 0.875rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tline-height: 1.5;\n\t\t}\n\t\t.ads-wizard-step { display: none; }\n\t\t.ads-wizard-step.is-active { display: block; }\n\t\t.ads-form-wizard-footer {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: nowrap;\n\t\t\talign-items: center;\n\t\t\tjustify-content: space-between;\n\t\t\tgap: var(--space-3);\n\t\t}\n\t\t.ads-wizard-footer-start,\n\t\t.ads-wizard-footer-end {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t}\n\t\t.ads-wizard-footer-end {\n\t\t\tmargin-left: auto;\n\t\t\tflex-shrink: 0;\n\t\t}\n\t\t.ads-form-wizard-footer .ads-wizard-nav-hidden {\n\t\t\tdisplay: none !important;\n\t\t}\n\t\t.ads-form-wizard-footer .btn:disabled {\n\t\t\topacity: 0.55;\n\t\t\tcursor: not-allowed;\n\t\t}\n\t\t.ads-products-required-hint {\n\t\t\tmargin: var(--space-2) 0 0;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-destructive);\n\t\t}\n\t\t.ads-products-required-hint[hidden] { display: none; }\n\t\t.ads-view-modal { max-width: 36rem; }\n\t\t.ads-modal-footer { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }\n\t\t.ads-modal-footer .btn, .ads-modal-footer .btn-secondary, .ads-modal-footer .btn-danger { margin-top: 0; }\n\t\t.ads-search-results { margin-top: var(--space-2); max-height: 22rem; overflow: auto; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); }\n\t\t.ads-selection-count {\n\t\t\tmargin: var(--space-2) 0 0;\n\t\t\tfont-size: 0.875rem;\n\t\t\tfont-weight: 600;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\t\t.ads-selection-count-n { color: var(--color-primary); }\n\t\t.ads-wizard-step-note {\n\t\t\tmargin: var(--space-3) 0 0;\n\t\t\tfont-size: 0.875rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\t\t.ads-search-pagination { margin-top: var(--space-2); padding: var(--space-2); border-top: 1px solid var(--color-border-subtle); }\n\t\t.ads-search-list { list-style: none; margin: 0; padding: 0; }\n\t\t.ads-search-item { border-bottom: 1px solid var(--color-border-subtle); }\n\t\t.ads-search-item:last-child { border-bottom: none; }\n\t\t.ads-search-item-label { display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-2) var(--space-3); cursor: pointer; }\n\t\t.ads-search-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: var(--radius-sm); flex-shrink: 0; }\n\t\t.ads-search-item-text { display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; }\n\t\t.ads-search-item-name { font-weight: 600; font-size: 0.875rem; }\n\t\t.ads-search-item-shop, .ads-search-item-price { font-size: 0.75rem; color: var(--color-muted-foreground); }\n\t\t.ads-search-empty { padding: var(--space-3); margin: 0; font-size: 0.875rem; color: var(--color-muted-foreground); }\n\t\t.ads-view-meta { display: grid; gap: var(--space-2); margin: 0 0 var(--space-4); }\n\t\t.ads-view-meta div { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }\n\t\t.ads-view-meta dt { font-weight: 600; margin: 0; min-width: 5rem; }\n\t\t.ads-view-meta dd { margin: 0; }\n\t\t.ads-view-products { margin-top: var(--space-3); }\n\t\t.ads-delete-lead { margin: 0; line-height: 1.5; }\n\t\t.table-wrapper .table-actions [data-tooltip]::after { content: none; }\n\t\t.ads-page .table-actions [data-tooltip]::after { left: auto; right: 0; transform: none; }\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 207, "<style>\n\t\t.ads-page { padding-bottom: var(--space-10); }\n\t\t.ads-hub-header { align-items: flex-start; }\n\t\t.ads-page-heading { display: flex; flex-direction: column; gap: var(--space-1); }\n\t\t.ads-page-subtitle {\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-size: 0.9375rem;\n\t\t\tline-height: 1.5;\n\t\t\tmax-width: 40rem;\n\t\t\tmargin: 0;\n\t\t}\n\t\t.ads-header-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); flex-shrink: 0; }\n\t\t.ads-header-actions .add-btn { margin-top: 0; }\n\t\t.ads-toolbar .ads-search-group { min-width: 12rem; flex: 1 1 12rem; }\n\t\t.ads-table .col-name { max-width: 14rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n\t\t.ads-empty { color: var(--color-muted-foreground); margin-top: var(--space-4); }\n\t\t.ads-modal { max-width: 56rem; width: calc(100% - var(--space-4)); }\n\t\t.ads-form-wizard-body { max-height: min(70vh, 36rem); overflow: auto; }\n\t\t.ads-modal-header-text { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }\n\t\t.ads-wizard-step-label {\n\t\t\tmargin: 0;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tfont-weight: 500;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\t\t.ads-wizard-step-lead {\n\t\t\tmargin: 0 0 var(--space-3);\n\t\t\tfont-size: 0.875rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tline-height: 1.5;\n\t\t}\n\t\t.ads-wizard-step { display: none; }\n\t\t.ads-wizard-step.is-active { display: block; }\n\t\t.ads-form-wizard-footer {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: nowrap;\n\t\t\talign-items: center;\n\t\t\tjustify-content: space-between;\n\t\t\tgap: var(--space-3);\n\t\t}\n\t\t.ads-wizard-footer-start,\n\t\t.ads-wizard-footer-end {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t}\n\t\t.ads-wizard-footer-end {\n\t\t\tmargin-left: auto;\n\t\t\tflex-shrink: 0;\n\t\t}\n\t\t.ads-form-wizard-footer .ads-wizard-nav-hidden {\n\t\t\tdisplay: none !important;\n\t\t}\n\t\t.ads-form-wizard-footer .btn:disabled {\n\t\t\topacity: 0.55;\n\t\t\tcursor: not-allowed;\n\t\t}\n\t\t.ads-products-required-hint {\n\t\t\tmargin: var(--space-2) 0 0;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-destructive);\n\t\t}\n\t\t.ads-products-required-hint[hidden] { display: none; }\n\t\t.ads-view-modal { max-width: 36rem; }\n\t\t.ads-modal-footer { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }\n\t\t.ads-modal-footer .btn, .ads-modal-footer .btn-secondary, .ads-modal-footer .btn-danger { margin-top: 0; }\n\t\t.ads-search-results { margin-top: var(--space-2); max-height: 22rem; overflow: auto; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); }\n\t\t.ads-selection-row {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tjustify-content: space-between;\n\t\t\tgap: var(--space-2);\n\t\t\tmargin: var(--space-2) 0 0;\n\t\t}\n\t\t.ads-selection-count {\n\t\t\tmargin: 0;\n\t\t\tfont-size: 0.875rem;\n\t\t\tfont-weight: 600;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\t\t.ads-select-all-toggle {\n\t\t\tmargin: 0;\n\t\t\tfont-size: 0.875rem;\n\t\t\tfont-weight: 600;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tflex-shrink: 0;\n\t\t}\n\t\t.ads-select-all-toggle input {\n\t\t\tmargin-top: 0;\n\t\t}\n\t\t.ads-selection-count-n { color: var(--color-primary); }\n\t\t.ads-wizard-step-note {\n\t\t\tmargin: var(--space-3) 0 0;\n\t\t\tfont-size: 0.875rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\t\t.ads-search-pagination { margin-top: var(--space-2); padding: var(--space-2); border-top: 1px solid var(--color-border-subtle); }\n\t\t.ads-search-list { list-style: none; margin: 0; padding: 0; }\n\t\t.ads-search-item { border-bottom: 1px solid var(--color-border-subtle); }\n\t\t.ads-search-item:last-child { border-bottom: none; }\n\t\t.ads-search-item-label { display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-2) var(--space-3); cursor: pointer; }\n\t\t.ads-search-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: var(--radius-sm); flex-shrink: 0; }\n\t\t.ads-search-item-text { display: flex; flex-direction: column; gap: 0.125rem; min-width: 0; }\n\t\t.ads-search-item-name { font-weight: 600; font-size: 0.875rem; }\n\t\t.ads-search-item-shop, .ads-search-item-price { font-size: 0.75rem; color: var(--color-muted-foreground); }\n\t\t.ads-search-empty { padding: var(--space-3); margin: 0; font-size: 0.875rem; color: var(--color-muted-foreground); }\n\t\t.ads-view-meta { display: grid; gap: var(--space-2); margin: 0 0 var(--space-4); }\n\t\t.ads-view-meta div { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }\n\t\t.ads-view-meta dt { font-weight: 600; margin: 0; min-width: 5rem; }\n\t\t.ads-view-meta dd { margin: 0; }\n\t\t.ads-view-products { margin-top: var(--space-3); }\n\t\t.ads-delete-lead { margin: 0; line-height: 1.5; }\n\t\t.table-wrapper .table-actions [data-tooltip]::after { content: none; }\n\t\t.ads-page .table-actions [data-tooltip]::after { left: auto; right: 0; transform: none; }\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -2117,12 +2166,12 @@ func AdsPageScripts(openCreate bool) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var96 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var96 == nil {
-			templ_7745c5c3_Var96 = templ.NopComponent
+		templ_7745c5c3_Var99 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var99 == nil {
+			templ_7745c5c3_Var99 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 203, "<script>\n\t\t(function () {\n\t\t\tfunction wireModal(modal, closeSelector) {\n\t\t\t\tif (!modal) return;\n\t\t\t\tfunction closeModal() {\n\t\t\t\t\tmodal.hidden = true;\n\t\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t\t}\n\t\t\t\tmodal.querySelectorAll(closeSelector).forEach(function (btn) {\n\t\t\t\t\tbtn.addEventListener('click', closeModal);\n\t\t\t\t});\n\t\t\t\tmodal.addEventListener('click', function (e) {\n\t\t\t\t\tif (e.target === modal) closeModal();\n\t\t\t\t});\n\t\t\t\tif (!modal.hidden) document.body.classList.add('modal-open');\n\t\t\t\treturn { open: function () { modal.hidden = false; document.body.classList.add('modal-open'); }, close: closeModal };\n\t\t\t}\n\n\t\t\tconst createModal = document.getElementById('adCreateModal');\n\t\t\tconst createCtl = wireModal(createModal, '.ad-create-modal-close, .ad-form-modal-close');\n\t\t\tconst openCreateBtn = document.getElementById('openAdCreateModalBtn');\n\t\t\tif (openCreateBtn && createCtl) {\n\t\t\t\topenCreateBtn.addEventListener('click', function () {\n\t\t\t\t\tconst form = document.getElementById('adCreateForm');\n\t\t\t\t\tif (form) resetAdWizard(form);\n\t\t\t\t\tcreateCtl.open();\n\t\t\t\t});\n\t\t\t}\n\t\t\tif (createModal && !createModal.hidden) document.body.classList.add('modal-open');\n\n\t\t\twireModal(document.getElementById('adEditModal'), '.ad-edit-modal-close, .ad-form-modal-close');\n\t\t\twireModal(document.getElementById('adViewModal'), '.ad-view-modal-close');\n\t\t\twireModal(document.getElementById('adDeleteModal'), '.ad-delete-modal-close');\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (e) {\n\t\t\t\tconst t = e.detail.target;\n\t\t\t\tif (!t) return;\n\t\t\t\tif (t.id === 'adEditModalHost' || t.id === 'adViewModalHost' || t.id === 'adDeleteModalHost') {\n\t\t\t\t\tconst modal = t.querySelector('.modal-overlay');\n\t\t\t\t\tif (modal) {\n\t\t\t\t\t\tmodal.hidden = false;\n\t\t\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\t\t\twireModal(modal, '.modal-close, .ad-view-modal-close, .ad-delete-modal-close, .ad-edit-modal-close, .ad-form-modal-close');\n\t\t\t\t\t\tinitAdForms(modal);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tfunction resetAdWizard(form) {\n\t\t\t\tif (!form || form.dataset.adWizard !== '1') return;\n\t\t\t\tform.dataset.adsCurrentStep = '1';\n\t\t\t\tsetAdWizardStep(form, 1);\n\t\t\t\tconst hint = form.querySelector('[id$=\"ProductsHint\"]');\n\t\t\t\tif (hint) hint.hidden = true;\n\t\t\t}\n\n\t\t\tfunction adWizardStepLabel(form) {\n\t\t\t\tif (!form || !form.id) return null;\n\t\t\t\treturn document.getElementById(form.id + 'StepLabel');\n\t\t\t}\n\n\t\t\tfunction setAdWizardNavButton(btn, hide) {\n\t\t\t\tif (!btn) return;\n\t\t\t\tbtn.classList.toggle('ads-wizard-nav-hidden', hide);\n\t\t\t\tbtn.hidden = hide;\n\t\t\t\tbtn.setAttribute('aria-hidden', hide ? 'true' : 'false');\n\t\t\t}\n\n\t\t\tfunction isAdWizardStep1Complete(form) {\n\t\t\t\tconst step = form.querySelector('.ads-wizard-step[data-ad-step=\"1\"]');\n\t\t\t\tif (!step) return false;\n\t\t\t\tconst fields = step.querySelectorAll('input, select, textarea');\n\t\t\t\tfor (let i = 0; i < fields.length; i++) {\n\t\t\t\t\tconst field = fields[i];\n\t\t\t\t\tif (field.disabled || field.type === 'hidden') continue;\n\t\t\t\t\tif (!field.checkValidity()) return false;\n\t\t\t\t}\n\t\t\t\treturn true;\n\t\t\t}\n\n\t\t\tfunction syncAdWizardNextButton(form) {\n\t\t\t\tconst nextBtn = form.querySelector('.ads-wizard-next');\n\t\t\t\tif (!nextBtn) return;\n\t\t\t\tconst step = parseInt(form.dataset.adsCurrentStep || '1', 10);\n\t\t\t\tif (step === 1) {\n\t\t\t\t\tnextBtn.disabled = !isAdWizardStep1Complete(form);\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (step === 2) {\n\t\t\t\t\tconst selectedInputs = form.querySelector('[id$=\"SelectedIDs\"]');\n\t\t\t\t\tconst count = selectedInputs ? selectedInputs.querySelectorAll('input[name=\"affiliate_product_ids\"]').length : 0;\n\t\t\t\t\tnextBtn.disabled = count < 1;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tnextBtn.disabled = false;\n\t\t\t}\n\n\t\t\tfunction setAdWizardStep(form, step) {\n\t\t\t\tconst total = 3;\n\t\t\t\tstep = step < 1 ? 1 : step > total ? total : step;\n\t\t\t\tform.dataset.adsCurrentStep = String(step);\n\t\t\t\tform.querySelectorAll('.ads-wizard-step').forEach(function (el) {\n\t\t\t\t\tconst n = parseInt(el.getAttribute('data-ad-step'), 10);\n\t\t\t\t\tconst active = n === step;\n\t\t\t\t\tel.classList.toggle('is-active', active);\n\t\t\t\t\tel.hidden = !active;\n\t\t\t\t});\n\t\t\t\tconst label = adWizardStepLabel(form);\n\t\t\t\tif (label) label.textContent = 'Step ' + step + ' of ' + total;\n\t\t\t\tconst prevBtn = form.querySelector('.ads-wizard-prev');\n\t\t\t\tconst nextBtn = form.querySelector('.ads-wizard-next');\n\t\t\t\tconst saveBtn = form.querySelector('.ads-wizard-save');\n\t\t\t\tsetAdWizardNavButton(prevBtn, step <= 1);\n\t\t\t\tsetAdWizardNavButton(nextBtn, step >= total);\n\t\t\t\tsetAdWizardNavButton(saveBtn, step < total);\n\t\t\t\tsyncAdWizardNextButton(form);\n\t\t\t}\n\n\t\t\tfunction validateAdWizardStep1(form) {\n\t\t\t\tconst step = form.querySelector('.ads-wizard-step[data-ad-step=\"1\"]');\n\t\t\t\tif (!step) return true;\n\t\t\t\tconst fields = step.querySelectorAll('input, select, textarea');\n\t\t\t\tfor (let i = 0; i < fields.length; i++) {\n\t\t\t\t\tconst field = fields[i];\n\t\t\t\t\tif (field.disabled || field.type === 'hidden') continue;\n\t\t\t\t\tif (!field.checkValidity()) {\n\t\t\t\t\t\tfield.reportValidity();\n\t\t\t\t\t\treturn false;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\treturn true;\n\t\t\t}\n\n\t\t\tfunction validateAdWizardStep2(form) {\n\t\t\t\tconst selectedInputs = form.querySelector('[id$=\"SelectedIDs\"]');\n\t\t\t\tconst count = selectedInputs ? selectedInputs.querySelectorAll('input[name=\"affiliate_product_ids\"]').length : 0;\n\t\t\t\tconst hint = form.querySelector('[id$=\"ProductsHint\"]');\n\t\t\t\tif (count < 1) {\n\t\t\t\t\tif (hint) hint.hidden = false;\n\t\t\t\t\treturn false;\n\t\t\t\t}\n\t\t\t\tif (hint) hint.hidden = true;\n\t\t\t\treturn true;\n\t\t\t}\n\n\t\t\tfunction syncAdSelectionCount(form) {\n\t\t\t\tif (!form) return;\n\t\t\t\tconst selectedInputs = form.querySelector('[id$=\"SelectedIDs\"]');\n\t\t\t\tconst count = selectedInputs ? selectedInputs.querySelectorAll('input[name=\"affiliate_product_ids\"]').length : 0;\n\t\t\t\tconst countRoot = form.querySelector('[id$=\"SelectionCount\"]');\n\t\t\t\tif (countRoot) {\n\t\t\t\t\tconst nSpan = countRoot.querySelector('.ads-selection-count-n');\n\t\t\t\t\tif (nSpan) nSpan.textContent = String(count);\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tfunction syncAdSearchTotalFromPanel(form, panelEl) {\n\t\t\t\tif (!form || !panelEl) return;\n\t\t\t\tconst total = panelEl.getAttribute('data-total');\n\t\t\t\tconst totalSpan = form.querySelector('[id$=\"SelectionCount\"] .ads-selection-count-total');\n\t\t\t\tif (totalSpan && total) totalSpan.textContent = total;\n\t\t\t}\n\n\t\t\tfunction loadAffiliateProductsForForm(form) {\n\t\t\t\tif (!form || typeof htmx === 'undefined') return;\n\t\t\t\tconst body = document.body;\n\t\t\t\tif (body) htmx.trigger(body, 'loadAffiliateProducts');\n\t\t\t}\n\n\t\t\tfunction syncAdSingleProductNote(form) {\n\t\t\t\tconst note = form.querySelector('[id$=\"SingleProductNote\"]');\n\t\t\t\tconst selectedInputs = form.querySelector('[id$=\"SelectedIDs\"]');\n\t\t\t\tconst count = selectedInputs ? selectedInputs.querySelectorAll('input[name=\"affiliate_product_ids\"]').length : 0;\n\t\t\t\tif (note) note.hidden = count !== 1;\n\t\t\t}\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (e) {\n\t\t\t\tconst t = e.detail.target;\n\t\t\t\tif (!t || !t.id || t.id.indexOf('SearchResults') < 0) return;\n\t\t\t\tconst form = t.closest('form.ads-form-wizard');\n\t\t\t\tif (!form) return;\n\t\t\t\tconst panel = t.querySelector('.ads-search-panel');\n\t\t\t\tsyncAdSearchTotalFromPanel(form, panel);\n\t\t\t\tsyncAdSelectionCount(form);\n\t\t\t\tsyncAdWizardNextButton(form);\n\t\t\t});\n\n\t\t\tfunction initAdForms(root) {\n\t\t\t\tconst forms = (root || document).querySelectorAll('.ads-form-wizard');\n\t\t\t\tforms.forEach(function (form) {\n\t\t\t\t\tif (form.dataset.adsWired === '1') return;\n\t\t\t\t\tform.dataset.adsWired = '1';\n\t\t\t\t\tresetAdWizard(form);\n\n\t\t\t\t\tconst randomizeFields = form.querySelector('[id$=\"RandomizeFields\"]');\n\t\t\t\t\tconst timerGroup = form.querySelector('[id$=\"TimerIntervalGroup\"]');\n\t\t\t\t\tconst kindSelect = form.querySelector('[id$=\"RandomizeKind\"]');\n\t\t\t\t\tconst selectedInputs = form.querySelector('[id$=\"SelectedIDs\"]');\n\t\t\t\t\tconst results = form.querySelector('[id$=\"SearchResults\"]');\n\t\t\t\t\tconst nextBtn = form.querySelector('.ads-wizard-next');\n\t\t\t\t\tconst prevBtn = form.querySelector('.ads-wizard-prev');\n\n\t\t\t\t\tfunction syncRandomizeVisibility() {\n\t\t\t\t\t\tconst count = selectedInputs ? selectedInputs.querySelectorAll('input[name=\"affiliate_product_ids\"]').length : 0;\n\t\t\t\t\t\tif (randomizeFields) randomizeFields.hidden = count <= 1;\n\t\t\t\t\t\tsyncAdSingleProductNote(form);\n\t\t\t\t\t}\n\t\t\t\t\tconst timerSelect = form.querySelector('[id$=\"TimerInterval\"]');\n\t\t\t\t\tfunction syncTimerVisibility() {\n\t\t\t\t\t\tif (!kindSelect) return;\n\t\t\t\t\t\tconst isTimer = kindSelect.value === 'timer';\n\t\t\t\t\t\tif (timerGroup) timerGroup.hidden = !isTimer;\n\t\t\t\t\t\tif (timerSelect) timerSelect.disabled = dataIsDeleted(form) || !isTimer;\n\t\t\t\t\t}\n\t\t\t\t\tfunction dataIsDeleted(formEl) {\n\t\t\t\t\t\tconst status = formEl.querySelector('[name=\"status\"]');\n\t\t\t\t\t\treturn status && status.tagName === 'INPUT' && status.readOnly;\n\t\t\t\t\t}\n\t\t\t\t\tif (kindSelect) kindSelect.addEventListener('change', syncTimerVisibility);\n\t\t\t\t\tsyncRandomizeVisibility();\n\t\t\t\t\tsyncTimerVisibility();\n\n\t\t\t\t\tconst step1 = form.querySelector('.ads-wizard-step[data-ad-step=\"1\"]');\n\t\t\t\t\tif (step1) {\n\t\t\t\t\t\tstep1.addEventListener('input', function () { syncAdWizardNextButton(form); });\n\t\t\t\t\t\tstep1.addEventListener('change', function () { syncAdWizardNextButton(form); });\n\t\t\t\t\t}\n\t\t\t\t\tsyncAdWizardNextButton(form);\n\n\t\t\t\t\tif (nextBtn) {\n\t\t\t\t\t\tnextBtn.addEventListener('click', function () {\n\t\t\t\t\t\t\tconst step = parseInt(form.dataset.adsCurrentStep || '1', 10);\n\t\t\t\t\t\t\tif (step === 1) {\n\t\t\t\t\t\t\t\tif (!validateAdWizardStep1(form)) return;\n\t\t\t\t\t\t\t\tsetAdWizardStep(form, 2);\n\t\t\t\t\t\t\t\tloadAffiliateProductsForForm(form);\n\t\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\tif (step === 2) {\n\t\t\t\t\t\t\t\tif (!validateAdWizardStep2(form)) return;\n\t\t\t\t\t\t\t\tsetAdWizardStep(form, 3);\n\t\t\t\t\t\t\t\tsyncRandomizeVisibility();\n\t\t\t\t\t\t\t\tsyncTimerVisibility();\n\t\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t\tif (prevBtn) {\n\t\t\t\t\t\tprevBtn.addEventListener('click', function () {\n\t\t\t\t\t\t\tconst step = parseInt(form.dataset.adsCurrentStep || '1', 10);\n\t\t\t\t\t\t\tif (step > 1) setAdWizardStep(form, step - 1);\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\n\t\t\t\t\tform.addEventListener('submit', function (e) {\n\t\t\t\t\t\tconst step = parseInt(form.dataset.adsCurrentStep || '1', 10);\n\t\t\t\t\t\tif (step < 3) {\n\t\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\t\tif (step === 1 && validateAdWizardStep1(form)) {\n\t\t\t\t\t\t\t\tsetAdWizardStep(form, 2);\n\t\t\t\t\t\t\t\tloadAffiliateProductsForForm(form);\n\t\t\t\t\t\t\t} else if (step === 2 && validateAdWizardStep2(form)) {\n\t\t\t\t\t\t\t\tsetAdWizardStep(form, 3);\n\t\t\t\t\t\t\t\tsyncRandomizeVisibility();\n\t\t\t\t\t\t\t\tsyncTimerVisibility();\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t}\n\t\t\t\t\t\tif (!validateAdWizardStep2(form)) {\n\t\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\t}\n\t\t\t\t\t});\n\n\t\t\t\t\tfunction appendSelectedProduct(id) {\n\t\t\t\t\t\tif (!selectedInputs || selectedInputs.querySelector('input[value=\"' + id + '\"]')) return;\n\t\t\t\t\t\tconst hidden = document.createElement('input');\n\t\t\t\t\t\thidden.type = 'hidden';\n\t\t\t\t\t\thidden.name = 'affiliate_product_ids';\n\t\t\t\t\t\thidden.value = id;\n\t\t\t\t\t\tselectedInputs.appendChild(hidden);\n\t\t\t\t\t}\n\n\t\t\t\t\tfunction removeSelectedProduct(id) {\n\t\t\t\t\t\tif (!selectedInputs) return;\n\t\t\t\t\t\tconst h = selectedInputs.querySelector('input[value=\"' + id + '\"]');\n\t\t\t\t\t\tif (h) h.remove();\n\t\t\t\t\t}\n\n\t\t\t\t\tif (results) {\n\t\t\t\t\t\tresults.addEventListener('change', function (e) {\n\t\t\t\t\t\t\tconst cb = e.target;\n\t\t\t\t\t\t\tif (!cb || !cb.classList || !cb.classList.contains('ads-product-checkbox')) return;\n\t\t\t\t\t\t\tconst id = cb.value;\n\t\t\t\t\t\t\tif (cb.checked) {\n\t\t\t\t\t\t\t\tappendSelectedProduct(id);\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\tremoveSelectedProduct(id);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\tsyncRandomizeVisibility();\n\t\t\t\t\t\t\tsyncAdSelectionCount(form);\n\t\t\t\t\t\t\tsyncAdWizardNextButton(form);\n\t\t\t\t\t\t\tconst hint = form.querySelector('[id$=\"ProductsHint\"]');\n\t\t\t\t\t\t\tif (hint && selectedInputs.querySelectorAll('input[name=\"affiliate_product_ids\"]').length > 0) {\n\t\t\t\t\t\t\t\thint.hidden = true;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t\tsyncAdSelectionCount(form);\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tinitAdForms(document);\n\t\t})();\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 208, "<script>\n\t\t(function () {\n\t\t\tfunction wireModal(modal, closeSelector) {\n\t\t\t\tif (!modal) return;\n\t\t\t\tfunction closeModal() {\n\t\t\t\t\tmodal.hidden = true;\n\t\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t\t}\n\t\t\t\tmodal.querySelectorAll(closeSelector).forEach(function (btn) {\n\t\t\t\t\tbtn.addEventListener('click', closeModal);\n\t\t\t\t});\n\t\t\t\tmodal.addEventListener('click', function (e) {\n\t\t\t\t\tif (e.target === modal) closeModal();\n\t\t\t\t});\n\t\t\t\tif (!modal.hidden) document.body.classList.add('modal-open');\n\t\t\t\treturn { open: function () { modal.hidden = false; document.body.classList.add('modal-open'); }, close: closeModal };\n\t\t\t}\n\n\t\t\tconst createModal = document.getElementById('adCreateModal');\n\t\t\tconst createCtl = wireModal(createModal, '.ad-create-modal-close, .ad-form-modal-close');\n\t\t\tconst openCreateBtn = document.getElementById('openAdCreateModalBtn');\n\t\t\tif (openCreateBtn && createCtl) {\n\t\t\t\topenCreateBtn.addEventListener('click', function () {\n\t\t\t\t\tconst form = document.getElementById('adCreateForm');\n\t\t\t\t\tif (form) resetAdWizard(form);\n\t\t\t\t\tcreateCtl.open();\n\t\t\t\t});\n\t\t\t}\n\t\t\tif (createModal && !createModal.hidden) document.body.classList.add('modal-open');\n\n\t\t\twireModal(document.getElementById('adEditModal'), '.ad-edit-modal-close, .ad-form-modal-close');\n\t\t\twireModal(document.getElementById('adViewModal'), '.ad-view-modal-close');\n\t\t\twireModal(document.getElementById('adDeleteModal'), '.ad-delete-modal-close');\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (e) {\n\t\t\t\tconst t = e.detail.target;\n\t\t\t\tif (!t) return;\n\t\t\t\tif (t.id === 'adEditModalHost' || t.id === 'adViewModalHost' || t.id === 'adDeleteModalHost') {\n\t\t\t\t\tconst modal = t.querySelector('.modal-overlay');\n\t\t\t\t\tif (modal) {\n\t\t\t\t\t\tmodal.hidden = false;\n\t\t\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\t\t\twireModal(modal, '.modal-close, .ad-view-modal-close, .ad-delete-modal-close, .ad-edit-modal-close, .ad-form-modal-close');\n\t\t\t\t\t\tinitAdForms(modal);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tfunction resetAdWizard(form) {\n\t\t\t\tif (!form || form.dataset.adWizard !== '1') return;\n\t\t\t\tform.dataset.adsCurrentStep = '1';\n\t\t\t\tsetAdWizardStep(form, 1);\n\t\t\t\tconst hint = form.querySelector('[id$=\"ProductsHint\"]');\n\t\t\t\tif (hint) hint.hidden = true;\n\t\t\t}\n\n\t\t\tfunction adWizardStepLabel(form) {\n\t\t\t\tif (!form || !form.id) return null;\n\t\t\t\treturn document.getElementById(form.id + 'StepLabel');\n\t\t\t}\n\n\t\t\tfunction setAdWizardNavButton(btn, hide) {\n\t\t\t\tif (!btn) return;\n\t\t\t\tbtn.classList.toggle('ads-wizard-nav-hidden', hide);\n\t\t\t\tbtn.hidden = hide;\n\t\t\t\tbtn.setAttribute('aria-hidden', hide ? 'true' : 'false');\n\t\t\t}\n\n\t\t\tfunction isAdWizardStep1Complete(form) {\n\t\t\t\tconst step = form.querySelector('.ads-wizard-step[data-ad-step=\"1\"]');\n\t\t\t\tif (!step) return false;\n\t\t\t\tconst fields = step.querySelectorAll('input, select, textarea');\n\t\t\t\tfor (let i = 0; i < fields.length; i++) {\n\t\t\t\t\tconst field = fields[i];\n\t\t\t\t\tif (field.disabled || field.type === 'hidden') continue;\n\t\t\t\t\tif (!field.checkValidity()) return false;\n\t\t\t\t}\n\t\t\t\treturn true;\n\t\t\t}\n\n\t\t\tfunction syncAdWizardNextButton(form) {\n\t\t\t\tconst nextBtn = form.querySelector('.ads-wizard-next');\n\t\t\t\tif (!nextBtn) return;\n\t\t\t\tconst step = parseInt(form.dataset.adsCurrentStep || '1', 10);\n\t\t\t\tif (step === 1) {\n\t\t\t\t\tnextBtn.disabled = !isAdWizardStep1Complete(form);\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (step === 2) {\n\t\t\t\t\tconst selectedInputs = form.querySelector('[id$=\"SelectedIDs\"]');\n\t\t\t\t\tconst count = selectedInputs ? selectedInputs.querySelectorAll('input[name=\"affiliate_product_ids\"]').length : 0;\n\t\t\t\t\tnextBtn.disabled = count < 1;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tnextBtn.disabled = false;\n\t\t\t}\n\n\t\t\tfunction setAdWizardStep(form, step) {\n\t\t\t\tconst total = 3;\n\t\t\t\tstep = step < 1 ? 1 : step > total ? total : step;\n\t\t\t\tform.dataset.adsCurrentStep = String(step);\n\t\t\t\tform.querySelectorAll('.ads-wizard-step').forEach(function (el) {\n\t\t\t\t\tconst n = parseInt(el.getAttribute('data-ad-step'), 10);\n\t\t\t\t\tconst active = n === step;\n\t\t\t\t\tel.classList.toggle('is-active', active);\n\t\t\t\t\tel.hidden = !active;\n\t\t\t\t});\n\t\t\t\tconst label = adWizardStepLabel(form);\n\t\t\t\tif (label) label.textContent = 'Step ' + step + ' of ' + total;\n\t\t\t\tconst prevBtn = form.querySelector('.ads-wizard-prev');\n\t\t\t\tconst nextBtn = form.querySelector('.ads-wizard-next');\n\t\t\t\tconst saveBtn = form.querySelector('.ads-wizard-save');\n\t\t\t\tsetAdWizardNavButton(prevBtn, step <= 1);\n\t\t\t\tsetAdWizardNavButton(nextBtn, step >= total);\n\t\t\t\tsetAdWizardNavButton(saveBtn, step < total);\n\t\t\t\tsyncAdWizardNextButton(form);\n\t\t\t}\n\n\t\t\tfunction validateAdWizardStep1(form) {\n\t\t\t\tconst step = form.querySelector('.ads-wizard-step[data-ad-step=\"1\"]');\n\t\t\t\tif (!step) return true;\n\t\t\t\tconst fields = step.querySelectorAll('input, select, textarea');\n\t\t\t\tfor (let i = 0; i < fields.length; i++) {\n\t\t\t\t\tconst field = fields[i];\n\t\t\t\t\tif (field.disabled || field.type === 'hidden') continue;\n\t\t\t\t\tif (!field.checkValidity()) {\n\t\t\t\t\t\tfield.reportValidity();\n\t\t\t\t\t\treturn false;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\treturn true;\n\t\t\t}\n\n\t\t\tfunction validateAdWizardStep2(form) {\n\t\t\t\tconst selectedInputs = form.querySelector('[id$=\"SelectedIDs\"]');\n\t\t\t\tconst count = selectedInputs ? selectedInputs.querySelectorAll('input[name=\"affiliate_product_ids\"]').length : 0;\n\t\t\t\tconst hint = form.querySelector('[id$=\"ProductsHint\"]');\n\t\t\t\tif (count < 1) {\n\t\t\t\t\tif (hint) hint.hidden = false;\n\t\t\t\t\treturn false;\n\t\t\t\t}\n\t\t\t\tif (hint) hint.hidden = true;\n\t\t\t\treturn true;\n\t\t\t}\n\n\t\t\tfunction syncAdSelectionCount(form) {\n\t\t\t\tif (!form) return;\n\t\t\t\tconst selectedInputs = form.querySelector('[id$=\"SelectedIDs\"]');\n\t\t\t\tconst count = selectedInputs ? selectedInputs.querySelectorAll('input[name=\"affiliate_product_ids\"]').length : 0;\n\t\t\t\tconst countRoot = form.querySelector('[id$=\"SelectionCount\"]');\n\t\t\t\tif (countRoot) {\n\t\t\t\t\tconst nSpan = countRoot.querySelector('.ads-selection-count-n');\n\t\t\t\t\tif (nSpan) nSpan.textContent = String(count);\n\t\t\t\t}\n\t\t\t\tsyncAdSelectAllToggle(form);\n\t\t\t}\n\n\t\t\tfunction syncAdSelectAllToggle(form) {\n\t\t\t\tconst toggle = form.querySelector('.ads-select-all-checkbox');\n\t\t\t\tconst totalSpan = form.querySelector('[id$=\"SelectionCount\"] .ads-selection-count-total');\n\t\t\t\tconst selectedInputs = form.querySelector('[id$=\"SelectedIDs\"]');\n\t\t\t\tif (!toggle || !totalSpan || toggle.disabled) return;\n\t\t\t\tconst totalRaw = totalSpan.textContent.trim();\n\t\t\t\tconst total = parseInt(totalRaw, 10);\n\t\t\t\tconst count = selectedInputs ? selectedInputs.querySelectorAll('input[name=\"affiliate_product_ids\"]').length : 0;\n\t\t\t\tif (totalRaw === '-' || isNaN(total) || total <= 0) {\n\t\t\t\t\ttoggle.checked = false;\n\t\t\t\t\ttoggle.indeterminate = false;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\ttoggle.checked = count >= total;\n\t\t\t\ttoggle.indeterminate = count > 0 && count < total;\n\t\t\t}\n\n\t\t\tasync function fetchAffiliateProductIDsForForm(form) {\n\t\t\t\tconst toggle = form.querySelector('.ads-select-all-checkbox');\n\t\t\t\tconst search = form.querySelector('[id$=\"ProductSearch\"]');\n\t\t\t\tif (!toggle || !toggle.dataset.idsUrl) return null;\n\t\t\t\tconst q = search ? search.value.trim() : '';\n\t\t\t\tconst url = toggle.dataset.idsUrl + (q ? '?q=' + encodeURIComponent(q) : '');\n\t\t\t\tconst res = await fetch(url, { credentials: 'same-origin' });\n\t\t\t\tif (!res.ok) return null;\n\t\t\t\tconst data = await res.json();\n\t\t\t\treturn data && Array.isArray(data.ids) ? data.ids : null;\n\t\t\t}\n\n\t\t\tfunction syncAdSearchTotalFromPanel(form, panelEl) {\n\t\t\t\tif (!form || !panelEl) return;\n\t\t\t\tconst total = panelEl.getAttribute('data-total');\n\t\t\t\tconst totalSpan = form.querySelector('[id$=\"SelectionCount\"] .ads-selection-count-total');\n\t\t\t\tif (totalSpan && total) totalSpan.textContent = total;\n\t\t\t}\n\n\t\t\tfunction loadAffiliateProductsForForm(form) {\n\t\t\t\tif (!form || typeof htmx === 'undefined') return;\n\t\t\t\tconst body = document.body;\n\t\t\t\tif (body) htmx.trigger(body, 'loadAffiliateProducts');\n\t\t\t}\n\n\t\t\tfunction syncAdSingleProductNote(form) {\n\t\t\t\tconst note = form.querySelector('[id$=\"SingleProductNote\"]');\n\t\t\t\tconst selectedInputs = form.querySelector('[id$=\"SelectedIDs\"]');\n\t\t\t\tconst count = selectedInputs ? selectedInputs.querySelectorAll('input[name=\"affiliate_product_ids\"]').length : 0;\n\t\t\t\tif (note) note.hidden = count !== 1;\n\t\t\t}\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (e) {\n\t\t\t\tconst t = e.detail.target;\n\t\t\t\tif (!t || !t.id || t.id.indexOf('SearchResults') < 0) return;\n\t\t\t\tconst form = t.closest('form.ads-form-wizard');\n\t\t\t\tif (!form) return;\n\t\t\t\tconst panel = t.querySelector('.ads-search-panel');\n\t\t\t\tsyncAdSearchTotalFromPanel(form, panel);\n\t\t\t\tsyncAdSelectionCount(form);\n\t\t\t\tsyncAdSelectAllToggle(form);\n\t\t\t\tsyncAdWizardNextButton(form);\n\t\t\t});\n\n\t\t\tfunction initAdForms(root) {\n\t\t\t\tconst forms = (root || document).querySelectorAll('.ads-form-wizard');\n\t\t\t\tforms.forEach(function (form) {\n\t\t\t\t\tif (form.dataset.adsWired === '1') return;\n\t\t\t\t\tform.dataset.adsWired = '1';\n\t\t\t\t\tresetAdWizard(form);\n\n\t\t\t\t\tconst randomizeFields = form.querySelector('[id$=\"RandomizeFields\"]');\n\t\t\t\t\tconst timerGroup = form.querySelector('[id$=\"TimerIntervalGroup\"]');\n\t\t\t\t\tconst kindSelect = form.querySelector('[id$=\"RandomizeKind\"]');\n\t\t\t\t\tconst selectedInputs = form.querySelector('[id$=\"SelectedIDs\"]');\n\t\t\t\t\tconst results = form.querySelector('[id$=\"SearchResults\"]');\n\t\t\t\t\tconst nextBtn = form.querySelector('.ads-wizard-next');\n\t\t\t\t\tconst prevBtn = form.querySelector('.ads-wizard-prev');\n\t\t\t\t\tconst selectAllToggle = form.querySelector('.ads-select-all-checkbox');\n\n\t\t\t\t\tfunction syncRandomizeVisibility() {\n\t\t\t\t\t\tconst count = selectedInputs ? selectedInputs.querySelectorAll('input[name=\"affiliate_product_ids\"]').length : 0;\n\t\t\t\t\t\tif (randomizeFields) randomizeFields.hidden = count <= 1;\n\t\t\t\t\t\tsyncAdSingleProductNote(form);\n\t\t\t\t\t}\n\t\t\t\t\tconst timerSelect = form.querySelector('[id$=\"TimerInterval\"]');\n\t\t\t\t\tfunction syncTimerVisibility() {\n\t\t\t\t\t\tif (!kindSelect) return;\n\t\t\t\t\t\tconst isTimer = kindSelect.value === 'timer';\n\t\t\t\t\t\tif (timerGroup) timerGroup.hidden = !isTimer;\n\t\t\t\t\t\tif (timerSelect) timerSelect.disabled = dataIsDeleted(form) || !isTimer;\n\t\t\t\t\t}\n\t\t\t\t\tfunction dataIsDeleted(formEl) {\n\t\t\t\t\t\tconst status = formEl.querySelector('[name=\"status\"]');\n\t\t\t\t\t\treturn status && status.tagName === 'INPUT' && status.readOnly;\n\t\t\t\t\t}\n\t\t\t\t\tif (kindSelect) kindSelect.addEventListener('change', syncTimerVisibility);\n\t\t\t\t\tsyncRandomizeVisibility();\n\t\t\t\t\tsyncTimerVisibility();\n\n\t\t\t\t\tconst step1 = form.querySelector('.ads-wizard-step[data-ad-step=\"1\"]');\n\t\t\t\t\tif (step1) {\n\t\t\t\t\t\tstep1.addEventListener('input', function () { syncAdWizardNextButton(form); });\n\t\t\t\t\t\tstep1.addEventListener('change', function () { syncAdWizardNextButton(form); });\n\t\t\t\t\t}\n\t\t\t\t\tsyncAdWizardNextButton(form);\n\n\t\t\t\t\tif (nextBtn) {\n\t\t\t\t\t\tnextBtn.addEventListener('click', function () {\n\t\t\t\t\t\t\tconst step = parseInt(form.dataset.adsCurrentStep || '1', 10);\n\t\t\t\t\t\t\tif (step === 1) {\n\t\t\t\t\t\t\t\tif (!validateAdWizardStep1(form)) return;\n\t\t\t\t\t\t\t\tsetAdWizardStep(form, 2);\n\t\t\t\t\t\t\t\tloadAffiliateProductsForForm(form);\n\t\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\tif (step === 2) {\n\t\t\t\t\t\t\t\tif (!validateAdWizardStep2(form)) return;\n\t\t\t\t\t\t\t\tsetAdWizardStep(form, 3);\n\t\t\t\t\t\t\t\tsyncRandomizeVisibility();\n\t\t\t\t\t\t\t\tsyncTimerVisibility();\n\t\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t\tif (prevBtn) {\n\t\t\t\t\t\tprevBtn.addEventListener('click', function () {\n\t\t\t\t\t\t\tconst step = parseInt(form.dataset.adsCurrentStep || '1', 10);\n\t\t\t\t\t\t\tif (step > 1) setAdWizardStep(form, step - 1);\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\n\t\t\t\t\tform.addEventListener('submit', function (e) {\n\t\t\t\t\t\tconst step = parseInt(form.dataset.adsCurrentStep || '1', 10);\n\t\t\t\t\t\tif (step < 3) {\n\t\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\t\tif (step === 1 && validateAdWizardStep1(form)) {\n\t\t\t\t\t\t\t\tsetAdWizardStep(form, 2);\n\t\t\t\t\t\t\t\tloadAffiliateProductsForForm(form);\n\t\t\t\t\t\t\t} else if (step === 2 && validateAdWizardStep2(form)) {\n\t\t\t\t\t\t\t\tsetAdWizardStep(form, 3);\n\t\t\t\t\t\t\t\tsyncRandomizeVisibility();\n\t\t\t\t\t\t\t\tsyncTimerVisibility();\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t}\n\t\t\t\t\t\tif (!validateAdWizardStep2(form)) {\n\t\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\t}\n\t\t\t\t\t});\n\n\t\t\t\t\tfunction appendSelectedProduct(id) {\n\t\t\t\t\t\tif (!selectedInputs || selectedInputs.querySelector('input[value=\"' + id + '\"]')) return;\n\t\t\t\t\t\tconst hidden = document.createElement('input');\n\t\t\t\t\t\thidden.type = 'hidden';\n\t\t\t\t\t\thidden.name = 'affiliate_product_ids';\n\t\t\t\t\t\thidden.value = id;\n\t\t\t\t\t\tselectedInputs.appendChild(hidden);\n\t\t\t\t\t}\n\n\t\t\t\t\tfunction removeSelectedProduct(id) {\n\t\t\t\t\t\tif (!selectedInputs) return;\n\t\t\t\t\t\tconst h = selectedInputs.querySelector('input[value=\"' + id + '\"]');\n\t\t\t\t\t\tif (h) h.remove();\n\t\t\t\t\t}\n\n\t\t\t\t\tif (selectAllToggle) {\n\t\t\t\t\t\tselectAllToggle.addEventListener('change', async function () {\n\t\t\t\t\t\t\tif (selectAllToggle.dataset.adsSelectAllBusy === '1') return;\n\t\t\t\t\t\t\tselectAllToggle.dataset.adsSelectAllBusy = '1';\n\t\t\t\t\t\t\tconst ids = await fetchAffiliateProductIDsForForm(form);\n\t\t\t\t\t\t\tselectAllToggle.dataset.adsSelectAllBusy = '0';\n\t\t\t\t\t\t\tif (!ids) {\n\t\t\t\t\t\t\t\tselectAllToggle.checked = !selectAllToggle.checked;\n\t\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\tconst idSet = new Set(ids);\n\t\t\t\t\t\t\tif (selectAllToggle.checked) {\n\t\t\t\t\t\t\t\tids.forEach(function (id) { appendSelectedProduct(id); });\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\tids.forEach(function (id) { removeSelectedProduct(id); });\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\tif (results) {\n\t\t\t\t\t\t\t\tresults.querySelectorAll('.ads-product-checkbox').forEach(function (cb) {\n\t\t\t\t\t\t\t\t\tif (idSet.has(cb.value)) cb.checked = selectAllToggle.checked;\n\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\tsyncRandomizeVisibility();\n\t\t\t\t\t\t\tsyncAdSelectionCount(form);\n\t\t\t\t\t\t\tsyncAdWizardNextButton(form);\n\t\t\t\t\t\t\tconst hint = form.querySelector('[id$=\"ProductsHint\"]');\n\t\t\t\t\t\t\tif (hint && selectedInputs.querySelectorAll('input[name=\"affiliate_product_ids\"]').length > 0) {\n\t\t\t\t\t\t\t\thint.hidden = true;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\n\t\t\t\t\tif (results) {\n\t\t\t\t\t\tresults.addEventListener('change', function (e) {\n\t\t\t\t\t\t\tconst cb = e.target;\n\t\t\t\t\t\t\tif (!cb || !cb.classList || !cb.classList.contains('ads-product-checkbox')) return;\n\t\t\t\t\t\t\tconst id = cb.value;\n\t\t\t\t\t\t\tif (cb.checked) {\n\t\t\t\t\t\t\t\tappendSelectedProduct(id);\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\tremoveSelectedProduct(id);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\tsyncRandomizeVisibility();\n\t\t\t\t\t\t\tsyncAdSelectionCount(form);\n\t\t\t\t\t\t\tsyncAdWizardNextButton(form);\n\t\t\t\t\t\t\tconst hint = form.querySelector('[id$=\"ProductsHint\"]');\n\t\t\t\t\t\t\tif (hint && selectedInputs.querySelectorAll('input[name=\"affiliate_product_ids\"]').length > 0) {\n\t\t\t\t\t\t\t\thint.hidden = true;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t\tsyncAdSelectionCount(form);\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tinitAdForms(document);\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

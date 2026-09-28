@@ -50,6 +50,22 @@ func handleAffiliateLink(w http.ResponseWriter, r *http.Request) {
 		logs.Log().Error("increment affiliate product click count", zap.Error(err), zap.Int64("product_id", id))
 	}
 
+	eventParams := queries.InsertAffiliateLinkClickEventParams{
+		AffiliateProductID: id,
+	}
+	user := auth.GetUser(ctx)
+	if user.ID > 0 {
+		eventParams.TeacherID = sql.NullInt64{Int64: user.ID, Valid: true}
+	}
+	q := r.URL.Query()
+	if attr, ok := affiliates.ResolveClickAttribution(ctx, dbRO.GetQueries(), id, q.Get("ad_id"), q.Get("zone")); ok {
+		eventParams.AdID = sql.NullInt64{Int64: attr.AdID, Valid: true}
+		eventParams.AdZone = sql.NullString{String: string(attr.Zone), Valid: true}
+	}
+	if err := dbRW.GetQueries().InsertAffiliateLinkClickEvent(ctx, eventParams); err != nil {
+		logs.Log().Error("insert affiliate link click event", zap.Error(err), zap.Int64("product_id", id))
+	}
+
 	http.Redirect(w, r, dest, http.StatusFound)
 }
 
@@ -364,17 +380,31 @@ func handleAffiliatesList(w http.ResponseWriter, r *http.Request, state affiliat
 	rows = filterAffiliateRows(rows, query)
 	sortAffiliateRows(rows, sort)
 
-	items := make([]frontend.AffiliateListItem, 0, len(rows))
-	for _, row := range rows {
+	page := utils.ParsePageQuery(r)
+	page.Total = int64(len(rows))
+	pagedRows := paginateSlice(rows, page)
+
+	items := make([]frontend.AffiliateListItem, 0, len(pagedRows))
+	for _, row := range pagedRows {
 		items = append(items, mapAffiliateListItem(row))
 	}
+
+	filterPath := utils.URL("/affiliates")
+	params := listQueryParamsWithSort(r, frontend.ListSortKindAffiliate)
 
 	data := frontend.AffiliatesPageData{
 		Items:            items,
 		Query:            query,
 		SortBy:           sort.By,
 		SortOrder:        string(sort.Order),
-		FilterPath:       utils.URL("/affiliates"),
+		FilterPath:       filterPath,
+		PageNumber:       page.Number,
+		PageTotalPages:   page.TotalPages(),
+		PageTotal:        page.Total,
+		PrevURL:          utils.BuildPageURLAt(filterPath, page.Number-1, page.Size, params),
+		NextURL:          utils.BuildPageURLAt(filterPath, page.Number+1, page.Size, params),
+		HasPrev:          page.HasPrev(),
+		HasNext:          page.HasNext(),
 		Form:             state.Form,
 		OpenEditModal:    state.OpenEditModal,
 		ImportPreview:    state.ImportPreview,
@@ -398,7 +428,7 @@ func mapAffiliateListItem(row queries.GetAllAffiliateProductsRow) frontend.Affil
 		PriceDisplay:  row.PriceDisplay,
 		ClickCount:    row.ClickCount,
 		ThumbnailURL:  row.ThumbnailUrl,
-		AffiliateURL:  frontend.AffiliateProductLinkHref(row.ID, row.AffiliateUrl),
+		AffiliateURL:  frontend.AffiliateProductLinkHref(row.ID, row.AffiliateUrl, 0, ""),
 		AffiliateDisp: frontend.AffiliateURLPreview(row.AffiliateUrl),
 	}
 }

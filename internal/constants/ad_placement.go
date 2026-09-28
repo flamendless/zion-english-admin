@@ -51,3 +51,12 @@ const (
 	AdZoneRight  AdZone = "right"
 	AdZoneBottom AdZone = "bottom"
 )
+
+func ValidAdZone(zone string) bool {
+	switch AdZone(zone) {
+	case AdZoneTop, AdZoneLeft, AdZoneRight, AdZoneBottom:
+		return true
+	default:
+		return false
+	}
+}

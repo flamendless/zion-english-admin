@@ -127,3 +127,14 @@ WHERE (
 )
 ORDER BY p.sort_order ASC, p.id ASC
 LIMIT ? OFFSET ?;
+
+-- name: ListAffiliateProductIDsForAds :many
+SELECT p.id
+FROM tbl_affiliate_products p
+LEFT JOIN tbl_affiliated_product_shops s ON s.id = p.affiliated_shop_id
+WHERE (
+	? = ''
+	OR p.name LIKE '%' || ? || '%'
+	OR COALESCE(s.brand_name, p.brand, '') LIKE '%' || ? || '%'
+)
+ORDER BY p.sort_order ASC, p.id ASC;

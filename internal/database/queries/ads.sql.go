@@ -307,6 +307,47 @@ func (q *Queries) InsertAdAffiliateProduct(ctx context.Context, arg InsertAdAffi
 	return err
 }
 
+const listAffiliateProductIDsForAds = `-- name: ListAffiliateProductIDsForAds :many
+SELECT p.id
+FROM tbl_affiliate_products p
+LEFT JOIN tbl_affiliated_product_shops s ON s.id = p.affiliated_shop_id
+WHERE (
+	? = ''
+	OR p.name LIKE '%' || ? || '%'
+	OR COALESCE(s.brand_name, p.brand, '') LIKE '%' || ? || '%'
+)
+ORDER BY p.sort_order ASC, p.id ASC
+`
+
+type ListAffiliateProductIDsForAdsParams struct {
+	Column1 interface{}
+	Column2 sql.NullString
+	Column3 sql.NullString
+}
+
+func (q *Queries) ListAffiliateProductIDsForAds(ctx context.Context, arg ListAffiliateProductIDsForAdsParams) ([]int64, error) {
+	rows, err := q.db.QueryContext(ctx, listAffiliateProductIDsForAds, arg.Column1, arg.Column2, arg.Column3)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []int64
+	for rows.Next() {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		items = append(items, id)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const searchAffiliateProductsForAds = `-- name: SearchAffiliateProductsForAds :many
 SELECT
 	p.id,

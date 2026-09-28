@@ -301,12 +301,24 @@ templ AdForm(data AdFormData, formID string) {
 							hx-include={ "#" + formID + "ProductSearch, #" + formID + "SelectedIDs" }
 						/>
 					</div>
-					<p class="ads-selection-count" id={ formID + "SelectionCount" }>
-						<span class="ads-selection-count-n">{ fmt.Sprintf("%d", len(data.SelectedProducts)) }</span>
-						<span class="ads-selection-count-sep"> / </span>
-						<span class="ads-selection-count-total">-</span>
-						<span> selected</span>
-					</p>
+					<div class="ads-selection-row">
+						<p class="ads-selection-count" id={ formID + "SelectionCount" }>
+							<span class="ads-selection-count-n">{ fmt.Sprintf("%d", len(data.SelectedProducts)) }</span>
+							<span class="ads-selection-count-sep"> / </span>
+							<span class="ads-selection-count-total">-</span>
+							<span> selected</span>
+						</p>
+						<label class="ads-select-all-toggle checkbox-label" for={ formID + "SelectAll" }>
+							<input
+								type="checkbox"
+								id={ formID + "SelectAll" }
+								class="ads-select-all-checkbox"
+								disabled?={ data.IsDeleted }
+								data-ids-url={ utils.URL("/ads/partials/affiliate-product-ids") }
+							/>
+							Select all
+						</label>
+					</div>
 					<div id={ formID + "SelectedIDs" } class="ads-selected-product-inputs">
 						for _, p := range data.SelectedProducts {
 							<input type="hidden" name="affiliate_product_ids" value={ p.ID }/>
@@ -558,11 +570,29 @@ templ AdsPageStyles() {
 		.ads-modal-footer { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
 		.ads-modal-footer .btn, .ads-modal-footer .btn-secondary, .ads-modal-footer .btn-danger { margin-top: 0; }
 		.ads-search-results { margin-top: var(--space-2); max-height: 22rem; overflow: auto; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); }
-		.ads-selection-count {
+		.ads-selection-row {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: space-between;
+			gap: var(--space-2);
 			margin: var(--space-2) 0 0;
+		}
+		.ads-selection-count {
+			margin: 0;
 			font-size: 0.875rem;
 			font-weight: 600;
 			color: var(--color-muted-foreground);
+		}
+		.ads-select-all-toggle {
+			margin: 0;
+			font-size: 0.875rem;
+			font-weight: 600;
+			color: var(--color-muted-foreground);
+			flex-shrink: 0;
+		}
+		.ads-select-all-toggle input {
+			margin-top: 0;
 		}
 		.ads-selection-count-n { color: var(--color-primary); }
 		.ads-wizard-step-note {
@@ -746,6 +776,36 @@ templ AdsPageScripts(openCreate bool) {
 					const nSpan = countRoot.querySelector('.ads-selection-count-n');
 					if (nSpan) nSpan.textContent = String(count);
 				}
+				syncAdSelectAllToggle(form);
+			}
+
+			function syncAdSelectAllToggle(form) {
+				const toggle = form.querySelector('.ads-select-all-checkbox');
+				const totalSpan = form.querySelector('[id$="SelectionCount"] .ads-selection-count-total');
+				const selectedInputs = form.querySelector('[id$="SelectedIDs"]');
+				if (!toggle || !totalSpan || toggle.disabled) return;
+				const totalRaw = totalSpan.textContent.trim();
+				const total = parseInt(totalRaw, 10);
+				const count = selectedInputs ? selectedInputs.querySelectorAll('input[name="affiliate_product_ids"]').length : 0;
+				if (totalRaw === '-' || isNaN(total) || total <= 0) {
+					toggle.checked = false;
+					toggle.indeterminate = false;
+					return;
+				}
+				toggle.checked = count >= total;
+				toggle.indeterminate = count > 0 && count < total;
+			}
+
+			async function fetchAffiliateProductIDsForForm(form) {
+				const toggle = form.querySelector('.ads-select-all-checkbox');
+				const search = form.querySelector('[id$="ProductSearch"]');
+				if (!toggle || !toggle.dataset.idsUrl) return null;
+				const q = search ? search.value.trim() : '';
+				const url = toggle.dataset.idsUrl + (q ? '?q=' + encodeURIComponent(q) : '');
+				const res = await fetch(url, { credentials: 'same-origin' });
+				if (!res.ok) return null;
+				const data = await res.json();
+				return data && Array.isArray(data.ids) ? data.ids : null;
 			}
 
 			function syncAdSearchTotalFromPanel(form, panelEl) {
@@ -776,6 +836,7 @@ templ AdsPageScripts(openCreate bool) {
 				const panel = t.querySelector('.ads-search-panel');
 				syncAdSearchTotalFromPanel(form, panel);
 				syncAdSelectionCount(form);
+				syncAdSelectAllToggle(form);
 				syncAdWizardNextButton(form);
 			});
 
@@ -793,6 +854,7 @@ templ AdsPageScripts(openCreate bool) {
 					const results = form.querySelector('[id$="SearchResults"]');
 					const nextBtn = form.querySelector('.ads-wizard-next');
 					const prevBtn = form.querySelector('.ads-wizard-prev');
+					const selectAllToggle = form.querySelector('.ads-select-all-checkbox');
 
 					function syncRandomizeVisibility() {
 						const count = selectedInputs ? selectedInputs.querySelectorAll('input[name="affiliate_product_ids"]').length : 0;
@@ -878,6 +940,37 @@ templ AdsPageScripts(openCreate bool) {
 						if (!selectedInputs) return;
 						const h = selectedInputs.querySelector('input[value="' + id + '"]');
 						if (h) h.remove();
+					}
+
+					if (selectAllToggle) {
+						selectAllToggle.addEventListener('change', async function () {
+							if (selectAllToggle.dataset.adsSelectAllBusy === '1') return;
+							selectAllToggle.dataset.adsSelectAllBusy = '1';
+							const ids = await fetchAffiliateProductIDsForForm(form);
+							selectAllToggle.dataset.adsSelectAllBusy = '0';
+							if (!ids) {
+								selectAllToggle.checked = !selectAllToggle.checked;
+								return;
+							}
+							const idSet = new Set(ids);
+							if (selectAllToggle.checked) {
+								ids.forEach(function (id) { appendSelectedProduct(id); });
+							} else {
+								ids.forEach(function (id) { removeSelectedProduct(id); });
+							}
+							if (results) {
+								results.querySelectorAll('.ads-product-checkbox').forEach(function (cb) {
+									if (idSet.has(cb.value)) cb.checked = selectAllToggle.checked;
+								});
+							}
+							syncRandomizeVisibility();
+							syncAdSelectionCount(form);
+							syncAdWizardNextButton(form);
+							const hint = form.querySelector('[id$="ProductsHint"]');
+							if (hint && selectedInputs.querySelectorAll('input[name="affiliate_product_ids"]').length > 0) {
+								hint.hidden = true;
+							}
+						});
 					}
 
 					if (results) {
