@@ -377,6 +377,9 @@ func IsNavAccessible(role auth.Role, path string) bool {
 		if path == "/my-students" {
 			return false
 		}
+		if role == auth.RoleSuperuser && path == "/profile" {
+			return false
+		}
 		if path == "/feature-flags" || path == "/settings" || path == "/affiliates" || path == "/ads" || path == "/affiliate-ads/reports" {
 			return role == auth.RoleSuperuser
 		}

@@ -136,15 +136,7 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 
 	if role == auth.RoleSuperuser {
-		data := frontend.ProfileData{
-			IsSuperuser: true,
-			Name:        user.Name,
-			Email:       user.Email,
-			Avatar:      frontend.WithSuperuserBadge(buildSuperuserAvatarProps(user)),
-		}
-		if err := frontend.Profile(data).Render(ctx, w); err != nil {
-			HttpError(w, err.Error(), http.StatusInternalServerError)
-		}
+		HttpRedirect(w, r, "/dashboard")
 		return
 	}
 

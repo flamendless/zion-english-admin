@@ -32,6 +32,18 @@ func TestIsNavAccessibleTesterSandbox(t *testing.T) {
 	}
 }
 
+func TestIsNavAccessibleSuperuserProfile(t *testing.T) {
+	if IsNavAccessible(auth.RoleSuperuser, "/profile") {
+		t.Fatal("superuser should not access /profile via nav")
+	}
+	if !IsNavAccessible(auth.RoleAdmin, "/profile") {
+		t.Fatal("admin should access /profile")
+	}
+	if !IsNavAccessible(auth.RoleTeacher, "/profile") {
+		t.Fatal("teacher should access /profile")
+	}
+}
+
 func TestIsNavAccessibleTeacherResources(t *testing.T) {
 	for _, path := range []string{"/learning-materials", "/training-materials", "/documents", "/intro-videos"} {
 		if !IsNavAccessible(auth.RoleTeacher, path) {

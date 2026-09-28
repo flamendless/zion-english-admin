@@ -16,13 +16,19 @@ const (
 	NavIconSchedule       NavIconKind = "schedule"
 	NavIconScheduleSeries NavIconKind = "schedule-series"
 	NavIconRecordClass    NavIconKind = "record-class"
-	NavIconReports        NavIconKind = "reports"
-	NavIconAnalytics      NavIconKind = "analytics"
-	NavIconPayments       NavIconKind = "payments"
+	NavIconReports              NavIconKind = "reports"
+	NavIconReportsHistory       NavIconKind = "reports-history"
+	NavIconAnalytics            NavIconKind = "analytics"
+	NavIconAffiliateAdsReports  NavIconKind = "affiliate-ads-reports"
+	NavIconPayments             NavIconKind = "payments"
 	NavIconProcess        NavIconKind = "process"
 	NavIconFeatureFlags   NavIconKind = "feature-flags"
 	NavIconSettings       NavIconKind = "settings"
+	NavIconMeta           NavIconKind = "meta"
+	NavIconAffiliates     NavIconKind = "affiliates"
+	NavIconAds            NavIconKind = "ads"
 	NavIconLogs           NavIconKind = "logs"
+	NavIconUploadLogs     NavIconKind = "upload-logs"
 	NavIconAnnouncements  NavIconKind = "announcements"
 	NavIconChangelogs     NavIconKind = "changelogs"
 	NavIconPeopleGroup    NavIconKind = "people-group"
@@ -56,17 +62,19 @@ var navIconByPath = map[string]NavIconKind{
 	"/schedule/series":       NavIconScheduleSeries,
 	"/my-students":           NavIconMyStudents,
 	"/reports":               NavIconReports,
-	"/reports/history":       NavIconReports,
-	"/affiliate-ads/reports": NavIconAnalytics,
+	"/reports/history":       NavIconReportsHistory,
+	"/affiliate-ads/reports": NavIconAffiliateAdsReports,
 	"/analytics":             NavIconAnalytics,
 	"/payments":              NavIconPayments,
 	"/student-relationships": NavIconStudents,
 	"/process":               NavIconProcess,
 	"/feature-flags":         NavIconFeatureFlags,
 	"/settings":              NavIconSettings,
-	"/meta":                  NavIconSettings,
+	"/meta":                  NavIconMeta,
+	"/affiliates":            NavIconAffiliates,
+	"/ads":                   NavIconAds,
 	"/logs":                  NavIconLogs,
-	"/upload-logs":           NavIconDocuments,
+	"/upload-logs":           NavIconUploadLogs,
 	"/announcements":         NavIconAnnouncements,
 	"/changelogs":            NavIconChangelogs,
 }
@@ -93,13 +101,19 @@ var navIconToneByKind = map[NavIconKind]NavIconTone{
 	NavIconSchedule:       NavIconTonePrimary,
 	NavIconScheduleSeries: NavIconToneInfo,
 	NavIconRecordClass:    NavIconToneSuccess,
-	NavIconReports:        NavIconToneInfo,
-	NavIconAnalytics:      NavIconToneInfo,
+	NavIconReports:             NavIconToneInfo,
+	NavIconReportsHistory:      NavIconToneInfo,
+	NavIconAnalytics:           NavIconToneInfo,
+	NavIconAffiliateAdsReports: NavIconToneInfo,
 	NavIconPayments:       NavIconToneSuccess,
 	NavIconProcess:        NavIconToneWarning,
 	NavIconFeatureFlags:   NavIconToneWarning,
-	NavIconSettings:       NavIconToneWarning,
-	NavIconLogs:           NavIconToneNeutral,
+	NavIconSettings:   NavIconToneWarning,
+	NavIconMeta:       NavIconToneWarning,
+	NavIconAffiliates: NavIconToneWarning,
+	NavIconAds:        NavIconToneWarning,
+	NavIconLogs:       NavIconToneNeutral,
+	NavIconUploadLogs: NavIconToneInfo,
 	NavIconAnnouncements:  NavIconToneWarning,
 	NavIconChangelogs:     NavIconToneNeutral,
 	NavIconPeopleGroup:    NavIconToneSuccess,
