@@ -2,10 +2,8 @@ package cmd
 
 import (
 	"net/http"
-	"sort"
 	"strings"
 	"time"
-	"zion-english/frontend"
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/utils"
@@ -49,25 +47,6 @@ func notificationFilterParams(unreadOnly bool, filters notificationFilters, sort
 		}
 	}
 	return params
-}
-
-func notificationFromOptions(rows []queries.TblNotification) []frontend.StatusOption {
-	seen := make(map[string]bool)
-	names := make([]string, 0)
-	for _, row := range rows {
-		name := strings.TrimSpace(row.FromName)
-		if name == "" || seen[name] {
-			continue
-		}
-		seen[name] = true
-		names = append(names, name)
-	}
-	sort.Strings(names)
-	opts := make([]frontend.StatusOption, 0, len(names))
-	for _, name := range names {
-		opts = append(opts, frontend.StatusOption{Value: name, Label: name})
-	}
-	return opts
 }
 
 func filterNotificationRows(rows []queries.TblNotification, filters notificationFilters) []queries.TblNotification {

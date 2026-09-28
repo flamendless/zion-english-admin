@@ -5,12 +5,19 @@ import (
 )
 
 type NotificationItem struct {
-	ID        string
-	From      string
-	To        string
-	Message   string
-	CreatedAt string
-	Read      bool
+	ID         string
+	From       string
+	FromAvatar AvatarProps
+	To         string
+	Message    string
+	CreatedAt  string
+	Read       bool
+}
+
+type NotificationFromOption struct {
+	Value  string
+	Label  string
+	Avatar AvatarProps
 }
 
 type NotificationPanelData struct {
@@ -24,7 +31,7 @@ type NotificationListData struct {
 	MessageFilter  string
 	FromFilter     string
 	DateFilter     string
-	FromOptions    []StatusOption
+	FromOptions    []NotificationFromOption
 	SortBy         string
 	SortOrder      string
 	PageNumber     int
@@ -105,7 +112,7 @@ templ NotificationPanelItem(item NotificationItem) {
 		<div class="notification-item-body">
 			<p class="notification-item-message">{ item.Message }</p>
 			<p class="notification-item-meta">
-				<span>From { item.From }</span>
+				<span class="notification-item-from">@TeacherNameCell(item.From, item.FromAvatar)</span>
 				<span>{ item.CreatedAt }</span>
 			</p>
 		</div>
@@ -128,6 +135,7 @@ templ Notifications(data NotificationListData) {
 		<title>Notifications - Zion English Admin Tool</title>
 		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
 		@GlobalIncludes()
+		@AvatarStyles()
 	</head>
 	<body>
 		<div class="container">
@@ -168,62 +176,95 @@ templ Notifications(data NotificationListData) {
 }
 
 templ NotificationListToolbar(data NotificationListData) {
-	<div class="notifications-toolbar-row">
-		<form class="list-toolbar notifications-toolbar" method="GET" action={ utils.URL("/notifications") }>
-			<div class="form-group notifications-message-group">
-				<label for="notificationMessageFilter">Message</label>
-				<input
-					type="search"
-					id="notificationMessageFilter"
-					name="message"
-					value={ data.MessageFilter }
-					placeholder="Search message..."
-					autocomplete="off"
-				/>
-			</div>
-			<div class="form-group">
-				<label for="notificationFromFilter">From</label>
-				<select id="notificationFromFilter" name="from">
-					<option value="">All</option>
-					for _, opt := range data.FromOptions {
-						<option value={ opt.Value } selected?={ data.FromFilter == opt.Value }>{ opt.Label }</option>
-					}
-				</select>
-			</div>
-			<div class="form-group">
-				<label for="notificationDateFilter">Date</label>
-				<input type="date" id="notificationDateFilter" name="date" value={ data.DateFilter }/>
-			</div>
-			<div class="form-group">
-				<label for="notificationViewFilter">View</label>
-				<select id="notificationViewFilter" name="filter">
-					<option value="" selected?={ !data.UnreadOnly }>All</option>
-					<option value="unread" selected?={ data.UnreadOnly }>Unread</option>
-				</select>
-			</div>
-			@SortControls(data.SortBy, data.SortOrder, ListSortKindNotification)
+	<form class="list-toolbar notifications-toolbar" method="GET" action={ utils.URL("/notifications") }>
+		<div class="form-group notifications-message-group">
+			<label for="notificationMessageFilter">Message</label>
+			<input
+				type="search"
+				id="notificationMessageFilter"
+				name="message"
+				value={ data.MessageFilter }
+				placeholder="Search message..."
+				autocomplete="off"
+			/>
+		</div>
+		@NotificationFromFilter(data.FromFilter, data.FromOptions)
+		<div class="form-group">
+			<label for="notificationDateFilter">Date</label>
+			<input type="date" id="notificationDateFilter" name="date" value={ data.DateFilter }/>
+		</div>
+		<div class="form-group">
+			<label for="notificationViewFilter">View</label>
+			<select id="notificationViewFilter" name="filter">
+				<option value="" selected?={ !data.UnreadOnly }>All</option>
+				<option value="unread" selected?={ data.UnreadOnly }>Unread</option>
+			</select>
+		</div>
+		@SortControls(data.SortBy, data.SortOrder, ListSortKindNotification)
+		<div class="notifications-toolbar-submit-row">
 			<div class="form-group list-toolbar-action">
 				<label for="notificationFilterSubmit">&nbsp;</label>
 				<button type="submit" id="notificationFilterSubmit">Filter</button>
 			</div>
-		</form>
-		if data.UnreadOnly && data.PageTotal > 0 {
-			<div class="notifications-toolbar-secondary">
-				<button
-					type="button"
-					class="notification-mark-all-page"
-					hx-post={ utils.URL("/notifications/read-all") }
-					hx-swap={ HxSwapNone }
-				>Mark all read</button>
+			if data.UnreadOnly && data.PageTotal > 0 {
+				<div class="form-group notifications-mark-all-group">
+					<label for="notificationMarkAllPage">&nbsp;</label>
+					<button
+						type="button"
+						id="notificationMarkAllPage"
+						class="notification-mark-all-page"
+						hx-post={ utils.URL("/notifications/read-all") }
+						hx-swap={ HxSwapNone }
+					>Mark all read</button>
+				</div>
+			}
+		</div>
+	</form>
+}
+
+templ NotificationFromFilter(selected string, options []NotificationFromOption) {
+	<div class="form-group notifications-from-group">
+		<span class="toolbar-filter-dropdown-label" id="notificationFromLabel">From</span>
+		<details class="toolbar-filter-dropdown notification-from-filter">
+			<summary class="toolbar-filter-dropdown-trigger notification-from-filter-trigger" aria-labelledby="notificationFromLabel">
+				@NotificationFromFilterSummary(selected, options)
+			</summary>
+			<div class="toolbar-filter-dropdown-panel notification-from-filter-panel" role="radiogroup" aria-labelledby="notificationFromLabel">
+				<label class="notification-from-option">
+					<input type="radio" name="from" value="" checked?={ selected == "" }/>
+					<span class="notification-from-option-label">All</span>
+				</label>
+				for _, opt := range options {
+					<label class="notification-from-option">
+						<input type="radio" name="from" value={ opt.Value } checked?={ selected == opt.Value }/>
+						@Avatar(opt.Avatar)
+						<span class="notification-from-option-label">{ opt.Label }</span>
+					</label>
+				}
 			</div>
-		}
+		</details>
 	</div>
+}
+
+templ NotificationFromFilterSummary(selected string, options []NotificationFromOption) {
+	if selected == "" {
+		<span class="notification-from-summary-label">All</span>
+	} else {
+		for _, opt := range options {
+			if opt.Value == selected {
+				<span class="notification-from-summary">
+					@Avatar(opt.Avatar)
+					<span class="notification-from-summary-label">{ opt.Label }</span>
+				</span>
+			}
+		}
+	}
 }
 
 templ NotificationListRow(item NotificationItem) {
 	<tr class={ notificationItemClass(item.Read, false) } id={ "notification-" + item.ID }>
 		<td data-label="Message" class="notification-message-cell">{ item.Message }</td>
-		<td data-label="From">{ item.From }</td>
+		<td data-label="From">@TeacherNameCell(item.From, item.FromAvatar)</td>
 		<td data-label="Date">{ item.CreatedAt }</td>
 		<td data-label="Status">
 			if item.Read {

@@ -10,7 +10,6 @@ import (
 	"zion-english/internal/auth"
 	"zion-english/internal/classrules"
 	"zion-english/internal/database/queries"
-	"zion-english/internal/notifications"
 	"zion-english/internal/utils"
 )
 
@@ -150,8 +149,6 @@ func handleScheduleRepeatConfirm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("created repeating series with %d classes for student id %d (teacher id %d)", len(createdIDs), base.StudentID, base.TeacherID))
-	notifyCrossParty(ctx, user, base.TeacherID, teacherNameByID(ctx, base.TeacherID), notifications.KindScheduleChanged,
-		fmt.Sprintf("Created %d scheduled classes", len(createdIDs)))
 
 	dateLabels := make([]string, 0, len(dates))
 	for _, date := range dates {

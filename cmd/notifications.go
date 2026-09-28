@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"strconv"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/database/queries"
@@ -42,7 +41,8 @@ func handleNotifications(w http.ResponseWriter, r *http.Request) {
 		HttpError(w, fmt.Sprintf("Failed to load notifications: %v", err), http.StatusInternalServerError)
 		return
 	}
-	fromOptions := notificationFromOptions(allRows)
+	avatarByFromName := notificationFromAvatars(ctx, allRows)
+	fromOptions := notificationFromOptions(allRows, avatarByFromName)
 	filtered := filterNotificationRows(allRows, filters)
 	page.Total = int64(len(filtered))
 	sortNotificationRows(filtered, sort)
@@ -51,7 +51,7 @@ func handleNotifications(w http.ResponseWriter, r *http.Request) {
 	params := notificationFilterParams(unreadOnly, filters, sort)
 	filterPath := utils.URL("/notifications")
 	data := frontend.NotificationListData{
-		Items:          notificationItems(rows),
+		Items:          notificationItems(rows, avatarByFromName),
 		UnreadOnly:     unreadOnly,
 		MessageFilter:  filters.Message,
 		FromFilter:     filters.From,
@@ -125,7 +125,8 @@ func handleNotificationRead(w http.ResponseWriter, r *http.Request, id int64) {
 			return
 		}
 		writeHTML(w)
-		item := notificationItems([]queries.TblNotification{row})[0]
+		avatars := notificationFromAvatars(ctx, []queries.TblNotification{row})
+		item := notificationItems([]queries.TblNotification{row}, avatars)[0]
 		if err := frontend.NotificationListRow(item).Render(ctx, w); err != nil {
 			HttpError(w, fmt.Sprintf("Failed to render notification: %v", err), http.StatusInternalServerError)
 		}
@@ -174,8 +175,9 @@ func renderNotificationsPanel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeHTML(w)
+	avatars := notificationFromAvatars(ctx, rows)
 	if err := frontend.NotificationPanel(frontend.NotificationPanelData{
-		Items:       notificationItems(rows),
+		Items:       notificationItems(rows, avatars),
 		UnreadCount: unread,
 	}).Render(ctx, w); err != nil {
 		HttpError(w, fmt.Sprintf("Failed to render notification panel: %v", err), http.StatusInternalServerError)
@@ -190,21 +192,6 @@ func getNotificationForUser(ctx context.Context, user auth.User, id int64) (quer
 		ID:          id,
 		ToTeacherID: user.ID,
 	})
-}
-
-func notificationItems(rows []queries.TblNotification) []frontend.NotificationItem {
-	items := make([]frontend.NotificationItem, 0, len(rows))
-	for _, row := range rows {
-		items = append(items, frontend.NotificationItem{
-			ID:        strconv.FormatInt(row.ID, 10),
-			From:      row.FromName,
-			To:        row.ToName,
-			Message:   row.Message,
-			CreatedAt: formatNotificationCreatedAt(row.CreatedAt),
-			Read:      row.Read == 1,
-		})
-	}
-	return items
 }
 
 func formatNotificationCreatedAt(value string) string {

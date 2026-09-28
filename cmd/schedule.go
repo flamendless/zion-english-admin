@@ -497,9 +497,6 @@ func handleCancelScheduledClass(w http.ResponseWriter, r *http.Request, schedule
 		}
 	}
 
-	notifyCrossParty(ctx, user, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
-		fmt.Sprintf("Scheduled class%s cancelled", formatSeriesScopeSummary(int64(len(targets)), "cancelled")))
-
 	message := "Class cancelled."
 	if len(targets) > 1 {
 		message = fmt.Sprintf("%d classes cancelled.", len(targets))
@@ -668,9 +665,6 @@ func handleDeleteScheduledClass(w http.ResponseWriter, r *http.Request, schedule
 		}
 	}
 
-	notifyCrossParty(ctx, user, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
-		fmt.Sprintf("Scheduled class%s deleted", formatSeriesScopeSummary(int64(len(targets)), "deleted")))
-
 	message := "Scheduled class deleted successfully."
 	if len(targets) > 1 {
 		message = fmt.Sprintf("%d scheduled classes deleted successfully.", len(targets))
@@ -834,8 +828,6 @@ func handleScheduledClassEdit(w http.ResponseWriter, r *http.Request, scheduleID
 				auditAction = fmt.Sprintf("updated %d scheduled classes in series", affected)
 			}
 			insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("%s starting id %d (student id %d)", auditAction, scheduleID, studentID))
-			notifyCrossParty(ctx, user, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
-				fmt.Sprintf("Scheduled class%s updated", formatSeriesScopeSummary(int64(affected), "updated")))
 			respondScheduledClassAction(w, r.FormValue("from"), "Scheduled class updated successfully!")
 			return
 		}
@@ -886,9 +878,6 @@ func handleScheduledClassEdit(w http.ResponseWriter, r *http.Request, scheduleID
 		auditAction = fmt.Sprintf("updated %d scheduled classes in series", len(targets))
 	}
 	insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("%s starting id %d (student id %d)", auditAction, scheduleID, studentID))
-	notifyCrossParty(ctx, user, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
-		fmt.Sprintf("Scheduled class%s updated", formatSeriesScopeSummary(int64(len(targets)), "updated")))
-
 	respondScheduledClassAction(w, r.FormValue("from"), "Scheduled class updated successfully!")
 }
 

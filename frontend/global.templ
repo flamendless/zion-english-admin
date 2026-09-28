@@ -808,17 +808,8 @@ templ GlobalIncludes() {
 			border-color: var(--color-primary-hover);
 		}
 
-		.notifications-toolbar-row {
-			display: flex;
-			flex-wrap: wrap;
-			align-items: flex-end;
-			gap: var(--space-3);
+		.notifications-toolbar {
 			margin-bottom: var(--space-4);
-		}
-
-		.notifications-toolbar-row .list-toolbar {
-			flex: 1 1 20rem;
-			margin-bottom: 0;
 		}
 
 		.notifications-toolbar .notifications-message-group {
@@ -830,13 +821,83 @@ templ GlobalIncludes() {
 			width: 100%;
 		}
 
-		.notifications-toolbar-secondary {
-			flex: 0 0 auto;
+		.notifications-from-group {
+			min-width: 11.5rem;
+			flex: 1 1 11.5rem;
 		}
 
-		.notifications-toolbar-secondary .notification-mark-all-page {
+		.notification-from-filter-trigger {
+			min-height: 2.625rem;
+		}
+
+		.notification-from-summary,
+		.notification-from-option {
+			display: inline-flex;
+			align-items: center;
+			gap: var(--space-2);
+			min-width: 0;
+		}
+
+		.notification-from-option {
+			width: 100%;
+			cursor: pointer;
+			font-size: 0.875rem;
+		}
+
+		.notification-from-option input {
+			flex-shrink: 0;
+		}
+
+		.notification-from-summary-label,
+		.notification-from-option-label {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.notification-from-filter-panel {
+			max-height: 16rem;
+			overflow-y: auto;
+		}
+
+		.notifications-toolbar-submit-row {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: flex-end;
+			gap: var(--space-3);
+			flex: 1 1 100%;
+			width: 100%;
+			padding-top: var(--space-3);
+			margin-top: var(--space-1);
+			border-top: 1px solid var(--color-border-subtle);
+		}
+
+		.notifications-mark-all-group {
+			flex: 0 0 auto;
+			min-width: auto;
+		}
+
+		.notifications-mark-all-group label {
+			visibility: hidden;
+		}
+
+		.notifications-toolbar-submit-row .list-toolbar-action button,
+		.notifications-mark-all-group .notification-mark-all-page {
 			margin-top: 0;
 			min-height: 2.5rem;
+		}
+
+		.notification-item-from .teacher-name-cell {
+			font-size: inherit;
+			color: inherit;
+		}
+
+		.notification-item-from .teacher-name-cell-text {
+			font-weight: 400;
+		}
+
+		.notification-table .teacher-name-cell-text {
+			font-weight: 500;
 		}
 
 		.notification-panel-list {
@@ -4405,20 +4466,18 @@ templ GlobalIncludes() {
 				display: none;
 			}
 
-			.notifications-toolbar-row {
+			.notifications-toolbar-submit-row {
 				flex-direction: column;
 				align-items: stretch;
 			}
 
-			.notifications-toolbar-row .list-toolbar {
-				flex: 1 1 100%;
-			}
-
-			.notifications-toolbar-secondary {
+			.notifications-toolbar-submit-row .list-toolbar-action,
+			.notifications-mark-all-group {
 				width: 100%;
 			}
 
-			.notifications-toolbar-secondary .notification-mark-all-page {
+			.notifications-toolbar-submit-row .list-toolbar-action button,
+			.notifications-mark-all-group .notification-mark-all-page {
 				width: 100%;
 				min-height: 44px;
 			}
