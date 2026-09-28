@@ -1,19 +1,29 @@
 ---
-description: Go coding conventions for handlers, errors, naming, and imports
+description: Go coding conventions for handlers, errors, naming, imports, and gofmt
 alwaysApply: true
 ---
 
 # Go Conventions
 
+## Formatting (gofmt)
+
+Hand-written Go must match **`gofmt`** output: tabs for indentation, standard spacing, and import blocks as gofmt lays them out.
+
+- Write new and edited code so **`gofmt` would not change it** (no spaces-for-tabs, no manual column alignment, no trailing whitespace).
+- After substantive Go edits, run **`./run.sh gofmt`** before finishing. It formats tracked `*.go` files and skips generated trees: `internal/database/queries/` (use `./run.sh gensql`) and `frontend/*_templ.go` (use `./run.sh gentempl`).
+- Do not hand-format or fix generated files under those paths; change the source SQL/templ and regenerate.
+- **Imports:** gofmt sorts and groups imports. Match existing files: stdlib and `zion-english/...` in one block, blank line, then third-party (e.g. `go.uber.org`, `golang.org`). Do not insert extra blank lines inside a group.
+
 ## Imports
 
-Stdlib, then third-party, then `zion-english/...`: no blank lines between groups:
+Stdlib and `zion-english/...` in one block (no blank lines inside that block), then a blank line, then third-party imports:
 
 ```go
 import (
 	"context"
 	"errors"
 	"zion-english/internal/auth"
+
 	"github.com/spf13/cobra"
 )
 ```
