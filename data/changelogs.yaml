@@ -9,6 +9,27 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.09.28.3"
+    date: "2026-09-28"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Superusers can turn affiliate ad placements on or off globally from Feature Flags; disabling hides banners on portal pages without changing Ads page configuration."
+        commit: "a91b3f5"
+    improvements:
+      - text: "Browser tab titles stay in sync when you use back or forward navigation across admin pages."
+        commit: "a91b3f5"
+      - text: "Affiliate ad chrome uses updated sizing on class views and public sign-in pages."
+        commit: "2366a61"
+    bug_fixes:
+      - text: "Fixed affiliate ads appearing on login and forgot-password pages when they should be hidden."
+        commit: "8aa9a1f"
+      - text: "Fixed bottom-right persistent panels (overdue classes, background uploads) appearing behind modals and other overlays."
+        commit: "bfc2269"
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
   - version: "2026.09.28.2"
     date: "2026-09-28"
     released: true
