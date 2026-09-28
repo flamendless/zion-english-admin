@@ -9,6 +9,27 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.09.28.2"
+    date: "2026-09-28"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Superusers get Ads/Affiliates reports under Insights with affiliate link click totals, product and ad placement summaries, and charts."
+        commit: "cf93dc0"
+    improvements:
+      - text: "Affiliate ads support separate top and bottom placement zones with improved rotation and loading."
+        commit: "676dafd"
+      - text: "Affiliate ad banners adapt better on mobile and respect visibility rules on small screens."
+        commit: "3611296"
+      - text: "The Notifications page and bell panel show sender avatars and an updated layout."
+        commit: "21f9868"
+    bug_fixes:
+      - text: "Fixed affiliate ad banner height so the chrome does not leave extra empty space."
+        commit: "0b6466d"
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
   - version: "2026.09.28"
     date: "2026-09-28"
     released: true
