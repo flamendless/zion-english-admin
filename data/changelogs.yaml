@@ -9,6 +9,23 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.09.29"
+    date: "2026-09-29"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "My Profile uses tabs for Profile, Security, Integrations, Files, and Notifications. Teachers can turn in-app notification categories on or off from the Notifications tab."
+      - text: "Affiliate CSV imports show a diff against your catalog (new, changed, unchanged, duplicates, and products missing from the file) before save; matching item ids update existing rows and keep click counts."
+      - text: "Analytics adds a Trial classes section with conducted and scheduled trial counts and a weekly conducted-trials chart."
+      - text: "Meta tags support property attributes and public-page scope for Open Graph tags on landing and login (for example og:title and og:image)."
+      - text: "Superusers get an Affiliates guide covering CSV import, manual products, click tracking, and catalog upserts."
+    improvements:
+      - text: "Manual affiliate product saves merge into existing catalog rows when the Shopee item id or product URL matches."
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal: []
   - version: "2026.09.28.3"
     date: "2026-09-28"
     released: true
