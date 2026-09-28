@@ -105,45 +105,30 @@ templ AdPlacementChromeStyles() {
 		.ad-zone--right {
 			position: fixed;
 			top: 4.75rem;
-			bottom: 0;
 			width: 11rem;
+			max-height: calc(100vh - 4.75rem - var(--space-2));
 			z-index: 850;
 			display: flex;
 			flex-direction: column;
+			align-items: stretch;
+			justify-content: flex-start;
 			gap: var(--space-2);
-			overflow: hidden;
+			overflow-x: hidden;
+			overflow-y: auto;
 			padding: var(--space-2) var(--space-1);
 			box-sizing: border-box;
+			scrollbar-width: thin;
 		}
 		.ad-zone--left { left: 0; }
 		.ad-zone--right { right: 0; }
 		.ad-zone--left .affiliate-product-card,
 		.ad-zone--right .affiliate-product-card {
 			width: 100%;
-			flex: 1 1 0;
-			min-height: 0;
-		}
-		.ad-zone--left .affiliate-product-card-image-wrap,
-		.ad-zone--right .affiliate-product-card-image-wrap {
-			flex: 1 1 0;
-			min-height: 0;
-			display: flex;
-			flex-direction: column;
-		}
-		.ad-zone--left .affiliate-product-card-image-link,
-		.ad-zone--right .affiliate-product-card-image-link {
-			flex: 1 1 0;
-			min-height: 0;
-			aspect-ratio: auto;
-			height: 100%;
-		}
-		.ad-zone--left .affiliate-product-card-image,
-		.ad-zone--right .affiliate-product-card-image {
-			object-fit: cover;
+			flex: 0 0 auto;
+			height: auto;
 		}
 		.ad-zone--left .affiliate-product-card-body,
 		.ad-zone--right .affiliate-product-card-body {
-			flex: 0 0 auto;
 			padding: var(--space-2);
 			gap: var(--space-1);
 		}
