@@ -151,15 +151,7 @@ func Login(successMessage string) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<script>\n\t\t\t\tdocument.body.addEventListener('htmx:afterSwap', function(evt) {\n\t\t\t\t\tif (evt.detail.target.id === 'loginError' && evt.detail.target.textContent.trim()) {\n\t\t\t\t\t\tshowErrorBanner(evt.detail.target.textContent.trim());\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t</script>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = LayoutEnd().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<script>\n\t\t\t\tdocument.body.addEventListener('htmx:afterSwap', function(evt) {\n\t\t\t\t\tif (evt.detail.target.id === 'loginError' && evt.detail.target.textContent.trim()) {\n\t\t\t\t\t\tshowErrorBanner(evt.detail.target.textContent.trim());\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

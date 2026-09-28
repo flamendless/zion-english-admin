@@ -69,6 +69,9 @@ func shouldLoadAds(path string) bool {
 	if isLandingPath(path) {
 		return false
 	}
+	if isAuthPath(path) {
+		return false
+	}
 	if strings.Contains(path, "/static/") {
 		return false
 	}
@@ -97,6 +100,22 @@ func isLandingPath(path string) bool {
 		return p == "" || p == "/"
 	}
 	return p == base
+}
+
+func isAuthPath(path string) bool {
+	return strings.HasPrefix(pathWithoutBase(path), "/auth/")
+}
+
+func pathWithoutBase(path string) string {
+	base := strings.TrimSuffix(conf.Conf().BasePath, "/")
+	p := strings.TrimSuffix(path, "/")
+	if base != "" && strings.HasPrefix(p, base) {
+		p = strings.TrimPrefix(p, base)
+	}
+	if p == "" {
+		return "/"
+	}
+	return p
 }
 
 func buildCatalog(rows []queries.GetPublishedAdsWithProductsRow) []CatalogAd {
