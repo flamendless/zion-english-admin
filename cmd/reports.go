@@ -88,12 +88,15 @@ func handleReportsPartial(w http.ResponseWriter, r *http.Request) {
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
 	roleFilters := parseReportRoleFilters(r)
 	sort := parseListSort(r, frontend.ListSortKindReport)
-	rows, err := loadReportRows(r.Context(), startDate, endDate, q, roleFilters)
+	page := utils.ParsePageQuery(r)
+	allRows, err := loadReportRows(r.Context(), startDate, endDate, q, roleFilters)
 	if err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	sortReportRows(rows, sort)
+	sortReportRows(allRows, sort)
+	page.Total = int64(len(allRows))
+	rows := paginateSlice(allRows, page)
 
 	emptyMsg := "No teachers found."
 	hasDateRange := startDate != "" && endDate != ""
@@ -104,11 +107,16 @@ func handleReportsPartial(w http.ResponseWriter, r *http.Request) {
 	summary := frontend.ReportsSummaryData{
 		HasDateRange: hasDateRange,
 		CutoffLabel:  formatReportCutoffLabel(startDate, endDate),
-		Earnings:     aggregateReportEarnings(rows),
+		Earnings:     aggregateReportEarnings(allRows),
 	}
 
+	pagination := frontend.BuildPaginationData(page.Number, page.Size, page.Total)
+	partialsURL := utils.URL("/reports/partials/rows")
+	includeSelector := "#reportsFilters"
+	targetSelector := "#reportsTableBody"
+
 	writeHTML(w)
-	if err := frontend.ReportsPartial(rows, startDate, endDate, emptyMsg, summary).Render(r.Context(), w); err != nil {
+	if err := frontend.ReportsPartial(rows, startDate, endDate, emptyMsg, summary, pagination, partialsURL, includeSelector, targetSelector).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }

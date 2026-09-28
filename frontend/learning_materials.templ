@@ -108,10 +108,10 @@ func learningMaterialSubmitLabel(data LearningMaterialFormData) string {
 
 func learningMaterialDescriptionPreview(desc string) string {
 	desc = strings.TrimSpace(desc)
-	if len(desc) <= 120 {
+	if len(desc) <= 72 {
 		return desc
 	}
-	return desc[:117] + "..."
+	return desc[:69] + "..."
 }
 
 func learningMaterialStatusFilterOptions(show bool) []StatusOption {
@@ -147,11 +147,7 @@ templ LearningMaterials(data LearningMaterialsData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>Learning Library - Zion English Admin</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
+		@AdminPageHead("Learning Library - Zion English Admin")
 		@AvatarStyles()
 		@LearningMaterialsStyles()
 	</head>
@@ -234,14 +230,11 @@ templ LearningMaterials(data LearningMaterialsData) {
 
 templ LearningMaterialCard(item LearningMaterialListItem) {
 	<article class={ learningMaterialCardClass(item.Status) } role="listitem">
-		@LearningMaterialThumbnail(item.ThumbnailURL, item.Title, LearningMaterialThumbSizeDefault)
+		@LearningMaterialThumbnail(item.ThumbnailURL, item.Title, LearningMaterialThumbSizeCard)
 		<h3 class="lm-card-title">{ item.Title }</h3>
-		<p class="lm-card-description">{ learningMaterialDescriptionPreview(item.Description) }</p>
-		<div class="lm-card-url">
-			<a href={ item.URL } class="lm-card-url-text" target="_blank" rel="noopener noreferrer">
-				{ item.URL }
-			</a>
-		</div>
+		if learningMaterialDescriptionPreview(item.Description) != "" {
+			<p class="lm-card-description">{ learningMaterialDescriptionPreview(item.Description) }</p>
+		}
 		<div class="lm-card-badges">
 			@StatusPill(item.PublicationStatus, item.PublicationTone, false)
 			@StatusPill(item.AccessLabel, item.AccessTone, false)
@@ -253,11 +246,15 @@ templ LearningMaterialCard(item LearningMaterialListItem) {
 				}
 			</div>
 		}
+		<div class="lm-card-owner">
+			@TeacherNameCell(item.OwnerName, item.OwnerAvatar)
+		</div>
 		<div class="lm-card-footer">
-			<div class="lm-card-owner">
-				@TeacherNameCell(item.OwnerName, item.OwnerAvatar)
-			</div>
 			<div class="lm-card-actions">
+				@IconActionButton("Copy link", IconKindCopy, templ.Attributes{
+					"data-copy": item.URL,
+					"onclick":   "copyCellText(this)",
+				})
 				@IconActionLinkExternal(item.URL, "Open link", IconKindExternal)
 				@IconActionButton("View", IconKindView, templ.Attributes{
 					"hx-get":    utils.URL("/learning-materials/" + item.ID + "/view"),
@@ -533,14 +530,19 @@ type LearningMaterialThumbSize string
 
 const (
 	LearningMaterialThumbSizeDefault LearningMaterialThumbSize = "default"
+	LearningMaterialThumbSizeCard    LearningMaterialThumbSize = "card"
 	LearningMaterialThumbSizeCompact LearningMaterialThumbSize = "compact"
 )
 
 func learningMaterialThumbClass(size LearningMaterialThumbSize) string {
-	if size == LearningMaterialThumbSizeCompact {
+	switch size {
+	case LearningMaterialThumbSizeCompact:
 		return "lm-thumb lm-thumb--compact"
+	case LearningMaterialThumbSizeCard:
+		return "lm-thumb lm-thumb--card"
+	default:
+		return "lm-thumb"
 	}
-	return "lm-thumb"
 }
 
 templ LearningMaterialThumbnail(thumbnailURL string, title string, size LearningMaterialThumbSize) {
@@ -608,16 +610,17 @@ templ LearningMaterialsStyles() {
 
 		.lm-grid {
 			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-			gap: var(--space-4);
+			grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+			gap: var(--space-3);
 			margin-bottom: var(--space-6);
 		}
 
 		.lm-card {
 			display: flex;
 			flex-direction: column;
-			gap: var(--space-3);
-			padding: var(--space-5);
+			gap: var(--space-2);
+			min-width: 0;
+			padding: var(--space-4);
 			border: 2px solid var(--color-border-subtle);
 			border-radius: var(--radius-lg);
 			background: transparent;
@@ -632,6 +635,10 @@ templ LearningMaterialsStyles() {
 			overflow: hidden;
 			background: linear-gradient(180deg, #F0FDFA 0%, #E6FFFA 100%);
 			border: 1px solid var(--color-border-subtle);
+		}
+
+		.lm-thumb--card {
+			aspect-ratio: 2 / 1;
 		}
 
 		.lm-thumb--compact {
@@ -736,19 +743,9 @@ templ LearningMaterialsStyles() {
 			gap: var(--space-2);
 		}
 
-		.lm-card-footer {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			gap: var(--space-3);
-			margin-top: auto;
-			padding-top: var(--space-3);
-			border-top: 1px solid var(--color-border-subtle);
-		}
-
 		.lm-card-owner {
-			flex: 1;
 			min-width: 0;
+			margin-top: var(--space-1);
 		}
 
 		.lm-card-owner .teacher-name-cell-text {
@@ -757,55 +754,61 @@ templ LearningMaterialsStyles() {
 			color: var(--color-muted-foreground);
 		}
 
+		.lm-card-footer {
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			margin-top: auto;
+			padding-top: var(--space-2);
+			border-top: 1px solid var(--color-border-subtle);
+		}
+
 		.lm-card-actions {
 			display: flex;
 			align-items: center;
 			justify-content: flex-end;
+			flex-wrap: wrap;
 			gap: var(--space-1);
-			flex-shrink: 0;
+			width: 100%;
+		}
+
+		.lm-card-actions [data-tooltip]::after {
+			left: auto;
+			right: 0;
+			transform: none;
 		}
 
 		.lm-card-title {
 			margin: 0;
-			font-size: 1rem;
+			font-size: 0.9375rem;
 			font-weight: 600;
-			line-height: 1.4;
+			line-height: 1.35;
 			color: var(--color-foreground);
-		}
-
-		.lm-card-url {
-			display: flex;
-			align-items: flex-start;
-			gap: var(--space-2);
-			min-width: 0;
-		}
-
-		.lm-card-url-text {
-			flex: 1;
-			min-width: 0;
-			font-size: 0.8125rem;
-			font-family: 'Fira Code', monospace;
-			color: #0D9488;
-			text-decoration: none;
-			line-height: 1.5;
-			overflow-wrap: anywhere;
-			word-break: break-word;
-		}
-
-		.lm-card-url-text:hover {
-			text-decoration: underline;
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 2;
+			overflow: hidden;
 		}
 
 		.lm-card-description {
-			font-size: 0.9375rem;
-			line-height: 1.55;
-			color: var(--color-foreground);
+			margin: 0;
+			font-size: 0.8125rem;
+			line-height: 1.45;
+			color: var(--color-muted-foreground);
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 2;
+			overflow: hidden;
 		}
 
 		.lm-tag-list {
 			display: flex;
 			flex-wrap: wrap;
 			gap: var(--space-2);
+		}
+
+		.lm-card .lm-tag-pill {
+			padding: 3px 8px;
 		}
 
 		.lm-tag-pill {

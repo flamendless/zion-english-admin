@@ -238,11 +238,7 @@ templ TrainingMaterials(data TrainingMaterialsData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>Training Materials - Zion English Admin</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
+		@AdminPageHead("Training Materials - Zion English Admin")
 		@TrainingMaterialsStyles()
 	</head>
 	<body>
@@ -563,11 +559,7 @@ templ TrainingMaterialWatch(data TrainingMaterialWatchData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>{ data.Title } - Training - Zion English Admin</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
+		@AdminPageHead(data.Title + " - Training - Zion English Admin")
 		@TrainingMaterialsStyles()
 	</head>
 	<body>
@@ -619,11 +611,7 @@ templ TrainingMaterialsProgressReport(data TrainingMaterialsProgressData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>Training Progress - Zion English Admin</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
+		@AdminPageHead("Training Progress - Zion English Admin")
 		@AvatarStyles()
 		@TrainingMaterialsStyles()
 	</head>

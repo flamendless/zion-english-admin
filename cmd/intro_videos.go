@@ -183,6 +183,7 @@ func handleIntroVideosPartial(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sort := parseListSort(r, frontend.ListSortKindIntroVideo)
+	page := utils.ParsePageQuery(r)
 
 	var (
 		items          []frontend.IntroVideoItem
@@ -204,7 +205,9 @@ func handleIntroVideosPartial(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		sortIntroVideoRows(rows, sort)
-		items, err = mapAllIntroVideoItems(ctx, rows)
+		page.Total = int64(len(rows))
+		pagedRows := paginateSlice(rows, page)
+		items, err = mapAllIntroVideoItems(ctx, pagedRows)
 		if err != nil {
 			logs.Log().Error("load teacher roles for intro videos", zap.Error(err))
 			HttpError(w, "Failed to load intro videos", http.StatusInternalServerError)
@@ -220,14 +223,21 @@ func handleIntroVideosPartial(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		sortTeacherIntroVideoRows(rows, sort)
-		items = mapIntroVideoItems(rows)
+		page.Total = int64(len(rows))
+		pagedRows := paginateSlice(rows, page)
+		items = mapIntroVideoItems(pagedRows)
 	default:
 		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 
+	pagination := frontend.BuildPaginationData(page.Number, page.Size, page.Total)
+	partialsURL := utils.URL("/intro-videos/partials/rows")
+	includeSelector := "#introVideosToolbar"
+	targetSelector := "#introVideosTableBody"
+
 	writeHTML(w)
-	if err := frontend.IntroVideosTableBody(items, showUploader, showViewAction, showActions, introVideosEmptyMessage(filters, isTeacher)).Render(ctx, w); err != nil {
+	if err := frontend.IntroVideosTablePartial(items, showUploader, showViewAction, showActions, introVideosEmptyMessage(filters, isTeacher), pagination, partialsURL, includeSelector, targetSelector).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }

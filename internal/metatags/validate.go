@@ -32,6 +32,9 @@ func ValidateRequest(req Request) error {
 	if utf8.RuneCountInString(req.Name) > maxNameLen {
 		return ErrInvalidName
 	}
+	if isReservedMetaName(req.Name) {
+		return ErrReservedName
+	}
 	if req.Content == "" && req.Value == "" {
 		return ErrContentOrValueRequired
 	}
@@ -39,4 +42,13 @@ func ValidateRequest(req Request) error {
 		return ErrAttributeTooLong
 	}
 	return nil
+}
+
+func isReservedMetaName(name string) bool {
+	switch strings.ToLower(strings.TrimSpace(name)) {
+	case "title", "viewport":
+		return true
+	default:
+		return false
+	}
 }

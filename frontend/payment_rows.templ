@@ -78,6 +78,9 @@ templ PaymentsTableBody(rows []PaymentRowData, emptyMessage string, showTeacherC
 	}
 }
 
-templ PaymentsPartial(rows []PaymentRowData, emptyMessage string, showTeacherColumn bool) {
+templ PaymentsPartial(rows []PaymentRowData, emptyMessage string, showTeacherColumn bool, page PaginationData, partialsURL string, includeSelector string, targetSelector string) {
 	@PaymentsTableBody(rows, emptyMessage, showTeacherColumn)
+	<div id="paginationBottom" hx-swap-oob={ HxSwapInnerHTML }>
+		@PaginationBarHTMX(partialsURL, includeSelector, targetSelector, page)
+	</div>
 }

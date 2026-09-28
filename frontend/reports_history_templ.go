@@ -31,24 +31,11 @@ func ReportsHistory() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Reports History - Zion English Admin Tool</title><link rel=\"icon\" type=\"image/x-icon\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var2 templ.SafeURL
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 12, Col: 78}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = GlobalIncludes().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = AdminPageHead("Reports History - Zion English Admin Tool").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -56,7 +43,7 @@ func ReportsHistory() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<style>\n\t\t\t.reports-history-filters {\n\t\t\t\tdisplay: contents;\n\t\t\t}\n\n\t\t\t.reports-history-header-actions {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-wrap: wrap;\n\t\t\t\tgap: var(--space-2);\n\t\t\t\talign-items: center;\n\t\t\t\tjustify-content: flex-end;\n\t\t\t\tflex-shrink: 0;\n\t\t\t}\n\n\t\t\t.reports-history-header-actions .btn {\n\t\t\t\tmargin-top: 0;\n\t\t\t\twidth: auto;\n\t\t\t}\n\n\t\t\t.hub-header > .btn,\n\t\t\t.hub-header > a.btn {\n\t\t\t\tmargin-top: 0;\n\t\t\t\twidth: auto;\n\t\t\t\tflex-shrink: 0;\n\t\t\t}\n\t\t</style></head><body><div class=\"container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t.reports-history-filters {\n\t\t\t\tdisplay: contents;\n\t\t\t}\n\n\t\t\t.reports-history-header-actions {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-wrap: wrap;\n\t\t\t\tgap: var(--space-2);\n\t\t\t\talign-items: center;\n\t\t\t\tjustify-content: flex-end;\n\t\t\t\tflex-shrink: 0;\n\t\t\t}\n\n\t\t\t.reports-history-header-actions .btn {\n\t\t\t\tmargin-top: 0;\n\t\t\t\twidth: auto;\n\t\t\t}\n\n\t\t\t.hub-header > .btn,\n\t\t\t.hub-header > a.btn {\n\t\t\t\tmargin-top: 0;\n\t\t\t\twidth: auto;\n\t\t\t\tflex-shrink: 0;\n\t\t\t}\n\t\t</style></head><body><div class=\"container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -68,20 +55,20 @@ func ReportsHistory() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"hub-header\"><h2 class=\"hub-title\">Reports History</h2><div class=\"reports-history-header-actions\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"hub-header\"><h2 class=\"hub-title\">Reports History</h2><div class=\"reports-history-header-actions\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var3 templ.SafeURL
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/reports"))
+		var templ_7745c5c3_Var2 templ.SafeURL
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/reports"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 49, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 45, Col: 36}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"btn btn-secondary\">Back to Reports</a></div></div><div class=\"toolbar\" id=\"reportsHistoryToolbar\"><div id=\"reportsHistoryFilters\" class=\"reports-history-filters\"><div class=\"form-group\"><label for=\"reportHistorySearch\">Search</label> <input type=\"text\" id=\"reportHistorySearch\" name=\"q\" placeholder=\"Search teacher name...\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"btn btn-secondary\">Back to Reports</a></div></div><div class=\"toolbar\" id=\"reportsHistoryToolbar\"><div id=\"reportsHistoryFilters\" class=\"reports-history-filters\"><div class=\"form-group\"><label for=\"reportHistorySearch\">Search</label> <input type=\"text\" id=\"reportHistorySearch\" name=\"q\" placeholder=\"Search teacher name...\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -93,72 +80,72 @@ func ReportsHistory() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<button type=\"button\" id=\"reportHistoryFilterBtn\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<input type=\"hidden\" id=\"reportsHistoryPage\" name=\"page\" value=\"1\"> <button type=\"button\" id=\"reportHistoryFilterBtn\" hx-get=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var3 string
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/history/partials/rows"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 61, Col: 58}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" hx-include=\"#reportsHistoryFilters\" hx-target=\"#reportsHistoryTableBody\" hx-swap=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/history/partials/rows"))
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 64, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 64, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" hx-include=\"#reportsHistoryFilters\" hx-target=\"#reportsHistoryTableBody\" hx-swap=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\">Filter</button></div></div><div class=\"table-wrapper\"><table id=\"reportsHistoryTable\" class=\"table-stack-mobile\"><thead><tr><th>Teacher</th><th>Period</th><th>Records</th><th>Generated at</th><th>Actions</th></tr></thead> <tbody id=\"reportsHistoryTableBody\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/history/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 67, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 82, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\">Filter</button></div></div><div class=\"table-wrapper\"><table id=\"reportsHistoryTable\" class=\"table-stack-mobile\"><thead><tr><th>Teacher</th><th>Period</th><th>Records</th><th>Generated at</th><th>Actions</th></tr></thead> <tbody id=\"reportsHistoryTableBody\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" hx-include=\"#reportsHistoryFilters\" hx-trigger=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/history/partials/rows"))
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 85, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 84, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-include=\"#reportsHistoryFilters\" hx-trigger=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-swap=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 87, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 85, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" hx-swap=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 88, Col: 31}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\"><tr><td colspan=\"5\" class=\"empty-state\">Loading report history...</td></tr></tbody></table></div></div><script>\n\t\t\tconst reportHistorySearch = document.getElementById('reportHistorySearch');\n\n\t\t\tfunction setReportHistoryDateRangeFromPreset(select) {\n\t\t\t\tif (!select) return;\n\t\t\t\tif (!select.value) {\n\t\t\t\t\tdelete select.dataset.startDate;\n\t\t\t\t\tdelete select.dataset.endDate;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst parts = select.value.split('|');\n\t\t\t\tif (parts.length !== 2) return;\n\t\t\t\tselect.dataset.startDate = parts[0];\n\t\t\t\tselect.dataset.endDate = parts[1];\n\t\t\t}\n\n\t\t\tfunction bindReportHistoryDatePresetSelect() {\n\t\t\t\tconst datePresetSelect = document.getElementById('datePreset');\n\t\t\t\tif (!datePresetSelect) return;\n\t\t\t\tsetReportHistoryDateRangeFromPreset(datePresetSelect);\n\t\t\t\tdatePresetSelect.addEventListener('change', () => {\n\t\t\t\t\tsetReportHistoryDateRangeFromPreset(datePresetSelect);\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tbindReportHistoryDatePresetSelect();\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.id !== 'datePresetGroup') return;\n\t\t\t\tbindReportHistoryDatePresetSelect();\n\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\thtmx.trigger('#reportsHistoryTableBody', 'load');\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tif (reportHistorySearch) {\n\t\t\t\treportHistorySearch.addEventListener('keydown', function (e) {\n\t\t\t\t\tif (e.key === 'Enter') {\n\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\t\t\thtmx.trigger('#reportsHistoryTableBody', 'load');\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\t\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\"><tr><td colspan=\"5\" class=\"empty-state\">Loading report history...</td></tr></tbody></table></div><div id=\"paginationBottom\" class=\"pagination-bar\"></div></div><script>\n\t\t\tconst reportHistorySearch = document.getElementById('reportHistorySearch');\n\n\t\t\tfunction setReportHistoryDateRangeFromPreset(select) {\n\t\t\t\tif (!select) return;\n\t\t\t\tif (!select.value) {\n\t\t\t\t\tdelete select.dataset.startDate;\n\t\t\t\t\tdelete select.dataset.endDate;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst parts = select.value.split('|');\n\t\t\t\tif (parts.length !== 2) return;\n\t\t\t\tselect.dataset.startDate = parts[0];\n\t\t\t\tselect.dataset.endDate = parts[1];\n\t\t\t}\n\n\t\t\tfunction bindReportHistoryDatePresetSelect() {\n\t\t\t\tconst datePresetSelect = document.getElementById('datePreset');\n\t\t\t\tif (!datePresetSelect) return;\n\t\t\t\tsetReportHistoryDateRangeFromPreset(datePresetSelect);\n\t\t\t\tdatePresetSelect.addEventListener('change', () => {\n\t\t\t\t\tsetReportHistoryDateRangeFromPreset(datePresetSelect);\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tbindReportHistoryDatePresetSelect();\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.id !== 'datePresetGroup') return;\n\t\t\t\tbindReportHistoryDatePresetSelect();\n\t\t\t\tconst reportsHistoryPage = document.getElementById('reportsHistoryPage');\n\t\t\t\tif (reportsHistoryPage) reportsHistoryPage.value = '1';\n\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\thtmx.trigger('#reportsHistoryTableBody', 'load');\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tconst reportHistoryFilterBtn = document.getElementById('reportHistoryFilterBtn');\n\t\t\tconst reportsHistoryPage = document.getElementById('reportsHistoryPage');\n\t\t\tif (reportHistoryFilterBtn) {\n\t\t\t\treportHistoryFilterBtn.addEventListener('click', function () {\n\t\t\t\t\tif (reportsHistoryPage) reportsHistoryPage.value = '1';\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tif (reportHistorySearch) {\n\t\t\t\treportHistorySearch.addEventListener('keydown', function (e) {\n\t\t\t\t\tif (e.key === 'Enter') {\n\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\tif (reportsHistoryPage) reportsHistoryPage.value = '1';\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\t\t\thtmx.trigger('#reportsHistoryTableBody', 'load');\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tconst pageBtn = e.target.closest('#paginationBottom .pagination-btn[hx-get]');\n\t\t\t\tif (!pageBtn || !reportsHistoryPage) return;\n\t\t\t\tconst vals = pageBtn.getAttribute('hx-vals');\n\t\t\t\tif (!vals) return;\n\t\t\t\ttry {\n\t\t\t\t\tconst parsed = JSON.parse(vals.replace(/'/g, '\"'));\n\t\t\t\t\tif (parsed.page) reportsHistoryPage.value = String(parsed.page);\n\t\t\t\t} catch (err) { /* ignore */ }\n\t\t\t});\n\t\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -166,7 +153,7 @@ func ReportsHistory() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

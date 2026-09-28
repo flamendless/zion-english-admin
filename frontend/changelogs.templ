@@ -1,7 +1,5 @@
 package frontend
 
-import "zion-english/internal/utils"
-
 type ChangelogsData struct {
 	Title          string
 	Subtitle       string
@@ -35,11 +33,7 @@ templ Changelogs(data ChangelogsData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Changelogs - Zion English Admin Tool</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
+		@AdminPageHead("Changelogs - Zion English Admin Tool")
 		<style>
 			.changelogs-hero {
 				margin-bottom: var(--space-6);

@@ -6,11 +6,7 @@ templ Reports() {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Reports - Zion English Admin Tool</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
+		@AdminPageHead("Reports - Zion English Admin Tool")
 		@AvatarStyles()
 		<style>
 			.reports-filters {
@@ -123,6 +119,7 @@ templ Reports() {
 					@DatePreset(true)
 					@ReportRolesFilterDropdown(true, false)
 					@SortControls("earnings", "desc", ListSortKindReport)
+					<input type="hidden" id="reportsPage" name="page" value="1"/>
 					<button
 						type="button"
 						id="filterBtn"
@@ -172,6 +169,8 @@ templ Reports() {
 				</table>
 			</div>
 
+			<div id="paginationBottom" class="pagination-bar"></div>
+
 			<div id="reportViewModalHost"></div>
 			<div id="reportPaymentModalHost"></div>
 		</div>
@@ -206,18 +205,40 @@ templ Reports() {
 			document.body.addEventListener('htmx:afterSwap', function (evt) {
 				if (evt.detail.target.id !== 'datePresetGroup') return;
 				bindDatePresetSelect();
+				const reportsPage = document.getElementById('reportsPage');
+				if (reportsPage) reportsPage.value = '1';
 				if (typeof htmx !== 'undefined') {
 					htmx.trigger('#reportsTableBody', 'load');
 				}
 			});
 
+			const filterBtn = document.getElementById('filterBtn');
+			const reportsPage = document.getElementById('reportsPage');
+			if (filterBtn) {
+				filterBtn.addEventListener('click', function () {
+					if (reportsPage) reportsPage.value = '1';
+				});
+			}
+
 			reportSearch.addEventListener('keydown', function (e) {
 				if (e.key === 'Enter') {
 					e.preventDefault();
+					if (reportsPage) reportsPage.value = '1';
 					if (typeof htmx !== 'undefined') {
 						htmx.trigger('#reportsTableBody', 'load');
 					}
 				}
+			});
+
+			document.body.addEventListener('click', function (e) {
+				const pageBtn = e.target.closest('#paginationBottom .pagination-btn[hx-get]');
+				if (!pageBtn || !reportsPage) return;
+				const vals = pageBtn.getAttribute('hx-vals');
+				if (!vals) return;
+				try {
+					const parsed = JSON.parse(vals.replace(/'/g, '"'));
+					if (parsed.page) reportsPage.value = String(parsed.page);
+				} catch (err) { /* ignore */ }
 			});
 
 			window.syncReportSummaryForm = function (e) {

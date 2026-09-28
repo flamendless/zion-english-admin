@@ -1,7 +1,5 @@
 package frontend
 
-import "zion-english/internal/utils"
-
 type SystemLogData struct {
 	Logs           []SystemLogItem
 	HideCreatedBy  bool
@@ -33,15 +31,11 @@ templ SystemLogs(data SystemLogData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		if data.HideCreatedBy {
-			<title>My Activity - Zion English Admin Tool</title>
+			@AdminPageHead("My Activity - Zion English Admin Tool")
 		} else {
-			<title>Logs - Zion English Admin Tool</title>
+			@AdminPageHead("Logs - Zion English Admin Tool")
 		}
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
 	</head>
 	<body>
 		<div class="container">

@@ -79,11 +79,7 @@ templ AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>Ads/Affiliates Reports - Zion English Admin Tool</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
+		@AdminPageHead("Ads/Affiliates Reports - Zion English Admin Tool")
 		@AvatarStyles()
 		@ScrChartJS()
 		@AffiliateAdsReportsPageStyles()

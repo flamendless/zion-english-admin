@@ -117,9 +117,12 @@ templ ReportsSummaryCards(data ReportsSummaryData) {
 	}
 }
 
-templ ReportsPartial(rows []ReportRowData, startDate string, endDate string, emptyMessage string, summary ReportsSummaryData) {
+templ ReportsPartial(rows []ReportRowData, startDate string, endDate string, emptyMessage string, summary ReportsSummaryData, page PaginationData, partialsURL string, includeSelector string, targetSelector string) {
 	@ReportsTableBody(rows, startDate, endDate, emptyMessage)
 	<div id="reportsSummaryCards" class="dashboard-stats reports-summary" hx-swap-oob={ HxSwapOuterHTML }>
 		@ReportsSummaryCards(summary)
+	</div>
+	<div id="paginationBottom" hx-swap-oob={ HxSwapInnerHTML }>
+		@PaginationBarHTMX(partialsURL, includeSelector, targetSelector, page)
 	</div>
 }

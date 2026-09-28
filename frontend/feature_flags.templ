@@ -25,6 +25,7 @@ type FeatureFlagsData struct {
 	PersistentOnboarding           FeatureFlagBooleanItem
 	IntroVideoUploads              FeatureFlagRoleGatedItem
 	IntroVideoCompressPreset       FeatureFlagSelectItem
+	AdsDisplay                     FeatureFlagBooleanItem
 	Zoom                           FeatureFlagIntegrationItem
 	GoogleCalendar                 FeatureFlagIntegrationItem
 }
@@ -83,11 +84,7 @@ templ FeatureFlags(data FeatureFlagsData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>Feature Flags - Zion English Admin Tool</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
+		@AdminPageHead("Feature Flags - Zion English Admin Tool")
 		<style>
 			.feature-flags-hero {
 				margin-bottom: var(--space-6);
@@ -324,7 +321,7 @@ templ FeatureFlags(data FeatureFlagsData) {
 
 			<div class="feature-flags-hero">
 				<p class="feature-flags-subtitle">
-					Control integration availability, teacher profile features, class overdue timing, and which teacher roles can see each option. Login superuser and admin accounts always see all integrations. Existing connections stay active when connections are disabled.
+					Control integration availability, affiliate ad placements, teacher profile features, class overdue timing, and which teacher roles can see each option. Login superuser and admin accounts always see all integrations. Existing connections stay active when connections are disabled.
 				</p>
 			</div>
 
@@ -339,6 +336,12 @@ templ FeatureFlags(data FeatureFlagsData) {
 						@FeatureFlagBooleanRow(data.PersistentOnboarding)
 						@FeatureFlagRoleGatedRow(data.IntroVideoUploads)
 						@FeatureFlagSelectRow(data.IntroVideoCompressPreset)
+					</div>
+				</section>
+				<section class="feature-flags-section">
+					<h2 class="feature-flags-section-title">Affiliate ads</h2>
+					<div class="integration-list">
+						@FeatureFlagBooleanRow(data.AdsDisplay)
 					</div>
 				</section>
 				<section class="feature-flags-section">

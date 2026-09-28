@@ -134,6 +134,7 @@ func handleDocumentsPartial(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sort := parseListSort(r, frontend.ListSortKindDocument)
+	page := utils.ParsePageQuery(r)
 
 	var (
 		items        []frontend.DocumentItem
@@ -153,7 +154,9 @@ func handleDocumentsPartial(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		sortDocumentRows(rows, sort)
-		items, err = mapAllDocumentItems(ctx, rows)
+		page.Total = int64(len(rows))
+		pagedRows := paginateSlice(rows, page)
+		items, err = mapAllDocumentItems(ctx, pagedRows)
 		if err != nil {
 			logs.Log().Error("load teacher roles for documents", zap.Error(err))
 			HttpError(w, "Failed to load documents", http.StatusInternalServerError)
@@ -168,14 +171,21 @@ func handleDocumentsPartial(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		sortTeacherDocumentRows(rows, sort)
-		items = mapDocumentItems(rows)
+		page.Total = int64(len(rows))
+		pagedRows := paginateSlice(rows, page)
+		items = mapDocumentItems(pagedRows)
 	default:
 		HttpError(w, MsgAccessDenied, http.StatusForbidden)
 		return
 	}
 
+	pagination := frontend.BuildPaginationData(page.Number, page.Size, page.Total)
+	partialsURL := utils.URL("/documents/partials/rows")
+	includeSelector := "#documentsToolbar"
+	targetSelector := "#documentsTableBody"
+
 	writeHTML(w)
-	if err := frontend.DocumentsTableBody(items, showUploader, showActions, documentsEmptyMessage(filters, isTeacher)).Render(ctx, w); err != nil {
+	if err := frontend.DocumentsTablePartial(items, showUploader, showActions, documentsEmptyMessage(filters, isTeacher), pagination, partialsURL, includeSelector, targetSelector).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }

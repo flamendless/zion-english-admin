@@ -102,6 +102,7 @@ templ DocumentsToolbar(showTeacherFilter bool, status constants.TeacherDocumentS
 			@TeacherFilterDropdown("", "")
 		}
 		@SortControls("", "desc", ListSortKindDocument)
+		<input type="hidden" id="documentsPage" name="page" value="1"/>
 		<button
 			type="button"
 			id="documentsFilterBtn"
@@ -168,6 +169,13 @@ templ DocumentsTableBody(items []DocumentItem, showUploader bool, showActions bo
 			@DocumentTableRow(item, showUploader, showActions)
 		}
 	}
+}
+
+templ DocumentsTablePartial(items []DocumentItem, showUploader bool, showActions bool, emptyMessage string, page PaginationData, partialsURL string, includeSelector string, targetSelector string) {
+	@DocumentsTableBody(items, showUploader, showActions, emptyMessage)
+	<div id="paginationBottom" hx-swap-oob={ HxSwapInnerHTML }>
+		@PaginationBarHTMX(partialsURL, includeSelector, targetSelector, page)
+	</div>
 }
 
 templ DocumentsTable(showUploader bool, showActions bool) {
@@ -432,11 +440,7 @@ templ DocumentsPage(data DocumentsPageData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>{ data.Title } - Zion English Admin Tool</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
+		@AdminPageHead(data.Title + " - Zion English Admin Tool")
 		@AvatarStyles()
 		@DocumentsStyles()
 	</head>
@@ -451,21 +455,43 @@ templ DocumentsPage(data DocumentsPageData) {
 			}
 			@DocumentsToolbar(data.ShowTeacherFilter, data.Status)
 			@DocumentsTable(data.ShowUploader, data.ShowActions)
+			<div id="paginationBottom" class="pagination-bar"></div>
 		</div>
 		@SuccessBannerHandlers()
 		@ErrorBannerHandlers()
 		<script>
 			const documentSearch = document.getElementById('documentSearch');
+			const documentsFilterBtn = document.getElementById('documentsFilterBtn');
+			const documentsPage = document.getElementById('documentsPage');
+
+			if (documentsFilterBtn) {
+				documentsFilterBtn.addEventListener('click', function () {
+					if (documentsPage) documentsPage.value = '1';
+				});
+			}
+
 			if (documentSearch) {
 				documentSearch.addEventListener('keydown', function (e) {
 					if (e.key === 'Enter') {
 						e.preventDefault();
+						if (documentsPage) documentsPage.value = '1';
 						if (typeof htmx !== 'undefined') {
 							htmx.trigger('#documentsTableBody', 'load');
 						}
 					}
 				});
 			}
+
+			document.body.addEventListener('click', function (e) {
+				const pageBtn = e.target.closest('#paginationBottom .pagination-btn[hx-get]');
+				if (!pageBtn || !documentsPage) return;
+				const vals = pageBtn.getAttribute('hx-vals');
+				if (!vals) return;
+				try {
+					const parsed = JSON.parse(vals.replace(/'/g, '"'));
+					if (parsed.page) documentsPage.value = String(parsed.page);
+				} catch (err) { /* ignore */ }
+			});
 		</script>
 	@LayoutEnd()
 	</body>

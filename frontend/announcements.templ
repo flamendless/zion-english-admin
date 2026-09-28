@@ -144,11 +144,7 @@ templ Announcements(data AnnouncementListData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>Announcements - Zion English Admin</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
+		@AdminPageHead("Announcements - Zion English Admin")
 		@AnnouncementBannerStyles()
 		@AnnouncementPageStyles()
 	</head>
@@ -229,11 +225,7 @@ templ AnnouncementForm(data AnnouncementFormData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>{ announcementFormTitle(data) } - Zion English Admin</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
+		@AdminPageHead(announcementFormTitle(data) + " - Zion English Admin")
 		@AnnouncementBannerStyles()
 		@AnnouncementPageStyles()
 	</head>

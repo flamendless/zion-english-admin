@@ -86,11 +86,15 @@ func handlePaymentsPartial(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rows, err := loadPaymentRows(r.Context(), paymentsTeacherScope(role, auth.GetUser(r.Context()).ID), startDate, endDate, q, status)
+	page := utils.ParsePageQuery(r)
+
+	allRows, err := loadPaymentRows(r.Context(), paymentsTeacherScope(role, auth.GetUser(r.Context()).ID), startDate, endDate, q, status)
 	if err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	page.Total = int64(len(allRows))
+	rows := paginateSlice(allRows, page)
 
 	emptyMsg := "No payments found."
 	if startDate == "" && endDate == "" && q == "" && status == "" {
@@ -98,9 +102,13 @@ func handlePaymentsPartial(w http.ResponseWriter, r *http.Request) {
 	}
 
 	showTeacherColumn := auth.HasAdminAccess(role)
+	pagination := frontend.BuildPaginationData(page.Number, page.Size, page.Total)
+	partialsURL := utils.URL("/payments/partials/rows")
+	includeSelector := "#paymentsFilters"
+	targetSelector := "#paymentsTableBody"
 
 	writeHTML(w)
-	if err := frontend.PaymentsPartial(rows, emptyMsg, showTeacherColumn).Render(r.Context(), w); err != nil {
+	if err := frontend.PaymentsPartial(rows, emptyMsg, showTeacherColumn, pagination, partialsURL, includeSelector, targetSelector).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }

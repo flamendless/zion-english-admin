@@ -179,6 +179,11 @@ func PersistentOnboardingEnabled(ctx context.Context, db database.Service) bool 
 	return err == nil && enabled
 }
 
+func AdsDisplayEnabled(ctx context.Context, db database.Service) bool {
+	enabled, _, err := GetFlagDefault(ctx, db, constants.FeatureFlagAdsDisplay, true)
+	return err == nil && enabled
+}
+
 func IntroVideoCompressPreset(ctx context.Context, db database.Service) constants.IntroVideoCompressPreset {
 	value := GetStringValue(ctx, db, constants.FeatureFlagIntroVideoCompressPreset, string(constants.DefaultIntroVideoCompressPreset()))
 	if !constants.ValidIntroVideoCompressPreset(value) {

@@ -8,4 +8,5 @@ var (
 	ErrInvalidName            = errors.New("[META] invalid meta name")
 	ErrAttributeTooLong       = errors.New("[META] content or value is too long")
 	ErrDuplicateName          = errors.New("[META] a tag with this name already exists")
+	ErrReservedName           = errors.New("[META] this name is reserved; use each page title instead of a meta tag")
 )

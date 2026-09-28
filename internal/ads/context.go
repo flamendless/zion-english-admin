@@ -7,7 +7,9 @@ import (
 
 	"zion-english/internal/conf"
 	"zion-english/internal/constants"
+	"zion-english/internal/database"
 	"zion-english/internal/database/queries"
+	"zion-english/internal/featureflags"
 )
 
 type contextKey string
@@ -48,19 +50,24 @@ func GetResolvedSlots(ctx context.Context) ResolvedSlots {
 	return slots
 }
 
-func Middleware(db *queries.Queries, next http.Handler) http.Handler {
+func Middleware(db database.Service, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		if !shouldLoadAds(r.URL.Path) {
 			next.ServeHTTP(w, r)
 			return
 		}
-		if suppressAdsForRequest(ctx, r, db) {
+		if !featureflags.AdsDisplayEnabled(ctx, db) {
+			next.ServeHTTP(w, r)
+			return
+		}
+		q := db.GetQueries()
+		if suppressAdsForRequest(ctx, r, q) {
 			next.ServeHTTP(w, r)
 			return
 		}
 
-		ctx = LoadRequestContext(ctx, w, r, db, false)
+		ctx = LoadRequestContext(ctx, w, r, q, false)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

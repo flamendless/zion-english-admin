@@ -1,7 +1,6 @@
 package frontend
 
 import "zion-english/internal/constants"
-import "zion-english/internal/utils"
 
 type UploadLogData struct {
 	Logs           []UploadLogItem
@@ -68,15 +67,11 @@ templ UploadLogs(data UploadLogData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		if data.HideTeacher {
-			<title>My Upload Logs - Zion English Admin Tool</title>
+			@AdminPageHead("My Upload Logs - Zion English Admin Tool")
 		} else {
-			<title>Upload Logs - Zion English Admin Tool</title>
+			@AdminPageHead("Upload Logs - Zion English Admin Tool")
 		}
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
 	</head>
 	<body>
 		<div class="container">

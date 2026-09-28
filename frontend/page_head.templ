@@ -1,0 +1,31 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+templ AdminPageHead(title string) {
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
+	@GlobalIncludes()
+	<title>{ title }</title>
+	@ScrSyncDocumentTitle()
+}
+
+templ ScrSyncDocumentTitle() {
+	<script>
+		(function () {
+			function applyHeadTitle() {
+				var el = document.head.querySelector('title');
+				if (el && el.textContent) {
+					document.title = el.textContent;
+				}
+			}
+			applyHeadTitle();
+			window.addEventListener('pageshow', function (event) {
+				if (event.persisted) {
+					applyHeadTitle();
+				}
+			});
+		})();
+	</script>
+}

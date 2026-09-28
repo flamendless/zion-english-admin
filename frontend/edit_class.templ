@@ -36,15 +36,11 @@ templ EditClass(data EditClassData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		if data.Readonly {
-			<title>View Class - Zion English Admin</title>
+			@AdminPageHead("View Class - Zion English Admin")
 		} else {
-			<title>Edit Class - Zion English Admin</title>
+			@AdminPageHead("Edit Class - Zion English Admin")
 		}
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
 		@ScrTimeRangeJS()
 		@AvatarStyles()
 		@LearningMaterialViewModalStyles()

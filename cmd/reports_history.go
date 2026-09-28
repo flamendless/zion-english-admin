@@ -45,19 +45,27 @@ func handleReportsHistoryPartial(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
-	rows, err := loadReportHistoryRows(r.Context(), startDate, endDate, q)
+	page := utils.ParsePageQuery(r)
+	allRows, err := loadReportHistoryRows(r.Context(), startDate, endDate, q)
 	if err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	page.Total = int64(len(allRows))
+	rows := paginateSlice(allRows, page)
 
 	emptyMsg := "No report generations found."
 	if startDate == "" && endDate == "" && q == "" {
 		emptyMsg = "No reports generated yet."
 	}
 
+	pagination := frontend.BuildPaginationData(page.Number, page.Size, page.Total)
+	partialsURL := utils.URL("/reports/history/partials/rows")
+	includeSelector := "#reportsHistoryFilters"
+	targetSelector := "#reportsHistoryTableBody"
+
 	writeHTML(w)
-	if err := frontend.ReportsHistoryPartial(rows, emptyMsg).Render(r.Context(), w); err != nil {
+	if err := frontend.ReportsHistoryPartial(rows, emptyMsg, pagination, partialsURL, includeSelector, targetSelector).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }

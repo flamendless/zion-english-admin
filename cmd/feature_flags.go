@@ -49,6 +49,7 @@ func handleFeatureFlagsGet(w http.ResponseWriter, r *http.Request) {
 	introVideoEnabled, introVideoVisibleRoles, _ := featureflags.GetFlagDefault(ctx, dbRO, constants.FeatureFlagIntroVideoUploads, false)
 	introVideoCompressPreset := featureflags.IntroVideoCompressPreset(ctx, dbRO)
 	persistentOnboardingEnabled, _, _ := featureflags.GetFlagDefault(ctx, dbRO, constants.FeatureFlagPersistentOnboarding, false)
+	adsDisplayEnabled, _, _ := featureflags.GetFlagDefault(ctx, dbRO, constants.FeatureFlagAdsDisplay, true)
 	roleOptions := constants.AllTeacherRoles()
 	introVideoCompressPresetOptions := make([]frontend.FeatureFlagSelectOption, 0, len(constants.IntroVideoCompressPresetOptions()))
 	for _, preset := range constants.IntroVideoCompressPresetOptions() {
@@ -75,6 +76,13 @@ func handleFeatureFlagsGet(w http.ResponseWriter, r *http.Request) {
 			RoleOptions:   roleOptions,
 			FormFieldName: "intro_video_uploads_enabled",
 			FormPrefix:    "intro_video",
+		},
+		AdsDisplay: frontend.FeatureFlagBooleanItem{
+			Name:          "Show affiliate ad placements",
+			Description:   "When disabled, published ad placements are hidden on all portal pages. Ad configuration on the Ads page is unchanged.",
+			Enabled:       adsDisplayEnabled,
+			FormFieldName: "ads_display_enabled",
+			ToggleLabel:   "Enabled",
 		},
 		IntroVideoCompressPreset: frontend.FeatureFlagSelectItem{
 			Name:          "Intro video compression",
@@ -134,6 +142,7 @@ func handleFeatureFlagsUpdate(w http.ResponseWriter, r *http.Request) {
 	googleEnabled := r.FormValue("google_calendar_enabled") == "on"
 	introVideoEnabled := r.FormValue("intro_video_uploads_enabled") == "on"
 	persistentOnboardingEnabled := r.FormValue("persistent_onboarding_enabled") == "on"
+	adsDisplayEnabled := r.FormValue("ads_display_enabled") == "on"
 
 	zoomRoles, err := parseFeatureFlagRolesFromForm(r, "zoom")
 	if err != nil {
@@ -159,6 +168,7 @@ func handleFeatureFlagsUpdate(w http.ResponseWriter, r *http.Request) {
 	prevIntroVideoEnabled, prevIntroVideoRoles, _ := featureflags.GetFlagDefault(ctx, dbRO, constants.FeatureFlagIntroVideoUploads, false)
 	prevIntroVideoCompressPreset := featureflags.IntroVideoCompressPreset(ctx, dbRO)
 	prevPersistentOnboardingEnabled, _, _ := featureflags.GetFlagDefault(ctx, dbRO, constants.FeatureFlagPersistentOnboarding, false)
+	prevAdsDisplayEnabled, _, _ := featureflags.GetFlagDefault(ctx, dbRO, constants.FeatureFlagAdsDisplay, true)
 	prevGracePeriod := classOverdueGracePeriodMinutes(ctx)
 
 	gracePeriod, err := parseClassOverdueGracePeriodFromForm(r)
@@ -192,6 +202,11 @@ func handleFeatureFlagsUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := featureflags.SetFlag(ctx, dbRW, constants.FeatureFlagPersistentOnboarding, persistentOnboardingEnabled, featureflags.DefaultVisibleRoles()); err != nil {
 		setErrorFlash(w, fmt.Sprintf("Failed to update persistent onboarding flag: %v", err))
+		HttpRedirect(w, r, "/feature-flags")
+		return
+	}
+	if err := featureflags.SetFlag(ctx, dbRW, constants.FeatureFlagAdsDisplay, adsDisplayEnabled, featureflags.DefaultVisibleRoles()); err != nil {
+		setErrorFlash(w, fmt.Sprintf("Failed to update affiliate ad placements flag: %v", err))
 		HttpRedirect(w, r, "/feature-flags")
 		return
 	}
@@ -242,6 +257,13 @@ func handleFeatureFlagsUpdate(w http.ResponseWriter, r *http.Request) {
 			insertAuditLogAs(ctx, user, "feature-flags", "enabled persistent onboarding")
 		} else {
 			insertAuditLogAs(ctx, user, "feature-flags", "disabled persistent onboarding")
+		}
+	}
+	if prevAdsDisplayEnabled != adsDisplayEnabled {
+		if adsDisplayEnabled {
+			insertAuditLogAs(ctx, user, "feature-flags", "enabled affiliate ad placements")
+		} else {
+			insertAuditLogAs(ctx, user, "feature-flags", "disabled affiliate ad placements")
 		}
 	}
 	if prevGracePeriod != gracePeriod {

@@ -10,15 +10,11 @@ templ Payments(data PaymentsData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		if data.ShowTeacherColumn {
-			<title>Payment History - Zion English Admin Tool</title>
+			@AdminPageHead("Payment History - Zion English Admin Tool")
 		} else {
-			<title>My Payment History - Zion English Admin Tool</title>
+			@AdminPageHead("My Payment History - Zion English Admin Tool")
 		}
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
 		@AvatarStyles()
 		<style>
 			.payments-filters {
@@ -62,6 +58,7 @@ templ Payments(data PaymentsData) {
 							}
 						</select>
 					</div>
+					<input type="hidden" id="paymentsPage" name="page" value="1"/>
 					<button
 						type="button"
 						id="paymentFilterBtn"
@@ -104,6 +101,8 @@ templ Payments(data PaymentsData) {
 					</tbody>
 				</table>
 			</div>
+
+			<div id="paginationBottom" class="pagination-bar"></div>
 
 			<div id="paymentReceiptModalHost"></div>
 		</div>
@@ -171,21 +170,43 @@ templ Payments(data PaymentsData) {
 			document.body.addEventListener('htmx:afterSwap', function (evt) {
 				if (evt.detail.target.id !== 'datePresetGroup') return;
 				bindPaymentDatePresetSelect();
+				const paymentsPage = document.getElementById('paymentsPage');
+				if (paymentsPage) paymentsPage.value = '1';
 				if (typeof htmx !== 'undefined') {
 					htmx.trigger('#paymentsTableBody', 'load');
 				}
 			});
 
+			const paymentFilterBtn = document.getElementById('paymentFilterBtn');
+			const paymentsPage = document.getElementById('paymentsPage');
+			if (paymentFilterBtn) {
+				paymentFilterBtn.addEventListener('click', function () {
+					if (paymentsPage) paymentsPage.value = '1';
+				});
+			}
+
 			if (paymentSearch) {
 				paymentSearch.addEventListener('keydown', function (e) {
 					if (e.key === 'Enter') {
 						e.preventDefault();
+						if (paymentsPage) paymentsPage.value = '1';
 						if (typeof htmx !== 'undefined') {
 							htmx.trigger('#paymentsTableBody', 'load');
 						}
 					}
 				});
 			}
+
+			document.body.addEventListener('click', function (e) {
+				const pageBtn = e.target.closest('#paginationBottom .pagination-btn[hx-get]');
+				if (!pageBtn || !paymentsPage) return;
+				const vals = pageBtn.getAttribute('hx-vals');
+				if (!vals) return;
+				try {
+					const parsed = JSON.parse(vals.replace(/'/g, '"'));
+					if (parsed.page) paymentsPage.value = String(parsed.page);
+				} catch (err) { /* ignore */ }
+			});
 		</script>
 	@LayoutEnd()
 	</body>

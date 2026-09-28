@@ -6,11 +6,7 @@ templ ReportsHistory() {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Reports History - Zion English Admin Tool</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
+		@AdminPageHead("Reports History - Zion English Admin Tool")
 		@AvatarStyles()
 		<style>
 			.reports-history-filters {
@@ -58,6 +54,7 @@ templ ReportsHistory() {
 					</div>
 					@MonthPicker("reportHistoryMonth", utils.URL("/reports/history/partials/date-preset"))
 					@DatePreset(true)
+					<input type="hidden" id="reportsHistoryPage" name="page" value="1"/>
 					<button
 						type="button"
 						id="reportHistoryFilterBtn"
@@ -93,6 +90,8 @@ templ ReportsHistory() {
 					</tbody>
 				</table>
 			</div>
+
+			<div id="paginationBottom" class="pagination-bar"></div>
 		</div>
 
 		<script>
@@ -125,21 +124,43 @@ templ ReportsHistory() {
 			document.body.addEventListener('htmx:afterSwap', function (evt) {
 				if (evt.detail.target.id !== 'datePresetGroup') return;
 				bindReportHistoryDatePresetSelect();
+				const reportsHistoryPage = document.getElementById('reportsHistoryPage');
+				if (reportsHistoryPage) reportsHistoryPage.value = '1';
 				if (typeof htmx !== 'undefined') {
 					htmx.trigger('#reportsHistoryTableBody', 'load');
 				}
 			});
 
+			const reportHistoryFilterBtn = document.getElementById('reportHistoryFilterBtn');
+			const reportsHistoryPage = document.getElementById('reportsHistoryPage');
+			if (reportHistoryFilterBtn) {
+				reportHistoryFilterBtn.addEventListener('click', function () {
+					if (reportsHistoryPage) reportsHistoryPage.value = '1';
+				});
+			}
+
 			if (reportHistorySearch) {
 				reportHistorySearch.addEventListener('keydown', function (e) {
 					if (e.key === 'Enter') {
 						e.preventDefault();
+						if (reportsHistoryPage) reportsHistoryPage.value = '1';
 						if (typeof htmx !== 'undefined') {
 							htmx.trigger('#reportsHistoryTableBody', 'load');
 						}
 					}
 				});
 			}
+
+			document.body.addEventListener('click', function (e) {
+				const pageBtn = e.target.closest('#paginationBottom .pagination-btn[hx-get]');
+				if (!pageBtn || !reportsHistoryPage) return;
+				const vals = pageBtn.getAttribute('hx-vals');
+				if (!vals) return;
+				try {
+					const parsed = JSON.parse(vals.replace(/'/g, '"'));
+					if (parsed.page) reportsHistoryPage.value = String(parsed.page);
+				} catch (err) { /* ignore */ }
+			});
 		</script>
 	@LayoutEnd()
 	</body>

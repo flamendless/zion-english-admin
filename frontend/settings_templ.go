@@ -73,41 +73,15 @@ func Settings(data SettingsData) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(data.Title)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 51, Col: 21}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+		templ_7745c5c3_Err = AdminPageHead(data.Title+" - Zion English Admin Tool").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " - Zion English Admin Tool</title><link rel=\"icon\" href=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var3 templ.SafeURL
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 52, Col: 58}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = GlobalIncludes().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<style>\n\t\t\t.settings-layout {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\tgap: var(--space-5);\n\t\t\t\tmax-width: 56rem;\n\t\t\t}\n\n\t\t\t.settings-panel {\n\t\t\t\tbackground: var(--color-surface);\n\t\t\t\tborder: 1px solid var(--color-border);\n\t\t\t\tborder-radius: var(--radius-lg);\n\t\t\t\tbox-shadow: var(--shadow-sm, 0 1px 2px rgba(15, 23, 42, 0.05));\n\t\t\t}\n\n\t\t\t.settings-panel-header {\n\t\t\t\tpadding: var(--space-4) var(--space-5);\n\t\t\t\tborder-bottom: 1px solid var(--color-border-subtle);\n\t\t\t\tbackground: linear-gradient(180deg, var(--color-primary-light) 0%, var(--color-surface) 100%);\n\t\t\t}\n\n\t\t\t.settings-section-title {\n\t\t\t\tmargin: 0;\n\t\t\t\tfont-size: 1rem;\n\t\t\t\tfont-weight: 600;\n\t\t\t\tcolor: var(--color-foreground, #0f172a);\n\t\t\t}\n\n\t\t\t.settings-section-meta {\n\t\t\t\tmargin: var(--space-1) 0 0;\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t}\n\n\t\t\t.settings-fields {\n\t\t\t\tmargin: 0;\n\t\t\t\tpadding: 0;\n\t\t\t}\n\n\t\t\t.settings-field-row {\n\t\t\t\tdisplay: grid;\n\t\t\t\tgrid-template-columns: minmax(0, 11rem) minmax(0, 1fr);\n\t\t\t\tgap: var(--space-3) var(--space-4);\n\t\t\t\tpadding: var(--space-4) var(--space-5);\n\t\t\t\tborder-bottom: 1px solid var(--color-border-subtle);\n\t\t\t\talign-items: start;\n\t\t\t}\n\n\t\t\t.settings-field-row:last-child {\n\t\t\t\tborder-bottom: none;\n\t\t\t}\n\n\t\t\t.settings-field-label {\n\t\t\t\tmargin: 0;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t\tfont-weight: 500;\n\t\t\t\tline-height: 1.4;\n\t\t\t}\n\n\t\t\t.settings-field-env {\n\t\t\t\tdisplay: inline-block;\n\t\t\t\tmargin-top: var(--space-1);\n\t\t\t\tpadding: 0.1rem 0.4rem;\n\t\t\t\tborder-radius: var(--radius-sm);\n\t\t\t\tborder: var(--pill-border);\n\t\t\t\tbackground: var(--color-muted);\n\t\t\t\tfont-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;\n\t\t\t\tfont-size: 0.6875rem;\n\t\t\t\tfont-weight: 500;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tline-height: 1.4;\n\t\t\t}\n\n\t\t\t.settings-field-value {\n\t\t\t\tmargin: 0;\n\t\t\t\tcolor: var(--color-foreground, #0f172a);\n\t\t\t\tfont-size: 0.875rem;\n\t\t\t\tline-height: 1.5;\n\t\t\t\tword-break: break-word;\n\t\t\t}\n\n\t\t\t.settings-field-value-mono {\n\t\t\t\tfont-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t}\n\n\t\t\t.settings-value-box {\n\t\t\t\tdisplay: block;\n\t\t\t\tpadding: var(--space-2) var(--space-3);\n\t\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\t\tborder-radius: var(--radius-md);\n\t\t\t\tbackground: var(--color-muted);\n\t\t\t\tword-break: break-all;\n\t\t\t}\n\n\t\t\t.settings-sensitive-wrap {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: flex-start;\n\t\t\t\tjustify-content: space-between;\n\t\t\t\tgap: var(--space-3);\n\t\t\t}\n\n\t\t\t.settings-sensitive-value {\n\t\t\t\tflex: 1 1 auto;\n\t\t\t\tmin-width: 0;\n\t\t\t}\n\n\t\t\t.settings-sensitive-actions {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: center;\n\t\t\t\tflex-shrink: 0;\n\t\t\t}\n\n\t\t\t.settings-sensitive-actions .icon-action-btn {\n\t\t\t\tmargin-top: 0;\n\t\t\t}\n\n\t\t\t.settings-sensitive-actions [data-tooltip]::after {\n\t\t\t\tleft: auto;\n\t\t\t\tright: 0;\n\t\t\t\ttransform: none;\n\t\t\t}\n\n\t\t\t.settings-integration-value {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\tgap: var(--space-2);\n\t\t\t}\n\n\t\t\t.settings-integration-detail {\n\t\t\t\tmargin: 0;\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t}\n\n\t\t\t.settings-revealed-value {\n\t\t\t\tmargin: 0;\n\t\t\t\tpadding: var(--space-2) var(--space-3);\n\t\t\t\tborder: 1px solid var(--color-success);\n\t\t\t\tborder-radius: var(--radius-md);\n\t\t\t\tbackground: var(--color-success-bg);\n\t\t\t\tfont-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t\tword-break: break-all;\n\t\t\t}\n\n\t\t\t.settings-revealed-note {\n\t\t\t\tmargin: var(--space-2) 0 0;\n\t\t\t\tfont-size: 0.75rem;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t}\n\n\t\t\t.settings-reveal-error {\n\t\t\t\tmargin: 0;\n\t\t\t\tpadding: var(--space-2) var(--space-3);\n\t\t\t\tborder: 1px solid var(--color-destructive);\n\t\t\t\tborder-radius: var(--radius-md);\n\t\t\t\tbackground: rgba(239, 68, 68, 0.08);\n\t\t\t\tcolor: var(--color-destructive);\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t}\n\n\t\t\t.settings-reveal-lead {\n\t\t\t\tmargin: 0 0 var(--space-4);\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tfont-size: 0.875rem;\n\t\t\t\tline-height: 1.5;\n\t\t\t}\n\n\t\t\t.settings-reveal-field-name {\n\t\t\t\tfont-weight: 600;\n\t\t\t\tcolor: var(--color-foreground, #0f172a);\n\t\t\t}\n\n\t\t\t.settings-reveal-form .form-group {\n\t\t\t\tmargin-bottom: var(--space-4);\n\t\t\t}\n\n\t\t\t.settings-reveal-form label {\n\t\t\t\tdisplay: block;\n\t\t\t\tmargin-bottom: var(--space-2);\n\t\t\t\tfont-size: 0.875rem;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.settings-reveal-form input[type=\"password\"] {\n\t\t\t\twidth: 100%;\n\t\t\t\tmargin-top: 0;\n\t\t\t\tbox-sizing: border-box;\n\t\t\t}\n\n\t\t\t.modal-dialog-settings-reveal {\n\t\t\t\twidth: min(100%, 28rem);\n\t\t\t}\n\n\t\t\t@media (max-width: 640px) {\n\t\t\t\t.settings-field-row {\n\t\t\t\t\tgrid-template-columns: 1fr;\n\t\t\t\t\tgap: var(--space-2);\n\t\t\t\t}\n\t\t\t}\n\t\t</style></head><body><div class=\"container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t.settings-layout {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\tgap: var(--space-5);\n\t\t\t\tmax-width: 56rem;\n\t\t\t}\n\n\t\t\t.settings-panel {\n\t\t\t\tbackground: var(--color-surface);\n\t\t\t\tborder: 1px solid var(--color-border);\n\t\t\t\tborder-radius: var(--radius-lg);\n\t\t\t\tbox-shadow: var(--shadow-sm, 0 1px 2px rgba(15, 23, 42, 0.05));\n\t\t\t}\n\n\t\t\t.settings-panel-header {\n\t\t\t\tpadding: var(--space-4) var(--space-5);\n\t\t\t\tborder-bottom: 1px solid var(--color-border-subtle);\n\t\t\t\tbackground: linear-gradient(180deg, var(--color-primary-light) 0%, var(--color-surface) 100%);\n\t\t\t}\n\n\t\t\t.settings-section-title {\n\t\t\t\tmargin: 0;\n\t\t\t\tfont-size: 1rem;\n\t\t\t\tfont-weight: 600;\n\t\t\t\tcolor: var(--color-foreground, #0f172a);\n\t\t\t}\n\n\t\t\t.settings-section-meta {\n\t\t\t\tmargin: var(--space-1) 0 0;\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t}\n\n\t\t\t.settings-fields {\n\t\t\t\tmargin: 0;\n\t\t\t\tpadding: 0;\n\t\t\t}\n\n\t\t\t.settings-field-row {\n\t\t\t\tdisplay: grid;\n\t\t\t\tgrid-template-columns: minmax(0, 11rem) minmax(0, 1fr);\n\t\t\t\tgap: var(--space-3) var(--space-4);\n\t\t\t\tpadding: var(--space-4) var(--space-5);\n\t\t\t\tborder-bottom: 1px solid var(--color-border-subtle);\n\t\t\t\talign-items: start;\n\t\t\t}\n\n\t\t\t.settings-field-row:last-child {\n\t\t\t\tborder-bottom: none;\n\t\t\t}\n\n\t\t\t.settings-field-label {\n\t\t\t\tmargin: 0;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t\tfont-weight: 500;\n\t\t\t\tline-height: 1.4;\n\t\t\t}\n\n\t\t\t.settings-field-env {\n\t\t\t\tdisplay: inline-block;\n\t\t\t\tmargin-top: var(--space-1);\n\t\t\t\tpadding: 0.1rem 0.4rem;\n\t\t\t\tborder-radius: var(--radius-sm);\n\t\t\t\tborder: var(--pill-border);\n\t\t\t\tbackground: var(--color-muted);\n\t\t\t\tfont-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;\n\t\t\t\tfont-size: 0.6875rem;\n\t\t\t\tfont-weight: 500;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tline-height: 1.4;\n\t\t\t}\n\n\t\t\t.settings-field-value {\n\t\t\t\tmargin: 0;\n\t\t\t\tcolor: var(--color-foreground, #0f172a);\n\t\t\t\tfont-size: 0.875rem;\n\t\t\t\tline-height: 1.5;\n\t\t\t\tword-break: break-word;\n\t\t\t}\n\n\t\t\t.settings-field-value-mono {\n\t\t\t\tfont-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t}\n\n\t\t\t.settings-value-box {\n\t\t\t\tdisplay: block;\n\t\t\t\tpadding: var(--space-2) var(--space-3);\n\t\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\t\tborder-radius: var(--radius-md);\n\t\t\t\tbackground: var(--color-muted);\n\t\t\t\tword-break: break-all;\n\t\t\t}\n\n\t\t\t.settings-sensitive-wrap {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: flex-start;\n\t\t\t\tjustify-content: space-between;\n\t\t\t\tgap: var(--space-3);\n\t\t\t}\n\n\t\t\t.settings-sensitive-value {\n\t\t\t\tflex: 1 1 auto;\n\t\t\t\tmin-width: 0;\n\t\t\t}\n\n\t\t\t.settings-sensitive-actions {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: center;\n\t\t\t\tflex-shrink: 0;\n\t\t\t}\n\n\t\t\t.settings-sensitive-actions .icon-action-btn {\n\t\t\t\tmargin-top: 0;\n\t\t\t}\n\n\t\t\t.settings-sensitive-actions [data-tooltip]::after {\n\t\t\t\tleft: auto;\n\t\t\t\tright: 0;\n\t\t\t\ttransform: none;\n\t\t\t}\n\n\t\t\t.settings-integration-value {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\tgap: var(--space-2);\n\t\t\t}\n\n\t\t\t.settings-integration-detail {\n\t\t\t\tmargin: 0;\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t}\n\n\t\t\t.settings-revealed-value {\n\t\t\t\tmargin: 0;\n\t\t\t\tpadding: var(--space-2) var(--space-3);\n\t\t\t\tborder: 1px solid var(--color-success);\n\t\t\t\tborder-radius: var(--radius-md);\n\t\t\t\tbackground: var(--color-success-bg);\n\t\t\t\tfont-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t\tword-break: break-all;\n\t\t\t}\n\n\t\t\t.settings-revealed-note {\n\t\t\t\tmargin: var(--space-2) 0 0;\n\t\t\t\tfont-size: 0.75rem;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t}\n\n\t\t\t.settings-reveal-error {\n\t\t\t\tmargin: 0;\n\t\t\t\tpadding: var(--space-2) var(--space-3);\n\t\t\t\tborder: 1px solid var(--color-destructive);\n\t\t\t\tborder-radius: var(--radius-md);\n\t\t\t\tbackground: rgba(239, 68, 68, 0.08);\n\t\t\t\tcolor: var(--color-destructive);\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t}\n\n\t\t\t.settings-reveal-lead {\n\t\t\t\tmargin: 0 0 var(--space-4);\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tfont-size: 0.875rem;\n\t\t\t\tline-height: 1.5;\n\t\t\t}\n\n\t\t\t.settings-reveal-field-name {\n\t\t\t\tfont-weight: 600;\n\t\t\t\tcolor: var(--color-foreground, #0f172a);\n\t\t\t}\n\n\t\t\t.settings-reveal-form .form-group {\n\t\t\t\tmargin-bottom: var(--space-4);\n\t\t\t}\n\n\t\t\t.settings-reveal-form label {\n\t\t\t\tdisplay: block;\n\t\t\t\tmargin-bottom: var(--space-2);\n\t\t\t\tfont-size: 0.875rem;\n\t\t\t\tfont-weight: 500;\n\t\t\t}\n\n\t\t\t.settings-reveal-form input[type=\"password\"] {\n\t\t\t\twidth: 100%;\n\t\t\t\tmargin-top: 0;\n\t\t\t\tbox-sizing: border-box;\n\t\t\t}\n\n\t\t\t.modal-dialog-settings-reveal {\n\t\t\t\twidth: min(100%, 28rem);\n\t\t\t}\n\n\t\t\t@media (max-width: 640px) {\n\t\t\t\t.settings-field-row {\n\t\t\t\t\tgrid-template-columns: 1fr;\n\t\t\t\t\tgap: var(--space-2);\n\t\t\t\t}\n\t\t\t}\n\t\t</style></head><body><div class=\"container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -119,97 +93,97 @@ func Settings(data SettingsData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"settings-layout\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"settings-layout\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, section := range data.Sections {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<section class=\"settings-panel\"><div class=\"settings-panel-header\"><h2 class=\"settings-section-title\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<section class=\"settings-panel\"><div class=\"settings-panel-header\"><h2 class=\"settings-section-title\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(section.Title)
+			var templ_7745c5c3_Var2 string
+			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(section.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 267, Col: 57}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 265, Col: 57}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</h2><p class=\"settings-section-meta\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var5 string
-			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(len(section.Fields))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 268, Col: 61}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</h2><p class=\"settings-section-meta\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, " fields</p></div><dl class=\"settings-fields\">")
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(len(section.Fields))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 266, Col: 61}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, " fields</p></div><dl class=\"settings-fields\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, field := range section.Fields {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"settings-field-row\"><dt class=\"settings-field-label\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"settings-field-row\"><dt class=\"settings-field-label\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var6 string
-				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(field.Label)
+				var templ_7745c5c3_Var4 string
+				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(field.Label)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 274, Col: 23}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 272, Col: 23}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, " ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, " ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if field.EnvKey != "" {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<span class=\"settings-field-env\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<span class=\"settings-field-env\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var7 string
-					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(field.EnvKey)
+					var templ_7745c5c3_Var5 string
+					templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(field.EnvKey)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 276, Col: 58}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 274, Col: 58}
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</span>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</span>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</dt>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</dt>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if field.Sensitive {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<dd class=\"settings-field-value\" id=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<dd class=\"settings-field-value\" id=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var8 string
-					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(settingsFieldValueID(string(field.FieldKey)))
+					var templ_7745c5c3_Var6 string
+					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(settingsFieldValueID(string(field.FieldKey)))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 280, Col: 92}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 278, Col: 92}
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -217,12 +191,12 @@ func Settings(data SettingsData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</dd>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</dd>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				} else if section.Title == "Services and integrations" && (strings.HasPrefix(field.Value, "configured") || strings.HasPrefix(field.Value, "not configured")) {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<dd class=\"settings-field-value settings-integration-value\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<dd class=\"settings-field-value settings-integration-value\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -231,76 +205,76 @@ func Settings(data SettingsData) templ.Component {
 						return templ_7745c5c3_Err
 					}
 					if detail := settingsIntegrationDetail(field.Value); detail != "" {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<p class=\"settings-integration-detail\">")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<p class=\"settings-integration-detail\">")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						var templ_7745c5c3_Var9 string
-						templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(detail)
+						var templ_7745c5c3_Var7 string
+						templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(detail)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 287, Col: 59}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 285, Col: 59}
 						}
-						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</p>")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</p>")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</dd>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</dd>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				} else if field.Monospace {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<dd class=\"settings-field-value settings-field-value-mono\"><span class=\"settings-value-box\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<dd class=\"settings-field-value settings-field-value-mono\"><span class=\"settings-value-box\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var10 string
-					templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(field.Value)
+					var templ_7745c5c3_Var8 string
+					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(field.Value)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 292, Col: 57}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 290, Col: 57}
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</span></dd>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</span></dd>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				} else {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<dd class=\"settings-field-value\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<dd class=\"settings-field-value\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var11 string
-					templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(field.Value)
+					var templ_7745c5c3_Var9 string
+					templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(field.Value)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 295, Col: 56}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 293, Col: 56}
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</dd>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</dd>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</dl></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</dl></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -316,7 +290,7 @@ func Settings(data SettingsData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -340,25 +314,25 @@ func SettingsSensitiveField(field conf.SettingsField) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var12 == nil {
-			templ_7745c5c3_Var12 = templ.NopComponent
+		templ_7745c5c3_Var10 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var10 == nil {
+			templ_7745c5c3_Var10 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<div class=\"settings-sensitive-wrap\"><span class=\"settings-sensitive-value settings-value-box settings-field-value-mono\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<div class=\"settings-sensitive-wrap\"><span class=\"settings-sensitive-value settings-value-box settings-field-value-mono\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var13 string
-		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(field.Value)
+		var templ_7745c5c3_Var11 string
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(field.Value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 314, Col: 99}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 312, Col: 99}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</span><div class=\"settings-sensitive-actions\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</span><div class=\"settings-sensitive-actions\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -371,7 +345,7 @@ func SettingsSensitiveField(field conf.SettingsField) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -395,38 +369,38 @@ func SettingsRevealModal() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var14 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var14 == nil {
-			templ_7745c5c3_Var14 = templ.NopComponent
+		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var12 == nil {
+			templ_7745c5c3_Var12 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<div class=\"modal-overlay\" id=\"settingsRevealModal\" hidden role=\"presentation\"><div class=\"modal-dialog modal-dialog-settings-reveal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"settingsRevealTitle\"><div class=\"modal-header\"><h3 id=\"settingsRevealTitle\">View secret value</h3><button type=\"button\" class=\"modal-close settings-reveal-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><form class=\"settings-reveal-form\" id=\"settingsRevealForm\" hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<div class=\"modal-overlay\" id=\"settingsRevealModal\" hidden role=\"presentation\"><div class=\"modal-dialog modal-dialog-settings-reveal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"settingsRevealTitle\"><div class=\"modal-header\"><h3 id=\"settingsRevealTitle\">View secret value</h3><button type=\"button\" class=\"modal-close settings-reveal-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><form class=\"settings-reveal-form\" id=\"settingsRevealForm\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var15 string
-		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/settings/reveal"))
+		var templ_7745c5c3_Var13 string
+		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/settings/reveal"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 336, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 334, Col: 43}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\" hx-target=\"#settingsRevealFeedback\" hx-swap=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var16 string
-		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 338, Col: 29}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\" hx-target=\"#settingsRevealFeedback\" hx-swap=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "\"><div class=\"modal-body\"><p class=\"settings-reveal-lead\">Enter the superuser password to reveal <span class=\"settings-reveal-field-name\" id=\"settingsRevealFieldName\">this value</span>.</p><input type=\"hidden\" name=\"field\" id=\"settingsRevealFieldKey\" value=\"\"><div class=\"form-group\"><label for=\"settingsRevealPassword\">Superuser password</label> <input type=\"password\" id=\"settingsRevealPassword\" name=\"password\" placeholder=\"Enter superuser password\" autocomplete=\"current-password\" required></div><div id=\"settingsRevealFeedback\" aria-live=\"polite\"></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary settings-reveal-close\">Cancel</button> <button type=\"submit\" class=\"btn\">View value</button></div></form></div></div>")
+		var templ_7745c5c3_Var14 string
+		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 336, Col: 29}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\"><div class=\"modal-body\"><p class=\"settings-reveal-lead\">Enter the superuser password to reveal <span class=\"settings-reveal-field-name\" id=\"settingsRevealFieldName\">this value</span>.</p><input type=\"hidden\" name=\"field\" id=\"settingsRevealFieldKey\" value=\"\"><div class=\"form-group\"><label for=\"settingsRevealPassword\">Superuser password</label> <input type=\"password\" id=\"settingsRevealPassword\" name=\"password\" placeholder=\"Enter superuser password\" autocomplete=\"current-password\" required></div><div id=\"settingsRevealFeedback\" aria-live=\"polite\"></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary settings-reveal-close\">Cancel</button> <button type=\"submit\" class=\"btn\">View value</button></div></form></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -450,25 +424,25 @@ func SettingsRevealedValueInline(value string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var17 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var17 == nil {
-			templ_7745c5c3_Var17 = templ.NopComponent
+		templ_7745c5c3_Var15 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var15 == nil {
+			templ_7745c5c3_Var15 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<p class=\"settings-revealed-value\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<p class=\"settings-revealed-value\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var18 string
-		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(value)
+		var templ_7745c5c3_Var16 string
+		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 369, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 367, Col: 43}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "</p><p class=\"settings-revealed-note\">Refresh the page to mask this value again.</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</p><p class=\"settings-revealed-note\">Refresh the page to mask this value again.</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -492,38 +466,38 @@ func SettingsRevealSuccess(fieldKey string, value string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var19 == nil {
-			templ_7745c5c3_Var19 = templ.NopComponent
+		templ_7745c5c3_Var17 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var17 == nil {
+			templ_7745c5c3_Var17 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<div id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<div id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var20 string
-		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.ResolveAttributeValue(settingsFieldValueID(fieldKey))
+		var templ_7745c5c3_Var18 string
+		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue(settingsFieldValueID(fieldKey))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 374, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 372, Col: 41}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var20)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\" hx-swap-oob=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var21 string
-		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 374, Col: 73}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var21)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "\" hx-swap-oob=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\">")
+		var templ_7745c5c3_Var19 string
+		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 372, Col: 73}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var19)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -531,7 +505,7 @@ func SettingsRevealSuccess(fieldKey string, value string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -555,25 +529,25 @@ func SettingsRevealError(message string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var22 == nil {
-			templ_7745c5c3_Var22 = templ.NopComponent
+		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var20 == nil {
+			templ_7745c5c3_Var20 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<p class=\"settings-reveal-error\" role=\"alert\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<p class=\"settings-reveal-error\" role=\"alert\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var23 string
-		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(message)
+		var templ_7745c5c3_Var21 string
+		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(message)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 380, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/settings.templ`, Line: 378, Col: 56}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -597,12 +571,12 @@ func SettingsRevealScript() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var24 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var24 == nil {
-			templ_7745c5c3_Var24 = templ.NopComponent
+		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var22 == nil {
+			templ_7745c5c3_Var22 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<script>\n\t\t(function () {\n\t\t\tconst modal = document.getElementById('settingsRevealModal');\n\t\t\tconst form = document.getElementById('settingsRevealForm');\n\t\t\tconst fieldKeyInput = document.getElementById('settingsRevealFieldKey');\n\t\t\tconst fieldNameEl = document.getElementById('settingsRevealFieldName');\n\t\t\tconst passwordInput = document.getElementById('settingsRevealPassword');\n\t\t\tconst feedback = document.getElementById('settingsRevealFeedback');\n\t\t\tif (!modal || !form || !fieldKeyInput || !fieldNameEl || !passwordInput || !feedback) return;\n\n\t\t\tlet triggerEl = null;\n\n\t\t\tfunction resetModal() {\n\t\t\t\tform.reset();\n\t\t\t\tfieldKeyInput.value = '';\n\t\t\t\tfieldNameEl.textContent = 'this value';\n\t\t\t\tfeedback.innerHTML = '';\n\t\t\t}\n\n\t\t\tfunction getFocusables() {\n\t\t\t\treturn Array.from(modal.querySelectorAll(\n\t\t\t\t\t'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex=\"-1\"])'\n\t\t\t\t)).filter(function (el) {\n\t\t\t\t\treturn el.offsetParent !== null;\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tfunction trapFocus(e) {\n\t\t\t\tif (modal.hidden || e.key !== 'Tab') return;\n\t\t\t\tconst focusables = getFocusables();\n\t\t\t\tif (!focusables.length) return;\n\t\t\t\tconst first = focusables[0];\n\t\t\t\tconst last = focusables[focusables.length - 1];\n\t\t\t\tif (e.shiftKey && document.activeElement === first) {\n\t\t\t\t\te.preventDefault();\n\t\t\t\t\tlast.focus();\n\t\t\t\t} else if (!e.shiftKey && document.activeElement === last) {\n\t\t\t\t\te.preventDefault();\n\t\t\t\t\tfirst.focus();\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tfunction openModal(trigger) {\n\t\t\t\tconst fieldKey = trigger.getAttribute('data-field-key') || '';\n\t\t\t\tconst fieldLabel = trigger.getAttribute('data-field-label') || 'this value';\n\t\t\t\tconst fieldEnv = trigger.getAttribute('data-field-env') || '';\n\t\t\t\tresetModal();\n\t\t\t\tfieldKeyInput.value = fieldKey;\n\t\t\t\tfieldNameEl.textContent = fieldEnv ? fieldLabel + ' (' + fieldEnv + ')' : fieldLabel;\n\t\t\t\ttriggerEl = trigger;\n\t\t\t\tmodal.hidden = false;\n\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\trequestAnimationFrame(function () {\n\t\t\t\t\tpasswordInput.focus();\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tfunction closeModal() {\n\t\t\t\tmodal.hidden = true;\n\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t\tresetModal();\n\t\t\t\tif (triggerEl && typeof triggerEl.focus === 'function') {\n\t\t\t\t\ttriggerEl.focus();\n\t\t\t\t}\n\t\t\t\ttriggerEl = null;\n\t\t\t}\n\n\t\t\twindow.closeSettingsRevealModal = closeModal;\n\n\t\t\tdocument.addEventListener('click', function (e) {\n\t\t\t\tconst trigger = e.target.closest('[data-settings-reveal]');\n\t\t\t\tif (!trigger) return;\n\t\t\t\te.preventDefault();\n\t\t\t\topenModal(trigger);\n\t\t\t});\n\n\t\t\tmodal.querySelectorAll('.settings-reveal-close').forEach(function (btn) {\n\t\t\t\tbtn.addEventListener('click', closeModal);\n\t\t\t});\n\n\t\t\tmodal.addEventListener('click', function (e) {\n\t\t\t\tif (e.target === modal) closeModal();\n\t\t\t});\n\n\t\t\tdocument.addEventListener('keydown', function (e) {\n\t\t\t\tif (e.key === 'Escape' && !modal.hidden) {\n\t\t\t\t\tcloseModal();\n\t\t\t\t}\n\t\t\t\ttrapFocus(e);\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('settings-revealed', closeModal);\n\t\t})();\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<script>\n\t\t(function () {\n\t\t\tconst modal = document.getElementById('settingsRevealModal');\n\t\t\tconst form = document.getElementById('settingsRevealForm');\n\t\t\tconst fieldKeyInput = document.getElementById('settingsRevealFieldKey');\n\t\t\tconst fieldNameEl = document.getElementById('settingsRevealFieldName');\n\t\t\tconst passwordInput = document.getElementById('settingsRevealPassword');\n\t\t\tconst feedback = document.getElementById('settingsRevealFeedback');\n\t\t\tif (!modal || !form || !fieldKeyInput || !fieldNameEl || !passwordInput || !feedback) return;\n\n\t\t\tlet triggerEl = null;\n\n\t\t\tfunction resetModal() {\n\t\t\t\tform.reset();\n\t\t\t\tfieldKeyInput.value = '';\n\t\t\t\tfieldNameEl.textContent = 'this value';\n\t\t\t\tfeedback.innerHTML = '';\n\t\t\t}\n\n\t\t\tfunction getFocusables() {\n\t\t\t\treturn Array.from(modal.querySelectorAll(\n\t\t\t\t\t'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex=\"-1\"])'\n\t\t\t\t)).filter(function (el) {\n\t\t\t\t\treturn el.offsetParent !== null;\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tfunction trapFocus(e) {\n\t\t\t\tif (modal.hidden || e.key !== 'Tab') return;\n\t\t\t\tconst focusables = getFocusables();\n\t\t\t\tif (!focusables.length) return;\n\t\t\t\tconst first = focusables[0];\n\t\t\t\tconst last = focusables[focusables.length - 1];\n\t\t\t\tif (e.shiftKey && document.activeElement === first) {\n\t\t\t\t\te.preventDefault();\n\t\t\t\t\tlast.focus();\n\t\t\t\t} else if (!e.shiftKey && document.activeElement === last) {\n\t\t\t\t\te.preventDefault();\n\t\t\t\t\tfirst.focus();\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tfunction openModal(trigger) {\n\t\t\t\tconst fieldKey = trigger.getAttribute('data-field-key') || '';\n\t\t\t\tconst fieldLabel = trigger.getAttribute('data-field-label') || 'this value';\n\t\t\t\tconst fieldEnv = trigger.getAttribute('data-field-env') || '';\n\t\t\t\tresetModal();\n\t\t\t\tfieldKeyInput.value = fieldKey;\n\t\t\t\tfieldNameEl.textContent = fieldEnv ? fieldLabel + ' (' + fieldEnv + ')' : fieldLabel;\n\t\t\t\ttriggerEl = trigger;\n\t\t\t\tmodal.hidden = false;\n\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\trequestAnimationFrame(function () {\n\t\t\t\t\tpasswordInput.focus();\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tfunction closeModal() {\n\t\t\t\tmodal.hidden = true;\n\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t\tresetModal();\n\t\t\t\tif (triggerEl && typeof triggerEl.focus === 'function') {\n\t\t\t\t\ttriggerEl.focus();\n\t\t\t\t}\n\t\t\t\ttriggerEl = null;\n\t\t\t}\n\n\t\t\twindow.closeSettingsRevealModal = closeModal;\n\n\t\t\tdocument.addEventListener('click', function (e) {\n\t\t\t\tconst trigger = e.target.closest('[data-settings-reveal]');\n\t\t\t\tif (!trigger) return;\n\t\t\t\te.preventDefault();\n\t\t\t\topenModal(trigger);\n\t\t\t});\n\n\t\t\tmodal.querySelectorAll('.settings-reveal-close').forEach(function (btn) {\n\t\t\t\tbtn.addEventListener('click', closeModal);\n\t\t\t});\n\n\t\t\tmodal.addEventListener('click', function (e) {\n\t\t\t\tif (e.target === modal) closeModal();\n\t\t\t});\n\n\t\t\tdocument.addEventListener('keydown', function (e) {\n\t\t\t\tif (e.key === 'Escape' && !modal.hidden) {\n\t\t\t\t\tcloseModal();\n\t\t\t\t}\n\t\t\t\ttrapFocus(e);\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('settings-revealed', closeModal);\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

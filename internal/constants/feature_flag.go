@@ -9,6 +9,7 @@ const (
 	FeatureFlagIntroVideoUploads         FeatureFlagKey = "intro_video.uploads"
 	FeatureFlagIntroVideoCompressPreset  FeatureFlagKey = "intro_video.compress_preset"
 	FeatureFlagPersistentOnboarding    FeatureFlagKey = "onboarding.persistent"
+	FeatureFlagAdsDisplay              FeatureFlagKey = "ads.display"
 )
 
 const (

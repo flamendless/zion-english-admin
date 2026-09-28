@@ -69,11 +69,7 @@ templ Profile(data ProfileData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>My Profile - Zion English Admin</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
+		@AdminPageHead("My Profile - Zion English Admin")
 		@AvatarStyles()
 		@DocumentsStyles()
 		<style>

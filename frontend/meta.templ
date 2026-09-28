@@ -2,6 +2,7 @@ package frontend
 
 import (
 	"fmt"
+	"strings"
 	"zion-english/internal/metatags"
 	"zion-english/internal/utils"
 )
@@ -44,6 +45,9 @@ templ HeadMetaTags() {
 		tags := metatags.Get(ctx)
 	}}
 	for _, tag := range tags {
+		if strings.EqualFold(strings.TrimSpace(tag.Name), "title") || strings.EqualFold(strings.TrimSpace(tag.Name), "viewport") {
+			continue
+		}
 		if tag.Content != "" && tag.Value != "" {
 			<meta name={ tag.Name } content={ tag.Content } value={ tag.Value }/>
 		} else if tag.Content != "" {
@@ -58,11 +62,7 @@ templ MetaTagsPage(data MetaTagsListData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>Meta - Zion English Admin Tool</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
+		@AdminPageHead("Meta - Zion English Admin Tool")
 		@MetaTagsPageStyles()
 	</head>
 	<body>
@@ -73,7 +73,7 @@ templ MetaTagsPage(data MetaTagsListData) {
 			@ErrorBanner()
 
 			<p class="meta-tags-subtitle">
-				Configure extra <code>&lt;meta&gt;</code> tags injected into every page head (landing, login, and admin pages). Use for site verification and similar integrations.
+				Configure extra <code>&lt;meta&gt;</code> tags injected into every page head (landing, login, and admin pages). Use for site verification and similar integrations. Names <code>title</code> and <code>viewport</code> are reserved; each page sets its own document title.
 			</p>
 
 			<div class="meta-tags-card">
@@ -126,11 +126,7 @@ templ MetaTagEditPage(data MetaTagFormData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>Edit Meta Tag - Zion English Admin Tool</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
+		@AdminPageHead("Edit Meta Tag - Zion English Admin Tool")
 		@MetaTagsPageStyles()
 	</head>
 	<body>

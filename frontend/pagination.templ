@@ -38,7 +38,7 @@ templ PaginationBar(hasPrev bool, prevURL string, hasNext bool, nextURL string, 
 	</div>
 }
 
-templ PaginationBarHTMX(loadURL string, includeSelector string, page PaginationData) {
+templ PaginationBarHTMX(loadURL string, includeSelector string, targetSelector string, page PaginationData) {
 	<div class="pagination-bar">
 		if page.HasPrev {
 			<button
@@ -47,7 +47,7 @@ templ PaginationBarHTMX(loadURL string, includeSelector string, page PaginationD
 				hx-get={ loadURL }
 				hx-include={ includeSelector }
 				hx-vals={ fmt.Sprintf(`{"page": %d}`, page.PrevPage) }
-				hx-target="#classesTableBody"
+				hx-target={ targetSelector }
 				hx-swap={ HxSwapInnerHTML }
 			>Previous</button>
 		} else {
@@ -61,7 +61,7 @@ templ PaginationBarHTMX(loadURL string, includeSelector string, page PaginationD
 				hx-get={ loadURL }
 				hx-include={ includeSelector }
 				hx-vals={ fmt.Sprintf(`{"page": %d}`, page.NextPage) }
-				hx-target="#classesTableBody"
+				hx-target={ targetSelector }
 				hx-swap={ HxSwapInnerHTML }
 			>Next</button>
 		} else {

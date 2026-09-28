@@ -42,24 +42,11 @@ func ScheduleRecord(data ScheduleRecordData) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Schedule a Class - Zion English Admin</title><link rel=\"icon\" type=\"image/x-icon\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var2 templ.SafeURL
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 23, Col: 78}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = GlobalIncludes().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = AdminPageHead("Schedule a Class - Zion English Admin").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -67,20 +54,20 @@ func ScheduleRecord(data ScheduleRecordData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</head><body><div class=\"container schedule-record-page\" data-lock-teacher=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body><div class=\"container schedule-record-page\" data-lock-teacher=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%t", data.LockTeacher))
+		var templ_7745c5c3_Var2 string
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%t", data.LockTeacher))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 28, Col: 101}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 24, Col: 101}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -96,64 +83,64 @@ func ScheduleRecord(data ScheduleRecordData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<h2>Schedule a Class</h2><p class=\"field-hint schedule-record-intro\">Plan a lesson for a future date. You can view and manage it later from Class Schedule.</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<h2>Schedule a Class</h2><p class=\"field-hint schedule-record-intro\">Plan a lesson for a future date. You can view and manage it later from Class Schedule.</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.LockTeacher {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<form id=\"scheduleRecordForm\" hx-post=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<form id=\"scheduleRecordForm\" hx-post=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/schedule/record"))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 35, Col: 44}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" hx-swap=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/schedule/record"))
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 39, Col: 44}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 36, Col: 30}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" hx-swap=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" hx-target=\"#logOutput\" hx-indicator=\"#scheduleSubmitBtn\" _=\"\n\t\t\t\t\t\ton submit\n\t\t\t\t\t\t\tif #student.value is ''\n\t\t\t\t\t\t\t\talert('Please select a student')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #scheduled_date.value is ''\n\t\t\t\t\t\t\t\talert('Please set a date')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #start_time.value is ''\n\t\t\t\t\t\t\t\talert('Please set start time')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #end_time.value is ''\n\t\t\t\t\t\t\t\talert('Please set end time')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #rate.value < 0\n\t\t\t\t\t\t\t\talert('Invalid rate')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\tend\n\t\t\t\t\t\"><input type=\"hidden\" id=\"modal_teacher\" name=\"teacher\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
-			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 40, Col: 30}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 64, Col: 82}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" hx-target=\"#logOutput\" hx-indicator=\"#scheduleSubmitBtn\" _=\"\n\t\t\t\t\t\ton submit\n\t\t\t\t\t\t\tif #student.value is ''\n\t\t\t\t\t\t\t\talert('Please select a student')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #scheduled_date.value is ''\n\t\t\t\t\t\t\t\talert('Please set a date')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #start_time.value is ''\n\t\t\t\t\t\t\t\talert('Please set start time')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #end_time.value is ''\n\t\t\t\t\t\t\t\talert('Please set end time')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #rate.value < 0\n\t\t\t\t\t\t\t\talert('Invalid rate')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\tend\n\t\t\t\t\t\"><input type=\"hidden\" id=\"modal_teacher\" name=\"teacher\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\"><div class=\"form-row\"><div class=\"form-group\"><label>Teacher</label> <input type=\"text\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 68, Col: 82}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 68, Col: 50}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\"><div class=\"form-row\"><div class=\"form-group\"><label>Teacher</label> <input type=\"text\" value=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var7 string
-			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherName)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 72, Col: 50}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" disabled></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" disabled></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -165,7 +152,7 @@ func ScheduleRecord(data ScheduleRecordData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -173,38 +160,38 @@ func ScheduleRecord(data ScheduleRecordData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<button type=\"submit\" class=\"btn\" id=\"scheduleSubmitBtn\">Schedule Class</button></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<button type=\"submit\" class=\"btn\" id=\"scheduleSubmitBtn\">Schedule Class</button></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<form id=\"scheduleRecordForm\" hx-post=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<form id=\"scheduleRecordForm\" hx-post=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var7 string
+			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/schedule/record"))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 79, Col: 44}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" hx-swap=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var8 string
-			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/schedule/record"))
+			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 83, Col: 44}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 80, Col: 30}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" hx-swap=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var9 string
-			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 84, Col: 30}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" hx-target=\"#logOutput\" hx-indicator=\"#scheduleSubmitBtn\" _=\"\n\t\t\t\t\t\ton submit\n\t\t\t\t\t\t\tif #schedule_teacher.value is ''\n\t\t\t\t\t\t\t\talert('Please select a teacher')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #schedule_student.value is ''\n\t\t\t\t\t\t\t\talert('Please select a student')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #scheduled_date.value is ''\n\t\t\t\t\t\t\t\talert('Please set a date')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #start_time.value is ''\n\t\t\t\t\t\t\t\talert('Please set start time')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #end_time.value is ''\n\t\t\t\t\t\t\t\talert('Please set end time')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #rate.value < 0\n\t\t\t\t\t\t\t\talert('Invalid rate')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\tend\n\t\t\t\t\t\"><div class=\"form-row\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" hx-target=\"#logOutput\" hx-indicator=\"#scheduleSubmitBtn\" _=\"\n\t\t\t\t\t\ton submit\n\t\t\t\t\t\t\tif #schedule_teacher.value is ''\n\t\t\t\t\t\t\t\talert('Please select a teacher')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #schedule_student.value is ''\n\t\t\t\t\t\t\t\talert('Please select a student')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #scheduled_date.value is ''\n\t\t\t\t\t\t\t\talert('Please set a date')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #start_time.value is ''\n\t\t\t\t\t\t\t\talert('Please set start time')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #end_time.value is ''\n\t\t\t\t\t\t\t\talert('Please set end time')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\t\tif #rate.value < 0\n\t\t\t\t\t\t\t\talert('Invalid rate')\n\t\t\t\t\t\t\t\thalt\n\t\t\t\t\t\t\tend\n\t\t\t\t\t\tend\n\t\t\t\t\t\"><div class=\"form-row\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -220,7 +207,7 @@ func ScheduleRecord(data ScheduleRecordData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -228,12 +215,12 @@ func ScheduleRecord(data ScheduleRecordData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<button type=\"submit\" class=\"btn\" id=\"scheduleSubmitBtn\">Schedule Class</button></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<button type=\"submit\" class=\"btn\" id=\"scheduleSubmitBtn\">Schedule Class</button></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div></div><style>\n\t\t\t.schedule-record-intro {\n\t\t\t\tmax-width: 36rem;\n\t\t\t\tmargin-bottom: var(--space-4);\n\t\t\t}\n\t\t</style><script>\n\t\t\t(function () {\n\t\t\t\tconst pageRoot = document.querySelector('.schedule-record-page');\n\t\t\t\tconst lockTeacher = pageRoot && pageRoot.dataset.lockTeacher === 'true';\n\t\t\t\tconst ZOOM_MAX_AUTO_MINUTES = 40;\n\t\t\t\tconst ZOOM_MANUAL_WARNING = 'Classes longer than 40 minutes cannot receive an automatic Zoom meeting room on a Basic account. Please create your Zoom meeting manually and share the link with your student.';\n\n\t\t\t\tfunction getBaseURL() {\n\t\t\t\t\tconst banner = document.getElementById('errorBanner');\n\t\t\t\t\tif (banner && banner.dataset.basePath) {\n\t\t\t\t\t\treturn banner.dataset.basePath.replace(/\\/$/, '');\n\t\t\t\t\t}\n\t\t\t\t\tconst pathname = window.location.pathname;\n\t\t\t\t\tconst cleanPath = pathname.replace(/\\/$/, '');\n\t\t\t\t\tconst parts = cleanPath.split('/').filter(p => p !== '');\n\t\t\t\t\tif (parts.length === 0 || cleanPath.endsWith('.html')) {\n\t\t\t\t\t\treturn cleanPath.includes('/zion-english-admin') ? '/zion-english-admin' : '';\n\t\t\t\t\t}\n\t\t\t\t\tif (parts.length === 1) return '/' + parts[0];\n\t\t\t\t\treturn '/' + parts.slice(0, -1).join('/');\n\t\t\t\t}\n\n\t\t\t\tconst baseURL = getBaseURL();\n\t\t\t\tfunction buildURL(path) { return baseURL + path; }\n\n\t\t\t\tfunction getTeacherEl() {\n\t\t\t\t\treturn lockTeacher\n\t\t\t\t\t\t? document.getElementById('modal_teacher')\n\t\t\t\t\t\t: document.getElementById('schedule_teacher');\n\t\t\t\t}\n\n\t\t\t\tfunction getStudentEl() {\n\t\t\t\t\treturn lockTeacher\n\t\t\t\t\t\t? document.getElementById('student')\n\t\t\t\t\t\t: document.getElementById('schedule_student');\n\t\t\t\t}\n\n\t\t\t\tfunction durationFromForm() {\n\t\t\t\t\tconst startInput = document.getElementById('start_time');\n\t\t\t\t\tconst endInput = document.getElementById('end_time');\n\t\t\t\t\tconst start = parseTimeToMinutes(startInput ? startInput.value : '');\n\t\t\t\t\tconst end = parseTimeToMinutes(endInput ? endInput.value : '');\n\t\t\t\t\tif (start === null || end === null || end <= start) return null;\n\t\t\t\t\treturn end - start;\n\t\t\t\t}\n\n\t\t\t\tfunction updateScheduleZoomWarning() {\n\t\t\t\t\tconst el = document.getElementById('zoomDurationWarning');\n\t\t\t\t\tif (!el) return;\n\t\t\t\t\tconst duration = durationFromForm();\n\t\t\t\t\tif (duration !== null && duration > ZOOM_MAX_AUTO_MINUTES) {\n\t\t\t\t\t\tel.textContent = ZOOM_MANUAL_WARNING;\n\t\t\t\t\t\tel.hidden = false;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tel.hidden = true;\n\t\t\t\t\t\tel.textContent = '';\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\tasync function loadStudentsForTeacher(teacherId) {\n\t\t\t\t\tconst studentEl = getStudentEl();\n\t\t\t\t\tif (!studentEl || lockTeacher) return;\n\t\t\t\t\tif (!teacherId) {\n\t\t\t\t\t\tstudentEl.innerHTML = '<option value=\"\">-- Select teacher first --</option>';\n\t\t\t\t\t\tstudentEl.value = '';\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\t\t\t\t\ttry {\n\t\t\t\t\t\tconst response = await fetch(buildURL('/api/students?teacher=' + encodeURIComponent(teacherId)));\n\t\t\t\t\t\tconst html = await response.text();\n\t\t\t\t\t\tif (!response.ok) throw new Error(html);\n\t\t\t\t\t\tstudentEl.innerHTML = html;\n\t\t\t\t\t\tstudentEl.value = '';\n\t\t\t\t\t} catch (err) {\n\t\t\t\t\t\tif (typeof showErrorBanner === 'function') {\n\t\t\t\t\t\t\tshowErrorBanner(err.message || 'Failed to load students');\n\t\t\t\t\t\t}\n\t\t\t\t\t\tstudentEl.innerHTML = '<option value=\"\">-- Select teacher first --</option>';\n\t\t\t\t\t\tstudentEl.value = '';\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\tconst teacherEl = getTeacherEl();\n\t\t\t\tif (teacherEl && !lockTeacher) {\n\t\t\t\t\tteacherEl.addEventListener('change', () => {\n\t\t\t\t\t\tloadStudentsForTeacher(teacherEl.value);\n\t\t\t\t\t});\n\t\t\t\t\tloadStudentsForTeacher('');\n\t\t\t\t}\n\n\t\t\t\tconst studentEl = getStudentEl();\n\t\t\t\tif (studentEl) {\n\t\t\t\t\tstudentEl.addEventListener('change', () => {\n\t\t\t\t\t\tapplyStudentRateToForm();\n\t\t\t\t\t});\n\t\t\t\t}\n\n\t\t\t\tdocument.getElementById('start_time')?.addEventListener('change', updateScheduleZoomWarning);\n\t\t\t\tdocument.getElementById('end_time')?.addEventListener('change', updateScheduleZoomWarning);\n\t\t\t\tupdateScheduleZoomWarning();\n\t\t\t})();\n\t\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"logs-section\"><h3>Logs and Errors</h3><div id=\"logOutput\">Waiting for submission...</div></div></div><style>\n\t\t\t.schedule-record-intro {\n\t\t\t\tmax-width: 36rem;\n\t\t\t\tmargin-bottom: var(--space-4);\n\t\t\t}\n\t\t</style><script>\n\t\t\t(function () {\n\t\t\t\tconst pageRoot = document.querySelector('.schedule-record-page');\n\t\t\t\tconst lockTeacher = pageRoot && pageRoot.dataset.lockTeacher === 'true';\n\t\t\t\tconst ZOOM_MAX_AUTO_MINUTES = 40;\n\t\t\t\tconst ZOOM_MANUAL_WARNING = 'Classes longer than 40 minutes cannot receive an automatic Zoom meeting room on a Basic account. Please create your Zoom meeting manually and share the link with your student.';\n\n\t\t\t\tfunction getBaseURL() {\n\t\t\t\t\tconst banner = document.getElementById('errorBanner');\n\t\t\t\t\tif (banner && banner.dataset.basePath) {\n\t\t\t\t\t\treturn banner.dataset.basePath.replace(/\\/$/, '');\n\t\t\t\t\t}\n\t\t\t\t\tconst pathname = window.location.pathname;\n\t\t\t\t\tconst cleanPath = pathname.replace(/\\/$/, '');\n\t\t\t\t\tconst parts = cleanPath.split('/').filter(p => p !== '');\n\t\t\t\t\tif (parts.length === 0 || cleanPath.endsWith('.html')) {\n\t\t\t\t\t\treturn cleanPath.includes('/zion-english-admin') ? '/zion-english-admin' : '';\n\t\t\t\t\t}\n\t\t\t\t\tif (parts.length === 1) return '/' + parts[0];\n\t\t\t\t\treturn '/' + parts.slice(0, -1).join('/');\n\t\t\t\t}\n\n\t\t\t\tconst baseURL = getBaseURL();\n\t\t\t\tfunction buildURL(path) { return baseURL + path; }\n\n\t\t\t\tfunction getTeacherEl() {\n\t\t\t\t\treturn lockTeacher\n\t\t\t\t\t\t? document.getElementById('modal_teacher')\n\t\t\t\t\t\t: document.getElementById('schedule_teacher');\n\t\t\t\t}\n\n\t\t\t\tfunction getStudentEl() {\n\t\t\t\t\treturn lockTeacher\n\t\t\t\t\t\t? document.getElementById('student')\n\t\t\t\t\t\t: document.getElementById('schedule_student');\n\t\t\t\t}\n\n\t\t\t\tfunction durationFromForm() {\n\t\t\t\t\tconst startInput = document.getElementById('start_time');\n\t\t\t\t\tconst endInput = document.getElementById('end_time');\n\t\t\t\t\tconst start = parseTimeToMinutes(startInput ? startInput.value : '');\n\t\t\t\t\tconst end = parseTimeToMinutes(endInput ? endInput.value : '');\n\t\t\t\t\tif (start === null || end === null || end <= start) return null;\n\t\t\t\t\treturn end - start;\n\t\t\t\t}\n\n\t\t\t\tfunction updateScheduleZoomWarning() {\n\t\t\t\t\tconst el = document.getElementById('zoomDurationWarning');\n\t\t\t\t\tif (!el) return;\n\t\t\t\t\tconst duration = durationFromForm();\n\t\t\t\t\tif (duration !== null && duration > ZOOM_MAX_AUTO_MINUTES) {\n\t\t\t\t\t\tel.textContent = ZOOM_MANUAL_WARNING;\n\t\t\t\t\t\tel.hidden = false;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tel.hidden = true;\n\t\t\t\t\t\tel.textContent = '';\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\tasync function loadStudentsForTeacher(teacherId) {\n\t\t\t\t\tconst studentEl = getStudentEl();\n\t\t\t\t\tif (!studentEl || lockTeacher) return;\n\t\t\t\t\tif (!teacherId) {\n\t\t\t\t\t\tstudentEl.innerHTML = '<option value=\"\">-- Select teacher first --</option>';\n\t\t\t\t\t\tstudentEl.value = '';\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\t\t\t\t\ttry {\n\t\t\t\t\t\tconst response = await fetch(buildURL('/api/students?teacher=' + encodeURIComponent(teacherId)));\n\t\t\t\t\t\tconst html = await response.text();\n\t\t\t\t\t\tif (!response.ok) throw new Error(html);\n\t\t\t\t\t\tstudentEl.innerHTML = html;\n\t\t\t\t\t\tstudentEl.value = '';\n\t\t\t\t\t} catch (err) {\n\t\t\t\t\t\tif (typeof showErrorBanner === 'function') {\n\t\t\t\t\t\t\tshowErrorBanner(err.message || 'Failed to load students');\n\t\t\t\t\t\t}\n\t\t\t\t\t\tstudentEl.innerHTML = '<option value=\"\">-- Select teacher first --</option>';\n\t\t\t\t\t\tstudentEl.value = '';\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\tconst teacherEl = getTeacherEl();\n\t\t\t\tif (teacherEl && !lockTeacher) {\n\t\t\t\t\tteacherEl.addEventListener('change', () => {\n\t\t\t\t\t\tloadStudentsForTeacher(teacherEl.value);\n\t\t\t\t\t});\n\t\t\t\t\tloadStudentsForTeacher('');\n\t\t\t\t}\n\n\t\t\t\tconst studentEl = getStudentEl();\n\t\t\t\tif (studentEl) {\n\t\t\t\t\tstudentEl.addEventListener('change', () => {\n\t\t\t\t\t\tapplyStudentRateToForm();\n\t\t\t\t\t});\n\t\t\t\t}\n\n\t\t\t\tdocument.getElementById('start_time')?.addEventListener('change', updateScheduleZoomWarning);\n\t\t\t\tdocument.getElementById('end_time')?.addEventListener('change', updateScheduleZoomWarning);\n\t\t\t\tupdateScheduleZoomWarning();\n\t\t\t})();\n\t\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -249,7 +236,7 @@ func ScheduleRecord(data ScheduleRecordData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -273,38 +260,38 @@ func ScheduledDateField(todayPHT string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var10 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var10 == nil {
-			templ_7745c5c3_Var10 = templ.NopComponent
+		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var9 == nil {
+			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<div class=\"form-group\"><label for=\"scheduled_date\">Date *</label> <input type=\"date\" id=\"scheduled_date\" name=\"scheduled_date\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<div class=\"form-group\"><label for=\"scheduled_date\">Date *</label> <input type=\"date\" id=\"scheduled_date\" name=\"scheduled_date\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var10 string
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(todayPHT)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 245, Col: 79}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" required min=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(todayPHT)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 249, Col: 79}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 245, Col: 105}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" required min=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var12 string
-		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(todayPHT)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/schedule_record.templ`, Line: 249, Col: 105}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

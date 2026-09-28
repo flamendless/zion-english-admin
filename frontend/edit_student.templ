@@ -37,15 +37,11 @@ templ EditStudent(data EditStudentData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		if data.Readonly {
-			<title>View Student - Zion English Admin</title>
+			@AdminPageHead("View Student - Zion English Admin")
 		} else {
-			<title>Edit Student - Zion English Admin</title>
+			@AdminPageHead("Edit Student - Zion English Admin")
 		}
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
 		@AvatarStyles()
 		<style>
 			.relationship-list {

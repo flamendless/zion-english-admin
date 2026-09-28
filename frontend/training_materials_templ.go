@@ -263,24 +263,11 @@ func TrainingMaterials(data TrainingMaterialsData) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Training Materials - Zion English Admin</title><link rel=\"icon\" type=\"image/x-icon\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var2 templ.SafeURL
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 244, Col: 78}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = GlobalIncludes().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = AdminPageHead("Training Materials - Zion English Admin").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -288,7 +275,7 @@ func TrainingMaterials(data TrainingMaterialsData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</head><body><div class=\"container tm-page\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body><div class=\"container tm-page\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -296,31 +283,31 @@ func TrainingMaterials(data TrainingMaterialsData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"hub-header\"><div class=\"tm-page-heading\"><h2 class=\"hub-title\">Training Materials</h2><p class=\"tm-page-subtitle\">Admin-curated training videos for teachers.</p></div><div class=\"tm-header-actions\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"hub-header\"><div class=\"tm-page-heading\"><h2 class=\"hub-title\">Training Materials</h2><p class=\"tm-page-subtitle\">Admin-curated training videos for teachers.</p></div><div class=\"tm-header-actions\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.CanViewReport {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<a href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var3 templ.SafeURL
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/training-materials/progress"))
+			var templ_7745c5c3_Var2 templ.SafeURL
+			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/training-materials/progress"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 258, Col: 57}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 254, Col: 57}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"btn btn-secondary\">View progress</a> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"btn btn-secondary\">View progress</a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
 		if data.CanCreate {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<button type=\"button\" class=\"add-btn tm-add-btn\" id=\"openCreateTrainingBtn\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<button type=\"button\" class=\"add-btn tm-add-btn\" id=\"openCreateTrainingBtn\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -328,12 +315,12 @@ func TrainingMaterials(data TrainingMaterialsData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "Add material</button>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "Add material</button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -372,7 +359,7 @@ func TrainingMaterials(data TrainingMaterialsData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if len(data.Materials) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"tm-grid\" role=\"list\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"tm-grid\" role=\"list\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -382,7 +369,7 @@ func TrainingMaterials(data TrainingMaterialsData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -391,7 +378,7 @@ func TrainingMaterials(data TrainingMaterialsData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"tm-empty\"><div class=\"tm-empty-icon\" aria-hidden=\"true\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"tm-empty\"><div class=\"tm-empty-icon\" aria-hidden=\"true\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -399,33 +386,33 @@ func TrainingMaterials(data TrainingMaterialsData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.Query != "" || data.StatusFilter != "" || data.TagFilter != "" || data.ProgressFilter != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<p>No training materials match your filters.</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<p>No training materials match your filters.</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<p>No training materials yet.</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<p>No training materials yet.</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 			if data.CanCreate {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<button type=\"button\" class=\"add-btn tm-add-btn\" onclick=\"document.getElementById('openCreateTrainingBtn')?.click()\">Add your first material</button>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<button type=\"button\" class=\"add-btn tm-add-btn\" onclick=\"document.getElementById('openCreateTrainingBtn')?.click()\">Add your first material</button>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div><div id=\"tmViewModalHost\"></div><div id=\"tmEditModalHost\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div><div id=\"tmViewModalHost\"></div><div id=\"tmEditModalHost\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -451,7 +438,7 @@ func TrainingMaterials(data TrainingMaterialsData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -475,30 +462,30 @@ func TrainingMaterialCard(item TrainingMaterialListItem) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var4 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var4 == nil {
-			templ_7745c5c3_Var4 = templ.NopComponent
+		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var3 == nil {
+			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var5 = []any{trainingMaterialCardClass(item.Status)}
-		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var5...)
+		var templ_7745c5c3_Var4 = []any{trainingMaterialCardClass(item.Status)}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var4...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<article class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<article class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var5).String())
+		var templ_7745c5c3_Var5 string
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var4).String())
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 1, Col: 0}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" role=\"listitem\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" role=\"listitem\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -506,33 +493,33 @@ func TrainingMaterialCard(item TrainingMaterialListItem) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<h3 class=\"tm-card-title\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<h3 class=\"tm-card-title\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(item.Title)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 331, Col: 40}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</h3><p class=\"tm-card-description\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(item.Title)
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(trainingMaterialDescriptionPreview(item.Description))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 335, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 332, Col: 87}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</h3><p class=\"tm-card-description\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(trainingMaterialDescriptionPreview(item.Description))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 336, Col: 87}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</p><div class=\"tm-card-badges\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</p><div class=\"tm-card-badges\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -552,12 +539,12 @@ func TrainingMaterialCard(item TrainingMaterialListItem) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(item.Tags) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<div class=\"tm-tag-list\" aria-label=\"Tags\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<div class=\"tm-tag-list\" aria-label=\"Tags\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -567,30 +554,30 @@ func TrainingMaterialCard(item TrainingMaterialListItem) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<div class=\"tm-card-footer\"><div class=\"tm-card-actions\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<div class=\"tm-card-footer\"><div class=\"tm-card-actions\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if item.CanWatch {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<a href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var9 templ.SafeURL
-			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/training-materials/" + item.ID + "/watch"))
+			var templ_7745c5c3_Var8 templ.SafeURL
+			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/training-materials/" + item.ID + "/watch"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 356, Col: 69}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 352, Col: 69}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\" class=\"btn\">Watch</a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "\" class=\"btn\">Watch</a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -613,7 +600,7 @@ func TrainingMaterialCard(item TrainingMaterialListItem) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</div></div></article>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</div></div></article>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -637,38 +624,38 @@ func TrainingMaterialTagPill(tag TrainingMaterialTag) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var10 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var10 == nil {
-			templ_7745c5c3_Var10 = templ.NopComponent
+		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var9 == nil {
+			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<span class=\"tm-tag-pill\" style=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<span class=\"tm-tag-pill\" style=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var10 string
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color: " + tag.Color + "33; color: #2D2D2D;")
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 372, Col: 91}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var11 string
-		templ_7745c5c3_Var11, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color: " + tag.Color + "33; color: #2D2D2D;")
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(tag.Label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 376, Col: 91}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 373, Col: 13}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var12 string
-		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(tag.Label)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 377, Col: 13}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -692,43 +679,43 @@ func TrainingMaterialThumbnail(thumbnailURL string, title string) templ.Componen
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var13 == nil {
-			templ_7745c5c3_Var13 = templ.NopComponent
+		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var12 == nil {
+			templ_7745c5c3_Var12 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<div class=\"tm-thumb\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<div class=\"tm-thumb\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if thumbnailURL != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<img src=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<img src=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var13 string
+			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(thumbnailURL)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 381, Col: 22}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "\" class=\"tm-thumb-img\" alt=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var14 string
-			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(thumbnailURL)
+			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue("Preview for " + title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 385, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 383, Col: 32}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\" class=\"tm-thumb-img\" alt=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var15 string
-			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue("Preview for " + title)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 387, Col: 32}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "\" loading=\"lazy\" referrerpolicy=\"no-referrer\" onerror=\"this.hidden=true; const p=this.parentElement.querySelector('.tm-thumb-placeholder'); if(p) p.hidden=false;\"><div class=\"tm-thumb-placeholder\" hidden aria-hidden=\"true\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\" loading=\"lazy\" referrerpolicy=\"no-referrer\" onerror=\"this.hidden=true; const p=this.parentElement.querySelector('.tm-thumb-placeholder'); if(p) p.hidden=false;\"><div class=\"tm-thumb-placeholder\" hidden aria-hidden=\"true\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -736,12 +723,12 @@ func TrainingMaterialThumbnail(thumbnailURL string, title string) templ.Componen
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "<div class=\"tm-thumb-placeholder\" aria-hidden=\"true\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<div class=\"tm-thumb-placeholder\" aria-hidden=\"true\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -749,12 +736,12 @@ func TrainingMaterialThumbnail(thumbnailURL string, title string) templ.Componen
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -778,25 +765,25 @@ func TrainingMaterialViewModal(data TrainingMaterialViewData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var16 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var16 == nil {
-			templ_7745c5c3_Var16 = templ.NopComponent
+		templ_7745c5c3_Var15 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var15 == nil {
+			templ_7745c5c3_Var15 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<div class=\"modal-overlay\" id=\"tmViewModal\" role=\"presentation\"><div class=\"modal-dialog modal-dialog-entity tm-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"tmViewTitle\"><div class=\"modal-header\"><h3 id=\"tmViewTitle\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "<div class=\"modal-overlay\" id=\"tmViewModal\" role=\"presentation\"><div class=\"modal-dialog modal-dialog-entity tm-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"tmViewTitle\"><div class=\"modal-header\"><h3 id=\"tmViewTitle\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var17 string
-		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(data.Title)
+		var templ_7745c5c3_Var16 string
+		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(data.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 407, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 403, Col: 37}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</h3><button type=\"button\" class=\"modal-close tm-view-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><div class=\"modal-body tm-view-body\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</h3><button type=\"button\" class=\"modal-close tm-view-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><div class=\"modal-body tm-view-body\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -804,46 +791,46 @@ func TrainingMaterialViewModal(data TrainingMaterialViewData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<div class=\"tm-view-section\"><h4 class=\"tm-view-label\">Description</h4><p class=\"tm-view-text\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<div class=\"tm-view-section\"><h4 class=\"tm-view-label\">Description</h4><p class=\"tm-view-text\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var18 string
-		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
+		var templ_7745c5c3_Var17 string
+		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 414, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 410, Col: 47}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "</p></div><div class=\"tm-view-section\"><h4 class=\"tm-view-label\">URL</h4><a href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var18 templ.SafeURL
+		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinURLErrs(data.URL)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 414, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "</p></div><div class=\"tm-view-section\"><h4 class=\"tm-view-label\">URL</h4><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\" class=\"tm-view-link\" target=\"_blank\" rel=\"noopener noreferrer\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var19 templ.SafeURL
-		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinURLErrs(data.URL)
+		var templ_7745c5c3_Var19 string
+		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(data.URL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 418, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 414, Col: 99}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "\" class=\"tm-view-link\" target=\"_blank\" rel=\"noopener noreferrer\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var20 string
-		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(data.URL)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 418, Col: 99}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</a></div><div class=\"tm-view-section\"><h4 class=\"tm-view-label\">Status</h4>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</a></div><div class=\"tm-view-section\"><h4 class=\"tm-view-label\">Status</h4>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -851,25 +838,25 @@ func TrainingMaterialViewModal(data TrainingMaterialViewData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</div><div class=\"tm-view-section\"><h4 class=\"tm-view-label\">Required for onboarding</h4><p class=\"tm-view-text\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</div><div class=\"tm-view-section\"><h4 class=\"tm-view-label\">Required for onboarding</h4><p class=\"tm-view-text\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var21 string
-		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(trainingMaterialRequiredLabel(data.Required))
+		var templ_7745c5c3_Var20 string
+		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(trainingMaterialRequiredLabel(data.Required))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 426, Col: 75}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 422, Col: 75}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "</p></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</p></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(data.Tags) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "<div class=\"tm-view-section\"><h4 class=\"tm-view-label\">Tags</h4><div class=\"tm-tag-list\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<div class=\"tm-view-section\"><h4 class=\"tm-view-label\">Tags</h4><div class=\"tm-tag-list\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -879,12 +866,12 @@ func TrainingMaterialViewModal(data TrainingMaterialViewData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "<div class=\"tm-view-meta\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "<div class=\"tm-view-meta\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -902,30 +889,30 @@ func TrainingMaterialViewModal(data TrainingMaterialViewData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "</div></div><div class=\"modal-footer tm-view-footer\"><div class=\"tm-view-footer-actions\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "</div></div><div class=\"modal-footer tm-view-footer\"><div class=\"tm-view-footer-actions\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.CanWatch {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<a href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "<a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var22 templ.SafeURL
-			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/training-materials/" + data.ID + "/watch"))
+			var templ_7745c5c3_Var21 templ.SafeURL
+			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/training-materials/" + data.ID + "/watch"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 449, Col: 70}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 445, Col: 70}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\" class=\"btn\">Watch</a> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "\" class=\"btn\">Watch</a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "<button type=\"button\" class=\"btn btn-secondary tm-view-close\">Close</button></div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "<button type=\"button\" class=\"btn btn-secondary tm-view-close\">Close</button></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -949,38 +936,38 @@ func TrainingMaterialMetaItem(label string, value string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var23 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var23 == nil {
-			templ_7745c5c3_Var23 = templ.NopComponent
+		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var22 == nil {
+			templ_7745c5c3_Var22 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "<div class=\"tm-meta-item\"><span class=\"tm-meta-label\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "<div class=\"tm-meta-item\"><span class=\"tm-meta-label\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var23 string
+		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(label)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 456, Col: 37}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "</span> <span class=\"tm-meta-value\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var24 string
-		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(label)
+		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 460, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 457, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "</span> <span class=\"tm-meta-value\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var25 string
-		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(value)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 461, Col: 37}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</span></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "</span></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1004,149 +991,149 @@ func TrainingMaterialFormModal(data TrainingMaterialFormData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var26 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var26 == nil {
-			templ_7745c5c3_Var26 = templ.NopComponent
+		templ_7745c5c3_Var25 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var25 == nil {
+			templ_7745c5c3_Var25 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "<div class=\"modal-overlay\" id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "<div class=\"modal-overlay\" id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var27 string
-		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.ResolveAttributeValue(trainingMaterialModalID(data))
+		var templ_7745c5c3_Var26 string
+		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(trainingMaterialModalID(data))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 466, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 462, Col: 62}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if !data.IsEdit {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, " hidden")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, " hidden")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, " role=\"presentation\"><div class=\"modal-dialog tm-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"tmFormTitle\"><div class=\"modal-header\"><h3 id=\"tmFormTitle\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, " role=\"presentation\"><div class=\"modal-dialog tm-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"tmFormTitle\"><div class=\"modal-header\"><h3 id=\"tmFormTitle\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var28 string
-		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(trainingMaterialFormTitle(data))
+		var templ_7745c5c3_Var27 string
+		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(trainingMaterialFormTitle(data))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 469, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 465, Col: 58}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "</h3><button type=\"button\" class=\"modal-close tm-form-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><form id=\"tmMaterialForm\" method=\"POST\" action=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var28 templ.SafeURL
+		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinURLErrs(trainingMaterialFormAction(data))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 471, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "</h3><button type=\"button\" class=\"modal-close tm-form-close\" data-tooltip=\"Close\" aria-label=\"Close\">&times;</button></div><form id=\"tmMaterialForm\" method=\"POST\" action=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "\" class=\"modal-body tm-form-body\"><div class=\"form-group\"><label for=\"tmTitle\">Title *</label> <input type=\"text\" id=\"tmTitle\" name=\"title\" required maxlength=\"64\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var29 templ.SafeURL
-		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinURLErrs(trainingMaterialFormAction(data))
+		var templ_7745c5c3_Var29 string
+		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 475, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 476, Col: 92}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var29)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "\" class=\"modal-body tm-form-body\"><div class=\"form-group\"><label for=\"tmTitle\">Title *</label> <input type=\"text\" id=\"tmTitle\" name=\"title\" required maxlength=\"64\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "\" placeholder=\"Short name for this training\"></div><div class=\"form-group\"><label for=\"tmDescription\">Description *</label> <textarea id=\"tmDescription\" name=\"description\" required rows=\"4\" maxlength=\"1000\" placeholder=\"What will teachers learn?\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var30 string
-		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Title)
+		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 480, Col: 92}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 480, Col: 146}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var30)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "\" placeholder=\"Short name for this training\"></div><div class=\"form-group\"><label for=\"tmDescription\">Description *</label> <textarea id=\"tmDescription\" name=\"description\" required rows=\"4\" maxlength=\"1000\" placeholder=\"What will teachers learn?\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "</textarea></div><div class=\"form-group\"><label for=\"tmURL\">YouTube URL *</label> <input type=\"url\" id=\"tmURL\" class=\"tm-form-url\" name=\"url\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var31 string
-		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
+		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.URL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 484, Col: 146}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 484, Col: 90}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "</textarea></div><div class=\"form-group\"><label for=\"tmURL\">YouTube URL *</label> <input type=\"url\" id=\"tmURL\" class=\"tm-form-url\" name=\"url\" required value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var31)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var32 string
-		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.URL)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 488, Col: 90}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var32)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "\" placeholder=\"https://www.youtube.com/watch?v=...\"><p class=\"field-hint\">Paste a YouTube link. Other video hosts are not supported yet.</p><div id=\"tmUrlPreview\" class=\"tm-thumb tm-url-preview\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "\" placeholder=\"https://www.youtube.com/watch?v=...\"><p class=\"field-hint\">Paste a YouTube link. Other video hosts are not supported yet.</p><div id=\"tmUrlPreview\" class=\"tm-thumb tm-url-preview\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.ThumbnailURL == "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, " hidden")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, " hidden")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "><img id=\"tmUrlPreviewImg\" class=\"tm-thumb-img\" alt=\"Link preview\" referrerpolicy=\"no-referrer\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "><img id=\"tmUrlPreviewImg\" class=\"tm-thumb-img\" alt=\"Link preview\" referrerpolicy=\"no-referrer\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.ThumbnailURL == "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, " hidden")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, " hidden")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
 		if data.ThumbnailURL != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, " src=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, " src=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var33 string
-			templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.ThumbnailURL)
+			var templ_7745c5c3_Var32 string
+			templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.ThumbnailURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 498, Col: 31}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 494, Col: 31}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var33)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var32)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "><div id=\"tmUrlPreviewPlaceholder\" class=\"tm-thumb-placeholder\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "><div id=\"tmUrlPreviewPlaceholder\" class=\"tm-thumb-placeholder\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.ThumbnailURL != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, " hidden")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, " hidden")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, " aria-hidden=\"true\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, " aria-hidden=\"true\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1154,178 +1141,178 @@ func TrainingMaterialFormModal(data TrainingMaterialFormData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "</div><span class=\"tm-url-preview-loading\">Fetching preview…</span></div><input type=\"hidden\" id=\"tmSourceType\" name=\"source_type\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "</div><span class=\"tm-url-preview-loading\">Fetching preview…</span></div><input type=\"hidden\" id=\"tmSourceType\" name=\"source_type\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var33 string
+		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.SourceType)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 502, Col: 86}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var33)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "\"></div><div class=\"form-group\"><label for=\"tmStatus\">Status *</label> ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.IsDeleted {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "<p class=\"field-hint\">This material is deleted. Choose Draft or Published to restore it.</p>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "<select id=\"tmStatus\" name=\"status\" required><option value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var34 string
-		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.SourceType)
+		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.ResolveAttributeValue(trainingmaterials.StatusDraft)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 506, Col: 86}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 510, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var34)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "\"></div><div class=\"form-group\"><label for=\"tmStatus\">Status *</label> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if data.IsDeleted {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "<p class=\"field-hint\">This material is deleted. Choose Draft or Published to restore it.</p>")
+		if data.Status != trainingmaterials.StatusPublished && data.Status != trainingmaterials.StatusDeleted {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, " selected")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "<select id=\"tmStatus\" name=\"status\" required><option value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, ">Draft</option> <option value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var35 string
-		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.ResolveAttributeValue(trainingmaterials.StatusDraft)
+		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.ResolveAttributeValue(trainingmaterials.StatusPublished)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 514, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 511, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var35)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if data.Status != trainingmaterials.StatusPublished && data.Status != trainingmaterials.StatusDeleted {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, ">Draft</option> <option value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var36 string
-		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.ResolveAttributeValue(trainingmaterials.StatusPublished)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 515, Col: 55}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var36)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.Status == trainingmaterials.StatusPublished {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, " selected")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, " selected")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, ">Published</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, ">Published</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.IsEdit && data.CanDelete {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "<option value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "<option value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var36 string
+			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.ResolveAttributeValue(trainingmaterials.StatusDeleted)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 513, Col: 54}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var36)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if data.Status == trainingmaterials.StatusDeleted {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, " selected")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, ">Deleted</option>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "</select></div><div class=\"form-group\"><label class=\"checkbox-label\"><input type=\"checkbox\" name=\"required\" value=\"1\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.Required {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, " checked")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "> Required for teacher onboarding</label><p class=\"field-hint\">Teachers must complete this video before their setup checklist is done.</p></div><div class=\"form-group\"><label for=\"tmTagInput\">Tags * <span class=\"tm-tag-hint\">(1–7 tags)</span></label><div class=\"tm-tag-input-wrap\" id=\"tmTagInputWrap\"><div class=\"tm-tag-chips\" id=\"tmTagChips\" aria-live=\"polite\"></div><input type=\"text\" id=\"tmTagInput\" class=\"tm-tag-text-input\" placeholder=\"Type a tag and press Enter\" autocomplete=\"off\" list=\"tmTagSuggestions\"> <datalist id=\"tmTagSuggestions\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		for _, tag := range data.ExistingTags {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 94, "<option value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var37 string
-			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.ResolveAttributeValue(trainingmaterials.StatusDeleted)
+			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.ResolveAttributeValue(tag.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 517, Col: 54}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 531, Col: 33}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var37)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			if data.Status == trainingmaterials.StatusDeleted {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, " selected")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, ">Deleted</option>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 95, "\"></option>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "</select></div><div class=\"form-group\"><label class=\"checkbox-label\"><input type=\"checkbox\" name=\"required\" value=\"1\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 96, "</datalist></div><p class=\"field-hint tm-tag-limit-warning\" hidden>Maximum of 7 tags reached. Remove a tag to add another.</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if data.Required {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, " checked")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 94, "> Required for teacher onboarding</label><p class=\"field-hint\">Teachers must complete this video before their setup checklist is done.</p></div><div class=\"form-group\"><label for=\"tmTagInput\">Tags * <span class=\"tm-tag-hint\">(1–7 tags)</span></label><div class=\"tm-tag-input-wrap\" id=\"tmTagInputWrap\"><div class=\"tm-tag-chips\" id=\"tmTagChips\" aria-live=\"polite\"></div><input type=\"text\" id=\"tmTagInput\" class=\"tm-tag-text-input\" placeholder=\"Type a tag and press Enter\" autocomplete=\"off\" list=\"tmTagSuggestions\"> <datalist id=\"tmTagSuggestions\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		for _, tag := range data.ExistingTags {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 95, "<option value=\"")
+		for _, tag := range data.SelectedTags {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 97, "<input type=\"hidden\" name=\"tags\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var38 string
 			templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.ResolveAttributeValue(tag.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 535, Col: 33}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 537, Col: 56}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var38)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 96, "\"></option>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 98, "\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 97, "</datalist></div><p class=\"field-hint tm-tag-limit-warning\" hidden>Maximum of 7 tags reached. Remove a tag to add another.</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 99, "</div><div class=\"modal-footer tm-form-footer\"><div class=\"tm-form-footer-actions\"><button type=\"button\" class=\"btn btn-secondary tm-form-close\">Cancel</button> <button type=\"submit\" class=\"add-btn tm-submit-btn\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, tag := range data.SelectedTags {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 98, "<input type=\"hidden\" name=\"tags\" value=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var39 string
-			templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.ResolveAttributeValue(tag.Label)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 541, Col: 56}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var39)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 99, "\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
+		var templ_7745c5c3_Var39 string
+		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(trainingMaterialSubmitLabel(data))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 543, Col: 93}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 100, "</div><div class=\"modal-footer tm-form-footer\"><div class=\"tm-form-footer-actions\"><button type=\"button\" class=\"btn btn-secondary tm-form-close\">Cancel</button> <button type=\"submit\" class=\"add-btn tm-submit-btn\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var40 string
-		templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(trainingMaterialSubmitLabel(data))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 547, Col: 93}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 101, "</button></div></div></form></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 100, "</button></div></div></form></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1356,42 +1343,16 @@ func TrainingMaterialWatch(data TrainingMaterialWatchData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var41 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var41 == nil {
-			templ_7745c5c3_Var41 = templ.NopComponent
+		templ_7745c5c3_Var40 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var40 == nil {
+			templ_7745c5c3_Var40 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 101, "<!doctype html><html lang=\"en\"><head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var42 string
-		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(data.Title)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 568, Col: 21}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, " - Training - Zion English Admin</title><link rel=\"icon\" type=\"image/x-icon\" href=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var43 templ.SafeURL
-		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 569, Col: 78}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = GlobalIncludes().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = AdminPageHead(data.Title+" - Training - Zion English Admin").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1399,7 +1360,7 @@ func TrainingMaterialWatch(data TrainingMaterialWatchData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 105, "</head><body><div class=\"container tm-watch-page\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "</head><body><div class=\"container tm-watch-page\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1407,87 +1368,87 @@ func TrainingMaterialWatch(data TrainingMaterialWatchData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 106, "<div class=\"tm-watch-header\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, "<div class=\"tm-watch-header\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var44 templ.SafeURL
-		templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinURLErrs(data.BackURL)
+		var templ_7745c5c3_Var41 templ.SafeURL
+		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinURLErrs(data.BackURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 577, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 569, Col: 26}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "\" class=\"btn btn-secondary\">Back to library</a><h2 class=\"hub-title\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var42 string
+		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(data.Title)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 570, Col: 38}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 105, "</h2><p class=\"tm-page-subtitle\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var43 string
+		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 571, Col: 50}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 106, "</p></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.SourceType == string(trainingmaterials.SourceYouTube) {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 107, "<div class=\"tm-player-wrap\"><div id=\"tmYouTubePlayer\"></div></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 108, "<div class=\"tm-watch-progress\"><div class=\"tm-progress-bar\" aria-hidden=\"true\"><div id=\"tmProgressFill\" class=\"tm-progress-fill\" style=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var44 string
+		templ_7745c5c3_Var44, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(fmt.Sprintf("width: %.1f%%", data.Progress.ProgressPercent))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 582, Col: 122}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 107, "\" class=\"btn btn-secondary\">Back to library</a><h2 class=\"hub-title\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 109, "\"></div></div><p id=\"tmProgressLabel\" class=\"tm-progress-label\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var45 string
-		templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(data.Title)
+		templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(trainingMaterialProgressPercentLabel(data.Progress.ProgressPercent))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 578, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 584, Col: 123}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 108, "</h2><p class=\"tm-page-subtitle\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var46 string
-		templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 579, Col: 50}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var46))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 109, "</p></div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if data.SourceType == string(trainingmaterials.SourceYouTube) {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 110, "<div class=\"tm-player-wrap\"><div id=\"tmYouTubePlayer\"></div></div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 111, "<div class=\"tm-watch-progress\"><div class=\"tm-progress-bar\" aria-hidden=\"true\"><div id=\"tmProgressFill\" class=\"tm-progress-fill\" style=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var47 string
-		templ_7745c5c3_Var47, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(fmt.Sprintf("width: %.1f%%", data.Progress.ProgressPercent))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 590, Col: 122}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var47))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 112, "\"></div></div><p id=\"tmProgressLabel\" class=\"tm-progress-label\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var48 string
-		templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.JoinStringErrs(trainingMaterialProgressPercentLabel(data.Progress.ProgressPercent))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 592, Col: 123}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var48))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 113, "</p></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 110, "</p></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(data.Tags) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 114, "<div class=\"tm-tag-list\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 111, "<div class=\"tm-tag-list\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1497,12 +1458,12 @@ func TrainingMaterialWatch(data TrainingMaterialWatchData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 115, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 112, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 116, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 113, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1525,7 +1486,7 @@ func TrainingMaterialWatch(data TrainingMaterialWatchData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 117, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 114, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1549,29 +1510,16 @@ func TrainingMaterialsProgressReport(data TrainingMaterialsProgressData) templ.C
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var49 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var49 == nil {
-			templ_7745c5c3_Var49 = templ.NopComponent
+		templ_7745c5c3_Var46 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var46 == nil {
+			templ_7745c5c3_Var46 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 118, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Training Progress - Zion English Admin</title><link rel=\"icon\" type=\"image/x-icon\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 115, "<!doctype html><html lang=\"en\"><head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var50 templ.SafeURL
-		templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/static/favicon.ico"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 625, Col: 78}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var50))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 119, "\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = GlobalIncludes().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = AdminPageHead("Training Progress - Zion English Admin").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1583,7 +1531,7 @@ func TrainingMaterialsProgressReport(data TrainingMaterialsProgressData) templ.C
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 120, "</head><body><div class=\"container tm-page\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 116, "</head><body><div class=\"container tm-page\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1591,129 +1539,129 @@ func TrainingMaterialsProgressReport(data TrainingMaterialsProgressData) templ.C
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 121, "<div class=\"hub-header\"><div class=\"tm-page-heading\"><h2 class=\"hub-title\">Training Progress</h2><p class=\"tm-page-subtitle\">See which teachers have watched each training material.</p></div><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 117, "<div class=\"hub-header\"><div class=\"tm-page-heading\"><h2 class=\"hub-title\">Training Progress</h2><p class=\"tm-page-subtitle\">See which teachers have watched each training material.</p></div><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var51 templ.SafeURL
-		templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.JoinURLErrs(data.BackURL)
+		var templ_7745c5c3_Var47 templ.SafeURL
+		templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.JoinURLErrs(data.BackURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 638, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 626, Col: 26}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var51))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 122, "\" class=\"btn btn-secondary\">Back to library</a></div><form class=\"tm-filter-form\" method=\"GET\" action=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var47))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var52 templ.SafeURL
-		templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/training-materials/progress"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 641, Col: 95}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var52))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 118, "\" class=\"btn btn-secondary\">Back to library</a></div><form class=\"tm-filter-form\" method=\"GET\" action=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 123, "\"><div class=\"form-group\"><label for=\"tmFilterMaterial\">Material</label> <select id=\"tmFilterMaterial\" name=\"material_id\"><option value=\"\">All materials</option> ")
+		var templ_7745c5c3_Var48 templ.SafeURL
+		templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/training-materials/progress"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 629, Col: 95}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var48))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 119, "\"><div class=\"form-group\"><label for=\"tmFilterMaterial\">Material</label> <select id=\"tmFilterMaterial\" name=\"material_id\"><option value=\"\">All materials</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, opt := range data.MaterialOptions {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 124, "<option value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 120, "<option value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var53 string
-			templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.ID)
+			var templ_7745c5c3_Var49 string
+			templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 647, Col: 29}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 635, Col: 29}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var53)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var49)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 125, "\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 121, "\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.SelectedMaterial == opt.ID {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 126, " selected")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 122, " selected")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 127, ">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 123, ">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var54 string
-			templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Title)
+			var templ_7745c5c3_Var50 string
+			templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 647, Col: 89}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 635, Col: 89}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var54))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var50))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 128, "</option>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 124, "</option>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 129, "</select></div><div class=\"form-group\"><label for=\"tmFilterStatus\">Status</label> <select id=\"tmFilterStatus\" name=\"status\"><option value=\"all\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 125, "</select></div><div class=\"form-group\"><label for=\"tmFilterStatus\">Status</label> <select id=\"tmFilterStatus\" name=\"status\"><option value=\"all\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.StatusFilter == "all" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 126, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 127, ">All</option> <option value=\"completed\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.StatusFilter == "completed" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 128, " selected")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 129, ">Completed</option> <option value=\"in_progress\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.StatusFilter == "in_progress" {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 130, " selected")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 131, ">All</option> <option value=\"completed\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 131, ">In progress</option> <option value=\"not_started\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if data.StatusFilter == "completed" {
+		if data.StatusFilter == "not_started" {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 132, " selected")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 133, ">Completed</option> <option value=\"in_progress\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if data.StatusFilter == "in_progress" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 134, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 135, ">In progress</option> <option value=\"not_started\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		if data.StatusFilter == "not_started" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 136, " selected")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 137, ">Not started</option></select></div><button type=\"submit\" class=\"btn\">Filter</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 133, ">Not started</option></select></div><button type=\"submit\" class=\"btn\">Filter</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(data.Items) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 138, "<div class=\"table-wrap\"><table class=\"data-table\"><thead><tr><th>Teacher</th><th>Material</th><th>Progress</th><th>Completed</th><th>Last watched</th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 134, "<div class=\"table-wrap\"><table class=\"data-table\"><thead><tr><th>Teacher</th><th>Material</th><th>Progress</th><th>Completed</th><th>Last watched</th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, item := range data.Items {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 139, "<tr><td>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 135, "<tr><td>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1721,20 +1669,20 @@ func TrainingMaterialsProgressReport(data TrainingMaterialsProgressData) templ.C
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 140, "</td><td>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 136, "</td><td>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var55 string
-				templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.JoinStringErrs(item.MaterialTitle)
+				var templ_7745c5c3_Var51 string
+				templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.JoinStringErrs(item.MaterialTitle)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 679, Col: 33}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 667, Col: 33}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var55))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var51))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 141, "</td><td>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 137, "</td><td>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1749,38 +1697,38 @@ func TrainingMaterialsProgressReport(data TrainingMaterialsProgressData) templ.C
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 142, "</td><td>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 138, "</td><td>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var56 string
-				templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.JoinStringErrs(item.CompletedAt)
+				var templ_7745c5c3_Var52 string
+				templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.JoinStringErrs(item.CompletedAt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 687, Col: 31}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 675, Col: 31}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var56))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 143, "</td><td>")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var52))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var57 string
-				templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.JoinStringErrs(item.LastViewedAt)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 688, Col: 32}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var57))
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 139, "</td><td>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 144, "</td></tr>")
+				var templ_7745c5c3_Var53 string
+				templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.JoinStringErrs(item.LastViewedAt)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/training_materials.templ`, Line: 676, Col: 32}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var53))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 140, "</td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 145, "</tbody></table></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 141, "</tbody></table></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1789,12 +1737,12 @@ func TrainingMaterialsProgressReport(data TrainingMaterialsProgressData) templ.C
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 146, "<div class=\"tm-empty\"><p>No progress records match these filters.</p></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 142, "<div class=\"tm-empty\"><p>No progress records match these filters.</p></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 147, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 143, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1802,7 +1750,7 @@ func TrainingMaterialsProgressReport(data TrainingMaterialsProgressData) templ.C
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 148, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 144, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1826,12 +1774,12 @@ func TrainingMaterialPlusIcon() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var58 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var58 == nil {
-			templ_7745c5c3_Var58 = templ.NopComponent
+		templ_7745c5c3_Var54 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var54 == nil {
+			templ_7745c5c3_Var54 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 149, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14\"></path> <path d=\"M5 12h14\"></path></svg>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 145, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14\"></path> <path d=\"M5 12h14\"></path></svg>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1855,12 +1803,12 @@ func TrainingMaterialVideoIcon() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var59 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var59 == nil {
-			templ_7745c5c3_Var59 = templ.NopComponent
+		templ_7745c5c3_Var55 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var55 == nil {
+			templ_7745c5c3_Var55 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 150, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m16 13 5.223-3.482a.5.5 0 0 1 .777.416V14.87a.5.5 0 0 1-.777.416L16 11.87\"></path> <rect width=\"14\" height=\"12\" x=\"2\" y=\"6\" rx=\"2\"></rect></svg>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 146, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m16 13 5.223-3.482a.5.5 0 0 1 .777.416V14.87a.5.5 0 0 1-.777.416L16 11.87\"></path> <rect width=\"14\" height=\"12\" x=\"2\" y=\"6\" rx=\"2\"></rect></svg>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1884,12 +1832,12 @@ func TrainingMaterialsStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var60 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var60 == nil {
-			templ_7745c5c3_Var60 = templ.NopComponent
+		templ_7745c5c3_Var56 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var56 == nil {
+			templ_7745c5c3_Var56 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 151, "<style>\n\t\t.tm-page { padding-bottom: var(--space-10); }\n\t\t.tm-page-heading { display: flex; flex-direction: column; gap: var(--space-1); }\n\t\t.tm-page-subtitle { color: var(--color-muted-foreground); font-size: 0.9375rem; line-height: 1.5; max-width: 36rem; }\n\t\t.tm-header-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\tgap: var(--space-2);\n\t\t\talign-items: center;\n\t\t\tjustify-content: flex-end;\n\t\t\tflex-shrink: 0;\n\t\t}\n\t\t.tm-header-actions .btn,\n\t\t.tm-header-actions .add-btn,\n\t\t.tm-header-actions button {\n\t\t\tmargin-top: 0;\n\t\t\twidth: auto;\n\t\t}\n\t\t.hub-header > .btn,\n\t\t.hub-header > a.btn {\n\t\t\tmargin-top: 0;\n\t\t\twidth: auto;\n\t\t\tflex-shrink: 0;\n\t\t}\n\t\t.tm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-4); margin-top: var(--space-4); }\n\t\t.tm-card { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); box-shadow: var(--shadow-sm); }\n\t\t.tm-card-title { font-size: 1.0625rem; font-weight: 600; line-height: 1.35; }\n\t\t.tm-card-description { color: var(--color-muted-foreground); font-size: 0.875rem; line-height: 1.5; }\n\t\t.tm-card-badges { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }\n\t\t.tm-card-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tjustify-content: flex-end;\n\t\t\tgap: var(--space-1);\n\t\t\tflex-shrink: 0;\n\t\t}\n\t\t.tm-card-actions .btn {\n\t\t\tdisplay: inline-flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\theight: 36px;\n\t\t\tmargin-top: 0;\n\t\t\tpadding: 0 var(--space-3);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tline-height: 1;\n\t\t\tbox-sizing: border-box;\n\t\t}\n\t\t.tm-card-footer { margin-top: auto; display: flex; justify-content: flex-end; }\n\t\t.tm-thumb { width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-md); overflow: hidden; background: linear-gradient(180deg, #F0FDFA 0%, #E6FFFA 100%); border: 1px solid var(--color-border-subtle); position: relative; }\n\t\t.tm-thumb-img { width: 100%; height: 100%; object-fit: cover; display: block; }\n\t\t.tm-thumb-placeholder { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: var(--color-muted-foreground); }\n\t\t.tm-tag-list { display: flex; flex-wrap: wrap; gap: var(--space-2); }\n\t\t.tm-tag-pill { display: inline-flex; align-items: center; padding: 0.2rem 0.55rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600; border: var(--pill-border); }\n\t\t.tm-empty { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); padding: var(--space-10) var(--space-4); color: var(--color-muted-foreground); text-align: center; }\n\t\t.tm-empty-icon { color: var(--color-primary); }\n\t\t.tm-view-body, .tm-form-body { display: flex; flex-direction: column; gap: var(--space-4); }\n\t\t.tm-view-label { font-size: 0.8125rem; font-weight: 600; color: var(--color-muted-foreground); text-transform: uppercase; letter-spacing: 0.04em; }\n\t\t.tm-view-text { font-size: 0.9375rem; line-height: 1.6; white-space: pre-wrap; }\n\t\t.tm-view-link { word-break: break-all; font-size: 0.875rem; }\n\t\t.tm-view-meta { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); border-radius: var(--radius-md); background: var(--color-muted); }\n\t\t.tm-meta-item { display: flex; flex-direction: column; gap: 2px; }\n\t\t.tm-meta-label { font-size: 0.75rem; font-weight: 600; color: var(--color-muted-foreground); text-transform: uppercase; }\n\t\t.tm-meta-value { font-size: 0.875rem; }\n\t\t.tm-form-footer {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-3);\n\t\t\tjustify-content: flex-end;\n\t\t}\n\t\t.tm-view-footer {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-3);\n\t\t\tpadding: var(--space-2) var(--space-4) var(--space-4);\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\n\t\t}\n\t\t.tm-form-footer-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tjustify-content: flex-end;\n\t\t\tgap: var(--space-3);\n\t\t\twidth: 100%;\n\t\t}\n\t\t.tm-view-footer-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tjustify-content: flex-end;\n\t\t\tgap: var(--space-3);\n\t\t\twidth: 100%;\n\t\t}\n\t\t.tm-view-footer button,\n\t\t.tm-view-footer .btn,\n\t\t.tm-view-footer .add-btn,\n\t\t.tm-form-footer button,\n\t\t.tm-form-footer .btn,\n\t\t.tm-form-footer .add-btn {\n\t\t\tmargin-top: 0;\n\t\t}\n\t\t.tm-tag-input-wrap { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; padding: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); min-height: 2.75rem; }\n\t\t.tm-tag-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }\n\t\t.tm-tag-chip { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.15rem 0.5rem; border-radius: var(--radius-full); background: var(--color-muted); font-size: 0.8125rem; border: var(--pill-border); }\n\t\t.tm-tag-text-input { flex: 1; min-width: 8rem; border: none; outline: none; background: transparent; font-size: 0.875rem; }\n\t\t.tm-url-preview-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.75); font-size: 0.8125rem; color: var(--color-muted-foreground); }\n\t\t.tm-url-preview.is-loading .tm-url-preview-loading { display: flex; }\n\t\t.tm-url-preview:not(.is-loading) .tm-url-preview-loading { display: none; }\n\t\t.tm-watch-page { padding-bottom: var(--space-10); }\n\t\t.tm-watch-header {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\talign-items: flex-start;\n\t\t\tgap: var(--space-3);\n\t\t\tmargin-bottom: var(--space-4);\n\t\t}\n\t\t.tm-watch-header .btn {\n\t\t\tmargin-top: 0;\n\t\t\twidth: auto;\n\t\t}\n\t\t.tm-player-wrap { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--color-border); background: #000; }\n\t\t.tm-player-wrap iframe, #tmYouTubePlayer { width: 100%; height: 100%; }\n\t\t.tm-watch-progress { margin-top: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); }\n\t\t.tm-progress-bar { width: 100%; height: 0.5rem; border-radius: var(--radius-full); background: var(--color-muted); overflow: hidden; }\n\t\t.tm-progress-fill { height: 100%; background: var(--color-primary); transition: width 0.3s ease; }\n\t\t.tm-progress-label { font-size: 0.875rem; color: var(--color-muted-foreground); }\n\t\t.tm-filter-form { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: flex-end; margin: var(--space-4) 0; }\n\t\t.tm-filter-form .form-group { margin: 0; min-width: 12rem; }\n\t\t#tmViewModalHost .modal-overlay, #tmEditModalHost .modal-overlay { z-index: 1100; }\n\t\t@media (max-width: 768px) {\n\t\t\t.hub-header { flex-direction: column; align-items: stretch; }\n\t\t\t.hub-header > .btn,\n\t\t\t.hub-header > a.btn {\n\t\t\t\talign-self: flex-start;\n\t\t\t}\n\t\t\t.tm-header-actions .btn,\n\t\t\t.tm-header-actions .add-btn {\n\t\t\t\twidth: auto;\n\t\t\t}\n\t\t}\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 147, "<style>\n\t\t.tm-page { padding-bottom: var(--space-10); }\n\t\t.tm-page-heading { display: flex; flex-direction: column; gap: var(--space-1); }\n\t\t.tm-page-subtitle { color: var(--color-muted-foreground); font-size: 0.9375rem; line-height: 1.5; max-width: 36rem; }\n\t\t.tm-header-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\tgap: var(--space-2);\n\t\t\talign-items: center;\n\t\t\tjustify-content: flex-end;\n\t\t\tflex-shrink: 0;\n\t\t}\n\t\t.tm-header-actions .btn,\n\t\t.tm-header-actions .add-btn,\n\t\t.tm-header-actions button {\n\t\t\tmargin-top: 0;\n\t\t\twidth: auto;\n\t\t}\n\t\t.hub-header > .btn,\n\t\t.hub-header > a.btn {\n\t\t\tmargin-top: 0;\n\t\t\twidth: auto;\n\t\t\tflex-shrink: 0;\n\t\t}\n\t\t.tm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-4); margin-top: var(--space-4); }\n\t\t.tm-card { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); box-shadow: var(--shadow-sm); }\n\t\t.tm-card-title { font-size: 1.0625rem; font-weight: 600; line-height: 1.35; }\n\t\t.tm-card-description { color: var(--color-muted-foreground); font-size: 0.875rem; line-height: 1.5; }\n\t\t.tm-card-badges { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }\n\t\t.tm-card-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tjustify-content: flex-end;\n\t\t\tgap: var(--space-1);\n\t\t\tflex-shrink: 0;\n\t\t}\n\t\t.tm-card-actions .btn {\n\t\t\tdisplay: inline-flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\theight: 36px;\n\t\t\tmargin-top: 0;\n\t\t\tpadding: 0 var(--space-3);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tline-height: 1;\n\t\t\tbox-sizing: border-box;\n\t\t}\n\t\t.tm-card-footer { margin-top: auto; display: flex; justify-content: flex-end; }\n\t\t.tm-thumb { width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-md); overflow: hidden; background: linear-gradient(180deg, #F0FDFA 0%, #E6FFFA 100%); border: 1px solid var(--color-border-subtle); position: relative; }\n\t\t.tm-thumb-img { width: 100%; height: 100%; object-fit: cover; display: block; }\n\t\t.tm-thumb-placeholder { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: var(--color-muted-foreground); }\n\t\t.tm-tag-list { display: flex; flex-wrap: wrap; gap: var(--space-2); }\n\t\t.tm-tag-pill { display: inline-flex; align-items: center; padding: 0.2rem 0.55rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600; border: var(--pill-border); }\n\t\t.tm-empty { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); padding: var(--space-10) var(--space-4); color: var(--color-muted-foreground); text-align: center; }\n\t\t.tm-empty-icon { color: var(--color-primary); }\n\t\t.tm-view-body, .tm-form-body { display: flex; flex-direction: column; gap: var(--space-4); }\n\t\t.tm-view-label { font-size: 0.8125rem; font-weight: 600; color: var(--color-muted-foreground); text-transform: uppercase; letter-spacing: 0.04em; }\n\t\t.tm-view-text { font-size: 0.9375rem; line-height: 1.6; white-space: pre-wrap; }\n\t\t.tm-view-link { word-break: break-all; font-size: 0.875rem; }\n\t\t.tm-view-meta { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); border-radius: var(--radius-md); background: var(--color-muted); }\n\t\t.tm-meta-item { display: flex; flex-direction: column; gap: 2px; }\n\t\t.tm-meta-label { font-size: 0.75rem; font-weight: 600; color: var(--color-muted-foreground); text-transform: uppercase; }\n\t\t.tm-meta-value { font-size: 0.875rem; }\n\t\t.tm-form-footer {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-3);\n\t\t\tjustify-content: flex-end;\n\t\t}\n\t\t.tm-view-footer {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-3);\n\t\t\tpadding: var(--space-2) var(--space-4) var(--space-4);\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\n\t\t}\n\t\t.tm-form-footer-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tjustify-content: flex-end;\n\t\t\tgap: var(--space-3);\n\t\t\twidth: 100%;\n\t\t}\n\t\t.tm-view-footer-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tjustify-content: flex-end;\n\t\t\tgap: var(--space-3);\n\t\t\twidth: 100%;\n\t\t}\n\t\t.tm-view-footer button,\n\t\t.tm-view-footer .btn,\n\t\t.tm-view-footer .add-btn,\n\t\t.tm-form-footer button,\n\t\t.tm-form-footer .btn,\n\t\t.tm-form-footer .add-btn {\n\t\t\tmargin-top: 0;\n\t\t}\n\t\t.tm-tag-input-wrap { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; padding: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); min-height: 2.75rem; }\n\t\t.tm-tag-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }\n\t\t.tm-tag-chip { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.15rem 0.5rem; border-radius: var(--radius-full); background: var(--color-muted); font-size: 0.8125rem; border: var(--pill-border); }\n\t\t.tm-tag-text-input { flex: 1; min-width: 8rem; border: none; outline: none; background: transparent; font-size: 0.875rem; }\n\t\t.tm-url-preview-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.75); font-size: 0.8125rem; color: var(--color-muted-foreground); }\n\t\t.tm-url-preview.is-loading .tm-url-preview-loading { display: flex; }\n\t\t.tm-url-preview:not(.is-loading) .tm-url-preview-loading { display: none; }\n\t\t.tm-watch-page { padding-bottom: var(--space-10); }\n\t\t.tm-watch-header {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\talign-items: flex-start;\n\t\t\tgap: var(--space-3);\n\t\t\tmargin-bottom: var(--space-4);\n\t\t}\n\t\t.tm-watch-header .btn {\n\t\t\tmargin-top: 0;\n\t\t\twidth: auto;\n\t\t}\n\t\t.tm-player-wrap { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--color-border); background: #000; }\n\t\t.tm-player-wrap iframe, #tmYouTubePlayer { width: 100%; height: 100%; }\n\t\t.tm-watch-progress { margin-top: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); }\n\t\t.tm-progress-bar { width: 100%; height: 0.5rem; border-radius: var(--radius-full); background: var(--color-muted); overflow: hidden; }\n\t\t.tm-progress-fill { height: 100%; background: var(--color-primary); transition: width 0.3s ease; }\n\t\t.tm-progress-label { font-size: 0.875rem; color: var(--color-muted-foreground); }\n\t\t.tm-filter-form { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: flex-end; margin: var(--space-4) 0; }\n\t\t.tm-filter-form .form-group { margin: 0; min-width: 12rem; }\n\t\t#tmViewModalHost .modal-overlay, #tmEditModalHost .modal-overlay { z-index: 1100; }\n\t\t@media (max-width: 768px) {\n\t\t\t.hub-header { flex-direction: column; align-items: stretch; }\n\t\t\t.hub-header > .btn,\n\t\t\t.hub-header > a.btn {\n\t\t\t\talign-self: flex-start;\n\t\t\t}\n\t\t\t.tm-header-actions .btn,\n\t\t\t.tm-header-actions .add-btn {\n\t\t\t\twidth: auto;\n\t\t\t}\n\t\t}\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1913,16 +1861,16 @@ func TrainingMaterialsScripts() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var61 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var61 == nil {
-			templ_7745c5c3_Var61 = templ.NopComponent
+		templ_7745c5c3_Var57 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var57 == nil {
+			templ_7745c5c3_Var57 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = templ.JSONScript("tmPreviewURL", utils.URL("/training-materials/preview")).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 152, "<script>\n\t\t(function () {\n\t\t\tif (window._tmScriptsBound) return;\n\t\t\twindow._tmScriptsBound = true;\n\n\t\t\tconst MAX_TAGS = 7;\n\t\t\tconst MIN_TAGS = 1;\n\t\t\tconst previewURLScript = document.getElementById('tmPreviewURL');\n\t\t\tconst PREVIEW_URL = previewURLScript ? JSON.parse(previewURLScript.textContent) : '/training-materials/preview';\n\n\t\t\tfunction normalizeTag(value) {\n\t\t\t\treturn (value || '').trim().toLowerCase();\n\t\t\t}\n\n\t\t\tfunction bindTagInput(form) {\n\t\t\t\tconst wrap = form.querySelector('#tmTagInputWrap');\n\t\t\t\tconst chips = form.querySelector('#tmTagChips');\n\t\t\t\tconst input = form.querySelector('#tmTagInput');\n\t\t\t\tconst limitWarning = form.querySelector('.tm-tag-limit-warning');\n\t\t\t\tif (!wrap || !chips || !input) return;\n\n\t\t\t\tfunction currentTags() {\n\t\t\t\t\treturn Array.from(form.querySelectorAll('input[name=\"tags\"]')).map(function (el) { return el.value; });\n\t\t\t\t}\n\n\t\t\t\tfunction renderChips() {\n\t\t\t\t\tchips.innerHTML = '';\n\t\t\t\t\tcurrentTags().forEach(function (label) {\n\t\t\t\t\t\tconst chip = document.createElement('span');\n\t\t\t\t\t\tchip.className = 'tm-tag-chip';\n\t\t\t\t\t\tchip.textContent = label;\n\t\t\t\t\t\tconst remove = document.createElement('button');\n\t\t\t\t\t\tremove.type = 'button';\n\t\t\t\t\t\tremove.className = 'chip-remove';\n\t\t\t\t\t\tremove.setAttribute('aria-label', 'Remove tag');\n\t\t\t\t\t\tremove.textContent = '×';\n\t\t\t\t\t\tremove.addEventListener('click', function () {\n\t\t\t\t\t\t\tform.querySelectorAll('input[name=\"tags\"]').forEach(function (el) {\n\t\t\t\t\t\t\t\tif (el.value === label) el.remove();\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\trenderChips();\n\t\t\t\t\t\t\tif (limitWarning) limitWarning.hidden = currentTags().length < MAX_TAGS;\n\t\t\t\t\t\t});\n\t\t\t\t\t\tchip.appendChild(remove);\n\t\t\t\t\t\tchips.appendChild(chip);\n\t\t\t\t\t});\n\t\t\t\t\tif (limitWarning) limitWarning.hidden = currentTags().length < MAX_TAGS;\n\t\t\t\t}\n\n\t\t\t\tfunction addTag(value) {\n\t\t\t\t\tconst label = normalizeTag(value);\n\t\t\t\t\tif (!label || currentTags().includes(label)) return;\n\t\t\t\t\tif (currentTags().length >= MAX_TAGS) return;\n\t\t\t\t\tconst hidden = document.createElement('input');\n\t\t\t\t\thidden.type = 'hidden';\n\t\t\t\t\thidden.name = 'tags';\n\t\t\t\t\thidden.value = label;\n\t\t\t\t\tform.appendChild(hidden);\n\t\t\t\t\tinput.value = '';\n\t\t\t\t\trenderChips();\n\t\t\t\t}\n\n\t\t\t\tinput.addEventListener('keydown', function (e) {\n\t\t\t\t\tif (e.key === 'Enter' || e.key === ',') {\n\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\taddTag(input.value);\n\t\t\t\t\t}\n\t\t\t\t});\n\n\t\t\t\trenderChips();\n\t\t\t}\n\n\t\t\tlet previewTimer = null;\n\t\t\tfunction bindUrlPreview(form) {\n\t\t\t\tconst urlInput = form.querySelector('#tmURL');\n\t\t\t\tconst preview = form.querySelector('#tmUrlPreview');\n\t\t\t\tconst img = form.querySelector('#tmUrlPreviewImg');\n\t\t\t\tconst placeholder = form.querySelector('#tmUrlPreviewPlaceholder');\n\t\t\t\tconst sourceTypeInput = form.querySelector('#tmSourceType');\n\t\t\t\tif (!urlInput || !preview) return;\n\n\t\t\t\turlInput.addEventListener('input', function () {\n\t\t\t\t\tclearTimeout(previewTimer);\n\t\t\t\t\tpreviewTimer = setTimeout(function () {\n\t\t\t\t\t\tconst url = (urlInput.value || '').trim();\n\t\t\t\t\t\tif (!url) {\n\t\t\t\t\t\t\tpreview.hidden = true;\n\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t}\n\t\t\t\t\t\tpreview.hidden = false;\n\t\t\t\t\t\tpreview.classList.add('is-loading');\n\t\t\t\t\t\tfetch(PREVIEW_URL + '?url=' + encodeURIComponent(url))\n\t\t\t\t\t\t\t.then(function (r) { return r.json(); })\n\t\t\t\t\t\t\t.then(function (data) {\n\t\t\t\t\t\t\t\tpreview.classList.remove('is-loading');\n\t\t\t\t\t\t\t\tif (data.thumbnail_url && img) {\n\t\t\t\t\t\t\t\t\timg.src = data.thumbnail_url;\n\t\t\t\t\t\t\t\t\timg.hidden = false;\n\t\t\t\t\t\t\t\t\tif (placeholder) placeholder.hidden = true;\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\tif (data.source_type && sourceTypeInput) {\n\t\t\t\t\t\t\t\t\tsourceTypeInput.value = data.source_type;\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t})\n\t\t\t\t\t\t\t.catch(function () { preview.classList.remove('is-loading'); });\n\t\t\t\t\t}, 400);\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tfunction openModal(overlay) {\n\t\t\t\tif (!overlay) return;\n\t\t\t\toverlay.hidden = false;\n\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\tconst form = overlay.querySelector('form');\n\t\t\t\tif (form) {\n\t\t\t\t\tbindTagInput(form);\n\t\t\t\t\tbindUrlPreview(form);\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tfunction closeModal(overlay) {\n\t\t\t\tif (!overlay) return;\n\t\t\t\toverlay.hidden = true;\n\t\t\t\tif (!document.getElementById('tmViewModal') && !document.getElementById('tmEditModal')) {\n\t\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tdocument.getElementById('openCreateTrainingBtn')?.addEventListener('click', function () {\n\t\t\t\topenModal(document.getElementById('tmFormModal'));\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tif (e.target.closest('.tm-form-close')) {\n\t\t\t\t\tconst overlay = e.target.closest('.modal-overlay');\n\t\t\t\t\tif (overlay?.id === 'tmEditModal') {\n\t\t\t\t\t\tdocument.getElementById('tmEditModalHost').innerHTML = '';\n\t\t\t\t\t} else {\n\t\t\t\t\t\tcloseModal(overlay);\n\t\t\t\t\t}\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst overlay = e.target.closest('#tmFormModal, #tmEditModal');\n\t\t\t\tif (overlay && e.target === overlay) {\n\t\t\t\t\tif (overlay.id === 'tmEditModal') {\n\t\t\t\t\t\tdocument.getElementById('tmEditModalHost').innerHTML = '';\n\t\t\t\t\t} else {\n\t\t\t\t\t\tcloseModal(overlay);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.id === 'tmEditModalHost') {\n\t\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\t\tconst form = evt.detail.target.querySelector('form');\n\t\t\t\t\tif (form) {\n\t\t\t\t\t\tbindTagInput(form);\n\t\t\t\t\t\tbindUrlPreview(form);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\t\t})();\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 148, "<script>\n\t\t(function () {\n\t\t\tif (window._tmScriptsBound) return;\n\t\t\twindow._tmScriptsBound = true;\n\n\t\t\tconst MAX_TAGS = 7;\n\t\t\tconst MIN_TAGS = 1;\n\t\t\tconst previewURLScript = document.getElementById('tmPreviewURL');\n\t\t\tconst PREVIEW_URL = previewURLScript ? JSON.parse(previewURLScript.textContent) : '/training-materials/preview';\n\n\t\t\tfunction normalizeTag(value) {\n\t\t\t\treturn (value || '').trim().toLowerCase();\n\t\t\t}\n\n\t\t\tfunction bindTagInput(form) {\n\t\t\t\tconst wrap = form.querySelector('#tmTagInputWrap');\n\t\t\t\tconst chips = form.querySelector('#tmTagChips');\n\t\t\t\tconst input = form.querySelector('#tmTagInput');\n\t\t\t\tconst limitWarning = form.querySelector('.tm-tag-limit-warning');\n\t\t\t\tif (!wrap || !chips || !input) return;\n\n\t\t\t\tfunction currentTags() {\n\t\t\t\t\treturn Array.from(form.querySelectorAll('input[name=\"tags\"]')).map(function (el) { return el.value; });\n\t\t\t\t}\n\n\t\t\t\tfunction renderChips() {\n\t\t\t\t\tchips.innerHTML = '';\n\t\t\t\t\tcurrentTags().forEach(function (label) {\n\t\t\t\t\t\tconst chip = document.createElement('span');\n\t\t\t\t\t\tchip.className = 'tm-tag-chip';\n\t\t\t\t\t\tchip.textContent = label;\n\t\t\t\t\t\tconst remove = document.createElement('button');\n\t\t\t\t\t\tremove.type = 'button';\n\t\t\t\t\t\tremove.className = 'chip-remove';\n\t\t\t\t\t\tremove.setAttribute('aria-label', 'Remove tag');\n\t\t\t\t\t\tremove.textContent = '×';\n\t\t\t\t\t\tremove.addEventListener('click', function () {\n\t\t\t\t\t\t\tform.querySelectorAll('input[name=\"tags\"]').forEach(function (el) {\n\t\t\t\t\t\t\t\tif (el.value === label) el.remove();\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\trenderChips();\n\t\t\t\t\t\t\tif (limitWarning) limitWarning.hidden = currentTags().length < MAX_TAGS;\n\t\t\t\t\t\t});\n\t\t\t\t\t\tchip.appendChild(remove);\n\t\t\t\t\t\tchips.appendChild(chip);\n\t\t\t\t\t});\n\t\t\t\t\tif (limitWarning) limitWarning.hidden = currentTags().length < MAX_TAGS;\n\t\t\t\t}\n\n\t\t\t\tfunction addTag(value) {\n\t\t\t\t\tconst label = normalizeTag(value);\n\t\t\t\t\tif (!label || currentTags().includes(label)) return;\n\t\t\t\t\tif (currentTags().length >= MAX_TAGS) return;\n\t\t\t\t\tconst hidden = document.createElement('input');\n\t\t\t\t\thidden.type = 'hidden';\n\t\t\t\t\thidden.name = 'tags';\n\t\t\t\t\thidden.value = label;\n\t\t\t\t\tform.appendChild(hidden);\n\t\t\t\t\tinput.value = '';\n\t\t\t\t\trenderChips();\n\t\t\t\t}\n\n\t\t\t\tinput.addEventListener('keydown', function (e) {\n\t\t\t\t\tif (e.key === 'Enter' || e.key === ',') {\n\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\taddTag(input.value);\n\t\t\t\t\t}\n\t\t\t\t});\n\n\t\t\t\trenderChips();\n\t\t\t}\n\n\t\t\tlet previewTimer = null;\n\t\t\tfunction bindUrlPreview(form) {\n\t\t\t\tconst urlInput = form.querySelector('#tmURL');\n\t\t\t\tconst preview = form.querySelector('#tmUrlPreview');\n\t\t\t\tconst img = form.querySelector('#tmUrlPreviewImg');\n\t\t\t\tconst placeholder = form.querySelector('#tmUrlPreviewPlaceholder');\n\t\t\t\tconst sourceTypeInput = form.querySelector('#tmSourceType');\n\t\t\t\tif (!urlInput || !preview) return;\n\n\t\t\t\turlInput.addEventListener('input', function () {\n\t\t\t\t\tclearTimeout(previewTimer);\n\t\t\t\t\tpreviewTimer = setTimeout(function () {\n\t\t\t\t\t\tconst url = (urlInput.value || '').trim();\n\t\t\t\t\t\tif (!url) {\n\t\t\t\t\t\t\tpreview.hidden = true;\n\t\t\t\t\t\t\treturn;\n\t\t\t\t\t\t}\n\t\t\t\t\t\tpreview.hidden = false;\n\t\t\t\t\t\tpreview.classList.add('is-loading');\n\t\t\t\t\t\tfetch(PREVIEW_URL + '?url=' + encodeURIComponent(url))\n\t\t\t\t\t\t\t.then(function (r) { return r.json(); })\n\t\t\t\t\t\t\t.then(function (data) {\n\t\t\t\t\t\t\t\tpreview.classList.remove('is-loading');\n\t\t\t\t\t\t\t\tif (data.thumbnail_url && img) {\n\t\t\t\t\t\t\t\t\timg.src = data.thumbnail_url;\n\t\t\t\t\t\t\t\t\timg.hidden = false;\n\t\t\t\t\t\t\t\t\tif (placeholder) placeholder.hidden = true;\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\tif (data.source_type && sourceTypeInput) {\n\t\t\t\t\t\t\t\t\tsourceTypeInput.value = data.source_type;\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t})\n\t\t\t\t\t\t\t.catch(function () { preview.classList.remove('is-loading'); });\n\t\t\t\t\t}, 400);\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tfunction openModal(overlay) {\n\t\t\t\tif (!overlay) return;\n\t\t\t\toverlay.hidden = false;\n\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\tconst form = overlay.querySelector('form');\n\t\t\t\tif (form) {\n\t\t\t\t\tbindTagInput(form);\n\t\t\t\t\tbindUrlPreview(form);\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tfunction closeModal(overlay) {\n\t\t\t\tif (!overlay) return;\n\t\t\t\toverlay.hidden = true;\n\t\t\t\tif (!document.getElementById('tmViewModal') && !document.getElementById('tmEditModal')) {\n\t\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tdocument.getElementById('openCreateTrainingBtn')?.addEventListener('click', function () {\n\t\t\t\topenModal(document.getElementById('tmFormModal'));\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tif (e.target.closest('.tm-form-close')) {\n\t\t\t\t\tconst overlay = e.target.closest('.modal-overlay');\n\t\t\t\t\tif (overlay?.id === 'tmEditModal') {\n\t\t\t\t\t\tdocument.getElementById('tmEditModalHost').innerHTML = '';\n\t\t\t\t\t} else {\n\t\t\t\t\t\tcloseModal(overlay);\n\t\t\t\t\t}\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst overlay = e.target.closest('#tmFormModal, #tmEditModal');\n\t\t\t\tif (overlay && e.target === overlay) {\n\t\t\t\t\tif (overlay.id === 'tmEditModal') {\n\t\t\t\t\t\tdocument.getElementById('tmEditModalHost').innerHTML = '';\n\t\t\t\t\t} else {\n\t\t\t\t\t\tcloseModal(overlay);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.id === 'tmEditModalHost') {\n\t\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\t\tconst form = evt.detail.target.querySelector('form');\n\t\t\t\t\tif (form) {\n\t\t\t\t\t\tbindTagInput(form);\n\t\t\t\t\t\tbindUrlPreview(form);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1946,12 +1894,12 @@ func TrainingMaterialViewModalScripts() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var62 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var62 == nil {
-			templ_7745c5c3_Var62 = templ.NopComponent
+		templ_7745c5c3_Var58 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var58 == nil {
+			templ_7745c5c3_Var58 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 153, "<script>\n\t\t(function () {\n\t\t\tif (window._tmViewModalBound) return;\n\t\t\twindow._tmViewModalBound = true;\n\n\t\t\tfunction isOpenModalOverlay(id) {\n\t\t\t\tconst el = document.getElementById(id);\n\t\t\t\treturn !!(el && !el.hidden);\n\t\t\t}\n\n\t\t\tfunction hasOpenModalLayer() {\n\t\t\t\treturn (\n\t\t\t\t\tisOpenModalOverlay('tmViewModal') ||\n\t\t\t\t\tisOpenModalOverlay('tmEditModal') ||\n\t\t\t\t\tisOpenModalOverlay('tmFormModal')\n\t\t\t\t);\n\t\t\t}\n\n\t\t\twindow.closeTrainingMaterialViewModal = function () {\n\t\t\t\tconst host = document.getElementById('tmViewModalHost');\n\t\t\t\tif (host) host.innerHTML = '';\n\t\t\t\tif (!hasOpenModalLayer()) {\n\t\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t\t}\n\t\t\t};\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tif (e.target.closest('.tm-view-close')) {\n\t\t\t\t\twindow.closeTrainingMaterialViewModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst viewOverlay = e.target.closest('#tmViewModal');\n\t\t\t\tif (viewOverlay && e.target === viewOverlay) {\n\t\t\t\t\twindow.closeTrainingMaterialViewModal();\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.addEventListener('keydown', function (e) {\n\t\t\t\tif (e.key === 'Escape' && document.getElementById('tmViewModal')) {\n\t\t\t\t\twindow.closeTrainingMaterialViewModal();\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.id !== 'tmViewModalHost') return;\n\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t});\n\t\t})();\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 149, "<script>\n\t\t(function () {\n\t\t\tif (window._tmViewModalBound) return;\n\t\t\twindow._tmViewModalBound = true;\n\n\t\t\tfunction isOpenModalOverlay(id) {\n\t\t\t\tconst el = document.getElementById(id);\n\t\t\t\treturn !!(el && !el.hidden);\n\t\t\t}\n\n\t\t\tfunction hasOpenModalLayer() {\n\t\t\t\treturn (\n\t\t\t\t\tisOpenModalOverlay('tmViewModal') ||\n\t\t\t\t\tisOpenModalOverlay('tmEditModal') ||\n\t\t\t\t\tisOpenModalOverlay('tmFormModal')\n\t\t\t\t);\n\t\t\t}\n\n\t\t\twindow.closeTrainingMaterialViewModal = function () {\n\t\t\t\tconst host = document.getElementById('tmViewModalHost');\n\t\t\t\tif (host) host.innerHTML = '';\n\t\t\t\tif (!hasOpenModalLayer()) {\n\t\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t\t}\n\t\t\t};\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tif (e.target.closest('.tm-view-close')) {\n\t\t\t\t\twindow.closeTrainingMaterialViewModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst viewOverlay = e.target.closest('#tmViewModal');\n\t\t\t\tif (viewOverlay && e.target === viewOverlay) {\n\t\t\t\t\twindow.closeTrainingMaterialViewModal();\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.addEventListener('keydown', function (e) {\n\t\t\t\tif (e.key === 'Escape' && document.getElementById('tmViewModal')) {\n\t\t\t\t\twindow.closeTrainingMaterialViewModal();\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.id !== 'tmViewModalHost') return;\n\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t});\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1975,12 +1923,12 @@ func TrainingMaterialWatchScripts() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var63 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var63 == nil {
-			templ_7745c5c3_Var63 = templ.NopComponent
+		templ_7745c5c3_Var59 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var59 == nil {
+			templ_7745c5c3_Var59 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 154, "<script>\n\t\t(function () {\n\t\t\tconst configEl = document.getElementById('tmWatchConfig');\n\t\t\tif (!configEl) return;\n\t\t\tconst config = JSON.parse(configEl.textContent);\n\t\t\tconst playerHost = document.getElementById('tmYouTubePlayer');\n\t\t\tlet player = null;\n\t\t\tlet durationSeconds = config.durationSeconds || 0;\n\t\t\tlet lastReportedSeconds = 0;\n\t\t\tlet heartbeatTimer = null;\n\n\t\t\tfunction updateProgressUI(percent) {\n\t\t\t\tconst fill = document.getElementById('tmProgressFill');\n\t\t\t\tconst label = document.getElementById('tmProgressLabel');\n\t\t\t\tif (fill) fill.style.width = percent + '%';\n\t\t\t\tif (label) label.textContent = Math.round(percent) + '% complete';\n\t\t\t}\n\n\t\t\tfunction sendProgress() {\n\t\t\t\tif (!player || !config.progressUrl) return;\n\t\t\t\tconst current = Math.floor(player.getCurrentTime() || 0);\n\t\t\t\tif (current < lastReportedSeconds) return;\n\t\t\t\tlastReportedSeconds = current;\n\t\t\t\tconst duration = Math.floor(player.getDuration() || durationSeconds || 0);\n\t\t\t\tif (duration > 0) durationSeconds = duration;\n\t\t\t\tconst percent = duration > 0 ? Math.min(100, (current / duration) * 100) : 0;\n\t\t\t\tupdateProgressUI(percent);\n\t\t\t\tfetch(config.progressUrl, {\n\t\t\t\t\tmethod: 'POST',\n\t\t\t\t\tcredentials: 'same-origin',\n\t\t\t\t\theaders: Object.assign(\n\t\t\t\t\t\t{ 'Content-Type': 'application/json' },\n\t\t\t\t\t\twindow.getCSRFHeaders ? window.getCSRFHeaders() : {}\n\t\t\t\t\t),\n\t\t\t\t\tbody: JSON.stringify({\n\t\t\t\t\t\twatch_seconds: current,\n\t\t\t\t\t\tprogress_percent: percent,\n\t\t\t\t\t\tduration_seconds: duration\n\t\t\t\t\t})\n\t\t\t\t}).catch(function () {});\n\t\t\t}\n\n\t\t\tfunction pauseOnFocusLoss() {\n\t\t\t\tif (player && typeof player.pauseVideo === 'function') {\n\t\t\t\t\tplayer.pauseVideo();\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tdocument.addEventListener('visibilitychange', function () {\n\t\t\t\tif (document.hidden) pauseOnFocusLoss();\n\t\t\t});\n\t\t\twindow.addEventListener('blur', pauseOnFocusLoss);\n\n\t\t\tfunction initYouTubePlayer() {\n\t\t\t\tif (config.sourceType !== 'youtube' || !config.videoId || !playerHost) return;\n\t\t\t\tplayer = new YT.Player('tmYouTubePlayer', {\n\t\t\t\t\tvideoId: config.videoId,\n\t\t\t\t\tplayerVars: { enablejsapi: 1, rel: 0, modestbranding: 1 },\n\t\t\t\t\tevents: {\n\t\t\t\t\t\tonReady: function () {\n\t\t\t\t\t\t\tupdateProgressUI(config.initialProgress || 0);\n\t\t\t\t\t\t\theartbeatTimer = setInterval(sendProgress, 15000);\n\t\t\t\t\t\t},\n\t\t\t\t\t\tonStateChange: function (event) {\n\t\t\t\t\t\t\tif (event.data === YT.PlayerState.PLAYING) {\n\t\t\t\t\t\t\t\tsendProgress();\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\twindow.onYouTubeIframeAPIReady = initYouTubePlayer;\n\n\t\t\tfunction loadYouTubeAPI() {\n\t\t\t\tif (config.sourceType !== 'youtube' || !config.videoId || !playerHost) return;\n\t\t\t\tif (window.YT && window.YT.Player) {\n\t\t\t\t\tinitYouTubePlayer();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst existing = document.querySelector('script[data-tm-youtube-api]');\n\t\t\t\tif (existing) return;\n\t\t\t\tconst tag = document.createElement('script');\n\t\t\t\ttag.src = 'https://www.youtube.com/iframe_api';\n\t\t\t\ttag.async = true;\n\t\t\t\ttag.setAttribute('data-tm-youtube-api', '1');\n\t\t\t\tdocument.head.appendChild(tag);\n\t\t\t}\n\n\t\t\tloadYouTubeAPI();\n\n\t\t\twindow.addEventListener('beforeunload', function () {\n\t\t\t\tif (heartbeatTimer) clearInterval(heartbeatTimer);\n\t\t\t\tsendProgress();\n\t\t\t});\n\t\t})();\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 150, "<script>\n\t\t(function () {\n\t\t\tconst configEl = document.getElementById('tmWatchConfig');\n\t\t\tif (!configEl) return;\n\t\t\tconst config = JSON.parse(configEl.textContent);\n\t\t\tconst playerHost = document.getElementById('tmYouTubePlayer');\n\t\t\tlet player = null;\n\t\t\tlet durationSeconds = config.durationSeconds || 0;\n\t\t\tlet lastReportedSeconds = 0;\n\t\t\tlet heartbeatTimer = null;\n\n\t\t\tfunction updateProgressUI(percent) {\n\t\t\t\tconst fill = document.getElementById('tmProgressFill');\n\t\t\t\tconst label = document.getElementById('tmProgressLabel');\n\t\t\t\tif (fill) fill.style.width = percent + '%';\n\t\t\t\tif (label) label.textContent = Math.round(percent) + '% complete';\n\t\t\t}\n\n\t\t\tfunction sendProgress() {\n\t\t\t\tif (!player || !config.progressUrl) return;\n\t\t\t\tconst current = Math.floor(player.getCurrentTime() || 0);\n\t\t\t\tif (current < lastReportedSeconds) return;\n\t\t\t\tlastReportedSeconds = current;\n\t\t\t\tconst duration = Math.floor(player.getDuration() || durationSeconds || 0);\n\t\t\t\tif (duration > 0) durationSeconds = duration;\n\t\t\t\tconst percent = duration > 0 ? Math.min(100, (current / duration) * 100) : 0;\n\t\t\t\tupdateProgressUI(percent);\n\t\t\t\tfetch(config.progressUrl, {\n\t\t\t\t\tmethod: 'POST',\n\t\t\t\t\tcredentials: 'same-origin',\n\t\t\t\t\theaders: Object.assign(\n\t\t\t\t\t\t{ 'Content-Type': 'application/json' },\n\t\t\t\t\t\twindow.getCSRFHeaders ? window.getCSRFHeaders() : {}\n\t\t\t\t\t),\n\t\t\t\t\tbody: JSON.stringify({\n\t\t\t\t\t\twatch_seconds: current,\n\t\t\t\t\t\tprogress_percent: percent,\n\t\t\t\t\t\tduration_seconds: duration\n\t\t\t\t\t})\n\t\t\t\t}).catch(function () {});\n\t\t\t}\n\n\t\t\tfunction pauseOnFocusLoss() {\n\t\t\t\tif (player && typeof player.pauseVideo === 'function') {\n\t\t\t\t\tplayer.pauseVideo();\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tdocument.addEventListener('visibilitychange', function () {\n\t\t\t\tif (document.hidden) pauseOnFocusLoss();\n\t\t\t});\n\t\t\twindow.addEventListener('blur', pauseOnFocusLoss);\n\n\t\t\tfunction initYouTubePlayer() {\n\t\t\t\tif (config.sourceType !== 'youtube' || !config.videoId || !playerHost) return;\n\t\t\t\tplayer = new YT.Player('tmYouTubePlayer', {\n\t\t\t\t\tvideoId: config.videoId,\n\t\t\t\t\tplayerVars: { enablejsapi: 1, rel: 0, modestbranding: 1 },\n\t\t\t\t\tevents: {\n\t\t\t\t\t\tonReady: function () {\n\t\t\t\t\t\t\tupdateProgressUI(config.initialProgress || 0);\n\t\t\t\t\t\t\theartbeatTimer = setInterval(sendProgress, 15000);\n\t\t\t\t\t\t},\n\t\t\t\t\t\tonStateChange: function (event) {\n\t\t\t\t\t\t\tif (event.data === YT.PlayerState.PLAYING) {\n\t\t\t\t\t\t\t\tsendProgress();\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\twindow.onYouTubeIframeAPIReady = initYouTubePlayer;\n\n\t\t\tfunction loadYouTubeAPI() {\n\t\t\t\tif (config.sourceType !== 'youtube' || !config.videoId || !playerHost) return;\n\t\t\t\tif (window.YT && window.YT.Player) {\n\t\t\t\t\tinitYouTubePlayer();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst existing = document.querySelector('script[data-tm-youtube-api]');\n\t\t\t\tif (existing) return;\n\t\t\t\tconst tag = document.createElement('script');\n\t\t\t\ttag.src = 'https://www.youtube.com/iframe_api';\n\t\t\t\ttag.async = true;\n\t\t\t\ttag.setAttribute('data-tm-youtube-api', '1');\n\t\t\t\tdocument.head.appendChild(tag);\n\t\t\t}\n\n\t\t\tloadYouTubeAPI();\n\n\t\t\twindow.addEventListener('beforeunload', function () {\n\t\t\t\tif (heartbeatTimer) clearInterval(heartbeatTimer);\n\t\t\t\tsendProgress();\n\t\t\t});\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

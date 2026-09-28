@@ -10,6 +10,7 @@ import (
 	"strings"
 	"zion-english/frontend"
 	"zion-english/internal/ads"
+	"zion-english/internal/featureflags"
 	"zion-english/internal/auth"
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
@@ -576,7 +577,7 @@ func handleAdChromePartial(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ctx := r.Context()
-	if ads.SuppressAdsForRequest(ctx, r, dbRO.GetQueries()) {
+	if !featureflags.AdsDisplayEnabled(ctx, dbRO) || ads.SuppressAdsForRequest(ctx, r, dbRO.GetQueries()) {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}

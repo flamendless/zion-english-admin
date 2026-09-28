@@ -1972,15 +1972,23 @@ templ GlobalIncludes() {
 		}
 
 		.icon-action-btn--view,
-		.icon-action-btn--mark-read {
+		.icon-action-btn--mark-read,
+		.icon-action-btn--copy {
 			color: var(--color-primary-hover);
 			border-color: color-mix(in srgb, var(--color-primary) 35%, var(--color-border));
 		}
 
 		.icon-action-btn--view:hover,
-		.icon-action-btn--mark-read:hover {
+		.icon-action-btn--mark-read:hover,
+		.icon-action-btn--copy:hover {
 			background: var(--color-primary-light);
 			border-color: var(--color-primary);
+		}
+
+		.icon-action-btn.copied {
+			color: var(--color-success);
+			border-color: var(--color-success);
+			background: var(--color-success-bg);
 		}
 
 		.icon-action-btn--approve {

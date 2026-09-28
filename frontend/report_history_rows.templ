@@ -46,6 +46,9 @@ templ ReportsHistoryTableBody(rows []ReportHistoryRowData, emptyMessage string) 
 	}
 }
 
-templ ReportsHistoryPartial(rows []ReportHistoryRowData, emptyMessage string) {
+templ ReportsHistoryPartial(rows []ReportHistoryRowData, emptyMessage string, page PaginationData, partialsURL string, includeSelector string, targetSelector string) {
 	@ReportsHistoryTableBody(rows, emptyMessage)
+	<div id="paginationBottom" hx-swap-oob={ HxSwapInnerHTML }>
+		@PaginationBarHTMX(partialsURL, includeSelector, targetSelector, page)
+	</div>
 }

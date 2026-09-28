@@ -13,15 +13,11 @@ templ Analytics(data AnalyticsData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		if data.IsSuperuser {
-			<title>Analytics - Zion English Admin Tool</title>
+			@AdminPageHead("Analytics - Zion English Admin Tool")
 		} else {
-			<title>My Analytics - Zion English Admin Tool</title>
+			@AdminPageHead("My Analytics - Zion English Admin Tool")
 		}
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
 		@AvatarStyles()
 		@ScrChartJS()
 		<style>

@@ -93,6 +93,7 @@ templ IntroVideosToolbar(showTeacherFilter bool, status constants.TeacherIntroVi
 			@TeacherFilterDropdown("", "")
 		}
 		@SortControls("", "desc", ListSortKindIntroVideo)
+		<input type="hidden" id="introVideosPage" name="page" value="1"/>
 		<button
 			type="button"
 			id="introVideosFilterBtn"
@@ -207,6 +208,13 @@ templ IntroVideosTableBody(items []IntroVideoItem, showUploader bool, showViewAc
 	}
 }
 
+templ IntroVideosTablePartial(items []IntroVideoItem, showUploader bool, showViewAction bool, showActions bool, emptyMessage string, page PaginationData, partialsURL string, includeSelector string, targetSelector string) {
+	@IntroVideosTableBody(items, showUploader, showViewAction, showActions, emptyMessage)
+	<div id="paginationBottom" hx-swap-oob={ HxSwapInnerHTML }>
+		@PaginationBarHTMX(partialsURL, includeSelector, targetSelector, page)
+	</div>
+}
+
 templ IntroVideosTable(showUploader bool, showViewAction bool, showActions bool) {
 	<div class="table-wrapper documents-table-wrapper">
 		<table class="documents-table table-stack-mobile">
@@ -255,11 +263,7 @@ templ IntroVideosPage(data IntroVideosPageData) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>{ data.Title } - Zion English Admin Tool</title>
-		<link rel="icon" type="image/x-icon" href={ utils.URL("/static/favicon.ico") }/>
-		@GlobalIncludes()
+		@AdminPageHead(data.Title + " - Zion English Admin Tool")
 		@AvatarStyles()
 		@DocumentsStyles()
 		<style>
@@ -293,6 +297,7 @@ templ IntroVideosPage(data IntroVideosPageData) {
 			}
 			@IntroVideosToolbar(data.ShowTeacherFilter, data.Status)
 			@IntroVideosTable(data.ShowUploader, data.ShowViewAction, data.ShowActions)
+			<div id="paginationBottom" class="pagination-bar"></div>
 			if data.ShowActions {
 				@IntroVideoRejectModal()
 			}
@@ -301,16 +306,37 @@ templ IntroVideosPage(data IntroVideosPageData) {
 		@ErrorBannerHandlers()
 		<script>
 			const introVideoSearch = document.getElementById('introVideoSearch');
+			const introVideosFilterBtn = document.getElementById('introVideosFilterBtn');
+			const introVideosPage = document.getElementById('introVideosPage');
+
+			if (introVideosFilterBtn) {
+				introVideosFilterBtn.addEventListener('click', function () {
+					if (introVideosPage) introVideosPage.value = '1';
+				});
+			}
+
 			if (introVideoSearch) {
 				introVideoSearch.addEventListener('keydown', function (e) {
 					if (e.key === 'Enter') {
 						e.preventDefault();
+						if (introVideosPage) introVideosPage.value = '1';
 						if (typeof htmx !== 'undefined') {
 							htmx.trigger('#introVideosTableBody', 'load');
 						}
 					}
 				});
 			}
+
+			document.body.addEventListener('click', function (e) {
+				const pageBtn = e.target.closest('#paginationBottom .pagination-btn[hx-get]');
+				if (!pageBtn || !introVideosPage) return;
+				const vals = pageBtn.getAttribute('hx-vals');
+				if (!vals) return;
+				try {
+					const parsed = JSON.parse(vals.replace(/'/g, '"'));
+					if (parsed.page) introVideosPage.value = String(parsed.page);
+				} catch (err) { /* ignore */ }
+			});
 		</script>
 	@LayoutEnd()
 	</body>
