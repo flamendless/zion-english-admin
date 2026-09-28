@@ -55,6 +55,10 @@ func Middleware(db *queries.Queries, next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 			return
 		}
+		if suppressAdsForRequest(ctx, r, db) {
+			next.ServeHTTP(w, r)
+			return
+		}
 
 		rows, err := db.GetPublishedAdsWithProducts(ctx)
 		if err == nil {

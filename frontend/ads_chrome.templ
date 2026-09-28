@@ -49,14 +49,27 @@ templ AdPlacementChrome() {
 templ AdPlacementBottom() {
 	{{
 		slots := ads.GetResolvedSlots(ctx)
+		hasMobileSides := len(slots.Left) > 0 || len(slots.Right) > 0
 	}}
-	if len(slots.Bottom) > 0 {
+	if len(slots.Bottom) > 0 || hasMobileSides {
 		<div class="ad-chrome ad-chrome--bottom" aria-label="Sponsored recommendations">
-			<div class="ad-zone ad-zone--bottom">
-				for _, item := range slots.Bottom {
-					@AffiliateProductCard(AffiliateProductCardFromResolved(item))
-				}
-			</div>
+			if len(slots.Bottom) > 0 {
+				<div class="ad-zone ad-zone--bottom">
+					for _, item := range slots.Bottom {
+						@AffiliateProductCard(AffiliateProductCardFromResolved(item))
+					}
+				</div>
+			}
+			if hasMobileSides {
+				<div class="ad-zone ad-zone--mobile-sides" aria-label="Sponsored recommendations">
+					for _, item := range slots.Left {
+						@AffiliateProductCard(AffiliateProductCardFromResolved(item))
+					}
+					for _, item := range slots.Right {
+						@AffiliateProductCard(AffiliateProductCardFromResolved(item))
+					}
+				</div>
+			}
 		</div>
 	}
 }
@@ -75,12 +88,35 @@ templ AdPlacementChromeStyles() {
 			display: flex;
 			flex-wrap: wrap;
 			justify-content: center;
-			gap: var(--space-3);
+			gap: var(--space-2);
 			padding: var(--space-2) 0;
 			margin-bottom: var(--space-2);
 		}
 		.ad-zone--top .affiliate-product-card {
-			width: min(100%, 14rem);
+			width: min(100%, 10.5rem);
+			flex: 0 0 auto;
+		}
+		.ad-zone--top .affiliate-product-card-body {
+			padding: var(--space-2);
+			gap: var(--space-1);
+		}
+		.ad-zone--top .affiliate-product-card-title {
+			font-size: 0.8125rem;
+		}
+		.ad-zone--top .affiliate-product-card-price {
+			font-size: 0.875rem;
+		}
+		.ad-zone--top .affiliate-product-card-cta {
+			padding: 0.4375rem var(--space-2);
+			font-size: 0.6875rem;
+			gap: 0.25rem;
+		}
+		.ad-zone--top .affiliate-product-card-cta-logo {
+			width: 0.875rem;
+			height: 0.875rem;
+		}
+		.ad-zone--top .affiliate-product-card-sales {
+			display: none;
 		}
 		.ad-chrome--bottom {
 			pointer-events: none;
@@ -100,6 +136,9 @@ templ AdPlacementChromeStyles() {
 		}
 		.ad-chrome--bottom .affiliate-product-card {
 			width: min(100%, 14rem);
+		}
+		.ad-zone--mobile-sides {
+			display: none;
 		}
 		.ad-zone--left,
 		.ad-zone--right {
@@ -155,11 +194,8 @@ templ AdPlacementChromeStyles() {
 		.ad-zone--right .affiliate-product-card-sales {
 			display: none;
 		}
-		.ad-zone--left [data-tooltip]::after,
-		.ad-zone--right [data-tooltip]::after {
-			left: auto;
-			right: 0;
-			transform: none;
+		.ad-zone [data-tooltip]::after {
+			content: none;
 		}
 		html.has-ad-rails body {
 			padding-left: 11.5rem;
@@ -169,6 +205,28 @@ templ AdPlacementChromeStyles() {
 			.ad-zone--left,
 			.ad-zone--right {
 				display: none;
+			}
+			.ad-chrome--bottom .ad-zone--bottom,
+			.ad-zone--mobile-sides {
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+				justify-content: center;
+				align-items: stretch;
+				gap: var(--space-2);
+				max-width: none;
+				margin: 0;
+				padding: var(--space-3);
+			}
+			.ad-chrome--bottom .ad-zone--bottom .affiliate-product-card,
+			.ad-zone--mobile-sides .affiliate-product-card {
+				width: min(calc(50% - var(--space-1)), 11rem);
+				flex: 0 0 auto;
+			}
+			.ad-chrome--bottom .ad-zone--bottom + .ad-zone--mobile-sides {
+				padding-top: var(--space-3);
+				border-top: 1px solid var(--color-border-subtle);
+				margin-top: 0;
 			}
 			html.has-ad-rails body {
 				padding-left: 0;
