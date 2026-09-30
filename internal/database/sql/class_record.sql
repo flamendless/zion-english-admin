@@ -70,6 +70,12 @@ WHERE cr.student_id = ? AND cr.teacher_id = ? AND cr.date = ? AND cr.duration_mi
 	AND (? = 0 OR cr.id != ?)
 LIMIT 1;
 
+-- name: CountClassRecordsByTeacherAndDateRange :one
+SELECT COUNT(*) as count
+FROM tbl_class_records cr
+WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ?
+	AND cr.deleted_at IS NULL;
+
 -- name: CountClassRecordsFiltered :one
 SELECT COUNT(*) as count
 FROM tbl_class_records cr

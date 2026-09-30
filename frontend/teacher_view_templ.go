@@ -43,6 +43,14 @@ type TeacherViewData struct {
 	GoogleCalendarConnectionsAllowed bool
 	Onboarding                       OnboardingChecklistData
 	ShowOnboarding                   bool
+	ShowResignationTab               bool
+	ResignationDate                  string
+	ResignationReason                string
+	FinalReportStart                 string
+	FinalReportEnd                   string
+	CanDownloadFinalReport           bool
+	FinalReportUnavailableMessage    string
+	ShowFinalReportDisabledButton    bool
 }
 
 func TeacherViewModal(data TeacherViewData) templ.Component {
@@ -89,7 +97,7 @@ func TeacherViewModal(data TeacherViewData) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(data.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 53, Col: 22}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 61, Col: 22}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -102,7 +110,7 @@ func TeacherViewModal(data TeacherViewData) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.Email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 54, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 62, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -113,12 +121,18 @@ func TeacherViewModal(data TeacherViewData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if data.ShowOnboarding {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<button type=\"button\" class=\"profile-tab\" role=\"tab\" aria-selected=\"false\" data-profile-tab=\"onboarding\" onclick=\"window.switchTeacherProfileTab('onboarding')\">Setup</button>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<button type=\"button\" class=\"profile-tab\" role=\"tab\" aria-selected=\"false\" data-profile-tab=\"onboarding\" onclick=\"window.switchTeacherProfileTab('onboarding')\">Setup</button> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div><div class=\"profile-tab-panel is-active\" role=\"tabpanel\" data-profile-panel=\"personal\"><h2>Personal information</h2><div class=\"profile-details\">")
+		if data.ShowResignationTab {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<button type=\"button\" class=\"profile-tab\" role=\"tab\" aria-selected=\"false\" data-profile-tab=\"resignation\" onclick=\"window.switchTeacherProfileTab('resignation')\">Resignation</button>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div><div class=\"profile-tab-panel is-active\" role=\"tabpanel\" data-profile-panel=\"personal\"><h2>Personal information</h2><div class=\"profile-details\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -154,12 +168,12 @@ func TeacherViewModal(data TeacherViewData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.ShowOnboarding {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"profile-tab-panel\" role=\"tabpanel\" data-profile-panel=\"onboarding\"><h2>Setup checklist</h2>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"profile-tab-panel\" role=\"tabpanel\" data-profile-panel=\"onboarding\"><h2>Setup checklist</h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -167,12 +181,113 @@ func TeacherViewModal(data TeacherViewData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"profile-tab-panel\" role=\"tabpanel\" data-profile-panel=\"contact\"><h2>Contact & work</h2><div class=\"profile-details\">")
+		if data.ShowResignationTab {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"profile-tab-panel\" role=\"tabpanel\" data-profile-panel=\"resignation\"><h2>Resignation</h2><div class=\"profile-details\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = ProfileDetailField("Resignation date", data.ResignationDate).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = ProfileDetailField("Resignation reason", data.ResignationReason).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if data.FinalReportStart != "" && data.FinalReportEnd != "" {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<p class=\"teacher-resignation-report-hint\">Final report period: ")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var4 string
+				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(data.FinalReportStart)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 104, Col: 54}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, " through ")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var5 string
+				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(data.FinalReportEnd)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 104, Col: 86}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, " (payroll cutoff start through resignation date).</p>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"teacher-resignation-report-actions\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if data.FinalReportUnavailableMessage != "" {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<p class=\"teacher-resignation-report-warning\" role=\"status\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var6 string
+				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(data.FinalReportUnavailableMessage)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 109, Col: 106}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</p>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			if data.CanDownloadFinalReport {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<a class=\"btn\" href=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var7 templ.SafeURL
+				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/teachers/" + data.ID + "/final-report"))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 112, Col: 83}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\">Download final report</a>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			} else if data.ShowFinalReportDisabledButton {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<span class=\"btn teacher-resignation-report-btn-disabled\" aria-disabled=\"true\">Download final report</span>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<div class=\"profile-tab-panel\" role=\"tabpanel\" data-profile-panel=\"contact\"><h2>Contact & work</h2><div class=\"profile-details\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -193,7 +308,7 @@ func TeacherViewModal(data TeacherViewData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if data.ZoomConfigured && (data.ZoomConnected || data.ZoomIntegrationVisible) {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"profile-detail\"><span class=\"profile-detail-label\">Zoom</span> <span class=\"profile-detail-value\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<div class=\"profile-detail\"><span class=\"profile-detail-label\">Zoom</span> <span class=\"profile-detail-value\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -201,13 +316,13 @@ func TeacherViewModal(data TeacherViewData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</span></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</span></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
 		if data.GoogleCalendarConfigured && (data.GoogleCalendarConnected || data.GoogleCalendarIntegrationVisible) {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"profile-detail\"><span class=\"profile-detail-label\">Google Calendar</span> <span class=\"profile-detail-value\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<div class=\"profile-detail\"><span class=\"profile-detail-label\">Google Calendar</span> <span class=\"profile-detail-value\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -215,12 +330,12 @@ func TeacherViewModal(data TeacherViewData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</span></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</span></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"profile-detail\"><span class=\"profile-detail-label\">Google Sheet</span> <span class=\"profile-detail-value\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<div class=\"profile-detail\"><span class=\"profile-detail-label\">Google Sheet</span> <span class=\"profile-detail-value\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -228,33 +343,33 @@ func TeacherViewModal(data TeacherViewData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</span></div><div class=\"profile-detail\"><span class=\"profile-detail-label\">Assigned color</span> <span class=\"profile-detail-value\"><div class=\"color-cell\"><div class=\"color-box\" style=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</span></div><div class=\"profile-detail\"><span class=\"profile-detail-label\">Assigned color</span> <span class=\"profile-detail-value\"><div class=\"color-cell\"><div class=\"color-box\" style=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color: " + data.AssignedColor)
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color: " + data.AssignedColor)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 117, Col: 83}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 152, Col: 83}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\"></div><span>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(data.AssignedColor)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 118, Col: 37}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\"></div><span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</span></div></span></div></div></div></div></div></div></div></div>")
+		var templ_7745c5c3_Var9 string
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(data.AssignedColor)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 153, Col: 37}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</span></div></span></div></div></div></div></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -278,38 +393,38 @@ func ProfileDetailField(label, value string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var6 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var6 == nil {
-			templ_7745c5c3_Var6 = templ.NopComponent
+		templ_7745c5c3_Var10 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var10 == nil {
+			templ_7745c5c3_Var10 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<div class=\"profile-detail\"><span class=\"profile-detail-label\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<div class=\"profile-detail\"><span class=\"profile-detail-label\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(label)
+		var templ_7745c5c3_Var11 string
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 133, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 168, Col: 44}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</span> <span class=\"profile-detail-value\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(value)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 134, Col: 44}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</span> <span class=\"profile-detail-value\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</span></div>")
+		var templ_7745c5c3_Var12 string
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(value)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/teacher_view.templ`, Line: 169, Col: 44}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "</span></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -333,12 +448,12 @@ func TeacherViewProfileStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var9 == nil {
-			templ_7745c5c3_Var9 = templ.NopComponent
+		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var13 == nil {
+			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<style>\r\n\t\t.teacher-view-body {\r\n\t\t\tpadding: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.teacher-view-layout {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t@media (min-width: 768px) {\r\n\t\t\t.teacher-view-layout {\r\n\t\t\t\tgrid-template-columns: 220px 1fr;\r\n\t\t\t\talign-items: start;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-card {\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-card h2 {\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\tfont-size: 1.125rem;\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-identity {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: center;\r\n\t\t\ttext-align: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-identity h2 {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 1rem;\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-email {\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tword-break: break-all;\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-details {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t@media (min-width: 640px) {\r\n\t\t\t.teacher-view-body .profile-details {\r\n\t\t\t\tgrid-template-columns: 1fr 1fr;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-detail {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-1);\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-detail-label {\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-detail-value {\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tword-break: break-word;\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<style>\r\n\t\t.teacher-view-body {\r\n\t\t\tpadding: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.teacher-view-layout {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t@media (min-width: 768px) {\r\n\t\t\t.teacher-view-layout {\r\n\t\t\t\tgrid-template-columns: 220px 1fr;\r\n\t\t\t\talign-items: start;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-card {\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\tpadding: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-card h2 {\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\tfont-size: 1.125rem;\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-identity {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: center;\r\n\t\t\ttext-align: center;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-identity h2 {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 1rem;\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-email {\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tword-break: break-all;\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-details {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t@media (min-width: 640px) {\r\n\t\t\t.teacher-view-body .profile-details {\r\n\t\t\t\tgrid-template-columns: 1fr 1fr;\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-detail {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-1);\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-detail-label {\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.teacher-view-body .profile-detail-value {\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tword-break: break-word;\r\n\t\t}\r\n\r\n\t\t.teacher-resignation-report-hint {\r\n\t\t\tmargin: var(--space-4) 0 0;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.teacher-resignation-report-actions {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmargin-top: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.teacher-resignation-report-actions .btn {\r\n\t\t\tmargin-top: 0;\r\n\t\t}\r\n\r\n\t\t.teacher-resignation-report-warning {\r\n\t\t\tmargin: 0;\r\n\t\t\tflex: 1 1 100%;\r\n\t\t\tpadding: var(--space-3);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tline-height: 1.45;\r\n\t\t\tcolor: var(--color-warning-foreground);\r\n\t\t\tbackground: var(--color-warning-bg);\r\n\t\t\tborder: 1px solid var(--color-warning);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t}\r\n\r\n\t\t.teacher-resignation-report-btn-disabled {\r\n\t\t\topacity: 0.55;\r\n\t\t\tcursor: not-allowed;\r\n\t\t\tpointer-events: none;\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

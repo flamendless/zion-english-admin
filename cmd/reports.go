@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -552,10 +553,31 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 	}
 
 	ctx := r.Context()
+	filename, _, fromCache, err := generateTeacherReportFile(ctx, teacherID, startDate, endDate)
+	if err != nil {
+		if errors.Is(err, ErrReportNoRecords) {
+			sendErrorLog(w, err.Error())
+			return
+		}
+		if errors.Is(err, sql.ErrNoRows) {
+			sendErrorLog(w, MsgTeacherNotFound)
+			return
+		}
+		sendErrorLog(w, "failed to generate report")
+		return
+	}
+	if fromCache {
+		renderReportGenerateRow(w, r, teacherID, startDate, endDate, true)
+		return
+	}
+	_ = filename
+	renderReportGenerateRow(w, r, teacherID, startDate, endDate, false)
+}
+
+func generateTeacherReportFile(ctx context.Context, teacherID int64, startDate, endDate string) (filename string, recordCount int64, fromCache bool, err error) {
 	profile, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, teacherID)
 	if err != nil {
-		sendErrorLog(w, MsgTeacherNotFound)
-		return
+		return "", 0, false, err
 	}
 
 	fpRows, err := dbRO.GetQueries().GetClassRecordFingerprintRows(ctx, queries.GetClassRecordFingerprintRowsParams{
@@ -564,8 +586,7 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 		Date_2:    endDate,
 	})
 	if err != nil {
-		sendErrorLog(w, "failed to load class records")
-		return
+		return "", 0, false, err
 	}
 	currentHash := reports.Fingerprint(fingerprintRowsFromFingerprintQuery(fpRows))
 
@@ -575,12 +596,10 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 		Date_2:    endDate,
 	})
 	if err != nil {
-		sendErrorLog(w, "failed to load class records")
-		return
+		return "", 0, false, err
 	}
 	if len(records) == 0 {
-		sendErrorLog(w, "no records found")
-		return
+		return "", 0, false, ErrReportNoRecords
 	}
 
 	cache, cacheErr := dbRO.GetQueries().GetReportGeneration(ctx, queries.GetReportGenerationParams{
@@ -589,16 +608,15 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 		EndDate:   endDate,
 	})
 	if cacheErr == nil && cache.ContentHash == currentHash {
-		if _, ok := reportCacheAvailable(ctx, cache.OutputPath); ok {
-			renderReportGenerateRow(w, r, teacherID, startDate, endDate, true)
-			return
+		if cachedName, ok := reportCacheAvailable(ctx, cache.OutputPath); ok {
+			return cachedName, int64(len(records)), true, nil
 		}
 	}
 
 	processorRecords := classRecordsToProcessor(records)
 	teacherName := utils.ComposePersonName(profile.FirstName, profile.MiddleName, profile.LastName)
 	safeName := utils.SanitizeFilename(teacherName)
-	filename := fmt.Sprintf("%s_report_%s.xlsx", safeName, utils.RandomString(8))
+	filename = fmt.Sprintf("%s_report_%s.xlsx", safeName, utils.RandomString(8))
 	outputPath := filepath.Join("tmp", filename)
 
 	colIndices := processor.ColumnIndices{
@@ -612,14 +630,12 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 	}
 	if err := processor.SaveReportRecords(processorRecords, outputPath, colIndices, teacherName); err != nil {
 		logs.Log().Error("save report xlsx", zap.Error(err))
-		sendErrorLog(w, "failed to generate report")
-		return
+		return "", 0, false, err
 	}
 
 	if err := putReportFile(ctx, filename, outputPath); err != nil {
 		logs.Log().Error("upload report to storage", zap.Error(err))
-		sendErrorLog(w, "failed to save report")
-		return
+		return "", 0, false, err
 	}
 
 	if cacheErr == nil && cache.OutputPath != "" {
@@ -639,8 +655,7 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 		RecordCount: int64(len(records)),
 	}); err != nil {
 		logs.Log().Error("upsert report generation", zap.Error(err))
-		sendErrorLog(w, "failed to save report cache")
-		return
+		return "", 0, false, err
 	}
 
 	user := auth.GetUser(ctx)
@@ -649,7 +664,7 @@ func handleReportGenerate(w http.ResponseWriter, r *http.Request, teacherID int6
 		teacherName, startDate, endDate, len(records), filename,
 	))
 
-	renderReportGenerateRow(w, r, teacherID, startDate, endDate, false)
+	return filename, int64(len(records)), false, nil
 }
 
 func reportSearchParams(q, startDate, endDate string, roleFilters reportRoleFilters) queries.GetReportTeacherSummariesParams {

@@ -353,6 +353,8 @@ type TblTeacher struct {
 	MobileChangedAt   sql.NullTime
 	Deleted           int64
 	DeletedAt         sql.NullTime
+	ResignedAt        sql.NullString
+	ResignedReason    sql.NullString
 }
 
 type TblTeacherDocument struct {

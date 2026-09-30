@@ -137,11 +137,34 @@ func handleTeachersPath(w http.ResponseWriter, r *http.Request) {
 		handleTeacherEdit(w, r, id)
 		return
 	}
+	if id, ok := extractPathID(r, "teachers", "/final-report"); ok {
+		handleTeacherFinalReport(w, r, id)
+		return
+	}
 	if id, ok := extractPathID(r, "teachers", "/view"); ok {
 		handleTeacherView(w, r, id)
 		return
 	}
 	HttpError(w, MsgNotFound, http.StatusNotFound)
+}
+
+func parseTeacherResignationFields(status, resignedAtRaw, resignedReasonRaw string) (resignedAt, resignedReason sql.NullString, err error) {
+	if status != string(constants.TeacherStatusResigned) {
+		return sql.NullString{}, sql.NullString{}, nil
+	}
+	reason := strings.TrimSpace(resignedReasonRaw)
+	if reason == "" {
+		return sql.NullString{}, sql.NullString{}, ErrTeacherResignationReasonRequired
+	}
+	dateRaw := strings.TrimSpace(resignedAtRaw)
+	if dateRaw == "" {
+		return sql.NullString{}, sql.NullString{}, ErrTeacherResignationDateRequired
+	}
+	normalized := utils.NormalizeDatePHT(dateRaw)
+	if _, parseErr := utils.ParseDatePHT(normalized); parseErr != nil {
+		return sql.NullString{}, sql.NullString{}, ErrInvalidDateFormat
+	}
+	return sql.NullString{String: normalized, Valid: true}, sql.NullString{String: reason, Valid: true}, nil
 }
 
 func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) {
@@ -187,6 +210,54 @@ func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) 
 			ShowSummary:    true,
 		}
 	}
+	showResignationTab := row.Status == string(constants.TeacherStatusResigned)
+	resignationDate := "-"
+	resignationReason := "-"
+	canDownloadFinalReport := false
+	showFinalReportDisabledButton := false
+	finalReportUnavailableMessage := ""
+	finalReportStart := ""
+	finalReportEnd := ""
+	if showResignationTab {
+		if row.ResignedReason.Valid && strings.TrimSpace(row.ResignedReason.String) != "" {
+			resignationReason = row.ResignedReason.String
+		}
+		if !row.ResignedAt.Valid || row.ResignedAt.String == "" {
+			finalReportUnavailableMessage = "Set a resignation date on Edit teacher to generate the final report."
+		} else {
+			if t, parseErr := utils.ParseDatePHT(row.ResignedAt.String); parseErr == nil && t != nil {
+				resignationDate = utils.DatePHT(*t)
+			} else {
+				resignationDate = row.ResignedAt.String
+			}
+			start, end, rangeErr := utils.FinalReportRangeFromResignationDate(row.ResignedAt.String)
+			if rangeErr != nil {
+				finalReportUnavailableMessage = "Resignation date could not be mapped to a payroll cutoff period."
+				showFinalReportDisabledButton = true
+			} else {
+				if startT, err := utils.ParseDatePHT(start); err == nil && startT != nil {
+					finalReportStart = utils.DatePHT(*startT)
+				}
+				if endT, err := utils.ParseDatePHT(end); err == nil && endT != nil {
+					finalReportEnd = utils.DatePHT(*endT)
+				}
+				recordCount, countErr := dbRO.GetQueries().CountClassRecordsByTeacherAndDateRange(ctx, queries.CountClassRecordsByTeacherAndDateRangeParams{
+					TeacherID: teacherID,
+					Date:      start,
+					Date_2:    end,
+				})
+				if countErr != nil {
+					finalReportUnavailableMessage = MsgSomethingWrong
+					showFinalReportDisabledButton = true
+				} else if recordCount == 0 {
+					finalReportUnavailableMessage = MsgFinalReportNoRecords
+					showFinalReportDisabledButton = true
+				} else {
+					canDownloadFinalReport = true
+				}
+			}
+		}
+	}
 	writeHTML(w)
 	frontend.TeacherViewModal(frontend.TeacherViewData{
 		ID:                               strconv.FormatInt(teacherID, 10),
@@ -218,6 +289,14 @@ func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		GoogleCalendarConnectionsAllowed: googleCalendarConnectionsAllowed,
 		Onboarding:                       onboardingData,
 		ShowOnboarding:                   showOnboarding,
+		ShowResignationTab:               showResignationTab,
+		ResignationDate:                  resignationDate,
+		ResignationReason:                resignationReason,
+		FinalReportStart:                 finalReportStart,
+		FinalReportEnd:                   finalReportEnd,
+		CanDownloadFinalReport:           canDownloadFinalReport,
+		FinalReportUnavailableMessage:    finalReportUnavailableMessage,
+		ShowFinalReportDisabledButton:    showFinalReportDisabledButton,
 	}).Render(ctx, w)
 }
 
@@ -448,29 +527,42 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		if existing.Template.Valid {
 			template = existing.Template.String
 		}
+		resignedAt := ""
+		if existing.ResignedAt.Valid {
+			resignedAt = existing.ResignedAt.String
+		} else if existing.Status == string(constants.TeacherStatusResigned) {
+			resignedAt = utils.TodayPHT()
+		}
+		resignedReason := ""
+		if existing.ResignedReason.Valid {
+			resignedReason = existing.ResignedReason.String
+		}
 		writeHTML(w)
 		frontend.EditTeacher(frontend.EditTeacherData{
-			ID:              strconv.FormatInt(teacherID, 10),
-			FirstName:       existing.FirstName,
-			MiddleName:      existing.MiddleName,
-			LastName:        existing.LastName,
-			Birthdate:       existing.Birthdate,
-			Address:         existing.Address,
-			JoiningDate:     existing.JoiningDate,
-			MobileNumber:    existing.MobileNumber,
-			Email:           existing.Email,
-			Certifications:  existing.Certifications.String,
-			AssignedColor:   existing.AssignedColor,
-			RatePerClass:    existing.RatePerClass,
-			Currency:        existing.Currency,
-			DriveUrl:        existing.DriveUrl,
-			Sex:             existing.Sex.String,
-			Template:        template,
-			CanManageRoles:  canManageRoles,
-			CanManageStatus: canManageStatus,
-			Status:          constants.TeacherStatus(existing.Status),
-			Roles:           existingRoles,
-			RoleOptions:     availableRoleOptions(existingRoles),
+			ID:                     strconv.FormatInt(teacherID, 10),
+			FirstName:              existing.FirstName,
+			MiddleName:             existing.MiddleName,
+			LastName:               existing.LastName,
+			Birthdate:              existing.Birthdate,
+			Address:                existing.Address,
+			JoiningDate:            existing.JoiningDate,
+			MobileNumber:           existing.MobileNumber,
+			Email:                  existing.Email,
+			Certifications:         existing.Certifications.String,
+			AssignedColor:          existing.AssignedColor,
+			RatePerClass:           existing.RatePerClass,
+			Currency:               existing.Currency,
+			DriveUrl:               existing.DriveUrl,
+			Sex:                    existing.Sex.String,
+			Template:               template,
+			CanManageRoles:         canManageRoles,
+			CanManageStatus:        canManageStatus,
+			Status:                 constants.TeacherStatus(existing.Status),
+			ResignedAt:             resignedAt,
+			ResignedReason:         resignedReason,
+			DefaultResignationDate: utils.TodayPHT(),
+			Roles:                  existingRoles,
+			RoleOptions:            availableRoleOptions(existingRoles),
 		}).Render(ctx, w)
 		return
 	}
@@ -574,10 +666,17 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		return
 	}
 
-	if canManageStatus && submittedStatus != existing.Status {
+	if canManageStatus {
+		resignedAt, resignedReason, err := parseTeacherResignationFields(submittedStatus, r.FormValue("resignedAt"), r.FormValue("resignedReason"))
+		if err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
 		if err := qtx.UpdateTeacherStatus(ctx, queries.UpdateTeacherStatusParams{
-			Status: submittedStatus,
-			ID:     teacherID,
+			Status:         submittedStatus,
+			ResignedAt:     resignedAt,
+			ResignedReason: resignedReason,
+			ID:             teacherID,
 		}); err != nil {
 			sendErrorLog(w, err.Error())
 			return

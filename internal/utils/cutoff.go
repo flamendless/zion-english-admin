@@ -110,3 +110,26 @@ func splitCutoff(value string) []string {
 	}
 	return nil
 }
+
+// FinalReportRangeFromResignationDate returns the payroll cutoff start through the resignation date (PHT).
+func FinalReportRangeFromResignationDate(resignDate string) (startDate, endDate string, err error) {
+	resignDate = strings.TrimSpace(resignDate)
+	if resignDate == "" {
+		return "", "", ErrResignationDateOutsideCutoff
+	}
+	t, err := time.ParseInLocation(constants.DateLayout, resignDate, constants.LocationPHT)
+	if err != nil {
+		return "", "", err
+	}
+	day := t.Format(constants.DateLayout)
+	firstPreset, secondPreset := CutoffRangeForMonth(t.Year(), t.Month())
+	firstStart, firstEnd := CutoffDatesFromPreset(firstPreset)
+	secondStart, secondEnd := CutoffDatesFromPreset(secondPreset)
+	if day >= firstStart && day <= firstEnd {
+		return firstStart, day, nil
+	}
+	if day >= secondStart && day <= secondEnd {
+		return secondStart, day, nil
+	}
+	return "", "", ErrResignationDateOutsideCutoff
+}

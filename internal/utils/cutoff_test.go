@@ -74,3 +74,25 @@ func TestCurrentCutoffRange(t *testing.T) {
 		t.Fatalf("active cutoff %q must match first %q or second %q", active, first, second)
 	}
 }
+
+func TestFinalReportRangeFromResignationDate(t *testing.T) {
+	start, end, err := FinalReportRangeFromResignationDate("2026-09-10")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if start != "2026-09-01" || end != "2026-09-10" {
+		t.Fatalf("unexpected first-half range: %q %q", start, end)
+	}
+
+	start, end, err = FinalReportRangeFromResignationDate("2026-09-28")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if start != "2026-09-16" || end != "2026-09-28" {
+		t.Fatalf("unexpected second-half range: %q %q", start, end)
+	}
+
+	if _, _, err := FinalReportRangeFromResignationDate(""); err == nil {
+		t.Fatal("expected error for empty date")
+	}
+}

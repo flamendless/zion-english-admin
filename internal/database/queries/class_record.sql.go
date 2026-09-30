@@ -90,6 +90,26 @@ func (q *Queries) CountClassRecordsByStatusAndDateRange(ctx context.Context, arg
 	return items, nil
 }
 
+const countClassRecordsByTeacherAndDateRange = `-- name: CountClassRecordsByTeacherAndDateRange :one
+SELECT COUNT(*) as count
+FROM tbl_class_records cr
+WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ?
+	AND cr.deleted_at IS NULL
+`
+
+type CountClassRecordsByTeacherAndDateRangeParams struct {
+	TeacherID int64
+	Date      string
+	Date_2    string
+}
+
+func (q *Queries) CountClassRecordsByTeacherAndDateRange(ctx context.Context, arg CountClassRecordsByTeacherAndDateRangeParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countClassRecordsByTeacherAndDateRange, arg.TeacherID, arg.Date, arg.Date_2)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const countClassRecordsFiltered = `-- name: CountClassRecordsFiltered :one
 SELECT COUNT(*) as count
 FROM tbl_class_records cr

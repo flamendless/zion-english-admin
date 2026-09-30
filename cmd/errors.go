@@ -109,6 +109,13 @@ var (
 
 	ErrTeacherNotFoundInReportSummaries = errors.New("[REPORTS] teacher not found in report summaries")
 
+	ErrTeacherResignationDateRequired   = errors.New("[TEACHERS] resignation date is required when status is resigned")
+	ErrTeacherResignationReasonRequired = errors.New("[TEACHERS] resignation reason is required when status is resigned")
+	ErrTeacherNotResigned               = errors.New("[TEACHERS] teacher is not resigned")
+	ErrTeacherResignationDateMissing    = errors.New("[TEACHERS] resignation date is not set")
+
+	ErrReportNoRecords = errors.New(MsgReportNoRecords)
+
 	ErrInvalidPaymentMethod    = errors.New("[PAYMENTS] invalid payment method")
 	ErrReferenceNumberRequired = errors.New("[PAYMENTS] reference number is required")
 	ErrInvalidPaymentAmount    = errors.New("[PAYMENTS] amount must be greater than zero")

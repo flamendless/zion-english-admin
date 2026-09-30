@@ -12,4 +12,6 @@ var (
 	ErrInvalidStartTime  = errors.New("invalid start time")
 	ErrInvalidEndTime    = errors.New("invalid end time")
 	ErrEndBeforeStart    = errors.New("end time must be after start time")
+
+	ErrResignationDateOutsideCutoff = errors.New("[CUTOFF] resignation date is outside a payroll cutoff period")
 )

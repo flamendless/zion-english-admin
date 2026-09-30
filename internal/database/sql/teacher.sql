@@ -78,7 +78,7 @@ UPDATE tbl_teachers SET deleted = 1, deleted_at = CURRENT_TIMESTAMP, updated_at 
 SELECT id, template, status FROM tbl_teachers WHERE id = ?;
 
 -- name: GetTeacherFullByID :one
-SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted
+SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted, resigned_at, resigned_reason
 FROM tbl_teachers
 WHERE id = ?;
 
@@ -89,7 +89,7 @@ UPDATE tbl_teachers SET template = ? WHERE id = ?;
 UPDATE tbl_teachers SET password = ?, password_changed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?;
 
 -- name: GetTeacherProfileByID :one
-SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, template, status, profile_picture, password_changed_at, mobile_changed_at, created_at, updated_at
+SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, template, status, profile_picture, password_changed_at, mobile_changed_at, created_at, updated_at, resigned_at, resigned_reason
 FROM tbl_teachers
 WHERE id = ?;
 
@@ -115,7 +115,9 @@ SET first_name = ?, middle_name = ?, last_name = ?, birthdate = ?, address = ?, 
 WHERE id = ?;
 
 -- name: UpdateTeacherStatus :exec
-UPDATE tbl_teachers SET status = ?, updated_at = datetime('now') WHERE id = ?;
+UPDATE tbl_teachers
+SET status = ?, resigned_at = ?, resigned_reason = ?, updated_at = datetime('now')
+WHERE id = ?;
 
 -- name: CountTeachersFiltered :one
 SELECT COUNT(*) as count

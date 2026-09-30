@@ -23,4 +23,7 @@ const (
 	MsgFailedToFetchTeachers       = "Failed to fetch teachers"
 	MsgFailedToSearchTeachers      = "Failed to search teachers"
 	MsgFailedToSearchStudents      = "Failed to search students"
+
+	MsgReportNoRecords      = "No records found"
+	MsgFinalReportNoRecords = "No records found for the final report period."
 )

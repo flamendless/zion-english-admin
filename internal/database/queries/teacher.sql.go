@@ -493,7 +493,7 @@ func (q *Queries) GetTeacherCountByMobileExcludingID(ctx context.Context, arg Ge
 }
 
 const getTeacherFullByID = `-- name: GetTeacherFullByID :one
-SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted
+SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted, resigned_at, resigned_reason
 FROM tbl_teachers
 WHERE id = ?
 `
@@ -520,6 +520,8 @@ type GetTeacherFullByIDRow struct {
 	UpdatedAt      sql.NullTime
 	Status         string
 	Deleted        int64
+	ResignedAt     sql.NullString
+	ResignedReason sql.NullString
 }
 
 func (q *Queries) GetTeacherFullByID(ctx context.Context, id int64) (GetTeacherFullByIDRow, error) {
@@ -547,6 +549,8 @@ func (q *Queries) GetTeacherFullByID(ctx context.Context, id int64) (GetTeacherF
 		&i.UpdatedAt,
 		&i.Status,
 		&i.Deleted,
+		&i.ResignedAt,
+		&i.ResignedReason,
 	)
 	return i, err
 }
@@ -563,7 +567,7 @@ func (q *Queries) GetTeacherPasswordByID(ctx context.Context, id int64) (string,
 }
 
 const getTeacherProfileByID = `-- name: GetTeacherProfileByID :one
-SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, template, status, profile_picture, password_changed_at, mobile_changed_at, created_at, updated_at
+SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, template, status, profile_picture, password_changed_at, mobile_changed_at, created_at, updated_at, resigned_at, resigned_reason
 FROM tbl_teachers
 WHERE id = ?
 `
@@ -591,6 +595,8 @@ type GetTeacherProfileByIDRow struct {
 	MobileChangedAt   sql.NullTime
 	CreatedAt         sql.NullTime
 	UpdatedAt         sql.NullTime
+	ResignedAt        sql.NullString
+	ResignedReason    sql.NullString
 }
 
 func (q *Queries) GetTeacherProfileByID(ctx context.Context, id int64) (GetTeacherProfileByIDRow, error) {
@@ -619,6 +625,8 @@ func (q *Queries) GetTeacherProfileByID(ctx context.Context, id int64) (GetTeach
 		&i.MobileChangedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.ResignedAt,
+		&i.ResignedReason,
 	)
 	return i, err
 }
@@ -1222,16 +1230,25 @@ func (q *Queries) UpdateTeacherProfilePicture(ctx context.Context, arg UpdateTea
 }
 
 const updateTeacherStatus = `-- name: UpdateTeacherStatus :exec
-UPDATE tbl_teachers SET status = ?, updated_at = datetime('now') WHERE id = ?
+UPDATE tbl_teachers
+SET status = ?, resigned_at = ?, resigned_reason = ?, updated_at = datetime('now')
+WHERE id = ?
 `
 
 type UpdateTeacherStatusParams struct {
-	Status string
-	ID     int64
+	Status         string
+	ResignedAt     sql.NullString
+	ResignedReason sql.NullString
+	ID             int64
 }
 
 func (q *Queries) UpdateTeacherStatus(ctx context.Context, arg UpdateTeacherStatusParams) error {
-	_, err := q.db.ExecContext(ctx, updateTeacherStatus, arg.Status, arg.ID)
+	_, err := q.db.ExecContext(ctx, updateTeacherStatus,
+		arg.Status,
+		arg.ResignedAt,
+		arg.ResignedReason,
+		arg.ID,
+	)
 	return err
 }
 

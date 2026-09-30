@@ -35,6 +35,14 @@ type TeacherViewData struct {
 	GoogleCalendarConnectionsAllowed bool
 	Onboarding                       OnboardingChecklistData
 	ShowOnboarding                   bool
+	ShowResignationTab               bool
+	ResignationDate                  string
+	ResignationReason                string
+	FinalReportStart                 string
+	FinalReportEnd                   string
+	CanDownloadFinalReport           bool
+	FinalReportUnavailableMessage    string
+	ShowFinalReportDisabledButton    bool
 }
 
 templ TeacherViewModal(data TeacherViewData) {
@@ -61,6 +69,9 @@ templ TeacherViewModal(data TeacherViewData) {
 							if data.ShowOnboarding {
 								<button type="button" class="profile-tab" role="tab" aria-selected="false" data-profile-tab="onboarding" onclick="window.switchTeacherProfileTab('onboarding')">Setup</button>
 							}
+							if data.ShowResignationTab {
+								<button type="button" class="profile-tab" role="tab" aria-selected="false" data-profile-tab="resignation" onclick="window.switchTeacherProfileTab('resignation')">Resignation</button>
+							}
 						</div>
 						<div class="profile-tab-panel is-active" role="tabpanel" data-profile-panel="personal">
 							<h2>Personal information</h2>
@@ -79,6 +90,30 @@ templ TeacherViewModal(data TeacherViewData) {
 							<div class="profile-tab-panel" role="tabpanel" data-profile-panel="onboarding">
 								<h2>Setup checklist</h2>
 								@OnboardingChecklist(data.Onboarding)
+							</div>
+						}
+						if data.ShowResignationTab {
+							<div class="profile-tab-panel" role="tabpanel" data-profile-panel="resignation">
+								<h2>Resignation</h2>
+								<div class="profile-details">
+									@ProfileDetailField("Resignation date", data.ResignationDate)
+									@ProfileDetailField("Resignation reason", data.ResignationReason)
+								</div>
+								if data.FinalReportStart != "" && data.FinalReportEnd != "" {
+									<p class="teacher-resignation-report-hint">
+										Final report period: { data.FinalReportStart } through { data.FinalReportEnd } (payroll cutoff start through resignation date).
+									</p>
+								}
+								<div class="teacher-resignation-report-actions">
+									if data.FinalReportUnavailableMessage != "" {
+										<p class="teacher-resignation-report-warning" role="status">{ data.FinalReportUnavailableMessage }</p>
+									}
+									if data.CanDownloadFinalReport {
+										<a class="btn" href={ utils.URL("/teachers/" + data.ID + "/final-report") }>Download final report</a>
+									} else if data.ShowFinalReportDisabledButton {
+										<span class="btn teacher-resignation-report-btn-disabled" aria-disabled="true">Download final report</span>
+									}
+								</div>
 							</div>
 						}
 						<div class="profile-tab-panel" role="tabpanel" data-profile-panel="contact">
@@ -213,6 +248,42 @@ templ TeacherViewProfileStyles() {
 			font-size: 0.9375rem;
 			color: var(--color-foreground);
 			word-break: break-word;
+		}
+
+		.teacher-resignation-report-hint {
+			margin: var(--space-4) 0 0;
+			font-size: 0.875rem;
+			color: var(--color-muted-foreground);
+		}
+
+		.teacher-resignation-report-actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-2);
+			margin-top: var(--space-4);
+		}
+
+		.teacher-resignation-report-actions .btn {
+			margin-top: 0;
+		}
+
+		.teacher-resignation-report-warning {
+			margin: 0;
+			flex: 1 1 100%;
+			padding: var(--space-3);
+			font-size: 0.875rem;
+			line-height: 1.45;
+			color: var(--color-warning-foreground);
+			background: var(--color-warning-bg);
+			border: 1px solid var(--color-warning);
+			border-radius: var(--radius-md);
+		}
+
+		.teacher-resignation-report-btn-disabled {
+			opacity: 0.55;
+			cursor: not-allowed;
+			pointer-events: none;
 		}
 	</style>
 }
