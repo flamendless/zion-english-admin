@@ -103,6 +103,8 @@ var navItemDefs = []navItemDef{
 	{Path: "/meta", LinkID: "metaLink", Title: "Meta", Description: "Manage HTML head meta tags for site verification and integrations", AdminOnlyCard: true},
 	{Path: "/affiliates", LinkID: "affiliatesLink", Title: "Affiliates", Description: "Manage Shopee affiliate product links and previews", AdminOnlyCard: true},
 	{Path: "/ads", LinkID: "adsLink", Title: "Ads", Description: "Configure affiliate ad placements across portal pages", AdminOnlyCard: true},
+	{Path: "/plans", LinkID: "plansLink", Title: "Plans", Description: "Grant Teacher Pro and view plan transaction history", AdminOnlyCard: true},
+	{Path: "/exports", LinkID: "exportsLink", Title: "My data export", Description: "Export your classes, students, and schedule for personal use", TeacherTitle: "My data export", TeacherDesc: "Export your classes, students, and schedule for personal use", FeatureCard: true},
 	{Path: "/logs", LinkID: "logsLink", Title: "Logs", TeacherTitle: "My Activity", Description: "View system logs", TeacherDesc: "View your recent actions"},
 	{Path: "/upload-logs", LinkID: "uploadLogsLink", Title: "Upload Logs", TeacherTitle: "My Upload Logs", Description: "Teacher file upload activity", TeacherDesc: "View success and failure for your file uploads", AdminOnlyCard: true},
 }
@@ -112,7 +114,7 @@ var navGroupDefs = []navGroupDef{
 	{ID: "people", Label: "People", Description: "Manage teachers and students", AdminOnlyCard: true, Paths: []string{"/teachers", "/students"}},
 	{ID: "resources", Label: "Resources", Description: "Guides, documents, learning materials, and training videos", TeacherDesc: "Guides, your documents, learning materials, and training videos", FeatureCard: true, Paths: []string{"/guides", "/documents", "/intro-videos", "/learning-materials", "/training-materials"}},
 	{ID: "insights", Label: "Insights", Description: "Payroll reports and analytics", AdminOnlyCard: true, Paths: []string{"/reports", "/reports/history", "/analytics", "/payments", "/student-relationships", "/affiliate-ads/reports"}},
-	{ID: "admin", Label: "Admin", Description: "Process CSV files, feature flags, meta tags, affiliates, ads, settings, logs, and upload logs", AdminOnlyCard: true, Paths: []string{"/process", "/feature-flags", "/meta", "/affiliates", "/ads", "/settings", "/logs", "/upload-logs"}},
+	{ID: "admin", Label: "Admin", Description: "Process CSV files, feature flags, meta tags, affiliates, ads, plans, settings, logs, and upload logs", AdminOnlyCard: true, Paths: []string{"/process", "/feature-flags", "/meta", "/affiliates", "/ads", "/plans", "/settings", "/logs", "/upload-logs"}},
 }
 
 var adminNavLayout = []navLayoutEntry{
@@ -132,6 +134,7 @@ var teacherNavLayout = []navLayoutEntry{
 	{LinkPath: "/my-students"},
 	{GroupID: "classes"},
 	{LinkPath: "/analytics"},
+	{LinkPath: "/exports"},
 	{LinkPath: "/payments"},
 	{LinkPath: "/logs"},
 	{LinkPath: "/upload-logs"},
@@ -380,7 +383,7 @@ func IsNavAccessible(role auth.Role, path string) bool {
 		if role == auth.RoleSuperuser && path == "/profile" {
 			return false
 		}
-		if path == "/feature-flags" || path == "/settings" || path == "/affiliates" || path == "/ads" || path == "/affiliate-ads/reports" {
+		if path == "/feature-flags" || path == "/settings" || path == "/affiliates" || path == "/ads" || path == "/plans" || path == "/affiliate-ads/reports" {
 			return role == auth.RoleSuperuser
 		}
 		return true
@@ -402,7 +405,7 @@ func IsNavAccessible(role auth.Role, path string) bool {
 		return false
 	case "/students/register":
 		return true
-	case "/classes", "/classes/record", "/schedule", "/schedule/record", "/schedule/repeat", "/schedule/series", "/profile", "/logs", "/upload-logs", "/my-students", "/documents", "/intro-videos", "/analytics", "/payments", "/guides", "/learning-materials", "/training-materials":
+	case "/classes", "/classes/record", "/schedule", "/schedule/record", "/schedule/repeat", "/schedule/series", "/profile", "/logs", "/upload-logs", "/my-students", "/documents", "/intro-videos", "/analytics", "/exports", "/payments", "/guides", "/learning-materials", "/training-materials":
 		return true
 	default:
 		return false

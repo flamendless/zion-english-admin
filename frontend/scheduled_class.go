@@ -52,13 +52,14 @@ func ScheduledClassItemFromView(v models.ScheduledClassView, gracePeriodMinutes 
 		StudentName: v.StudentName,
 		TeacherName: v.TeacherName,
 		TeacherAvatar: AvatarProps{
-			Size:          "sm",
-			Initials:      v.TeacherAvatar.Initials,
-			AssignedColor: v.TeacherAvatar.AssignedColor,
-			PictureURL:    v.TeacherAvatar.PictureURL,
-			HasPicture:    v.TeacherAvatar.HasPicture,
-			Alt:           v.TeacherAvatar.Alt,
-			RoleBadge:     v.TeacherAvatar.RoleBadge,
+			Size:                 "sm",
+			Initials:             v.TeacherAvatar.Initials,
+			AssignedColor:        v.TeacherAvatar.AssignedColor,
+			PictureURL:           v.TeacherAvatar.PictureURL,
+			HasPicture:           v.TeacherAvatar.HasPicture,
+			Alt:                  v.TeacherAvatar.Alt,
+			RoleBadge:            v.TeacherAvatar.RoleBadge,
+			TeacherAccountStatus: constants.TeacherStatus(v.TeacherAvatar.TeacherAccountStatus),
 		},
 		ScheduledDate:    v.ScheduledDate,
 		StartTime:        v.StartTime,
@@ -347,7 +348,7 @@ func scheduledClassDetailAttrs(item ScheduledClassItemData) templ.Attributes {
 	}
 	if item.TeacherAvatar.RoleBadge != "" {
 		attrs["data-teacher-role-badge"] = item.TeacherAvatar.RoleBadge
-		attrs["data-teacher-role-badge-class"] = pillClass(AvatarRoleBadgeTone(item.TeacherAvatar.RoleBadge))
+		attrs["data-teacher-role-badge-class"] = pillClass(AvatarRoleBadgeToneForProps(item.TeacherAvatar))
 	}
 	if item.SeriesID > 0 {
 		attrs["data-series-id"] = strconv.FormatInt(item.SeriesID, 10)

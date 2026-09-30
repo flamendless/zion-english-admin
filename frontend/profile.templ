@@ -64,6 +64,20 @@ type ProfileData struct {
 	GoogleCalendarGuideURL      string
 	GoogleCalendarStatusMessage string
 	NotificationPreferences   []NotificationPreferenceItem
+	PlanTierLabel             string
+	PlanDetail                string
+	PlanHistory               []ProfilePlanHistoryItem
+	IsTeacherPro              bool
+}
+
+type ProfilePlanHistoryItem struct {
+	BillingKind    string
+	EffectiveStart string
+	EffectiveEnd   string
+	Status         string
+	GrantedByName  string
+	Note           string
+	CreatedAt      string
 }
 
 type NotificationPreferenceItem struct {
@@ -709,6 +723,7 @@ templ Profile(data ProfileData) {
 								<button type="button" class="profile-tab" role="tab" aria-selected="false" data-profile-tab="security" onclick="window.switchMyProfileTab('security')">Security</button>
 								<button type="button" class="profile-tab" role="tab" aria-selected="false" data-profile-tab="integrations" onclick="window.switchMyProfileTab('integrations')">Integrations</button>
 								<button type="button" class="profile-tab" role="tab" aria-selected="false" data-profile-tab="files" onclick="window.switchMyProfileTab('files')">Files</button>
+								<button type="button" class="profile-tab" role="tab" aria-selected="false" data-profile-tab="plan" onclick="window.switchMyProfileTab('plan')">Plan</button>
 								<button type="button" class="profile-tab" role="tab" aria-selected="false" data-profile-tab="notifications" onclick="window.switchMyProfileTab('notifications')">Notifications</button>
 							</div>
 							<div class="profile-tab-panel is-active" role="tabpanel" data-profile-panel="profile">
@@ -917,6 +932,52 @@ templ Profile(data ProfileData) {
 								@ProfileDocumentUpload(data)
 								@ProfileIntroVideoUpload(data)
 							</div>
+							<div class="profile-tab-panel" role="tabpanel" data-profile-panel="plan">
+								@ProfilePanelHead("Teacher plan", "Your Teacher Pro access is managed by an administrator. Contact them to upgrade or extend your plan.")
+								<div class="profile-details" style="margin-bottom: var(--space-4);">
+									<div class="profile-detail">
+										<span class="profile-detail-label">Current plan</span>
+										<span class="profile-detail-value"><strong>{ data.PlanTierLabel }</strong></span>
+									</div>
+									if data.PlanDetail != "" {
+										<div class="profile-detail">
+											<span class="profile-detail-label">Details</span>
+											<span class="profile-detail-value">{ data.PlanDetail }</span>
+										</div>
+									}
+								</div>
+								if len(data.PlanHistory) > 0 {
+									<h3 style="font-size: 1rem; margin-bottom: var(--space-3);">Plan history</h3>
+									<div class="table-wrapper">
+										<table class="table-stack-mobile">
+											<thead>
+												<tr>
+													<th>Billing</th>
+													<th>Start</th>
+													<th>End</th>
+													<th>Status</th>
+													<th>Granted by</th>
+													<th>Note</th>
+												</tr>
+											</thead>
+											<tbody>
+												for _, row := range data.PlanHistory {
+													<tr>
+														<td data-label="Billing">{ row.BillingKind }</td>
+														<td data-label="Start">{ row.EffectiveStart }</td>
+														<td data-label="End">{ row.EffectiveEnd }</td>
+														<td data-label="Status">{ row.Status }</td>
+														<td data-label="Granted by">{ row.GrantedByName }</td>
+														<td data-label="Note">{ row.Note }</td>
+													</tr>
+												}
+											</tbody>
+										</table>
+									</div>
+								} else {
+									<p class="profile-panel-desc">No plan transactions on record yet.</p>
+								}
+							</div>
 							<div class="profile-tab-panel" role="tabpanel" data-profile-panel="notifications">
 								@ProfileNotificationPreferences(data)
 							</div>
@@ -966,7 +1027,10 @@ templ ProfilePanelHead(title string, description string) {
 }
 
 templ ProfileNotificationPreferences(data ProfileData) {
-	@ProfilePanelHead("Notification preferences", "Choose which in-app notification categories you receive. Turning off a category stops new notifications only; existing items in your bell and Notifications page stay visible.")
+	@ProfilePanelHead("Notification preferences", "Choose which in-app notification categories you receive. Turning off a category stops new notifications only; existing items in your bell and Notifications page stay visible. Email delivery requires Teacher Pro when it becomes available.")
+	if !data.IsTeacherPro {
+		<div class="form-warning" role="status" style="margin-bottom: var(--space-4);">Email notifications and insight digests will be available on Teacher Pro. In-app notifications below stay available on the free plan.</div>
+	}
 	<form class="profile-notifications-form" method="POST" action={ utils.URL("/profile/notifications") }>
 		<div class="integration-list">
 			for _, item := range data.NotificationPreferences {

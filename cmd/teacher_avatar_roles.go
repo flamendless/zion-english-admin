@@ -6,7 +6,6 @@ import (
 	"zion-english/frontend"
 	"zion-english/internal/constants"
 	"zion-english/internal/models"
-	"zion-english/internal/teachers"
 )
 
 func loadRolesByTeacherIDs(ctx context.Context, teacherIDs []int64) (map[int64][]constants.TeacherRole, error) {
@@ -25,38 +24,66 @@ func loadRolesByTeacherIDs(ctx context.Context, teacherIDs []int64) (map[int64][
 	return rolesByTeacher, nil
 }
 
-func avatarWithTeacherRoles(props frontend.AvatarProps, roles []constants.TeacherRole) frontend.AvatarProps {
-	return frontend.WithRoleBadge(props, roles)
-}
-
-func avatarViewWithTeacherRoles(view models.AvatarView, roles []constants.TeacherRole) models.AvatarView {
-	if role, ok := teachers.PrimaryTeacherRole(roles); ok {
-		view.RoleBadge = string(role)
+func loadTeacherStatusesByIDs(ctx context.Context, teacherIDs []int64) (map[int64]constants.TeacherStatus, error) {
+	statusByTeacher := make(map[int64]constants.TeacherStatus)
+	if len(teacherIDs) == 0 {
+		return statusByTeacher, nil
 	}
-	return view
+
+	rows, err := dbRO.GetQueries().GetTeacherStatusesByIDs(ctx, teacherIDs)
+	if err != nil {
+		return nil, err
+	}
+	for _, row := range rows {
+		statusByTeacher[row.ID] = constants.TeacherStatus(row.Status)
+	}
+	return statusByTeacher, nil
 }
 
-func enrichClassRecordViewsWithRoleBadges(views []models.ClassRecordView, rolesMap map[int64][]constants.TeacherRole) {
+func teacherStatusFromMap(statusMap map[int64]constants.TeacherStatus, teacherID int64) constants.TeacherStatus {
+	if status, ok := statusMap[teacherID]; ok {
+		return status
+	}
+	return constants.TeacherStatusApproved
+}
+
+func teacherStatusForID(ctx context.Context, teacherID int64) (constants.TeacherStatus, error) {
+	statusMap, err := loadTeacherStatusesByIDs(ctx, []int64{teacherID})
+	if err != nil {
+		return "", err
+	}
+	return teacherStatusFromMap(statusMap, teacherID), nil
+}
+
+func avatarWithTeacherRoles(props frontend.AvatarProps, roles []constants.TeacherRole, status constants.TeacherStatus) frontend.AvatarProps {
+	return frontend.AssignedTeacherAvatar(props, roles, status)
+}
+
+func avatarViewWithTeacherRoles(view models.AvatarView, roles []constants.TeacherRole, status constants.TeacherStatus) models.AvatarView {
+	return frontend.ApplyTeacherAvatarViewRoles(view, roles, status)
+}
+
+func enrichClassRecordViewsWithRoleBadges(views []models.ClassRecordView, rolesMap map[int64][]constants.TeacherRole, statusMap map[int64]constants.TeacherStatus) {
 	for i := range views {
-		views[i].TeacherAvatar = avatarViewWithTeacherRoles(views[i].TeacherAvatar, rolesMap[views[i].TeacherID])
+		views[i].TeacherAvatar = avatarViewWithTeacherRoles(views[i].TeacherAvatar, rolesMap[views[i].TeacherID], teacherStatusFromMap(statusMap, views[i].TeacherID))
 	}
 }
 
-func enrichScheduledClassViewsWithRoleBadges(views []models.ScheduledClassView, rolesMap map[int64][]constants.TeacherRole) {
+func enrichScheduledClassViewsWithRoleBadges(views []models.ScheduledClassView, rolesMap map[int64][]constants.TeacherRole, statusMap map[int64]constants.TeacherStatus) {
 	for i := range views {
-		views[i].TeacherAvatar = avatarViewWithTeacherRoles(views[i].TeacherAvatar, rolesMap[views[i].TeacherID])
+		views[i].TeacherAvatar = avatarViewWithTeacherRoles(views[i].TeacherAvatar, rolesMap[views[i].TeacherID], teacherStatusFromMap(statusMap, views[i].TeacherID))
 	}
 }
 
-func enrichDocumentItemsWithRoleBadges(items []frontend.DocumentItem, teacherIDs []int64, rolesMap map[int64][]constants.TeacherRole) {
+func enrichDocumentItemsWithRoleBadges(items []frontend.DocumentItem, teacherIDs []int64, rolesMap map[int64][]constants.TeacherRole, statusMap map[int64]constants.TeacherStatus) {
 	for i, id := range teacherIDs {
-		items[i].UploadedByAvatar = avatarWithTeacherRoles(items[i].UploadedByAvatar, rolesMap[id])
+		items[i].UploadedByAvatar = avatarWithTeacherRoles(items[i].UploadedByAvatar, rolesMap[id], teacherStatusFromMap(statusMap, id))
 	}
 }
 
-func enrichIntroVideoItemsWithRoleBadges(items []frontend.IntroVideoItem, teacherIDs []int64, rolesMap map[int64][]constants.TeacherRole) {
+func enrichIntroVideoItemsWithRoleBadges(items []frontend.IntroVideoItem, teacherIDs []int64, rolesMap map[int64][]constants.TeacherRole, statusMap map[int64]constants.TeacherStatus) {
 	for i, id := range teacherIDs {
-		items[i].UploadedByAvatar = avatarWithTeacherRoles(items[i].UploadedByAvatar, rolesMap[id])
+		items[i].UploadedByAvatar = avatarWithTeacherRoles(items[i].UploadedByAvatar, rolesMap[id], teacherStatusFromMap(statusMap, id))
 	}
 }
 

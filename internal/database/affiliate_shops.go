@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"errors"
 	"strings"
+
+	"zion-english/internal/utils"
 )
 
 func EnsureAffiliatedProductShopID(ctx context.Context, db Service, brandName string) (sql.NullInt64, error) {
@@ -24,7 +26,7 @@ func EnsureAffiliatedProductShopID(ctx context.Context, db Service, brandName st
 
 	id, err := q.InsertAffiliatedProductShop(ctx, brandName)
 	if err != nil {
-		if IsUniqueConstraint(err) {
+		if utils.IsUniqueConstraint(err) {
 			row, err := q.GetAffiliatedProductShopByBrandName(ctx, brandName)
 			if err != nil {
 				return sql.NullInt64{}, err

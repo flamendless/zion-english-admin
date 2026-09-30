@@ -300,11 +300,16 @@ func fetchScheduledClassViews(ctx context.Context, q scheduledClassesQuery, limi
 		teacherIDs = append(teacherIDs, sc.TeacherID)
 	}
 
-	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueTeacherIDs(teacherIDs))
+	uniqueIDs := uniqueTeacherIDs(teacherIDs)
+	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueIDs)
 	if err != nil {
 		return nil, err
 	}
-	enrichScheduledClassViewsWithRoleBadges(response, rolesMap)
+	statusMap, err := loadTeacherStatusesByIDs(ctx, uniqueIDs)
+	if err != nil {
+		return nil, err
+	}
+	enrichScheduledClassViewsWithRoleBadges(response, rolesMap, statusMap)
 	return response, nil
 }
 
@@ -1114,6 +1119,7 @@ func scheduledClassViewData(ctx context.Context, scheduleID int64) (frontend.Edi
 				teacher.ProfilePicture,
 			),
 			teacherRoles,
+			constants.TeacherStatus(teacher.Status),
 		),
 		Date:              existing.ScheduledDate,
 		StartTime:         startTime,

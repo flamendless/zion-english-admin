@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"math"
 	"net/http"
 	"sort"
@@ -13,6 +14,7 @@ import (
 	"zion-english/internal/auth"
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
+	"zion-english/internal/entitlements"
 	"zion-english/internal/logs"
 	"zion-english/internal/models"
 	"zion-english/internal/utils"
@@ -106,6 +108,7 @@ type analyticsTrialWeeklyRowJSON struct {
 }
 
 type analyticsResponseJSON struct {
+	Tier            string                        `json:"tier"`
 	Summary         analyticsSummaryJSON          `json:"summary"`
 	TrialSummary    analyticsTrialSummaryJSON     `json:"trialSummary"`
 	TrialWeekly     []analyticsTrialWeeklyRowJSON `json:"trialWeekly"`
@@ -131,6 +134,10 @@ func handleAnalytics(w http.ResponseWriter, r *http.Request) {
 		user := auth.GetUser(r.Context())
 		data.TeacherID = strconv.FormatInt(user.ID, 10)
 		data.TeacherName = user.Name
+		plan, err := entitlements.TeacherPlan(r.Context(), dbRO.GetQueries(), user.ID)
+		if err == nil {
+			data.IsPro = plan.IsPro
+		}
 	}
 
 	writeHTML(w)
@@ -164,7 +171,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 
 	teacherID, err := analyticsTeacherID(r)
 	if err != nil {
-		if err.Error() == "forbidden" {
+		if errors.Is(err, ErrForbidden) {
 			HttpError(w, MsgForbidden, http.StatusForbidden)
 			return
 		}
@@ -174,7 +181,32 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	q := dbRO.GetQueries()
-	isSuperuser := auth.HasAdminAccess(auth.GetRole(ctx))
+	role := auth.GetRole(ctx)
+	isSuperuser := auth.HasAdminAccess(role)
+	planView := entitlements.TeacherPlanView{Tier: constants.TeacherPlanTierFree}
+	if !isSuperuser {
+		scopeID := teacherID
+		if scopeID == 0 {
+			scopeID = auth.GetUser(ctx).ID
+		}
+		if scopeID > 0 {
+			planView, err = entitlements.TeacherPlan(ctx, q, scopeID)
+			if err != nil {
+				logs.Log().Error("analytics teacher plan", zap.Error(err))
+				HttpError(w, MsgFailedToLoadAnalytics, http.StatusInternalServerError)
+				return
+			}
+		}
+		startDate, endDate, err = entitlements.ClampAnalyticsRange(planView, startDate, endDate)
+		if err != nil {
+			if errors.Is(err, entitlements.ErrAnalyticsRangeRequiresPro) {
+				HttpError(w, MsgAnalyticsRangeRequiresPro, http.StatusForbidden)
+				return
+			}
+			HttpError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+	}
 
 	summaryRow, err := q.GetAnalyticsSummary(ctx, analyticsSummaryParams(startDate, endDate, teacherID))
 	if err != nil {
@@ -415,6 +447,11 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	resp.Tier = string(planView.Tier)
+	if !isSuperuser && !planView.IsPro {
+		stripAnalyticsProFields(&resp)
+	}
+
 	writeJSON(w)
 	if err := json.NewEncoder(w).Encode(resp); err != nil {
 		logs.Log().Error("encode analytics", zap.Error(err))
@@ -432,7 +469,12 @@ func enrichAnalyticsResponseWithRoleBadges(ctx context.Context, resp *analyticsR
 	}
 	teacherIDs = append(teacherIDs, noShowTeacherIDs...)
 
-	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueTeacherIDs(teacherIDs))
+	uniqueIDs := uniqueTeacherIDs(teacherIDs)
+	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueIDs)
+	if err != nil {
+		return err
+	}
+	statusMap, err := loadTeacherStatusesByIDs(ctx, uniqueIDs)
 	if err != nil {
 		return err
 	}
@@ -442,10 +484,10 @@ func enrichAnalyticsResponseWithRoleBadges(ctx context.Context, resp *analyticsR
 		if err != nil {
 			continue
 		}
-		resp.ByTeacher[i].TeacherAvatar = avatarViewWithTeacherRoles(resp.ByTeacher[i].TeacherAvatar, rolesMap[id])
+		resp.ByTeacher[i].TeacherAvatar = avatarViewWithTeacherRoles(resp.ByTeacher[i].TeacherAvatar, rolesMap[id], teacherStatusFromMap(statusMap, id))
 	}
 	for i, teacherID := range noShowTeacherIDs {
-		resp.NoShows[i].TeacherAvatar = avatarViewWithTeacherRoles(resp.NoShows[i].TeacherAvatar, rolesMap[teacherID])
+		resp.NoShows[i].TeacherAvatar = avatarViewWithTeacherRoles(resp.NoShows[i].TeacherAvatar, rolesMap[teacherID], teacherStatusFromMap(statusMap, teacherID))
 	}
 	return nil
 }
@@ -633,4 +675,13 @@ func sqlNumericToString(value interface{}) string {
 	default:
 		return ""
 	}
+}
+
+func stripAnalyticsProFields(resp *analyticsResponseJSON) {
+	resp.Weekly = nil
+	resp.ByStudent = nil
+	resp.NoShows = nil
+	resp.InactiveReasons = nil
+	resp.ChurnedStudents = nil
+	resp.Retention = analyticsRetentionJSON{}
 }

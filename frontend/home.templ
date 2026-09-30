@@ -43,6 +43,7 @@ type DashboardData struct {
 	AllTeachersSecondCutoffParentTotals []CurrencyTotal
 	StudentsWithoutParent             int64
 	StudentsWithoutParentRate         int64
+	StudentsWithoutApprovedTeacher    int64
 	TotalTeachers                     int64
 	TeachersWithoutZoom               int64
 	TeachersWithoutGoogleCal int64
@@ -332,6 +333,14 @@ templ DashboardStats(data DashboardData) {
 				@AdminOnlyStatLabel("Students")
 				<span class="stat-value">{ fmt.Sprintf("%d", data.ActiveStudents + data.InactiveStudents) }</span>
 				<span class="stat-sub">{ fmt.Sprintf("%d active, %d inactive", data.ActiveStudents, data.InactiveStudents) }</span>
+				<div class="stat-link-rows">
+					@DashboardStatLinkRow(
+						"Without valid teacher",
+						utils.URL("/students?status=active&teacherAssignmentFilter=no_approved_teacher"),
+						data.StudentsWithoutApprovedTeacher,
+						"View active students without an approved teacher",
+					)
+				</div>
 			</div>
 			@DashboardPendingStatCard(data.PendingTeachers, data.PendingDocuments, data.PendingIntroVideos)
 			@DashboardTeachersStatCard(data.TotalTeachers, data.TeachersWithoutZoom, data.TeachersWithoutGoogleCal, data.TeachersWithoutCV, data.TeachersWithoutValidDocuments, data.TeachersWithoutProfileAvatar)

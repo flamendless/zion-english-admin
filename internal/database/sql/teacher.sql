@@ -337,3 +337,8 @@ LIMIT ? OFFSET ?;
 
 -- name: CountTeachersByStatus :one
 SELECT COUNT(*) as count FROM tbl_teachers WHERE status = ? AND deleted = 0;
+
+-- name: GetTeacherStatusesByIDs :many
+SELECT id, status
+FROM tbl_teachers
+WHERE id IN (sqlc.slice('teacher_ids'));

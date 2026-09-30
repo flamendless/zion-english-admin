@@ -3083,7 +3083,8 @@ templ GlobalIncludes() {
 		}
 
 		/* Profile section tabs (teacher view modal, My Profile) */
-		#teacherViewModal .profile-tablist {
+		#teacherViewModal .profile-tablist,
+		#planTeacherViewModal .profile-tablist {
 			display: flex;
 			flex-wrap: wrap;
 			gap: var(--space-2);
@@ -3107,6 +3108,7 @@ templ GlobalIncludes() {
 		}
 
 		#teacherViewModal .profile-tab,
+		#planTeacherViewModal .profile-tab,
 		#myProfileRoot .profile-tab {
 			margin: 0;
 			margin-top: 0;
@@ -3123,12 +3125,14 @@ templ GlobalIncludes() {
 		}
 
 		#teacherViewModal .profile-tab:hover,
+		#planTeacherViewModal .profile-tab:hover,
 		#myProfileRoot .profile-tab:hover {
 			background: var(--color-surface);
 			color: var(--color-foreground);
 		}
 
-		#teacherViewModal .profile-tab.is-active {
+		#teacherViewModal .profile-tab.is-active,
+		#planTeacherViewModal .profile-tab.is-active {
 			background: var(--color-primary-light);
 			color: var(--color-primary-hover);
 		}
@@ -3145,11 +3149,13 @@ templ GlobalIncludes() {
 		}
 
 		#teacherViewModal .profile-tab-panel,
+		#planTeacherViewModal .profile-tab-panel,
 		#myProfileRoot .profile-tab-panel {
 			display: none;
 		}
 
 		#teacherViewModal .profile-tab-panel.is-active,
+		#planTeacherViewModal .profile-tab-panel.is-active,
 		#myProfileRoot .profile-tab-panel.is-active {
 			display: block;
 		}

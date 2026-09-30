@@ -1,0 +1,57 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+type ExportsPageData struct {
+	IsPro bool
+}
+
+templ Exports(data ExportsPageData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		@AdminPageHead("My data export - Zion English Admin Tool")
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@SuccessBanner()
+			@HubHeader("My data export", "Download your class history, students, and schedule for personal use.", "", false)
+			if !data.IsPro {
+				<div class="panel" style="padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-muted);">
+					<h3 style="margin-top: 0;">Teacher Pro required</h3>
+					<p style="color: var(--color-muted-foreground);">Data export is available on Teacher Pro. Contact your administrator to upgrade your plan.</p>
+				</div>
+			} else {
+				<div class="panel" style="padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-lg);">
+					<h3 style="margin-top: 0;">Class records</h3>
+					<p style="color: var(--color-muted-foreground);">CSV export of your conducted and scheduled class records.</p>
+					<form method="GET" action={ utils.URL("/exports/classes") } class="form-row">
+						<div class="form-group">
+							<label for="classStart">Start date</label>
+							<input type="date" id="classStart" name="startDate" required/>
+						</div>
+						<div class="form-group">
+							<label for="classEnd">End date</label>
+							<input type="date" id="classEnd" name="endDate" required/>
+						</div>
+						<div class="form-group" style="align-self: end;">
+							<button type="submit" class="btn" style="margin-top: 0;">Download CSV</button>
+						</div>
+					</form>
+				</div>
+				<div class="panel" style="margin-top: var(--space-4); padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-lg);">
+					<h3 style="margin-top: 0;">My students</h3>
+					<p style="color: var(--color-muted-foreground);">CSV export of students assigned to you.</p>
+					<a href={ utils.URL("/exports/students") } class="btn" style="margin-top: 0; width: auto; display: inline-block;">Download CSV</a>
+				</div>
+				<div class="panel" style="margin-top: var(--space-4); padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-lg);">
+					<h3 style="margin-top: 0;">Schedule</h3>
+					<p style="color: var(--color-muted-foreground);">CSV export of upcoming scheduled classes (next 90 days).</p>
+					<a href={ utils.URL("/exports/schedule") } class="btn" style="margin-top: 0; width: auto; display: inline-block;">Download CSV</a>
+				</div>
+			}
+		</div>
+	</body>
+	</html>
+}

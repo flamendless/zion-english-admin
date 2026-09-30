@@ -5,6 +5,7 @@ import "fmt"
 
 type AnalyticsData struct {
 	IsSuperuser bool
+	IsPro       bool
 	TeacherID   string
 	TeacherName string
 }
@@ -92,13 +93,18 @@ templ Analytics(data AnalyticsData) {
 		</style>
 	</head>
 	<body>
-		<div class="container analytics-page" data-is-superuser={ fmt.Sprintf("%t", data.IsSuperuser) }>
+		<div class="container analytics-page" data-is-superuser={ fmt.Sprintf("%t", data.IsSuperuser) } data-is-pro={ fmt.Sprintf("%t", data.IsSuperuser || data.IsPro) }>
 			@HeaderSimple()
 			@SuccessBanner()
 			if data.IsSuperuser {
 				@HubHeader("Analytics", "", "", false)
 			} else {
 				@HubHeader("My Analytics", "", "", false)
+			}
+			if !data.IsSuperuser && !data.IsPro {
+				<div class="panel" style="margin-bottom: var(--space-4); padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface);">
+					<p style="margin: 0; color: var(--color-muted-foreground);">You are on the free plan. Summary and trial analytics use the <strong>current calendar month (PHT)</strong>. Upgrade to Teacher Pro for full date ranges, student breakdowns, no-shows, and retention insights. Contact your administrator.</p>
+				</div>
 			}
 
 			<div class="toolbar" id="analyticsToolbar">
@@ -125,6 +131,7 @@ templ Analytics(data AnalyticsData) {
 					</div>
 				</div>
 
+				if data.IsSuperuser || data.IsPro {
 				<div class="analytics-charts">
 					<div class="analytics-chart-card">
 						<h2>Class Status</h2>
@@ -270,6 +277,7 @@ templ Analytics(data AnalyticsData) {
 						</table>
 					</div>
 				</div>
+				}
 			</div>
 		</div>
 
@@ -392,6 +400,19 @@ templ Analytics(data AnalyticsData) {
 				}
 			}
 
+			function avatarRoleBadgeClass(avatar) {
+				if (!avatar) {
+					return 'pill pill--neutral';
+				}
+				if (avatar.teacherAccountStatus === 'resigned') {
+					return 'pill pill--error';
+				}
+				if (avatar.teacherAccountStatus === 'pending') {
+					return 'pill pill--warning';
+				}
+				return roleBadgeClass(avatar.roleBadge);
+			}
+
 			function renderAvatarHTML(avatar) {
 				if (!avatar) {
 					return '';
@@ -407,7 +428,7 @@ templ Analytics(data AnalyticsData) {
 				const circle = '<div class="avatar avatar-sm" style="' + style + '" aria-label="' + escapeHTML(avatar.alt || '') + '">' + inner + '</div>';
 				if (avatar.roleBadge) {
 					return '<div class="avatar-with-role">' + circle +
-						'<span class="avatar-role-badge ' + roleBadgeClass(avatar.roleBadge) + '">' + escapeHTML(avatar.roleBadge) + '</span></div>';
+						'<span class="avatar-role-badge ' + avatarRoleBadgeClass(avatar) + '">' + escapeHTML(avatar.roleBadge) + '</span></div>';
 				}
 				return circle;
 			}

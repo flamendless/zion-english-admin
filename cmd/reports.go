@@ -311,9 +311,14 @@ func loadReportRows(ctx context.Context, startDate, endDate, q string, roleFilte
 	for i, summary := range summaries {
 		teacherIDs[i] = summary.TeacherID
 	}
-	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueTeacherIDs(teacherIDs))
+	uniqueIDs := uniqueTeacherIDs(teacherIDs)
+	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueIDs)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load teacher roles")
+	}
+	statusMap, err := loadTeacherStatusesByIDs(ctx, uniqueIDs)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load teacher statuses")
 	}
 
 	paymentStatuses, err := loadPaymentStatusesForPeriod(ctx, startDate, endDate)
@@ -329,6 +334,7 @@ func loadReportRows(ctx context.Context, startDate, endDate, q string, roleFilte
 			TeacherAvatar: avatarWithTeacherRoles(
 				buildReportSummaryAvatarProps(summary),
 				rolesMap[summary.TeacherID],
+				teacherStatusFromMap(statusMap, summary.TeacherID),
 			),
 			ConductedClasses: sqlNumericToInt64(summary.ConductedClasses),
 			CancelledClasses: sqlNumericToInt64(summary.CancelledClasses),
@@ -520,7 +526,7 @@ func handleReportView(w http.ResponseWriter, r *http.Request, teacherID int64) {
 		RescheduledCount: rescheduled,
 		CancelledCount:   cancelled,
 		Classes:          classes,
-		Avatar:           avatarWithTeacherRoles(buildReportTeacherAvatarProps(teacherID, profile), teacherRoles),
+		Avatar:           avatarWithTeacherRoles(buildReportTeacherAvatarProps(teacherID, profile), teacherRoles, constants.TeacherStatus(profile.Status)),
 	}).Render(ctx, w)
 }
 

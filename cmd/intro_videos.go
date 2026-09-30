@@ -12,7 +12,6 @@ import (
 	"zion-english/frontend"
 	"zion-english/internal/auth"
 	"zion-english/internal/constants"
-	"zion-english/internal/database"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/featureflags"
 	"zion-english/internal/logs"
@@ -122,11 +121,16 @@ func mapAllIntroVideoItems(ctx context.Context, rows []queries.GetAllTeacherIntr
 		}
 	}
 
-	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueTeacherIDs(teacherIDs))
+	uniqueIDs := uniqueTeacherIDs(teacherIDs)
+	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueIDs)
 	if err != nil {
 		return nil, err
 	}
-	enrichIntroVideoItemsWithRoleBadges(items, teacherIDs, rolesMap)
+	statusMap, err := loadTeacherStatusesByIDs(ctx, uniqueIDs)
+	if err != nil {
+		return nil, err
+	}
+	enrichIntroVideoItemsWithRoleBadges(items, teacherIDs, rolesMap, statusMap)
 	return items, nil
 }
 
@@ -394,7 +398,7 @@ func handleProfileIntroVideoLink(w http.ResponseWriter, r *http.Request, ctx con
 		SourceType: sql.NullString{String: string(parsed.SourceType), Valid: true},
 		Status:     string(constants.TeacherIntroVideoStatusSubmitted),
 	}); err != nil {
-		if database.IsUniqueConstraint(err) {
+		if utils.IsUniqueConstraint(err) {
 			setErrorFlash(w, "You already have a submitted, processing, or approved intro video. You cannot submit again unless it is rejected or deleted.")
 		} else {
 			logs.Log().Error("insert teacher intro video", zap.Error(err))
@@ -451,7 +455,7 @@ func handleProfileIntroVideoUpload(w http.ResponseWriter, r *http.Request, ctx c
 	})
 	if err != nil {
 		cleanupStage()
-		if database.IsUniqueConstraint(err) {
+		if utils.IsUniqueConstraint(err) {
 			setErrorFlash(w, "You already have a submitted, processing, or approved intro video. You cannot submit again unless it is rejected or deleted.")
 		} else {
 			logs.Log().Error("insert teacher intro video", zap.Error(err))

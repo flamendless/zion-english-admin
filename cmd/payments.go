@@ -144,19 +144,24 @@ func loadPaymentRows(ctx context.Context, teacherID int64, startDate, endDate, q
 	for _, row := range dbRows {
 		teacherIDs = append(teacherIDs, row.TeacherID)
 	}
-	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueTeacherIDs(teacherIDs))
+	uniqueIDs := uniqueTeacherIDs(teacherIDs)
+	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueIDs)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load teacher roles")
+	}
+	statusMap, err := loadTeacherStatusesByIDs(ctx, uniqueIDs)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load teacher statuses")
 	}
 
 	rows := make([]frontend.PaymentRowData, 0, len(dbRows))
 	for _, row := range dbRows {
-		rows = append(rows, mapPaymentRow(row, rolesMap, teacherID))
+		rows = append(rows, mapPaymentRow(row, rolesMap, statusMap, teacherID))
 	}
 	return rows, nil
 }
 
-func mapPaymentRow(row queries.GetTeacherPaymentsFilteredRow, rolesMap map[int64][]constants.TeacherRole, scopedTeacherID int64) frontend.PaymentRowData {
+func mapPaymentRow(row queries.GetTeacherPaymentsFilteredRow, rolesMap map[int64][]constants.TeacherRole, statusMap map[int64]constants.TeacherStatus, scopedTeacherID int64) frontend.PaymentRowData {
 	teacherName := utils.ComposePersonName(row.TeacherFirstName, row.TeacherMiddleName, row.TeacherLastName)
 	receivedAt := ""
 	if row.ReceivedAt != nil {
@@ -169,6 +174,7 @@ func mapPaymentRow(row queries.GetTeacherPaymentsFilteredRow, rolesMap map[int64
 		TeacherAvatar: avatarWithTeacherRoles(
 			buildTeacherListAvatarProps(row.TeacherID, row.TeacherFirstName, row.TeacherMiddleName, row.TeacherLastName, constants.DefaultTeacherAssignedColor, row.TeacherProfilePicture),
 			rolesMap[row.TeacherID],
+			teacherStatusFromMap(statusMap, row.TeacherID),
 		),
 		PeriodLabel:        formatReportCutoffLabel(row.PeriodStart, row.PeriodEnd),
 		PaymentMethod:      constants.PaymentMethod(row.PaymentMethod),
@@ -223,7 +229,10 @@ func loadPaymentRow(ctx context.Context, paymentID int64, scopedTeacherID int64)
 		TeacherLastName:       profile.LastName,
 		TeacherProfilePicture: profile.ProfilePicture,
 	}
-	return mapPaymentRow(filteredRow, rolesMap, scopedTeacherID), nil
+	statusMap := map[int64]constants.TeacherStatus{
+		payment.TeacherID: constants.TeacherStatus(profile.Status),
+	}
+	return mapPaymentRow(filteredRow, rolesMap, statusMap, scopedTeacherID), nil
 }
 
 func teacherHasPaymentForPeriod(ctx context.Context, teacherID int64, startDate, endDate string) (bool, error) {

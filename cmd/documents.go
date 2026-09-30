@@ -75,11 +75,16 @@ func mapAllDocumentItems(ctx context.Context, rows []queries.GetAllTeacherDocume
 		}
 	}
 
-	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueTeacherIDs(teacherIDs))
+	uniqueIDs := uniqueTeacherIDs(teacherIDs)
+	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueIDs)
 	if err != nil {
 		return nil, err
 	}
-	enrichDocumentItemsWithRoleBadges(items, teacherIDs, rolesMap)
+	statusMap, err := loadTeacherStatusesByIDs(ctx, uniqueIDs)
+	if err != nil {
+		return nil, err
+	}
+	enrichDocumentItemsWithRoleBadges(items, teacherIDs, rolesMap, statusMap)
 	return items, nil
 }
 

@@ -1,0 +1,489 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/constants"
+	"zion-english/internal/utils"
+)
+
+type PlansPageData struct {
+	Teachers     []PlansTeacherRowItem
+	Transactions []PlanTransactionItem
+}
+
+type PlansTeacherRowItem struct {
+	ID       string
+	Name     string
+	Email    string
+	PlanTier string
+	Avatar   AvatarProps
+}
+
+type PlanSummaryView struct {
+	TierLabel     string
+	Detail        string
+	ActiveGrantID int64
+}
+
+type PlansTeacherViewModalData struct {
+	TeacherID    string
+	TeacherName  string
+	TeacherEmail string
+	Avatar       AvatarProps
+	Summary      PlanSummaryView
+	Transactions []PlanTransactionItem
+}
+
+type PlansGrantModalData struct {
+	TeacherID   string
+	TeacherName string
+	Avatar      AvatarProps
+	Summary     PlanSummaryView
+}
+
+type PlanTransactionItem struct {
+	ID             int64
+	TeacherID      int64
+	TeacherName    string
+	TeacherAvatar  AvatarProps
+	BillingKind    constants.TeacherPlanBillingKind
+	EffectiveStart string
+	EffectiveEnd   string
+	Status         string
+	GrantedByName  string
+	Note           string
+	CreatedAt      string
+	CanRevoke      bool
+}
+
+templ PlansPage(data PlansPageData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		@AdminPageHead("Plans - Zion English Admin Tool")
+		@AvatarStyles()
+		<style>
+			.plans-layout {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-5);
+			}
+			.plans-section {
+				background: var(--color-surface);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-lg);
+				padding: var(--space-4);
+				min-width: 0;
+			}
+			.plans-section-header {
+				margin: 0 0 var(--space-4);
+			}
+			.plans-section-header h2 {
+				margin: 0 0 var(--space-2);
+				font-size: 1rem;
+				font-weight: 600;
+			}
+			.plans-section-header p {
+				margin: 0;
+				font-size: 0.8125rem;
+				color: var(--color-muted-foreground);
+				line-height: 1.45;
+			}
+			.plans-section .table-wrapper {
+				margin: 0;
+				width: 100%;
+			}
+			.plans-table-actions {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: var(--space-2);
+			}
+			.plans-history-revoke form {
+				margin: 0;
+			}
+			.plans-history-revoke .btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				height: 36px;
+				margin-top: 0;
+				padding: 0 var(--space-3);
+				font-size: 0.8125rem;
+				line-height: 1;
+			}
+			.plan-view-identity {
+				display: flex;
+				align-items: center;
+				gap: var(--space-3);
+				margin-bottom: var(--space-4);
+			}
+			.plan-view-identity h4 {
+				margin: 0 0 var(--space-1);
+				font-size: 1rem;
+			}
+			.plan-view-identity p {
+				margin: 0;
+				font-size: 0.875rem;
+				color: var(--color-muted-foreground);
+			}
+			.plans-grant-form .form-group {
+				margin-bottom: var(--space-3);
+			}
+			.plans-grant-form .btn,
+			.plans-revoke-form .btn {
+				margin-top: 0;
+			}
+			.plans-action-row {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: var(--space-2);
+			}
+			.plans-action-row .btn {
+				margin-top: 0;
+			}
+			.plans-tier-detail {
+				margin: var(--space-2) 0 var(--space-4);
+				font-size: 0.875rem;
+				color: var(--color-muted-foreground);
+				line-height: 1.45;
+			}
+			.plan-modal-history .table-wrapper {
+				margin: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container plans-page">
+			@HeaderSimple()
+			@SuccessBanner()
+			@HubHeader("Plans", "Grant Teacher Pro and review plan transaction history.", "", false)
+
+			<div class="plans-layout">
+				<section class="plans-section" aria-labelledby="plansTeachersHeading">
+					<div class="plans-section-header">
+						<h2 id="plansTeachersHeading">Teachers</h2>
+						<p>View plan details or grant Teacher Pro for a teacher.</p>
+					</div>
+					<div class="table-wrapper">
+						<table class="table-stack-mobile" id="plansTeachersTable">
+							<thead>
+								<tr>
+									<th>Teacher</th>
+									<th>Email</th>
+									<th>Current plan</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								if len(data.Teachers) == 0 {
+									<tr><td colspan="4" class="empty-state">No teachers found.</td></tr>
+								} else {
+									for _, item := range data.Teachers {
+										@PlansTeacherRow(item)
+									}
+								}
+							</tbody>
+						</table>
+					</div>
+				</section>
+
+				<section class="plans-section" aria-labelledby="plansHistoryHeading">
+					<div class="plans-section-header">
+						<h2 id="plansHistoryHeading">Plan transactions</h2>
+						<p>Recent grants and revocations across all teachers.</p>
+					</div>
+					<div class="table-wrapper">
+						<table class="table-stack-mobile" id="plansHistoryTable">
+							<thead>
+								<tr>
+									<th>Teacher</th>
+									<th>Billing</th>
+									<th>Start</th>
+									<th>End</th>
+									<th>Status</th>
+									<th>Granted by</th>
+									<th>Note</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody id="plansHistoryBody">
+								@PlansHistoryRows(data.Transactions, "No plan transactions yet.", true)
+							</tbody>
+						</table>
+					</div>
+				</section>
+			</div>
+
+			<div id="plansTeacherViewModalHost"></div>
+			<div id="plansGrantModalHost"></div>
+		</div>
+		@PlansModalScripts()
+	</body>
+	</html>
+}
+
+templ PlansTeacherRow(item PlansTeacherRowItem) {
+	<tr>
+		<td data-label="Teacher">
+			@TeacherNameCell(item.Name, item.Avatar)
+		</td>
+		<td data-label="Email">{ item.Email }</td>
+		<td data-label="Current plan">
+			@StatusPill(item.PlanTier, PlanTierPillTone(item.PlanTier), false)
+		</td>
+		<td data-label="Actions">
+			<div class="table-actions plans-table-actions">
+				@IconActionButton("View plan", IconKindView, templ.Attributes{
+					"hx-get":    utils.URL("/plans/teacher/" + item.ID + "/view"),
+					"hx-target": "#plansTeacherViewModalHost",
+					"hx-swap":   HxSwapInnerHTML,
+				})
+				@IconActionButton("Grant Pro", IconKindEdit, templ.Attributes{
+					"hx-get":    utils.URL("/plans/teacher/" + item.ID + "/grant"),
+					"hx-target": "#plansGrantModalHost",
+					"hx-swap":   HxSwapInnerHTML,
+				})
+			</div>
+		</td>
+	</tr>
+}
+
+templ PlansTeacherViewModal(data PlansTeacherViewModalData) {
+	<div class="modal-overlay" id="planTeacherViewModal" role="presentation">
+		<div class="modal-dialog modal-dialog-profile" role="dialog" aria-modal="true" aria-labelledby="planTeacherViewTitle">
+			<div class="modal-header">
+				<h3 id="planTeacherViewTitle">Teacher plan</h3>
+				<button type="button" class="modal-close plan-teacher-view-close" aria-label="Close" onclick="window.closePlansTeacherViewModal()">&times;</button>
+			</div>
+			<div class="modal-body">
+				<div class="plan-view-identity">
+					@Avatar(data.Avatar)
+					<div>
+						<h4>{ data.TeacherName }</h4>
+						<p>{ data.TeacherEmail }</p>
+					</div>
+				</div>
+				<div class="profile-tablist" role="tablist" aria-label="Teacher plan sections">
+					<button type="button" class="profile-tab is-active" role="tab" aria-selected="true" data-plan-tab="details" onclick="window.switchPlanTeacherModalTab('details')">Details</button>
+					<button type="button" class="profile-tab" role="tab" aria-selected="false" data-plan-tab="transactions" onclick="window.switchPlanTeacherModalTab('transactions')">Transactions</button>
+				</div>
+				<div class="profile-tab-panel is-active" role="tabpanel" data-plan-panel="details">
+					<div class="profile-details">
+						<div class="profile-detail">
+							<span class="profile-detail-label">Current plan</span>
+							<span class="profile-detail-value">
+								@StatusPill(data.Summary.TierLabel, PlanTierPillTone(data.Summary.TierLabel), false)
+							</span>
+						</div>
+						if data.Summary.Detail != "" {
+							<div class="profile-detail">
+								<span class="profile-detail-label">Status</span>
+								<span class="profile-detail-value">{ data.Summary.Detail }</span>
+							</div>
+						}
+					</div>
+					if data.Summary.ActiveGrantID > 0 {
+						<form class="plans-revoke-form" method="POST" action={ utils.URL("/plans/revoke") } style="margin-top: var(--space-4);">
+							<input type="hidden" name="teacher_id" value={ data.TeacherID }/>
+							<input type="hidden" name="transaction_id" value={ fmt.Sprintf("%d", data.Summary.ActiveGrantID) }/>
+							<div class="plans-action-row">
+								<button type="submit" class="btn btn-danger" onclick="return confirm('Revoke this active Pro grant?');">Revoke active grant</button>
+							</div>
+						</form>
+					}
+				</div>
+				<div class="profile-tab-panel plan-modal-history" role="tabpanel" data-plan-panel="transactions">
+					<div class="table-wrapper">
+						<table class="table-stack-mobile">
+							<thead>
+								<tr>
+									<th>Billing</th>
+									<th>Start</th>
+									<th>End</th>
+									<th>Status</th>
+									<th>Granted by</th>
+									<th>Note</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								@PlansHistoryRows(data.Transactions, "No plan transactions for this teacher.", false)
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary plan-teacher-view-close" onclick="window.closePlansTeacherViewModal()">Close</button>
+			</div>
+		</div>
+	</div>
+}
+
+templ PlansGrantModal(data PlansGrantModalData) {
+	<div class="modal-overlay" id="planGrantModal" role="presentation">
+		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="planGrantTitle">
+			<div class="modal-header">
+				<h3 id="planGrantTitle">Grant Teacher Pro</h3>
+				<button type="button" class="modal-close plan-grant-close" aria-label="Close" onclick="window.closePlansGrantModal()">&times;</button>
+			</div>
+			<div class="modal-body">
+				<div class="plan-view-identity">
+					@Avatar(data.Avatar)
+					<div>
+						<h4>{ data.TeacherName }</h4>
+						<p>
+							@StatusPill(data.Summary.TierLabel, PlanTierPillTone(data.Summary.TierLabel), false)
+						</p>
+					</div>
+				</div>
+				if data.Summary.Detail != "" {
+					<p class="plans-tier-detail">{ data.Summary.Detail }</p>
+				}
+				@PlansGrantForm(data.TeacherID)
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary plan-grant-close" onclick="window.closePlansGrantModal()">Cancel</button>
+			</div>
+		</div>
+	</div>
+}
+
+templ PlansGrantForm(teacherID string) {
+	<form class="plans-grant-form" method="POST" action={ utils.URL("/plans/grant") }>
+		<input type="hidden" name="teacher_id" value={ teacherID }/>
+		<div class="form-row">
+			<div class="form-group">
+				<label for="plan_grant_billing_kind">Billing kind</label>
+				<select id="plan_grant_billing_kind" name="billing_kind" required>
+					<option value={ string(constants.TeacherPlanBillingMonthly) }>Monthly</option>
+					<option value={ string(constants.TeacherPlanBillingLifetime) }>Lifetime</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="plan_grant_effective_start">Start date (PHT)</label>
+				<input type="date" id="plan_grant_effective_start" name="effective_start" value={ utils.TodayPHT() } required/>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="plan_grant_note">Note</label>
+			<input type="text" id="plan_grant_note" name="note" placeholder="Optional reference or comment"/>
+		</div>
+		<div class="plans-action-row">
+			<button type="submit" class="btn">Grant Pro</button>
+		</div>
+	</form>
+}
+
+templ PlansModalScripts() {
+	<script>
+		(function () {
+			if (window.__plansModalScriptsBound) return;
+			window.__plansModalScriptsBound = true;
+
+		window.closePlansTeacherViewModal = function () {
+			const host = document.getElementById('plansTeacherViewModalHost');
+			if (host) host.innerHTML = '';
+			document.body.classList.remove('modal-open');
+		};
+		window.closePlansGrantModal = function () {
+			const host = document.getElementById('plansGrantModalHost');
+			if (host) host.innerHTML = '';
+			document.body.classList.remove('modal-open');
+		};
+		window.switchPlanTeacherModalTab = function (targetTab) {
+			const root = document.getElementById('planTeacherViewModal');
+			if (!root || !targetTab) return;
+			root.querySelectorAll('[data-plan-tab]').forEach(function (t) {
+				const active = t.getAttribute('data-plan-tab') === targetTab;
+				t.classList.toggle('is-active', active);
+				t.setAttribute('aria-selected', active ? 'true' : 'false');
+			});
+			root.querySelectorAll('[data-plan-panel]').forEach(function (panel) {
+				const active = panel.getAttribute('data-plan-panel') === targetTab;
+				panel.classList.toggle('is-active', active);
+			});
+		};
+		document.body.addEventListener('htmx:afterSwap', function (evt) {
+			if (evt.detail.target.id === 'plansTeacherViewModalHost') {
+				document.body.classList.add('modal-open');
+				const overlay = evt.detail.target.querySelector('#planTeacherViewModal');
+				const closeBtn = overlay && overlay.querySelector('.plan-teacher-view-close');
+				if (closeBtn) closeBtn.focus();
+			}
+			if (evt.detail.target.id === 'plansGrantModalHost') {
+				document.body.classList.add('modal-open');
+				const overlay = evt.detail.target.querySelector('#planGrantModal');
+				const closeBtn = overlay && overlay.querySelector('.plan-grant-close');
+				if (closeBtn) closeBtn.focus();
+			}
+		});
+		document.body.addEventListener('click', function (e) {
+			if (e.target.closest('.plan-teacher-view-close')) {
+				window.closePlansTeacherViewModal();
+				return;
+			}
+			if (e.target.closest('.plan-grant-close')) {
+				window.closePlansGrantModal();
+				return;
+			}
+			const viewOverlay = e.target.closest('#planTeacherViewModal');
+			if (viewOverlay && e.target === viewOverlay) window.closePlansTeacherViewModal();
+			const grantOverlay = e.target.closest('#planGrantModal');
+			if (grantOverlay && e.target === grantOverlay) window.closePlansGrantModal();
+		});
+		document.addEventListener('keydown', function (e) {
+			if (e.key !== 'Escape') return;
+			if (document.getElementById('planTeacherViewModal')) window.closePlansTeacherViewModal();
+			if (document.getElementById('planGrantModal')) window.closePlansGrantModal();
+		});
+		})();
+	</script>
+}
+
+templ PlansHistoryRows(items []PlanTransactionItem, emptyMsg string, showTeacher bool) {
+	if len(items) == 0 {
+		if showTeacher {
+			<tr><td colspan="8" class="empty-state">{ emptyMsg }</td></tr>
+		} else {
+			<tr><td colspan="7" class="empty-state">{ emptyMsg }</td></tr>
+		}
+	} else {
+		for _, item := range items {
+			@PlansHistoryRow(item, showTeacher)
+		}
+	}
+}
+
+templ PlansHistoryRow(item PlanTransactionItem, showTeacher bool) {
+	<tr>
+		if showTeacher {
+			<td data-label="Teacher">
+				@TeacherNameCell(item.TeacherName, item.TeacherAvatar)
+			</td>
+		}
+		<td data-label="Billing">
+			@StatusPill(TeacherPlanBillingLabel(item.BillingKind), TeacherPlanBillingPillTone(item.BillingKind), false)
+		</td>
+		<td data-label="Start">{ item.EffectiveStart }</td>
+		<td data-label="End">{ item.EffectiveEnd }</td>
+		<td data-label="Status">
+			@StatusPill(item.Status, PlanTransactionStatusPillTone(item.Status), false)
+		</td>
+		<td data-label="Granted by">{ item.GrantedByName }</td>
+		<td data-label="Note">{ item.Note }</td>
+		<td data-label="Actions" class="plans-history-revoke">
+			if item.CanRevoke {
+				<form method="POST" action={ utils.URL("/plans/revoke") }>
+					<input type="hidden" name="teacher_id" value={ fmt.Sprintf("%d", item.TeacherID) }/>
+					<input type="hidden" name="transaction_id" value={ fmt.Sprintf("%d", item.ID) }/>
+					<button type="submit" class="btn btn-secondary" onclick="return confirm('Revoke this grant?');">Revoke</button>
+				</form>
+			} else {
+				-
+			}
+		</td>
+	</tr>
+}

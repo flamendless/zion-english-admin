@@ -72,6 +72,7 @@ SELECT
 	t.last_name,
 	t.assigned_color,
 	t.profile_picture,
+	t.status,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_teachers_students_m2m m2m
 INNER JOIN tbl_teachers t ON t.id = m2m.teacher_id
@@ -87,6 +88,7 @@ type GetAllStudentTeacherNamesRow struct {
 	LastName       string
 	AssignedColor  string
 	ProfilePicture sql.NullString
+	Status         string
 	TeacherName    string
 }
 
@@ -107,6 +109,7 @@ func (q *Queries) GetAllStudentTeacherNames(ctx context.Context) ([]GetAllStuden
 			&i.LastName,
 			&i.AssignedColor,
 			&i.ProfilePicture,
+			&i.Status,
 			&i.TeacherName,
 		); err != nil {
 			return nil, err
@@ -256,7 +259,7 @@ func (q *Queries) GetStudentsByTeacherIDFiltered(ctx context.Context, arg GetStu
 }
 
 const getTeachersByStudentID = `-- name: GetTeachersByStudentID :many
-SELECT t.id, t.first_name, t.middle_name, t.last_name, t.birthdate, t.address, t.joining_date, t.mobile_number, t.email, t.certifications, t.assigned_color, t.rate_per_class, t.currency, t.drive_url, t.sex, t.password, t.created_at, t.updated_at, t.profile_picture
+SELECT t.id, t.first_name, t.middle_name, t.last_name, t.birthdate, t.address, t.joining_date, t.mobile_number, t.email, t.certifications, t.assigned_color, t.rate_per_class, t.currency, t.drive_url, t.sex, t.password, t.created_at, t.updated_at, t.profile_picture, t.status
 FROM tbl_teachers t
 INNER JOIN tbl_teachers_students_m2m m2m ON t.id = m2m.teacher_id
 WHERE m2m.student_id = ?
@@ -283,6 +286,7 @@ type GetTeachersByStudentIDRow struct {
 	CreatedAt      sql.NullTime
 	UpdatedAt      sql.NullTime
 	ProfilePicture sql.NullString
+	Status         string
 }
 
 func (q *Queries) GetTeachersByStudentID(ctx context.Context, studentID int64) ([]GetTeachersByStudentIDRow, error) {
@@ -314,6 +318,7 @@ func (q *Queries) GetTeachersByStudentID(ctx context.Context, studentID int64) (
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.ProfilePicture,
+			&i.Status,
 		); err != nil {
 			return nil, err
 		}

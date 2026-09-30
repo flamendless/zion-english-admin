@@ -207,7 +207,7 @@ func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		Sex:                              sex,
 		Status:                           constants.TeacherStatus(row.Status),
 		Roles:                            roleStrings,
-		Avatar:                           avatarWithTeacherRoles(buildTeacherAvatarProps(row), roleStrings),
+		Avatar:                           avatarWithTeacherRoles(buildTeacherAvatarProps(row), roleStrings, constants.TeacherStatus(row.Status)),
 		ZoomConfigured:                   zoomConfigured,
 		ZoomConnected:                    zoomConnected,
 		ZoomIntegrationVisible:           zoomVisible,
@@ -391,7 +391,7 @@ func handleTeachers(w http.ResponseWriter, r *http.Request) {
 			CreatedAt:               utils.FormatNullDateTimeSecondsPHT(t.CreatedAt),
 			Avatar: avatarWithTeacherRoles(buildTeacherListAvatarProps(
 				t.ID, t.FirstName, t.MiddleName, t.LastName, t.AssignedColor, t.ProfilePicture,
-			), rolesByTeacher[t.ID]),
+			), rolesByTeacher[t.ID], constants.TeacherStatus(t.Status)),
 		}
 	}
 

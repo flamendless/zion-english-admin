@@ -63,6 +63,21 @@ WHERE (? = '' OR s.name LIKE '%' || ? || '%')
 				OR TRIM(COALESCE(s.parent_currency, '')) = ''
 			)
 		)
+	)
+	AND (
+		? = ''
+		OR (
+			? = 'no_approved_teacher'
+			AND s.status = 'active'
+			AND NOT EXISTS (
+				SELECT 1
+				FROM tbl_teachers_students_m2m m2m_valid
+				INNER JOIN tbl_teachers t_valid ON t_valid.id = m2m_valid.teacher_id
+				WHERE m2m_valid.student_id = s.id
+					AND t_valid.deleted = 0
+					AND t_valid.status = 'approved'
+			)
+		)
 	);
 
 -- name: GetStudentsFiltered :many
@@ -92,6 +107,21 @@ WHERE (? = '' OR s.name LIKE '%' || ? || '%')
 			)
 		)
 	)
+	AND (
+		? = ''
+		OR (
+			? = 'no_approved_teacher'
+			AND s.status = 'active'
+			AND NOT EXISTS (
+				SELECT 1
+				FROM tbl_teachers_students_m2m m2m_valid
+				INNER JOIN tbl_teachers t_valid ON t_valid.id = m2m_valid.teacher_id
+				WHERE m2m_valid.student_id = s.id
+					AND t_valid.deleted = 0
+					AND t_valid.status = 'approved'
+			)
+		)
+	)
 ORDER BY s.created_at DESC
 LIMIT ? OFFSET ?;
 
@@ -114,4 +144,17 @@ WHERE status = 'active'
 		parent_rate IS NULL
 		OR parent_currency IS NULL
 		OR TRIM(COALESCE(parent_currency, '')) = ''
+	);
+
+-- name: CountActiveStudentsWithoutApprovedTeacher :one
+SELECT COUNT(*) AS count
+FROM tbl_students s
+WHERE s.status = 'active'
+	AND NOT EXISTS (
+		SELECT 1
+		FROM tbl_teachers_students_m2m m2m_valid
+		INNER JOIN tbl_teachers t_valid ON t_valid.id = m2m_valid.teacher_id
+		WHERE m2m_valid.student_id = s.id
+			AND t_valid.deleted = 0
+			AND t_valid.status = 'approved'
 	);

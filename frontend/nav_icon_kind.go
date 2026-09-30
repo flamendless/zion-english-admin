@@ -73,6 +73,8 @@ var navIconByPath = map[string]NavIconKind{
 	"/meta":                  NavIconMeta,
 	"/affiliates":            NavIconAffiliates,
 	"/ads":                   NavIconAds,
+	"/plans":                 NavIconAnalytics,
+	"/exports":               NavIconReports,
 	"/logs":                  NavIconLogs,
 	"/upload-logs":           NavIconUploadLogs,
 	"/announcements":         NavIconAnnouncements,

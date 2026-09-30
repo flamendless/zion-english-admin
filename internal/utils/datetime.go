@@ -39,6 +39,30 @@ func TodayPHT() string {
 	return DatePHT(time.Now())
 }
 
+func FormatPlanDateTimePHT(value string) string {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return "-"
+	}
+	layouts := []string{constants.DateTimeSecondsLayout, constants.DateTimeLayout, constants.DateLayout}
+	for _, layout := range layouts {
+		t, err := time.ParseInLocation(layout, value, constants.LocationPHT)
+		if err != nil {
+			t, err = time.Parse(layout, value)
+		}
+		if err == nil {
+			if layout == constants.DateLayout {
+				return DatePHT(t)
+			}
+			return DateTimeSecondsPHT(t)
+		}
+	}
+	if len(value) >= 10 {
+		return value[:10]
+	}
+	return value
+}
+
 func ParseDatePHT(value string) (*time.Time, error) {
 	value = strings.TrimSpace(value)
 	if value == "" {

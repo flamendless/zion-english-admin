@@ -138,7 +138,12 @@ func scheduledClassSeriesItemsFromRows(ctx context.Context, rows []queries.ListA
 	for _, row := range rows {
 		teacherIDs = append(teacherIDs, row.TeacherID)
 	}
-	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueTeacherIDs(teacherIDs))
+	uniqueIDs := uniqueTeacherIDs(teacherIDs)
+	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueIDs)
+	if err != nil {
+		return nil, err
+	}
+	statusMap, err := loadTeacherStatusesByIDs(ctx, uniqueIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -160,6 +165,7 @@ func scheduledClassSeriesItemsFromRows(ctx context.Context, rows []queries.ListA
 				row.TeacherProfilePicture,
 			),
 			rolesMap[row.TeacherID],
+			teacherStatusFromMap(statusMap, row.TeacherID),
 		)
 		nullSeries := sql.NullInt64{Int64: row.SeriesID, Valid: true}
 		_, future, err := seriesCounts(ctx, nullSeries, row.AnchorDate)

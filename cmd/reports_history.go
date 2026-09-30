@@ -90,25 +90,31 @@ func loadReportHistoryRows(ctx context.Context, startDate, endDate, q string) ([
 	for _, row := range dbRows {
 		teacherIDs = append(teacherIDs, row.TeacherID)
 	}
-	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueTeacherIDs(teacherIDs))
+	uniqueIDs := uniqueTeacherIDs(teacherIDs)
+	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueIDs)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load teacher roles")
+	}
+	statusMap, err := loadTeacherStatusesByIDs(ctx, uniqueIDs)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load teacher statuses")
 	}
 
 	rows := make([]frontend.ReportHistoryRowData, 0, len(dbRows))
 	for _, row := range dbRows {
-		rows = append(rows, mapReportHistoryRow(ctx, row, rolesMap))
+		rows = append(rows, mapReportHistoryRow(ctx, row, rolesMap, statusMap))
 	}
 	return rows, nil
 }
 
-func mapReportHistoryRow(ctx context.Context, row queries.GetReportGenerationsFilteredRow, rolesMap map[int64][]constants.TeacherRole) frontend.ReportHistoryRowData {
+func mapReportHistoryRow(ctx context.Context, row queries.GetReportGenerationsFilteredRow, rolesMap map[int64][]constants.TeacherRole, statusMap map[int64]constants.TeacherStatus) frontend.ReportHistoryRowData {
 	teacherName := utils.ComposePersonName(row.TeacherFirstName, row.TeacherMiddleName, row.TeacherLastName)
 	item := frontend.ReportHistoryRowData{
 		TeacherName: teacherName,
 		TeacherAvatar: avatarWithTeacherRoles(
 			buildTeacherListAvatarProps(row.TeacherID, row.TeacherFirstName, row.TeacherMiddleName, row.TeacherLastName, constants.DefaultTeacherAssignedColor, row.TeacherProfilePicture),
 			rolesMap[row.TeacherID],
+			teacherStatusFromMap(statusMap, row.TeacherID),
 		),
 		PeriodLabel: formatReportCutoffLabel(row.StartDate, row.EndDate),
 		RecordCount: row.RecordCount,

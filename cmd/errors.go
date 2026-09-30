@@ -3,14 +3,16 @@ package cmd
 import "errors"
 
 var (
-	ErrInvalidTeacherID          = errors.New("invalid teacher ID")
-	ErrForbidden                 = errors.New(MsgForbidden)
-	ErrUnauthorized              = errors.New(MsgUnauthorized)
-	ErrNotFound                  = errors.New(MsgNotFound)
-	ErrAccessDenied              = errors.New(MsgAccessDenied)
-	ErrMissingRequiredParameters = errors.New("missing required parameters")
-	ErrMissingNumericValue       = errors.New("missing numeric value")
-	ErrMissingIntegerValue       = errors.New("missing integer value")
+	ErrInvalidTeacherID            = errors.New("invalid teacher ID")
+	ErrAnalyticsRangeRequiresPro   = errors.New(MsgAnalyticsRangeRequiresPro)
+	ErrEntitlementsUpgradeRequired = errors.New(MsgEntitlementsUpgradeRequired)
+	ErrForbidden                   = errors.New(MsgForbidden)
+	ErrUnauthorized                = errors.New(MsgUnauthorized)
+	ErrNotFound                    = errors.New(MsgNotFound)
+	ErrAccessDenied                = errors.New(MsgAccessDenied)
+	ErrMissingRequiredParameters   = errors.New("missing required parameters")
+	ErrMissingNumericValue         = errors.New("missing numeric value")
+	ErrMissingIntegerValue         = errors.New("missing integer value")
 
 	ErrEndDateBeforeStart     = errors.New("end date must be after start date")
 	ErrMissingDateRange       = errors.New("missing date range")

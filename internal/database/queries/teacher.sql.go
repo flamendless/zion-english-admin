@@ -8,6 +8,7 @@ package queries
 import (
 	"context"
 	"database/sql"
+	"strings"
 )
 
 const approveTeacher = `-- name: ApproveTeacher :exec
@@ -620,6 +621,50 @@ func (q *Queries) GetTeacherProfileByID(ctx context.Context, id int64) (GetTeach
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const getTeacherStatusesByIDs = `-- name: GetTeacherStatusesByIDs :many
+SELECT id, status
+FROM tbl_teachers
+WHERE id IN (/*SLICE:teacher_ids*/?)
+`
+
+type GetTeacherStatusesByIDsRow struct {
+	ID     int64
+	Status string
+}
+
+func (q *Queries) GetTeacherStatusesByIDs(ctx context.Context, teacherIds []int64) ([]GetTeacherStatusesByIDsRow, error) {
+	query := getTeacherStatusesByIDs
+	var queryParams []interface{}
+	if len(teacherIds) > 0 {
+		for _, v := range teacherIds {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:teacher_ids*/?", strings.Repeat(",?", len(teacherIds))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:teacher_ids*/?", "NULL", 1)
+	}
+	rows, err := q.db.QueryContext(ctx, query, queryParams...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTeacherStatusesByIDsRow
+	for rows.Next() {
+		var i GetTeacherStatusesByIDsRow
+		if err := rows.Scan(&i.ID, &i.Status); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getTeachersFiltered = `-- name: GetTeachersFiltered :many

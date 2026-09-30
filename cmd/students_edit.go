@@ -56,7 +56,7 @@ func requireStudentAssignedToTeacher(ctx context.Context, teacherID, studentID i
 	return nil
 }
 
-func studentFilterParams(q, status string, teacherID int64, parentFilter string) queries.CountStudentsFilteredParams {
+func studentFilterParams(q, status string, teacherID int64, parentFilter string, teacherAssignmentFilter string) queries.CountStudentsFilteredParams {
 	return queries.CountStudentsFilteredParams{
 		Column1:   q,
 		Column2:   sql.NullString{String: q, Valid: true},
@@ -68,6 +68,8 @@ func studentFilterParams(q, status string, teacherID int64, parentFilter string)
 		Column8:   parentFilter,
 		Column9:   parentFilter,
 		Column10:  parentFilter,
+		Column11:  teacherAssignmentFilter,
+		Column12:  teacherAssignmentFilter,
 	}
 }
 
@@ -119,6 +121,7 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 			Avatar: avatarWithTeacherRoles(
 				buildTeacherListAvatarProps(t.ID, t.FirstName, t.MiddleName, t.LastName, t.AssignedColor, t.ProfilePicture),
 				rolesMap[t.ID],
+				constants.TeacherStatus(t.Status),
 			),
 		}
 	}
@@ -298,11 +301,15 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 	if parentFilter != "" && !constants.ValidStudentParentFilter(parentFilter) {
 		parentFilter = ""
 	}
+	teacherAssignmentFilter := strings.TrimSpace(r.URL.Query().Get("teacherAssignmentFilter"))
+	if teacherAssignmentFilter != "" && !constants.ValidStudentTeacherAssignmentFilter(teacherAssignmentFilter) {
+		teacherAssignmentFilter = ""
+	}
 	teacherID := utils.QueryParamInt64(r, "teacherId")
 	sort := parseListSort(r, frontend.ListSortKindStudent)
 	page := utils.ParsePageQuery(r)
 
-	filter := studentFilterParams(q, status, teacherID, parentFilter)
+	filter := studentFilterParams(q, status, teacherID, parentFilter, teacherAssignmentFilter)
 	total, err := dbRO.GetQueries().CountStudentsFiltered(ctx, filter)
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to count students: %v", err), http.StatusInternalServerError)
@@ -321,6 +328,8 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		Column8:   filter.Column8,
 		Column9:   filter.Column9,
 		Column10:  filter.Column10,
+		Column11:  filter.Column11,
+		Column12:  filter.Column12,
 		Limit:     total,
 		Offset:    0,
 	})
@@ -348,6 +357,16 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	assignmentTeacherIDs := make([]int64, 0, len(teacherAssignments))
+	for _, assignment := range teacherAssignments {
+		assignmentTeacherIDs = append(assignmentTeacherIDs, assignment.TeacherID)
+	}
+	assignmentRolesMap, err := loadRolesByTeacherIDs(ctx, uniqueTeacherIDs(assignmentTeacherIDs))
+	if err != nil {
+		HttpError(w, fmt.Sprintf("Failed to fetch teacher roles: %v", err), http.StatusInternalServerError)
+		return
+	}
+
 	teachersByStudent := make(map[int64][]frontend.TeacherListItem)
 	for _, assignment := range teacherAssignments {
 		name := assignment.TeacherName
@@ -356,13 +375,17 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		}
 		teachersByStudent[assignment.StudentID] = append(teachersByStudent[assignment.StudentID], frontend.TeacherListItem{
 			Name: name,
-			Avatar: buildTeacherListAvatarProps(
-				assignment.TeacherID,
-				assignment.FirstName,
-				assignment.MiddleName,
-				assignment.LastName,
-				assignment.AssignedColor,
-				assignment.ProfilePicture,
+			Avatar: avatarWithTeacherRoles(
+				buildTeacherListAvatarProps(
+					assignment.TeacherID,
+					assignment.FirstName,
+					assignment.MiddleName,
+					assignment.LastName,
+					assignment.AssignedColor,
+					assignment.ProfilePicture,
+				),
+				assignmentRolesMap[assignment.TeacherID],
+				constants.TeacherStatus(assignment.Status),
 			),
 		})
 	}
@@ -398,22 +421,23 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 	}
 	writeHTML(w)
 	frontend.Students(frontend.StudentData{
-		Students:       viewStudents,
-		Query:          q,
-		Status:         constants.StudentStatus(status),
-		ParentFilter:   parentFilter,
-		TeacherID:      strconv.FormatInt(teacherID, 10),
-		TeacherName:    teacherName,
-		SortBy:         sort.By,
-		SortOrder:      string(sort.Order),
-		PageNumber:     page.Number,
-		PageTotalPages: page.TotalPages(),
-		PageTotal:      page.Total,
-		PrevURL:        utils.BuildPageURLAt(utils.URL("/students"), page.Number-1, page.Size, params),
-		NextURL:        utils.BuildPageURLAt(utils.URL("/students"), page.Number+1, page.Size, params),
-		HasPrev:        page.HasPrev(),
-		HasNext:        page.HasNext(),
-		FilterPath:     utils.URL("/students"),
+		Students:                viewStudents,
+		Query:                   q,
+		Status:                  constants.StudentStatus(status),
+		ParentFilter:            parentFilter,
+		TeacherAssignmentFilter: teacherAssignmentFilter,
+		TeacherID:               strconv.FormatInt(teacherID, 10),
+		TeacherName:             teacherName,
+		SortBy:                  sort.By,
+		SortOrder:               string(sort.Order),
+		PageNumber:              page.Number,
+		PageTotalPages:          page.TotalPages(),
+		PageTotal:               page.Total,
+		PrevURL:                 utils.BuildPageURLAt(utils.URL("/students"), page.Number-1, page.Size, params),
+		NextURL:                 utils.BuildPageURLAt(utils.URL("/students"), page.Number+1, page.Size, params),
+		HasPrev:                 page.HasPrev(),
+		HasNext:                 page.HasNext(),
+		FilterPath:              utils.URL("/students"),
 	}).Render(ctx, w)
 }
 

@@ -176,12 +176,13 @@ type ScheduledClassRequest struct {
 }
 
 type AvatarView struct {
-	Initials      string `json:"initials"`
-	AssignedColor string `json:"assignedColor"`
-	HasPicture    bool   `json:"hasPicture"`
-	PictureURL    string `json:"pictureURL"`
-	Alt           string `json:"alt"`
-	RoleBadge     string `json:"roleBadge,omitempty"`
+	Initials             string `json:"initials"`
+	AssignedColor        string `json:"assignedColor"`
+	HasPicture           bool   `json:"hasPicture"`
+	PictureURL           string `json:"pictureURL"`
+	Alt                  string `json:"alt"`
+	RoleBadge            string `json:"roleBadge,omitempty"`
+	TeacherAccountStatus string `json:"teacherAccountStatus,omitempty"`
 }
 
 type ScheduledClassView struct {

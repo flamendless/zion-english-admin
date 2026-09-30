@@ -1,5 +1,6 @@
 package frontend
 
+import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 type AvatarProps struct {
@@ -9,7 +10,8 @@ type AvatarProps struct {
 	PictureURL    string `json:"pictureURL"`
 	HasPicture    bool   `json:"hasPicture"`
 	Alt           string `json:"alt"`
-	RoleBadge     string `json:"roleBadge,omitempty"`
+	RoleBadge            string                    `json:"roleBadge,omitempty"`
+	TeacherAccountStatus constants.TeacherStatus   `json:"teacherAccountStatus,omitempty"`
 }
 
 type TeacherListItem struct {
@@ -42,7 +44,7 @@ templ Avatar(props AvatarProps) {
 	if props.RoleBadge != "" {
 		<div class="avatar-with-role">
 			@avatarCircle(props)
-			<span class={ "avatar-role-badge " + pillClass(AvatarRoleBadgeTone(props.RoleBadge)) }>{ props.RoleBadge }</span>
+			<span class={ "avatar-role-badge " + pillClass(AvatarRoleBadgeToneForProps(props)) }>{ props.RoleBadge }</span>
 		</div>
 	} else {
 		@avatarCircle(props)

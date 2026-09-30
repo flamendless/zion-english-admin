@@ -166,6 +166,10 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 			data.StudentsWithoutParentRate = withoutParentRate
 		}
+		withoutApprovedTeacher, err := dbRO.GetQueries().CountActiveStudentsWithoutApprovedTeacher(ctx)
+		if err == nil {
+			data.StudentsWithoutApprovedTeacher = withoutApprovedTeacher
+		}
 		data.TotalTeachers = teacherDashboardCount(ctx, "", "", "", "")
 		data.TeachersWithoutZoom = teacherDashboardCount(ctx, string(constants.TeacherConnectionFilterMissingZoom), "", "", "")
 		data.TeachersWithoutGoogleCal = teacherDashboardCount(ctx, string(constants.TeacherConnectionFilterMissingGoogle), "", "", "")

@@ -427,6 +427,20 @@ type TblTeacherPayment struct {
 	UpdatedAt         string
 }
 
+type TblTeacherPlanTransaction struct {
+	ID                 int64
+	TeacherID          int64
+	Tier               string
+	BillingKind        string
+	EffectiveStart     string
+	EffectiveEnd       interface{}
+	RevokedAt          interface{}
+	GrantedByTeacherID interface{}
+	GrantedByName      string
+	Note               string
+	CreatedAt          string
+}
+
 type TblTeacherRole struct {
 	TeacherID int64
 	Role      string

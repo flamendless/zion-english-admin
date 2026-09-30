@@ -10,6 +10,27 @@ import (
 	"database/sql"
 )
 
+const countActiveStudentsWithoutApprovedTeacher = `-- name: CountActiveStudentsWithoutApprovedTeacher :one
+SELECT COUNT(*) AS count
+FROM tbl_students s
+WHERE s.status = 'active'
+	AND NOT EXISTS (
+		SELECT 1
+		FROM tbl_teachers_students_m2m m2m_valid
+		INNER JOIN tbl_teachers t_valid ON t_valid.id = m2m_valid.teacher_id
+		WHERE m2m_valid.student_id = s.id
+			AND t_valid.deleted = 0
+			AND t_valid.status = 'approved'
+	)
+`
+
+func (q *Queries) CountActiveStudentsWithoutApprovedTeacher(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countActiveStudentsWithoutApprovedTeacher)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const countActiveStudentsWithoutParent = `-- name: CountActiveStudentsWithoutParent :one
 SELECT COUNT(*) AS count
 FROM tbl_students
@@ -103,6 +124,21 @@ WHERE (? = '' OR s.name LIKE '%' || ? || '%')
 			)
 		)
 	)
+	AND (
+		? = ''
+		OR (
+			? = 'no_approved_teacher'
+			AND s.status = 'active'
+			AND NOT EXISTS (
+				SELECT 1
+				FROM tbl_teachers_students_m2m m2m_valid
+				INNER JOIN tbl_teachers t_valid ON t_valid.id = m2m_valid.teacher_id
+				WHERE m2m_valid.student_id = s.id
+					AND t_valid.deleted = 0
+					AND t_valid.status = 'approved'
+			)
+		)
+	)
 `
 
 type CountStudentsFilteredParams struct {
@@ -116,6 +152,8 @@ type CountStudentsFilteredParams struct {
 	Column8   interface{}
 	Column9   interface{}
 	Column10  interface{}
+	Column11  interface{}
+	Column12  interface{}
 }
 
 func (q *Queries) CountStudentsFiltered(ctx context.Context, arg CountStudentsFilteredParams) (int64, error) {
@@ -130,6 +168,8 @@ func (q *Queries) CountStudentsFiltered(ctx context.Context, arg CountStudentsFi
 		arg.Column8,
 		arg.Column9,
 		arg.Column10,
+		arg.Column11,
+		arg.Column12,
 	)
 	var count int64
 	err := row.Scan(&count)
@@ -331,6 +371,21 @@ WHERE (? = '' OR s.name LIKE '%' || ? || '%')
 			)
 		)
 	)
+	AND (
+		? = ''
+		OR (
+			? = 'no_approved_teacher'
+			AND s.status = 'active'
+			AND NOT EXISTS (
+				SELECT 1
+				FROM tbl_teachers_students_m2m m2m_valid
+				INNER JOIN tbl_teachers t_valid ON t_valid.id = m2m_valid.teacher_id
+				WHERE m2m_valid.student_id = s.id
+					AND t_valid.deleted = 0
+					AND t_valid.status = 'approved'
+			)
+		)
+	)
 ORDER BY s.created_at DESC
 LIMIT ? OFFSET ?
 `
@@ -346,6 +401,8 @@ type GetStudentsFilteredParams struct {
 	Column8   interface{}
 	Column9   interface{}
 	Column10  interface{}
+	Column11  interface{}
+	Column12  interface{}
 	Limit     int64
 	Offset    int64
 }
@@ -379,6 +436,8 @@ func (q *Queries) GetStudentsFiltered(ctx context.Context, arg GetStudentsFilter
 		arg.Column8,
 		arg.Column9,
 		arg.Column10,
+		arg.Column11,
+		arg.Column12,
 		arg.Limit,
 		arg.Offset,
 	)

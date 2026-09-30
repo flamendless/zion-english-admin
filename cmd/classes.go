@@ -116,6 +116,10 @@ func classEditClassData(ctx context.Context, recordID int64, readonly bool) (fro
 	if err != nil {
 		return frontend.EditClassData{}, err
 	}
+	teacherStatus, err := teacherStatusForID(ctx, existing.TeacherID)
+	if err != nil {
+		return frontend.EditClassData{}, err
+	}
 	return frontend.EditClassData{
 		OverdueGracePeriodMinutes: classOverdueGracePeriodMinutes(ctx),
 		RecordID:                  strconv.FormatInt(recordID, 10),
@@ -125,7 +129,7 @@ func classEditClassData(ctx context.Context, recordID int64, readonly bool) (fro
 		TeacherID:                 strconv.FormatInt(existing.TeacherID, 10),
 		StudentName:               existing.StudentName,
 		TeacherName:               existing.TeacherName,
-		TeacherAvatar:             avatarWithTeacherRoles(classRecordTeacherAvatar(existing), teacherRoles),
+		TeacherAvatar:             avatarWithTeacherRoles(classRecordTeacherAvatar(existing), teacherRoles, teacherStatus),
 		Date:                      existing.Date,
 		StartTime:                 startTime,
 		EndTime:                   endTime,
@@ -643,12 +647,18 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 		views = append(views, classesListViewFromRow(cr))
 		teacherIDs = append(teacherIDs, cr.TeacherID)
 	}
-	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueTeacherIDs(teacherIDs))
+	uniqueIDs := uniqueTeacherIDs(teacherIDs)
+	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueIDs)
 	if err != nil {
 		HttpError(w, "Failed to fetch teacher roles", http.StatusInternalServerError)
 		return
 	}
-	enrichClassRecordViewsWithRoleBadges(views, rolesMap)
+	statusMap, err := loadTeacherStatusesByIDs(ctx, uniqueIDs)
+	if err != nil {
+		HttpError(w, "Failed to fetch teacher statuses", http.StatusInternalServerError)
+		return
+	}
+	enrichClassRecordViewsWithRoleBadges(views, rolesMap, statusMap)
 	rows := frontend.ClassRecordRowFromViews(views)
 	for i, cr := range records {
 		if cr.Source != "scheduled" {

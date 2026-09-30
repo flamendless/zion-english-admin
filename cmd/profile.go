@@ -19,6 +19,7 @@ import (
 	"zion-english/internal/auth"
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
+	"zion-english/internal/entitlements"
 	"zion-english/internal/logs"
 	"zion-english/internal/notifications"
 	"zion-english/internal/storage"
@@ -101,7 +102,7 @@ func buildHeaderAvatarProps(ctx context.Context, user auth.User, role auth.Role)
 	if err != nil {
 		return frontend.AvatarProps{}, err
 	}
-	return avatarWithTeacherRoles(props, roleStrings), nil
+	return avatarWithTeacherRoles(props, roleStrings, constants.TeacherStatus(row.Status)), nil
 }
 
 func handleHeaderAvatar(w http.ResponseWriter, r *http.Request) {
@@ -225,7 +226,7 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 		Sex:                       sex,
 		Status:                    constants.TeacherStatus(row.Status),
 		HasProfilePicture:         row.ProfilePicture.Valid && row.ProfilePicture.String != "",
-		Avatar:                    avatarWithTeacherRoles(buildTeacherAvatarProps(row), roleStrings),
+		Avatar:                    avatarWithTeacherRoles(buildTeacherAvatarProps(row), roleStrings, constants.TeacherStatus(row.Status)),
 		CanChangeMobile:           canChangeMobile,
 		MobileDaysRemaining:       mobileDays,
 		CanChangePassword:         canChangePassword,
@@ -281,6 +282,37 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 		prefRows = nil
 	}
 	data.NotificationPreferences = buildNotificationPreferenceItems(prefRows)
+
+	planView, planErr := entitlements.TeacherPlan(ctx, dbRO.GetQueries(), user.ID)
+	if planErr != nil {
+		logs.Log().Error("teacher plan for profile", zap.Error(planErr))
+	} else {
+		data.IsTeacherPro = planView.IsPro
+		summary := buildPlanSummaryView(ctx, user.ID)
+		data.PlanTierLabel = summary.TierLabel
+		data.PlanDetail = summary.Detail
+		if data.PlanTierLabel == "" {
+			data.PlanTierLabel = "Free"
+		}
+		historyRows, histErr := dbRO.GetQueries().GetTeacherPlanTransactionsByTeacherID(ctx, queries.GetTeacherPlanTransactionsByTeacherIDParams{
+			TeacherID: user.ID,
+			Limit:     50,
+			Offset:    0,
+		})
+		if histErr == nil {
+			for _, row := range historyRows {
+				data.PlanHistory = append(data.PlanHistory, frontend.ProfilePlanHistoryItem{
+					BillingKind:    row.BillingKind,
+					EffectiveStart: formatPlanTxnDate(row.EffectiveStart),
+					EffectiveEnd:   formatPlanTxnEnd(utils.NullStringFromAny(row.EffectiveEnd)),
+					Status:         planTransactionStatus(row),
+					GrantedByName:  row.GrantedByName,
+					Note:           row.Note,
+					CreatedAt:      row.CreatedAt,
+				})
+			}
+		}
+	}
 
 	if err := frontend.Profile(data).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
