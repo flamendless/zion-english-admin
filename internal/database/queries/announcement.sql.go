@@ -7,6 +7,7 @@ package queries
 
 import (
 	"context"
+	"database/sql"
 )
 
 const countAnnouncements = `-- name: CountAnnouncements :one
@@ -52,10 +53,28 @@ func (q *Queries) DeleteAnnouncementTeacherLinks(ctx context.Context, announceme
 }
 
 const getActiveAnnouncementsAll = `-- name: GetActiveAnnouncementsAll :many
-SELECT id, title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url, status, created_at, updated_at
+SELECT
+	id,
+	title,
+	description,
+	level,
+	start_date,
+	end_date,
+	visible_to_all,
+	cta_label,
+	cta_url,
+	status,
+	display_type,
+	modal_frequency,
+	repeat_enabled,
+	repeat_schedule,
+	cutoff_repeat_days,
+	created_at,
+	updated_at
 FROM tbl_announcements
 WHERE date(?) BETWEEN start_date AND end_date
-AND status = 'published'
+	AND status = 'published'
+	AND display_type = 'banner'
 ORDER BY
 	CASE level WHEN 'critical' THEN 0 WHEN 'warning' THEN 1 ELSE 2 END,
 	start_date ASC,
@@ -63,18 +82,23 @@ ORDER BY
 `
 
 type GetActiveAnnouncementsAllRow struct {
-	ID           int64
-	Title        string
-	Description  string
-	Level        string
-	StartDate    string
-	EndDate      string
-	VisibleToAll int64
-	CtaLabel     string
-	CtaUrl       string
-	Status       string
-	CreatedAt    string
-	UpdatedAt    string
+	ID               int64
+	Title            string
+	Description      string
+	Level            string
+	StartDate        string
+	EndDate          string
+	VisibleToAll     int64
+	CtaLabel         string
+	CtaUrl           string
+	Status           string
+	DisplayType      string
+	ModalFrequency   sql.NullString
+	RepeatEnabled    int64
+	RepeatSchedule   sql.NullString
+	CutoffRepeatDays sql.NullInt64
+	CreatedAt        string
+	UpdatedAt        string
 }
 
 func (q *Queries) GetActiveAnnouncementsAll(ctx context.Context, date interface{}) ([]GetActiveAnnouncementsAllRow, error) {
@@ -97,6 +121,11 @@ func (q *Queries) GetActiveAnnouncementsAll(ctx context.Context, date interface{
 			&i.CtaLabel,
 			&i.CtaUrl,
 			&i.Status,
+			&i.DisplayType,
+			&i.ModalFrequency,
+			&i.RepeatEnabled,
+			&i.RepeatSchedule,
+			&i.CutoffRepeatDays,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -114,17 +143,35 @@ func (q *Queries) GetActiveAnnouncementsAll(ctx context.Context, date interface{
 }
 
 const getActiveAnnouncementsForTeacher = `-- name: GetActiveAnnouncementsForTeacher :many
-SELECT a.id, a.title, a.description, a.level, a.start_date, a.end_date, a.visible_to_all, a.cta_label, a.cta_url, a.status, a.created_at, a.updated_at
+SELECT
+	a.id,
+	a.title,
+	a.description,
+	a.level,
+	a.start_date,
+	a.end_date,
+	a.visible_to_all,
+	a.cta_label,
+	a.cta_url,
+	a.status,
+	a.display_type,
+	a.modal_frequency,
+	a.repeat_enabled,
+	a.repeat_schedule,
+	a.cutoff_repeat_days,
+	a.created_at,
+	a.updated_at
 FROM tbl_announcements a
 WHERE date(?) BETWEEN a.start_date AND a.end_date
-AND a.status = 'published'
-AND (
-	a.visible_to_all = 1
-	OR EXISTS (
-		SELECT 1 FROM tbl_announcements_teachers_m2m m
-		WHERE m.announcement_id = a.id AND m.teacher_id = ?
+	AND a.status = 'published'
+	AND a.display_type = 'banner'
+	AND (
+		a.visible_to_all = 1
+		OR EXISTS (
+			SELECT 1 FROM tbl_announcements_teachers_m2m m
+			WHERE m.announcement_id = a.id AND m.teacher_id = ?
+		)
 	)
-)
 ORDER BY
 	CASE a.level WHEN 'critical' THEN 0 WHEN 'warning' THEN 1 ELSE 2 END,
 	a.start_date ASC,
@@ -137,18 +184,23 @@ type GetActiveAnnouncementsForTeacherParams struct {
 }
 
 type GetActiveAnnouncementsForTeacherRow struct {
-	ID           int64
-	Title        string
-	Description  string
-	Level        string
-	StartDate    string
-	EndDate      string
-	VisibleToAll int64
-	CtaLabel     string
-	CtaUrl       string
-	Status       string
-	CreatedAt    string
-	UpdatedAt    string
+	ID               int64
+	Title            string
+	Description      string
+	Level            string
+	StartDate        string
+	EndDate          string
+	VisibleToAll     int64
+	CtaLabel         string
+	CtaUrl           string
+	Status           string
+	DisplayType      string
+	ModalFrequency   sql.NullString
+	RepeatEnabled    int64
+	RepeatSchedule   sql.NullString
+	CutoffRepeatDays sql.NullInt64
+	CreatedAt        string
+	UpdatedAt        string
 }
 
 func (q *Queries) GetActiveAnnouncementsForTeacher(ctx context.Context, arg GetActiveAnnouncementsForTeacherParams) ([]GetActiveAnnouncementsForTeacherRow, error) {
@@ -171,6 +223,203 @@ func (q *Queries) GetActiveAnnouncementsForTeacher(ctx context.Context, arg GetA
 			&i.CtaLabel,
 			&i.CtaUrl,
 			&i.Status,
+			&i.DisplayType,
+			&i.ModalFrequency,
+			&i.RepeatEnabled,
+			&i.RepeatSchedule,
+			&i.CutoffRepeatDays,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getActiveModalAnnouncementsAll = `-- name: GetActiveModalAnnouncementsAll :many
+SELECT
+	id,
+	title,
+	description,
+	level,
+	start_date,
+	end_date,
+	visible_to_all,
+	cta_label,
+	cta_url,
+	status,
+	display_type,
+	modal_frequency,
+	repeat_enabled,
+	repeat_schedule,
+	cutoff_repeat_days,
+	created_at,
+	updated_at
+FROM tbl_announcements
+WHERE date(?) BETWEEN start_date AND end_date
+	AND status = 'published'
+	AND display_type = 'modal'
+ORDER BY
+	CASE level WHEN 'critical' THEN 0 WHEN 'warning' THEN 1 ELSE 2 END,
+	start_date ASC,
+	id ASC
+`
+
+type GetActiveModalAnnouncementsAllRow struct {
+	ID               int64
+	Title            string
+	Description      string
+	Level            string
+	StartDate        string
+	EndDate          string
+	VisibleToAll     int64
+	CtaLabel         string
+	CtaUrl           string
+	Status           string
+	DisplayType      string
+	ModalFrequency   sql.NullString
+	RepeatEnabled    int64
+	RepeatSchedule   sql.NullString
+	CutoffRepeatDays sql.NullInt64
+	CreatedAt        string
+	UpdatedAt        string
+}
+
+func (q *Queries) GetActiveModalAnnouncementsAll(ctx context.Context, date interface{}) ([]GetActiveModalAnnouncementsAllRow, error) {
+	rows, err := q.db.QueryContext(ctx, getActiveModalAnnouncementsAll, date)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetActiveModalAnnouncementsAllRow
+	for rows.Next() {
+		var i GetActiveModalAnnouncementsAllRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Description,
+			&i.Level,
+			&i.StartDate,
+			&i.EndDate,
+			&i.VisibleToAll,
+			&i.CtaLabel,
+			&i.CtaUrl,
+			&i.Status,
+			&i.DisplayType,
+			&i.ModalFrequency,
+			&i.RepeatEnabled,
+			&i.RepeatSchedule,
+			&i.CutoffRepeatDays,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getActiveModalAnnouncementsForTeacher = `-- name: GetActiveModalAnnouncementsForTeacher :many
+SELECT
+	a.id,
+	a.title,
+	a.description,
+	a.level,
+	a.start_date,
+	a.end_date,
+	a.visible_to_all,
+	a.cta_label,
+	a.cta_url,
+	a.status,
+	a.display_type,
+	a.modal_frequency,
+	a.repeat_enabled,
+	a.repeat_schedule,
+	a.cutoff_repeat_days,
+	a.created_at,
+	a.updated_at
+FROM tbl_announcements a
+WHERE date(?) BETWEEN a.start_date AND a.end_date
+	AND a.status = 'published'
+	AND a.display_type = 'modal'
+	AND (
+		a.visible_to_all = 1
+		OR EXISTS (
+			SELECT 1 FROM tbl_announcements_teachers_m2m m
+			WHERE m.announcement_id = a.id AND m.teacher_id = ?
+		)
+	)
+ORDER BY
+	CASE a.level WHEN 'critical' THEN 0 WHEN 'warning' THEN 1 ELSE 2 END,
+	a.start_date ASC,
+	a.id ASC
+`
+
+type GetActiveModalAnnouncementsForTeacherParams struct {
+	Date      interface{}
+	TeacherID int64
+}
+
+type GetActiveModalAnnouncementsForTeacherRow struct {
+	ID               int64
+	Title            string
+	Description      string
+	Level            string
+	StartDate        string
+	EndDate          string
+	VisibleToAll     int64
+	CtaLabel         string
+	CtaUrl           string
+	Status           string
+	DisplayType      string
+	ModalFrequency   sql.NullString
+	RepeatEnabled    int64
+	RepeatSchedule   sql.NullString
+	CutoffRepeatDays sql.NullInt64
+	CreatedAt        string
+	UpdatedAt        string
+}
+
+func (q *Queries) GetActiveModalAnnouncementsForTeacher(ctx context.Context, arg GetActiveModalAnnouncementsForTeacherParams) ([]GetActiveModalAnnouncementsForTeacherRow, error) {
+	rows, err := q.db.QueryContext(ctx, getActiveModalAnnouncementsForTeacher, arg.Date, arg.TeacherID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetActiveModalAnnouncementsForTeacherRow
+	for rows.Next() {
+		var i GetActiveModalAnnouncementsForTeacherRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Description,
+			&i.Level,
+			&i.StartDate,
+			&i.EndDate,
+			&i.VisibleToAll,
+			&i.CtaLabel,
+			&i.CtaUrl,
+			&i.Status,
+			&i.DisplayType,
+			&i.ModalFrequency,
+			&i.RepeatEnabled,
+			&i.RepeatSchedule,
+			&i.CutoffRepeatDays,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -188,24 +437,46 @@ func (q *Queries) GetActiveAnnouncementsForTeacher(ctx context.Context, arg GetA
 }
 
 const getAnnouncementByID = `-- name: GetAnnouncementByID :one
-SELECT id, title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url, status, created_at, updated_at
+SELECT
+	id,
+	title,
+	description,
+	level,
+	start_date,
+	end_date,
+	visible_to_all,
+	cta_label,
+	cta_url,
+	status,
+	display_type,
+	modal_frequency,
+	repeat_enabled,
+	repeat_schedule,
+	cutoff_repeat_days,
+	created_at,
+	updated_at
 FROM tbl_announcements
 WHERE id = ?
 `
 
 type GetAnnouncementByIDRow struct {
-	ID           int64
-	Title        string
-	Description  string
-	Level        string
-	StartDate    string
-	EndDate      string
-	VisibleToAll int64
-	CtaLabel     string
-	CtaUrl       string
-	Status       string
-	CreatedAt    string
-	UpdatedAt    string
+	ID               int64
+	Title            string
+	Description      string
+	Level            string
+	StartDate        string
+	EndDate          string
+	VisibleToAll     int64
+	CtaLabel         string
+	CtaUrl           string
+	Status           string
+	DisplayType      string
+	ModalFrequency   sql.NullString
+	RepeatEnabled    int64
+	RepeatSchedule   sql.NullString
+	CutoffRepeatDays sql.NullInt64
+	CreatedAt        string
+	UpdatedAt        string
 }
 
 func (q *Queries) GetAnnouncementByID(ctx context.Context, id int64) (GetAnnouncementByIDRow, error) {
@@ -222,6 +493,11 @@ func (q *Queries) GetAnnouncementByID(ctx context.Context, id int64) (GetAnnounc
 		&i.CtaLabel,
 		&i.CtaUrl,
 		&i.Status,
+		&i.DisplayType,
+		&i.ModalFrequency,
+		&i.RepeatEnabled,
+		&i.RepeatSchedule,
+		&i.CutoffRepeatDays,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -229,7 +505,24 @@ func (q *Queries) GetAnnouncementByID(ctx context.Context, id int64) (GetAnnounc
 }
 
 const getAnnouncementsPaged = `-- name: GetAnnouncementsPaged :many
-SELECT id, title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url, status, created_at, updated_at
+SELECT
+	id,
+	title,
+	description,
+	level,
+	start_date,
+	end_date,
+	visible_to_all,
+	cta_label,
+	cta_url,
+	status,
+	display_type,
+	modal_frequency,
+	repeat_enabled,
+	repeat_schedule,
+	cutoff_repeat_days,
+	created_at,
+	updated_at
 FROM tbl_announcements
 ORDER BY start_date DESC, id DESC
 LIMIT ? OFFSET ?
@@ -241,18 +534,23 @@ type GetAnnouncementsPagedParams struct {
 }
 
 type GetAnnouncementsPagedRow struct {
-	ID           int64
-	Title        string
-	Description  string
-	Level        string
-	StartDate    string
-	EndDate      string
-	VisibleToAll int64
-	CtaLabel     string
-	CtaUrl       string
-	Status       string
-	CreatedAt    string
-	UpdatedAt    string
+	ID               int64
+	Title            string
+	Description      string
+	Level            string
+	StartDate        string
+	EndDate          string
+	VisibleToAll     int64
+	CtaLabel         string
+	CtaUrl           string
+	Status           string
+	DisplayType      string
+	ModalFrequency   sql.NullString
+	RepeatEnabled    int64
+	RepeatSchedule   sql.NullString
+	CutoffRepeatDays sql.NullInt64
+	CreatedAt        string
+	UpdatedAt        string
 }
 
 func (q *Queries) GetAnnouncementsPaged(ctx context.Context, arg GetAnnouncementsPagedParams) ([]GetAnnouncementsPagedRow, error) {
@@ -275,6 +573,11 @@ func (q *Queries) GetAnnouncementsPaged(ctx context.Context, arg GetAnnouncement
 			&i.CtaLabel,
 			&i.CtaUrl,
 			&i.Status,
+			&i.DisplayType,
+			&i.ModalFrequency,
+			&i.RepeatEnabled,
+			&i.RepeatSchedule,
+			&i.CutoffRepeatDays,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -319,21 +622,41 @@ func (q *Queries) GetTeacherIDsByAnnouncementID(ctx context.Context, announcemen
 }
 
 const insertAnnouncement = `-- name: InsertAnnouncement :one
-INSERT INTO tbl_announcements (title, description, level, start_date, end_date, visible_to_all, cta_label, cta_url, status)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO tbl_announcements (
+	title,
+	description,
+	level,
+	start_date,
+	end_date,
+	visible_to_all,
+	cta_label,
+	cta_url,
+	status,
+	display_type,
+	modal_frequency,
+	repeat_enabled,
+	repeat_schedule,
+	cutoff_repeat_days
+)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 RETURNING id
 `
 
 type InsertAnnouncementParams struct {
-	Title        string
-	Description  string
-	Level        string
-	StartDate    string
-	EndDate      string
-	VisibleToAll int64
-	CtaLabel     string
-	CtaUrl       string
-	Status       string
+	Title            string
+	Description      string
+	Level            string
+	StartDate        string
+	EndDate          string
+	VisibleToAll     int64
+	CtaLabel         string
+	CtaUrl           string
+	Status           string
+	DisplayType      string
+	ModalFrequency   sql.NullString
+	RepeatEnabled    int64
+	RepeatSchedule   sql.NullString
+	CutoffRepeatDays sql.NullInt64
 }
 
 func (q *Queries) InsertAnnouncement(ctx context.Context, arg InsertAnnouncementParams) (int64, error) {
@@ -347,6 +670,11 @@ func (q *Queries) InsertAnnouncement(ctx context.Context, arg InsertAnnouncement
 		arg.CtaLabel,
 		arg.CtaUrl,
 		arg.Status,
+		arg.DisplayType,
+		arg.ModalFrequency,
+		arg.RepeatEnabled,
+		arg.RepeatSchedule,
+		arg.CutoffRepeatDays,
 	)
 	var id int64
 	err := row.Scan(&id)
@@ -369,21 +697,41 @@ func (q *Queries) InsertAnnouncementTeacherM2M(ctx context.Context, arg InsertAn
 
 const updateAnnouncement = `-- name: UpdateAnnouncement :exec
 UPDATE tbl_announcements
-SET title = ?, description = ?, level = ?, start_date = ?, end_date = ?, visible_to_all = ?, cta_label = ?, cta_url = ?, status = ?, updated_at = datetime('now')
+SET
+	title = ?,
+	description = ?,
+	level = ?,
+	start_date = ?,
+	end_date = ?,
+	visible_to_all = ?,
+	cta_label = ?,
+	cta_url = ?,
+	status = ?,
+	display_type = ?,
+	modal_frequency = ?,
+	repeat_enabled = ?,
+	repeat_schedule = ?,
+	cutoff_repeat_days = ?,
+	updated_at = datetime('now')
 WHERE id = ?
 `
 
 type UpdateAnnouncementParams struct {
-	Title        string
-	Description  string
-	Level        string
-	StartDate    string
-	EndDate      string
-	VisibleToAll int64
-	CtaLabel     string
-	CtaUrl       string
-	Status       string
-	ID           int64
+	Title            string
+	Description      string
+	Level            string
+	StartDate        string
+	EndDate          string
+	VisibleToAll     int64
+	CtaLabel         string
+	CtaUrl           string
+	Status           string
+	DisplayType      string
+	ModalFrequency   sql.NullString
+	RepeatEnabled    int64
+	RepeatSchedule   sql.NullString
+	CutoffRepeatDays sql.NullInt64
+	ID               int64
 }
 
 func (q *Queries) UpdateAnnouncement(ctx context.Context, arg UpdateAnnouncementParams) error {
@@ -397,6 +745,11 @@ func (q *Queries) UpdateAnnouncement(ctx context.Context, arg UpdateAnnouncement
 		arg.CtaLabel,
 		arg.CtaUrl,
 		arg.Status,
+		arg.DisplayType,
+		arg.ModalFrequency,
+		arg.RepeatEnabled,
+		arg.RepeatSchedule,
+		arg.CutoffRepeatDays,
 		arg.ID,
 	)
 	return err

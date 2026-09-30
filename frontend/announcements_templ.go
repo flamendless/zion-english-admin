@@ -9,6 +9,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
+	"strconv"
 	"strings"
 	"zion-english/internal/announcements"
 	"zion-english/internal/utils"
@@ -18,6 +19,8 @@ type AnnouncementListItem struct {
 	ID                string
 	Title             string
 	Level             string
+	DisplayType       string
+	DisplayDetail     string
 	StartDate         string
 	EndDate           string
 	Audience          string
@@ -48,19 +51,31 @@ type AnnouncementTeacherOption struct {
 }
 
 type AnnouncementFormData struct {
-	ID          string
-	Title       string
-	Description string
-	Level       string
-	StartDate   string
-	EndDate     string
-	VisibleTo   string
-	Teachers    []AnnouncementTeacherOption
-	Today       string
-	IsEdit      bool
-	CTALabel    string
-	CTAURL      string
-	Status      string
+	ID               string
+	Title            string
+	Description      string
+	Level            string
+	StartDate        string
+	EndDate          string
+	VisibleTo        string
+	Teachers         []AnnouncementTeacherOption
+	Today            string
+	IsEdit           bool
+	CTALabel         string
+	CTAURL           string
+	Status           string
+	DisplayType      string
+	ModalFrequency   string
+	RepeatEnabled    bool
+	RepeatSchedule   string
+	CutoffRepeatDays string
+}
+
+func announcementFormDisplayType(data AnnouncementFormData) string {
+	if data.DisplayType == string(announcements.DisplayTypeModal) {
+		return string(announcements.DisplayTypeModal)
+	}
+	return string(announcements.DisplayTypeBanner)
 }
 
 func (d AnnouncementFormData) StartDateMin() string {
@@ -92,7 +107,7 @@ func getAnnouncementRowClass(isDeleted bool) string {
 	return ""
 }
 
-func AnnouncementBanners() templ.Component {
+func AnnouncementModals() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -113,13 +128,160 @@ func AnnouncementBanners() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+		items := announcements.GetModals(ctx)
+		if len(items) > 0 {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div id=\"announcementModalsRoot\" hidden aria-hidden=\"true\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			for _, item := range items {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"announcement-modal-item\" data-announcement-id=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var2 string
+				templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(strconv.FormatInt(item.ID, 10))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 111, Col: 58}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" data-frequency=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var3 string
+				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(item.ModalFrequency))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 112, Col: 49}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" data-level=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var4 string
+				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.Level)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 113, Col: 28}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\"><div class=\"announcement-modal-item__title\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var5 string
+				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(item.Title)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 115, Col: 61}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div><div class=\"announcement-modal-item__description\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var6 string
+				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(item.Description)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 116, Col: 73}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				if item.CTALabel != "" && item.CTAURL != "" {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"announcement-modal-item__cta-label\" data-cta-label=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var7 string
+					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.CTALabel)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 120, Col: 37}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" data-cta-url=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var8 string
+					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(announcements.ResolveCTAURL(item.CTAURL))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 121, Col: 62}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\"></div>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div><div class=\"modal-overlay\" id=\"announcementModalOverlay\" hidden role=\"presentation\"><div class=\"modal-dialog announcement-modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"announcementModalTitle\"><div class=\"modal-header\"><h3 id=\"announcementModalTitle\" class=\"announcement-modal-title\"></h3><button type=\"button\" class=\"modal-close\" id=\"announcementModalClose\" aria-label=\"Close\">&times;</button></div><div class=\"modal-body\"><p id=\"announcementModalDescription\" class=\"announcement-modal-description\"></p><p id=\"announcementModalCTA\" class=\"announcement-modal-cta-wrap\"></p></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary\" id=\"announcementModalDismiss\">Close</button></div></div></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = ScrAnnouncementModals().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		return nil
+	})
+}
+
+func AnnouncementBanners() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var9 == nil {
+			templ_7745c5c3_Var9 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
 		items := announcements.GetBanners(ctx)
 		templ_7745c5c3_Err = AnnouncementBannerStyles().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(items) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"announcement-banners\" role=\"region\" aria-label=\"Announcements\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"announcement-banners\" role=\"region\" aria-label=\"Announcements\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -129,7 +291,7 @@ func AnnouncementBanners() templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -154,30 +316,30 @@ func AnnouncementBanner(title string, description string, level string, ctaLabel
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var2 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var2 == nil {
-			templ_7745c5c3_Var2 = templ.NopComponent
+		templ_7745c5c3_Var10 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var10 == nil {
+			templ_7745c5c3_Var10 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var3 = []any{"announcement-banner announcement-banner--" + level}
-		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var3...)
+		var templ_7745c5c3_Var11 = []any{"announcement-banner announcement-banner--" + level}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var11...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<div class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var3).String())
+		var templ_7745c5c3_Var12 string
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var11).String())
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 1, Col: 0}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" role=\"status\"><div class=\"announcement-banner__icon\" aria-hidden=\"true\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" role=\"status\"><div class=\"announcement-banner__icon\" aria-hidden=\"true\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -185,102 +347,102 @@ func AnnouncementBanner(title string, description string, level string, ctaLabel
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div><div class=\"announcement-banner__content\"><p class=\"announcement-banner__title\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div><div class=\"announcement-banner__content\"><p class=\"announcement-banner__title\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(title)
+		var templ_7745c5c3_Var13 string
+		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 107, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 166, Col: 48}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</p><p class=\"announcement-banner__description\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(description)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 108, Col: 60}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</p><p class=\"announcement-banner__description\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</p>")
+		var templ_7745c5c3_Var14 string
+		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(description)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 167, Col: 60}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if ctaLabel != "" && ctaURL != "" {
 			if announcements.IsExternalCTAURL(ctaURL) {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<a href=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<a href=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var7 templ.SafeURL
-				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(announcements.ResolveCTAURL(ctaURL))
+				var templ_7745c5c3_Var15 templ.SafeURL
+				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinURLErrs(announcements.ResolveCTAURL(ctaURL))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 111, Col: 50}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 170, Col: 50}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"announcement-banner__cta\" target=\"_blank\" rel=\"noopener noreferrer\">")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var8 string
-				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(ctaLabel)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 111, Col: 138}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"announcement-banner__cta\" target=\"_blank\" rel=\"noopener noreferrer\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</a>")
+				var templ_7745c5c3_Var16 string
+				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(ctaLabel)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 170, Col: 138}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</a>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<a href=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<a href=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var9 templ.SafeURL
-				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(announcements.ResolveCTAURL(ctaURL))
+				var templ_7745c5c3_Var17 templ.SafeURL
+				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinURLErrs(announcements.ResolveCTAURL(ctaURL))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 113, Col: 50}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 172, Col: 50}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" class=\"announcement-banner__cta\">")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var10 string
-				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(ctaLabel)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 113, Col: 96}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "\" class=\"announcement-banner__cta\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</a>")
+				var templ_7745c5c3_Var18 string
+				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(ctaLabel)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 172, Col: 96}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</a>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -304,24 +466,24 @@ func AnnouncementLevelIcon(level string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var11 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var11 == nil {
-			templ_7745c5c3_Var11 = templ.NopComponent
+		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var19 == nil {
+			templ_7745c5c3_Var19 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		switch level {
 		case announcements.LevelWarning:
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z\"></path> <line x1=\"12\" y1=\"9\" x2=\"12\" y2=\"13\"></line> <line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"></line></svg>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z\"></path> <line x1=\"12\" y1=\"9\" x2=\"12\" y2=\"13\"></line> <line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"></line></svg>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		case announcements.LevelCritical:
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polygon points=\"7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2\"></polygon> <line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line> <line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polygon points=\"7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2\"></polygon> <line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line> <line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		default:
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle> <line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line> <line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle> <line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line> <line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -346,12 +508,12 @@ func Announcements(data AnnouncementListData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var12 == nil {
-			templ_7745c5c3_Var12 = templ.NopComponent
+		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var20 == nil {
+			templ_7745c5c3_Var20 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<!doctype html><html lang=\"en\"><head>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<!doctype html><html lang=\"en\"><head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -367,7 +529,7 @@ func Announcements(data AnnouncementListData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</head><body><div class=\"container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</head><body><div class=\"container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -387,20 +549,20 @@ func Announcements(data AnnouncementListData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<form class=\"list-toolbar\" method=\"GET\" action=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<form class=\"list-toolbar\" method=\"GET\" action=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var13 templ.SafeURL
-		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/announcements"))
+		var templ_7745c5c3_Var21 templ.SafeURL
+		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/announcements"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 158, Col: 79}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 217, Col: 79}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -408,48 +570,84 @@ func Announcements(data AnnouncementListData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"form-group list-toolbar-action\"><label for=\"announcementSortSubmit\">&nbsp;</label> <button type=\"submit\" id=\"announcementSortSubmit\">Apply</button></div></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<div class=\"form-group list-toolbar-action\"><label for=\"announcementSortSubmit\">&nbsp;</label> <button type=\"submit\" id=\"announcementSortSubmit\">Apply</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(data.Announcements) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<div class=\"table-wrapper\"><table class=\"table-stack-mobile\"><thead><tr><th>Title</th><th>Level</th><th>Schedule</th><th>Audience</th><th>Status</th><th>Actions</th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<div class=\"table-wrapper\"><table class=\"table-stack-mobile\"><thead><tr><th>Title</th><th>Type</th><th>Level</th><th>Schedule</th><th>Audience</th><th>Status</th><th>Actions</th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, item := range data.Announcements {
-				var templ_7745c5c3_Var14 = []any{getAnnouncementRowClass(item.IsDeleted)}
-				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var14...)
+				var templ_7745c5c3_Var22 = []any{getAnnouncementRowClass(item.IsDeleted)}
+				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var22...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<tr class=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<tr class=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var15 string
-				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var14).String())
+				var templ_7745c5c3_Var23 string
+				templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var22).String())
 				if templ_7745c5c3_Err != nil {
 					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 1, Col: 0}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\"><td data-label=\"Title\"><span class=\"announcement-list-title\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\"><td data-label=\"Title\"><span class=\"announcement-list-title\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var16 string
-				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(item.Title)
+				var templ_7745c5c3_Var24 string
+				templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(item.Title)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 183, Col: 60}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 243, Col: 60}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</span></td><td data-label=\"Level\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</span></td><td data-label=\"Type\"><span>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var25 string
+				templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(item.DisplayType)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 246, Col: 34}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</span> ")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				if item.DisplayDetail != "" {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "<span class=\"announcement-list-type-detail\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var26 string
+					templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(item.DisplayDetail)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 248, Col: 75}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</span>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</td><td data-label=\"Level\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -457,33 +655,33 @@ func Announcements(data AnnouncementListData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</td><td data-label=\"Schedule\"><span class=\"announcement-schedule\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</td><td data-label=\"Schedule\"><span class=\"announcement-schedule\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var17 string
-				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(item.StartDate)
+				var templ_7745c5c3_Var27 string
+				templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(item.StartDate)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 189, Col: 62}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 255, Col: 62}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, " → ")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var18 string
-				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(item.EndDate)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 189, Col: 83}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, " → ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</span>")
+				var templ_7745c5c3_Var28 string
+				templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(item.EndDate)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 255, Col: 83}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "</span>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -491,20 +689,20 @@ func Announcements(data AnnouncementListData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</td><td data-label=\"Audience\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "</td><td data-label=\"Audience\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var19 string
-				templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(item.Audience)
+				var templ_7745c5c3_Var29 string
+				templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(item.Audience)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 192, Col: 50}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 258, Col: 50}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</td><td data-label=\"Status\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</td><td data-label=\"Status\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -512,12 +710,12 @@ func Announcements(data AnnouncementListData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</td><td data-label=\"Actions\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</td><td data-label=\"Actions\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if !item.IsDeleted {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<div class=\"table-actions\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "<div class=\"table-actions\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -525,20 +723,20 @@ func Announcements(data AnnouncementListData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<form method=\"POST\" action=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<form method=\"POST\" action=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var20 templ.SafeURL
-					templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/announcements/" + item.ID + "/delete"))
+					var templ_7745c5c3_Var30 templ.SafeURL
+					templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/announcements/" + item.ID + "/delete"))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 200, Col: 91}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 266, Col: 91}
 					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\" class=\"table-action-form\" onsubmit=\"return confirm('Delete this announcement?');\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "\" class=\"table-action-form\" onsubmit=\"return confirm('Delete this announcement?');\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -546,17 +744,17 @@ func Announcements(data AnnouncementListData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "</form></div>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</form></div>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "</td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "</td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</tbody></table></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "</tbody></table></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -565,25 +763,25 @@ func Announcements(data AnnouncementListData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<div class=\"announcement-empty\"><p>No announcements yet.</p><a href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<div class=\"announcement-empty\"><p>No announcements yet.</p><a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var21 templ.SafeURL
-			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/announcements/register"))
+			var templ_7745c5c3_Var31 templ.SafeURL
+			templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/announcements/register"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 215, Col: 51}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 281, Col: 51}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\" class=\"add-btn\">Create your first announcement</a></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\" class=\"add-btn\">Create your first announcement</a></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -591,7 +789,7 @@ func Announcements(data AnnouncementListData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -615,12 +813,12 @@ func AnnouncementForm(data AnnouncementFormData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var22 == nil {
-			templ_7745c5c3_Var22 = templ.NopComponent
+		templ_7745c5c3_Var32 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var32 == nil {
+			templ_7745c5c3_Var32 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<!doctype html><html lang=\"en\"><head>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "<!doctype html><html lang=\"en\"><head>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -636,7 +834,7 @@ func AnnouncementForm(data AnnouncementFormData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</head><body><div class=\"container announcement-form-page\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</head><body><div class=\"container announcement-form-page\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -652,144 +850,335 @@ func AnnouncementForm(data AnnouncementFormData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<div class=\"hub-header\"><h2 class=\"hub-title\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "<div class=\"hub-header\"><h2 class=\"hub-title\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var23 string
-		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(announcementFormTitle(data))
+		var templ_7745c5c3_Var33 string
+		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(announcementFormTitle(data))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 239, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 305, Col: 55}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "</h2><a href=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var24 templ.SafeURL
-		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/announcements"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 240, Col: 41}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</h2><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "\" class=\"add-btn add-btn-secondary\">Back to list</a></div><div class=\"announcement-form-layout\"><form id=\"announcementForm\" class=\"announcement-form\" method=\"POST\" action=\"")
+		var templ_7745c5c3_Var34 templ.SafeURL
+		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/announcements"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 306, Col: 41}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var25 templ.SafeURL
-		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinURLErrs(announcementFormAction(data))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 248, Col: 42}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "\" class=\"add-btn add-btn-secondary\">Back to list</a></div><div class=\"announcement-form-layout\"><form id=\"announcementForm\" class=\"announcement-form\" method=\"POST\" action=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "\"><section class=\"announcement-form-section\" aria-labelledby=\"announcementContentHeading\"><h3 id=\"announcementContentHeading\" class=\"announcement-form-section-title\">Content</h3><div class=\"form-group\"><label for=\"title\">Title *</label> <input type=\"text\" id=\"title\" name=\"title\" required maxlength=\"120\" value=\"")
+		var templ_7745c5c3_Var35 templ.SafeURL
+		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinURLErrs(announcementFormAction(data))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 314, Col: 42}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var26 string
-		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Title)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 260, Col: 26}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "\"><section class=\"announcement-form-section\" aria-labelledby=\"announcementContentHeading\"><h3 id=\"announcementContentHeading\" class=\"announcement-form-section-title\">Content</h3><div class=\"form-group\"><label for=\"title\">Title *</label> <input type=\"text\" id=\"title\" name=\"title\" required maxlength=\"120\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "\" placeholder=\"Short headline for the banner\" data-preview-target=\"title\"></div><div class=\"form-group\"><label for=\"description\">Description *</label> <textarea id=\"description\" name=\"description\" required rows=\"4\" maxlength=\"500\" placeholder=\"Additional details shown below the title\" data-preview-target=\"description\">")
+		var templ_7745c5c3_Var36 string
+		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Title)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 326, Col: 26}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var36)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var27 string
-		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 275, Col: 26}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "\" placeholder=\"Short headline for the banner\" data-preview-target=\"title\"></div><div class=\"form-group\"><label for=\"description\">Description *</label> <textarea id=\"description\" name=\"description\" required rows=\"4\" maxlength=\"500\" placeholder=\"Additional details shown below the title\" data-preview-target=\"description\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "</textarea><p class=\"field-hint\">Keep it concise. This appears in the persistent banner across all pages.</p></div><div class=\"form-group\"><label for=\"cta_label\">CTA label</label> <input type=\"text\" id=\"cta_label\" name=\"cta_label\" maxlength=\"60\" value=\"")
+		var templ_7745c5c3_Var37 string
+		templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 341, Col: 26}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var28 string
-		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.CTALabel)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 285, Col: 29}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var28)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "</textarea><p class=\"field-hint\">Keep it concise. This appears in the persistent banner across all pages.</p></div><div class=\"form-group\"><label for=\"cta_label\">CTA label</label> <input type=\"text\" id=\"cta_label\" name=\"cta_label\" maxlength=\"60\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "\" placeholder=\"Learn more\" data-preview-target=\"cta_label\"></div><div class=\"form-group\"><label for=\"cta_url\">CTA URL</label> <input type=\"text\" id=\"cta_url\" name=\"cta_url\" value=\"")
+		var templ_7745c5c3_Var38 string
+		templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.CTALabel)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 351, Col: 29}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var38)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var29 string
-		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.CTAURL)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 296, Col: 27}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var29)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "\" placeholder=\"Learn more\" data-preview-target=\"cta_label\"></div><div class=\"form-group\"><label for=\"cta_url\">CTA URL</label> <input type=\"text\" id=\"cta_url\" name=\"cta_url\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "\" placeholder=\"https://… or /students\" data-preview-target=\"cta_url\"><p class=\"field-hint\">Optional. Both fields required to show a button on the banner.</p></div></section><section class=\"announcement-form-section\" aria-labelledby=\"announcementStatusHeading\"><h3 id=\"announcementStatusHeading\" class=\"announcement-form-section-title\">Status</h3><p class=\"field-hint\">Draft announcements are saved but not shown in banners.</p><div class=\"announcement-visibility-options\"><label class=\"announcement-visibility-card\"><input type=\"radio\" name=\"status\" value=\"")
+		var templ_7745c5c3_Var39 string
+		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.CTAURL)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 362, Col: 27}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var39)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var30 string
-		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.ResolveAttributeValue(announcements.StatusDraft)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 312, Col: 42}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var30)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "\" placeholder=\"https://… or /students\" data-preview-target=\"cta_url\"><p class=\"field-hint\">Optional. Both fields required to show a button on the banner.</p></div></section><section class=\"announcement-form-section\" aria-labelledby=\"announcementDisplayHeading\"><h3 id=\"announcementDisplayHeading\" class=\"announcement-form-section-title\">Display</h3><p class=\"field-hint\">Banners appear below the header. Modals open as a dialog when teachers load a page.</p><div class=\"announcement-visibility-options\"><label class=\"announcement-visibility-card\"><input type=\"radio\" name=\"display_type\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "\"")
+		var templ_7745c5c3_Var40 string
+		templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(announcements.DisplayTypeBanner))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 378, Col: 56}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var40)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if announcementFormDisplayType(data) == string(announcements.DisplayTypeBanner) {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, " checked")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, " data-display-type=\"banner\"> <span class=\"announcement-visibility-card__body\"><span class=\"announcement-visibility-card__title\">Banner</span> <span class=\"announcement-visibility-card__desc\">Persistent strip across pages</span></span></label> <label class=\"announcement-visibility-card\"><input type=\"radio\" name=\"display_type\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var41 string
+		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(announcements.DisplayTypeModal))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 391, Col: 55}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var41)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if announcementFormDisplayType(data) == string(announcements.DisplayTypeModal) {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, " checked")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, " data-display-type=\"modal\"> <span class=\"announcement-visibility-card__body\"><span class=\"announcement-visibility-card__title\">Modal</span> <span class=\"announcement-visibility-card__desc\">Dialog with dismiss per session or page</span></span></label></div><div id=\"announcementModalOptions\" class=\"announcement-modal-options\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if announcementFormDisplayType(data) != string(announcements.DisplayTypeModal) {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, " hidden")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "><p class=\"field-hint\">How often the modal may appear after a teacher dismisses it.</p><div class=\"announcement-visibility-options\"><label class=\"announcement-visibility-card\"><input type=\"radio\" name=\"modal_frequency\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var42 string
+		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(announcements.ModalFrequencyPerSession))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 408, Col: 64}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var42)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.ModalFrequency != string(announcements.ModalFrequencyPerPage) {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, " checked")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "> <span class=\"announcement-visibility-card__body\"><span class=\"announcement-visibility-card__title\">Per session</span> <span class=\"announcement-visibility-card__desc\">Once per browser session after dismiss</span></span></label> <label class=\"announcement-visibility-card\"><input type=\"radio\" name=\"modal_frequency\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var43 string
+		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(announcements.ModalFrequencyPerPage))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 420, Col: 61}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var43)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.ModalFrequency == string(announcements.ModalFrequencyPerPage) {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, " checked")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "> <span class=\"announcement-visibility-card__body\"><span class=\"announcement-visibility-card__title\">Per page</span> <span class=\"announcement-visibility-card__desc\">Once per page path after dismiss</span></span></label></div><div class=\"form-group announcement-repeat-toggle\"><label class=\"announcement-select-all\"><input type=\"checkbox\" name=\"repeat_enabled\" value=\"1\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.RepeatEnabled {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, " checked")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, " id=\"announcementRepeatEnabled\"> Repeat scheduling</label><p class=\"field-hint\">Optional. Limit when the modal is eligible beyond the campaign dates.</p></div><div id=\"announcementRepeatOptions\" class=\"announcement-repeat-options\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if !data.RepeatEnabled {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, " hidden")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "><div class=\"announcement-visibility-options\"><label class=\"announcement-visibility-card\"><input type=\"radio\" name=\"repeat_schedule\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var44 string
+		templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(announcements.RepeatScheduleStartEnd))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 448, Col: 63}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var44)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.RepeatSchedule != string(announcements.RepeatScheduleCutoffBefore) {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, " checked")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "> <span class=\"announcement-visibility-card__body\"><span class=\"announcement-visibility-card__title\">Use start and end date</span> <span class=\"announcement-visibility-card__desc\">Visible any day within the schedule below</span></span></label> <label class=\"announcement-visibility-card\"><input type=\"radio\" name=\"repeat_schedule\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var45 string
+		templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(announcements.RepeatScheduleCutoffBefore))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 460, Col: 67}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var45)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, "\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.RepeatSchedule == string(announcements.RepeatScheduleCutoffBefore) {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, " checked")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, " data-repeat-cutoff=\"1\"> <span class=\"announcement-visibility-card__body\"><span class=\"announcement-visibility-card__title\">On or before cutoff</span> <span class=\"announcement-visibility-card__desc\">Only on the last N days of the active payroll cutoff (PHT)</span></span></label></div><div id=\"announcementCutoffDaysGroup\" class=\"form-group\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if data.RepeatSchedule != string(announcements.RepeatScheduleCutoffBefore) {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, " hidden")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 94, "><label for=\"cutoff_repeat_days\">Days on or before cutoff end</label> <input type=\"number\" id=\"cutoff_repeat_days\" name=\"cutoff_repeat_days\" min=\"0\" max=\"10\" step=\"1\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var46 string
+		templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.CutoffRepeatDays)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 479, Col: 39}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var46)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 95, "\" placeholder=\"0\"><p class=\"field-hint\">Example: 3 with cutoff end Sep 15 shows Sep 13, 14, and 15.</p></div></div></div></section><section class=\"announcement-form-section\" aria-labelledby=\"announcementStatusHeading\"><h3 id=\"announcementStatusHeading\" class=\"announcement-form-section-title\">Status</h3><p class=\"field-hint\">Draft announcements are saved but not shown to teachers.</p><div class=\"announcement-visibility-options\"><label class=\"announcement-visibility-card\"><input type=\"radio\" name=\"status\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var47 string
+		templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.ResolveAttributeValue(announcements.StatusDraft)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 496, Col: 42}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var47)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 96, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.Status != announcements.StatusPublished {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, " checked")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 97, " checked")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "> <span class=\"announcement-visibility-card__body\"><span class=\"announcement-visibility-card__title\">Draft</span> <span class=\"announcement-visibility-card__desc\">Hidden from banners until published</span></span></label> <label class=\"announcement-visibility-card\"><input type=\"radio\" name=\"status\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 98, "> <span class=\"announcement-visibility-card__body\"><span class=\"announcement-visibility-card__title\">Draft</span> <span class=\"announcement-visibility-card__desc\">Hidden from banners until published</span></span></label> <label class=\"announcement-visibility-card\"><input type=\"radio\" name=\"status\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var31 string
-		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.ResolveAttributeValue(announcements.StatusPublished)
+		var templ_7745c5c3_Var48 string
+		templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.ResolveAttributeValue(announcements.StatusPublished)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 324, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 508, Col: 46}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var31)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var48)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 99, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.Status == announcements.StatusPublished {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, " checked")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 100, " checked")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "> <span class=\"announcement-visibility-card__body\"><span class=\"announcement-visibility-card__title\">Published</span> <span class=\"announcement-visibility-card__desc\">Visible in banners when within the schedule</span></span></label></div></section><section class=\"announcement-form-section\" aria-labelledby=\"announcementLevelHeading\"><h3 id=\"announcementLevelHeading\" class=\"announcement-form-section-title\">Level</h3><p class=\"field-hint\">Determines banner color and icon. Critical appears first when multiple announcements are active.</p><div class=\"announcement-level-picker\" role=\"radiogroup\" aria-label=\"Announcement level\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 101, "> <span class=\"announcement-visibility-card__body\"><span class=\"announcement-visibility-card__title\">Published</span> <span class=\"announcement-visibility-card__desc\">Visible in banners when within the schedule</span></span></label></div></section><section class=\"announcement-form-section\" aria-labelledby=\"announcementLevelHeading\"><h3 id=\"announcementLevelHeading\" class=\"announcement-form-section-title\">Level</h3><p class=\"field-hint\">Determines banner color and icon. Critical appears first when multiple announcements are active.</p><div class=\"announcement-level-picker\" role=\"radiogroup\" aria-label=\"Announcement level\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -805,79 +1194,79 @@ func AnnouncementForm(data AnnouncementFormData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "</div></section><section class=\"announcement-form-section\" aria-labelledby=\"announcementScheduleHeading\"><h3 id=\"announcementScheduleHeading\" class=\"announcement-form-section-title\">Schedule</h3><div class=\"form-row\"><div class=\"form-group\"><label for=\"start_date\">Start date *</label> <input type=\"date\" id=\"start_date\" name=\"start_date\" required min=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "</div></section><section class=\"announcement-form-section\" aria-labelledby=\"announcementScheduleHeading\"><h3 id=\"announcementScheduleHeading\" class=\"announcement-form-section-title\">Schedule</h3><div class=\"form-row\"><div class=\"form-group\"><label for=\"start_date\">Start date *</label> <input type=\"date\" id=\"start_date\" name=\"start_date\" required min=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var32 string
-		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.StartDateMin())
+		var templ_7745c5c3_Var49 string
+		templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.StartDateMin())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 355, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 539, Col: 34}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var32)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var49)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var33 string
-		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.StartDate)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 356, Col: 31}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var33)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, "\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "\"></div><div class=\"form-group\"><label for=\"end_date\">End date *</label> <input type=\"date\" id=\"end_date\" name=\"end_date\" required min=\"")
+		var templ_7745c5c3_Var50 string
+		templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.StartDate)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 540, Col: 31}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var50)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var34 string
-		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Today)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 366, Col: 25}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var34)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "\"></div><div class=\"form-group\"><label for=\"end_date\">End date *</label> <input type=\"date\" id=\"end_date\" name=\"end_date\" required min=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "\" value=\"")
+		var templ_7745c5c3_Var51 string
+		templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Today)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 550, Col: 25}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var51)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var35 string
-		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.EndDate)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 367, Col: 29}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var35)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 105, "\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "\"></div></div><p class=\"field-hint\">Banner is visible from start through end date (inclusive, PHT).</p></section><section class=\"announcement-form-section\" aria-labelledby=\"announcementAudienceHeading\"><h3 id=\"announcementAudienceHeading\" class=\"announcement-form-section-title\">Visible to</h3><div class=\"announcement-visibility-options\"><label class=\"announcement-visibility-card\"><input type=\"radio\" name=\"visible_to\" value=\"all\"")
+		var templ_7745c5c3_Var52 string
+		templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.EndDate)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 551, Col: 29}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var52)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 106, "\"></div></div><p class=\"field-hint\">Banner is visible from start through end date (inclusive, PHT).</p></section><section class=\"announcement-form-section\" aria-labelledby=\"announcementAudienceHeading\"><h3 id=\"announcementAudienceHeading\" class=\"announcement-form-section-title\">Visible to</h3><div class=\"announcement-visibility-options\"><label class=\"announcement-visibility-card\"><input type=\"radio\" name=\"visible_to\" value=\"all\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.VisibleTo != "selected" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, " checked")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 107, " checked")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, " data-visibility-toggle=\"all\"> <span class=\"announcement-visibility-card__body\"><span class=\"announcement-visibility-card__title\">All teachers</span> <span class=\"announcement-visibility-card__desc\">Everyone sees this banner, including superuser</span></span></label> <label class=\"announcement-visibility-card\"><input type=\"radio\" name=\"visible_to\" value=\"selected\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 108, " data-visibility-toggle=\"all\"> <span class=\"announcement-visibility-card__body\"><span class=\"announcement-visibility-card__title\">All teachers</span> <span class=\"announcement-visibility-card__desc\">Everyone sees this banner, including superuser</span></span></label> <label class=\"announcement-visibility-card\"><input type=\"radio\" name=\"visible_to\" value=\"selected\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.VisibleTo == "selected" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, " checked")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 109, " checked")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, " data-visibility-toggle=\"selected\"> <span class=\"announcement-visibility-card__body\"><span class=\"announcement-visibility-card__title\">Selected teachers</span> <span class=\"announcement-visibility-card__desc\">Only checked teachers will see this banner</span></span></label></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 110, " data-visibility-toggle=\"selected\"> <span class=\"announcement-visibility-card__body\"><span class=\"announcement-visibility-card__title\">Selected teachers</span> <span class=\"announcement-visibility-card__desc\">Only checked teachers will see this banner</span></span></label></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -885,43 +1274,43 @@ func AnnouncementForm(data AnnouncementFormData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "</section><div class=\"announcement-form-actions\"><button type=\"submit\" class=\"announcement-submit-btn\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 111, "</section><div class=\"announcement-form-actions\"><button type=\"submit\" class=\"announcement-submit-btn\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var36 string
-		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(announcementSubmitLabel(data))
+		var templ_7745c5c3_Var53 string
+		templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.JoinStringErrs(announcementSubmitLabel(data))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 408, Col: 91}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 592, Col: 91}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var53))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "</button> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 112, "</button> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.IsEdit {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "<a href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 113, "<a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var37 templ.SafeURL
-			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/announcements"))
+			var templ_7745c5c3_Var54 templ.SafeURL
+			templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/announcements"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 410, Col: 44}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 594, Col: 44}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var54))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "\" class=\"add-btn add-btn-secondary announcement-discard-btn\">Discard changes</a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 114, "\" class=\"add-btn add-btn-secondary announcement-discard-btn\">Discard changes</a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "</div></form><aside class=\"announcement-preview-panel\" aria-labelledby=\"announcementPreviewHeading\"><h3 id=\"announcementPreviewHeading\" class=\"announcement-form-section-title\">Live preview</h3><p class=\"field-hint\">How the banner will appear below the navbar.</p><div id=\"announcementPreview\" class=\"announcement-preview-stack\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 115, "</div></form><aside class=\"announcement-preview-panel\" aria-labelledby=\"announcementPreviewHeading\"><h3 id=\"announcementPreviewHeading\" class=\"announcement-form-section-title\">Live preview</h3><p class=\"field-hint\" id=\"announcementPreviewHint\">How the banner will appear below the navbar.</p><div id=\"announcementPreview\" class=\"announcement-preview-stack\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -935,7 +1324,7 @@ func AnnouncementForm(data AnnouncementFormData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "</div></aside></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 116, "</div></aside></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -947,7 +1336,7 @@ func AnnouncementForm(data AnnouncementFormData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 117, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -999,66 +1388,66 @@ func AnnouncementLevelOption(value string, label string, desc string, selected s
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var38 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var38 == nil {
-			templ_7745c5c3_Var38 = templ.NopComponent
+		templ_7745c5c3_Var55 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var55 == nil {
+			templ_7745c5c3_Var55 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var39 = []any{"announcement-level-option announcement-level-option--" + value}
-		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var39...)
+		var templ_7745c5c3_Var56 = []any{"announcement-level-option announcement-level-option--" + value}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var56...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "<label class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 118, "<label class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var40 string
-		templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var39).String())
+		var templ_7745c5c3_Var57 string
+		templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var56).String())
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 1, Col: 0}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var40)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var57)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "\"><input type=\"radio\" name=\"level\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 119, "\"><input type=\"radio\" name=\"level\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var41 string
-		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.ResolveAttributeValue(value)
+		var templ_7745c5c3_Var58 string
+		templ_7745c5c3_Var58, templ_7745c5c3_Err = templ.ResolveAttributeValue(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 466, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 650, Col: 48}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var41)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var58)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 120, "\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if selected == value || (selected == "" && value == announcements.LevelInfo) {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, " checked")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 121, " checked")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, " data-level=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 122, " data-level=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var42 string
-		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.ResolveAttributeValue(value)
+		var templ_7745c5c3_Var59 string
+		templ_7745c5c3_Var59, templ_7745c5c3_Err = templ.ResolveAttributeValue(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 466, Col: 156}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 650, Col: 156}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var42)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var59)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "\"> <span class=\"announcement-level-option__icon\" aria-hidden=\"true\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 123, "\"> <span class=\"announcement-level-option__icon\" aria-hidden=\"true\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1066,33 +1455,33 @@ func AnnouncementLevelOption(value string, label string, desc string, selected s
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "</span> <span class=\"announcement-level-option__text\"><span class=\"announcement-level-option__label\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 124, "</span> <span class=\"announcement-level-option__text\"><span class=\"announcement-level-option__label\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var43 string
-		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(label)
+		var templ_7745c5c3_Var60 string
+		templ_7745c5c3_Var60, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 471, Col: 57}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 655, Col: 57}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "</span> <span class=\"announcement-level-option__desc\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var60))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var44 string
-		templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs(desc)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 472, Col: 55}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 125, "</span> <span class=\"announcement-level-option__desc\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "</span></span></label>")
+		var templ_7745c5c3_Var61 string
+		templ_7745c5c3_Var61, templ_7745c5c3_Err = templ.JoinStringErrs(desc)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 656, Col: 55}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var61))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 126, "</span></span></label>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1116,74 +1505,103 @@ func AnnouncementTeacherSelect(teachers []AnnouncementTeacherOption, showPanel b
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var45 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var45 == nil {
-			templ_7745c5c3_Var45 = templ.NopComponent
+		templ_7745c5c3_Var62 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var62 == nil {
+			templ_7745c5c3_Var62 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "<div id=\"teacherSelectPanel\" class=\"announcement-teacher-panel\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 127, "<div id=\"teacherSelectPanel\" class=\"announcement-teacher-panel\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if !showPanel {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, " hidden")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 128, " hidden")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "><div class=\"announcement-teacher-panel__toolbar\"><span class=\"announcement-teacher-panel__label\">Teachers</span> <label class=\"announcement-select-all\"><input type=\"checkbox\" id=\"selectAllTeachers\" aria-controls=\"teacherCheckboxList\"> Select all</label></div><div id=\"teacherCheckboxList\" class=\"announcement-teacher-list\" role=\"group\" aria-label=\"Select teachers\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 129, "><div class=\"announcement-teacher-panel__toolbar\"><span class=\"announcement-teacher-panel__label\">Teachers</span> <label class=\"announcement-select-all\"><input type=\"checkbox\" id=\"selectAllTeachers\" aria-controls=\"teacherCheckboxList\"> Select all</label></div><div id=\"teacherCheckboxList\" class=\"announcement-teacher-list\" role=\"group\" aria-label=\"Select teachers\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(teachers) == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "<p class=\"field-hint\">No approved teachers available.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 130, "<p class=\"field-hint\">No approved teachers available.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
 		for _, t := range teachers {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "<label class=\"announcement-teacher-item\"><input type=\"checkbox\" name=\"teachers\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 131, "<label class=\"announcement-teacher-item\"><input type=\"checkbox\" name=\"teachers\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var46 string
-			templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.ResolveAttributeValue(t.ID)
+			var templ_7745c5c3_Var63 string
+			templ_7745c5c3_Var63, templ_7745c5c3_Err = templ.ResolveAttributeValue(t.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 492, Col: 56}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 676, Col: 56}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var46)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var63)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "\" class=\"teacher-checkbox\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 132, "\" class=\"teacher-checkbox\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if t.Selected {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, " checked")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 133, " checked")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "> <span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 134, "> <span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var47 string
-			templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.JoinStringErrs(t.Name)
+			var templ_7745c5c3_Var64 string
+			templ_7745c5c3_Var64, templ_7745c5c3_Err = templ.JoinStringErrs(t.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 493, Col: 19}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/announcements.templ`, Line: 677, Col: 19}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var47))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var64))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "</span></label>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 135, "</span></label>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 136, "</div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func ScrAnnouncementModals() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var65 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var65 == nil {
+			templ_7745c5c3_Var65 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 137, "<script>\n\t\t(function () {\n\t\t\tconst root = document.getElementById('announcementModalsRoot');\n\t\t\tconst overlay = document.getElementById('announcementModalOverlay');\n\t\t\tif (!root || !overlay) return;\n\n\t\t\tconst titleEl = document.getElementById('announcementModalTitle');\n\t\t\tconst descEl = document.getElementById('announcementModalDescription');\n\t\t\tconst ctaEl = document.getElementById('announcementModalCTA');\n\t\t\tconst closeBtn = document.getElementById('announcementModalClose');\n\t\t\tconst dismissBtn = document.getElementById('announcementModalDismiss');\n\t\t\tconst items = Array.from(root.querySelectorAll('.announcement-modal-item'));\n\t\t\tconst queue = [];\n\t\t\tlet currentId = null;\n\t\t\tlet currentFrequency = 'per_session';\n\n\t\t\tfunction storageKey(id, frequency) {\n\t\t\t\tif (frequency === 'per_page') {\n\t\t\t\t\treturn 'zion_ann_' + id + '_' + window.location.pathname;\n\t\t\t\t}\n\t\t\t\treturn 'zion_ann_' + id;\n\t\t\t}\n\n\t\t\tfunction isDismissed(id, frequency) {\n\t\t\t\ttry {\n\t\t\t\t\treturn sessionStorage.getItem(storageKey(id, frequency)) === '1';\n\t\t\t\t} catch (e) {\n\t\t\t\t\treturn false;\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tfunction markDismissed(id, frequency) {\n\t\t\t\ttry {\n\t\t\t\t\tsessionStorage.setItem(storageKey(id, frequency), '1');\n\t\t\t\t} catch (e) { /* ignore */ }\n\t\t\t}\n\n\t\t\titems.forEach(function (node) {\n\t\t\t\tconst id = node.getAttribute('data-announcement-id');\n\t\t\t\tconst frequency = node.getAttribute('data-frequency') || 'per_session';\n\t\t\t\tif (!id || isDismissed(id, frequency)) return;\n\t\t\t\tqueue.push(node);\n\t\t\t});\n\n\t\t\tfunction hideOverlay() {\n\t\t\t\toverlay.hidden = true;\n\t\t\t\toverlay.setAttribute('aria-hidden', 'true');\n\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t\tcurrentId = null;\n\t\t\t}\n\n\t\t\tfunction showNext() {\n\t\t\t\tif (queue.length === 0) {\n\t\t\t\t\thideOverlay();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst node = queue.shift();\n\t\t\t\tconst id = node.getAttribute('data-announcement-id');\n\t\t\t\tconst frequency = node.getAttribute('data-frequency') || 'per_session';\n\t\t\t\tconst level = node.getAttribute('data-level') || 'info';\n\t\t\t\tconst titleNode = node.querySelector('.announcement-modal-item__title');\n\t\t\t\tconst descNode = node.querySelector('.announcement-modal-item__description');\n\t\t\t\tconst ctaWrap = node.querySelector('.announcement-modal-item__cta-label');\n\t\t\t\tcurrentId = id;\n\t\t\t\tcurrentFrequency = frequency;\n\t\t\t\tif (titleEl) titleEl.textContent = titleNode ? titleNode.textContent : '';\n\t\t\t\tif (descEl) descEl.textContent = descNode ? descNode.textContent : '';\n\t\t\t\tconst dialog = overlay.querySelector('.announcement-modal-dialog');\n\t\t\t\tif (dialog) {\n\t\t\t\t\tdialog.classList.remove('announcement-modal-dialog--info', 'announcement-modal-dialog--warning', 'announcement-modal-dialog--critical');\n\t\t\t\t\tdialog.classList.add('announcement-modal-dialog--' + level);\n\t\t\t\t}\n\t\t\t\tif (ctaEl) {\n\t\t\t\t\tctaEl.innerHTML = '';\n\t\t\t\t\tif (ctaWrap) {\n\t\t\t\t\t\tconst label = ctaWrap.getAttribute('data-cta-label');\n\t\t\t\t\t\tconst url = ctaWrap.getAttribute('data-cta-url');\n\t\t\t\t\t\tif (label && url) {\n\t\t\t\t\t\t\tconst a = document.createElement('a');\n\t\t\t\t\t\t\ta.className = 'btn announcement-modal-cta';\n\t\t\t\t\t\t\ta.textContent = label;\n\t\t\t\t\t\t\ta.href = url;\n\t\t\t\t\t\t\tif (url.indexOf('http://') === 0 || url.indexOf('https://') === 0) {\n\t\t\t\t\t\t\t\ta.target = '_blank';\n\t\t\t\t\t\t\t\ta.rel = 'noopener noreferrer';\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\tctaEl.appendChild(a);\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\toverlay.hidden = false;\n\t\t\t\toverlay.removeAttribute('aria-hidden');\n\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\tif (dismissBtn) dismissBtn.focus();\n\t\t\t}\n\n\t\t\tfunction dismissCurrent() {\n\t\t\t\tif (currentId) {\n\t\t\t\t\tmarkDismissed(currentId, currentFrequency);\n\t\t\t\t}\n\t\t\t\tshowNext();\n\t\t\t}\n\n\t\t\tif (closeBtn) closeBtn.addEventListener('click', dismissCurrent);\n\t\t\tif (dismissBtn) dismissBtn.addEventListener('click', dismissCurrent);\n\t\t\toverlay.addEventListener('click', function (e) {\n\t\t\t\tif (e.target === overlay) dismissCurrent();\n\t\t\t});\n\t\t\tdocument.addEventListener('keydown', function (e) {\n\t\t\t\tif (e.key === 'Escape' && !overlay.hidden) dismissCurrent();\n\t\t\t});\n\n\t\t\tif (queue.length > 0) {\n\t\t\t\tshowNext();\n\t\t\t}\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1207,12 +1625,12 @@ func AnnouncementFormScript() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var48 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var48 == nil {
-			templ_7745c5c3_Var48 = templ.NopComponent
+		templ_7745c5c3_Var66 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var66 == nil {
+			templ_7745c5c3_Var66 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 94, "<script>\n\t\t(function () {\n\t\t\tconst form = document.getElementById('announcementForm');\n\t\t\tconst preview = document.getElementById('announcementPreview');\n\t\t\tif (!form || !preview) return;\n\n\t\t\tconst titleInput = form.querySelector('[data-preview-target=\"title\"]');\n\t\t\tconst descInput = form.querySelector('[data-preview-target=\"description\"]');\n\t\t\tconst ctaLabelInput = form.querySelector('[data-preview-target=\"cta_label\"]');\n\t\t\tconst ctaURLInput = form.querySelector('[data-preview-target=\"cta_url\"]');\n\t\t\tconst levelInputs = form.querySelectorAll('input[name=\"level\"]');\n\t\t\tconst visibilityRadios = form.querySelectorAll('[data-visibility-toggle]');\n\t\t\tconst teacherPanel = document.getElementById('teacherSelectPanel');\n\t\t\tconst selectAll = document.getElementById('selectAllTeachers');\n\t\t\tconst teacherCheckboxes = () => Array.from(form.querySelectorAll('.teacher-checkbox'));\n\n\t\t\tfunction currentLevel() {\n\t\t\t\tconst checked = form.querySelector('input[name=\"level\"]:checked');\n\t\t\t\treturn checked ? checked.value : 'info';\n\t\t\t}\n\n\t\t\tfunction escapeHTML(value) {\n\t\t\t\treturn value\n\t\t\t\t\t.replace(/&/g, '&amp;')\n\t\t\t\t\t.replace(/</g, '&lt;')\n\t\t\t\t\t.replace(/>/g, '&gt;')\n\t\t\t\t\t.replace(/\"/g, '&quot;');\n\t\t\t}\n\n\t\t\tfunction levelIcon(level) {\n\t\t\t\tif (level === 'warning') {\n\t\t\t\t\treturn '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z\"></path><line x1=\"12\" y1=\"9\" x2=\"12\" y2=\"13\"></line><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"></line></svg>';\n\t\t\t\t}\n\t\t\t\tif (level === 'critical') {\n\t\t\t\t\treturn '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polygon points=\"7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2\"></polygon><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg>';\n\t\t\t\t}\n\t\t\t\treturn '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>';\n\t\t\t}\n\n\t\t\tfunction updatePreview() {\n\t\t\t\tconst title = (titleInput && titleInput.value.trim()) || 'Announcement title';\n\t\t\t\tconst description = (descInput && descInput.value.trim()) || 'Description text appears here.';\n\t\t\t\tconst level = currentLevel();\n\t\t\t\tconst ctaLabel = ctaLabelInput && ctaLabelInput.value.trim();\n\t\t\t\tconst ctaURL = ctaURLInput && ctaURLInput.value.trim();\n\t\t\t\tlet ctaHTML = '';\n\t\t\t\tif (ctaLabel && ctaURL) {\n\t\t\t\t\tconst href = ctaURL.startsWith('http://') || ctaURL.startsWith('https://') ? escapeHTML(ctaURL) : '#';\n\t\t\t\t\tconst externalAttrs = ctaURL.startsWith('http://') || ctaURL.startsWith('https://')\n\t\t\t\t\t\t? ' target=\"_blank\" rel=\"noopener noreferrer\"'\n\t\t\t\t\t\t: '';\n\t\t\t\t\tctaHTML = '<a href=\"' + href + '\" class=\"announcement-banner__cta\"' + externalAttrs + '>' + escapeHTML(ctaLabel) + '</a>';\n\t\t\t\t}\n\t\t\t\tpreview.innerHTML =\n\t\t\t\t\t'<div class=\"announcement-banner announcement-banner--' + level + '\" role=\"status\">' +\n\t\t\t\t\t\t'<div class=\"announcement-banner__icon\" aria-hidden=\"true\">' + levelIcon(level) + '</div>' +\n\t\t\t\t\t\t'<div class=\"announcement-banner__content\">' +\n\t\t\t\t\t\t\t'<p class=\"announcement-banner__title\">' + escapeHTML(title) + '</p>' +\n\t\t\t\t\t\t\t'<p class=\"announcement-banner__description\">' + escapeHTML(description) + '</p>' +\n\t\t\t\t\t\t\tctaHTML +\n\t\t\t\t\t\t'</div>' +\n\t\t\t\t\t'</div>';\n\t\t\t}\n\n\t\t\tfunction syncVisibilityPanel() {\n\t\t\t\tconst selected = form.querySelector('[data-visibility-toggle=\"selected\"]');\n\t\t\t\tif (!teacherPanel) return;\n\t\t\t\tconst show = selected && selected.checked;\n\t\t\t\tteacherPanel.hidden = !show;\n\t\t\t}\n\n\t\t\tfunction syncSelectAllState() {\n\t\t\t\tif (!selectAll) return;\n\t\t\t\tconst boxes = teacherCheckboxes();\n\t\t\t\tif (boxes.length === 0) {\n\t\t\t\t\tselectAll.checked = false;\n\t\t\t\t\tselectAll.indeterminate = false;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst checkedCount = boxes.filter(function (cb) { return cb.checked; }).length;\n\t\t\t\tselectAll.checked = checkedCount === boxes.length;\n\t\t\t\tselectAll.indeterminate = checkedCount > 0 && checkedCount < boxes.length;\n\t\t\t}\n\n\t\t\tif (titleInput) titleInput.addEventListener('input', updatePreview);\n\t\t\tif (descInput) descInput.addEventListener('input', updatePreview);\n\t\t\tif (ctaLabelInput) ctaLabelInput.addEventListener('input', updatePreview);\n\t\t\tif (ctaURLInput) ctaURLInput.addEventListener('input', updatePreview);\n\t\t\tlevelInputs.forEach(function (input) {\n\t\t\t\tinput.addEventListener('change', updatePreview);\n\t\t\t});\n\n\t\t\tvisibilityRadios.forEach(function (radio) {\n\t\t\t\tradio.addEventListener('change', syncVisibilityPanel);\n\t\t\t});\n\n\t\t\tif (selectAll) {\n\t\t\t\tselectAll.addEventListener('change', function () {\n\t\t\t\t\tteacherCheckboxes().forEach(function (cb) {\n\t\t\t\t\t\tcb.checked = selectAll.checked;\n\t\t\t\t\t});\n\t\t\t\t\tselectAll.indeterminate = false;\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tteacherCheckboxes().forEach(function (cb) {\n\t\t\t\tcb.addEventListener('change', syncSelectAllState);\n\t\t\t});\n\n\t\t\tconst startDate = form.querySelector('#start_date');\n\t\t\tconst endDate = form.querySelector('#end_date');\n\t\t\tif (startDate && endDate) {\n\t\t\t\tstartDate.addEventListener('change', function () {\n\t\t\t\t\tif (startDate.value) {\n\t\t\t\t\t\tendDate.min = startDate.value;\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tsyncVisibilityPanel();\n\t\t\tsyncSelectAllState();\n\t\t\tupdatePreview();\n\t\t})();\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 138, "<script>\n\t\t(function () {\n\t\t\tconst form = document.getElementById('announcementForm');\n\t\t\tconst preview = document.getElementById('announcementPreview');\n\t\t\tconst previewHint = document.getElementById('announcementPreviewHint');\n\t\t\tif (!form || !preview) return;\n\n\t\t\tconst titleInput = form.querySelector('[data-preview-target=\"title\"]');\n\t\t\tconst descInput = form.querySelector('[data-preview-target=\"description\"]');\n\t\t\tconst ctaLabelInput = form.querySelector('[data-preview-target=\"cta_label\"]');\n\t\t\tconst ctaURLInput = form.querySelector('[data-preview-target=\"cta_url\"]');\n\t\t\tconst levelInputs = form.querySelectorAll('input[name=\"level\"]');\n\t\t\tconst visibilityRadios = form.querySelectorAll('[data-visibility-toggle]');\n\t\t\tconst teacherPanel = document.getElementById('teacherSelectPanel');\n\t\t\tconst selectAll = document.getElementById('selectAllTeachers');\n\t\t\tconst teacherCheckboxes = () => Array.from(form.querySelectorAll('.teacher-checkbox'));\n\n\t\t\tfunction currentLevel() {\n\t\t\t\tconst checked = form.querySelector('input[name=\"level\"]:checked');\n\t\t\t\treturn checked ? checked.value : 'info';\n\t\t\t}\n\n\t\t\tfunction escapeHTML(value) {\n\t\t\t\treturn value\n\t\t\t\t\t.replace(/&/g, '&amp;')\n\t\t\t\t\t.replace(/</g, '&lt;')\n\t\t\t\t\t.replace(/>/g, '&gt;')\n\t\t\t\t\t.replace(/\"/g, '&quot;');\n\t\t\t}\n\n\t\t\tfunction levelIcon(level) {\n\t\t\t\tif (level === 'warning') {\n\t\t\t\t\treturn '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z\"></path><line x1=\"12\" y1=\"9\" x2=\"12\" y2=\"13\"></line><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"></line></svg>';\n\t\t\t\t}\n\t\t\t\tif (level === 'critical') {\n\t\t\t\t\treturn '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polygon points=\"7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2\"></polygon><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"16\" x2=\"12.01\" y2=\"16\"></line></svg>';\n\t\t\t\t}\n\t\t\t\treturn '<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><line x1=\"12\" y1=\"16\" x2=\"12\" y2=\"12\"></line><line x1=\"12\" y1=\"8\" x2=\"12.01\" y2=\"8\"></line></svg>';\n\t\t\t}\n\n\t\t\tconst displayTypeRadios = form.querySelectorAll('input[name=\"display_type\"]');\n\t\t\tconst modalOptions = document.getElementById('announcementModalOptions');\n\t\t\tconst repeatEnabled = document.getElementById('announcementRepeatEnabled');\n\t\t\tconst repeatOptions = document.getElementById('announcementRepeatOptions');\n\t\t\tconst cutoffDaysGroup = document.getElementById('announcementCutoffDaysGroup');\n\t\t\tconst repeatScheduleRadios = form.querySelectorAll('input[name=\"repeat_schedule\"]');\n\n\t\t\tfunction isModalDisplay() {\n\t\t\t\tconst checked = form.querySelector('input[name=\"display_type\"]:checked');\n\t\t\t\treturn checked && checked.value === 'modal';\n\t\t\t}\n\n\t\t\tfunction syncDisplaySections() {\n\t\t\t\tconst modal = isModalDisplay();\n\t\t\t\tif (modalOptions) modalOptions.hidden = !modal;\n\t\t\t\tif (previewHint) {\n\t\t\t\t\tpreviewHint.textContent = modal\n\t\t\t\t\t\t? 'How the modal dialog will appear when opened.'\n\t\t\t\t\t\t: 'How the banner will appear below the navbar.';\n\t\t\t\t}\n\t\t\t\tif (repeatOptions && repeatEnabled) {\n\t\t\t\t\trepeatOptions.hidden = !repeatEnabled.checked;\n\t\t\t\t}\n\t\t\t\tconst cutoffSelected = form.querySelector('input[name=\"repeat_schedule\"][value=\"cutoff_before\"]');\n\t\t\t\tif (cutoffDaysGroup) {\n\t\t\t\t\tcutoffDaysGroup.hidden = !cutoffSelected || !cutoffSelected.checked || !repeatEnabled || !repeatEnabled.checked;\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tfunction updatePreview() {\n\t\t\t\tconst title = (titleInput && titleInput.value.trim()) || 'Announcement title';\n\t\t\t\tconst description = (descInput && descInput.value.trim()) || 'Description text appears here.';\n\t\t\t\tconst level = currentLevel();\n\t\t\t\tconst ctaLabel = ctaLabelInput && ctaLabelInput.value.trim();\n\t\t\t\tconst ctaURL = ctaURLInput && ctaURLInput.value.trim();\n\t\t\t\tlet ctaHTML = '';\n\t\t\t\tif (ctaLabel && ctaURL) {\n\t\t\t\t\tconst href = ctaURL.startsWith('http://') || ctaURL.startsWith('https://') ? escapeHTML(ctaURL) : '#';\n\t\t\t\t\tconst externalAttrs = ctaURL.startsWith('http://') || ctaURL.startsWith('https://')\n\t\t\t\t\t\t? ' target=\"_blank\" rel=\"noopener noreferrer\"'\n\t\t\t\t\t\t: '';\n\t\t\t\t\tctaHTML = '<a href=\"' + href + '\" class=\"announcement-banner__cta\"' + externalAttrs + '>' + escapeHTML(ctaLabel) + '</a>';\n\t\t\t\t}\n\t\t\t\tif (isModalDisplay()) {\n\t\t\t\t\tpreview.innerHTML =\n\t\t\t\t\t\t'<div class=\"modal-dialog announcement-modal-dialog announcement-modal-dialog--' + level + ' announcement-modal-preview\">' +\n\t\t\t\t\t\t\t'<div class=\"modal-header\"><h3 class=\"announcement-modal-title\">' + escapeHTML(title) + '</h3></div>' +\n\t\t\t\t\t\t\t'<div class=\"modal-body\"><p class=\"announcement-modal-description\">' + escapeHTML(description) + '</p>' +\n\t\t\t\t\t\t\t(ctaHTML ? '<p class=\"announcement-modal-cta-wrap\">' + ctaHTML.replace('announcement-banner__cta', 'btn announcement-modal-cta') + '</p>' : '') +\n\t\t\t\t\t\t\t'</div>' +\n\t\t\t\t\t\t\t'<div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary\" disabled>Close</button></div>' +\n\t\t\t\t\t\t'</div>';\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tpreview.innerHTML =\n\t\t\t\t\t'<div class=\"announcement-banner announcement-banner--' + level + '\" role=\"status\">' +\n\t\t\t\t\t\t'<div class=\"announcement-banner__icon\" aria-hidden=\"true\">' + levelIcon(level) + '</div>' +\n\t\t\t\t\t\t'<div class=\"announcement-banner__content\">' +\n\t\t\t\t\t\t\t'<p class=\"announcement-banner__title\">' + escapeHTML(title) + '</p>' +\n\t\t\t\t\t\t\t'<p class=\"announcement-banner__description\">' + escapeHTML(description) + '</p>' +\n\t\t\t\t\t\t\tctaHTML +\n\t\t\t\t\t\t'</div>' +\n\t\t\t\t\t'</div>';\n\t\t\t}\n\n\t\t\tfunction syncVisibilityPanel() {\n\t\t\t\tconst selected = form.querySelector('[data-visibility-toggle=\"selected\"]');\n\t\t\t\tif (!teacherPanel) return;\n\t\t\t\tconst show = selected && selected.checked;\n\t\t\t\tteacherPanel.hidden = !show;\n\t\t\t}\n\n\t\t\tfunction syncSelectAllState() {\n\t\t\t\tif (!selectAll) return;\n\t\t\t\tconst boxes = teacherCheckboxes();\n\t\t\t\tif (boxes.length === 0) {\n\t\t\t\t\tselectAll.checked = false;\n\t\t\t\t\tselectAll.indeterminate = false;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst checkedCount = boxes.filter(function (cb) { return cb.checked; }).length;\n\t\t\t\tselectAll.checked = checkedCount === boxes.length;\n\t\t\t\tselectAll.indeterminate = checkedCount > 0 && checkedCount < boxes.length;\n\t\t\t}\n\n\t\t\tif (titleInput) titleInput.addEventListener('input', updatePreview);\n\t\t\tif (descInput) descInput.addEventListener('input', updatePreview);\n\t\t\tif (ctaLabelInput) ctaLabelInput.addEventListener('input', updatePreview);\n\t\t\tif (ctaURLInput) ctaURLInput.addEventListener('input', updatePreview);\n\t\t\tlevelInputs.forEach(function (input) {\n\t\t\t\tinput.addEventListener('change', updatePreview);\n\t\t\t});\n\n\t\t\tvisibilityRadios.forEach(function (radio) {\n\t\t\t\tradio.addEventListener('change', syncVisibilityPanel);\n\t\t\t});\n\n\t\t\tif (selectAll) {\n\t\t\t\tselectAll.addEventListener('change', function () {\n\t\t\t\t\tteacherCheckboxes().forEach(function (cb) {\n\t\t\t\t\t\tcb.checked = selectAll.checked;\n\t\t\t\t\t});\n\t\t\t\t\tselectAll.indeterminate = false;\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tteacherCheckboxes().forEach(function (cb) {\n\t\t\t\tcb.addEventListener('change', syncSelectAllState);\n\t\t\t});\n\n\t\t\tconst startDate = form.querySelector('#start_date');\n\t\t\tconst endDate = form.querySelector('#end_date');\n\t\t\tif (startDate && endDate) {\n\t\t\t\tstartDate.addEventListener('change', function () {\n\t\t\t\t\tif (startDate.value) {\n\t\t\t\t\t\tendDate.min = startDate.value;\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tdisplayTypeRadios.forEach(function (radio) {\n\t\t\t\tradio.addEventListener('change', function () {\n\t\t\t\t\tsyncDisplaySections();\n\t\t\t\t\tupdatePreview();\n\t\t\t\t});\n\t\t\t});\n\t\t\tif (repeatEnabled) {\n\t\t\t\trepeatEnabled.addEventListener('change', syncDisplaySections);\n\t\t\t}\n\t\t\trepeatScheduleRadios.forEach(function (radio) {\n\t\t\t\tradio.addEventListener('change', syncDisplaySections);\n\t\t\t});\n\n\t\t\tsyncVisibilityPanel();\n\t\t\tsyncSelectAllState();\n\t\t\tsyncDisplaySections();\n\t\t\tupdatePreview();\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1236,12 +1654,12 @@ func AnnouncementBannerStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var49 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var49 == nil {
-			templ_7745c5c3_Var49 = templ.NopComponent
+		templ_7745c5c3_Var67 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var67 == nil {
+			templ_7745c5c3_Var67 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 95, "<style>\n\t\t/* Announcement banners (global display) */\n\t\t.announcement-banners {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tgap: var(--space-2);\n\t\t\tmargin-bottom: var(--space-4);\n\t\t}\n\n\t\t.home-container .announcement-banners {\n\t\t\tmargin-top: var(--space-4);\n\t\t\tmargin-bottom: 0;\n\t\t}\n\n\t\t.header-section .announcement-banners {\n\t\t\tmargin-top: 0;\n\t\t\tmargin-bottom: 0;\n\t\t}\n\n\t\t.announcement-banner {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: 36px 1fr 36px;\n\t\t\talign-items: start;\n\t\t\tcolumn-gap: var(--space-3);\n\t\t\tpadding: var(--space-3) var(--space-4);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tborder: 1px solid transparent;\n\t\t\tborder-left-width: 4px;\n\t\t\tline-height: 1.5;\n\t\t}\n\n\t\t.announcement-banner__icon {\n\t\t\tgrid-column: 1;\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\twidth: 36px;\n\t\t\theight: 36px;\n\t\t\tborder-radius: var(--radius-full);\n\t\t}\n\n\t\t.announcement-banner__content {\n\t\t\tgrid-column: 2;\n\t\t\ttext-align: center;\n\t\t}\n\n\t\t.announcement-banner__title {\n\t\t\tfont-weight: 600;\n\t\t\tfont-size: 0.9375rem;\n\t\t\tmargin-bottom: 2px;\n\t\t}\n\n\t\t.announcement-banner__description {\n\t\t\tfont-size: 0.875rem;\n\t\t\topacity: 0.92;\n\t\t}\n\n\t\t.announcement-banner__cta {\n\t\t\tdisplay: inline-block;\n\t\t\tmargin-top: var(--space-2);\n\t\t\tpadding: 6px 14px;\n\t\t\tborder-radius: var(--radius-full);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tfont-weight: 600;\n\t\t\ttext-decoration: none;\n\t\t\ttransition: background var(--transition-fast), color var(--transition-fast);\n\t\t}\n\n\t\t.announcement-banner--info .announcement-banner__cta {\n\t\t\tbackground: rgba(32, 160, 224, 0.18);\n\t\t\tcolor: #0C4A6E;\n\t\t}\n\t\t.announcement-banner--info .announcement-banner__cta:hover {\n\t\t\tbackground: rgba(32, 160, 224, 0.28);\n\t\t}\n\n\t\t.announcement-banner--warning .announcement-banner__cta {\n\t\t\tbackground: rgba(240, 176, 48, 0.25);\n\t\t\tcolor: #7A4E00;\n\t\t}\n\t\t.announcement-banner--warning .announcement-banner__cta:hover {\n\t\t\tbackground: rgba(240, 176, 48, 0.35);\n\t\t}\n\n\t\t.announcement-banner--critical .announcement-banner__cta {\n\t\t\tbackground: rgba(240, 96, 96, 0.22);\n\t\t\tcolor: #7F1D1D;\n\t\t}\n\t\t.announcement-banner--critical .announcement-banner__cta:hover {\n\t\t\tbackground: rgba(240, 96, 96, 0.32);\n\t\t}\n\n\t\t.announcement-banner--info {\n\t\t\tbackground: var(--color-info-bg);\n\t\t\tborder-color: var(--color-info);\n\t\t\tcolor: #0C4A6E;\n\t\t}\n\t\t.announcement-banner--info .announcement-banner__icon {\n\t\t\tbackground: rgba(32, 160, 224, 0.15);\n\t\t\tcolor: var(--color-info);\n\t\t}\n\n\t\t.announcement-banner--warning {\n\t\t\tbackground: var(--color-warning-bg);\n\t\t\tborder-color: var(--color-warning);\n\t\t\tcolor: #7A4E00;\n\t\t}\n\t\t.announcement-banner--warning .announcement-banner__icon {\n\t\t\tbackground: rgba(240, 176, 48, 0.2);\n\t\t\tcolor: #B45309;\n\t\t}\n\n\t\t.announcement-banner--critical {\n\t\t\tbackground: var(--color-error-bg);\n\t\t\tborder-color: var(--color-tertiary);\n\t\t\tcolor: #7F1D1D;\n\t\t}\n\t\t.announcement-banner--critical .announcement-banner__icon {\n\t\t\tbackground: rgba(240, 96, 96, 0.18);\n\t\t\tcolor: var(--color-destructive);\n\t\t}\n\n\t\t@media (max-width: 768px) {\n\t\t\t.announcement-banner {\n\t\t\t\tgrid-template-columns: 32px 1fr 32px;\n\t\t\t\tcolumn-gap: var(--space-2);\n\t\t\t\tpadding: var(--space-3);\n\t\t\t}\n\n\t\t\t.announcement-banner__icon {\n\t\t\t\twidth: 32px;\n\t\t\t\theight: 32px;\n\t\t\t}\n\n\t\t\t.announcement-banner__icon svg {\n\t\t\t\twidth: 18px;\n\t\t\t\theight: 18px;\n\t\t\t}\n\n\t\t\t.announcement-banner__title {\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t\tmargin-bottom: 0;\n\t\t\t}\n\n\t\t\t.announcement-banner__description {\n\t\t\t\tfont-size: 0.75rem;\n\t\t\t}\n\n\t\t\t.announcement-banner__cta {\n\t\t\t\tfont-size: 0.75rem;\n\t\t\t\tpadding: 5px 12px;\n\t\t\t}\n\t\t}\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 139, "<style>\n\t\t/* Announcement banners (global display) */\n\t\t.announcement-banners {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tgap: var(--space-2);\n\t\t\tmargin-bottom: var(--space-4);\n\t\t}\n\n\t\t.home-container .announcement-banners {\n\t\t\tmargin-top: var(--space-4);\n\t\t\tmargin-bottom: 0;\n\t\t}\n\n\t\t.header-section .announcement-banners {\n\t\t\tmargin-top: 0;\n\t\t\tmargin-bottom: 0;\n\t\t}\n\n\t\t.announcement-banner {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: 36px 1fr 36px;\n\t\t\talign-items: start;\n\t\t\tcolumn-gap: var(--space-3);\n\t\t\tpadding: var(--space-3) var(--space-4);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tborder: 1px solid transparent;\n\t\t\tborder-left-width: 4px;\n\t\t\tline-height: 1.5;\n\t\t}\n\n\t\t.announcement-banner__icon {\n\t\t\tgrid-column: 1;\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\twidth: 36px;\n\t\t\theight: 36px;\n\t\t\tborder-radius: var(--radius-full);\n\t\t}\n\n\t\t.announcement-banner__content {\n\t\t\tgrid-column: 2;\n\t\t\ttext-align: center;\n\t\t}\n\n\t\t.announcement-banner__title {\n\t\t\tfont-weight: 600;\n\t\t\tfont-size: 0.9375rem;\n\t\t\tmargin-bottom: 2px;\n\t\t}\n\n\t\t.announcement-banner__description {\n\t\t\tfont-size: 0.875rem;\n\t\t\topacity: 0.92;\n\t\t}\n\n\t\t.announcement-banner__cta {\n\t\t\tdisplay: inline-block;\n\t\t\tmargin-top: var(--space-2);\n\t\t\tpadding: 6px 14px;\n\t\t\tborder-radius: var(--radius-full);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tfont-weight: 600;\n\t\t\ttext-decoration: none;\n\t\t\ttransition: background var(--transition-fast), color var(--transition-fast);\n\t\t}\n\n\t\t.announcement-banner--info .announcement-banner__cta {\n\t\t\tbackground: rgba(32, 160, 224, 0.18);\n\t\t\tcolor: #0C4A6E;\n\t\t}\n\t\t.announcement-banner--info .announcement-banner__cta:hover {\n\t\t\tbackground: rgba(32, 160, 224, 0.28);\n\t\t}\n\n\t\t.announcement-banner--warning .announcement-banner__cta {\n\t\t\tbackground: rgba(240, 176, 48, 0.25);\n\t\t\tcolor: #7A4E00;\n\t\t}\n\t\t.announcement-banner--warning .announcement-banner__cta:hover {\n\t\t\tbackground: rgba(240, 176, 48, 0.35);\n\t\t}\n\n\t\t.announcement-banner--critical .announcement-banner__cta {\n\t\t\tbackground: rgba(240, 96, 96, 0.22);\n\t\t\tcolor: #7F1D1D;\n\t\t}\n\t\t.announcement-banner--critical .announcement-banner__cta:hover {\n\t\t\tbackground: rgba(240, 96, 96, 0.32);\n\t\t}\n\n\t\t.announcement-banner--info {\n\t\t\tbackground: var(--color-info-bg);\n\t\t\tborder-color: var(--color-info);\n\t\t\tcolor: #0C4A6E;\n\t\t}\n\t\t.announcement-banner--info .announcement-banner__icon {\n\t\t\tbackground: rgba(32, 160, 224, 0.15);\n\t\t\tcolor: var(--color-info);\n\t\t}\n\n\t\t.announcement-banner--warning {\n\t\t\tbackground: var(--color-warning-bg);\n\t\t\tborder-color: var(--color-warning);\n\t\t\tcolor: #7A4E00;\n\t\t}\n\t\t.announcement-banner--warning .announcement-banner__icon {\n\t\t\tbackground: rgba(240, 176, 48, 0.2);\n\t\t\tcolor: #B45309;\n\t\t}\n\n\t\t.announcement-banner--critical {\n\t\t\tbackground: var(--color-error-bg);\n\t\t\tborder-color: var(--color-tertiary);\n\t\t\tcolor: #7F1D1D;\n\t\t}\n\t\t.announcement-banner--critical .announcement-banner__icon {\n\t\t\tbackground: rgba(240, 96, 96, 0.18);\n\t\t\tcolor: var(--color-destructive);\n\t\t}\n\n\t\t@media (max-width: 768px) {\n\t\t\t.announcement-banner {\n\t\t\t\tgrid-template-columns: 32px 1fr 32px;\n\t\t\t\tcolumn-gap: var(--space-2);\n\t\t\t\tpadding: var(--space-3);\n\t\t\t}\n\n\t\t\t.announcement-banner__icon {\n\t\t\t\twidth: 32px;\n\t\t\t\theight: 32px;\n\t\t\t}\n\n\t\t\t.announcement-banner__icon svg {\n\t\t\t\twidth: 18px;\n\t\t\t\theight: 18px;\n\t\t\t}\n\n\t\t\t.announcement-banner__title {\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t\tmargin-bottom: 0;\n\t\t\t}\n\n\t\t\t.announcement-banner__description {\n\t\t\t\tfont-size: 0.75rem;\n\t\t\t}\n\n\t\t\t.announcement-banner__cta {\n\t\t\t\tfont-size: 0.75rem;\n\t\t\t\tpadding: 5px 12px;\n\t\t\t}\n\t\t}\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1265,12 +1683,12 @@ func AnnouncementPageStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var50 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var50 == nil {
-			templ_7745c5c3_Var50 = templ.NopComponent
+		templ_7745c5c3_Var68 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var68 == nil {
+			templ_7745c5c3_Var68 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 96, "<style>\n\t\t.announcement-list-title {\n\t\t\tfont-weight: 500;\n\t\t}\n\n\t\t.announcement-schedule {\n\t\t\tfont-family: 'Fira Code', monospace;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tdisplay: block;\n\t\t}\n\n\t\t.announcement-schedule + .status-pill {\n\t\t\tmargin-top: var(--space-1);\n\t\t}\n\n\t\t.announcement-deleted {\n\t\t\topacity: 0.55;\n\t\t}\n\n\t\t.announcement-deleted .announcement-list-title {\n\t\t\ttext-decoration: line-through;\n\t\t}\n\n\t\t.announcement-empty {\n\t\t\ttext-align: center;\n\t\t\tpadding: var(--space-10) var(--space-4);\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\t\t.announcement-empty p {\n\t\t\tmargin-bottom: var(--space-4);\n\t\t}\n\n\t\t/* Form layout */\n\t\t.announcement-form-layout {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: 1fr 340px;\n\t\t\tgap: var(--space-6);\n\t\t\talign-items: start;\n\t\t}\n\n\t\t.announcement-form-section {\n\t\t\tmargin-bottom: var(--space-6);\n\t\t\tpadding-bottom: var(--space-5);\n\t\t\tborder-bottom: 1px solid var(--color-border-subtle);\n\t\t}\n\t\t.announcement-form-section:last-of-type {\n\t\t\tborder-bottom: none;\n\t\t}\n\n\t\t.announcement-form-section-title {\n\t\t\tfont-size: 1rem;\n\t\t\tmargin-bottom: var(--space-3);\n\t\t}\n\n\t\t.field-hint {\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tmargin-top: var(--space-2);\n\t\t}\n\n\t\ttextarea {\n\t\t\twidth: 100%;\n\t\t\tpadding: var(--space-3);\n\t\t\tborder: 1px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tfont-family: inherit;\n\t\t\tfont-size: 0.9375rem;\n\t\t\tresize: vertical;\n\t\t\tmin-height: 100px;\n\t\t\ttransition: border-color var(--transition-fast), box-shadow var(--transition-fast);\n\t\t}\n\t\ttextarea:focus {\n\t\t\toutline: none;\n\t\t\tborder-color: var(--color-ring);\n\t\t\tbox-shadow: 0 0 0 3px rgba(144, 192, 32, 0.2);\n\t\t}\n\n\t\t/* Level picker cards */\n\t\t.announcement-level-picker {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: repeat(3, 1fr);\n\t\t\tgap: var(--space-3);\n\t\t}\n\n\t\t.announcement-level-option {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tpadding: var(--space-4);\n\t\t\tborder: 2px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tcursor: pointer;\n\t\t\ttransition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);\n\t\t\ttext-align: center;\n\t\t}\n\t\t.announcement-level-option:hover {\n\t\t\tborder-color: var(--color-border);\n\t\t\tbackground: var(--color-muted);\n\t\t}\n\t\t.announcement-level-option input {\n\t\t\tposition: absolute;\n\t\t\topacity: 0;\n\t\t\tpointer-events: none;\n\t\t}\n\t\t.announcement-level-option:has(input:checked) {\n\t\t\tbox-shadow: var(--shadow-sm);\n\t\t}\n\t\t.announcement-level-option--info:has(input:checked) {\n\t\t\tborder-color: var(--color-info);\n\t\t\tbackground: var(--color-info-bg);\n\t\t}\n\t\t.announcement-level-option--warning:has(input:checked) {\n\t\t\tborder-color: var(--color-warning);\n\t\t\tbackground: var(--color-warning-bg);\n\t\t}\n\t\t.announcement-level-option--critical:has(input:checked) {\n\t\t\tborder-color: var(--color-tertiary);\n\t\t\tbackground: var(--color-error-bg);\n\t\t}\n\n\t\t.announcement-level-option__icon {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\twidth: 40px;\n\t\t\theight: 40px;\n\t\t\tborder-radius: var(--radius-full);\n\t\t\tbackground: var(--color-surface);\n\t\t}\n\t\t.announcement-level-option__label {\n\t\t\tdisplay: block;\n\t\t\tfont-weight: 600;\n\t\t\tfont-size: 0.875rem;\n\t\t}\n\t\t.announcement-level-option__desc {\n\t\t\tdisplay: block;\n\t\t\tfont-size: 0.75rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tline-height: 1.4;\n\t\t}\n\n\t\t/* Visibility cards */\n\t\t.announcement-visibility-options {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: 1fr 1fr;\n\t\t\tgap: var(--space-3);\n\t\t\tmargin-bottom: var(--space-3);\n\t\t}\n\n\t\t.announcement-visibility-card {\n\t\t\tdisplay: flex;\n\t\t\talign-items: flex-start;\n\t\t\tgap: var(--space-3);\n\t\t\tpadding: var(--space-4);\n\t\t\tborder: 2px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tcursor: pointer;\n\t\t\ttransition: border-color var(--transition-fast), background var(--transition-fast);\n\t\t}\n\t\t.announcement-visibility-card:hover {\n\t\t\tbackground: var(--color-muted);\n\t\t}\n\t\t.announcement-visibility-card:has(input:checked) {\n\t\t\tborder-color: var(--color-primary);\n\t\t\tbackground: var(--color-primary-light);\n\t\t}\n\t\t.announcement-visibility-card input {\n\t\t\tmargin-top: 4px;\n\t\t\taccent-color: var(--color-primary);\n\t\t}\n\t\t.announcement-visibility-card__title {\n\t\t\tdisplay: block;\n\t\t\tfont-weight: 600;\n\t\t\tfont-size: 0.9375rem;\n\t\t}\n\t\t.announcement-visibility-card__desc {\n\t\t\tdisplay: block;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tmargin-top: 2px;\n\t\t}\n\n\t\t/* Teacher select panel */\n\t\t.announcement-teacher-panel {\n\t\t\tborder: 1px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tbackground: var(--color-muted);\n\t\t\tpadding: var(--space-3);\n\t\t}\n\t\t.announcement-teacher-panel[hidden] {\n\t\t\tdisplay: none;\n\t\t}\n\n\t\t.announcement-teacher-panel__toolbar {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: space-between;\n\t\t\tmargin-bottom: var(--space-3);\n\t\t\tpadding-bottom: var(--space-2);\n\t\t\tborder-bottom: 1px solid var(--color-border);\n\t\t}\n\t\t.announcement-teacher-panel__label {\n\t\t\tfont-weight: 600;\n\t\t\tfont-size: 0.875rem;\n\t\t}\n\n\t\t.announcement-select-all {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tfont-size: 0.875rem;\n\t\t\tcursor: pointer;\n\t\t\tuser-select: none;\n\t\t}\n\t\t.announcement-select-all input {\n\t\t\taccent-color: var(--color-primary);\n\t\t}\n\n\t\t.announcement-teacher-list {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: repeat(auto-fill, minmax(200px, 1fr));\n\t\t\tgap: var(--space-2);\n\t\t\tmax-height: 240px;\n\t\t\toverflow-y: auto;\n\t\t}\n\n\t\t.announcement-teacher-item {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tpadding: var(--space-2) var(--space-3);\n\t\t\tbackground: var(--color-surface);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tborder-radius: var(--radius-sm);\n\t\t\tfont-size: 0.875rem;\n\t\t\tcursor: pointer;\n\t\t\ttransition: border-color var(--transition-fast);\n\t\t}\n\t\t.announcement-teacher-item:hover {\n\t\t\tborder-color: var(--color-border);\n\t\t}\n\t\t.announcement-teacher-item:has(input:checked) {\n\t\t\tborder-color: var(--color-primary);\n\t\t\tbackground: var(--color-primary-light);\n\t\t}\n\t\t.announcement-teacher-item input {\n\t\t\taccent-color: var(--color-primary);\n\t\t}\n\n\t\t/* Preview panel */\n\t\t.announcement-preview-panel {\n\t\t\tposition: sticky;\n\t\t\ttop: var(--space-5);\n\t\t\tpadding: var(--space-4);\n\t\t\tbackground: var(--color-muted);\n\t\t\tborder: 1px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-lg);\n\t\t}\n\t\t.announcement-preview-stack .announcement-banners {\n\t\t\tmargin-bottom: 0;\n\t\t}\n\n\t\t.announcement-form-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-3);\n\t\t\tpadding-top: var(--space-2);\n\t\t}\n\t\t.announcement-form-actions button,\n\t\t.announcement-form-actions .add-btn {\n\t\t\tmargin-top: 0;\n\t\t\tpadding: 10px 20px;\n\t\t\tfont-size: 14px;\n\t\t\tfont-weight: 500;\n\t\t\tline-height: 1.25;\n\t\t\tbox-sizing: border-box;\n\t\t}\n\t\t.announcement-submit-btn {\n\t\t\tmin-width: 180px;\n\t\t}\n\n\t\t.add-btn-secondary {\n\t\t\tbackground: var(--color-surface);\n\t\t\tcolor: var(--color-foreground);\n\t\t\tborder: 1px solid var(--color-border);\n\t\t}\n\t\t.add-btn-secondary:hover {\n\t\t\tbackground: var(--color-muted);\n\t\t\tcolor: var(--color-foreground);\n\t\t}\n\n\t\t@media (max-width: 900px) {\n\t\t\t.announcement-form-layout {\n\t\t\t\tgrid-template-columns: 1fr;\n\t\t\t}\n\t\t\t.announcement-preview-panel {\n\t\t\t\tposition: static;\n\t\t\t\torder: -1;\n\t\t\t}\n\t\t\t.announcement-level-picker {\n\t\t\t\tgrid-template-columns: 1fr;\n\t\t\t}\n\t\t\t.announcement-visibility-options {\n\t\t\t\tgrid-template-columns: 1fr;\n\t\t\t}\n\t\t}\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 140, "<style>\n\t\t.announcement-list-title {\n\t\t\tfont-weight: 500;\n\t\t}\n\n\t\t.announcement-list-type-detail {\n\t\t\tdisplay: block;\n\t\t\tfont-size: 0.75rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tmargin-top: var(--space-1);\n\t\t}\n\n\t\t.announcement-modal-options,\n\t\t.announcement-repeat-options {\n\t\t\tmargin-top: var(--space-4);\n\t\t}\n\n\t\t.announcement-repeat-toggle {\n\t\t\tmargin-top: var(--space-4);\n\t\t}\n\n\t\t.announcement-modal-dialog--info .modal-header {\n\t\t\tbackground: linear-gradient(180deg, var(--color-primary-light) 0%, var(--color-surface) 100%);\n\t\t}\n\n\t\t.announcement-modal-dialog--warning .modal-header {\n\t\t\tbackground: var(--color-warning-bg);\n\t\t}\n\n\t\t.announcement-modal-dialog--critical .modal-header {\n\t\t\tbackground: rgba(220, 38, 38, 0.08);\n\t\t}\n\n\t\t.announcement-modal-title {\n\t\t\tfont-size: 1.125rem;\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.announcement-modal-description {\n\t\t\tmargin: 0;\n\t\t\tline-height: 1.5;\n\t\t}\n\n\t\t.announcement-modal-cta-wrap {\n\t\t\tmargin: var(--space-4) 0 0;\n\t\t}\n\n\t\t.announcement-modal-preview {\n\t\t\tposition: relative;\n\t\t\tbox-shadow: var(--shadow-lg);\n\t\t}\n\n\t\t.announcement-modal-preview .modal-footer button {\n\t\t\tmargin-top: 0;\n\t\t}\n\n\t\t#announcementModalOverlay .modal-footer .btn {\n\t\t\tmargin-top: 0;\n\t\t}\n\n\t\t.announcement-schedule {\n\t\t\tfont-family: 'Fira Code', monospace;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tdisplay: block;\n\t\t}\n\n\t\t.announcement-schedule + .status-pill {\n\t\t\tmargin-top: var(--space-1);\n\t\t}\n\n\t\t.announcement-deleted {\n\t\t\topacity: 0.55;\n\t\t}\n\n\t\t.announcement-deleted .announcement-list-title {\n\t\t\ttext-decoration: line-through;\n\t\t}\n\n\t\t.announcement-empty {\n\t\t\ttext-align: center;\n\t\t\tpadding: var(--space-10) var(--space-4);\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\t\t.announcement-empty p {\n\t\t\tmargin-bottom: var(--space-4);\n\t\t}\n\n\t\t/* Form layout */\n\t\t.announcement-form-layout {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: 1fr 340px;\n\t\t\tgap: var(--space-6);\n\t\t\talign-items: start;\n\t\t}\n\n\t\t.announcement-form-section {\n\t\t\tmargin-bottom: var(--space-6);\n\t\t\tpadding-bottom: var(--space-5);\n\t\t\tborder-bottom: 1px solid var(--color-border-subtle);\n\t\t}\n\t\t.announcement-form-section:last-of-type {\n\t\t\tborder-bottom: none;\n\t\t}\n\n\t\t.announcement-form-section-title {\n\t\t\tfont-size: 1rem;\n\t\t\tmargin-bottom: var(--space-3);\n\t\t}\n\n\t\t.field-hint {\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tmargin-top: var(--space-2);\n\t\t}\n\n\t\ttextarea {\n\t\t\twidth: 100%;\n\t\t\tpadding: var(--space-3);\n\t\t\tborder: 1px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tfont-family: inherit;\n\t\t\tfont-size: 0.9375rem;\n\t\t\tresize: vertical;\n\t\t\tmin-height: 100px;\n\t\t\ttransition: border-color var(--transition-fast), box-shadow var(--transition-fast);\n\t\t}\n\t\ttextarea:focus {\n\t\t\toutline: none;\n\t\t\tborder-color: var(--color-ring);\n\t\t\tbox-shadow: 0 0 0 3px rgba(144, 192, 32, 0.2);\n\t\t}\n\n\t\t/* Level picker cards */\n\t\t.announcement-level-picker {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: repeat(3, 1fr);\n\t\t\tgap: var(--space-3);\n\t\t}\n\n\t\t.announcement-level-option {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tpadding: var(--space-4);\n\t\t\tborder: 2px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tcursor: pointer;\n\t\t\ttransition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);\n\t\t\ttext-align: center;\n\t\t}\n\t\t.announcement-level-option:hover {\n\t\t\tborder-color: var(--color-border);\n\t\t\tbackground: var(--color-muted);\n\t\t}\n\t\t.announcement-level-option input {\n\t\t\tposition: absolute;\n\t\t\topacity: 0;\n\t\t\tpointer-events: none;\n\t\t}\n\t\t.announcement-level-option:has(input:checked) {\n\t\t\tbox-shadow: var(--shadow-sm);\n\t\t}\n\t\t.announcement-level-option--info:has(input:checked) {\n\t\t\tborder-color: var(--color-info);\n\t\t\tbackground: var(--color-info-bg);\n\t\t}\n\t\t.announcement-level-option--warning:has(input:checked) {\n\t\t\tborder-color: var(--color-warning);\n\t\t\tbackground: var(--color-warning-bg);\n\t\t}\n\t\t.announcement-level-option--critical:has(input:checked) {\n\t\t\tborder-color: var(--color-tertiary);\n\t\t\tbackground: var(--color-error-bg);\n\t\t}\n\n\t\t.announcement-level-option__icon {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\twidth: 40px;\n\t\t\theight: 40px;\n\t\t\tborder-radius: var(--radius-full);\n\t\t\tbackground: var(--color-surface);\n\t\t}\n\t\t.announcement-level-option__label {\n\t\t\tdisplay: block;\n\t\t\tfont-weight: 600;\n\t\t\tfont-size: 0.875rem;\n\t\t}\n\t\t.announcement-level-option__desc {\n\t\t\tdisplay: block;\n\t\t\tfont-size: 0.75rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tline-height: 1.4;\n\t\t}\n\n\t\t/* Visibility cards */\n\t\t.announcement-visibility-options {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: 1fr 1fr;\n\t\t\tgap: var(--space-3);\n\t\t\tmargin-bottom: var(--space-3);\n\t\t}\n\n\t\t.announcement-visibility-card {\n\t\t\tdisplay: flex;\n\t\t\talign-items: flex-start;\n\t\t\tgap: var(--space-3);\n\t\t\tpadding: var(--space-4);\n\t\t\tborder: 2px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tcursor: pointer;\n\t\t\ttransition: border-color var(--transition-fast), background var(--transition-fast);\n\t\t}\n\t\t.announcement-visibility-card:hover {\n\t\t\tbackground: var(--color-muted);\n\t\t}\n\t\t.announcement-visibility-card:has(input:checked) {\n\t\t\tborder-color: var(--color-primary);\n\t\t\tbackground: var(--color-primary-light);\n\t\t}\n\t\t.announcement-visibility-card input {\n\t\t\tmargin-top: 4px;\n\t\t\taccent-color: var(--color-primary);\n\t\t}\n\t\t.announcement-visibility-card__title {\n\t\t\tdisplay: block;\n\t\t\tfont-weight: 600;\n\t\t\tfont-size: 0.9375rem;\n\t\t}\n\t\t.announcement-visibility-card__desc {\n\t\t\tdisplay: block;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tmargin-top: 2px;\n\t\t}\n\n\t\t/* Teacher select panel */\n\t\t.announcement-teacher-panel {\n\t\t\tborder: 1px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tbackground: var(--color-muted);\n\t\t\tpadding: var(--space-3);\n\t\t}\n\t\t.announcement-teacher-panel[hidden] {\n\t\t\tdisplay: none;\n\t\t}\n\n\t\t.announcement-teacher-panel__toolbar {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: space-between;\n\t\t\tmargin-bottom: var(--space-3);\n\t\t\tpadding-bottom: var(--space-2);\n\t\t\tborder-bottom: 1px solid var(--color-border);\n\t\t}\n\t\t.announcement-teacher-panel__label {\n\t\t\tfont-weight: 600;\n\t\t\tfont-size: 0.875rem;\n\t\t}\n\n\t\t.announcement-select-all {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tfont-size: 0.875rem;\n\t\t\tcursor: pointer;\n\t\t\tuser-select: none;\n\t\t}\n\t\t.announcement-select-all input {\n\t\t\taccent-color: var(--color-primary);\n\t\t}\n\n\t\t.announcement-teacher-list {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: repeat(auto-fill, minmax(200px, 1fr));\n\t\t\tgap: var(--space-2);\n\t\t\tmax-height: 240px;\n\t\t\toverflow-y: auto;\n\t\t}\n\n\t\t.announcement-teacher-item {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tpadding: var(--space-2) var(--space-3);\n\t\t\tbackground: var(--color-surface);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tborder-radius: var(--radius-sm);\n\t\t\tfont-size: 0.875rem;\n\t\t\tcursor: pointer;\n\t\t\ttransition: border-color var(--transition-fast);\n\t\t}\n\t\t.announcement-teacher-item:hover {\n\t\t\tborder-color: var(--color-border);\n\t\t}\n\t\t.announcement-teacher-item:has(input:checked) {\n\t\t\tborder-color: var(--color-primary);\n\t\t\tbackground: var(--color-primary-light);\n\t\t}\n\t\t.announcement-teacher-item input {\n\t\t\taccent-color: var(--color-primary);\n\t\t}\n\n\t\t/* Preview panel */\n\t\t.announcement-preview-panel {\n\t\t\tposition: sticky;\n\t\t\ttop: var(--space-5);\n\t\t\tpadding: var(--space-4);\n\t\t\tbackground: var(--color-muted);\n\t\t\tborder: 1px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-lg);\n\t\t}\n\t\t.announcement-preview-stack .announcement-banners {\n\t\t\tmargin-bottom: 0;\n\t\t}\n\n\t\t.announcement-form-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-3);\n\t\t\tpadding-top: var(--space-2);\n\t\t}\n\t\t.announcement-form-actions button,\n\t\t.announcement-form-actions .add-btn {\n\t\t\tmargin-top: 0;\n\t\t\tpadding: 10px 20px;\n\t\t\tfont-size: 14px;\n\t\t\tfont-weight: 500;\n\t\t\tline-height: 1.25;\n\t\t\tbox-sizing: border-box;\n\t\t}\n\t\t.announcement-submit-btn {\n\t\t\tmin-width: 180px;\n\t\t}\n\n\t\t.add-btn-secondary {\n\t\t\tbackground: var(--color-surface);\n\t\t\tcolor: var(--color-foreground);\n\t\t\tborder: 1px solid var(--color-border);\n\t\t}\n\t\t.add-btn-secondary:hover {\n\t\t\tbackground: var(--color-muted);\n\t\t\tcolor: var(--color-foreground);\n\t\t}\n\n\t\t@media (max-width: 900px) {\n\t\t\t.announcement-form-layout {\n\t\t\t\tgrid-template-columns: 1fr;\n\t\t\t}\n\t\t\t.announcement-preview-panel {\n\t\t\t\tposition: static;\n\t\t\t\torder: -1;\n\t\t\t}\n\t\t\t.announcement-level-picker {\n\t\t\t\tgrid-template-columns: 1fr;\n\t\t\t}\n\t\t\t.announcement-visibility-options {\n\t\t\t\tgrid-template-columns: 1fr;\n\t\t\t}\n\t\t}\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

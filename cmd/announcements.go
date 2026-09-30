@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"zion-english/frontend"
 	"zion-english/internal/announcements"
 	"zion-english/internal/auth"
@@ -67,6 +68,8 @@ func handleAnnouncements(w http.ResponseWriter, r *http.Request) {
 			ID:                strconv.FormatInt(row.ID, 10),
 			Title:             row.Title,
 			Level:             row.Level,
+			DisplayType:       announcementDisplayTypeLabel(row.DisplayType),
+			DisplayDetail:     announcementDisplayDetail(row),
 			StartDate:         row.StartDate,
 			EndDate:           row.EndDate,
 			Audience:          audience,
@@ -128,12 +131,18 @@ func handleAnnouncementCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req := parseAnnouncementRequest(r)
+	req, parseErr := parseAnnouncementRequest(r)
+	if parseErr != nil {
+		setErrorFlash(w, parseErr.Error())
+		HttpRedirect(w, r, "/announcements/register")
+		return
+	}
 	if err := announcements.ValidateRequest(req, false); err != nil {
 		setErrorFlash(w, err.Error())
 		HttpRedirect(w, r, "/announcements/register")
 		return
 	}
+	dbFields := announcements.DBFieldsFromRequest(req)
 
 	visibleToAll := int64(1)
 	if !req.VisibleToAll {
@@ -141,15 +150,20 @@ func handleAnnouncementCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id, err := dbRW.GetQueries().InsertAnnouncement(ctx, queries.InsertAnnouncementParams{
-		Title:        req.Title,
-		Description:  req.Description,
-		Level:        req.Level,
-		StartDate:    req.StartDate,
-		EndDate:      req.EndDate,
-		VisibleToAll: visibleToAll,
-		CtaLabel:     req.CTALabel,
-		CtaUrl:       req.CTAURL,
-		Status:       req.Status,
+		Title:            req.Title,
+		Description:      req.Description,
+		Level:            req.Level,
+		StartDate:        req.StartDate,
+		EndDate:          req.EndDate,
+		VisibleToAll:     visibleToAll,
+		CtaLabel:         req.CTALabel,
+		CtaUrl:           req.CTAURL,
+		Status:           req.Status,
+		DisplayType:      dbFields.DisplayType,
+		ModalFrequency:   dbFields.ModalFrequency,
+		RepeatEnabled:    dbFields.RepeatEnabled,
+		RepeatSchedule:   dbFields.RepeatSchedule,
+		CutoffRepeatDays: dbFields.CutoffRepeatDays,
 	})
 	if err != nil {
 		setErrorFlash(w, fmt.Sprintf("Failed to create announcement: %v", err))
@@ -211,21 +225,7 @@ func handleAnnouncementEdit(w http.ResponseWriter, r *http.Request, announcement
 			formStatus = announcements.StatusDraft
 		}
 
-		renderAnnouncementForm(w, r, frontend.AnnouncementFormData{
-			ID:          strconv.FormatInt(announcementID, 10),
-			Title:       row.Title,
-			Description: row.Description,
-			Level:       row.Level,
-			StartDate:   row.StartDate,
-			EndDate:     row.EndDate,
-			VisibleTo:   visibleTo,
-			Teachers:    teachers,
-			Today:       utils.TodayPHT(),
-			IsEdit:      true,
-			CTALabel:    row.CtaLabel,
-			CTAURL:      row.CtaUrl,
-			Status:      formStatus,
-		})
+		renderAnnouncementForm(w, r, announcementFormDataFromRow(row, visibleTo, teachers, formStatus, announcementID))
 	case http.MethodPost:
 		handleAnnouncementUpdate(w, r, announcementID)
 	default:
@@ -255,13 +255,19 @@ func handleAnnouncementUpdate(w http.ResponseWriter, r *http.Request, announceme
 		return
 	}
 
-	req := parseAnnouncementRequest(r)
+	req, parseErr := parseAnnouncementRequest(r)
+	if parseErr != nil {
+		setErrorFlash(w, parseErr.Error())
+		HttpRedirect(w, r, editPath)
+		return
+	}
 	req.OriginalStart = existing.StartDate
 	if err := announcements.ValidateRequest(req, true); err != nil {
 		setErrorFlash(w, err.Error())
 		HttpRedirect(w, r, editPath)
 		return
 	}
+	dbFields := announcements.DBFieldsFromRequest(req)
 
 	visibleToAll := int64(1)
 	if !req.VisibleToAll {
@@ -269,16 +275,21 @@ func handleAnnouncementUpdate(w http.ResponseWriter, r *http.Request, announceme
 	}
 
 	if err := dbRW.GetQueries().UpdateAnnouncement(ctx, queries.UpdateAnnouncementParams{
-		Title:        req.Title,
-		Description:  req.Description,
-		Level:        req.Level,
-		StartDate:    req.StartDate,
-		EndDate:      req.EndDate,
-		VisibleToAll: visibleToAll,
-		CtaLabel:     req.CTALabel,
-		CtaUrl:       req.CTAURL,
-		Status:       req.Status,
-		ID:           announcementID,
+		Title:            req.Title,
+		Description:      req.Description,
+		Level:            req.Level,
+		StartDate:        req.StartDate,
+		EndDate:          req.EndDate,
+		VisibleToAll:     visibleToAll,
+		CtaLabel:         req.CTALabel,
+		CtaUrl:           req.CTAURL,
+		Status:           req.Status,
+		DisplayType:      dbFields.DisplayType,
+		ModalFrequency:   dbFields.ModalFrequency,
+		RepeatEnabled:    dbFields.RepeatEnabled,
+		RepeatSchedule:   dbFields.RepeatSchedule,
+		CutoffRepeatDays: dbFields.CutoffRepeatDays,
+		ID:               announcementID,
 	}); err != nil {
 		setErrorFlash(w, fmt.Sprintf("Failed to update announcement: %v", err))
 		HttpRedirect(w, r, editPath)
@@ -330,7 +341,7 @@ func handleAnnouncementDelete(w http.ResponseWriter, r *http.Request, announceme
 	HttpRedirect(w, r, "/announcements")
 }
 
-func parseAnnouncementRequest(r *http.Request) announcements.Request {
+func parseAnnouncementRequest(r *http.Request) (announcements.Request, error) {
 	visibleToAll := r.FormValue("visible_to") != "selected"
 	var teacherIDs []int64
 	if !visibleToAll {
@@ -340,18 +351,103 @@ func parseAnnouncementRequest(r *http.Request) announcements.Request {
 	if status == "" {
 		status = announcements.StatusDraft
 	}
-	return announcements.Request{
-		Title:        r.FormValue("title"),
-		Description:  r.FormValue("description"),
-		Level:        r.FormValue("level"),
-		StartDate:    r.FormValue("start_date"),
-		EndDate:      r.FormValue("end_date"),
-		VisibleToAll: visibleToAll,
-		TeacherIDs:   teacherIDs,
-		CTALabel:     r.FormValue("cta_label"),
-		CTAURL:       r.FormValue("cta_url"),
-		Status:       status,
+	displayType := strings.TrimSpace(r.FormValue("display_type"))
+	if displayType == "" {
+		displayType = string(announcements.DisplayTypeBanner)
 	}
+	cutoffDays, err := announcements.ParseCutoffRepeatDaysFromForm(r.FormValue("cutoff_repeat_days"))
+	if err != nil {
+		return announcements.Request{}, err
+	}
+	return announcements.Request{
+		Title:            r.FormValue("title"),
+		Description:      r.FormValue("description"),
+		Level:            r.FormValue("level"),
+		StartDate:        r.FormValue("start_date"),
+		EndDate:          r.FormValue("end_date"),
+		VisibleToAll:     visibleToAll,
+		TeacherIDs:       teacherIDs,
+		CTALabel:         r.FormValue("cta_label"),
+		CTAURL:           r.FormValue("cta_url"),
+		Status:           status,
+		DisplayType:      displayType,
+		ModalFrequency:   r.FormValue("modal_frequency"),
+		RepeatEnabled:    r.FormValue("repeat_enabled") == "1",
+		RepeatSchedule:   r.FormValue("repeat_schedule"),
+		CutoffRepeatDays: cutoffDays,
+	}, nil
+}
+
+func announcementFormDataFromRow(
+	row queries.GetAnnouncementByIDRow,
+	visibleTo string,
+	teachers []frontend.AnnouncementTeacherOption,
+	formStatus string,
+	announcementID int64,
+) frontend.AnnouncementFormData {
+	displayType := row.DisplayType
+	if displayType == "" {
+		displayType = string(announcements.DisplayTypeBanner)
+	}
+	modalFreq := ""
+	if row.ModalFrequency.Valid {
+		modalFreq = row.ModalFrequency.String
+	}
+	repeatSchedule := ""
+	if row.RepeatSchedule.Valid {
+		repeatSchedule = row.RepeatSchedule.String
+	}
+	cutoffDays := ""
+	if row.CutoffRepeatDays.Valid {
+		cutoffDays = strconv.FormatInt(row.CutoffRepeatDays.Int64, 10)
+	}
+	return frontend.AnnouncementFormData{
+		ID:               strconv.FormatInt(announcementID, 10),
+		Title:            row.Title,
+		Description:      row.Description,
+		Level:            row.Level,
+		StartDate:        row.StartDate,
+		EndDate:          row.EndDate,
+		VisibleTo:        visibleTo,
+		Teachers:         teachers,
+		Today:            utils.TodayPHT(),
+		IsEdit:           true,
+		CTALabel:         row.CtaLabel,
+		CTAURL:           row.CtaUrl,
+		Status:           formStatus,
+		DisplayType:      displayType,
+		ModalFrequency:   modalFreq,
+		RepeatEnabled:    row.RepeatEnabled != 0,
+		RepeatSchedule:   repeatSchedule,
+		CutoffRepeatDays: cutoffDays,
+	}
+}
+
+func announcementDisplayTypeLabel(displayType string) string {
+	if announcements.DisplayType(displayType) == announcements.DisplayTypeModal {
+		return "Modal"
+	}
+	return "Banner"
+}
+
+func announcementDisplayDetail(row queries.GetAnnouncementsPagedRow) string {
+	if announcements.DisplayType(row.DisplayType) != announcements.DisplayTypeModal {
+		return ""
+	}
+	freq := "Per session"
+	if row.ModalFrequency.Valid && announcements.ModalFrequency(row.ModalFrequency.String) == announcements.ModalFrequencyPerPage {
+		freq = "Per page"
+	}
+	if row.RepeatEnabled == 0 {
+		return freq
+	}
+	if row.RepeatSchedule.Valid && announcements.RepeatSchedule(row.RepeatSchedule.String) == announcements.RepeatScheduleCutoffBefore {
+		if row.CutoffRepeatDays.Valid {
+			return fmt.Sprintf("%s · %d d before cutoff", freq, row.CutoffRepeatDays.Int64)
+		}
+		return freq + " · Before cutoff"
+	}
+	return freq + " · Start/end dates"
 }
 
 func loadAnnouncementTeacherOptions(ctx context.Context, selected []string) ([]frontend.AnnouncementTeacherOption, error) {

@@ -1,6 +1,7 @@
 package frontend
 
 import (
+	"strconv"
 	"strings"
 	"zion-english/internal/announcements"
 	"zion-english/internal/utils"
@@ -10,6 +11,8 @@ type AnnouncementListItem struct {
 	ID                string
 	Title             string
 	Level             string
+	DisplayType       string
+	DisplayDetail     string
 	StartDate         string
 	EndDate           string
 	Audience          string
@@ -40,19 +43,31 @@ type AnnouncementTeacherOption struct {
 }
 
 type AnnouncementFormData struct {
-	ID          string
-	Title       string
-	Description string
-	Level       string
-	StartDate   string
-	EndDate     string
-	VisibleTo   string
-	Teachers    []AnnouncementTeacherOption
-	Today       string
-	IsEdit      bool
-	CTALabel    string
-	CTAURL      string
-	Status      string
+	ID               string
+	Title            string
+	Description      string
+	Level            string
+	StartDate        string
+	EndDate          string
+	VisibleTo        string
+	Teachers         []AnnouncementTeacherOption
+	Today            string
+	IsEdit           bool
+	CTALabel         string
+	CTAURL           string
+	Status           string
+	DisplayType      string
+	ModalFrequency   string
+	RepeatEnabled    bool
+	RepeatSchedule   string
+	CutoffRepeatDays string
+}
+
+func announcementFormDisplayType(data AnnouncementFormData) string {
+	if data.DisplayType == string(announcements.DisplayTypeModal) {
+		return string(announcements.DisplayTypeModal)
+	}
+	return string(announcements.DisplayTypeBanner)
 }
 
 func (d AnnouncementFormData) StartDateMin() string {
@@ -82,6 +97,50 @@ func getAnnouncementRowClass(isDeleted bool) string {
 		return "announcement-deleted"
 	}
 	return ""
+}
+
+templ AnnouncementModals() {
+	{{
+		items := announcements.GetModals(ctx)
+	}}
+	if len(items) > 0 {
+		<div id="announcementModalsRoot" hidden aria-hidden="true">
+			for _, item := range items {
+				<div
+					class="announcement-modal-item"
+					data-announcement-id={ strconv.FormatInt(item.ID, 10) }
+					data-frequency={ string(item.ModalFrequency) }
+					data-level={ item.Level }
+				>
+					<div class="announcement-modal-item__title">{ item.Title }</div>
+					<div class="announcement-modal-item__description">{ item.Description }</div>
+					if item.CTALabel != "" && item.CTAURL != "" {
+						<div
+							class="announcement-modal-item__cta-label"
+							data-cta-label={ item.CTALabel }
+							data-cta-url={ announcements.ResolveCTAURL(item.CTAURL) }
+						></div>
+					}
+				</div>
+			}
+		</div>
+		<div class="modal-overlay" id="announcementModalOverlay" hidden role="presentation">
+			<div class="modal-dialog announcement-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="announcementModalTitle">
+				<div class="modal-header">
+					<h3 id="announcementModalTitle" class="announcement-modal-title"></h3>
+					<button type="button" class="modal-close" id="announcementModalClose" aria-label="Close">&times;</button>
+				</div>
+				<div class="modal-body">
+					<p id="announcementModalDescription" class="announcement-modal-description"></p>
+					<p id="announcementModalCTA" class="announcement-modal-cta-wrap"></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" id="announcementModalDismiss">Close</button>
+				</div>
+			</div>
+		</div>
+		@ScrAnnouncementModals()
+	}
 }
 
 templ AnnouncementBanners() {
@@ -169,6 +228,7 @@ templ Announcements(data AnnouncementListData) {
 						<thead>
 							<tr>
 								<th>Title</th>
+								<th>Type</th>
 								<th>Level</th>
 								<th>Schedule</th>
 								<th>Audience</th>
@@ -181,6 +241,12 @@ templ Announcements(data AnnouncementListData) {
 								<tr class={ getAnnouncementRowClass(item.IsDeleted) }>
 									<td data-label="Title">
 										<span class="announcement-list-title">{ item.Title }</span>
+									</td>
+									<td data-label="Type">
+										<span>{ item.DisplayType }</span>
+										if item.DisplayDetail != "" {
+											<span class="announcement-list-type-detail">{ item.DisplayDetail }</span>
+										}
 									</td>
 									<td data-label="Level">
 										@Pill(announcementLevelPillLabel(item.Level), AnnouncementLevelPillTone(item.Level))
@@ -301,9 +367,127 @@ templ AnnouncementForm(data AnnouncementFormData) {
 						</div>
 					</section>
 
+					<section class="announcement-form-section" aria-labelledby="announcementDisplayHeading">
+						<h3 id="announcementDisplayHeading" class="announcement-form-section-title">Display</h3>
+						<p class="field-hint">Banners appear below the header. Modals open as a dialog when teachers load a page.</p>
+						<div class="announcement-visibility-options">
+							<label class="announcement-visibility-card">
+								<input
+									type="radio"
+									name="display_type"
+									value={ string(announcements.DisplayTypeBanner) }
+									checked?={ announcementFormDisplayType(data) == string(announcements.DisplayTypeBanner) }
+									data-display-type="banner"
+								/>
+								<span class="announcement-visibility-card__body">
+									<span class="announcement-visibility-card__title">Banner</span>
+									<span class="announcement-visibility-card__desc">Persistent strip across pages</span>
+								</span>
+							</label>
+							<label class="announcement-visibility-card">
+								<input
+									type="radio"
+									name="display_type"
+									value={ string(announcements.DisplayTypeModal) }
+									checked?={ announcementFormDisplayType(data) == string(announcements.DisplayTypeModal) }
+									data-display-type="modal"
+								/>
+								<span class="announcement-visibility-card__body">
+									<span class="announcement-visibility-card__title">Modal</span>
+									<span class="announcement-visibility-card__desc">Dialog with dismiss per session or page</span>
+								</span>
+							</label>
+						</div>
+						<div id="announcementModalOptions" class="announcement-modal-options" hidden?={ announcementFormDisplayType(data) != string(announcements.DisplayTypeModal) }>
+							<p class="field-hint">How often the modal may appear after a teacher dismisses it.</p>
+							<div class="announcement-visibility-options">
+								<label class="announcement-visibility-card">
+									<input
+										type="radio"
+										name="modal_frequency"
+										value={ string(announcements.ModalFrequencyPerSession) }
+										checked?={ data.ModalFrequency != string(announcements.ModalFrequencyPerPage) }
+									/>
+									<span class="announcement-visibility-card__body">
+										<span class="announcement-visibility-card__title">Per session</span>
+										<span class="announcement-visibility-card__desc">Once per browser session after dismiss</span>
+									</span>
+								</label>
+								<label class="announcement-visibility-card">
+									<input
+										type="radio"
+										name="modal_frequency"
+										value={ string(announcements.ModalFrequencyPerPage) }
+										checked?={ data.ModalFrequency == string(announcements.ModalFrequencyPerPage) }
+									/>
+									<span class="announcement-visibility-card__body">
+										<span class="announcement-visibility-card__title">Per page</span>
+										<span class="announcement-visibility-card__desc">Once per page path after dismiss</span>
+									</span>
+								</label>
+							</div>
+							<div class="form-group announcement-repeat-toggle">
+								<label class="announcement-select-all">
+									<input
+										type="checkbox"
+										name="repeat_enabled"
+										value="1"
+										checked?={ data.RepeatEnabled }
+										id="announcementRepeatEnabled"
+									/>
+									Repeat scheduling
+								</label>
+								<p class="field-hint">Optional. Limit when the modal is eligible beyond the campaign dates.</p>
+							</div>
+							<div id="announcementRepeatOptions" class="announcement-repeat-options" hidden?={ !data.RepeatEnabled }>
+								<div class="announcement-visibility-options">
+									<label class="announcement-visibility-card">
+										<input
+											type="radio"
+											name="repeat_schedule"
+											value={ string(announcements.RepeatScheduleStartEnd) }
+											checked?={ data.RepeatSchedule != string(announcements.RepeatScheduleCutoffBefore) }
+										/>
+										<span class="announcement-visibility-card__body">
+											<span class="announcement-visibility-card__title">Use start and end date</span>
+											<span class="announcement-visibility-card__desc">Visible any day within the schedule below</span>
+										</span>
+									</label>
+									<label class="announcement-visibility-card">
+										<input
+											type="radio"
+											name="repeat_schedule"
+											value={ string(announcements.RepeatScheduleCutoffBefore) }
+											checked?={ data.RepeatSchedule == string(announcements.RepeatScheduleCutoffBefore) }
+											data-repeat-cutoff="1"
+										/>
+										<span class="announcement-visibility-card__body">
+											<span class="announcement-visibility-card__title">On or before cutoff</span>
+											<span class="announcement-visibility-card__desc">Only on the last N days of the active payroll cutoff (PHT)</span>
+										</span>
+									</label>
+								</div>
+								<div id="announcementCutoffDaysGroup" class="form-group" hidden?={ data.RepeatSchedule != string(announcements.RepeatScheduleCutoffBefore) }>
+									<label for="cutoff_repeat_days">Days on or before cutoff end</label>
+									<input
+										type="number"
+										id="cutoff_repeat_days"
+										name="cutoff_repeat_days"
+										min="0"
+										max="10"
+										step="1"
+										value={ data.CutoffRepeatDays }
+										placeholder="0"
+									/>
+									<p class="field-hint">Example: 3 with cutoff end Sep 15 shows Sep 13, 14, and 15.</p>
+								</div>
+							</div>
+						</div>
+					</section>
+
 					<section class="announcement-form-section" aria-labelledby="announcementStatusHeading">
 						<h3 id="announcementStatusHeading" class="announcement-form-section-title">Status</h3>
-						<p class="field-hint">Draft announcements are saved but not shown in banners.</p>
+						<p class="field-hint">Draft announcements are saved but not shown to teachers.</p>
 						<div class="announcement-visibility-options">
 							<label class="announcement-visibility-card">
 								<input
@@ -414,7 +598,7 @@ templ AnnouncementForm(data AnnouncementFormData) {
 
 				<aside class="announcement-preview-panel" aria-labelledby="announcementPreviewHeading">
 					<h3 id="announcementPreviewHeading" class="announcement-form-section-title">Live preview</h3>
-					<p class="field-hint">How the banner will appear below the navbar.</p>
+					<p class="field-hint" id="announcementPreviewHint">How the banner will appear below the navbar.</p>
 					<div id="announcementPreview" class="announcement-preview-stack">
 						@AnnouncementBanner(
 							previewOrDefault(data.Title, "Announcement title"),
@@ -497,11 +681,132 @@ templ AnnouncementTeacherSelect(teachers []AnnouncementTeacherOption, showPanel 
 	</div>
 }
 
+templ ScrAnnouncementModals() {
+	<script>
+		(function () {
+			const root = document.getElementById('announcementModalsRoot');
+			const overlay = document.getElementById('announcementModalOverlay');
+			if (!root || !overlay) return;
+
+			const titleEl = document.getElementById('announcementModalTitle');
+			const descEl = document.getElementById('announcementModalDescription');
+			const ctaEl = document.getElementById('announcementModalCTA');
+			const closeBtn = document.getElementById('announcementModalClose');
+			const dismissBtn = document.getElementById('announcementModalDismiss');
+			const items = Array.from(root.querySelectorAll('.announcement-modal-item'));
+			const queue = [];
+			let currentId = null;
+			let currentFrequency = 'per_session';
+
+			function storageKey(id, frequency) {
+				if (frequency === 'per_page') {
+					return 'zion_ann_' + id + '_' + window.location.pathname;
+				}
+				return 'zion_ann_' + id;
+			}
+
+			function isDismissed(id, frequency) {
+				try {
+					return sessionStorage.getItem(storageKey(id, frequency)) === '1';
+				} catch (e) {
+					return false;
+				}
+			}
+
+			function markDismissed(id, frequency) {
+				try {
+					sessionStorage.setItem(storageKey(id, frequency), '1');
+				} catch (e) { /* ignore */ }
+			}
+
+			items.forEach(function (node) {
+				const id = node.getAttribute('data-announcement-id');
+				const frequency = node.getAttribute('data-frequency') || 'per_session';
+				if (!id || isDismissed(id, frequency)) return;
+				queue.push(node);
+			});
+
+			function hideOverlay() {
+				overlay.hidden = true;
+				overlay.setAttribute('aria-hidden', 'true');
+				document.body.classList.remove('modal-open');
+				currentId = null;
+			}
+
+			function showNext() {
+				if (queue.length === 0) {
+					hideOverlay();
+					return;
+				}
+				const node = queue.shift();
+				const id = node.getAttribute('data-announcement-id');
+				const frequency = node.getAttribute('data-frequency') || 'per_session';
+				const level = node.getAttribute('data-level') || 'info';
+				const titleNode = node.querySelector('.announcement-modal-item__title');
+				const descNode = node.querySelector('.announcement-modal-item__description');
+				const ctaWrap = node.querySelector('.announcement-modal-item__cta-label');
+				currentId = id;
+				currentFrequency = frequency;
+				if (titleEl) titleEl.textContent = titleNode ? titleNode.textContent : '';
+				if (descEl) descEl.textContent = descNode ? descNode.textContent : '';
+				const dialog = overlay.querySelector('.announcement-modal-dialog');
+				if (dialog) {
+					dialog.classList.remove('announcement-modal-dialog--info', 'announcement-modal-dialog--warning', 'announcement-modal-dialog--critical');
+					dialog.classList.add('announcement-modal-dialog--' + level);
+				}
+				if (ctaEl) {
+					ctaEl.innerHTML = '';
+					if (ctaWrap) {
+						const label = ctaWrap.getAttribute('data-cta-label');
+						const url = ctaWrap.getAttribute('data-cta-url');
+						if (label && url) {
+							const a = document.createElement('a');
+							a.className = 'btn announcement-modal-cta';
+							a.textContent = label;
+							a.href = url;
+							if (url.indexOf('http://') === 0 || url.indexOf('https://') === 0) {
+								a.target = '_blank';
+								a.rel = 'noopener noreferrer';
+							}
+							ctaEl.appendChild(a);
+						}
+					}
+				}
+				overlay.hidden = false;
+				overlay.removeAttribute('aria-hidden');
+				document.body.classList.add('modal-open');
+				if (dismissBtn) dismissBtn.focus();
+			}
+
+			function dismissCurrent() {
+				if (currentId) {
+					markDismissed(currentId, currentFrequency);
+				}
+				showNext();
+			}
+
+			if (closeBtn) closeBtn.addEventListener('click', dismissCurrent);
+			if (dismissBtn) dismissBtn.addEventListener('click', dismissCurrent);
+			overlay.addEventListener('click', function (e) {
+				if (e.target === overlay) dismissCurrent();
+			});
+			document.addEventListener('keydown', function (e) {
+				if (e.key === 'Escape' && !overlay.hidden) dismissCurrent();
+			});
+
+			if (queue.length > 0) {
+				showNext();
+			}
+		})();
+	</script>
+}
+
 templ AnnouncementFormScript() {
 	<script>
 		(function () {
 			const form = document.getElementById('announcementForm');
 			const preview = document.getElementById('announcementPreview');
+			const previewHint = document.getElementById('announcementPreviewHint');
 			if (!form || !preview) return;
 
 			const titleInput = form.querySelector('[data-preview-target="title"]');
@@ -537,6 +842,35 @@ templ AnnouncementFormScript() {
 				return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
 			}
 
+			const displayTypeRadios = form.querySelectorAll('input[name="display_type"]');
+			const modalOptions = document.getElementById('announcementModalOptions');
+			const repeatEnabled = document.getElementById('announcementRepeatEnabled');
+			const repeatOptions = document.getElementById('announcementRepeatOptions');
+			const cutoffDaysGroup = document.getElementById('announcementCutoffDaysGroup');
+			const repeatScheduleRadios = form.querySelectorAll('input[name="repeat_schedule"]');
+
+			function isModalDisplay() {
+				const checked = form.querySelector('input[name="display_type"]:checked');
+				return checked && checked.value === 'modal';
+			}
+
+			function syncDisplaySections() {
+				const modal = isModalDisplay();
+				if (modalOptions) modalOptions.hidden = !modal;
+				if (previewHint) {
+					previewHint.textContent = modal
+						? 'How the modal dialog will appear when opened.'
+						: 'How the banner will appear below the navbar.';
+				}
+				if (repeatOptions && repeatEnabled) {
+					repeatOptions.hidden = !repeatEnabled.checked;
+				}
+				const cutoffSelected = form.querySelector('input[name="repeat_schedule"][value="cutoff_before"]');
+				if (cutoffDaysGroup) {
+					cutoffDaysGroup.hidden = !cutoffSelected || !cutoffSelected.checked || !repeatEnabled || !repeatEnabled.checked;
+				}
+			}
+
 			function updatePreview() {
 				const title = (titleInput && titleInput.value.trim()) || 'Announcement title';
 				const description = (descInput && descInput.value.trim()) || 'Description text appears here.';
@@ -550,6 +884,17 @@ templ AnnouncementFormScript() {
 						? ' target="_blank" rel="noopener noreferrer"'
 						: '';
 					ctaHTML = '<a href="' + href + '" class="announcement-banner__cta"' + externalAttrs + '>' + escapeHTML(ctaLabel) + '</a>';
+				}
+				if (isModalDisplay()) {
+					preview.innerHTML =
+						'<div class="modal-dialog announcement-modal-dialog announcement-modal-dialog--' + level + ' announcement-modal-preview">' +
+							'<div class="modal-header"><h3 class="announcement-modal-title">' + escapeHTML(title) + '</h3></div>' +
+							'<div class="modal-body"><p class="announcement-modal-description">' + escapeHTML(description) + '</p>' +
+							(ctaHTML ? '<p class="announcement-modal-cta-wrap">' + ctaHTML.replace('announcement-banner__cta', 'btn announcement-modal-cta') + '</p>' : '') +
+							'</div>' +
+							'<div class="modal-footer"><button type="button" class="btn btn-secondary" disabled>Close</button></div>' +
+						'</div>';
+					return;
 				}
 				preview.innerHTML =
 					'<div class="announcement-banner announcement-banner--' + level + '" role="status">' +
@@ -617,8 +962,22 @@ templ AnnouncementFormScript() {
 				});
 			}
 
+			displayTypeRadios.forEach(function (radio) {
+				radio.addEventListener('change', function () {
+					syncDisplaySections();
+					updatePreview();
+				});
+			});
+			if (repeatEnabled) {
+				repeatEnabled.addEventListener('change', syncDisplaySections);
+			}
+			repeatScheduleRadios.forEach(function (radio) {
+				radio.addEventListener('change', syncDisplaySections);
+			});
+
 			syncVisibilityPanel();
 			syncSelectAllState();
+			syncDisplaySections();
 			updatePreview();
 		})();
 	</script>
@@ -785,6 +1144,61 @@ templ AnnouncementPageStyles() {
 	<style>
 		.announcement-list-title {
 			font-weight: 500;
+		}
+
+		.announcement-list-type-detail {
+			display: block;
+			font-size: 0.75rem;
+			color: var(--color-muted-foreground);
+			margin-top: var(--space-1);
+		}
+
+		.announcement-modal-options,
+		.announcement-repeat-options {
+			margin-top: var(--space-4);
+		}
+
+		.announcement-repeat-toggle {
+			margin-top: var(--space-4);
+		}
+
+		.announcement-modal-dialog--info .modal-header {
+			background: linear-gradient(180deg, var(--color-primary-light) 0%, var(--color-surface) 100%);
+		}
+
+		.announcement-modal-dialog--warning .modal-header {
+			background: var(--color-warning-bg);
+		}
+
+		.announcement-modal-dialog--critical .modal-header {
+			background: rgba(220, 38, 38, 0.08);
+		}
+
+		.announcement-modal-title {
+			font-size: 1.125rem;
+			margin: 0;
+		}
+
+		.announcement-modal-description {
+			margin: 0;
+			line-height: 1.5;
+		}
+
+		.announcement-modal-cta-wrap {
+			margin: var(--space-4) 0 0;
+		}
+
+		.announcement-modal-preview {
+			position: relative;
+			box-shadow: var(--shadow-lg);
+		}
+
+		.announcement-modal-preview .modal-footer button {
+			margin-top: 0;
+		}
+
+		#announcementModalOverlay .modal-footer .btn {
+			margin-top: 0;
 		}
 
 		.announcement-schedule {

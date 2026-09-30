@@ -39,6 +39,32 @@ func TestActiveCutoffDates(t *testing.T) {
 	}
 }
 
+func TestCutoffRepeatWindowContains(t *testing.T) {
+	cutoffEnd := "2026-09-15"
+	tests := []struct {
+		today string
+		n     int
+		want  bool
+	}{
+		{"2026-09-12", 3, false},
+		{"2026-09-13", 3, true},
+		{"2026-09-14", 3, true},
+		{"2026-09-15", 3, true},
+		{"2026-09-16", 3, false},
+		{"2026-09-15", 1, true},
+		{"2026-09-14", 1, false},
+		{"2026-09-15", 0, true},
+		{"2026-09-14", 0, false},
+		{"2026-09-15", 11, false},
+	}
+	for _, tc := range tests {
+		got := CutoffRepeatWindowContains(tc.today, cutoffEnd, tc.n)
+		if got != tc.want {
+			t.Fatalf("CutoffRepeatWindowContains(%q, %q, %d) = %v, want %v", tc.today, cutoffEnd, tc.n, got, tc.want)
+		}
+	}
+}
+
 func TestCutoffDatesFromPreset(t *testing.T) {
 	start, end := CutoffDatesFromPreset("2026-09-01|2026-09-15")
 	if start != "2026-09-01" || end != "2026-09-15" {

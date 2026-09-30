@@ -1,6 +1,7 @@
 package announcements
 
 import (
+	"database/sql"
 	"net/url"
 	"strings"
 
@@ -10,17 +11,22 @@ import (
 const maxCTALabelLen = 60
 
 type Request struct {
-	Title         string
-	Description   string
-	Level         string
-	StartDate     string
-	EndDate       string
-	VisibleToAll  bool
-	TeacherIDs    []int64
-	OriginalStart string
-	CTALabel      string
-	CTAURL        string
-	Status        string
+	Title            string
+	Description      string
+	Level            string
+	StartDate        string
+	EndDate          string
+	VisibleToAll     bool
+	TeacherIDs       []int64
+	OriginalStart    string
+	CTALabel         string
+	CTAURL           string
+	Status           string
+	DisplayType      string
+	ModalFrequency   string
+	RepeatEnabled    bool
+	RepeatSchedule   string
+	CutoffRepeatDays sql.NullInt64
 }
 
 func ValidateRequest(req Request, isUpdate bool) error {
@@ -38,6 +44,37 @@ func ValidateRequest(req Request, isUpdate bool) error {
 	}
 	if !ValidFormStatus(req.Status) {
 		return ErrInvalidStatus
+	}
+	displayType := req.DisplayType
+	if displayType == "" {
+		displayType = string(DisplayTypeBanner)
+	}
+	if !ValidDisplayType(displayType) {
+		return ErrInvalidDisplayType
+	}
+	if DisplayType(displayType) == DisplayTypeModal {
+		if !ValidModalFrequency(req.ModalFrequency) {
+			if strings.TrimSpace(req.ModalFrequency) == "" {
+				return ErrModalFrequencyRequired
+			}
+			return ErrInvalidModalFrequency
+		}
+		if req.RepeatEnabled {
+			if !ValidRepeatSchedule(req.RepeatSchedule) {
+				if strings.TrimSpace(req.RepeatSchedule) == "" {
+					return ErrRepeatScheduleRequired
+				}
+				return ErrInvalidRepeatSchedule
+			}
+			if RepeatSchedule(req.RepeatSchedule) == RepeatScheduleCutoffBefore {
+				if !req.CutoffRepeatDays.Valid {
+					return ErrCutoffRepeatDaysRequired
+				}
+				if !ValidCutoffRepeatDays(int(req.CutoffRepeatDays.Int64)) {
+					return ErrInvalidCutoffRepeatDays
+				}
+			}
+		}
 	}
 	if req.StartDate == "" {
 		return ErrStartDateRequired

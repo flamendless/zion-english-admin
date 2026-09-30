@@ -101,6 +101,26 @@ func TestValidateRequestCreate(t *testing.T) {
 			wantErr: announcements.ErrTeachersRequired,
 		},
 		{
+			name: "modal requires frequency",
+			req: func() announcements.Request {
+				req := validAnnouncementReq()
+				req.DisplayType = string(announcements.DisplayTypeModal)
+				return req
+			}(),
+			wantErr: announcements.ErrModalFrequencyRequired,
+		},
+		{
+			name: "modal repeat requires schedule",
+			req: func() announcements.Request {
+				req := validAnnouncementReq()
+				req.DisplayType = string(announcements.DisplayTypeModal)
+				req.ModalFrequency = string(announcements.ModalFrequencyPerPage)
+				req.RepeatEnabled = true
+				return req
+			}(),
+			wantErr: announcements.ErrRepeatScheduleRequired,
+		},
+		{
 			name: "cta label without url",
 			req: func() announcements.Request {
 				req := validAnnouncementReq()

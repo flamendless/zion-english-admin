@@ -85,18 +85,23 @@ type TblAffiliatedProductShop struct {
 }
 
 type TblAnnouncement struct {
-	ID           int64
-	Title        string
-	Description  string
-	Level        string
-	StartDate    string
-	EndDate      string
-	VisibleToAll int64
-	CreatedAt    string
-	UpdatedAt    string
-	CtaLabel     string
-	CtaUrl       string
-	Status       string
+	ID               int64
+	Title            string
+	Description      string
+	Level            string
+	StartDate        string
+	EndDate          string
+	VisibleToAll     int64
+	CreatedAt        string
+	UpdatedAt        string
+	CtaLabel         string
+	CtaUrl           string
+	Status           string
+	DisplayType      string
+	ModalFrequency   sql.NullString
+	RepeatEnabled    int64
+	RepeatSchedule   sql.NullString
+	CutoffRepeatDays sql.NullInt64
 }
 
 type TblAnnouncementsTeachersM2m struct {

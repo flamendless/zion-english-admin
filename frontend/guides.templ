@@ -441,6 +441,18 @@ templ GuideAds() {
 					},
 					false,
 				)
+				@GuideSection(
+					"announcement-modals",
+					"Announcement modals",
+					utils.URL("/announcements"),
+					"Superusers can publish banner or modal announcements from Admin.",
+					[]string{
+						"Banners stay below the header on each page. Modals open as a dialog when a teacher loads a page.",
+						"Modal frequency: per session hides the modal for the rest of the browser session after dismiss; per page hides it for that page path until the session ends.",
+						"Optional repeat scheduling can limit modals to the campaign start/end dates or to the last N days before the active payroll cutoff end (PHT). Example: 3 days before cutoff end Sep 15 shows on Sep 13, 14, and 15.",
+					},
+					false,
+				)
 			</div>
 
 			<div class="guides-footer">

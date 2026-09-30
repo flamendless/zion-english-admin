@@ -66,6 +66,36 @@ func ActiveCutoffDates() (startDate, endDate string) {
 	return CutoffDatesFromPreset(active)
 }
 
+// InCutoffRepeatWindow reports whether today (YYYY-MM-DD, PHT) falls in the repeat window
+// of N days on or before the active payroll cutoff end (inclusive). N=3 with cutoff end Sep 15
+// includes Sep 13, 14, and 15.
+func InCutoffRepeatWindow(today string, n int) bool {
+	_, endDate := ActiveCutoffDates()
+	return CutoffRepeatWindowContains(today, endDate, n)
+}
+
+// CutoffRepeatWindowContains reports whether today is within N days on or before cutoffEnd (inclusive).
+func CutoffRepeatWindowContains(today, cutoffEnd string, n int) bool {
+	if n < 0 || n > 10 {
+		return false
+	}
+	cutoffEnd = strings.TrimSpace(cutoffEnd)
+	if cutoffEnd == "" {
+		return false
+	}
+	end, err := time.ParseInLocation(constants.DateLayout, cutoffEnd, constants.LocationPHT)
+	if err != nil {
+		return false
+	}
+	offset := 0
+	if n > 0 {
+		offset = n - 1
+	}
+	start := end.AddDate(0, 0, -offset)
+	startDay := start.Format(constants.DateLayout)
+	return today >= startDay && today <= cutoffEnd
+}
+
 // NextCutoffDates returns the payroll cutoff that follows the given period.
 // Returns ok false when the dates do not match a standard first or second cutoff.
 func NextCutoffDates(startDate, endDate string) (nextStart, nextEnd string, ok bool) {
