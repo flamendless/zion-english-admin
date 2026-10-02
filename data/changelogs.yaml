@@ -9,6 +9,33 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.10.02"
+    date: "2026-10-02"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Superusers get a Plans page under Admin to grant Teacher Pro and review plan transaction history (grant, extend, or revoke)."
+        commit: "804dc87"
+      - text: "Announcements can display as modals with per-session or per-page dismiss rules and optional repeat scheduling tied to campaign dates or payroll cutoff."
+        commit: "94d3f67"
+      - text: "Affiliates supports Impact CSV imports alongside Shopee, with provider-aware import review, product cards, and Ads/Affiliates report breakdowns by provider."
+        commit: "701b61e"
+      - text: "Teacher Pro unlocks full Analytics date ranges plus student, no-show, and retention sections, and Data Export for classes, students, and schedule."
+        commit: "804dc87"
+    improvements:
+      - text: "Teachers on the free plan see Analytics limited to the current calendar month (PHT) with clear upgrade guidance."
+        commit: "575d7f9"
+      - text: "Marking a teacher as resigned captures resignation date and reason, adds a Resignation tab on the teacher profile, and offers a downloadable final payroll report for the resignation period."
+        commit: "e56c665"
+      - text: "Teacher avatars and lists show resigned and pending account status in analytics, logs, and class views."
+        commit: "804dc87"
+    bug_fixes: []
+    removed: []
+    security: []
+    deprecated: []
+    internal:
+      - text: "Documented gofmt workflow in project Go conventions."
+        commit: "da75182"
   - version: "2026.09.29"
     date: "2026-09-29"
     released: true

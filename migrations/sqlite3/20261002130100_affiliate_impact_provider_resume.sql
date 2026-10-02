@@ -1,26 +1,12 @@
 -- +goose Up
--- +goose StatementBegin
-ALTER TABLE tbl_affiliate_products ADD COLUMN provider TEXT NOT NULL DEFAULT 'shopee';
--- +goose StatementEnd
-
--- +goose StatementBegin
-ALTER TABLE tbl_affiliate_products ADD COLUMN program_id TEXT NOT NULL DEFAULT '';
--- +goose StatementEnd
-
--- +goose StatementBegin
-ALTER TABLE tbl_affiliate_products ADD COLUMN impact_state TEXT NOT NULL DEFAULT '';
--- +goose StatementEnd
-
--- +goose StatementBegin
-ALTER TABLE tbl_affiliate_products ADD COLUMN impact_ad_type TEXT NOT NULL DEFAULT '';
--- +goose StatementEnd
+-- Resume Impact provider migration when 20261002120000 applied ALTERs but failed on junction dedupe.
+-- If provider column already exists and goose still shows 20261002120000 pending, mark that version
+-- applied manually, then run goose so this migration completes dedupe and the unique index.
 
 -- +goose StatementBegin
 INSERT OR IGNORE INTO tbl_affiliated_product_shops (brand_name)
 VALUES ('Impact');
--- +goose StatementEnd
 
--- +goose StatementBegin
 CREATE TEMP TABLE affiliate_product_keeper AS
 SELECT
 	provider,
@@ -106,20 +92,4 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_affiliate_products_provider_item_id
 -- +goose Down
 -- +goose StatementBegin
 DROP INDEX IF EXISTS idx_affiliate_products_provider_item_id;
--- +goose StatementEnd
-
--- +goose StatementBegin
-ALTER TABLE tbl_affiliate_products DROP COLUMN impact_ad_type;
--- +goose StatementEnd
-
--- +goose StatementBegin
-ALTER TABLE tbl_affiliate_products DROP COLUMN impact_state;
--- +goose StatementEnd
-
--- +goose StatementBegin
-ALTER TABLE tbl_affiliate_products DROP COLUMN program_id;
--- +goose StatementEnd
-
--- +goose StatementBegin
-ALTER TABLE tbl_affiliate_products DROP COLUMN provider;
 -- +goose StatementEnd
