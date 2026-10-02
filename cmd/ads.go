@@ -22,6 +22,24 @@ import (
 
 const adAffiliateSearchPageSize = 20
 
+func adAffiliateOrientationFilter(r *http.Request) string {
+	raw := strings.TrimSpace(r.URL.Query().Get("orientation"))
+	if raw == "" || !constants.ValidThumbnailOrientation(raw) {
+		return ""
+	}
+	return raw
+}
+
+func adAffiliateProductsForAdsCountParams(q string, orientation string) queries.CountAffiliateProductsForAdsParams {
+	return queries.CountAffiliateProductsForAdsParams{
+		Column1:              q,
+		Column2:              sql.NullString{String: q, Valid: q != ""},
+		Column3:              sql.NullString{String: q, Valid: q != ""},
+		Column4:              orientation,
+		ThumbnailOrientation: orientation,
+	}
+}
+
 type adsListPageState struct {
 	Form            frontend.AdFormData
 	OpenCreateModal bool
@@ -316,12 +334,8 @@ func handleAdAffiliateSearch(w http.ResponseWriter, r *http.Request) {
 		selectedSet[strings.TrimSpace(id)] = struct{}{}
 	}
 
-	countParams := queries.CountAffiliateProductsForAdsParams{
-		Column1: q,
-		Column2: sql.NullString{String: q, Valid: q != ""},
-		Column3: sql.NullString{String: q, Valid: q != ""},
-	}
-	total, err := dbRO.GetQueries().CountAffiliateProductsForAds(ctx, countParams)
+	orientation := adAffiliateOrientationFilter(r)
+	total, err := dbRO.GetQueries().CountAffiliateProductsForAds(ctx, adAffiliateProductsForAdsCountParams(q, orientation))
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Search failed: %v", err), http.StatusInternalServerError)
 		return
@@ -336,11 +350,13 @@ func handleAdAffiliateSearch(w http.ResponseWriter, r *http.Request) {
 	offset := int64((page - 1) * adAffiliateSearchPageSize)
 
 	rows, err := dbRO.GetQueries().SearchAffiliateProductsForAds(ctx, queries.SearchAffiliateProductsForAdsParams{
-		Column1: q,
-		Column2: sql.NullString{String: q, Valid: q != ""},
-		Column3: sql.NullString{String: q, Valid: q != ""},
-		Limit:   adAffiliateSearchPageSize,
-		Offset:  offset,
+		Column1:              q,
+		Column2:              sql.NullString{String: q, Valid: q != ""},
+		Column3:              sql.NullString{String: q, Valid: q != ""},
+		Column4:              orientation,
+		ThumbnailOrientation: orientation,
+		Limit:                adAffiliateSearchPageSize,
+		Offset:               offset,
 	})
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Search failed: %v", err), http.StatusInternalServerError)
@@ -356,20 +372,22 @@ func handleAdAffiliateSearch(w http.ResponseWriter, r *http.Request) {
 			Name:         row.Name,
 			ShopName:     row.ShopName,
 			PriceDisplay: row.PriceDisplay,
-			ThumbnailURL: affiliateThumbnailFromRow(row.Provider, row.ItemID, row.ProgramID, row.ThumbnailUrl),
+			ThumbnailURL: affiliateThumbnailFromRow(row.ID, row.Provider, row.ItemID, row.ProgramID, row.ThumbnailUrl),
 			Provider:     constants.AffiliateProvider(row.Provider),
+			Orientation:  constants.ThumbnailOrientation(row.ThumbnailOrientation),
 			Checked:      checked,
 		})
 	}
 
 	panel := frontend.AdAffiliateSearchPanelData{
-		Items:         items,
-		Query:         q,
-		Page:          page,
-		TotalPages:    totalPages,
-		Total:         total,
-		SelectedCount: len(selectedSet),
-		FormID:        formID,
+		Items:             items,
+		Query:             q,
+		Page:              page,
+		TotalPages:        totalPages,
+		Total:             total,
+		SelectedCount:     len(selectedSet),
+		FormID:            formID,
+		OrientationFilter: orientation,
 	}
 
 	writeHTML(w)
@@ -388,10 +406,13 @@ func handleAdAffiliateProductIDs(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := r.Context()
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	orientation := adAffiliateOrientationFilter(r)
 	rows, err := dbRO.GetQueries().ListAffiliateProductIDsForAds(ctx, queries.ListAffiliateProductIDsForAdsParams{
-		Column1: q,
-		Column2: sql.NullString{String: q, Valid: q != ""},
-		Column3: sql.NullString{String: q, Valid: q != ""},
+		Column1:              q,
+		Column2:              sql.NullString{String: q, Valid: q != ""},
+		Column3:              sql.NullString{String: q, Valid: q != ""},
+		Column4:              orientation,
+		ThumbnailOrientation: orientation,
 	})
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Search failed: %v", err), http.StatusInternalServerError)
@@ -585,7 +606,7 @@ func handleAdChromePartial(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
-	ctx = ads.LoadRequestContext(ctx, w, r, dbRO.GetQueries(), true)
+	ctx = ads.LoadChromePartialRequestContext(ctx, w, r, dbRO.GetQueries())
 	slots := ads.GetResolvedSlots(ctx)
 	if len(slots.Top) == 0 && len(slots.Left) == 0 && len(slots.Right) == 0 &&
 		len(slots.Bottom) == 0 {

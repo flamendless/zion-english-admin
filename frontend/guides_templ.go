@@ -722,7 +722,7 @@ func GuideAffiliates() templ.Component {
 			"Choose Shopee or Impact on Upload CSV from the Affiliates page.",
 			[]string{
 				"Shopee: expected columns include Item Id, Item Name, Product Link, and Offer Link. Thumbnails are fetched from Product Link during import.",
-				"Impact: expected columns include AdId, State, ProgramId, Name, AdType, and TrackingLink. Preview images use ProgramId and AdId (not stored in the database).",
+				"Impact: expected columns include AdId, State, ProgramId, Name, AdType, and TrackingLink. Optional ThirdPartyServableAdCreativeWidth and ThirdPartyServableAdCreativeHeight set landscape, portrait, or square orientation.",
 				"After upload, the review modal highlights new, changed, unchanged, and duplicate rows compared with your catalog for that provider.",
 				"Products in the catalog but missing from the CSV are listed for reference; nothing is deleted automatically.",
 			},
@@ -737,7 +737,7 @@ func GuideAffiliates() templ.Component {
 			utils.URL("/affiliates"),
 			"Impact rows are imported from CSV only in this release.",
 			[]string{
-				"All State values are stored; only ACTIVE Impact creatives appear in the Ads product picker and on live portal placements.",
+				"All State values are stored; only ACTIVE Impact creatives appear in the Ads product picker and on live portal placements. Filter by orientation in Ads step 2 when building an ad.",
 				"TrackingLink is saved as the affiliate URL teachers open through /affiliate-link.",
 				"Use the Ads guide to attach Shopee and Impact catalog items to the same affiliate ad when needed.",
 			},

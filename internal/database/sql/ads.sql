@@ -32,7 +32,8 @@ SELECT
 	p.sales,
 	p.provider,
 	p.program_id,
-	p.item_id AS product_item_id
+	p.item_id AS product_item_id,
+	p.thumbnail_orientation
 FROM tbl_ads a
 INNER JOIN tbl_ad_affiliate_products j ON j.ad_id = a.id
 INNER JOIN tbl_affiliate_products p ON p.id = j.affiliate_product_id
@@ -120,6 +121,11 @@ WHERE (
 	AND (
 		p.provider != 'impact'
 		OR upper(p.impact_state) = 'ACTIVE'
+	)
+	AND (
+		? = ''
+		OR p.provider != 'impact'
+		OR p.thumbnail_orientation = ?
 	);
 
 -- name: SearchAffiliateProductsForAds :many
@@ -131,7 +137,8 @@ SELECT
 	COALESCE(s.brand_name, p.brand, '') AS shop_name,
 	p.provider,
 	p.program_id,
-	p.item_id
+	p.item_id,
+	p.thumbnail_orientation
 FROM tbl_affiliate_products p
 LEFT JOIN tbl_affiliated_product_shops s ON s.id = p.affiliated_shop_id
 WHERE (
@@ -142,6 +149,11 @@ WHERE (
 	AND (
 		p.provider != 'impact'
 		OR upper(p.impact_state) = 'ACTIVE'
+	)
+	AND (
+		? = ''
+		OR p.provider != 'impact'
+		OR p.thumbnail_orientation = ?
 	)
 ORDER BY p.sort_order ASC, p.id ASC
 LIMIT ? OFFSET ?;
@@ -158,5 +170,10 @@ WHERE (
 	AND (
 		p.provider != 'impact'
 		OR upper(p.impact_state) = 'ACTIVE'
+	)
+	AND (
+		? = ''
+		OR p.provider != 'impact'
+		OR p.thumbnail_orientation = ?
 	)
 ORDER BY p.sort_order ASC, p.id ASC;

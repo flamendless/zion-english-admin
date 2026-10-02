@@ -7,20 +7,21 @@ import (
 )
 
 type ImportRowInput struct {
-	Provider       constants.AffiliateProvider
-	ItemID         string
-	ProductURL     string
-	OfferLink      string
-	ItemName       string
-	PriceDisplay   string
-	Sales          string
-	ShopName       string
-	CommissionRate string
-	Commission     string
-	ThumbnailURL   string
-	ProgramID      string
-	ImpactState    string
-	ImpactAdType   string
+	Provider             constants.AffiliateProvider
+	ItemID               string
+	ProductURL           string
+	OfferLink            string
+	ItemName             string
+	PriceDisplay         string
+	Sales                string
+	ShopName             string
+	CommissionRate       string
+	Commission           string
+	ThumbnailURL         string
+	ProgramID            string
+	ImpactState          string
+	ImpactAdType         string
+	ThumbnailOrientation string
 }
 
 type ImportDiffResult struct {
@@ -90,6 +91,9 @@ func compareImportFields(row ImportRowInput, existing CatalogRow) []string {
 		}
 		if !strings.EqualFold(strings.TrimSpace(row.ImpactAdType), strings.TrimSpace(existing.ImpactAdType)) {
 			changed = append(changed, "Ad type")
+		}
+		if strings.TrimSpace(row.ThumbnailOrientation) != strings.TrimSpace(existing.ThumbnailOrientation) {
+			changed = append(changed, "Orientation")
 		}
 		return changed
 	}

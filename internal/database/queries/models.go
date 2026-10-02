@@ -9,9 +9,6 @@ import (
 	"time"
 )
 
-type AffiliateProductKeeper struct {
-}
-
 type TblAccess struct {
 	ID          int64
 	TeacherID   int64
@@ -62,28 +59,29 @@ type TblAffiliateLinkClickEvent struct {
 }
 
 type TblAffiliateProduct struct {
-	ID               int64
-	AffiliateUrl     string
-	ProductUrl       string
-	ShopID           string
-	ItemID           string
-	Name             string
-	Brand            string
-	PriceDisplay     string
-	ThumbnailUrl     string
-	SortOrder        int64
-	CreatedAt        string
-	UpdatedAt        string
-	ImportBatchID    int64
-	Sales            string
-	CommissionRate   string
-	Commission       string
-	AffiliatedShopID sql.NullInt64
-	ClickCount       int64
-	Provider         string
-	ProgramID        string
-	ImpactState      string
-	ImpactAdType     string
+	ID                   int64
+	AffiliateUrl         string
+	ProductUrl           string
+	ShopID               string
+	ItemID               string
+	Name                 string
+	Brand                string
+	PriceDisplay         string
+	ThumbnailUrl         string
+	SortOrder            int64
+	CreatedAt            string
+	UpdatedAt            string
+	ImportBatchID        int64
+	Sales                string
+	CommissionRate       string
+	Commission           string
+	AffiliatedShopID     sql.NullInt64
+	ClickCount           int64
+	Provider             string
+	ProgramID            string
+	ImpactState          string
+	ImpactAdType         string
+	ThumbnailOrientation string
 }
 
 type TblAffiliatedProductShop struct {

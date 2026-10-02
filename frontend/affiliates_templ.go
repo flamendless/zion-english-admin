@@ -28,44 +28,47 @@ type AffiliateListItem struct {
 }
 
 type AffiliateFormData struct {
-	ID             string
-	AffiliateURL   string
-	ProductURL     string
-	ShopID         string
-	ItemID         string
-	Name           string
-	Brand          string
-	PriceDisplay   string
-	ThumbnailURL   string
-	SortOrder      int64
-	Sales          string
-	ShopName       string
-	CommissionRate string
-	Commission     string
-	IsEdit         bool
+	ID                   string
+	Provider             constants.AffiliateProvider
+	ThumbnailOrientation string
+	AffiliateURL         string
+	ProductURL           string
+	ShopID               string
+	ItemID               string
+	Name                 string
+	Brand                string
+	PriceDisplay         string
+	ThumbnailURL         string
+	SortOrder            int64
+	Sales                string
+	ShopName             string
+	CommissionRate       string
+	Commission           string
+	IsEdit               bool
 }
 
 type AffiliateStagedImportItem struct {
-	Index             int
-	Card              AffiliateProductCardData
-	ItemID            string
-	ItemName          string
-	Price             string
-	Sales             string
-	ShopName          string
-	CommissionRate    string
-	Commission        string
-	ProductLink       string
-	OfferLink         string
-	ShopeeShopID      string
-	ProgramID         string
-	ImpactState       string
-	ImpactAdType      string
-	ThumbnailURL      string
-	PriceDisplay      string
-	DiffStatus        constants.AffiliateImportDiffStatus
-	ExistingProductID int64
-	ChangedFields     []string
+	Index                int
+	Card                 AffiliateProductCardData
+	ItemID               string
+	ItemName             string
+	Price                string
+	Sales                string
+	ShopName             string
+	CommissionRate       string
+	Commission           string
+	ProductLink          string
+	OfferLink            string
+	ShopeeShopID         string
+	ProgramID            string
+	ImpactState          string
+	ImpactAdType         string
+	ThumbnailOrientation string
+	ThumbnailURL         string
+	PriceDisplay         string
+	DiffStatus           constants.AffiliateImportDiffStatus
+	ExistingProductID    int64
+	ChangedFields        []string
 }
 
 type AffiliateImportDiffSummary struct {
@@ -204,7 +207,7 @@ func AffiliatesPage(data AffiliatesPageData) templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(data.FilterPath)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 160, Col: 86}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 163, Col: 86}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -217,7 +220,7 @@ func AffiliatesPage(data AffiliatesPageData) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.Query)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 167, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 170, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 		if templ_7745c5c3_Err != nil {
@@ -245,7 +248,7 @@ func AffiliatesPage(data AffiliatesPageData) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 177, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 180, Col: 32}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 			if templ_7745c5c3_Err != nil {
@@ -268,7 +271,7 @@ func AffiliatesPage(data AffiliatesPageData) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 177, Col: 101}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 180, Col: 101}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -313,7 +316,7 @@ func AffiliatesPage(data AffiliatesPageData) templ.Component {
 					var templ_7745c5c3_Var6 string
 					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ThumbnailURL)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 208, Col: 39}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 211, Col: 39}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 					if templ_7745c5c3_Err != nil {
@@ -336,7 +339,7 @@ func AffiliatesPage(data AffiliatesPageData) templ.Component {
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 213, Col: 65}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 216, Col: 65}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 				if templ_7745c5c3_Err != nil {
@@ -349,7 +352,7 @@ func AffiliatesPage(data AffiliatesPageData) templ.Component {
 				var templ_7745c5c3_Var8 string
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(item.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 213, Col: 79}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 216, Col: 79}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
@@ -370,7 +373,7 @@ func AffiliatesPage(data AffiliatesPageData) templ.Component {
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(affiliateCellText(item.ShopName))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 216, Col: 79}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 219, Col: 79}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -383,7 +386,7 @@ func AffiliatesPage(data AffiliatesPageData) templ.Component {
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(affiliateCellText(item.PriceDisplay))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 218, Col: 70}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 221, Col: 70}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -396,7 +399,7 @@ func AffiliatesPage(data AffiliatesPageData) templ.Component {
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", item.ClickCount))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 219, Col: 88}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 222, Col: 88}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -409,7 +412,7 @@ func AffiliatesPage(data AffiliatesPageData) templ.Component {
 				var templ_7745c5c3_Var12 templ.SafeURL
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinURLErrs(item.AffiliateURL)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 221, Col: 37}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 224, Col: 37}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
@@ -422,7 +425,7 @@ func AffiliatesPage(data AffiliatesPageData) templ.Component {
 				var templ_7745c5c3_Var13 string
 				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(item.AffiliateDisp)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 221, Col: 112}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 224, Col: 112}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
@@ -455,7 +458,7 @@ func AffiliatesPage(data AffiliatesPageData) templ.Component {
 				var templ_7745c5c3_Var14 templ.SafeURL
 				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/affiliates/" + item.ID + "/delete"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 235, Col: 87}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 238, Col: 87}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 				if templ_7745c5c3_Err != nil {
@@ -590,7 +593,7 @@ func AffiliateUploadSourceModal() templ.Component {
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/shopee-logo-white.svg"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 296, Col: 60}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 299, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
 		if templ_7745c5c3_Err != nil {
@@ -603,7 +606,7 @@ func AffiliateUploadSourceModal() templ.Component {
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/impact-logo.png"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 305, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 308, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var17)
 		if templ_7745c5c3_Err != nil {
@@ -645,7 +648,7 @@ func AffiliateUploadModal() templ.Component {
 		var templ_7745c5c3_Var19 templ.SafeURL
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/affiliates/upload"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 328, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 331, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
@@ -687,13 +690,13 @@ func AffiliateImpactUploadModal() templ.Component {
 		var templ_7745c5c3_Var21 templ.SafeURL
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/affiliates/upload/impact"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 382, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 385, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\" enctype=\"multipart/form-data\"><div class=\"modal-header\"><h3 id=\"affiliateImpactUploadModalTitle\">Upload Impact ads CSV</h3><button type=\"button\" class=\"modal-close affiliate-impact-upload-modal-close\" aria-label=\"Close\">&times;</button></div><div class=\"modal-body\" id=\"affiliateImpactUploadModalDesc\"><div class=\"affiliates-upload-callout\"><p class=\"affiliates-upload-callout-title\">Impact ads export</p><ul class=\"affiliates-upload-steps\"><li>TrackingLink is saved as the affiliate URL.</li><li>Preview images use the Impact display-ad URL built from ProgramId and AdId.</li><li>Only ACTIVE creatives appear in Ads picker and live placements.</li></ul></div><p class=\"affiliates-upload-columns-label\">Expected columns</p><p class=\"affiliates-upload-columns\">AdId, State, ProgramId, Name, AdType, TrackingLink</p><div class=\"upload-zone affiliates-csv-upload-zone\" id=\"affiliateImpactCSVUploadZone\"><label class=\"upload-zone-label\" for=\"affiliateImpactCSVInput\"><span class=\"upload-zone-icon affiliates-csv-upload-icon\" aria-hidden=\"true\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"></path><polyline points=\"17 8 12 3 7 8\"></polyline><line x1=\"12\" x2=\"12\" y1=\"3\" y2=\"15\"></line></svg></span> <span class=\"upload-zone-meta\"><span id=\"affiliateImpactCSVUploadPrompt\">Choose a CSV file or drop it here</span> <span class=\"upload-zone-hint\">Comma-separated values, up to 2 MB</span></span> <input type=\"file\" id=\"affiliateImpactCSVInput\" name=\"csv\" accept=\".csv,text/csv\" required></label><p class=\"upload-filename\" id=\"affiliateImpactCSVFilename\" aria-live=\"polite\"></p></div></div><div class=\"modal-footer affiliates-modal-footer affiliates-upload-modal-footer\"><button type=\"button\" class=\"btn btn-secondary affiliate-impact-upload-modal-close\">Cancel</button> <button type=\"submit\" class=\"btn\" id=\"affiliateImpactUploadSubmitBtn\" disabled>Import creatives</button></div></form></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "\" enctype=\"multipart/form-data\"><div class=\"modal-header\"><h3 id=\"affiliateImpactUploadModalTitle\">Upload Impact ads CSV</h3><button type=\"button\" class=\"modal-close affiliate-impact-upload-modal-close\" aria-label=\"Close\">&times;</button></div><div class=\"modal-body\" id=\"affiliateImpactUploadModalDesc\"><div class=\"affiliates-upload-callout\"><p class=\"affiliates-upload-callout-title\">Impact ads export</p><ul class=\"affiliates-upload-steps\"><li>TrackingLink is saved as the affiliate URL.</li><li>Preview images use the Impact display-ad URL built from ProgramId and AdId.</li><li>Landscape, portrait, or square orientation is derived from creative width and height columns when present.</li><li>Only ACTIVE creatives appear in Ads picker and live placements.</li></ul></div><p class=\"affiliates-upload-columns-label\">Expected columns</p><p class=\"affiliates-upload-columns\">AdId, State, ProgramId, Name, AdType, TrackingLink, ThirdPartyServableAdCreativeWidth, ThirdPartyServableAdCreativeHeight</p><div class=\"upload-zone affiliates-csv-upload-zone\" id=\"affiliateImpactCSVUploadZone\"><label class=\"upload-zone-label\" for=\"affiliateImpactCSVInput\"><span class=\"upload-zone-icon affiliates-csv-upload-icon\" aria-hidden=\"true\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"></path><polyline points=\"17 8 12 3 7 8\"></polyline><line x1=\"12\" x2=\"12\" y1=\"3\" y2=\"15\"></line></svg></span> <span class=\"upload-zone-meta\"><span id=\"affiliateImpactCSVUploadPrompt\">Choose a CSV file or drop it here</span> <span class=\"upload-zone-hint\">Comma-separated values, up to 2 MB</span></span> <input type=\"file\" id=\"affiliateImpactCSVInput\" name=\"csv\" accept=\".csv,text/csv\" required></label><p class=\"upload-filename\" id=\"affiliateImpactCSVFilename\" aria-live=\"polite\"></p></div></div><div class=\"modal-footer affiliates-modal-footer affiliates-upload-modal-footer\"><button type=\"button\" class=\"btn btn-secondary affiliate-impact-upload-modal-close\">Cancel</button> <button type=\"submit\" class=\"btn\" id=\"affiliateImpactUploadSubmitBtn\" disabled>Import creatives</button></div></form></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -744,7 +747,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 			var templ_7745c5c3_Var23 templ.SafeURL
 			templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/affiliates/import/save"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 433, Col: 69}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 437, Col: 69}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 			if templ_7745c5c3_Err != nil {
@@ -757,7 +760,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 			var templ_7745c5c3_Var24 string
 			templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.ResolveAttributeValue(preview.Filename)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 439, Col: 74}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 443, Col: 74}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
 			if templ_7745c5c3_Err != nil {
@@ -770,7 +773,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 			var templ_7745c5c3_Var25 string
 			templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", preview.FileSizeBytes))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 440, Col: 99}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 444, Col: 99}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var25)
 			if templ_7745c5c3_Err != nil {
@@ -783,7 +786,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 			var templ_7745c5c3_Var26 string
 			templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", preview.TotalCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 441, Col: 100}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 445, Col: 100}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 			if templ_7745c5c3_Err != nil {
@@ -796,7 +799,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 			var templ_7745c5c3_Var27 string
 			templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", len(preview.StagedItems)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 442, Col: 98}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 446, Col: 98}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
 			if templ_7745c5c3_Err != nil {
@@ -809,7 +812,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 			var templ_7745c5c3_Var28 string
 			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(preview.ImportProvider))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 443, Col: 88}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 447, Col: 88}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var28)
 			if templ_7745c5c3_Err != nil {
@@ -822,7 +825,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 			var templ_7745c5c3_Var29 string
 			templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(affiliateImportSummaryText(preview.Filename))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 449, Col: 59}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 453, Col: 59}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 			if templ_7745c5c3_Err != nil {
@@ -835,7 +838,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 			var templ_7745c5c3_Var30 string
 			templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(affiliateImportSummaryText(preview.FileSizeDisplay))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 453, Col: 66}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 457, Col: 66}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 			if templ_7745c5c3_Err != nil {
@@ -848,7 +851,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 			var templ_7745c5c3_Var31 string
 			templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d / %d", preview.ProcessedCount, preview.TotalCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 457, Col: 81}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 461, Col: 81}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 			if templ_7745c5c3_Err != nil {
@@ -861,7 +864,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 			var templ_7745c5c3_Var32 string
 			templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d / %d", preview.ThumbnailsFound, preview.ProcessedCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 461, Col: 86}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 465, Col: 86}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 			if templ_7745c5c3_Err != nil {
@@ -874,7 +877,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 			var templ_7745c5c3_Var33 string
 			templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", preview.DiffSummary.NewCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 465, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 469, Col: 62}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 			if templ_7745c5c3_Err != nil {
@@ -887,7 +890,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 			var templ_7745c5c3_Var34 string
 			templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", preview.DiffSummary.ChangedCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 469, Col: 66}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 473, Col: 66}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 			if templ_7745c5c3_Err != nil {
@@ -900,7 +903,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 			var templ_7745c5c3_Var35 string
 			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", preview.DiffSummary.UnchangedCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 473, Col: 68}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 477, Col: 68}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 			if templ_7745c5c3_Err != nil {
@@ -913,7 +916,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 			var templ_7745c5c3_Var36 string
 			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", preview.DiffSummary.DuplicateInCSVCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 477, Col: 73}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 481, Col: 73}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 			if templ_7745c5c3_Err != nil {
@@ -926,7 +929,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 			var templ_7745c5c3_Var37 string
 			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", preview.DiffSummary.RemovedFromCSVCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 481, Col: 73}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 485, Col: 73}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 			if templ_7745c5c3_Err != nil {
@@ -944,7 +947,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 				var templ_7745c5c3_Var38 string
 				templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", len(preview.RemovedFromCSV)))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 489, Col: 104}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 493, Col: 104}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 				if templ_7745c5c3_Err != nil {
@@ -962,7 +965,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 					var templ_7745c5c3_Var39 string
 					templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(row.ItemID)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 503, Col: 29}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 507, Col: 29}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 					if templ_7745c5c3_Err != nil {
@@ -975,7 +978,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 					var templ_7745c5c3_Var40 string
 					templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(row.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 504, Col: 27}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 508, Col: 27}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 					if templ_7745c5c3_Err != nil {
@@ -988,7 +991,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 					var templ_7745c5c3_Var41 templ.SafeURL
 					templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/affiliates/" + row.ID + "/view"))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 506, Col: 68}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 510, Col: 68}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 					if templ_7745c5c3_Err != nil {
@@ -1021,7 +1024,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 			var templ_7745c5c3_Var42 string
 			templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", len(preview.ImportLogs)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 518, Col: 96}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 522, Col: 96}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
 			if templ_7745c5c3_Err != nil {
@@ -1044,7 +1047,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 					var templ_7745c5c3_Var43 string
 					templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(affiliateImportLogItemID(entry.ItemID))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 533, Col: 58}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 537, Col: 58}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 					if templ_7745c5c3_Err != nil {
@@ -1057,7 +1060,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 					var templ_7745c5c3_Var44 string
 					templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinStringErrs(entry.Message)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 534, Col: 33}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 538, Col: 33}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
 					if templ_7745c5c3_Err != nil {
@@ -1090,7 +1093,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 				var templ_7745c5c3_Var45 string
 				templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", len(preview.StagedItems)))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 549, Col: 102}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 553, Col: 102}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 				if templ_7745c5c3_Err != nil {
@@ -1135,7 +1138,7 @@ func AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad 
 						var templ_7745c5c3_Var48 string
 						templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.JoinStringErrs(strings.Join(item.ChangedFields, ", "))
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 559, Col: 107}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 563, Col: 107}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var48))
 						if templ_7745c5c3_Err != nil {
@@ -1246,7 +1249,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 			var templ_7745c5c3_Var50 string
 			templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateStagedFieldName(item.Index, "existing_id"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 608, Col: 81}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 612, Col: 81}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var50)
 			if templ_7745c5c3_Err != nil {
@@ -1259,7 +1262,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 			var templ_7745c5c3_Var51 string
 			templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", item.ExistingProductID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 608, Col: 133}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 612, Col: 133}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var51)
 			if templ_7745c5c3_Err != nil {
@@ -1277,7 +1280,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var52 string
 		templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateStagedFieldName(item.Index, "item_id"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 610, Col: 76}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 614, Col: 76}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var52)
 		if templ_7745c5c3_Err != nil {
@@ -1290,7 +1293,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var53 string
 		templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ItemID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 610, Col: 98}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 614, Col: 98}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var53)
 		if templ_7745c5c3_Err != nil {
@@ -1303,7 +1306,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var54 string
 		templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateStagedFieldName(item.Index, "item_name"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 611, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 615, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var54)
 		if templ_7745c5c3_Err != nil {
@@ -1316,7 +1319,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var55 string
 		templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ItemName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 611, Col: 102}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 615, Col: 102}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var55)
 		if templ_7745c5c3_Err != nil {
@@ -1329,7 +1332,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var56 string
 		templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateStagedFieldName(item.Index, "price"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 612, Col: 74}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 616, Col: 74}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var56)
 		if templ_7745c5c3_Err != nil {
@@ -1342,7 +1345,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var57 string
 		templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.Price)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 612, Col: 95}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 616, Col: 95}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var57)
 		if templ_7745c5c3_Err != nil {
@@ -1355,7 +1358,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var58 string
 		templ_7745c5c3_Var58, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateStagedFieldName(item.Index, "sales"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 613, Col: 74}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 617, Col: 74}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var58)
 		if templ_7745c5c3_Err != nil {
@@ -1368,7 +1371,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var59 string
 		templ_7745c5c3_Var59, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.Sales)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 613, Col: 95}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 617, Col: 95}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var59)
 		if templ_7745c5c3_Err != nil {
@@ -1381,7 +1384,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var60 string
 		templ_7745c5c3_Var60, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateStagedFieldName(item.Index, "shop_name"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 614, Col: 78}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 618, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var60)
 		if templ_7745c5c3_Err != nil {
@@ -1394,7 +1397,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var61 string
 		templ_7745c5c3_Var61, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ShopName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 614, Col: 102}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 618, Col: 102}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var61)
 		if templ_7745c5c3_Err != nil {
@@ -1407,7 +1410,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var62 string
 		templ_7745c5c3_Var62, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateStagedFieldName(item.Index, "commission_rate"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 615, Col: 84}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 619, Col: 84}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var62)
 		if templ_7745c5c3_Err != nil {
@@ -1420,7 +1423,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var63 string
 		templ_7745c5c3_Var63, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.CommissionRate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 615, Col: 114}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 619, Col: 114}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var63)
 		if templ_7745c5c3_Err != nil {
@@ -1433,7 +1436,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var64 string
 		templ_7745c5c3_Var64, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateStagedFieldName(item.Index, "commission"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 616, Col: 79}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 620, Col: 79}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var64)
 		if templ_7745c5c3_Err != nil {
@@ -1446,7 +1449,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var65 string
 		templ_7745c5c3_Var65, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.Commission)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 616, Col: 105}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 620, Col: 105}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var65)
 		if templ_7745c5c3_Err != nil {
@@ -1459,7 +1462,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var66 string
 		templ_7745c5c3_Var66, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateStagedFieldName(item.Index, "product_link"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 617, Col: 81}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 621, Col: 81}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var66)
 		if templ_7745c5c3_Err != nil {
@@ -1472,7 +1475,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var67 string
 		templ_7745c5c3_Var67, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ProductLink)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 617, Col: 108}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 621, Col: 108}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var67)
 		if templ_7745c5c3_Err != nil {
@@ -1485,7 +1488,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var68 string
 		templ_7745c5c3_Var68, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateStagedFieldName(item.Index, "offer_link"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 618, Col: 79}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 622, Col: 79}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var68)
 		if templ_7745c5c3_Err != nil {
@@ -1498,7 +1501,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var69 string
 		templ_7745c5c3_Var69, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.OfferLink)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 618, Col: 104}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 622, Col: 104}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var69)
 		if templ_7745c5c3_Err != nil {
@@ -1511,7 +1514,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var70 string
 		templ_7745c5c3_Var70, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateStagedFieldName(item.Index, "shopee_shop_id"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 619, Col: 83}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 623, Col: 83}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var70)
 		if templ_7745c5c3_Err != nil {
@@ -1524,7 +1527,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var71 string
 		templ_7745c5c3_Var71, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ShopeeShopID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 619, Col: 111}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 623, Col: 111}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var71)
 		if templ_7745c5c3_Err != nil {
@@ -1537,7 +1540,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var72 string
 		templ_7745c5c3_Var72, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateStagedFieldName(item.Index, "thumbnail_url"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 620, Col: 82}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 624, Col: 82}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var72)
 		if templ_7745c5c3_Err != nil {
@@ -1550,7 +1553,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var73 string
 		templ_7745c5c3_Var73, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ThumbnailURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 620, Col: 110}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 624, Col: 110}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var73)
 		if templ_7745c5c3_Err != nil {
@@ -1563,7 +1566,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var74 string
 		templ_7745c5c3_Var74, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateStagedFieldName(item.Index, "price_display"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 621, Col: 82}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 625, Col: 82}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var74)
 		if templ_7745c5c3_Err != nil {
@@ -1576,7 +1579,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var75 string
 		templ_7745c5c3_Var75, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.PriceDisplay)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 621, Col: 110}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 625, Col: 110}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var75)
 		if templ_7745c5c3_Err != nil {
@@ -1589,7 +1592,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var76 string
 		templ_7745c5c3_Var76, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateStagedFieldName(item.Index, "program_id"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 622, Col: 79}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 626, Col: 79}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var76)
 		if templ_7745c5c3_Err != nil {
@@ -1602,7 +1605,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var77 string
 		templ_7745c5c3_Var77, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ProgramID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 622, Col: 104}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 626, Col: 104}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var77)
 		if templ_7745c5c3_Err != nil {
@@ -1615,7 +1618,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var78 string
 		templ_7745c5c3_Var78, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateStagedFieldName(item.Index, "impact_state"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 623, Col: 81}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 627, Col: 81}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var78)
 		if templ_7745c5c3_Err != nil {
@@ -1628,7 +1631,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var79 string
 		templ_7745c5c3_Var79, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ImpactState)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 623, Col: 108}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 627, Col: 108}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var79)
 		if templ_7745c5c3_Err != nil {
@@ -1641,7 +1644,7 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var80 string
 		templ_7745c5c3_Var80, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateStagedFieldName(item.Index, "impact_ad_type"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 624, Col: 83}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 628, Col: 83}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var80)
 		if templ_7745c5c3_Err != nil {
@@ -1654,13 +1657,39 @@ func AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) templ.Com
 		var templ_7745c5c3_Var81 string
 		templ_7745c5c3_Var81, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ImpactAdType)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 624, Col: 111}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 628, Col: 111}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var81)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 130, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 130, "\"> <input type=\"hidden\" name=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var82 string
+		templ_7745c5c3_Var82, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateStagedFieldName(item.Index, "thumbnail_orientation"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 629, Col: 90}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var82)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 131, "\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var83 string
+		templ_7745c5c3_Var83, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ThumbnailOrientation)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 629, Col: 126}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var83)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 132, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1702,227 +1731,283 @@ func AffiliateEditModal(form AffiliateFormData, openOnLoad bool) templ.Component
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var82 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var82 == nil {
-			templ_7745c5c3_Var82 = templ.NopComponent
+		templ_7745c5c3_Var84 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var84 == nil {
+			templ_7745c5c3_Var84 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 131, "<div class=\"modal-overlay\" id=\"affiliateEditModal\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 133, "<div class=\"modal-overlay\" id=\"affiliateEditModal\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if !openOnLoad {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 132, " hidden")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 134, " hidden")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 133, " role=\"presentation\"><div class=\"modal-dialog affiliates-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"affiliateEditModalTitle\"><div class=\"modal-header\"><h3 id=\"affiliateEditModalTitle\">Edit affiliate product</h3><button type=\"button\" class=\"modal-close affiliate-edit-modal-close\" aria-label=\"Close\">&times;</button></div><form id=\"affiliateEditForm\" method=\"POST\" action=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 135, " role=\"presentation\"><div class=\"modal-dialog affiliates-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"affiliateEditModalTitle\"><div class=\"modal-header\"><h3 id=\"affiliateEditModalTitle\">Edit affiliate product</h3><button type=\"button\" class=\"modal-close affiliate-edit-modal-close\" aria-label=\"Close\">&times;</button></div><form id=\"affiliateEditForm\" method=\"POST\" action=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var83 templ.SafeURL
-		templ_7745c5c3_Var83, templ_7745c5c3_Err = templ.JoinURLErrs(affiliateFormAction(form))
+		var templ_7745c5c3_Var85 templ.SafeURL
+		templ_7745c5c3_Var85, templ_7745c5c3_Err = templ.JoinURLErrs(affiliateFormAction(form))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 655, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 660, Col: 38}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var83))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var85))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 134, "\" class=\"affiliates-form\"><div class=\"modal-body\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 136, "\" class=\"affiliates-form\"><div class=\"modal-body\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if form.ThumbnailURL != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 135, "<div class=\"affiliates-preview-thumb\"><img src=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 137, "<div class=\"affiliates-preview-thumb\"><img src=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var84 string
-			templ_7745c5c3_Var84, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.ThumbnailURL)
+			var templ_7745c5c3_Var86 string
+			templ_7745c5c3_Var86, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.ThumbnailURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 661, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 666, Col: 35}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var84)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 136, "\" alt=\"Product thumbnail\" referrerpolicy=\"no-referrer\"></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var86)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 138, "\" alt=\"Product thumbnail\" referrerpolicy=\"no-referrer\"></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 137, "<div class=\"form-group\"><label for=\"affiliateName\">Name</label> <input type=\"text\" id=\"affiliateName\" name=\"name\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var85 string
-		templ_7745c5c3_Var85, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.Name)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 666, Col: 73}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var85)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 138, "\" required maxlength=\"256\"></div><div class=\"form-row\"><div class=\"form-group\"><label for=\"affiliateShopName\">Shop</label> <input type=\"text\" id=\"affiliateShopName\" name=\"shop_name\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var86 string
-		templ_7745c5c3_Var86, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.ShopName)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 671, Col: 87}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var86)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 139, "\" maxlength=\"256\"></div><div class=\"form-group\"><label for=\"affiliatePrice\">Price</label> <input type=\"text\" id=\"affiliatePrice\" name=\"price_display\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 139, "<div class=\"form-group\"><label for=\"affiliateName\">Name</label> <input type=\"text\" id=\"affiliateName\" name=\"name\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var87 string
-		templ_7745c5c3_Var87, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.PriceDisplay)
+		templ_7745c5c3_Var87, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 675, Col: 92}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 671, Col: 73}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var87)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 140, "\" maxlength=\"64\"></div></div><div class=\"form-row\"><div class=\"form-group\"><label for=\"affiliateSales\">Sales</label> <input type=\"text\" id=\"affiliateSales\" name=\"sales\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 140, "\" required maxlength=\"256\"></div><div class=\"form-row\"><div class=\"form-group\"><label for=\"affiliateShopName\">Shop</label> <input type=\"text\" id=\"affiliateShopName\" name=\"shop_name\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var88 string
-		templ_7745c5c3_Var88, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.Sales)
+		templ_7745c5c3_Var88, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.ShopName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 681, Col: 77}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 676, Col: 87}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var88)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 141, "\" maxlength=\"64\"></div><div class=\"form-group\"><label for=\"affiliateCommissionRate\">Commission rate</label> <input type=\"text\" id=\"affiliateCommissionRate\" name=\"commission_rate\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 141, "\" maxlength=\"256\"></div><div class=\"form-group\"><label for=\"affiliatePrice\">Price</label> <input type=\"text\" id=\"affiliatePrice\" name=\"price_display\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var89 string
-		templ_7745c5c3_Var89, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.CommissionRate)
+		templ_7745c5c3_Var89, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.PriceDisplay)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 685, Col: 105}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 680, Col: 92}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var89)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 142, "\" maxlength=\"32\"></div></div><div class=\"form-group\"><label for=\"affiliateCommission\">Commission</label> <input type=\"text\" id=\"affiliateCommission\" name=\"commission\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 142, "\" maxlength=\"64\"></div></div><div class=\"form-row\"><div class=\"form-group\"><label for=\"affiliateSales\">Sales</label> <input type=\"text\" id=\"affiliateSales\" name=\"sales\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var90 string
-		templ_7745c5c3_Var90, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.Commission)
+		templ_7745c5c3_Var90, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.Sales)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 690, Col: 91}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 686, Col: 77}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var90)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 143, "\" maxlength=\"32\"></div><div class=\"form-group\"><label for=\"affiliateLinkInput\">Affiliate link (Offer Link)</label> <input type=\"url\" id=\"affiliateLinkInput\" name=\"affiliate_url\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 143, "\" maxlength=\"64\"></div><div class=\"form-group\"><label for=\"affiliateCommissionRate\">Commission rate</label> <input type=\"text\" id=\"affiliateCommissionRate\" name=\"commission_rate\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var91 string
-		templ_7745c5c3_Var91, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.AffiliateURL)
+		templ_7745c5c3_Var91, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.CommissionRate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 694, Col: 94}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 690, Col: 105}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var91)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 144, "\" required></div><div class=\"form-group\"><label for=\"affiliateProductURL\">Product link</label> <input type=\"url\" id=\"affiliateProductURL\" name=\"product_url\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 144, "\" maxlength=\"32\"></div></div><div class=\"form-group\"><label for=\"affiliateCommission\">Commission</label> <input type=\"text\" id=\"affiliateCommission\" name=\"commission\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var92 string
-		templ_7745c5c3_Var92, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.ProductURL)
+		templ_7745c5c3_Var92, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.Commission)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 698, Col: 91}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 695, Col: 91}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var92)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 145, "\"></div><div class=\"form-group\"><label for=\"affiliateThumbnail\">Thumbnail URL</label> <input type=\"url\" id=\"affiliateThumbnail\" name=\"thumbnail_url\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 145, "\" maxlength=\"32\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var93 string
-		templ_7745c5c3_Var93, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.ThumbnailURL)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 702, Col: 94}
+		if form.Provider == constants.AffiliateProviderImpact {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 146, "<div class=\"form-group\"><label for=\"affiliateThumbnailOrientation\">Thumbnail orientation</label> <select id=\"affiliateThumbnailOrientation\" name=\"thumbnail_orientation\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			for _, opt := range ThumbnailOrientationEditOptions {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 147, "<option value=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var93 string
+				templ_7745c5c3_Var93, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 702, Col: 34}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var93)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 148, "\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				if opt.Value == form.ThumbnailOrientation {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 149, " selected")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 150, ">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var94 string
+				templ_7745c5c3_Var94, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 702, Col: 101}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var94))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 151, "</option>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 152, "</select></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var93)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 146, "\"></div><div class=\"form-group\"><label for=\"affiliateSortOrder\">Sort order</label> <input type=\"number\" id=\"affiliateSortOrder\" name=\"sort_order\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var94 string
-		templ_7745c5c3_Var94, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", form.SortOrder))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 706, Col: 110}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var94)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 147, "\" min=\"0\" step=\"1\"></div><input type=\"hidden\" name=\"shop_id\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 153, "<div class=\"form-group\"><label for=\"affiliateLinkInput\">Affiliate link (Offer Link)</label> <input type=\"url\" id=\"affiliateLinkInput\" name=\"affiliate_url\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var95 string
-		templ_7745c5c3_Var95, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.ShopID)
+		templ_7745c5c3_Var95, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.AffiliateURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 708, Col: 60}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 709, Col: 94}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var95)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 148, "\"> <input type=\"hidden\" name=\"item_id\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 154, "\" required></div><div class=\"form-group\"><label for=\"affiliateProductURL\">Product link</label> <input type=\"url\" id=\"affiliateProductURL\" name=\"product_url\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var96 string
-		templ_7745c5c3_Var96, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.ItemID)
+		templ_7745c5c3_Var96, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.ProductURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 709, Col: 60}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 713, Col: 91}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var96)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 149, "\"> <input type=\"hidden\" name=\"brand\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 155, "\"></div><div class=\"form-group\"><label for=\"affiliateThumbnail\">Thumbnail URL</label> <input type=\"url\" id=\"affiliateThumbnail\" name=\"thumbnail_url\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var97 string
-		templ_7745c5c3_Var97, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.Brand)
+		templ_7745c5c3_Var97, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.ThumbnailURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 710, Col: 57}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 717, Col: 94}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var97)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 150, "\"></div><div class=\"modal-footer affiliates-modal-footer\"><button type=\"button\" class=\"btn btn-secondary affiliate-edit-modal-close\">Cancel</button> <button type=\"submit\" class=\"btn\">Save changes</button></div></form></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 156, "\"></div><div class=\"form-group\"><label for=\"affiliateSortOrder\">Sort order</label> <input type=\"number\" id=\"affiliateSortOrder\" name=\"sort_order\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var98 string
+		templ_7745c5c3_Var98, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", form.SortOrder))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 721, Col: 110}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var98)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 157, "\" min=\"0\" step=\"1\"></div><input type=\"hidden\" name=\"shop_id\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var99 string
+		templ_7745c5c3_Var99, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.ShopID)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 723, Col: 60}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var99)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 158, "\"> <input type=\"hidden\" name=\"item_id\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var100 string
+		templ_7745c5c3_Var100, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.ItemID)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 724, Col: 60}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var100)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 159, "\"> <input type=\"hidden\" name=\"brand\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var101 string
+		templ_7745c5c3_Var101, templ_7745c5c3_Err = templ.ResolveAttributeValue(form.Brand)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliates.templ`, Line: 725, Col: 57}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var101)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 160, "\"></div><div class=\"modal-footer affiliates-modal-footer\"><button type=\"button\" class=\"btn btn-secondary affiliate-edit-modal-close\">Cancel</button> <button type=\"submit\" class=\"btn\">Save changes</button></div></form></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1953,12 +2038,12 @@ func AffiliatesPageStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var98 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var98 == nil {
-			templ_7745c5c3_Var98 = templ.NopComponent
+		templ_7745c5c3_Var102 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var102 == nil {
+			templ_7745c5c3_Var102 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 151, "<style>\n\t\t.affiliates-page {\n\t\t\tpadding-bottom: var(--space-10);\n\t\t}\n\n\t\t.affiliates-hub-header {\n\t\t\talign-items: flex-start;\n\t\t}\n\n\t\t.affiliates-page-heading {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tgap: var(--space-1);\n\t\t}\n\n\t\t.affiliates-page-subtitle {\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-size: 0.9375rem;\n\t\t\tline-height: 1.5;\n\t\t\tmax-width: 40rem;\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.affiliates-header-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tflex-shrink: 0;\n\t\t}\n\n\t\t.affiliates-header-actions .add-btn {\n\t\t\tmargin-top: 0;\n\t\t}\n\n\t\t.affiliates-shop-name {\n\t\t\tdisplay: block;\n\t\t\tmargin-top: var(--space-1);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-source-icon {\n\t\t\tdisplay: inline-flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t}\n\n\t\t.affiliates-source-icon img {\n\t\t\tdisplay: block;\n\t\t\tobject-fit: contain;\n\t\t}\n\n\t\t.affiliates-source-icon--shopee {\n\t\t\tbackground: #ee4d2d;\n\t\t}\n\n\t\t.affiliates-source-icon--impact {\n\t\t\tbackground: #1e3a5f;\n\t\t\tpadding: 4px 8px;\n\t\t\tmin-width: 4.5rem;\n\t\t}\n\n\t\t.affiliates-source-icon--impact img {\n\t\t\twidth: auto;\n\t\t\tmax-width: 4rem;\n\t\t\theight: 1.25rem;\n\t\t}\n\n\t\t.affiliates-upload-modal {\n\t\t\tmax-width: 28rem;\n\t\t}\n\n\t\t.affiliates-upload-callout {\n\t\t\tpadding: var(--space-3) var(--space-4);\n\t\t\tmargin-bottom: var(--space-4);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tbackground: linear-gradient(180deg, var(--color-primary-light) 0%, var(--color-surface) 100%);\n\t\t}\n\n\t\t.affiliates-upload-callout-title {\n\t\t\tmargin: 0 0 var(--space-2);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tfont-weight: 600;\n\t\t\tcolor: var(--color-foreground);\n\t\t}\n\n\t\t.affiliates-upload-steps {\n\t\t\tmargin: 0;\n\t\t\tpadding-left: 1.125rem;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tline-height: 1.55;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-upload-steps li {\n\t\t\tmargin-bottom: var(--space-1);\n\t\t}\n\n\t\t.affiliates-upload-steps li:last-child {\n\t\t\tmargin-bottom: 0;\n\t\t}\n\n\t\t.affiliates-upload-columns-label {\n\t\t\tmargin: 0 0 var(--space-1);\n\t\t\tfont-size: 0.75rem;\n\t\t\tfont-weight: 600;\n\t\t\ttext-transform: uppercase;\n\t\t\tletter-spacing: 0.04em;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-upload-columns {\n\t\t\tmargin: 0 0 var(--space-4);\n\t\t\tfont-size: 0.75rem;\n\t\t\tline-height: 1.45;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-csv-upload-zone.upload-zone {\n\t\t\tposition: relative;\n\t\t\tmargin-bottom: 0;\n\t\t}\n\n\t\t.affiliates-csv-upload-zone.upload-zone.is-dragover {\n\t\t\tborder-color: var(--color-primary);\n\t\t\tbackground: var(--color-primary-light);\n\t\t}\n\n\t\t.affiliates-csv-upload-icon {\n\t\t\tbackground: var(--color-primary-light);\n\t\t\tcolor: var(--color-primary-hover);\n\t\t}\n\n\t\t.upload-zone {\n\t\t\tborder: 2px dashed var(--color-border);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tpadding: var(--space-4);\n\t\t\tbackground: var(--color-surface);\n\t\t\ttransition: border-color var(--transition-fast), background-color var(--transition-fast);\n\t\t}\n\n\t\t.upload-zone:focus-within {\n\t\t\tborder-color: var(--color-primary);\n\t\t\tbackground: var(--color-primary-light);\n\t\t}\n\n\t\t.upload-zone-label {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-3);\n\t\t\tcursor: pointer;\n\t\t\tfont-weight: 500;\n\t\t\tfont-size: 0.875rem;\n\t\t}\n\n\t\t.upload-zone-icon {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\twidth: 44px;\n\t\t\theight: 44px;\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tflex-shrink: 0;\n\t\t}\n\n\t\t.upload-zone input[type=\"file\"] {\n\t\t\tposition: absolute;\n\t\t\twidth: 1px;\n\t\t\theight: 1px;\n\t\t\tpadding: 0;\n\t\t\tmargin: -1px;\n\t\t\toverflow: hidden;\n\t\t\tclip: rect(0, 0, 0, 0);\n\t\t\tborder: 0;\n\t\t}\n\n\t\t.upload-zone-meta {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tgap: 2px;\n\t\t\tmin-width: 0;\n\t\t}\n\n\t\t.upload-zone-hint {\n\t\t\tfont-size: 0.75rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-weight: 400;\n\t\t}\n\n\t\t.upload-filename {\n\t\t\tmargin: var(--space-3) 0 0;\n\t\t\tpadding-top: var(--space-3);\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-foreground);\n\t\t\tword-break: break-all;\n\t\t}\n\n\t\t.upload-filename:empty {\n\t\t\tdisplay: none;\n\t\t\tmargin: 0;\n\t\t\tpadding: 0;\n\t\t\tborder: none;\n\t\t}\n\n\t\t.affiliates-upload-modal-footer {\n\t\t\tjustify-content: flex-end;\n\t\t}\n\n\t\t.affiliates-toolbar .affiliates-search-group {\n\t\t\tflex: 2 1 280px;\n\t\t\tmin-width: min(100%, 280px);\n\t\t}\n\n\t\t.affiliates-thumb {\n\t\t\twidth: 48px;\n\t\t\theight: 48px;\n\t\t\tobject-fit: contain;\n\t\t\tobject-position: center;\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tbackground: var(--color-muted);\n\t\t\tdisplay: block;\n\t\t}\n\n\t\t.affiliates-thumb-empty {\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-table th.col-name,\n\t\t.affiliates-table td.col-name {\n\t\t\tmax-width: 9rem;\n\t\t\twidth: 14%;\n\t\t}\n\n\t\t.affiliates-table td.col-name {\n\t\t\toverflow: hidden;\n\t\t\ttext-overflow: ellipsis;\n\t\t\twhite-space: nowrap;\n\t\t}\n\n\t\t.affiliates-table th.col-clicks,\n\t\t.affiliates-table td.col-clicks {\n\t\t\twidth: 4.5rem;\n\t\t\ttext-align: right;\n\t\t\twhite-space: nowrap;\n\t\t}\n\n\t\t.affiliates-empty {\n\t\t\ttext-align: center;\n\t\t\tpadding: var(--space-8);\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-modal {\n\t\t\tmax-width: 32rem;\n\t\t}\n\n\t\t.affiliates-preview-thumb {\n\t\t\tmargin-bottom: var(--space-4);\n\t\t}\n\n\t\t.affiliates-preview-thumb img {\n\t\t\tmax-width: 120px;\n\t\t\tmax-height: 120px;\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tbackground: var(--color-muted);\n\t\t\tobject-fit: contain;\n\t\t\tobject-position: center;\n\t\t}\n\n\t\t.affiliates-modal-footer {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t}\n\n\t\t.affiliates-modal-footer .btn,\n\t\t.affiliates-modal-footer .btn-secondary {\n\t\t\tmargin-top: 0;\n\t\t}\n\n\t\t.affiliates-import-summary {\n\t\t\tmargin-bottom: var(--space-4);\n\t\t\tpadding: var(--space-4);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tbackground: var(--color-surface);\n\t\t}\n\n\t\t.affiliates-import-summary-title {\n\t\t\tmargin: 0 0 var(--space-3);\n\t\t\tfont-size: 0.875rem;\n\t\t\tfont-weight: 600;\n\t\t}\n\n\t\t.affiliates-import-summary-grid {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));\n\t\t\tgap: var(--space-3);\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.affiliates-import-summary-item {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tgap: var(--space-1);\n\t\t\tmin-width: 0;\n\t\t}\n\n\t\t.affiliates-import-summary-item dt {\n\t\t\tmargin: 0;\n\t\t\tfont-size: 0.75rem;\n\t\t\tfont-weight: 600;\n\t\t\ttext-transform: uppercase;\n\t\t\tletter-spacing: 0.03em;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-import-summary-item dd {\n\t\t\tmargin: 0;\n\t\t\tfont-size: 0.875rem;\n\t\t\tline-height: 1.4;\n\t\t\tword-break: break-word;\n\t\t}\n\n\t\t.affiliate-staged-import-item-meta {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tmargin-bottom: var(--space-2);\n\t\t}\n\n\t\t.affiliate-staged-import-changed-fields {\n\t\t\tfont-size: 0.75rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-import-removed {\n\t\t\tmargin-bottom: var(--space-3);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tbackground: var(--color-surface);\n\t\t}\n\n\t\t.affiliates-import-removed-summary {\n\t\t\tpadding: var(--space-3) var(--space-4);\n\t\t\tfont-size: 0.875rem;\n\t\t\tfont-weight: 600;\n\t\t\tcursor: pointer;\n\t\t}\n\n\t\t.affiliates-import-logs,\n\t\t.affiliates-import-products {\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tbackground: var(--color-surface);\n\t\t}\n\n\t\t.affiliates-import-logs {\n\t\t\tmargin-bottom: var(--space-3);\n\t\t}\n\n\t\t.affiliates-import-logs-summary,\n\t\t.affiliates-import-products-summary {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tpadding: var(--space-3) var(--space-4);\n\t\t\tfont-size: 0.875rem;\n\t\t\tfont-weight: 600;\n\t\t\tcursor: pointer;\n\t\t\tlist-style: none;\n\t\t}\n\n\t\t.affiliates-import-logs-summary::-webkit-details-marker,\n\t\t.affiliates-import-products-summary::-webkit-details-marker {\n\t\t\tdisplay: none;\n\t\t}\n\n\t\t.affiliates-import-logs-summary::before,\n\t\t.affiliates-import-products-summary::before {\n\t\t\tcontent: \"\";\n\t\t\twidth: 0.5rem;\n\t\t\theight: 0.5rem;\n\t\t\tborder-right: 2px solid var(--color-muted-foreground);\n\t\t\tborder-bottom: 2px solid var(--color-muted-foreground);\n\t\t\ttransform: rotate(-45deg);\n\t\t\ttransition: transform var(--transition-fast);\n\t\t\tflex-shrink: 0;\n\t\t}\n\n\t\t.affiliates-import-logs[open] .affiliates-import-logs-summary::before,\n\t\t.affiliates-import-products[open] .affiliates-import-products-summary::before {\n\t\t\ttransform: rotate(45deg);\n\t\t}\n\n\t\t.affiliates-import-logs-count,\n\t\t.affiliates-import-products-count {\n\t\t\tfont-weight: 500;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-import-logs-panel,\n\t\t.affiliates-import-products-panel {\n\t\t\tpadding: var(--space-4);\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\n\t\t}\n\n\t\t.affiliates-import-logs-empty {\n\t\t\tmargin: 0;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-import-logs-table {\n\t\t\twidth: 100%;\n\t\t}\n\n\t\t.affiliates-import-logs-table th,\n\t\t.affiliates-import-logs-table td {\n\t\t\tfont-size: 0.8125rem;\n\t\t\tvertical-align: top;\n\t\t}\n\n\t\t.affiliates-import-logs-table td:first-child {\n\t\t\twidth: 8rem;\n\t\t\twhite-space: nowrap;\n\t\t}\n\n\t\t.affiliates-import-products {\n\t\t\tmargin-top: var(--space-3);\n\t\t}\n\n\t\t.affiliates-import-select-hint {\n\t\t\tmargin: 0 0 var(--space-3);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliate-staged-import-item {\n\t\t\tmin-width: 0;\n\t\t}\n\n\t\t.affiliates-import-save-footer {\n\t\t\tjustify-content: flex-end;\n\t\t}\n\n\t\t.affiliates-import-save-footer .btn,\n\t\t.affiliates-import-save-footer .btn-secondary {\n\t\t\tmargin-top: 0;\n\t\t}\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 161, "<style>\n\t\t.affiliates-page {\n\t\t\tpadding-bottom: var(--space-10);\n\t\t}\n\n\t\t.affiliates-hub-header {\n\t\t\talign-items: flex-start;\n\t\t}\n\n\t\t.affiliates-page-heading {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tgap: var(--space-1);\n\t\t}\n\n\t\t.affiliates-page-subtitle {\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-size: 0.9375rem;\n\t\t\tline-height: 1.5;\n\t\t\tmax-width: 40rem;\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.affiliates-header-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tflex-shrink: 0;\n\t\t}\n\n\t\t.affiliates-header-actions .add-btn {\n\t\t\tmargin-top: 0;\n\t\t}\n\n\t\t.affiliates-shop-name {\n\t\t\tdisplay: block;\n\t\t\tmargin-top: var(--space-1);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-source-icon {\n\t\t\tdisplay: inline-flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t}\n\n\t\t.affiliates-source-icon img {\n\t\t\tdisplay: block;\n\t\t\tobject-fit: contain;\n\t\t}\n\n\t\t.affiliates-source-icon--shopee {\n\t\t\tbackground: #ee4d2d;\n\t\t}\n\n\t\t.affiliates-source-icon--impact {\n\t\t\tbackground: #1e3a5f;\n\t\t\tpadding: 4px 8px;\n\t\t\tmin-width: 4.5rem;\n\t\t}\n\n\t\t.affiliates-source-icon--impact img {\n\t\t\twidth: auto;\n\t\t\tmax-width: 4rem;\n\t\t\theight: 1.25rem;\n\t\t}\n\n\t\t.affiliates-upload-modal {\n\t\t\tmax-width: 28rem;\n\t\t}\n\n\t\t.affiliates-upload-callout {\n\t\t\tpadding: var(--space-3) var(--space-4);\n\t\t\tmargin-bottom: var(--space-4);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tbackground: linear-gradient(180deg, var(--color-primary-light) 0%, var(--color-surface) 100%);\n\t\t}\n\n\t\t.affiliates-upload-callout-title {\n\t\t\tmargin: 0 0 var(--space-2);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tfont-weight: 600;\n\t\t\tcolor: var(--color-foreground);\n\t\t}\n\n\t\t.affiliates-upload-steps {\n\t\t\tmargin: 0;\n\t\t\tpadding-left: 1.125rem;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tline-height: 1.55;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-upload-steps li {\n\t\t\tmargin-bottom: var(--space-1);\n\t\t}\n\n\t\t.affiliates-upload-steps li:last-child {\n\t\t\tmargin-bottom: 0;\n\t\t}\n\n\t\t.affiliates-upload-columns-label {\n\t\t\tmargin: 0 0 var(--space-1);\n\t\t\tfont-size: 0.75rem;\n\t\t\tfont-weight: 600;\n\t\t\ttext-transform: uppercase;\n\t\t\tletter-spacing: 0.04em;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-upload-columns {\n\t\t\tmargin: 0 0 var(--space-4);\n\t\t\tfont-size: 0.75rem;\n\t\t\tline-height: 1.45;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-csv-upload-zone.upload-zone {\n\t\t\tposition: relative;\n\t\t\tmargin-bottom: 0;\n\t\t}\n\n\t\t.affiliates-csv-upload-zone.upload-zone.is-dragover {\n\t\t\tborder-color: var(--color-primary);\n\t\t\tbackground: var(--color-primary-light);\n\t\t}\n\n\t\t.affiliates-csv-upload-icon {\n\t\t\tbackground: var(--color-primary-light);\n\t\t\tcolor: var(--color-primary-hover);\n\t\t}\n\n\t\t.upload-zone {\n\t\t\tborder: 2px dashed var(--color-border);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tpadding: var(--space-4);\n\t\t\tbackground: var(--color-surface);\n\t\t\ttransition: border-color var(--transition-fast), background-color var(--transition-fast);\n\t\t}\n\n\t\t.upload-zone:focus-within {\n\t\t\tborder-color: var(--color-primary);\n\t\t\tbackground: var(--color-primary-light);\n\t\t}\n\n\t\t.upload-zone-label {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-3);\n\t\t\tcursor: pointer;\n\t\t\tfont-weight: 500;\n\t\t\tfont-size: 0.875rem;\n\t\t}\n\n\t\t.upload-zone-icon {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\twidth: 44px;\n\t\t\theight: 44px;\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tflex-shrink: 0;\n\t\t}\n\n\t\t.upload-zone input[type=\"file\"] {\n\t\t\tposition: absolute;\n\t\t\twidth: 1px;\n\t\t\theight: 1px;\n\t\t\tpadding: 0;\n\t\t\tmargin: -1px;\n\t\t\toverflow: hidden;\n\t\t\tclip: rect(0, 0, 0, 0);\n\t\t\tborder: 0;\n\t\t}\n\n\t\t.upload-zone-meta {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tgap: 2px;\n\t\t\tmin-width: 0;\n\t\t}\n\n\t\t.upload-zone-hint {\n\t\t\tfont-size: 0.75rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-weight: 400;\n\t\t}\n\n\t\t.upload-filename {\n\t\t\tmargin: var(--space-3) 0 0;\n\t\t\tpadding-top: var(--space-3);\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-foreground);\n\t\t\tword-break: break-all;\n\t\t}\n\n\t\t.upload-filename:empty {\n\t\t\tdisplay: none;\n\t\t\tmargin: 0;\n\t\t\tpadding: 0;\n\t\t\tborder: none;\n\t\t}\n\n\t\t.affiliates-upload-modal-footer {\n\t\t\tjustify-content: flex-end;\n\t\t}\n\n\t\t.affiliates-toolbar .affiliates-search-group {\n\t\t\tflex: 2 1 280px;\n\t\t\tmin-width: min(100%, 280px);\n\t\t}\n\n\t\t.affiliates-thumb {\n\t\t\twidth: 48px;\n\t\t\theight: 48px;\n\t\t\tobject-fit: contain;\n\t\t\tobject-position: center;\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tbackground: var(--color-muted);\n\t\t\tdisplay: block;\n\t\t}\n\n\t\t.affiliates-thumb-empty {\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-table th.col-name,\n\t\t.affiliates-table td.col-name {\n\t\t\tmax-width: 9rem;\n\t\t\twidth: 14%;\n\t\t}\n\n\t\t.affiliates-table td.col-name {\n\t\t\toverflow: hidden;\n\t\t\ttext-overflow: ellipsis;\n\t\t\twhite-space: nowrap;\n\t\t}\n\n\t\t.affiliates-table th.col-clicks,\n\t\t.affiliates-table td.col-clicks {\n\t\t\twidth: 4.5rem;\n\t\t\ttext-align: right;\n\t\t\twhite-space: nowrap;\n\t\t}\n\n\t\t.affiliates-empty {\n\t\t\ttext-align: center;\n\t\t\tpadding: var(--space-8);\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-modal {\n\t\t\tmax-width: 32rem;\n\t\t}\n\n\t\t.affiliates-preview-thumb {\n\t\t\tmargin-bottom: var(--space-4);\n\t\t}\n\n\t\t.affiliates-preview-thumb img {\n\t\t\tmax-width: 120px;\n\t\t\tmax-height: 120px;\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tbackground: var(--color-muted);\n\t\t\tobject-fit: contain;\n\t\t\tobject-position: center;\n\t\t}\n\n\t\t.affiliates-modal-footer {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t}\n\n\t\t.affiliates-modal-footer .btn,\n\t\t.affiliates-modal-footer .btn-secondary {\n\t\t\tmargin-top: 0;\n\t\t}\n\n\t\t.affiliates-import-summary {\n\t\t\tmargin-bottom: var(--space-4);\n\t\t\tpadding: var(--space-4);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tbackground: var(--color-surface);\n\t\t}\n\n\t\t.affiliates-import-summary-title {\n\t\t\tmargin: 0 0 var(--space-3);\n\t\t\tfont-size: 0.875rem;\n\t\t\tfont-weight: 600;\n\t\t}\n\n\t\t.affiliates-import-summary-grid {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));\n\t\t\tgap: var(--space-3);\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.affiliates-import-summary-item {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tgap: var(--space-1);\n\t\t\tmin-width: 0;\n\t\t}\n\n\t\t.affiliates-import-summary-item dt {\n\t\t\tmargin: 0;\n\t\t\tfont-size: 0.75rem;\n\t\t\tfont-weight: 600;\n\t\t\ttext-transform: uppercase;\n\t\t\tletter-spacing: 0.03em;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-import-summary-item dd {\n\t\t\tmargin: 0;\n\t\t\tfont-size: 0.875rem;\n\t\t\tline-height: 1.4;\n\t\t\tword-break: break-word;\n\t\t}\n\n\t\t.affiliate-staged-import-item-meta {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tmargin-bottom: var(--space-2);\n\t\t}\n\n\t\t.affiliate-staged-import-changed-fields {\n\t\t\tfont-size: 0.75rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-import-removed {\n\t\t\tmargin-bottom: var(--space-3);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tbackground: var(--color-surface);\n\t\t}\n\n\t\t.affiliates-import-removed-summary {\n\t\t\tpadding: var(--space-3) var(--space-4);\n\t\t\tfont-size: 0.875rem;\n\t\t\tfont-weight: 600;\n\t\t\tcursor: pointer;\n\t\t}\n\n\t\t.affiliates-import-logs,\n\t\t.affiliates-import-products {\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tbackground: var(--color-surface);\n\t\t}\n\n\t\t.affiliates-import-logs {\n\t\t\tmargin-bottom: var(--space-3);\n\t\t}\n\n\t\t.affiliates-import-logs-summary,\n\t\t.affiliates-import-products-summary {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tpadding: var(--space-3) var(--space-4);\n\t\t\tfont-size: 0.875rem;\n\t\t\tfont-weight: 600;\n\t\t\tcursor: pointer;\n\t\t\tlist-style: none;\n\t\t}\n\n\t\t.affiliates-import-logs-summary::-webkit-details-marker,\n\t\t.affiliates-import-products-summary::-webkit-details-marker {\n\t\t\tdisplay: none;\n\t\t}\n\n\t\t.affiliates-import-logs-summary::before,\n\t\t.affiliates-import-products-summary::before {\n\t\t\tcontent: \"\";\n\t\t\twidth: 0.5rem;\n\t\t\theight: 0.5rem;\n\t\t\tborder-right: 2px solid var(--color-muted-foreground);\n\t\t\tborder-bottom: 2px solid var(--color-muted-foreground);\n\t\t\ttransform: rotate(-45deg);\n\t\t\ttransition: transform var(--transition-fast);\n\t\t\tflex-shrink: 0;\n\t\t}\n\n\t\t.affiliates-import-logs[open] .affiliates-import-logs-summary::before,\n\t\t.affiliates-import-products[open] .affiliates-import-products-summary::before {\n\t\t\ttransform: rotate(45deg);\n\t\t}\n\n\t\t.affiliates-import-logs-count,\n\t\t.affiliates-import-products-count {\n\t\t\tfont-weight: 500;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-import-logs-panel,\n\t\t.affiliates-import-products-panel {\n\t\t\tpadding: var(--space-4);\n\t\t\tborder-top: 1px solid var(--color-border-subtle);\n\t\t}\n\n\t\t.affiliates-import-logs-empty {\n\t\t\tmargin: 0;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliates-import-logs-table {\n\t\t\twidth: 100%;\n\t\t}\n\n\t\t.affiliates-import-logs-table th,\n\t\t.affiliates-import-logs-table td {\n\t\t\tfont-size: 0.8125rem;\n\t\t\tvertical-align: top;\n\t\t}\n\n\t\t.affiliates-import-logs-table td:first-child {\n\t\t\twidth: 8rem;\n\t\t\twhite-space: nowrap;\n\t\t}\n\n\t\t.affiliates-import-products {\n\t\t\tmargin-top: var(--space-3);\n\t\t}\n\n\t\t.affiliates-import-select-hint {\n\t\t\tmargin: 0 0 var(--space-3);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliate-staged-import-item {\n\t\t\tmin-width: 0;\n\t\t}\n\n\t\t.affiliates-import-save-footer {\n\t\t\tjustify-content: flex-end;\n\t\t}\n\n\t\t.affiliates-import-save-footer .btn,\n\t\t.affiliates-import-save-footer .btn-secondary {\n\t\t\tmargin-top: 0;\n\t\t}\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1982,12 +2067,12 @@ func AffiliatesEditModalScripts() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var99 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var99 == nil {
-			templ_7745c5c3_Var99 = templ.NopComponent
+		templ_7745c5c3_Var103 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var103 == nil {
+			templ_7745c5c3_Var103 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 152, "<script>\n\t\t(function () {\n\t\t\tif (window.__affiliateEditModalScriptsBound) return;\n\t\t\twindow.__affiliateEditModalScriptsBound = true;\n\n\t\t\twindow.closeAffiliateEditModal = function () {\n\t\t\t\tconst host = document.getElementById('affiliateEditModalHost');\n\t\t\t\tif (host) host.innerHTML = '';\n\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t};\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (!evt.detail.target || evt.detail.target.id !== 'affiliateEditModalHost') return;\n\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\tconst closeBtn = evt.detail.target.querySelector('.affiliate-edit-modal-close');\n\t\t\t\tif (closeBtn) closeBtn.focus();\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tif (e.target.closest('.affiliate-edit-modal-close')) {\n\t\t\t\t\twindow.closeAffiliateEditModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst overlay = e.target.closest('#affiliateEditModal');\n\t\t\t\tif (overlay && e.target === overlay) window.closeAffiliateEditModal();\n\t\t\t});\n\n\t\t\tdocument.addEventListener('keydown', function (e) {\n\t\t\t\tif (e.key !== 'Escape' || !document.getElementById('affiliateEditModal')) return;\n\t\t\t\twindow.closeAffiliateEditModal();\n\t\t\t});\n\n\t\t\tconst editModal = document.getElementById('affiliateEditModal');\n\t\t\tif (editModal && !editModal.hidden) {\n\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t}\n\t\t})();\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 162, "<script>\n\t\t(function () {\n\t\t\tif (window.__affiliateEditModalScriptsBound) return;\n\t\t\twindow.__affiliateEditModalScriptsBound = true;\n\n\t\t\twindow.closeAffiliateEditModal = function () {\n\t\t\t\tconst host = document.getElementById('affiliateEditModalHost');\n\t\t\t\tif (host) host.innerHTML = '';\n\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t};\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (!evt.detail.target || evt.detail.target.id !== 'affiliateEditModalHost') return;\n\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\tconst closeBtn = evt.detail.target.querySelector('.affiliate-edit-modal-close');\n\t\t\t\tif (closeBtn) closeBtn.focus();\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tif (e.target.closest('.affiliate-edit-modal-close')) {\n\t\t\t\t\twindow.closeAffiliateEditModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst overlay = e.target.closest('#affiliateEditModal');\n\t\t\t\tif (overlay && e.target === overlay) window.closeAffiliateEditModal();\n\t\t\t});\n\n\t\t\tdocument.addEventListener('keydown', function (e) {\n\t\t\t\tif (e.key !== 'Escape' || !document.getElementById('affiliateEditModal')) return;\n\t\t\t\twindow.closeAffiliateEditModal();\n\t\t\t});\n\n\t\t\tconst editModal = document.getElementById('affiliateEditModal');\n\t\t\tif (editModal && !editModal.hidden) {\n\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t}\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -2011,12 +2096,12 @@ func AffiliatesScripts() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var100 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var100 == nil {
-			templ_7745c5c3_Var100 = templ.NopComponent
+		templ_7745c5c3_Var104 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var104 == nil {
+			templ_7745c5c3_Var104 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 153, "<script>\n\t\t(function () {\n\t\t\tfunction wireModal(modalId, closeClass) {\n\t\t\t\tconst modal = document.getElementById(modalId);\n\t\t\t\tif (!modal) return;\n\t\t\t\tfunction closeModal() {\n\t\t\t\t\tmodal.hidden = true;\n\t\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t\t}\n\t\t\t\tmodal.querySelectorAll('.' + closeClass).forEach(function (btn) {\n\t\t\t\t\tbtn.addEventListener('click', closeModal);\n\t\t\t\t});\n\t\t\t\tmodal.addEventListener('click', function (e) {\n\t\t\t\t\tif (e.target === modal) closeModal();\n\t\t\t\t});\n\t\t\t\tif (!modal.hidden) {\n\t\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\t}\n\t\t\t}\n\t\t\tfunction openModal(modalId) {\n\t\t\t\tconst modal = document.getElementById(modalId);\n\t\t\t\tif (!modal) return;\n\t\t\t\tmodal.hidden = false;\n\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t}\n\n\t\t\twireModal('affiliateUploadSourceModal', 'affiliate-upload-source-close');\n\t\t\twireModal('affiliateUploadModal', 'affiliate-upload-modal-close');\n\t\t\twireModal('affiliateImpactUploadModal', 'affiliate-impact-upload-modal-close');\n\t\t\twireModal('affiliatePreviewModal', 'affiliate-preview-modal-close');\n\t\t\tdocument.getElementById('affiliateImportSaveForm')?.addEventListener('submit', function () {\n\t\t\t\tconst btn = document.getElementById('affiliateImportSaveBtn');\n\t\t\t\tif (btn) {\n\t\t\t\t\tbtn.disabled = true;\n\t\t\t\t\tbtn.textContent = 'Saving…';\n\t\t\t\t}\n\t\t\t});\n\t\t\tfunction resetAffiliateUploadForm() {\n\t\t\t\tconst form = document.getElementById('affiliateUploadForm');\n\t\t\t\tconst input = document.getElementById('affiliateCSVInput');\n\t\t\t\tconst filenameEl = document.getElementById('affiliateCSVFilename');\n\t\t\t\tconst submitBtn = document.getElementById('affiliateUploadSubmitBtn');\n\t\t\t\tconst zone = document.getElementById('affiliateCSVUploadZone');\n\t\t\t\tif (form) form.reset();\n\t\t\t\tif (filenameEl) filenameEl.textContent = '';\n\t\t\t\tif (submitBtn) {\n\t\t\t\t\tsubmitBtn.disabled = true;\n\t\t\t\t\tsubmitBtn.textContent = 'Import products';\n\t\t\t\t}\n\t\t\t\tif (zone) zone.classList.remove('is-dragover');\n\t\t\t}\n\n\t\t\tfunction bindAffiliateCSVUpload() {\n\t\t\t\tconst form = document.getElementById('affiliateUploadForm');\n\t\t\t\tconst input = document.getElementById('affiliateCSVInput');\n\t\t\t\tconst filenameEl = document.getElementById('affiliateCSVFilename');\n\t\t\t\tconst submitBtn = document.getElementById('affiliateUploadSubmitBtn');\n\t\t\t\tconst zone = document.getElementById('affiliateCSVUploadZone');\n\t\t\t\tif (!form || !input || form.dataset.csvUploadBound === '1') return;\n\t\t\t\tform.dataset.csvUploadBound = '1';\n\n\t\t\t\tfunction syncFileState() {\n\t\t\t\t\tconst file = input.files && input.files[0];\n\t\t\t\t\tif (filenameEl) {\n\t\t\t\t\t\tfilenameEl.textContent = file ? file.name : '';\n\t\t\t\t\t}\n\t\t\t\t\tif (submitBtn) submitBtn.disabled = !file;\n\t\t\t\t}\n\n\t\t\t\tinput.addEventListener('change', syncFileState);\n\n\t\t\t\tif (zone) {\n\t\t\t\t\t['dragenter', 'dragover'].forEach(function (name) {\n\t\t\t\t\t\tzone.addEventListener(name, function (e) {\n\t\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\t\tzone.classList.add('is-dragover');\n\t\t\t\t\t\t});\n\t\t\t\t\t});\n\t\t\t\t\t['dragleave', 'drop'].forEach(function (name) {\n\t\t\t\t\t\tzone.addEventListener(name, function (e) {\n\t\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\t\tif (name === 'drop' && e.dataTransfer?.files?.length) {\n\t\t\t\t\t\t\t\tconst dropped = e.dataTransfer.files[0];\n\t\t\t\t\t\t\t\tif (dropped) {\n\t\t\t\t\t\t\t\t\tconst dt = new DataTransfer();\n\t\t\t\t\t\t\t\t\tdt.items.add(dropped);\n\t\t\t\t\t\t\t\t\tinput.files = dt.files;\n\t\t\t\t\t\t\t\t\tsyncFileState();\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\tzone.classList.remove('is-dragover');\n\t\t\t\t\t\t});\n\t\t\t\t\t});\n\t\t\t\t}\n\n\t\t\t\tform.addEventListener('submit', function () {\n\t\t\t\t\tif (submitBtn) {\n\t\t\t\t\t\tsubmitBtn.disabled = true;\n\t\t\t\t\t\tsubmitBtn.textContent = 'Importing…';\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tfunction bindAffiliateImpactCSVUpload() {\n\t\t\t\tconst form = document.getElementById('affiliateImpactUploadForm');\n\t\t\t\tconst input = document.getElementById('affiliateImpactCSVInput');\n\t\t\t\tconst filenameEl = document.getElementById('affiliateImpactCSVFilename');\n\t\t\t\tconst submitBtn = document.getElementById('affiliateImpactUploadSubmitBtn');\n\t\t\t\tconst zone = document.getElementById('affiliateImpactCSVUploadZone');\n\t\t\t\tif (!form || !input || form.dataset.csvUploadBound === '1') return;\n\t\t\t\tform.dataset.csvUploadBound = '1';\n\n\t\t\t\tfunction syncFileState() {\n\t\t\t\t\tconst file = input.files && input.files[0];\n\t\t\t\t\tif (filenameEl) filenameEl.textContent = file ? file.name : '';\n\t\t\t\t\tif (submitBtn) submitBtn.disabled = !file;\n\t\t\t\t}\n\n\t\t\t\tinput.addEventListener('change', syncFileState);\n\n\t\t\t\tif (zone) {\n\t\t\t\t\t['dragenter', 'dragover'].forEach(function (name) {\n\t\t\t\t\t\tzone.addEventListener(name, function (e) {\n\t\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\t\tzone.classList.add('is-dragover');\n\t\t\t\t\t\t});\n\t\t\t\t\t});\n\t\t\t\t\t['dragleave', 'drop'].forEach(function (name) {\n\t\t\t\t\t\tzone.addEventListener(name, function (e) {\n\t\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\t\tif (name === 'drop' && e.dataTransfer?.files?.length) {\n\t\t\t\t\t\t\t\tconst dropped = e.dataTransfer.files[0];\n\t\t\t\t\t\t\t\tif (dropped) {\n\t\t\t\t\t\t\t\t\tconst dt = new DataTransfer();\n\t\t\t\t\t\t\t\t\tdt.items.add(dropped);\n\t\t\t\t\t\t\t\t\tinput.files = dt.files;\n\t\t\t\t\t\t\t\t\tsyncFileState();\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\tzone.classList.remove('is-dragover');\n\t\t\t\t\t\t});\n\t\t\t\t\t});\n\t\t\t\t}\n\n\t\t\t\tform.addEventListener('submit', function () {\n\t\t\t\t\tif (submitBtn) {\n\t\t\t\t\t\tsubmitBtn.disabled = true;\n\t\t\t\t\t\tsubmitBtn.textContent = 'Importing…';\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tfunction resetAffiliateImpactUploadForm() {\n\t\t\t\tconst form = document.getElementById('affiliateImpactUploadForm');\n\t\t\t\tconst input = document.getElementById('affiliateImpactCSVInput');\n\t\t\t\tconst filenameEl = document.getElementById('affiliateImpactCSVFilename');\n\t\t\t\tconst submitBtn = document.getElementById('affiliateImpactUploadSubmitBtn');\n\t\t\t\tconst zone = document.getElementById('affiliateImpactCSVUploadZone');\n\t\t\t\tif (form) form.reset();\n\t\t\t\tif (filenameEl) filenameEl.textContent = '';\n\t\t\t\tif (submitBtn) {\n\t\t\t\t\tsubmitBtn.disabled = true;\n\t\t\t\t\tsubmitBtn.textContent = 'Import creatives';\n\t\t\t\t}\n\t\t\t\tif (zone) zone.classList.remove('is-dragover');\n\t\t\t}\n\n\t\t\tbindAffiliateCSVUpload();\n\t\t\tbindAffiliateImpactCSVUpload();\n\n\t\t\tdocument.getElementById('openAffiliateUploadModalBtn')?.addEventListener('click', function () {\n\t\t\t\topenModal('affiliateUploadSourceModal');\n\t\t\t});\n\n\t\t\tdocument.getElementById('affiliateUploadSourceShopeeBtn')?.addEventListener('click', function () {\n\t\t\t\tconst source = document.getElementById('affiliateUploadSourceModal');\n\t\t\t\tif (source) source.hidden = true;\n\t\t\t\tresetAffiliateUploadForm();\n\t\t\t\topenModal('affiliateUploadModal');\n\t\t\t\tdocument.getElementById('affiliateCSVInput')?.focus();\n\t\t\t});\n\n\t\t\tdocument.getElementById('affiliateUploadSourceImpactBtn')?.addEventListener('click', function () {\n\t\t\t\tconst source = document.getElementById('affiliateUploadSourceModal');\n\t\t\t\tif (source) source.hidden = true;\n\t\t\t\tresetAffiliateImpactUploadForm();\n\t\t\t\topenModal('affiliateImpactUploadModal');\n\t\t\t\tdocument.getElementById('affiliateImpactCSVInput')?.focus();\n\t\t\t});\n\t\t})();\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 163, "<script>\n\t\t(function () {\n\t\t\tfunction wireModal(modalId, closeClass) {\n\t\t\t\tconst modal = document.getElementById(modalId);\n\t\t\t\tif (!modal) return;\n\t\t\t\tfunction closeModal() {\n\t\t\t\t\tmodal.hidden = true;\n\t\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t\t}\n\t\t\t\tmodal.querySelectorAll('.' + closeClass).forEach(function (btn) {\n\t\t\t\t\tbtn.addEventListener('click', closeModal);\n\t\t\t\t});\n\t\t\t\tmodal.addEventListener('click', function (e) {\n\t\t\t\t\tif (e.target === modal) closeModal();\n\t\t\t\t});\n\t\t\t\tif (!modal.hidden) {\n\t\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\t}\n\t\t\t}\n\t\t\tfunction openModal(modalId) {\n\t\t\t\tconst modal = document.getElementById(modalId);\n\t\t\t\tif (!modal) return;\n\t\t\t\tmodal.hidden = false;\n\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t}\n\n\t\t\twireModal('affiliateUploadSourceModal', 'affiliate-upload-source-close');\n\t\t\twireModal('affiliateUploadModal', 'affiliate-upload-modal-close');\n\t\t\twireModal('affiliateImpactUploadModal', 'affiliate-impact-upload-modal-close');\n\t\t\twireModal('affiliatePreviewModal', 'affiliate-preview-modal-close');\n\t\t\tdocument.getElementById('affiliateImportSaveForm')?.addEventListener('submit', function () {\n\t\t\t\tconst btn = document.getElementById('affiliateImportSaveBtn');\n\t\t\t\tif (btn) {\n\t\t\t\t\tbtn.disabled = true;\n\t\t\t\t\tbtn.textContent = 'Saving…';\n\t\t\t\t}\n\t\t\t});\n\t\t\tfunction resetAffiliateUploadForm() {\n\t\t\t\tconst form = document.getElementById('affiliateUploadForm');\n\t\t\t\tconst input = document.getElementById('affiliateCSVInput');\n\t\t\t\tconst filenameEl = document.getElementById('affiliateCSVFilename');\n\t\t\t\tconst submitBtn = document.getElementById('affiliateUploadSubmitBtn');\n\t\t\t\tconst zone = document.getElementById('affiliateCSVUploadZone');\n\t\t\t\tif (form) form.reset();\n\t\t\t\tif (filenameEl) filenameEl.textContent = '';\n\t\t\t\tif (submitBtn) {\n\t\t\t\t\tsubmitBtn.disabled = true;\n\t\t\t\t\tsubmitBtn.textContent = 'Import products';\n\t\t\t\t}\n\t\t\t\tif (zone) zone.classList.remove('is-dragover');\n\t\t\t}\n\n\t\t\tfunction bindAffiliateCSVUpload() {\n\t\t\t\tconst form = document.getElementById('affiliateUploadForm');\n\t\t\t\tconst input = document.getElementById('affiliateCSVInput');\n\t\t\t\tconst filenameEl = document.getElementById('affiliateCSVFilename');\n\t\t\t\tconst submitBtn = document.getElementById('affiliateUploadSubmitBtn');\n\t\t\t\tconst zone = document.getElementById('affiliateCSVUploadZone');\n\t\t\t\tif (!form || !input || form.dataset.csvUploadBound === '1') return;\n\t\t\t\tform.dataset.csvUploadBound = '1';\n\n\t\t\t\tfunction syncFileState() {\n\t\t\t\t\tconst file = input.files && input.files[0];\n\t\t\t\t\tif (filenameEl) {\n\t\t\t\t\t\tfilenameEl.textContent = file ? file.name : '';\n\t\t\t\t\t}\n\t\t\t\t\tif (submitBtn) submitBtn.disabled = !file;\n\t\t\t\t}\n\n\t\t\t\tinput.addEventListener('change', syncFileState);\n\n\t\t\t\tif (zone) {\n\t\t\t\t\t['dragenter', 'dragover'].forEach(function (name) {\n\t\t\t\t\t\tzone.addEventListener(name, function (e) {\n\t\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\t\tzone.classList.add('is-dragover');\n\t\t\t\t\t\t});\n\t\t\t\t\t});\n\t\t\t\t\t['dragleave', 'drop'].forEach(function (name) {\n\t\t\t\t\t\tzone.addEventListener(name, function (e) {\n\t\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\t\tif (name === 'drop' && e.dataTransfer?.files?.length) {\n\t\t\t\t\t\t\t\tconst dropped = e.dataTransfer.files[0];\n\t\t\t\t\t\t\t\tif (dropped) {\n\t\t\t\t\t\t\t\t\tconst dt = new DataTransfer();\n\t\t\t\t\t\t\t\t\tdt.items.add(dropped);\n\t\t\t\t\t\t\t\t\tinput.files = dt.files;\n\t\t\t\t\t\t\t\t\tsyncFileState();\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\tzone.classList.remove('is-dragover');\n\t\t\t\t\t\t});\n\t\t\t\t\t});\n\t\t\t\t}\n\n\t\t\t\tform.addEventListener('submit', function () {\n\t\t\t\t\tif (submitBtn) {\n\t\t\t\t\t\tsubmitBtn.disabled = true;\n\t\t\t\t\t\tsubmitBtn.textContent = 'Importing…';\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tfunction bindAffiliateImpactCSVUpload() {\n\t\t\t\tconst form = document.getElementById('affiliateImpactUploadForm');\n\t\t\t\tconst input = document.getElementById('affiliateImpactCSVInput');\n\t\t\t\tconst filenameEl = document.getElementById('affiliateImpactCSVFilename');\n\t\t\t\tconst submitBtn = document.getElementById('affiliateImpactUploadSubmitBtn');\n\t\t\t\tconst zone = document.getElementById('affiliateImpactCSVUploadZone');\n\t\t\t\tif (!form || !input || form.dataset.csvUploadBound === '1') return;\n\t\t\t\tform.dataset.csvUploadBound = '1';\n\n\t\t\t\tfunction syncFileState() {\n\t\t\t\t\tconst file = input.files && input.files[0];\n\t\t\t\t\tif (filenameEl) filenameEl.textContent = file ? file.name : '';\n\t\t\t\t\tif (submitBtn) submitBtn.disabled = !file;\n\t\t\t\t}\n\n\t\t\t\tinput.addEventListener('change', syncFileState);\n\n\t\t\t\tif (zone) {\n\t\t\t\t\t['dragenter', 'dragover'].forEach(function (name) {\n\t\t\t\t\t\tzone.addEventListener(name, function (e) {\n\t\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\t\tzone.classList.add('is-dragover');\n\t\t\t\t\t\t});\n\t\t\t\t\t});\n\t\t\t\t\t['dragleave', 'drop'].forEach(function (name) {\n\t\t\t\t\t\tzone.addEventListener(name, function (e) {\n\t\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\t\tif (name === 'drop' && e.dataTransfer?.files?.length) {\n\t\t\t\t\t\t\t\tconst dropped = e.dataTransfer.files[0];\n\t\t\t\t\t\t\t\tif (dropped) {\n\t\t\t\t\t\t\t\t\tconst dt = new DataTransfer();\n\t\t\t\t\t\t\t\t\tdt.items.add(dropped);\n\t\t\t\t\t\t\t\t\tinput.files = dt.files;\n\t\t\t\t\t\t\t\t\tsyncFileState();\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\tzone.classList.remove('is-dragover');\n\t\t\t\t\t\t});\n\t\t\t\t\t});\n\t\t\t\t}\n\n\t\t\t\tform.addEventListener('submit', function () {\n\t\t\t\t\tif (submitBtn) {\n\t\t\t\t\t\tsubmitBtn.disabled = true;\n\t\t\t\t\t\tsubmitBtn.textContent = 'Importing…';\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tfunction resetAffiliateImpactUploadForm() {\n\t\t\t\tconst form = document.getElementById('affiliateImpactUploadForm');\n\t\t\t\tconst input = document.getElementById('affiliateImpactCSVInput');\n\t\t\t\tconst filenameEl = document.getElementById('affiliateImpactCSVFilename');\n\t\t\t\tconst submitBtn = document.getElementById('affiliateImpactUploadSubmitBtn');\n\t\t\t\tconst zone = document.getElementById('affiliateImpactCSVUploadZone');\n\t\t\t\tif (form) form.reset();\n\t\t\t\tif (filenameEl) filenameEl.textContent = '';\n\t\t\t\tif (submitBtn) {\n\t\t\t\t\tsubmitBtn.disabled = true;\n\t\t\t\t\tsubmitBtn.textContent = 'Import creatives';\n\t\t\t\t}\n\t\t\t\tif (zone) zone.classList.remove('is-dragover');\n\t\t\t}\n\n\t\t\tbindAffiliateCSVUpload();\n\t\t\tbindAffiliateImpactCSVUpload();\n\n\t\t\tdocument.getElementById('openAffiliateUploadModalBtn')?.addEventListener('click', function () {\n\t\t\t\topenModal('affiliateUploadSourceModal');\n\t\t\t});\n\n\t\t\tdocument.getElementById('affiliateUploadSourceShopeeBtn')?.addEventListener('click', function () {\n\t\t\t\tconst source = document.getElementById('affiliateUploadSourceModal');\n\t\t\t\tif (source) source.hidden = true;\n\t\t\t\tresetAffiliateUploadForm();\n\t\t\t\topenModal('affiliateUploadModal');\n\t\t\t\tdocument.getElementById('affiliateCSVInput')?.focus();\n\t\t\t});\n\n\t\t\tdocument.getElementById('affiliateUploadSourceImpactBtn')?.addEventListener('click', function () {\n\t\t\t\tconst source = document.getElementById('affiliateUploadSourceModal');\n\t\t\t\tif (source) source.hidden = true;\n\t\t\t\tresetAffiliateImpactUploadForm();\n\t\t\t\topenModal('affiliateImpactUploadModal');\n\t\t\t\tdocument.getElementById('affiliateImpactCSVInput')?.focus();\n\t\t\t});\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -388,24 +388,26 @@ func buildStagedImpactImportItems(catalog []affiliates.CatalogRow, catalogIndex 
 	importInputs := make([]affiliates.ImportRowInput, 0, len(rows))
 
 	for i, row := range rows {
-		thumb := affiliates.ImpactDisplayAdThumbnailURL(row.ProgramID, row.AdID)
-		if thumb != "" {
-			thumbsFound++
-		}
+		thumb := ""
 
 		importInput := affiliates.ImportRowInput{
-			Provider:     constants.AffiliateProviderImpact,
-			ItemID:       row.AdID,
-			OfferLink:    row.TrackingLink,
-			ItemName:     row.Name,
-			ProgramID:    row.ProgramID,
-			ImpactState:  row.State,
-			ImpactAdType: row.AdType,
-			ShopName:     "Impact",
-			ThumbnailURL: thumb,
+			Provider:             constants.AffiliateProviderImpact,
+			ItemID:               row.AdID,
+			OfferLink:            row.TrackingLink,
+			ItemName:             row.Name,
+			ProgramID:            row.ProgramID,
+			ImpactState:          row.State,
+			ImpactAdType:         row.AdType,
+			ThumbnailOrientation: string(row.Orientation),
+			ShopName:             "Impact",
+			ThumbnailURL:         thumb,
 		}
 		importInputs = append(importInputs, importInput)
 		diff := affiliates.DiffImportRow(importInput, catalogIndex, seenKeys)
+		thumb = affiliates.ImpactCreativeImageURL(diff.ExistingID, row.ProgramID, row.AdID)
+		if thumb != "" {
+			thumbsFound++
+		}
 		switch diff.Status {
 		case constants.AffiliateImportDiffNew:
 			diffSummary.NewCount++
@@ -422,6 +424,7 @@ func buildStagedImpactImportItems(catalog []affiliates.CatalogRow, catalogIndex 
 		staged = append(staged, frontend.AffiliateStagedImportItem{
 			Index: i,
 			Card: frontend.AffiliateProductCardData{
+				ProductID:     diff.ExistingID,
 				Provider:      constants.AffiliateProviderImpact,
 				Name:          row.Name,
 				ShopName:      "Impact",
@@ -430,17 +433,18 @@ func buildStagedImpactImportItems(catalog []affiliates.CatalogRow, catalogIndex 
 				IncludeInSave: diff.IncludeByDefault,
 				FormIndex:     i,
 			},
-			ItemID:            row.AdID,
-			ItemName:          row.Name,
-			OfferLink:         row.TrackingLink,
-			ProgramID:         row.ProgramID,
-			ImpactState:       row.State,
-			ImpactAdType:      row.AdType,
-			ShopName:          "Impact",
-			ThumbnailURL:      thumb,
-			DiffStatus:        diff.Status,
-			ExistingProductID: diff.ExistingID,
-			ChangedFields:     diff.ChangedFields,
+			ItemID:               row.AdID,
+			ItemName:             row.Name,
+			OfferLink:            row.TrackingLink,
+			ProgramID:            row.ProgramID,
+			ImpactState:          row.State,
+			ImpactAdType:         row.AdType,
+			ThumbnailOrientation: string(row.Orientation),
+			ShopName:             "Impact",
+			ThumbnailURL:         thumb,
+			DiffStatus:           diff.Status,
+			ExistingProductID:    diff.ExistingID,
+			ChangedFields:        diff.ChangedFields,
 		})
 	}
 	removedRows := affiliates.RemovedFromCSV(catalog, affiliates.CollectCSVItemIDs(importInputs), constants.AffiliateProviderImpact)
@@ -555,24 +559,25 @@ func handleAffiliateImportSave(w http.ResponseWriter, r *http.Request) {
 
 		existingID := parseStagedExistingID(r, i)
 		write := affiliateProductWriteParams{
-			AffiliateURL:     offerLink,
-			ProductURL:       productLink,
-			ShopID:           strings.TrimSpace(r.FormValue(prefix + "shopee_shop_id")),
-			ItemID:           itemID,
-			Name:             itemName,
-			Brand:            "",
-			PriceDisplay:     strings.TrimSpace(r.FormValue(prefix + "price_display")),
-			ThumbnailURL:     strings.TrimSpace(r.FormValue(prefix + "thumbnail_url")),
-			SortOrder:        int64(sortOrder),
-			ImportBatchID:    batchID,
-			Sales:            strings.TrimSpace(r.FormValue(prefix + "sales")),
-			AffiliatedShopID: affiliatedShopID,
-			CommissionRate:   strings.TrimSpace(r.FormValue(prefix + "commission_rate")),
-			Commission:       strings.TrimSpace(r.FormValue(prefix + "commission")),
-			Provider:         string(importProvider),
-			ProgramID:        strings.TrimSpace(r.FormValue(prefix + "program_id")),
-			ImpactState:      strings.TrimSpace(r.FormValue(prefix + "impact_state")),
-			ImpactAdType:     strings.TrimSpace(r.FormValue(prefix + "impact_ad_type")),
+			AffiliateURL:         offerLink,
+			ProductURL:           productLink,
+			ShopID:               strings.TrimSpace(r.FormValue(prefix + "shopee_shop_id")),
+			ItemID:               itemID,
+			Name:                 itemName,
+			Brand:                "",
+			PriceDisplay:         strings.TrimSpace(r.FormValue(prefix + "price_display")),
+			ThumbnailURL:         strings.TrimSpace(r.FormValue(prefix + "thumbnail_url")),
+			SortOrder:            int64(sortOrder),
+			ImportBatchID:        batchID,
+			Sales:                strings.TrimSpace(r.FormValue(prefix + "sales")),
+			AffiliatedShopID:     affiliatedShopID,
+			CommissionRate:       strings.TrimSpace(r.FormValue(prefix + "commission_rate")),
+			Commission:           strings.TrimSpace(r.FormValue(prefix + "commission")),
+			Provider:             string(importProvider),
+			ProgramID:            strings.TrimSpace(r.FormValue(prefix + "program_id")),
+			ImpactState:          strings.TrimSpace(r.FormValue(prefix + "impact_state")),
+			ImpactAdType:         strings.TrimSpace(r.FormValue(prefix + "impact_ad_type")),
+			ThumbnailOrientation: strings.TrimSpace(r.FormValue(prefix + "thumbnail_orientation")),
 		}
 		if existingID == 0 {
 			existingID = resolveAffiliateUpsertTargetID(catalogIndex, importProvider, itemID, productLink, 0)
@@ -701,7 +706,7 @@ func mapAffiliateListItem(row queries.GetAllAffiliateProductsRow) frontend.Affil
 		Provider:      constants.AffiliateProvider(row.Provider),
 		PriceDisplay:  row.PriceDisplay,
 		ClickCount:    row.ClickCount,
-		ThumbnailURL:  affiliateThumbnailFromRow(row.Provider, row.ItemID, row.ProgramID, row.ThumbnailUrl),
+		ThumbnailURL:  affiliateThumbnailFromRow(row.ID, row.Provider, row.ItemID, row.ProgramID, row.ThumbnailUrl),
 		AffiliateURL:  frontend.AffiliateProductLinkHref(row.ID, row.AffiliateUrl, 0, ""),
 		AffiliateDisp: frontend.AffiliateURLPreview(row.AffiliateUrl),
 	}
@@ -749,7 +754,7 @@ func mapAffiliateProductCard(productID int64, provider string, itemID, programID
 		ShopName:     shopName,
 		PriceDisplay: priceDisplay,
 		Sales:        sales,
-		ThumbnailURL: affiliateThumbnailFromRow(provider, itemID, programID, thumbnailURL),
+		ThumbnailURL: affiliateThumbnailFromRow(productID, provider, itemID, programID, thumbnailURL),
 		AffiliateURL: affiliateURL,
 	}
 }
@@ -918,24 +923,36 @@ func handleAffiliateUpdate(w http.ResponseWriter, r *http.Request, affiliateID i
 		return
 	}
 
+	thumbnailOrientation := existingRow.ThumbnailOrientation
+	if constants.AffiliateProvider(existingRow.Provider) == constants.AffiliateProviderImpact {
+		raw := strings.TrimSpace(r.FormValue("thumbnail_orientation"))
+		if raw != "" && !constants.ValidThumbnailOrientation(raw) {
+			setErrorFlash(w, "invalid thumbnail orientation")
+			HttpRedirect(w, r, editPath)
+			return
+		}
+		thumbnailOrientation = raw
+	}
+
 	targetID, _, merged, err := upsertAffiliateProduct(ctx, dbRW, catalogIndex, affiliateID, affiliateProductWriteParams{
-		AffiliateURL:     req.AffiliateURL,
-		ProductURL:       req.ProductURL,
-		ShopID:           req.ShopID,
-		ItemID:           req.ItemID,
-		Name:             req.Name,
-		Brand:            req.Brand,
-		PriceDisplay:     req.PriceDisplay,
-		ThumbnailURL:     req.ThumbnailURL,
-		SortOrder:        req.SortOrder,
-		Sales:            req.Sales,
-		AffiliatedShopID: affiliatedShopID,
-		CommissionRate:   req.CommissionRate,
-		Commission:       req.Commission,
-		Provider:         existingRow.Provider,
-		ProgramID:        existingRow.ProgramID,
-		ImpactState:      existingRow.ImpactState,
-		ImpactAdType:     existingRow.ImpactAdType,
+		AffiliateURL:         req.AffiliateURL,
+		ProductURL:           req.ProductURL,
+		ShopID:               req.ShopID,
+		ItemID:               req.ItemID,
+		Name:                 req.Name,
+		Brand:                req.Brand,
+		PriceDisplay:         req.PriceDisplay,
+		ThumbnailURL:         req.ThumbnailURL,
+		SortOrder:            req.SortOrder,
+		Sales:                req.Sales,
+		AffiliatedShopID:     affiliatedShopID,
+		CommissionRate:       req.CommissionRate,
+		Commission:           req.Commission,
+		Provider:             existingRow.Provider,
+		ProgramID:            existingRow.ProgramID,
+		ImpactState:          existingRow.ImpactState,
+		ImpactAdType:         existingRow.ImpactAdType,
+		ThumbnailOrientation: thumbnailOrientation,
 	})
 	if err != nil {
 		setErrorFlash(w, fmt.Sprintf("Failed to update affiliate product: %v", err))
@@ -976,22 +993,28 @@ func handleAffiliateDelete(w http.ResponseWriter, r *http.Request, affiliateID i
 }
 
 func affiliateFormFromRow(row queries.GetAffiliateProductByIDRow) frontend.AffiliateFormData {
+	provider := constants.AffiliateProvider(row.Provider)
+	if !constants.ValidAffiliateProvider(row.Provider) {
+		provider = constants.AffiliateProviderShopee
+	}
 	return frontend.AffiliateFormData{
-		ID:             strconv.FormatInt(row.ID, 10),
-		AffiliateURL:   row.AffiliateUrl,
-		ProductURL:     row.ProductUrl,
-		ShopID:         row.ShopID,
-		ItemID:         row.ItemID,
-		Name:           row.Name,
-		Brand:          row.Brand,
-		PriceDisplay:   row.PriceDisplay,
-		ThumbnailURL:   row.ThumbnailUrl,
-		SortOrder:      row.SortOrder,
-		Sales:          row.Sales,
-		ShopName:       row.ShopBrandName,
-		CommissionRate: row.CommissionRate,
-		Commission:     row.Commission,
-		IsEdit:         true,
+		ID:                   strconv.FormatInt(row.ID, 10),
+		Provider:             provider,
+		ThumbnailOrientation: row.ThumbnailOrientation,
+		AffiliateURL:         row.AffiliateUrl,
+		ProductURL:           row.ProductUrl,
+		ShopID:               row.ShopID,
+		ItemID:               row.ItemID,
+		Name:                 row.Name,
+		Brand:                row.Brand,
+		PriceDisplay:         row.PriceDisplay,
+		ThumbnailURL:         affiliateThumbnailFromRow(row.ID, row.Provider, row.ItemID, row.ProgramID, row.ThumbnailUrl),
+		SortOrder:            row.SortOrder,
+		Sales:                row.Sales,
+		ShopName:             row.ShopBrandName,
+		CommissionRate:       row.CommissionRate,
+		Commission:           row.Commission,
+		IsEdit:               true,
 	}
 }
 

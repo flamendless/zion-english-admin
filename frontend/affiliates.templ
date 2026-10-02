@@ -20,21 +20,23 @@ type AffiliateListItem struct {
 }
 
 type AffiliateFormData struct {
-	ID             string
-	AffiliateURL   string
-	ProductURL     string
-	ShopID         string
-	ItemID         string
-	Name           string
-	Brand          string
-	PriceDisplay   string
-	ThumbnailURL   string
-	SortOrder      int64
-	Sales          string
-	ShopName       string
-	CommissionRate string
-	Commission     string
-	IsEdit         bool
+	ID                   string
+	Provider             constants.AffiliateProvider
+	ThumbnailOrientation string
+	AffiliateURL         string
+	ProductURL           string
+	ShopID               string
+	ItemID               string
+	Name                 string
+	Brand                string
+	PriceDisplay         string
+	ThumbnailURL         string
+	SortOrder            int64
+	Sales                string
+	ShopName             string
+	CommissionRate       string
+	Commission           string
+	IsEdit               bool
 }
 
 type AffiliateStagedImportItem struct {
@@ -53,6 +55,7 @@ type AffiliateStagedImportItem struct {
 	ProgramID         string
 	ImpactState       string
 	ImpactAdType      string
+	ThumbnailOrientation string
 	ThumbnailURL      string
 	PriceDisplay      string
 	DiffStatus        constants.AffiliateImportDiffStatus
@@ -392,11 +395,12 @@ templ AffiliateImpactUploadModal() {
 						<ul class="affiliates-upload-steps">
 							<li>TrackingLink is saved as the affiliate URL.</li>
 							<li>Preview images use the Impact display-ad URL built from ProgramId and AdId.</li>
+							<li>Landscape, portrait, or square orientation is derived from creative width and height columns when present.</li>
 							<li>Only ACTIVE creatives appear in Ads picker and live placements.</li>
 						</ul>
 					</div>
 					<p class="affiliates-upload-columns-label">Expected columns</p>
-					<p class="affiliates-upload-columns">AdId, State, ProgramId, Name, AdType, TrackingLink</p>
+						<p class="affiliates-upload-columns">AdId, State, ProgramId, Name, AdType, TrackingLink, ThirdPartyServableAdCreativeWidth, ThirdPartyServableAdCreativeHeight</p>
 					<div class="upload-zone affiliates-csv-upload-zone" id="affiliateImpactCSVUploadZone">
 						<label class="upload-zone-label" for="affiliateImpactCSVInput">
 							<span class="upload-zone-icon affiliates-csv-upload-icon" aria-hidden="true">
@@ -622,6 +626,7 @@ templ AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) {
 	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "program_id") } value={ item.ProgramID }/>
 	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "impact_state") } value={ item.ImpactState }/>
 	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "impact_ad_type") } value={ item.ImpactAdType }/>
+	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "thumbnail_orientation") } value={ item.ThumbnailOrientation }/>
 }
 
 func affiliateStagedFieldName(index int, field string) string {
@@ -689,6 +694,16 @@ templ AffiliateEditModal(form AffiliateFormData, openOnLoad bool) {
 						<label for="affiliateCommission">Commission</label>
 						<input type="text" id="affiliateCommission" name="commission" value={ form.Commission } maxlength="32"/>
 					</div>
+					if form.Provider == constants.AffiliateProviderImpact {
+						<div class="form-group">
+							<label for="affiliateThumbnailOrientation">Thumbnail orientation</label>
+							<select id="affiliateThumbnailOrientation" name="thumbnail_orientation">
+								for _, opt := range ThumbnailOrientationEditOptions {
+									<option value={ opt.Value } selected?={ opt.Value == form.ThumbnailOrientation }>{ opt.Label }</option>
+								}
+							</select>
+						</div>
+					}
 					<div class="form-group">
 						<label for="affiliateLinkInput">Affiliate link (Offer Link)</label>
 						<input type="url" id="affiliateLinkInput" name="affiliate_url" value={ form.AffiliateURL } required/>

@@ -36,16 +36,29 @@ WHERE (
 		p.provider != 'impact'
 		OR upper(p.impact_state) = 'ACTIVE'
 	)
+	AND (
+		? = ''
+		OR p.provider != 'impact'
+		OR p.thumbnail_orientation = ?
+	)
 `
 
 type CountAffiliateProductsForAdsParams struct {
-	Column1 interface{}
-	Column2 sql.NullString
-	Column3 sql.NullString
+	Column1              interface{}
+	Column2              sql.NullString
+	Column3              sql.NullString
+	Column4              interface{}
+	ThumbnailOrientation string
 }
 
 func (q *Queries) CountAffiliateProductsForAds(ctx context.Context, arg CountAffiliateProductsForAdsParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, countAffiliateProductsForAds, arg.Column1, arg.Column2, arg.Column3)
+	row := q.db.QueryRowContext(ctx, countAffiliateProductsForAds,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+		arg.ThumbnailOrientation,
+	)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
@@ -194,7 +207,8 @@ SELECT
 	p.sales,
 	p.provider,
 	p.program_id,
-	p.item_id AS product_item_id
+	p.item_id AS product_item_id,
+	p.thumbnail_orientation
 FROM tbl_ads a
 INNER JOIN tbl_ad_affiliate_products j ON j.ad_id = a.id
 INNER JOIN tbl_affiliate_products p ON p.id = j.affiliate_product_id
@@ -208,24 +222,25 @@ ORDER BY a.sort_order ASC, a.id ASC, j.sort_order ASC, j.affiliate_product_id AS
 `
 
 type GetPublishedAdsWithProductsRow struct {
-	AdID               int64
-	AdName             string
-	Placement          string
-	AdType             string
-	RandomizeKind      string
-	TimerInterval      string
-	AdSortOrder        int64
-	AffiliateProductID int64
-	ProductSortOrder   int64
-	ProductName        string
-	PriceDisplay       string
-	ThumbnailUrl       string
-	AffiliateUrl       string
-	ShopName           string
-	Sales              string
-	Provider           string
-	ProgramID          string
-	ProductItemID      string
+	AdID                 int64
+	AdName               string
+	Placement            string
+	AdType               string
+	RandomizeKind        string
+	TimerInterval        string
+	AdSortOrder          int64
+	AffiliateProductID   int64
+	ProductSortOrder     int64
+	ProductName          string
+	PriceDisplay         string
+	ThumbnailUrl         string
+	AffiliateUrl         string
+	ShopName             string
+	Sales                string
+	Provider             string
+	ProgramID            string
+	ProductItemID        string
+	ThumbnailOrientation string
 }
 
 func (q *Queries) GetPublishedAdsWithProducts(ctx context.Context) ([]GetPublishedAdsWithProductsRow, error) {
@@ -256,6 +271,7 @@ func (q *Queries) GetPublishedAdsWithProducts(ctx context.Context) ([]GetPublish
 			&i.Provider,
 			&i.ProgramID,
 			&i.ProductItemID,
+			&i.ThumbnailOrientation,
 		); err != nil {
 			return nil, err
 		}
@@ -337,17 +353,30 @@ WHERE (
 		p.provider != 'impact'
 		OR upper(p.impact_state) = 'ACTIVE'
 	)
+	AND (
+		? = ''
+		OR p.provider != 'impact'
+		OR p.thumbnail_orientation = ?
+	)
 ORDER BY p.sort_order ASC, p.id ASC
 `
 
 type ListAffiliateProductIDsForAdsParams struct {
-	Column1 interface{}
-	Column2 sql.NullString
-	Column3 sql.NullString
+	Column1              interface{}
+	Column2              sql.NullString
+	Column3              sql.NullString
+	Column4              interface{}
+	ThumbnailOrientation string
 }
 
 func (q *Queries) ListAffiliateProductIDsForAds(ctx context.Context, arg ListAffiliateProductIDsForAdsParams) ([]int64, error) {
-	rows, err := q.db.QueryContext(ctx, listAffiliateProductIDsForAds, arg.Column1, arg.Column2, arg.Column3)
+	rows, err := q.db.QueryContext(ctx, listAffiliateProductIDsForAds,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+		arg.ThumbnailOrientation,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -378,7 +407,8 @@ SELECT
 	COALESCE(s.brand_name, p.brand, '') AS shop_name,
 	p.provider,
 	p.program_id,
-	p.item_id
+	p.item_id,
+	p.thumbnail_orientation
 FROM tbl_affiliate_products p
 LEFT JOIN tbl_affiliated_product_shops s ON s.id = p.affiliated_shop_id
 WHERE (
@@ -390,27 +420,35 @@ WHERE (
 		p.provider != 'impact'
 		OR upper(p.impact_state) = 'ACTIVE'
 	)
+	AND (
+		? = ''
+		OR p.provider != 'impact'
+		OR p.thumbnail_orientation = ?
+	)
 ORDER BY p.sort_order ASC, p.id ASC
 LIMIT ? OFFSET ?
 `
 
 type SearchAffiliateProductsForAdsParams struct {
-	Column1 interface{}
-	Column2 sql.NullString
-	Column3 sql.NullString
-	Limit   int64
-	Offset  int64
+	Column1              interface{}
+	Column2              sql.NullString
+	Column3              sql.NullString
+	Column4              interface{}
+	ThumbnailOrientation string
+	Limit                int64
+	Offset               int64
 }
 
 type SearchAffiliateProductsForAdsRow struct {
-	ID           int64
-	Name         string
-	PriceDisplay string
-	ThumbnailUrl string
-	ShopName     string
-	Provider     string
-	ProgramID    string
-	ItemID       string
+	ID                   int64
+	Name                 string
+	PriceDisplay         string
+	ThumbnailUrl         string
+	ShopName             string
+	Provider             string
+	ProgramID            string
+	ItemID               string
+	ThumbnailOrientation string
 }
 
 func (q *Queries) SearchAffiliateProductsForAds(ctx context.Context, arg SearchAffiliateProductsForAdsParams) ([]SearchAffiliateProductsForAdsRow, error) {
@@ -418,6 +456,8 @@ func (q *Queries) SearchAffiliateProductsForAds(ctx context.Context, arg SearchA
 		arg.Column1,
 		arg.Column2,
 		arg.Column3,
+		arg.Column4,
+		arg.ThumbnailOrientation,
 		arg.Limit,
 		arg.Offset,
 	)
@@ -437,6 +477,7 @@ func (q *Queries) SearchAffiliateProductsForAds(ctx context.Context, arg SearchA
 			&i.Provider,
 			&i.ProgramID,
 			&i.ItemID,
+			&i.ThumbnailOrientation,
 		); err != nil {
 			return nil, err
 		}

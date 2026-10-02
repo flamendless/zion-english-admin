@@ -312,7 +312,7 @@ func mapAffiliateAdsReportProduct(id int64, provider, itemID, programID, name, s
 		Name:         name,
 		ShopName:     shop,
 		Provider:     p,
-		ThumbnailURL: affiliateThumbnailFromRow(provider, itemID, programID, thumb),
+		ThumbnailURL: affiliateThumbnailFromRow(id, provider, itemID, programID, thumb),
 		ClickCount:   clicks,
 	}
 }

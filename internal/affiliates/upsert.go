@@ -50,21 +50,22 @@ func NormalizeProductURL(raw string) string {
 }
 
 type CatalogRow struct {
-	ID             int64
-	Provider       constants.AffiliateProvider
-	ItemID         string
-	ProductURL     string
-	AffiliateURL   string
-	Name           string
-	PriceDisplay   string
-	Sales          string
-	ShopBrandName  string
-	CommissionRate string
-	Commission     string
-	ThumbnailURL   string
-	ProgramID      string
-	ImpactState    string
-	ImpactAdType   string
+	ID                   int64
+	Provider             constants.AffiliateProvider
+	ItemID               string
+	ProductURL           string
+	AffiliateURL         string
+	Name                 string
+	PriceDisplay         string
+	Sales                string
+	ShopBrandName        string
+	CommissionRate       string
+	Commission           string
+	ThumbnailURL         string
+	ProgramID            string
+	ImpactState          string
+	ImpactAdType         string
+	ThumbnailOrientation string
 }
 
 func BuildCatalogIndex(rows []CatalogRow) map[string]CatalogRow {

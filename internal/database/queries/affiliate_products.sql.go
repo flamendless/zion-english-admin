@@ -43,6 +43,7 @@ SELECT
 	p.program_id,
 	p.impact_state,
 	p.impact_ad_type,
+	p.thumbnail_orientation,
 	p.created_at,
 	p.updated_at
 FROM tbl_affiliate_products p
@@ -51,29 +52,30 @@ WHERE p.id = ?
 `
 
 type GetAffiliateProductByIDRow struct {
-	ID               int64
-	AffiliateUrl     string
-	ProductUrl       string
-	ShopID           string
-	ItemID           string
-	Name             string
-	Brand            string
-	PriceDisplay     string
-	ThumbnailUrl     string
-	SortOrder        int64
-	ImportBatchID    int64
-	Sales            string
-	AffiliatedShopID sql.NullInt64
-	ShopBrandName    string
-	CommissionRate   string
-	Commission       string
-	ClickCount       int64
-	Provider         string
-	ProgramID        string
-	ImpactState      string
-	ImpactAdType     string
-	CreatedAt        string
-	UpdatedAt        string
+	ID                   int64
+	AffiliateUrl         string
+	ProductUrl           string
+	ShopID               string
+	ItemID               string
+	Name                 string
+	Brand                string
+	PriceDisplay         string
+	ThumbnailUrl         string
+	SortOrder            int64
+	ImportBatchID        int64
+	Sales                string
+	AffiliatedShopID     sql.NullInt64
+	ShopBrandName        string
+	CommissionRate       string
+	Commission           string
+	ClickCount           int64
+	Provider             string
+	ProgramID            string
+	ImpactState          string
+	ImpactAdType         string
+	ThumbnailOrientation string
+	CreatedAt            string
+	UpdatedAt            string
 }
 
 func (q *Queries) GetAffiliateProductByID(ctx context.Context, id int64) (GetAffiliateProductByIDRow, error) {
@@ -101,6 +103,7 @@ func (q *Queries) GetAffiliateProductByID(ctx context.Context, id int64) (GetAff
 		&i.ProgramID,
 		&i.ImpactState,
 		&i.ImpactAdType,
+		&i.ThumbnailOrientation,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -130,6 +133,7 @@ SELECT
 	p.program_id,
 	p.impact_state,
 	p.impact_ad_type,
+	p.thumbnail_orientation,
 	p.created_at,
 	p.updated_at
 FROM tbl_affiliate_products p
@@ -145,29 +149,30 @@ type GetAffiliateProductByItemIDParams struct {
 }
 
 type GetAffiliateProductByItemIDRow struct {
-	ID               int64
-	AffiliateUrl     string
-	ProductUrl       string
-	ShopID           string
-	ItemID           string
-	Name             string
-	Brand            string
-	PriceDisplay     string
-	ThumbnailUrl     string
-	SortOrder        int64
-	ImportBatchID    int64
-	Sales            string
-	AffiliatedShopID sql.NullInt64
-	ShopBrandName    string
-	CommissionRate   string
-	Commission       string
-	ClickCount       int64
-	Provider         string
-	ProgramID        string
-	ImpactState      string
-	ImpactAdType     string
-	CreatedAt        string
-	UpdatedAt        string
+	ID                   int64
+	AffiliateUrl         string
+	ProductUrl           string
+	ShopID               string
+	ItemID               string
+	Name                 string
+	Brand                string
+	PriceDisplay         string
+	ThumbnailUrl         string
+	SortOrder            int64
+	ImportBatchID        int64
+	Sales                string
+	AffiliatedShopID     sql.NullInt64
+	ShopBrandName        string
+	CommissionRate       string
+	Commission           string
+	ClickCount           int64
+	Provider             string
+	ProgramID            string
+	ImpactState          string
+	ImpactAdType         string
+	ThumbnailOrientation string
+	CreatedAt            string
+	UpdatedAt            string
 }
 
 func (q *Queries) GetAffiliateProductByItemID(ctx context.Context, arg GetAffiliateProductByItemIDParams) (GetAffiliateProductByItemIDRow, error) {
@@ -195,6 +200,7 @@ func (q *Queries) GetAffiliateProductByItemID(ctx context.Context, arg GetAffili
 		&i.ProgramID,
 		&i.ImpactState,
 		&i.ImpactAdType,
+		&i.ThumbnailOrientation,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -220,6 +226,7 @@ SELECT
 	p.program_id,
 	p.impact_state,
 	p.impact_ad_type,
+	p.thumbnail_orientation,
 	COALESCE(s.brand_name, '') AS shop_brand_name
 FROM tbl_affiliate_products p
 LEFT JOIN tbl_affiliated_product_shops s ON s.id = p.affiliated_shop_id
@@ -227,24 +234,25 @@ ORDER BY p.id ASC
 `
 
 type GetAffiliateProductsCatalogKeysRow struct {
-	ID             int64
-	AffiliateUrl   string
-	ProductUrl     string
-	ShopID         string
-	ItemID         string
-	Name           string
-	Brand          string
-	PriceDisplay   string
-	ThumbnailUrl   string
-	Sales          string
-	CommissionRate string
-	Commission     string
-	ClickCount     int64
-	Provider       string
-	ProgramID      string
-	ImpactState    string
-	ImpactAdType   string
-	ShopBrandName  string
+	ID                   int64
+	AffiliateUrl         string
+	ProductUrl           string
+	ShopID               string
+	ItemID               string
+	Name                 string
+	Brand                string
+	PriceDisplay         string
+	ThumbnailUrl         string
+	Sales                string
+	CommissionRate       string
+	Commission           string
+	ClickCount           int64
+	Provider             string
+	ProgramID            string
+	ImpactState          string
+	ImpactAdType         string
+	ThumbnailOrientation string
+	ShopBrandName        string
 }
 
 func (q *Queries) GetAffiliateProductsCatalogKeys(ctx context.Context) ([]GetAffiliateProductsCatalogKeysRow, error) {
@@ -274,6 +282,7 @@ func (q *Queries) GetAffiliateProductsCatalogKeys(ctx context.Context) ([]GetAff
 			&i.ProgramID,
 			&i.ImpactState,
 			&i.ImpactAdType,
+			&i.ThumbnailOrientation,
 			&i.ShopBrandName,
 		); err != nil {
 			return nil, err
@@ -312,6 +321,7 @@ SELECT
 	p.program_id,
 	p.impact_state,
 	p.impact_ad_type,
+	p.thumbnail_orientation,
 	p.created_at,
 	p.updated_at
 FROM tbl_affiliate_products p
@@ -320,29 +330,30 @@ ORDER BY p.sort_order ASC, p.id ASC
 `
 
 type GetAllAffiliateProductsRow struct {
-	ID               int64
-	AffiliateUrl     string
-	ProductUrl       string
-	ShopID           string
-	ItemID           string
-	Name             string
-	Brand            string
-	PriceDisplay     string
-	ThumbnailUrl     string
-	SortOrder        int64
-	ImportBatchID    int64
-	Sales            string
-	AffiliatedShopID sql.NullInt64
-	ShopBrandName    string
-	CommissionRate   string
-	Commission       string
-	ClickCount       int64
-	Provider         string
-	ProgramID        string
-	ImpactState      string
-	ImpactAdType     string
-	CreatedAt        string
-	UpdatedAt        string
+	ID                   int64
+	AffiliateUrl         string
+	ProductUrl           string
+	ShopID               string
+	ItemID               string
+	Name                 string
+	Brand                string
+	PriceDisplay         string
+	ThumbnailUrl         string
+	SortOrder            int64
+	ImportBatchID        int64
+	Sales                string
+	AffiliatedShopID     sql.NullInt64
+	ShopBrandName        string
+	CommissionRate       string
+	Commission           string
+	ClickCount           int64
+	Provider             string
+	ProgramID            string
+	ImpactState          string
+	ImpactAdType         string
+	ThumbnailOrientation string
+	CreatedAt            string
+	UpdatedAt            string
 }
 
 func (q *Queries) GetAllAffiliateProducts(ctx context.Context) ([]GetAllAffiliateProductsRow, error) {
@@ -376,6 +387,7 @@ func (q *Queries) GetAllAffiliateProducts(ctx context.Context) ([]GetAllAffiliat
 			&i.ProgramID,
 			&i.ImpactState,
 			&i.ImpactAdType,
+			&i.ThumbnailOrientation,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -424,31 +436,33 @@ INSERT INTO tbl_affiliate_products (
 	provider,
 	program_id,
 	impact_state,
-	impact_ad_type
+	impact_ad_type,
+	thumbnail_orientation
 )
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 RETURNING id
 `
 
 type InsertAffiliateProductParams struct {
-	AffiliateUrl     string
-	ProductUrl       string
-	ShopID           string
-	ItemID           string
-	Name             string
-	Brand            string
-	PriceDisplay     string
-	ThumbnailUrl     string
-	SortOrder        int64
-	ImportBatchID    int64
-	Sales            string
-	AffiliatedShopID sql.NullInt64
-	CommissionRate   string
-	Commission       string
-	Provider         string
-	ProgramID        string
-	ImpactState      string
-	ImpactAdType     string
+	AffiliateUrl         string
+	ProductUrl           string
+	ShopID               string
+	ItemID               string
+	Name                 string
+	Brand                string
+	PriceDisplay         string
+	ThumbnailUrl         string
+	SortOrder            int64
+	ImportBatchID        int64
+	Sales                string
+	AffiliatedShopID     sql.NullInt64
+	CommissionRate       string
+	Commission           string
+	Provider             string
+	ProgramID            string
+	ImpactState          string
+	ImpactAdType         string
+	ThumbnailOrientation string
 }
 
 func (q *Queries) InsertAffiliateProduct(ctx context.Context, arg InsertAffiliateProductParams) (int64, error) {
@@ -471,6 +485,7 @@ func (q *Queries) InsertAffiliateProduct(ctx context.Context, arg InsertAffiliat
 		arg.ProgramID,
 		arg.ImpactState,
 		arg.ImpactAdType,
+		arg.ThumbnailOrientation,
 	)
 	var id int64
 	err := row.Scan(&id)
@@ -497,29 +512,31 @@ SET
 	program_id = ?,
 	impact_state = ?,
 	impact_ad_type = ?,
+	thumbnail_orientation = ?,
 	updated_at = datetime('now')
 WHERE id = ?
 `
 
 type UpdateAffiliateProductParams struct {
-	AffiliateUrl     string
-	ProductUrl       string
-	ShopID           string
-	ItemID           string
-	Name             string
-	Brand            string
-	PriceDisplay     string
-	ThumbnailUrl     string
-	SortOrder        int64
-	Sales            string
-	AffiliatedShopID sql.NullInt64
-	CommissionRate   string
-	Commission       string
-	Provider         string
-	ProgramID        string
-	ImpactState      string
-	ImpactAdType     string
-	ID               int64
+	AffiliateUrl         string
+	ProductUrl           string
+	ShopID               string
+	ItemID               string
+	Name                 string
+	Brand                string
+	PriceDisplay         string
+	ThumbnailUrl         string
+	SortOrder            int64
+	Sales                string
+	AffiliatedShopID     sql.NullInt64
+	CommissionRate       string
+	Commission           string
+	Provider             string
+	ProgramID            string
+	ImpactState          string
+	ImpactAdType         string
+	ThumbnailOrientation string
+	ID                   int64
 }
 
 func (q *Queries) UpdateAffiliateProduct(ctx context.Context, arg UpdateAffiliateProductParams) error {
@@ -541,6 +558,7 @@ func (q *Queries) UpdateAffiliateProduct(ctx context.Context, arg UpdateAffiliat
 		arg.ProgramID,
 		arg.ImpactState,
 		arg.ImpactAdType,
+		arg.ThumbnailOrientation,
 		arg.ID,
 	)
 	return err

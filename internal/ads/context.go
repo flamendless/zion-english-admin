@@ -31,15 +31,16 @@ type CatalogAd struct {
 }
 
 type ProductOption struct {
-	ProductID    int64
-	Provider     constants.AffiliateProvider
-	Name         string
-	ShopName     string
-	PriceDisplay string
-	ThumbnailURL string
-	AffiliateURL string
-	Sales        string
-	SortOrder    int64
+	ProductID            int64
+	Provider             constants.AffiliateProvider
+	ThumbnailOrientation constants.ThumbnailOrientation
+	Name                 string
+	ShopName             string
+	PriceDisplay         string
+	ThumbnailURL         string
+	AffiliateURL         string
+	Sales                string
+	SortOrder            int64
 }
 
 func GetCatalog(ctx context.Context) []CatalogAd {
@@ -69,7 +70,7 @@ func Middleware(db database.Service, next http.Handler) http.Handler {
 			return
 		}
 
-		ctx = LoadRequestContext(ctx, w, r, q, false)
+		ctx = LoadRequestContext(ctx, w, r, q)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -149,13 +150,15 @@ func buildCatalog(rows []queries.GetPublishedAdsWithProductsRow) []CatalogAd {
 			order = append(order, row.AdID)
 		}
 		ad.ProductOptions = append(ad.ProductOptions, ProductOption{
-			ProductID:    row.AffiliateProductID,
-			Provider:     constants.AffiliateProvider(row.Provider),
-			Name:         row.ProductName,
-			ShopName:     row.ShopName,
-			Sales:        row.Sales,
-			PriceDisplay: row.PriceDisplay,
+			ProductID:            row.AffiliateProductID,
+			Provider:             constants.AffiliateProvider(row.Provider),
+			ThumbnailOrientation: constants.ThumbnailOrientation(row.ThumbnailOrientation),
+			Name:                 row.ProductName,
+			ShopName:             row.ShopName,
+			Sales:                row.Sales,
+			PriceDisplay:         row.PriceDisplay,
 			ThumbnailURL: affiliates.ResolveProductThumbnail(affiliates.ProductThumbnailInput{
+				ProductID:    row.AffiliateProductID,
 				Provider:     constants.AffiliateProvider(row.Provider),
 				ItemID:       row.ProductItemID,
 				ProgramID:    row.ProgramID,

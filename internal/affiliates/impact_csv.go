@@ -4,15 +4,20 @@ import (
 	"encoding/csv"
 	"io"
 	"strings"
+
+	"zion-english/internal/constants"
 )
 
 type ImpactCSVRow struct {
-	AdID         string
-	State        string
-	ProgramID    string
-	Name         string
-	AdType       string
-	TrackingLink string
+	AdID           string
+	State          string
+	ProgramID      string
+	Name           string
+	AdType         string
+	TrackingLink   string
+	CreativeWidth  string
+	CreativeHeight string
+	Orientation    constants.ThumbnailOrientation
 }
 
 var impactRequiredHeaders = []string{
@@ -52,13 +57,18 @@ func ParseImpactAdsCSV(r io.Reader) ([]ImpactCSVRow, error) {
 		if len(record) == 0 || csvRecordEmpty(record) {
 			continue
 		}
+		creativeWidth := fieldAt(record, col["thirdpartyservableadcreativewidth"])
+		creativeHeight := fieldAt(record, col["thirdpartyservableadcreativeheight"])
 		row := ImpactCSVRow{
-			AdID:         fieldAt(record, col["adid"]),
-			State:        fieldAt(record, col["state"]),
-			ProgramID:    fieldAt(record, col["programid"]),
-			Name:         fieldAt(record, col["name"]),
-			AdType:       fieldAt(record, col["adtype"]),
-			TrackingLink: fieldAt(record, col["trackinglink"]),
+			AdID:           fieldAt(record, col["adid"]),
+			State:          fieldAt(record, col["state"]),
+			ProgramID:      fieldAt(record, col["programid"]),
+			Name:           fieldAt(record, col["name"]),
+			AdType:         fieldAt(record, col["adtype"]),
+			TrackingLink:   fieldAt(record, col["trackinglink"]),
+			CreativeWidth:  creativeWidth,
+			CreativeHeight: creativeHeight,
+			Orientation:    OrientationFromCreativeDimensions(creativeWidth, creativeHeight),
 		}
 		if row.AdID == "" || row.Name == "" || row.TrackingLink == "" {
 			return nil, ErrCSVInvalid
@@ -89,6 +99,14 @@ func mapImpactCSVColumns(header []string) map[string]int {
 	for _, required := range impactRequiredHeaders {
 		if _, ok := out[required]; !ok {
 			out[required] = -1
+		}
+	}
+	for _, optional := range []string{
+		"thirdpartyservableadcreativewidth",
+		"thirdpartyservableadcreativeheight",
+	} {
+		if _, ok := out[optional]; !ok {
+			out[optional] = -1
 		}
 	}
 	return out

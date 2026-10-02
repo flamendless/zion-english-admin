@@ -74,6 +74,7 @@ SELECT
 	p.program_id,
 	p.impact_state,
 	p.impact_ad_type,
+	p.thumbnail_orientation,
 	p.created_at,
 	p.updated_at
 FROM tbl_affiliate_products p
@@ -83,29 +84,30 @@ ORDER BY p.sort_order ASC, p.id ASC
 `
 
 type GetAffiliateProductsByImportBatchIDRow struct {
-	ID               int64
-	AffiliateUrl     string
-	ProductUrl       string
-	ShopID           string
-	ItemID           string
-	Name             string
-	Brand            string
-	PriceDisplay     string
-	ThumbnailUrl     string
-	SortOrder        int64
-	ImportBatchID    int64
-	Sales            string
-	AffiliatedShopID sql.NullInt64
-	ShopBrandName    string
-	CommissionRate   string
-	Commission       string
-	ClickCount       int64
-	Provider         string
-	ProgramID        string
-	ImpactState      string
-	ImpactAdType     string
-	CreatedAt        string
-	UpdatedAt        string
+	ID                   int64
+	AffiliateUrl         string
+	ProductUrl           string
+	ShopID               string
+	ItemID               string
+	Name                 string
+	Brand                string
+	PriceDisplay         string
+	ThumbnailUrl         string
+	SortOrder            int64
+	ImportBatchID        int64
+	Sales                string
+	AffiliatedShopID     sql.NullInt64
+	ShopBrandName        string
+	CommissionRate       string
+	Commission           string
+	ClickCount           int64
+	Provider             string
+	ProgramID            string
+	ImpactState          string
+	ImpactAdType         string
+	ThumbnailOrientation string
+	CreatedAt            string
+	UpdatedAt            string
 }
 
 func (q *Queries) GetAffiliateProductsByImportBatchID(ctx context.Context, importBatchID int64) ([]GetAffiliateProductsByImportBatchIDRow, error) {
@@ -139,6 +141,7 @@ func (q *Queries) GetAffiliateProductsByImportBatchID(ctx context.Context, impor
 			&i.ProgramID,
 			&i.ImpactState,
 			&i.ImpactAdType,
+			&i.ThumbnailOrientation,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {

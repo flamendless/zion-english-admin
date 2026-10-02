@@ -21,6 +21,7 @@ SELECT
 	p.program_id,
 	p.impact_state,
 	p.impact_ad_type,
+	p.thumbnail_orientation,
 	p.created_at,
 	p.updated_at
 FROM tbl_affiliate_products p
@@ -50,6 +51,7 @@ SELECT
 	p.program_id,
 	p.impact_state,
 	p.impact_ad_type,
+	p.thumbnail_orientation,
 	p.created_at,
 	p.updated_at
 FROM tbl_affiliate_products p
@@ -75,9 +77,10 @@ INSERT INTO tbl_affiliate_products (
 	provider,
 	program_id,
 	impact_state,
-	impact_ad_type
+	impact_ad_type,
+	thumbnail_orientation
 )
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 RETURNING id;
 
 -- name: UpdateAffiliateProduct :exec
@@ -100,6 +103,7 @@ SET
 	program_id = ?,
 	impact_state = ?,
 	impact_ad_type = ?,
+	thumbnail_orientation = ?,
 	updated_at = datetime('now')
 WHERE id = ?;
 
@@ -133,6 +137,7 @@ SELECT
 	p.program_id,
 	p.impact_state,
 	p.impact_ad_type,
+	p.thumbnail_orientation,
 	COALESCE(s.brand_name, '') AS shop_brand_name
 FROM tbl_affiliate_products p
 LEFT JOIN tbl_affiliated_product_shops s ON s.id = p.affiliated_shop_id
@@ -161,6 +166,7 @@ SELECT
 	p.program_id,
 	p.impact_state,
 	p.impact_ad_type,
+	p.thumbnail_orientation,
 	p.created_at,
 	p.updated_at
 FROM tbl_affiliate_products p

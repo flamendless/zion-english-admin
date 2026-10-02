@@ -9,8 +9,7 @@ import (
 )
 
 // LoadRequestContext loads published ads into ctx, applies rotation cookies, and resolves slots.
-// When forceRotateFiveSecondTimers is true, timer ads with a 5 second interval get fresh picks.
-func LoadRequestContext(ctx context.Context, w http.ResponseWriter, r *http.Request, db *queries.Queries, forceRotateFiveSecondTimers bool) context.Context {
+func LoadRequestContext(ctx context.Context, w http.ResponseWriter, r *http.Request, db *queries.Queries) context.Context {
 	rows, err := db.GetPublishedAdsWithProducts(ctx)
 	if err != nil {
 		return ctx
@@ -20,9 +19,26 @@ func LoadRequestContext(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		return ctx
 	}
 	ctx = context.WithValue(ctx, catalogKey, catalog)
-	slots, picks := resolveCatalog(ctx, r, catalog, forceRotateFiveSecondTimers)
+	slots, picks := resolveCatalog(ctx, r, catalog, false)
 	ctx = context.WithValue(ctx, rotationPicksKey, picks)
-	ApplyRotationCookies(w, r, catalog, picks)
+	ApplyRotationCookies(w, r, catalog, picks, false)
+	return context.WithValue(ctx, slotsKey, slots)
+}
+
+// LoadChromePartialRequestContext resolves slots for the fast chrome refresh: only 5 second timer ads rotate.
+func LoadChromePartialRequestContext(ctx context.Context, w http.ResponseWriter, r *http.Request, db *queries.Queries) context.Context {
+	rows, err := db.GetPublishedAdsWithProducts(ctx)
+	if err != nil {
+		return ctx
+	}
+	catalog := buildCatalog(rows)
+	if len(catalog) == 0 {
+		return ctx
+	}
+	ctx = context.WithValue(ctx, catalogKey, catalog)
+	slots, picks := resolveCatalogForChromeRefresh(ctx, r, catalog)
+	ctx = context.WithValue(ctx, rotationPicksKey, picks)
+	ApplyRotationCookies(w, r, catalog, picks, true)
 	return context.WithValue(ctx, slotsKey, slots)
 }
 

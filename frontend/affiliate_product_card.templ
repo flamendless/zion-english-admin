@@ -21,8 +21,9 @@ type AffiliateProductCardData struct {
 	ThumbnailURL string
 	AffiliateURL string
 	TrackAdID    int64
-	TrackAdZone  constants.AdZone
-	IncludeInSave bool
+	TrackAdZone           constants.AdZone
+	ThumbnailOrientation  constants.ThumbnailOrientation
+	IncludeInSave         bool
 	FormIndex     int
 }
 
@@ -54,16 +55,40 @@ func AffiliateProductCardFromResolved(item ads.ResolvedProduct) AffiliateProduct
 		Sales:        item.Sales,
 		ThumbnailURL: item.ThumbnailURL,
 		AffiliateURL: item.AffiliateURL,
-		TrackAdID:    item.AdID,
-		TrackAdZone:  item.Zone,
+		TrackAdID:            item.AdID,
+		TrackAdZone:          item.Zone,
+		ThumbnailOrientation: item.ThumbnailOrientation,
 	}
 }
 
 func affiliateProductCardClass(provider constants.AffiliateProvider) string {
 	if provider == constants.AffiliateProviderImpact {
-		return "affiliate-product-card affiliate-product-card--impact-banner"
+		return affiliateImpactBannerCardClass(AffiliateProductCardData{
+			Provider: provider,
+		})
 	}
 	return "affiliate-product-card"
+}
+
+func affiliateProductCardChromeModifier(card AffiliateProductCardData) string {
+	if card.TrackAdZone != "" {
+		return " affiliate-product-card--ad-chrome"
+	}
+	return ""
+}
+
+func affiliateImpactBannerCardClass(card AffiliateProductCardData) string {
+	classes := "affiliate-product-card affiliate-product-card--impact-banner" + affiliateProductCardChromeModifier(card)
+	switch card.ThumbnailOrientation {
+	case constants.ThumbnailOrientationLandscape:
+		return classes + " affiliate-product-card--thumbnail-landscape"
+	case constants.ThumbnailOrientationPortrait:
+		return classes + " affiliate-product-card--thumbnail-portrait"
+	case constants.ThumbnailOrientationSquare:
+		return classes + " affiliate-product-card--thumbnail-square"
+	default:
+		return classes
+	}
 }
 
 templ AffiliateProductCard(card AffiliateProductCardData) {
@@ -75,7 +100,7 @@ templ AffiliateProductCard(card AffiliateProductCardData) {
 }
 
 templ AffiliateImpactBannerCard(card AffiliateProductCardData) {
-	<article class={ affiliateProductCardClass(card.Provider) }>
+	<article class={ affiliateImpactBannerCardClass(card) }>
 		<div class="affiliate-product-card-image-wrap">
 			if card.IncludeInSave {
 				<label class="affiliate-product-card-include" title="Include when saving">
@@ -110,13 +135,12 @@ templ AffiliateImpactBannerCard(card AffiliateProductCardData) {
 					</div>
 				}
 			</a>
-			<span class="affiliate-product-card-badge">Affiliated</span>
 		</div>
 	</article>
 }
 
 templ AffiliateShopeeProductCard(card AffiliateProductCardData) {
-	<article class="affiliate-product-card">
+	<article class={ "affiliate-product-card" + affiliateProductCardChromeModifier(card) }>
 		<div class="affiliate-product-card-image-wrap">
 			if card.IncludeInSave {
 				<label class="affiliate-product-card-include" title="Include when saving">
@@ -263,22 +287,27 @@ templ AffiliateProductCardStyles() {
 		}
 
 		.affiliate-product-card--impact-banner {
-			--affiliate-card-accent: #1e3a5f;
-			--affiliate-card-border: rgba(30, 58, 95, 0.18);
-			--affiliate-card-shadow: rgba(15, 23, 42, 0.08);
+			height: auto;
+			background: transparent;
+			border: none;
+			box-shadow: none;
+			border-radius: 0;
 		}
 
 		.affiliate-product-card-image-link--banner {
 			aspect-ratio: auto;
-			background: var(--color-muted);
+			display: block;
+			width: 100%;
+			background: transparent;
+			line-height: 0;
 		}
 
 		.affiliate-product-card-image--banner {
 			width: 100%;
 			height: auto;
-			max-height: 20rem;
-			object-fit: contain;
-			object-position: center;
+			max-height: none;
+			display: block;
+			vertical-align: top;
 		}
 
 		.affiliate-product-card-image-placeholder--banner {

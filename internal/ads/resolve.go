@@ -3,10 +3,14 @@ package ads
 import (
 	"context"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"zion-english/internal/conf"
@@ -23,17 +27,18 @@ var resolutionZoneOrder = []constants.AdZone{
 }
 
 type ResolvedProduct struct {
-	AdID         int64
-	AdName       string
-	Zone         constants.AdZone
-	ProductID    int64
-	Provider     constants.AffiliateProvider
-	Name         string
-	ShopName     string
-	PriceDisplay string
-	ThumbnailURL string
-	AffiliateURL string
-	Sales        string
+	AdID                 int64
+	AdName               string
+	Zone                 constants.AdZone
+	ProductID            int64
+	Provider             constants.AffiliateProvider
+	ThumbnailOrientation constants.ThumbnailOrientation
+	Name                 string
+	ShopName             string
+	PriceDisplay         string
+	ThumbnailURL         string
+	AffiliateURL         string
+	Sales                string
 }
 
 type ResolvedSlots struct {
@@ -69,6 +74,8 @@ func resolveCatalog(ctx context.Context, r *http.Request, catalog []CatalogAd, f
 				switch ad.RandomizeKind {
 				case constants.AdRandomizePerSession, constants.AdRandomizeTimer:
 					picks[cookieNameForAdZone(ad.ID, zone)] = opt.ProductID
+				case constants.AdRandomizePerPage:
+					picks[cookieNameForAdZonePerPage(ad.ID, zone, requestPagePath(r))] = opt.ProductID
 				}
 			}
 			product := resolvedProductFromOption(ad, zone, opt)
@@ -76,6 +83,103 @@ func resolveCatalog(ctx context.Context, r *http.Request, catalog []CatalogAd, f
 		}
 	}
 	return slots, picks
+}
+
+// resolveCatalogForChromeRefresh keeps per-page, session, and non-5s timer picks stable and only re-randomizes 5 second timer ads.
+func resolveCatalogForChromeRefresh(ctx context.Context, r *http.Request, catalog []CatalogAd) (ResolvedSlots, map[string]int64) {
+	slots, picks := resolveCatalog(ctx, r, catalog, false)
+	for _, ad := range catalog {
+		if !isFiveSecondTimerAd(ad) {
+			continue
+		}
+		used := productIDsFromSlots(slots)
+		for _, zone := range zonesForAdInResolutionOrder(ad) {
+			if oldID := productIDInSlot(slots, ad.ID, zone); oldID != 0 {
+				delete(used, oldID)
+			}
+			unused := filterUnusedOptions(ad.ProductOptions, used)
+			if len(unused) == 0 {
+				continue
+			}
+			opt := unused[randomIndex(len(unused))]
+			used[opt.ProductID] = true
+			picks[cookieNameForAdZone(ad.ID, zone)] = opt.ProductID
+			replaceSlotProduct(&slots, ad.ID, zone, resolvedProductFromOption(ad, zone, opt))
+		}
+	}
+	return slots, picks
+}
+
+func isFiveSecondTimerAd(ad CatalogAd) bool {
+	return len(ad.ProductOptions) > 1 &&
+		ad.RandomizeKind == constants.AdRandomizeTimer &&
+		ad.TimerInterval == constants.AdTimerIntervalFiveSeconds
+}
+
+func productIDsFromSlots(slots ResolvedSlots) map[int64]bool {
+	used := make(map[int64]bool)
+	for _, p := range slots.Top {
+		used[p.ProductID] = true
+	}
+	for _, p := range slots.Left {
+		used[p.ProductID] = true
+	}
+	for _, p := range slots.Right {
+		used[p.ProductID] = true
+	}
+	for _, p := range slots.Bottom {
+		used[p.ProductID] = true
+	}
+	return used
+}
+
+func productIDInSlot(slots ResolvedSlots, adID int64, zone constants.AdZone) int64 {
+	for _, p := range productsInZone(slots, zone) {
+		if p.AdID == adID {
+			return p.ProductID
+		}
+	}
+	return 0
+}
+
+func productsInZone(slots ResolvedSlots, zone constants.AdZone) []ResolvedProduct {
+	switch zone {
+	case constants.AdZoneTop:
+		return slots.Top
+	case constants.AdZoneLeft:
+		return slots.Left
+	case constants.AdZoneRight:
+		return slots.Right
+	case constants.AdZoneBottom:
+		return slots.Bottom
+	default:
+		return nil
+	}
+}
+
+func replaceSlotProduct(slots *ResolvedSlots, adID int64, zone constants.AdZone, product ResolvedProduct) {
+	switch zone {
+	case constants.AdZoneTop:
+		slots.Top = replaceProductInSlice(slots.Top, adID, product)
+	case constants.AdZoneLeft:
+		slots.Left = replaceProductInSlice(slots.Left, adID, product)
+	case constants.AdZoneRight:
+		slots.Right = replaceProductInSlice(slots.Right, adID, product)
+	case constants.AdZoneBottom:
+		slots.Bottom = replaceProductInSlice(slots.Bottom, adID, product)
+	}
+}
+
+func replaceProductInSlice(items []ResolvedProduct, adID int64, product ResolvedProduct) []ResolvedProduct {
+	out := make([]ResolvedProduct, 0, len(items))
+	for _, p := range items {
+		if p.AdID == adID {
+			out = append(out, product)
+		} else {
+			out = append(out, p)
+		}
+	}
+	return out
 }
 
 func zonesForAdInResolutionOrder(ad CatalogAd) []constants.AdZone {
@@ -109,17 +213,18 @@ func appendResolvedProduct(slots *ResolvedSlots, product ResolvedProduct) {
 
 func resolvedProductFromOption(ad CatalogAd, zone constants.AdZone, chosen ProductOption) ResolvedProduct {
 	return ResolvedProduct{
-		AdID:         ad.ID,
-		AdName:       ad.Name,
-		Zone:         zone,
-		ProductID:    chosen.ProductID,
-		Provider:     chosen.Provider,
-		Name:         chosen.Name,
-		ShopName:     chosen.ShopName,
-		PriceDisplay: chosen.PriceDisplay,
-		ThumbnailURL: chosen.ThumbnailURL,
-		AffiliateURL: chosen.AffiliateURL,
-		Sales:        chosen.Sales,
+		AdID:                 ad.ID,
+		AdName:               ad.Name,
+		Zone:                 zone,
+		ProductID:            chosen.ProductID,
+		Provider:             chosen.Provider,
+		ThumbnailOrientation: chosen.ThumbnailOrientation,
+		Name:                 chosen.Name,
+		ShopName:             chosen.ShopName,
+		PriceDisplay:         chosen.PriceDisplay,
+		ThumbnailURL:         chosen.ThumbnailURL,
+		AffiliateURL:         chosen.AffiliateURL,
+		Sales:                chosen.Sales,
 	}
 }
 
@@ -142,6 +247,12 @@ func pickProductForSlot(
 
 	switch ad.RandomizeKind {
 	case constants.AdRandomizePerPage:
+		cookieName := cookieNameForAdZonePerPage(ad.ID, zone, requestPagePath(r))
+		if id, ok := stableProductIDForSlot(ctx, r, cookieName, picks); ok {
+			if opt, found := findProduct(unused, id); found {
+				return opt, true
+			}
+		}
 		return unused[randomIndex(len(unused))], true
 	case constants.AdRandomizePerSession, constants.AdRandomizeTimer:
 		cookieName := cookieNameForAdZone(ad.ID, zone)
@@ -202,6 +313,23 @@ func cookieNameForAdZone(adID int64, zone constants.AdZone) string {
 	return fmt.Sprintf("%s%d_%s", cookiePrefix, adID, zone)
 }
 
+func cookieNameForAdZonePerPage(adID int64, zone constants.AdZone, pagePath string) string {
+	sum := sha256.Sum256([]byte(pagePath))
+	return fmt.Sprintf("%s%d_%s_p%s", cookiePrefix, adID, zone, hex.EncodeToString(sum[:8]))
+}
+
+func requestPagePath(r *http.Request) string {
+	path := r.URL.Path
+	if strings.Contains(path, "/ads/partials/") {
+		if ref := r.Referer(); ref != "" {
+			if u, err := url.Parse(ref); err == nil && u.Path != "" {
+				return u.Path
+			}
+		}
+	}
+	return path
+}
+
 func timerMaxAge(interval constants.AdTimerInterval) int {
 	switch interval {
 	case constants.AdTimerIntervalFiveSeconds:
@@ -227,7 +355,8 @@ func randomIndex(n int) int {
 }
 
 // ApplyRotationCookies sets HttpOnly cookies for session/timer rotation picks when needed.
-func ApplyRotationCookies(w http.ResponseWriter, r *http.Request, catalog []CatalogAd, picks map[string]int64) {
+// When refreshFiveSecondTimerCookies is true, 5 second timer cookies are rewritten from picks (chrome partial refresh).
+func ApplyRotationCookies(w http.ResponseWriter, r *http.Request, catalog []CatalogAd, picks map[string]int64, refreshFiveSecondTimerCookies bool) {
 	cookiePath := conf.Conf().BasePath
 	if cookiePath == "" {
 		cookiePath = "/"
@@ -239,6 +368,21 @@ func ApplyRotationCookies(w http.ResponseWriter, r *http.Request, catalog []Cata
 		for _, zone := range zonesForAdInResolutionOrder(ad) {
 			cookieName := cookieNameForAdZone(ad.ID, zone)
 			switch ad.RandomizeKind {
+			case constants.AdRandomizePerPage:
+				pageCookie := cookieNameForAdZonePerPage(ad.ID, zone, requestPagePath(r))
+				if _, err := r.Cookie(pageCookie); err != nil {
+					productID, ok := picks[pageCookie]
+					if !ok {
+						continue
+					}
+					http.SetCookie(w, &http.Cookie{
+						Name:     pageCookie,
+						Value:    strconv.FormatInt(productID, 10),
+						Path:     cookiePath,
+						HttpOnly: true,
+						SameSite: http.SameSiteLaxMode,
+					})
+				}
 			case constants.AdRandomizePerSession:
 				if _, err := r.Cookie(cookieName); err != nil {
 					productID, ok := picks[cookieName]
@@ -254,23 +398,33 @@ func ApplyRotationCookies(w http.ResponseWriter, r *http.Request, catalog []Cata
 					})
 				}
 			case constants.AdRandomizeTimer:
+				isFiveSecond := ad.TimerInterval == constants.AdTimerIntervalFiveSeconds
+				forceSet := refreshFiveSecondTimerCookies && isFiveSecond
+				if forceSet {
+					setTimerRotationCookie(w, cookiePath, cookieName, picks, ad.TimerInterval)
+					continue
+				}
 				if _, err := r.Cookie(cookieName); err != nil {
-					productID, ok := picks[cookieName]
-					if !ok {
-						continue
-					}
-					http.SetCookie(w, &http.Cookie{
-						Name:     cookieName,
-						Value:    strconv.FormatInt(productID, 10),
-						Path:     cookiePath,
-						MaxAge:   timerMaxAge(ad.TimerInterval),
-						HttpOnly: true,
-						SameSite: http.SameSiteLaxMode,
-					})
+					setTimerRotationCookie(w, cookiePath, cookieName, picks, ad.TimerInterval)
 				}
 			}
 		}
 	}
+}
+
+func setTimerRotationCookie(w http.ResponseWriter, cookiePath, cookieName string, picks map[string]int64, interval constants.AdTimerInterval) {
+	productID, ok := picks[cookieName]
+	if !ok {
+		return
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:     cookieName,
+		Value:    strconv.FormatInt(productID, 10),
+		Path:     cookiePath,
+		MaxAge:   timerMaxAge(interval),
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	})
 }
 
 // ComputeRotationPicks chooses stable session/timer products per ad zone for this request.

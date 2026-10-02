@@ -59,17 +59,19 @@ type AdAffiliateSearchItem struct {
 	PriceDisplay string
 	ThumbnailURL string
 	Provider     constants.AffiliateProvider
+	Orientation  constants.ThumbnailOrientation
 	Checked      bool
 }
 
 type AdAffiliateSearchPanelData struct {
-	Items         []AdAffiliateSearchItem
-	Query         string
-	Page          int
-	TotalPages    int
-	Total         int64
-	SelectedCount int
-	FormID        string
+	Items             []AdAffiliateSearchItem
+	Query             string
+	Page              int
+	TotalPages        int
+	Total             int64
+	SelectedCount     int
+	FormID            string
+	OrientationFilter string
 }
 
 type AdsPageData struct {
@@ -295,7 +297,7 @@ templ AdForm(data AdFormData, formID string) {
 							hx-get={ utils.URL("/ads/partials/affiliate-search?form_id=" + formID) }
 							hx-trigger="input changed delay:300ms, loadAffiliateProducts from:body"
 							hx-target={ "#" + formID + "SearchResults" }
-							hx-include={ "#" + formID + "ProductSearch, #" + formID + "SelectedIDs" }
+							hx-include={ "#" + formID + "ProductSearch, #" + formID + "SelectedIDs, #" + formID + "OrientationFilter" }
 						/>
 					</div>
 					<div class="ads-selection-row">
@@ -305,6 +307,20 @@ templ AdForm(data AdFormData, formID string) {
 							<span class="ads-selection-count-total">-</span>
 							<span> selected</span>
 						</p>
+						<div class="ads-selection-actions">
+							<div class="form-group ads-orientation-filter">
+								<label class="ads-orientation-filter-label" for={ formID + "OrientationFilter" }>Orientation</label>
+								<select
+									id={ formID + "OrientationFilter" }
+									name="orientation"
+									class="ads-orientation-filter-select"
+									disabled?={ data.IsDeleted }
+								>
+									for _, opt := range ThumbnailOrientationFilterOptions {
+										<option value={ opt.Value }>{ opt.Label }</option>
+									}
+								</select>
+							</div>
 						<label class="ads-select-all-toggle checkbox-label" for={ formID + "SelectAll" }>
 							<input
 								type="checkbox"
@@ -315,6 +331,7 @@ templ AdForm(data AdFormData, formID string) {
 							/>
 							Select all
 						</label>
+						</div>
 					</div>
 					<div id={ formID + "SelectedIDs" } class="ads-selected-product-inputs">
 						for _, p := range data.SelectedProducts {
@@ -386,7 +403,11 @@ templ adPlacementOptions(selected constants.AdPlacement) {
 }
 
 templ AdAffiliateSearchPanel(data AdAffiliateSearchPanelData) {
-	<div class="ads-search-panel" data-total={ fmt.Sprintf("%d", data.Total) }>
+	<div
+		class="ads-search-panel"
+		data-total={ fmt.Sprintf("%d", data.Total) }
+		data-orientation-filter={ data.OrientationFilter }
+	>
 		if len(data.Items) == 0 {
 			<p class="ads-search-empty">No products match your search.</p>
 		} else {
@@ -400,6 +421,9 @@ templ AdAffiliateSearchPanel(data AdAffiliateSearchPanelData) {
 							}
 							<span class="ads-search-item-text">
 								<span class="ads-search-item-name">{ item.Name }</span>
+								if item.Provider == constants.AffiliateProviderImpact && item.Orientation != "" {
+									<span class="ads-search-item-orientation">{ constants.ThumbnailOrientationLabel(item.Orientation) }</span>
+								}
 								if item.ShopName != "" {
 									<span class="ads-search-item-shop">{ item.ShopName }</span>
 								}
@@ -419,7 +443,7 @@ templ AdAffiliateSearchPanel(data AdAffiliateSearchPanelData) {
 						type="button"
 						class="pagination-btn"
 						hx-get={ utils.URL("/ads/partials/affiliate-search?form_id=" + data.FormID) }
-						hx-include={ "#" + data.FormID + "ProductSearch, #" + data.FormID + "SelectedIDs" }
+						hx-include={ "#" + data.FormID + "ProductSearch, #" + data.FormID + "SelectedIDs, #" + data.FormID + "OrientationFilter" }
 						hx-vals={ fmt.Sprintf(`{"page": %d}`, data.Page-1) }
 						hx-target={ "#" + data.FormID + "SearchResults" }
 						hx-swap={ HxSwapInnerHTML }
@@ -435,7 +459,7 @@ templ AdAffiliateSearchPanel(data AdAffiliateSearchPanelData) {
 						type="button"
 						class="pagination-btn"
 						hx-get={ utils.URL("/ads/partials/affiliate-search?form_id=" + data.FormID) }
-						hx-include={ "#" + data.FormID + "ProductSearch, #" + data.FormID + "SelectedIDs" }
+						hx-include={ "#" + data.FormID + "ProductSearch, #" + data.FormID + "SelectedIDs, #" + data.FormID + "OrientationFilter" }
 						hx-vals={ fmt.Sprintf(`{"page": %d}`, data.Page+1) }
 						hx-target={ "#" + data.FormID + "SearchResults" }
 						hx-swap={ HxSwapInnerHTML }
@@ -582,6 +606,45 @@ templ AdsPageStyles() {
 			font-weight: 600;
 			color: var(--color-muted-foreground);
 		}
+		.ads-selection-actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-3);
+			margin-left: auto;
+		}
+
+		.ads-orientation-filter {
+			margin: 0;
+			display: flex;
+			align-items: center;
+			gap: var(--space-2);
+		}
+
+		.ads-orientation-filter-label {
+			margin: 0;
+			font-size: 0.8125rem;
+			font-weight: 600;
+			color: var(--color-muted-foreground);
+			white-space: nowrap;
+		}
+
+		.ads-orientation-filter-select {
+			margin-top: 0;
+			min-width: 9rem;
+			padding: 0.375rem var(--space-2);
+			font-size: 0.8125rem;
+		}
+
+		.ads-search-item-orientation {
+			display: inline-block;
+			font-size: 0.6875rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.03em;
+			color: var(--color-muted-foreground);
+		}
+
 		.ads-select-all-toggle {
 			margin: 0;
 			font-size: 0.875rem;
@@ -799,7 +862,14 @@ templ AdsPageScripts(openCreate bool) {
 				const search = form.querySelector('[id$="ProductSearch"]');
 				if (!toggle || !toggle.dataset.idsUrl) return null;
 				const q = search ? search.value.trim() : '';
-				const url = toggle.dataset.idsUrl + (q ? '?q=' + encodeURIComponent(q) : '');
+				const orientationEl = form.querySelector('[id$="OrientationFilter"]');
+				const orientation = orientationEl ? orientationEl.value.trim() : '';
+				let url = toggle.dataset.idsUrl;
+				const params = new URLSearchParams();
+				if (q) params.set('q', q);
+				if (orientation) params.set('orientation', orientation);
+				const qs = params.toString();
+				if (qs) url += '?' + qs;
 				const res = await fetch(url, { credentials: 'same-origin' });
 				if (!res.ok) return null;
 				const data = await res.json();
@@ -811,6 +881,11 @@ templ AdsPageScripts(openCreate bool) {
 				const total = panelEl.getAttribute('data-total');
 				const totalSpan = form.querySelector('[id$="SelectionCount"] .ads-selection-count-total');
 				if (totalSpan && total) totalSpan.textContent = total;
+				const orientation = panelEl.getAttribute('data-orientation-filter');
+				const orientationEl = form.querySelector('[id$="OrientationFilter"]');
+				if (orientationEl && orientation != null) {
+					orientationEl.value = orientation;
+				}
 			}
 
 			function loadAffiliateProductsForForm(form) {
@@ -938,6 +1013,13 @@ templ AdsPageScripts(openCreate bool) {
 						if (!selectedInputs) return;
 						const h = selectedInputs.querySelector('input[value="' + id + '"]');
 						if (h) h.remove();
+					}
+
+					const orientationFilter = form.querySelector('[id$="OrientationFilter"]');
+					if (orientationFilter) {
+						orientationFilter.addEventListener('change', function () {
+							loadAffiliateProductsForForm(form);
+						});
 					}
 
 					if (selectAllToggle) {

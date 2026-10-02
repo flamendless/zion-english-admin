@@ -90,6 +90,59 @@ func TestResolveCatalogDedupesProductsOnPage(t *testing.T) {
 	}
 }
 
+func TestResolveCatalogForChromeRefreshKeepsPerPageStable(t *testing.T) {
+	t.Parallel()
+	catalog := []CatalogAd{
+		{
+			ID:            1,
+			Placement:     constants.AdPlacementTop,
+			RandomizeKind: constants.AdRandomizePerPage,
+			ProductOptions: []ProductOption{
+				{ProductID: 10},
+				{ProductID: 20},
+			},
+		},
+		{
+			ID:            2,
+			Placement:     constants.AdPlacementTop,
+			RandomizeKind: constants.AdRandomizeTimer,
+			TimerInterval: constants.AdTimerIntervalFiveSeconds,
+			ProductOptions: []ProductOption{
+				{ProductID: 30},
+				{ProductID: 40},
+			},
+		},
+	}
+	page := httptest.NewRequest("GET", "/zion-english-admin/students", nil)
+	page.Header.Set("Cookie", cookieNameForAdZonePerPage(1, constants.AdZoneTop, "/zion-english-admin/students")+"=10")
+	first, _ := resolveCatalog(context.Background(), page, catalog, false)
+	perPageID := first.Top[0].ProductID
+
+	partial := httptest.NewRequest("GET", "/zion-english-admin/ads/partials/chrome", nil)
+	partial.Header.Set("Referer", "http://localhost/zion-english-admin/students")
+	partial.Header.Set("Cookie", page.Header.Get("Cookie"))
+	second, _ := resolveCatalogForChromeRefresh(context.Background(), partial, catalog)
+	if len(second.Top) != 2 {
+		t.Fatalf("expected 2 top slots, got %d", len(second.Top))
+	}
+	var perPageAfter int64
+	var timerAdID int64
+	for _, p := range second.Top {
+		if p.AdID == 1 {
+			perPageAfter = p.ProductID
+		}
+		if p.AdID == 2 {
+			timerAdID = p.ProductID
+		}
+	}
+	if perPageAfter != perPageID {
+		t.Fatalf("per-page product changed on chrome refresh: %d -> %d", perPageID, perPageAfter)
+	}
+	if timerAdID != 30 && timerAdID != 40 {
+		t.Fatalf("unexpected timer product id %d", timerAdID)
+	}
+}
+
 func TestResolveCatalogSkipsSlotsWhenPoolExhausted(t *testing.T) {
 	t.Parallel()
 	catalog := []CatalogAd{
