@@ -39,6 +39,10 @@ SELECT
 	p.commission_rate,
 	p.commission,
 	p.click_count,
+	p.provider,
+	p.program_id,
+	p.impact_state,
+	p.impact_ad_type,
 	p.created_at,
 	p.updated_at
 FROM tbl_affiliate_products p
@@ -64,6 +68,10 @@ type GetAffiliateProductByIDRow struct {
 	CommissionRate   string
 	Commission       string
 	ClickCount       int64
+	Provider         string
+	ProgramID        string
+	ImpactState      string
+	ImpactAdType     string
 	CreatedAt        string
 	UpdatedAt        string
 }
@@ -89,6 +97,10 @@ func (q *Queries) GetAffiliateProductByID(ctx context.Context, id int64) (GetAff
 		&i.CommissionRate,
 		&i.Commission,
 		&i.ClickCount,
+		&i.Provider,
+		&i.ProgramID,
+		&i.ImpactState,
+		&i.ImpactAdType,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -114,13 +126,23 @@ SELECT
 	p.commission_rate,
 	p.commission,
 	p.click_count,
+	p.provider,
+	p.program_id,
+	p.impact_state,
+	p.impact_ad_type,
 	p.created_at,
 	p.updated_at
 FROM tbl_affiliate_products p
 LEFT JOIN tbl_affiliated_product_shops s ON s.id = p.affiliated_shop_id
 WHERE p.item_id = ?
 	AND TRIM(p.item_id) != ''
+	AND p.provider = ?
 `
+
+type GetAffiliateProductByItemIDParams struct {
+	ItemID   string
+	Provider string
+}
 
 type GetAffiliateProductByItemIDRow struct {
 	ID               int64
@@ -140,12 +162,16 @@ type GetAffiliateProductByItemIDRow struct {
 	CommissionRate   string
 	Commission       string
 	ClickCount       int64
+	Provider         string
+	ProgramID        string
+	ImpactState      string
+	ImpactAdType     string
 	CreatedAt        string
 	UpdatedAt        string
 }
 
-func (q *Queries) GetAffiliateProductByItemID(ctx context.Context, itemID string) (GetAffiliateProductByItemIDRow, error) {
-	row := q.db.QueryRowContext(ctx, getAffiliateProductByItemID, itemID)
+func (q *Queries) GetAffiliateProductByItemID(ctx context.Context, arg GetAffiliateProductByItemIDParams) (GetAffiliateProductByItemIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getAffiliateProductByItemID, arg.ItemID, arg.Provider)
 	var i GetAffiliateProductByItemIDRow
 	err := row.Scan(
 		&i.ID,
@@ -165,6 +191,10 @@ func (q *Queries) GetAffiliateProductByItemID(ctx context.Context, itemID string
 		&i.CommissionRate,
 		&i.Commission,
 		&i.ClickCount,
+		&i.Provider,
+		&i.ProgramID,
+		&i.ImpactState,
+		&i.ImpactAdType,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -186,6 +216,10 @@ SELECT
 	p.commission_rate,
 	p.commission,
 	p.click_count,
+	p.provider,
+	p.program_id,
+	p.impact_state,
+	p.impact_ad_type,
 	COALESCE(s.brand_name, '') AS shop_brand_name
 FROM tbl_affiliate_products p
 LEFT JOIN tbl_affiliated_product_shops s ON s.id = p.affiliated_shop_id
@@ -206,6 +240,10 @@ type GetAffiliateProductsCatalogKeysRow struct {
 	CommissionRate string
 	Commission     string
 	ClickCount     int64
+	Provider       string
+	ProgramID      string
+	ImpactState    string
+	ImpactAdType   string
 	ShopBrandName  string
 }
 
@@ -232,6 +270,10 @@ func (q *Queries) GetAffiliateProductsCatalogKeys(ctx context.Context) ([]GetAff
 			&i.CommissionRate,
 			&i.Commission,
 			&i.ClickCount,
+			&i.Provider,
+			&i.ProgramID,
+			&i.ImpactState,
+			&i.ImpactAdType,
 			&i.ShopBrandName,
 		); err != nil {
 			return nil, err
@@ -266,6 +308,10 @@ SELECT
 	p.commission_rate,
 	p.commission,
 	p.click_count,
+	p.provider,
+	p.program_id,
+	p.impact_state,
+	p.impact_ad_type,
 	p.created_at,
 	p.updated_at
 FROM tbl_affiliate_products p
@@ -291,6 +337,10 @@ type GetAllAffiliateProductsRow struct {
 	CommissionRate   string
 	Commission       string
 	ClickCount       int64
+	Provider         string
+	ProgramID        string
+	ImpactState      string
+	ImpactAdType     string
 	CreatedAt        string
 	UpdatedAt        string
 }
@@ -322,6 +372,10 @@ func (q *Queries) GetAllAffiliateProducts(ctx context.Context) ([]GetAllAffiliat
 			&i.CommissionRate,
 			&i.Commission,
 			&i.ClickCount,
+			&i.Provider,
+			&i.ProgramID,
+			&i.ImpactState,
+			&i.ImpactAdType,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -366,9 +420,13 @@ INSERT INTO tbl_affiliate_products (
 	sales,
 	affiliated_shop_id,
 	commission_rate,
-	commission
+	commission,
+	provider,
+	program_id,
+	impact_state,
+	impact_ad_type
 )
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 RETURNING id
 `
 
@@ -387,6 +445,10 @@ type InsertAffiliateProductParams struct {
 	AffiliatedShopID sql.NullInt64
 	CommissionRate   string
 	Commission       string
+	Provider         string
+	ProgramID        string
+	ImpactState      string
+	ImpactAdType     string
 }
 
 func (q *Queries) InsertAffiliateProduct(ctx context.Context, arg InsertAffiliateProductParams) (int64, error) {
@@ -405,6 +467,10 @@ func (q *Queries) InsertAffiliateProduct(ctx context.Context, arg InsertAffiliat
 		arg.AffiliatedShopID,
 		arg.CommissionRate,
 		arg.Commission,
+		arg.Provider,
+		arg.ProgramID,
+		arg.ImpactState,
+		arg.ImpactAdType,
 	)
 	var id int64
 	err := row.Scan(&id)
@@ -427,6 +493,10 @@ SET
 	affiliated_shop_id = ?,
 	commission_rate = ?,
 	commission = ?,
+	provider = ?,
+	program_id = ?,
+	impact_state = ?,
+	impact_ad_type = ?,
 	updated_at = datetime('now')
 WHERE id = ?
 `
@@ -445,6 +515,10 @@ type UpdateAffiliateProductParams struct {
 	AffiliatedShopID sql.NullInt64
 	CommissionRate   string
 	Commission       string
+	Provider         string
+	ProgramID        string
+	ImpactState      string
+	ImpactAdType     string
 	ID               int64
 }
 
@@ -463,6 +537,10 @@ func (q *Queries) UpdateAffiliateProduct(ctx context.Context, arg UpdateAffiliat
 		arg.AffiliatedShopID,
 		arg.CommissionRate,
 		arg.Commission,
+		arg.Provider,
+		arg.ProgramID,
+		arg.ImpactState,
+		arg.ImpactAdType,
 		arg.ID,
 	)
 	return err

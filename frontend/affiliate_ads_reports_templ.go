@@ -41,8 +41,17 @@ type AffiliateAdsReportProductItem struct {
 	ID           string
 	Name         string
 	ShopName     string
+	Provider     constants.AffiliateProvider
 	ThumbnailURL string
 	ClickCount   int64
+}
+
+type AffiliateAdsReportProviderSummary struct {
+	Provider           constants.AffiliateProvider
+	Label              string
+	ProductCount       int64
+	TotalClicks        int64
+	ProductsWithClicks int64
 }
 
 type AffiliateAdsReportAdItem struct {
@@ -67,20 +76,22 @@ type AffiliateAdsReportsChartSummary struct {
 }
 
 type AffiliateAdsReportsChartData struct {
-	TopProducts    []AffiliateAdsReportChartPoint  `json:"topProducts"`
-	TopAds         []AffiliateAdsReportChartPoint  `json:"topAds"`
-	TopTeachers    []AffiliateAdsReportChartPoint  `json:"topTeachers"`
-	ClicksByAdZone []AffiliateAdsReportChartPoint  `json:"clicksByAdZone"`
-	Summary        AffiliateAdsReportsChartSummary `json:"summary"`
+	TopProducts      []AffiliateAdsReportChartPoint  `json:"topProducts"`
+	TopAds           []AffiliateAdsReportChartPoint  `json:"topAds"`
+	TopTeachers      []AffiliateAdsReportChartPoint  `json:"topTeachers"`
+	ClicksByAdZone   []AffiliateAdsReportChartPoint  `json:"clicksByAdZone"`
+	ClicksByProvider []AffiliateAdsReportChartPoint  `json:"clicksByProvider"`
+	Summary          AffiliateAdsReportsChartSummary `json:"summary"`
 }
 
 type AffiliateAdsReportsPageData struct {
-	Summary     AffiliateAdsReportSummary
-	TopProducts []AffiliateAdsReportProductItem
-	TopAds      []AffiliateAdsReportAdItem
-	TopTeachers []AffiliateAdsReportTeacherItem
-	TopAdZones  []AffiliateAdsReportAdZoneItem
-	Charts      AffiliateAdsReportsChartData
+	Summary           AffiliateAdsReportSummary
+	ProviderSummaries []AffiliateAdsReportProviderSummary
+	TopProducts       []AffiliateAdsReportProductItem
+	TopAds            []AffiliateAdsReportAdItem
+	TopTeachers       []AffiliateAdsReportTeacherItem
+	TopAdZones        []AffiliateAdsReportAdZoneItem
+	Charts            AffiliateAdsReportsChartData
 }
 
 func AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) templ.Component {
@@ -139,7 +150,7 @@ func AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/affiliates"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 98, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 109, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -152,7 +163,7 @@ func AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) templ.Component {
 		var templ_7745c5c3_Var3 templ.SafeURL
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/ads"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 99, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 110, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -165,7 +176,7 @@ func AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.Summary.TotalClicks))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 106, Col: 75}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 117, Col: 75}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -178,7 +189,7 @@ func AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.Summary.ProductCount))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 110, Col: 76}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 121, Col: 76}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -191,7 +202,7 @@ func AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.Summary.ProductsWithClicks))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 114, Col: 82}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 125, Col: 82}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -204,7 +215,7 @@ func AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.Summary.PublishedAdsCount))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 118, Col: 81}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 129, Col: 81}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -217,103 +228,166 @@ func AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.Summary.AttributedAdClicks))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 122, Col: 82}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 133, Col: 82}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</span></div></div><section class=\"affiliate-ads-reports-block\" aria-labelledby=\"affiliateAdsReportsChartsTitle\"><h3 class=\"affiliate-ads-reports-block-title\" id=\"affiliateAdsReportsChartsTitle\">Performance charts</h3><div class=\"affiliate-ads-reports-charts\"><div class=\"affiliate-ads-reports-chart-card affiliate-ads-reports-chart-card--hero\"><div class=\"affiliate-ads-reports-chart-card-head\"><h4 class=\"affiliate-ads-reports-chart-title\">Top affiliate links</h4><p class=\"affiliate-ads-reports-chart-hint\">Highest lifetime click counts among tracked product links.</p></div><div class=\"affiliate-ads-reports-chart-wrap affiliate-ads-reports-chart-wrap--bars\"><canvas id=\"topAffiliateProductsChart\" role=\"img\" aria-label=\"Bar chart of top affiliate links by clicks\"></canvas></div></div><div class=\"affiliate-ads-reports-chart-card affiliate-ads-reports-chart-card--compact\"><div class=\"affiliate-ads-reports-chart-card-head\"><h4 class=\"affiliate-ads-reports-chart-title\">Product click activity</h4><p class=\"affiliate-ads-reports-chart-hint\">Catalog with at least one recorded click.</p></div><div class=\"affiliate-ads-reports-chart-wrap affiliate-ads-reports-chart-wrap--donut\"><canvas id=\"affiliateProductActivityChart\" role=\"img\" aria-label=\"Donut chart of products with clicks versus none\"></canvas></div></div><div class=\"affiliate-ads-reports-chart-card\"><div class=\"affiliate-ads-reports-chart-card-head\"><h4 class=\"affiliate-ads-reports-chart-title\">Top ads by linked clicks</h4><p class=\"affiliate-ads-reports-chart-hint\">Sum of linked product lifetime clicks per ad.</p></div><div class=\"affiliate-ads-reports-chart-wrap affiliate-ads-reports-chart-wrap--bars\"><canvas id=\"topAdsChart\" role=\"img\" aria-label=\"Bar chart of top ads by linked clicks\"></canvas></div></div><div class=\"affiliate-ads-reports-chart-card\"><div class=\"affiliate-ads-reports-chart-card-head\"><h4 class=\"affiliate-ads-reports-chart-title\">Top teachers by clicks</h4><p class=\"affiliate-ads-reports-chart-hint\">Teachers with the most tracked link opens.</p></div><div class=\"affiliate-ads-reports-chart-wrap affiliate-ads-reports-chart-wrap--bars\"><canvas id=\"topTeachersChart\" role=\"img\" aria-label=\"Bar chart of top teachers by clicks\"></canvas></div></div><div class=\"affiliate-ads-reports-chart-card affiliate-ads-reports-chart-card--wide\"><div class=\"affiliate-ads-reports-chart-card-head\"><h4 class=\"affiliate-ads-reports-chart-title\">Clicks by ad zone</h4><p class=\"affiliate-ads-reports-chart-hint\">Attributed clicks per published ad and screen zone.</p></div><div class=\"affiliate-ads-reports-chart-wrap affiliate-ads-reports-chart-wrap--bars\"><canvas id=\"clicksByAdZoneChart\" role=\"img\" aria-label=\"Bar chart of clicks by ad zone\"></canvas></div></div></div></section><section class=\"affiliate-ads-reports-block\" aria-labelledby=\"affiliateAdsReportsLeaderboardsTitle\"><h3 class=\"affiliate-ads-reports-block-title\" id=\"affiliateAdsReportsLeaderboardsTitle\">Top performers</h3><div class=\"affiliate-ads-reports-leaderboards\"><section class=\"affiliate-ads-reports-section affiliate-ads-reports-panel\"><h3 class=\"affiliate-ads-reports-section-title\">Top performing affiliate links</h3>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</span></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if len(data.TopProducts) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<ol class=\"affiliate-ads-reports-leaderboard\">")
+		if len(data.ProviderSummaries) > 0 {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"dashboard-stats affiliate-ads-reports-provider-summary\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			for i, item := range data.TopProducts {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<li class=\"affiliate-ads-reports-leaderboard-item\"><span class=\"affiliate-ads-reports-rank\">")
+			for _, row := range data.ProviderSummaries {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"stat-card\"><span class=\"stat-label\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var9 string
-				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", i+1))
+				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(row.Label)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 186, Col: 74}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 141, Col: 43}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</span> ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</span> <span class=\"stat-sub\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				if item.ThumbnailURL != "" {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<img src=\"")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					var templ_7745c5c3_Var10 string
-					templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ThumbnailURL)
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 188, Col: 38}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" alt=\"\" class=\"affiliate-ads-reports-leaderboard-thumb\" referrerpolicy=\"no-referrer\">")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-				} else {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<span class=\"affiliate-ads-reports-leaderboard-thumb-empty\" aria-hidden=\"true\">-</span>")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
+				var templ_7745c5c3_Var10 string
+				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d products · %d clicks", row.ProductCount, row.TotalClicks))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 142, Col: 106}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"affiliate-ads-reports-leaderboard-body\"><span class=\"affiliate-ads-reports-leaderboard-name\" title=\"")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</span> <span class=\"stat-value\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var11 string
-				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.Name)
+				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d with clicks", row.ProductsWithClicks))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 193, Col: 80}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 143, Col: 87}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</span></div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<section class=\"affiliate-ads-reports-block\" aria-labelledby=\"affiliateAdsReportsChartsTitle\"><h3 class=\"affiliate-ads-reports-block-title\" id=\"affiliateAdsReportsChartsTitle\">Performance charts</h3><div class=\"affiliate-ads-reports-charts\"><div class=\"affiliate-ads-reports-chart-card affiliate-ads-reports-chart-card--hero\"><div class=\"affiliate-ads-reports-chart-card-head\"><h4 class=\"affiliate-ads-reports-chart-title\">Top affiliate links</h4><p class=\"affiliate-ads-reports-chart-hint\">Highest lifetime click counts among tracked product links.</p></div><div class=\"affiliate-ads-reports-chart-wrap affiliate-ads-reports-chart-wrap--bars\"><canvas id=\"topAffiliateProductsChart\" role=\"img\" aria-label=\"Bar chart of top affiliate links by clicks\"></canvas></div></div><div class=\"affiliate-ads-reports-chart-card affiliate-ads-reports-chart-card--compact\"><div class=\"affiliate-ads-reports-chart-card-head\"><h4 class=\"affiliate-ads-reports-chart-title\">Clicks by provider</h4><p class=\"affiliate-ads-reports-chart-hint\">Lifetime clicks grouped by Shopee vs Impact catalog.</p></div><div class=\"affiliate-ads-reports-chart-wrap affiliate-ads-reports-chart-wrap--bars\"><canvas id=\"clicksByProviderChart\" role=\"img\" aria-label=\"Bar chart of clicks by affiliate provider\"></canvas></div></div><div class=\"affiliate-ads-reports-chart-card affiliate-ads-reports-chart-card--compact\"><div class=\"affiliate-ads-reports-chart-card-head\"><h4 class=\"affiliate-ads-reports-chart-title\">Product click activity</h4><p class=\"affiliate-ads-reports-chart-hint\">Catalog with at least one recorded click.</p></div><div class=\"affiliate-ads-reports-chart-wrap affiliate-ads-reports-chart-wrap--donut\"><canvas id=\"affiliateProductActivityChart\" role=\"img\" aria-label=\"Donut chart of products with clicks versus none\"></canvas></div></div><div class=\"affiliate-ads-reports-chart-card\"><div class=\"affiliate-ads-reports-chart-card-head\"><h4 class=\"affiliate-ads-reports-chart-title\">Top ads by linked clicks</h4><p class=\"affiliate-ads-reports-chart-hint\">Sum of linked product lifetime clicks per ad.</p></div><div class=\"affiliate-ads-reports-chart-wrap affiliate-ads-reports-chart-wrap--bars\"><canvas id=\"topAdsChart\" role=\"img\" aria-label=\"Bar chart of top ads by linked clicks\"></canvas></div></div><div class=\"affiliate-ads-reports-chart-card\"><div class=\"affiliate-ads-reports-chart-card-head\"><h4 class=\"affiliate-ads-reports-chart-title\">Top teachers by clicks</h4><p class=\"affiliate-ads-reports-chart-hint\">Teachers with the most tracked link opens.</p></div><div class=\"affiliate-ads-reports-chart-wrap affiliate-ads-reports-chart-wrap--bars\"><canvas id=\"topTeachersChart\" role=\"img\" aria-label=\"Bar chart of top teachers by clicks\"></canvas></div></div><div class=\"affiliate-ads-reports-chart-card affiliate-ads-reports-chart-card--wide\"><div class=\"affiliate-ads-reports-chart-card-head\"><h4 class=\"affiliate-ads-reports-chart-title\">Clicks by ad zone</h4><p class=\"affiliate-ads-reports-chart-hint\">Attributed clicks per published ad and screen zone.</p></div><div class=\"affiliate-ads-reports-chart-wrap affiliate-ads-reports-chart-wrap--bars\"><canvas id=\"clicksByAdZoneChart\" role=\"img\" aria-label=\"Bar chart of clicks by ad zone\"></canvas></div></div></div></section><section class=\"affiliate-ads-reports-block\" aria-labelledby=\"affiliateAdsReportsLeaderboardsTitle\"><h3 class=\"affiliate-ads-reports-block-title\" id=\"affiliateAdsReportsLeaderboardsTitle\">Top performers</h3><div class=\"affiliate-ads-reports-leaderboards\"><section class=\"affiliate-ads-reports-section affiliate-ads-reports-panel\"><h3 class=\"affiliate-ads-reports-section-title\">Top performing affiliate links</h3>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if len(data.TopProducts) > 0 {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<ol class=\"affiliate-ads-reports-leaderboard\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			for i, item := range data.TopProducts {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<li class=\"affiliate-ads-reports-leaderboard-item\"><span class=\"affiliate-ads-reports-rank\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var12 string
-				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(item.Name)
+				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", i+1))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 193, Col: 94}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 218, Col: 74}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</span> <span class=\"affiliate-ads-reports-leaderboard-meta\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</span> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var13 string
-				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(affiliateAdsReportCellText(item.ShopName))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 194, Col: 106}
+				if item.ThumbnailURL != "" {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<img src=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var13 string
+					templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.ThumbnailURL)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 220, Col: 38}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" alt=\"\" class=\"affiliate-ads-reports-leaderboard-thumb\" referrerpolicy=\"no-referrer\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				} else {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<span class=\"affiliate-ads-reports-leaderboard-thumb-empty\" aria-hidden=\"true\">-</span>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<div class=\"affiliate-ads-reports-leaderboard-body\"><span class=\"affiliate-ads-reports-leaderboard-name\" title=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</span></div>")
+				var templ_7745c5c3_Var14 string
+				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.Name)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 225, Col: 80}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var15 string
+				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(item.Name)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 225, Col: 94}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</span> <span class=\"affiliate-ads-reports-leaderboard-meta\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = StatusPill(constants.AffiliateProviderLabel(item.Provider), affiliateAdsReportProviderPillTone(item.Provider), false).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var16 string
+				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(affiliateAdsReportCellText(item.ShopName))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 228, Col: 54}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</span></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -321,71 +395,71 @@ func AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</li>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</li>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</ol>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</ol>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<p class=\"affiliate-ads-reports-empty\">No affiliate link clicks recorded yet.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<p class=\"affiliate-ads-reports-empty\">No affiliate link clicks recorded yet.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</section><section class=\"affiliate-ads-reports-section affiliate-ads-reports-panel\"><h3 class=\"affiliate-ads-reports-section-title\">Top performing ads</h3><p class=\"affiliate-ads-reports-hint\">Linked click totals sum lifetime product clicks for each ad's products. The same product in multiple ads is counted in each row.</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</section><section class=\"affiliate-ads-reports-section affiliate-ads-reports-panel\"><h3 class=\"affiliate-ads-reports-section-title\">Top performing ads</h3><p class=\"affiliate-ads-reports-hint\">Linked click totals sum lifetime product clicks for each ad's products. The same product in multiple ads is counted in each row.</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(data.TopAds) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<ol class=\"affiliate-ads-reports-leaderboard\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<ol class=\"affiliate-ads-reports-leaderboard\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for i, item := range data.TopAds {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<li class=\"affiliate-ads-reports-leaderboard-item\"><span class=\"affiliate-ads-reports-rank\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<li class=\"affiliate-ads-reports-leaderboard-item\"><span class=\"affiliate-ads-reports-rank\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var14 string
-				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", i+1))
+				var templ_7745c5c3_Var17 string
+				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", i+1))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 214, Col: 74}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 249, Col: 74}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</span><div class=\"affiliate-ads-reports-leaderboard-body affiliate-ads-reports-leaderboard-body--ads\"><span class=\"affiliate-ads-reports-leaderboard-name\" title=\"")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var15 string
-				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.Name)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 216, Col: 80}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</span><div class=\"affiliate-ads-reports-leaderboard-body affiliate-ads-reports-leaderboard-body--ads\"><span class=\"affiliate-ads-reports-leaderboard-name\" title=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "\">")
+				var templ_7745c5c3_Var18 string
+				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.Name)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 251, Col: 80}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var16 string
-				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(item.Name)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 216, Col: 94}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</span> <span class=\"affiliate-ads-reports-leaderboard-meta\">")
+				var templ_7745c5c3_Var19 string
+				templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(item.Name)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 251, Col: 94}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "</span> <span class=\"affiliate-ads-reports-leaderboard-meta\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -393,33 +467,33 @@ func AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<span>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<span>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var17 string
-				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(item.PlacementLabel)
+				var templ_7745c5c3_Var20 string
+				templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(item.PlacementLabel)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 219, Col: 38}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 254, Col: 38}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</span> <span>")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var18 string
-				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d products", item.ProductCount))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 220, Col: 64}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</span> <span>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</span></span></div>")
+				var templ_7745c5c3_Var21 string
+				templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d products", item.ProductCount))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 255, Col: 64}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</span></span></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -427,45 +501,45 @@ func AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</li>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</li>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</ol>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</ol>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<p class=\"affiliate-ads-reports-empty\">No ad linked click totals yet.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "<p class=\"affiliate-ads-reports-empty\">No ad linked click totals yet.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "</section><section class=\"affiliate-ads-reports-section affiliate-ads-reports-panel\"><h3 class=\"affiliate-ads-reports-section-title\">Top teachers</h3><p class=\"affiliate-ads-reports-hint\">Counted when a teacher opens any tracked affiliate link while logged in.</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</section><section class=\"affiliate-ads-reports-section affiliate-ads-reports-panel\"><h3 class=\"affiliate-ads-reports-section-title\">Top teachers</h3><p class=\"affiliate-ads-reports-hint\">Counted when a teacher opens any tracked affiliate link while logged in.</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(data.TopTeachers) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<ol class=\"affiliate-ads-reports-leaderboard\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<ol class=\"affiliate-ads-reports-leaderboard\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for i, item := range data.TopTeachers {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<li class=\"affiliate-ads-reports-leaderboard-item\"><span class=\"affiliate-ads-reports-rank\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<li class=\"affiliate-ads-reports-leaderboard-item\"><span class=\"affiliate-ads-reports-rank\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var19 string
-				templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", i+1))
+				var templ_7745c5c3_Var22 string
+				templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", i+1))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 239, Col: 74}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 274, Col: 74}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</span><div class=\"affiliate-ads-reports-leaderboard-body affiliate-ads-reports-leaderboard-body--teacher\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "</span><div class=\"affiliate-ads-reports-leaderboard-body affiliate-ads-reports-leaderboard-body--teacher\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -473,7 +547,7 @@ func AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -481,84 +555,84 @@ func AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</li>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</li>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</ol>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</ol>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<p class=\"affiliate-ads-reports-empty\">No teacher click events recorded yet.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<p class=\"affiliate-ads-reports-empty\">No teacher click events recorded yet.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</section><section class=\"affiliate-ads-reports-section affiliate-ads-reports-panel\"><h3 class=\"affiliate-ads-reports-section-title\">Clicks by ad zone</h3><p class=\"affiliate-ads-reports-hint\">Attributed clicks from ad placement chrome only (validated ad and zone on each link).</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</section><section class=\"affiliate-ads-reports-section affiliate-ads-reports-panel\"><h3 class=\"affiliate-ads-reports-section-title\">Clicks by ad zone</h3><p class=\"affiliate-ads-reports-hint\">Attributed clicks from ad placement chrome only (validated ad and zone on each link).</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(data.TopAdZones) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<ol class=\"affiliate-ads-reports-leaderboard\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "<ol class=\"affiliate-ads-reports-leaderboard\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for i, item := range data.TopAdZones {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "<li class=\"affiliate-ads-reports-leaderboard-item\"><span class=\"affiliate-ads-reports-rank\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var20 string
-				templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", i+1))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 259, Col: 74}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</span><div class=\"affiliate-ads-reports-leaderboard-body\"><span class=\"affiliate-ads-reports-leaderboard-name\" title=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var21 string
-				templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.AdName)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 261, Col: 82}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var21)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var22 string
-				templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(item.AdName)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 261, Col: 98}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</span> <span class=\"affiliate-ads-reports-leaderboard-meta\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "<li class=\"affiliate-ads-reports-leaderboard-item\"><span class=\"affiliate-ads-reports-rank\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var23 string
-				templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(item.ZoneLabel)
+				templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", i+1))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 262, Col: 79}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 294, Col: 74}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "</span></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "</span><div class=\"affiliate-ads-reports-leaderboard-body\"><span class=\"affiliate-ads-reports-leaderboard-name\" title=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var24 string
+				templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.ResolveAttributeValue(item.AdName)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 296, Col: 82}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var25 string
+				templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(item.AdName)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 296, Col: 98}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "</span> <span class=\"affiliate-ads-reports-leaderboard-meta\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var26 string
+				templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(item.ZoneLabel)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 297, Col: 79}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "</span></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -566,22 +640,22 @@ func AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</li>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "</li>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</ol>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "</ol>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "<p class=\"affiliate-ads-reports-empty\">No attributed ad zone clicks yet.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "<p class=\"affiliate-ads-reports-empty\">No attributed ad zone clicks yet.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "</section></div></section></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</section></div></section></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -589,20 +663,20 @@ func AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<script type=\"text/javascript\" src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "<script type=\"text/javascript\" src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var24 string
-		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/js/affiliate-ads-reports-charts.js"))
+		var templ_7745c5c3_Var27 string
+		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/js/affiliate-ads-reports-charts.js"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 276, Col: 94}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_ads_reports.templ`, Line: 311, Col: 94}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\"></script><script>\n\t\t\t(function () {\n\t\t\t\tconst el = document.getElementById('affiliateAdsReportsChartData');\n\t\t\t\tif (!el || !window.affiliateAdsReportsCharts) return;\n\t\t\t\ttry {\n\t\t\t\t\tconst data = JSON.parse(el.textContent);\n\t\t\t\t\twindow.affiliateAdsReportsCharts.renderAll(data);\n\t\t\t\t} catch (e) {\n\t\t\t\t\tconsole.error('affiliate ads reports charts', e);\n\t\t\t\t}\n\t\t\t})();\n\t\t</script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "\"></script><script>\n\t\t\t(function () {\n\t\t\t\tconst el = document.getElementById('affiliateAdsReportsChartData');\n\t\t\t\tif (!el || !window.affiliateAdsReportsCharts) return;\n\t\t\t\ttry {\n\t\t\t\t\tconst data = JSON.parse(el.textContent);\n\t\t\t\t\twindow.affiliateAdsReportsCharts.renderAll(data);\n\t\t\t\t} catch (e) {\n\t\t\t\t\tconsole.error('affiliate ads reports charts', e);\n\t\t\t\t}\n\t\t\t})();\n\t\t</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -615,6 +689,15 @@ func affiliateAdsReportCellText(s string) string {
 		return "-"
 	}
 	return s
+}
+
+func affiliateAdsReportProviderPillTone(provider constants.AffiliateProvider) PillTone {
+	switch provider {
+	case constants.AffiliateProviderImpact:
+		return PillToneInfo
+	default:
+		return PillToneWarning
+	}
 }
 
 func AffiliateAdsReportsPageStyles() templ.Component {
@@ -633,12 +716,12 @@ func AffiliateAdsReportsPageStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var25 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var25 == nil {
-			templ_7745c5c3_Var25 = templ.NopComponent
+		templ_7745c5c3_Var28 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var28 == nil {
+			templ_7745c5c3_Var28 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "<style>\n\t\t.affiliate-ads-reports-page {\n\t\t\tpadding-bottom: var(--space-10);\n\t\t}\n\n\t\t.affiliate-ads-reports-header {\n\t\t\talign-items: flex-start;\n\t\t}\n\n\t\t.affiliate-ads-reports-heading {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tgap: var(--space-1);\n\t\t}\n\n\t\t.affiliate-ads-reports-subtitle {\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-size: 0.9375rem;\n\t\t\tline-height: 1.5;\n\t\t\tmax-width: 42rem;\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.affiliate-ads-reports-header-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tflex-shrink: 0;\n\t\t}\n\n\t\t.affiliate-ads-reports-header-actions .btn {\n\t\t\tmargin-top: 0;\n\t\t\tdisplay: inline-flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\theight: 36px;\n\t\t\tpadding: 0 var(--space-3);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tline-height: 1;\n\t\t\tbox-sizing: border-box;\n\t\t}\n\n\t\t.affiliate-ads-reports-summary {\n\t\t\tmargin-bottom: var(--space-8);\n\t\t}\n\n\t\t.affiliate-ads-reports-block {\n\t\t\tmargin-bottom: var(--space-8);\n\t\t}\n\n\t\t.affiliate-ads-reports-block-title {\n\t\t\tmargin: 0 0 var(--space-4);\n\t\t\tfont-size: 1.125rem;\n\t\t\tfont-weight: 600;\n\t\t\tcolor: var(--color-foreground);\n\t\t}\n\n\t\t.affiliate-ads-reports-charts {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: repeat(12, minmax(0, 1fr));\n\t\t\tgap: var(--space-4);\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-card {\n\t\t\tgrid-column: span 6;\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tbackground: var(--color-surface);\n\t\t\tborder: 1px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-lg);\n\t\t\tbox-shadow: var(--shadow-sm);\n\t\t\tpadding: var(--space-4);\n\t\t\tmin-width: 0;\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-card--hero {\n\t\t\tgrid-column: span 8;\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-card--compact {\n\t\t\tgrid-column: span 4;\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-card--wide {\n\t\t\tgrid-column: 1 / -1;\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-card-head {\n\t\t\tmargin-bottom: var(--space-3);\n\t\t\tpadding-bottom: var(--space-3);\n\t\t\tborder-bottom: 1px solid var(--color-border-subtle);\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-title {\n\t\t\tmargin: 0 0 var(--space-1);\n\t\t\tfont-size: 1rem;\n\t\t\tfont-weight: 600;\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-hint {\n\t\t\tmargin: 0;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tline-height: 1.45;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-wrap {\n\t\t\tposition: relative;\n\t\t\tflex: 1;\n\t\t\tmin-height: 120px;\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-wrap--bars {\n\t\t\theight: auto;\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-wrap--donut {\n\t\t\theight: 220px;\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-empty {\n\t\t\tmargin: 0;\n\t\t\tpadding: var(--space-6) var(--space-4);\n\t\t\ttext-align: center;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-size: 0.875rem;\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboards {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: repeat(2, minmax(0, 1fr));\n\t\t\tgap: var(--space-4);\n\t\t}\n\n\t\t.affiliate-ads-reports-panel {\n\t\t\tbackground: var(--color-surface);\n\t\t\tborder: 1px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-lg);\n\t\t\tbox-shadow: var(--shadow-sm);\n\t\t\tpadding: var(--space-4);\n\t\t\tmin-width: 0;\n\t\t}\n\n\t\t.affiliate-ads-reports-section {\n\t\t\tmargin-bottom: 0;\n\t\t}\n\n\t\t.affiliate-ads-reports-section-title {\n\t\t\tmargin: 0 0 var(--space-3);\n\t\t\tfont-size: 0.9375rem;\n\t\t\tfont-weight: 600;\n\t\t}\n\n\t\t.affiliate-ads-reports-hint {\n\t\t\tfont-size: 0.8125rem;\n\t\t\tline-height: 1.45;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tmargin: 0 0 var(--space-3);\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard {\n\t\t\tlist-style: none;\n\t\t\tmargin: 0;\n\t\t\tpadding: 0;\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tgap: var(--space-2);\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-item {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-3);\n\t\t\tpadding: var(--space-2) var(--space-3);\n\t\t\tbackground: var(--color-muted);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\ttransition: border-color var(--transition-fast), box-shadow var(--transition-fast);\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-item:hover {\n\t\t\tborder-color: var(--color-border);\n\t\t\tbox-shadow: var(--shadow-sm);\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-item .pill {\n\t\t\tflex-shrink: 0;\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.affiliate-ads-reports-rank {\n\t\t\tflex-shrink: 0;\n\t\t\tdisplay: inline-flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\twidth: 1.625rem;\n\t\t\theight: 1.625rem;\n\t\t\tfont-size: 0.75rem;\n\t\t\tfont-weight: 700;\n\t\t\tfont-variant-numeric: tabular-nums;\n\t\t\tcolor: var(--color-primary-hover);\n\t\t\tbackground: var(--color-primary-light);\n\t\t\tborder-radius: var(--radius-full);\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-thumb {\n\t\t\twidth: 2.25rem;\n\t\t\theight: 2.25rem;\n\t\t\tobject-fit: cover;\n\t\t\tborder-radius: var(--radius-sm);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tflex-shrink: 0;\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-thumb-empty {\n\t\t\twidth: 2.25rem;\n\t\t\tflex-shrink: 0;\n\t\t\ttext-align: center;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-size: 0.8125rem;\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-body {\n\t\t\tflex: 1;\n\t\t\tmin-width: 0;\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tgap: 2px;\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-body--teacher {\n\t\t\tflex: 1;\n\t\t\tmin-width: 0;\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-body--ads .affiliate-ads-reports-leaderboard-meta {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-name {\n\t\t\tfont-weight: 600;\n\t\t\tfont-size: 0.875rem;\n\t\t\toverflow: hidden;\n\t\t\ttext-overflow: ellipsis;\n\t\t\twhite-space: nowrap;\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-meta {\n\t\t\tfont-size: 0.75rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliate-ads-reports-empty {\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-size: 0.875rem;\n\t\t\tmargin: var(--space-2) 0 0;\n\t\t}\n\n\t\t@media (max-width: 1024px) {\n\t\t\t.affiliate-ads-reports-chart-card,\n\t\t\t.affiliate-ads-reports-chart-card--hero,\n\t\t\t.affiliate-ads-reports-chart-card--compact,\n\t\t\t.affiliate-ads-reports-chart-card--wide {\n\t\t\t\tgrid-column: 1 / -1;\n\t\t\t}\n\t\t}\n\n\t\t@media (max-width: 900px) {\n\t\t\t.affiliate-ads-reports-leaderboards {\n\t\t\t\tgrid-template-columns: 1fr;\n\t\t\t}\n\t\t}\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "<style>\n\t\t.affiliate-ads-reports-page {\n\t\t\tpadding-bottom: var(--space-10);\n\t\t}\n\n\t\t.affiliate-ads-reports-header {\n\t\t\talign-items: flex-start;\n\t\t}\n\n\t\t.affiliate-ads-reports-heading {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tgap: var(--space-1);\n\t\t}\n\n\t\t.affiliate-ads-reports-subtitle {\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-size: 0.9375rem;\n\t\t\tline-height: 1.5;\n\t\t\tmax-width: 42rem;\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.affiliate-ads-reports-header-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tflex-shrink: 0;\n\t\t}\n\n\t\t.affiliate-ads-reports-header-actions .btn {\n\t\t\tmargin-top: 0;\n\t\t\tdisplay: inline-flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\theight: 36px;\n\t\t\tpadding: 0 var(--space-3);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tline-height: 1;\n\t\t\tbox-sizing: border-box;\n\t\t}\n\n\t\t.affiliate-ads-reports-summary {\n\t\t\tmargin-bottom: var(--space-8);\n\t\t}\n\n\t\t.affiliate-ads-reports-block {\n\t\t\tmargin-bottom: var(--space-8);\n\t\t}\n\n\t\t.affiliate-ads-reports-block-title {\n\t\t\tmargin: 0 0 var(--space-4);\n\t\t\tfont-size: 1.125rem;\n\t\t\tfont-weight: 600;\n\t\t\tcolor: var(--color-foreground);\n\t\t}\n\n\t\t.affiliate-ads-reports-charts {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: repeat(12, minmax(0, 1fr));\n\t\t\tgap: var(--space-4);\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-card {\n\t\t\tgrid-column: span 6;\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tbackground: var(--color-surface);\n\t\t\tborder: 1px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-lg);\n\t\t\tbox-shadow: var(--shadow-sm);\n\t\t\tpadding: var(--space-4);\n\t\t\tmin-width: 0;\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-card--hero {\n\t\t\tgrid-column: span 8;\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-card--compact {\n\t\t\tgrid-column: span 4;\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-card--wide {\n\t\t\tgrid-column: 1 / -1;\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-card-head {\n\t\t\tmargin-bottom: var(--space-3);\n\t\t\tpadding-bottom: var(--space-3);\n\t\t\tborder-bottom: 1px solid var(--color-border-subtle);\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-title {\n\t\t\tmargin: 0 0 var(--space-1);\n\t\t\tfont-size: 1rem;\n\t\t\tfont-weight: 600;\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-hint {\n\t\t\tmargin: 0;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tline-height: 1.45;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-wrap {\n\t\t\tposition: relative;\n\t\t\tflex: 1;\n\t\t\tmin-height: 120px;\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-wrap--bars {\n\t\t\theight: auto;\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-wrap--donut {\n\t\t\theight: 220px;\n\t\t}\n\n\t\t.affiliate-ads-reports-chart-empty {\n\t\t\tmargin: 0;\n\t\t\tpadding: var(--space-6) var(--space-4);\n\t\t\ttext-align: center;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-size: 0.875rem;\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboards {\n\t\t\tdisplay: grid;\n\t\t\tgrid-template-columns: repeat(2, minmax(0, 1fr));\n\t\t\tgap: var(--space-4);\n\t\t}\n\n\t\t.affiliate-ads-reports-panel {\n\t\t\tbackground: var(--color-surface);\n\t\t\tborder: 1px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-lg);\n\t\t\tbox-shadow: var(--shadow-sm);\n\t\t\tpadding: var(--space-4);\n\t\t\tmin-width: 0;\n\t\t}\n\n\t\t.affiliate-ads-reports-section {\n\t\t\tmargin-bottom: 0;\n\t\t}\n\n\t\t.affiliate-ads-reports-section-title {\n\t\t\tmargin: 0 0 var(--space-3);\n\t\t\tfont-size: 0.9375rem;\n\t\t\tfont-weight: 600;\n\t\t}\n\n\t\t.affiliate-ads-reports-hint {\n\t\t\tfont-size: 0.8125rem;\n\t\t\tline-height: 1.45;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tmargin: 0 0 var(--space-3);\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard {\n\t\t\tlist-style: none;\n\t\t\tmargin: 0;\n\t\t\tpadding: 0;\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tgap: var(--space-2);\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-item {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-3);\n\t\t\tpadding: var(--space-2) var(--space-3);\n\t\t\tbackground: var(--color-muted);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\ttransition: border-color var(--transition-fast), box-shadow var(--transition-fast);\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-item:hover {\n\t\t\tborder-color: var(--color-border);\n\t\t\tbox-shadow: var(--shadow-sm);\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-item .pill {\n\t\t\tflex-shrink: 0;\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.affiliate-ads-reports-rank {\n\t\t\tflex-shrink: 0;\n\t\t\tdisplay: inline-flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\twidth: 1.625rem;\n\t\t\theight: 1.625rem;\n\t\t\tfont-size: 0.75rem;\n\t\t\tfont-weight: 700;\n\t\t\tfont-variant-numeric: tabular-nums;\n\t\t\tcolor: var(--color-primary-hover);\n\t\t\tbackground: var(--color-primary-light);\n\t\t\tborder-radius: var(--radius-full);\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-thumb {\n\t\t\twidth: 2.25rem;\n\t\t\theight: 2.25rem;\n\t\t\tobject-fit: cover;\n\t\t\tborder-radius: var(--radius-sm);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tflex-shrink: 0;\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-thumb-empty {\n\t\t\twidth: 2.25rem;\n\t\t\tflex-shrink: 0;\n\t\t\ttext-align: center;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-size: 0.8125rem;\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-body {\n\t\t\tflex: 1;\n\t\t\tmin-width: 0;\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tgap: 2px;\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-body--teacher {\n\t\t\tflex: 1;\n\t\t\tmin-width: 0;\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-body--ads .affiliate-ads-reports-leaderboard-meta {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-name {\n\t\t\tfont-weight: 600;\n\t\t\tfont-size: 0.875rem;\n\t\t\toverflow: hidden;\n\t\t\ttext-overflow: ellipsis;\n\t\t\twhite-space: nowrap;\n\t\t}\n\n\t\t.affiliate-ads-reports-leaderboard-meta {\n\t\t\tfont-size: 0.75rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.affiliate-ads-reports-empty {\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-size: 0.875rem;\n\t\t\tmargin: var(--space-2) 0 0;\n\t\t}\n\n\t\t@media (max-width: 1024px) {\n\t\t\t.affiliate-ads-reports-chart-card,\n\t\t\t.affiliate-ads-reports-chart-card--hero,\n\t\t\t.affiliate-ads-reports-chart-card--compact,\n\t\t\t.affiliate-ads-reports-chart-card--wide {\n\t\t\t\tgrid-column: 1 / -1;\n\t\t\t}\n\t\t}\n\n\t\t@media (max-width: 900px) {\n\t\t\t.affiliate-ads-reports-leaderboards {\n\t\t\t\tgrid-template-columns: 1fr;\n\t\t\t}\n\t\t}\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

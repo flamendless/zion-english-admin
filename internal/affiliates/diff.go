@@ -7,6 +7,7 @@ import (
 )
 
 type ImportRowInput struct {
+	Provider       constants.AffiliateProvider
 	ItemID         string
 	ProductURL     string
 	OfferLink      string
@@ -17,6 +18,9 @@ type ImportRowInput struct {
 	CommissionRate string
 	Commission     string
 	ThumbnailURL   string
+	ProgramID      string
+	ImpactState    string
+	ImpactAdType   string
 }
 
 type ImportDiffResult struct {
@@ -27,7 +31,10 @@ type ImportDiffResult struct {
 }
 
 func DiffImportRow(row ImportRowInput, index map[string]CatalogRow, seenKeys map[string]bool) ImportDiffResult {
-	key := CatalogKey(row.ItemID, row.ProductURL)
+	if row.Provider == "" {
+		row.Provider = constants.AffiliateProviderShopee
+	}
+	key := CatalogKeyForProvider(row.Provider, row.ItemID, row.ProductURL)
 	if key == "" {
 		return ImportDiffResult{
 			Status:           constants.AffiliateImportDiffMissingItemKey,
@@ -72,7 +79,19 @@ func compareImportFields(row ImportRowInput, existing CatalogRow) []string {
 		changed = append(changed, "Name")
 	}
 	if strings.TrimSpace(row.OfferLink) != strings.TrimSpace(existing.AffiliateURL) {
-		changed = append(changed, "Offer link")
+		changed = append(changed, "Tracking link")
+	}
+	if row.Provider == constants.AffiliateProviderImpact {
+		if !strings.EqualFold(strings.TrimSpace(row.ImpactState), strings.TrimSpace(existing.ImpactState)) {
+			changed = append(changed, "State")
+		}
+		if strings.TrimSpace(row.ProgramID) != strings.TrimSpace(existing.ProgramID) {
+			changed = append(changed, "Program ID")
+		}
+		if !strings.EqualFold(strings.TrimSpace(row.ImpactAdType), strings.TrimSpace(existing.ImpactAdType)) {
+			changed = append(changed, "Ad type")
+		}
+		return changed
 	}
 	if NormalizeProductURL(row.ProductURL) != NormalizeProductURL(existing.ProductURL) {
 		changed = append(changed, "Product link")
@@ -101,9 +120,12 @@ type RemovedCatalogItem struct {
 	Name   string
 }
 
-func RemovedFromCSV(catalog []CatalogRow, csvItemIDs map[string]bool) []RemovedCatalogItem {
+func RemovedFromCSV(catalog []CatalogRow, csvItemIDs map[string]bool, provider constants.AffiliateProvider) []RemovedCatalogItem {
 	out := make([]RemovedCatalogItem, 0)
 	for _, row := range catalog {
+		if row.Provider != provider {
+			continue
+		}
 		itemID := strings.TrimSpace(row.ItemID)
 		if itemID == "" {
 			continue

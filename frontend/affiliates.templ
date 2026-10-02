@@ -11,6 +11,7 @@ type AffiliateListItem struct {
 	ID            string
 	Name          string
 	ShopName      string
+	Provider      constants.AffiliateProvider
 	PriceDisplay  string
 	ClickCount    int64
 	ThumbnailURL  string
@@ -49,6 +50,9 @@ type AffiliateStagedImportItem struct {
 	ProductLink       string
 	OfferLink         string
 	ShopeeShopID      string
+	ProgramID         string
+	ImpactState       string
+	ImpactAdType      string
 	ThumbnailURL      string
 	PriceDisplay      string
 	DiffStatus        constants.AffiliateImportDiffStatus
@@ -88,11 +92,13 @@ type AffiliateImportPreviewData struct {
 	StagedItems     []AffiliateStagedImportItem
 	DiffSummary     AffiliateImportDiffSummary
 	RemovedFromCSV  []AffiliateRemovedFromCSVItem
+	ImportProvider  constants.AffiliateProvider
 }
 
 type AffiliatesPageData struct {
 	Items            []AffiliateListItem
 	Query            string
+	ProviderFilter   constants.AffiliateProvider
 	SortBy           string
 	SortOrder        string
 	FilterPath       string
@@ -107,6 +113,13 @@ type AffiliatesPageData struct {
 	OpenEditModal    bool
 	ImportPreview    AffiliateImportPreviewData
 	OpenPreviewModal bool
+}
+
+func affiliateProviderFilterOptions() []StatusOption {
+	return []StatusOption{
+		{Value: string(constants.AffiliateProviderShopee), Label: constants.AffiliateProviderLabel(constants.AffiliateProviderShopee)},
+		{Value: string(constants.AffiliateProviderImpact), Label: constants.AffiliateProviderLabel(constants.AffiliateProviderImpact)},
+	}
 }
 
 func AffiliateURLPreview(s string) string {
@@ -134,7 +147,7 @@ templ AffiliatesPage(data AffiliatesPageData) {
 				<div class="affiliates-page-heading">
 					<h2 class="hub-title">Affiliates</h2>
 					<p class="affiliates-page-subtitle">
-						Upload a Shopee affiliate product links CSV. Offer Link is saved as the affiliate URL; thumbnails are fetched from Product Link.
+						Import Shopee product link batches or Impact display ad exports. Shopee thumbnails come from Product Link; Impact preview images use ProgramId and AdId.
 					</p>
 				</div>
 				<div class="affiliates-header-actions">
@@ -155,6 +168,15 @@ templ AffiliatesPage(data AffiliatesPageData) {
 						placeholder="Name or shop..."
 						autocomplete="off"
 					/>
+				</div>
+				<div class="form-group">
+					<label for="affiliatesProvider">Affiliate type</label>
+					<select id="affiliatesProvider" name="provider">
+						<option value="" selected?={ data.ProviderFilter == "" }>All</option>
+						for _, opt := range affiliateProviderFilterOptions() {
+							<option value={ opt.Value } selected?={ string(data.ProviderFilter) == opt.Value }>{ opt.Label }</option>
+						}
+					</select>
 				</div>
 				@SortControls(data.SortBy, data.SortOrder, ListSortKindAffiliate)
 				<div class="form-group list-toolbar-action">
@@ -189,7 +211,10 @@ templ AffiliatesPage(data AffiliatesPageData) {
 										}
 									</td>
 									<td class="col-name" data-label="Name" title={ item.Name }>{ item.Name }</td>
-									<td data-label="Shop">{ affiliateCellText(item.ShopName) }</td>
+									<td data-label="Shop">
+										@StatusPill(constants.AffiliateProviderLabel(item.Provider), affiliateProviderPillTone(item.Provider), false)
+										<span class="affiliates-shop-name">{ affiliateCellText(item.ShopName) }</span>
+									</td>
 									<td data-label="Price">{ affiliateCellText(item.PriceDisplay) }</td>
 									<td class="col-clicks" data-label="Clicks">{ fmt.Sprintf("%d", item.ClickCount) }</td>
 									<td data-label="Affiliate link">
@@ -223,7 +248,9 @@ templ AffiliatesPage(data AffiliatesPageData) {
 			}
 		</div>
 
+		@AffiliateUploadSourceModal()
 		@AffiliateUploadModal()
+		@AffiliateImpactUploadModal()
 		@AffiliateImportPreviewModal(data.ImportPreview, data.OpenPreviewModal)
 		<div id="affiliateEditModalHost">
 			if data.OpenEditModal {
@@ -244,6 +271,48 @@ func affiliateCellText(s string) string {
 		return "-"
 	}
 	return s
+}
+
+func affiliateProviderPillTone(provider constants.AffiliateProvider) PillTone {
+	switch provider {
+	case constants.AffiliateProviderImpact:
+		return PillToneInfo
+	default:
+		return PillToneWarning
+	}
+}
+
+templ AffiliateUploadSourceModal() {
+	<div class="modal-overlay nav-group-choice-modal" id="affiliateUploadSourceModal" hidden role="presentation">
+		<div class="modal-dialog modal-dialog-choice" role="dialog" aria-modal="true" aria-labelledby="affiliateUploadSourceModalTitle">
+			<div class="modal-header">
+				<h3 id="affiliateUploadSourceModalTitle">Upload affiliate CSV</h3>
+				<button type="button" class="modal-close affiliate-upload-source-close" aria-label="Close">&times;</button>
+			</div>
+			<div class="modal-body nav-group-choice-body">
+				<div class="choice-option-cards">
+					<button type="button" class="choice-option-card" id="affiliateUploadSourceShopeeBtn">
+						<span class="choice-option-card__icon choice-option-card__icon--warning affiliates-source-icon affiliates-source-icon--shopee" aria-hidden="true">
+							<img src={ utils.URL("/static/shopee-logo-white.svg") } alt="" width="28" height="28"/>
+						</span>
+						<span class="choice-option-card__body">
+							<span class="choice-option-card__title">Shopee</span>
+							<span class="choice-option-card__desc">Product links batch export with Offer Link and Product Link columns.</span>
+						</span>
+					</button>
+					<button type="button" class="choice-option-card" id="affiliateUploadSourceImpactBtn">
+						<span class="choice-option-card__icon choice-option-card__icon--info affiliates-source-icon affiliates-source-icon--impact" aria-hidden="true">
+							<img src={ utils.URL("/static/impact-logo.png") } alt="" width="28" height="28"/>
+						</span>
+						<span class="choice-option-card__body">
+							<span class="choice-option-card__title">Impact</span>
+							<span class="choice-option-card__desc">Ads export with AdId, State, ProgramId, Name, AdType, and TrackingLink.</span>
+						</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
 }
 
 templ AffiliateUploadModal() {
@@ -304,6 +373,59 @@ templ AffiliateUploadModal() {
 	</div>
 }
 
+templ AffiliateImpactUploadModal() {
+	<div class="modal-overlay" id="affiliateImpactUploadModal" hidden role="presentation">
+		<div class="modal-dialog affiliates-modal affiliates-upload-modal" role="dialog" aria-modal="true" aria-labelledby="affiliateImpactUploadModalTitle" aria-describedby="affiliateImpactUploadModalDesc">
+			<form
+				id="affiliateImpactUploadForm"
+				method="POST"
+				action={ utils.URL("/affiliates/upload/impact") }
+				enctype="multipart/form-data"
+			>
+				<div class="modal-header">
+					<h3 id="affiliateImpactUploadModalTitle">Upload Impact ads CSV</h3>
+					<button type="button" class="modal-close affiliate-impact-upload-modal-close" aria-label="Close">&times;</button>
+				</div>
+				<div class="modal-body" id="affiliateImpactUploadModalDesc">
+					<div class="affiliates-upload-callout">
+						<p class="affiliates-upload-callout-title">Impact ads export</p>
+						<ul class="affiliates-upload-steps">
+							<li>TrackingLink is saved as the affiliate URL.</li>
+							<li>Preview images use the Impact display-ad URL built from ProgramId and AdId.</li>
+							<li>Only ACTIVE creatives appear in Ads picker and live placements.</li>
+						</ul>
+					</div>
+					<p class="affiliates-upload-columns-label">Expected columns</p>
+					<p class="affiliates-upload-columns">AdId, State, ProgramId, Name, AdType, TrackingLink</p>
+					<div class="upload-zone affiliates-csv-upload-zone" id="affiliateImpactCSVUploadZone">
+						<label class="upload-zone-label" for="affiliateImpactCSVInput">
+							<span class="upload-zone-icon affiliates-csv-upload-icon" aria-hidden="true">
+								<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+							</span>
+							<span class="upload-zone-meta">
+								<span id="affiliateImpactCSVUploadPrompt">Choose a CSV file or drop it here</span>
+								<span class="upload-zone-hint">Comma-separated values, up to 2 MB</span>
+							</span>
+							<input
+								type="file"
+								id="affiliateImpactCSVInput"
+								name="csv"
+								accept=".csv,text/csv"
+								required
+							/>
+						</label>
+						<p class="upload-filename" id="affiliateImpactCSVFilename" aria-live="polite"></p>
+					</div>
+				</div>
+				<div class="modal-footer affiliates-modal-footer affiliates-upload-modal-footer">
+					<button type="button" class="btn btn-secondary affiliate-impact-upload-modal-close">Cancel</button>
+					<button type="submit" class="btn" id="affiliateImpactUploadSubmitBtn" disabled>Import creatives</button>
+				</div>
+			</form>
+		</div>
+	</div>
+}
+
 templ AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad bool) {
 	<div class="modal-overlay" id="affiliatePreviewModal" hidden?={ !openOnLoad } role="presentation">
 		<div class="modal-dialog affiliates-import-preview-modal" role="dialog" aria-modal="true" aria-labelledby="affiliatePreviewModalTitle">
@@ -318,6 +440,7 @@ templ AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad
 						<input type="hidden" name="import_file_size" value={ fmt.Sprintf("%d", preview.FileSizeBytes) }/>
 						<input type="hidden" name="import_csv_row_count" value={ fmt.Sprintf("%d", preview.TotalCount) }/>
 						<input type="hidden" name="staged_count" value={ fmt.Sprintf("%d", len(preview.StagedItems)) }/>
+						<input type="hidden" name="import_provider" value={ string(preview.ImportProvider) }/>
 						<section class="affiliates-import-summary" aria-labelledby="affiliateImportSummaryTitle">
 							<h4 class="affiliates-import-summary-title" id="affiliateImportSummaryTitle">Import summary</h4>
 							<dl class="affiliates-import-summary-grid">
@@ -496,6 +619,9 @@ templ AffiliateStagedImportHiddenFields(item AffiliateStagedImportItem) {
 	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "shopee_shop_id") } value={ item.ShopeeShopID }/>
 	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "thumbnail_url") } value={ item.ThumbnailURL }/>
 	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "price_display") } value={ item.PriceDisplay }/>
+	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "program_id") } value={ item.ProgramID }/>
+	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "impact_state") } value={ item.ImpactState }/>
+	<input type="hidden" name={ affiliateStagedFieldName(item.Index, "impact_ad_type") } value={ item.ImpactAdType }/>
 }
 
 func affiliateStagedFieldName(index int, field string) string {
@@ -633,6 +759,40 @@ templ AffiliatesPageStyles() {
 
 		.affiliates-header-actions .add-btn {
 			margin-top: 0;
+		}
+
+		.affiliates-shop-name {
+			display: block;
+			margin-top: var(--space-1);
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+		}
+
+		.affiliates-source-icon {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.affiliates-source-icon img {
+			display: block;
+			object-fit: contain;
+		}
+
+		.affiliates-source-icon--shopee {
+			background: #ee4d2d;
+		}
+
+		.affiliates-source-icon--impact {
+			background: #1e3a5f;
+			padding: 4px 8px;
+			min-width: 4.5rem;
+		}
+
+		.affiliates-source-icon--impact img {
+			width: auto;
+			max-width: 4rem;
+			height: 1.25rem;
 		}
 
 		.affiliates-upload-modal {
@@ -1094,7 +1254,9 @@ templ AffiliatesScripts() {
 				document.body.classList.add('modal-open');
 			}
 
+			wireModal('affiliateUploadSourceModal', 'affiliate-upload-source-close');
 			wireModal('affiliateUploadModal', 'affiliate-upload-modal-close');
+			wireModal('affiliateImpactUploadModal', 'affiliate-impact-upload-modal-close');
 			wireModal('affiliatePreviewModal', 'affiliate-preview-modal-close');
 			document.getElementById('affiliateImportSaveForm')?.addEventListener('submit', function () {
 				const btn = document.getElementById('affiliateImportSaveBtn');
@@ -1169,12 +1331,91 @@ templ AffiliatesScripts() {
 				});
 			}
 
+			function bindAffiliateImpactCSVUpload() {
+				const form = document.getElementById('affiliateImpactUploadForm');
+				const input = document.getElementById('affiliateImpactCSVInput');
+				const filenameEl = document.getElementById('affiliateImpactCSVFilename');
+				const submitBtn = document.getElementById('affiliateImpactUploadSubmitBtn');
+				const zone = document.getElementById('affiliateImpactCSVUploadZone');
+				if (!form || !input || form.dataset.csvUploadBound === '1') return;
+				form.dataset.csvUploadBound = '1';
+
+				function syncFileState() {
+					const file = input.files && input.files[0];
+					if (filenameEl) filenameEl.textContent = file ? file.name : '';
+					if (submitBtn) submitBtn.disabled = !file;
+				}
+
+				input.addEventListener('change', syncFileState);
+
+				if (zone) {
+					['dragenter', 'dragover'].forEach(function (name) {
+						zone.addEventListener(name, function (e) {
+							e.preventDefault();
+							zone.classList.add('is-dragover');
+						});
+					});
+					['dragleave', 'drop'].forEach(function (name) {
+						zone.addEventListener(name, function (e) {
+							e.preventDefault();
+							if (name === 'drop' && e.dataTransfer?.files?.length) {
+								const dropped = e.dataTransfer.files[0];
+								if (dropped) {
+									const dt = new DataTransfer();
+									dt.items.add(dropped);
+									input.files = dt.files;
+									syncFileState();
+								}
+							}
+							zone.classList.remove('is-dragover');
+						});
+					});
+				}
+
+				form.addEventListener('submit', function () {
+					if (submitBtn) {
+						submitBtn.disabled = true;
+						submitBtn.textContent = 'Importing…';
+					}
+				});
+			}
+
+			function resetAffiliateImpactUploadForm() {
+				const form = document.getElementById('affiliateImpactUploadForm');
+				const input = document.getElementById('affiliateImpactCSVInput');
+				const filenameEl = document.getElementById('affiliateImpactCSVFilename');
+				const submitBtn = document.getElementById('affiliateImpactUploadSubmitBtn');
+				const zone = document.getElementById('affiliateImpactCSVUploadZone');
+				if (form) form.reset();
+				if (filenameEl) filenameEl.textContent = '';
+				if (submitBtn) {
+					submitBtn.disabled = true;
+					submitBtn.textContent = 'Import creatives';
+				}
+				if (zone) zone.classList.remove('is-dragover');
+			}
+
 			bindAffiliateCSVUpload();
+			bindAffiliateImpactCSVUpload();
 
 			document.getElementById('openAffiliateUploadModalBtn')?.addEventListener('click', function () {
+				openModal('affiliateUploadSourceModal');
+			});
+
+			document.getElementById('affiliateUploadSourceShopeeBtn')?.addEventListener('click', function () {
+				const source = document.getElementById('affiliateUploadSourceModal');
+				if (source) source.hidden = true;
 				resetAffiliateUploadForm();
 				openModal('affiliateUploadModal');
 				document.getElementById('affiliateCSVInput')?.focus();
+			});
+
+			document.getElementById('affiliateUploadSourceImpactBtn')?.addEventListener('click', function () {
+				const source = document.getElementById('affiliateUploadSourceModal');
+				if (source) source.hidden = true;
+				resetAffiliateImpactUploadForm();
+				openModal('affiliateImpactUploadModal');
+				document.getElementById('affiliateImpactCSVInput')?.focus();
 			});
 		})();
 	</script>

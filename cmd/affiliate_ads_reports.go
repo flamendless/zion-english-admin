@@ -69,6 +69,32 @@ func handleAffiliateAdsReports(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	providerRows, err := dbRO.GetQueries().GetAffiliateClickSummaryByProvider(ctx)
+	if err != nil {
+		HttpError(w, fmt.Sprintf("Failed to load provider summary: %v", err), http.StatusInternalServerError)
+		return
+	}
+	providerSummaries := make([]frontend.AffiliateAdsReportProviderSummary, 0, len(providerRows))
+	providerChart := make([]frontend.AffiliateAdsReportChartPoint, 0, len(providerRows))
+	for _, row := range providerRows {
+		provider := constants.AffiliateProvider(row.Provider)
+		if !constants.ValidAffiliateProvider(row.Provider) {
+			provider = constants.AffiliateProviderShopee
+		}
+		clicks := sqlAggregateInt64(row.TotalClicks)
+		providerSummaries = append(providerSummaries, frontend.AffiliateAdsReportProviderSummary{
+			Provider:           provider,
+			Label:              constants.AffiliateProviderLabel(provider),
+			ProductCount:       row.ProductCount,
+			TotalClicks:        clicks,
+			ProductsWithClicks: row.ProductsWithClicks,
+		})
+		providerChart = append(providerChart, frontend.AffiliateAdsReportChartPoint{
+			Label:  constants.AffiliateProviderLabel(provider),
+			Clicks: clicks,
+		})
+	}
+
 	attributedAdClicks, err := dbRO.GetQueries().CountAffiliateLinkClickEventsWithAd(ctx)
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to load attributed clicks: %v", err), http.StatusInternalServerError)
@@ -82,6 +108,7 @@ func handleAffiliateAdsReports(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := frontend.AffiliateAdsReportsPageData{
+		ProviderSummaries: providerSummaries,
 		Summary: frontend.AffiliateAdsReportSummary{
 			ProductCount:          summaryRow.ProductCount,
 			TotalClicks:           totalClicks,
@@ -95,10 +122,11 @@ func handleAffiliateAdsReports(w http.ResponseWriter, r *http.Request) {
 		TopTeachers: topTeachers,
 		TopAdZones:  topAdZones,
 		Charts: frontend.AffiliateAdsReportsChartData{
-			TopProducts:    chartPointsFromProducts(topProducts),
-			TopAds:         chartPointsFromAds(topAds),
-			TopTeachers:    chartPointsFromTeachers(topTeachers),
-			ClicksByAdZone: chartPointsFromAdZones(topAdZones),
+			TopProducts:      chartPointsFromProducts(topProducts),
+			TopAds:           chartPointsFromAds(topAds),
+			TopTeachers:      chartPointsFromTeachers(topTeachers),
+			ClicksByAdZone:   chartPointsFromAdZones(topAdZones),
+			ClicksByProvider: providerChart,
 			Summary: frontend.AffiliateAdsReportsChartSummary{
 				ProductsWithClicks:    summaryRow.ProductsWithClicks,
 				ProductsWithoutClicks: productsWithoutClicks,
@@ -129,7 +157,16 @@ func loadTopAffiliateProductsByClicks(ctx context.Context, limit int) ([]fronten
 		if shop == "" {
 			shop = row.Brand
 		}
-		items = append(items, mapAffiliateAdsReportProduct(row.ID, row.Name, shop, row.ThumbnailUrl, row.ClickCount))
+		items = append(items, mapAffiliateAdsReportProduct(
+			row.ID,
+			row.Provider,
+			row.ItemID,
+			row.ProgramID,
+			row.Name,
+			shop,
+			row.ThumbnailUrl,
+			row.ClickCount,
+		))
 		if len(items) >= limit {
 			break
 		}
@@ -265,12 +302,17 @@ func truncateAffiliateChartLabel(s string, max int) string {
 	return s[:max-3] + "..."
 }
 
-func mapAffiliateAdsReportProduct(id int64, name, shop, thumb string, clicks int64) frontend.AffiliateAdsReportProductItem {
+func mapAffiliateAdsReportProduct(id int64, provider, itemID, programID, name, shop, thumb string, clicks int64) frontend.AffiliateAdsReportProductItem {
+	p := constants.AffiliateProvider(provider)
+	if !constants.ValidAffiliateProvider(provider) {
+		p = constants.AffiliateProviderShopee
+	}
 	return frontend.AffiliateAdsReportProductItem{
 		ID:           strconv.FormatInt(id, 10),
 		Name:         name,
 		ShopName:     shop,
-		ThumbnailURL: thumb,
+		Provider:     p,
+		ThumbnailURL: affiliateThumbnailFromRow(provider, itemID, programID, thumb),
 		ClickCount:   clicks,
 	}
 }

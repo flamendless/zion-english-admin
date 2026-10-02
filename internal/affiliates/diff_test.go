@@ -19,6 +19,7 @@ func TestDiffImportRowNewAndChanged(t *testing.T) {
 	index := BuildCatalogIndex([]CatalogRow{
 		{
 			ID:           1,
+			Provider:     constants.AffiliateProviderShopee,
 			ItemID:       "99",
 			ProductURL:   "https://shopee.ph/p/99",
 			AffiliateURL: "https://offer/1",
@@ -29,6 +30,7 @@ func TestDiffImportRowNewAndChanged(t *testing.T) {
 	seen := make(map[string]bool)
 
 	newRes := DiffImportRow(ImportRowInput{
+		Provider:     constants.AffiliateProviderShopee,
 		ItemID:       "100",
 		ProductURL:   "https://shopee.ph/p/100",
 		OfferLink:    "https://offer/2",
@@ -40,6 +42,7 @@ func TestDiffImportRowNewAndChanged(t *testing.T) {
 	}
 
 	changedRes := DiffImportRow(ImportRowInput{
+		Provider:     constants.AffiliateProviderShopee,
 		ItemID:       "99",
 		ProductURL:   "https://shopee.ph/p/99",
 		OfferLink:    "https://offer/1",
@@ -57,7 +60,7 @@ func TestDiffImportRowNewAndChanged(t *testing.T) {
 func TestDiffImportRowDuplicateInCSV(t *testing.T) {
 	index := map[string]CatalogRow{}
 	seen := make(map[string]bool)
-	row := ImportRowInput{ItemID: "1", ProductURL: "https://a", OfferLink: "https://b", ItemName: "X", PriceDisplay: "1"}
+	row := ImportRowInput{Provider: constants.AffiliateProviderShopee, ItemID: "1", ProductURL: "https://a", OfferLink: "https://b", ItemName: "X", PriceDisplay: "1"}
 	DiffImportRow(row, index, seen)
 	dup := DiffImportRow(row, index, seen)
 	if dup.Status != constants.AffiliateImportDiffDuplicateInCSV {
@@ -67,11 +70,11 @@ func TestDiffImportRowDuplicateInCSV(t *testing.T) {
 
 func TestRemovedFromCSV(t *testing.T) {
 	catalog := []CatalogRow{
-		{ID: 1, ItemID: "a", Name: "A"},
-		{ID: 2, ItemID: "b", Name: "B"},
-		{ID: 3, ItemID: "", Name: "No ID"},
+		{ID: 1, Provider: constants.AffiliateProviderShopee, ItemID: "a", Name: "A"},
+		{ID: 2, Provider: constants.AffiliateProviderShopee, ItemID: "b", Name: "B"},
+		{ID: 3, Provider: constants.AffiliateProviderShopee, ItemID: "", Name: "No ID"},
 	}
-	removed := RemovedFromCSV(catalog, map[string]bool{"a": true})
+	removed := RemovedFromCSV(catalog, map[string]bool{"a": true}, constants.AffiliateProviderShopee)
 	if len(removed) != 1 || removed[0].ItemID != "b" {
 		t.Fatalf("removed: %+v", removed)
 	}

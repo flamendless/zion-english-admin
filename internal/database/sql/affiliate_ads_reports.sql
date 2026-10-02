@@ -21,7 +21,10 @@ SELECT
 	p.name,
 	p.thumbnail_url,
 	p.click_count,
-	COALESCE(s.brand_name, p.brand, '') AS shop_name
+	COALESCE(s.brand_name, p.brand, '') AS shop_name,
+	p.provider,
+	p.program_id,
+	p.item_id
 FROM tbl_affiliate_products p
 LEFT JOIN tbl_affiliated_product_shops s ON s.id = p.affiliated_shop_id
 WHERE (
@@ -31,6 +34,16 @@ WHERE (
 )
 ORDER BY p.click_count DESC, p.id ASC
 LIMIT ? OFFSET ?;
+
+-- name: GetAffiliateClickSummaryByProvider :many
+SELECT
+	p.provider,
+	COUNT(*) AS product_count,
+	COALESCE(SUM(p.click_count), 0) AS total_clicks,
+	COUNT(CASE WHEN p.click_count > 0 THEN 1 END) AS products_with_clicks
+FROM tbl_affiliate_products p
+GROUP BY p.provider
+ORDER BY p.provider ASC;
 
 -- name: ListAdsClickReport :many
 SELECT

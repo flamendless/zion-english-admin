@@ -202,6 +202,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/affiliate-link/", affiliateLinkRole(handleAffiliateLink))
 		authMux.HandleFunc(basePath+"/affiliates/import/save", affiliatesRole(handleAffiliateImportSave))
 		authMux.HandleFunc(basePath+"/affiliates/upload", affiliatesRole(handleAffiliateUpload))
+		authMux.HandleFunc(basePath+"/affiliates/upload/impact", affiliatesRole(handleAffiliateImpactUpload))
 		authMux.HandleFunc(basePath+"/affiliates", affiliatesRole(handleAffiliates))
 		authMux.HandleFunc(basePath+"/affiliates/", affiliatesRole(handleAffiliatesPath))
 		adsRole := auth.RequireRole(auth.RoleSuperuser)
@@ -591,7 +592,7 @@ func contentSecurityPolicy(r *http.Request) string {
 		"default-src 'self'",
 		"script-src 'self' 'unsafe-inline'",
 		"style-src 'self' 'unsafe-inline'",
-		"img-src 'self' data: https://down-ph.img.susercontent.com https://cf.shopee.ph",
+		"img-src 'self' data: https://down-ph.img.susercontent.com https://cf.shopee.ph https://a.impactradius-go.com",
 		"media-src 'self' blob:",
 	}, "; ")
 }

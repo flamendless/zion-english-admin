@@ -182,6 +182,24 @@ templ AdPlacementChromeStyles() {
 			margin: 0 auto;
 			aspect-ratio: 1 / 1;
 		}
+		.ad-chrome .affiliate-product-card--impact-banner {
+			--ad-placement-card-max-width: 20rem;
+		}
+		.ad-chrome .affiliate-product-card--impact-banner .affiliate-product-card-image-link--banner {
+			max-width: 100%;
+			max-height: none;
+			aspect-ratio: auto;
+		}
+		.ad-chrome .affiliate-product-card--impact-banner .affiliate-product-card-image--banner {
+			max-height: 10rem;
+		}
+		.ad-zone--top .affiliate-product-card--impact-banner .affiliate-product-card-image--banner {
+			max-height: 8rem;
+		}
+		.ad-zone--left .affiliate-product-card--impact-banner .affiliate-product-card-image--banner,
+		.ad-zone--right .affiliate-product-card--impact-banner .affiliate-product-card-image--banner {
+			max-height: 9rem;
+		}
 		.ad-zone--top {
 			width: 100%;
 			display: flex;

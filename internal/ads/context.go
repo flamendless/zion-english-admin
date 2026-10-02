@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"zion-english/internal/affiliates"
 	"zion-english/internal/conf"
 	"zion-english/internal/constants"
 	"zion-english/internal/database"
@@ -31,6 +32,7 @@ type CatalogAd struct {
 
 type ProductOption struct {
 	ProductID    int64
+	Provider     constants.AffiliateProvider
 	Name         string
 	ShopName     string
 	PriceDisplay string
@@ -148,11 +150,17 @@ func buildCatalog(rows []queries.GetPublishedAdsWithProductsRow) []CatalogAd {
 		}
 		ad.ProductOptions = append(ad.ProductOptions, ProductOption{
 			ProductID:    row.AffiliateProductID,
+			Provider:     constants.AffiliateProvider(row.Provider),
 			Name:         row.ProductName,
 			ShopName:     row.ShopName,
 			Sales:        row.Sales,
 			PriceDisplay: row.PriceDisplay,
-			ThumbnailURL: row.ThumbnailUrl,
+			ThumbnailURL: affiliates.ResolveProductThumbnail(affiliates.ProductThumbnailInput{
+				Provider:     constants.AffiliateProvider(row.Provider),
+				ItemID:       row.ProductItemID,
+				ProgramID:    row.ProgramID,
+				ThumbnailURL: row.ThumbnailUrl,
+			}),
 			AffiliateURL: row.AffiliateUrl,
 			SortOrder:    row.ProductSortOrder,
 		})

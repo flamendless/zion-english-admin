@@ -356,7 +356,8 @@ func handleAdAffiliateSearch(w http.ResponseWriter, r *http.Request) {
 			Name:         row.Name,
 			ShopName:     row.ShopName,
 			PriceDisplay: row.PriceDisplay,
-			ThumbnailURL: row.ThumbnailUrl,
+			ThumbnailURL: affiliateThumbnailFromRow(row.Provider, row.ItemID, row.ProgramID, row.ThumbnailUrl),
+			Provider:     constants.AffiliateProvider(row.Provider),
 			Checked:      checked,
 		})
 	}
@@ -549,6 +550,9 @@ func adViewFromID(ctx context.Context, adID int64) (frontend.AdViewData, error) 
 		}
 		cards = append(cards, mapAffiliateProductCard(
 			prod.ID,
+			prod.Provider,
+			prod.ItemID,
+			prod.ProgramID,
 			prod.Name,
 			shop,
 			prod.PriceDisplay,

@@ -47,6 +47,10 @@ SELECT
 	p.commission_rate,
 	p.commission,
 	p.click_count,
+	p.provider,
+	p.program_id,
+	p.impact_state,
+	p.impact_ad_type,
 	p.created_at,
 	p.updated_at
 FROM tbl_affiliate_products p

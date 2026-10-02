@@ -182,6 +182,7 @@ func handleAffiliateUpload(w http.ResponseWriter, r *http.Request) {
 			StagedItems:     staged,
 			DiffSummary:     diffSummary,
 			RemovedFromCSV:  removed,
+			ImportProvider:  constants.AffiliateProviderShopee,
 		},
 		OpenPreviewModal: true,
 	})
@@ -216,6 +217,7 @@ func buildStagedAffiliateImportItems(ctx context.Context, catalog []affiliates.C
 		priceDisplay := affiliates.FormatPriceDisplay(row.Price)
 
 		importInput := affiliates.ImportRowInput{
+			Provider:       constants.AffiliateProviderShopee,
 			ItemID:         itemID,
 			ProductURL:     row.ProductLink,
 			OfferLink:      row.OfferLink,
@@ -245,6 +247,7 @@ func buildStagedAffiliateImportItems(ctx context.Context, catalog []affiliates.C
 		staged = append(staged, frontend.AffiliateStagedImportItem{
 			Index: i,
 			Card: frontend.AffiliateProductCardData{
+				Provider:      constants.AffiliateProviderShopee,
 				Name:          row.ItemName,
 				ShopName:      row.ShopName,
 				PriceDisplay:  priceDisplay,
@@ -271,7 +274,176 @@ func buildStagedAffiliateImportItems(ctx context.Context, catalog []affiliates.C
 			ChangedFields:     diff.ChangedFields,
 		})
 	}
-	removedRows := affiliates.RemovedFromCSV(catalog, affiliates.CollectCSVItemIDs(importInputs))
+	removedRows := affiliates.RemovedFromCSV(catalog, affiliates.CollectCSVItemIDs(importInputs), constants.AffiliateProviderShopee)
+	removed := make([]frontend.AffiliateRemovedFromCSVItem, 0, len(removedRows))
+	for _, row := range removedRows {
+		removed = append(removed, frontend.AffiliateRemovedFromCSVItem{
+			ID:     strconv.FormatInt(row.ID, 10),
+			ItemID: row.ItemID,
+			Name:   row.Name,
+		})
+	}
+	diffSummary.RemovedFromCSVCount = len(removed)
+	return staged, thumbsFound, importLogs, diffSummary, removed
+}
+
+func handleAffiliateImpactUpload(w http.ResponseWriter, r *http.Request) {
+	if !requireMethod(w, r, http.MethodPost) {
+		return
+	}
+
+	ctx := r.Context()
+	user := auth.GetUser(ctx)
+
+	if err := r.ParseMultipartForm(maxAffiliateCSVBytes); err != nil {
+		setErrorFlash(w, "CSV file is too large or invalid")
+		HttpRedirect(w, r, "/affiliates")
+		return
+	}
+
+	file, header, err := r.FormFile("csv")
+	if err != nil {
+		setErrorFlash(w, "Please choose a CSV file to upload")
+		HttpRedirect(w, r, "/affiliates")
+		return
+	}
+	defer file.Close()
+
+	filename := filepath.Base(header.Filename)
+	fileSize := header.Size
+
+	data, err := io.ReadAll(io.LimitReader(file, maxAffiliateCSVBytes+1))
+	if err != nil {
+		logAffiliateUploadFailure(ctx, user, filename, fileSize, err)
+		setErrorFlash(w, "Failed to read CSV file")
+		HttpRedirect(w, r, "/affiliates")
+		return
+	}
+	if int64(len(data)) > maxAffiliateCSVBytes {
+		logAffiliateUploadFailure(ctx, user, filename, fileSize, fmt.Errorf("file exceeds size limit"))
+		setErrorFlash(w, "CSV file is too large")
+		HttpRedirect(w, r, "/affiliates")
+		return
+	}
+
+	rows, err := affiliates.ParseImpactAdsCSV(strings.NewReader(string(data)))
+	if err != nil {
+		logAffiliateUploadFailure(ctx, user, filename, fileSize, err)
+		setErrorFlash(w, err.Error())
+		HttpRedirect(w, r, "/affiliates")
+		return
+	}
+
+	catalog, catalogIndex, err := loadAffiliateCatalog(ctx)
+	if err != nil {
+		logAffiliateUploadFailure(ctx, user, filename, fileSize, err)
+		setErrorFlash(w, "Failed to load affiliate catalog")
+		HttpRedirect(w, r, "/affiliates")
+		return
+	}
+
+	staged, thumbsFound, importLogs, diffSummary, removed := buildStagedImpactImportItems(catalog, catalogIndex, rows)
+	if len(staged) == 0 {
+		logAffiliateUploadFailure(ctx, user, filename, fileSize, fmt.Errorf("no creatives to review"))
+		setErrorFlash(w, "No creatives found in CSV")
+		HttpRedirect(w, r, "/affiliates")
+		return
+	}
+
+	insertUploadLog(ctx, user, uploadLogEntry{
+		Module:        "affiliates",
+		Outcome:       constants.UploadLogOutcomeSucceeded,
+		Kind:          constants.UploadLogKindAffiliateCSV,
+		Summary:       fmt.Sprintf("Parsed %d Impact creatives from '%s'", len(staged), filename),
+		Filename:      filename,
+		FileSize:      fileSize,
+		FileSizeValid: fileSize > 0,
+	})
+
+	handleAffiliatesList(w, r, affiliatesListPageState{
+		ImportPreview: frontend.AffiliateImportPreviewData{
+			Filename:        filename,
+			FileSizeDisplay: utils.FormatFileSize(fileSize),
+			FileSizeBytes:   fileSize,
+			ProcessedCount:  len(staged),
+			TotalCount:      len(rows),
+			ThumbnailsFound: thumbsFound,
+			PendingSave:     true,
+			ImportLogs:      importLogs,
+			StagedItems:     staged,
+			DiffSummary:     diffSummary,
+			RemovedFromCSV:  removed,
+			ImportProvider:  constants.AffiliateProviderImpact,
+		},
+		OpenPreviewModal: true,
+	})
+}
+
+func buildStagedImpactImportItems(catalog []affiliates.CatalogRow, catalogIndex map[string]affiliates.CatalogRow, rows []affiliates.ImpactCSVRow) ([]frontend.AffiliateStagedImportItem, int, []frontend.AffiliateImportLogEntry, frontend.AffiliateImportDiffSummary, []frontend.AffiliateRemovedFromCSVItem) {
+	staged := make([]frontend.AffiliateStagedImportItem, 0, len(rows))
+	importLogs := make([]frontend.AffiliateImportLogEntry, 0)
+	thumbsFound := 0
+	seenKeys := make(map[string]bool)
+	diffSummary := frontend.AffiliateImportDiffSummary{}
+	importInputs := make([]affiliates.ImportRowInput, 0, len(rows))
+
+	for i, row := range rows {
+		thumb := affiliates.ImpactDisplayAdThumbnailURL(row.ProgramID, row.AdID)
+		if thumb != "" {
+			thumbsFound++
+		}
+
+		importInput := affiliates.ImportRowInput{
+			Provider:     constants.AffiliateProviderImpact,
+			ItemID:       row.AdID,
+			OfferLink:    row.TrackingLink,
+			ItemName:     row.Name,
+			ProgramID:    row.ProgramID,
+			ImpactState:  row.State,
+			ImpactAdType: row.AdType,
+			ShopName:     "Impact",
+			ThumbnailURL: thumb,
+		}
+		importInputs = append(importInputs, importInput)
+		diff := affiliates.DiffImportRow(importInput, catalogIndex, seenKeys)
+		switch diff.Status {
+		case constants.AffiliateImportDiffNew:
+			diffSummary.NewCount++
+		case constants.AffiliateImportDiffChanged:
+			diffSummary.ChangedCount++
+		case constants.AffiliateImportDiffUnchanged:
+			diffSummary.UnchangedCount++
+		case constants.AffiliateImportDiffDuplicateInCSV:
+			diffSummary.DuplicateInCSVCount++
+		case constants.AffiliateImportDiffMissingItemKey:
+			diffSummary.MissingItemKeyCount++
+		}
+
+		staged = append(staged, frontend.AffiliateStagedImportItem{
+			Index: i,
+			Card: frontend.AffiliateProductCardData{
+				Provider:      constants.AffiliateProviderImpact,
+				Name:          row.Name,
+				ShopName:      "Impact",
+				ThumbnailURL:  thumb,
+				AffiliateURL:  row.TrackingLink,
+				IncludeInSave: diff.IncludeByDefault,
+				FormIndex:     i,
+			},
+			ItemID:            row.AdID,
+			ItemName:          row.Name,
+			OfferLink:         row.TrackingLink,
+			ProgramID:         row.ProgramID,
+			ImpactState:       row.State,
+			ImpactAdType:      row.AdType,
+			ShopName:          "Impact",
+			ThumbnailURL:      thumb,
+			DiffStatus:        diff.Status,
+			ExistingProductID: diff.ExistingID,
+			ChangedFields:     diff.ChangedFields,
+		})
+	}
+	removedRows := affiliates.RemovedFromCSV(catalog, affiliates.CollectCSVItemIDs(importInputs), constants.AffiliateProviderImpact)
 	removed := make([]frontend.AffiliateRemovedFromCSVItem, 0, len(removedRows))
 	for _, row := range removedRows {
 		removed = append(removed, frontend.AffiliateRemovedFromCSVItem{
@@ -346,6 +518,11 @@ func handleAffiliateImportSave(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	importProvider := constants.AffiliateProvider(strings.TrimSpace(r.FormValue("import_provider")))
+	if !constants.ValidAffiliateProvider(string(importProvider)) {
+		importProvider = constants.AffiliateProviderShopee
+	}
+
 	inserted := 0
 	updated := 0
 	sortOrder := 0
@@ -355,19 +532,27 @@ func handleAffiliateImportSave(w http.ResponseWriter, r *http.Request) {
 		}
 		prefix := fmt.Sprintf("staged_%d_", i)
 		offerLink := strings.TrimSpace(r.FormValue(prefix + "offer_link"))
-		productLink := strings.TrimSpace(r.FormValue(prefix + "product_link"))
 		itemName := strings.TrimSpace(r.FormValue(prefix + "item_name"))
-		if offerLink == "" || productLink == "" || itemName == "" {
+		itemID := strings.TrimSpace(r.FormValue(prefix + "item_id"))
+		if offerLink == "" || itemName == "" || itemID == "" {
 			continue
 		}
 
-		affiliatedShopID, err := database.EnsureAffiliatedProductShopID(ctx, dbRW, r.FormValue(prefix+"shop_name"))
+		shopName := strings.TrimSpace(r.FormValue(prefix + "shop_name"))
+		if shopName == "" && importProvider == constants.AffiliateProviderImpact {
+			shopName = "Impact"
+		}
+		affiliatedShopID, err := database.EnsureAffiliatedProductShopID(ctx, dbRW, shopName)
 		if err != nil {
 			logs.Log().Error("ensure affiliated product shop on import save", zap.Error(err))
 			continue
 		}
 
-		itemID := strings.TrimSpace(r.FormValue(prefix + "item_id"))
+		productLink := strings.TrimSpace(r.FormValue(prefix + "product_link"))
+		if importProvider == constants.AffiliateProviderShopee && productLink == "" {
+			continue
+		}
+
 		existingID := parseStagedExistingID(r, i)
 		write := affiliateProductWriteParams{
 			AffiliateURL:     offerLink,
@@ -384,9 +569,13 @@ func handleAffiliateImportSave(w http.ResponseWriter, r *http.Request) {
 			AffiliatedShopID: affiliatedShopID,
 			CommissionRate:   strings.TrimSpace(r.FormValue(prefix + "commission_rate")),
 			Commission:       strings.TrimSpace(r.FormValue(prefix + "commission")),
+			Provider:         string(importProvider),
+			ProgramID:        strings.TrimSpace(r.FormValue(prefix + "program_id")),
+			ImpactState:      strings.TrimSpace(r.FormValue(prefix + "impact_state")),
+			ImpactAdType:     strings.TrimSpace(r.FormValue(prefix + "impact_ad_type")),
 		}
 		if existingID == 0 {
-			existingID = resolveAffiliateUpsertTargetID(catalogIndex, itemID, productLink, 0)
+			existingID = resolveAffiliateUpsertTargetID(catalogIndex, importProvider, itemID, productLink, 0)
 		}
 		id, isUpdate, _, err := upsertAffiliateProduct(ctx, dbRW, catalogIndex, existingID, write)
 		if err != nil {
@@ -399,9 +588,10 @@ func handleAffiliateImportSave(w http.ResponseWriter, r *http.Request) {
 			inserted++
 		}
 		if id > 0 {
-			if row, ok := catalogIndex[affiliates.CatalogKey(itemID, productLink)]; ok {
+			key := affiliates.CatalogKeyForProvider(importProvider, itemID, productLink)
+			if row, ok := catalogIndex[key]; ok {
 				row.ID = id
-				catalogIndex[affiliates.CatalogKey(itemID, productLink)] = row
+				catalogIndex[key] = row
 			}
 		}
 		sortOrder++
@@ -448,6 +638,10 @@ func handleAffiliatesList(w http.ResponseWriter, r *http.Request, state affiliat
 	ctx := r.Context()
 	sort := parseListSort(r, frontend.ListSortKindAffiliate)
 	query := strings.TrimSpace(r.URL.Query().Get("q"))
+	providerFilter := constants.AffiliateProvider(strings.TrimSpace(r.URL.Query().Get("provider")))
+	if providerFilter != "" && !constants.ValidAffiliateProvider(string(providerFilter)) {
+		providerFilter = ""
+	}
 
 	rows, err := dbRO.GetQueries().GetAllAffiliateProducts(ctx)
 	if err != nil {
@@ -455,7 +649,7 @@ func handleAffiliatesList(w http.ResponseWriter, r *http.Request, state affiliat
 		return
 	}
 
-	rows = filterAffiliateRows(rows, query)
+	rows = filterAffiliateRows(rows, query, string(providerFilter))
 	sortAffiliateRows(rows, sort)
 
 	page := utils.ParsePageQuery(r)
@@ -473,6 +667,7 @@ func handleAffiliatesList(w http.ResponseWriter, r *http.Request, state affiliat
 	data := frontend.AffiliatesPageData{
 		Items:            items,
 		Query:            query,
+		ProviderFilter:   providerFilter,
 		SortBy:           sort.By,
 		SortOrder:        string(sort.Order),
 		FilterPath:       filterPath,
@@ -503,9 +698,10 @@ func mapAffiliateListItem(row queries.GetAllAffiliateProductsRow) frontend.Affil
 		ID:            strconv.FormatInt(row.ID, 10),
 		Name:          row.Name,
 		ShopName:      shop,
+		Provider:      constants.AffiliateProvider(row.Provider),
 		PriceDisplay:  row.PriceDisplay,
 		ClickCount:    row.ClickCount,
-		ThumbnailURL:  row.ThumbnailUrl,
+		ThumbnailURL:  affiliateThumbnailFromRow(row.Provider, row.ItemID, row.ProgramID, row.ThumbnailUrl),
 		AffiliateURL:  frontend.AffiliateProductLinkHref(row.ID, row.AffiliateUrl, 0, ""),
 		AffiliateDisp: frontend.AffiliateURLPreview(row.AffiliateUrl),
 	}
@@ -514,6 +710,9 @@ func mapAffiliateListItem(row queries.GetAllAffiliateProductsRow) frontend.Affil
 func mapAffiliateProductCardFromBatch(row queries.GetAffiliateProductsByImportBatchIDRow) frontend.AffiliateProductCardData {
 	return mapAffiliateProductCard(
 		row.ID,
+		row.Provider,
+		row.ItemID,
+		row.ProgramID,
 		row.Name,
 		row.ShopBrandName,
 		row.PriceDisplay,
@@ -526,6 +725,9 @@ func mapAffiliateProductCardFromBatch(row queries.GetAffiliateProductsByImportBa
 func mapAffiliateProductCardFromByID(row queries.GetAffiliateProductByIDRow) frontend.AffiliateProductCardData {
 	return mapAffiliateProductCard(
 		row.ID,
+		row.Provider,
+		row.ItemID,
+		row.ProgramID,
 		row.Name,
 		row.ShopBrandName,
 		row.PriceDisplay,
@@ -535,14 +737,19 @@ func mapAffiliateProductCardFromByID(row queries.GetAffiliateProductByIDRow) fro
 	)
 }
 
-func mapAffiliateProductCard(productID int64, name, shopName, priceDisplay, sales, thumbnailURL, affiliateURL string) frontend.AffiliateProductCardData {
+func mapAffiliateProductCard(productID int64, provider string, itemID, programID, name, shopName, priceDisplay, sales, thumbnailURL, affiliateURL string) frontend.AffiliateProductCardData {
+	p := constants.AffiliateProvider(provider)
+	if !constants.ValidAffiliateProvider(provider) {
+		p = constants.AffiliateProviderShopee
+	}
 	return frontend.AffiliateProductCardData{
 		ProductID:    productID,
+		Provider:     p,
 		Name:         name,
 		ShopName:     shopName,
 		PriceDisplay: priceDisplay,
 		Sales:        sales,
-		ThumbnailURL: thumbnailURL,
+		ThumbnailURL: affiliateThumbnailFromRow(provider, itemID, programID, thumbnailURL),
 		AffiliateURL: affiliateURL,
 	}
 }
@@ -620,6 +827,7 @@ func handleAffiliateCreate(w http.ResponseWriter, r *http.Request) {
 		AffiliatedShopID: affiliatedShopID,
 		CommissionRate:   req.CommissionRate,
 		Commission:       req.Commission,
+		Provider:         string(constants.AffiliateProviderShopee),
 	})
 	if err != nil {
 		setErrorFlash(w, fmt.Sprintf("Failed to save affiliate product: %v", err))
@@ -675,7 +883,7 @@ func handleAffiliateUpdate(w http.ResponseWriter, r *http.Request, affiliateID i
 	ctx := r.Context()
 	editPath := fmt.Sprintf("/affiliates/%d/edit", affiliateID)
 
-	_, err := dbRO.GetQueries().GetAffiliateProductByID(ctx, affiliateID)
+	existingRow, err := dbRO.GetQueries().GetAffiliateProductByID(ctx, affiliateID)
 	if err != nil {
 		setErrorFlash(w, "Affiliate product not found")
 		HttpRedirect(w, r, "/affiliates")
@@ -724,6 +932,10 @@ func handleAffiliateUpdate(w http.ResponseWriter, r *http.Request, affiliateID i
 		AffiliatedShopID: affiliatedShopID,
 		CommissionRate:   req.CommissionRate,
 		Commission:       req.Commission,
+		Provider:         existingRow.Provider,
+		ProgramID:        existingRow.ProgramID,
+		ImpactState:      existingRow.ImpactState,
+		ImpactAdType:     existingRow.ImpactAdType,
 	})
 	if err != nil {
 		setErrorFlash(w, fmt.Sprintf("Failed to update affiliate product: %v", err))

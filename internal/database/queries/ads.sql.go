@@ -32,6 +32,10 @@ WHERE (
 	OR p.name LIKE '%' || ? || '%'
 	OR COALESCE(s.brand_name, p.brand, '') LIKE '%' || ? || '%'
 )
+	AND (
+		p.provider != 'impact'
+		OR upper(p.impact_state) = 'ACTIVE'
+	)
 `
 
 type CountAffiliateProductsForAdsParams struct {
@@ -187,12 +191,19 @@ SELECT
 	p.thumbnail_url,
 	p.affiliate_url,
 	COALESCE(s.brand_name, p.brand, '') AS shop_name,
-	p.sales
+	p.sales,
+	p.provider,
+	p.program_id,
+	p.item_id AS product_item_id
 FROM tbl_ads a
 INNER JOIN tbl_ad_affiliate_products j ON j.ad_id = a.id
 INNER JOIN tbl_affiliate_products p ON p.id = j.affiliate_product_id
 LEFT JOIN tbl_affiliated_product_shops s ON s.id = p.affiliated_shop_id
 WHERE a.status = 'published'
+	AND (
+		p.provider != 'impact'
+		OR upper(p.impact_state) = 'ACTIVE'
+	)
 ORDER BY a.sort_order ASC, a.id ASC, j.sort_order ASC, j.affiliate_product_id ASC
 `
 
@@ -212,6 +223,9 @@ type GetPublishedAdsWithProductsRow struct {
 	AffiliateUrl       string
 	ShopName           string
 	Sales              string
+	Provider           string
+	ProgramID          string
+	ProductItemID      string
 }
 
 func (q *Queries) GetPublishedAdsWithProducts(ctx context.Context) ([]GetPublishedAdsWithProductsRow, error) {
@@ -239,6 +253,9 @@ func (q *Queries) GetPublishedAdsWithProducts(ctx context.Context) ([]GetPublish
 			&i.AffiliateUrl,
 			&i.ShopName,
 			&i.Sales,
+			&i.Provider,
+			&i.ProgramID,
+			&i.ProductItemID,
 		); err != nil {
 			return nil, err
 		}
@@ -316,6 +333,10 @@ WHERE (
 	OR p.name LIKE '%' || ? || '%'
 	OR COALESCE(s.brand_name, p.brand, '') LIKE '%' || ? || '%'
 )
+	AND (
+		p.provider != 'impact'
+		OR upper(p.impact_state) = 'ACTIVE'
+	)
 ORDER BY p.sort_order ASC, p.id ASC
 `
 
@@ -354,7 +375,10 @@ SELECT
 	p.name,
 	p.price_display,
 	p.thumbnail_url,
-	COALESCE(s.brand_name, p.brand, '') AS shop_name
+	COALESCE(s.brand_name, p.brand, '') AS shop_name,
+	p.provider,
+	p.program_id,
+	p.item_id
 FROM tbl_affiliate_products p
 LEFT JOIN tbl_affiliated_product_shops s ON s.id = p.affiliated_shop_id
 WHERE (
@@ -362,6 +386,10 @@ WHERE (
 	OR p.name LIKE '%' || ? || '%'
 	OR COALESCE(s.brand_name, p.brand, '') LIKE '%' || ? || '%'
 )
+	AND (
+		p.provider != 'impact'
+		OR upper(p.impact_state) = 'ACTIVE'
+	)
 ORDER BY p.sort_order ASC, p.id ASC
 LIMIT ? OFFSET ?
 `
@@ -380,6 +408,9 @@ type SearchAffiliateProductsForAdsRow struct {
 	PriceDisplay string
 	ThumbnailUrl string
 	ShopName     string
+	Provider     string
+	ProgramID    string
+	ItemID       string
 }
 
 func (q *Queries) SearchAffiliateProductsForAds(ctx context.Context, arg SearchAffiliateProductsForAdsParams) ([]SearchAffiliateProductsForAdsRow, error) {
@@ -403,6 +434,9 @@ func (q *Queries) SearchAffiliateProductsForAds(ctx context.Context, arg SearchA
 			&i.PriceDisplay,
 			&i.ThumbnailUrl,
 			&i.ShopName,
+			&i.Provider,
+			&i.ProgramID,
+			&i.ItemID,
 		); err != nil {
 			return nil, err
 		}

@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"zion-english/internal/affiliates"
+	"zion-english/internal/constants"
 	"zion-english/internal/database"
 	"zion-english/internal/database/queries"
 )
@@ -20,25 +21,29 @@ func loadAffiliateCatalog(ctx context.Context) ([]affiliates.CatalogRow, map[str
 	}
 	catalog := make([]affiliates.CatalogRow, 0, len(rows))
 	for _, row := range rows {
-		catalog = append(catalog, affiliates.CatalogRow{
-			ID:             row.ID,
-			ItemID:         row.ItemID,
-			ProductURL:     row.ProductUrl,
-			AffiliateURL:   row.AffiliateUrl,
-			Name:           row.Name,
-			PriceDisplay:   row.PriceDisplay,
-			Sales:          row.Sales,
-			ShopBrandName:  row.ShopBrandName,
-			CommissionRate: row.CommissionRate,
-			Commission:     row.Commission,
-			ThumbnailURL:   row.ThumbnailUrl,
-		})
+		catalog = append(catalog, affiliates.CatalogRowFromDB(
+			row.ID,
+			row.Provider,
+			row.ItemID,
+			row.ProductUrl,
+			row.AffiliateUrl,
+			row.Name,
+			row.PriceDisplay,
+			row.Sales,
+			row.ShopBrandName,
+			row.CommissionRate,
+			row.Commission,
+			row.ThumbnailUrl,
+			row.ProgramID,
+			row.ImpactState,
+			row.ImpactAdType,
+		))
 	}
 	return catalog, affiliates.BuildCatalogIndex(catalog), nil
 }
 
-func resolveAffiliateUpsertTargetID(index map[string]affiliates.CatalogRow, itemID, productURL string, currentID int64) int64 {
-	existing, ok := affiliates.FindExisting(index, itemID, productURL)
+func resolveAffiliateUpsertTargetID(index map[string]affiliates.CatalogRow, provider constants.AffiliateProvider, itemID, productURL string, currentID int64) int64 {
+	existing, ok := affiliates.FindExisting(index, provider, itemID, productURL)
 	if !ok {
 		return 0
 	}
@@ -63,10 +68,19 @@ type affiliateProductWriteParams struct {
 	AffiliatedShopID sql.NullInt64
 	CommissionRate   string
 	Commission       string
+	Provider         string
+	ProgramID        string
+	ImpactState      string
+	ImpactAdType     string
 }
 
 func upsertAffiliateProduct(ctx context.Context, db database.Service, index map[string]affiliates.CatalogRow, currentID int64, p affiliateProductWriteParams) (id int64, isUpdate bool, merged bool, err error) {
-	targetID := resolveAffiliateUpsertTargetID(index, p.ItemID, p.ProductURL, currentID)
+	provider := constants.AffiliateProvider(p.Provider)
+	if !constants.ValidAffiliateProvider(p.Provider) {
+		provider = constants.AffiliateProviderShopee
+		p.Provider = string(provider)
+	}
+	targetID := resolveAffiliateUpsertTargetID(index, provider, p.ItemID, p.ProductURL, currentID)
 	if targetID == 0 && currentID > 0 {
 		targetID = currentID
 	}
@@ -86,6 +100,10 @@ func upsertAffiliateProduct(ctx context.Context, db database.Service, index map[
 			AffiliatedShopID: p.AffiliatedShopID,
 			CommissionRate:   p.CommissionRate,
 			Commission:       p.Commission,
+			Provider:         p.Provider,
+			ProgramID:        p.ProgramID,
+			ImpactState:      p.ImpactState,
+			ImpactAdType:     p.ImpactAdType,
 			ID:               targetID,
 		})
 		if err != nil {
@@ -109,6 +127,10 @@ func upsertAffiliateProduct(ctx context.Context, db database.Service, index map[
 		AffiliatedShopID: p.AffiliatedShopID,
 		CommissionRate:   p.CommissionRate,
 		Commission:       p.Commission,
+		Provider:         p.Provider,
+		ProgramID:        p.ProgramID,
+		ImpactState:      p.ImpactState,
+		ImpactAdType:     p.ImpactAdType,
 	})
 	if err != nil {
 		return 0, false, false, err
@@ -127,4 +149,13 @@ func parseStagedExistingID(r *http.Request, index int) int64 {
 		return 0
 	}
 	return id
+}
+
+func affiliateThumbnailFromRow(provider string, itemID, programID, thumbnailURL string) string {
+	return affiliates.ResolveProductThumbnail(affiliates.ProductThumbnailInput{
+		Provider:     constants.AffiliateProvider(provider),
+		ItemID:       itemID,
+		ProgramID:    programID,
+		ThumbnailURL: thumbnailURL,
+	})
 }

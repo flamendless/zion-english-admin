@@ -297,6 +297,12 @@
 				'No attributed ad zone clicks yet.',
 				'primary'
 			);
+			renderHorizontalBar(
+				'clicksByProviderChart',
+				data.clicksByProvider,
+				'No provider click totals yet.',
+				'info'
+			);
 			renderProductActivity(data.summary);
 		}
 	};

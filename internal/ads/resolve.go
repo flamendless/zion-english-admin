@@ -27,6 +27,7 @@ type ResolvedProduct struct {
 	AdName       string
 	Zone         constants.AdZone
 	ProductID    int64
+	Provider     constants.AffiliateProvider
 	Name         string
 	ShopName     string
 	PriceDisplay string
@@ -112,6 +113,7 @@ func resolvedProductFromOption(ad CatalogAd, zone constants.AdZone, chosen Produ
 		AdName:       ad.Name,
 		Zone:         zone,
 		ProductID:    chosen.ProductID,
+		Provider:     chosen.Provider,
 		Name:         chosen.Name,
 		ShopName:     chosen.ShopName,
 		PriceDisplay: chosen.PriceDisplay,

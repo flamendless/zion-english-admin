@@ -55,6 +55,52 @@ func (q *Queries) GetAffiliateClickSummary(ctx context.Context) (GetAffiliateCli
 	return i, err
 }
 
+const getAffiliateClickSummaryByProvider = `-- name: GetAffiliateClickSummaryByProvider :many
+SELECT
+	p.provider,
+	COUNT(*) AS product_count,
+	COALESCE(SUM(p.click_count), 0) AS total_clicks,
+	COUNT(CASE WHEN p.click_count > 0 THEN 1 END) AS products_with_clicks
+FROM tbl_affiliate_products p
+GROUP BY p.provider
+ORDER BY p.provider ASC
+`
+
+type GetAffiliateClickSummaryByProviderRow struct {
+	Provider           string
+	ProductCount       int64
+	TotalClicks        interface{}
+	ProductsWithClicks int64
+}
+
+func (q *Queries) GetAffiliateClickSummaryByProvider(ctx context.Context) ([]GetAffiliateClickSummaryByProviderRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAffiliateClickSummaryByProvider)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAffiliateClickSummaryByProviderRow
+	for rows.Next() {
+		var i GetAffiliateClickSummaryByProviderRow
+		if err := rows.Scan(
+			&i.Provider,
+			&i.ProductCount,
+			&i.TotalClicks,
+			&i.ProductsWithClicks,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listAdsClickReport = `-- name: ListAdsClickReport :many
 SELECT
 	a.id,
@@ -119,7 +165,10 @@ SELECT
 	p.name,
 	p.thumbnail_url,
 	p.click_count,
-	COALESCE(s.brand_name, p.brand, '') AS shop_name
+	COALESCE(s.brand_name, p.brand, '') AS shop_name,
+	p.provider,
+	p.program_id,
+	p.item_id
 FROM tbl_affiliate_products p
 LEFT JOIN tbl_affiliated_product_shops s ON s.id = p.affiliated_shop_id
 WHERE (
@@ -145,6 +194,9 @@ type ListAffiliateProductsForClickReportRow struct {
 	ThumbnailUrl string
 	ClickCount   int64
 	ShopName     string
+	Provider     string
+	ProgramID    string
+	ItemID       string
 }
 
 func (q *Queries) ListAffiliateProductsForClickReport(ctx context.Context, arg ListAffiliateProductsForClickReportParams) ([]ListAffiliateProductsForClickReportRow, error) {
@@ -168,6 +220,9 @@ func (q *Queries) ListAffiliateProductsForClickReport(ctx context.Context, arg L
 			&i.ThumbnailUrl,
 			&i.ClickCount,
 			&i.ShopName,
+			&i.Provider,
+			&i.ProgramID,
+			&i.ItemID,
 		); err != nil {
 			return nil, err
 		}

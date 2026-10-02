@@ -411,14 +411,16 @@ func affiliateShopSortKey(row queries.GetAllAffiliateProductsRow) string {
 	return row.Brand
 }
 
-func filterAffiliateRows(rows []queries.GetAllAffiliateProductsRow, query string) []queries.GetAllAffiliateProductsRow {
+func filterAffiliateRows(rows []queries.GetAllAffiliateProductsRow, query string, provider string) []queries.GetAllAffiliateProductsRow {
 	query = strings.ToLower(strings.TrimSpace(query))
-	if query == "" {
-		return rows
-	}
+	provider = strings.TrimSpace(provider)
 	out := make([]queries.GetAllAffiliateProductsRow, 0, len(rows))
 	for _, row := range rows {
-		if strings.Contains(strings.ToLower(row.Name), query) ||
+		if provider != "" && row.Provider != provider {
+			continue
+		}
+		if query == "" ||
+			strings.Contains(strings.ToLower(row.Name), query) ||
 			strings.Contains(strings.ToLower(row.Brand), query) ||
 			strings.Contains(strings.ToLower(row.ShopBrandName), query) {
 			out = append(out, row)

@@ -9,6 +9,9 @@ import (
 	"time"
 )
 
+type AffiliateProductKeeper struct {
+}
+
 type TblAccess struct {
 	ID          int64
 	TeacherID   int64
@@ -77,6 +80,10 @@ type TblAffiliateProduct struct {
 	Commission       string
 	AffiliatedShopID sql.NullInt64
 	ClickCount       int64
+	Provider         string
+	ProgramID        string
+	ImpactState      string
+	ImpactAdType     string
 }
 
 type TblAffiliatedProductShop struct {

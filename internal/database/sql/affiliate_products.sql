@@ -17,6 +17,10 @@ SELECT
 	p.commission_rate,
 	p.commission,
 	p.click_count,
+	p.provider,
+	p.program_id,
+	p.impact_state,
+	p.impact_ad_type,
 	p.created_at,
 	p.updated_at
 FROM tbl_affiliate_products p
@@ -42,6 +46,10 @@ SELECT
 	p.commission_rate,
 	p.commission,
 	p.click_count,
+	p.provider,
+	p.program_id,
+	p.impact_state,
+	p.impact_ad_type,
 	p.created_at,
 	p.updated_at
 FROM tbl_affiliate_products p
@@ -63,9 +71,13 @@ INSERT INTO tbl_affiliate_products (
 	sales,
 	affiliated_shop_id,
 	commission_rate,
-	commission
+	commission,
+	provider,
+	program_id,
+	impact_state,
+	impact_ad_type
 )
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 RETURNING id;
 
 -- name: UpdateAffiliateProduct :exec
@@ -84,6 +96,10 @@ SET
 	affiliated_shop_id = ?,
 	commission_rate = ?,
 	commission = ?,
+	provider = ?,
+	program_id = ?,
+	impact_state = ?,
+	impact_ad_type = ?,
 	updated_at = datetime('now')
 WHERE id = ?;
 
@@ -113,6 +129,10 @@ SELECT
 	p.commission_rate,
 	p.commission,
 	p.click_count,
+	p.provider,
+	p.program_id,
+	p.impact_state,
+	p.impact_ad_type,
 	COALESCE(s.brand_name, '') AS shop_brand_name
 FROM tbl_affiliate_products p
 LEFT JOIN tbl_affiliated_product_shops s ON s.id = p.affiliated_shop_id
@@ -137,9 +157,14 @@ SELECT
 	p.commission_rate,
 	p.commission,
 	p.click_count,
+	p.provider,
+	p.program_id,
+	p.impact_state,
+	p.impact_ad_type,
 	p.created_at,
 	p.updated_at
 FROM tbl_affiliate_products p
 LEFT JOIN tbl_affiliated_product_shops s ON s.id = p.affiliated_shop_id
 WHERE p.item_id = ?
-	AND TRIM(p.item_id) != '';
+	AND TRIM(p.item_id) != ''
+	AND p.provider = ?;

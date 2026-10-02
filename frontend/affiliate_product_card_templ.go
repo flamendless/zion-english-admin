@@ -21,6 +21,7 @@ const affiliateProductDisclosureTooltip = "This is an affiliated product. This i
 
 type AffiliateProductCardData struct {
 	ProductID     int64
+	Provider      constants.AffiliateProvider
 	Name          string
 	ShopName      string
 	PriceDisplay  string
@@ -54,6 +55,7 @@ func AffiliateProductLinkHref(productID int64, affiliateURL string, trackAdID in
 func AffiliateProductCardFromResolved(item ads.ResolvedProduct) AffiliateProductCardData {
 	return AffiliateProductCardData{
 		ProductID:    item.ProductID,
+		Provider:     item.Provider,
 		Name:         item.Name,
 		ShopName:     item.ShopName,
 		PriceDisplay: item.PriceDisplay,
@@ -63,6 +65,13 @@ func AffiliateProductCardFromResolved(item ads.ResolvedProduct) AffiliateProduct
 		TrackAdID:    item.AdID,
 		TrackAdZone:  item.Zone,
 	}
+}
+
+func affiliateProductCardClass(provider constants.AffiliateProvider) string {
+	if provider == constants.AffiliateProviderImpact {
+		return "affiliate-product-card affiliate-product-card--impact-banner"
+	}
+	return "affiliate-product-card"
 }
 
 func AffiliateProductCard(card AffiliateProductCardData) templ.Component {
@@ -86,242 +95,412 @@ func AffiliateProductCard(card AffiliateProductCardData) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<article class=\"affiliate-product-card\"><div class=\"affiliate-product-card-image-wrap\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
+		if card.Provider == constants.AffiliateProviderImpact {
+			templ_7745c5c3_Err = AffiliateImpactBannerCard(card).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = AffiliateShopeeProductCard(card).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
-		if card.IncludeInSave {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<label class=\"affiliate-product-card-include\" title=\"Include when saving\"><input type=\"checkbox\" class=\"affiliate-product-card-include-input\" name=\"include\" value=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var2 string
-			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", card.FormIndex))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 69, Col: 47}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			if card.IncludeInSave {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " checked")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
+		return nil
+	})
+}
+
+func AffiliateImpactBannerCard(card AffiliateProductCardData) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
 				}
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "> <span class=\"affiliate-product-card-include-box\" aria-hidden=\"true\"></span></label> ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
+			}()
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<a class=\"affiliate-product-card-image-link\" href=\"")
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var2 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var2 == nil {
+			templ_7745c5c3_Var2 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		var templ_7745c5c3_Var3 = []any{affiliateProductCardClass(card.Provider)}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var3...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var3 templ.SafeURL
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(AffiliateProductLinkHref(card.ProductID, card.AffiliateURL, card.TrackAdID, card.TrackAdZone))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 77, Col: 104}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" target=\"_blank\" rel=\"noopener noreferrer sponsored\" aria-label=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<article class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue("View " + card.Name)
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var3).String())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 80, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 1, Col: 0}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><div class=\"affiliate-product-card-image-wrap\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if card.ThumbnailURL != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<img class=\"affiliate-product-card-image\" src=\"")
+		if card.IncludeInSave {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<label class=\"affiliate-product-card-include\" title=\"Include when saving\"><input type=\"checkbox\" class=\"affiliate-product-card-include-input\" name=\"include\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
-			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(card.ThumbnailURL)
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", card.FormIndex))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 85, Col: 29}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 86, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" alt=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"affiliate-product-card-image-placeholder\" aria-hidden=\"true\"><span>No image</span></div>")
+			if card.IncludeInSave {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, " checked")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "> <span class=\"affiliate-product-card-include-box\" aria-hidden=\"true\"></span></label> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</a> <span class=\"affiliate-product-card-badge\">Affiliated</span></div><div class=\"affiliate-product-card-body\"><div class=\"affiliate-product-card-shop-row\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<a class=\"affiliate-product-card-image-link affiliate-product-card-image-link--banner\" href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var6 templ.SafeURL
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(AffiliateProductLinkHref(card.ProductID, card.AffiliateURL, card.TrackAdID, card.TrackAdZone))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 94, Col: 104}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" target=\"_blank\" rel=\"noopener noreferrer sponsored\" aria-label=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var7 string
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue("Open " + card.Name)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 97, Col: 36}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if card.ThumbnailURL != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<img class=\"affiliate-product-card-image affiliate-product-card-image--banner\" src=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var8 string
+			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(card.ThumbnailURL)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 102, Col: 29}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" alt=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"affiliate-product-card-image-placeholder affiliate-product-card-image-placeholder--banner\" aria-hidden=\"true\"><span>No image</span></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</a> <span class=\"affiliate-product-card-badge\">Affiliated</span></div></article>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func AffiliateShopeeProductCard(card AffiliateProductCardData) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var9 == nil {
+			templ_7745c5c3_Var9 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<article class=\"affiliate-product-card\"><div class=\"affiliate-product-card-image-wrap\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if card.IncludeInSave {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<label class=\"affiliate-product-card-include\" title=\"Include when saving\"><input type=\"checkbox\" class=\"affiliate-product-card-include-input\" name=\"include\" value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var10 string
+			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", card.FormIndex))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 127, Col: 47}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if card.IncludeInSave {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, " checked")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "> <span class=\"affiliate-product-card-include-box\" aria-hidden=\"true\"></span></label> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<a class=\"affiliate-product-card-image-link\" href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var11 templ.SafeURL
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(AffiliateProductLinkHref(card.ProductID, card.AffiliateURL, card.TrackAdID, card.TrackAdZone))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 135, Col: 104}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" target=\"_blank\" rel=\"noopener noreferrer sponsored\" aria-label=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var12 string
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue("View " + card.Name)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 138, Col: 36}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if card.ThumbnailURL != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<img class=\"affiliate-product-card-image\" src=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var13 string
+			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(card.ThumbnailURL)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 143, Col: 29}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "\" alt=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<div class=\"affiliate-product-card-image-placeholder\" aria-hidden=\"true\"><span>No image</span></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</a> <span class=\"affiliate-product-card-badge\">Affiliated</span></div><div class=\"affiliate-product-card-body\"><div class=\"affiliate-product-card-shop-row\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if card.ShopName != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<a class=\"affiliate-product-card-shop\" href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<a class=\"affiliate-product-card-shop\" href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var6 templ.SafeURL
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(AffiliateProductLinkHref(card.ProductID, card.AffiliateURL, card.TrackAdID, card.TrackAdZone))
+			var templ_7745c5c3_Var14 templ.SafeURL
+			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinURLErrs(AffiliateProductLinkHref(card.ProductID, card.AffiliateURL, card.TrackAdID, card.TrackAdZone))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 103, Col: 106}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 161, Col: 106}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" target=\"_blank\" rel=\"noopener noreferrer sponsored\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var7 string
-			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(card.ShopName)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 107, Col: 21}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\" target=\"_blank\" rel=\"noopener noreferrer sponsored\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</a> ")
+			var templ_7745c5c3_Var15 string
+			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(card.ShopName)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 165, Col: 21}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<p class=\"affiliate-product-card-shop affiliate-product-card-shop--empty\"></p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<p class=\"affiliate-product-card-shop affiliate-product-card-shop--empty\"></p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<button type=\"button\" class=\"affiliate-product-card-help\" aria-label=\"About affiliated products\" data-tooltip=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<button type=\"button\" class=\"affiliate-product-card-help\" aria-label=\"About affiliated products\" data-tooltip=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateProductDisclosureTooltip)
+		var templ_7745c5c3_Var16 string
+		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(affiliateProductDisclosureTooltip)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 116, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 174, Col: 53}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\">?</button></div><h4 class=\"affiliate-product-card-title\"><a href=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var9 templ.SafeURL
-		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinURLErrs(AffiliateProductLinkHref(card.ProductID, card.AffiliateURL, card.TrackAdID, card.TrackAdZone))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 122, Col: 107}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\">?</button></div><h4 class=\"affiliate-product-card-title\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" target=\"_blank\" rel=\"noopener noreferrer sponsored\">")
+		var templ_7745c5c3_Var17 templ.SafeURL
+		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinURLErrs(AffiliateProductLinkHref(card.ProductID, card.AffiliateURL, card.TrackAdID, card.TrackAdZone))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 180, Col: 107}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var10 string
-		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(card.Name)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 122, Col: 173}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\" target=\"_blank\" rel=\"noopener noreferrer sponsored\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</a></h4><div class=\"affiliate-product-card-meta\">")
+		var templ_7745c5c3_Var18 string
+		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(card.Name)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 180, Col: 173}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</a></h4><div class=\"affiliate-product-card-meta\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if card.PriceDisplay != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<span class=\"affiliate-product-card-price\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<span class=\"affiliate-product-card-price\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var11 string
-			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(card.PriceDisplay)
+			var templ_7745c5c3_Var19 string
+			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(card.PriceDisplay)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 126, Col: 67}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 184, Col: 67}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</span> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "</span> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
 		if card.Sales != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<span class=\"affiliate-product-card-sales\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<span class=\"affiliate-product-card-sales\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var12 string
-			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(card.Sales)
+			var templ_7745c5c3_Var20 string
+			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(card.Sales)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 129, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 187, Col: 60}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, " sold</span>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, " sold</span>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div><a class=\"affiliate-product-card-cta\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</div><a class=\"affiliate-product-card-cta\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var13 templ.SafeURL
-		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinURLErrs(AffiliateProductLinkHref(card.ProductID, card.AffiliateURL, card.TrackAdID, card.TrackAdZone))
+		var templ_7745c5c3_Var21 templ.SafeURL
+		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinURLErrs(AffiliateProductLinkHref(card.ProductID, card.AffiliateURL, card.TrackAdID, card.TrackAdZone))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 134, Col: 104}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 192, Col: 104}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" target=\"_blank\" rel=\"noopener noreferrer sponsored\"><img class=\"affiliate-product-card-cta-logo\" src=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var14 string
-		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/shopee-logo-white.svg"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 140, Col: 53}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\" target=\"_blank\" rel=\"noopener noreferrer sponsored\"><img class=\"affiliate-product-card-cta-logo\" src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\" alt=\"\" width=\"16\" height=\"16\"> Shop now</a></div></article>")
+		var templ_7745c5c3_Var22 string
+		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/shopee-logo-white.svg"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/affiliate_product_card.templ`, Line: 198, Col: 53}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var22)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\" alt=\"\" width=\"16\" height=\"16\"> Shop now</a></div></article>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -345,12 +524,27 @@ func AffiliateProductViewModal(card AffiliateProductCardData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var15 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var15 == nil {
-			templ_7745c5c3_Var15 = templ.NopComponent
+		templ_7745c5c3_Var23 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var23 == nil {
+			templ_7745c5c3_Var23 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<div class=\"modal-overlay\" id=\"affiliateViewModal\" role=\"presentation\"><div class=\"modal-dialog affiliates-product-view-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"affiliateViewModalTitle\"><div class=\"modal-header\"><h3 id=\"affiliateViewModalTitle\">Product preview</h3><button type=\"button\" class=\"modal-close affiliate-view-modal-close\" aria-label=\"Close\">&times;</button></div><div class=\"modal-body affiliates-product-view-modal-body\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<div class=\"modal-overlay\" id=\"affiliateViewModal\" role=\"presentation\"><div class=\"modal-dialog affiliates-product-view-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"affiliateViewModalTitle\"><div class=\"modal-header\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if card.Provider == constants.AffiliateProviderImpact {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "<h3 id=\"affiliateViewModalTitle\">Creative preview</h3>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<h3 id=\"affiliateViewModalTitle\">Product preview</h3>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<button type=\"button\" class=\"modal-close affiliate-view-modal-close\" aria-label=\"Close\">&times;</button></div><div class=\"modal-body affiliates-product-view-modal-body\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -358,7 +552,7 @@ func AffiliateProductViewModal(card AffiliateProductCardData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</div><div class=\"modal-footer affiliates-modal-footer\"><button type=\"button\" class=\"btn btn-secondary affiliate-view-modal-close\">Close</button></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "</div><div class=\"modal-footer affiliates-modal-footer\"><button type=\"button\" class=\"btn btn-secondary affiliate-view-modal-close\">Close</button></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -382,12 +576,12 @@ func AffiliateProductCardGrid(cards []AffiliateProductCardData) templ.Component 
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var16 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var16 == nil {
-			templ_7745c5c3_Var16 = templ.NopComponent
+		templ_7745c5c3_Var24 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var24 == nil {
+			templ_7745c5c3_Var24 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<div class=\"affiliate-product-card-grid\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "<div class=\"affiliate-product-card-grid\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -397,7 +591,7 @@ func AffiliateProductCardGrid(cards []AffiliateProductCardData) templ.Component 
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -421,12 +615,12 @@ func AffiliateProductCardStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var17 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var17 == nil {
-			templ_7745c5c3_Var17 = templ.NopComponent
+		templ_7745c5c3_Var25 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var25 == nil {
+			templ_7745c5c3_Var25 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<style>\r\n\t\t.affiliate-product-card-grid {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: repeat(auto-fill, minmax(220px, 1fr));\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card {\r\n\t\t\t--affiliate-shopee-orange: #ee4d2d;\r\n\t\t\t--affiliate-shopee-orange-dark: #d73211;\r\n\t\t\t--affiliate-shopee-surface: #fffaf8;\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tborder: 1px solid rgba(238, 77, 45, 0.18);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbox-shadow: 0 1px 2px rgba(238, 77, 45, 0.08);\r\n\t\t\theight: 100%;\r\n\t\t\toverflow: hidden;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-image-wrap {\r\n\t\t\tposition: relative;\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-include {\r\n\t\t\tposition: absolute;\r\n\t\t\ttop: var(--space-2);\r\n\t\t\tleft: var(--space-2);\r\n\t\t\tz-index: 2;\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\tmargin: 0;\r\n\t\t\tcursor: pointer;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-include-input {\r\n\t\t\tposition: absolute;\r\n\t\t\twidth: 1px;\r\n\t\t\theight: 1px;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: -1px;\r\n\t\t\toverflow: hidden;\r\n\t\t\tclip: rect(0, 0, 0, 0);\r\n\t\t\tborder: 0;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-include-box {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 1.25rem;\r\n\t\t\theight: 1.25rem;\r\n\t\t\tborder-radius: var(--radius-sm);\r\n\t\t\tborder: var(--pill-border);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-include-box::after {\r\n\t\t\tcontent: \"\";\r\n\t\t\twidth: 0.35rem;\r\n\t\t\theight: 0.625rem;\r\n\t\t\tborder: solid var(--color-primary-hover);\r\n\t\t\tborder-width: 0 2px 2px 0;\r\n\t\t\ttransform: rotate(45deg) scale(0);\r\n\t\t\tmargin-top: -2px;\r\n\t\t\ttransition: transform var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-include-input:checked + .affiliate-product-card-include-box::after {\r\n\t\t\ttransform: rotate(45deg) scale(1);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-include-input:focus-visible + .affiliate-product-card-include-box {\r\n\t\t\toutline: 2px solid var(--color-primary);\r\n\t\t\toutline-offset: 2px;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-image-link {\r\n\t\t\tdisplay: block;\r\n\t\t\taspect-ratio: 1 / 1;\r\n\t\t\tbackground: var(--affiliate-shopee-surface);\r\n\t\t\tborder-radius: 0;\r\n\t\t\toverflow: hidden;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-badge {\r\n\t\t\tposition: absolute;\r\n\t\t\ttop: 0.25rem;\r\n\t\t\tright: 0.25rem;\r\n\t\t\tz-index: 1;\r\n\t\t\tpadding: 0.0625rem 0.3125rem;\r\n\t\t\tfont-size: 0.5rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\tline-height: 1.35;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tcolor: #fff;\r\n\t\t\tbackground: var(--affiliate-shopee-orange);\r\n\t\t\tborder: none;\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tpointer-events: none;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-image {\r\n\t\t\twidth: 100%;\r\n\t\t\theight: 100%;\r\n\t\t\tobject-fit: contain;\r\n\t\t\tobject-position: center;\r\n\t\t\tdisplay: block;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-image-placeholder {\r\n\t\t\twidth: 100%;\r\n\t\t\theight: 100%;\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tflex: 1;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tpadding: var(--space-3);\r\n\t\t\tbackground: linear-gradient(180deg, #fff 0%, var(--affiliate-shopee-surface) 100%);\r\n\t\t\tborder-top: 1px solid rgba(238, 77, 45, 0.1);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-shop-row {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmin-height: 1.25rem;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-shop {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.02em;\r\n\t\t\tline-height: 1.3;\r\n\t\t\tmin-width: 0;\r\n\t\t\tflex: 1;\r\n\t\t\ttext-decoration: none;\r\n\t\t}\r\n\r\n\t\ta.affiliate-product-card-shop:hover {\r\n\t\t\tcolor: var(--affiliate-shopee-orange);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-shop--empty {\r\n\t\t\tmin-height: 0;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-help {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 1.25rem;\r\n\t\t\theight: 1.25rem;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: 0;\r\n\t\t\tmargin-top: 0;\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tborder: var(--pill-border);\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\tline-height: 1;\r\n\t\t\tcursor: help;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-help:hover {\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-title {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tline-height: 1.35;\r\n\t\t\tdisplay: -webkit-box;\r\n\t\t\t-webkit-line-clamp: 2;\r\n\t\t\t-webkit-box-orient: vertical;\r\n\t\t\toverflow: hidden;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-title a {\r\n\t\t\tcolor: inherit;\r\n\t\t\ttext-decoration: none;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-title a:hover {\r\n\t\t\tcolor: var(--affiliate-shopee-orange);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-meta {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: baseline;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-price {\r\n\t\t\tfont-size: 1.125rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\tcolor: var(--affiliate-shopee-orange);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-sales {\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-cta {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\tgap: 0.375rem;\r\n\t\t\tmargin-top: auto;\r\n\t\t\twidth: 100%;\r\n\t\t\tpadding: 0.5625rem var(--space-3);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tline-height: 1;\r\n\t\t\ttext-align: center;\r\n\t\t\ttext-decoration: none;\r\n\t\t\tbox-sizing: border-box;\r\n\t\t\tborder: none;\r\n\t\t\tborder-radius: var(--radius-sm);\r\n\t\t\tbackground: var(--affiliate-shopee-orange);\r\n\t\t\tcolor: #fff;\r\n\t\t\tcursor: pointer;\r\n\t\t\ttransition: background var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-cta:hover {\r\n\t\t\tbackground: var(--affiliate-shopee-orange-dark);\r\n\t\t\tcolor: #fff;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-cta-logo {\r\n\t\t\twidth: 1rem;\r\n\t\t\theight: 1rem;\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tdisplay: block;\r\n\t\t}\r\n\r\n\t\t.affiliates-import-preview-modal {\r\n\t\t\tmax-width: min(56rem, 96vw);\r\n\t\t\twidth: 100%;\r\n\t\t}\r\n\r\n\t\t.affiliates-import-preview-modal .modal-body {\r\n\t\t\tmax-height: min(70vh, 720px);\r\n\t\t\toverflow-y: auto;\r\n\t\t}\r\n\r\n\t\t.affiliates-product-view-modal {\r\n\t\t\tmax-width: 22rem;\r\n\t\t\twidth: 100%;\r\n\t\t}\r\n\r\n\t\t.affiliates-product-view-modal-body {\r\n\t\t\tpadding-top: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.affiliates-product-view-modal-body .affiliate-product-card {\r\n\t\t\tmax-width: 100%;\r\n\t\t}\r\n\r\n\t\t.affiliates-product-view-modal .modal-footer {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: flex-end;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.affiliates-product-view-modal .modal-footer .btn,\r\n\t\t.affiliates-product-view-modal .modal-footer .btn-secondary {\r\n\t\t\tmargin-top: 0;\r\n\t\t}\r\n\r\n\t\t.affiliates-import-preview-modal [data-tooltip]::after {\r\n\t\t\tcontent: none;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-shop-row [data-tooltip]::after {\r\n\t\t\tcontent: none;\r\n\t\t}\r\n\r\n\t\t#affiliateViewModalHost .modal-overlay {\r\n\t\t\tdisplay: flex;\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "<style>\r\n\t\t.affiliate-product-card-grid {\r\n\t\t\tdisplay: grid;\r\n\t\t\tgrid-template-columns: repeat(auto-fill, minmax(220px, 1fr));\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card {\r\n\t\t\t--affiliate-shopee-orange: #ee4d2d;\r\n\t\t\t--affiliate-shopee-orange-dark: #d73211;\r\n\t\t\t--affiliate-shopee-surface: #fffaf8;\r\n\t\t\t--affiliate-card-accent: var(--affiliate-shopee-orange);\r\n\t\t\t--affiliate-card-accent-dark: var(--affiliate-shopee-orange-dark);\r\n\t\t\t--affiliate-card-surface: var(--affiliate-shopee-surface);\r\n\t\t\t--affiliate-card-border: rgba(238, 77, 45, 0.18);\r\n\t\t\t--affiliate-card-shadow: rgba(238, 77, 45, 0.08);\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tborder: 1px solid var(--affiliate-card-border);\r\n\t\t\tborder-radius: var(--radius-md);\r\n\t\t\tbox-shadow: 0 1px 2px var(--affiliate-card-shadow);\r\n\t\t\theight: 100%;\r\n\t\t\toverflow: hidden;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card--impact-banner {\r\n\t\t\t--affiliate-card-accent: #1e3a5f;\r\n\t\t\t--affiliate-card-border: rgba(30, 58, 95, 0.18);\r\n\t\t\t--affiliate-card-shadow: rgba(15, 23, 42, 0.08);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-image-link--banner {\r\n\t\t\taspect-ratio: auto;\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-image--banner {\r\n\t\t\twidth: 100%;\r\n\t\t\theight: auto;\r\n\t\t\tmax-height: 20rem;\r\n\t\t\tobject-fit: contain;\r\n\t\t\tobject-position: center;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-image-placeholder--banner {\r\n\t\t\tmin-height: 8rem;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-grid .affiliate-product-card-image--banner {\r\n\t\t\tmax-height: 16rem;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-image-wrap {\r\n\t\t\tposition: relative;\r\n\t\t\tflex-shrink: 0;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-include {\r\n\t\t\tposition: absolute;\r\n\t\t\ttop: var(--space-2);\r\n\t\t\tleft: var(--space-2);\r\n\t\t\tz-index: 2;\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\tmargin: 0;\r\n\t\t\tcursor: pointer;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-include-input {\r\n\t\t\tposition: absolute;\r\n\t\t\twidth: 1px;\r\n\t\t\theight: 1px;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: -1px;\r\n\t\t\toverflow: hidden;\r\n\t\t\tclip: rect(0, 0, 0, 0);\r\n\t\t\tborder: 0;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-include-box {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 1.25rem;\r\n\t\t\theight: 1.25rem;\r\n\t\t\tborder-radius: var(--radius-sm);\r\n\t\t\tborder: var(--pill-border);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-include-box::after {\r\n\t\t\tcontent: \"\";\r\n\t\t\twidth: 0.35rem;\r\n\t\t\theight: 0.625rem;\r\n\t\t\tborder: solid var(--color-primary-hover);\r\n\t\t\tborder-width: 0 2px 2px 0;\r\n\t\t\ttransform: rotate(45deg) scale(0);\r\n\t\t\tmargin-top: -2px;\r\n\t\t\ttransition: transform var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-include-input:checked + .affiliate-product-card-include-box::after {\r\n\t\t\ttransform: rotate(45deg) scale(1);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-include-input:focus-visible + .affiliate-product-card-include-box {\r\n\t\t\toutline: 2px solid var(--color-primary);\r\n\t\t\toutline-offset: 2px;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-image-link {\r\n\t\t\tdisplay: block;\r\n\t\t\taspect-ratio: 1 / 1;\r\n\t\t\tbackground: var(--affiliate-shopee-surface);\r\n\t\t\tborder-radius: 0;\r\n\t\t\toverflow: hidden;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-badge {\r\n\t\t\tposition: absolute;\r\n\t\t\ttop: 0.25rem;\r\n\t\t\tright: 0.25rem;\r\n\t\t\tz-index: 1;\r\n\t\t\tpadding: 0.0625rem 0.3125rem;\r\n\t\t\tfont-size: 0.5rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\tline-height: 1.35;\r\n\t\t\tletter-spacing: 0.04em;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tcolor: #fff;\r\n\t\t\tbackground: var(--affiliate-card-accent);\r\n\t\t\tborder: none;\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tpointer-events: none;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-image {\r\n\t\t\twidth: 100%;\r\n\t\t\theight: 100%;\r\n\t\t\tobject-fit: contain;\r\n\t\t\tobject-position: center;\r\n\t\t\tdisplay: block;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-image-placeholder {\r\n\t\t\twidth: 100%;\r\n\t\t\theight: 100%;\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tflex: 1;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tpadding: var(--space-3);\r\n\t\t\tbackground: linear-gradient(180deg, #fff 0%, var(--affiliate-card-surface) 100%);\r\n\t\t\tborder-top: 1px solid rgba(238, 77, 45, 0.1);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-shop-row {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: space-between;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmin-height: 1.25rem;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-shop {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tletter-spacing: 0.02em;\r\n\t\t\tline-height: 1.3;\r\n\t\t\tmin-width: 0;\r\n\t\t\tflex: 1;\r\n\t\t\ttext-decoration: none;\r\n\t\t}\r\n\r\n\t\ta.affiliate-product-card-shop:hover {\r\n\t\t\tcolor: var(--affiliate-shopee-orange);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-shop--empty {\r\n\t\t\tmin-height: 0;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-help {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\twidth: 1.25rem;\r\n\t\t\theight: 1.25rem;\r\n\t\t\tpadding: 0;\r\n\t\t\tmargin: 0;\r\n\t\t\tmargin-top: 0;\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tborder: var(--pill-border);\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.75rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\tline-height: 1;\r\n\t\t\tcursor: help;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-help:hover {\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tbackground: var(--color-muted);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-title {\r\n\t\t\tmargin: 0;\r\n\t\t\tfont-size: 0.9375rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tline-height: 1.35;\r\n\t\t\tdisplay: -webkit-box;\r\n\t\t\t-webkit-line-clamp: 2;\r\n\t\t\t-webkit-box-orient: vertical;\r\n\t\t\toverflow: hidden;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-title a {\r\n\t\t\tcolor: inherit;\r\n\t\t\ttext-decoration: none;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-title a:hover {\r\n\t\t\tcolor: var(--affiliate-shopee-orange);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-meta {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: baseline;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-price {\r\n\t\t\tfont-size: 1.125rem;\r\n\t\t\tfont-weight: 700;\r\n\t\t\tcolor: var(--affiliate-shopee-orange);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-sales {\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-cta {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\tgap: 0.375rem;\r\n\t\t\tmargin-top: auto;\r\n\t\t\twidth: 100%;\r\n\t\t\tpadding: 0.5625rem var(--space-3);\r\n\t\t\tfont-size: 0.8125rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t\tline-height: 1;\r\n\t\t\ttext-align: center;\r\n\t\t\ttext-decoration: none;\r\n\t\t\tbox-sizing: border-box;\r\n\t\t\tborder: none;\r\n\t\t\tborder-radius: var(--radius-sm);\r\n\t\t\tbackground: var(--affiliate-card-accent);\r\n\t\t\tcolor: #fff;\r\n\t\t\tcursor: pointer;\r\n\t\t\ttransition: background var(--transition-fast);\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-cta:hover {\r\n\t\t\tbackground: var(--affiliate-card-accent-dark);\r\n\t\t\tcolor: #fff;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-cta-logo {\r\n\t\t\twidth: 1rem;\r\n\t\t\theight: 1rem;\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tdisplay: block;\r\n\t\t}\r\n\r\n\t\t.affiliates-import-preview-modal {\r\n\t\t\tmax-width: min(56rem, 96vw);\r\n\t\t\twidth: 100%;\r\n\t\t}\r\n\r\n\t\t.affiliates-import-preview-modal .modal-body {\r\n\t\t\tmax-height: min(70vh, 720px);\r\n\t\t\toverflow-y: auto;\r\n\t\t}\r\n\r\n\t\t.affiliates-product-view-modal {\r\n\t\t\tmax-width: 22rem;\r\n\t\t\twidth: 100%;\r\n\t\t}\r\n\r\n\t\t.affiliates-product-view-modal-body {\r\n\t\t\tpadding-top: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.affiliates-product-view-modal-body .affiliate-product-card {\r\n\t\t\tmax-width: 100%;\r\n\t\t}\r\n\r\n\t\t.affiliates-product-view-modal .modal-footer {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: flex-end;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.affiliates-product-view-modal .modal-footer .btn,\r\n\t\t.affiliates-product-view-modal .modal-footer .btn-secondary {\r\n\t\t\tmargin-top: 0;\r\n\t\t}\r\n\r\n\t\t.affiliates-import-preview-modal [data-tooltip]::after {\r\n\t\t\tcontent: none;\r\n\t\t}\r\n\r\n\t\t.affiliate-product-card-shop-row [data-tooltip]::after {\r\n\t\t\tcontent: none;\r\n\t\t}\r\n\r\n\t\t#affiliateViewModalHost .modal-overlay {\r\n\t\t\tdisplay: flex;\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -450,12 +644,12 @@ func AffiliatesViewModalScripts() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var18 == nil {
-			templ_7745c5c3_Var18 = templ.NopComponent
+		templ_7745c5c3_Var26 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var26 == nil {
+			templ_7745c5c3_Var26 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<script>\r\n\t\t(function () {\r\n\t\t\tif (window.__affiliateViewModalScriptsBound) return;\r\n\t\t\twindow.__affiliateViewModalScriptsBound = true;\r\n\r\n\t\t\twindow.closeAffiliateViewModal = function () {\r\n\t\t\t\tconst host = document.getElementById('affiliateViewModalHost');\r\n\t\t\t\tif (host) host.innerHTML = '';\r\n\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t};\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tif (!evt.detail.target || evt.detail.target.id !== 'affiliateViewModalHost') return;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\tconst closeBtn = evt.detail.target.querySelector('.affiliate-view-modal-close');\r\n\t\t\t\tif (closeBtn) closeBtn.focus();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tif (e.target.closest('.affiliate-view-modal-close')) {\r\n\t\t\t\t\twindow.closeAffiliateViewModal();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst overlay = e.target.closest('#affiliateViewModal');\r\n\t\t\t\tif (overlay && e.target === overlay) window.closeAffiliateViewModal();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key !== 'Escape' || !document.getElementById('affiliateViewModal')) return;\r\n\t\t\t\twindow.closeAffiliateViewModal();\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "<script>\r\n\t\t(function () {\r\n\t\t\tif (window.__affiliateViewModalScriptsBound) return;\r\n\t\t\twindow.__affiliateViewModalScriptsBound = true;\r\n\r\n\t\t\twindow.closeAffiliateViewModal = function () {\r\n\t\t\t\tconst host = document.getElementById('affiliateViewModalHost');\r\n\t\t\t\tif (host) host.innerHTML = '';\r\n\t\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t\t};\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tif (!evt.detail.target || evt.detail.target.id !== 'affiliateViewModalHost') return;\r\n\t\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\t\tconst closeBtn = evt.detail.target.querySelector('.affiliate-view-modal-close');\r\n\t\t\t\tif (closeBtn) closeBtn.focus();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\tif (e.target.closest('.affiliate-view-modal-close')) {\r\n\t\t\t\t\twindow.closeAffiliateViewModal();\r\n\t\t\t\t\treturn;\r\n\t\t\t\t}\r\n\t\t\t\tconst overlay = e.target.closest('#affiliateViewModal');\r\n\t\t\t\tif (overlay && e.target === overlay) window.closeAffiliateViewModal();\r\n\t\t\t});\r\n\r\n\t\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\t\tif (e.key !== 'Escape' || !document.getElementById('affiliateViewModal')) return;\r\n\t\t\t\twindow.closeAffiliateViewModal();\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

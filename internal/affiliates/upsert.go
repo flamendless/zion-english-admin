@@ -3,9 +3,22 @@ package affiliates
 import (
 	"net/url"
 	"strings"
+
+	"zion-english/internal/constants"
 )
 
 func CatalogKey(itemID, productURL string) string {
+	return CatalogKeyForProvider(constants.AffiliateProviderShopee, itemID, productURL)
+}
+
+func CatalogKeyForProvider(provider constants.AffiliateProvider, itemID, productURL string) string {
+	if provider == constants.AffiliateProviderImpact {
+		itemID = strings.TrimSpace(itemID)
+		if itemID == "" {
+			return ""
+		}
+		return "impact:" + itemID
+	}
 	itemID = strings.TrimSpace(itemID)
 	if itemID != "" {
 		return "item:" + itemID
@@ -38,6 +51,7 @@ func NormalizeProductURL(raw string) string {
 
 type CatalogRow struct {
 	ID             int64
+	Provider       constants.AffiliateProvider
 	ItemID         string
 	ProductURL     string
 	AffiliateURL   string
@@ -48,12 +62,15 @@ type CatalogRow struct {
 	CommissionRate string
 	Commission     string
 	ThumbnailURL   string
+	ProgramID      string
+	ImpactState    string
+	ImpactAdType   string
 }
 
 func BuildCatalogIndex(rows []CatalogRow) map[string]CatalogRow {
 	out := make(map[string]CatalogRow, len(rows))
 	for _, row := range rows {
-		key := CatalogKey(row.ItemID, row.ProductURL)
+		key := CatalogKeyForProvider(row.Provider, row.ItemID, row.ProductURL)
 		if key == "" {
 			continue
 		}
@@ -65,8 +82,8 @@ func BuildCatalogIndex(rows []CatalogRow) map[string]CatalogRow {
 	return out
 }
 
-func FindExisting(index map[string]CatalogRow, itemID, productURL string) (CatalogRow, bool) {
-	key := CatalogKey(itemID, productURL)
+func FindExisting(index map[string]CatalogRow, provider constants.AffiliateProvider, itemID, productURL string) (CatalogRow, bool) {
+	key := CatalogKeyForProvider(provider, itemID, productURL)
 	if key == "" {
 		return CatalogRow{}, false
 	}

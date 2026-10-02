@@ -33,8 +33,17 @@ type AffiliateAdsReportProductItem struct {
 	ID           string
 	Name         string
 	ShopName     string
+	Provider     constants.AffiliateProvider
 	ThumbnailURL string
 	ClickCount   int64
+}
+
+type AffiliateAdsReportProviderSummary struct {
+	Provider            constants.AffiliateProvider
+	Label               string
+	ProductCount        int64
+	TotalClicks         int64
+	ProductsWithClicks  int64
 }
 
 type AffiliateAdsReportAdItem struct {
@@ -59,16 +68,18 @@ type AffiliateAdsReportsChartSummary struct {
 }
 
 type AffiliateAdsReportsChartData struct {
-	TopProducts    []AffiliateAdsReportChartPoint  `json:"topProducts"`
-	TopAds         []AffiliateAdsReportChartPoint  `json:"topAds"`
-	TopTeachers    []AffiliateAdsReportChartPoint  `json:"topTeachers"`
-	ClicksByAdZone []AffiliateAdsReportChartPoint  `json:"clicksByAdZone"`
-	Summary        AffiliateAdsReportsChartSummary `json:"summary"`
+	TopProducts      []AffiliateAdsReportChartPoint  `json:"topProducts"`
+	TopAds           []AffiliateAdsReportChartPoint  `json:"topAds"`
+	TopTeachers      []AffiliateAdsReportChartPoint  `json:"topTeachers"`
+	ClicksByAdZone   []AffiliateAdsReportChartPoint  `json:"clicksByAdZone"`
+	ClicksByProvider []AffiliateAdsReportChartPoint  `json:"clicksByProvider"`
+	Summary          AffiliateAdsReportsChartSummary `json:"summary"`
 }
 
 type AffiliateAdsReportsPageData struct {
-	Summary     AffiliateAdsReportSummary
-	TopProducts []AffiliateAdsReportProductItem
+	Summary           AffiliateAdsReportSummary
+	ProviderSummaries []AffiliateAdsReportProviderSummary
+	TopProducts       []AffiliateAdsReportProductItem
 	TopAds      []AffiliateAdsReportAdItem
 	TopTeachers []AffiliateAdsReportTeacherItem
 	TopAdZones  []AffiliateAdsReportAdZoneItem
@@ -123,6 +134,18 @@ templ AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) {
 				</div>
 			</div>
 
+			if len(data.ProviderSummaries) > 0 {
+				<div class="dashboard-stats affiliate-ads-reports-provider-summary">
+					for _, row := range data.ProviderSummaries {
+						<div class="stat-card">
+							<span class="stat-label">{ row.Label }</span>
+							<span class="stat-sub">{ fmt.Sprintf("%d products · %d clicks", row.ProductCount, row.TotalClicks) }</span>
+							<span class="stat-value">{ fmt.Sprintf("%d with clicks", row.ProductsWithClicks) }</span>
+						</div>
+					}
+				</div>
+			}
+
 			<section class="affiliate-ads-reports-block" aria-labelledby="affiliateAdsReportsChartsTitle">
 				<h3 class="affiliate-ads-reports-block-title" id="affiliateAdsReportsChartsTitle">Performance charts</h3>
 				<div class="affiliate-ads-reports-charts">
@@ -133,6 +156,15 @@ templ AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) {
 						</div>
 						<div class="affiliate-ads-reports-chart-wrap affiliate-ads-reports-chart-wrap--bars">
 							<canvas id="topAffiliateProductsChart" role="img" aria-label="Bar chart of top affiliate links by clicks"></canvas>
+						</div>
+					</div>
+					<div class="affiliate-ads-reports-chart-card affiliate-ads-reports-chart-card--compact">
+						<div class="affiliate-ads-reports-chart-card-head">
+							<h4 class="affiliate-ads-reports-chart-title">Clicks by provider</h4>
+							<p class="affiliate-ads-reports-chart-hint">Lifetime clicks grouped by Shopee vs Impact catalog.</p>
+						</div>
+						<div class="affiliate-ads-reports-chart-wrap affiliate-ads-reports-chart-wrap--bars">
+							<canvas id="clicksByProviderChart" role="img" aria-label="Bar chart of clicks by affiliate provider"></canvas>
 						</div>
 					</div>
 					<div class="affiliate-ads-reports-chart-card affiliate-ads-reports-chart-card--compact">
@@ -191,7 +223,10 @@ templ AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) {
 									}
 									<div class="affiliate-ads-reports-leaderboard-body">
 										<span class="affiliate-ads-reports-leaderboard-name" title={ item.Name }>{ item.Name }</span>
-										<span class="affiliate-ads-reports-leaderboard-meta">{ affiliateAdsReportCellText(item.ShopName) }</span>
+										<span class="affiliate-ads-reports-leaderboard-meta">
+											@StatusPill(constants.AffiliateProviderLabel(item.Provider), affiliateAdsReportProviderPillTone(item.Provider), false)
+											{ affiliateAdsReportCellText(item.ShopName) }
+										</span>
 									</div>
 									@Pill(fmt.Sprintf("%d clicks", item.ClickCount), PillToneInfo)
 								</li>
@@ -295,6 +330,15 @@ func affiliateAdsReportCellText(s string) string {
 		return "-"
 	}
 	return s
+}
+
+func affiliateAdsReportProviderPillTone(provider constants.AffiliateProvider) PillTone {
+	switch provider {
+	case constants.AffiliateProviderImpact:
+		return PillToneInfo
+	default:
+		return PillToneWarning
+	}
 }
 
 templ AffiliateAdsReportsPageStyles() {
