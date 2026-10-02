@@ -95,6 +95,8 @@ WHERE rowid NOT IN (
 DELETE FROM tbl_affiliate_products
 WHERE trim(item_id) != ''
 	AND id NOT IN (SELECT keep_id FROM affiliate_product_keeper);
+
+DROP TABLE IF EXISTS affiliate_product_keeper;
 -- +goose StatementEnd
 
 -- +goose StatementBegin
