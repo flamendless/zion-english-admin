@@ -21,6 +21,8 @@ const (
 	NavIconAnalytics           NavIconKind = "analytics"
 	NavIconAffiliateAdsReports NavIconKind = "affiliate-ads-reports"
 	NavIconPayments            NavIconKind = "payments"
+	NavIconMyEarnings          NavIconKind = "my-earnings"
+	NavIconTeachersEarnings    NavIconKind = "teachers-earnings"
 	NavIconProcess             NavIconKind = "process"
 	NavIconFeatureFlags        NavIconKind = "feature-flags"
 	NavIconSettings            NavIconKind = "settings"
@@ -66,6 +68,8 @@ var navIconByPath = map[string]NavIconKind{
 	"/affiliate-ads/reports": NavIconAffiliateAdsReports,
 	"/analytics":             NavIconAnalytics,
 	"/payments":              NavIconPayments,
+	"/my-earnings":           NavIconMyEarnings,
+	"/teachers-earnings":     NavIconTeachersEarnings,
 	"/student-relationships": NavIconStudents,
 	"/process":               NavIconProcess,
 	"/feature-flags":         NavIconFeatureFlags,
@@ -108,6 +112,8 @@ var navIconToneByKind = map[NavIconKind]NavIconTone{
 	NavIconAnalytics:           NavIconToneInfo,
 	NavIconAffiliateAdsReports: NavIconToneInfo,
 	NavIconPayments:            NavIconToneSuccess,
+	NavIconMyEarnings:          NavIconToneSuccess,
+	NavIconTeachersEarnings:    NavIconToneSuccess,
 	NavIconProcess:             NavIconToneWarning,
 	NavIconFeatureFlags:        NavIconToneWarning,
 	NavIconSettings:            NavIconToneWarning,

@@ -1,0 +1,131 @@
+package frontend
+
+import "fmt"
+import "zion-english/internal/utils"
+
+templ MyEarnings(rows []EarningsCutoffRow, emptyMsg string) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		@AdminPageHead("My Earnings - Zion English Admin Tool")
+		<style>
+			.earnings-toolbar button {
+				margin-top: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@HubHeader("My Earnings", "", "Conducted-class totals for each payroll cutoff from your first class through today.", false)
+			<div class="table-wrapper">
+				@EarningsCutoffTable(rows, emptyMsg)
+			</div>
+		</div>
+	</body>
+	</html>
+}
+
+templ TeachersEarnings() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		@AdminPageHead("Teachers Earnings - Zion English Admin Tool")
+		<style>
+			.earnings-toolbar {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: flex-end;
+				gap: var(--space-3);
+				margin-bottom: var(--space-4);
+			}
+
+			.earnings-toolbar .form-group {
+				margin-bottom: 0;
+			}
+
+			.earnings-toolbar button {
+				margin-top: 0;
+				height: 36px;
+				display: inline-flex;
+				align-items: center;
+				padding: 0 var(--space-3);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@HubHeader("Teachers Earnings", "", "Choose a teacher to view payroll cutoff earnings history.", false)
+			<div class="earnings-toolbar" id="teachersEarningsFilters">
+				@ClassesTeacherFilterSearch()
+				<button
+					type="button"
+					id="teachersEarningsViewBtn"
+					hx-get={ utils.URL("/teachers-earnings/partials/rows") }
+					hx-include="#teachersEarningsFilters"
+					hx-target="#teachersEarningsTableBody"
+					hx-swap={ HxSwapInnerHTML }
+				>View earnings</button>
+			</div>
+			<div class="table-wrapper">
+				<table class="table-stack-mobile earnings-cutoff-table">
+					<thead>
+						<tr>
+							<th>Month</th>
+							<th>Cutoff</th>
+							<th>Period</th>
+							<th>Earnings</th>
+							<th>Conducted</th>
+						</tr>
+					</thead>
+					<tbody id="teachersEarningsTableBody">
+						@EarningsCutoffTableBody(nil, "Select a teacher to view earnings history.")
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</body>
+	</html>
+}
+
+templ EarningsCutoffTable(rows []EarningsCutoffRow, emptyMsg string) {
+	<table class="table-stack-mobile earnings-cutoff-table">
+		<thead>
+			<tr>
+				<th>Month</th>
+				<th>Cutoff</th>
+				<th>Period</th>
+				<th>Earnings</th>
+				<th>Conducted</th>
+			</tr>
+		</thead>
+		<tbody>
+			@EarningsCutoffTableBody(rows, emptyMsg)
+		</tbody>
+	</table>
+}
+
+templ EarningsCutoffTableBody(rows []EarningsCutoffRow, emptyMsg string) {
+	if len(rows) == 0 {
+		<tr>
+			<td colspan="5" class="empty-state">{ emptyMsg }</td>
+		</tr>
+	} else {
+		for _, row := range rows {
+			@EarningsCutoffTableRow(row)
+		}
+	}
+}
+
+templ EarningsCutoffTableRow(row EarningsCutoffRow) {
+	<tr>
+		<td data-label="Month">{ row.MonthLabel }</td>
+		<td data-label="Cutoff">{ row.CutoffKind.Label() }</td>
+		<td data-label="Period">{ row.PeriodLabel }</td>
+		<td data-label="Earnings">
+			@templ.Raw(row.EarningsHTML())
+		</td>
+		<td data-label="Conducted">{ fmt.Sprintf("%d", row.Conducted) }</td>
+	</tr>
+}

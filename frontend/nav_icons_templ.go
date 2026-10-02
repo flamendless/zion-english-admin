@@ -225,7 +225,7 @@ func NavIconSVG(kind NavIconKind) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-		case NavIconPayments:
+		case NavIconPayments, NavIconMyEarnings, NavIconTeachersEarnings:
 			templ_7745c5c3_Err = navIconSVGCreditCard().Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

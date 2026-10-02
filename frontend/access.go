@@ -94,6 +94,8 @@ var navItemDefs = []navItemDef{
 	{Path: "/reports", LinkID: "reportsLink", Title: "Reports", Description: "View teacher payroll reports by cutoff period", AdminOnlyCard: true},
 	{Path: "/reports/history", LinkID: "reportsHistoryLink", Title: "Reports History", Description: "Browse cached teacher payroll report generations", AdminOnlyCard: true},
 	{Path: "/analytics", LinkID: "analyticsLink", Title: "Analytics", TeacherTitle: "My Analytics", Description: "Attendance, utilization, and student retention insights", TeacherDesc: "View attendance and utilization for your classes"},
+	{Path: "/my-earnings", LinkID: "myEarningsLink", Title: "My Earnings", Description: "Payroll cutoff earnings history for your conducted classes", FeatureCard: true},
+	{Path: "/teachers-earnings", LinkID: "teachersEarningsLink", Title: "Teachers Earnings", Description: "View payroll cutoff earnings history for any teacher", AdminOnlyCard: true},
 	{Path: "/payments", LinkID: "paymentsLink", Title: "Payment History", TeacherTitle: "My Payment History", Description: "View teacher payment records and receipt status", TeacherDesc: "View your payment records and receipt status", AdminOnlyCard: true},
 	{Path: "/student-relationships", LinkID: "studentRelationshipsLink", Title: "Students Relationship Diagram", Description: "Visual family groupings and linked student relationships", AdminOnlyCard: true},
 	{Path: "/affiliate-ads/reports", LinkID: "affiliateAdsReportsLink", Title: "Ads/Affiliates", Description: "Affiliate link click totals and ad placement summaries", AdminOnlyCard: true},
@@ -113,8 +115,8 @@ var navGroupDefs = []navGroupDef{
 	{ID: "classes", Label: "Classes", Description: "View classes, schedules, and repeating series", TeacherDesc: "View and record classes, schedules, and repeating series", FeatureCard: true, Paths: []string{"/classes", "/schedule", "/schedule/series"}},
 	{ID: "people", Label: "People", Description: "Manage teachers and students", AdminOnlyCard: true, Paths: []string{"/teachers", "/students"}},
 	{ID: "resources", Label: "Resources", Description: "Guides, documents, learning materials, and training videos", TeacherDesc: "Guides, your documents, learning materials, and training videos", FeatureCard: true, Paths: []string{"/guides", "/documents", "/intro-videos", "/learning-materials", "/training-materials"}},
-	{ID: "insights", Label: "Insights", Description: "Payroll reports and analytics", AdminOnlyCard: true, Paths: []string{"/reports", "/reports/history", "/analytics", "/payments", "/student-relationships", "/affiliate-ads/reports"}},
-	{ID: "admin", Label: "Admin", Description: "Process CSV files, feature flags, meta tags, affiliates, ads, plans, settings, logs, and upload logs", AdminOnlyCard: true, Paths: []string{"/process", "/feature-flags", "/meta", "/affiliates", "/ads", "/plans", "/settings", "/logs", "/upload-logs"}},
+	{ID: "insights", Label: "Insights", Description: "Payroll reports and analytics", AdminOnlyCard: true, Paths: []string{"/reports", "/reports/history", "/analytics", "/my-earnings", "/payments", "/student-relationships", "/affiliate-ads/reports"}},
+	{ID: "admin", Label: "Admin", Description: "Process CSV files, feature flags, meta tags, affiliates, ads, plans, settings, logs, and upload logs", AdminOnlyCard: true, Paths: []string{"/process", "/feature-flags", "/meta", "/affiliates", "/ads", "/plans", "/settings", "/logs", "/upload-logs", "/teachers-earnings"}},
 }
 
 var adminNavLayout = []navLayoutEntry{
@@ -134,6 +136,7 @@ var teacherNavLayout = []navLayoutEntry{
 	{LinkPath: "/my-students"},
 	{GroupID: "classes"},
 	{LinkPath: "/analytics"},
+	{LinkPath: "/my-earnings"},
 	{LinkPath: "/exports"},
 	{LinkPath: "/payments"},
 	{LinkPath: "/logs"},
@@ -380,6 +383,12 @@ func IsNavAccessible(role auth.Role, path string) bool {
 		if path == "/my-students" {
 			return false
 		}
+		if path == "/my-earnings" && role == auth.RoleSuperuser {
+			return false
+		}
+		if path == "/teachers-earnings" {
+			return true
+		}
 		if role == auth.RoleSuperuser && path == "/profile" {
 			return false
 		}
@@ -405,7 +414,7 @@ func IsNavAccessible(role auth.Role, path string) bool {
 		return false
 	case "/students/register":
 		return true
-	case "/classes", "/classes/record", "/schedule", "/schedule/record", "/schedule/repeat", "/schedule/series", "/profile", "/logs", "/upload-logs", "/my-students", "/documents", "/intro-videos", "/analytics", "/exports", "/payments", "/guides", "/learning-materials", "/training-materials":
+	case "/classes", "/classes/record", "/schedule", "/schedule/record", "/schedule/repeat", "/schedule/series", "/profile", "/logs", "/upload-logs", "/my-students", "/documents", "/intro-videos", "/analytics", "/my-earnings", "/exports", "/payments", "/guides", "/learning-materials", "/training-materials":
 		return true
 	default:
 		return false

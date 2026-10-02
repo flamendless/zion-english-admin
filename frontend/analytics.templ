@@ -285,6 +285,7 @@ templ Analytics(data AnalyticsData) {
 		<script>
 			const pageRoot = document.querySelector('.analytics-page');
 			const isSuperuser = pageRoot && pageRoot.dataset.isSuperuser === 'true';
+			const isPro = pageRoot && pageRoot.dataset.isPro === 'true';
 			const filterBtn = document.getElementById('filterBtn');
 			const analyticsLoading = document.getElementById('analyticsLoading');
 			const analyticsContent = document.getElementById('analyticsContent');
@@ -466,13 +467,17 @@ templ Analytics(data AnalyticsData) {
 			}
 
 			function renderRetention(retention) {
+				const container = document.getElementById('retentionCards');
+				if (!container) {
+					return;
+				}
 				const cards = [
 					{ label: 'Active Students', value: retention.activeCount },
 					{ label: 'Inactive Students', value: retention.inactiveCount },
 					{ label: 'Churned in Period', value: retention.churnedInPeriod },
 					{ label: 'Median Tenure', value: retention.medianTenureDays + ' days', sub: 'inactive students in period' }
 				];
-				document.getElementById('retentionCards').innerHTML = cards.map(function (card) {
+				container.innerHTML = cards.map(function (card) {
 					const sub = card.sub ? '<span class="stat-sub">' + escapeHTML(card.sub) + '</span>' : '';
 					return '<div class="stat-card"><span class="stat-label">' + escapeHTML(card.label) +
 						'</span><span class="stat-value">' + escapeHTML(card.value) + '</span>' + sub + '</div>';
@@ -480,6 +485,9 @@ templ Analytics(data AnalyticsData) {
 			}
 
 			function renderTableBody(tbody, rows, emptyMessage) {
+				if (!tbody) {
+					return;
+				}
 				if (!rows || rows.length === 0) {
 					tbody.innerHTML = '<tr><td colspan="20" class="empty-state">' + escapeHTML(emptyMessage) + '</td></tr>';
 					return;
@@ -530,6 +538,9 @@ templ Analytics(data AnalyticsData) {
 
 			function renderWeekly(rows) {
 				const tbody = document.getElementById('weeklyTableBody');
+				if (!tbody) {
+					return;
+				}
 				const sorted = sortRows(rows, {
 					name: function (row) { return row.weekLabel || ''; },
 					conducted: function (row) { return row.conducted || 0; },
@@ -581,6 +592,9 @@ templ Analytics(data AnalyticsData) {
 
 			function renderStudents(rows) {
 				const tbody = document.getElementById('studentTableBody');
+				if (!tbody) {
+					return;
+				}
 				const sorted = sortRows(rows, {
 					name: function (row) { return row.studentName || ''; },
 					conducted: function (row) { return row.conducted || 0; },
@@ -607,13 +621,16 @@ templ Analytics(data AnalyticsData) {
 			}
 
 			function renderNoShows(rows) {
-				const tbody = document.getElementById('noShowTable');
-				const colCount = isSuperuser ? 5 : 4;
-				if (!rows || rows.length === 0) {
-					document.getElementById('noShowTableBody').innerHTML = '<tr><td colspan="' + colCount + '" class="empty-state">No no-shows in this period.</td></tr>';
+				const tbody = document.getElementById('noShowTableBody');
+				if (!tbody) {
 					return;
 				}
-				document.getElementById('noShowTableBody').innerHTML = rows.map(function (row) {
+				const colCount = isSuperuser ? 5 : 4;
+				if (!rows || rows.length === 0) {
+					tbody.innerHTML = '<tr><td colspan="' + colCount + '" class="empty-state">No no-shows in this period.</td></tr>';
+					return;
+				}
+				tbody.innerHTML = rows.map(function (row) {
 					let html = '<tr><td data-label="Date">' + escapeHTML(row.scheduledDate) +
 						'</td><td data-label="Student">' + escapeHTML(row.studentName) + '</td>';
 					if (isSuperuser) {
@@ -658,6 +675,9 @@ templ Analytics(data AnalyticsData) {
 				renderTrialSummary(data.trialSummary);
 				if (window.analyticsCharts) {
 					window.analyticsCharts.renderAll(data);
+				}
+				if (!isPro) {
+					return;
 				}
 				renderWeekly(data.weekly);
 				renderTeachers(data.byTeacher);
@@ -719,7 +739,7 @@ templ Analytics(data AnalyticsData) {
 			if (sortOrderToggle) {
 				sortOrderToggle.addEventListener('click', function () {
 					window.setTimeout(function () {
-						if (analyticsCache) {
+						if (analyticsCache && isPro) {
 							teacherPage = 1;
 							studentPage = 1;
 							renderTeachers(analyticsCache.byTeacher);

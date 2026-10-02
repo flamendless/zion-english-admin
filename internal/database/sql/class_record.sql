@@ -284,3 +284,9 @@ WHERE cr.date >= ? AND cr.date <= ?
 	AND s.parent_currency != ''
 	AND (? = 0 OR cr.teacher_id = ?)
 GROUP BY s.parent_currency;
+
+-- name: GetMinClassRecordDateForTeacher :one
+SELECT MIN(cr.date) AS min_date
+FROM tbl_class_records cr
+WHERE cr.deleted_at IS NULL
+	AND cr.teacher_id = ?;

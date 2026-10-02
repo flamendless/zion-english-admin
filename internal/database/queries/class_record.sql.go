@@ -810,6 +810,20 @@ func (q *Queries) GetClassesListFiltered(ctx context.Context, arg GetClassesList
 	return items, nil
 }
 
+const getMinClassRecordDateForTeacher = `-- name: GetMinClassRecordDateForTeacher :one
+SELECT MIN(cr.date) AS min_date
+FROM tbl_class_records cr
+WHERE cr.deleted_at IS NULL
+	AND cr.teacher_id = ?
+`
+
+func (q *Queries) GetMinClassRecordDateForTeacher(ctx context.Context, teacherID int64) (interface{}, error) {
+	row := q.db.QueryRowContext(ctx, getMinClassRecordDateForTeacher, teacherID)
+	var min_date interface{}
+	err := row.Scan(&min_date)
+	return min_date, err
+}
+
 const getTotalRateByTeacherAndDateRange = `-- name: GetTotalRateByTeacherAndDateRange :one
 SELECT COALESCE(SUM(cr.rate), 0) as total_rate
 FROM tbl_class_records cr
