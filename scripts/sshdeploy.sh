@@ -104,11 +104,21 @@ fi
 
 git reset --hard origin/master
 
+# Prefer slower compiles over RAM/CPU spikes that can hang prod or OOM the VPS.
+export GOMAXPROCS=1
+run_low_priority() {
+	if command -v nice >/dev/null 2>&1; then
+		nice -n 10 "$@"
+	else
+		"$@"
+	fi
+}
+
 echo "Syncing Go modules..."
 go mod download
 
 echo "Installing/updating Go tools..."
-go install tool
+run_low_priority go install tool
 
 if [ -f .env ]; then
 	set -a
@@ -121,6 +131,18 @@ GOOSE_DRIVER="${GOOSE_DRIVER:-sqlite3}"
 GOOSE_DBSTRING="${GOOSE_DBSTRING:-./data/zion.db}"
 GOOSE_MIGRATION_DIR="${GOOSE_MIGRATION_DIR:-./migrations/sqlite3}"
 
+echo "Generating sqlc..."
+run_low_priority ./run.sh gensql
+
+echo "Generating templ..."
+run_low_priority ./run.sh gentempl
+
+mkdir -p ./tmp
+BIN_NEW="${BIN}.new"
+echo "Building $BIN_NEW (GOMAXPROCS=1, -p 1; may take longer)..."
+run_low_priority go build -p 1 -ldflags="-s -w" -o "$BIN_NEW" .
+mv -f "$BIN_NEW" "$BIN"
+
 echo "Stopping existing process..."
 if pgrep -af "$PROCESS_PATTERN" >/dev/null 2>&1; then
 	pkill -f "$PROCESS_PATTERN" || true
@@ -132,16 +154,6 @@ fi
 echo "Running migrations..."
 export GOOSE_DRIVER GOOSE_DBSTRING GOOSE_MIGRATION_DIR
 go tool goose up
-
-echo "Generating sqlc..."
-./run.sh gensql
-
-echo "Generating templ..."
-./run.sh gentempl
-
-mkdir -p ./tmp
-echo "Building $BIN..."
-go build -o "$BIN" .
 
 RUN_CMD=("$BIN" web -p "$PORT" "${WEB_ARGS[@]}")
 echo "Starting web server with: ${RUN_CMD[*]}"
