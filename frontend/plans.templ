@@ -152,6 +152,9 @@ templ PlansPage(data PlansPageData) {
 			.plan-modal-history .table-wrapper {
 				margin: 0;
 			}
+			.plans-list-toolbar {
+				margin-bottom: var(--space-4);
+			}
 		</style>
 	</head>
 	<body>
@@ -160,13 +163,17 @@ templ PlansPage(data PlansPageData) {
 			@SuccessBanner()
 			@HubHeader("Plans", "Grant Teacher Pro and review plan transaction history.", "", false)
 
+			<div class="list-toolbar plans-list-toolbar">
+				@DataListViewToggle()
+			</div>
+
 			<div class="plans-layout">
 				<section class="plans-section" aria-labelledby="plansTeachersHeading">
 					<div class="plans-section-header">
 						<h2 id="plansTeachersHeading">Teachers</h2>
 						<p>View plan details or grant Teacher Pro for a teacher.</p>
 					</div>
-					<div class="table-wrapper">
+					<div class="table-wrapper data-list-view-root">
 						<table class="table-stack-mobile" id="plansTeachersTable">
 							<thead>
 								<tr>
@@ -194,7 +201,7 @@ templ PlansPage(data PlansPageData) {
 						<h2 id="plansHistoryHeading">Plan transactions</h2>
 						<p>Recent grants and revocations across all teachers.</p>
 					</div>
-					<div class="table-wrapper">
+					<div class="table-wrapper data-list-view-root">
 						<table class="table-stack-mobile" id="plansHistoryTable">
 							<thead>
 								<tr>
@@ -295,7 +302,7 @@ templ PlansTeacherViewModal(data PlansTeacherViewModalData) {
 					}
 				</div>
 				<div class="profile-tab-panel plan-modal-history" role="tabpanel" data-plan-panel="transactions">
-					<div class="table-wrapper">
+					<div class="table-wrapper data-list-view-root">
 						<table class="table-stack-mobile">
 							<thead>
 								<tr>

@@ -59,7 +59,7 @@ templ ReportViewModal(data ReportViewData) {
 					@Pill(fmt.Sprintf("%d cancelled", data.CancelledCount), PillToneError)
 				</div>
 				if len(data.Classes) > 0 {
-					<div class="table-wrapper">
+					<div class="table-wrapper data-list-view-root">
 						<table class="table-stack-mobile report-classes-table">
 							<thead>
 								<tr>

@@ -103,6 +103,7 @@ templ DocumentsToolbar(showTeacherFilter bool, status constants.TeacherDocumentS
 		}
 		@SortControls("", "desc", ListSortKindDocument)
 		<input type="hidden" id="documentsPage" name="page" value="1"/>
+		@DataListViewToggle()
 		<button
 			type="button"
 			id="documentsFilterBtn"
@@ -176,7 +177,7 @@ templ DocumentsTablePartial(items []DocumentItem, showUploader bool, showActions
 }
 
 templ DocumentsTable(showUploader bool, showActions bool) {
-	<div class="table-wrapper documents-table-wrapper">
+	<div class="table-wrapper data-list-view-root documents-table-wrapper">
 		<table class="documents-table table-stack-mobile">
 			<thead>
 				<tr>

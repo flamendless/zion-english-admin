@@ -52,6 +52,7 @@ templ Payments(data PaymentsData) {
 						</select>
 					</div>
 					<input type="hidden" id="paymentsPage" name="page" value="1"/>
+					@DataListViewToggle()
 					<button
 						type="button"
 						id="paymentFilterBtn"
@@ -63,7 +64,7 @@ templ Payments(data PaymentsData) {
 				</div>
 			</div>
 
-			<div class="table-wrapper">
+			<div class="table-wrapper data-list-view-root">
 				<table id="paymentsTable" class="table-stack-mobile">
 					<thead>
 						<tr>

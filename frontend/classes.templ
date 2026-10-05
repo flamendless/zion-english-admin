@@ -83,6 +83,7 @@ templ Classes(data ClassesData) {
 				@ClassesStatusFilterDropdownWithValue(data.StatusFilter)
 				@SortControls("", "desc", ListSortKindClass)
 				<input type="hidden" id="classesPage" name="page" value="1"/>
+				@DataListViewToggle()
 				<button
 					type="button"
 					id="filterBtn"
@@ -93,7 +94,7 @@ templ Classes(data ClassesData) {
 				>Filter</button>
 			</div>
 
-			<div class="table-wrapper">
+			<div class="table-wrapper data-list-view-root">
 			<table id="classesTable" class="table-stack-mobile">
 				<thead>
 					<tr>

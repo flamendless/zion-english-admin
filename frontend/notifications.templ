@@ -141,7 +141,7 @@ templ Notifications(data NotificationListData) {
 			@NotificationListToolbar(data)
 
 			if len(data.Items) > 0 {
-				<div class="table-wrapper">
+				<div class="table-wrapper data-list-view-root">
 					<table class="table-stack-mobile notification-table">
 						<thead>
 							<tr>
@@ -197,6 +197,7 @@ templ NotificationListToolbar(data NotificationListData) {
 			</select>
 		</div>
 		@SortControls(data.SortBy, data.SortOrder, ListSortKindNotification)
+		@DataListViewToggle()
 		<div class="notifications-toolbar-submit-row">
 			<div class="form-group list-toolbar-action">
 				<label for="notificationFilterSubmit">&nbsp;</label>

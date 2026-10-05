@@ -84,6 +84,7 @@ templ MaterialLibraryFilterBar(data MaterialLibraryFilterData) {
 			</div>
 		}
 		@SortControls(data.SortBy, data.SortOrder, data.SortKind)
+		@DataListViewToggle()
 		<div class="form-group list-toolbar-action">
 			<label for="materialLibraryFilterSubmit">&nbsp;</label>
 			<button type="submit" id="materialLibraryFilterSubmit">Filter</button>

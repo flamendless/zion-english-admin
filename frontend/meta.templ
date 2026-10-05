@@ -97,7 +97,10 @@ templ MetaTagsPage(data MetaTagsListData) {
 			</div>
 
 			if len(data.Tags) > 0 {
-				<div class="table-wrapper meta-tags-table-wrap">
+				<div class="list-toolbar">
+					@DataListViewToggle()
+				</div>
+				<div class="table-wrapper data-list-view-root meta-tags-table-wrap">
 					<table class="table-stack-mobile">
 						<thead>
 							<tr>

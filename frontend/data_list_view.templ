@@ -1,0 +1,97 @@
+package frontend
+
+templ DataListViewToggle() {
+	<div class="form-group data-list-view-control" data-data-list-view-control>
+		<span class="toolbar-filter-dropdown-label" id="dataListViewLabel">Layout</span>
+		<div class="data-list-view-toggle" role="group" aria-labelledby="dataListViewLabel">
+			<button
+				type="button"
+				class="data-list-view-btn"
+				data-list-view="rows"
+				aria-pressed="false"
+				data-tooltip="Table rows"
+				aria-label="Table rows"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<line x1="4" y1="6" x2="20" y2="6"></line>
+					<line x1="4" y1="12" x2="20" y2="12"></line>
+					<line x1="4" y1="18" x2="20" y2="18"></line>
+				</svg>
+			</button>
+			<button
+				type="button"
+				class="data-list-view-btn"
+				data-list-view="cards"
+				aria-pressed="false"
+				data-tooltip="Cards"
+				aria-label="Cards"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<rect x="3" y="3" width="8" height="8" rx="1"></rect>
+					<rect x="13" y="3" width="8" height="8" rx="1"></rect>
+					<rect x="3" y="13" width="8" height="8" rx="1"></rect>
+					<rect x="13" y="13" width="8" height="8" rx="1"></rect>
+				</svg>
+			</button>
+		</div>
+	</div>
+}
+
+templ ScrDataListViewBootstrap() {
+	<script>
+		(function () {
+			var cards = window.matchMedia('(max-width: 768px)').matches;
+			document.documentElement.classList.add(cards ? 'list-view-cards' : 'list-view-rows');
+		})();
+	</script>
+}
+
+templ ScrDataListView() {
+	<script>
+		(function () {
+			if (window.__dataListViewReady) return;
+			window.__dataListViewReady = true;
+
+			var mq = window.matchMedia('(max-width: 768px)');
+			var manualMode = null;
+
+			function defaultMode() {
+				return mq.matches ? 'cards' : 'rows';
+			}
+
+			function activeMode() {
+				return manualMode || defaultMode();
+			}
+
+			function applyMode(mode) {
+				var root = document.documentElement;
+				root.classList.remove('list-view-cards', 'list-view-rows');
+				root.classList.add(mode === 'cards' ? 'list-view-cards' : 'list-view-rows');
+				document.querySelectorAll('[data-data-list-view-control]').forEach(function (control) {
+					control.querySelectorAll('.data-list-view-btn').forEach(function (btn) {
+						var on = btn.getAttribute('data-list-view') === mode;
+						btn.classList.toggle('is-active', on);
+						btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+					});
+				});
+			}
+
+			document.addEventListener('click', function (e) {
+				var btn = e.target.closest('.data-list-view-btn');
+				if (!btn) return;
+				var mode = btn.getAttribute('data-list-view');
+				if (mode !== 'cards' && mode !== 'rows') return;
+				manualMode = mode;
+				applyMode(mode);
+			});
+
+			mq.addEventListener('change', function () {
+				if (!manualMode) {
+					applyMode(defaultMode());
+				}
+			});
+
+			applyMode(activeMode());
+		})();
+	</script>
+}

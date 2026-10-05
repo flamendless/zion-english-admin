@@ -133,6 +133,7 @@ templ AdsPage(data AdsPageData) {
 					</select>
 				</div>
 				@SortControls(data.SortBy, data.SortOrder, ListSortKindAds)
+				@DataListViewToggle()
 				<div class="form-group list-toolbar-action">
 					<label for="adsFilterSubmit">&nbsp;</label>
 					<button type="submit" id="adsFilterSubmit">Filter</button>
@@ -141,7 +142,7 @@ templ AdsPage(data AdsPageData) {
 			@SortToggleScript()
 
 			if len(data.Items) > 0 {
-				<div class="table-wrapper">
+				<div class="table-wrapper data-list-view-root">
 					<table class="table-stack-mobile ads-table">
 						<thead>
 							<tr>

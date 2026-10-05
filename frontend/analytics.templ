@@ -111,6 +111,7 @@ templ Analytics(data AnalyticsData) {
 				@MonthPicker("analyticsMonth", utils.URL("/analytics/partials/date-preset"))
 				@DatePreset(true)
 				@SortControls("", "asc", ListSortKindAnalytics)
+				@DataListViewToggle()
 				<button type="button" id="filterBtn">Filter</button>
 			</div>
 
@@ -149,7 +150,7 @@ templ Analytics(data AnalyticsData) {
 
 				<div class="analytics-section">
 					<h2>Weekly Trend</h2>
-					<div class="table-wrapper">
+					<div class="table-wrapper data-list-view-root">
 						<table class="table-stack-mobile" id="weeklyTable">
 							<thead>
 								<tr>
@@ -168,7 +169,7 @@ templ Analytics(data AnalyticsData) {
 				if data.IsSuperuser {
 					<div class="analytics-section" id="teacherSection">
 						@AdminOnlySectionTitle("By Teacher")
-						<div class="table-wrapper">
+						<div class="table-wrapper data-list-view-root">
 							<table class="table-stack-mobile" id="teacherTable">
 								<thead>
 									<tr>
@@ -199,7 +200,7 @@ templ Analytics(data AnalyticsData) {
 
 				<div class="analytics-section">
 					<h2>By Student</h2>
-					<div class="table-wrapper">
+					<div class="table-wrapper data-list-view-root">
 						<table class="table-stack-mobile" id="studentTable">
 							<thead>
 								<tr>
@@ -219,7 +220,7 @@ templ Analytics(data AnalyticsData) {
 				<div class="analytics-section">
 					<h2>No-Shows</h2>
 					<p class="analytics-hint">Scheduled classes still marked scheduled after their date (never recorded or updated).</p>
-					<div class="table-wrapper">
+					<div class="table-wrapper data-list-view-root">
 						<table class="table-stack-mobile" id="noShowTable">
 							<thead>
 								<tr>
@@ -250,7 +251,7 @@ templ Analytics(data AnalyticsData) {
 					</div>
 
 					<h3>Inactive Reasons</h3>
-					<div class="table-wrapper">
+					<div class="table-wrapper data-list-view-root">
 						<table class="table-stack-mobile" id="reasonsTable">
 							<thead>
 								<tr>
@@ -263,7 +264,7 @@ templ Analytics(data AnalyticsData) {
 					</div>
 
 					<h3 style="margin-top: var(--space-6);">Churned in Period</h3>
-					<div class="table-wrapper">
+					<div class="table-wrapper data-list-view-root">
 						<table class="table-stack-mobile" id="churnedTable">
 							<thead>
 								<tr>

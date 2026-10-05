@@ -182,6 +182,7 @@ templ AffiliatesPage(data AffiliatesPageData) {
 					</select>
 				</div>
 				@SortControls(data.SortBy, data.SortOrder, ListSortKindAffiliate)
+				@DataListViewToggle()
 				<div class="form-group list-toolbar-action">
 					<label for="affiliatesFilterSubmit">&nbsp;</label>
 					<button type="submit" id="affiliatesFilterSubmit">Filter</button>
@@ -190,7 +191,7 @@ templ AffiliatesPage(data AffiliatesPageData) {
 			@SortToggleScript()
 
 			if len(data.Items) > 0 {
-				<div class="table-wrapper">
+				<div class="table-wrapper data-list-view-root">
 					<table class="table-stack-mobile affiliates-table">
 						<thead>
 							<tr>
@@ -492,7 +493,7 @@ templ AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad
 									In catalog but not in this CSV
 									<span class="affiliates-import-removed-count">({ fmt.Sprintf("%d", len(preview.RemovedFromCSV)) })</span>
 								</summary>
-								<div class="table-wrapper">
+								<div class="table-wrapper data-list-view-root">
 									<table class="affiliates-import-removed-table">
 										<thead>
 											<tr>
@@ -523,7 +524,7 @@ templ AffiliateImportPreviewModal(preview AffiliateImportPreviewData, openOnLoad
 							</summary>
 							<div class="affiliates-import-logs-panel">
 								if len(preview.ImportLogs) > 0 {
-									<div class="table-wrapper">
+									<div class="table-wrapper data-list-view-root">
 										<table class="affiliates-import-logs-table">
 											<thead>
 												<tr>

@@ -3582,6 +3582,63 @@ templ GlobalIncludes() {
 			max-width: 16rem;
 		}
 
+		.data-list-view-control {
+			flex: 0 0 auto;
+			min-width: auto;
+			margin-bottom: 0;
+		}
+
+		.data-list-view-toggle {
+			display: inline-flex;
+			align-items: stretch;
+			padding: 2px;
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-md);
+			background: var(--color-muted);
+			gap: 2px;
+		}
+
+		.data-list-view-btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 36px;
+			height: 32px;
+			margin: 0;
+			margin-top: 0;
+			padding: 0;
+			border: none;
+			border-radius: calc(var(--radius-md) - 2px);
+			background: transparent;
+			background-color: transparent;
+			color: var(--color-muted-foreground);
+			cursor: pointer;
+			transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+		}
+
+		.data-list-view-btn:hover {
+			color: var(--color-foreground);
+			background: rgba(255, 255, 255, 0.55);
+			background-color: rgba(255, 255, 255, 0.55);
+		}
+
+		.data-list-view-btn.is-active {
+			background: var(--color-surface);
+			background-color: var(--color-surface);
+			color: var(--color-primary);
+			box-shadow: var(--shadow-sm);
+		}
+
+		.data-list-view-btn:focus-visible {
+			outline: 2px solid var(--color-primary);
+			outline-offset: 1px;
+		}
+
+		.toolbar .data-list-view-control,
+		.list-toolbar .data-list-view-control {
+			align-self: flex-end;
+		}
+
 		.list-toolbar {
 			display: flex;
 			flex-wrap: wrap;
@@ -4131,29 +4188,28 @@ templ GlobalIncludes() {
 		/* Responsive tables (mobile cards)*/
 		/* ============================= */
 
-		@media (max-width: 768px) {
-			.table-wrapper:has(.table-stack-mobile) {
+			html.list-view-cards .data-list-view-root.table-wrapper:has(.table-stack-mobile) {
 				overflow-x: visible;
 				border: none;
 				background: transparent;
 				margin-bottom: var(--space-4);
 			}
 
-			.table-stack-mobile {
+			html.list-view-cards .data-list-view-root .table-stack-mobile {
 				display: block;
 				min-width: 0;
 				width: 100%;
 			}
 
-			.table-stack-mobile thead {
+			html.list-view-cards .data-list-view-root .table-stack-mobile thead {
 				display: none;
 			}
 
-			.table-stack-mobile tbody {
+			html.list-view-cards .data-list-view-root .table-stack-mobile tbody {
 				display: block;
 			}
 
-			.table-stack-mobile tbody tr {
+			html.list-view-cards .data-list-view-root .table-stack-mobile tbody tr {
 				display: block;
 				border: 1px solid var(--color-border-subtle);
 				border-radius: var(--radius-md);
@@ -4163,40 +4219,40 @@ templ GlobalIncludes() {
 				box-shadow: var(--shadow-sm);
 			}
 
-			.table-stack-mobile tbody tr.teacher-pending,
-			.table-stack-mobile tbody tr.student-inactive {
+			html.list-view-cards .data-list-view-root .table-stack-mobile tbody tr.teacher-pending, 
+			html.list-view-cards .data-list-view-root .table-stack-mobile tbody tr.student-inactive {
 				background: var(--color-warning-bg);
 			}
 
-			.table-stack-mobile tbody tr.teacher-resigned {
+			html.list-view-cards .data-list-view-root .table-stack-mobile tbody tr.teacher-resigned {
 				background: var(--color-muted);
 			}
 
-			.table-stack-mobile tbody tr.teacher-deleted,
-			.table-stack-mobile tbody tr.row-cancelled {
+			html.list-view-cards .data-list-view-root .table-stack-mobile tbody tr.teacher-deleted, 
+			html.list-view-cards .data-list-view-root .table-stack-mobile tbody tr.row-cancelled {
 				background: var(--color-error-bg);
 			}
 
-			.table-stack-mobile tbody tr.row-rescheduled {
+			html.list-view-cards .data-list-view-root .table-stack-mobile tbody tr.row-rescheduled {
 				background: var(--color-warning-bg);
 			}
 
-			.table-stack-mobile tbody tr:hover {
+			html.list-view-cards .data-list-view-root .table-stack-mobile tbody tr:hover {
 				background-color: var(--color-surface);
 			}
 
-			.table-stack-mobile tbody tr.teacher-pending:hover,
-			.table-stack-mobile tbody tr.student-inactive:hover,
-			.table-stack-mobile tbody tr.row-rescheduled:hover {
+			html.list-view-cards .data-list-view-root .table-stack-mobile tbody tr.teacher-pending:hover, 
+			html.list-view-cards .data-list-view-root .table-stack-mobile tbody tr.student-inactive:hover, 
+			html.list-view-cards .data-list-view-root .table-stack-mobile tbody tr.row-rescheduled:hover {
 				background: var(--color-warning-bg);
 			}
 
-			.table-stack-mobile tbody tr.teacher-deleted:hover,
-			.table-stack-mobile tbody tr.row-cancelled:hover {
+			html.list-view-cards .data-list-view-root .table-stack-mobile tbody tr.teacher-deleted:hover, 
+			html.list-view-cards .data-list-view-root .table-stack-mobile tbody tr.row-cancelled:hover {
 				background: var(--color-error-bg);
 			}
 
-			.table-stack-mobile td {
+			html.list-view-cards .data-list-view-root .table-stack-mobile td {
 				display: flex;
 				align-items: flex-start;
 				justify-content: space-between;
@@ -4208,11 +4264,11 @@ templ GlobalIncludes() {
 				white-space: normal;
 			}
 
-			.table-stack-mobile td:last-child {
+			html.list-view-cards .data-list-view-root .table-stack-mobile td:last-child {
 				border-bottom: none;
 			}
 
-			.table-stack-mobile td::before {
+			html.list-view-cards .data-list-view-root .table-stack-mobile td::before {
 				content: attr(data-label);
 				font-weight: 600;
 				font-size: 0.75rem;
@@ -4226,9 +4282,9 @@ templ GlobalIncludes() {
 				line-height: 1.4;
 			}
 
-			.table-stack-mobile td[data-label="Name"],
-			.table-stack-mobile td[data-label="Title"],
-			.table-stack-mobile td[data-label="Teacher"] {
+			html.list-view-cards .data-list-view-root .table-stack-mobile td[data-label="Name"], 
+			html.list-view-cards .data-list-view-root .table-stack-mobile td[data-label="Title"], 
+			html.list-view-cards .data-list-view-root .table-stack-mobile td[data-label="Teacher"] {
 				display: block;
 				border-bottom: 1px solid var(--color-border-subtle);
 				padding-bottom: var(--space-3);
@@ -4240,19 +4296,19 @@ templ GlobalIncludes() {
 				color: var(--color-foreground);
 			}
 
-			.table-stack-mobile td[data-label="Name"]::before,
-			.table-stack-mobile td[data-label="Title"]::before,
-			.table-stack-mobile td[data-label="Teacher"]::before {
+			html.list-view-cards .data-list-view-root .table-stack-mobile td[data-label="Name"]::before, 
+			html.list-view-cards .data-list-view-root .table-stack-mobile td[data-label="Title"]::before, 
+			html.list-view-cards .data-list-view-root .table-stack-mobile td[data-label="Teacher"]::before {
 				content: none;
 				display: none;
 			}
 
-			.table-stack-mobile td[data-label="Name"] .name-link {
+			html.list-view-cards .data-list-view-root .table-stack-mobile td[data-label="Name"] .name-link {
 				font-size: 1rem;
 				font-weight: 600;
 			}
 
-			.table-stack-mobile td[data-label="Actions"] {
+			html.list-view-cards .data-list-view-root .table-stack-mobile td[data-label="Actions"] {
 				display: block;
 				border-top: 1px solid var(--color-border-subtle);
 				margin-top: var(--space-2);
@@ -4261,54 +4317,54 @@ templ GlobalIncludes() {
 				border-bottom: none;
 			}
 
-			.table-stack-mobile td[data-label="Actions"]::before {
+			html.list-view-cards .data-list-view-root .table-stack-mobile td[data-label="Actions"]::before {
 				content: none;
 				display: none;
 			}
 
-			.table-stack-mobile td[data-label="Total Rate/Earnings"] {
+			html.list-view-cards .data-list-view-root .table-stack-mobile td[data-label="Total Rate/Earnings"] {
 				flex-direction: column;
 				align-items: flex-end;
 				gap: var(--space-1);
 			}
 
-			.table-stack-mobile td[colspan],
-			.table-stack-mobile td.empty-state {
+			html.list-view-cards .data-list-view-root .table-stack-mobile td[colspan], 
+			html.list-view-cards .data-list-view-root .table-stack-mobile td.empty-state {
 				display: block;
 				text-align: center;
 				padding: var(--space-6) var(--space-3);
 			}
 
-			.table-stack-mobile td[colspan]::before,
-			.table-stack-mobile td.empty-state::before {
+			html.list-view-cards .data-list-view-root .table-stack-mobile td[colspan]::before, 
+			html.list-view-cards .data-list-view-root .table-stack-mobile td.empty-state::before {
 				content: none;
 				display: none;
 			}
 
-			.table-stack-mobile .date-cell,
-			.table-stack-mobile .rate-cell {
+			html.list-view-cards .data-list-view-root .table-stack-mobile .date-cell, 
+			html.list-view-cards .data-list-view-root .table-stack-mobile .rate-cell {
 				white-space: normal;
 			}
 
-			.table-stack-mobile .copyable-cell {
+			html.list-view-cards .data-list-view-root .table-stack-mobile .copyable-cell {
 				max-width: none;
 				justify-content: flex-end;
 				flex: 1;
 				min-width: 0;
 			}
 
-			.table-stack-mobile .copy-btn {
+			html.list-view-cards .data-list-view-root .table-stack-mobile .copy-btn {
 				min-width: 44px;
 				min-height: 44px;
 				flex-shrink: 0;
 			}
 
-			.table-stack-mobile .table-actions {
+			html.list-view-cards .data-list-view-root .table-stack-mobile .table-actions {
 				flex-direction: row;
 				justify-content: flex-end;
 			}
 
-			.table-stack-mobile .table-actions .icon-action-btn {
+			html.list-view-cards .data-list-view-root .table-stack-mobile .table-actions .icon-action-btn {
 				min-width: 44px;
 				min-height: 44px;
 				width: 44px;
@@ -4316,23 +4372,22 @@ templ GlobalIncludes() {
 				flex-shrink: 0;
 			}
 
-			.table-stack-mobile .table-action-form {
+			html.list-view-cards .data-list-view-root .table-stack-mobile .table-action-form {
 				display: inline-flex;
 			}
 
-			.table-stack-mobile .error-cell {
+			html.list-view-cards .data-list-view-root .table-stack-mobile .error-cell {
 				max-width: none;
 				white-space: normal;
 				overflow: visible;
 				text-overflow: unset;
 			}
 
-			.table-stack-mobile .announcement-schedule {
+			html.list-view-cards .data-list-view-root .table-stack-mobile .announcement-schedule {
 				display: block;
 				text-align: right;
 				line-height: 1.4;
 			}
-		}
 
 		/* ============================= */
 		/* Responsive                    */
@@ -4395,7 +4450,8 @@ templ GlobalIncludes() {
 			.hub-header .add-btn,
 			.header-right > button,
 			.header-right > .btn,
-			.toolbar > button,
+			.toolbar > button:not(.data-list-view-btn),
+			.data-list-view-toggle .data-list-view-btn,
 			.modal-footer .btn,
 			.modal-footer button,
 			.cancel-confirm-actions button,
@@ -4727,6 +4783,7 @@ templ GlobalIncludes() {
 	if ShowDevBanner() {
 		<script>document.documentElement.classList.add('is-dev')</script>
 	}
+	@ScrDataListViewBootstrap()
 	@ScrHTMX()
 	@ScrHyperscript()
 	@ScrClock()
@@ -4736,6 +4793,7 @@ templ GlobalIncludes() {
 	@ErrorBannerHandlers()
 	@ScrClipboardHelpers()
 	@ScrTableTruncationTooltips()
+	@ScrDataListView()
 	@ScrFloatingTooltips()
 	@SortToggleScript()
 	@AdminOnlyTooltipScript()

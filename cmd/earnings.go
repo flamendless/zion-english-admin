@@ -155,11 +155,11 @@ func buildCutoffEarningsRows(ctx context.Context, teacherID int64, minDate strin
 func earningsRowForPreset(ctx context.Context, teacherID int64, monthLabel string, kind frontend.EarningsCutoffKind, preset string) frontend.EarningsCutoffRow {
 	startDate, endDate := utils.CutoffDatesFromPreset(preset)
 	row := frontend.EarningsCutoffRow{
-		MonthLabel:   monthLabel,
-		CutoffKind:   kind,
-		PeriodLabel:  formatReportCutoffLabel(startDate, endDate),
-		Earnings:     fetchCutoffTotalsByPreset(ctx, preset, teacherID),
-		Conducted:    conductedClassCount(ctx, teacherID, startDate, endDate),
+		MonthLabel:  monthLabel,
+		CutoffKind:  kind,
+		PeriodLabel: formatReportCutoffLabel(startDate, endDate),
+		Earnings:    fetchCutoffTotalsByPreset(ctx, preset, teacherID),
+		Conducted:   conductedClassCount(ctx, teacherID, startDate, endDate),
 	}
 	return row
 }

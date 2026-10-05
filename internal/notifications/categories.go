@@ -37,7 +37,7 @@ func TeacherNotificationCategories() []CategoryDefinition {
 		{
 			Category:    CategoryPayments,
 			Label:       "Payments",
-			Description: "Payment sent confirmations for your classes.",
+			Description: "Payment sent, receipt confirmed, and received updates.",
 		},
 		{
 			Category:    CategoryIntroVideo,
@@ -60,7 +60,7 @@ func CategoryForKind(kind string) (Category, bool) {
 		return CategoryStudents, true
 	case KindDocumentReviewed:
 		return CategoryDocuments, true
-	case KindPaymentSent:
+	case KindPaymentSent, KindPaymentReceived, KindPaymentConfirmed:
 		return CategoryPayments, true
 	case KindIntroVideoProcessed, KindIntroVideoFailed, KindIntroVideoReviewed, KindIntroVideoDeleted:
 		return CategoryIntroVideo, true

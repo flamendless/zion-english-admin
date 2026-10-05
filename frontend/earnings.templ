@@ -18,7 +18,10 @@ templ MyEarnings(rows []EarningsCutoffRow, emptyMsg string) {
 		<div class="container">
 			@HeaderSimple()
 			@HubHeader("My Earnings", "", "Conducted-class totals for each payroll cutoff from your first class through today.", false)
-			<div class="table-wrapper">
+			<div class="list-toolbar">
+				@DataListViewToggle()
+			</div>
+			<div class="table-wrapper data-list-view-root">
 				@EarningsCutoffTable(rows, emptyMsg)
 			</div>
 		</div>
@@ -59,6 +62,7 @@ templ TeachersEarnings() {
 			@HubHeader("Teachers Earnings", "", "Choose a teacher to view payroll cutoff earnings history.", false)
 			<div class="earnings-toolbar" id="teachersEarningsFilters">
 				@ClassesTeacherFilterSearch()
+				@DataListViewToggle()
 				<button
 					type="button"
 					id="teachersEarningsViewBtn"
@@ -68,7 +72,7 @@ templ TeachersEarnings() {
 					hx-swap={ HxSwapInnerHTML }
 				>View earnings</button>
 			</div>
-			<div class="table-wrapper">
+			<div class="table-wrapper data-list-view-root">
 				<table class="table-stack-mobile earnings-cutoff-table">
 					<thead>
 						<tr>

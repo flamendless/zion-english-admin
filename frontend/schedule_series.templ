@@ -36,7 +36,10 @@ templ ScheduleSeries(data ScheduleSeriesData) {
 					<p><a href={ utils.URL("/schedule/repeat") }>Schedule repeating classes</a></p>
 				</div>
 			} else {
-				<div class="table-wrapper">
+				<div class="list-toolbar">
+					@DataListViewToggle()
+				</div>
+				<div class="table-wrapper data-list-view-root">
 					<table class="table-stack-mobile">
 						<thead>
 							<tr>

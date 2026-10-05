@@ -244,7 +244,7 @@ func teacherHasPaymentForPeriod(ctx context.Context, teacherID int64, startDate,
 	if err != nil {
 		return false, err
 	}
-	return hasPayment > 0, nil
+	return hasPayment, nil
 }
 
 func paymentSentDisabledTooltip(startDate, endDate string) string {
@@ -593,6 +593,16 @@ func handlePaymentReceived(w http.ResponseWriter, r *http.Request, paymentID int
 		sendErrorLog(w, "failed to confirm payment")
 		return
 	}
+
+	teacherName := user.Name
+	if profile, err := dbRO.GetQueries().GetTeacherProfileByID(ctx, user.ID); err == nil {
+		teacherName = utils.ComposePersonName(profile.FirstName, profile.MiddleName, profile.LastName)
+	}
+	amountLabel := utils.FormatCurrency(payment.Amount, payment.Currency)
+	notifySuperuser(ctx, user, notifications.KindPaymentReceived,
+		fmt.Sprintf("%s marked payment as received (%s, ref %s)", teacherName, amountLabel, payment.ReferenceNumber), "")
+	notifyTeacher(ctx, user.ID, teacherName, notifications.SystemUser(), notifications.KindPaymentConfirmed,
+		fmt.Sprintf("You confirmed receipt of %s (ref %s)", amountLabel, payment.ReferenceNumber), "")
 
 	if r.Header.Get(headerHXRequest) != "" && r.Header.Get("X-Payment-Source") == "history" {
 		row, err := loadPaymentRow(ctx, paymentID, user.ID)

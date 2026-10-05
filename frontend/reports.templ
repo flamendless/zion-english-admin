@@ -113,6 +113,7 @@ templ Reports() {
 					@ReportRolesFilterDropdown(true, false)
 					@SortControls("earnings", "desc", ListSortKindReport)
 					<input type="hidden" id="reportsPage" name="page" value="1"/>
+					@DataListViewToggle()
 					<button
 						type="button"
 						id="filterBtn"
@@ -137,7 +138,7 @@ templ Reports() {
 				</form>
 			</div>
 
-			<div class="table-wrapper">
+			<div class="table-wrapper data-list-view-root">
 				<table id="reportsTable" class="table-stack-mobile">
 					<thead>
 						<tr>

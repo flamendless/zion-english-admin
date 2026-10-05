@@ -55,6 +55,7 @@ templ ReportsHistory() {
 					@MonthPicker("reportHistoryMonth", utils.URL("/reports/history/partials/date-preset"))
 					@DatePreset(true)
 					<input type="hidden" id="reportsHistoryPage" name="page" value="1"/>
+					@DataListViewToggle()
 					<button
 						type="button"
 						id="reportHistoryFilterBtn"
@@ -66,7 +67,7 @@ templ ReportsHistory() {
 				</div>
 			</div>
 
-			<div class="table-wrapper">
+			<div class="table-wrapper data-list-view-root">
 				<table id="reportsHistoryTable" class="table-stack-mobile">
 					<thead>
 						<tr>

@@ -211,6 +211,7 @@ templ ListFilterForm(actionPath string, query string, status string, statusType 
 			</div>
 		}
 		@SortControls(sortBy, sortOrder, sortKind)
+		@DataListViewToggle()
 		if parentFilter != "" {
 			<input type="hidden" name="parentFilter" value={ parentFilter }/>
 		}

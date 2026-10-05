@@ -216,6 +216,7 @@ templ Announcements(data AnnouncementListData) {
 
 			<form class="list-toolbar" method="GET" action={ utils.URL("/announcements") }>
 				@SortControls(data.SortBy, data.SortOrder, ListSortKindAnnouncement)
+				@DataListViewToggle()
 				<div class="form-group list-toolbar-action">
 					<label for="announcementSortSubmit">&nbsp;</label>
 					<button type="submit" id="announcementSortSubmit">Apply</button>
@@ -223,7 +224,7 @@ templ Announcements(data AnnouncementListData) {
 			</form>
 
 			if len(data.Announcements) > 0 {
-				<div class="table-wrapper">
+				<div class="table-wrapper data-list-view-root">
 					<table class="table-stack-mobile">
 						<thead>
 							<tr>

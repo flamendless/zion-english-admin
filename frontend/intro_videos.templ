@@ -94,6 +94,7 @@ templ IntroVideosToolbar(showTeacherFilter bool, status constants.TeacherIntroVi
 		}
 		@SortControls("", "desc", ListSortKindIntroVideo)
 		<input type="hidden" id="introVideosPage" name="page" value="1"/>
+		@DataListViewToggle()
 		<button
 			type="button"
 			id="introVideosFilterBtn"
@@ -213,7 +214,7 @@ templ IntroVideosTablePartial(items []IntroVideoItem, showUploader bool, showVie
 }
 
 templ IntroVideosTable(showUploader bool, showViewAction bool, showActions bool) {
-	<div class="table-wrapper documents-table-wrapper">
+	<div class="table-wrapper data-list-view-root documents-table-wrapper">
 		<table class="documents-table table-stack-mobile">
 			<thead>
 				<tr>
