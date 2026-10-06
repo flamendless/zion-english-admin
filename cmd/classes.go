@@ -250,11 +250,11 @@ func handleClassEdit(w http.ResponseWriter, r *http.Request, recordID int64) {
 	}
 
 	if err := rules.Validate(ctx, user, classrules.ClassRecordInput{
-		RecordID:        recordID,
-		StudentID:       req.StudentID,
-		TeacherID:       req.TeacherID,
-		Date:            req.Date,
-		DurationMinutes: req.DurationMinutes,
+		RecordID:  recordID,
+		StudentID: req.StudentID,
+		TeacherID: req.TeacherID,
+		Date:      req.Date,
+		StartTime: req.StartTime,
 	}); err != nil {
 		sendErrorLog(w, err.Error())
 		return
@@ -336,11 +336,11 @@ func parseClassRecordRequest(r *http.Request, user auth.User, role auth.Role, de
 
 func applyClassRecordRules(ctx context.Context, user auth.User, req models.ClassRecordRequest, recordID int64) error {
 	return classrules.ClassRecordRules{DB: dbRO.GetQueries()}.Validate(ctx, user, classrules.ClassRecordInput{
-		RecordID:        recordID,
-		StudentID:       req.StudentID,
-		TeacherID:       req.TeacherID,
-		Date:            req.Date,
-		DurationMinutes: req.DurationMinutes,
+		RecordID:  recordID,
+		StudentID: req.StudentID,
+		TeacherID: req.TeacherID,
+		Date:      req.Date,
+		StartTime: req.StartTime,
 	})
 }
 

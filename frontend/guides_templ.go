@@ -1469,7 +1469,7 @@ func GuidePayments() templ.Component {
 				"Each payment is tied to a report cutoff date range and a single teacher.",
 				"Only one payment can be recorded per teacher per cutoff period.",
 				"Status starts as Pending when an administrator sends payment, then becomes Received when the teacher confirms.",
-				"Payment method is GCash. A reference number is required when sending payment.",
+				"Payment methods include GCash, BPI, GoTyme, PNB, UnionBank, BDO, and Maya. A reference number is required when sending payment.",
 				"For payroll totals and class details, see the Reports & Generation guide.",
 			},
 			false,

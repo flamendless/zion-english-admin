@@ -13,10 +13,12 @@ import (
 
 type mockScheduleDB struct {
 	mockDB
-	scheduledDup       int64
-	scheduledDuplicate queries.GetScheduledDuplicateRow
-	teacherSchedules   []queries.GetScheduledClassesByTeacherOnDateRow
-	studentSchedules   []queries.GetScheduledClassesByStudentOnDateRow
+	scheduledDup        int64
+	scheduledDuplicate  queries.GetScheduledDuplicateRow
+	classRecordDup      int64
+	classRecordDupStart string
+	teacherSchedules    []queries.GetScheduledClassesByTeacherOnDateRow
+	studentSchedules    []queries.GetScheduledClassesByStudentOnDateRow
 }
 
 func (m *mockScheduleDB) CountScheduledDuplicate(ctx context.Context, arg queries.CountScheduledDuplicateParams) (int64, error) {
@@ -25,6 +27,13 @@ func (m *mockScheduleDB) CountScheduledDuplicate(ctx context.Context, arg querie
 
 func (m *mockScheduleDB) GetScheduledDuplicate(ctx context.Context, arg queries.GetScheduledDuplicateParams) (queries.GetScheduledDuplicateRow, error) {
 	return m.scheduledDuplicate, nil
+}
+
+func (m *mockScheduleDB) CountClassRecordDuplicate(ctx context.Context, arg queries.CountClassRecordDuplicateParams) (int64, error) {
+	if m.classRecordDupStart != "" && arg.StartTime.String != m.classRecordDupStart {
+		return 0, nil
+	}
+	return m.classRecordDup, nil
 }
 
 func (m *mockScheduleDB) GetClassRecordDuplicate(ctx context.Context, arg queries.GetClassRecordDuplicateParams) (queries.GetClassRecordDuplicateRow, error) {
@@ -69,7 +78,7 @@ func TestValidateDuplicateScheduled(t *testing.T) {
 	if !errors.Is(err, classrules.ErrDuplicateScheduled) {
 		t.Fatalf("expected ErrDuplicateScheduled, got %v", err)
 	}
-	if err.Error() != "[SCHEDULE] a scheduled class with the same student, teacher, date, and duration already exists. Conflicting class: 2026-01-01, 10:00 - 11:00, status: Scheduled, teacher: Jane Teacher, student: John Student" {
+	if err.Error() != "[SCHEDULE] a scheduled class with the same student, teacher, date, and start time already exists. Conflicting class: 2026-01-01, 10:00 - 11:00, status: Scheduled, teacher: Jane Teacher, student: John Student" {
 		t.Fatalf("unexpected error message: %v", err)
 	}
 }
@@ -129,6 +138,23 @@ func TestValidateStudentScheduleConflict(t *testing.T) {
 	}
 	if err.Error() != "[SCHEDULE] student already has a class scheduled at this time. Conflicting class: 2026-01-01, 14:00 - 14:30, status: Scheduled, teacher: Jane Teacher, student: John Student" {
 		t.Fatalf("unexpected error message: %v", err)
+	}
+}
+
+func TestValidateScheduleAllowedWhenClassRecordSameDurationDifferentStart(t *testing.T) {
+	rules := classrules.ScheduledClassRules{DB: &mockScheduleDB{
+		mockDB: mockDB{
+			student:  activeScheduleStudent(),
+			assigned: 1,
+		},
+		classRecordDup:      1,
+		classRecordDupStart: "19:00",
+	}}
+	err := rules.Validate(context.Background(), auth.User{Role: auth.RoleSuperuser}, classrules.ScheduledClassInput{
+		StudentID: 1, TeacherID: 2, Date: "2026-10-05", StartTime: "20:30", DurationMinutes: 25,
+	})
+	if err != nil {
+		t.Fatalf("expected no duplicate when start time differs from cancelled class record, got %v", err)
 	}
 }
 

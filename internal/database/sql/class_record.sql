@@ -48,7 +48,8 @@ WHERE id = ? AND deleted_at IS NULL;
 -- name: CountClassRecordDuplicate :one
 SELECT COUNT(*) as count
 FROM tbl_class_records
-WHERE student_id = ? AND teacher_id = ? AND date = ? AND duration_minutes = ?
+WHERE student_id = ? AND teacher_id = ? AND date = ?
+	AND COALESCE(trim(start_time), '') = sqlc.arg(start_time)
 	AND deleted_at IS NULL
 	AND (? = 0 OR id != ?);
 
@@ -65,7 +66,8 @@ SELECT
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
-WHERE cr.student_id = ? AND cr.teacher_id = ? AND cr.date = ? AND cr.duration_minutes = ?
+WHERE cr.student_id = ? AND cr.teacher_id = ? AND cr.date = ?
+	AND COALESCE(trim(cr.start_time), '') = sqlc.arg(start_time)
 	AND cr.deleted_at IS NULL
 	AND (? = 0 OR cr.id != ?)
 LIMIT 1;

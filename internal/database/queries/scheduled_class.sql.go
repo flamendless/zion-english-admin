@@ -113,19 +113,20 @@ func (q *Queries) CountScheduledClassesInSeriesFromDate(ctx context.Context, arg
 const countScheduledDuplicate = `-- name: CountScheduledDuplicate :one
 SELECT COUNT(*) as count
 FROM tbl_scheduled_classes
-WHERE student_id = ? AND teacher_id = ? AND scheduled_date = ? AND duration_minutes = ?
+WHERE student_id = ? AND teacher_id = ? AND scheduled_date = ?
+	AND COALESCE(trim(start_time), '') = ?6
 	AND status = 'scheduled'
 	AND deleted_at IS NULL
 	AND (? = 0 OR id != ?)
 `
 
 type CountScheduledDuplicateParams struct {
-	StudentID       int64
-	TeacherID       int64
-	ScheduledDate   string
-	DurationMinutes int64
-	Column5         interface{}
-	ID              int64
+	StudentID     int64
+	TeacherID     int64
+	ScheduledDate string
+	StartTime     sql.NullString
+	Column5       interface{}
+	ID            int64
 }
 
 func (q *Queries) CountScheduledDuplicate(ctx context.Context, arg CountScheduledDuplicateParams) (int64, error) {
@@ -133,7 +134,7 @@ func (q *Queries) CountScheduledDuplicate(ctx context.Context, arg CountSchedule
 		arg.StudentID,
 		arg.TeacherID,
 		arg.ScheduledDate,
-		arg.DurationMinutes,
+		arg.StartTime,
 		arg.Column5,
 		arg.ID,
 	)
@@ -536,7 +537,8 @@ SELECT
 FROM tbl_scheduled_classes sc
 JOIN tbl_students s ON sc.student_id = s.id
 JOIN tbl_teachers t ON sc.teacher_id = t.id
-WHERE sc.student_id = ? AND sc.teacher_id = ? AND sc.scheduled_date = ? AND sc.duration_minutes = ?
+WHERE sc.student_id = ? AND sc.teacher_id = ? AND sc.scheduled_date = ?
+	AND COALESCE(trim(sc.start_time), '') = ?6
 	AND sc.status = 'scheduled'
 	AND sc.deleted_at IS NULL
 	AND (? = 0 OR sc.id != ?)
@@ -544,12 +546,12 @@ LIMIT 1
 `
 
 type GetScheduledDuplicateParams struct {
-	StudentID       int64
-	TeacherID       int64
-	ScheduledDate   string
-	DurationMinutes int64
-	Column5         interface{}
-	ID              int64
+	StudentID     int64
+	TeacherID     int64
+	ScheduledDate string
+	StartTime     sql.NullString
+	Column5       interface{}
+	ID            int64
 }
 
 type GetScheduledDuplicateRow struct {
@@ -567,7 +569,7 @@ func (q *Queries) GetScheduledDuplicate(ctx context.Context, arg GetScheduledDup
 		arg.StudentID,
 		arg.TeacherID,
 		arg.ScheduledDate,
-		arg.DurationMinutes,
+		arg.StartTime,
 		arg.Column5,
 		arg.ID,
 	)

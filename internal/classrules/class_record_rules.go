@@ -2,6 +2,9 @@ package classrules
 
 import (
 	"context"
+	"database/sql"
+	"strings"
+
 	"zion-english/internal/auth"
 	"zion-english/internal/database/queries"
 )
@@ -13,11 +16,11 @@ type classRecordDB interface {
 }
 
 type ClassRecordInput struct {
-	RecordID        int64
-	StudentID       int64
-	TeacherID       int64
-	Date            string
-	DurationMinutes int64
+	RecordID  int64
+	StudentID int64
+	TeacherID int64
+	Date      string
+	StartTime string
 }
 
 type ClassRecordRules struct {
@@ -35,12 +38,12 @@ func (r ClassRecordRules) Validate(ctx context.Context, actor auth.User, input C
 
 	excludeID := input.RecordID
 	dup, err := r.DB.CountClassRecordDuplicate(ctx, queries.CountClassRecordDuplicateParams{
-		StudentID:       input.StudentID,
-		TeacherID:       input.TeacherID,
-		Date:            input.Date,
-		DurationMinutes: input.DurationMinutes,
-		Column5:         excludeID,
-		ID:              excludeID,
+		StudentID: input.StudentID,
+		TeacherID: input.TeacherID,
+		Date:      input.Date,
+		StartTime: classRecordStartTimeParam(input.StartTime),
+		Column5:   excludeID,
+		ID:        excludeID,
 	})
 	if err != nil {
 		return ErrCheckClassDuplicate
@@ -66,6 +69,11 @@ func (r ClassRecordRules) Validate(ctx context.Context, actor auth.User, input C
 	}
 
 	return nil
+}
+
+func classRecordStartTimeParam(startTime string) sql.NullString {
+	t := strings.TrimSpace(startTime)
+	return sql.NullString{String: t, Valid: t != ""}
 }
 
 func (r ClassRecordRules) ValidateEditAccess(recordTeacherID int64, actor auth.User) error {

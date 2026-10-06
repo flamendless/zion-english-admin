@@ -162,12 +162,12 @@ func (r ScheduledClassRules) Validate(ctx context.Context, actor auth.User, inpu
 
 func (r ScheduledClassRules) validateDuplicateScheduled(ctx context.Context, input ScheduledClassInput) error {
 	dup, err := r.DB.CountScheduledDuplicate(ctx, queries.CountScheduledDuplicateParams{
-		StudentID:       input.StudentID,
-		TeacherID:       input.TeacherID,
-		ScheduledDate:   input.Date,
-		DurationMinutes: input.DurationMinutes,
-		Column5:         input.ScheduleID,
-		ID:              input.ScheduleID,
+		StudentID:     input.StudentID,
+		TeacherID:     input.TeacherID,
+		ScheduledDate: input.Date,
+		StartTime:     classRecordStartTimeParam(input.StartTime),
+		Column5:       input.ScheduleID,
+		ID:            input.ScheduleID,
 	})
 	if err != nil {
 		return ErrCheckScheduledDuplicate
@@ -177,12 +177,12 @@ func (r ScheduledClassRules) validateDuplicateScheduled(ctx context.Context, inp
 	}
 
 	row, err := r.DB.GetScheduledDuplicate(ctx, queries.GetScheduledDuplicateParams{
-		StudentID:       input.StudentID,
-		TeacherID:       input.TeacherID,
-		ScheduledDate:   input.Date,
-		DurationMinutes: input.DurationMinutes,
-		Column5:         input.ScheduleID,
-		ID:              input.ScheduleID,
+		StudentID:     input.StudentID,
+		TeacherID:     input.TeacherID,
+		ScheduledDate: input.Date,
+		StartTime:     classRecordStartTimeParam(input.StartTime),
+		Column5:       input.ScheduleID,
+		ID:            input.ScheduleID,
 	})
 	if err != nil {
 		return ErrDuplicateScheduled
@@ -205,12 +205,12 @@ func (r ScheduledClassRules) validateDuplicateScheduled(ctx context.Context, inp
 
 func (r ScheduledClassRules) validateDuplicateClassRecord(ctx context.Context, input ScheduledClassInput) error {
 	dup, err := r.DB.CountClassRecordDuplicate(ctx, queries.CountClassRecordDuplicateParams{
-		StudentID:       input.StudentID,
-		TeacherID:       input.TeacherID,
-		Date:            input.Date,
-		DurationMinutes: input.DurationMinutes,
-		Column5:         0,
-		ID:              0,
+		StudentID: input.StudentID,
+		TeacherID: input.TeacherID,
+		Date:      input.Date,
+		StartTime: classRecordStartTimeParam(input.StartTime),
+		Column5:   0,
+		ID:        0,
 	})
 	if err != nil {
 		return ErrCheckClassRecordDuplicate
@@ -220,12 +220,12 @@ func (r ScheduledClassRules) validateDuplicateClassRecord(ctx context.Context, i
 	}
 
 	row, err := r.DB.GetClassRecordDuplicate(ctx, queries.GetClassRecordDuplicateParams{
-		StudentID:       input.StudentID,
-		TeacherID:       input.TeacherID,
-		Date:            input.Date,
-		DurationMinutes: input.DurationMinutes,
-		Column5:         0,
-		ID:              0,
+		StudentID: input.StudentID,
+		TeacherID: input.TeacherID,
+		Date:      input.Date,
+		StartTime: classRecordStartTimeParam(input.StartTime),
+		Column5:   0,
+		ID:        0,
 	})
 	if err != nil {
 		return ErrDuplicateClass

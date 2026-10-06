@@ -13,18 +13,19 @@ import (
 const countClassRecordDuplicate = `-- name: CountClassRecordDuplicate :one
 SELECT COUNT(*) as count
 FROM tbl_class_records
-WHERE student_id = ? AND teacher_id = ? AND date = ? AND duration_minutes = ?
+WHERE student_id = ? AND teacher_id = ? AND date = ?
+	AND COALESCE(trim(start_time), '') = ?6
 	AND deleted_at IS NULL
 	AND (? = 0 OR id != ?)
 `
 
 type CountClassRecordDuplicateParams struct {
-	StudentID       int64
-	TeacherID       int64
-	Date            string
-	DurationMinutes int64
-	Column5         interface{}
-	ID              int64
+	StudentID int64
+	TeacherID int64
+	Date      string
+	StartTime sql.NullString
+	Column5   interface{}
+	ID        int64
 }
 
 func (q *Queries) CountClassRecordDuplicate(ctx context.Context, arg CountClassRecordDuplicateParams) (int64, error) {
@@ -32,7 +33,7 @@ func (q *Queries) CountClassRecordDuplicate(ctx context.Context, arg CountClassR
 		arg.StudentID,
 		arg.TeacherID,
 		arg.Date,
-		arg.DurationMinutes,
+		arg.StartTime,
 		arg.Column5,
 		arg.ID,
 	)
@@ -372,19 +373,20 @@ SELECT
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
-WHERE cr.student_id = ? AND cr.teacher_id = ? AND cr.date = ? AND cr.duration_minutes = ?
+WHERE cr.student_id = ? AND cr.teacher_id = ? AND cr.date = ?
+	AND COALESCE(trim(cr.start_time), '') = ?6
 	AND cr.deleted_at IS NULL
 	AND (? = 0 OR cr.id != ?)
 LIMIT 1
 `
 
 type GetClassRecordDuplicateParams struct {
-	StudentID       int64
-	TeacherID       int64
-	Date            string
-	DurationMinutes int64
-	Column5         interface{}
-	ID              int64
+	StudentID int64
+	TeacherID int64
+	Date      string
+	StartTime sql.NullString
+	Column5   interface{}
+	ID        int64
 }
 
 type GetClassRecordDuplicateRow struct {
@@ -403,7 +405,7 @@ func (q *Queries) GetClassRecordDuplicate(ctx context.Context, arg GetClassRecor
 		arg.StudentID,
 		arg.TeacherID,
 		arg.Date,
-		arg.DurationMinutes,
+		arg.StartTime,
 		arg.Column5,
 		arg.ID,
 	)

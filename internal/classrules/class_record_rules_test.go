@@ -36,7 +36,7 @@ func TestValidateInactiveStudent(t *testing.T) {
 		student: queries.GetStudentByIDRow{ID: 1, Status: "inactive"},
 	}}
 	err := rules.Validate(context.Background(), auth.User{Role: auth.RoleSuperuser}, classrules.ClassRecordInput{
-		StudentID: 1, TeacherID: 2, Date: "2026-01-01", DurationMinutes: 60,
+		StudentID: 1, TeacherID: 2, Date: "2026-01-01", StartTime: "10:00",
 	})
 	if !errors.Is(err, classrules.ErrInactiveStudent) {
 		t.Fatalf("expected ErrInactiveStudent, got %v", err)
@@ -49,7 +49,7 @@ func TestValidateDuplicateClass(t *testing.T) {
 		duplicate: 1,
 	}}
 	err := rules.Validate(context.Background(), auth.User{Role: auth.RoleSuperuser}, classrules.ClassRecordInput{
-		StudentID: 1, TeacherID: 2, Date: "2026-01-01", DurationMinutes: 60,
+		StudentID: 1, TeacherID: 2, Date: "2026-01-01", StartTime: "10:00",
 	})
 	if !errors.Is(err, classrules.ErrDuplicateClass) {
 		t.Fatalf("expected ErrDuplicateClass, got %v", err)
@@ -61,7 +61,7 @@ func TestValidateTeacherAssignment(t *testing.T) {
 		student: queries.GetStudentByIDRow{ID: 1, Status: "active"},
 	}}
 	err := rules.Validate(context.Background(), auth.User{ID: 5, Role: auth.RoleTeacher}, classrules.ClassRecordInput{
-		StudentID: 1, TeacherID: 5, Date: "2026-01-01", DurationMinutes: 60,
+		StudentID: 1, TeacherID: 5, Date: "2026-01-01", StartTime: "10:00",
 	})
 	if !errors.Is(err, classrules.ErrStudentNotAssigned) {
 		t.Fatalf("expected ErrStudentNotAssigned, got %v", err)

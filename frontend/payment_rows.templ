@@ -29,7 +29,9 @@ templ PaymentTableRow(row PaymentRowData, showTeacherColumn bool, swapOOB bool) 
 			</td>
 		}
 		<td data-label="Period">{ row.PeriodLabel }</td>
-		<td data-label="Method">{ row.PaymentMethod.Label() }</td>
+		<td data-label="Method">
+			@PaymentMethodLogo(row.PaymentMethod)
+		</td>
 		<td data-label="Reference #">{ row.ReferenceNumber }</td>
 		<td data-label="Amount">{ utils.FormatCurrency(row.Amount, row.Currency) }</td>
 		<td data-label="Status">

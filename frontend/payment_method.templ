@@ -1,0 +1,130 @@
+package frontend
+
+import "zion-english/internal/constants"
+import "zion-english/internal/utils"
+
+func paymentMethodLogoURL(m constants.PaymentMethod) string {
+	filename := m.LogoFilename()
+	if filename == "" {
+		return ""
+	}
+	return utils.URL("/static/" + filename)
+}
+
+templ PaymentMethodLogo(m constants.PaymentMethod) {
+	if paymentMethodLogoURL(m) != "" {
+		<img
+			class="payment-method-cell__logo"
+			src={ paymentMethodLogoURL(m) }
+			alt={ m.Label() }
+			width="22"
+			height="22"
+		/>
+	} else {
+		{ m.Label() }
+	}
+}
+
+templ PaymentMethodPicker(name string, selected constants.PaymentMethod) {
+	<div class="payment-method-picker" role="radiogroup" aria-label="Payment method">
+		for i, method := range constants.PaymentMethods {
+			<label class="payment-method-option">
+				<input
+					type="radio"
+					name={ name }
+					value={ string(method) }
+					required
+					if i == 0 && selected == "" {
+						checked
+					} else if method == selected {
+						checked
+					}
+				/>
+				<span class="payment-method-option__card">
+					if paymentMethodLogoURL(method) != "" {
+						<img
+							class="payment-method-option__logo"
+							src={ paymentMethodLogoURL(method) }
+							alt=""
+							width="28"
+							height="28"
+							aria-hidden="true"
+						/>
+					}
+					<span class="payment-method-option__label">{ method.Label() }</span>
+				</span>
+			</label>
+		}
+	</div>
+}
+
+templ PaymentMethodStyles() {
+	<style>
+		.payment-method-cell__logo {
+			flex-shrink: 0;
+			width: auto;
+			max-width: 4.5rem;
+			height: 22px;
+			object-fit: contain;
+		}
+
+		.payment-method-option__logo {
+			flex-shrink: 0;
+			width: auto;
+			max-width: 5.5rem;
+			height: 28px;
+			object-fit: contain;
+		}
+
+		.payment-method-picker {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+			gap: var(--space-2);
+		}
+
+		.payment-method-option {
+			margin: 0;
+			cursor: pointer;
+		}
+
+		.payment-method-option input {
+			position: absolute;
+			opacity: 0;
+			width: 0;
+			height: 0;
+			margin: 0;
+		}
+
+		.payment-method-option__card {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			gap: var(--space-1);
+			min-height: 4.5rem;
+			padding: var(--space-2);
+			border: var(--pill-border);
+			border-radius: var(--radius-md);
+			background: var(--color-surface);
+			text-align: center;
+			transition: border-color 0.15s ease, box-shadow 0.15s ease;
+		}
+
+		.payment-method-option__label {
+			font-size: 0.6875rem;
+			font-weight: 600;
+			line-height: 1.2;
+		}
+
+		.payment-method-option input:focus-visible + .payment-method-option__card {
+			outline: 2px solid var(--color-primary);
+			outline-offset: 2px;
+		}
+
+		.payment-method-option input:checked + .payment-method-option__card {
+			border-color: var(--color-primary);
+			box-shadow: 0 0 0 1px var(--color-primary);
+			background: var(--color-primary-light);
+		}
+	</style>
+}

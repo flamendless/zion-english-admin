@@ -25,11 +25,14 @@ templ PaymentReceiptModal(data PaymentReceiptData) {
 			</div>
 			<div class="modal-body">
 				@PaymentReceiptModalStyles()
+				@PaymentMethodStyles()
 				<p class="payment-receipt-intro">A payment was sent to you. Please confirm once you have received it.</p>
 				<dl class="payment-receipt-details">
 					<div class="payment-receipt-row">
 						<dt>Payment method</dt>
-						<dd>{ data.PaymentMethod.Label() }</dd>
+						<dd>
+							@PaymentMethodLogo(data.PaymentMethod)
+						</dd>
 					</div>
 					<div class="payment-receipt-row">
 						<dt>Reference number</dt>
