@@ -182,7 +182,7 @@ LIMIT ? OFFSET ?;
 SELECT COUNT(*) as count
 FROM tbl_scheduled_classes
 WHERE student_id = ? AND teacher_id = ? AND scheduled_date = ?
-	AND COALESCE(trim(start_time), '') = sqlc.arg(start_time)
+	AND COALESCE(trim(start_time), '') = ?
 	AND status = 'scheduled'
 	AND deleted_at IS NULL
 	AND (? = 0 OR id != ?);
@@ -200,7 +200,7 @@ FROM tbl_scheduled_classes sc
 JOIN tbl_students s ON sc.student_id = s.id
 JOIN tbl_teachers t ON sc.teacher_id = t.id
 WHERE sc.student_id = ? AND sc.teacher_id = ? AND sc.scheduled_date = ?
-	AND COALESCE(trim(sc.start_time), '') = sqlc.arg(start_time)
+	AND COALESCE(trim(sc.start_time), '') = ?
 	AND sc.status = 'scheduled'
 	AND sc.deleted_at IS NULL
 	AND (? = 0 OR sc.id != ?)

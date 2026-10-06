@@ -14,7 +14,7 @@ const countClassRecordDuplicate = `-- name: CountClassRecordDuplicate :one
 SELECT COUNT(*) as count
 FROM tbl_class_records
 WHERE student_id = ? AND teacher_id = ? AND date = ?
-	AND COALESCE(trim(start_time), '') = ?6
+	AND COALESCE(trim(start_time), '') = ?
 	AND deleted_at IS NULL
 	AND (? = 0 OR id != ?)
 `
@@ -374,7 +374,7 @@ FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE cr.student_id = ? AND cr.teacher_id = ? AND cr.date = ?
-	AND COALESCE(trim(cr.start_time), '') = ?6
+	AND COALESCE(trim(cr.start_time), '') = ?
 	AND cr.deleted_at IS NULL
 	AND (? = 0 OR cr.id != ?)
 LIMIT 1
