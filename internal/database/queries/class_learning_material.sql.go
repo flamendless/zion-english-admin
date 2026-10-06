@@ -152,9 +152,9 @@ LIMIT 10
 `
 
 type SearchLearningMaterialsByTitleParams struct {
-	Column1 interface{}
+	Column1 any
 	Column2 sql.NullString
-	Column3 interface{}
+	Column3 any
 	OwnerID int64
 }
 

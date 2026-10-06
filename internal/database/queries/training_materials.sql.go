@@ -74,12 +74,12 @@ WHERE t.deleted = 0
 `
 
 type CountTrainingMaterialProgressReportParams struct {
-	Column1    interface{}
+	Column1    any
 	MaterialID int64
-	Column3    interface{}
-	Column4    interface{}
-	Column5    interface{}
-	Column6    interface{}
+	Column3    any
+	Column4    any
+	Column5    any
+	Column6    any
 }
 
 func (q *Queries) CountTrainingMaterialProgressReport(ctx context.Context, arg CountTrainingMaterialProgressReportParams) (int64, error) {
@@ -288,7 +288,7 @@ type GetTagsByTrainingMaterialIDsRow struct {
 
 func (q *Queries) GetTagsByTrainingMaterialIDs(ctx context.Context, materialIds []int64) ([]GetTagsByTrainingMaterialIDsRow, error) {
 	query := getTagsByTrainingMaterialIDs
-	var queryParams []interface{}
+	var queryParams []any
 	if len(materialIds) > 0 {
 		for _, v := range materialIds {
 			queryParams = append(queryParams, v)
@@ -513,7 +513,7 @@ type GetTrainingMaterialProgressByTeacherIDParams struct {
 
 func (q *Queries) GetTrainingMaterialProgressByTeacherID(ctx context.Context, arg GetTrainingMaterialProgressByTeacherIDParams) ([]TblTrainingMaterialProgress, error) {
 	query := getTrainingMaterialProgressByTeacherID
-	var queryParams []interface{}
+	var queryParams []any
 	queryParams = append(queryParams, arg.TeacherID)
 	if len(arg.MaterialIds) > 0 {
 		for _, v := range arg.MaterialIds {
@@ -584,12 +584,12 @@ LIMIT ? OFFSET ?
 `
 
 type GetTrainingMaterialProgressReportParams struct {
-	Column1    interface{}
+	Column1    any
 	MaterialID int64
-	Column3    interface{}
-	Column4    interface{}
-	Column5    interface{}
-	Column6    interface{}
+	Column3    any
+	Column4    any
+	Column5    any
+	Column6    any
 	Limit      int64
 	Offset     int64
 }

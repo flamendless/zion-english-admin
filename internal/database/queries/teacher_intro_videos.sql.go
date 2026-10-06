@@ -107,11 +107,11 @@ ORDER BY v.created_at DESC
 `
 
 type GetAllTeacherIntroVideosFilteredParams struct {
-	Column1   interface{}
+	Column1   any
 	Status    string
-	Column3   interface{}
+	Column3   any
 	TeacherID int64
-	Column5   interface{}
+	Column5   any
 	Column6   sql.NullString
 	Column7   sql.NullString
 	Column8   sql.NullString
@@ -444,9 +444,9 @@ ORDER BY created_at DESC
 
 type GetTeacherIntroVideosByTeacherIDFilteredParams struct {
 	TeacherID int64
-	Column2   interface{}
+	Column2   any
 	Status    string
-	Column4   interface{}
+	Column4   any
 	Column5   sql.NullString
 	Column6   sql.NullString
 }

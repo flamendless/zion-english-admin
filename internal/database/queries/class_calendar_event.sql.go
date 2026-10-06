@@ -42,7 +42,7 @@ WHERE class_id IN (/*SLICE:class_ids*/?) AND deleted_at IS NULL
 
 func (q *Queries) GetActiveClassCalendarEventsByClassIDs(ctx context.Context, classIds []int64) ([]TblClassCalendarEvent, error) {
 	query := getActiveClassCalendarEventsByClassIDs
-	var queryParams []interface{}
+	var queryParams []any
 	if len(classIds) > 0 {
 		for _, v := range classIds {
 			queryParams = append(queryParams, v)

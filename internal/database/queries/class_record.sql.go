@@ -24,7 +24,7 @@ type CountClassRecordDuplicateParams struct {
 	TeacherID int64
 	Date      string
 	StartTime sql.NullString
-	Column5   interface{}
+	Column5   any
 	ID        int64
 }
 
@@ -54,7 +54,7 @@ GROUP BY cr.status
 type CountClassRecordsByStatusAndDateRangeParams struct {
 	Date      string
 	Date_2    string
-	Column3   interface{}
+	Column3   any
 	TeacherID int64
 }
 
@@ -122,13 +122,13 @@ WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
 `
 
 type CountClassRecordsFilteredParams struct {
-	Column1   interface{}
+	Column1   any
 	TeacherID int64
 	Date      string
 	Date_2    string
-	Column5   interface{}
+	Column5   any
 	Status    string
-	Column7   interface{}
+	Column7   any
 	Column8   sql.NullString
 }
 
@@ -182,33 +182,33 @@ SELECT (
 `
 
 type CountClassesListFilteredParams struct {
-	Column1         interface{}
+	Column1         any
 	TeacherID       int64
 	Date            string
 	Date_2          string
-	Column5         interface{}
-	Column6         interface{}
-	Column7         interface{}
-	Column8         interface{}
-	Column9         interface{}
-	Column10        interface{}
-	Column11        interface{}
+	Column5         any
+	Column6         any
+	Column7         any
+	Column8         any
+	Column9         any
+	Column10        any
+	Column11        any
 	Status          string
-	Column13        interface{}
+	Column13        any
 	Column14        sql.NullString
-	Column15        interface{}
+	Column15        any
 	TeacherID_2     int64
 	ScheduledDate   string
 	ScheduledDate_2 string
-	Column19        interface{}
-	Column20        interface{}
-	Column21        interface{}
-	Column22        interface{}
-	Column23        interface{}
-	Column24        interface{}
-	Column25        interface{}
-	Datetime        interface{}
-	Column27        interface{}
+	Column19        any
+	Column20        any
+	Column21        any
+	Column22        any
+	Column23        any
+	Column24        any
+	Column25        any
+	Datetime        any
+	Column27        any
 	Column28        sql.NullString
 }
 
@@ -268,11 +268,11 @@ WHERE sc.deleted_at IS NULL
 `
 
 type CountOverdueScheduledClassesByDateRangeParams struct {
-	Column1         interface{}
+	Column1         any
 	TeacherID       int64
 	ScheduledDate   string
 	ScheduledDate_2 string
-	Datetime        interface{}
+	Datetime        any
 }
 
 func (q *Queries) CountOverdueScheduledClassesByDateRange(ctx context.Context, arg CountOverdueScheduledClassesByDateRangeParams) (int64, error) {
@@ -385,7 +385,7 @@ type GetClassRecordDuplicateParams struct {
 	TeacherID int64
 	Date      string
 	StartTime sql.NullString
-	Column5   interface{}
+	Column5   any
 	ID        int64
 }
 
@@ -514,13 +514,13 @@ LIMIT ? OFFSET ?
 `
 
 type GetClassRecordsFilteredParams struct {
-	Column1   interface{}
+	Column1   any
 	TeacherID int64
 	Date      string
 	Date_2    string
-	Column5   interface{}
+	Column5   any
 	Status    string
-	Column7   interface{}
+	Column7   any
 	Column8   sql.NullString
 	Limit     int64
 	Offset    int64
@@ -680,33 +680,33 @@ LIMIT ? OFFSET ?
 `
 
 type GetClassesListFilteredParams struct {
-	Column1         interface{}
+	Column1         any
 	TeacherID       int64
 	Date            string
 	Date_2          string
-	Column5         interface{}
-	Column6         interface{}
-	Column7         interface{}
-	Column8         interface{}
-	Column9         interface{}
-	Column10        interface{}
-	Column11        interface{}
+	Column5         any
+	Column6         any
+	Column7         any
+	Column8         any
+	Column9         any
+	Column10        any
+	Column11        any
 	Status          string
-	Column13        interface{}
+	Column13        any
 	Column14        sql.NullString
-	Column15        interface{}
+	Column15        any
 	TeacherID_2     int64
 	ScheduledDate   string
 	ScheduledDate_2 string
-	Column19        interface{}
-	Column20        interface{}
-	Column21        interface{}
-	Column22        interface{}
-	Column23        interface{}
-	Column24        interface{}
-	Column25        interface{}
-	Datetime        interface{}
-	Column27        interface{}
+	Column19        any
+	Column20        any
+	Column21        any
+	Column22        any
+	Column23        any
+	Column24        any
+	Column25        any
+	Datetime        any
+	Column27        any
 	Column28        sql.NullString
 	Limit           int64
 	Offset          int64
@@ -819,9 +819,9 @@ WHERE cr.deleted_at IS NULL
 	AND cr.teacher_id = ?
 `
 
-func (q *Queries) GetMinClassRecordDateForTeacher(ctx context.Context, teacherID int64) (interface{}, error) {
+func (q *Queries) GetMinClassRecordDateForTeacher(ctx context.Context, teacherID int64) (any, error) {
 	row := q.db.QueryRowContext(ctx, getMinClassRecordDateForTeacher, teacherID)
-	var min_date interface{}
+	var min_date any
 	err := row.Scan(&min_date)
 	return min_date, err
 }
@@ -835,20 +835,20 @@ WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
 `
 
 type GetTotalRateByTeacherAndDateRangeParams struct {
-	Column1   interface{}
+	Column1   any
 	TeacherID int64
 	Date      string
 	Date_2    string
 }
 
-func (q *Queries) GetTotalRateByTeacherAndDateRange(ctx context.Context, arg GetTotalRateByTeacherAndDateRangeParams) (interface{}, error) {
+func (q *Queries) GetTotalRateByTeacherAndDateRange(ctx context.Context, arg GetTotalRateByTeacherAndDateRangeParams) (any, error) {
 	row := q.db.QueryRowContext(ctx, getTotalRateByTeacherAndDateRange,
 		arg.Column1,
 		arg.TeacherID,
 		arg.Date,
 		arg.Date_2,
 	)
-	var total_rate interface{}
+	var total_rate any
 	err := row.Scan(&total_rate)
 	return total_rate, err
 }
@@ -924,11 +924,11 @@ LIMIT ?
 `
 
 type ListOverdueScheduledClassesByDateRangeParams struct {
-	Column1         interface{}
+	Column1         any
 	TeacherID       int64
 	ScheduledDate   string
 	ScheduledDate_2 string
-	Datetime        interface{}
+	Datetime        any
 	Limit           int64
 }
 
@@ -1009,13 +1009,13 @@ GROUP BY s.parent_currency
 type SumConductedParentRateByCurrencyAndDateRangeParams struct {
 	Date      string
 	Date_2    string
-	Column3   interface{}
+	Column3   any
 	TeacherID int64
 }
 
 type SumConductedParentRateByCurrencyAndDateRangeRow struct {
 	Currency  sql.NullString
-	TotalRate interface{}
+	TotalRate any
 }
 
 func (q *Queries) SumConductedParentRateByCurrencyAndDateRange(ctx context.Context, arg SumConductedParentRateByCurrencyAndDateRangeParams) ([]SumConductedParentRateByCurrencyAndDateRangeRow, error) {
@@ -1059,13 +1059,13 @@ GROUP BY cr.currency
 type SumConductedRateByCurrencyAndDateRangeParams struct {
 	Date      string
 	Date_2    string
-	Column3   interface{}
+	Column3   any
 	TeacherID int64
 }
 
 type SumConductedRateByCurrencyAndDateRangeRow struct {
 	Currency  string
-	TotalRate interface{}
+	TotalRate any
 }
 
 func (q *Queries) SumConductedRateByCurrencyAndDateRange(ctx context.Context, arg SumConductedRateByCurrencyAndDateRangeParams) ([]SumConductedRateByCurrencyAndDateRangeRow, error) {

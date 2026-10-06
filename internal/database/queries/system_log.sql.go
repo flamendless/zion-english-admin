@@ -20,13 +20,13 @@ WHERE (? = '' OR l.module = ?)
 `
 
 type CountAllLogsFilteredParams struct {
-	Column1     interface{}
+	Column1     any
 	Module      string
-	Column3     interface{}
+	Column3     any
 	Column4     sql.NullString
-	Column5     interface{}
+	Column5     any
 	CreatedAt   string
-	Column7     interface{}
+	Column7     any
 	CreatedAt_2 string
 }
 
@@ -58,13 +58,13 @@ WHERE l.created_by = ?
 
 type CountLogsByCreatedByFilteredParams struct {
 	CreatedBy   sql.NullInt64
-	Column2     interface{}
+	Column2     any
 	Module      string
-	Column4     interface{}
+	Column4     any
 	Column5     sql.NullString
-	Column6     interface{}
+	Column6     any
 	CreatedAt   string
-	Column8     interface{}
+	Column8     any
 	CreatedAt_2 string
 }
 
@@ -146,13 +146,13 @@ LIMIT ? OFFSET ?
 `
 
 type GetAllLogsFilteredParams struct {
-	Column1     interface{}
+	Column1     any
 	Module      string
-	Column3     interface{}
+	Column3     any
 	Column4     sql.NullString
-	Column5     interface{}
+	Column5     any
 	CreatedAt   string
-	Column7     interface{}
+	Column7     any
 	CreatedAt_2 string
 	Limit       int64
 	Offset      int64
@@ -272,13 +272,13 @@ LIMIT ? OFFSET ?
 
 type GetLogsByCreatedByFilteredParams struct {
 	CreatedBy   sql.NullInt64
-	Column2     interface{}
+	Column2     any
 	Module      string
-	Column4     interface{}
+	Column4     any
 	Column5     sql.NullString
-	Column6     interface{}
+	Column6     any
 	CreatedAt   string
-	Column8     interface{}
+	Column8     any
 	CreatedAt_2 string
 	Limit       int64
 	Offset      int64

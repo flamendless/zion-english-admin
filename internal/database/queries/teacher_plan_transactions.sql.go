@@ -7,6 +7,7 @@ package queries
 
 import (
 	"context"
+	"database/sql"
 )
 
 const countAllTeacherPlanTransactions = `-- name: CountAllTeacherPlanTransactions :one
@@ -137,8 +138,8 @@ type InsertTeacherPlanTransactionParams struct {
 	Tier               string
 	BillingKind        string
 	EffectiveStart     string
-	EffectiveEnd       interface{}
-	GrantedByTeacherID interface{}
+	EffectiveEnd       sql.NullString
+	GrantedByTeacherID sql.NullInt64
 	GrantedByName      string
 	Note               string
 }

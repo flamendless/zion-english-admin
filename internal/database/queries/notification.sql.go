@@ -7,6 +7,7 @@ package queries
 
 import (
 	"context"
+	"database/sql"
 )
 
 const countNotificationsForSuperuser = `-- name: CountNotificationsForSuperuser :one
@@ -15,7 +16,7 @@ WHERE to_teacher_id IS NULL
 	AND (? = 0 OR read = 0)
 `
 
-func (q *Queries) CountNotificationsForSuperuser(ctx context.Context, dollar_1 interface{}) (int64, error) {
+func (q *Queries) CountNotificationsForSuperuser(ctx context.Context, dollar_1 any) (int64, error) {
 	row := q.db.QueryRowContext(ctx, countNotificationsForSuperuser, dollar_1)
 	var count int64
 	err := row.Scan(&count)
@@ -29,8 +30,8 @@ WHERE to_teacher_id = ?
 `
 
 type CountNotificationsForTeacherParams struct {
-	ToTeacherID interface{}
-	Column2     interface{}
+	ToTeacherID sql.NullInt64
+	Column2     any
 }
 
 func (q *Queries) CountNotificationsForTeacher(ctx context.Context, arg CountNotificationsForTeacherParams) (int64, error) {
@@ -57,7 +58,7 @@ SELECT COUNT(*) FROM tbl_notifications
 WHERE read = 0 AND to_teacher_id = ?
 `
 
-func (q *Queries) CountUnreadNotificationsForTeacher(ctx context.Context, toTeacherID interface{}) (int64, error) {
+func (q *Queries) CountUnreadNotificationsForTeacher(ctx context.Context, toTeacherID sql.NullInt64) (int64, error) {
 	row := q.db.QueryRowContext(ctx, countUnreadNotificationsForTeacher, toTeacherID)
 	var count int64
 	err := row.Scan(&count)
@@ -97,7 +98,7 @@ WHERE id = ? AND to_teacher_id = ?
 
 type GetNotificationForTeacherParams struct {
 	ID          int64
-	ToTeacherID interface{}
+	ToTeacherID sql.NullInt64
 }
 
 func (q *Queries) GetNotificationForTeacher(ctx context.Context, arg GetNotificationForTeacherParams) (TblNotification, error) {
@@ -129,7 +130,7 @@ LIMIT ? OFFSET ?
 `
 
 type GetNotificationsPagedForSuperuserParams struct {
-	Column1 interface{}
+	Column1 any
 	Limit   int64
 	Offset  int64
 }
@@ -179,8 +180,8 @@ LIMIT ? OFFSET ?
 `
 
 type GetNotificationsPagedForTeacherParams struct {
-	ToTeacherID interface{}
-	Column2     interface{}
+	ToTeacherID sql.NullInt64
+	Column2     any
 	Limit       int64
 	Offset      int64
 }
@@ -277,7 +278,7 @@ LIMIT ?
 `
 
 type GetRecentNotificationsForTeacherParams struct {
-	ToTeacherID interface{}
+	ToTeacherID sql.NullInt64
 	Limit       int64
 }
 
@@ -367,13 +368,13 @@ INSERT OR IGNORE INTO tbl_notifications (
 `
 
 type InsertNotificationParams struct {
-	FromTeacherID interface{}
+	FromTeacherID sql.NullInt64
 	FromName      string
-	ToTeacherID   interface{}
+	ToTeacherID   sql.NullInt64
 	ToName        string
 	Message       string
 	Kind          string
-	DedupeKey     interface{}
+	DedupeKey     sql.NullString
 }
 
 func (q *Queries) InsertNotification(ctx context.Context, arg InsertNotificationParams) error {
@@ -406,7 +407,7 @@ SET read = 1, read_at = datetime('now')
 WHERE to_teacher_id = ? AND read = 0
 `
 
-func (q *Queries) MarkAllNotificationsReadForTeacher(ctx context.Context, toTeacherID interface{}) error {
+func (q *Queries) MarkAllNotificationsReadForTeacher(ctx context.Context, toTeacherID sql.NullInt64) error {
 	_, err := q.db.ExecContext(ctx, markAllNotificationsReadForTeacher, toTeacherID)
 	return err
 }
@@ -430,7 +431,7 @@ WHERE id = ? AND to_teacher_id = ? AND read = 0
 
 type MarkNotificationReadForTeacherParams struct {
 	ID          int64
-	ToTeacherID interface{}
+	ToTeacherID sql.NullInt64
 }
 
 func (q *Queries) MarkNotificationReadForTeacher(ctx context.Context, arg MarkNotificationReadForTeacherParams) error {

@@ -7,6 +7,7 @@ package queries
 
 import (
 	"context"
+	"database/sql"
 	"strings"
 )
 
@@ -44,7 +45,7 @@ type GetTeacherMeetingAccountRow struct {
 	ResourceID     string
 	AccessToken    string
 	RefreshToken   string
-	TokenExpiresAt interface{}
+	TokenExpiresAt sql.NullString
 	ConnectedAt    string
 	UpdatedAt      string
 }
@@ -80,7 +81,7 @@ type GetTeacherMeetingServicesByTeacherIDsRow struct {
 
 func (q *Queries) GetTeacherMeetingServicesByTeacherIDs(ctx context.Context, teacherIds []int64) ([]GetTeacherMeetingServicesByTeacherIDsRow, error) {
 	query := getTeacherMeetingServicesByTeacherIDs
-	var queryParams []interface{}
+	var queryParams []any
 	if len(teacherIds) > 0 {
 		for _, v := range teacherIds {
 			queryParams = append(queryParams, v)
@@ -149,7 +150,7 @@ type UpsertTeacherMeetingAccountParams struct {
 	ResourceID     string
 	AccessToken    string
 	RefreshToken   string
-	TokenExpiresAt interface{}
+	TokenExpiresAt sql.NullString
 }
 
 func (q *Queries) UpsertTeacherMeetingAccount(ctx context.Context, arg UpsertTeacherMeetingAccountParams) error {

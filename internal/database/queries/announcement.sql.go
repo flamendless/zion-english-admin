@@ -101,7 +101,7 @@ type GetActiveAnnouncementsAllRow struct {
 	UpdatedAt        string
 }
 
-func (q *Queries) GetActiveAnnouncementsAll(ctx context.Context, date interface{}) ([]GetActiveAnnouncementsAllRow, error) {
+func (q *Queries) GetActiveAnnouncementsAll(ctx context.Context, date any) ([]GetActiveAnnouncementsAllRow, error) {
 	rows, err := q.db.QueryContext(ctx, getActiveAnnouncementsAll, date)
 	if err != nil {
 		return nil, err
@@ -179,7 +179,7 @@ ORDER BY
 `
 
 type GetActiveAnnouncementsForTeacherParams struct {
-	Date      interface{}
+	Date      any
 	TeacherID int64
 }
 
@@ -293,7 +293,7 @@ type GetActiveModalAnnouncementsAllRow struct {
 	UpdatedAt        string
 }
 
-func (q *Queries) GetActiveModalAnnouncementsAll(ctx context.Context, date interface{}) ([]GetActiveModalAnnouncementsAllRow, error) {
+func (q *Queries) GetActiveModalAnnouncementsAll(ctx context.Context, date any) ([]GetActiveModalAnnouncementsAllRow, error) {
 	rows, err := q.db.QueryContext(ctx, getActiveModalAnnouncementsAll, date)
 	if err != nil {
 		return nil, err
@@ -371,7 +371,7 @@ ORDER BY
 `
 
 type GetActiveModalAnnouncementsForTeacherParams struct {
-	Date      interface{}
+	Date      any
 	TeacherID int64
 }
 

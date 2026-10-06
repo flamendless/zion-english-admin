@@ -155,13 +155,13 @@ ORDER BY d.uploaded_at DESC
 `
 
 type GetAllTeacherDocumentsFilteredParams struct {
-	Column1   interface{}
+	Column1   any
 	Type      string
-	Column3   interface{}
+	Column3   any
 	Status    string
-	Column5   interface{}
+	Column5   any
 	TeacherID int64
-	Column7   interface{}
+	Column7   any
 	Column8   sql.NullString
 	Column9   sql.NullString
 }
@@ -298,7 +298,7 @@ type GetLatestTeacherDocumentStatusesByTeacherIDsRow struct {
 
 func (q *Queries) GetLatestTeacherDocumentStatusesByTeacherIDs(ctx context.Context, arg GetLatestTeacherDocumentStatusesByTeacherIDsParams) ([]GetLatestTeacherDocumentStatusesByTeacherIDsRow, error) {
 	query := getLatestTeacherDocumentStatusesByTeacherIDs
-	var queryParams []interface{}
+	var queryParams []any
 	queryParams = append(queryParams, arg.Type)
 	if len(arg.TeacherIds) > 0 {
 		for _, v := range arg.TeacherIds {
@@ -477,11 +477,11 @@ ORDER BY uploaded_at DESC
 
 type GetTeacherDocumentsByTeacherIDFilteredParams struct {
 	TeacherID int64
-	Column2   interface{}
+	Column2   any
 	Type      string
-	Column4   interface{}
+	Column4   any
 	Status    string
-	Column6   interface{}
+	Column6   any
 	Column7   sql.NullString
 }
 

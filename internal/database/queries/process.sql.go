@@ -19,11 +19,11 @@ WHERE (? = '' OR name LIKE '%' || ? || '%')
 `
 
 type CountProcessingLogsFilteredParams struct {
-	Column1     interface{}
+	Column1     any
 	Column2     sql.NullString
-	Column3     interface{}
+	Column3     any
 	CreatedAt   sql.NullTime
-	Column5     interface{}
+	Column5     any
 	CreatedAt_2 sql.NullTime
 }
 
@@ -121,11 +121,11 @@ LIMIT ? OFFSET ?
 `
 
 type GetProcessingLogsFilteredParams struct {
-	Column1     interface{}
+	Column1     any
 	Column2     sql.NullString
-	Column3     interface{}
+	Column3     any
 	CreatedAt   sql.NullTime
-	Column5     interface{}
+	Column5     any
 	CreatedAt_2 sql.NullTime
 	Limit       int64
 	Offset      int64

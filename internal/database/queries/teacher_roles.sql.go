@@ -79,7 +79,7 @@ type GetTeacherRolesByTeacherIDsRow struct {
 
 func (q *Queries) GetTeacherRolesByTeacherIDs(ctx context.Context, teacherIds []int64) ([]GetTeacherRolesByTeacherIDsRow, error) {
 	query := getTeacherRolesByTeacherIDs
-	var queryParams []interface{}
+	var queryParams []any
 	if len(teacherIds) > 0 {
 		for _, v := range teacherIds {
 			queryParams = append(queryParams, v)

@@ -383,7 +383,7 @@ type GetTagsByMaterialIDsRow struct {
 
 func (q *Queries) GetTagsByMaterialIDs(ctx context.Context, materialIds []int64) ([]GetTagsByMaterialIDsRow, error) {
 	query := getTagsByMaterialIDs
-	var queryParams []interface{}
+	var queryParams []any
 	if len(materialIds) > 0 {
 		for _, v := range materialIds {
 			queryParams = append(queryParams, v)
@@ -511,7 +511,7 @@ LIMIT 20
 `
 
 type SearchLearningMaterialTagsParams struct {
-	Column1 interface{}
+	Column1 any
 	Column2 sql.NullString
 }
 

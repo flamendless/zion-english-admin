@@ -101,10 +101,10 @@ ORDER BY cr.teacher_id ASC, cr.id ASC
 type GetClassRecordFingerprintRowsForRangeParams struct {
 	Date    string
 	Date_2  string
-	Column3 interface{}
-	Column4 interface{}
-	Column5 interface{}
-	Column6 interface{}
+	Column3 any
+	Column4 any
+	Column5 any
+	Column6 any
 }
 
 type GetClassRecordFingerprintRowsForRangeRow struct {
@@ -256,11 +256,11 @@ ORDER BY rg.generated_at DESC
 `
 
 type GetReportGenerationsFilteredParams struct {
-	Column1   interface{}
+	Column1   any
 	StartDate string
-	Column3   interface{}
+	Column3   any
 	EndDate   string
-	Column5   interface{}
+	Column5   any
 	Column6   sql.NullString
 	Column7   sql.NullString
 	Column8   sql.NullString
@@ -419,15 +419,15 @@ ORDER BY t.last_name ASC, t.first_name ASC, t.middle_name ASC, s.name ASC, cr.da
 type GetReportSummaryRowsParams struct {
 	Date     string
 	Date_2   string
-	Column3  interface{}
+	Column3  any
 	Column4  sql.NullString
 	Date_3   string
 	Date_4   string
 	Column7  sql.NullString
-	Column8  interface{}
-	Column9  interface{}
-	Column10 interface{}
-	Column11 interface{}
+	Column8  any
+	Column9  any
+	Column10 any
+	Column11 any
 }
 
 type GetReportSummaryRowsRow struct {
@@ -530,21 +530,21 @@ GROUP BY cr.teacher_id, cr.currency
 type GetReportTeacherEarningsParams struct {
 	Date     string
 	Date_2   string
-	Column3  interface{}
+	Column3  any
 	Column4  sql.NullString
 	Date_3   string
 	Date_4   string
 	Column7  sql.NullString
-	Column8  interface{}
-	Column9  interface{}
-	Column10 interface{}
-	Column11 interface{}
+	Column8  any
+	Column9  any
+	Column10 any
+	Column11 any
 }
 
 type GetReportTeacherEarningsRow struct {
 	TeacherID int64
 	Currency  string
-	TotalRate interface{}
+	TotalRate any
 }
 
 func (q *Queries) GetReportTeacherEarnings(ctx context.Context, arg GetReportTeacherEarningsParams) ([]GetReportTeacherEarningsRow, error) {
@@ -633,15 +633,15 @@ ORDER BY t.last_name ASC, t.first_name ASC, t.middle_name ASC
 type GetReportTeacherSummariesParams struct {
 	Date     string
 	Date_2   string
-	Column3  interface{}
+	Column3  any
 	Column4  sql.NullString
 	Date_3   string
 	Date_4   string
 	Column7  sql.NullString
-	Column8  interface{}
-	Column9  interface{}
-	Column10 interface{}
-	Column11 interface{}
+	Column8  any
+	Column9  any
+	Column10 any
+	Column11 any
 }
 
 type GetReportTeacherSummariesRow struct {
@@ -653,8 +653,8 @@ type GetReportTeacherSummariesRow struct {
 	TeacherAssignedColor  string
 	TeacherProfilePicture sql.NullString
 	TotalClasses          int64
-	ConductedClasses      interface{}
-	CancelledClasses      interface{}
+	ConductedClasses      any
+	CancelledClasses      any
 }
 
 func (q *Queries) GetReportTeacherSummaries(ctx context.Context, arg GetReportTeacherSummariesParams) ([]GetReportTeacherSummariesRow, error) {

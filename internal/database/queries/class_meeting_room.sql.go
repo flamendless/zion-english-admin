@@ -7,6 +7,7 @@ package queries
 
 import (
 	"context"
+	"database/sql"
 	"strings"
 )
 
@@ -53,7 +54,7 @@ WHERE class_id IN (/*SLICE:class_ids*/?) AND deleted_at IS NULL
 
 func (q *Queries) GetActiveClassMeetingRoomsByClassIDs(ctx context.Context, classIds []int64) ([]TblClassMeetingRoom, error) {
 	query := getActiveClassMeetingRoomsByClassIDs
-	var queryParams []interface{}
+	var queryParams []any
 	if len(classIds) > 0 {
 		for _, v := range classIds {
 			queryParams = append(queryParams, v)
@@ -105,7 +106,7 @@ type InsertClassMeetingRoomParams struct {
 	Service      string
 	RoomID       string
 	RoomUrl      string
-	RoomPasscode interface{}
+	RoomPasscode sql.NullString
 }
 
 func (q *Queries) InsertClassMeetingRoom(ctx context.Context, arg InsertClassMeetingRoomParams) (TblClassMeetingRoom, error) {
@@ -150,7 +151,7 @@ WHERE id = ?
 
 type UpdateClassMeetingRoomParams struct {
 	RoomUrl      string
-	RoomPasscode interface{}
+	RoomPasscode sql.NullString
 	ID           int64
 }
 

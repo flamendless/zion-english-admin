@@ -142,18 +142,18 @@ WHERE (? = '' OR s.name LIKE '%' || ? || '%')
 `
 
 type CountStudentsFilteredParams struct {
-	Column1   interface{}
+	Column1   any
 	Column2   sql.NullString
-	Column3   interface{}
-	Column4   interface{}
+	Column3   any
+	Column4   any
 	Status    string
-	Column6   interface{}
+	Column6   any
 	TeacherID int64
-	Column8   interface{}
-	Column9   interface{}
-	Column10  interface{}
-	Column11  interface{}
-	Column12  interface{}
+	Column8   any
+	Column9   any
+	Column10  any
+	Column11  any
+	Column12  any
 }
 
 func (q *Queries) CountStudentsFiltered(ctx context.Context, arg CountStudentsFilteredParams) (int64, error) {
@@ -391,18 +391,18 @@ LIMIT ? OFFSET ?
 `
 
 type GetStudentsFilteredParams struct {
-	Column1   interface{}
+	Column1   any
 	Column2   sql.NullString
-	Column3   interface{}
-	Column4   interface{}
+	Column3   any
+	Column4   any
 	Status    string
-	Column6   interface{}
+	Column6   any
 	TeacherID int64
-	Column8   interface{}
-	Column9   interface{}
-	Column10  interface{}
-	Column11  interface{}
-	Column12  interface{}
+	Column8   any
+	Column9   any
+	Column10  any
+	Column11  any
+	Column12  any
 	Limit     int64
 	Offset    int64
 }

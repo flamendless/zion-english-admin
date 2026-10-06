@@ -141,36 +141,36 @@ WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || midd
 `
 
 type CountTeachersFilteredParams struct {
-	Column1  interface{}
+	Column1  any
 	Column2  sql.NullString
 	Column3  sql.NullString
-	Column4  interface{}
-	Column5  interface{}
-	Column6  interface{}
-	Column7  interface{}
+	Column4  any
+	Column5  any
+	Column6  any
+	Column7  any
 	Status   string
-	Column9  interface{}
-	Column10 interface{}
-	Column11 interface{}
-	Column12 interface{}
-	Column13 interface{}
-	Column14 interface{}
+	Column9  any
+	Column10 any
+	Column11 any
+	Column12 any
+	Column13 any
+	Column14 any
 	Status_2 string
-	Column16 interface{}
-	Column17 interface{}
-	Column18 interface{}
-	Column19 interface{}
+	Column16 any
+	Column17 any
+	Column18 any
+	Column19 any
 	Status_3 string
-	Column21 interface{}
-	Column22 interface{}
-	Column23 interface{}
-	Column24 interface{}
-	Column25 interface{}
-	Column26 interface{}
-	Column27 interface{}
-	Column28 interface{}
-	Column29 interface{}
-	Column30 interface{}
+	Column21 any
+	Column22 any
+	Column23 any
+	Column24 any
+	Column25 any
+	Column26 any
+	Column27 any
+	Column28 any
+	Column29 any
+	Column30 any
 }
 
 func (q *Queries) CountTeachersFiltered(ctx context.Context, arg CountTeachersFilteredParams) (int64, error) {
@@ -644,7 +644,7 @@ type GetTeacherStatusesByIDsRow struct {
 
 func (q *Queries) GetTeacherStatusesByIDs(ctx context.Context, teacherIds []int64) ([]GetTeacherStatusesByIDsRow, error) {
 	query := getTeacherStatusesByIDs
-	var queryParams []interface{}
+	var queryParams []any
 	if len(teacherIds) > 0 {
 		for _, v := range teacherIds {
 			queryParams = append(queryParams, v)
@@ -787,36 +787,36 @@ LIMIT ? OFFSET ?
 `
 
 type GetTeachersFilteredParams struct {
-	Column1  interface{}
+	Column1  any
 	Column2  sql.NullString
 	Column3  sql.NullString
-	Column4  interface{}
-	Column5  interface{}
-	Column6  interface{}
-	Column7  interface{}
+	Column4  any
+	Column5  any
+	Column6  any
+	Column7  any
 	Status   string
-	Column9  interface{}
-	Column10 interface{}
-	Column11 interface{}
-	Column12 interface{}
-	Column13 interface{}
-	Column14 interface{}
+	Column9  any
+	Column10 any
+	Column11 any
+	Column12 any
+	Column13 any
+	Column14 any
 	Status_2 string
-	Column16 interface{}
-	Column17 interface{}
-	Column18 interface{}
-	Column19 interface{}
+	Column16 any
+	Column17 any
+	Column18 any
+	Column19 any
 	Status_3 string
-	Column21 interface{}
-	Column22 interface{}
-	Column23 interface{}
-	Column24 interface{}
-	Column25 interface{}
-	Column26 interface{}
-	Column27 interface{}
-	Column28 interface{}
-	Column29 interface{}
-	Column30 interface{}
+	Column21 any
+	Column22 any
+	Column23 any
+	Column24 any
+	Column25 any
+	Column26 any
+	Column27 any
+	Column28 any
+	Column29 any
+	Column30 any
 	Limit    int64
 	Offset   int64
 }

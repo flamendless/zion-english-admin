@@ -18,8 +18,8 @@ type InsertRecordParams struct {
 	GoogleDriveUrl  string
 	StudentName     string
 	Date            string
-	DurationMinutes interface{}
-	Rate            interface{}
+	DurationMinutes any
+	Rate            any
 	Status          string
 }
 

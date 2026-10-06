@@ -44,10 +44,10 @@ WHERE (
 `
 
 type CountAffiliateProductsForAdsParams struct {
-	Column1              interface{}
+	Column1              any
 	Column2              sql.NullString
 	Column3              sql.NullString
-	Column4              interface{}
+	Column4              any
 	ThumbnailOrientation string
 }
 
@@ -362,10 +362,10 @@ ORDER BY p.sort_order ASC, p.id ASC
 `
 
 type ListAffiliateProductIDsForAdsParams struct {
-	Column1              interface{}
+	Column1              any
 	Column2              sql.NullString
 	Column3              sql.NullString
-	Column4              interface{}
+	Column4              any
 	ThumbnailOrientation string
 }
 
@@ -430,10 +430,10 @@ LIMIT ? OFFSET ?
 `
 
 type SearchAffiliateProductsForAdsParams struct {
-	Column1              interface{}
+	Column1              any
 	Column2              sql.NullString
 	Column3              sql.NullString
-	Column4              interface{}
+	Column4              any
 	ThumbnailOrientation string
 	Limit                int64
 	Offset               int64

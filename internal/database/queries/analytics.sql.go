@@ -38,18 +38,18 @@ ORDER BY cancelled DESC, student_name ASC
 type GetAnalyticsCancellationByStudentParams struct {
 	Date        string
 	Date_2      string
-	Column3     interface{}
+	Column3     any
 	TeacherID   int64
-	Column5     interface{}
+	Column5     any
 	TeacherID_2 int64
 }
 
 type GetAnalyticsCancellationByStudentRow struct {
 	StudentID   int64
 	StudentName string
-	Conducted   interface{}
-	Cancelled   interface{}
-	Rescheduled interface{}
+	Conducted   any
+	Cancelled   any
+	Rescheduled any
 }
 
 func (q *Queries) GetAnalyticsCancellationByStudent(ctx context.Context, arg GetAnalyticsCancellationByStudentParams) ([]GetAnalyticsCancellationByStudentRow, error) {
@@ -150,7 +150,7 @@ type GetAnalyticsCancellationByTeacherParams struct {
 	ScheduledDate_4 string
 	Date_3          string
 	Date_4          string
-	Column9         interface{}
+	Column9         any
 	ID              int64
 }
 
@@ -162,12 +162,12 @@ type GetAnalyticsCancellationByTeacherRow struct {
 	TeacherLastName       string
 	TeacherProfilePicture sql.NullString
 	TeacherAssignedColor  string
-	Conducted             interface{}
-	Cancelled             interface{}
-	Rescheduled           interface{}
-	ScheduledMinutes      interface{}
-	ConductedMinutes      interface{}
-	NoShowCount           interface{}
+	Conducted             any
+	Cancelled             any
+	Rescheduled           any
+	ScheduledMinutes      any
+	ConductedMinutes      any
+	NoShowCount           any
 }
 
 func (q *Queries) GetAnalyticsCancellationByTeacher(ctx context.Context, arg GetAnalyticsCancellationByTeacherParams) ([]GetAnalyticsCancellationByTeacherRow, error) {
@@ -238,7 +238,7 @@ ORDER BY s.updated_at DESC, s.name ASC
 type GetAnalyticsChurnedStudentsParams struct {
 	UpdatedAt   sql.NullTime
 	UpdatedAt_2 sql.NullTime
-	Column3     interface{}
+	Column3     any
 	TeacherID   int64
 }
 
@@ -299,12 +299,12 @@ ORDER BY count DESC, inactive_reason ASC
 `
 
 type GetAnalyticsInactiveReasonsParams struct {
-	Column1   interface{}
+	Column1   any
 	TeacherID int64
 }
 
 type GetAnalyticsInactiveReasonsRow struct {
-	InactiveReason interface{}
+	InactiveReason any
 	Count          int64
 }
 
@@ -365,7 +365,7 @@ LIMIT 50
 type GetAnalyticsNoShowsParams struct {
 	ScheduledDate   string
 	ScheduledDate_2 string
-	Column3         interface{}
+	Column3         any
 	TeacherID       int64
 }
 
@@ -460,20 +460,20 @@ SELECT
 `
 
 type GetAnalyticsRetentionSummaryParams struct {
-	Column1     interface{}
+	Column1     any
 	TeacherID   int64
-	Column3     interface{}
+	Column3     any
 	TeacherID_2 int64
 	UpdatedAt   sql.NullTime
 	UpdatedAt_2 sql.NullTime
-	Column7     interface{}
+	Column7     any
 	TeacherID_3 int64
 }
 
 type GetAnalyticsRetentionSummaryRow struct {
-	ActiveCount     interface{}
-	InactiveCount   interface{}
-	ChurnedInPeriod interface{}
+	ActiveCount     any
+	InactiveCount   any
+	ChurnedInPeriod any
 }
 
 func (q *Queries) GetAnalyticsRetentionSummary(ctx context.Context, arg GetAnalyticsRetentionSummaryParams) (GetAnalyticsRetentionSummaryRow, error) {
@@ -568,37 +568,37 @@ SELECT
 type GetAnalyticsSummaryParams struct {
 	Date            string
 	Date_2          string
-	Column3         interface{}
+	Column3         any
 	TeacherID       int64
 	Date_3          string
 	Date_4          string
-	Column7         interface{}
+	Column7         any
 	TeacherID_2     int64
 	Date_5          string
 	Date_6          string
-	Column11        interface{}
+	Column11        any
 	TeacherID_3     int64
 	ScheduledDate   string
 	ScheduledDate_2 string
-	Column15        interface{}
+	Column15        any
 	TeacherID_4     int64
 	Date_7          string
 	Date_8          string
-	Column19        interface{}
+	Column19        any
 	TeacherID_5     int64
 	ScheduledDate_3 string
 	ScheduledDate_4 string
-	Column23        interface{}
+	Column23        any
 	TeacherID_6     int64
 }
 
 type GetAnalyticsSummaryRow struct {
-	Conducted        interface{}
-	Cancelled        interface{}
-	Rescheduled      interface{}
-	ScheduledMinutes interface{}
-	ConductedMinutes interface{}
-	NoShowCount      interface{}
+	Conducted        any
+	Cancelled        any
+	Rescheduled      any
+	ScheduledMinutes any
+	ConductedMinutes any
+	NoShowCount      any
 }
 
 func (q *Queries) GetAnalyticsSummary(ctx context.Context, arg GetAnalyticsSummaryParams) (GetAnalyticsSummaryRow, error) {
@@ -682,22 +682,22 @@ SELECT
 type GetAnalyticsTrialSummaryParams struct {
 	Date            string
 	Date_2          string
-	Column3         interface{}
+	Column3         any
 	TeacherID       int64
 	Date_3          string
 	Date_4          string
-	Column7         interface{}
+	Column7         any
 	TeacherID_2     int64
 	ScheduledDate   string
 	ScheduledDate_2 string
-	Column11        interface{}
+	Column11        any
 	TeacherID_3     int64
 }
 
 type GetAnalyticsTrialSummaryRow struct {
-	TrialConducted   interface{}
-	RegularConducted interface{}
-	TrialScheduled   interface{}
+	TrialConducted   any
+	RegularConducted any
+	TrialScheduled   any
 }
 
 func (q *Queries) GetAnalyticsTrialSummary(ctx context.Context, arg GetAnalyticsTrialSummaryParams) (GetAnalyticsTrialSummaryRow, error) {
@@ -739,13 +739,13 @@ ORDER BY week_label ASC
 type GetAnalyticsTrialWeeklyParams struct {
 	Date      string
 	Date_2    string
-	Column3   interface{}
+	Column3   any
 	TeacherID int64
 }
 
 type GetAnalyticsTrialWeeklyRow struct {
-	WeekLabel      interface{}
-	TrialConducted interface{}
+	WeekLabel      sql.NullString
+	TrialConducted any
 }
 
 func (q *Queries) GetAnalyticsTrialWeekly(ctx context.Context, arg GetAnalyticsTrialWeeklyParams) ([]GetAnalyticsTrialWeeklyRow, error) {
@@ -797,15 +797,15 @@ ORDER BY week_label ASC
 type GetAnalyticsWeeklyTrendParams struct {
 	Date      string
 	Date_2    string
-	Column3   interface{}
+	Column3   any
 	TeacherID int64
 }
 
 type GetAnalyticsWeeklyTrendRow struct {
-	WeekLabel   interface{}
-	Conducted   interface{}
-	Cancelled   interface{}
-	Rescheduled interface{}
+	WeekLabel   sql.NullString
+	Conducted   any
+	Cancelled   any
+	Rescheduled any
 }
 
 func (q *Queries) GetAnalyticsWeeklyTrend(ctx context.Context, arg GetAnalyticsWeeklyTrendParams) ([]GetAnalyticsWeeklyTrendRow, error) {

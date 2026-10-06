@@ -22,7 +22,7 @@ WHERE (
 `
 
 type CountAffiliateProductsForClickReportParams struct {
-	Column1 interface{}
+	Column1 any
 	Column2 sql.NullString
 	Column3 sql.NullString
 }
@@ -44,7 +44,7 @@ FROM tbl_affiliate_products
 
 type GetAffiliateClickSummaryRow struct {
 	ProductCount       int64
-	TotalClicks        interface{}
+	TotalClicks        any
 	ProductsWithClicks int64
 }
 
@@ -69,7 +69,7 @@ ORDER BY p.provider ASC
 type GetAffiliateClickSummaryByProviderRow struct {
 	Provider           string
 	ProductCount       int64
-	TotalClicks        interface{}
+	TotalClicks        any
 	ProductsWithClicks int64
 }
 
@@ -125,7 +125,7 @@ type ListAdsClickReportRow struct {
 	Status           string
 	SortOrder        int64
 	ProductCount     int64
-	LinkedClickTotal interface{}
+	LinkedClickTotal any
 }
 
 func (q *Queries) ListAdsClickReport(ctx context.Context) ([]ListAdsClickReportRow, error) {
@@ -181,7 +181,7 @@ LIMIT ? OFFSET ?
 `
 
 type ListAffiliateProductsForClickReportParams struct {
-	Column1 interface{}
+	Column1 any
 	Column2 sql.NullString
 	Column3 sql.NullString
 	Limit   int64

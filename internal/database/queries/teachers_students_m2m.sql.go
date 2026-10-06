@@ -35,9 +35,9 @@ WHERE m2m.teacher_id = ?
 
 type CountStudentsByTeacherIDFilteredParams struct {
 	TeacherID int64
-	Column2   interface{}
+	Column2   any
 	Column3   sql.NullString
-	Column4   interface{}
+	Column4   any
 	Status    string
 }
 
@@ -195,9 +195,9 @@ LIMIT ? OFFSET ?
 
 type GetStudentsByTeacherIDFilteredParams struct {
 	TeacherID int64
-	Column2   interface{}
+	Column2   any
 	Column3   sql.NullString
-	Column4   interface{}
+	Column4   any
 	Status    string
 	Limit     int64
 	Offset    int64

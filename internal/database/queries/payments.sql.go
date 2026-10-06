@@ -21,7 +21,7 @@ WHERE id = ?
 `
 
 type DeferTeacherPaymentReceiptParams struct {
-	DismissedAccessID interface{}
+	DismissedAccessID sql.NullInt64
 	ID                int64
 	TeacherID         int64
 }
@@ -59,8 +59,8 @@ LIMIT 1
 
 type GetPendingPaymentForTeacherReceiptParams struct {
 	TeacherID         int64
-	Column2           interface{}
-	DismissedAccessID interface{}
+	Column2           any
+	DismissedAccessID sql.NullInt64
 }
 
 type GetPendingPaymentForTeacherReceiptRow struct {
@@ -73,7 +73,7 @@ type GetPendingPaymentForTeacherReceiptRow struct {
 	PeriodStart       string
 	PeriodEnd         string
 	SentAt            string
-	DismissedAccessID interface{}
+	DismissedAccessID sql.NullInt64
 }
 
 func (q *Queries) GetPendingPaymentForTeacherReceipt(ctx context.Context, arg GetPendingPaymentForTeacherReceiptParams) (GetPendingPaymentForTeacherReceiptRow, error) {
@@ -118,7 +118,7 @@ LIMIT 1
 type GetTeacherPaymentByIDRow struct {
 	ID                int64
 	TeacherID         int64
-	SentByTeacherID   interface{}
+	SentByTeacherID   sql.NullInt64
 	SentByName        string
 	PaymentMethod     string
 	ReferenceNumber   string
@@ -127,9 +127,9 @@ type GetTeacherPaymentByIDRow struct {
 	PeriodStart       string
 	PeriodEnd         string
 	Status            string
-	DismissedAccessID interface{}
+	DismissedAccessID sql.NullInt64
 	SentAt            string
-	ReceivedAt        interface{}
+	ReceivedAt        sql.NullString
 }
 
 func (q *Queries) GetTeacherPaymentByID(ctx context.Context, id int64) (GetTeacherPaymentByIDRow, error) {
@@ -238,24 +238,24 @@ ORDER BY p.sent_at DESC
 `
 
 type GetTeacherPaymentsFilteredParams struct {
-	Column1     interface{}
+	Column1     any
 	PeriodStart string
-	Column3     interface{}
+	Column3     any
 	PeriodEnd   string
-	Column5     interface{}
+	Column5     any
 	Column6     sql.NullString
 	Column7     sql.NullString
 	Column8     sql.NullString
-	Column9     interface{}
+	Column9     any
 	Status      string
-	Column11    interface{}
+	Column11    any
 	TeacherID   int64
 }
 
 type GetTeacherPaymentsFilteredRow struct {
 	ID                    int64
 	TeacherID             int64
-	SentByTeacherID       interface{}
+	SentByTeacherID       sql.NullInt64
 	SentByName            string
 	PaymentMethod         string
 	ReferenceNumber       string
@@ -265,7 +265,7 @@ type GetTeacherPaymentsFilteredRow struct {
 	PeriodEnd             string
 	Status                string
 	SentAt                string
-	ReceivedAt            interface{}
+	ReceivedAt            sql.NullString
 	TeacherFirstName      string
 	TeacherMiddleName     string
 	TeacherLastName       string
@@ -360,7 +360,7 @@ INSERT INTO tbl_teacher_payments (
 
 type InsertTeacherPaymentParams struct {
 	TeacherID       int64
-	SentByTeacherID interface{}
+	SentByTeacherID sql.NullInt64
 	SentByName      string
 	PaymentMethod   string
 	ReferenceNumber string

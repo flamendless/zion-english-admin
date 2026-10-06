@@ -36,7 +36,7 @@ WHERE scheduled_date = ? AND status = ?
 type CountScheduledClassesByStatusAndDateParams struct {
 	ScheduledDate string
 	Status        string
-	Column3       interface{}
+	Column3       any
 	TeacherID     int64
 }
 
@@ -63,13 +63,13 @@ WHERE (? = 0 OR sc.teacher_id = ?) AND sc.scheduled_date >= ? AND sc.scheduled_d
 `
 
 type CountScheduledClassesFilteredParams struct {
-	Column1         interface{}
+	Column1         any
 	TeacherID       int64
 	ScheduledDate   string
 	ScheduledDate_2 string
-	Column5         interface{}
+	Column5         any
 	Status          string
-	Column7         interface{}
+	Column7         any
 	Column8         sql.NullString
 }
 
@@ -125,7 +125,7 @@ type CountScheduledDuplicateParams struct {
 	TeacherID     int64
 	ScheduledDate string
 	StartTime     sql.NullString
-	Column5       interface{}
+	Column5       any
 	ID            int64
 }
 
@@ -219,7 +219,7 @@ WHERE sc.student_id = ? AND sc.scheduled_date = ? AND sc.status = 'scheduled'
 type GetScheduledClassesByStudentOnDateParams struct {
 	StudentID     int64
 	ScheduledDate string
-	Column3       interface{}
+	Column3       any
 	ID            int64
 }
 
@@ -290,7 +290,7 @@ WHERE sc.teacher_id = ? AND sc.scheduled_date = ? AND sc.status = 'scheduled'
 type GetScheduledClassesByTeacherOnDateParams struct {
 	TeacherID     int64
 	ScheduledDate string
-	Column3       interface{}
+	Column3       any
 	ID            int64
 }
 
@@ -358,13 +358,13 @@ LIMIT ? OFFSET ?
 `
 
 type GetScheduledClassesFilteredParams struct {
-	Column1         interface{}
+	Column1         any
 	TeacherID       int64
 	ScheduledDate   string
 	ScheduledDate_2 string
-	Column5         interface{}
+	Column5         any
 	Status          string
-	Column7         interface{}
+	Column7         any
 	Column8         sql.NullString
 	Limit           int64
 	Offset          int64
@@ -550,7 +550,7 @@ type GetScheduledDuplicateParams struct {
 	TeacherID     int64
 	ScheduledDate string
 	StartTime     sql.NullString
-	Column5       interface{}
+	Column5       any
 	ID            int64
 }
 
@@ -708,7 +708,7 @@ ORDER BY sc.scheduled_date ASC, sc.start_time ASC, ser.id ASC
 `
 
 type ListActiveScheduledClassSeriesParams struct {
-	Column1   interface{}
+	Column1   any
 	TeacherID int64
 }
 

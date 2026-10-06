@@ -123,7 +123,7 @@ type TblClassCalendarEvent struct {
 	EventUrl  string
 	CreatedAt string
 	UpdatedAt string
-	DeletedAt interface{}
+	DeletedAt sql.NullString
 }
 
 type TblClassMeetingRoom struct {
@@ -132,10 +132,10 @@ type TblClassMeetingRoom struct {
 	Service      string
 	RoomID       string
 	RoomUrl      string
-	RoomPasscode interface{}
+	RoomPasscode sql.NullString
 	CreatedAt    string
 	UpdatedAt    string
-	DeletedAt    interface{}
+	DeletedAt    sql.NullString
 }
 
 type TblClassRecord struct {
@@ -222,15 +222,15 @@ type TblMetaTag struct {
 
 type TblNotification struct {
 	ID            int64
-	FromTeacherID interface{}
+	FromTeacherID sql.NullInt64
 	FromName      string
-	ToTeacherID   interface{}
+	ToTeacherID   sql.NullInt64
 	ToName        string
 	Message       string
 	Kind          string
-	DedupeKey     interface{}
+	DedupeKey     sql.NullString
 	Read          int64
-	ReadAt        interface{}
+	ReadAt        sql.NullString
 	CreatedAt     string
 }
 
@@ -265,8 +265,8 @@ type TblRecord struct {
 	GoogleDriveUrl  string
 	StudentName     string
 	Date            string
-	DurationMinutes interface{}
-	Rate            interface{}
+	DurationMinutes any
+	Rate            any
 	Status          string
 	CreatedAt       sql.NullTime
 }
@@ -407,7 +407,7 @@ type TblTeacherMeetingAccount struct {
 	ExternalUserID string
 	AccessToken    string
 	RefreshToken   string
-	TokenExpiresAt interface{}
+	TokenExpiresAt sql.NullString
 	ConnectedAt    string
 	UpdatedAt      string
 	ResourceID     string
@@ -423,7 +423,7 @@ type TblTeacherNotificationPreference struct {
 type TblTeacherPayment struct {
 	ID                int64
 	TeacherID         int64
-	SentByTeacherID   interface{}
+	SentByTeacherID   sql.NullInt64
 	SentByName        string
 	PaymentMethod     string
 	ReferenceNumber   string
@@ -432,9 +432,9 @@ type TblTeacherPayment struct {
 	PeriodStart       string
 	PeriodEnd         string
 	Status            string
-	DismissedAccessID interface{}
+	DismissedAccessID sql.NullInt64
 	SentAt            string
-	ReceivedAt        interface{}
+	ReceivedAt        sql.NullString
 	CreatedAt         string
 	UpdatedAt         string
 }
@@ -445,9 +445,9 @@ type TblTeacherPlanTransaction struct {
 	Tier               string
 	BillingKind        string
 	EffectiveStart     string
-	EffectiveEnd       interface{}
-	RevokedAt          interface{}
-	GrantedByTeacherID interface{}
+	EffectiveEnd       sql.NullString
+	RevokedAt          sql.NullString
+	GrantedByTeacherID sql.NullInt64
 	GrantedByName      string
 	Note               string
 	CreatedAt          string
