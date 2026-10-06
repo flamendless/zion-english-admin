@@ -274,6 +274,7 @@ WHERE (
 			AND 'Payroll summary' LIKE '%' || ? || '%'
 		)
 	)
+	AND (? = '' OR rg.kind = ?)
 ORDER BY rg.generated_at DESC
 `
 
@@ -287,6 +288,8 @@ type GetReportGenerationsFilteredParams struct {
 	Column7   sql.NullString
 	Column8   sql.NullString
 	Column9   sql.NullString
+	Column10  any
+	Kind      string
 }
 
 type GetReportGenerationsFilteredRow struct {
@@ -315,6 +318,8 @@ func (q *Queries) GetReportGenerationsFiltered(ctx context.Context, arg GetRepor
 		arg.Column7,
 		arg.Column8,
 		arg.Column9,
+		arg.Column10,
+		arg.Kind,
 	)
 	if err != nil {
 		return nil, err

@@ -8,6 +8,10 @@ import (
 
 const reportHistoryDownloadMissingTooltip = "Report file is no longer available"
 
+var ReportHistoryKindFilterOptions = []StatusOption{
+	{Value: string(constants.ReportGenerationKindSummary), Label: constants.ReportHistorySummaryLabel},
+}
+
 type ReportHistoryRowData struct {
 	Kind          constants.ReportGenerationKind
 	TeacherName   string

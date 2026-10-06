@@ -52,6 +52,15 @@ templ ReportsHistory() {
 						<label for="reportHistorySearch">Search</label>
 						<input type="text" id="reportHistorySearch" name="q" placeholder="Search teacher or summary..."/>
 					</div>
+					<div class="form-group">
+						<label for="reportHistoryKind">Type</label>
+						<select id="reportHistoryKind" name="kind">
+							<option value="">All reports</option>
+							for _, opt := range ReportHistoryKindFilterOptions {
+								<option value={ opt.Value }>{ opt.Label }</option>
+							}
+						</select>
+					</div>
 					@MonthPicker("reportHistoryMonth", utils.URL("/reports/history/partials/date-preset"))
 					@DatePreset(true)
 					<input type="hidden" id="reportsHistoryPage" name="page" value="1"/>

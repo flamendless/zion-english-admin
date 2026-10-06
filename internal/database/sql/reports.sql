@@ -215,6 +215,7 @@ WHERE (
 			AND 'Payroll summary' LIKE '%' || ? || '%'
 		)
 	)
+	AND (? = '' OR rg.kind = ?)
 ORDER BY rg.generated_at DESC;
 
 -- name: GetReportSummaryRows :many

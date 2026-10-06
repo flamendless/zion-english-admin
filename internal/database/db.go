@@ -60,7 +60,7 @@ func New(mode DBMode) Service {
 		panic("db mode enum not handled")
 	}
 
-	dataSourceName := dbPath + "?_journal_mode=wal" + "&mode=" + string(mode)
+	dataSourceName := dbPath + "?_journal_mode=WAL&_busy_timeout=5000&mode=" + string(mode)
 
 	db, err := sql.Open("sqlite3", dataSourceName)
 	if err != nil {

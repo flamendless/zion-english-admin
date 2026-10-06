@@ -45,8 +45,9 @@ func handleReportsHistoryPartial(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	kindFilter := parseReportHistoryKindFilter(r)
 	page := utils.ParsePageQuery(r)
-	allRows, err := loadReportHistoryRows(r.Context(), startDate, endDate, q)
+	allRows, err := loadReportHistoryRows(r.Context(), startDate, endDate, q, kindFilter)
 	if err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -54,10 +55,7 @@ func handleReportsHistoryPartial(w http.ResponseWriter, r *http.Request) {
 	page.Total = int64(len(allRows))
 	rows := paginateSlice(allRows, page)
 
-	emptyMsg := "No report generations found."
-	if startDate == "" && endDate == "" && q == "" {
-		emptyMsg = "No reports generated yet."
-	}
+	emptyMsg := reportHistoryEmptyMessage(startDate, endDate, q, kindFilter)
 
 	pagination := frontend.BuildPaginationData(page.Number, page.Size, page.Total)
 	partialsURL := utils.URL("/reports/history/partials/rows")
@@ -70,7 +68,25 @@ func handleReportsHistoryPartial(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func loadReportHistoryRows(ctx context.Context, startDate, endDate, q string) ([]frontend.ReportHistoryRowData, error) {
+func parseReportHistoryKindFilter(r *http.Request) string {
+	kind := strings.TrimSpace(r.URL.Query().Get("kind"))
+	if kind == string(constants.ReportGenerationKindSummary) {
+		return kind
+	}
+	return ""
+}
+
+func reportHistoryEmptyMessage(startDate, endDate, q, kindFilter string) string {
+	if kindFilter == string(constants.ReportGenerationKindSummary) {
+		return "No payroll summary reports found."
+	}
+	if startDate == "" && endDate == "" && q == "" && kindFilter == "" {
+		return "No reports generated yet."
+	}
+	return "No report generations found."
+}
+
+func loadReportHistoryRows(ctx context.Context, startDate, endDate, q, kindFilter string) ([]frontend.ReportHistoryRowData, error) {
 	qNull := sql.NullString{String: q, Valid: q != ""}
 	dbRows, err := dbRO.GetQueries().GetReportGenerationsFiltered(ctx, queries.GetReportGenerationsFilteredParams{
 		Column1:   startDate,
@@ -82,6 +98,8 @@ func loadReportHistoryRows(ctx context.Context, startDate, endDate, q string) ([
 		Column7:   qNull,
 		Column8:   qNull,
 		Column9:   qNull,
+		Column10:  kindFilter,
+		Kind:      kindFilter,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to load report history")

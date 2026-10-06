@@ -7,6 +7,9 @@ import (
 
 	"zion-english/internal/auth"
 	"zion-english/internal/database/queries"
+	"zion-english/internal/logs"
+
+	"go.uber.org/zap"
 )
 
 type classRecordDB interface {
@@ -46,6 +49,14 @@ func (r ClassRecordRules) Validate(ctx context.Context, actor auth.User, input C
 		ID:        excludeID,
 	})
 	if err != nil {
+		logs.Log().Error("CountClassRecordDuplicate failed",
+			zap.Error(err),
+			zap.Int64("student_id", input.StudentID),
+			zap.Int64("teacher_id", input.TeacherID),
+			zap.String("date", input.Date),
+			zap.String("start_time", input.StartTime),
+			zap.Int64("exclude_record_id", excludeID),
+		)
 		return ErrCheckClassDuplicate
 	}
 	if dup > 0 {

@@ -68,7 +68,43 @@ func ReportsHistory() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"btn btn-secondary\">Back to Reports</a></div></div><div class=\"toolbar\" id=\"reportsHistoryToolbar\"><div id=\"reportsHistoryFilters\" class=\"reports-history-filters\"><div class=\"form-group\"><label for=\"reportHistorySearch\">Search</label> <input type=\"text\" id=\"reportHistorySearch\" name=\"q\" placeholder=\"Search teacher or summary...\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"btn btn-secondary\">Back to Reports</a></div></div><div class=\"toolbar\" id=\"reportsHistoryToolbar\"><div id=\"reportsHistoryFilters\" class=\"reports-history-filters\"><div class=\"form-group\"><label for=\"reportHistorySearch\">Search</label> <input type=\"text\" id=\"reportHistorySearch\" name=\"q\" placeholder=\"Search teacher or summary...\"></div><div class=\"form-group\"><label for=\"reportHistoryKind\">Type</label> <select id=\"reportHistoryKind\" name=\"kind\"><option value=\"\">All reports</option> ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		for _, opt := range ReportHistoryKindFilterOptions {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<option value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 60, Col: 33}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 60, Col: 47}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</option>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</select></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -80,7 +116,7 @@ func ReportsHistory() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<input type=\"hidden\" id=\"reportsHistoryPage\" name=\"page\" value=\"1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<input type=\"hidden\" id=\"reportsHistoryPage\" name=\"page\" value=\"1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -88,72 +124,72 @@ func ReportsHistory() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<button type=\"button\" id=\"reportHistoryFilterBtn\" hx-get=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/history/partials/rows"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 62, Col: 58}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" hx-include=\"#reportsHistoryFilters\" hx-target=\"#reportsHistoryTableBody\" hx-swap=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 65, Col: 31}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\">Filter</button></div></div><div class=\"table-wrapper data-list-view-root\"><table id=\"reportsHistoryTable\" class=\"table-stack-mobile\"><thead><tr><th>Teacher</th><th>Period</th><th>Records</th><th>Generated at</th><th>Actions</th></tr></thead> <tbody id=\"reportsHistoryTableBody\" data-loading-label=\"Loading report history...\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<button type=\"button\" id=\"reportHistoryFilterBtn\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/history/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 84, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 71, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-include=\"#reportsHistoryFilters\" hx-trigger=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" hx-include=\"#reportsHistoryFilters\" hx-target=\"#reportsHistoryTableBody\" hx-swap=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 86, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 74, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" hx-swap=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\">Filter</button></div></div><div class=\"table-wrapper data-list-view-root\"><table id=\"reportsHistoryTable\" class=\"table-stack-mobile\"><thead><tr><th>Teacher</th><th>Period</th><th>Records</th><th>Generated at</th><th>Actions</th></tr></thead> <tbody id=\"reportsHistoryTableBody\" data-loading-label=\"Loading report history...\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/history/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 87, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 93, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" hx-include=\"#reportsHistoryFilters\" hx-trigger=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 95, Col: 32}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" hx-swap=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var9 string
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports_history.templ`, Line: 96, Col: 31}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -161,7 +197,7 @@ func ReportsHistory() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</tbody></table></div><div id=\"paginationBottom\" class=\"pagination-bar\"></div></div><script>\n\t\t\tconst reportHistorySearch = document.getElementById('reportHistorySearch');\n\n\t\t\tfunction setReportHistoryDateRangeFromPreset(select) {\n\t\t\t\tif (!select) return;\n\t\t\t\tif (!select.value) {\n\t\t\t\t\tdelete select.dataset.startDate;\n\t\t\t\t\tdelete select.dataset.endDate;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst parts = select.value.split('|');\n\t\t\t\tif (parts.length !== 2) return;\n\t\t\t\tselect.dataset.startDate = parts[0];\n\t\t\t\tselect.dataset.endDate = parts[1];\n\t\t\t}\n\n\t\t\tfunction bindReportHistoryDatePresetSelect() {\n\t\t\t\tconst datePresetSelect = document.getElementById('datePreset');\n\t\t\t\tif (!datePresetSelect) return;\n\t\t\t\tsetReportHistoryDateRangeFromPreset(datePresetSelect);\n\t\t\t\tdatePresetSelect.addEventListener('change', () => {\n\t\t\t\t\tsetReportHistoryDateRangeFromPreset(datePresetSelect);\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tbindReportHistoryDatePresetSelect();\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.id !== 'datePresetGroup') return;\n\t\t\t\tbindReportHistoryDatePresetSelect();\n\t\t\t\tconst reportsHistoryPage = document.getElementById('reportsHistoryPage');\n\t\t\t\tif (reportsHistoryPage) reportsHistoryPage.value = '1';\n\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\thtmx.trigger('#reportsHistoryTableBody', 'load');\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tconst reportHistoryFilterBtn = document.getElementById('reportHistoryFilterBtn');\n\t\t\tconst reportsHistoryPage = document.getElementById('reportsHistoryPage');\n\t\t\tif (reportHistoryFilterBtn) {\n\t\t\t\treportHistoryFilterBtn.addEventListener('click', function () {\n\t\t\t\t\tif (reportsHistoryPage) reportsHistoryPage.value = '1';\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tif (reportHistorySearch) {\n\t\t\t\treportHistorySearch.addEventListener('keydown', function (e) {\n\t\t\t\t\tif (e.key === 'Enter') {\n\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\tif (reportsHistoryPage) reportsHistoryPage.value = '1';\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\t\t\thtmx.trigger('#reportsHistoryTableBody', 'load');\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tconst pageBtn = e.target.closest('#paginationBottom .pagination-btn[hx-get]');\n\t\t\t\tif (!pageBtn || !reportsHistoryPage) return;\n\t\t\t\tconst vals = pageBtn.getAttribute('hx-vals');\n\t\t\t\tif (!vals) return;\n\t\t\t\ttry {\n\t\t\t\t\tconst parsed = JSON.parse(vals.replace(/'/g, '\"'));\n\t\t\t\t\tif (parsed.page) reportsHistoryPage.value = String(parsed.page);\n\t\t\t\t} catch (err) { /* ignore */ }\n\t\t\t});\n\t\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</tbody></table></div><div id=\"paginationBottom\" class=\"pagination-bar\"></div></div><script>\n\t\t\tconst reportHistorySearch = document.getElementById('reportHistorySearch');\n\n\t\t\tfunction setReportHistoryDateRangeFromPreset(select) {\n\t\t\t\tif (!select) return;\n\t\t\t\tif (!select.value) {\n\t\t\t\t\tdelete select.dataset.startDate;\n\t\t\t\t\tdelete select.dataset.endDate;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst parts = select.value.split('|');\n\t\t\t\tif (parts.length !== 2) return;\n\t\t\t\tselect.dataset.startDate = parts[0];\n\t\t\t\tselect.dataset.endDate = parts[1];\n\t\t\t}\n\n\t\t\tfunction bindReportHistoryDatePresetSelect() {\n\t\t\t\tconst datePresetSelect = document.getElementById('datePreset');\n\t\t\t\tif (!datePresetSelect) return;\n\t\t\t\tsetReportHistoryDateRangeFromPreset(datePresetSelect);\n\t\t\t\tdatePresetSelect.addEventListener('change', () => {\n\t\t\t\t\tsetReportHistoryDateRangeFromPreset(datePresetSelect);\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tbindReportHistoryDatePresetSelect();\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.id !== 'datePresetGroup') return;\n\t\t\t\tbindReportHistoryDatePresetSelect();\n\t\t\t\tconst reportsHistoryPage = document.getElementById('reportsHistoryPage');\n\t\t\t\tif (reportsHistoryPage) reportsHistoryPage.value = '1';\n\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\thtmx.trigger('#reportsHistoryTableBody', 'load');\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tconst reportHistoryFilterBtn = document.getElementById('reportHistoryFilterBtn');\n\t\t\tconst reportsHistoryPage = document.getElementById('reportsHistoryPage');\n\t\t\tif (reportHistoryFilterBtn) {\n\t\t\t\treportHistoryFilterBtn.addEventListener('click', function () {\n\t\t\t\t\tif (reportsHistoryPage) reportsHistoryPage.value = '1';\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tif (reportHistorySearch) {\n\t\t\t\treportHistorySearch.addEventListener('keydown', function (e) {\n\t\t\t\t\tif (e.key === 'Enter') {\n\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\tif (reportsHistoryPage) reportsHistoryPage.value = '1';\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\t\t\thtmx.trigger('#reportsHistoryTableBody', 'load');\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tconst pageBtn = e.target.closest('#paginationBottom .pagination-btn[hx-get]');\n\t\t\t\tif (!pageBtn || !reportsHistoryPage) return;\n\t\t\t\tconst vals = pageBtn.getAttribute('hx-vals');\n\t\t\t\tif (!vals) return;\n\t\t\t\ttry {\n\t\t\t\t\tconst parsed = JSON.parse(vals.replace(/'/g, '\"'));\n\t\t\t\t\tif (parsed.page) reportsHistoryPage.value = String(parsed.page);\n\t\t\t\t} catch (err) { /* ignore */ }\n\t\t\t});\n\t\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -169,7 +205,7 @@ func ReportsHistory() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
