@@ -43,7 +43,7 @@ func Reports() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t.reports-filters {\n\t\t\t\tdisplay: contents;\n\t\t\t}\n\n\t\t\t.reports-header-actions .btn {\n\t\t\t\tmargin-top: 0;\n\t\t\t\twidth: auto;\n\t\t\t}\n\n\t\t\t.hub-header > .btn,\n\t\t\t.hub-header > a.btn {\n\t\t\t\tmargin-top: 0;\n\t\t\t\twidth: auto;\n\t\t\t\tflex-shrink: 0;\n\t\t\t}\n\n\t\t\t.report-role-excluded {\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tcursor: not-allowed;\n\t\t\t}\n\t\t</style><script>\n\t\t\twindow.closeReportViewModal = function () {\n\t\t\t\tconst host = document.getElementById('reportViewModalHost');\n\t\t\t\tif (host) host.innerHTML = '';\n\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t};\n\n\t\t\twindow.closeReportPaymentModal = function () {\n\t\t\t\tconst host = document.getElementById('reportPaymentModalHost');\n\t\t\t\tif (host) host.innerHTML = '';\n\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t};\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.id === 'reportViewModalHost') {\n\t\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\t\tconst overlay = evt.detail.target.querySelector('.modal-overlay');\n\t\t\t\t\tconst closeBtn = overlay && overlay.querySelector('.report-view-close');\n\t\t\t\t\tif (closeBtn) closeBtn.focus();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (evt.detail.target.id === 'reportPaymentModalHost') {\n\t\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\t\tconst overlay = evt.detail.target.querySelector('.modal-overlay');\n\t\t\t\t\tconst closeBtn = overlay && overlay.querySelector('.report-payment-close');\n\t\t\t\t\tif (closeBtn) closeBtn.focus();\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tif (e.target.closest('.report-view-close')) {\n\t\t\t\t\twindow.closeReportViewModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (e.target.closest('.report-payment-close')) {\n\t\t\t\t\twindow.closeReportPaymentModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst viewOverlay = e.target.closest('#reportViewModal');\n\t\t\t\tif (viewOverlay && e.target === viewOverlay) window.closeReportViewModal();\n\t\t\t\tconst paymentOverlay = e.target.closest('#reportPaymentModal');\n\t\t\t\tif (paymentOverlay && e.target === paymentOverlay) window.closeReportPaymentModal();\n\t\t\t});\n\n\t\t\tdocument.addEventListener('keydown', function (e) {\n\t\t\t\tif (e.key === 'Escape' && document.getElementById('reportViewModalHost')?.innerHTML) {\n\t\t\t\t\twindow.closeReportViewModal();\n\t\t\t\t}\n\t\t\t\tif (e.key === 'Escape' && document.getElementById('reportPaymentModalHost')?.innerHTML) {\n\t\t\t\t\twindow.closeReportPaymentModal();\n\t\t\t\t}\n\t\t\t});\n\t\t</script></head><body><div class=\"container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t.reports-filters {\n\t\t\t\tdisplay: contents;\n\t\t\t}\n\n\t\t\t.reports-header-actions {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-wrap: wrap;\n\t\t\t\tgap: var(--space-2);\n\t\t\t\talign-items: center;\n\t\t\t\tjustify-content: flex-end;\n\t\t\t\tflex-shrink: 0;\n\t\t\t}\n\n\t\t\t.reports-header-actions .btn {\n\t\t\t\tmargin-top: 0;\n\t\t\t\twidth: auto;\n\t\t\t}\n\n\t\t\t.hub-header > .btn,\n\t\t\t.hub-header > a.btn {\n\t\t\t\tmargin-top: 0;\n\t\t\t\twidth: auto;\n\t\t\t\tflex-shrink: 0;\n\t\t\t}\n\n\t\t\t.report-role-excluded {\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tcursor: not-allowed;\n\t\t\t}\n\t\t</style><script>\n\t\t\twindow.closeReportViewModal = function () {\n\t\t\t\tconst host = document.getElementById('reportViewModalHost');\n\t\t\t\tif (host) host.innerHTML = '';\n\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t};\n\n\t\t\twindow.closeReportPaymentModal = function () {\n\t\t\t\tconst host = document.getElementById('reportPaymentModalHost');\n\t\t\t\tif (host) host.innerHTML = '';\n\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t};\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.id === 'reportViewModalHost') {\n\t\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\t\tconst overlay = evt.detail.target.querySelector('.modal-overlay');\n\t\t\t\t\tconst closeBtn = overlay && overlay.querySelector('.report-view-close');\n\t\t\t\t\tif (closeBtn) closeBtn.focus();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (evt.detail.target.id === 'reportPaymentModalHost') {\n\t\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t\t\tconst overlay = evt.detail.target.querySelector('.modal-overlay');\n\t\t\t\t\tconst closeBtn = overlay && overlay.querySelector('.report-payment-close');\n\t\t\t\t\tif (closeBtn) closeBtn.focus();\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tif (e.target.closest('.report-view-close')) {\n\t\t\t\t\twindow.closeReportViewModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (e.target.closest('.report-payment-close')) {\n\t\t\t\t\twindow.closeReportPaymentModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst viewOverlay = e.target.closest('#reportViewModal');\n\t\t\t\tif (viewOverlay && e.target === viewOverlay) window.closeReportViewModal();\n\t\t\t\tconst paymentOverlay = e.target.closest('#reportPaymentModal');\n\t\t\t\tif (paymentOverlay && e.target === paymentOverlay) window.closeReportPaymentModal();\n\t\t\t});\n\n\t\t\tdocument.addEventListener('keydown', function (e) {\n\t\t\t\tif (e.key === 'Escape' && document.getElementById('reportViewModalHost')?.innerHTML) {\n\t\t\t\t\twindow.closeReportViewModal();\n\t\t\t\t}\n\t\t\t\tif (e.key === 'Escape' && document.getElementById('reportPaymentModalHost')?.innerHTML) {\n\t\t\t\t\twindow.closeReportPaymentModal();\n\t\t\t\t}\n\t\t\t});\n\t\t</script></head><body><div class=\"container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -62,13 +62,26 @@ func Reports() templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/reports/history"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 94, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 103, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"btn btn-secondary\">View History</a></div></div><div id=\"reportsSummaryCards\" class=\"dashboard-stats reports-summary\"><div class=\"stat-card\"><span class=\"stat-label\">Total Earnings</span> <span class=\"stat-sub\">Loading...</span></div></div><div class=\"toolbar\" id=\"reportsToolbar\"><div id=\"reportsFilters\" class=\"reports-filters\"><div class=\"form-group\"><label for=\"reportSearch\">Search</label> <input type=\"text\" id=\"reportSearch\" name=\"q\" placeholder=\"Search teacher or student name...\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"btn btn-secondary\">View History</a> <a href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var3 templ.SafeURL
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/payments"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 104, Col: 37}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"btn btn-secondary\">View Payment History</a></div></div><div id=\"reportsSummaryCards\" class=\"dashboard-stats reports-summary\"><div class=\"stat-card\"><span class=\"stat-label\">Total Earnings</span> <span class=\"stat-sub\">Loading...</span></div></div><div class=\"toolbar\" id=\"reportsToolbar\"><div id=\"reportsFilters\" class=\"reports-filters\"><div class=\"form-group\"><label for=\"reportSearch\">Search</label> <input type=\"text\" id=\"reportSearch\" name=\"q\" placeholder=\"Search teacher or student name...\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -88,7 +101,7 @@ func Reports() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<input type=\"hidden\" id=\"reportsPage\" name=\"page\" value=\"1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<input type=\"hidden\" id=\"reportsPage\" name=\"page\" value=\"1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -96,85 +109,93 @@ func Reports() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<button type=\"button\" id=\"filterBtn\" hx-get=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/partials/rows"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 120, Col: 50}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" hx-include=\"#reportsFilters\" hx-target=\"#reportsTableBody\" hx-swap=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<button type=\"button\" id=\"filterBtn\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 123, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 130, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\">Filter</button></div><form method=\"GET\" action=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" hx-include=\"#reportsFilters\" hx-target=\"#reportsTableBody\" hx-swap=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var5 templ.SafeURL
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/reports/summary"))
+		var templ_7745c5c3_Var5 string
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 128, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 133, Col: 31}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" id=\"reportSummaryForm\" class=\"report-summary-form\" onsubmit=\"syncReportSummaryForm(event)\"><input type=\"hidden\" name=\"q\" id=\"summaryQ\" value=\"\"> <input type=\"hidden\" name=\"datePreset\" id=\"summaryDatePreset\" value=\"\"> <input type=\"hidden\" name=\"roleTeacher\" id=\"summaryRoleTeacher\" value=\"\"> <input type=\"hidden\" name=\"roleAdmin\" id=\"summaryRoleAdmin\" value=\"\"> <button type=\"submit\" class=\"btn\">Generate Summary</button></form></div><div class=\"table-wrapper data-list-view-root\"><table id=\"reportsTable\" class=\"table-stack-mobile\"><thead><tr><th>Teacher</th><th>Payment status</th><th>Total Classes</th><th>Total Rate/Earnings</th><th>Actions</th></tr></thead> <tbody id=\"reportsTableBody\" hx-get=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/partials/rows"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 154, Col: 50}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\">Filter</button></div><form method=\"GET\" action=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" hx-include=\"#reportsFilters\" hx-trigger=\"")
+		var templ_7745c5c3_Var6 templ.SafeURL
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/reports/summary"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 138, Col: 43}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" id=\"reportSummaryForm\" class=\"report-summary-form\" onsubmit=\"syncReportSummaryForm(event)\"><input type=\"hidden\" name=\"q\" id=\"summaryQ\" value=\"\"> <input type=\"hidden\" name=\"datePreset\" id=\"summaryDatePreset\" value=\"\"> <input type=\"hidden\" name=\"roleTeacher\" id=\"summaryRoleTeacher\" value=\"\"> <input type=\"hidden\" name=\"roleAdmin\" id=\"summaryRoleAdmin\" value=\"\"> <button type=\"submit\" class=\"btn\">Generate Summary</button></form></div><div class=\"table-wrapper data-list-view-root\"><table id=\"reportsTable\" class=\"table-stack-mobile\"><thead><tr><th>Teacher</th><th>Payment status</th><th>Total Classes</th><th>Total Rate/Earnings</th><th>Actions</th></tr></thead> <tbody id=\"reportsTableBody\" data-loading-label=\"Loading reports...\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 156, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 165, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" hx-swap=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" hx-include=\"#reportsFilters\" hx-trigger=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 157, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 167, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\"><tr><td colspan=\"5\" class=\"empty-state\">Loading reports...</td></tr></tbody></table></div><div id=\"paginationBottom\" class=\"pagination-bar\"></div><div id=\"reportViewModalHost\"></div><div id=\"reportPaymentModalHost\"></div></div><script>\n\t\t\tconst reportSearch = document.getElementById('reportSearch');\n\n\t\t\tfunction setDateRangeFromPreset(select) {\n\t\t\t\tif (!select) return;\n\t\t\t\tif (!select.value) {\n\t\t\t\t\tdelete select.dataset.startDate;\n\t\t\t\t\tdelete select.dataset.endDate;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst parts = select.value.split('|');\n\t\t\t\tif (parts.length !== 2) return;\n\t\t\t\tselect.dataset.startDate = parts[0];\n\t\t\t\tselect.dataset.endDate = parts[1];\n\t\t\t}\n\n\t\t\tfunction bindDatePresetSelect() {\n\t\t\t\tconst datePresetSelect = document.getElementById('datePreset');\n\t\t\t\tif (!datePresetSelect) return;\n\t\t\t\tsetDateRangeFromPreset(datePresetSelect);\n\t\t\t\tdatePresetSelect.addEventListener('change', () => {\n\t\t\t\t\tsetDateRangeFromPreset(datePresetSelect);\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tbindDatePresetSelect();\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.id !== 'datePresetGroup') return;\n\t\t\t\tbindDatePresetSelect();\n\t\t\t\tconst reportsPage = document.getElementById('reportsPage');\n\t\t\t\tif (reportsPage) reportsPage.value = '1';\n\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\thtmx.trigger('#reportsTableBody', 'load');\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tconst filterBtn = document.getElementById('filterBtn');\n\t\t\tconst reportsPage = document.getElementById('reportsPage');\n\t\t\tif (filterBtn) {\n\t\t\t\tfilterBtn.addEventListener('click', function () {\n\t\t\t\t\tif (reportsPage) reportsPage.value = '1';\n\t\t\t\t});\n\t\t\t}\n\n\t\t\treportSearch.addEventListener('keydown', function (e) {\n\t\t\t\tif (e.key === 'Enter') {\n\t\t\t\t\te.preventDefault();\n\t\t\t\t\tif (reportsPage) reportsPage.value = '1';\n\t\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\t\thtmx.trigger('#reportsTableBody', 'load');\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tconst pageBtn = e.target.closest('#paginationBottom .pagination-btn[hx-get]');\n\t\t\t\tif (!pageBtn || !reportsPage) return;\n\t\t\t\tconst vals = pageBtn.getAttribute('hx-vals');\n\t\t\t\tif (!vals) return;\n\t\t\t\ttry {\n\t\t\t\t\tconst parsed = JSON.parse(vals.replace(/'/g, '\"'));\n\t\t\t\t\tif (parsed.page) reportsPage.value = String(parsed.page);\n\t\t\t\t} catch (err) { /* ignore */ }\n\t\t\t});\n\n\t\t\twindow.syncReportSummaryForm = function (e) {\n\t\t\t\tconst search = document.getElementById('reportSearch');\n\t\t\t\tconst preset = document.getElementById('datePreset');\n\t\t\t\tconst qField = document.getElementById('summaryQ');\n\t\t\t\tconst presetField = document.getElementById('summaryDatePreset');\n\t\t\t\tconst roleTeacher = document.querySelector('#reportsFilters input[name=\"roleTeacher\"]');\n\t\t\t\tconst roleAdmin = document.querySelector('#reportsFilters input[name=\"roleAdmin\"]');\n\t\t\t\tconst summaryRoleTeacher = document.getElementById('summaryRoleTeacher');\n\t\t\t\tconst summaryRoleAdmin = document.getElementById('summaryRoleAdmin');\n\t\t\t\tif (search && qField) {\n\t\t\t\t\tqField.value = search.value || '';\n\t\t\t\t}\n\t\t\t\tif (preset && presetField) {\n\t\t\t\t\tpresetField.value = preset.value || '';\n\t\t\t\t}\n\t\t\t\tif (summaryRoleTeacher) {\n\t\t\t\t\tsummaryRoleTeacher.value = roleTeacher && roleTeacher.checked ? '1' : '';\n\t\t\t\t}\n\t\t\t\tif (summaryRoleAdmin) {\n\t\t\t\t\tsummaryRoleAdmin.value = roleAdmin && roleAdmin.checked ? '1' : '';\n\t\t\t\t}\n\t\t\t\tif (!presetField || !presetField.value) {\n\t\t\t\t\te.preventDefault();\n\t\t\t\t\talert('Select a date range first.');\n\t\t\t\t}\n\t\t\t};\n\t\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" hx-swap=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var9 string
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/reports.templ`, Line: 168, Col: 31}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = TableBodyLoadingRow(5, "Loading reports...").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</tbody></table></div><div id=\"paginationBottom\" class=\"pagination-bar\"></div><div id=\"reportViewModalHost\"></div><div id=\"reportPaymentModalHost\"></div></div><script>\n\t\t\tconst reportSearch = document.getElementById('reportSearch');\n\n\t\t\tfunction setDateRangeFromPreset(select) {\n\t\t\t\tif (!select) return;\n\t\t\t\tif (!select.value) {\n\t\t\t\t\tdelete select.dataset.startDate;\n\t\t\t\t\tdelete select.dataset.endDate;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tconst parts = select.value.split('|');\n\t\t\t\tif (parts.length !== 2) return;\n\t\t\t\tselect.dataset.startDate = parts[0];\n\t\t\t\tselect.dataset.endDate = parts[1];\n\t\t\t}\n\n\t\t\tfunction bindDatePresetSelect() {\n\t\t\t\tconst datePresetSelect = document.getElementById('datePreset');\n\t\t\t\tif (!datePresetSelect) return;\n\t\t\t\tsetDateRangeFromPreset(datePresetSelect);\n\t\t\t\tdatePresetSelect.addEventListener('change', () => {\n\t\t\t\t\tsetDateRangeFromPreset(datePresetSelect);\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tbindDatePresetSelect();\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.id !== 'datePresetGroup') return;\n\t\t\t\tbindDatePresetSelect();\n\t\t\t\tconst reportsPage = document.getElementById('reportsPage');\n\t\t\t\tif (reportsPage) reportsPage.value = '1';\n\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\thtmx.trigger('#reportsTableBody', 'load');\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tconst filterBtn = document.getElementById('filterBtn');\n\t\t\tconst reportsPage = document.getElementById('reportsPage');\n\t\t\tif (filterBtn) {\n\t\t\t\tfilterBtn.addEventListener('click', function () {\n\t\t\t\t\tif (reportsPage) reportsPage.value = '1';\n\t\t\t\t});\n\t\t\t}\n\n\t\t\treportSearch.addEventListener('keydown', function (e) {\n\t\t\t\tif (e.key === 'Enter') {\n\t\t\t\t\te.preventDefault();\n\t\t\t\t\tif (reportsPage) reportsPage.value = '1';\n\t\t\t\t\tif (typeof htmx !== 'undefined') {\n\t\t\t\t\t\thtmx.trigger('#reportsTableBody', 'load');\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tconst pageBtn = e.target.closest('#paginationBottom .pagination-btn[hx-get]');\n\t\t\t\tif (!pageBtn || !reportsPage) return;\n\t\t\t\tconst vals = pageBtn.getAttribute('hx-vals');\n\t\t\t\tif (!vals) return;\n\t\t\t\ttry {\n\t\t\t\t\tconst parsed = JSON.parse(vals.replace(/'/g, '\"'));\n\t\t\t\t\tif (parsed.page) reportsPage.value = String(parsed.page);\n\t\t\t\t} catch (err) { /* ignore */ }\n\t\t\t});\n\n\t\t\twindow.syncReportSummaryForm = function (e) {\n\t\t\t\tconst search = document.getElementById('reportSearch');\n\t\t\t\tconst preset = document.getElementById('datePreset');\n\t\t\t\tconst qField = document.getElementById('summaryQ');\n\t\t\t\tconst presetField = document.getElementById('summaryDatePreset');\n\t\t\t\tconst roleTeacher = document.querySelector('#reportsFilters input[name=\"roleTeacher\"]');\n\t\t\t\tconst roleAdmin = document.querySelector('#reportsFilters input[name=\"roleAdmin\"]');\n\t\t\t\tconst summaryRoleTeacher = document.getElementById('summaryRoleTeacher');\n\t\t\t\tconst summaryRoleAdmin = document.getElementById('summaryRoleAdmin');\n\t\t\t\tif (search && qField) {\n\t\t\t\t\tqField.value = search.value || '';\n\t\t\t\t}\n\t\t\t\tif (preset && presetField) {\n\t\t\t\t\tpresetField.value = preset.value || '';\n\t\t\t\t}\n\t\t\t\tif (summaryRoleTeacher) {\n\t\t\t\t\tsummaryRoleTeacher.value = roleTeacher && roleTeacher.checked ? '1' : '';\n\t\t\t\t}\n\t\t\t\tif (summaryRoleAdmin) {\n\t\t\t\t\tsummaryRoleAdmin.value = roleAdmin && roleAdmin.checked ? '1' : '';\n\t\t\t\t}\n\t\t\t\tif (!presetField || !presetField.value) {\n\t\t\t\t\te.preventDefault();\n\t\t\t\t\talert('Select a date range first.');\n\t\t\t\t}\n\t\t\t};\n\t\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -182,7 +203,7 @@ func Reports() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

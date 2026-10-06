@@ -197,14 +197,13 @@ templ DocumentsTable(showUploader bool, showActions bool) {
 			</thead>
 			<tbody
 				id="documentsTableBody"
+				data-loading-label="Loading documents..."
 				hx-get={ utils.URL("/documents/partials/rows") }
 				hx-include="#documentsToolbar"
 				hx-trigger={ HxTriggerLoad }
 				hx-swap={ HxSwapInnerHTML }
 			>
-				<tr>
-					<td colspan={ fmt.Sprintf("%d", documentsTableColspan(showUploader, showActions)) } class="empty-state">Loading documents...</td>
-				</tr>
+				@TableBodyLoadingRow(documentsTableColspan(showUploader, showActions), "Loading documents...")
 			</tbody>
 		</table>
 	</div>

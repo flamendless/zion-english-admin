@@ -50,7 +50,7 @@ templ ReportsHistory() {
 				<div id="reportsHistoryFilters" class="reports-history-filters">
 					<div class="form-group">
 						<label for="reportHistorySearch">Search</label>
-						<input type="text" id="reportHistorySearch" name="q" placeholder="Search teacher name..."/>
+						<input type="text" id="reportHistorySearch" name="q" placeholder="Search teacher or summary..."/>
 					</div>
 					@MonthPicker("reportHistoryMonth", utils.URL("/reports/history/partials/date-preset"))
 					@DatePreset(true)
@@ -80,14 +80,13 @@ templ ReportsHistory() {
 					</thead>
 					<tbody
 						id="reportsHistoryTableBody"
+						data-loading-label="Loading report history..."
 						hx-get={ utils.URL("/reports/history/partials/rows") }
 						hx-include="#reportsHistoryFilters"
 						hx-trigger={ HxTriggerLoad }
 						hx-swap={ HxSwapInnerHTML }
 					>
-						<tr>
-							<td colspan="5" class="empty-state">Loading report history...</td>
-						</tr>
+						@TableBodyLoadingRow(5, "Loading report history...")
 					</tbody>
 				</table>
 			</div>

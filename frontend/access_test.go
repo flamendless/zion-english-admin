@@ -51,3 +51,25 @@ func TestIsNavAccessibleTeacherResources(t *testing.T) {
 		}
 	}
 }
+
+func TestAnnouncementsInAdminNavGroup(t *testing.T) {
+	group := navGroupForRole(auth.RoleAdmin, "admin")
+	if group == nil {
+		t.Fatal("admin nav group expected")
+	}
+	if len(group.Items) == 0 {
+		t.Fatal("admin nav group should have items")
+	}
+	last := group.Items[len(group.Items)-1]
+	if last.Path != "/announcements" {
+		t.Fatalf("expected announcements last in admin group, got %s", last.Path)
+	}
+	for _, item := range DashboardExtraItems(auth.RoleAdmin) {
+		if item.Path == "/announcements" {
+			t.Fatal("announcements should not be a standalone dashboard card")
+		}
+	}
+	if !IsNavAccessible(auth.RoleAdmin, "/announcements") {
+		t.Fatal("admin should access /announcements")
+	}
+}

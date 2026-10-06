@@ -96,7 +96,7 @@ var navItemDefs = []navItemDef{
 	{Path: "/analytics", LinkID: "analyticsLink", Title: "Analytics", TeacherTitle: "My Analytics", Description: "Attendance, utilization, and student retention insights", TeacherDesc: "View attendance and utilization for your classes"},
 	{Path: "/my-earnings", LinkID: "myEarningsLink", Title: "My Earnings", Description: "Payroll cutoff earnings history for your conducted classes", FeatureCard: true},
 	{Path: "/teachers-earnings", LinkID: "teachersEarningsLink", Title: "Teachers Earnings", Description: "View payroll cutoff earnings history for any teacher", AdminOnlyCard: true},
-	{Path: "/payments", LinkID: "paymentsLink", Title: "Payment History", TeacherTitle: "My Payment History", Description: "View teacher payment records and receipt status", TeacherDesc: "View your payment records and receipt status", AdminOnlyCard: true},
+	{Path: "/payments", LinkID: "paymentsLink", Title: "Payments", TeacherTitle: "My Payment History", Description: "View teacher payment records and receipt status", TeacherDesc: "View your payment records and receipt status", AdminOnlyCard: true},
 	{Path: "/student-relationships", LinkID: "studentRelationshipsLink", Title: "Students Relationship Diagram", Description: "Visual family groupings and linked student relationships", AdminOnlyCard: true},
 	{Path: "/affiliate-ads/reports", LinkID: "affiliateAdsReportsLink", Title: "Ads/Affiliates", Description: "Affiliate link click totals and ad placement summaries", AdminOnlyCard: true},
 	{Path: "/process", LinkID: "processLink", Title: "Process", Description: "Process CSV files and view logs", AdminOnlyCard: true},
@@ -109,6 +109,7 @@ var navItemDefs = []navItemDef{
 	{Path: "/exports", LinkID: "exportsLink", Title: "My data export", Description: "Export your classes, students, and schedule for personal use", TeacherTitle: "My data export", TeacherDesc: "Export your classes, students, and schedule for personal use", FeatureCard: true},
 	{Path: "/logs", LinkID: "logsLink", Title: "Logs", TeacherTitle: "My Activity", Description: "View system logs", TeacherDesc: "View your recent actions"},
 	{Path: "/upload-logs", LinkID: "uploadLogsLink", Title: "Upload Logs", TeacherTitle: "My Upload Logs", Description: "Teacher file upload activity", TeacherDesc: "View success and failure for your file uploads", AdminOnlyCard: true},
+	{Path: "/announcements", LinkID: "announcementsLink", Title: "Announcements", Description: "Create and manage system-wide banners", AdminOnlyCard: true},
 }
 
 var navGroupDefs = []navGroupDef{
@@ -116,7 +117,7 @@ var navGroupDefs = []navGroupDef{
 	{ID: "people", Label: "People", Description: "Manage teachers and students", AdminOnlyCard: true, Paths: []string{"/teachers", "/students"}},
 	{ID: "resources", Label: "Resources", Description: "Guides, documents, learning materials, and training videos", TeacherDesc: "Guides, your documents, learning materials, and training videos", FeatureCard: true, Paths: []string{"/guides", "/documents", "/intro-videos", "/learning-materials", "/training-materials"}},
 	{ID: "insights", Label: "Insights", Description: "Payroll reports and analytics", AdminOnlyCard: true, Paths: []string{"/reports", "/reports/history", "/analytics", "/my-earnings", "/payments", "/student-relationships", "/affiliate-ads/reports"}},
-	{ID: "admin", Label: "Admin", Description: "Process CSV files, feature flags, meta tags, affiliates, ads, plans, settings, logs, and upload logs", AdminOnlyCard: true, Paths: []string{"/process", "/feature-flags", "/meta", "/affiliates", "/ads", "/plans", "/settings", "/logs", "/upload-logs", "/teachers-earnings"}},
+	{ID: "admin", Label: "Admin", Description: "Process CSV files, feature flags, meta tags, affiliates, ads, plans, settings, logs, upload logs, and announcements", AdminOnlyCard: true, Paths: []string{"/process", "/feature-flags", "/meta", "/affiliates", "/ads", "/plans", "/settings", "/logs", "/upload-logs", "/teachers-earnings", "/announcements"}},
 }
 
 var adminNavLayout = []navLayoutEntry{
@@ -231,16 +232,6 @@ func DashboardStandaloneItems(role auth.Role) []NavItem {
 
 func DashboardExtraItems(role auth.Role) []NavItem {
 	var items []NavItem
-	if auth.HasAdminAccess(role) {
-		items = append(items, NavItem{
-			Path:          "/announcements",
-			LinkID:        "announcementsLink",
-			Title:         "Announcements",
-			Description:   "Create and manage system-wide banners",
-			Icon:          NavIconForPath("/announcements"),
-			AdminOnlyCard: true,
-		})
-	}
 	items = append(items, NavItem{
 		Path:        "/changelogs",
 		LinkID:      "changelogsLink",

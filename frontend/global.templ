@@ -3405,6 +3405,17 @@ templ GlobalIncludes() {
 			animation: btn-spin 0.65s linear infinite;
 		}
 
+		.table-body-loading {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: var(--space-2);
+		}
+
+		td.empty-state.table-body-loading {
+			display: flex;
+		}
+
 		.calendar-month-label {
 			font-weight: 600;
 			font-size: 1rem;
@@ -4793,6 +4804,7 @@ templ GlobalIncludes() {
 	@ErrorBannerHandlers()
 	@ScrClipboardHelpers()
 	@ScrTableTruncationTooltips()
+	@ScrTableBodyLoading()
 	@ScrDataListView()
 	@ScrFloatingTooltips()
 	@SortToggleScript()

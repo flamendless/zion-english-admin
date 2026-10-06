@@ -216,6 +216,30 @@ func handleReportSummary(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	existing, existingErr := dbRO.GetQueries().GetSummaryReportGeneration(ctx, queries.GetSummaryReportGenerationParams{
+		StartDate: startDate,
+		EndDate:   endDate,
+	})
+	if existingErr == nil && existing.OutputPath != "" {
+		oldBase := reportOutputBasename(existing.OutputPath)
+		if oldBase != "" && oldBase != filename {
+			_ = storage.Default().Delete(ctx, storage.CategoryReports, oldBase)
+			_ = os.Remove(filepath.Join("tmp", oldBase))
+		}
+	}
+
+	if err := dbRW.GetQueries().UpsertSummaryReportGeneration(ctx, queries.UpsertSummaryReportGenerationParams{
+		StartDate:   startDate,
+		EndDate:     endDate,
+		ContentHash: string(constants.ReportGenerationKindSummary),
+		OutputPath:  filename,
+		RecordCount: int64(len(summaryRows)),
+	}); err != nil {
+		logs.Log().Error("upsert summary report generation", zap.Error(err))
+		HttpError(w, "Failed to save summary report", http.StatusInternalServerError)
+		return
+	}
+
 	user := auth.GetUser(ctx)
 	insertAuditLogAs(ctx, user, "reports", fmt.Sprintf(
 		"generated summary report (%s to %s): %s",
@@ -305,7 +329,9 @@ func loadReportRows(ctx context.Context, startDate, endDate, q string, roleFilte
 
 	cacheByTeacher := map[int64]queries.TblReportGeneration{}
 	for _, row := range cachedRows {
-		cacheByTeacher[row.TeacherID] = row
+		if row.TeacherID.Valid {
+			cacheByTeacher[row.TeacherID.Int64] = row
+		}
 	}
 
 	teacherIDs := make([]int64, len(summaries))
@@ -603,7 +629,7 @@ func generateTeacherReportFile(ctx context.Context, teacherID int64, startDate, 
 	}
 
 	cache, cacheErr := dbRO.GetQueries().GetReportGeneration(ctx, queries.GetReportGenerationParams{
-		TeacherID: teacherID,
+		TeacherID: sql.NullInt64{Int64: teacherID, Valid: true},
 		StartDate: startDate,
 		EndDate:   endDate,
 	})
@@ -647,7 +673,7 @@ func generateTeacherReportFile(ctx context.Context, teacherID int64, startDate, 
 	}
 
 	if err := dbRW.GetQueries().UpsertReportGeneration(ctx, queries.UpsertReportGenerationParams{
-		TeacherID:   teacherID,
+		TeacherID:   sql.NullInt64{Int64: teacherID, Valid: true},
 		StartDate:   startDate,
 		EndDate:     endDate,
 		ContentHash: currentHash,
@@ -978,6 +1004,6 @@ func auditReportDownload(ctx context.Context, filename string) {
 	user := auth.GetUser(ctx)
 	insertAuditLogAs(ctx, user, "reports", fmt.Sprintf(
 		"downloaded report for teacher '%s' (%s to %s): %s",
-		row.TeacherName, row.StartDate, row.EndDate, filename,
+		fmt.Sprint(row.TeacherName), row.StartDate, row.EndDate, filename,
 	))
 }

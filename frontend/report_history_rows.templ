@@ -3,7 +3,11 @@ package frontend
 templ ReportHistoryTableRow(row ReportHistoryRowData) {
 	<tr>
 		<td data-label="Teacher">
-			@TeacherNameCell(row.TeacherName, row.TeacherAvatar)
+			if row.IsSummary() {
+				{ row.TeacherName }
+			} else {
+				@TeacherNameCell(row.TeacherName, row.TeacherAvatar)
+			}
 		</td>
 		<td data-label="Period">{ row.PeriodLabel }</td>
 		<td data-label="Records">{ row.RecordsLabel() }</td>

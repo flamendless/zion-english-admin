@@ -689,14 +689,14 @@ func DocumentsTable(showUploader bool, showActions bool) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "</tr></thead> <tbody id=\"documentsTableBody\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "</tr></thead> <tbody id=\"documentsTableBody\" data-loading-label=\"Loading documents...\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var26 string
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/documents/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 200, Col: 50}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 201, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 		if templ_7745c5c3_Err != nil {
@@ -709,7 +709,7 @@ func DocumentsTable(showUploader bool, showActions bool) templ.Component {
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 202, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 203, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
 		if templ_7745c5c3_Err != nil {
@@ -722,26 +722,21 @@ func DocumentsTable(showUploader bool, showActions bool) templ.Component {
 		var templ_7745c5c3_Var28 string
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 203, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 204, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var28)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "\"><tr><td colspan=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var29 string
-		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", documentsTableColspan(showUploader, showActions)))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 206, Col: 86}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var29)
+		templ_7745c5c3_Err = TableBodyLoadingRow(documentsTableColspan(showUploader, showActions), "Loading documents...").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "\" class=\"empty-state\">Loading documents...</td></tr></tbody></table></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "</tbody></table></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -765,21 +760,21 @@ func DocumentsCard(title string, description string, showUploader bool, showActi
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var30 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var30 == nil {
-			templ_7745c5c3_Var30 = templ.NopComponent
+		templ_7745c5c3_Var29 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var29 == nil {
+			templ_7745c5c3_Var29 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<section class=\"documents-card\"><div class=\"documents-card-header\"><div><h2>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var31 string
-		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(title)
+		var templ_7745c5c3_Var30 string
+		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 217, Col: 15}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 216, Col: 15}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -792,12 +787,12 @@ func DocumentsCard(title string, description string, showUploader bool, showActi
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var32 string
-			templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(description)
+			var templ_7745c5c3_Var31 string
+			templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 219, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 218, Col: 49}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -842,9 +837,9 @@ func DocumentsStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var33 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var33 == nil {
-			templ_7745c5c3_Var33 = templ.NopComponent
+		templ_7745c5c3_Var32 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var32 == nil {
+			templ_7745c5c3_Var32 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "<style>\n\t\t.documents-page-desc {\n\t\t\tmargin-bottom: var(--space-6);\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-size: 0.9375rem;\n\t\t}\n\n\t\t.documents-card {\n\t\t\tbackground: var(--color-muted);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t\tborder-radius: var(--radius-lg);\n\t\t\tpadding: var(--space-6);\n\t\t\tmargin-top: var(--space-6);\n\t\t}\n\n\t\t.documents-card-header {\n\t\t\tdisplay: flex;\n\t\t\talign-items: flex-start;\n\t\t\tjustify-content: space-between;\n\t\t\tgap: var(--space-4);\n\t\t\tmargin-bottom: var(--space-4);\n\t\t}\n\n\t\t.documents-card h2 {\n\t\t\tmargin: 0;\n\t\t\tfont-size: 1.125rem;\n\t\t}\n\n\t\t.documents-card-desc {\n\t\t\tmargin-top: var(--space-2);\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-size: 0.875rem;\n\t\t}\n\n\t\t.documents-table-wrapper {\n\t\t\tmargin-top: var(--space-2);\n\t\t}\n\n\t\t.documents-uploader-cell {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tmin-width: 0;\n\t\t}\n\n\t\t.documents-table .documents-filename {\n\t\t\tdisplay: inline;\n\t\t\tword-break: break-all;\n\t\t\toverflow-wrap: anywhere;\n\t\t}\n\n\t\t.documents-filename-link {\n\t\t\tcolor: var(--color-accent);\n\t\t\ttext-decoration: none;\n\t\t}\n\n\t\t.documents-filename-link:hover {\n\t\t\tcolor: var(--color-accent-hover);\n\t\t\ttext-decoration: underline;\n\t\t}\n\n\t\t.documents-ext {\n\t\t\tfont-family: 'Fira Code', monospace;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tbackground: var(--color-surface);\n\t\t\tpadding: 2px 8px;\n\t\t\tborder-radius: var(--radius-sm);\n\t\t\tborder: 1px solid var(--color-border-subtle);\n\t\t}\n\n\t\t.document-row-submitted {\n\t\t\tbackground-color: var(--color-warning-bg) !important;\n\t\t}\n\n\t\t.document-row-rejected {\n\t\t\tbackground-color: var(--color-error-bg) !important;\n\t\t}\n\n\t\t.documents-empty {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\tgap: var(--space-3);\n\t\t\tpadding: var(--space-8) var(--space-4);\n\t\t\ttext-align: center;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.documents-empty svg {\n\t\t\tcolor: var(--color-border);\n\t\t}\n\n\t\t.documents-empty-hint {\n\t\t\tfont-size: 0.875rem;\n\t\t}\n\n\t\t.upload-zone {\n\t\t\tborder: 2px dashed var(--color-border);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tpadding: var(--space-4);\n\t\t\tbackground: var(--color-surface);\n\t\t\ttransition: border-color var(--transition-fast), background-color var(--transition-fast);\n\t\t}\n\n\t\t.upload-zone:focus-within {\n\t\t\tborder-color: var(--color-primary);\n\t\t\tbackground: var(--color-primary-light);\n\t\t}\n\n\t\t.upload-zone-label {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-3);\n\t\t\tcursor: pointer;\n\t\t\tfont-weight: 500;\n\t\t\tfont-size: 0.875rem;\n\t\t}\n\n\t\t.upload-zone-icon {\n\t\t\tdisplay: flex;\n\t\t\talign-items: center;\n\t\t\tjustify-content: center;\n\t\t\twidth: 40px;\n\t\t\theight: 40px;\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tbackground: var(--color-info-bg);\n\t\t\tcolor: var(--color-accent);\n\t\t\tflex-shrink: 0;\n\t\t}\n\n\t\t.upload-zone input[type=\"file\"] {\n\t\t\tposition: absolute;\n\t\t\twidth: 1px;\n\t\t\theight: 1px;\n\t\t\tpadding: 0;\n\t\t\tmargin: -1px;\n\t\t\toverflow: hidden;\n\t\t\tclip: rect(0, 0, 0, 0);\n\t\t\tborder: 0;\n\t\t}\n\n\t\t.upload-zone-meta {\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tgap: 2px;\n\t\t\tmin-width: 0;\n\t\t}\n\n\t\t.upload-zone-hint {\n\t\t\tfont-size: 0.75rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t\tfont-weight: 400;\n\t\t}\n\n\t\t.upload-zone.is-disabled {\n\t\t\topacity: 0.72;\n\t\t\tpointer-events: none;\n\t\t\tbackground: var(--color-muted);\n\t\t\tborder-color: var(--color-border-subtle);\n\t\t\tborder-style: solid;\n\t\t}\n\n\t\t.upload-zone.is-disabled .upload-zone-icon {\n\t\t\tbackground: var(--color-surface);\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.upload-zone.is-disabled .upload-zone-meta {\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.upload-filename {\n\t\t\tmargin-top: var(--space-2);\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-foreground);\n\t\t\tword-break: break-all;\n\t\t}\n\n\t\t.upload-locked-notice {\n\t\t\tdisplay: flex;\n\t\t\talign-items: flex-start;\n\t\t\tgap: var(--space-2);\n\t\t\tpadding: var(--space-3) var(--space-4);\n\t\t\tmargin-bottom: var(--space-4);\n\t\t\tborder-radius: var(--radius-md);\n\t\t\tbackground: var(--color-info-bg);\n\t\t\tborder: 1px solid color-mix(in srgb, var(--color-info) 25%, transparent);\n\t\t\tfont-size: 0.875rem;\n\t\t}\n\n\t\t.upload-locked-notice svg {\n\t\t\tflex-shrink: 0;\n\t\t\tmargin-top: 2px;\n\t\t\tcolor: var(--color-info);\n\t\t}\n\t</style>")
@@ -880,9 +875,9 @@ func DocumentsPage(data DocumentsPageData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var34 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var34 == nil {
-			templ_7745c5c3_Var34 = templ.NopComponent
+		templ_7745c5c3_Var33 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var33 == nil {
+			templ_7745c5c3_Var33 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "<!doctype html><html lang=\"en\"><head>")
@@ -926,12 +921,12 @@ func DocumentsPage(data DocumentsPageData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var35 string
-			templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
+			var templ_7745c5c3_Var34 string
+			templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(data.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 452, Col: 53}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 451, Col: 53}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -992,9 +987,9 @@ func ProfilePictureUpload(data ProfileData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var36 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var36 == nil {
-			templ_7745c5c3_Var36 = templ.NopComponent
+		templ_7745c5c3_Var35 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var35 == nil {
+			templ_7745c5c3_Var35 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		if !data.IsSuperuser {
@@ -1002,12 +997,12 @@ func ProfilePictureUpload(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var37 templ.SafeURL
-			templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/avatar"))
+			var templ_7745c5c3_Var36 templ.SafeURL
+			templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/avatar"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 507, Col: 41}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 506, Col: 41}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1044,9 +1039,9 @@ func ProfileAvatarUploadScript() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var38 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var38 == nil {
-			templ_7745c5c3_Var38 = templ.NopComponent
+		templ_7745c5c3_Var37 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var37 == nil {
+			templ_7745c5c3_Var37 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "<script>\n\t\t(function () {\n\t\t\tfunction bindProfileAvatarUpload() {\n\t\t\t\tconst form = document.getElementById('profileAvatarForm');\n\t\t\t\tif (!form || form.dataset.avatarUploadBound === '1') {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tconst input = document.getElementById('profileAvatarInput');\n\t\t\t\tconst previewRoot = document.getElementById('profileAvatarPreview');\n\t\t\t\tif (!input || !previewRoot) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tconst avatarEl = previewRoot.querySelector('.avatar');\n\t\t\t\tif (!avatarEl) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tform.dataset.avatarUploadBound = '1';\n\n\t\t\t\tconst filenameEl = form.querySelector('.upload-filename');\n\t\t\t\tconst submitBtn = form.querySelector('button[type=\"submit\"]');\n\t\t\t\tconst originalAvatarHTML = avatarEl.innerHTML;\n\t\t\t\tconst altText = avatarEl.getAttribute('aria-label') || 'Profile photo preview';\n\n\t\t\t\tfunction setCardPreview(file) {\n\t\t\t\t\tif (!file) {\n\t\t\t\t\t\tavatarEl.innerHTML = originalAvatarHTML;\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\n\t\t\t\t\tconst reader = new FileReader();\n\t\t\t\t\treader.onload = function () {\n\t\t\t\t\t\tconst img = document.createElement('img');\n\t\t\t\t\t\timg.className = 'avatar-image';\n\t\t\t\t\t\timg.alt = altText;\n\t\t\t\t\t\timg.src = reader.result;\n\t\t\t\t\t\tavatarEl.replaceChildren(img);\n\t\t\t\t\t};\n\t\t\t\t\treader.readAsDataURL(file);\n\t\t\t\t}\n\n\t\t\t\tinput.addEventListener('change', function () {\n\t\t\t\t\tconst file = input.files && input.files[0];\n\t\t\t\t\tif (filenameEl) {\n\t\t\t\t\t\tfilenameEl.textContent = file ? file.name : '';\n\t\t\t\t\t}\n\t\t\t\t\tif (submitBtn) {\n\t\t\t\t\t\tsubmitBtn.disabled = !file;\n\t\t\t\t\t}\n\t\t\t\t\tsetCardPreview(file || null);\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tif (document.readyState === 'loading') {\n\t\t\t\tdocument.addEventListener('DOMContentLoaded', bindProfileAvatarUpload);\n\t\t\t} else {\n\t\t\t\tbindProfileAvatarUpload();\n\t\t\t}\n\t\t})();\n\t</script>")
@@ -1073,9 +1068,9 @@ func ProfileDocumentUpload(data ProfileData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var39 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var39 == nil {
-			templ_7745c5c3_Var39 = templ.NopComponent
+		templ_7745c5c3_Var38 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var38 == nil {
+			templ_7745c5c3_Var38 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		if !data.IsSuperuser {
@@ -1093,12 +1088,12 @@ func ProfileDocumentUpload(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var40 templ.SafeURL
-			templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/document"))
+			var templ_7745c5c3_Var39 templ.SafeURL
+			templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/document"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 622, Col: 43}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 621, Col: 43}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1147,9 +1142,9 @@ func ProfileResumeUpload(data ProfileData) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var41 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var41 == nil {
-			templ_7745c5c3_Var41 = templ.NopComponent
+		templ_7745c5c3_Var40 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var40 == nil {
+			templ_7745c5c3_Var40 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		if !data.IsSuperuser {
@@ -1172,12 +1167,12 @@ func ProfileResumeUpload(data ProfileData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var42 string
-				templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.ResumeFilename)
+				var templ_7745c5c3_Var41 string
+				templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.ResumeFilename)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 674, Col: 75}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 673, Col: 75}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var42)
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var41)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1185,12 +1180,12 @@ func ProfileResumeUpload(data ProfileData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var43 string
-				templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(data.ResumeFilename)
+				var templ_7745c5c3_Var42 string
+				templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(data.ResumeFilename)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 674, Col: 99}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 673, Col: 99}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1209,12 +1204,12 @@ func ProfileResumeUpload(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var44 templ.SafeURL
-			templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/resume"))
+			var templ_7745c5c3_Var43 templ.SafeURL
+			templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile/resume"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 684, Col: 41}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 683, Col: 41}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1222,8 +1217,8 @@ func ProfileResumeUpload(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var45 = []any{profileUploadZoneClass(data.CanUploadResume)}
-			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var45...)
+			var templ_7745c5c3_Var44 = []any{profileUploadZoneClass(data.CanUploadResume)}
+			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var44...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1231,12 +1226,12 @@ func ProfileResumeUpload(data ProfileData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var46 string
-			templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var45).String())
+			var templ_7745c5c3_Var45 string
+			templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var44).String())
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/documents.templ`, Line: 1, Col: 0}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var46)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var45)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

@@ -96,6 +96,113 @@ templ ScrTableTruncationTooltips() {
 	</script>
 }
 
+templ ScrTableBodyLoading() {
+	<script>
+		(function () {
+			if (window.zionFetchBodyLoading) return;
+
+			var defaultMessage = 'Loading...';
+
+			function escapeHTML(text) {
+				var div = document.createElement('div');
+				div.textContent = text;
+				return div.innerHTML;
+			}
+
+			function tableColspan(target) {
+				var table = target.closest('table');
+				if (!table) return 1;
+				var headers = table.querySelectorAll('thead th');
+				return headers.length > 0 ? headers.length : 1;
+			}
+
+			function isModalHost(el) {
+				return el && el.id && el.id.indexOf('ModalHost') !== -1;
+			}
+
+			function isFetchBodyTarget(target) {
+				if (!target || isModalHost(target)) return false;
+				if (target.tagName === 'TBODY' && target.closest('.table-wrapper')) return true;
+				if (target.hasAttribute('data-zion-fetch-body')) return true;
+				return false;
+			}
+
+			function blockLoadingHTML(message) {
+				return '<p class="day-classes-empty table-body-loading" aria-busy="true">' +
+					'<span class="loading-spinner" aria-hidden="true"></span>' +
+					'<span>' + escapeHTML(message) + '</span></p>';
+			}
+
+			function tableRowLoadingHTML(colspan, message) {
+				return '<tr class="table-body-loading-row" aria-busy="true">' +
+					'<td colspan="' + colspan + '" class="empty-state table-body-loading">' +
+					'<span class="loading-spinner" aria-hidden="true"></span>' +
+					'<span>' + escapeHTML(message) + '</span></td></tr>';
+			}
+
+			function showFetchBodyLoading(target, message) {
+				if (!target) return;
+				var msg = message || target.dataset.loadingLabel || defaultMessage;
+				if (!target.dataset.zionFetchBodyPrev) {
+					target.dataset.zionFetchBodyPrev = target.innerHTML;
+				}
+				if (target.tagName === 'TBODY') {
+					target.innerHTML = tableRowLoadingHTML(tableColspan(target), msg);
+				} else {
+					target.innerHTML = blockLoadingHTML(msg);
+				}
+			}
+
+			function clearFetchBodyPrev(target) {
+				if (target && target.dataset) {
+					delete target.dataset.zionFetchBodyPrev;
+				}
+			}
+
+			window.zionFetchBodyLoading = {
+				show: showFetchBodyLoading,
+				tableRow: tableRowLoadingHTML,
+				block: blockLoadingHTML,
+				isTarget: isFetchBodyTarget
+			};
+
+			function bindBodyHTMXListeners() {
+				if (!document.body) return;
+				document.body.addEventListener('htmx:beforeRequest', function (evt) {
+					var target = evt.detail.target;
+					if (!isFetchBodyTarget(target)) return;
+					showFetchBodyLoading(target);
+				});
+				document.body.addEventListener('htmx:afterSwap', function (evt) {
+					var target = evt.detail.target;
+					if (!isFetchBodyTarget(target)) return;
+					clearFetchBodyPrev(target);
+				});
+				document.body.addEventListener('htmx:responseError', function (evt) {
+					var target = evt.detail.target;
+					if (!target || !target.querySelector('.table-body-loading')) return;
+					if (!isFetchBodyTarget(target)) return;
+					var prev = target.dataset.zionFetchBodyPrev;
+					if (prev) {
+						target.innerHTML = prev;
+					} else if (target.tagName === 'TBODY') {
+						target.innerHTML = tableRowLoadingHTML(tableColspan(target), 'Could not load data. Try again.');
+					} else {
+						target.innerHTML = blockLoadingHTML('Could not load data. Try again.');
+					}
+					clearFetchBodyPrev(target);
+				});
+			}
+
+			if (document.body) {
+				bindBodyHTMXListeners();
+			} else {
+				document.addEventListener('DOMContentLoaded', bindBodyHTMXListeners);
+			}
+		})();
+	</script>
+}
+
 templ ScrFloatingTooltips() {
 	<script>
 		(function () {

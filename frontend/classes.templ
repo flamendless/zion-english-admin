@@ -112,18 +112,19 @@ templ Classes(data ClassesData) {
 				</thead>
 				<tbody
 					id="classesTableBody"
+					data-loading-label="Loading classes..."
 					hx-get={ utils.URL("/classes/partials/rows") }
 					hx-include="#classesToolbar"
 					hx-trigger="load, classesRefresh from:body"
 					hx-swap={ HxSwapInnerHTML }
 				>
-					<tr>
-						if data.LockTeacher || data.ShowAllTeachers {
-							<td colspan={ fmt.Sprintf("%d", classesTableColspan(data)) } class="empty-state">Loading classes...</td>
-						} else {
+					if data.LockTeacher || data.ShowAllTeachers {
+						@TableBodyLoadingRow(classesTableColspan(data), "Loading classes...")
+					} else {
+						<tr>
 							<td colspan="7" class="empty-state">Select a teacher to view classes</td>
-						}
-					</tr>
+						</tr>
+					}
 				</tbody>
 			</table>
 			</div>

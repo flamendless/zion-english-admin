@@ -1,0 +1,19 @@
+package frontend
+
+import "fmt"
+
+templ TableBodyLoadingRow(colspan int, message string) {
+	<tr class="table-body-loading-row" aria-busy="true">
+		<td colspan={ fmt.Sprintf("%d", colspan) } class="empty-state table-body-loading">
+			<span class="loading-spinner" aria-hidden="true"></span>
+			<span>{ message }</span>
+		</td>
+	</tr>
+}
+
+templ FetchBodyLoading(message string) {
+	<p class="day-classes-empty table-body-loading" aria-busy="true">
+		<span class="loading-spinner" aria-hidden="true"></span>
+		<span>{ message }</span>
+	</p>
+}

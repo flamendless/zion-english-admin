@@ -356,12 +356,14 @@ templ Schedule(data ScheduleData) {
 					<div
 						id="todayScheduleList"
 						class="day-classes-list"
+						data-zion-fetch-body
+						data-loading-label="Loading today's schedule..."
 						hx-get={ utils.URL("/schedule/partials/list") }
 						hx-include="#listTeacher, #todayListStart, #todayListEnd, #todayListStatus"
 						hx-trigger="load, scheduleRefresh from:body"
 						hx-swap={ HxSwapInnerHTML }
 					>
-						<p class="day-classes-empty">Loading today's schedule...</p>
+						@FetchBodyLoading("Loading today's schedule...")
 					</div>
 				</aside>
 
@@ -414,6 +416,8 @@ templ Schedule(data ScheduleData) {
 							<div
 								id="dayClassesList"
 								class="day-timeline-host"
+								data-zion-fetch-body
+								data-loading-label="Loading day schedule..."
 								hx-get={ utils.URL("/schedule/partials/day-timeline") }
 								hx-include="#listTeacher, #dayListStart, #dayListEnd, #dayListStatus"
 								hx-trigger="scheduleDayOpen from:body"

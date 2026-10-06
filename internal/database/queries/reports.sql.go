@@ -164,13 +164,16 @@ func (q *Queries) GetClassRecordFingerprintRowsForRange(ctx context.Context, arg
 }
 
 const getReportGeneration = `-- name: GetReportGeneration :one
-SELECT id, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at
+SELECT id, kind, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at
 FROM tbl_report_generations
-WHERE teacher_id = ? AND start_date = ? AND end_date = ?
+WHERE kind = 'teacher'
+	AND teacher_id = ?
+	AND start_date = ?
+	AND end_date = ?
 `
 
 type GetReportGenerationParams struct {
-	TeacherID int64
+	TeacherID sql.NullInt64
 	StartDate string
 	EndDate   string
 }
@@ -180,6 +183,7 @@ func (q *Queries) GetReportGeneration(ctx context.Context, arg GetReportGenerati
 	var i TblReportGeneration
 	err := row.Scan(
 		&i.ID,
+		&i.Kind,
 		&i.TeacherID,
 		&i.StartDate,
 		&i.EndDate,
@@ -192,23 +196,27 @@ func (q *Queries) GetReportGeneration(ctx context.Context, arg GetReportGenerati
 }
 
 const getReportGenerationByOutputBasename = `-- name: GetReportGenerationByOutputBasename :one
-SELECT rg.id, rg.teacher_id, rg.start_date, rg.end_date, rg.content_hash, rg.output_path, rg.record_count, rg.generated_at,
-	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name
+SELECT rg.id, rg.kind, rg.teacher_id, rg.start_date, rg.end_date, rg.content_hash, rg.output_path, rg.record_count, rg.generated_at,
+	COALESCE(
+		trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END),
+		'Payroll summary'
+	) AS teacher_name
 FROM tbl_report_generations rg
-JOIN tbl_teachers t ON rg.teacher_id = t.id
+LEFT JOIN tbl_teachers t ON rg.teacher_id = t.id
 WHERE rg.output_path = ?
 `
 
 type GetReportGenerationByOutputBasenameRow struct {
 	ID          int64
-	TeacherID   int64
+	Kind        string
+	TeacherID   sql.NullInt64
 	StartDate   string
 	EndDate     string
 	ContentHash string
 	OutputPath  string
 	RecordCount int64
 	GeneratedAt string
-	TeacherName string
+	TeacherName any
 }
 
 func (q *Queries) GetReportGenerationByOutputBasename(ctx context.Context, outputPath string) (GetReportGenerationByOutputBasenameRow, error) {
@@ -216,6 +224,7 @@ func (q *Queries) GetReportGenerationByOutputBasename(ctx context.Context, outpu
 	var i GetReportGenerationByOutputBasenameRow
 	err := row.Scan(
 		&i.ID,
+		&i.Kind,
 		&i.TeacherID,
 		&i.StartDate,
 		&i.EndDate,
@@ -231,6 +240,7 @@ func (q *Queries) GetReportGenerationByOutputBasename(ctx context.Context, outpu
 const getReportGenerationsFiltered = `-- name: GetReportGenerationsFiltered :many
 SELECT
 	rg.id,
+	rg.kind,
 	rg.teacher_id,
 	rg.start_date,
 	rg.end_date,
@@ -242,15 +252,27 @@ SELECT
 	t.last_name AS teacher_last_name,
 	t.profile_picture AS teacher_profile_picture
 FROM tbl_report_generations rg
-INNER JOIN tbl_teachers t ON t.id = rg.teacher_id
-WHERE t.deleted = 0
+LEFT JOIN tbl_teachers t ON t.id = rg.teacher_id
+WHERE (
+		(rg.kind = 'teacher' AND t.deleted = 0)
+		OR rg.kind = 'summary'
+	)
 	AND (? = '' OR rg.start_date >= ?)
 	AND (? = '' OR rg.end_date <= ?)
 	AND (
 		? = ''
-		OR t.first_name LIKE '%' || ? || '%'
-		OR t.middle_name LIKE '%' || ? || '%'
-		OR t.last_name LIKE '%' || ? || '%'
+		OR (
+			rg.kind = 'teacher'
+			AND (
+				t.first_name LIKE '%' || ? || '%'
+				OR t.middle_name LIKE '%' || ? || '%'
+				OR t.last_name LIKE '%' || ? || '%'
+			)
+		)
+		OR (
+			rg.kind = 'summary'
+			AND 'Payroll summary' LIKE '%' || ? || '%'
+		)
 	)
 ORDER BY rg.generated_at DESC
 `
@@ -264,19 +286,21 @@ type GetReportGenerationsFilteredParams struct {
 	Column6   sql.NullString
 	Column7   sql.NullString
 	Column8   sql.NullString
+	Column9   sql.NullString
 }
 
 type GetReportGenerationsFilteredRow struct {
 	ID                    int64
-	TeacherID             int64
+	Kind                  string
+	TeacherID             sql.NullInt64
 	StartDate             string
 	EndDate               string
 	OutputPath            string
 	RecordCount           int64
 	GeneratedAt           string
-	TeacherFirstName      string
-	TeacherMiddleName     string
-	TeacherLastName       string
+	TeacherFirstName      sql.NullString
+	TeacherMiddleName     sql.NullString
+	TeacherLastName       sql.NullString
 	TeacherProfilePicture sql.NullString
 }
 
@@ -290,6 +314,7 @@ func (q *Queries) GetReportGenerationsFiltered(ctx context.Context, arg GetRepor
 		arg.Column6,
 		arg.Column7,
 		arg.Column8,
+		arg.Column9,
 	)
 	if err != nil {
 		return nil, err
@@ -300,6 +325,7 @@ func (q *Queries) GetReportGenerationsFiltered(ctx context.Context, arg GetRepor
 		var i GetReportGenerationsFilteredRow
 		if err := rows.Scan(
 			&i.ID,
+			&i.Kind,
 			&i.TeacherID,
 			&i.StartDate,
 			&i.EndDate,
@@ -325,9 +351,11 @@ func (q *Queries) GetReportGenerationsFiltered(ctx context.Context, arg GetRepor
 }
 
 const getReportGenerationsForRange = `-- name: GetReportGenerationsForRange :many
-SELECT id, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at
+SELECT id, kind, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at
 FROM tbl_report_generations
-WHERE start_date = ? AND end_date = ?
+WHERE kind = 'teacher'
+	AND start_date = ?
+	AND end_date = ?
 `
 
 type GetReportGenerationsForRangeParams struct {
@@ -346,6 +374,7 @@ func (q *Queries) GetReportGenerationsForRange(ctx context.Context, arg GetRepor
 		var i TblReportGeneration
 		if err := rows.Scan(
 			&i.ID,
+			&i.Kind,
 			&i.TeacherID,
 			&i.StartDate,
 			&i.EndDate,
@@ -703,6 +732,36 @@ func (q *Queries) GetReportTeacherSummaries(ctx context.Context, arg GetReportTe
 	return items, nil
 }
 
+const getSummaryReportGeneration = `-- name: GetSummaryReportGeneration :one
+SELECT id, kind, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at
+FROM tbl_report_generations
+WHERE kind = 'summary'
+	AND start_date = ?
+	AND end_date = ?
+`
+
+type GetSummaryReportGenerationParams struct {
+	StartDate string
+	EndDate   string
+}
+
+func (q *Queries) GetSummaryReportGeneration(ctx context.Context, arg GetSummaryReportGenerationParams) (TblReportGeneration, error) {
+	row := q.db.QueryRowContext(ctx, getSummaryReportGeneration, arg.StartDate, arg.EndDate)
+	var i TblReportGeneration
+	err := row.Scan(
+		&i.ID,
+		&i.Kind,
+		&i.TeacherID,
+		&i.StartDate,
+		&i.EndDate,
+		&i.ContentHash,
+		&i.OutputPath,
+		&i.RecordCount,
+		&i.GeneratedAt,
+	)
+	return i, err
+}
+
 const getTeacherReportClassRecords = `-- name: GetTeacherReportClassRecords :many
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time,
 	cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes,
@@ -785,9 +844,9 @@ func (q *Queries) GetTeacherReportClassRecords(ctx context.Context, arg GetTeach
 }
 
 const upsertReportGeneration = `-- name: UpsertReportGeneration :exec
-INSERT INTO tbl_report_generations (teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at)
-VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
-ON CONFLICT(teacher_id, start_date, end_date) DO UPDATE SET
+INSERT INTO tbl_report_generations (kind, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at)
+VALUES ('teacher', ?, ?, ?, ?, ?, ?, datetime('now'))
+ON CONFLICT(teacher_id, start_date, end_date) WHERE kind = 'teacher' DO UPDATE SET
 	content_hash = excluded.content_hash,
 	output_path = excluded.output_path,
 	record_count = excluded.record_count,
@@ -795,7 +854,7 @@ ON CONFLICT(teacher_id, start_date, end_date) DO UPDATE SET
 `
 
 type UpsertReportGenerationParams struct {
-	TeacherID   int64
+	TeacherID   sql.NullInt64
 	StartDate   string
 	EndDate     string
 	ContentHash string
@@ -806,6 +865,35 @@ type UpsertReportGenerationParams struct {
 func (q *Queries) UpsertReportGeneration(ctx context.Context, arg UpsertReportGenerationParams) error {
 	_, err := q.db.ExecContext(ctx, upsertReportGeneration,
 		arg.TeacherID,
+		arg.StartDate,
+		arg.EndDate,
+		arg.ContentHash,
+		arg.OutputPath,
+		arg.RecordCount,
+	)
+	return err
+}
+
+const upsertSummaryReportGeneration = `-- name: UpsertSummaryReportGeneration :exec
+INSERT INTO tbl_report_generations (kind, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at)
+VALUES ('summary', NULL, ?, ?, ?, ?, ?, datetime('now'))
+ON CONFLICT(start_date, end_date) WHERE kind = 'summary' DO UPDATE SET
+	content_hash = excluded.content_hash,
+	output_path = excluded.output_path,
+	record_count = excluded.record_count,
+	generated_at = datetime('now')
+`
+
+type UpsertSummaryReportGenerationParams struct {
+	StartDate   string
+	EndDate     string
+	ContentHash string
+	OutputPath  string
+	RecordCount int64
+}
+
+func (q *Queries) UpsertSummaryReportGeneration(ctx context.Context, arg UpsertSummaryReportGenerationParams) error {
+	_, err := q.db.ExecContext(ctx, upsertSummaryReportGeneration,
 		arg.StartDate,
 		arg.EndDate,
 		arg.ContentHash,

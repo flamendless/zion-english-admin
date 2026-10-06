@@ -273,7 +273,8 @@ type TblRecord struct {
 
 type TblReportGeneration struct {
 	ID          int64
-	TeacherID   int64
+	Kind        string
+	TeacherID   sql.NullInt64
 	StartDate   string
 	EndDate     string
 	ContentHash string

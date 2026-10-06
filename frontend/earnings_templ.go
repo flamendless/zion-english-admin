@@ -155,7 +155,7 @@ func TeachersEarnings() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\">View earnings</button></div><div class=\"table-wrapper data-list-view-root\"><table class=\"table-stack-mobile earnings-cutoff-table\"><thead><tr><th>Month</th><th>Cutoff</th><th>Period</th><th>Earnings</th><th>Conducted</th></tr></thead> <tbody id=\"teachersEarningsTableBody\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\">View earnings</button></div><div class=\"table-wrapper data-list-view-root\"><table class=\"table-stack-mobile earnings-cutoff-table\"><thead><tr><th>Month</th><th>Cutoff</th><th>Period</th><th>Earnings</th><th>Conducted</th></tr></thead> <tbody id=\"teachersEarningsTableBody\" data-loading-label=\"Loading earnings...\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

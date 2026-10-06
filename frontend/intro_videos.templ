@@ -234,14 +234,13 @@ templ IntroVideosTable(showUploader bool, showViewAction bool, showActions bool)
 			</thead>
 			<tbody
 				id="introVideosTableBody"
+				data-loading-label="Loading intro videos..."
 				hx-get={ utils.URL("/intro-videos/partials/rows") }
 				hx-include="#introVideosToolbar"
 				hx-trigger={ HxTriggerLoad }
 				hx-swap={ HxSwapInnerHTML }
 			>
-				<tr>
-					<td colspan={ fmt.Sprintf("%d", introVideosTableColspan(showUploader, showViewAction, showActions)) } class="empty-state">Loading intro videos...</td>
-				</tr>
+				@TableBodyLoadingRow(introVideosTableColspan(showUploader, showViewAction, showActions), "Loading intro videos...")
 			</tbody>
 		</table>
 	</div>

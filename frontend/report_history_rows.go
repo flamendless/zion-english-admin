@@ -2,12 +2,14 @@ package frontend
 
 import (
 	"fmt"
+	"zion-english/internal/constants"
 	"zion-english/internal/utils"
 )
 
 const reportHistoryDownloadMissingTooltip = "Report file is no longer available"
 
 type ReportHistoryRowData struct {
+	Kind          constants.ReportGenerationKind
 	TeacherName   string
 	TeacherAvatar AvatarProps
 	PeriodLabel   string
@@ -15,6 +17,10 @@ type ReportHistoryRowData struct {
 	GeneratedAt   string
 	DownloadReady bool
 	Filename      string
+}
+
+func (r ReportHistoryRowData) IsSummary() bool {
+	return r.Kind == constants.ReportGenerationKindSummary
 }
 
 func (r ReportHistoryRowData) RecordsLabel() string {

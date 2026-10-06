@@ -129,34 +129,59 @@ WHERE cr.date >= ? AND cr.date <= ?
 ORDER BY cr.teacher_id ASC, cr.id ASC;
 
 -- name: GetReportGeneration :one
-SELECT id, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at
+SELECT id, kind, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at
 FROM tbl_report_generations
-WHERE teacher_id = ? AND start_date = ? AND end_date = ?;
+WHERE kind = 'teacher'
+	AND teacher_id = ?
+	AND start_date = ?
+	AND end_date = ?;
+
+-- name: GetSummaryReportGeneration :one
+SELECT id, kind, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at
+FROM tbl_report_generations
+WHERE kind = 'summary'
+	AND start_date = ?
+	AND end_date = ?;
 
 -- name: GetReportGenerationsForRange :many
-SELECT id, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at
+SELECT id, kind, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at
 FROM tbl_report_generations
-WHERE start_date = ? AND end_date = ?;
+WHERE kind = 'teacher'
+	AND start_date = ?
+	AND end_date = ?;
 
 -- name: UpsertReportGeneration :exec
-INSERT INTO tbl_report_generations (teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at)
-VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
-ON CONFLICT(teacher_id, start_date, end_date) DO UPDATE SET
+INSERT INTO tbl_report_generations (kind, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at)
+VALUES ('teacher', ?, ?, ?, ?, ?, ?, datetime('now'))
+ON CONFLICT(teacher_id, start_date, end_date) WHERE kind = 'teacher' DO UPDATE SET
+	content_hash = excluded.content_hash,
+	output_path = excluded.output_path,
+	record_count = excluded.record_count,
+	generated_at = datetime('now');
+
+-- name: UpsertSummaryReportGeneration :exec
+INSERT INTO tbl_report_generations (kind, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at)
+VALUES ('summary', NULL, ?, ?, ?, ?, ?, datetime('now'))
+ON CONFLICT(start_date, end_date) WHERE kind = 'summary' DO UPDATE SET
 	content_hash = excluded.content_hash,
 	output_path = excluded.output_path,
 	record_count = excluded.record_count,
 	generated_at = datetime('now');
 
 -- name: GetReportGenerationByOutputBasename :one
-SELECT rg.id, rg.teacher_id, rg.start_date, rg.end_date, rg.content_hash, rg.output_path, rg.record_count, rg.generated_at,
-	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name
+SELECT rg.id, rg.kind, rg.teacher_id, rg.start_date, rg.end_date, rg.content_hash, rg.output_path, rg.record_count, rg.generated_at,
+	COALESCE(
+		trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END),
+		'Payroll summary'
+	) AS teacher_name
 FROM tbl_report_generations rg
-JOIN tbl_teachers t ON rg.teacher_id = t.id
+LEFT JOIN tbl_teachers t ON rg.teacher_id = t.id
 WHERE rg.output_path = ?;
 
 -- name: GetReportGenerationsFiltered :many
 SELECT
 	rg.id,
+	rg.kind,
 	rg.teacher_id,
 	rg.start_date,
 	rg.end_date,
@@ -168,15 +193,27 @@ SELECT
 	t.last_name AS teacher_last_name,
 	t.profile_picture AS teacher_profile_picture
 FROM tbl_report_generations rg
-INNER JOIN tbl_teachers t ON t.id = rg.teacher_id
-WHERE t.deleted = 0
+LEFT JOIN tbl_teachers t ON t.id = rg.teacher_id
+WHERE (
+		(rg.kind = 'teacher' AND t.deleted = 0)
+		OR rg.kind = 'summary'
+	)
 	AND (? = '' OR rg.start_date >= ?)
 	AND (? = '' OR rg.end_date <= ?)
 	AND (
 		? = ''
-		OR t.first_name LIKE '%' || ? || '%'
-		OR t.middle_name LIKE '%' || ? || '%'
-		OR t.last_name LIKE '%' || ? || '%'
+		OR (
+			rg.kind = 'teacher'
+			AND (
+				t.first_name LIKE '%' || ? || '%'
+				OR t.middle_name LIKE '%' || ? || '%'
+				OR t.last_name LIKE '%' || ? || '%'
+			)
+		)
+		OR (
+			rg.kind = 'summary'
+			AND 'Payroll summary' LIKE '%' || ? || '%'
+		)
 	)
 ORDER BY rg.generated_at DESC;
 

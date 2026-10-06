@@ -81,6 +81,7 @@ func loadReportHistoryRows(ctx context.Context, startDate, endDate, q string) ([
 		Column6:   qNull,
 		Column7:   qNull,
 		Column8:   qNull,
+		Column9:   qNull,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to load report history")
@@ -88,7 +89,10 @@ func loadReportHistoryRows(ctx context.Context, startDate, endDate, q string) ([
 
 	teacherIDs := make([]int64, 0, len(dbRows))
 	for _, row := range dbRows {
-		teacherIDs = append(teacherIDs, row.TeacherID)
+		if row.Kind == string(constants.ReportGenerationKindSummary) || !row.TeacherID.Valid {
+			continue
+		}
+		teacherIDs = append(teacherIDs, row.TeacherID.Int64)
 	}
 	uniqueIDs := uniqueTeacherIDs(teacherIDs)
 	rolesMap, err := loadRolesByTeacherIDs(ctx, uniqueIDs)
@@ -108,17 +112,27 @@ func loadReportHistoryRows(ctx context.Context, startDate, endDate, q string) ([
 }
 
 func mapReportHistoryRow(ctx context.Context, row queries.GetReportGenerationsFilteredRow, rolesMap map[int64][]constants.TeacherRole, statusMap map[int64]constants.TeacherStatus) frontend.ReportHistoryRowData {
-	teacherName := utils.ComposePersonName(row.TeacherFirstName, row.TeacherMiddleName, row.TeacherLastName)
 	item := frontend.ReportHistoryRowData{
-		TeacherName: teacherName,
-		TeacherAvatar: avatarWithTeacherRoles(
-			buildTeacherListAvatarProps(row.TeacherID, row.TeacherFirstName, row.TeacherMiddleName, row.TeacherLastName, constants.DefaultTeacherAssignedColor, row.TeacherProfilePicture),
-			rolesMap[row.TeacherID],
-			teacherStatusFromMap(statusMap, row.TeacherID),
-		),
+		Kind:        constants.ReportGenerationKind(row.Kind),
 		PeriodLabel: formatReportCutoffLabel(row.StartDate, row.EndDate),
 		RecordCount: row.RecordCount,
 		GeneratedAt: formatPaymentTimestamp(row.GeneratedAt),
+	}
+	if row.Kind == string(constants.ReportGenerationKindSummary) {
+		item.TeacherName = constants.ReportHistorySummaryLabel
+	} else {
+		teacherID := row.TeacherID.Int64
+		teacherName := utils.ComposePersonName(
+			nullStringValue(row.TeacherFirstName),
+			nullStringValue(row.TeacherMiddleName),
+			nullStringValue(row.TeacherLastName),
+		)
+		item.TeacherName = teacherName
+		item.TeacherAvatar = avatarWithTeacherRoles(
+			buildTeacherListAvatarProps(teacherID, nullStringValue(row.TeacherFirstName), nullStringValue(row.TeacherMiddleName), nullStringValue(row.TeacherLastName), constants.DefaultTeacherAssignedColor, row.TeacherProfilePicture),
+			rolesMap[teacherID],
+			teacherStatusFromMap(statusMap, teacherID),
+		)
 	}
 	if filename, ok := reportCacheAvailable(ctx, row.OutputPath); ok {
 		item.DownloadReady = true

@@ -115,7 +115,9 @@ templ Analytics(data AnalyticsData) {
 				<button type="button" id="filterBtn">Filter</button>
 			</div>
 
-			<div id="analyticsLoading" class="empty-state">Loading analytics...</div>
+			<div id="analyticsLoading" class="empty-state">
+				@FetchBodyLoading("Loading analytics...")
+			</div>
 			<div id="analyticsContent" hidden>
 
 				<div class="analytics-summary" id="summaryCards"></div>
@@ -296,6 +298,23 @@ templ Analytics(data AnalyticsData) {
 			let analyticsCache = null;
 			let teacherPage = 1;
 			let studentPage = 1;
+
+			function setAnalyticsLoadingPanel(message, withSpinner) {
+				if (!analyticsLoading) return;
+				analyticsLoading.className = 'empty-state';
+				if (withSpinner && window.zionFetchBodyLoading) {
+					analyticsLoading.innerHTML = window.zionFetchBodyLoading.block(message);
+				} else {
+					analyticsLoading.textContent = message;
+				}
+			}
+
+			function setAnalyticsTablesLoading() {
+				if (!window.zionFetchBodyLoading) return;
+				document.querySelectorAll('.analytics-page tbody').forEach(function (tbody) {
+					window.zionFetchBodyLoading.show(tbody, 'Loading...');
+				});
+			}
 
 			function getAnalyticsSort() {
 				return {
@@ -694,13 +713,15 @@ templ Analytics(data AnalyticsData) {
 				const startDate = presetSelect && presetSelect.dataset.startDate;
 				const endDate = presetSelect && presetSelect.dataset.endDate;
 				if (!startDate || !endDate) {
-					analyticsLoading.textContent = 'Select a date range.';
+					setAnalyticsLoadingPanel('Select a date range.', false);
+					analyticsLoading.hidden = false;
 					analyticsContent.hidden = true;
 					return;
 				}
 
 				analyticsLoading.hidden = false;
-				analyticsLoading.textContent = 'Loading analytics...';
+				setAnalyticsLoadingPanel('Loading analytics...', true);
+				setAnalyticsTablesLoading();
 				analyticsContent.hidden = true;
 				if (window.analyticsCharts) {
 					window.analyticsCharts.destroyAll();
@@ -721,7 +742,7 @@ templ Analytics(data AnalyticsData) {
 					analyticsLoading.hidden = true;
 					analyticsContent.hidden = false;
 				} catch (err) {
-					analyticsLoading.textContent = 'Error loading analytics.';
+					setAnalyticsLoadingPanel('Error loading analytics.', false);
 					analyticsContent.hidden = true;
 				}
 			}
