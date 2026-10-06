@@ -9,6 +9,13 @@ import (
 	"zion-english/internal/constants"
 )
 
+func NullRFC3339UTC(t time.Time) sql.NullString {
+	if t.IsZero() {
+		return sql.NullString{}
+	}
+	return sql.NullString{String: t.UTC().Format(time.RFC3339), Valid: true}
+}
+
 func DatePHT(t time.Time) string {
 	return t.In(constants.LocationPHT).Format(constants.DateLayout)
 }

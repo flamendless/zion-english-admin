@@ -164,8 +164,8 @@ func loadPaymentRows(ctx context.Context, teacherID int64, startDate, endDate, q
 func mapPaymentRow(row queries.GetTeacherPaymentsFilteredRow, rolesMap map[int64][]constants.TeacherRole, statusMap map[int64]constants.TeacherStatus, scopedTeacherID int64) frontend.PaymentRowData {
 	teacherName := utils.ComposePersonName(row.TeacherFirstName, row.TeacherMiddleName, row.TeacherLastName)
 	receivedAt := ""
-	if row.ReceivedAt != nil {
-		receivedAt = formatPaymentTimestamp(fmt.Sprint(row.ReceivedAt))
+	if row.ReceivedAt.Valid {
+		receivedAt = formatPaymentTimestamp(row.ReceivedAt.String)
 	}
 	status := constants.PaymentStatus(row.Status)
 	return frontend.PaymentRowData{
@@ -374,13 +374,9 @@ func handleReportPaymentSubmit(w http.ResponseWriter, r *http.Request, teacherID
 	}
 
 	user := auth.GetUser(ctx)
-	var sentByID interface{}
-	if user.ID > 0 {
-		sentByID = user.ID
-	}
 	if err := dbRW.GetQueries().InsertTeacherPayment(ctx, queries.InsertTeacherPaymentParams{
 		TeacherID:       teacherID,
-		SentByTeacherID: sentByID,
+		SentByTeacherID: utils.NullInt64(user.ID),
 		SentByName:      user.Name,
 		PaymentMethod:   paymentMethod,
 		ReferenceNumber: referenceNumber,
@@ -666,7 +662,7 @@ func handlePaymentDefer(w http.ResponseWriter, r *http.Request, paymentID int64)
 	}
 
 	if err := dbRW.GetQueries().DeferTeacherPaymentReceipt(ctx, queries.DeferTeacherPaymentReceiptParams{
-		DismissedAccessID: accessID,
+		DismissedAccessID: utils.NullInt64(accessID),
 		ID:                paymentID,
 		TeacherID:         user.ID,
 	}); err != nil {
@@ -687,7 +683,7 @@ func populatePaymentReceipt(ctx context.Context, data *frontend.DashboardData, t
 	payment, err := dbRO.GetQueries().GetPendingPaymentForTeacherReceipt(ctx, queries.GetPendingPaymentForTeacherReceiptParams{
 		TeacherID:         teacherID,
 		Column2:           accessID,
-		DismissedAccessID: accessID,
+		DismissedAccessID: utils.NullInt64(accessID),
 	})
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

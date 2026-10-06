@@ -59,10 +59,6 @@ func (s *Service) SaveOAuthAccount(ctx context.Context, teacherID int64, account
 	if err != nil {
 		return err
 	}
-	var expires any
-	if !expiresAt.IsZero() {
-		expires = expiresAt.UTC().Format(time.RFC3339)
-	}
 	return s.q.UpsertTeacherMeetingAccount(ctx, queries.UpsertTeacherMeetingAccountParams{
 		TeacherID:      teacherID,
 		Service:        account.Service,
@@ -70,7 +66,7 @@ func (s *Service) SaveOAuthAccount(ctx context.Context, teacherID int64, account
 		ResourceID:     account.ResourceID,
 		AccessToken:    accessEnc,
 		RefreshToken:   refreshEnc,
-		TokenExpiresAt: expires,
+		TokenExpiresAt: utils.NullRFC3339UTC(expiresAt),
 	})
 }
 

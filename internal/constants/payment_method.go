@@ -3,13 +3,13 @@ package constants
 type PaymentMethod string
 
 const (
-	PaymentMethodGCash      PaymentMethod = "gcash"
-	PaymentMethodBPI        PaymentMethod = "bpi"
-	PaymentMethodGoTyme     PaymentMethod = "gotyme"
-	PaymentMethodPNB        PaymentMethod = "pnb"
-	PaymentMethodUnionBank  PaymentMethod = "unionbank"
-	PaymentMethodBDO        PaymentMethod = "bdo"
-	PaymentMethodMaya       PaymentMethod = "maya"
+	PaymentMethodGCash     PaymentMethod = "gcash"
+	PaymentMethodBPI       PaymentMethod = "bpi"
+	PaymentMethodGoTyme    PaymentMethod = "gotyme"
+	PaymentMethodPNB       PaymentMethod = "pnb"
+	PaymentMethodUnionBank PaymentMethod = "unionbank"
+	PaymentMethodBDO       PaymentMethod = "bdo"
+	PaymentMethodMaya      PaymentMethod = "maya"
 )
 
 var PaymentMethods = []PaymentMethod{

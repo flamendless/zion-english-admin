@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"database/sql"
 	"fmt"
 	"math/rand"
 	"path/filepath"
@@ -39,11 +40,18 @@ func InterfaceToString(v any) string {
 	}
 }
 
-func NullIfEmptyString(value string) any {
+func NullIfEmptyString(value string) sql.NullString {
 	if value == "" {
-		return nil
+		return sql.NullString{}
 	}
-	return value
+	return sql.NullString{String: value, Valid: true}
+}
+
+func NullInt64(id int64) sql.NullInt64 {
+	if id <= 0 {
+		return sql.NullInt64{}
+	}
+	return sql.NullInt64{Int64: id, Valid: true}
 }
 
 func NormalizeEmail(email string) string {

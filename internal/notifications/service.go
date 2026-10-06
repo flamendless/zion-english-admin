@@ -2,9 +2,11 @@ package notifications
 
 import (
 	"context"
+	"database/sql"
 	"zion-english/internal/auth"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
+	"zion-english/internal/utils"
 
 	"go.uber.org/zap"
 )
@@ -23,7 +25,7 @@ func New(q *queries.Queries) *Service {
 }
 
 func (s *Service) NotifySuperuser(ctx context.Context, from auth.User, kind, message, dedupeKey string) {
-	s.insert(ctx, from, nil, superuserName, kind, message, dedupeKey)
+	s.insert(ctx, from, sql.NullInt64{}, superuserName, kind, message, dedupeKey)
 }
 
 func (s *Service) NotifyTeacher(ctx context.Context, teacherID int64, teacherName string, from auth.User, kind, message, dedupeKey string) {
@@ -33,7 +35,7 @@ func (s *Service) NotifyTeacher(ctx context.Context, teacherID int64, teacherNam
 	if !s.teacherAcceptsKind(ctx, teacherID, kind) {
 		return
 	}
-	s.insert(ctx, from, teacherID, teacherName, kind, message, dedupeKey)
+	s.insert(ctx, from, utils.NullInt64(teacherID), teacherName, kind, message, dedupeKey)
 }
 
 func (s *Service) NotifyTeachers(ctx context.Context, teacherIDs []int64, teacherNames map[int64]string, from auth.User, kind, message string) {
@@ -46,12 +48,8 @@ func (s *Service) NotifyTeachers(ctx context.Context, teacherIDs []int64, teache
 	}
 }
 
-func (s *Service) insert(ctx context.Context, from auth.User, toTeacherID interface{}, toName, kind, message, dedupeKey string) {
+func (s *Service) insert(ctx context.Context, from auth.User, toTeacherID sql.NullInt64, toName, kind, message, dedupeKey string) {
 	fromTeacherID, fromName := fromParams(from)
-	var dedupe interface{}
-	if dedupeKey != "" {
-		dedupe = dedupeKey
-	}
 	if err := s.q.InsertNotification(ctx, queries.InsertNotificationParams{
 		FromTeacherID: fromTeacherID,
 		FromName:      fromName,
@@ -59,21 +57,18 @@ func (s *Service) insert(ctx context.Context, from auth.User, toTeacherID interf
 		ToName:        toName,
 		Message:       message,
 		Kind:          kind,
-		DedupeKey:     dedupe,
+		DedupeKey:     utils.NullIfEmptyString(dedupeKey),
 	}); err != nil {
 		logs.Log().Info("notifications", zap.Error(err), zap.String("kind", kind))
 	}
 }
 
-func fromParams(from auth.User) (interface{}, string) {
+func fromParams(from auth.User) (sql.NullInt64, string) {
 	name := from.Name
 	if name == "" {
 		name = "system"
 	}
-	if from.ID > 0 {
-		return from.ID, name
-	}
-	return nil, name
+	return utils.NullInt64(from.ID), name
 }
 
 func SystemUser() auth.User {
@@ -84,7 +79,7 @@ func (s *Service) UnreadCount(ctx context.Context, user auth.User) (int64, error
 	if auth.HasAdminAccess(user.Role) {
 		return s.q.CountUnreadNotificationsForSuperuser(ctx)
 	}
-	return s.q.CountUnreadNotificationsForTeacher(ctx, user.ID)
+	return s.q.CountUnreadNotificationsForTeacher(ctx, utils.NullInt64(user.ID))
 }
 
 func (s *Service) Recent(ctx context.Context, user auth.User) ([]queries.TblNotification, error) {
@@ -92,7 +87,7 @@ func (s *Service) Recent(ctx context.Context, user auth.User) ([]queries.TblNoti
 		return s.q.GetRecentNotificationsForSuperuser(ctx, panelLimit)
 	}
 	return s.q.GetRecentNotificationsForTeacher(ctx, queries.GetRecentNotificationsForTeacherParams{
-		ToTeacherID: user.ID,
+		ToTeacherID: utils.NullInt64(user.ID),
 		Limit:       panelLimit,
 	})
 }
@@ -107,7 +102,7 @@ func (s *Service) ListPaged(ctx context.Context, user auth.User, unreadOnly bool
 		})
 	}
 	return s.q.GetNotificationsPagedForTeacher(ctx, queries.GetNotificationsPagedForTeacherParams{
-		ToTeacherID: user.ID,
+		ToTeacherID: utils.NullInt64(user.ID),
 		Column2:     filter,
 		Limit:       limit,
 		Offset:      offset,
@@ -120,7 +115,7 @@ func (s *Service) Count(ctx context.Context, user auth.User, unreadOnly bool) (i
 		return s.q.CountNotificationsForSuperuser(ctx, filter)
 	}
 	return s.q.CountNotificationsForTeacher(ctx, queries.CountNotificationsForTeacherParams{
-		ToTeacherID: user.ID,
+		ToTeacherID: utils.NullInt64(user.ID),
 		Column2:     filter,
 	})
 }
@@ -131,7 +126,7 @@ func (s *Service) MarkRead(ctx context.Context, user auth.User, id int64) error 
 	}
 	return s.q.MarkNotificationReadForTeacher(ctx, queries.MarkNotificationReadForTeacherParams{
 		ID:          id,
-		ToTeacherID: user.ID,
+		ToTeacherID: utils.NullInt64(user.ID),
 	})
 }
 
@@ -139,7 +134,7 @@ func (s *Service) MarkAllRead(ctx context.Context, user auth.User) error {
 	if auth.HasAdminAccess(user.Role) {
 		return s.q.MarkAllNotificationsReadForSuperuser(ctx)
 	}
-	return s.q.MarkAllNotificationsReadForTeacher(ctx, user.ID)
+	return s.q.MarkAllNotificationsReadForTeacher(ctx, utils.NullInt64(user.ID))
 }
 
 func unreadFilter(unreadOnly bool) interface{} {

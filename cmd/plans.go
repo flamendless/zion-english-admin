@@ -114,27 +114,23 @@ func handlePlansGrant(w http.ResponseWriter, r *http.Request) {
 		startDate = utils.TodayPHT()
 	}
 	effectiveStart := startDate + " 00:00:00"
-	var effectiveEnd interface{}
+	var effectiveEnd sql.NullString
 	if billingKind == constants.TeacherPlanBillingMonthly {
 		end, err := database.MonthlyPlanEffectiveEndPHT(startDate)
 		if err != nil {
 			sendErrorLog(w, ErrInvalidStartDateFormat.Error())
 			return
 		}
-		effectiveEnd = end
+		effectiveEnd = utils.NullIfEmptyString(end)
 	}
 	actor := auth.GetUser(ctx)
-	var grantedBy interface{}
-	if actor.ID > 0 {
-		grantedBy = actor.ID
-	}
 	row, err := dbRW.GetQueries().InsertTeacherPlanTransaction(ctx, queries.InsertTeacherPlanTransactionParams{
 		TeacherID:          teacherID,
 		Tier:               string(constants.TeacherPlanTierPro),
 		BillingKind:        string(billingKind),
 		EffectiveStart:     effectiveStart,
 		EffectiveEnd:       effectiveEnd,
-		GrantedByTeacherID: grantedBy,
+		GrantedByTeacherID: utils.NullInt64(actor.ID),
 		GrantedByName:      actor.Name,
 		Note:               strings.TrimSpace(r.FormValue("note")),
 	})

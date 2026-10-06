@@ -190,7 +190,7 @@ func getNotificationForUser(ctx context.Context, user auth.User, id int64) (quer
 	}
 	return dbRO.GetQueries().GetNotificationForTeacher(ctx, queries.GetNotificationForTeacherParams{
 		ID:          id,
-		ToTeacherID: user.ID,
+		ToTeacherID: utils.NullInt64(user.ID),
 	})
 }
 

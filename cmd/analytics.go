@@ -250,8 +250,8 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 	trialWeekly := make([]analyticsTrialWeeklyRowJSON, 0, len(trialWeeklyRows))
 	for _, row := range trialWeeklyRows {
 		weekLabel := ""
-		if row.WeekLabel != nil {
-			weekLabel = sqlNumericToString(row.WeekLabel)
+		if row.WeekLabel.Valid {
+			weekLabel = row.WeekLabel.String
 		}
 		trialWeekly = append(trialWeekly, analyticsTrialWeeklyRowJSON{
 			WeekLabel:      weekLabel,
@@ -347,8 +347,8 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 		wCancelled := sqlNumericToInt64(row.Cancelled)
 		wRescheduled := sqlNumericToInt64(row.Rescheduled)
 		weekLabel := ""
-		if row.WeekLabel != nil {
-			weekLabel = sqlNumericToString(row.WeekLabel)
+		if row.WeekLabel.Valid {
+			weekLabel = row.WeekLabel.String
 		}
 		resp.Weekly = append(resp.Weekly, analyticsWeeklyRowJSON{
 			WeekLabel:        weekLabel,
