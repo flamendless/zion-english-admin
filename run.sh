@@ -77,6 +77,26 @@ test() {
 	go test ./...
 }
 
+e2e() {
+	load_env
+	E2E_PORT="${E2E_PORT:-18080}"
+	export E2E_PORT
+	if [ "${E2E_REUSE_SERVER:-}" != "1" ]; then
+		lsof -ti:"$E2E_PORT" | xargs kill -9 2>/dev/null || true
+	fi
+	if [ ! -d e2e/node_modules ]; then
+		( cd e2e && npm install && npx playwright install chromium )
+	fi
+	( cd e2e && npx playwright test "${@:2}" )
+}
+
+hooks-install() {
+	git config core.hooksPath .githooks
+	chmod +x .githooks/pre-commit
+	echo "Git hooks installed from .githooks (pre-commit runs ./run.sh e2e)"
+	echo "Skip once: SKIP_E2E=1 git commit ..."
+}
+
 gofmt() {
 	mapfile -t go_files < <(git ls-files '*.go' | grep -Ev '^(internal/database/queries/|frontend/.*_templ\.go$)' || true)
 	if ((${#go_files[@]} == 0)); then
@@ -103,6 +123,8 @@ if [ "$#" -eq 0 ]; then
 	echo "    gensql"
 	echo "    gofmt"
 	echo "    test"
+	echo "    e2e"
+	echo "    hooks-install"
 else
 	echo "Running ${1}"
 	time "$1" "$@"

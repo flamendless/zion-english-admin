@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Install: ./run.sh hooks-install
+# Skip E2E once: SKIP_E2E=1 git commit ...
+
+set -euf -o pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+if [[ "${SKIP_E2E:-}" == "1" ]]; then
+	echo "pre-commit: SKIP_E2E=1, skipping Playwright E2E"
+	exit 0
+fi
+
+./run.sh e2e

@@ -5,3 +5,8 @@ tmp/
 *DS_STORE
 data/*
 !data/changelogs.yaml
+e2e/node_modules/
+e2e/.data/
+e2e/.auth-credentials.json
+e2e/test-results/
+e2e/playwright-report/

@@ -20,6 +20,16 @@ const (
 	DB_MODE_RW DBMode = "rw"
 )
 
+const defaultDBPath = "data/zion.db"
+
+// DBPathFromEnv returns ZION_DB_PATH when set, otherwise data/zion.db.
+func DBPathFromEnv() string {
+	if p := os.Getenv("ZION_DB_PATH"); p != "" {
+		return p
+	}
+	return defaultDBPath
+}
+
 type Service interface {
 	Health() map[string]string
 	Close() error

@@ -1,0 +1,13 @@
+{
+  "name": "zion-english-e2e",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.0",
+    "@types/node": "^22.13.10",
+    "typescript": "^5.8.2"
+  }
+}

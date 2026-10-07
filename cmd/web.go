@@ -67,7 +67,7 @@ var cmdWeb = &cobra.Command{
 			zap.String("bucket", cfg.Storage.R2.Bucket),
 		)
 
-		if err := database.Init("data/zion.db"); err != nil {
+		if err := database.Init(database.DBPathFromEnv()); err != nil {
 			panic(fmt.Sprintf("Failed to initialize database: %v", err))
 		}
 		defer database.Close()
