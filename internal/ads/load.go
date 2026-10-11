@@ -19,6 +19,7 @@ func LoadRequestContext(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		return ctx
 	}
 	ctx = context.WithValue(ctx, catalogKey, catalog)
+	ctx = withRequestRotationPicks(ctx, r)
 	slots, picks := resolveCatalog(ctx, r, catalog, false)
 	ctx = context.WithValue(ctx, rotationPicksKey, picks)
 	ApplyRotationCookies(w, r, catalog, picks, false)
@@ -36,6 +37,7 @@ func LoadChromePartialRequestContext(ctx context.Context, w http.ResponseWriter,
 		return ctx
 	}
 	ctx = context.WithValue(ctx, catalogKey, catalog)
+	ctx = withRequestRotationPicks(ctx, r)
 	slots, picks := resolveCatalogForChromeRefresh(ctx, r, catalog)
 	ctx = context.WithValue(ctx, rotationPicksKey, picks)
 	ApplyRotationCookies(w, r, catalog, picks, true)
