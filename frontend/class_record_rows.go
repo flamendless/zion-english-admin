@@ -75,18 +75,21 @@ func (r ClassRecordRowData) IsDeleted() bool {
 }
 
 func (r ClassRecordRowData) RowClass() string {
+	var classes []string
 	switch {
 	case r.IsDeleted():
-		return "row-deleted"
+		classes = append(classes, "row-deleted")
 	case r.Status == constants.ClassListFilterCancelled:
-		return "row-cancelled"
+		classes = append(classes, "row-cancelled")
 	case r.Status == constants.ClassListFilterRescheduled:
-		return "row-rescheduled"
+		classes = append(classes, "row-rescheduled")
 	case r.IsScheduled():
-		return "row-scheduled"
-	default:
-		return ""
+		classes = append(classes, "row-scheduled")
 	}
+	if c := rowClassForCutoffDate(r.Date); c != "" {
+		classes = append(classes, c)
+	}
+	return joinRowClasses(classes...)
 }
 
 func (r ClassRecordRowData) RateLabel() string {

@@ -132,6 +132,8 @@ func loadReportHistoryRows(ctx context.Context, startDate, endDate, q, kindFilte
 func mapReportHistoryRow(ctx context.Context, row queries.GetReportGenerationsFilteredRow, rolesMap map[int64][]constants.TeacherRole, statusMap map[int64]constants.TeacherStatus) frontend.ReportHistoryRowData {
 	item := frontend.ReportHistoryRowData{
 		Kind:        constants.ReportGenerationKind(row.Kind),
+		PeriodStart: row.StartDate,
+		PeriodEnd:   row.EndDate,
 		PeriodLabel: formatReportCutoffLabel(row.StartDate, row.EndDate),
 		RecordCount: row.RecordCount,
 		GeneratedAt: formatPaymentTimestamp(row.GeneratedAt),

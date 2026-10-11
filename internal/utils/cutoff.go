@@ -132,6 +132,62 @@ func NextCutoffDates(startDate, endDate string) (nextStart, nextEnd string, ok b
 	return "", "", false
 }
 
+// CutoffHalf identifies the first or second payroll cutoff within a calendar month.
+type CutoffHalf string
+
+const (
+	CutoffHalfFirst  CutoffHalf = "first"
+	CutoffHalfSecond CutoffHalf = "second"
+)
+
+// CutoffHalfForDate returns which payroll cutoff a class date (YYYY-MM-DD, PHT) falls in.
+func CutoffHalfForDate(date string) (CutoffHalf, bool) {
+	date = strings.TrimSpace(date)
+	if date == "" {
+		return "", false
+	}
+	t, err := time.ParseInLocation(constants.DateLayout, date, constants.LocationPHT)
+	if err != nil {
+		return "", false
+	}
+	firstPreset, secondPreset := CutoffRangeForMonth(t.Year(), t.Month())
+	firstStart, firstEnd := CutoffDatesFromPreset(firstPreset)
+	secondStart, secondEnd := CutoffDatesFromPreset(secondPreset)
+	if date >= firstStart && date <= firstEnd {
+		return CutoffHalfFirst, true
+	}
+	if date >= secondStart && date <= secondEnd {
+		return CutoffHalfSecond, true
+	}
+	return "", false
+}
+
+// CutoffHalfForPeriod returns which payroll cutoff a period matches when it is exactly a
+// standard first or second cutoff range.
+func CutoffHalfForPeriod(startDate, endDate string) (CutoffHalf, bool) {
+	startDate = strings.TrimSpace(startDate)
+	endDate = strings.TrimSpace(endDate)
+	if startDate == "" || endDate == "" {
+		return "", false
+	}
+	startT, err := time.ParseInLocation(constants.DateLayout, startDate, constants.LocationPHT)
+	if err != nil {
+		return "", false
+	}
+	if _, err := time.ParseInLocation(constants.DateLayout, endDate, constants.LocationPHT); err != nil {
+		return "", false
+	}
+	firstPreset, secondPreset := CutoffRangeForMonth(startT.Year(), startT.Month())
+	preset := startDate + "|" + endDate
+	if preset == firstPreset {
+		return CutoffHalfFirst, true
+	}
+	if preset == secondPreset {
+		return CutoffHalfSecond, true
+	}
+	return "", false
+}
+
 // CutoffDatesFromPreset parses a cutoff preset (YYYY-MM-DD|YYYY-MM-DD) into start and end dates.
 func CutoffDatesFromPreset(preset string) (startDate, endDate string) {
 	parts := splitCutoff(preset)

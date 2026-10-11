@@ -13,3 +13,7 @@ func paymentsTableColspanInt(showTeacherColumn bool) int {
 	}
 	return cols
 }
+
+func (r PaymentRowData) RowClass() string {
+	return rowClassForCutoffPeriod(r.PeriodStart, r.PeriodEnd)
+}

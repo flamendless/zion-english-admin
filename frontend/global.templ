@@ -1675,6 +1675,60 @@ templ GlobalIncludes() {
 			background-color: var(--color-warning-bg) !important;
 		}
 
+		tr.row-cutoff-first:not(.row-cancelled):not(.row-rescheduled):not(.row-deleted) {
+			background-color: var(--color-warning-bg) !important;
+		}
+
+		tr.row-cutoff-second:not(.row-cancelled):not(.row-rescheduled):not(.row-deleted) {
+			background-color: var(--color-success-bg) !important;
+		}
+
+		tr.row-cancelled.row-cutoff-first,
+		tr.row-rescheduled.row-cutoff-first,
+		tr.row-deleted.row-cutoff-first {
+			box-shadow: inset 4px 0 0 #ea580c;
+		}
+
+		tr.row-cancelled.row-cutoff-second,
+		tr.row-rescheduled.row-cutoff-second,
+		tr.row-deleted.row-cutoff-second {
+			box-shadow: inset 4px 0 0 var(--color-success);
+		}
+
+		.cutoff-legend {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-3);
+			flex: 1 1 100%;
+			margin: 0;
+			padding-top: var(--space-1);
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+		}
+
+		.cutoff-legend__item {
+			display: inline-flex;
+			align-items: center;
+			gap: var(--space-2);
+		}
+
+		.cutoff-legend__swatch {
+			width: 0.875rem;
+			height: 0.875rem;
+			border-radius: var(--radius-sm);
+			border: var(--pill-border);
+			flex-shrink: 0;
+		}
+
+		.cutoff-legend__swatch--first {
+			background-color: var(--color-warning-bg);
+		}
+
+		.cutoff-legend__swatch--second {
+			background-color: var(--color-success-bg);
+		}
+
 		.row-deleted {
 			background-color: var(--color-muted) !important;
 			opacity: 0.85;
@@ -4246,6 +4300,14 @@ templ GlobalIncludes() {
 
 			html.list-view-cards .data-list-view-root .table-stack-mobile tbody tr.row-rescheduled {
 				background: var(--color-warning-bg);
+			}
+
+			html.list-view-cards .data-list-view-root .table-stack-mobile tbody tr.row-cutoff-first:not(.row-cancelled):not(.row-rescheduled):not(.row-deleted) {
+				background: var(--color-warning-bg);
+			}
+
+			html.list-view-cards .data-list-view-root .table-stack-mobile tbody tr.row-cutoff-second:not(.row-cancelled):not(.row-rescheduled):not(.row-deleted) {
+				background: var(--color-success-bg);
 			}
 
 			html.list-view-cards .data-list-view-root .table-stack-mobile tbody tr:hover {

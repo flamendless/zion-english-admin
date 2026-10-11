@@ -9,6 +9,8 @@ type PaymentRowData struct {
 	ID                 string
 	TeacherName        string
 	TeacherAvatar      AvatarProps
+	PeriodStart        string
+	PeriodEnd          string
 	PeriodLabel        string
 	PaymentMethod      constants.PaymentMethod
 	ReferenceNumber    string
@@ -22,7 +24,7 @@ type PaymentRowData struct {
 }
 
 templ PaymentTableRow(row PaymentRowData, showTeacherColumn bool, swapOOB bool) {
-	<tr id={ "payment-row-" + row.ID } if swapOOB { hx-swap-oob={ HxSwapOuterHTML } }>
+	<tr id={ "payment-row-" + row.ID } class={ row.RowClass() } if swapOOB { hx-swap-oob={ HxSwapOuterHTML } }>
 		if showTeacherColumn {
 			<td data-label="Teacher">
 				@TeacherNameCell(row.TeacherName, row.TeacherAvatar)

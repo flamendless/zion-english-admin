@@ -176,6 +176,8 @@ func mapPaymentRow(row queries.GetTeacherPaymentsFilteredRow, rolesMap map[int64
 			rolesMap[row.TeacherID],
 			teacherStatusFromMap(statusMap, row.TeacherID),
 		),
+		PeriodStart:        row.PeriodStart,
+		PeriodEnd:          row.PeriodEnd,
 		PeriodLabel:        formatReportCutoffLabel(row.PeriodStart, row.PeriodEnd),
 		PaymentMethod:      constants.PaymentMethod(row.PaymentMethod),
 		ReferenceNumber:    row.ReferenceNumber,

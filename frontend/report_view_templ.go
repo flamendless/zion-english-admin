@@ -161,20 +161,38 @@ func ReportViewModal(data ReportViewData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			for _, class := range data.Classes {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<tr><td data-label=\"Date\">")
+				var templ_7745c5c3_Var5 = []any{ReportClassItemRowClass(class.Date)}
+				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var5...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var5 string
-				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(class.Date)
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<tr class=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var6 string
+				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var5).String())
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/report_view.templ`, Line: 1, Col: 0}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\"><td data-label=\"Date\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var7 string
+				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(class.Date)
 				if templ_7745c5c3_Err != nil {
 					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/report_view.templ`, Line: 76, Col: 44}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</td><td class=\"table-truncate-cell\" data-label=\"Student\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</td><td class=\"table-truncate-cell\" data-label=\"Student\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -182,33 +200,33 @@ func ReportViewModal(data ReportViewData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</td><td data-label=\"Rate\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</td><td data-label=\"Rate\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var6 string
-				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(class.Rate)
+				var templ_7745c5c3_Var8 string
+				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(class.Rate)
 				if templ_7745c5c3_Err != nil {
 					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/report_view.templ`, Line: 80, Col: 44}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</td><td data-label=\"Time\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</td><td data-label=\"Time\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var7 string
-				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(class.TimeRange)
+				var templ_7745c5c3_Var9 string
+				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(class.TimeRange)
 				if templ_7745c5c3_Err != nil {
 					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/report_view.templ`, Line: 81, Col: 49}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</td><td data-label=\"Status\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</td><td data-label=\"Status\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -216,22 +234,22 @@ func ReportViewModal(data ReportViewData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</tbody></table></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</tbody></table></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<p class=\"empty-state\">No classes in this cutoff period.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<p class=\"empty-state\">No classes in this cutoff period.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -255,12 +273,12 @@ func ReportViewStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var8 == nil {
-			templ_7745c5c3_Var8 = templ.NopComponent
+		templ_7745c5c3_Var10 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var10 == nil {
+			templ_7745c5c3_Var10 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<style>\r\n\t\t.modal-dialog-report {\r\n\t\t\tmax-width: 960px;\r\n\t\t\twidth: calc(100% - 2rem);\r\n\t\t}\r\n\r\n\t\t.report-view-body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.report-view-identity {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.report-view-identity h2 {\r\n\t\t\tmargin: 0 0 var(--space-1);\r\n\t\t\tfont-size: 1.25rem;\r\n\t\t}\r\n\r\n\t\t.report-cutoff-label {\r\n\t\t\tmargin: 0;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.report-total-earnings {\r\n\t\t\tmargin: var(--space-1) 0 0;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t}\r\n\r\n\t\t.report-summary {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t@media (max-width: 768px) {\r\n\t\t\t.modal-dialog-report {\r\n\t\t\t\twidth: calc(100% - 1rem);\r\n\t\t\t\tmax-height: 92vh;\r\n\t\t\t}\r\n\r\n\t\t\t.report-view-identity {\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t}\r\n\r\n\t\t\t.report-summary {\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t}\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<style>\r\n\t\t.modal-dialog-report {\r\n\t\t\tmax-width: 960px;\r\n\t\t\twidth: calc(100% - 2rem);\r\n\t\t}\r\n\r\n\t\t.report-view-body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.report-view-identity {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.report-view-identity h2 {\r\n\t\t\tmargin: 0 0 var(--space-1);\r\n\t\t\tfont-size: 1.25rem;\r\n\t\t}\r\n\r\n\t\t.report-cutoff-label {\r\n\t\t\tmargin: 0;\r\n\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.report-total-earnings {\r\n\t\t\tmargin: var(--space-1) 0 0;\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t\tfont-weight: 600;\r\n\t\t}\r\n\r\n\t\t.report-summary {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t@media (max-width: 768px) {\r\n\t\t\t.modal-dialog-report {\r\n\t\t\t\twidth: calc(100% - 1rem);\r\n\t\t\t\tmax-height: 92vh;\r\n\t\t\t}\r\n\r\n\t\t\t.report-view-identity {\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\talign-items: flex-start;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t}\r\n\r\n\t\t\t.report-summary {\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t}\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

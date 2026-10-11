@@ -16,6 +16,34 @@ func TestCutoffRangeForMonth(t *testing.T) {
 	}
 }
 
+func TestCutoffHalfForDate(t *testing.T) {
+	half, ok := CutoffHalfForDate("2026-09-10")
+	if !ok || half != CutoffHalfFirst {
+		t.Fatalf("unexpected first-half date: %q %v", half, ok)
+	}
+	half, ok = CutoffHalfForDate("2026-09-20")
+	if !ok || half != CutoffHalfSecond {
+		t.Fatalf("unexpected second-half date: %q %v", half, ok)
+	}
+	if _, ok := CutoffHalfForDate("invalid"); ok {
+		t.Fatal("expected invalid date to fail")
+	}
+}
+
+func TestCutoffHalfForPeriod(t *testing.T) {
+	half, ok := CutoffHalfForPeriod("2026-09-01", "2026-09-15")
+	if !ok || half != CutoffHalfFirst {
+		t.Fatalf("unexpected first period: %q %v", half, ok)
+	}
+	half, ok = CutoffHalfForPeriod("2026-09-16", "2026-09-30")
+	if !ok || half != CutoffHalfSecond {
+		t.Fatalf("unexpected second period: %q %v", half, ok)
+	}
+	if _, ok := CutoffHalfForPeriod("2026-09-01", "2026-09-30"); ok {
+		t.Fatal("expected full-month range to have no half")
+	}
+}
+
 func TestMonthCutoffPreset(t *testing.T) {
 	preset := MonthCutoffPreset(2026, time.September)
 	if preset != "2026-09-01|2026-09-30" {
