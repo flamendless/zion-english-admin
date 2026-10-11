@@ -5,7 +5,7 @@ import (
 	"zion-english/internal/utils"
 )
 
-func cutoffPresetForMonth(monthValue string, selectCurrentCutoff bool) (firstCutoff, secondCutoff, activeCutoff, normalizedMonth string) {
+func cutoffPresetForMonth(monthValue string, selectCurrentCutoff bool) (firstCutoff, secondCutoff, monthCutoff, defaultCutoff, normalizedMonth string) {
 	year, month, ok := utils.ParseMonthPHT(monthValue)
 	if !ok {
 		normalizedMonth = utils.CurrentMonthPHT()
@@ -15,9 +15,10 @@ func cutoffPresetForMonth(monthValue string, selectCurrentCutoff bool) (firstCut
 	}
 
 	firstCutoff, secondCutoff = utils.CutoffRangeForMonth(year, month)
-	activeCutoff = firstCutoff
+	monthCutoff = utils.MonthCutoffPreset(year, month)
+	defaultCutoff = firstCutoff
 	if selectCurrentCutoff {
-		activeCutoff = utils.ActiveCutoffForMonth(year, month)
+		defaultCutoff = monthCutoff
 	}
-	return firstCutoff, secondCutoff, activeCutoff, normalizedMonth
+	return firstCutoff, secondCutoff, monthCutoff, defaultCutoff, normalizedMonth
 }

@@ -19,6 +19,15 @@ func CutoffRangeForMonth(year int, month time.Month) (firstCutoff, secondCutoff 
 	return a + "|" + b, c + "|" + d
 }
 
+// MonthCutoffPreset returns the combined first and second payroll cutoff range for a calendar
+// month in Philippines time (YYYY-MM-DD|YYYY-MM-DD format).
+func MonthCutoffPreset(year int, month time.Month) string {
+	firstPreset, secondPreset := CutoffRangeForMonth(year, month)
+	firstStart, _ := CutoffDatesFromPreset(firstPreset)
+	_, secondEnd := CutoffDatesFromPreset(secondPreset)
+	return firstStart + "|" + secondEnd
+}
+
 // ActiveCutoffForMonth returns the payroll cutoff preset for a month. For the current month
 // it matches today's cutoff; for other months it defaults to the first cutoff.
 func ActiveCutoffForMonth(year int, month time.Month) string {
