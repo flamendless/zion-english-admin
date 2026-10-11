@@ -229,7 +229,7 @@ templ MonthPicker(inputID string, partialURL string) {
 
 templ DatePresetForMonth(monthValue string, selectCurrentCutoff bool) {
 	{{
-		firstCutoff, secondCutoff, activeCutoff, _ := cutoffPresetForMonth(monthValue, selectCurrentCutoff)
+		firstCutoff, secondCutoff, monthCutoff, defaultCutoff, _ := cutoffPresetForMonth(monthValue, selectCurrentCutoff)
 	}}
 	<div class="form-group" id="datePresetGroup">
 		<label for="datePreset">Date Range</label>
@@ -237,8 +237,9 @@ templ DatePresetForMonth(monthValue string, selectCurrentCutoff bool) {
 			if !selectCurrentCutoff {
 				<option value="">-- Select Range --</option>
 			}
-			<option value={ firstCutoff } selected?={ selectCurrentCutoff && activeCutoff == firstCutoff }>first cut-off</option>
-			<option value={ secondCutoff } selected?={ selectCurrentCutoff && activeCutoff == secondCutoff }>second cut-off</option>
+			<option value={ monthCutoff } selected?={ selectCurrentCutoff && defaultCutoff == monthCutoff }>first and second cut-offs</option>
+			<option value={ firstCutoff } selected?={ selectCurrentCutoff && defaultCutoff == firstCutoff }>first cut-off</option>
+			<option value={ secondCutoff } selected?={ selectCurrentCutoff && defaultCutoff == secondCutoff }>second cut-off</option>
 		</select>
 	</div>
 }

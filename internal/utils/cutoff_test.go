@@ -16,6 +16,17 @@ func TestCutoffRangeForMonth(t *testing.T) {
 	}
 }
 
+func TestMonthCutoffPreset(t *testing.T) {
+	preset := MonthCutoffPreset(2026, time.September)
+	if preset != "2026-09-01|2026-09-30" {
+		t.Fatalf("unexpected month cutoff preset: %q", preset)
+	}
+	start, end := CutoffDatesFromPreset(preset)
+	if start != "2026-09-01" || end != "2026-09-30" {
+		t.Fatalf("unexpected month cutoff dates: %q %q", start, end)
+	}
+}
+
 func TestParseMonthPHT(t *testing.T) {
 	year, month, ok := ParseMonthPHT("2026-09")
 	if !ok || year != 2026 || month != time.September {
