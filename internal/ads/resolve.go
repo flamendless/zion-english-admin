@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 
@@ -273,10 +272,8 @@ func pickProductForSlot(
 }
 
 func stableProductIDForSlot(ctx context.Context, r *http.Request, cookieName string, picks map[string]int64) (int64, bool) {
-	if c, err := r.Cookie(cookieName); err == nil {
-		if id, err := strconv.ParseInt(c.Value, 10, 64); err == nil {
-			return id, true
-		}
+	if id, ok := requestRotationPick(r, cookieName); ok {
+		return id, true
 	}
 	if id, ok := picks[cookieName]; ok {
 		return id, true
@@ -357,74 +354,14 @@ func randomIndex(n int) int {
 // ApplyRotationCookies sets HttpOnly cookies for session/timer rotation picks when needed.
 // When refreshFiveSecondTimerCookies is true, 5 second timer cookies are rewritten from picks (chrome partial refresh).
 func ApplyRotationCookies(w http.ResponseWriter, r *http.Request, catalog []CatalogAd, picks map[string]int64, refreshFiveSecondTimerCookies bool) {
+	if len(picks) == 0 && !hasLegacyRotationCookieHeader(r) {
+		return
+	}
 	cookiePath := conf.Conf().BasePath
 	if cookiePath == "" {
 		cookiePath = "/"
 	}
-	for _, ad := range catalog {
-		if len(ad.ProductOptions) <= 1 {
-			continue
-		}
-		for _, zone := range zonesForAdInResolutionOrder(ad) {
-			cookieName := cookieNameForAdZone(ad.ID, zone)
-			switch ad.RandomizeKind {
-			case constants.AdRandomizePerPage:
-				pageCookie := cookieNameForAdZonePerPage(ad.ID, zone, requestPagePath(r))
-				if _, err := r.Cookie(pageCookie); err != nil {
-					productID, ok := picks[pageCookie]
-					if !ok {
-						continue
-					}
-					http.SetCookie(w, &http.Cookie{
-						Name:     pageCookie,
-						Value:    strconv.FormatInt(productID, 10),
-						Path:     cookiePath,
-						HttpOnly: true,
-						SameSite: http.SameSiteLaxMode,
-					})
-				}
-			case constants.AdRandomizePerSession:
-				if _, err := r.Cookie(cookieName); err != nil {
-					productID, ok := picks[cookieName]
-					if !ok {
-						continue
-					}
-					http.SetCookie(w, &http.Cookie{
-						Name:     cookieName,
-						Value:    strconv.FormatInt(productID, 10),
-						Path:     cookiePath,
-						HttpOnly: true,
-						SameSite: http.SameSiteLaxMode,
-					})
-				}
-			case constants.AdRandomizeTimer:
-				isFiveSecond := ad.TimerInterval == constants.AdTimerIntervalFiveSeconds
-				forceSet := refreshFiveSecondTimerCookies && isFiveSecond
-				if forceSet {
-					setTimerRotationCookie(w, cookiePath, cookieName, picks, ad.TimerInterval)
-					continue
-				}
-				if _, err := r.Cookie(cookieName); err != nil {
-					setTimerRotationCookie(w, cookiePath, cookieName, picks, ad.TimerInterval)
-				}
-			}
-		}
-	}
-}
-
-func setTimerRotationCookie(w http.ResponseWriter, cookiePath, cookieName string, picks map[string]int64, interval constants.AdTimerInterval) {
-	productID, ok := picks[cookieName]
-	if !ok {
-		return
-	}
-	http.SetCookie(w, &http.Cookie{
-		Name:     cookieName,
-		Value:    strconv.FormatInt(productID, 10),
-		Path:     cookiePath,
-		MaxAge:   timerMaxAge(interval),
-		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
-	})
+	persistRotationPicks(w, r, cookiePath, picks)
 }
 
 // ComputeRotationPicks chooses stable session/timer products per ad zone for this request.
