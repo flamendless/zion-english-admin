@@ -73,15 +73,17 @@ var cmdSeedClasses = &cobra.Command{
 			panic(err)
 		}
 
-		logs.Log().Info("seed_classes complete",
+		monthLabel := fmt.Sprintf("%04d-%02d", year, month)
+		logs.Log().Info("seed_classes summary",
 			zap.String("teacher_email", teacherEmail),
 			zap.Int64("teacher_id", summary.TeacherID),
 			zap.Bool("teacher_created", summary.TeacherCreated),
+			zap.Bool("teacher_existing", summary.TeacherExisting),
 			zap.Int("students", summary.StudentsCreated),
 			zap.Int("conducted", summary.Conducted),
 			zap.Int("scheduled", summary.Scheduled),
 			zap.Int("cancelled", summary.Cancelled),
-			zap.String("month", fmt.Sprintf("%04d-%02d", year, month)),
+			zap.String("month", monthLabel),
 			zap.Bool("dry_run", seedClasses.dryRun),
 		)
 		if summary.TeacherCreated && !seedClasses.dryRun {
@@ -100,35 +102,62 @@ func init() {
 	f().StringVar(&seedClasses.teacherEmail, "teacher-email", "", "Teacher email (created if missing)")
 	f().IntVar(&seedClasses.students, "students", 0, "Number of students and of each class status to create")
 	f().StringVar(&seedClasses.month, "month", utils.CurrentMonthPHT(), "Calendar month (YYYY-MM, PHT)")
-	f().BoolVar(&seedClasses.dryRun, "dry-run", false, "Log planned inserts without writing")
+	f().BoolVar(&seedClasses.dryRun, "dry-run", true, "Log planned inserts without writing")
 	rootCmd.AddCommand(cmdSeedClasses)
 }
 
 type seedClassesSummary struct {
 	TeacherID       int64
 	TeacherCreated  bool
+	TeacherExisting bool
 	StudentsCreated int
 	Conducted       int
 	Scheduled       int
 	Cancelled       int
 }
 
+type seedStudentRef struct {
+	ID   int64
+	Name string
+}
+
 func runSeedClasses(ctx context.Context, dbRW database.Service, teacherEmail string, n int, year int, month time.Month, dryRun bool) (seedClassesSummary, error) {
 	q := dbRW.GetQueries()
 	summary := seedClassesSummary{}
+	monthLabel := fmt.Sprintf("%04d-%02d", year, month)
 
-	teacherID, created, err := ensureSeedTeacher(ctx, q, teacherEmail, dryRun)
+	teacherID, created, existing, teacherPlan, err := planSeedTeacher(ctx, q, teacherEmail)
 	if err != nil {
 		return summary, err
 	}
 	summary.TeacherID = teacherID
 	summary.TeacherCreated = created
+	summary.TeacherExisting = existing
+	if dryRun {
+		logSeedTeacherPlan(teacherPlan)
+	} else if created {
+		teacherID, err = insertSeedTeacher(ctx, q, teacherPlan)
+		if err != nil {
+			return summary, err
+		}
+		summary.TeacherID = teacherID
+	}
 
-	studentIDs, err := ensureSeedStudents(ctx, q, teacherID, n, dryRun)
+	students, err := planSeedStudents(n)
 	if err != nil {
 		return summary, err
 	}
-	summary.StudentsCreated = len(studentIDs)
+	if dryRun {
+		for _, s := range students {
+			logSeedStudentPlan(summary.TeacherID, teacherEmail, s)
+		}
+	} else {
+		students, err = insertSeedStudents(ctx, q, summary.TeacherID, students)
+		if err != nil {
+			return summary, err
+		}
+	}
+	summary.StudentsCreated = len(students)
 
 	firstDates, secondDates := cutoffDatePools(year, month)
 	today := utils.TodayPHT()
@@ -145,17 +174,19 @@ func runSeedClasses(ctx context.Context, dbRW database.Service, teacherEmail str
 		futureFirst, futureSecond = firstDates, secondDates
 	}
 
+	teacherID = summary.TeacherID
 	for i := 0; i < n; i++ {
-		studentID := studentIDs[i%len(studentIDs)]
+		student := students[i%len(students)]
 		date := pickSeedDate(i, pastFirst, pastSecond)
 		start := seedClassStartTime(i, 0)
 		end := utils.EndTimeFromStartAndDuration(start, seedClassDurationMins)
 		if dryRun {
+			logSeedClassRecordPlan(monthLabel, teacherID, teacherEmail, student, date, start, end, string(constants.ClassStatusConducted), "")
 			summary.Conducted++
 			continue
 		}
 		if _, err := q.InsertClassRecord(ctx, queries.InsertClassRecordParams{
-			StudentID:       studentID,
+			StudentID:       student.ID,
 			TeacherID:       teacherID,
 			Date:            date,
 			StartTime:       sql.NullString{String: start, Valid: true},
@@ -175,15 +206,16 @@ func runSeedClasses(ctx context.Context, dbRW database.Service, teacherEmail str
 	}
 
 	for i := 0; i < n; i++ {
-		studentID := studentIDs[i%len(studentIDs)]
+		student := students[i%len(students)]
 		date := pickSeedDate(i, futureFirst, futureSecond)
 		start := seedClassStartTime(i, 1)
 		if dryRun {
+			logSeedScheduledClassPlan(monthLabel, teacherID, teacherEmail, student, date, start)
 			summary.Scheduled++
 			continue
 		}
 		if _, err := q.InsertScheduledClass(ctx, queries.InsertScheduledClassParams{
-			StudentID:       studentID,
+			StudentID:       student.ID,
 			TeacherID:       teacherID,
 			ScheduledDate:   date,
 			StartTime:       sql.NullString{String: start, Valid: true},
@@ -201,16 +233,17 @@ func runSeedClasses(ctx context.Context, dbRW database.Service, teacherEmail str
 	}
 
 	for i := 0; i < n; i++ {
-		studentID := studentIDs[i%len(studentIDs)]
+		student := students[i%len(students)]
 		date := pickSeedDate(i, pastFirst, pastSecond)
 		start := seedClassStartTime(i, 2)
 		end := utils.EndTimeFromStartAndDuration(start, seedClassDurationMins)
 		if dryRun {
+			logSeedClassRecordPlan(monthLabel, teacherID, teacherEmail, student, date, start, end, string(constants.ClassStatusCancelled), "seed_classes")
 			summary.Cancelled++
 			continue
 		}
 		if _, err := q.InsertClassRecord(ctx, queries.InsertClassRecordParams{
-			StudentID:       studentID,
+			StudentID:       student.ID,
 			TeacherID:       teacherID,
 			Date:            date,
 			StartTime:       sql.NullString{String: start, Valid: true},
@@ -232,45 +265,62 @@ func runSeedClasses(ctx context.Context, dbRW database.Service, teacherEmail str
 	return summary, nil
 }
 
-func ensureSeedTeacher(ctx context.Context, q *queries.Queries, email string, dryRun bool) (int64, bool, error) {
-	existing, err := q.GetTeacherByEmail(ctx, email)
-	if err == nil {
-		return existing.ID, false, nil
+type seedTeacherPlan struct {
+	Action       string
+	ID           int64
+	Email        string
+	FirstName    string
+	LastName     string
+	MobileNumber string
+	JoiningDate  string
+	Status       string
+	Role         string
+}
+
+func planSeedTeacher(ctx context.Context, q *queries.Queries, email string) (teacherID int64, created, existing bool, plan seedTeacherPlan, err error) {
+	plan.Email = email
+	row, lookupErr := q.GetTeacherByEmail(ctx, email)
+	if lookupErr == nil {
+		plan.Action = "use_existing"
+		plan.ID = row.ID
+		return row.ID, false, true, plan, nil
 	}
-	if !errors.Is(err, sql.ErrNoRows) {
-		return 0, false, err
+	if !errors.Is(lookupErr, sql.ErrNoRows) {
+		return 0, false, false, plan, lookupErr
 	}
 
 	local := email
 	if at := strings.Index(email, "@"); at > 0 {
 		local = email[:at]
 	}
-	firstName := "Seed"
-	lastName := local
-	if len(lastName) > 40 {
-		lastName = lastName[:40]
+	plan.Action = "create"
+	plan.FirstName = "Seed"
+	plan.LastName = local
+	if len(plan.LastName) > 40 {
+		plan.LastName = plan.LastName[:40]
 	}
-	joining := utils.TodayPHT()
-	mobile := seedMobileForEmail(email)
+	plan.JoiningDate = utils.TodayPHT()
+	plan.MobileNumber = seedMobileForEmail(email)
+	plan.Status = string(constants.TeacherStatusApproved)
+	plan.Role = string(constants.TeacherRoleTeacher)
+	return 0, true, false, plan, nil
+}
 
-	if dryRun {
-		return 0, true, nil
-	}
-
+func insertSeedTeacher(ctx context.Context, q *queries.Queries, plan seedTeacherPlan) (int64, error) {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(seedTeacherPassword), bcrypt.DefaultCost)
 	if err != nil {
-		return 0, false, err
+		return 0, err
 	}
 
 	if err := q.InsertTeacher(ctx, queries.InsertTeacherParams{
-		FirstName:      firstName,
+		FirstName:      plan.FirstName,
 		MiddleName:     "",
-		LastName:       lastName,
+		LastName:       plan.LastName,
 		Birthdate:      "1990-01-01",
 		Address:        "Seed address",
-		JoiningDate:    joining,
-		MobileNumber:   mobile,
-		Email:          email,
+		JoiningDate:    plan.JoiningDate,
+		MobileNumber:   plan.MobileNumber,
+		Email:          plan.Email,
 		Certifications: sql.NullString{},
 		AssignedColor:  constants.DefaultTeacherAssignedColor,
 		RatePerClass:   seedDefaultRate,
@@ -278,35 +328,42 @@ func ensureSeedTeacher(ctx context.Context, q *queries.Queries, email string, dr
 		DriveUrl:       seedTeacherDriveURL,
 		Sex:            sql.NullString{},
 		Password:       string(hashed),
-		Status:         string(constants.TeacherStatusApproved),
+		Status:         plan.Status,
 	}); err != nil {
-		return 0, false, err
+		return 0, err
 	}
 
-	inserted, err := q.GetTeacherByEmail(ctx, email)
+	inserted, err := q.GetTeacherByEmail(ctx, plan.Email)
 	if err != nil {
-		return 0, false, err
+		return 0, err
 	}
 	if err := q.InsertTeacherRole(ctx, queries.InsertTeacherRoleParams{
 		TeacherID: inserted.ID,
-		Role:      string(constants.TeacherRoleTeacher),
+		Role:      plan.Role,
 	}); err != nil {
-		return 0, false, err
+		return 0, err
 	}
-	return inserted.ID, true, nil
+	return inserted.ID, nil
 }
 
-func ensureSeedStudents(ctx context.Context, q *queries.Queries, teacherID int64, n int, dryRun bool) ([]int64, error) {
-	ids := make([]int64, 0, n)
+func planSeedStudents(n int) ([]seedStudentRef, error) {
+	if n < 1 {
+		return nil, ErrSeedStudentsRequired
+	}
+	students := make([]seedStudentRef, 0, n)
 	for i := 0; i < n; i++ {
-		name := fmt.Sprintf("Seed Student %d", i+1)
+		students = append(students, seedStudentRef{
+			Name: fmt.Sprintf("Seed Student %d", i+1),
+		})
+	}
+	return students, nil
+}
+
+func insertSeedStudents(ctx context.Context, q *queries.Queries, teacherID int64, students []seedStudentRef) ([]seedStudentRef, error) {
+	for i := range students {
 		color := processor.StudentColorHex(i)
-		if dryRun {
-			ids = append(ids, int64(i+1))
-			continue
-		}
 		studentID, err := q.InsertStudent(ctx, queries.InsertStudentParams{
-			Name:           name,
+			Name:           students[i].Name,
 			Currency:       "PHP",
 			Contact:        sql.NullString{},
 			RatePerClass:   seedDefaultRate,
@@ -319,17 +376,99 @@ func ensureSeedStudents(ctx context.Context, q *queries.Queries, teacherID int64
 			DeletedReason:  sql.NullString{},
 		})
 		if err != nil {
-			return ids, err
+			return students, err
 		}
+		students[i].ID = studentID
 		if err := q.InsertTeacherStudentM2M(ctx, queries.InsertTeacherStudentM2MParams{
 			TeacherID: teacherID,
 			StudentID: studentID,
 		}); err != nil {
-			return ids, err
+			return students, err
 		}
-		ids = append(ids, studentID)
 	}
-	return ids, nil
+	return students, nil
+}
+
+func logSeedTeacherPlan(plan seedTeacherPlan) {
+	if plan.Action == "use_existing" {
+		logs.Log().Info("seed_classes plan teacher",
+			zap.String("action", "use_existing"),
+			zap.Int64("teacher_id", plan.ID),
+			zap.String("email", plan.Email),
+		)
+		return
+	}
+	logs.Log().Info("seed_classes plan teacher",
+		zap.String("action", "create"),
+		zap.String("email", plan.Email),
+		zap.String("first_name", plan.FirstName),
+		zap.String("last_name", plan.LastName),
+		zap.String("mobile_number", plan.MobileNumber),
+		zap.String("joining_date", plan.JoiningDate),
+		zap.String("status", plan.Status),
+		zap.String("role", plan.Role),
+		zap.String("password", seedTeacherPassword),
+		zap.Float64("rate_per_class", seedDefaultRate),
+		zap.String("currency", "PHP"),
+	)
+}
+
+func logSeedStudentPlan(teacherID int64, teacherEmail string, student seedStudentRef) {
+	logs.Log().Info("seed_classes plan student",
+		zap.String("action", "create"),
+		zap.String("name", student.Name),
+		zap.String("status", string(constants.StudentStatusActive)),
+		zap.Float64("rate_per_class", seedDefaultRate),
+		zap.String("currency", "PHP"),
+		zap.Int64("assign_teacher_id", teacherID),
+		zap.String("assign_teacher_email", teacherEmail),
+	)
+}
+
+func logSeedClassRecordPlan(monthLabel string, teacherID int64, teacherEmail string, student seedStudentRef, date, start, end, status, reason string) {
+	fields := []zap.Field{
+		zap.String("action", "create"),
+		zap.String("kind", "class_record"),
+		zap.String("month", monthLabel),
+		zap.Int64("teacher_id", teacherID),
+		zap.String("teacher_email", teacherEmail),
+		zap.String("student_name", student.Name),
+		zap.String("date", date),
+		zap.String("start_time", start),
+		zap.String("end_time", end),
+		zap.Int64("duration_minutes", seedClassDurationMins),
+		zap.Float64("rate", seedDefaultRate),
+		zap.String("currency", "PHP"),
+		zap.String("status", status),
+	}
+	if student.ID > 0 {
+		fields = append(fields, zap.Int64("student_id", student.ID))
+	}
+	if reason != "" {
+		fields = append(fields, zap.String("reason", reason))
+	}
+	logs.Log().Info("seed_classes plan class", fields...)
+}
+
+func logSeedScheduledClassPlan(monthLabel string, teacherID int64, teacherEmail string, student seedStudentRef, date, start string) {
+	fields := []zap.Field{
+		zap.String("action", "create"),
+		zap.String("kind", "scheduled_class"),
+		zap.String("month", monthLabel),
+		zap.Int64("teacher_id", teacherID),
+		zap.String("teacher_email", teacherEmail),
+		zap.String("student_name", student.Name),
+		zap.String("scheduled_date", date),
+		zap.String("start_time", start),
+		zap.Int64("duration_minutes", seedClassDurationMins),
+		zap.Float64("rate", seedDefaultRate),
+		zap.String("currency", "PHP"),
+		zap.String("status", string(constants.ScheduledClassStatusScheduled)),
+	}
+	if student.ID > 0 {
+		fields = append(fields, zap.Int64("student_id", student.ID))
+	}
+	logs.Log().Info("seed_classes plan class", fields...)
 }
 
 func cutoffDatePools(year int, month time.Month) (firstHalf, secondHalf []string) {
