@@ -1,0 +1,25 @@
+package frontend
+
+templ CutoffLegend() {
+	<div class="cutoff-legend" aria-label="Cutoff row colors">
+		<span class="cutoff-legend__item">
+			<span class="cutoff-legend__swatch cutoff-legend__swatch--first" aria-hidden="true"></span>
+			1st cut-off
+		</span>
+		<span class="cutoff-legend__item">
+			<span class="cutoff-legend__swatch cutoff-legend__swatch--second" aria-hidden="true"></span>
+			2nd cut-off
+		</span>
+	</div>
+}
+
+templ ScrCutoffRowClass() {
+	<script>
+		window.cutoffRowClassForDate = function (dateStr) {
+			if (!dateStr || dateStr.length < 10) return '';
+			var day = parseInt(dateStr.slice(8, 10), 10);
+			if (isNaN(day)) return '';
+			return day <= 15 ? 'row-cutoff-first' : 'row-cutoff-second';
+		};
+	</script>
+}

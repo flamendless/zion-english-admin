@@ -91,6 +91,7 @@ templ Analytics(data AnalyticsData) {
 				}
 			}
 		</style>
+		@ScrCutoffRowClass()
 	</head>
 	<body>
 		<div class="container analytics-page" data-is-superuser={ fmt.Sprintf("%t", data.IsSuperuser) } data-is-pro={ fmt.Sprintf("%t", data.IsSuperuser || data.IsPro) }>
@@ -113,6 +114,7 @@ templ Analytics(data AnalyticsData) {
 				@SortControls("", "asc", ListSortKindAnalytics)
 				@DataListViewToggle()
 				<button type="button" id="filterBtn">Filter</button>
+				@CutoffLegend()
 			</div>
 
 			<div id="analyticsLoading" class="empty-state">
@@ -651,7 +653,11 @@ templ Analytics(data AnalyticsData) {
 					return;
 				}
 				tbody.innerHTML = rows.map(function (row) {
-					let html = '<tr><td data-label="Date">' + escapeHTML(row.scheduledDate) +
+					const cutoffClass = typeof window.cutoffRowClassForDate === 'function'
+						? window.cutoffRowClassForDate(row.scheduledDate)
+						: '';
+					const trClass = cutoffClass ? ' class="' + cutoffClass + '"' : '';
+					let html = '<tr' + trClass + '><td data-label="Date">' + escapeHTML(row.scheduledDate) +
 						'</td><td data-label="Student">' + escapeHTML(row.studentName) + '</td>';
 					if (isSuperuser) {
 						html += '<td data-label="Teacher">' + renderTeacherCell(row.teacherName, row.teacherAvatar) + '</td>';

@@ -72,7 +72,7 @@ templ ReportViewModal(data ReportViewData) {
 							</thead>
 							<tbody>
 								for _, class := range data.Classes {
-									<tr>
+									<tr class={ ReportClassItemRowClass(class.Date) }>
 										<td data-label="Date">{ class.Date }</td>
 										<td class="table-truncate-cell" data-label="Student">
 											@TableTruncatedText(class.StudentName)

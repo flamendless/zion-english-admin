@@ -16,6 +16,8 @@ type ReportHistoryRowData struct {
 	Kind          constants.ReportGenerationKind
 	TeacherName   string
 	TeacherAvatar AvatarProps
+	PeriodStart   string
+	PeriodEnd     string
 	PeriodLabel   string
 	RecordCount   int64
 	GeneratedAt   string
@@ -29,6 +31,10 @@ func (r ReportHistoryRowData) IsSummary() bool {
 
 func (r ReportHistoryRowData) RecordsLabel() string {
 	return fmt.Sprintf("%d", r.RecordCount)
+}
+
+func (r ReportHistoryRowData) RowClass() string {
+	return rowClassForCutoffPeriod(r.PeriodStart, r.PeriodEnd)
 }
 
 func (r ReportHistoryRowData) DownloadURL() string {
