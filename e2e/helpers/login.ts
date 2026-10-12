@@ -22,9 +22,17 @@ export async function login(page: Page, email: string, password: string, opts?: 
 		return;
 	}
 
-	expect(loginResponse[0].status()).toBeGreaterThanOrEqual(300);
-	expect(loginResponse[0].status()).toBeLessThan(400);
-	await page.waitForURL("**/dashboard**");
+	const status = loginResponse[0].status();
+	if (status < 300 || status >= 400) {
+		const loginError = page.locator("#loginError");
+		const errText = (await loginError.textContent())?.trim() ?? "";
+		throw new Error(
+			errText
+				? `Login failed (HTTP ${status}): ${errText}`
+				: `Login failed: expected redirect, got HTTP ${status}`,
+		);
+	}
+	await page.waitForURL("**/dashboard**", { waitUntil: "domcontentloaded" });
 	await expect(page.getByRole("heading", { name: "Quick actions" })).toBeVisible({ timeout: 15_000 });
 }
 
@@ -33,12 +41,15 @@ export async function loginAsTeacher(page: Page, creds: E2ECredentials) {
 }
 
 export async function loginAsSuperuser(page: Page, creds: E2ECredentials) {
-	await page.goto("auth/login");
-	await page.locator("#email").fill(creds.superuserEmail);
-	await page.locator("#password").fill(creds.superuserPassword);
-	await page.getByRole("button", { name: "Login" }).click();
-	await page.waitForURL("**/dashboard**");
+	await login(page, creds.superuserEmail, creds.superuserPassword);
 	await expect(page.getByRole("heading", { name: /Welcome, superuser/i })).toBeVisible({
 		timeout: 15_000,
 	});
+}
+
+export async function loginAsAdmin(page: Page, creds: E2ECredentials) {
+	if (!creds.adminEmail || !creds.adminPassword) {
+		throw new Error("adminEmail and adminPassword required in e2e credentials");
+	}
+	await login(page, creds.adminEmail, creds.adminPassword);
 }

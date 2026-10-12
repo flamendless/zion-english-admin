@@ -26,7 +26,49 @@ export async function createLearningMaterial(page: Page, opts: CreateLearningMat
 		),
 		page.locator("#lmMaterialForm .lm-submit-btn").click(),
 	]);
-	await expect(page.locator(".lm-grid .lm-card-title")).toContainText(opts.title, {
+	await expect(page.locator(".lm-card-title", { hasText: opts.title })).toBeVisible({
+		timeout: 15_000,
+	});
+}
+
+export async function editLearningMaterialTitle(page: Page, currentTitle: string, newTitle: string) {
+	const card = page.locator(".lm-card", { hasText: currentTitle });
+	await card.getByRole("button", { name: "Edit" }).click();
+	const editForm = page.locator("#lmEditModalHost #lmMaterialForm");
+	await expect(editForm).toBeVisible();
+	await editForm.locator("#lmTitle").fill(newTitle);
+	await Promise.all([
+		page.waitForResponse(
+			(r) =>
+				r.url().includes("/learning-materials/") &&
+				r.request().method() === "POST" &&
+				r.status() >= 200 &&
+				r.status() < 400,
+		),
+		editForm.locator(".lm-submit-btn").click(),
+	]);
+	await expect(page.locator(".lm-card-title", { hasText: newTitle })).toBeVisible({
+		timeout: 15_000,
+	});
+}
+
+export async function deleteLearningMaterialByTitle(page: Page, title: string) {
+	const card = page.locator(".lm-card", { hasText: title });
+	await card.getByRole("button", { name: "Edit" }).click();
+	const editForm = page.locator("#lmEditModalHost #lmMaterialForm");
+	await expect(editForm).toBeVisible();
+	await editForm.locator("#lmStatus").selectOption("deleted");
+	await Promise.all([
+		page.waitForResponse(
+			(r) =>
+				r.url().includes("/learning-materials/") &&
+				r.request().method() === "POST" &&
+				r.status() >= 200 &&
+				r.status() < 400,
+		),
+		editForm.locator(".lm-submit-btn").click(),
+	]);
+	await expect(page.locator(".lm-grid .lm-card-title", { hasText: title })).toHaveCount(0, {
 		timeout: 15_000,
 	});
 }

@@ -83,11 +83,12 @@ e2e() {
 	export E2E_PORT
 	if [ "${E2E_REUSE_SERVER:-}" != "1" ]; then
 		lsof -ti:"$E2E_PORT" | xargs kill -9 2>/dev/null || true
+		sleep 1
 	fi
 	if [ ! -d e2e/node_modules ]; then
-		( cd e2e && npm install && npx playwright install chromium )
+		( cd e2e && npm install )
 	fi
-	( cd e2e && npx playwright test "${@:2}" )
+	( cd e2e && npx playwright install chromium && npx playwright test "${@:2}" )
 }
 
 hooks-install() {

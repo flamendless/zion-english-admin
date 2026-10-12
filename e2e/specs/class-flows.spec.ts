@@ -136,8 +136,10 @@ test("delete scheduled class", async ({ page }) => {
 test("edit class record", async ({ page }) => {
 	await page.goto("classes");
 	await page.locator("#studentSearch").fill(creds.studentName);
-	const conductedRow = page.locator("#classesTable tr", { hasText: "Conducted" });
-	const editHref = await conductedRow.getByRole("link", { name: "Edit" }).getAttribute("href");
+	const conductedRow = page.locator("#classesTable tr", {
+		hasText: creds.studentName,
+	}).filter({ hasText: "Conducted" });
+	const editHref = await conductedRow.first().getByRole("link", { name: "Edit" }).getAttribute("href");
 	expect(editHref).toBeTruthy();
 	await page.goto(editHref!);
 	await expect(page).toHaveTitle(/Edit Class/i);
@@ -149,8 +151,10 @@ test("edit class record", async ({ page }) => {
 test("delete class record", async ({ page }) => {
 	await page.goto("classes");
 	await page.locator("#studentSearch").fill(creds.studentName);
-	const conductedRow = page.locator("#classesTable tr", { hasText: "Conducted" });
-	await conductedRow.getByRole("button", { name: "Delete" }).click();
+	const conductedRow = page.locator("#classesTable tr", {
+		hasText: creds.studentName,
+	}).filter({ hasText: "Conducted" });
+	await conductedRow.first().getByRole("button", { name: "Delete" }).click();
 	await page.locator("#deleteClassReason").fill("E2E delete record");
 	await page.locator("#deleteClassForm").getByRole("button", { name: "Delete" }).click();
 	await expect(page.locator("#successBanner")).toContainText(successBanner, { timeout: 15_000 });

@@ -162,7 +162,7 @@ func Middleware(cfg *conf.Config, dbRO *queries.Queries, next http.Handler) http
 func Login(w http.ResponseWriter, r *http.Request, cfg *conf.Config, dbRO *queries.Queries, email, password string) (User, error) {
 	var user User
 
-	isSuperuser := subtle.ConstantTimeCompare([]byte(email), []byte(cfg.SuperuserUsername)) == 1 &&
+	isSuperuser := subtle.ConstantTimeCompare([]byte(email), []byte(utils.NormalizeEmail(cfg.SuperuserUsername))) == 1 &&
 		subtle.ConstantTimeCompare([]byte(password), []byte(cfg.SuperuserPassword)) == 1
 
 	switch {

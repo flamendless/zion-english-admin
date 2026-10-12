@@ -10,12 +10,20 @@ export async function openConductWizard(page: Page) {
 	await openRecordClassesChoice(page);
 	await page.getByRole("button", { name: "Record a past class" }).click();
 	await expect(page.getByRole("heading", { name: "Record a past class" })).toBeVisible();
+	const studentSelect = page.locator("#conductClassWizardModal #conductWizard_student");
+	await expect(studentSelect.locator("option[value]:not([value=''])")).not.toHaveCount(0, {
+		timeout: 15_000,
+	});
 }
 
 export async function openScheduleWizard(page: Page) {
 	await openRecordClassesChoice(page);
 	await page.getByRole("button", { name: "Schedule an upcoming class" }).click();
 	await expect(page.getByRole("heading", { name: "Schedule an upcoming class" })).toBeVisible();
+	const studentSelect = page.locator("#scheduleClassWizardModal #scheduleWizard_student");
+	await expect(studentSelect.locator("option[value]:not([value=''])")).not.toHaveCount(0, {
+		timeout: 15_000,
+	});
 }
 
 async function wizardNext(modal: Locator, nextId: string) {
@@ -31,12 +39,16 @@ async function selectStudentInWizard(modal: Locator, studentName: string, select
 	await select.dispatchEvent("change");
 }
 
-export async function fillConductWizard(page: Page, opts: {
+export type FillConductWizardOptions = {
 	studentName: string;
 	date: string;
 	status?: "conducted" | "cancelled" | "rescheduled";
 	reason?: string;
-}) {
+	trialClass?: boolean;
+	learningMaterialTitle?: string;
+};
+
+export async function fillConductWizard(page: Page, opts: FillConductWizardOptions) {
 	const modal = page.locator("#conductClassWizardModal");
 	const status = opts.status ?? "conducted";
 
@@ -59,7 +71,18 @@ export async function fillConductWizard(page: Page, opts: {
 	await modal.locator("#conductWizard_currency").selectOption("PHP");
 	await modal.locator("#conductWizard_rate").fill("500");
 	await wizardNext(modal, "conductWizardNext"); // materials
+	if (opts.learningMaterialTitle) {
+		await modal.locator("#conductWizard_lmSearch").fill(opts.learningMaterialTitle);
+		await expect(modal.locator(".class-lm-search-item", { hasText: opts.learningMaterialTitle })).toBeVisible({
+			timeout: 15_000,
+		});
+		await modal.locator(".class-lm-search-item", { hasText: opts.learningMaterialTitle }).click();
+		await expect(modal.locator(".class-lm-chip")).toContainText(opts.learningMaterialTitle);
+	}
 	await wizardNext(modal, "conductWizardNext"); // trial
+	if (opts.trialClass) {
+		await modal.locator("label.trial-yesno-card").filter({ hasText: "Yes" }).click();
+	}
 	await wizardNext(modal, "conductWizardNext"); // notes
 	await wizardNext(modal, "conductWizardNext"); // summary
 	await expect(modal.locator("#conductWizardSave")).toBeVisible();

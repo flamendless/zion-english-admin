@@ -17,6 +17,13 @@ const teacherRoutes: { path: string; heading: RegExp | string }[] = [
 	{ path: "guides", heading: "Guides" },
 	{ path: "analytics", heading: "My Analytics" },
 	{ path: "my-earnings", heading: "My Earnings" },
+	{ path: "payments", heading: "My Payment History" },
+	{ path: "exports", heading: "My data export" },
+	{ path: "logs", heading: "My Activity" },
+	{ path: "upload-logs", heading: "My Upload Logs" },
+	{ path: "training-materials", heading: "Training Materials" },
+	{ path: "documents", heading: "My Documents" },
+	{ path: "intro-videos", heading: "My Intro Video" },
 ];
 
 test("teacher nav pages load", async ({ page }) => {

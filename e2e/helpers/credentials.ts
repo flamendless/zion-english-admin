@@ -4,12 +4,18 @@ import path from "path";
 export type E2ECredentials = {
 	email: string;
 	password: string;
+	teacherId?: number;
 	studentName: string;
+	studentId?: number;
 	studentRate: number;
 	currency: string;
 	superuserEmail: string;
 	superuserPassword: string;
 	overdueScheduledDate?: string;
+	adminEmail?: string;
+	adminPassword?: string;
+	siblingStudentName?: string;
+	parentName?: string;
 };
 
 export function loadCredentials(): E2ECredentials {

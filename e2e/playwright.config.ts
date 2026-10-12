@@ -25,7 +25,8 @@ export default defineConfig({
 	},
 	timeout: 90_000,
 	webServer: {
-		command: `ZION_DB_PATH="${dbPath}" PORT="${e2ePort}" go run . web -p ${e2ePort}`,
+		// Seed before web so Playwright globalSetup (which may run after health) never resets DB while the server holds it open.
+		command: `go run . e2e-seed && ZION_DB_PATH="${dbPath}" PORT="${e2ePort}" go run . web -p ${e2ePort}`,
 		cwd: repoRoot,
 		url: `${baseURL}health`,
 		reuseExistingServer: process.env.E2E_REUSE_SERVER === "1",

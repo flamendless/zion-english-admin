@@ -7,6 +7,17 @@ export async function gotoSchedule(page: Page) {
 	await page.locator("#calendarGrid button.calendar-day").first().waitFor({ timeout: 15_000 });
 }
 
+export async function expectCalendarMonthChanges(page: Page) {
+	await gotoSchedule(page);
+	const label = page.locator("#calMonthLabel");
+	const before = (await label.textContent())?.trim() ?? "";
+	await page.locator("#calNext").click();
+	await expect(label).not.toHaveText(before, { timeout: 15_000 });
+	const afterNext = (await label.textContent())?.trim() ?? "";
+	await page.locator("#calPrev").click();
+	await expect(label).not.toHaveText(afterNext, { timeout: 15_000 });
+}
+
 export async function openScheduleDay(page: Page, isoDate: string) {
 	await gotoSchedule(page);
 	const dayBtn = page.locator(`#calendarGrid button.calendar-day[data-date="${isoDate}"]`);
