@@ -30,6 +30,7 @@ WHERE (? = 0 OR EXISTS (
 	SELECT 1 FROM tbl_teachers_students_m2m m
 	WHERE m.student_id = s.id AND m.teacher_id = ?
 ))
+	AND s.is_test_seed = 0
 GROUP BY s.id, s.name
 HAVING conducted + cancelled + rescheduled > 0
 ORDER BY cancelled DESC, student_name ASC
@@ -128,6 +129,10 @@ FROM tbl_teachers t
 LEFT JOIN tbl_class_records cr ON cr.teacher_id = t.id
 	AND cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_students ts
+		WHERE ts.id = cr.student_id AND ts.is_test_seed = 1
+	)
 WHERE t.status = 'approved' AND t.deleted = 0
 	AND (? = 0 OR t.id = ?)
 	AND NOT EXISTS (
@@ -227,6 +232,7 @@ SELECT
 	s.updated_at AS churned_at
 FROM tbl_students s
 WHERE s.status = 'inactive'
+	AND s.is_test_seed = 0
 	AND substr(s.updated_at, 1, 10) >= ? AND substr(s.updated_at, 1, 10) <= ?
 	AND (? = 0 OR EXISTS (
 	SELECT 1 FROM tbl_teachers_students_m2m m
@@ -290,6 +296,7 @@ SELECT
 	COUNT(*) AS count
 FROM tbl_students s
 WHERE s.status = 'inactive'
+	AND s.is_test_seed = 0
 	AND (? = 0 OR EXISTS (
 	SELECT 1 FROM tbl_teachers_students_m2m m
 	WHERE m.student_id = s.id AND m.teacher_id = ?
@@ -358,6 +365,7 @@ WHERE sc.status = 'scheduled'
 		SELECT 1 FROM tbl_teacher_roles tr
 		WHERE tr.teacher_id = t.id AND tr.role IN ('tester', 'developer')
 	)
+	AND s.is_test_seed = 0
 ORDER BY sc.scheduled_date ASC, sc.start_time ASC
 LIMIT 50
 `
@@ -433,6 +441,7 @@ SELECT
 		SELECT COUNT(*)
 		FROM tbl_students s
 		WHERE s.status = 'active'
+			AND s.is_test_seed = 0
 			AND (? = 0 OR EXISTS (
 			SELECT 1 FROM tbl_teachers_students_m2m m
 			WHERE m.student_id = s.id AND m.teacher_id = ?
@@ -442,6 +451,7 @@ SELECT
 		SELECT COUNT(*)
 		FROM tbl_students s
 		WHERE s.status = 'inactive'
+			AND s.is_test_seed = 0
 			AND (? = 0 OR EXISTS (
 			SELECT 1 FROM tbl_teachers_students_m2m m
 			WHERE m.student_id = s.id AND m.teacher_id = ?
@@ -451,6 +461,7 @@ SELECT
 		SELECT COUNT(*)
 		FROM tbl_students s
 		WHERE s.status = 'inactive'
+			AND s.is_test_seed = 0
 			AND substr(s.updated_at, 1, 10) >= ? AND substr(s.updated_at, 1, 10) <= ?
 			AND (? = 0 OR EXISTS (
 			SELECT 1 FROM tbl_teachers_students_m2m m
@@ -504,6 +515,10 @@ SELECT
 				SELECT 1 FROM tbl_teacher_roles tr
 				WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
 			)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_students ts
+				WHERE ts.id = cr.student_id AND ts.is_test_seed = 1
+			)
 	), 0) AS conducted,
 	COALESCE((
 		SELECT SUM(CASE WHEN cr.status = 'cancelled' THEN 1 ELSE 0 END)
@@ -514,6 +529,10 @@ SELECT
 			AND NOT EXISTS (
 				SELECT 1 FROM tbl_teacher_roles tr
 				WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
+			)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_students ts
+				WHERE ts.id = cr.student_id AND ts.is_test_seed = 1
 			)
 	), 0) AS cancelled,
 	COALESCE((
@@ -526,6 +545,10 @@ SELECT
 				SELECT 1 FROM tbl_teacher_roles tr
 				WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
 			)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_students ts
+				WHERE ts.id = cr.student_id AND ts.is_test_seed = 1
+			)
 	), 0) AS rescheduled,
 	COALESCE((
 		SELECT SUM(sc.duration_minutes)
@@ -536,6 +559,10 @@ SELECT
 			AND NOT EXISTS (
 				SELECT 1 FROM tbl_teacher_roles tr
 				WHERE tr.teacher_id = sc.teacher_id AND tr.role IN ('tester', 'developer')
+			)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_students ts
+				WHERE ts.id = sc.student_id AND ts.is_test_seed = 1
 			)
 	), 0) AS scheduled_minutes,
 	COALESCE((
@@ -549,6 +576,10 @@ SELECT
 				SELECT 1 FROM tbl_teacher_roles tr
 				WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
 			)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_students ts
+				WHERE ts.id = cr.student_id AND ts.is_test_seed = 1
+			)
 	), 0) AS conducted_minutes,
 	COALESCE((
 		SELECT COUNT(*)
@@ -561,6 +592,10 @@ SELECT
 			AND NOT EXISTS (
 				SELECT 1 FROM tbl_teacher_roles tr
 				WHERE tr.teacher_id = sc.teacher_id AND tr.role IN ('tester', 'developer')
+			)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_students ts
+				WHERE ts.id = sc.student_id AND ts.is_test_seed = 1
 			)
 	), 0) AS no_show_count
 `
@@ -652,6 +687,10 @@ SELECT
 				SELECT 1 FROM tbl_teacher_roles tr
 				WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
 			)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_students ts
+				WHERE ts.id = cr.student_id AND ts.is_test_seed = 1
+			)
 	), 0) AS trial_conducted,
 	COALESCE((
 		SELECT SUM(CASE WHEN cr.is_trial_class = 0 AND cr.status = 'conducted' THEN 1 ELSE 0 END)
@@ -662,6 +701,10 @@ SELECT
 			AND NOT EXISTS (
 				SELECT 1 FROM tbl_teacher_roles tr
 				WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
+			)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_students ts
+				WHERE ts.id = cr.student_id AND ts.is_test_seed = 1
 			)
 	), 0) AS regular_conducted,
 	COALESCE((
@@ -675,6 +718,10 @@ SELECT
 			AND NOT EXISTS (
 				SELECT 1 FROM tbl_teacher_roles tr
 				WHERE tr.teacher_id = sc.teacher_id AND tr.role IN ('tester', 'developer')
+			)
+			AND NOT EXISTS (
+				SELECT 1 FROM tbl_students ts
+				WHERE ts.id = sc.student_id AND ts.is_test_seed = 1
 			)
 	), 0) AS trial_scheduled
 `
@@ -789,6 +836,10 @@ WHERE cr.date >= ? AND cr.date <= ?
 	AND NOT EXISTS (
 		SELECT 1 FROM tbl_teacher_roles tr
 		WHERE tr.teacher_id = cr.teacher_id AND tr.role IN ('tester', 'developer')
+	)
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_students ts
+		WHERE ts.id = cr.student_id AND ts.is_test_seed = 1
 	)
 GROUP BY week_label
 ORDER BY week_label ASC

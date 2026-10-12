@@ -119,6 +119,7 @@ WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
 	AND (? = '' OR cr.status = ?)
 	AND (? = '' OR s.name LIKE '%' || ? || '%')
+	AND s.is_test_seed = 0
 `
 
 type CountClassRecordsFilteredParams struct {
@@ -158,6 +159,11 @@ SELECT (
 		AND (? = '' OR (? != 'scheduled' AND ? != 'overdue'))
 		AND (? = '' OR ? = 'deleted' OR cr.status = ?)
 		AND (? = '' OR s.name LIKE '%' || ? || '%')
+		AND (
+			? = 'all'
+			OR (? = 'only' AND s.is_test_seed = 1)
+			OR (? = '' AND s.is_test_seed = 0)
+		)
 ) + (
 	SELECT COUNT(*) as count
 	FROM tbl_scheduled_classes sc
@@ -178,6 +184,11 @@ SELECT (
 			) < datetime(?)
 		)
 		AND (? = '' OR s.name LIKE '%' || ? || '%')
+		AND (
+			? = 'all'
+			OR (? = 'only' AND s.is_test_seed = 1)
+			OR (? = '' AND s.is_test_seed = 0)
+		)
 ) AS count
 `
 
@@ -197,19 +208,25 @@ type CountClassesListFilteredParams struct {
 	Column13        any
 	Column14        sql.NullString
 	Column15        any
+	Column16        any
+	Column17        any
+	Column18        any
 	TeacherID_2     int64
 	ScheduledDate   string
 	ScheduledDate_2 string
-	Column19        any
-	Column20        any
-	Column21        any
 	Column22        any
 	Column23        any
 	Column24        any
 	Column25        any
-	Datetime        any
+	Column26        any
 	Column27        any
-	Column28        sql.NullString
+	Column28        any
+	Datetime        any
+	Column30        any
+	Column31        sql.NullString
+	Column32        any
+	Column33        any
+	Column34        any
 }
 
 func (q *Queries) CountClassesListFiltered(ctx context.Context, arg CountClassesListFilteredParams) (int64, error) {
@@ -229,19 +246,25 @@ func (q *Queries) CountClassesListFiltered(ctx context.Context, arg CountClasses
 		arg.Column13,
 		arg.Column14,
 		arg.Column15,
+		arg.Column16,
+		arg.Column17,
+		arg.Column18,
 		arg.TeacherID_2,
 		arg.ScheduledDate,
 		arg.ScheduledDate_2,
-		arg.Column19,
-		arg.Column20,
-		arg.Column21,
 		arg.Column22,
 		arg.Column23,
 		arg.Column24,
 		arg.Column25,
-		arg.Datetime,
+		arg.Column26,
 		arg.Column27,
 		arg.Column28,
+		arg.Datetime,
+		arg.Column30,
+		arg.Column31,
+		arg.Column32,
+		arg.Column33,
+		arg.Column34,
 	)
 	var count int64
 	err := row.Scan(&count)
@@ -251,6 +274,7 @@ func (q *Queries) CountClassesListFiltered(ctx context.Context, arg CountClasses
 const countOverdueScheduledClassesByDateRange = `-- name: CountOverdueScheduledClassesByDateRange :one
 SELECT COUNT(*) as count
 FROM tbl_scheduled_classes sc
+INNER JOIN tbl_students s ON s.id = sc.student_id
 WHERE sc.deleted_at IS NULL
 	AND sc.status = 'scheduled'
 	AND (? = 0 OR sc.teacher_id = ?)
@@ -265,6 +289,7 @@ WHERE sc.deleted_at IS NULL
 			ELSE datetime(sc.scheduled_date || ' 23:59:59')
 		END
 	) < datetime(?)
+	AND s.is_test_seed = 0
 `
 
 type CountOverdueScheduledClassesByDateRangeParams struct {
@@ -291,6 +316,8 @@ func (q *Queries) CountOverdueScheduledClassesByDateRange(ctx context.Context, a
 const getClassRecordByID = `-- name: GetClassRecordByID :one
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.is_trial_class, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
 	s.name as student_name,
+	s.assigned_color as student_assigned_color,
+	s.is_test_seed as student_is_test_seed,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name,
 	t.first_name as teacher_first_name,
 	t.middle_name as teacher_middle_name,
@@ -321,6 +348,8 @@ type GetClassRecordByIDRow struct {
 	UpdatedAt             string
 	RecordedByRole        string
 	StudentName           string
+	StudentAssignedColor  string
+	StudentIsTestSeed     int64
 	TeacherName           string
 	TeacherFirstName      string
 	TeacherMiddleName     string
@@ -350,6 +379,8 @@ func (q *Queries) GetClassRecordByID(ctx context.Context, id int64) (GetClassRec
 		&i.UpdatedAt,
 		&i.RecordedByRole,
 		&i.StudentName,
+		&i.StudentAssignedColor,
+		&i.StudentIsTestSeed,
 		&i.TeacherName,
 		&i.TeacherFirstName,
 		&i.TeacherMiddleName,
@@ -509,6 +540,7 @@ WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
 	AND (? = '' OR cr.status = ?)
 	AND (? = '' OR s.name LIKE '%' || ? || '%')
+	AND s.is_test_seed = 0
 ORDER BY CASE WHEN cr.date = date('now', 'localtime') THEN 0 ELSE 1 END, cr.date DESC, cr.created_at DESC
 LIMIT ? OFFSET ?
 `
@@ -599,7 +631,7 @@ func (q *Queries) GetClassRecordsFiltered(ctx context.Context, arg GetClassRecor
 }
 
 const getClassesListFiltered = `-- name: GetClassesListFiltered :many
-SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_minutes, rate, currency, status, reason, notes, created_at, student_name, teacher_name, teacher_first_name, teacher_middle_name, teacher_last_name, teacher_assigned_color, teacher_profile_picture FROM (
+SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_minutes, rate, currency, status, reason, notes, created_at, student_name, student_assigned_color, student_is_test_seed, teacher_name, teacher_first_name, teacher_middle_name, teacher_last_name, teacher_assigned_color, teacher_profile_picture FROM (
 	SELECT
 		cr.id,
 	'record' AS source,
@@ -616,6 +648,8 @@ SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_
 	cr.notes,
 	cr.created_at,
 	s.name AS student_name,
+	s.assigned_color AS student_assigned_color,
+	s.is_test_seed AS student_is_test_seed,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
 	t.first_name AS teacher_first_name,
 	t.middle_name AS teacher_middle_name,
@@ -630,6 +664,11 @@ SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_
 		AND (? = '' OR (? != 'scheduled' AND ? != 'overdue'))
 		AND (? = '' OR ? = 'deleted' OR cr.status = ?)
 		AND (? = '' OR s.name LIKE '%' || ? || '%')
+		AND (
+			? = 'all'
+			OR (? = 'only' AND s.is_test_seed = 1)
+			OR (? = '' AND s.is_test_seed = 0)
+		)
 
 	UNION ALL
 
@@ -649,6 +688,8 @@ SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_
 	NULL AS notes,
 	sc.created_at,
 	s.name AS student_name,
+	s.assigned_color AS student_assigned_color,
+	s.is_test_seed AS student_is_test_seed,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
 	t.first_name AS teacher_first_name,
 	t.middle_name AS teacher_middle_name,
@@ -674,6 +715,11 @@ SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_
 			) < datetime(?)
 		)
 		AND (? = '' OR s.name LIKE '%' || ? || '%')
+		AND (
+			? = 'all'
+			OR (? = 'only' AND s.is_test_seed = 1)
+			OR (? = '' AND s.is_test_seed = 0)
+		)
 ) AS combined
 ORDER BY CASE WHEN combined.date = date('now', 'localtime') THEN 0 ELSE 1 END, combined.date DESC, combined.start_time DESC, combined.created_at DESC
 LIMIT ? OFFSET ?
@@ -695,19 +741,25 @@ type GetClassesListFilteredParams struct {
 	Column13        any
 	Column14        sql.NullString
 	Column15        any
+	Column16        any
+	Column17        any
+	Column18        any
 	TeacherID_2     int64
 	ScheduledDate   string
 	ScheduledDate_2 string
-	Column19        any
-	Column20        any
-	Column21        any
 	Column22        any
 	Column23        any
 	Column24        any
 	Column25        any
-	Datetime        any
+	Column26        any
 	Column27        any
-	Column28        sql.NullString
+	Column28        any
+	Datetime        any
+	Column30        any
+	Column31        sql.NullString
+	Column32        any
+	Column33        any
+	Column34        any
 	Limit           int64
 	Offset          int64
 }
@@ -728,6 +780,8 @@ type GetClassesListFilteredRow struct {
 	Notes                 sql.NullString
 	CreatedAt             string
 	StudentName           string
+	StudentAssignedColor  string
+	StudentIsTestSeed     int64
 	TeacherName           string
 	TeacherFirstName      string
 	TeacherMiddleName     string
@@ -753,19 +807,25 @@ func (q *Queries) GetClassesListFiltered(ctx context.Context, arg GetClassesList
 		arg.Column13,
 		arg.Column14,
 		arg.Column15,
+		arg.Column16,
+		arg.Column17,
+		arg.Column18,
 		arg.TeacherID_2,
 		arg.ScheduledDate,
 		arg.ScheduledDate_2,
-		arg.Column19,
-		arg.Column20,
-		arg.Column21,
 		arg.Column22,
 		arg.Column23,
 		arg.Column24,
 		arg.Column25,
-		arg.Datetime,
+		arg.Column26,
 		arg.Column27,
 		arg.Column28,
+		arg.Datetime,
+		arg.Column30,
+		arg.Column31,
+		arg.Column32,
+		arg.Column33,
+		arg.Column34,
 		arg.Limit,
 		arg.Offset,
 	)
@@ -792,6 +852,8 @@ func (q *Queries) GetClassesListFiltered(ctx context.Context, arg GetClassesList
 			&i.Notes,
 			&i.CreatedAt,
 			&i.StudentName,
+			&i.StudentAssignedColor,
+			&i.StudentIsTestSeed,
 			&i.TeacherName,
 			&i.TeacherFirstName,
 			&i.TeacherMiddleName,
@@ -919,6 +981,7 @@ WHERE sc.deleted_at IS NULL
 			ELSE datetime(sc.scheduled_date || ' 23:59:59')
 		END
 	) < datetime(?)
+	AND s.is_test_seed = 0
 ORDER BY sc.scheduled_date ASC, sc.start_time ASC
 LIMIT ?
 `

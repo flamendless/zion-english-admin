@@ -22,6 +22,9 @@ type DashboardData struct {
 	ShowOnboarding         bool
 	ActiveStudents         int64
 	InactiveStudents       int64
+	DeletedStudents        int64
+	TotalStudentsAll       int64
+	TestSeedStudents       int64
 	PendingTeachers        int64
 	PendingDocuments       int64
 	PendingIntroVideos     int64
@@ -305,6 +308,17 @@ templ DashboardTeachersStatCard(total int64, withoutZoom int64, withoutGoogleCal
 	</div>
 }
 
+func dashboardStudentsOverviewSub(active, inactive, testSeed, deleted int64) string {
+	sub := fmt.Sprintf("%d active, %d inactive", active, inactive)
+	if testSeed > 0 {
+		sub += fmt.Sprintf(", %d test/seed", testSeed)
+	}
+	if deleted > 0 {
+		sub += fmt.Sprintf(", %d deleted", deleted)
+	}
+	return sub
+}
+
 templ DashboardParentGapStatCard(withoutParent int64, withoutParentRate int64) {
 	<div class="stat-card">
 		@AdminOnlyStatLabel("Students Missing Parent Info")
@@ -331,14 +345,20 @@ templ DashboardStats(data DashboardData) {
 		if auth.HasAdminAccess(data.Role) {
 			<div class="stat-card">
 				@AdminOnlyStatLabel("Students")
-				<span class="stat-value">{ fmt.Sprintf("%d", data.ActiveStudents + data.InactiveStudents) }</span>
-				<span class="stat-sub">{ fmt.Sprintf("%d active, %d inactive", data.ActiveStudents, data.InactiveStudents) }</span>
+				<span class="stat-value">{ fmt.Sprintf("%d", data.TotalStudentsAll) }</span>
+				<span class="stat-sub">{ dashboardStudentsOverviewSub(data.ActiveStudents, data.InactiveStudents, data.TestSeedStudents, data.DeletedStudents) }</span>
 				<div class="stat-link-rows">
 					@DashboardStatLinkRow(
 						"Without valid teacher",
 						utils.URL("/students?status=active&teacherAssignmentFilter=no_approved_teacher"),
 						data.StudentsWithoutApprovedTeacher,
 						"View active students without an approved teacher",
+					)
+					@DashboardStatLinkRow(
+						"Test/seed students",
+						utils.URL("/students?testSeedFilter=only"),
+						data.TestSeedStudents,
+						"View test and seed students",
 					)
 				</div>
 			</div>

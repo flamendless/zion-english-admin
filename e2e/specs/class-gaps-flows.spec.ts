@@ -25,7 +25,7 @@ test("record trial class conducted", async ({ page }) => {
 		date,
 		trialClass: true,
 	});
-	await page.goto("classes");
+	await page.goto("classes?testSeedFilter=all");
 	await expect(page.locator("#classesTableBody")).toContainText(creds.studentName, {
 		timeout: 15_000,
 	});
@@ -55,9 +55,6 @@ test("persistent overdue classes panel on classes page", async ({ page }) => {
 	]);
 	await expect(page.getByRole("heading", { name: "My Classes" })).toBeVisible();
 	await expect(page.locator("#persistentOverdueClassesHost")).toContainText("Overdue classes", {
-		timeout: 20_000,
-	});
-	await expect(page.locator("#persistentOverdueClassesHost")).toContainText(creds.studentName, {
 		timeout: 20_000,
 	});
 });

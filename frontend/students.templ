@@ -11,6 +11,7 @@ type StudentData struct {
 	Status         constants.StudentStatus
 	ParentFilter            string
 	TeacherAssignmentFilter string
+	TestSeedFilter          string
 	TeacherID               string
 	TeacherName    string
 	SortBy         string
@@ -41,6 +42,7 @@ type StudentItem struct {
 	RelatedToDisplay string
 	CreatedAt        string
 	UpdatedAt        string
+	Avatar           AvatarProps
 }
 
 func getStudentRowClass(status constants.StudentStatus) string {
@@ -109,9 +111,9 @@ templ Students(data StudentData) {
 			@HeaderSimple()
 			@HubHeader("Students", "New Student", utils.URL("/students/register"), true)
 
-			@ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindStudent, data.TeacherID, data.TeacherName, "", "", "", "", true, false, false, false, true, "", false, "", false, false, false, false, data.SortBy, data.SortOrder, ListSortKindStudent, false, data.ParentFilter, data.TeacherAssignmentFilter, "", "")
+			@ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindStudent, data.TeacherID, data.TeacherName, "", "", "", "", true, false, false, false, true, "", false, "", false, false, false, false, data.SortBy, data.SortOrder, ListSortKindStudent, false, data.ParentFilter, data.TeacherAssignmentFilter, "", "", data.TestSeedFilter, true)
 
-			if data.ParentFilter != "" || data.TeacherAssignmentFilter != "" {
+			if data.ParentFilter != "" || data.TeacherAssignmentFilter != "" || data.TestSeedFilter != "" {
 				<p class="list-active-filter-note">
 					if data.ParentFilter != "" {
 						Filter: { constants.StudentParentFilter(data.ParentFilter).Label() }.
@@ -121,6 +123,12 @@ templ Students(data StudentData) {
 							{ " " }
 						}
 						Filter: { constants.StudentTeacherAssignmentFilter(data.TeacherAssignmentFilter).Label() }.
+					}
+					if data.TestSeedFilter != "" {
+						if data.ParentFilter != "" || data.TeacherAssignmentFilter != "" {
+							{ " " }
+						}
+						Filter: { constants.StudentTestSeedFilter(data.TestSeedFilter).Label() }.
 					}
 					<a href={ utils.URL("/students") }>Clear filters</a>
 				</p>
@@ -144,7 +152,9 @@ templ Students(data StudentData) {
 						<tbody>
 							for _, student := range data.Students {
 								<tr class={ getStudentRowClass(student.Status) }>
-									<td data-label="Name">{ student.Name }</td>
+									<td data-label="Name">
+										@StudentNameCell(student.Name, student.Avatar)
+									</td>
 									<td data-label="Parent">{ getDisplayValue(student.ParentName) }</td>
 									<td data-label="Teacher">
 										if len(student.Teachers) > 0 {

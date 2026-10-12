@@ -12,8 +12,10 @@ import (
 
 const countStudentsByTeacherID = `-- name: CountStudentsByTeacherID :one
 SELECT COUNT(*) as count
-FROM tbl_teachers_students_m2m
-WHERE teacher_id = ?
+FROM tbl_teachers_students_m2m m2m
+INNER JOIN tbl_students s ON s.id = m2m.student_id
+WHERE m2m.teacher_id = ?
+	AND s.is_test_seed = 0
 `
 
 func (q *Queries) CountStudentsByTeacherID(ctx context.Context, teacherID int64) (int64, error) {
@@ -29,6 +31,7 @@ FROM tbl_students s
 INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?
 	AND s.status != 'deleted'
+	AND s.is_test_seed = 0
 	AND (? = '' OR s.name LIKE '%' || ? || '%')
 	AND (? = '' OR s.status = ?)
 `
@@ -187,6 +190,7 @@ FROM tbl_students s
 INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?
 	AND s.status != 'deleted'
+	AND s.is_test_seed = 0
 	AND (? = '' OR s.name LIKE '%' || ? || '%')
 	AND (? = '' OR s.status = ?)
 ORDER BY s.name ASC

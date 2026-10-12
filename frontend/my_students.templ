@@ -24,13 +24,14 @@ templ MyStudents(data MyStudentsData) {
 	<html lang="en">
 	<head>
 		@AdminPageHead("My Students - Zion English Admin")
+		@AvatarStyles()
 	</head>
 	<body>
 		<div class="container">
 			@HeaderSimple()
 			@HubHeader("My Students", "Register Student", utils.URL("/students/register"), true)
 
-			@ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindStudent, "", "", "", "", "", "", false, false, false, false, true, "", false, "", false, false, false, false, data.SortBy, data.SortOrder, ListSortKindMyStudent, false, "", "", "", "")
+			@ListFilterForm(data.FilterPath, data.Query, string(data.Status), ListFilterKindStudent, "", "", "", "", "", "", false, false, false, false, true, "", false, "", false, false, false, false, data.SortBy, data.SortOrder, ListSortKindMyStudent, false, "", "", "", "", "", false)
 
 			if len(data.Students) > 0 {
 				<div class="table-wrapper data-list-view-root">
@@ -42,24 +43,20 @@ templ MyStudents(data MyStudentsData) {
 								<th>Parent</th>
 								<th>Rate</th>
 								<th>Status</th>
-								<th>Color</th>
 								<th>Actions</th>
 							</tr>
 						</thead>
 						<tbody>
 							for _, s := range data.Students {
 								<tr>
-									<td data-label="Name">{ s.Name }</td>
+									<td data-label="Name">
+										@StudentNameCell(s.Name, s.Avatar)
+									</td>
 									<td data-label="Contact">{ getDisplayValue(s.Contact) }</td>
 									<td data-label="Parent">{ getDisplayValue(s.ParentName) }</td>
 									<td class="rate-cell" data-label="Rate">{ formatRate(s.RatePerClass, s.Currency) }</td>
 									<td data-label="Status">
 										@StatusPill(capitalizeStatus(s.Status), StudentStatusPillTone(s.Status), false)
-									</td>
-									<td data-label="Color">
-										<div class="color-cell">
-											<div class="color-box" style={ "background-color: " + s.AssignedColor }></div>
-										</div>
 									</td>
 									<td data-label="Actions">
 										<div class="table-actions">

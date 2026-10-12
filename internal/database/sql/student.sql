@@ -1,27 +1,28 @@
 -- name: InsertStudent :one
-INSERT INTO tbl_students (name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO tbl_students (name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 RETURNING id;
 
 -- name: GetAllStudents :many
-SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, created_at, updated_at
+SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
 FROM tbl_students
 ORDER BY created_at DESC;
 
 -- name: GetActiveStudents :many
-SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, created_at, updated_at
+SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
 FROM tbl_students
 WHERE status = 'active'
+	AND is_test_seed = 0
 ORDER BY name ASC;
 
 -- name: GetStudentByID :one
-SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, created_at, updated_at
+SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
 FROM tbl_students
 WHERE id = ?;
 
 -- name: UpdateStudent :exec
 UPDATE tbl_students
-SET name = ?, currency = ?, contact = ?, rate_per_class = ?, parent_name = ?, parent_rate = ?, parent_currency = ?, assigned_color = ?, status = ?, inactive_reason = ?, deleted_reason = ?, updated_at = datetime('now')
+SET name = ?, currency = ?, contact = ?, rate_per_class = ?, parent_name = ?, parent_rate = ?, parent_currency = ?, assigned_color = ?, status = ?, inactive_reason = ?, deleted_reason = ?, is_test_seed = ?, updated_at = datetime('now')
 WHERE id = ?;
 
 -- name: SoftDeleteStudent :exec
@@ -30,10 +31,11 @@ SET status = 'deleted', deleted_reason = ?, updated_at = datetime('now')
 WHERE id = ? AND status != 'deleted';
 
 -- name: SearchStudentsByName :many
-SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, created_at, updated_at
+SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
 FROM tbl_students
 WHERE name LIKE '%' || ? || '%'
 	AND status != 'deleted'
+	AND is_test_seed = 0
 ORDER BY name ASC
 LIMIT 10;
 
@@ -78,10 +80,15 @@ WHERE (? = '' OR s.name LIKE '%' || ? || '%')
 					AND t_valid.status = 'approved'
 			)
 		)
+	)
+	AND (
+		? = 'all'
+		OR (? = 'only' AND s.is_test_seed = 1)
+		OR (? = '' AND s.is_test_seed = 0)
 	);
 
 -- name: GetStudentsFiltered :many
-SELECT DISTINCT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.parent_rate, s.parent_currency, s.assigned_color, s.status, s.inactive_reason, s.deleted_reason, s.created_at, s.updated_at
+SELECT DISTINCT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.parent_rate, s.parent_currency, s.assigned_color, s.status, s.inactive_reason, s.deleted_reason, s.is_test_seed, s.created_at, s.updated_at
 FROM tbl_students s
 LEFT JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE (? = '' OR s.name LIKE '%' || ? || '%')
@@ -122,24 +129,41 @@ WHERE (? = '' OR s.name LIKE '%' || ? || '%')
 			)
 		)
 	)
+	AND (
+		? = 'all'
+		OR (? = 'only' AND s.is_test_seed = 1)
+		OR (? = '' AND s.is_test_seed = 0)
+	)
 ORDER BY s.created_at DESC
 LIMIT ? OFFSET ?;
 
 -- name: CountStudentsByStatus :many
 SELECT status, COUNT(*) as count
 FROM tbl_students
+WHERE is_test_seed = 0
 GROUP BY status;
+
+-- name: CountAllStudents :one
+SELECT COUNT(*) AS count
+FROM tbl_students;
+
+-- name: CountTestSeedStudents :one
+SELECT COUNT(*) AS count
+FROM tbl_students
+WHERE is_test_seed = 1;
 
 -- name: CountActiveStudentsWithoutParent :one
 SELECT COUNT(*) AS count
 FROM tbl_students
 WHERE status = 'active'
+	AND is_test_seed = 0
 	AND TRIM(COALESCE(parent_name, '')) = '';
 
 -- name: CountActiveStudentsWithoutParentRate :one
 SELECT COUNT(*) AS count
 FROM tbl_students
 WHERE status = 'active'
+	AND is_test_seed = 0
 	AND (
 		parent_rate IS NULL
 		OR parent_currency IS NULL
@@ -150,6 +174,7 @@ WHERE status = 'active'
 SELECT COUNT(*) AS count
 FROM tbl_students s
 WHERE s.status = 'active'
+	AND s.is_test_seed = 0
 	AND NOT EXISTS (
 		SELECT 1
 		FROM tbl_teachers_students_m2m m2m_valid

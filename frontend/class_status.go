@@ -51,6 +51,12 @@ var StudentFilterStatusOptions = func() []StatusOption {
 	return opts
 }()
 
+var StudentTestSeedFilterOptions = []StatusOption{
+	{Value: string(constants.StudentTestSeedFilterExclude), Label: constants.StudentTestSeedFilterExclude.Label()},
+	{Value: string(constants.StudentTestSeedFilterOnly), Label: constants.StudentTestSeedFilterOnly.Label()},
+	{Value: string(constants.StudentTestSeedFilterAll), Label: constants.StudentTestSeedFilterAll.Label()},
+}
+
 var TeacherStatusOptions = func() []StatusOption {
 	opts := make([]StatusOption, 0, len(constants.TeacherStatuses))
 	for _, status := range constants.TeacherStatuses {

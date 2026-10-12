@@ -24,6 +24,8 @@ WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
 -- name: GetClassRecordByID :one
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.is_trial_class, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
 	s.name as student_name,
+	s.assigned_color as student_assigned_color,
+	s.is_test_seed as student_is_test_seed,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name,
 	t.first_name as teacher_first_name,
 	t.middle_name as teacher_middle_name,
@@ -85,7 +87,8 @@ JOIN tbl_students s ON cr.student_id = s.id
 WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
 	AND (? = '' OR cr.status = ?)
-	AND (? = '' OR s.name LIKE '%' || ? || '%');
+	AND (? = '' OR s.name LIKE '%' || ? || '%')
+	AND s.is_test_seed = 0;
 
 -- name: GetClassRecordsFiltered :many
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
@@ -98,6 +101,7 @@ WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
 	AND (? = '' OR cr.status = ?)
 	AND (? = '' OR s.name LIKE '%' || ? || '%')
+	AND s.is_test_seed = 0
 ORDER BY CASE WHEN cr.date = date('now', 'localtime') THEN 0 ELSE 1 END, cr.date DESC, cr.created_at DESC
 LIMIT ? OFFSET ?;
 
@@ -111,6 +115,11 @@ SELECT (
 		AND (? = '' OR (? != 'scheduled' AND ? != 'overdue'))
 		AND (? = '' OR ? = 'deleted' OR cr.status = ?)
 		AND (? = '' OR s.name LIKE '%' || ? || '%')
+		AND (
+			? = 'all'
+			OR (? = 'only' AND s.is_test_seed = 1)
+			OR (? = '' AND s.is_test_seed = 0)
+		)
 ) + (
 	SELECT COUNT(*) as count
 	FROM tbl_scheduled_classes sc
@@ -131,6 +140,11 @@ SELECT (
 			) < datetime(?)
 		)
 		AND (? = '' OR s.name LIKE '%' || ? || '%')
+		AND (
+			? = 'all'
+			OR (? = 'only' AND s.is_test_seed = 1)
+			OR (? = '' AND s.is_test_seed = 0)
+		)
 ) AS count;
 
 -- name: GetClassesListFiltered :many
@@ -151,6 +165,8 @@ SELECT * FROM (
 	cr.notes,
 	cr.created_at,
 	s.name AS student_name,
+	s.assigned_color AS student_assigned_color,
+	s.is_test_seed AS student_is_test_seed,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
 	t.first_name AS teacher_first_name,
 	t.middle_name AS teacher_middle_name,
@@ -165,6 +181,11 @@ SELECT * FROM (
 		AND (? = '' OR (? != 'scheduled' AND ? != 'overdue'))
 		AND (? = '' OR ? = 'deleted' OR cr.status = ?)
 		AND (? = '' OR s.name LIKE '%' || ? || '%')
+		AND (
+			? = 'all'
+			OR (? = 'only' AND s.is_test_seed = 1)
+			OR (? = '' AND s.is_test_seed = 0)
+		)
 
 	UNION ALL
 
@@ -184,6 +205,8 @@ SELECT * FROM (
 	NULL AS notes,
 	sc.created_at,
 	s.name AS student_name,
+	s.assigned_color AS student_assigned_color,
+	s.is_test_seed AS student_is_test_seed,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
 	t.first_name AS teacher_first_name,
 	t.middle_name AS teacher_middle_name,
@@ -209,6 +232,11 @@ SELECT * FROM (
 			) < datetime(?)
 		)
 		AND (? = '' OR s.name LIKE '%' || ? || '%')
+		AND (
+			? = 'all'
+			OR (? = 'only' AND s.is_test_seed = 1)
+			OR (? = '' AND s.is_test_seed = 0)
+		)
 ) AS combined
 ORDER BY CASE WHEN combined.date = date('now', 'localtime') THEN 0 ELSE 1 END, combined.date DESC, combined.start_time DESC, combined.created_at DESC
 LIMIT ? OFFSET ?;
@@ -216,6 +244,7 @@ LIMIT ? OFFSET ?;
 -- name: CountOverdueScheduledClassesByDateRange :one
 SELECT COUNT(*) as count
 FROM tbl_scheduled_classes sc
+INNER JOIN tbl_students s ON s.id = sc.student_id
 WHERE sc.deleted_at IS NULL
 	AND sc.status = 'scheduled'
 	AND (? = 0 OR sc.teacher_id = ?)
@@ -229,7 +258,8 @@ WHERE sc.deleted_at IS NULL
 			THEN datetime(sc.scheduled_date || ' ' || sc.start_time, '+' || sc.duration_minutes || ' minutes')
 			ELSE datetime(sc.scheduled_date || ' 23:59:59')
 		END
-	) < datetime(?);
+	) < datetime(?)
+	AND s.is_test_seed = 0;
 
 -- name: ListOverdueScheduledClassesByDateRange :many
 SELECT
@@ -254,6 +284,7 @@ WHERE sc.deleted_at IS NULL
 			ELSE datetime(sc.scheduled_date || ' 23:59:59')
 		END
 	) < datetime(?)
+	AND s.is_test_seed = 0
 ORDER BY sc.scheduled_date ASC, sc.start_time ASC
 LIMIT ?;
 

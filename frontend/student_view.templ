@@ -16,8 +16,7 @@ templ StudentViewModal(data EditStudentData) {
 				<div class="entity-view-layout entity-view-layout--split">
 					<div class="entity-view-card">
 						<div class="entity-view-identity">
-							<div class="entity-view-color-swatch" style={ "background-color: " + data.AssignedColor } aria-hidden="true"></div>
-							<h2>{ data.Name }</h2>
+							@StudentNameCell(data.Name, data.Avatar)
 							@StatusPill(capitalizeStatus(data.Status), StudentStatusPillTone(data.Status), true)
 							<div class="entity-view-rate-block">
 								<div class="entity-view-rate-highlight">

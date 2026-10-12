@@ -14,6 +14,7 @@ const countActiveStudentsWithoutApprovedTeacher = `-- name: CountActiveStudentsW
 SELECT COUNT(*) AS count
 FROM tbl_students s
 WHERE s.status = 'active'
+	AND s.is_test_seed = 0
 	AND NOT EXISTS (
 		SELECT 1
 		FROM tbl_teachers_students_m2m m2m_valid
@@ -35,6 +36,7 @@ const countActiveStudentsWithoutParent = `-- name: CountActiveStudentsWithoutPar
 SELECT COUNT(*) AS count
 FROM tbl_students
 WHERE status = 'active'
+	AND is_test_seed = 0
 	AND TRIM(COALESCE(parent_name, '')) = ''
 `
 
@@ -49,6 +51,7 @@ const countActiveStudentsWithoutParentRate = `-- name: CountActiveStudentsWithou
 SELECT COUNT(*) AS count
 FROM tbl_students
 WHERE status = 'active'
+	AND is_test_seed = 0
 	AND (
 		parent_rate IS NULL
 		OR parent_currency IS NULL
@@ -63,9 +66,22 @@ func (q *Queries) CountActiveStudentsWithoutParentRate(ctx context.Context) (int
 	return count, err
 }
 
+const countAllStudents = `-- name: CountAllStudents :one
+SELECT COUNT(*) AS count
+FROM tbl_students
+`
+
+func (q *Queries) CountAllStudents(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countAllStudents)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const countStudentsByStatus = `-- name: CountStudentsByStatus :many
 SELECT status, COUNT(*) as count
 FROM tbl_students
+WHERE is_test_seed = 0
 GROUP BY status
 `
 
@@ -139,6 +155,11 @@ WHERE (? = '' OR s.name LIKE '%' || ? || '%')
 			)
 		)
 	)
+	AND (
+		? = 'all'
+		OR (? = 'only' AND s.is_test_seed = 1)
+		OR (? = '' AND s.is_test_seed = 0)
+	)
 `
 
 type CountStudentsFilteredParams struct {
@@ -154,6 +175,9 @@ type CountStudentsFilteredParams struct {
 	Column10  any
 	Column11  any
 	Column12  any
+	Column13  any
+	Column14  any
+	Column15  any
 }
 
 func (q *Queries) CountStudentsFiltered(ctx context.Context, arg CountStudentsFilteredParams) (int64, error) {
@@ -170,16 +194,33 @@ func (q *Queries) CountStudentsFiltered(ctx context.Context, arg CountStudentsFi
 		arg.Column10,
 		arg.Column11,
 		arg.Column12,
+		arg.Column13,
+		arg.Column14,
+		arg.Column15,
 	)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
 }
 
+const countTestSeedStudents = `-- name: CountTestSeedStudents :one
+SELECT COUNT(*) AS count
+FROM tbl_students
+WHERE is_test_seed = 1
+`
+
+func (q *Queries) CountTestSeedStudents(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countTestSeedStudents)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getActiveStudents = `-- name: GetActiveStudents :many
-SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, created_at, updated_at
+SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
 FROM tbl_students
 WHERE status = 'active'
+	AND is_test_seed = 0
 ORDER BY name ASC
 `
 
@@ -196,6 +237,7 @@ type GetActiveStudentsRow struct {
 	Status         string
 	InactiveReason sql.NullString
 	DeletedReason  sql.NullString
+	IsTestSeed     int64
 	CreatedAt      sql.NullTime
 	UpdatedAt      sql.NullTime
 }
@@ -222,6 +264,7 @@ func (q *Queries) GetActiveStudents(ctx context.Context) ([]GetActiveStudentsRow
 			&i.Status,
 			&i.InactiveReason,
 			&i.DeletedReason,
+			&i.IsTestSeed,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -239,7 +282,7 @@ func (q *Queries) GetActiveStudents(ctx context.Context) ([]GetActiveStudentsRow
 }
 
 const getAllStudents = `-- name: GetAllStudents :many
-SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, created_at, updated_at
+SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
 FROM tbl_students
 ORDER BY created_at DESC
 `
@@ -257,6 +300,7 @@ type GetAllStudentsRow struct {
 	Status         string
 	InactiveReason sql.NullString
 	DeletedReason  sql.NullString
+	IsTestSeed     int64
 	CreatedAt      sql.NullTime
 	UpdatedAt      sql.NullTime
 }
@@ -283,6 +327,7 @@ func (q *Queries) GetAllStudents(ctx context.Context) ([]GetAllStudentsRow, erro
 			&i.Status,
 			&i.InactiveReason,
 			&i.DeletedReason,
+			&i.IsTestSeed,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -300,7 +345,7 @@ func (q *Queries) GetAllStudents(ctx context.Context) ([]GetAllStudentsRow, erro
 }
 
 const getStudentByID = `-- name: GetStudentByID :one
-SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, created_at, updated_at
+SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
 FROM tbl_students
 WHERE id = ?
 `
@@ -318,6 +363,7 @@ type GetStudentByIDRow struct {
 	Status         string
 	InactiveReason sql.NullString
 	DeletedReason  sql.NullString
+	IsTestSeed     int64
 	CreatedAt      sql.NullTime
 	UpdatedAt      sql.NullTime
 }
@@ -338,6 +384,7 @@ func (q *Queries) GetStudentByID(ctx context.Context, id int64) (GetStudentByIDR
 		&i.Status,
 		&i.InactiveReason,
 		&i.DeletedReason,
+		&i.IsTestSeed,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -345,7 +392,7 @@ func (q *Queries) GetStudentByID(ctx context.Context, id int64) (GetStudentByIDR
 }
 
 const getStudentsFiltered = `-- name: GetStudentsFiltered :many
-SELECT DISTINCT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.parent_rate, s.parent_currency, s.assigned_color, s.status, s.inactive_reason, s.deleted_reason, s.created_at, s.updated_at
+SELECT DISTINCT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.parent_rate, s.parent_currency, s.assigned_color, s.status, s.inactive_reason, s.deleted_reason, s.is_test_seed, s.created_at, s.updated_at
 FROM tbl_students s
 LEFT JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE (? = '' OR s.name LIKE '%' || ? || '%')
@@ -386,6 +433,11 @@ WHERE (? = '' OR s.name LIKE '%' || ? || '%')
 			)
 		)
 	)
+	AND (
+		? = 'all'
+		OR (? = 'only' AND s.is_test_seed = 1)
+		OR (? = '' AND s.is_test_seed = 0)
+	)
 ORDER BY s.created_at DESC
 LIMIT ? OFFSET ?
 `
@@ -403,6 +455,9 @@ type GetStudentsFilteredParams struct {
 	Column10  any
 	Column11  any
 	Column12  any
+	Column13  any
+	Column14  any
+	Column15  any
 	Limit     int64
 	Offset    int64
 }
@@ -420,6 +475,7 @@ type GetStudentsFilteredRow struct {
 	Status         string
 	InactiveReason sql.NullString
 	DeletedReason  sql.NullString
+	IsTestSeed     int64
 	CreatedAt      sql.NullTime
 	UpdatedAt      sql.NullTime
 }
@@ -438,6 +494,9 @@ func (q *Queries) GetStudentsFiltered(ctx context.Context, arg GetStudentsFilter
 		arg.Column10,
 		arg.Column11,
 		arg.Column12,
+		arg.Column13,
+		arg.Column14,
+		arg.Column15,
 		arg.Limit,
 		arg.Offset,
 	)
@@ -461,6 +520,7 @@ func (q *Queries) GetStudentsFiltered(ctx context.Context, arg GetStudentsFilter
 			&i.Status,
 			&i.InactiveReason,
 			&i.DeletedReason,
+			&i.IsTestSeed,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -478,8 +538,8 @@ func (q *Queries) GetStudentsFiltered(ctx context.Context, arg GetStudentsFilter
 }
 
 const insertStudent = `-- name: InsertStudent :one
-INSERT INTO tbl_students (name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO tbl_students (name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 RETURNING id
 `
 
@@ -495,6 +555,7 @@ type InsertStudentParams struct {
 	Status         string
 	InactiveReason sql.NullString
 	DeletedReason  sql.NullString
+	IsTestSeed     int64
 }
 
 func (q *Queries) InsertStudent(ctx context.Context, arg InsertStudentParams) (int64, error) {
@@ -510,6 +571,7 @@ func (q *Queries) InsertStudent(ctx context.Context, arg InsertStudentParams) (i
 		arg.Status,
 		arg.InactiveReason,
 		arg.DeletedReason,
+		arg.IsTestSeed,
 	)
 	var id int64
 	err := row.Scan(&id)
@@ -517,10 +579,11 @@ func (q *Queries) InsertStudent(ctx context.Context, arg InsertStudentParams) (i
 }
 
 const searchStudentsByName = `-- name: SearchStudentsByName :many
-SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, created_at, updated_at
+SELECT id, name, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
 FROM tbl_students
 WHERE name LIKE '%' || ? || '%'
 	AND status != 'deleted'
+	AND is_test_seed = 0
 ORDER BY name ASC
 LIMIT 10
 `
@@ -538,6 +601,7 @@ type SearchStudentsByNameRow struct {
 	Status         string
 	InactiveReason sql.NullString
 	DeletedReason  sql.NullString
+	IsTestSeed     int64
 	CreatedAt      sql.NullTime
 	UpdatedAt      sql.NullTime
 }
@@ -564,6 +628,7 @@ func (q *Queries) SearchStudentsByName(ctx context.Context, dollar_1 sql.NullStr
 			&i.Status,
 			&i.InactiveReason,
 			&i.DeletedReason,
+			&i.IsTestSeed,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -598,7 +663,7 @@ func (q *Queries) SoftDeleteStudent(ctx context.Context, arg SoftDeleteStudentPa
 
 const updateStudent = `-- name: UpdateStudent :exec
 UPDATE tbl_students
-SET name = ?, currency = ?, contact = ?, rate_per_class = ?, parent_name = ?, parent_rate = ?, parent_currency = ?, assigned_color = ?, status = ?, inactive_reason = ?, deleted_reason = ?, updated_at = datetime('now')
+SET name = ?, currency = ?, contact = ?, rate_per_class = ?, parent_name = ?, parent_rate = ?, parent_currency = ?, assigned_color = ?, status = ?, inactive_reason = ?, deleted_reason = ?, is_test_seed = ?, updated_at = datetime('now')
 WHERE id = ?
 `
 
@@ -614,6 +679,7 @@ type UpdateStudentParams struct {
 	Status         string
 	InactiveReason sql.NullString
 	DeletedReason  sql.NullString
+	IsTestSeed     int64
 	ID             int64
 }
 
@@ -630,6 +696,7 @@ func (q *Queries) UpdateStudent(ctx context.Context, arg UpdateStudentParams) er
 		arg.Status,
 		arg.InactiveReason,
 		arg.DeletedReason,
+		arg.IsTestSeed,
 		arg.ID,
 	)
 	return err

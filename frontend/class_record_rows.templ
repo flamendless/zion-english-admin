@@ -13,8 +13,8 @@ templ ClassRecordRow(record ClassRecordRowData, showTeacher bool) {
 				@TeacherNameCell(record.TeacherName, record.TeacherAvatar)
 			</td>
 		}
-		<td class="table-truncate-cell" data-label="Student">
-			@TableTruncatedText(record.StudentName)
+		<td data-label="Student">
+			@StudentNameCell(record.StudentName, record.StudentAvatar)
 		</td>
 		<td data-label="Rate">@RatePill(record.Rate, record.Currency)</td>
 		<td data-label="Status">

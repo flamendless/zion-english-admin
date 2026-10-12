@@ -1079,6 +1079,10 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 
 	qtx := dbRW.GetQueries().WithTx(tx)
 
+	isTestSeed := int64(0)
+	if isSuperuser {
+		isTestSeed = parseIsTestSeedForm(r.FormValue("isTestSeed"))
+	}
 	studentID, err := qtx.InsertStudent(r.Context(), queries.InsertStudentParams{
 		Name:           req.Name,
 		Currency:       req.Currency,
@@ -1091,6 +1095,7 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		Status:         req.Status,
 		InactiveReason: sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
 		DeletedReason:  sql.NullString{},
+		IsTestSeed:     isTestSeed,
 	})
 	if err != nil {
 		sendErrorLog(w, "Failed to register student")
@@ -2209,6 +2214,7 @@ func handleGetStudents(w http.ResponseWriter, r *http.Request) {
 	writeHTML(w)
 
 	selectedID := r.URL.Query().Get("selected")
+	studentResponses = appendSelectedStudentIfMissing(ctx, studentResponses, selectedID)
 
 	if err := frontend.StudentOptions(studentResponses, selectedID).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
@@ -2243,7 +2249,10 @@ func handleGetMyStudents(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	if err := frontend.StudentOptions(studentResponses, r.URL.Query().Get("selected")).Render(r.Context(), w); err != nil {
+	selectedID := r.URL.Query().Get("selected")
+	studentResponses = appendSelectedStudentIfMissing(r.Context(), studentResponses, selectedID)
+
+	if err := frontend.StudentOptions(studentResponses, selectedID).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

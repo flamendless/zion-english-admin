@@ -15,6 +15,7 @@ type EditStudentData struct {
 	ID             string
 	Readonly       bool
 	IsSuperuser    bool
+	IsTestSeed     bool
 	Name           string
 	Currency       string
 	Contact        string
@@ -24,6 +25,7 @@ type EditStudentData struct {
 	ParentCurrency string
 	HasParentRate  bool
 	AssignedColor  string
+	Avatar         AvatarProps
 	Status         constants.StudentStatus
 	InactiveReason string
 	DeletedReason  string
@@ -79,8 +81,7 @@ templ EditStudent(data EditStudentData) {
 			if data.Readonly {
 				<div class="form-readonly">
 					<div class="form-group">
-						<label for="name">Student Name</label>
-						<input type="text" id="name" value={ data.Name } disabled/>
+						@StudentNameCell(data.Name, data.Avatar)
 					</div>
 					<div class="form-row">
 						<div class="form-group">
@@ -144,6 +145,12 @@ templ EditStudent(data EditStudentData) {
 						<label for="assignedColor">Assigned Color</label>
 						<input type="color" id="assignedColor" value={ data.AssignedColor } disabled/>
 					</div>
+					if data.IsTestSeed {
+						<div class="form-group">
+							@AdminOnlyFieldLabel("Test/seed")
+							<input type="text" value="Yes" disabled/>
+						</div>
+					}
 				</div>
 				<p><a href={ utils.URL("/students") } class="btn">Back to Students</a></p>
 			} else if data.IsSuperuser {
@@ -153,6 +160,9 @@ templ EditStudent(data EditStudentData) {
 					hx-swap={ HxSwapInnerHTML }
 					hx-target="#logOutput"
 				>
+					<div class="form-group">
+						@StudentNameCell(data.Name, data.Avatar)
+					</div>
 					<div class="form-group">
 						<label for="name">Student Name *</label>
 						<input type="text" id="name" name="name" required value={ data.Name }/>
@@ -188,6 +198,12 @@ templ EditStudent(data EditStudentData) {
 					<div class="form-group">
 						<label for="assignedColor">Assigned Color *</label>
 						<input type="color" id="assignedColor" name="assignedColor" required value={ data.AssignedColor }/>
+					</div>
+					<div class="form-group">
+						<label class="checkbox-label">
+							<input type="checkbox" name="isTestSeed" value="1" checked?={ data.IsTestSeed }/>
+							Test or seed student (excluded from reports and default lists)
+						</label>
 					</div>
 					<div class="form-group">
 						@AdminOnlyFieldLabel("Related Students")
@@ -241,6 +257,9 @@ templ EditStudent(data EditStudentData) {
 					hx-swap={ HxSwapInnerHTML }
 					hx-target="#logOutput"
 				>
+					<div class="form-group">
+						@StudentNameCell(data.Name, data.Avatar)
+					</div>
 					<div class="form-group">
 						<label for="name">Student Name *</label>
 						<input type="text" id="name" name="name" required value={ data.Name }/>

@@ -143,8 +143,18 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 					data.ActiveStudents = row.Count
 				case constants.StudentStatusInactive:
 					data.InactiveStudents = row.Count
+				case constants.StudentStatusDeleted:
+					data.DeletedStudents = row.Count
 				}
 			}
+		}
+		totalStudents, err := dbRO.GetQueries().CountAllStudents(ctx)
+		if err == nil {
+			data.TotalStudentsAll = totalStudents
+		}
+		testSeedStudents, err := dbRO.GetQueries().CountTestSeedStudents(ctx)
+		if err == nil {
+			data.TestSeedStudents = testSeedStudents
 		}
 		pending, err := dbRO.GetQueries().CountTeachersByStatus(ctx, "pending")
 		if err == nil {
@@ -336,6 +346,7 @@ func handleMyStudents(w http.ResponseWriter, r *http.Request) {
 			ParentName:    s.ParentName.String,
 			AssignedColor: s.AssignedColor,
 			Status:        constants.StudentStatus(s.Status),
+			Avatar:        frontend.StudentAvatarProps(s.Name, s.AssignedColor, false, "sm"),
 		}
 	}
 

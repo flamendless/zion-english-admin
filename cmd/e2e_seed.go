@@ -113,6 +113,7 @@ var cmdE2ESeed = &cobra.Command{
 			Status:         string(constants.StudentStatusActive),
 			InactiveReason: sql.NullString{},
 			DeletedReason:  sql.NullString{},
+			IsTestSeed:     1,
 		})
 		if err != nil {
 			panic(fmt.Sprintf("failed to insert student: %v", err))

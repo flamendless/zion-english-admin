@@ -15,8 +15,8 @@ templ ClassViewModal(data EditClassData) {
 				@ClassViewModalStyles()
 				<div class={ "entity-view-hero " + classStatusAccentClass(data.Status) }>
 					<div class="entity-view-hero-main">
-						<p class="entity-view-eyebrow">Student Name</p>
-						<h2>{ data.StudentName }</h2>
+						<p class="entity-view-eyebrow">Student</p>
+						@StudentNameCell(data.StudentName, data.StudentAvatar)
 						if data.IsSuperuser {
 							<div class="entity-view-hero-teacher">
 								<p class="entity-view-eyebrow admin-only-label-wrap">

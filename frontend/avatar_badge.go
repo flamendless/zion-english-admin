@@ -4,6 +4,7 @@ import (
 	"zion-english/internal/constants"
 	"zion-english/internal/models"
 	"zion-english/internal/teachers"
+	"zion-english/internal/utils"
 )
 
 func WithRoleBadge(props AvatarProps, roles []constants.TeacherRole) AvatarProps {
@@ -30,10 +31,32 @@ func AvatarRoleBadgeTone(label string) PillTone {
 	if label == "superuser" {
 		return PillTonePrimary
 	}
+	if label == "test" {
+		return PillToneWarning
+	}
 	if label == "" {
 		return PillToneNeutral
 	}
 	return TeacherRolePillTone(constants.TeacherRole(label))
+}
+
+func StudentAvatarProps(name, assignedColor string, isTestSeed bool, size string) AvatarProps {
+	if assignedColor == "" {
+		assignedColor = constants.DefaultAssignedColor
+	}
+	if size == "" {
+		size = "sm"
+	}
+	props := AvatarProps{
+		Size:          size,
+		Initials:      utils.PersonInitials("", "", "", name),
+		AssignedColor: assignedColor,
+		Alt:           name + " avatar",
+	}
+	if isTestSeed {
+		props.RoleBadge = "test"
+	}
+	return props
 }
 
 func AvatarRoleBadgeToneForProps(props AvatarProps) PillTone {

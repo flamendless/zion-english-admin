@@ -374,6 +374,7 @@ func insertSeedStudents(ctx context.Context, q *queries.Queries, teacherID int64
 			Status:         string(constants.StudentStatusActive),
 			InactiveReason: sql.NullString{},
 			DeletedReason:  sql.NullString{},
+			IsTestSeed:     1,
 		})
 		if err != nil {
 			return students, err

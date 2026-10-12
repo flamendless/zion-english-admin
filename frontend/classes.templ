@@ -21,6 +21,7 @@ type ClassesData struct {
 	StatusFilter    constants.ClassListFilterStatus
 	StartDate       string
 	EndDate         string
+	TestSeedFilter  string
 }
 
 templ Classes(data ClassesData) {
@@ -40,7 +41,8 @@ templ Classes(data ClassesData) {
 				font-variant-numeric: tabular-nums;
 			}
 
-			#classesTable td[data-label="Teacher"] {
+			#classesTable td[data-label="Teacher"],
+			#classesTable td[data-label="Student"] {
 				max-width: 220px;
 			}
 		</style>
@@ -81,6 +83,14 @@ templ Classes(data ClassesData) {
 					<input type="hidden" id="endDate" name="endDate" value={ data.EndDate }/>
 				}
 				@ClassesStatusFilterDropdownWithValue(data.StatusFilter)
+				<div class="form-group">
+					<label for="testSeedFilter">Test/seed</label>
+					<select id="testSeedFilter" name="testSeedFilter">
+						for _, opt := range StudentTestSeedFilterOptions {
+							<option value={ opt.Value } selected?={ data.TestSeedFilter == opt.Value }>{ opt.Label }</option>
+						}
+					</select>
+				</div>
 				@SortControls("", "desc", ListSortKindClass)
 				<input type="hidden" id="classesPage" name="page" value="1"/>
 				@DataListViewToggle()

@@ -22,6 +22,20 @@ func TestValidStudentStatus(t *testing.T) {
 	}
 }
 
+func TestValidStudentTestSeedFilter(t *testing.T) {
+	if !ValidStudentTestSeedFilter("") {
+		t.Fatal("expected empty test/seed filter to be valid")
+	}
+	for _, f := range []string{"only", "all"} {
+		if !ValidStudentTestSeedFilter(f) {
+			t.Fatalf("ValidStudentTestSeedFilter(%q) = false, want true", f)
+		}
+	}
+	if ValidStudentTestSeedFilter("yes") {
+		t.Fatal("expected invalid test/seed filter")
+	}
+}
+
 func TestValidStudentFilterStatus(t *testing.T) {
 	if !ValidStudentFilterStatus("") {
 		t.Fatal("expected empty filter to be valid")

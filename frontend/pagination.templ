@@ -155,7 +155,7 @@ templ ReportRolesFilterDropdown(roleTeacher bool, roleAdmin bool) {
 	</div>
 }
 
-templ ListFilterForm(actionPath string, query string, status string, statusType ListFilterKind, teacherID string, teacherName string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool, showStatus bool, docsStatus string, showDocsStatus bool, resumeStatus string, showResumeStatus bool, connectionZoom bool, connectionGoogle bool, showConnections bool, sortBy string, sortOrder string, sortKind ListSortKind, showTeacherTableColumns bool, parentFilter string, teacherAssignmentFilter string, connectionFilter string, profilePictureFilter string) {
+templ ListFilterForm(actionPath string, query string, status string, statusType ListFilterKind, teacherID string, teacherName string, email string, module string, startDate string, endDate string, showTeacher bool, showEmail bool, showModule bool, showDateRange bool, showStatus bool, docsStatus string, showDocsStatus bool, resumeStatus string, showResumeStatus bool, connectionZoom bool, connectionGoogle bool, showConnections bool, sortBy string, sortOrder string, sortKind ListSortKind, showTeacherTableColumns bool, parentFilter string, teacherAssignmentFilter string, connectionFilter string, profilePictureFilter string, testSeedFilter string, showTestSeedFilter bool) {
 	<form class="list-toolbar" method="GET" action={ actionPath }>
 		<div class="form-group">
 			<label for="q">Search</label>
@@ -163,6 +163,16 @@ templ ListFilterForm(actionPath string, query string, status string, statusType 
 		</div>
 		if showTeacherTableColumns {
 			@TeacherTableColumnsDropdown()
+		}
+		if showTestSeedFilter {
+			<div class="form-group">
+				<label for="testSeedFilter">Test/seed</label>
+				<select id="testSeedFilter" name="testSeedFilter">
+					for _, opt := range StudentTestSeedFilterOptions {
+						<option value={ opt.Value } selected?={ testSeedFilter == opt.Value }>{ opt.Label }</option>
+					}
+				</select>
+			</div>
 		}
 		if showStatus {
 			<div class="form-group">
@@ -223,6 +233,9 @@ templ ListFilterForm(actionPath string, query string, status string, statusType 
 		}
 		if profilePictureFilter != "" {
 			<input type="hidden" name="profilePictureFilter" value={ profilePictureFilter }/>
+		}
+		if testSeedFilter != "" && !showTestSeedFilter {
+			<input type="hidden" name="testSeedFilter" value={ testSeedFilter }/>
 		}
 		<div class="form-group list-toolbar-action">
 			<label for="listFilterSubmit">&nbsp;</label>

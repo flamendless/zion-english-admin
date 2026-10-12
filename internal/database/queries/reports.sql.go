@@ -16,6 +16,10 @@ SELECT cr.id, cr.student_id, cr.date, cr.start_time, cr.end_time,
 FROM tbl_class_records cr
 WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_students ts
+		WHERE ts.id = cr.student_id AND ts.is_test_seed = 1
+	)
 ORDER BY cr.id ASC
 `
 
@@ -77,6 +81,7 @@ SELECT cr.id, cr.teacher_id, cr.student_id, cr.date, cr.start_time, cr.end_time,
 	cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.updated_at
 FROM tbl_class_records cr
 JOIN tbl_teachers t ON cr.teacher_id = t.id
+JOIN tbl_students s ON s.id = cr.student_id AND s.is_test_seed = 0
 WHERE cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
 	AND t.status = 'approved' AND t.deleted = 0
@@ -419,6 +424,7 @@ JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE cr.date >= ? AND cr.date <= ?
 	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
 	AND cr.deleted_at IS NULL
+	AND s.is_test_seed = 0
 	AND t.status = 'approved' AND t.deleted = 0
 	AND NOT EXISTS (
 		SELECT 1 FROM tbl_teacher_roles tr
@@ -527,9 +533,11 @@ const getReportTeacherEarnings = `-- name: GetReportTeacherEarnings :many
 SELECT cr.teacher_id, cr.currency, COALESCE(SUM(cr.rate), 0) AS total_rate
 FROM tbl_class_records cr
 JOIN tbl_teachers t ON cr.teacher_id = t.id
+JOIN tbl_students s ON s.id = cr.student_id AND s.is_test_seed = 0
 WHERE cr.date >= ? AND cr.date <= ?
 	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
 	AND cr.deleted_at IS NULL
+	AND s.is_test_seed = 0
 	AND t.status = 'approved' AND t.deleted = 0
 	AND NOT EXISTS (
 		SELECT 1 FROM tbl_teacher_roles tr
@@ -632,6 +640,10 @@ FROM tbl_teachers t
 LEFT JOIN tbl_class_records cr ON cr.teacher_id = t.id
 	AND cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
+	AND NOT EXISTS (
+		SELECT 1 FROM tbl_students ts
+		WHERE ts.id = cr.student_id AND ts.is_test_seed = 1
+	)
 WHERE t.status = 'approved' AND t.deleted = 0
 	AND NOT EXISTS (
 		SELECT 1 FROM tbl_teacher_roles tr
@@ -778,6 +790,7 @@ JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE cr.teacher_id = ? AND cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
+	AND s.is_test_seed = 0
 ORDER BY s.name ASC, cr.date ASC, cr.rate ASC, cr.start_time ASC
 `
 

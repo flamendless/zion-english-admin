@@ -128,6 +128,7 @@ func classEditClassData(ctx context.Context, recordID int64, readonly bool) (fro
 		StudentID:                 strconv.FormatInt(existing.StudentID, 10),
 		TeacherID:                 strconv.FormatInt(existing.TeacherID, 10),
 		StudentName:               existing.StudentName,
+		StudentAvatar:             frontend.StudentAvatarProps(existing.StudentName, existing.StudentAssignedColor, existing.StudentIsTestSeed == 1, "md"),
 		TeacherName:               existing.TeacherName,
 		TeacherAvatar:             avatarWithTeacherRoles(classRecordTeacherAvatar(existing), teacherRoles, teacherStatus),
 		Date:                      existing.Date,
@@ -415,6 +416,7 @@ func classesListViewFromRow(row queries.GetClassesListFilteredRow) models.ClassR
 		StudentID:       row.StudentID,
 		TeacherID:       row.TeacherID,
 		StudentName:     row.StudentName,
+		StudentAvatar:   studentAvatarView(row.StudentName, row.StudentAssignedColor, row.StudentIsTestSeed),
 		TeacherName:     row.TeacherName,
 		TeacherAvatar:   classesListTeacherAvatar(row),
 		Date:            row.Date,
@@ -431,8 +433,9 @@ func classesListViewFromRow(row queries.GetClassesListFilteredRow) models.ClassR
 	}
 }
 
-func classesListCountParams(teacherID int64, startDate, endDate, statusFilter, nameFilter, overdueCutoff string) queries.CountClassesListFilteredParams {
+func classesListCountParams(teacherID int64, startDate, endDate, statusFilter, nameFilter, overdueCutoff, testSeedFilter string) queries.CountClassesListFilteredParams {
 	nameNull := sql.NullString{String: nameFilter, Valid: nameFilter != ""}
+	ts1, ts2, ts3 := studentTestSeedFilterTriplet(testSeedFilter)
 	return queries.CountClassesListFilteredParams{
 		Column1:         teacherID,
 		TeacherID:       teacherID,
@@ -448,25 +451,32 @@ func classesListCountParams(teacherID int64, startDate, endDate, statusFilter, n
 		Status:          statusFilter,
 		Column13:        nameFilter,
 		Column14:        nameNull,
-		Column15:        nameFilter,
+		Column15:        ts1,
+		Column16:        ts2,
+		Column17:        ts3,
+		Column18:        ts3,
 		TeacherID_2:     teacherID,
 		ScheduledDate:   startDate,
 		ScheduledDate_2: endDate,
-		Column19:        statusFilter,
-		Column20:        statusFilter,
-		Column21:        statusFilter,
 		Column22:        statusFilter,
 		Column23:        statusFilter,
 		Column24:        statusFilter,
 		Column25:        statusFilter,
+		Column26:        statusFilter,
+		Column27:        statusFilter,
+		Column28:        statusFilter,
 		Datetime:        overdueCutoff,
-		Column27:        nameFilter,
-		Column28:        nameNull,
+		Column30:        nameFilter,
+		Column31:        nameNull,
+		Column32:        ts1,
+		Column33:        ts2,
+		Column34:        ts3,
 	}
 }
 
-func classesListListParams(teacherID int64, startDate, endDate, statusFilter, nameFilter, overdueCutoff string, limit, offset int64) queries.GetClassesListFilteredParams {
+func classesListListParams(teacherID int64, startDate, endDate, statusFilter, nameFilter, overdueCutoff, testSeedFilter string, limit, offset int64) queries.GetClassesListFilteredParams {
 	nameNull := sql.NullString{String: nameFilter, Valid: nameFilter != ""}
+	ts1, ts2, ts3 := studentTestSeedFilterTriplet(testSeedFilter)
 	return queries.GetClassesListFilteredParams{
 		Column1:         teacherID,
 		TeacherID:       teacherID,
@@ -482,20 +492,26 @@ func classesListListParams(teacherID int64, startDate, endDate, statusFilter, na
 		Status:          statusFilter,
 		Column13:        nameFilter,
 		Column14:        nameNull,
-		Column15:        nameFilter,
+		Column15:        ts1,
+		Column16:        ts2,
+		Column17:        ts3,
+		Column18:        ts3,
 		TeacherID_2:     teacherID,
 		ScheduledDate:   startDate,
 		ScheduledDate_2: endDate,
-		Column19:        statusFilter,
-		Column20:        statusFilter,
-		Column21:        statusFilter,
 		Column22:        statusFilter,
 		Column23:        statusFilter,
 		Column24:        statusFilter,
 		Column25:        statusFilter,
+		Column26:        statusFilter,
+		Column27:        statusFilter,
+		Column28:        statusFilter,
 		Datetime:        overdueCutoff,
-		Column27:        nameFilter,
-		Column28:        nameNull,
+		Column30:        nameFilter,
+		Column31:        nameNull,
+		Column32:        ts1,
+		Column33:        ts2,
+		Column34:        ts3,
 		Limit:           limit,
 		Offset:          offset,
 	}
@@ -539,12 +555,13 @@ func totalRateParams(teacherID int64, startDate, endDate string) queries.GetTota
 }
 
 type classRecordsQuery struct {
-	teacherID    int64
-	startDate    string
-	endDate      string
-	statusFilter string
-	nameFilter   string
-	showAll      bool
+	teacherID      int64
+	startDate      string
+	endDate        string
+	statusFilter   string
+	nameFilter     string
+	testSeedFilter string
+	showAll        bool
 }
 
 func parseClassRecordsQuery(r *http.Request) (classRecordsQuery, error) {
@@ -559,6 +576,10 @@ func parseClassRecordsQuery(r *http.Request) (classRecordsQuery, error) {
 	}
 	statusFilter := r.URL.Query().Get("status")
 	nameFilter := firstQueryParam(r, "studentQ", "q")
+	testSeedFilter := strings.TrimSpace(r.URL.Query().Get("testSeedFilter"))
+	if testSeedFilter != "" && !constants.ValidStudentTestSeedFilter(testSeedFilter) {
+		testSeedFilter = ""
+	}
 
 	role := auth.GetRole(r.Context())
 	var teacherID int64
@@ -583,12 +604,13 @@ func parseClassRecordsQuery(r *http.Request) (classRecordsQuery, error) {
 	}
 
 	return classRecordsQuery{
-		teacherID:    teacherID,
-		startDate:    startDate,
-		endDate:      endDate,
-		statusFilter: statusFilter,
-		nameFilter:   nameFilter,
-		showAll:      showAll,
+		teacherID:      teacherID,
+		startDate:      startDate,
+		endDate:        endDate,
+		statusFilter:   statusFilter,
+		nameFilter:     nameFilter,
+		testSeedFilter: testSeedFilter,
+		showAll:        showAll,
 	}, nil
 }
 
@@ -621,14 +643,14 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	overdueCutoff := overdueCutoffPHT(ctx)
-	total, err := dbRO.GetQueries().CountClassesListFiltered(ctx, classesListCountParams(q.teacherID, q.startDate, q.endDate, q.statusFilter, q.nameFilter, overdueCutoff))
+	total, err := dbRO.GetQueries().CountClassesListFiltered(ctx, classesListCountParams(q.teacherID, q.startDate, q.endDate, q.statusFilter, q.nameFilter, overdueCutoff, q.testSeedFilter))
 	if err != nil {
 		HttpError(w, "Failed to count class records", http.StatusInternalServerError)
 		return
 	}
 	page.Total = total
 
-	allRecords, err := dbRO.GetQueries().GetClassesListFiltered(ctx, classesListListParams(q.teacherID, q.startDate, q.endDate, q.statusFilter, q.nameFilter, overdueCutoff, total, 0))
+	allRecords, err := dbRO.GetQueries().GetClassesListFiltered(ctx, classesListListParams(q.teacherID, q.startDate, q.endDate, q.statusFilter, q.nameFilter, overdueCutoff, q.testSeedFilter, total, 0))
 	if err != nil {
 		HttpError(w, "Failed to fetch class records", http.StatusInternalServerError)
 		return
@@ -790,10 +812,15 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 
 func handleClasses(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
+		testSeedFilter := strings.TrimSpace(r.URL.Query().Get("testSeedFilter"))
+		if testSeedFilter != "" && !constants.ValidStudentTestSeedFilter(testSeedFilter) {
+			testSeedFilter = ""
+		}
 		data := frontend.ClassesData{
-			StatusFilter: constants.ClassListFilterStatus(strings.TrimSpace(r.URL.Query().Get("status"))),
-			StartDate:    strings.TrimSpace(r.URL.Query().Get("startDate")),
-			EndDate:      strings.TrimSpace(r.URL.Query().Get("endDate")),
+			StatusFilter:   constants.ClassListFilterStatus(strings.TrimSpace(r.URL.Query().Get("status"))),
+			StartDate:      strings.TrimSpace(r.URL.Query().Get("startDate")),
+			EndDate:        strings.TrimSpace(r.URL.Query().Get("endDate")),
+			TestSeedFilter: testSeedFilter,
 		}
 		role := auth.GetRole(r.Context())
 		if auth.IsTeacherScoped(role) {

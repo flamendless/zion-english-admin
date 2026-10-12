@@ -149,6 +149,7 @@ type ClassRecordView struct {
 	StudentID       int64      `json:"studentId"`
 	TeacherID       int64      `json:"teacherId"`
 	StudentName     string     `json:"studentName"`
+	StudentAvatar   AvatarView `json:"studentAvatar"`
 	TeacherName     string     `json:"teacherName"`
 	Date            string     `json:"date"`
 	StartTime       string     `json:"startTime"`

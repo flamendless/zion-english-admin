@@ -66,7 +66,7 @@ func handleExportClasses(w http.ResponseWriter, r *http.Request) {
 	}
 	ctx := r.Context()
 	overdueCutoff := overdueCutoffPHT(ctx)
-	rows, err := dbRO.GetQueries().GetClassesListFiltered(ctx, classesListListParams(user.ID, startDate, endDate, "", "", overdueCutoff, 10000, 0))
+	rows, err := dbRO.GetQueries().GetClassesListFiltered(ctx, classesListListParams(user.ID, startDate, endDate, "", "", overdueCutoff, "", 10000, 0))
 	if err != nil {
 		HttpError(w, MsgSomethingWrong, http.StatusInternalServerError)
 		return
@@ -144,7 +144,7 @@ func handleExportSchedule(w http.ResponseWriter, r *http.Request) {
 	end := utils.DatePHT(endT.AddDate(0, 0, 90))
 	overdueCutoff := overdueCutoffPHT(ctx)
 	rows, err := dbRO.GetQueries().GetClassesListFiltered(ctx, classesListListParams(
-		user.ID, start, end, string(constants.ClassListFilterScheduled), "", overdueCutoff, 10000, 0,
+		user.ID, start, end, string(constants.ClassListFilterScheduled), "", overdueCutoff, "", 10000, 0,
 	))
 	if err != nil {
 		HttpError(w, MsgSomethingWrong, http.StatusInternalServerError)

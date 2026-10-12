@@ -56,7 +56,8 @@ func requireStudentAssignedToTeacher(ctx context.Context, teacherID, studentID i
 	return nil
 }
 
-func studentFilterParams(q, status string, teacherID int64, parentFilter string, teacherAssignmentFilter string) queries.CountStudentsFilteredParams {
+func studentFilterParams(q, status string, teacherID int64, parentFilter string, teacherAssignmentFilter string, testSeedFilter string) queries.CountStudentsFilteredParams {
+	ts1, ts2, ts3 := studentTestSeedFilterTriplet(testSeedFilter)
 	return queries.CountStudentsFilteredParams{
 		Column1:   q,
 		Column2:   sql.NullString{String: q, Valid: true},
@@ -70,6 +71,9 @@ func studentFilterParams(q, status string, teacherID int64, parentFilter string,
 		Column10:  parentFilter,
 		Column11:  teacherAssignmentFilter,
 		Column12:  teacherAssignmentFilter,
+		Column13:  ts1,
+		Column14:  ts2,
+		Column15:  ts3,
 	}
 }
 
@@ -166,9 +170,11 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 		ParentCurrency: parentCurrency,
 		HasParentRate:  hasParentRate,
 		AssignedColor:  existing.AssignedColor,
+		Avatar:         frontend.StudentAvatarProps(existing.Name, existing.AssignedColor, existing.IsTestSeed == 1, "md"),
 		Status:         constants.StudentStatus(existing.Status),
 		InactiveReason: inactiveReason,
 		DeletedReason:  deletedReason,
+		IsTestSeed:     existing.IsTestSeed == 1,
 		TeacherIDs:     teacherIDs,
 		TeacherNames:   teacherNames,
 		Teachers:       teachers,
@@ -305,11 +311,15 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 	if teacherAssignmentFilter != "" && !constants.ValidStudentTeacherAssignmentFilter(teacherAssignmentFilter) {
 		teacherAssignmentFilter = ""
 	}
+	testSeedFilter := strings.TrimSpace(r.URL.Query().Get("testSeedFilter"))
+	if testSeedFilter != "" && !constants.ValidStudentTestSeedFilter(testSeedFilter) {
+		testSeedFilter = ""
+	}
 	teacherID := utils.QueryParamInt64(r, "teacherId")
 	sort := parseListSort(r, frontend.ListSortKindStudent)
 	page := utils.ParsePageQuery(r)
 
-	filter := studentFilterParams(q, status, teacherID, parentFilter, teacherAssignmentFilter)
+	filter := studentFilterParams(q, status, teacherID, parentFilter, teacherAssignmentFilter, testSeedFilter)
 	total, err := dbRO.GetQueries().CountStudentsFiltered(ctx, filter)
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to count students: %v", err), http.StatusInternalServerError)
@@ -330,6 +340,9 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		Column10:  filter.Column10,
 		Column11:  filter.Column11,
 		Column12:  filter.Column12,
+		Column13:  filter.Column13,
+		Column14:  filter.Column14,
+		Column15:  filter.Column15,
 		Limit:     total,
 		Offset:    0,
 	})
@@ -396,6 +409,7 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		viewStudents[i] = frontend.StudentItem{
 			ID:               strconv.FormatInt(s.ID, 10),
 			Name:             s.Name,
+			Avatar:           frontend.StudentAvatarProps(s.Name, s.AssignedColor, s.IsTestSeed == 1, "sm"),
 			Currency:         s.Currency,
 			Contact:          s.Contact.String,
 			RatePerClass:     s.RatePerClass,
@@ -426,6 +440,7 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		Status:                  constants.StudentStatus(status),
 		ParentFilter:            parentFilter,
 		TeacherAssignmentFilter: teacherAssignmentFilter,
+		TestSeedFilter:          testSeedFilter,
 		TeacherID:               strconv.FormatInt(teacherID, 10),
 		TeacherName:             teacherName,
 		SortBy:                  sort.By,
@@ -545,6 +560,7 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 			Status:         req.Status,
 			InactiveReason: sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
 			DeletedReason:  existing.DeletedReason,
+			IsTestSeed:     parseIsTestSeedForm(r.FormValue("isTestSeed")),
 			ID:             studentID,
 		})
 		if err != nil {
@@ -619,6 +635,7 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		Status:         existing.Status,
 		InactiveReason: existing.InactiveReason,
 		DeletedReason:  existing.DeletedReason,
+		IsTestSeed:     existing.IsTestSeed,
 		ID:             studentID,
 	})
 	if err != nil {
