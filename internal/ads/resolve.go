@@ -70,10 +70,8 @@ func resolveCatalog(ctx context.Context, r *http.Request, catalog []CatalogAd, f
 			used[opt.ProductID] = true
 			if len(ad.ProductOptions) > 1 {
 				switch ad.RandomizeKind {
-				case constants.AdRandomizePerSession, constants.AdRandomizeTimer:
-					picks[cookieNameForAdZone(ad.ID, zone)] = opt.ProductID
-				case constants.AdRandomizePerPage:
-					picks[cookieNameForAdZonePerPage(ad.ID, zone, requestPagePath(r))] = opt.ProductID
+				case constants.AdRandomizePerSession, constants.AdRandomizeTimer, constants.AdRandomizePerPage:
+					picks[pickMapKey(ad, zone, r)] = opt.ProductID
 				}
 			}
 			product := resolvedProductFromOption(ad, zone, opt)
@@ -244,24 +242,25 @@ func pickProductForSlot(
 	}
 
 	switch ad.RandomizeKind {
-	case constants.AdRandomizePerPage:
-		cookieName := cookieNameForAdZonePerPage(ad.ID, zone, requestPagePath(r))
-		if id, ok := stableProductIDForSlot(ctx, r, cookieName, picks); ok {
-			if opt, found := findProduct(unused, id); found {
-				return opt, true
-			}
-		}
-		return unused[randomIndex(len(unused))], true
-	case constants.AdRandomizePerSession, constants.AdRandomizeTimer:
-		cookieName := cookieNameForAdZone(ad.ID, zone)
+	case constants.AdRandomizePerPage, constants.AdRandomizePerSession, constants.AdRandomizeTimer:
 		if forceRotateFiveSecondTimers &&
 			ad.RandomizeKind == constants.AdRandomizeTimer &&
 			ad.TimerInterval == constants.AdTimerIntervalFiveSeconds {
 			return unused[randomIndex(len(unused))], true
 		}
-		if id, ok := stableProductIDForSlot(ctx, r, cookieName, picks); ok {
+		pickKey := pickMapKey(ad, zone, r)
+		if id, ok := picks[pickKey]; ok {
 			if opt, found := findProduct(unused, id); found {
 				return opt, true
+			}
+		}
+		seed := viewerSeedFromRequest(r)
+		if seed != "" {
+			slotKey := rotationSlotKey(ad, zone, r)
+			if id, ok := deterministicProductInUnused(seed, slotKey, unused); ok {
+				if opt, found := findProduct(unused, id); found {
+					return opt, true
+				}
 			}
 		}
 		return unused[randomIndex(len(unused))], true
@@ -270,17 +269,13 @@ func pickProductForSlot(
 	}
 }
 
-func stableProductIDForSlot(ctx context.Context, r *http.Request, cookieName string, picks map[string]int64) (int64, bool) {
-	if id, ok := requestRotationPick(r, cookieName); ok {
-		return id, true
+func pickMapKey(ad CatalogAd, zone constants.AdZone, r *http.Request) string {
+	switch ad.RandomizeKind {
+	case constants.AdRandomizePerPage:
+		return cookieNameForAdZonePerPage(ad.ID, zone, requestPagePath(r))
+	default:
+		return cookieNameForAdZone(ad.ID, zone)
 	}
-	if id, ok := picks[cookieName]; ok {
-		return id, true
-	}
-	if id, ok := rotationPickFromContext(ctx, cookieName); ok {
-		return id, true
-	}
-	return 0, false
 }
 
 func filterUnusedOptions(options []ProductOption, used map[int64]bool) []ProductOption {
@@ -350,26 +345,13 @@ func randomIndex(n int) int {
 	return int(binary.BigEndian.Uint64(b[:]) % uint64(n))
 }
 
-// ApplyRotationCookies sets HttpOnly cookies for session/timer rotation picks when needed.
-// When refreshFiveSecondTimerCookies is true, 5 second timer cookies are rewritten from picks (chrome partial refresh).
-func ApplyRotationCookies(w http.ResponseWriter, r *http.Request, catalog []CatalogAd, picks map[string]int64, refreshFiveSecondTimerCookies bool) {
-	if len(picks) == 0 && !hasLegacyRotationCookieHeader(r) {
-		return
-	}
-	persistRotationPicks(w, r, rotationCookiePath(), picks)
+// ApplyRotationCookies sets the viewer seed cookie used for deterministic rotation (no per-slot pick cookies).
+func ApplyRotationCookies(w http.ResponseWriter, r *http.Request, _ []CatalogAd, _ map[string]int64, _ bool) {
+	ensureViewerSeedCookie(w, r)
 }
 
 // ComputeRotationPicks chooses stable session/timer products per ad zone for this request.
 func ComputeRotationPicks(r *http.Request, catalog []CatalogAd) map[string]int64 {
 	_, picks := resolveCatalog(context.Background(), r, catalog, false)
 	return picks
-}
-
-func rotationPickFromContext(ctx context.Context, cookieName string) (int64, bool) {
-	picks, _ := ctx.Value(rotationPicksKey).(map[string]int64)
-	if picks == nil {
-		return 0, false
-	}
-	id, ok := picks[cookieName]
-	return id, ok
 }

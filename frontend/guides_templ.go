@@ -919,7 +919,7 @@ func GuideAds() templ.Component {
 			[]string{
 				"Search by product or shop name and check the products to include.",
 				"With multiple products, choose per page, per session, or timer rotation.",
-				"Timer rotation uses an hourly or daily cookie to pick which product to show.",
+				"Timer rotation uses an hourly or daily time bucket and a small viewer seed to pick which product to show.",
 			},
 			false,
 		).Render(ctx, templ_7745c5c3_Buffer)

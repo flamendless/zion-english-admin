@@ -2,6 +2,7 @@ package ads
 
 import (
 	"context"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
@@ -30,6 +31,7 @@ func TestComputeRotationPicksPerZone(t *testing.T) {
 		},
 	}
 	r := httptest.NewRequest("GET", "/", nil)
+	r.AddCookie(&http.Cookie{Name: viewerSeedCookieName, Value: "test-viewer-seed-value"})
 	picks := ComputeRotationPicks(r, catalog)
 	zones := []constants.AdZone{
 		constants.AdZoneTop,
@@ -114,13 +116,13 @@ func TestResolveCatalogForChromeRefreshKeepsPerPageStable(t *testing.T) {
 		},
 	}
 	page := httptest.NewRequest("GET", "/zion-english-admin/students", nil)
-	page.Header.Set("Cookie", cookieNameForAdZonePerPage(1, constants.AdZoneTop, "/zion-english-admin/students")+"=10")
+	page.AddCookie(&http.Cookie{Name: viewerSeedCookieName, Value: "chrome-refresh-seed"})
 	first, _ := resolveCatalog(context.Background(), page, catalog, false)
 	perPageID := first.Top[0].ProductID
 
 	partial := httptest.NewRequest("GET", "/zion-english-admin/ads/partials/chrome", nil)
 	partial.Header.Set("Referer", "http://localhost/zion-english-admin/students")
-	partial.Header.Set("Cookie", page.Header.Get("Cookie"))
+	partial.AddCookie(&http.Cookie{Name: viewerSeedCookieName, Value: "chrome-refresh-seed"})
 	second, _ := resolveCatalogForChromeRefresh(context.Background(), partial, catalog)
 	if len(second.Top) != 2 {
 		t.Fatalf("expected 2 top slots, got %d", len(second.Top))
