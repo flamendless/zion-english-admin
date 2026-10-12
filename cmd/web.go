@@ -361,7 +361,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/notifications", authHandler)
 		rootMux.Handle(basePath+"/notifications/", authHandler)
 
-		handler := logRequests(securityHeaders(metatags.Middleware(dbRO.GetQueries(), ads.Middleware(dbRO, rootMux))))
+		handler := logRequests(securityHeaders(ads.RotationCookieMigrationMiddleware(metatags.Middleware(dbRO.GetQueries(), ads.Middleware(dbRO, rootMux)))))
 
 		port := webFlags.port
 		if !cmd.Flags().Changed("port") {

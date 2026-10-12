@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"zion-english/internal/conf"
 )
 
 const rotationPicksCookieName = "zion_ad_picks"
@@ -14,6 +16,9 @@ const rotationPicksCookieName = "zion_ad_picks"
 // maxRotationCookieBytes keeps the consolidated cookie under typical 4KB browser limits
 // with room for other session cookies in the same header.
 const maxRotationCookieBytes = 3800
+
+// maxLegacyRotationClearsPerResponse avoids oversized response Set-Cookie bursts on first migrate.
+const maxLegacyRotationClearsPerResponse = 40
 
 type requestRotationPicksKeyType struct{}
 
@@ -81,19 +86,29 @@ func persistRotationPicks(w http.ResponseWriter, r *http.Request, cookiePath str
 	if !ok {
 		merged = trimRotationPicksForCookie(merged, nil)
 		encoded, ok = encodeRotationPicksCookie(merged)
-		if !ok {
-			return
-		}
 	}
-	http.SetCookie(w, &http.Cookie{
-		Name:     rotationPicksCookieName,
-		Value:    encoded,
-		Path:     cookiePath,
-		MaxAge:   86400 * 7,
-		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
-	})
+	if !ok {
+		encoded, _ = encodeRotationPicksCookie(map[string]int64{})
+	}
+	if encoded != "" {
+		http.SetCookie(w, &http.Cookie{
+			Name:     rotationPicksCookieName,
+			Value:    encoded,
+			Path:     cookiePath,
+			MaxAge:   86400 * 7,
+			HttpOnly: true,
+			SameSite: http.SameSiteLaxMode,
+		})
+	}
 	clearLegacyRotationCookies(w, r, cookiePath)
+}
+
+func rotationCookiePath() string {
+	cookiePath := conf.Conf().BasePath
+	if cookiePath == "" {
+		return "/"
+	}
+	return cookiePath
 }
 
 func encodeRotationPicksCookie(merged map[string]int64) (string, bool) {
@@ -160,7 +175,11 @@ func clearLegacyRotationCookies(w http.ResponseWriter, r *http.Request, cookiePa
 	if r == nil {
 		return
 	}
+	cleared := 0
 	for _, c := range r.Cookies() {
+		if cleared >= maxLegacyRotationClearsPerResponse {
+			return
+		}
 		if c.Name == rotationPicksCookieName {
 			continue
 		}
@@ -175,5 +194,6 @@ func clearLegacyRotationCookies(w http.ResponseWriter, r *http.Request, cookiePa
 			HttpOnly: true,
 			SameSite: http.SameSiteLaxMode,
 		})
+		cleared++
 	}
 }

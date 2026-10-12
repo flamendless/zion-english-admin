@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"zion-english/internal/constants"
@@ -36,6 +37,26 @@ func TestPersistRotationPicksConsolidatesLegacyCookies(t *testing.T) {
 	}
 	if !consolidated {
 		t.Fatal("expected consolidated rotation cookie")
+	}
+}
+
+func TestClearLegacyRotationCookiesBatchesPerResponse(t *testing.T) {
+	t.Parallel()
+	req := httptest.NewRequest("GET", "/", nil)
+	for i := 0; i < maxLegacyRotationClearsPerResponse+5; i++ {
+		name := cookieNameForAdZone(int64(i+1), constants.AdZoneTop)
+		req.AddCookie(&http.Cookie{Name: name, Value: "1"})
+	}
+	rec := httptest.NewRecorder()
+	clearLegacyRotationCookies(rec, req, "/")
+	cleared := 0
+	for _, c := range rec.Result().Cookies() {
+		if c.MaxAge == -1 && strings.HasPrefix(c.Name, cookiePrefix) {
+			cleared++
+		}
+	}
+	if cleared != maxLegacyRotationClearsPerResponse {
+		t.Fatalf("cleared %d legacy cookies, want %d", cleared, maxLegacyRotationClearsPerResponse)
 	}
 }
 

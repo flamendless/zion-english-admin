@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"zion-english/internal/conf"
 	"zion-english/internal/constants"
 )
 
@@ -357,11 +356,7 @@ func ApplyRotationCookies(w http.ResponseWriter, r *http.Request, catalog []Cata
 	if len(picks) == 0 && !hasLegacyRotationCookieHeader(r) {
 		return
 	}
-	cookiePath := conf.Conf().BasePath
-	if cookiePath == "" {
-		cookiePath = "/"
-	}
-	persistRotationPicks(w, r, cookiePath, picks)
+	persistRotationPicks(w, r, rotationCookiePath(), picks)
 }
 
 // ComputeRotationPicks chooses stable session/timer products per ad zone for this request.
