@@ -121,6 +121,15 @@ func isLandingPath(path string) bool {
 	return p == base
 }
 
+// isPublicCookieRecoveryPath is landing or login: safe to wipe all site cookies when legacy ad headers are huge.
+func isPublicCookieRecoveryPath(path string) bool {
+	p := strings.TrimSuffix(path, "/")
+	if strings.HasSuffix(p, "/auth/login") {
+		return true
+	}
+	return isLandingPath(path)
+}
+
 func isAuthPath(path string) bool {
 	return strings.HasPrefix(pathWithoutBase(path), "/auth/")
 }

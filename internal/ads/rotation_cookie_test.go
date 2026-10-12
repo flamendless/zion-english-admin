@@ -103,6 +103,24 @@ func TestClearLegacyRotationCookiesRespectsPartialLimit(t *testing.T) {
 	}
 }
 
+func TestPurgeLegacyUsesClearSiteDataOnLandingWithManyLegacyCookies(t *testing.T) {
+	t.Parallel()
+	req := httptest.NewRequest("GET", "/zion-english-admin/auth/login", nil)
+	const n = maxLegacyRotationClearsPerPartialResponse + 5
+	for i := 0; i < n; i++ {
+		name := cookieNameForAdZone(int64(i+1), constants.AdZoneTop)
+		req.AddCookie(&http.Cookie{Name: name, Value: "1"})
+	}
+	rec := httptest.NewRecorder()
+	PurgeLegacyRotationCookies(rec, req)
+	if got := rec.Header().Get("Clear-Site-Data"); got != `"cookies"` {
+		t.Fatalf("Clear-Site-Data = %q, want %q", got, `"cookies"`)
+	}
+	if len(rec.Result().Cookies()) != 0 {
+		t.Fatalf("expected no Set-Cookie clears, got %d", len(rec.Result().Cookies()))
+	}
+}
+
 func TestRotationPicksFromRequestPrefersConsolidatedCookie(t *testing.T) {
 	t.Parallel()
 	legacyName := cookieNameForAdZone(2, constants.AdZoneLeft)
