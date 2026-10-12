@@ -189,10 +189,7 @@ func handleDocumentsPartial(w http.ResponseWriter, r *http.Request) {
 	includeSelector := "#documentsToolbar"
 	targetSelector := "#documentsTableBody"
 
-	writeHTML(w)
-	if err := frontend.DocumentsTablePartial(items, showUploader, showActions, documentsEmptyMessage(filters, isTeacher), pagination, partialsURL, includeSelector, targetSelector).Render(ctx, w); err != nil {
-		HttpError(w, err.Error(), http.StatusInternalServerError)
-	}
+	renderHTMLComponent(ctx, w, "render documents partial", frontend.DocumentsTablePartial(items, showUploader, showActions, documentsEmptyMessage(filters, isTeacher), pagination, partialsURL, includeSelector, targetSelector))
 }
 
 type documentFilters struct {

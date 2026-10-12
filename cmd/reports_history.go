@@ -62,10 +62,7 @@ func handleReportsHistoryPartial(w http.ResponseWriter, r *http.Request) {
 	includeSelector := "#reportsHistoryFilters"
 	targetSelector := "#reportsHistoryTableBody"
 
-	writeHTML(w)
-	if err := frontend.ReportsHistoryPartial(rows, emptyMsg, pagination, partialsURL, includeSelector, targetSelector).Render(r.Context(), w); err != nil {
-		HttpError(w, err.Error(), http.StatusInternalServerError)
-	}
+	renderHTMLComponent(r.Context(), w, "render reports history partial", frontend.ReportsHistoryPartial(rows, emptyMsg, pagination, partialsURL, includeSelector, targetSelector))
 }
 
 func parseReportHistoryKindFilter(r *http.Request) string {

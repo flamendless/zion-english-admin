@@ -116,10 +116,7 @@ func handleReportsPartial(w http.ResponseWriter, r *http.Request) {
 	includeSelector := "#reportsFilters"
 	targetSelector := "#reportsTableBody"
 
-	writeHTML(w)
-	if err := frontend.ReportsPartial(rows, startDate, endDate, emptyMsg, summary, pagination, partialsURL, includeSelector, targetSelector).Render(r.Context(), w); err != nil {
-		HttpError(w, err.Error(), http.StatusInternalServerError)
-	}
+	renderHTMLComponent(r.Context(), w, "render reports partial", frontend.ReportsPartial(rows, startDate, endDate, emptyMsg, summary, pagination, partialsURL, includeSelector, targetSelector))
 }
 
 func handleReportsAllTeachers(w http.ResponseWriter, r *http.Request) {

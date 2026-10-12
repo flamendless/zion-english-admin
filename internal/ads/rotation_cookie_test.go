@@ -40,23 +40,66 @@ func TestPersistRotationPicksConsolidatesLegacyCookies(t *testing.T) {
 	}
 }
 
-func TestClearLegacyRotationCookiesBatchesPerResponse(t *testing.T) {
+func TestPersistRotationPicksDoesNotImportLegacyCookieNames(t *testing.T) {
+	t.Parallel()
+	legacyName := cookieNameForAdZone(3, constants.AdZoneTop)
+	req := httptest.NewRequest("GET", "/schedule", nil)
+	req.AddCookie(&http.Cookie{Name: legacyName, Value: "42"})
+	rec := httptest.NewRecorder()
+
+	persistRotationPicks(rec, req, "/", nil)
+
+	for _, c := range rec.Result().Cookies() {
+		if c.Name != rotationPicksCookieName {
+			continue
+		}
+		picks := make(map[string]int64)
+		decodeRotationPicksCookie(c.Value, picks)
+		if len(picks) != 0 {
+			t.Fatalf("expected empty consolidated picks after legacy-only migrate, got %v", picks)
+		}
+	}
+}
+
+func TestClearLegacyRotationCookiesClearsAll(t *testing.T) {
 	t.Parallel()
 	req := httptest.NewRequest("GET", "/", nil)
-	for i := 0; i < maxLegacyRotationClearsPerResponse+5; i++ {
+	const n = 50
+	for i := 0; i < n; i++ {
 		name := cookieNameForAdZone(int64(i+1), constants.AdZoneTop)
 		req.AddCookie(&http.Cookie{Name: name, Value: "1"})
 	}
 	rec := httptest.NewRecorder()
-	clearLegacyRotationCookies(rec, req, "/")
+	clearLegacyRotationCookies(rec, req, "/", 0)
 	cleared := 0
 	for _, c := range rec.Result().Cookies() {
 		if c.MaxAge == -1 && strings.HasPrefix(c.Name, cookiePrefix) {
 			cleared++
 		}
 	}
-	if cleared != maxLegacyRotationClearsPerResponse {
-		t.Fatalf("cleared %d legacy cookies, want %d", cleared, maxLegacyRotationClearsPerResponse)
+	if cleared != n {
+		t.Fatalf("cleared %d legacy cookies, want %d", cleared, n)
+	}
+}
+
+func TestClearLegacyRotationCookiesRespectsPartialLimit(t *testing.T) {
+	t.Parallel()
+	req := httptest.NewRequest("GET", "/zion-english-admin/classes/partials/rows", nil)
+	const n = 40
+	for i := 0; i < n; i++ {
+		name := cookieNameForAdZone(int64(i+1), constants.AdZoneTop)
+		req.AddCookie(&http.Cookie{Name: name, Value: "1"})
+	}
+	rec := httptest.NewRecorder()
+	clearLegacyRotationCookies(rec, req, "/zion-english-admin", maxLegacyRotationClearsPerPartialResponse)
+	cleared := 0
+	for _, c := range rec.Result().Cookies() {
+		if c.MaxAge == -1 && strings.HasPrefix(c.Name, cookiePrefix) {
+			cleared++
+		}
+	}
+	if cleared != maxLegacyRotationClearsPerPartialResponse {
+		t.Fatalf("cleared %d legacy cookies, want %d", cleared, maxLegacyRotationClearsPerPartialResponse)
 	}
 }
 

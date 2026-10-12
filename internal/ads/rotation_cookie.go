@@ -17,8 +17,8 @@ const rotationPicksCookieName = "zion_ad_picks"
 // with room for other session cookies in the same header.
 const maxRotationCookieBytes = 3800
 
-// maxLegacyRotationClearsPerResponse avoids oversized response Set-Cookie bursts on first migrate.
-const maxLegacyRotationClearsPerResponse = 40
+// maxLegacyRotationClearsPerPartialResponse keeps HTMX fragment responses under proxy Set-Cookie limits.
+const maxLegacyRotationClearsPerPartialResponse = 24
 
 type requestRotationPicksKeyType struct{}
 
@@ -51,6 +51,17 @@ func rotationPicksFromRequest(r *http.Request) map[string]int64 {
 	return out
 }
 
+func consolidatedPicksFromRequest(r *http.Request) map[string]int64 {
+	out := make(map[string]int64)
+	if r == nil {
+		return out
+	}
+	if c, err := r.Cookie(rotationPicksCookieName); err == nil && c.Value != "" {
+		decodeRotationPicksCookie(c.Value, out)
+	}
+	return out
+}
+
 func requestRotationPick(r *http.Request, cookieName string) (int64, bool) {
 	if r == nil {
 		return 0, false
@@ -74,10 +85,11 @@ func persistRotationPicks(w http.ResponseWriter, r *http.Request, cookiePath str
 	if cookiePath == "" {
 		cookiePath = "/"
 	}
-	if len(picks) == 0 && !hasLegacyRotationCookieHeader(r) {
+	if len(picks) == 0 && !needsRotationCookiePurge(r) {
 		return
 	}
-	merged := rotationPicksFromRequest(r)
+	// Never copy legacy zion_ad_* names into zion_ad_picks; that recreates oversized headers.
+	merged := consolidatedPicksFromRequest(r)
 	for k, v := range picks {
 		merged[k] = v
 	}
@@ -100,7 +112,7 @@ func persistRotationPicks(w http.ResponseWriter, r *http.Request, cookiePath str
 			SameSite: http.SameSiteLaxMode,
 		})
 	}
-	clearLegacyRotationCookies(w, r, cookiePath)
+	clearLegacyRotationCookies(w, r, cookiePath, 0)
 }
 
 func rotationCookiePath() string {
@@ -171,29 +183,100 @@ func hasLegacyRotationCookieHeader(r *http.Request) bool {
 	return false
 }
 
-func clearLegacyRotationCookies(w http.ResponseWriter, r *http.Request, cookiePath string) {
+func needsRotationCookiePurge(r *http.Request) bool {
+	if hasLegacyRotationCookieHeader(r) {
+		return true
+	}
+	if r == nil {
+		return false
+	}
+	c, err := r.Cookie(rotationPicksCookieName)
+	if err != nil {
+		return false
+	}
+	if len(c.Value) > maxRotationCookieBytes {
+		return true
+	}
+	picks := consolidatedPicksFromRequest(r)
+	if _, ok := encodeRotationPicksCookie(picks); !ok {
+		return true
+	}
+	return false
+}
+
+// PurgeLegacyRotationCookies drops bloated rotation state and clears every legacy zion_ad_* cookie.
+func PurgeLegacyRotationCookies(w http.ResponseWriter, r *http.Request) {
+	if w == nil || !needsRotationCookiePurge(r) {
+		return
+	}
+	cookiePath := rotationCookiePath()
+	encoded, _ := encodeRotationPicksCookie(map[string]int64{})
+	if encoded != "" {
+		http.SetCookie(w, &http.Cookie{
+			Name:     rotationPicksCookieName,
+			Value:    encoded,
+			Path:     cookiePath,
+			MaxAge:   86400 * 7,
+			HttpOnly: true,
+			SameSite: http.SameSiteLaxMode,
+		})
+	}
+	clearLegacyRotationCookies(w, r, cookiePath, legacyRotationClearLimit(r))
+}
+
+func legacyRotationClearLimit(r *http.Request) int {
+	if r != nil && strings.Contains(r.URL.Path, "/partials/") {
+		return maxLegacyRotationClearsPerPartialResponse
+	}
+	return 0
+}
+
+func clearLegacyRotationCookies(w http.ResponseWriter, r *http.Request, cookiePath string, maxClears int) {
 	if r == nil {
 		return
 	}
+	paths := rotationCookieClearPaths(cookiePath)
+	if maxClears > 0 {
+		if cookiePath == "" {
+			cookiePath = "/"
+		}
+		paths = []string{cookiePath}
+	}
+	seen := make(map[string]struct{})
 	cleared := 0
 	for _, c := range r.Cookies() {
-		if cleared >= maxLegacyRotationClearsPerResponse {
-			return
-		}
 		if c.Name == rotationPicksCookieName {
 			continue
 		}
 		if !strings.HasPrefix(c.Name, cookiePrefix) {
 			continue
 		}
-		http.SetCookie(w, &http.Cookie{
-			Name:     c.Name,
-			Value:    "",
-			Path:     cookiePath,
-			MaxAge:   -1,
-			HttpOnly: true,
-			SameSite: http.SameSiteLaxMode,
-		})
-		cleared++
+		if _, ok := seen[c.Name]; ok {
+			continue
+		}
+		seen[c.Name] = struct{}{}
+		for _, path := range paths {
+			if maxClears > 0 && cleared >= maxClears {
+				return
+			}
+			http.SetCookie(w, &http.Cookie{
+				Name:     c.Name,
+				Value:    "",
+				Path:     path,
+				MaxAge:   -1,
+				HttpOnly: true,
+				SameSite: http.SameSiteLaxMode,
+			})
+			if maxClears > 0 {
+				cleared++
+			}
+		}
 	}
+}
+
+func rotationCookieClearPaths(cookiePath string) []string {
+	if cookiePath == "" || cookiePath == "/" {
+		return []string{"/"}
+	}
+	return []string{cookiePath, "/"}
 }

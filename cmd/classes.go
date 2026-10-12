@@ -598,10 +598,7 @@ func handleClassesDatePresetPartial(w http.ResponseWriter, r *http.Request) {
 	}
 
 	month := strings.TrimSpace(r.URL.Query().Get("month"))
-	writeHTML(w)
-	if err := frontend.DatePresetForMonth(month, true).Render(r.Context(), w); err != nil {
-		HttpError(w, err.Error(), http.StatusInternalServerError)
-	}
+	renderHTMLComponent(r.Context(), w, "render classes date preset partial", frontend.DatePresetForMonth(month, true))
 }
 
 func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
@@ -687,10 +684,7 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 	partialsURL := utils.URL("/classes/partials/rows")
 	includeSelector := "#classesToolbar"
 
-	writeHTML(w)
-	if err := frontend.ClassRecordsPartial(rows, showTeacher, colspan, "No classes found for the selected criteria", pagination, partialsURL, includeSelector).Render(ctx, w); err != nil {
-		HttpError(w, err.Error(), http.StatusInternalServerError)
-	}
+	renderHTMLComponent(ctx, w, "render class records partial", frontend.ClassRecordsPartial(rows, showTeacher, colspan, "No classes found for the selected criteria", pagination, partialsURL, includeSelector))
 }
 
 func handleClassRecord(w http.ResponseWriter, r *http.Request) {

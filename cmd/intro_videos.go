@@ -240,10 +240,7 @@ func handleIntroVideosPartial(w http.ResponseWriter, r *http.Request) {
 	includeSelector := "#introVideosToolbar"
 	targetSelector := "#introVideosTableBody"
 
-	writeHTML(w)
-	if err := frontend.IntroVideosTablePartial(items, showUploader, showViewAction, showActions, introVideosEmptyMessage(filters, isTeacher), pagination, partialsURL, includeSelector, targetSelector).Render(ctx, w); err != nil {
-		HttpError(w, err.Error(), http.StatusInternalServerError)
-	}
+	renderHTMLComponent(ctx, w, "render intro videos partial", frontend.IntroVideosTablePartial(items, showUploader, showViewAction, showActions, introVideosEmptyMessage(filters, isTeacher), pagination, partialsURL, includeSelector, targetSelector))
 }
 
 type introVideoFilters struct {

@@ -1,8 +1,14 @@
 package cmd
 
 import (
+	"bytes"
+	"context"
 	"net/http"
+	"zion-english/internal/logs"
 	"zion-english/internal/utils"
+
+	"github.com/a-h/templ"
+	"go.uber.org/zap"
 )
 
 const (
@@ -24,6 +30,20 @@ func requireMethod(w http.ResponseWriter, r *http.Request, method string) bool {
 
 func writeHTML(w http.ResponseWriter) {
 	w.Header().Set(headerContentType, mimeHTML)
+}
+
+// renderHTMLComponent renders to a buffer first so a failed templ render does not commit 200 then HttpError(500).
+func renderHTMLComponent(ctx context.Context, w http.ResponseWriter, logTag string, component templ.Component) {
+	var buf bytes.Buffer
+	if err := component.Render(ctx, &buf); err != nil {
+		logs.Log().Error(logTag, zap.Error(err))
+		HttpError(w, MsgSomethingWrong, http.StatusInternalServerError)
+		return
+	}
+	writeHTML(w)
+	if _, err := w.Write(buf.Bytes()); err != nil {
+		logs.Log().Error(logTag, zap.Error(err))
+	}
 }
 
 func writeJSON(w http.ResponseWriter) {

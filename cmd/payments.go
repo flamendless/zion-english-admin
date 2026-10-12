@@ -107,10 +107,7 @@ func handlePaymentsPartial(w http.ResponseWriter, r *http.Request) {
 	includeSelector := "#paymentsFilters"
 	targetSelector := "#paymentsTableBody"
 
-	writeHTML(w)
-	if err := frontend.PaymentsPartial(rows, emptyMsg, showTeacherColumn, pagination, partialsURL, includeSelector, targetSelector).Render(r.Context(), w); err != nil {
-		HttpError(w, err.Error(), http.StatusInternalServerError)
-	}
+	renderHTMLComponent(r.Context(), w, "render payments partial", frontend.PaymentsPartial(rows, emptyMsg, showTeacherColumn, pagination, partialsURL, includeSelector, targetSelector))
 }
 
 func paymentsTeacherScope(role auth.Role, userID int64) int64 {

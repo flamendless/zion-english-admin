@@ -53,10 +53,7 @@ func handleTeachersEarningsPartial(w http.ResponseWriter, r *http.Request) {
 
 	teacherIDStr := strings.TrimSpace(r.URL.Query().Get("teacherId"))
 	if teacherIDStr == "" {
-		writeHTML(w)
-		if err := frontend.EarningsCutoffTableBody(nil, "Select a teacher to view earnings history.").Render(r.Context(), w); err != nil {
-			HttpError(w, err.Error(), http.StatusInternalServerError)
-		}
+		renderHTMLComponent(r.Context(), w, "render teachers earnings partial", frontend.EarningsCutoffTableBody(nil, "Select a teacher to view earnings history."))
 		return
 	}
 
@@ -83,10 +80,7 @@ func handleTeachersEarningsPartial(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeHTML(w)
-	if err := frontend.EarningsCutoffTableBody(rows, emptyMsg).Render(ctx, w); err != nil {
-		HttpError(w, err.Error(), http.StatusInternalServerError)
-	}
+	renderHTMLComponent(ctx, w, "render teachers earnings partial", frontend.EarningsCutoffTableBody(rows, emptyMsg))
 }
 
 func loadEarningsCutoffRows(ctx context.Context, teacherID int64) ([]frontend.EarningsCutoffRow, string, error) {

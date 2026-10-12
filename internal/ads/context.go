@@ -53,13 +53,11 @@ func GetResolvedSlots(ctx context.Context) ResolvedSlots {
 	return slots
 }
 
-// RotationCookieMigrationMiddleware merges legacy per-zone zion_ad_* cookies into zion_ad_picks
-// and clears them on the response. Runs on auth and other paths that skip ad slot loading.
+// RotationCookieMigrationMiddleware clears legacy per-zone zion_ad_* cookies and resets
+// oversized zion_ad_picks on the response. Runs on auth and other paths that skip ad slot loading.
 func RotationCookieMigrationMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if hasLegacyRotationCookieHeader(r) {
-			persistRotationPicks(w, r, rotationCookiePath(), nil)
-		}
+		PurgeLegacyRotationCookies(w, r)
 		next.ServeHTTP(w, r)
 	})
 }
