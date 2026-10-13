@@ -70,7 +70,7 @@ func handlePersistentOverdueClassesPartial(w http.ResponseWriter, r *http.Reques
 		}
 		panelRows = append(panelRows, frontend.OverdueClassPanelItem{
 			ID:              row.ID,
-			StudentName:     row.StudentName,
+			StudentName:     studentDisplayName(row.StudentName, row.StudentNumber),
 			ScheduledDate:   row.ScheduledDate,
 			StartTime:       startTime,
 			DurationMinutes: row.DurationMinutes,

@@ -9,7 +9,7 @@ SELECT COUNT(*) as count FROM tbl_teachers_students_m2m WHERE teacher_id = ? AND
 DELETE FROM tbl_teachers_students_m2m WHERE student_id = ?;
 
 -- name: GetStudentsByTeacherID :many
-SELECT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
+SELECT s.id, s.name, s.student_number, s.parent_number, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
 FROM tbl_students s
 INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?
@@ -27,7 +27,7 @@ WHERE m2m.teacher_id = ?
 	AND (? = '' OR s.status = ?);
 
 -- name: GetStudentsByTeacherIDFiltered :many
-SELECT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
+SELECT s.id, s.name, s.student_number, s.parent_number, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
 FROM tbl_students s
 INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?

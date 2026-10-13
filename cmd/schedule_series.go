@@ -180,7 +180,7 @@ func scheduledClassSeriesItemsFromRows(ctx context.Context, rows []queries.ListA
 			ID:                row.AnchorClassID,
 			StudentID:         row.StudentID,
 			TeacherID:         row.TeacherID,
-			StudentName:       row.StudentName,
+			StudentName:       studentDisplayName(row.StudentName, row.StudentNumber),
 			TeacherName:       row.TeacherName,
 			TeacherAvatar:     avatar,
 			ScheduledDate:     row.AnchorDate,

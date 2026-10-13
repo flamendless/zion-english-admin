@@ -330,6 +330,8 @@ type TblStudent struct {
 	InactiveReason sql.NullString
 	DeletedReason  sql.NullString
 	IsTestSeed     int64
+	StudentNumber  sql.NullString
+	ParentNumber   sql.NullString
 }
 
 type TblStudentRelationship struct {

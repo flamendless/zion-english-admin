@@ -128,6 +128,7 @@ func classEditClassData(ctx context.Context, recordID int64, readonly bool) (fro
 		StudentID:                 strconv.FormatInt(existing.StudentID, 10),
 		TeacherID:                 strconv.FormatInt(existing.TeacherID, 10),
 		StudentName:               existing.StudentName,
+		StudentNumber:             studentNumberString(existing.StudentNumber),
 		StudentAvatar:             frontend.StudentAvatarProps(existing.StudentName, existing.StudentAssignedColor, existing.StudentIsTestSeed == 1, "md"),
 		TeacherName:               existing.TeacherName,
 		TeacherAvatar:             avatarWithTeacherRoles(classRecordTeacherAvatar(existing), teacherRoles, teacherStatus),
@@ -362,6 +363,7 @@ func classRecordViewFromRow(cr queries.GetClassRecordsFilteredRow) models.ClassR
 		StudentID:       cr.StudentID,
 		TeacherID:       cr.TeacherID,
 		StudentName:     cr.StudentName,
+		StudentNumber:   studentNumberString(cr.StudentNumber),
 		TeacherName:     cr.TeacherName,
 		Date:            cr.Date,
 		StartTime:       cr.StartTime.String,
@@ -416,6 +418,7 @@ func classesListViewFromRow(row queries.GetClassesListFilteredRow) models.ClassR
 		StudentID:       row.StudentID,
 		TeacherID:       row.TeacherID,
 		StudentName:     row.StudentName,
+		StudentNumber:   studentNumberString(row.StudentNumber),
 		StudentAvatar:   studentAvatarView(row.StudentName, row.StudentAssignedColor, row.StudentIsTestSeed),
 		TeacherName:     row.TeacherName,
 		TeacherAvatar:   classesListTeacherAvatar(row),
@@ -924,7 +927,7 @@ func parseRecordClassPrefill(r *http.Request) models.RecordClassPrefill {
 		}
 	}
 
-	prefill.StudentName = existing.StudentName
+	prefill.StudentName = studentDisplayName(existing.StudentName, existing.StudentNumber)
 	prefill.TeacherName = existing.TeacherName
 	prefill.StudentID = strconv.FormatInt(existing.StudentID, 10)
 	prefill.TeacherID = strconv.FormatInt(existing.TeacherID, 10)

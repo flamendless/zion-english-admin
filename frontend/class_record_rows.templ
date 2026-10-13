@@ -14,7 +14,7 @@ templ ClassRecordRow(record ClassRecordRowData, showTeacher bool) {
 			</td>
 		}
 		<td data-label="Student">
-			@StudentNameCell(record.StudentName, record.StudentAvatar)
+			@StudentNameCell(record.StudentName, record.StudentNumber, record.StudentAvatar)
 		</td>
 		<td data-label="Rate">@RatePill(record.Rate, record.Currency)</td>
 		<td data-label="Status">

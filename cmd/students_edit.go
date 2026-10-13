@@ -143,7 +143,7 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 		}
 		relItems[i] = frontend.StudentRelationshipItem{
 			RelatedStudentID:   strconv.FormatInt(rel.RelatedStudentID, 10),
-			RelatedStudentName: rel.RelatedStudentName,
+			RelatedStudentName: studentDisplayName(rel.RelatedStudentName, rel.RelatedStudentNumber),
 			Relationship:       relationship,
 		}
 	}
@@ -162,6 +162,8 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 		ID:             strconv.FormatInt(studentID, 10),
 		Readonly:       readonly || existing.Status == string(constants.StudentStatusDeleted),
 		Name:           existing.Name,
+		StudentNumber:  studentNumberString(existing.StudentNumber),
+		ParentNumber:   studentNumberString(existing.ParentNumber),
 		Currency:       existing.Currency,
 		Contact:        existing.Contact.String,
 		RatePerClass:   existing.RatePerClass,
@@ -409,6 +411,7 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		viewStudents[i] = frontend.StudentItem{
 			ID:               strconv.FormatInt(s.ID, 10),
 			Name:             s.Name,
+			StudentNumber:    studentNumberString(s.StudentNumber),
 			Avatar:           frontend.StudentAvatarProps(s.Name, s.AssignedColor, s.IsTestSeed == 1, "sm"),
 			Currency:         s.Currency,
 			Contact:          s.Contact.String,
@@ -529,6 +532,8 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 
 		req := models.StudentRegisterRequest{
 			Name:           r.FormValue("name"),
+			StudentNumber:  r.FormValue("studentNumber"),
+			ParentNumber:   r.FormValue("parentNumber"),
 			Currency:       r.FormValue("currency"),
 			Contact:        r.FormValue("contact"),
 			RatePerClass:   ratePerClass,
@@ -542,6 +547,12 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 			return
 		}
 
+		studentNumber, parentNumber, err := studentIdentifierFieldsFromForm(req.StudentNumber, req.ParentNumber)
+		if err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+
 		parentRate, parentCurrency, err := parseStudentParentRateFields(r.FormValue("parentRate"), r.FormValue("parentCurrency"))
 		if err != nil {
 			sendErrorLog(w, err.Error())
@@ -550,6 +561,8 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 
 		err = dbRW.GetQueries().UpdateStudent(ctx, queries.UpdateStudentParams{
 			Name:           req.Name,
+			StudentNumber:  studentNumber,
+			ParentNumber:   parentNumber,
 			Currency:       req.Currency,
 			Contact:        sql.NullString{String: req.Contact, Valid: req.Contact != ""},
 			RatePerClass:   req.RatePerClass,
@@ -611,6 +624,8 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 
 	req := models.StudentRegisterRequest{
 		Name:           r.FormValue("name"),
+		StudentNumber:  r.FormValue("studentNumber"),
+		ParentNumber:   r.FormValue("parentNumber"),
 		Currency:       r.FormValue("currency"),
 		RatePerClass:   ratePerClass,
 		ParentName:     r.FormValue("parentName"),
@@ -623,8 +638,16 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		return
 	}
 
+	studentNumber, parentNumber, err := studentIdentifierFieldsFromForm(req.StudentNumber, req.ParentNumber)
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+
 	err = dbRW.GetQueries().UpdateStudent(ctx, queries.UpdateStudentParams{
 		Name:           req.Name,
+		StudentNumber:  studentNumber,
+		ParentNumber:   parentNumber,
 		Currency:       req.Currency,
 		Contact:        existing.Contact,
 		RatePerClass:   req.RatePerClass,

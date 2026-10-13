@@ -415,6 +415,7 @@ SELECT
 	t.last_name AS teacher_last_name,
 	cr.student_id,
 	s.name AS student_name,
+	s.student_number AS student_number,
 	s.parent_rate,
 	s.parent_currency,
 	cr.date
@@ -478,6 +479,7 @@ type GetReportSummaryRowsRow struct {
 	TeacherLastName   string
 	StudentID         int64
 	StudentName       string
+	StudentNumber     sql.NullString
 	ParentRate        sql.NullFloat64
 	ParentCurrency    sql.NullString
 	Date              string
@@ -512,6 +514,7 @@ func (q *Queries) GetReportSummaryRows(ctx context.Context, arg GetReportSummary
 			&i.TeacherLastName,
 			&i.StudentID,
 			&i.StudentName,
+			&i.StudentNumber,
 			&i.ParentRate,
 			&i.ParentCurrency,
 			&i.Date,
@@ -784,6 +787,7 @@ SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time,
 	cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes,
 	cr.created_at, cr.updated_at, cr.recorded_by_role,
 	s.name AS student_name,
+	s.student_number AS student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
@@ -817,6 +821,7 @@ type GetTeacherReportClassRecordsRow struct {
 	UpdatedAt       string
 	RecordedByRole  string
 	StudentName     string
+	StudentNumber   sql.NullString
 	TeacherName     string
 }
 
@@ -846,6 +851,7 @@ func (q *Queries) GetTeacherReportClassRecords(ctx context.Context, arg GetTeach
 			&i.UpdatedAt,
 			&i.RecordedByRole,
 			&i.StudentName,
+			&i.StudentNumber,
 			&i.TeacherName,
 		); err != nil {
 			return nil, err

@@ -13,6 +13,7 @@ type ClassRecordRowData struct {
 	StudentID       int64
 	TeacherID       int64
 	StudentName     string
+	StudentNumber   string
 	StudentAvatar   AvatarProps
 	TeacherName     string
 	TeacherAvatar   AvatarProps
@@ -31,10 +32,11 @@ type ClassRecordRowData struct {
 
 func ClassRecordRowFromView(v models.ClassRecordView) ClassRecordRowData {
 	return ClassRecordRowData{
-		ID:          v.ID,
-		StudentID:   v.StudentID,
-		TeacherID:   v.TeacherID,
-		StudentName: v.StudentName,
+		ID:            v.ID,
+		StudentID:     v.StudentID,
+		TeacherID:     v.TeacherID,
+		StudentName:   v.StudentName,
+		StudentNumber: v.StudentNumber,
 		StudentAvatar: AvatarProps{
 			Size:          "sm",
 			Initials:      v.StudentAvatar.Initials,
@@ -152,7 +154,7 @@ func (r ClassRecordRowData) ScheduledItemData() ScheduledClassItemData {
 		ID:              r.ID,
 		StudentID:       r.StudentID,
 		TeacherID:       r.TeacherID,
-		StudentName:     r.StudentName,
+		StudentName:     utils.StudentDisplayName(r.StudentName, r.StudentNumber),
 		TeacherName:     r.TeacherName,
 		ScheduledDate:   r.Date,
 		StartTime:       r.StartTime,

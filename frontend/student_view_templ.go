@@ -48,7 +48,7 @@ func StudentViewModal(data EditStudentData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = StudentNameCell(data.Name, data.Avatar).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = StudentNameCell(data.Name, data.StudentNumber, data.Avatar).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -102,7 +102,15 @@ func StudentViewModal(data EditStudentData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+			templ_7745c5c3_Err = ProfileDetailField("Student number", displayOrDash(data.StudentNumber)).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 			templ_7745c5c3_Err = ProfileDetailField("Parent", displayOrDash(data.ParentName)).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = ProfileDetailField("Parent number", displayOrDash(data.ParentNumber)).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

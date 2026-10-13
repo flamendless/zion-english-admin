@@ -64,6 +64,8 @@ var (
 	ErrInvalidParentCurrency             = errors.New("invalid parent currency. Must be KRW, CAD, YEN, or PHP")
 	ErrInvalidParentRate                 = errors.New("invalid parent rate")
 	ErrParentRateCannotBeNegative        = errors.New("parent rate cannot be negative")
+	ErrInvalidStudentNumber              = errors.New("student number must be 1-16 letters or digits with no special characters")
+	ErrInvalidParentNumber               = errors.New("parent number must be 1-16 letters or digits with no special characters")
 
 	ErrFirstNameRequired    = errors.New("first name is required")
 	ErrLastNameRequired     = errors.New("last name is required")

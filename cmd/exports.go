@@ -81,7 +81,7 @@ func handleExportClasses(w http.ResponseWriter, r *http.Request) {
 			row.Date,
 			row.StartTime.String,
 			row.EndTime.String,
-			row.StudentName,
+			studentDisplayName(row.StudentName, row.StudentNumber),
 			row.Status,
 			fmt.Sprintf("%.2f", row.Rate),
 			row.Currency,
@@ -162,7 +162,7 @@ func handleExportSchedule(w http.ResponseWriter, r *http.Request) {
 			row.Date,
 			row.StartTime.String,
 			row.EndTime.String,
-			row.StudentName,
+			studentDisplayName(row.StudentName, row.StudentNumber),
 			fmt.Sprintf("%d", row.DurationMinutes),
 			row.Status,
 		})

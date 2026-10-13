@@ -322,7 +322,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 		sRescheduled := sqlNumericToInt64(row.Rescheduled)
 		resp.ByStudent = append(resp.ByStudent, analyticsStudentRowJSON{
 			StudentID:        strconv.FormatInt(row.StudentID, 10),
-			StudentName:      row.StudentName,
+			StudentName:      studentDisplayName(row.StudentName, row.StudentNumber),
 			Conducted:        sConducted,
 			Cancelled:        sCancelled,
 			Rescheduled:      sRescheduled,
@@ -379,7 +379,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 			ScheduledDate:   row.ScheduledDate,
 			StartTime:       row.StartTime.String,
 			DurationMinutes: row.DurationMinutes,
-			StudentName:     row.StudentName,
+			StudentName:     studentDisplayName(row.StudentName, row.StudentNumber),
 			TeacherName:     row.TeacherName,
 			TeacherAvatar:   analyticsTeacherAvatar(row.TeacherID, row.TeacherFirstName, row.TeacherMiddleName, row.TeacherLastName, row.TeacherName, row.TeacherAssignedColor, row.TeacherProfilePicture),
 			DaysOverdue:     row.DaysOverdue,
@@ -421,7 +421,7 @@ func handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
 		tenures = append(tenures, row.TenureDays)
 		resp.ChurnedStudents = append(resp.ChurnedStudents, analyticsChurnedStudentJSON{
 			StudentID:      strconv.FormatInt(row.StudentID, 10),
-			StudentName:    row.StudentName,
+			StudentName:    studentDisplayName(row.StudentName, row.StudentNumber),
 			InactiveReason: row.InactiveReason,
 			TenureDays:     row.TenureDays,
 			ChurnedAt:      utils.FormatNullDateTimePHT(row.ChurnedAt),

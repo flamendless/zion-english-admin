@@ -468,6 +468,22 @@ func studentParentRateView(rate sql.NullFloat64, currency sql.NullString) (float
 	return rate.Float64, currency.String, true
 }
 
+func parseOptionalStudentIdentifier(raw string, invalidErr error) (sql.NullString, error) {
+	s := strings.TrimSpace(raw)
+	if s == "" {
+		return sql.NullString{}, nil
+	}
+	if len(s) > 16 {
+		return sql.NullString{}, invalidErr
+	}
+	for _, r := range s {
+		if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') && (r < '0' || r > '9') {
+			return sql.NullString{}, invalidErr
+		}
+	}
+	return sql.NullString{String: s, Valid: true}, nil
+}
+
 func requireInt64(n string) (int64, error) {
 	if n == "" {
 		return 0, ErrMissingIntegerValue
@@ -953,10 +969,11 @@ func formatStudentRelationships(rels []queries.GetAllStudentRelationshipsRow) st
 	}
 	parts := make([]string, len(rels))
 	for i, r := range rels {
+		relatedName := studentDisplayName(r.RelatedStudentName, r.RelatedStudentNumber)
 		if r.Relationship.Valid && r.Relationship.String != "" {
-			parts[i] = fmt.Sprintf("%s → %s", r.Relationship.String, r.RelatedStudentName)
+			parts[i] = fmt.Sprintf("%s → %s", r.Relationship.String, relatedName)
 		} else {
-			parts[i] = r.RelatedStudentName
+			parts[i] = relatedName
 		}
 	}
 	return strings.Join(parts, "; ")
@@ -1033,6 +1050,8 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	}
 	if isSuperuser {
 		req.Contact = r.FormValue("contact")
+		req.StudentNumber = r.FormValue("studentNumber")
+		req.ParentNumber = r.FormValue("parentNumber")
 		req.AssignedColor = r.FormValue("assignedColor")
 		req.InactiveReason = r.FormValue("inactiveReason")
 		req.Relationship = r.FormValue("relationship")
@@ -1054,6 +1073,12 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 			sendErrorLog(w, err.Error())
 			return
 		}
+	}
+
+	studentNumber, parentNumber, err := studentIdentifierFieldsFromForm(req.StudentNumber, req.ParentNumber)
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
 	}
 
 	rl.add(fmt.Sprintf("Registering student: %s", req.Name))
@@ -1085,6 +1110,8 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	}
 	studentID, err := qtx.InsertStudent(r.Context(), queries.InsertStudentParams{
 		Name:           req.Name,
+		StudentNumber:  studentNumber,
+		ParentNumber:   parentNumber,
 		Currency:       req.Currency,
 		Contact:        sql.NullString{String: req.Contact, Valid: req.Contact != ""},
 		RatePerClass:   req.RatePerClass,
@@ -2145,7 +2172,7 @@ func handleSearchStudents(w http.ResponseWriter, r *http.Request) {
 	for _, s := range students {
 		studentResponses = append(studentResponses, models.StudentAPIResponse{
 			ID:           s.ID,
-			Name:         s.Name,
+			Name:         studentDisplayName(s.Name, s.StudentNumber),
 			Currency:     s.Currency,
 			RatePerClass: s.RatePerClass,
 		})
@@ -2190,7 +2217,7 @@ func handleGetStudents(w http.ResponseWriter, r *http.Request) {
 		for _, s := range students {
 			studentResponses = append(studentResponses, models.StudentAPIResponse{
 				ID:           s.ID,
-				Name:         s.Name,
+				Name:         studentDisplayName(s.Name, s.StudentNumber),
 				Currency:     s.Currency,
 				RatePerClass: s.RatePerClass,
 			})
@@ -2204,7 +2231,7 @@ func handleGetStudents(w http.ResponseWriter, r *http.Request) {
 		for _, s := range students {
 			studentResponses = append(studentResponses, models.StudentAPIResponse{
 				ID:           s.ID,
-				Name:         s.Name,
+				Name:         studentDisplayName(s.Name, s.StudentNumber),
 				Currency:     s.Currency,
 				RatePerClass: s.RatePerClass,
 			})
@@ -2243,7 +2270,7 @@ func handleGetMyStudents(w http.ResponseWriter, r *http.Request) {
 	for _, s := range students {
 		studentResponses = append(studentResponses, models.StudentAPIResponse{
 			ID:           s.ID,
-			Name:         s.Name,
+			Name:         studentDisplayName(s.Name, s.StudentNumber),
 			Currency:     s.Currency,
 			RatePerClass: s.RatePerClass,
 		})

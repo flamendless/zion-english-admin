@@ -129,7 +129,7 @@ func (q *Queries) GetAllStudentTeacherNames(ctx context.Context) ([]GetAllStuden
 }
 
 const getStudentsByTeacherID = `-- name: GetStudentsByTeacherID :many
-SELECT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
+SELECT s.id, s.name, s.student_number, s.parent_number, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
 FROM tbl_students s
 INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?
@@ -140,6 +140,8 @@ ORDER BY s.name ASC
 type GetStudentsByTeacherIDRow struct {
 	ID            int64
 	Name          string
+	StudentNumber sql.NullString
+	ParentNumber  sql.NullString
 	Currency      string
 	Contact       sql.NullString
 	RatePerClass  float64
@@ -162,6 +164,8 @@ func (q *Queries) GetStudentsByTeacherID(ctx context.Context, teacherID int64) (
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
+			&i.StudentNumber,
+			&i.ParentNumber,
 			&i.Currency,
 			&i.Contact,
 			&i.RatePerClass,
@@ -185,7 +189,7 @@ func (q *Queries) GetStudentsByTeacherID(ctx context.Context, teacherID int64) (
 }
 
 const getStudentsByTeacherIDFiltered = `-- name: GetStudentsByTeacherIDFiltered :many
-SELECT s.id, s.name, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
+SELECT s.id, s.name, s.student_number, s.parent_number, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
 FROM tbl_students s
 INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?
@@ -210,6 +214,8 @@ type GetStudentsByTeacherIDFilteredParams struct {
 type GetStudentsByTeacherIDFilteredRow struct {
 	ID            int64
 	Name          string
+	StudentNumber sql.NullString
+	ParentNumber  sql.NullString
 	Currency      string
 	Contact       sql.NullString
 	RatePerClass  float64
@@ -240,6 +246,8 @@ func (q *Queries) GetStudentsByTeacherIDFiltered(ctx context.Context, arg GetStu
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
+			&i.StudentNumber,
+			&i.ParentNumber,
 			&i.Currency,
 			&i.Contact,
 			&i.RatePerClass,
