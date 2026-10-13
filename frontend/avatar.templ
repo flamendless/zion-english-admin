@@ -26,10 +26,11 @@ templ TeacherNameCell(name string, avatar AvatarProps) {
 	</div>
 }
 
-templ StudentNameCell(name string, avatar AvatarProps) {
+templ StudentNameCell(name string, studentNumber string, avatar AvatarProps) {
+	{{ displayName := utils.StudentDisplayName(name, studentNumber) }}
 	<div class="teacher-name-cell">
 		@Avatar(avatar)
-		<span class="teacher-name-cell-text" data-full-text={ name }>{ name }</span>
+		<span class="teacher-name-cell-text" data-full-text={ displayName }>{ displayName }</span>
 	</div>
 }
 

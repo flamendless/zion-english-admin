@@ -29,6 +29,7 @@ type StudentData struct {
 type StudentItem struct {
 	ID               string
 	Name             string
+	StudentNumber    string
 	Currency         string
 	Contact          string
 	RatePerClass     float64
@@ -153,7 +154,7 @@ templ Students(data StudentData) {
 							for _, student := range data.Students {
 								<tr class={ getStudentRowClass(student.Status) }>
 									<td data-label="Name">
-										@StudentNameCell(student.Name, student.Avatar)
+										@StudentNameCell(student.Name, student.StudentNumber, student.Avatar)
 									</td>
 									<td data-label="Parent">{ getDisplayValue(student.ParentName) }</td>
 									<td data-label="Teacher">
@@ -191,7 +192,7 @@ templ Students(data StudentData) {
 												@IconActionLink(utils.URL("/students/" + student.ID + "/edit"), "Edit", IconKindEdit)
 												@IconActionTrigger("Delete", IconKindDelete, templ.Attributes{
 													"data-student-delete-url": StudentDeleteURL(student.ID),
-													"data-student-name":       student.Name,
+													"data-student-name":       utils.StudentDisplayName(student.Name, student.StudentNumber),
 												})
 											}
 										</div>

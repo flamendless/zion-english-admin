@@ -340,6 +340,7 @@ func handleMyStudents(w http.ResponseWriter, r *http.Request) {
 		viewStudents[i] = frontend.StudentItem{
 			ID:            strconv.FormatInt(s.ID, 10),
 			Name:          s.Name,
+			StudentNumber: studentNumberString(s.StudentNumber),
 			Currency:      s.Currency,
 			Contact:       s.Contact.String,
 			RatePerClass:  s.RatePerClass,

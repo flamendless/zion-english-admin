@@ -50,7 +50,7 @@ templ MyStudents(data MyStudentsData) {
 							for _, s := range data.Students {
 								<tr>
 									<td data-label="Name">
-										@StudentNameCell(s.Name, s.Avatar)
+										@StudentNameCell(s.Name, s.StudentNumber, s.Avatar)
 									</td>
 									<td data-label="Contact">{ getDisplayValue(s.Contact) }</td>
 									<td data-label="Parent">{ getDisplayValue(s.ParentName) }</td>

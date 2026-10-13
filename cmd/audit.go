@@ -176,6 +176,12 @@ func formatStudentAudit(before, after queries.GetStudentByIDRow, teachersBefore,
 	if before.Name != after.Name {
 		parts = append(parts, fmt.Sprintf("name '%s' -> '%s'", before.Name, after.Name))
 	}
+	if before.StudentNumber.String != after.StudentNumber.String || before.StudentNumber.Valid != after.StudentNumber.Valid {
+		parts = append(parts, fmt.Sprintf("student number '%s' -> '%s'", auditStr(before.StudentNumber), auditStr(after.StudentNumber)))
+	}
+	if before.ParentNumber.String != after.ParentNumber.String || before.ParentNumber.Valid != after.ParentNumber.Valid {
+		parts = append(parts, fmt.Sprintf("parent number '%s' -> '%s'", auditStr(before.ParentNumber), auditStr(after.ParentNumber)))
+	}
 	if before.Status != after.Status {
 		parts = append(parts, fmt.Sprintf("status '%s' -> '%s'", before.Status, after.Status))
 	}

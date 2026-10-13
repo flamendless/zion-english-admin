@@ -35,16 +35,17 @@ func (q *Queries) DeleteStudentRelationshipsByStudentID(ctx context.Context, stu
 }
 
 const getAllStudentRelationships = `-- name: GetAllStudentRelationships :many
-SELECT sr.student_id, sr.relationship, rs.name AS related_student_name
+SELECT sr.student_id, sr.relationship, rs.name AS related_student_name, rs.student_number AS related_student_number
 FROM tbl_student_relationships sr
 INNER JOIN tbl_students rs ON sr.related_student_id = rs.id
 ORDER BY rs.name ASC
 `
 
 type GetAllStudentRelationshipsRow struct {
-	StudentID          int64
-	Relationship       sql.NullString
-	RelatedStudentName string
+	StudentID            int64
+	Relationship         sql.NullString
+	RelatedStudentName   string
+	RelatedStudentNumber sql.NullString
 }
 
 func (q *Queries) GetAllStudentRelationships(ctx context.Context) ([]GetAllStudentRelationshipsRow, error) {
@@ -56,7 +57,12 @@ func (q *Queries) GetAllStudentRelationships(ctx context.Context) ([]GetAllStude
 	var items []GetAllStudentRelationshipsRow
 	for rows.Next() {
 		var i GetAllStudentRelationshipsRow
-		if err := rows.Scan(&i.StudentID, &i.Relationship, &i.RelatedStudentName); err != nil {
+		if err := rows.Scan(
+			&i.StudentID,
+			&i.Relationship,
+			&i.RelatedStudentName,
+			&i.RelatedStudentNumber,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -71,7 +77,7 @@ func (q *Queries) GetAllStudentRelationships(ctx context.Context) ([]GetAllStude
 }
 
 const getRelationshipsByStudentID = `-- name: GetRelationshipsByStudentID :many
-SELECT sr.student_id, sr.related_student_id, sr.relationship, rs.name AS related_student_name
+SELECT sr.student_id, sr.related_student_id, sr.relationship, rs.name AS related_student_name, rs.student_number AS related_student_number
 FROM tbl_student_relationships sr
 INNER JOIN tbl_students rs ON sr.related_student_id = rs.id
 WHERE sr.student_id = ?
@@ -79,10 +85,11 @@ ORDER BY rs.name ASC
 `
 
 type GetRelationshipsByStudentIDRow struct {
-	StudentID          int64
-	RelatedStudentID   int64
-	Relationship       sql.NullString
-	RelatedStudentName string
+	StudentID            int64
+	RelatedStudentID     int64
+	Relationship         sql.NullString
+	RelatedStudentName   string
+	RelatedStudentNumber sql.NullString
 }
 
 func (q *Queries) GetRelationshipsByStudentID(ctx context.Context, studentID int64) ([]GetRelationshipsByStudentIDRow, error) {
@@ -99,6 +106,7 @@ func (q *Queries) GetRelationshipsByStudentID(ctx context.Context, studentID int
 			&i.RelatedStudentID,
 			&i.Relationship,
 			&i.RelatedStudentName,
+			&i.RelatedStudentNumber,
 		); err != nil {
 			return nil, err
 		}
@@ -117,8 +125,10 @@ const getStudentRelationshipEdges = `-- name: GetStudentRelationshipEdges :many
 SELECT
 	sr.student_id,
 	s.name AS student_name,
+	s.student_number AS student_number,
 	sr.related_student_id,
 	rs.name AS related_student_name,
+	rs.student_number AS related_student_number,
 	sr.relationship
 FROM tbl_student_relationships sr
 INNER JOIN tbl_students s ON s.id = sr.student_id AND s.status != 'deleted'
@@ -127,11 +137,13 @@ ORDER BY s.name ASC, rs.name ASC
 `
 
 type GetStudentRelationshipEdgesRow struct {
-	StudentID          int64
-	StudentName        string
-	RelatedStudentID   int64
-	RelatedStudentName string
-	Relationship       sql.NullString
+	StudentID            int64
+	StudentName          string
+	StudentNumber        sql.NullString
+	RelatedStudentID     int64
+	RelatedStudentName   string
+	RelatedStudentNumber sql.NullString
+	Relationship         sql.NullString
 }
 
 func (q *Queries) GetStudentRelationshipEdges(ctx context.Context) ([]GetStudentRelationshipEdgesRow, error) {
@@ -146,8 +158,10 @@ func (q *Queries) GetStudentRelationshipEdges(ctx context.Context) ([]GetStudent
 		if err := rows.Scan(
 			&i.StudentID,
 			&i.StudentName,
+			&i.StudentNumber,
 			&i.RelatedStudentID,
 			&i.RelatedStudentName,
+			&i.RelatedStudentNumber,
 			&i.Relationship,
 		); err != nil {
 			return nil, err

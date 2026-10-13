@@ -52,6 +52,8 @@ type LogView struct {
 
 type StudentRegisterRequest struct {
 	Name             string  `json:"name"`
+	StudentNumber    string  `json:"studentNumber"`
+	ParentNumber     string  `json:"parentNumber"`
 	Currency         string  `json:"currency"`
 	Contact          string  `json:"contact"`
 	RatePerClass     float64 `json:"ratePerClass"`
@@ -149,6 +151,7 @@ type ClassRecordView struct {
 	StudentID       int64      `json:"studentId"`
 	TeacherID       int64      `json:"teacherId"`
 	StudentName     string     `json:"studentName"`
+	StudentNumber   string     `json:"studentNumber"`
 	StudentAvatar   AvatarView `json:"studentAvatar"`
 	TeacherName     string     `json:"teacherName"`
 	Date            string     `json:"date"`

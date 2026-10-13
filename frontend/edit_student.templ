@@ -17,6 +17,8 @@ type EditStudentData struct {
 	IsSuperuser    bool
 	IsTestSeed     bool
 	Name           string
+	StudentNumber  string
+	ParentNumber   string
 	Currency       string
 	Contact        string
 	RatePerClass   float64
@@ -81,7 +83,17 @@ templ EditStudent(data EditStudentData) {
 			if data.Readonly {
 				<div class="form-readonly">
 					<div class="form-group">
-						@StudentNameCell(data.Name, data.Avatar)
+						@StudentNameCell(data.Name, data.StudentNumber, data.Avatar)
+					</div>
+					<div class="form-row">
+						<div class="form-group">
+							<label for="studentNumber">Student Number</label>
+							<input type="text" id="studentNumber" value={ data.StudentNumber } disabled/>
+						</div>
+						<div class="form-group">
+							<label for="parentNumber">Parent Number</label>
+							<input type="text" id="parentNumber" value={ data.ParentNumber } disabled/>
+						</div>
 					</div>
 					<div class="form-row">
 						<div class="form-group">
@@ -161,11 +173,21 @@ templ EditStudent(data EditStudentData) {
 					hx-target="#logOutput"
 				>
 					<div class="form-group">
-						@StudentNameCell(data.Name, data.Avatar)
+						@StudentNameCell(data.Name, data.StudentNumber, data.Avatar)
 					</div>
 					<div class="form-group">
 						<label for="name">Student Name *</label>
 						<input type="text" id="name" name="name" required value={ data.Name }/>
+					</div>
+					<div class="form-row">
+						<div class="form-group">
+							<label for="studentNumber">Student Number</label>
+							<input type="text" id="studentNumber" name="studentNumber" maxlength="16" value={ data.StudentNumber } placeholder="Z001"/>
+						</div>
+						<div class="form-group">
+							<label for="parentNumber">Parent Number</label>
+							<input type="text" id="parentNumber" name="parentNumber" maxlength="16" value={ data.ParentNumber } placeholder="Optional"/>
+						</div>
 					</div>
 					<div class="form-row">
 						@CurrencyDropdownWithValue(data.Currency)
@@ -258,11 +280,21 @@ templ EditStudent(data EditStudentData) {
 					hx-target="#logOutput"
 				>
 					<div class="form-group">
-						@StudentNameCell(data.Name, data.Avatar)
+						@StudentNameCell(data.Name, data.StudentNumber, data.Avatar)
 					</div>
 					<div class="form-group">
 						<label for="name">Student Name *</label>
 						<input type="text" id="name" name="name" required value={ data.Name }/>
+					</div>
+					<div class="form-row">
+						<div class="form-group">
+							<label for="studentNumber">Student Number</label>
+							<input type="text" id="studentNumber" name="studentNumber" maxlength="16" value={ data.StudentNumber } placeholder="Z001"/>
+						</div>
+						<div class="form-group">
+							<label for="parentNumber">Parent Number</label>
+							<input type="text" id="parentNumber" name="parentNumber" maxlength="16" value={ data.ParentNumber } placeholder="Optional"/>
+						</div>
 					</div>
 					<div class="form-group">
 						@CurrencyDropdownWithValue(data.Currency)

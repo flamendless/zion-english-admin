@@ -3,14 +3,14 @@ INSERT INTO tbl_student_relationships (student_id, related_student_id, relations
 VALUES (?, ?, ?);
 
 -- name: GetRelationshipsByStudentID :many
-SELECT sr.student_id, sr.related_student_id, sr.relationship, rs.name AS related_student_name
+SELECT sr.student_id, sr.related_student_id, sr.relationship, rs.name AS related_student_name, rs.student_number AS related_student_number
 FROM tbl_student_relationships sr
 INNER JOIN tbl_students rs ON sr.related_student_id = rs.id
 WHERE sr.student_id = ?
 ORDER BY rs.name ASC;
 
 -- name: GetAllStudentRelationships :many
-SELECT sr.student_id, sr.relationship, rs.name AS related_student_name
+SELECT sr.student_id, sr.relationship, rs.name AS related_student_name, rs.student_number AS related_student_number
 FROM tbl_student_relationships sr
 INNER JOIN tbl_students rs ON sr.related_student_id = rs.id
 ORDER BY rs.name ASC;
@@ -26,8 +26,10 @@ WHERE student_id = ? AND related_student_id = ?;
 SELECT
 	sr.student_id,
 	s.name AS student_name,
+	s.student_number AS student_number,
 	sr.related_student_id,
 	rs.name AS related_student_name,
+	rs.student_number AS related_student_number,
 	sr.relationship
 FROM tbl_student_relationships sr
 INNER JOIN tbl_students s ON s.id = sr.student_id AND s.status != 'deleted'

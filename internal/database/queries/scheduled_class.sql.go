@@ -146,6 +146,7 @@ func (q *Queries) CountScheduledDuplicate(ctx context.Context, arg CountSchedule
 const getScheduledClassByID = `-- name: GetScheduledClassByID :one
 SELECT sc.id, sc.student_id, sc.teacher_id, sc.scheduled_date, sc.start_time, sc.duration_minutes, sc.rate, sc.currency, sc.is_trial_class, sc.series_id, sc.status, sc.reason, sc.created_by_role, sc.created_at, sc.updated_at,
 	s.name as student_name,
+	s.student_number as student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_scheduled_classes sc
 JOIN tbl_students s ON sc.student_id = s.id
@@ -170,6 +171,7 @@ type GetScheduledClassByIDRow struct {
 	CreatedAt       string
 	UpdatedAt       string
 	StudentName     string
+	StudentNumber   sql.NullString
 	TeacherName     string
 }
 
@@ -193,6 +195,7 @@ func (q *Queries) GetScheduledClassByID(ctx context.Context, id int64) (GetSched
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.StudentName,
+		&i.StudentNumber,
 		&i.TeacherName,
 	)
 	return i, err
@@ -206,6 +209,7 @@ SELECT
 	sc.duration_minutes,
 	sc.status,
 	s.name as student_name,
+	s.student_number as student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_scheduled_classes sc
 JOIN tbl_students s ON sc.student_id = s.id
@@ -230,6 +234,7 @@ type GetScheduledClassesByStudentOnDateRow struct {
 	DurationMinutes int64
 	Status          string
 	StudentName     string
+	StudentNumber   sql.NullString
 	TeacherName     string
 }
 
@@ -254,6 +259,7 @@ func (q *Queries) GetScheduledClassesByStudentOnDate(ctx context.Context, arg Ge
 			&i.DurationMinutes,
 			&i.Status,
 			&i.StudentName,
+			&i.StudentNumber,
 			&i.TeacherName,
 		); err != nil {
 			return nil, err
@@ -277,6 +283,7 @@ SELECT
 	sc.duration_minutes,
 	sc.status,
 	s.name as student_name,
+	s.student_number as student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_scheduled_classes sc
 JOIN tbl_students s ON sc.student_id = s.id
@@ -301,6 +308,7 @@ type GetScheduledClassesByTeacherOnDateRow struct {
 	DurationMinutes int64
 	Status          string
 	StudentName     string
+	StudentNumber   sql.NullString
 	TeacherName     string
 }
 
@@ -325,6 +333,7 @@ func (q *Queries) GetScheduledClassesByTeacherOnDate(ctx context.Context, arg Ge
 			&i.DurationMinutes,
 			&i.Status,
 			&i.StudentName,
+			&i.StudentNumber,
 			&i.TeacherName,
 		); err != nil {
 			return nil, err
@@ -343,6 +352,7 @@ func (q *Queries) GetScheduledClassesByTeacherOnDate(ctx context.Context, arg Ge
 const getScheduledClassesFiltered = `-- name: GetScheduledClassesFiltered :many
 SELECT sc.id, sc.student_id, sc.teacher_id, sc.scheduled_date, sc.start_time, sc.duration_minutes, sc.rate, sc.currency, sc.status, sc.reason, sc.created_by_role, sc.created_at, sc.updated_at, sc.series_id,
 	s.name as student_name,
+	s.student_number as student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name,
 	t.first_name as teacher_first_name, t.middle_name as teacher_middle_name, t.last_name as teacher_last_name,
 	t.assigned_color as teacher_assigned_color, t.profile_picture as teacher_profile_picture
@@ -386,6 +396,7 @@ type GetScheduledClassesFilteredRow struct {
 	UpdatedAt             string
 	SeriesID              sql.NullInt64
 	StudentName           string
+	StudentNumber         sql.NullString
 	TeacherName           string
 	TeacherFirstName      string
 	TeacherMiddleName     string
@@ -430,6 +441,7 @@ func (q *Queries) GetScheduledClassesFiltered(ctx context.Context, arg GetSchedu
 			&i.UpdatedAt,
 			&i.SeriesID,
 			&i.StudentName,
+			&i.StudentNumber,
 			&i.TeacherName,
 			&i.TeacherFirstName,
 			&i.TeacherMiddleName,
@@ -533,6 +545,7 @@ SELECT
 	sc.duration_minutes,
 	sc.status,
 	s.name as student_name,
+	s.student_number as student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_scheduled_classes sc
 JOIN tbl_students s ON sc.student_id = s.id
@@ -561,6 +574,7 @@ type GetScheduledDuplicateRow struct {
 	DurationMinutes int64
 	Status          string
 	StudentName     string
+	StudentNumber   sql.NullString
 	TeacherName     string
 }
 
@@ -581,6 +595,7 @@ func (q *Queries) GetScheduledDuplicate(ctx context.Context, arg GetScheduledDup
 		&i.DurationMinutes,
 		&i.Status,
 		&i.StudentName,
+		&i.StudentNumber,
 		&i.TeacherName,
 	)
 	return i, err
@@ -650,6 +665,7 @@ SELECT
 	sc.rate,
 	sc.currency,
 	s.name AS student_name,
+	s.student_number AS student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
 	t.first_name AS teacher_first_name,
 	t.middle_name AS teacher_middle_name,
@@ -723,6 +739,7 @@ type ListActiveScheduledClassSeriesRow struct {
 	Rate                  float64
 	Currency              string
 	StudentName           string
+	StudentNumber         sql.NullString
 	TeacherName           string
 	TeacherFirstName      string
 	TeacherMiddleName     string
@@ -754,6 +771,7 @@ func (q *Queries) ListActiveScheduledClassSeries(ctx context.Context, arg ListAc
 			&i.Rate,
 			&i.Currency,
 			&i.StudentName,
+			&i.StudentNumber,
 			&i.TeacherName,
 			&i.TeacherFirstName,
 			&i.TeacherMiddleName,

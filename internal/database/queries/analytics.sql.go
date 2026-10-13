@@ -14,6 +14,7 @@ const getAnalyticsCancellationByStudent = `-- name: GetAnalyticsCancellationBySt
 SELECT
 	s.id AS student_id,
 	s.name AS student_name,
+	s.student_number AS student_number,
 	COALESCE(SUM(CASE WHEN cr.status = 'conducted' THEN 1 ELSE 0 END), 0) AS conducted,
 	COALESCE(SUM(CASE WHEN cr.status = 'cancelled' THEN 1 ELSE 0 END), 0) AS cancelled,
 	COALESCE(SUM(CASE WHEN cr.status = 'rescheduled' THEN 1 ELSE 0 END), 0) AS rescheduled
@@ -46,11 +47,12 @@ type GetAnalyticsCancellationByStudentParams struct {
 }
 
 type GetAnalyticsCancellationByStudentRow struct {
-	StudentID   int64
-	StudentName string
-	Conducted   any
-	Cancelled   any
-	Rescheduled any
+	StudentID     int64
+	StudentName   string
+	StudentNumber sql.NullString
+	Conducted     any
+	Cancelled     any
+	Rescheduled   any
 }
 
 func (q *Queries) GetAnalyticsCancellationByStudent(ctx context.Context, arg GetAnalyticsCancellationByStudentParams) ([]GetAnalyticsCancellationByStudentRow, error) {
@@ -72,6 +74,7 @@ func (q *Queries) GetAnalyticsCancellationByStudent(ctx context.Context, arg Get
 		if err := rows.Scan(
 			&i.StudentID,
 			&i.StudentName,
+			&i.StudentNumber,
 			&i.Conducted,
 			&i.Cancelled,
 			&i.Rescheduled,
@@ -227,6 +230,7 @@ const getAnalyticsChurnedStudents = `-- name: GetAnalyticsChurnedStudents :many
 SELECT
 	s.id AS student_id,
 	s.name AS student_name,
+	s.student_number AS student_number,
 	COALESCE(s.inactive_reason, '') AS inactive_reason,
 	CAST(julianday(s.updated_at) - julianday(s.created_at) AS INTEGER) AS tenure_days,
 	s.updated_at AS churned_at
@@ -251,6 +255,7 @@ type GetAnalyticsChurnedStudentsParams struct {
 type GetAnalyticsChurnedStudentsRow struct {
 	StudentID      int64
 	StudentName    string
+	StudentNumber  sql.NullString
 	InactiveReason string
 	TenureDays     int64
 	ChurnedAt      sql.NullTime
@@ -273,6 +278,7 @@ func (q *Queries) GetAnalyticsChurnedStudents(ctx context.Context, arg GetAnalyt
 		if err := rows.Scan(
 			&i.StudentID,
 			&i.StudentName,
+			&i.StudentNumber,
 			&i.InactiveReason,
 			&i.TenureDays,
 			&i.ChurnedAt,
@@ -345,6 +351,7 @@ SELECT
 	sc.start_time,
 	sc.duration_minutes,
 	s.name AS student_name,
+	s.student_number AS student_number,
 	sc.teacher_id,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
 	t.first_name AS teacher_first_name,
@@ -383,6 +390,7 @@ type GetAnalyticsNoShowsRow struct {
 	StartTime             sql.NullString
 	DurationMinutes       int64
 	StudentName           string
+	StudentNumber         sql.NullString
 	TeacherID             int64
 	TeacherName           string
 	TeacherFirstName      string
@@ -413,6 +421,7 @@ func (q *Queries) GetAnalyticsNoShows(ctx context.Context, arg GetAnalyticsNoSho
 			&i.StartTime,
 			&i.DurationMinutes,
 			&i.StudentName,
+			&i.StudentNumber,
 			&i.TeacherID,
 			&i.TeacherName,
 			&i.TeacherFirstName,

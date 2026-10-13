@@ -154,7 +154,7 @@ func handleScheduleCreate(w http.ResponseWriter, r *http.Request) {
 		student, studentErr := dbRO.GetQueries().GetStudentByID(ctx, req.StudentID)
 		studentName := "student"
 		if studentErr == nil {
-			studentName = student.Name
+			studentName = studentDisplayName(student.Name, student.StudentNumber)
 		}
 		if err := meetingSvc.SyncRoomForSchedule(ctx, meetings.ScheduledClassMeetingInput{
 			ScheduleID:      scheduleID,
@@ -590,7 +590,7 @@ func handleRescheduleScheduledClass(w http.ResponseWriter, r *http.Request, sche
 		student, studentErr := dbRO.GetQueries().GetStudentByID(ctx, existing.StudentID)
 		studentName := "student"
 		if studentErr == nil {
-			studentName = student.Name
+			studentName = studentDisplayName(student.Name, student.StudentNumber)
 		}
 		if err := meetingSvc.SyncRoomForSchedule(ctx, meetings.ScheduledClassMeetingInput{
 			ScheduleID:      scheduleID,
@@ -1108,6 +1108,7 @@ func scheduledClassViewData(ctx context.Context, scheduleID int64) (frontend.Edi
 		StudentID:                 strconv.FormatInt(existing.StudentID, 10),
 		TeacherID:                 strconv.FormatInt(existing.TeacherID, 10),
 		StudentName:               existing.StudentName,
+		StudentNumber:             studentNumberString(existing.StudentNumber),
 		TeacherName:               existing.TeacherName,
 		TeacherAvatar: avatarWithTeacherRoles(
 			buildTeacherListAvatarProps(
@@ -1409,7 +1410,7 @@ func scheduledClassViewFromRow(sc queries.GetScheduledClassesFilteredRow) models
 		ID:              sc.ID,
 		StudentID:       sc.StudentID,
 		TeacherID:       sc.TeacherID,
-		StudentName:     sc.StudentName,
+		StudentName:     studentDisplayName(sc.StudentName, sc.StudentNumber),
 		TeacherName:     sc.TeacherName,
 		TeacherAvatar:   scheduledClassTeacherAvatar(sc),
 		ScheduledDate:   sc.ScheduledDate,
@@ -1439,7 +1440,7 @@ func syncCalendarForSchedule(ctx context.Context, scheduleID, teacherID, student
 	student, studentErr := dbRO.GetQueries().GetStudentByID(ctx, studentID)
 	studentName := "student"
 	if studentErr == nil {
-		studentName = student.Name
+		studentName = studentDisplayName(student.Name, student.StudentNumber)
 	}
 	if err := calendarSvc.SyncEventForSchedule(ctx, calendar.ScheduledClassCalendarInput{
 		ScheduleID:      scheduleID,

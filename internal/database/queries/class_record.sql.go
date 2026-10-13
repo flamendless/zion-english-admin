@@ -316,6 +316,7 @@ func (q *Queries) CountOverdueScheduledClassesByDateRange(ctx context.Context, a
 const getClassRecordByID = `-- name: GetClassRecordByID :one
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.is_trial_class, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
 	s.name as student_name,
+	s.student_number as student_number,
 	s.assigned_color as student_assigned_color,
 	s.is_test_seed as student_is_test_seed,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name,
@@ -348,6 +349,7 @@ type GetClassRecordByIDRow struct {
 	UpdatedAt             string
 	RecordedByRole        string
 	StudentName           string
+	StudentNumber         sql.NullString
 	StudentAssignedColor  string
 	StudentIsTestSeed     int64
 	TeacherName           string
@@ -379,6 +381,7 @@ func (q *Queries) GetClassRecordByID(ctx context.Context, id int64) (GetClassRec
 		&i.UpdatedAt,
 		&i.RecordedByRole,
 		&i.StudentName,
+		&i.StudentNumber,
 		&i.StudentAssignedColor,
 		&i.StudentIsTestSeed,
 		&i.TeacherName,
@@ -400,6 +403,7 @@ SELECT
 	cr.duration_minutes,
 	cr.status,
 	s.name as student_name,
+	s.student_number as student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
@@ -428,6 +432,7 @@ type GetClassRecordDuplicateRow struct {
 	DurationMinutes int64
 	Status          string
 	StudentName     string
+	StudentNumber   sql.NullString
 	TeacherName     string
 }
 
@@ -449,6 +454,7 @@ func (q *Queries) GetClassRecordDuplicate(ctx context.Context, arg GetClassRecor
 		&i.DurationMinutes,
 		&i.Status,
 		&i.StudentName,
+		&i.StudentNumber,
 		&i.TeacherName,
 	)
 	return i, err
@@ -457,6 +463,7 @@ func (q *Queries) GetClassRecordDuplicate(ctx context.Context, arg GetClassRecor
 const getClassRecordsByTeacherAndDateRange = `-- name: GetClassRecordsByTeacherAndDateRange :many
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
 	s.name as student_name,
+	s.student_number as student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
@@ -487,6 +494,7 @@ type GetClassRecordsByTeacherAndDateRangeRow struct {
 	UpdatedAt       string
 	RecordedByRole  string
 	StudentName     string
+	StudentNumber   sql.NullString
 	TeacherName     string
 }
 
@@ -514,6 +522,7 @@ func (q *Queries) GetClassRecordsByTeacherAndDateRange(ctx context.Context, arg 
 			&i.UpdatedAt,
 			&i.RecordedByRole,
 			&i.StudentName,
+			&i.StudentNumber,
 			&i.TeacherName,
 		); err != nil {
 			return nil, err
@@ -532,6 +541,7 @@ func (q *Queries) GetClassRecordsByTeacherAndDateRange(ctx context.Context, arg 
 const getClassRecordsFiltered = `-- name: GetClassRecordsFiltered :many
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
 	s.name as student_name,
+	s.student_number as student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
@@ -575,6 +585,7 @@ type GetClassRecordsFilteredRow struct {
 	UpdatedAt       string
 	RecordedByRole  string
 	StudentName     string
+	StudentNumber   sql.NullString
 	TeacherName     string
 }
 
@@ -615,6 +626,7 @@ func (q *Queries) GetClassRecordsFiltered(ctx context.Context, arg GetClassRecor
 			&i.UpdatedAt,
 			&i.RecordedByRole,
 			&i.StudentName,
+			&i.StudentNumber,
 			&i.TeacherName,
 		); err != nil {
 			return nil, err
@@ -631,7 +643,7 @@ func (q *Queries) GetClassRecordsFiltered(ctx context.Context, arg GetClassRecor
 }
 
 const getClassesListFiltered = `-- name: GetClassesListFiltered :many
-SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_minutes, rate, currency, status, reason, notes, created_at, student_name, student_assigned_color, student_is_test_seed, teacher_name, teacher_first_name, teacher_middle_name, teacher_last_name, teacher_assigned_color, teacher_profile_picture FROM (
+SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_minutes, rate, currency, status, reason, notes, created_at, student_name, student_number, student_assigned_color, student_is_test_seed, teacher_name, teacher_first_name, teacher_middle_name, teacher_last_name, teacher_assigned_color, teacher_profile_picture FROM (
 	SELECT
 		cr.id,
 	'record' AS source,
@@ -648,6 +660,7 @@ SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_
 	cr.notes,
 	cr.created_at,
 	s.name AS student_name,
+	s.student_number AS student_number,
 	s.assigned_color AS student_assigned_color,
 	s.is_test_seed AS student_is_test_seed,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
@@ -688,6 +701,7 @@ SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_
 	NULL AS notes,
 	sc.created_at,
 	s.name AS student_name,
+	s.student_number AS student_number,
 	s.assigned_color AS student_assigned_color,
 	s.is_test_seed AS student_is_test_seed,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
@@ -780,6 +794,7 @@ type GetClassesListFilteredRow struct {
 	Notes                 sql.NullString
 	CreatedAt             string
 	StudentName           string
+	StudentNumber         sql.NullString
 	StudentAssignedColor  string
 	StudentIsTestSeed     int64
 	TeacherName           string
@@ -852,6 +867,7 @@ func (q *Queries) GetClassesListFiltered(ctx context.Context, arg GetClassesList
 			&i.Notes,
 			&i.CreatedAt,
 			&i.StudentName,
+			&i.StudentNumber,
 			&i.StudentAssignedColor,
 			&i.StudentIsTestSeed,
 			&i.TeacherName,
@@ -964,7 +980,8 @@ SELECT
 	sc.scheduled_date,
 	sc.start_time,
 	sc.duration_minutes,
-	s.name AS student_name
+	s.name AS student_name,
+	s.student_number AS student_number
 FROM tbl_scheduled_classes sc
 INNER JOIN tbl_students s ON s.id = sc.student_id
 WHERE sc.deleted_at IS NULL
@@ -1001,6 +1018,7 @@ type ListOverdueScheduledClassesByDateRangeRow struct {
 	StartTime       sql.NullString
 	DurationMinutes int64
 	StudentName     string
+	StudentNumber   sql.NullString
 }
 
 func (q *Queries) ListOverdueScheduledClassesByDateRange(ctx context.Context, arg ListOverdueScheduledClassesByDateRangeParams) ([]ListOverdueScheduledClassesByDateRangeRow, error) {
@@ -1025,6 +1043,7 @@ func (q *Queries) ListOverdueScheduledClassesByDateRange(ctx context.Context, ar
 			&i.StartTime,
 			&i.DurationMinutes,
 			&i.StudentName,
+			&i.StudentNumber,
 		); err != nil {
 			return nil, err
 		}

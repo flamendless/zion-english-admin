@@ -50,7 +50,7 @@ func appendSelectedStudentIfMissing(ctx context.Context, responses []models.Stud
 	}
 	return append(responses, models.StudentAPIResponse{
 		ID:           row.ID,
-		Name:         row.Name,
+		Name:         studentDisplayName(row.Name, row.StudentNumber),
 		Currency:     row.Currency,
 		RatePerClass: row.RatePerClass,
 	})

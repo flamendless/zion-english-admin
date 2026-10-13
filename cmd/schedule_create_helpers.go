@@ -228,7 +228,7 @@ func runScheduledClassSideEffects(ctx context.Context, user auth.User, scheduleI
 		student, studentErr := dbRO.GetQueries().GetStudentByID(ctx, params.StudentID)
 		studentName := "student"
 		if studentErr == nil {
-			studentName = student.Name
+			studentName = studentDisplayName(student.Name, student.StudentNumber)
 		}
 		if err := meetingSvc.SyncRoomForSchedule(ctx, meetings.ScheduledClassMeetingInput{
 			ScheduleID:      scheduleID,
@@ -317,7 +317,7 @@ func applyScheduledClassEdit(ctx context.Context, user auth.User, target queries
 		student, studentErr := dbRO.GetQueries().GetStudentByID(ctx, input.StudentID)
 		studentName := "student"
 		if studentErr == nil {
-			studentName = student.Name
+			studentName = studentDisplayName(student.Name, student.StudentNumber)
 		}
 		if err := meetingSvc.SyncRoomForSchedule(ctx, meetings.ScheduledClassMeetingInput{
 			ScheduleID:      target.ID,

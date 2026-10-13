@@ -6,6 +6,7 @@ RETURNING id;
 -- name: GetClassRecordsByTeacherAndDateRange :many
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
 	s.name as student_name,
+	s.student_number as student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
@@ -24,6 +25,7 @@ WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
 -- name: GetClassRecordByID :one
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.is_trial_class, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
 	s.name as student_name,
+	s.student_number as student_number,
 	s.assigned_color as student_assigned_color,
 	s.is_test_seed as student_is_test_seed,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name,
@@ -64,6 +66,7 @@ SELECT
 	cr.duration_minutes,
 	cr.status,
 	s.name as student_name,
+	s.student_number as student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
@@ -93,6 +96,7 @@ WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
 -- name: GetClassRecordsFiltered :many
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
 	s.name as student_name,
+	s.student_number as student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
@@ -165,6 +169,7 @@ SELECT * FROM (
 	cr.notes,
 	cr.created_at,
 	s.name AS student_name,
+	s.student_number AS student_number,
 	s.assigned_color AS student_assigned_color,
 	s.is_test_seed AS student_is_test_seed,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
@@ -205,6 +210,7 @@ SELECT * FROM (
 	NULL AS notes,
 	sc.created_at,
 	s.name AS student_name,
+	s.student_number AS student_number,
 	s.assigned_color AS student_assigned_color,
 	s.is_test_seed AS student_is_test_seed,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
@@ -267,7 +273,8 @@ SELECT
 	sc.scheduled_date,
 	sc.start_time,
 	sc.duration_minutes,
-	s.name AS student_name
+	s.name AS student_name,
+	s.student_number AS student_number
 FROM tbl_scheduled_classes sc
 INNER JOIN tbl_students s ON s.id = sc.student_id
 WHERE sc.deleted_at IS NULL

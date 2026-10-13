@@ -508,7 +508,7 @@ func handleReportView(w http.ResponseWriter, r *http.Request, teacherID int64) {
 	for _, record := range records {
 		classes = append(classes, frontend.ReportClassItem{
 			Date:        record.Date,
-			StudentName: record.StudentName,
+			StudentName: studentDisplayName(record.StudentName, record.StudentNumber),
 			Rate:        utils.FormatCurrency(record.Rate, record.Currency),
 			TimeRange:   formatReportTimeRange(record.StartTime, record.EndTime),
 			Status:      constants.ClassStatus(record.Status),
@@ -786,7 +786,7 @@ func classRecordsToProcessor(records []queries.GetTeacherReportClassRecordsRow) 
 	out := make([]processor.ClassRecord, 0, len(records))
 	for _, record := range records {
 		item := processor.ClassRecord{
-			Name:              record.StudentName,
+			Name:              studentDisplayName(record.StudentName, record.StudentNumber),
 			DurationInMinutes: int(record.DurationMinutes),
 			Rate:              record.Rate,
 			Status:            record.Status,
@@ -825,7 +825,7 @@ func buildSummaryTeacherSheets(summaries []queries.GetReportTeacherSummariesRow,
 			teacherStudentOrder[row.TeacherID] = []int64{}
 		}
 		if _, ok := teacherStudents[row.TeacherID][row.StudentID]; !ok {
-			teacherStudents[row.TeacherID][row.StudentID] = &summaryStudentData{name: row.StudentName}
+			teacherStudents[row.TeacherID][row.StudentID] = &summaryStudentData{name: studentDisplayName(row.StudentName, row.StudentNumber)}
 			teacherStudentOrder[row.TeacherID] = append(teacherStudentOrder[row.TeacherID], row.StudentID)
 		}
 		student := teacherStudents[row.TeacherID][row.StudentID]

@@ -11,6 +11,7 @@ RETURNING id;
 -- name: GetScheduledClassByID :one
 SELECT sc.id, sc.student_id, sc.teacher_id, sc.scheduled_date, sc.start_time, sc.duration_minutes, sc.rate, sc.currency, sc.is_trial_class, sc.series_id, sc.status, sc.reason, sc.created_by_role, sc.created_at, sc.updated_at,
 	s.name as student_name,
+	s.student_number as student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_scheduled_classes sc
 JOIN tbl_students s ON sc.student_id = s.id
@@ -44,6 +45,7 @@ SELECT
 	sc.rate,
 	sc.currency,
 	s.name AS student_name,
+	s.student_number AS student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
 	t.first_name AS teacher_first_name,
 	t.middle_name AS teacher_middle_name,
@@ -165,6 +167,7 @@ WHERE (? = 0 OR sc.teacher_id = ?) AND sc.scheduled_date >= ? AND sc.scheduled_d
 -- name: GetScheduledClassesFiltered :many
 SELECT sc.id, sc.student_id, sc.teacher_id, sc.scheduled_date, sc.start_time, sc.duration_minutes, sc.rate, sc.currency, sc.status, sc.reason, sc.created_by_role, sc.created_at, sc.updated_at, sc.series_id,
 	s.name as student_name,
+	s.student_number as student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name,
 	t.first_name as teacher_first_name, t.middle_name as teacher_middle_name, t.last_name as teacher_last_name,
 	t.assigned_color as teacher_assigned_color, t.profile_picture as teacher_profile_picture
@@ -195,6 +198,7 @@ SELECT
 	sc.duration_minutes,
 	sc.status,
 	s.name as student_name,
+	s.student_number as student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_scheduled_classes sc
 JOIN tbl_students s ON sc.student_id = s.id
@@ -221,6 +225,7 @@ SELECT
 	sc.duration_minutes,
 	sc.status,
 	s.name as student_name,
+	s.student_number as student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_scheduled_classes sc
 JOIN tbl_students s ON sc.student_id = s.id
@@ -238,6 +243,7 @@ SELECT
 	sc.duration_minutes,
 	sc.status,
 	s.name as student_name,
+	s.student_number as student_number,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name
 FROM tbl_scheduled_classes sc
 JOIN tbl_students s ON sc.student_id = s.id

@@ -99,7 +99,7 @@ func ClassRecordRow(record ClassRecordRowData, showTeacher bool) templ.Component
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = StudentNameCell(record.StudentName, record.StudentAvatar).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = StudentNameCell(record.StudentName, record.StudentNumber, record.StudentAvatar).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
