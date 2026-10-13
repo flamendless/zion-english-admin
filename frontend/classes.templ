@@ -37,8 +37,19 @@ templ Classes(data ClassesData) {
 		@AvatarStyles()
 		<style>
 			.time-range-cell {
-				white-space: nowrap;
 				font-variant-numeric: tabular-nums;
+				vertical-align: top;
+			}
+
+			.time-range-stack {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
+				line-height: 1.25;
+			}
+
+			.time-range-stack__line {
+				white-space: nowrap;
 			}
 
 			#classesTable td[data-label="Teacher"],
@@ -96,6 +107,18 @@ templ Classes(data ClassesData) {
 			#classesTable .class-status-icon--empty {
 				font-size: 0.875rem;
 				line-height: 1;
+			}
+
+			#classesTable .sr-only {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				padding: 0;
+				margin: -1px;
+				overflow: hidden;
+				clip: rect(0, 0, 0, 0);
+				white-space: nowrap;
+				border: 0;
 			}
 		</style>
 		@ClassViewModalScripts()
@@ -161,7 +184,7 @@ templ Classes(data ClassesData) {
 			<table id="classesTable" class="table-stack-mobile">
 				<thead>
 					<tr>
-						<th class="class-record-status-col">Status</th>
+						<th class="class-record-status-col" scope="col"><span class="sr-only">Status</span></th>
 						<th>Date</th>
 						<th>Time</th>
 						if data.ShowAllTeachers {

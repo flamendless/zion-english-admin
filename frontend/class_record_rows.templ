@@ -25,7 +25,12 @@ templ ClassRecordRow(record ClassRecordRowData, showTeacher bool) {
 			@ClassRecordStatusIcon(record)
 		</td>
 		<td data-label="Date">{ record.Date }</td>
-		<td class="time-range-cell" data-label="Time">{ record.TimeRangeDisplay() }</td>
+		<td class="time-range-cell" data-label="Time" title={ record.TimeRangeDisplay() }>
+			<span class="time-range-stack">
+				<span class="time-range-stack__line">{ record.TimeRangeStartLine() }</span>
+				<span class="time-range-stack__line">{ record.TimeRangeEndLine() }</span>
+			</span>
+		</td>
 		if showTeacher {
 			<td data-label="Teacher">
 				@TeacherNameCell(record.TeacherName, record.TeacherAvatar)

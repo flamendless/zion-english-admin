@@ -126,6 +126,33 @@ func (r ClassRecordRowData) TimeRangeDisplay() string {
 	return FormatScheduledClassTimeRange(r.StartTime, r.EndTime, r.DurationMinutes)
 }
 
+func (r ClassRecordRowData) timeRangeEnd() string {
+	end := normalizeDisplayTime(r.EndTime)
+	if end == "" {
+		start := normalizeDisplayTime(r.StartTime)
+		if start != "" && r.DurationMinutes > 0 {
+			end = utils.EndTimeFromStartAndDuration(start, r.DurationMinutes)
+		}
+	}
+	return end
+}
+
+func (r ClassRecordRowData) TimeRangeStartLine() string {
+	start := normalizeDisplayTime(r.StartTime)
+	if start == "" {
+		return "-"
+	}
+	return start + " -"
+}
+
+func (r ClassRecordRowData) TimeRangeEndLine() string {
+	end := r.timeRangeEnd()
+	if end == "" {
+		return "-"
+	}
+	return end
+}
+
 func (r ClassRecordRowData) StatusIconLabel() string {
 	if r.Overdue || r.Status == constants.ClassListFilterOverdue {
 		return constants.ClassListFilterOverdue.Label()

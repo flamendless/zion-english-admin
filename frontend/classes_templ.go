@@ -76,7 +76,7 @@ func Classes(data ClassesData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t.time-range-cell {\n\t\t\t\twhite-space: nowrap;\n\t\t\t\tfont-variant-numeric: tabular-nums;\n\t\t\t}\n\n\t\t\t#classesTable td[data-label=\"Teacher\"],\n\t\t\t#classesTable td[data-label=\"Student\"] {\n\t\t\t\tmax-width: 220px;\n\t\t\t}\n\n\t\t\t#classesTable th.class-record-status-col,\n\t\t\t#classesTable td.class-record-status-cell {\n\t\t\t\twidth: 2.75rem;\n\t\t\t\tmax-width: 2.75rem;\n\t\t\t\tpadding-left: 12px;\n\t\t\t\tpadding-right: 8px;\n\t\t\t\ttext-align: center;\n\t\t\t\tvertical-align: middle;\n\t\t\t}\n\n\t\t\t#classesTable .class-status-icon {\n\t\t\t\tdisplay: inline-flex;\n\t\t\t\talign-items: center;\n\t\t\t\tjustify-content: center;\n\t\t\t\tline-height: 0;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t}\n\n\t\t\t#classesTable .class-status-icon svg {\n\t\t\t\twidth: 1.125rem;\n\t\t\t\theight: 1.125rem;\n\t\t\t}\n\n\t\t\t#classesTable .class-status-icon--conduct {\n\t\t\t\tcolor: var(--color-success);\n\t\t\t}\n\n\t\t\t#classesTable .class-status-icon--scheduled {\n\t\t\t\tcolor: var(--color-info);\n\t\t\t}\n\n\t\t\t#classesTable .class-status-icon--overdue {\n\t\t\t\tcolor: var(--color-destructive);\n\t\t\t}\n\n\t\t\t#classesTable .class-status-icon--cancel {\n\t\t\t\tcolor: var(--color-destructive);\n\t\t\t}\n\n\t\t\t#classesTable .class-status-icon--rescheduled {\n\t\t\t\tcolor: var(--color-warning);\n\t\t\t}\n\n\t\t\t#classesTable .class-status-icon--delete {\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t}\n\n\t\t\t#classesTable .class-status-icon--empty {\n\t\t\t\tfont-size: 0.875rem;\n\t\t\t\tline-height: 1;\n\t\t\t}\n\t\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t.time-range-cell {\n\t\t\t\tfont-variant-numeric: tabular-nums;\n\t\t\t\tvertical-align: top;\n\t\t\t}\n\n\t\t\t.time-range-stack {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\tgap: 2px;\n\t\t\t\tline-height: 1.25;\n\t\t\t}\n\n\t\t\t.time-range-stack__line {\n\t\t\t\twhite-space: nowrap;\n\t\t\t}\n\n\t\t\t#classesTable td[data-label=\"Teacher\"],\n\t\t\t#classesTable td[data-label=\"Student\"] {\n\t\t\t\tmax-width: 220px;\n\t\t\t}\n\n\t\t\t#classesTable th.class-record-status-col,\n\t\t\t#classesTable td.class-record-status-cell {\n\t\t\t\twidth: 2.75rem;\n\t\t\t\tmax-width: 2.75rem;\n\t\t\t\tpadding-left: 12px;\n\t\t\t\tpadding-right: 8px;\n\t\t\t\ttext-align: center;\n\t\t\t\tvertical-align: middle;\n\t\t\t}\n\n\t\t\t#classesTable .class-status-icon {\n\t\t\t\tdisplay: inline-flex;\n\t\t\t\talign-items: center;\n\t\t\t\tjustify-content: center;\n\t\t\t\tline-height: 0;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t}\n\n\t\t\t#classesTable .class-status-icon svg {\n\t\t\t\twidth: 1.125rem;\n\t\t\t\theight: 1.125rem;\n\t\t\t}\n\n\t\t\t#classesTable .class-status-icon--conduct {\n\t\t\t\tcolor: var(--color-success);\n\t\t\t}\n\n\t\t\t#classesTable .class-status-icon--scheduled {\n\t\t\t\tcolor: var(--color-info);\n\t\t\t}\n\n\t\t\t#classesTable .class-status-icon--overdue {\n\t\t\t\tcolor: var(--color-destructive);\n\t\t\t}\n\n\t\t\t#classesTable .class-status-icon--cancel {\n\t\t\t\tcolor: var(--color-destructive);\n\t\t\t}\n\n\t\t\t#classesTable .class-status-icon--rescheduled {\n\t\t\t\tcolor: var(--color-warning);\n\t\t\t}\n\n\t\t\t#classesTable .class-status-icon--delete {\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t}\n\n\t\t\t#classesTable .class-status-icon--empty {\n\t\t\t\tfont-size: 0.875rem;\n\t\t\t\tline-height: 1;\n\t\t\t}\n\n\t\t\t#classesTable .sr-only {\n\t\t\t\tposition: absolute;\n\t\t\t\twidth: 1px;\n\t\t\t\theight: 1px;\n\t\t\t\tpadding: 0;\n\t\t\t\tmargin: -1px;\n\t\t\t\toverflow: hidden;\n\t\t\t\tclip: rect(0, 0, 0, 0);\n\t\t\t\twhite-space: nowrap;\n\t\t\t\tborder: 0;\n\t\t\t}\n\t\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -95,7 +95,7 @@ func Classes(data ClassesData) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%t", data.ShowAllTeachers))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 105, Col: 89}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 128, Col: 89}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
 		if templ_7745c5c3_Err != nil {
@@ -145,7 +145,7 @@ func Classes(data ClassesData) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 119, Col: 78}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 142, Col: 78}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 			if templ_7745c5c3_Err != nil {
@@ -158,7 +158,7 @@ func Classes(data ClassesData) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 122, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 145, Col: 49}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 			if templ_7745c5c3_Err != nil {
@@ -194,7 +194,7 @@ func Classes(data ClassesData) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.StartDate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 134, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 157, Col: 80}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 			if templ_7745c5c3_Err != nil {
@@ -207,7 +207,7 @@ func Classes(data ClassesData) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.EndDate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 135, Col: 74}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 158, Col: 74}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
 			if templ_7745c5c3_Err != nil {
@@ -234,7 +234,7 @@ func Classes(data ClassesData) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 142, Col: 32}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 165, Col: 32}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
 			if templ_7745c5c3_Err != nil {
@@ -257,7 +257,7 @@ func Classes(data ClassesData) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 142, Col: 93}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 165, Col: 93}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -291,7 +291,7 @@ func Classes(data ClassesData) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/classes/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 152, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 175, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 		if templ_7745c5c3_Err != nil {
@@ -304,7 +304,7 @@ func Classes(data ClassesData) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 155, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 178, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 		if templ_7745c5c3_Err != nil {
@@ -318,7 +318,7 @@ func Classes(data ClassesData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</div><div class=\"table-wrapper data-list-view-root\"><table id=\"classesTable\" class=\"table-stack-mobile\"><thead><tr><th class=\"class-record-status-col\">Status</th><th>Date</th><th>Time</th>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</div><div class=\"table-wrapper data-list-view-root\"><table id=\"classesTable\" class=\"table-stack-mobile\"><thead><tr><th class=\"class-record-status-col\" scope=\"col\"><span class=\"sr-only\">Status</span></th><th>Date</th><th>Time</th>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -335,7 +335,7 @@ func Classes(data ClassesData) templ.Component {
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/classes/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 179, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 202, Col: 49}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
 		if templ_7745c5c3_Err != nil {
@@ -348,7 +348,7 @@ func Classes(data ClassesData) templ.Component {
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 182, Col: 30}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/classes.templ`, Line: 205, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
 		if templ_7745c5c3_Err != nil {
