@@ -2,6 +2,7 @@ package frontend
 
 import (
 	"strconv"
+	"zion-english/internal/utils"
 )
 templ ScheduledClassActions(item ScheduledClassItemData) {
 	<div class="scheduled-class-actions">
@@ -74,7 +75,7 @@ templ ScheduledClassListItem(item ScheduledClassItemData, zoomLogoURL string, ca
 		<div class="day-class-info">
 			<div class="day-class-header">
 				@Avatar(item.TeacherAvatar)
-				<strong>{ item.TeacherName } - { item.StudentName }</strong>
+				<strong>{ utils.TeacherCompactDisplayName(item.TeacherName) } - { item.StudentName }</strong>
 			</div>
 			<div class="day-class-pills">
 				@TimeRangePill(item.TimeRange)

@@ -105,6 +105,29 @@ templ Students(data StudentData) {
 				gap: var(--space-2);
 				min-width: 0;
 			}
+
+			#studentsTable {
+				table-layout: fixed;
+			}
+
+			#studentsTable th.students-col-wrap,
+			#studentsTable thead tr > th:nth-child(3),
+			#studentsTable td.students-col-wrap {
+				white-space: normal;
+				overflow-wrap: anywhere;
+				word-break: break-word;
+				vertical-align: top;
+			}
+
+			#studentsTable td.students-col-wrap .teacher-name-cell {
+				align-items: flex-start;
+			}
+
+			#studentsTable td.students-col-wrap .teacher-name-cell-text {
+				white-space: normal;
+				overflow: visible;
+				text-overflow: unset;
+			}
 		</style>
 	</head>
 	<body>
@@ -140,24 +163,22 @@ templ Students(data StudentData) {
 					<table id="studentsTable" class="table-stack-mobile">
 						<thead>
 							<tr>
-								<th>Name</th>
-								<th>Parent</th>
+								<th class="students-col-wrap">Name</th>
+								<th class="students-col-wrap">Parent</th>
 								@AdminOnlyTableHeader("Teacher")
 								<th>Rate Per Class</th>
-								@AdminOnlyTableHeader("Parent Rate")
 								@AdminOnlyTableHeader("Related To")
-								<th>Status</th>
 								<th>Actions</th>
 							</tr>
 						</thead>
 						<tbody>
 							for _, student := range data.Students {
 								<tr class={ getStudentRowClass(student.Status) }>
-									<td data-label="Name">
+									<td class="students-col-wrap" data-label="Name">
 										@StudentNameCell(student.Name, student.StudentNumber, student.Avatar)
 									</td>
-									<td data-label="Parent">{ getDisplayValue(student.ParentName) }</td>
-									<td data-label="Teacher">
+									<td class="students-col-wrap" data-label="Parent">{ getDisplayValue(student.ParentName) }</td>
+									<td class="students-col-wrap" data-label="Teacher">
 										if len(student.Teachers) > 0 {
 											<div class="student-teachers-cell">
 												for _, teacher := range student.Teachers {
@@ -174,13 +195,7 @@ templ Students(data StudentData) {
 											<span class="rate-currency">{ student.Currency }</span>
 										</span>
 									</td>
-									<td class="rate-cell" data-label="Parent Rate">
-										{ formatOptionalParentRate(student.ParentRate, student.ParentCurrency, student.HasParentRate) }
-									</td>
 									<td data-label="Related To">{ getDisplayValue(student.RelatedToDisplay) }</td>
-									<td data-label="Status">
-										@StatusPill(capitalizeStatus(student.Status), StudentStatusPillTone(student.Status), false)
-									</td>
 									<td data-label="Actions">
 										<div class="table-actions">
 											@IconActionButton("View", IconKindView, templ.Attributes{

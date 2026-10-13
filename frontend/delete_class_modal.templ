@@ -127,10 +127,12 @@ templ DeleteClassModal() {
 						'<span class="avatar-role-badge ' + escapeHtml(roleBadgeClass) + '">' + escapeHtml(roleBadge) + '</span>' +
 						'</div>';
 				}
+				const displayName = window.formatTeacherCompactName(name);
 				el.innerHTML =
 					'<div class="teacher-name-cell">' +
 					avatarHTML +
-					'<span class="teacher-name-cell-text">' + escapeHtml(name) + '</span>' +
+					'<span class="teacher-name-cell-text" data-full-text="' + escapeHtml(name) + '" title="' + escapeHtml(name) + '">' +
+					escapeHtml(displayName) + '</span>' +
 					'</div>';
 			}
 

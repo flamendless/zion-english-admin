@@ -35,6 +35,33 @@ templ ScrClipboardHelpers() {
 	</script>
 }
 
+templ ScrTeacherCompactName() {
+	<script>
+		window.formatTeacherCompactName = function (fullName) {
+			if (fullName == null || fullName === '') {
+				return '';
+			}
+			var trimmed = String(fullName).trim();
+			if (trimmed === '' || trimmed === '-') {
+				return trimmed;
+			}
+			var parts = trimmed.split(/\s+/);
+			if (parts.length === 1) {
+				return parts[0];
+			}
+			var last = parts[parts.length - 1];
+			if (!last) {
+				return parts[0];
+			}
+			var initial = Array.from(last)[0];
+			if (!initial) {
+				return parts[0];
+			}
+			return parts[0] + ' ' + initial.toUpperCase();
+		};
+	</script>
+}
+
 templ ScrTableTruncationTooltips() {
 	<script>
 		(function () {

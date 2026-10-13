@@ -102,7 +102,7 @@ func Students(data StudentData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t.student-deleted td {\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t}\n\n\t\t\t.rate-value {\n\t\t\t\tdisplay: inline-flex;\n\t\t\t\talign-items: baseline;\n\t\t\t\tgap: var(--space-1);\n\t\t\t\tfont-variant-numeric: tabular-nums;\n\t\t\t}\n\n\t\t\t.rate-amount {\n\t\t\t\tfont-weight: 600;\n\t\t\t\tcolor: var(--color-foreground);\n\t\t\t}\n\n\t\t\t.rate-currency {\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t\tfont-weight: 500;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tletter-spacing: 0.02em;\n\t\t\t}\n\n\t\t\t.list-active-filter-note {\n\t\t\t\tmargin: 0 0 var(--space-4);\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tfont-size: 0.9375rem;\n\t\t\t}\n\n\t\t\t.list-active-filter-note a {\n\t\t\t\tmargin-left: var(--space-2);\n\t\t\t}\n\n\t\t\t.student-teachers-cell {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\talign-items: flex-start;\n\t\t\t\tgap: var(--space-2);\n\t\t\t\tmin-width: 0;\n\t\t\t}\n\t\t</style></head><body><div class=\"container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t.student-deleted td {\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t}\n\n\t\t\t.rate-value {\n\t\t\t\tdisplay: inline-flex;\n\t\t\t\talign-items: baseline;\n\t\t\t\tgap: var(--space-1);\n\t\t\t\tfont-variant-numeric: tabular-nums;\n\t\t\t}\n\n\t\t\t.rate-amount {\n\t\t\t\tfont-weight: 600;\n\t\t\t\tcolor: var(--color-foreground);\n\t\t\t}\n\n\t\t\t.rate-currency {\n\t\t\t\tfont-size: 0.8125rem;\n\t\t\t\tfont-weight: 500;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tletter-spacing: 0.02em;\n\t\t\t}\n\n\t\t\t.list-active-filter-note {\n\t\t\t\tmargin: 0 0 var(--space-4);\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\tfont-size: 0.9375rem;\n\t\t\t}\n\n\t\t\t.list-active-filter-note a {\n\t\t\t\tmargin-left: var(--space-2);\n\t\t\t}\n\n\t\t\t.student-teachers-cell {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\talign-items: flex-start;\n\t\t\t\tgap: var(--space-2);\n\t\t\t\tmin-width: 0;\n\t\t\t}\n\n\t\t\t#studentsTable {\n\t\t\t\ttable-layout: fixed;\n\t\t\t}\n\n\t\t\t#studentsTable th.students-col-wrap,\n\t\t\t#studentsTable thead tr > th:nth-child(3),\n\t\t\t#studentsTable td.students-col-wrap {\n\t\t\t\twhite-space: normal;\n\t\t\t\toverflow-wrap: anywhere;\n\t\t\t\tword-break: break-word;\n\t\t\t\tvertical-align: top;\n\t\t\t}\n\n\t\t\t#studentsTable td.students-col-wrap .teacher-name-cell {\n\t\t\t\talign-items: flex-start;\n\t\t\t}\n\n\t\t\t#studentsTable td.students-col-wrap .teacher-name-cell-text {\n\t\t\t\twhite-space: normal;\n\t\t\t\toverflow: visible;\n\t\t\t\ttext-overflow: unset;\n\t\t\t}\n\t\t</style></head><body><div class=\"container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -131,7 +131,7 @@ func Students(data StudentData) templ.Component {
 				var templ_7745c5c3_Var2 string
 				templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(constants.StudentParentFilter(data.ParentFilter).Label())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 120, Col: 72}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 143, Col: 72}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 				if templ_7745c5c3_Err != nil {
@@ -147,7 +147,7 @@ func Students(data StudentData) templ.Component {
 					var templ_7745c5c3_Var3 string
 					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(" ")
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 124, Col: 12}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 147, Col: 12}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 					if templ_7745c5c3_Err != nil {
@@ -161,7 +161,7 @@ func Students(data StudentData) templ.Component {
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(constants.StudentTeacherAssignmentFilter(data.TeacherAssignmentFilter).Label())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 126, Col: 94}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 149, Col: 94}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -177,7 +177,7 @@ func Students(data StudentData) templ.Component {
 					var templ_7745c5c3_Var5 string
 					templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(" ")
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 130, Col: 12}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 153, Col: 12}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 					if templ_7745c5c3_Err != nil {
@@ -191,7 +191,7 @@ func Students(data StudentData) templ.Component {
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(constants.StudentTestSeedFilter(data.TestSeedFilter).Label())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 132, Col: 76}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 155, Col: 76}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
@@ -209,7 +209,7 @@ func Students(data StudentData) templ.Component {
 			var templ_7745c5c3_Var7 templ.SafeURL
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/students"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 134, Col: 37}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 157, Col: 37}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -221,7 +221,7 @@ func Students(data StudentData) templ.Component {
 			}
 		}
 		if len(data.Students) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"table-wrapper data-list-view-root\"><table id=\"studentsTable\" class=\"table-stack-mobile\"><thead><tr><th>Name</th><th>Parent</th>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"table-wrapper data-list-view-root\"><table id=\"studentsTable\" class=\"table-stack-mobile\"><thead><tr><th class=\"students-col-wrap\">Name</th><th class=\"students-col-wrap\">Parent</th>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -233,15 +233,11 @@ func Students(data StudentData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = AdminOnlyTableHeader("Parent Rate").Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
 			templ_7745c5c3_Err = AdminOnlyTableHeader("Related To").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<th>Status</th><th>Actions</th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<th>Actions</th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -264,7 +260,7 @@ func Students(data StudentData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\"><td data-label=\"Name\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\"><td class=\"students-col-wrap\" data-label=\"Name\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -272,20 +268,20 @@ func Students(data StudentData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</td><td data-label=\"Parent\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</td><td class=\"students-col-wrap\" data-label=\"Parent\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(student.ParentName))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 159, Col: 70}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 180, Col: 96}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</td><td data-label=\"Teacher\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</td><td class=\"students-col-wrap\" data-label=\"Teacher\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -317,7 +313,7 @@ func Students(data StudentData) templ.Component {
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(utils.FormatCurrencyAmountFixed(student.RatePerClass, student.Currency))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 173, Col: 110}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 194, Col: 110}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -330,47 +326,26 @@ func Students(data StudentData) templ.Component {
 				var templ_7745c5c3_Var12 string
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(student.Currency)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 174, Col: 57}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 195, Col: 57}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</span></span></td><td class=\"rate-cell\" data-label=\"Parent Rate\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</span></span></td><td data-label=\"Related To\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var13 string
-				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(formatOptionalParentRate(student.ParentRate, student.ParentCurrency, student.HasParentRate))
+				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(student.RelatedToDisplay))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 178, Col: 103}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 198, Col: 80}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</td><td data-label=\"Related To\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var14 string
-				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(student.RelatedToDisplay))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/students.templ`, Line: 180, Col: 80}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</td><td data-label=\"Status\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = StatusPill(capitalizeStatus(student.Status), StudentStatusPillTone(student.Status), false).Render(ctx, templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</td><td data-label=\"Actions\"><div class=\"table-actions\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</td><td data-label=\"Actions\"><div class=\"table-actions\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -395,12 +370,12 @@ func Students(data StudentData) templ.Component {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</div></td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</div></td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</tbody></table></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</tbody></table></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -409,12 +384,12 @@ func Students(data StudentData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<div class=\"empty-state\"><p>No students found.</p></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<div class=\"empty-state\"><p>No students found.</p></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div id=\"studentViewModalHost\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<div id=\"studentViewModalHost\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -422,7 +397,7 @@ func Students(data StudentData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -430,7 +405,7 @@ func Students(data StudentData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

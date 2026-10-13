@@ -4,8 +4,26 @@ import (
 	"fmt"
 )
 
+templ ClassRecordStatusIcon(record ClassRecordRowData) {
+	if record.StatusIconKind() != "" {
+		<span
+			class={ "class-status-icon class-status-icon--" + string(record.StatusIconKind()) }
+			data-tooltip={ record.StatusIconLabel() }
+			role="img"
+			aria-label={ record.StatusIconLabel() }
+		>
+			@IconSVG(record.StatusIconKind())
+		</span>
+	} else {
+		<span class="class-status-icon class-status-icon--empty" aria-hidden="true">-</span>
+	}
+}
+
 templ ClassRecordRow(record ClassRecordRowData, showTeacher bool) {
 	<tr class={ record.RowClass() }>
+		<td class="class-record-status-cell" data-label="Status">
+			@ClassRecordStatusIcon(record)
+		</td>
 		<td data-label="Date">{ record.Date }</td>
 		<td class="time-range-cell" data-label="Time">{ record.TimeRangeDisplay() }</td>
 		if showTeacher {
@@ -17,9 +35,6 @@ templ ClassRecordRow(record ClassRecordRowData, showTeacher bool) {
 			@StudentNameCell(record.StudentName, record.StudentNumber, record.StudentAvatar)
 		</td>
 		<td data-label="Rate">@RatePill(record.Rate, record.Currency)</td>
-		<td data-label="Status">
-			@StatusPill(record.StatusLabel(), record.StatusPillTone(), false)
-		</td>
 		<td class="table-truncate-cell" data-label="Note / Reason">
 			@TableTruncatedText(record.NoteOrReasonDisplay())
 		</td>

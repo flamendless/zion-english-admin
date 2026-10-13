@@ -126,18 +126,31 @@ func (r ClassRecordRowData) TimeRangeDisplay() string {
 	return FormatScheduledClassTimeRange(r.StartTime, r.EndTime, r.DurationMinutes)
 }
 
-func (r ClassRecordRowData) StatusLabel() string {
-	if r.Overdue {
-		return "Overdue"
+func (r ClassRecordRowData) StatusIconLabel() string {
+	if r.Overdue || r.Status == constants.ClassListFilterOverdue {
+		return constants.ClassListFilterOverdue.Label()
 	}
-	return capitalizeStatus(r.Status)
+	return r.Status.Label()
 }
 
-func (r ClassRecordRowData) StatusPillTone() PillTone {
-	if r.Overdue {
-		return PillToneError
+func (r ClassRecordRowData) StatusIconKind() IconKind {
+	if r.Overdue || r.Status == constants.ClassListFilterOverdue {
+		return IconKindOverdue
 	}
-	return ClassStatusPillTone(r.Status)
+	switch r.Status {
+	case constants.ClassListFilterConducted:
+		return IconKindConduct
+	case constants.ClassListFilterScheduled:
+		return IconKindScheduled
+	case constants.ClassListFilterCancelled:
+		return IconKindCancel
+	case constants.ClassListFilterRescheduled:
+		return IconKindRescheduled
+	case constants.ClassListFilterDeleted:
+		return IconKindDelete
+	default:
+		return ""
+	}
 }
 
 func (r ClassRecordRowData) NoteOrReasonDisplay() string {

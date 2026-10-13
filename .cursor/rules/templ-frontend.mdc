@@ -59,7 +59,7 @@ Prefer typed enums over `string` for closed value sets (status, docs status, sou
 | `@Pill()` / `@StatusPill()` | `pills.templ`: use `PillTone` constants, not string literals |
 | `@RatePill()` | `pills.templ`: use for class rate displays (scheduled cards, class tables, modal detail cards) |
 | `@TimeRangePill()` | `pills.templ`: use for scheduled class time ranges in cards and lists |
-| `@TeacherNameCell()` | `avatar.templ`: avatar + teacher name; use whenever a teacher name is shown |
+| `@TeacherNameCell()` | `avatar.templ`: avatar + compact teacher name (first word + last initial); full name in `data-full-text` for truncation tooltips; profile/report identity headers keep full legal name |
 
 ## Pills
 

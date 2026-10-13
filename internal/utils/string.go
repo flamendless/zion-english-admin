@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"unicode"
 	"zion-english/internal/constants"
 )
 
@@ -72,6 +73,24 @@ func ComposePersonName(first, middle, last string) string {
 		}
 	}
 	return strings.Join(parts, " ")
+}
+
+// TeacherCompactDisplayName shortens a full person name for list cells: first word plus last-name initial.
+func TeacherCompactDisplayName(fullName string) string {
+	fullName = strings.TrimSpace(fullName)
+	if fullName == "" || fullName == "-" {
+		return fullName
+	}
+	parts := strings.Fields(fullName)
+	if len(parts) == 1 {
+		return parts[0]
+	}
+	lastRunes := []rune(parts[len(parts)-1])
+	if len(lastRunes) == 0 {
+		return parts[0]
+	}
+	initial := string(unicode.ToUpper(lastRunes[0]))
+	return parts[0] + " " + initial
 }
 
 func SanitizeFilename(name string) string {

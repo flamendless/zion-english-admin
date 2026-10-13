@@ -24,3 +24,23 @@ func TestSanitizeSheetName(t *testing.T) {
 		t.Fatalf("SanitizeSheetName long name len = %d, want 31", len(got))
 	}
 }
+
+func TestTeacherCompactDisplayName(t *testing.T) {
+	tests := []struct {
+		in   string
+		want string
+	}{
+		{"", ""},
+		{"-", "-"},
+		{"Maria", "Maria"},
+		{"John Doe", "John D"},
+		{"Maria Ana Santos", "Maria S"},
+		{"  Juan  Dela  Cruz  ", "Juan C"},
+	}
+	for _, tc := range tests {
+		got := TeacherCompactDisplayName(tc.in)
+		if got != tc.want {
+			t.Fatalf("TeacherCompactDisplayName(%q) = %q, want %q", tc.in, got, tc.want)
+		}
+	}
+}

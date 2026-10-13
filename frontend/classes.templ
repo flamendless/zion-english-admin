@@ -45,6 +45,58 @@ templ Classes(data ClassesData) {
 			#classesTable td[data-label="Student"] {
 				max-width: 220px;
 			}
+
+			#classesTable th.class-record-status-col,
+			#classesTable td.class-record-status-cell {
+				width: 2.75rem;
+				max-width: 2.75rem;
+				padding-left: 12px;
+				padding-right: 8px;
+				text-align: center;
+				vertical-align: middle;
+			}
+
+			#classesTable .class-status-icon {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				line-height: 0;
+				color: var(--color-muted-foreground);
+			}
+
+			#classesTable .class-status-icon svg {
+				width: 1.125rem;
+				height: 1.125rem;
+			}
+
+			#classesTable .class-status-icon--conduct {
+				color: var(--color-success);
+			}
+
+			#classesTable .class-status-icon--scheduled {
+				color: var(--color-info);
+			}
+
+			#classesTable .class-status-icon--overdue {
+				color: var(--color-destructive);
+			}
+
+			#classesTable .class-status-icon--cancel {
+				color: var(--color-destructive);
+			}
+
+			#classesTable .class-status-icon--rescheduled {
+				color: var(--color-warning);
+			}
+
+			#classesTable .class-status-icon--delete {
+				color: var(--color-muted-foreground);
+			}
+
+			#classesTable .class-status-icon--empty {
+				font-size: 0.875rem;
+				line-height: 1;
+			}
 		</style>
 		@ClassViewModalScripts()
 		@LearningMaterialViewModalStyles()
@@ -109,6 +161,7 @@ templ Classes(data ClassesData) {
 			<table id="classesTable" class="table-stack-mobile">
 				<thead>
 					<tr>
+						<th class="class-record-status-col">Status</th>
 						<th>Date</th>
 						<th>Time</th>
 						if data.ShowAllTeachers {
@@ -116,7 +169,6 @@ templ Classes(data ClassesData) {
 						}
 						<th>Student</th>
 						<th>Rate</th>
-						<th>Status</th>
 						<th>Note / Reason</th>
 						<th>Actions</th>
 					</tr>

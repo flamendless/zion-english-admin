@@ -20,9 +20,10 @@ type TeacherListItem struct {
 }
 
 templ TeacherNameCell(name string, avatar AvatarProps) {
+	{{ displayName := utils.TeacherCompactDisplayName(name) }}
 	<div class="teacher-name-cell">
 		@Avatar(avatar)
-		<span class="teacher-name-cell-text" data-full-text={ name }>{ name }</span>
+		<span class="teacher-name-cell-text" data-full-text={ name }>{ displayName }</span>
 	</div>
 }
 

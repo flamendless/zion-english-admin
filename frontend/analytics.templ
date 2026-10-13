@@ -459,7 +459,10 @@ templ Analytics(data AnalyticsData) {
 			}
 
 			function renderTeacherCell(name, avatar) {
-				return '<div class="analytics-teacher-cell">' + renderAvatarHTML(avatar) + '<span>' + escapeHTML(name) + '</span></div>';
+				var displayName = window.formatTeacherCompactName(name);
+				return '<div class="analytics-teacher-cell">' + renderAvatarHTML(avatar) +
+					'<span class="teacher-name-cell-text" data-full-text="' + escapeHTML(name) + '" title="' + escapeHTML(name) + '">' +
+					escapeHTML(displayName) + '</span></div>';
 			}
 
 			function renderTrialSummary(trial) {
