@@ -9,6 +9,39 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.10.14"
+    date: "2026-10-14"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Teachers get a My Hub page with students, classes for the current payroll cutoff, payments, earnings, schedule, upload logs, analytics, and resources in one place; superusers can open the same Hub for any teacher from the teachers list."
+        commit: "5af51aa"
+      - text: "Teachers can open My Earnings to review conducted-class totals by first and second payroll cutoff; superusers get Teachers Earnings to browse the same history for any teacher."
+        commit: "964b32c"
+      - text: "Student records support optional student and parent numbers, shown beside names in lists and on student detail views."
+        commit: "1a36ba9"
+      - text: "Superusers can mark students as test/seed, filter student and class lists by test/seed status, and exclude test/seed students from payroll reports by default."
+        commit: "842be0d"
+    improvements:
+      - text: "Date filters on classes, reports, payments, and related pages default to the active first or second payroll cutoff for the current month."
+        commit: "2a852f6"
+      - text: "Classes, reports, and payment history tables color rows by first vs second payroll cutoff and show a legend in the toolbar."
+        commit: "fd10405"
+      - text: "Sending or recording a payroll payment uses a visual payment method picker with logos for GCash, Maya, and supported banks."
+        commit: "641d051"
+      - text: "Notifications and several admin pages received mobile layout and navigation polish."
+        commit: "d9379c7"
+    bug_fixes:
+      - text: "Fixed class scheduling validation so invalid or overlapping schedules are rejected consistently when creating or editing classes."
+        commit: "641d051"
+      - text: "Fixed affiliate ad rotation occasionally failing behind nginx when too many rotation cookies were set."
+        commit: "2ecedf6"
+    removed: []
+    security: []
+    deprecated: []
+    internal:
+      - text: "Added seed_classes CLI to generate a teacher, students, and monthly class records for local testing (dry-run by default)."
+        commit: "ecc40d4"
   - version: "2026.10.02"
     date: "2026-10-02"
     released: true
