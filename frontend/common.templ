@@ -211,6 +211,10 @@ templ DatePreset(selectCurrentCutoff bool) {
 }
 
 templ MonthPicker(inputID string, partialURL string) {
+	@MonthPickerTarget(inputID, partialURL, "datePresetGroup")
+}
+
+templ MonthPickerTarget(inputID string, partialURL string, datePresetGroupID string) {
 	<div class="form-group report-month-group">
 		<label for={ inputID }>Month</label>
 		<input
@@ -219,7 +223,7 @@ templ MonthPicker(inputID string, partialURL string) {
 			name="month"
 			value={ utils.CurrentMonthPHT() }
 			hx-get={ partialURL }
-			hx-target="#datePresetGroup"
+			hx-target={ "#" + datePresetGroupID }
 			hx-swap={ HxSwapOuterHTML }
 			hx-include="this"
 			hx-trigger="change"
@@ -228,12 +232,16 @@ templ MonthPicker(inputID string, partialURL string) {
 }
 
 templ DatePresetForMonth(monthValue string, selectCurrentCutoff bool) {
+	@DatePresetForMonthScoped(monthValue, selectCurrentCutoff, "datePresetGroup", "datePreset")
+}
+
+templ DatePresetForMonthScoped(monthValue string, selectCurrentCutoff bool, groupID string, selectID string) {
 	{{
 		firstCutoff, secondCutoff, monthCutoff, defaultCutoff, _ := cutoffPresetForMonth(monthValue, selectCurrentCutoff)
 	}}
-	<div class="form-group" id="datePresetGroup">
-		<label for="datePreset">Date Range</label>
-		<select id="datePreset" name="datePreset">
+	<div class="form-group" id={ groupID }>
+		<label for={ selectID }>Date Range</label>
+		<select id={ selectID } name="datePreset">
 			if !selectCurrentCutoff {
 				<option value="">-- Select Range --</option>
 			}

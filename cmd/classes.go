@@ -89,7 +89,7 @@ func handleDeleteClassRecord(w http.ResponseWriter, r *http.Request, recordID in
 		return
 	}
 
-	insertAuditLogAs(ctx, user, "classes", fmt.Sprintf("deleted class record id %d (student id %d, date %s, reason: %s)", recordID, existing.StudentID, existing.Date, reason))
+	insertAuditLogAs(ctx, user, "classes", fmt.Sprintf("deleted class record id %d (%s, date %s, reason: %s)", recordID, auditPartiesFromClassRecord(existing), existing.Date, reason))
 	respondScheduledClassAction(w, r.FormValue("from"), "Class deleted successfully.")
 }
 
@@ -623,6 +623,12 @@ func handleClassesDatePresetPartial(w http.ResponseWriter, r *http.Request) {
 	}
 
 	month := strings.TrimSpace(r.URL.Query().Get("month"))
+	groupID := strings.TrimSpace(r.URL.Query().Get("groupId"))
+	selectID := strings.TrimSpace(r.URL.Query().Get("selectId"))
+	if groupID != "" && selectID != "" {
+		renderHTMLComponent(r.Context(), w, "render classes date preset partial", frontend.DatePresetForMonthScoped(month, true, groupID, selectID))
+		return
+	}
 	renderHTMLComponent(r.Context(), w, "render classes date preset partial", frontend.DatePresetForMonth(month, true))
 }
 
@@ -701,6 +707,9 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 	}
 
 	showTeacher := auth.HasAdminAccess(auth.GetRole(ctx))
+	if r.URL.Query().Get("hideTeacherColumn") == "1" {
+		showTeacher = false
+	}
 	colspan := 7
 	if showTeacher {
 		colspan = 8
@@ -709,7 +718,15 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 	partialsURL := utils.URL("/classes/partials/rows")
 	includeSelector := "#classesToolbar"
 
-	renderHTMLComponent(ctx, w, "render class records partial", frontend.ClassRecordsPartial(rows, showTeacher, colspan, "No classes found for the selected criteria", pagination, partialsURL, includeSelector))
+	targetSelector := "#classesTableBody"
+	paginationOOBID := "paginationBottom"
+	if strings.TrimSpace(r.URL.Query().Get("paginationOOBID")) != "" {
+		paginationOOBID = strings.TrimSpace(r.URL.Query().Get("paginationOOBID"))
+	}
+	if ts := strings.TrimSpace(r.URL.Query().Get("hxTarget")); ts != "" {
+		targetSelector = ts
+	}
+	renderHTMLComponent(ctx, w, "render class records partial", frontend.ClassRecordsPartial(rows, showTeacher, colspan, "No classes found for the selected criteria", pagination, partialsURL, includeSelector, targetSelector, paginationOOBID))
 }
 
 func handleClassRecord(w http.ResponseWriter, r *http.Request) {
@@ -794,10 +811,15 @@ func handleClassRecord(w http.ResponseWriter, r *http.Request) {
 			sendErrorLog(w, err.Error())
 			return
 		}
-		insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("marked scheduled class id %d as %s", scheduleID, req.Status))
+		if sched, schedErr := dbRO.GetQueries().GetScheduledClassByID(ctx, scheduleID); schedErr == nil {
+			insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("marked scheduled class id %d as %s (%s)", scheduleID, req.Status, auditPartiesFromScheduled(sched)))
+		} else {
+			insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("marked scheduled class id %d as %s (%s, %s)", scheduleID, req.Status, auditStudentRefCtx(ctx, req.StudentID), auditTeacherRefCtx(ctx, req.TeacherID)))
+		}
 	}
 
-	insertAuditLogAs(ctx, auth.GetUser(ctx), "classes", fmt.Sprintf("recorded class for student id %d (teacher id %d, date %s, status %s)", req.StudentID, req.TeacherID, req.Date, req.Status))
+	parties := auditStudentRefCtx(ctx, req.StudentID) + ", " + auditTeacherRefCtx(ctx, req.TeacherID)
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "classes", formatRecordedClassAudit(parties, req.Date, req.Status))
 
 	if err := respondFormMutation(w, "Class recorded successfully!", "", "classesRefresh"); err != nil {
 		sendErrorLog(w, err.Error())

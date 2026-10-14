@@ -175,7 +175,7 @@ func handleScheduleCreate(w http.ResponseWriter, r *http.Request) {
 		syncCalendarForSchedule(ctx, scheduleID, req.TeacherID, req.StudentID, req.ScheduledDate, req.StartTime, req.DurationMinutes, req.Rate, req.Currency, "schedule create")
 	}
 
-	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("scheduled class for student id %d (teacher id %d, date %s)", req.StudentID, req.TeacherID, req.ScheduledDate))
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("scheduled class for %s, %s, date %s", auditStudentRefCtx(ctx, req.StudentID), auditTeacherRefCtx(ctx, req.TeacherID), req.ScheduledDate))
 
 	if err := respondFormMutation(w, "Class scheduled successfully!", "", "scheduleRefresh", "refreshScheduleCalendar"); err != nil {
 		sendErrorLog(w, err.Error())
@@ -611,7 +611,7 @@ func handleRescheduleScheduledClass(w http.ResponseWriter, r *http.Request, sche
 		syncCalendarForSchedule(ctx, scheduleID, existing.TeacherID, existing.StudentID, newDate, effectiveStart, existing.DurationMinutes, existing.Rate, existing.Currency, "reschedule")
 	}
 
-	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("rescheduled class id %d from %s to %s", scheduleID, existing.ScheduledDate, newDate))
+	insertAuditLogAs(ctx, auth.GetUser(ctx), "schedule", fmt.Sprintf("rescheduled class id %d from %s to %s (%s)", scheduleID, existing.ScheduledDate, newDate, auditPartiesFromScheduled(existing)))
 	actor := auth.GetUser(ctx)
 	notifyCrossParty(ctx, actor, existing.TeacherID, teacherNameByID(ctx, existing.TeacherID), notifications.KindScheduleChanged,
 		fmt.Sprintf("Scheduled class moved from %s to %s", existing.ScheduledDate, newDate))
@@ -832,7 +832,7 @@ func handleScheduledClassEdit(w http.ResponseWriter, r *http.Request, scheduleID
 			if affected > 1 {
 				auditAction = fmt.Sprintf("updated %d scheduled classes in series", affected)
 			}
-			insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("%s starting id %d (student id %d)", auditAction, scheduleID, studentID))
+			insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("%s starting id %d (%s, %s)", auditAction, scheduleID, auditStudentRefForEdit(ctx, studentID, existing), auditTeacherRef(existing.TeacherID, existing.TeacherName)))
 			respondScheduledClassAction(w, r.FormValue("from"), "Scheduled class updated successfully!")
 			return
 		}
@@ -882,7 +882,7 @@ func handleScheduledClassEdit(w http.ResponseWriter, r *http.Request, scheduleID
 	if len(targets) > 1 {
 		auditAction = fmt.Sprintf("updated %d scheduled classes in series", len(targets))
 	}
-	insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("%s starting id %d (student id %d)", auditAction, scheduleID, studentID))
+	insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("%s starting id %d (%s, %s)", auditAction, scheduleID, auditStudentRefForEdit(ctx, studentID, existing), auditTeacherRef(existing.TeacherID, existing.TeacherName)))
 	respondScheduledClassAction(w, r.FormValue("from"), "Scheduled class updated successfully!")
 }
 
@@ -1174,8 +1174,9 @@ func handleConductScheduledClass(w http.ResponseWriter, r *http.Request, schedul
 		return
 	}
 
-	insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("marked scheduled class id %d as conducted", scheduleID))
-	insertAuditLogAs(ctx, user, "classes", fmt.Sprintf("recorded class for student id %d (teacher id %d, date %s, status conducted)", existing.StudentID, existing.TeacherID, existing.ScheduledDate))
+	parties := auditPartiesFromScheduled(existing)
+	insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("marked scheduled class id %d as conducted (%s)", scheduleID, parties))
+	insertAuditLogAs(ctx, user, "classes", formatRecordedClassAudit(parties, existing.ScheduledDate, "conducted"))
 
 	respondScheduledClassAction(w, r.FormValue("from"), "Class conducted successfully!")
 }

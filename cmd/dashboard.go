@@ -2,10 +2,8 @@ package cmd
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
@@ -304,51 +302,10 @@ func handleMyStudents(w http.ResponseWriter, r *http.Request) {
 	sort := parseListSort(r, frontend.ListSortKindMyStudent)
 	page := utils.ParsePageQuery(r)
 
-	filter := queries.CountStudentsByTeacherIDFilteredParams{
-		TeacherID: user.ID,
-		Column2:   q,
-		Column3:   sql.NullString{String: q, Valid: true},
-		Column4:   status,
-		Status:    status,
-	}
-
-	total, err := dbRO.GetQueries().CountStudentsByTeacherIDFiltered(ctx, filter)
-	if err != nil {
-		HttpError(w, "Failed to count students", http.StatusInternalServerError)
-		return
-	}
-	page.Total = total
-
-	allStudents, err := dbRO.GetQueries().GetStudentsByTeacherIDFiltered(ctx, queries.GetStudentsByTeacherIDFilteredParams{
-		TeacherID: user.ID,
-		Column2:   q,
-		Column3:   sql.NullString{String: q, Valid: true},
-		Column4:   status,
-		Status:    status,
-		Limit:     total,
-		Offset:    0,
-	})
+	viewStudents, page, err := loadMyStudentsPage(ctx, user.ID, q, status, sort, page)
 	if err != nil {
 		HttpError(w, MsgFailedToFetchStudents, http.StatusInternalServerError)
 		return
-	}
-	sortMyStudentRows(allStudents, sort)
-	students := paginateSlice(allStudents, page)
-
-	viewStudents := make([]frontend.StudentItem, len(students))
-	for i, s := range students {
-		viewStudents[i] = frontend.StudentItem{
-			ID:            strconv.FormatInt(s.ID, 10),
-			Name:          s.Name,
-			StudentNumber: studentNumberString(s.StudentNumber),
-			Currency:      s.Currency,
-			Contact:       s.Contact.String,
-			RatePerClass:  s.RatePerClass,
-			ParentName:    s.ParentName.String,
-			AssignedColor: s.AssignedColor,
-			Status:        constants.StudentStatus(s.Status),
-			Avatar:        frontend.StudentAvatarProps(s.Name, s.AssignedColor, false, "sm"),
-		}
 	}
 
 	params := listQueryParamsWithSort(r, frontend.ListSortKindMyStudent)

@@ -52,6 +52,38 @@ func TestIsNavAccessibleTeacherResources(t *testing.T) {
 	}
 }
 
+func TestTeacherDashboardQuickActionsMyHubBeforeProfile(t *testing.T) {
+	entries := DashboardQuickActionEntries(auth.RoleTeacher)
+	var sawHub bool
+	for _, entry := range entries {
+		if entry.Kind != NavBarEntryLink {
+			continue
+		}
+		if entry.Item.Path == "/hub" {
+			sawHub = true
+			break
+		}
+		if entry.Item.Path == "/profile" {
+			t.Fatal("My Hub should appear before My Profile in dashboard quick actions")
+		}
+	}
+	if !sawHub {
+		t.Fatal("teacher dashboard quick actions should include My Hub")
+	}
+}
+
+func TestIsNavAccessibleHub(t *testing.T) {
+	if !IsNavAccessible(auth.RoleTeacher, "/hub") {
+		t.Fatal("teacher should access /hub")
+	}
+	if IsNavAccessible(auth.RoleAdmin, "/hub") {
+		t.Fatal("admin should not see /hub in nav")
+	}
+	if IsNavAccessible(auth.RoleSuperuser, "/hub") {
+		t.Fatal("superuser should not see /hub in nav")
+	}
+}
+
 func TestAnnouncementsInAdminNavGroup(t *testing.T) {
 	group := navGroupForRole(auth.RoleAdmin, "admin")
 	if group == nil {

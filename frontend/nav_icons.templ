@@ -32,6 +32,8 @@ templ NavIconSVG(kind NavIconKind) {
 			@navIconSVGUser()
 		case NavIconMyStudents:
 			@navIconSVGUserCheck()
+		case NavIconHub:
+			@navIconSVGHub()
 		case NavIconClasses:
 			@navIconSVGCalendarDays()
 		case NavIconSchedule:
@@ -81,6 +83,15 @@ templ NavIconSVG(kind NavIconKind) {
 		default:
 			@navIconSVGDefault()
 	}
+}
+
+templ navIconSVGHub() {
+	<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<rect width="7" height="7" x="3" y="3" rx="1"></rect>
+		<rect width="7" height="7" x="14" y="3" rx="1"></rect>
+		<rect width="7" height="7" x="14" y="14" rx="1"></rect>
+		<rect width="7" height="7" x="3" y="14" rx="1"></rect>
+	</svg>
 }
 
 templ navIconSVGUser() {

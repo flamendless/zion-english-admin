@@ -79,6 +79,65 @@ func auditStr(v sql.NullString) string {
 	return "(empty)"
 }
 
+func auditStudentRef(id int64, name string, studentNumber sql.NullString) string {
+	return fmt.Sprintf("student id %d (%s)", id, studentDisplayName(name, studentNumber))
+}
+
+func auditTeacherRef(id int64, name string) string {
+	label := strings.TrimSpace(name)
+	if label == "" {
+		label = "unknown"
+	}
+	return fmt.Sprintf("teacher id %d (%s)", id, label)
+}
+
+func auditStudentTeacherPair(studentID int64, studentName string, studentNumber sql.NullString, teacherID int64, teacherName string) string {
+	return auditStudentRef(studentID, studentName, studentNumber) + ", " + auditTeacherRef(teacherID, teacherName)
+}
+
+func auditPartiesFromScheduled(row queries.GetScheduledClassByIDRow) string {
+	return auditStudentTeacherPair(row.StudentID, row.StudentName, row.StudentNumber, row.TeacherID, row.TeacherName)
+}
+
+func auditPartiesFromClassRecord(row queries.GetClassRecordByIDRow) string {
+	return auditStudentTeacherPair(row.StudentID, row.StudentName, row.StudentNumber, row.TeacherID, row.TeacherName)
+}
+
+func auditStudentRefCtx(ctx context.Context, id int64) string {
+	s, err := dbRO.GetQueries().GetStudentByID(ctx, id)
+	if err != nil {
+		return fmt.Sprintf("student id %d (unknown)", id)
+	}
+	return auditStudentRef(id, s.Name, s.StudentNumber)
+}
+
+func auditTeacherRefCtx(ctx context.Context, id int64) string {
+	return auditTeacherRef(id, teacherNameByID(ctx, id))
+}
+
+func auditTeacherRefsList(ctx context.Context, ids []int64) string {
+	if len(ids) == 0 {
+		return ""
+	}
+	names := teacherNamesMap(ctx, ids)
+	parts := make([]string, len(ids))
+	for i, id := range ids {
+		parts[i] = auditTeacherRef(id, names[id])
+	}
+	return strings.Join(parts, ", ")
+}
+
+func auditStudentRefForEdit(ctx context.Context, studentID int64, existing queries.GetScheduledClassByIDRow) string {
+	if studentID == existing.StudentID {
+		return auditStudentRef(existing.StudentID, existing.StudentName, existing.StudentNumber)
+	}
+	return auditStudentRefCtx(ctx, studentID)
+}
+
+func formatRecordedClassAudit(parties string, date string, status string) string {
+	return fmt.Sprintf("recorded class for %s, date %s, status %s", parties, date, status)
+}
+
 func formatClassRecordAudit(before, after queries.GetClassRecordByIDRow) string {
 	var parts []string
 	if before.Date != after.Date {
@@ -103,10 +162,14 @@ func formatClassRecordAudit(before, after queries.GetClassRecordByIDRow) string 
 		parts = append(parts, fmt.Sprintf("notes '%s' -> '%s'", auditStr(before.Notes), auditStr(after.Notes)))
 	}
 	if before.StudentID != after.StudentID {
-		parts = append(parts, fmt.Sprintf("student id %d -> %d", before.StudentID, after.StudentID))
+		parts = append(parts, fmt.Sprintf("%s -> %s",
+			auditStudentRef(before.StudentID, before.StudentName, before.StudentNumber),
+			auditStudentRef(after.StudentID, after.StudentName, after.StudentNumber)))
 	}
 	if before.TeacherID != after.TeacherID {
-		parts = append(parts, fmt.Sprintf("teacher id %d -> %d", before.TeacherID, after.TeacherID))
+		parts = append(parts, fmt.Sprintf("%s -> %s",
+			auditTeacherRef(before.TeacherID, before.TeacherName),
+			auditTeacherRef(after.TeacherID, after.TeacherName)))
 	}
 	if len(parts) == 0 {
 		return fmt.Sprintf("updated class record id %d (no field changes)", after.ID)

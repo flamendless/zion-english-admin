@@ -125,6 +125,8 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/schedule/", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleSchedulePath))
 		authMux.HandleFunc(basePath+"/schedule", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleSchedule))
 		authMux.HandleFunc(basePath+"/my-students", auth.RequireRole(auth.RoleTeacher)(handleMyStudents))
+		authMux.HandleFunc(basePath+"/hub/partials/", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleHubPartials))
+		authMux.HandleFunc(basePath+"/hub", auth.RequireRole(auth.RoleTeacher)(handleHubSelf))
 		authMux.HandleFunc(basePath+"/logs", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleSystemLogs))
 		authMux.HandleFunc(basePath+"/upload-logs", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleUploadLogs))
 		authMux.HandleFunc(basePath+"/changelogs", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleChangelogs))
@@ -321,6 +323,8 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/schedule", authHandler)
 		rootMux.Handle(basePath+"/schedule/", authHandler)
 		rootMux.Handle(basePath+"/my-students", authHandler)
+		rootMux.Handle(basePath+"/hub/partials/", authHandler)
+		rootMux.Handle(basePath+"/hub", authHandler)
 		rootMux.Handle(basePath+"/onboarding/persistent", authHandler)
 		rootMux.Handle(basePath+"/background-jobs/persistent", authHandler)
 		rootMux.Handle(basePath+"/profile", authHandler)
@@ -988,7 +992,8 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		writeHTML(w)
 		frontend.RegisterStudent(frontend.RegisterStudentData{
-			IsSuperuser: isSuperuser,
+			IsSuperuser:     isSuperuser,
+			CanEditTestSeed: role == auth.RoleSuperuser,
 		}).Render(ctx, w)
 		return
 	}
@@ -1105,7 +1110,7 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	qtx := dbRW.GetQueries().WithTx(tx)
 
 	isTestSeed := int64(0)
-	if isSuperuser {
+	if role == auth.RoleSuperuser {
 		isTestSeed = parseIsTestSeedForm(r.FormValue("isTestSeed"))
 	}
 	studentID, err := qtx.InsertStudent(r.Context(), queries.InsertStudentParams{
@@ -1162,15 +1167,13 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		sendErrorLog(w, "Failed to register student")
 		return
 	}
-	teacherIDStrs := make([]string, len(teacherIDs))
-	for i, tid := range teacherIDs {
-		teacherIDStrs[i] = strconv.FormatInt(tid, 10)
+	for _, tid := range teacherIDs {
 		rl.add(fmt.Sprintf("Assigned student to teacher ID: %d", tid))
 	}
 
 	rl.add(fmt.Sprintf("Successfully registered student: %s", req.Name))
 
-	insertAuditLogAs(r.Context(), auth.GetUser(r.Context()), "students", fmt.Sprintf("registered student '%s' (teacher ids %s)", req.Name, strings.Join(teacherIDStrs, ",")))
+	insertAuditLogAs(r.Context(), auth.GetUser(r.Context()), "students", fmt.Sprintf("registered student '%s' (%s)", req.Name, auditTeacherRefsList(r.Context(), teacherIDs)))
 	notifyTeachers(r.Context(), teacherIDs, teacherNamesMap(r.Context(), teacherIDs), auth.GetUser(r.Context()), notifications.KindStudentRegistered,
 		fmt.Sprintf("New student '%s' was assigned to you", req.Name))
 

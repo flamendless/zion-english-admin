@@ -79,6 +79,7 @@ var dashboardNavItem = NavItem{
 }
 
 var navItemDefs = []navItemDef{
+	{Path: "/hub", LinkID: "hubLink", Title: "My Hub", TeacherTitle: "My Hub", Description: "Students, classes, payments, and resources in one place", TeacherDesc: "Students, classes, payments, and resources in one place", FeatureCard: true},
 	{Path: "/profile", LinkID: "profileLink", Title: "My Profile", Description: "View account info and update settings"},
 	{Path: "/learning-materials", LinkID: "learningMaterialsLink", Title: "Learning Library", Description: "Browse and share teaching materials and resources", FeatureCard: true},
 	{Path: "/training-materials", LinkID: "trainingMaterialsLink", Title: "Training Materials", Description: "Watch admin-curated training videos and track your progress", FeatureCard: true},
@@ -132,6 +133,7 @@ var adminNavLayout = []navLayoutEntry{
 
 var teacherNavLayout = []navLayoutEntry{
 	{LinkPath: "/dashboard"},
+	{LinkPath: "/hub"},
 	{LinkPath: "/profile"},
 	{GroupID: "resources"},
 	{LinkPath: "/my-students"},
@@ -371,7 +373,7 @@ func IsNavAccessible(role auth.Role, path string) bool {
 	}
 
 	if auth.HasAdminAccess(role) {
-		if path == "/my-students" {
+		if path == "/my-students" || path == "/hub" {
 			return false
 		}
 		if path == "/my-earnings" && role == auth.RoleSuperuser {
@@ -405,7 +407,7 @@ func IsNavAccessible(role auth.Role, path string) bool {
 		return false
 	case "/students/register":
 		return true
-	case "/classes", "/classes/record", "/schedule", "/schedule/record", "/schedule/repeat", "/schedule/series", "/profile", "/logs", "/upload-logs", "/my-students", "/documents", "/intro-videos", "/analytics", "/my-earnings", "/exports", "/payments", "/guides", "/learning-materials", "/training-materials":
+	case "/hub", "/classes", "/classes/record", "/schedule", "/schedule/record", "/schedule/repeat", "/schedule/series", "/profile", "/logs", "/upload-logs", "/my-students", "/documents", "/intro-videos", "/analytics", "/my-earnings", "/exports", "/payments", "/guides", "/learning-materials", "/training-materials":
 		return true
 	default:
 		return false

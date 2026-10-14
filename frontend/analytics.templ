@@ -10,6 +10,13 @@ type AnalyticsData struct {
 	TeacherName string
 }
 
+func noShowTableColspan(showTeacher bool) int {
+	if showTeacher {
+		return 5
+	}
+	return 4
+}
+
 templ Analytics(data AnalyticsData) {
 	<!DOCTYPE html>
 	<html lang="en">
@@ -20,6 +27,7 @@ templ Analytics(data AnalyticsData) {
 			@AdminPageHead("My Analytics - Zion English Admin Tool")
 		}
 		@AvatarStyles()
+		@ProFeatureLockStyles()
 		@ScrChartJS()
 		<style>
 			.analytics-section {
@@ -136,19 +144,30 @@ templ Analytics(data AnalyticsData) {
 					</div>
 				</div>
 
-				if data.IsSuperuser || data.IsPro {
 				<div class="analytics-charts">
 					<div class="analytics-chart-card">
 						<h2>Class Status</h2>
-						<div class="analytics-chart-wrap">
-							<canvas id="classStatusChart"></canvas>
-						</div>
+						if data.IsSuperuser || data.IsPro {
+							<div class="analytics-chart-wrap">
+								<canvas id="classStatusChart"></canvas>
+							</div>
+						} else {
+							<div class="analytics-chart-wrap is-pro-locked">
+								@ProFeatureLock(ProLockTitle, ProLockAnalyticsDetail)
+							</div>
+						}
 					</div>
 					<div class="analytics-chart-card">
 						<h2>Weekly Trend</h2>
-						<div class="analytics-chart-wrap">
-							<canvas id="weeklyTrendChart"></canvas>
-						</div>
+						if data.IsSuperuser || data.IsPro {
+							<div class="analytics-chart-wrap">
+								<canvas id="weeklyTrendChart"></canvas>
+							</div>
+						} else {
+							<div class="analytics-chart-wrap is-pro-locked">
+								@ProFeatureLock(ProLockTitle, ProLockAnalyticsDetail)
+							</div>
+						}
 					</div>
 				</div>
 
@@ -165,7 +184,11 @@ templ Analytics(data AnalyticsData) {
 									<th>Cancellation Rate</th>
 								</tr>
 							</thead>
-							<tbody id="weeklyTableBody"></tbody>
+							<tbody id="weeklyTableBody">
+								if !data.IsSuperuser && !data.IsPro {
+									@ProLockedTableRow(5, ProLockTitle, ProLockAnalyticsDetail)
+								}
+							</tbody>
 						</table>
 					</div>
 				</div>
@@ -215,7 +238,11 @@ templ Analytics(data AnalyticsData) {
 									<th>Cancellation Rate</th>
 								</tr>
 							</thead>
-							<tbody id="studentTableBody"></tbody>
+							<tbody id="studentTableBody">
+								if !data.IsSuperuser && !data.IsPro {
+									@ProLockedTableRow(5, ProLockTitle, ProLockAnalyticsDetail)
+								}
+							</tbody>
 						</table>
 					</div>
 					<div id="studentTablePagination" class="pagination-bar" hidden></div>
@@ -237,7 +264,11 @@ templ Analytics(data AnalyticsData) {
 									<th>Days Overdue</th>
 								</tr>
 							</thead>
-							<tbody id="noShowTableBody"></tbody>
+							<tbody id="noShowTableBody">
+								if !data.IsSuperuser && !data.IsPro {
+									@ProLockedTableRow(noShowTableColspan(data.IsSuperuser), ProLockTitle, ProLockAnalyticsDetail)
+								}
+							</tbody>
 						</table>
 					</div>
 				</div>
@@ -245,44 +276,58 @@ templ Analytics(data AnalyticsData) {
 				<div class="analytics-section">
 					<h2>Student Retention</h2>
 					<p class="analytics-hint">Churn dates use the student&rsquo;s last update time as a proxy when status changed to inactive.</p>
-					<div class="analytics-summary" id="retentionCards"></div>
+					if data.IsSuperuser || data.IsPro {
+						<div class="analytics-summary" id="retentionCards"></div>
 
-					<div class="analytics-chart-card" style="margin-bottom: var(--space-6);">
-						<h2>Inactive Reasons</h2>
-						<div class="analytics-chart-wrap">
-							<canvas id="inactiveReasonsChart"></canvas>
+						<div class="analytics-chart-card" style="margin-bottom: var(--space-6);">
+							<h2>Inactive Reasons</h2>
+							<div class="analytics-chart-wrap">
+								<canvas id="inactiveReasonsChart"></canvas>
+							</div>
 						</div>
-					</div>
 
-					<h3>Inactive Reasons</h3>
-					<div class="table-wrapper data-list-view-root">
-						<table class="table-stack-mobile" id="reasonsTable">
-							<thead>
-								<tr>
-									<th>Reason</th>
-									<th>Count</th>
-								</tr>
-							</thead>
-							<tbody id="reasonsTableBody"></tbody>
-						</table>
-					</div>
+						<h3>Inactive Reasons</h3>
+						<div class="table-wrapper data-list-view-root">
+							<table class="table-stack-mobile" id="reasonsTable">
+								<thead>
+									<tr>
+										<th>Reason</th>
+										<th>Count</th>
+									</tr>
+								</thead>
+								<tbody id="reasonsTableBody"></tbody>
+							</table>
+						</div>
 
-					<h3 style="margin-top: var(--space-6);">Churned in Period</h3>
-					<div class="table-wrapper data-list-view-root">
-						<table class="table-stack-mobile" id="churnedTable">
-							<thead>
-								<tr>
-									<th>Student</th>
-									<th>Reason</th>
-									<th>Tenure (days)</th>
-									<th>Churned At</th>
-								</tr>
-							</thead>
-							<tbody id="churnedTableBody"></tbody>
-						</table>
-					</div>
+						<h3 style="margin-top: var(--space-6);">Churned in Period</h3>
+						<div class="table-wrapper data-list-view-root">
+							<table class="table-stack-mobile" id="churnedTable">
+								<thead>
+									<tr>
+										<th>Student</th>
+										<th>Reason</th>
+										<th>Tenure (days)</th>
+										<th>Churned At</th>
+									</tr>
+								</thead>
+								<tbody id="churnedTableBody"></tbody>
+							</table>
+						</div>
+					} else {
+						<div class="table-wrapper data-list-view-root">
+							<table class="table-stack-mobile">
+								<thead>
+									<tr>
+										<th>Insight</th>
+									</tr>
+								</thead>
+								<tbody>
+									@ProLockedTableRow(1, ProLockTitle, ProLockAnalyticsDetail)
+								</tbody>
+							</table>
+						</div>
+					}
 				</div>
-				}
 			</div>
 		</div>
 
@@ -312,10 +357,25 @@ templ Analytics(data AnalyticsData) {
 			}
 
 			function setAnalyticsTablesLoading() {
-				if (!window.zionFetchBodyLoading) return;
+				if (!isPro || !window.zionFetchBodyLoading) return;
 				document.querySelectorAll('.analytics-page tbody').forEach(function (tbody) {
+					if (tbody.querySelector('.pro-locked-table-row')) return;
 					window.zionFetchBodyLoading.show(tbody, 'Loading...');
 				});
+			}
+
+			function proLockPanelHTML(title, detail) {
+				return '<div class="pro-feature-lock" role="status">' +
+					'<span class="pro-feature-lock__icon" aria-hidden="true">' +
+					'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+					'<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>' +
+					'<path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>' +
+					'<p class="pro-feature-lock__title">' + escapeHTML(title) + '</p>' +
+					'<p class="pro-feature-lock__detail">' + escapeHTML(detail) + '</p></div>';
+			}
+
+			function isProRequiredResponse(response, bodyText) {
+				return response.status === 403 && bodyText && bodyText.indexOf('Teacher Pro') !== -1;
 			}
 
 			function getAnalyticsSort() {
@@ -744,16 +804,24 @@ templ Analytics(data AnalyticsData) {
 					const response = await fetch(buildURL('/api/analytics?' + params.toString()), {
 						headers: window.getCSRFHeaders ? window.getCSRFHeaders() : {}
 					});
+					const bodyText = await response.text();
 					if (!response.ok) {
+						if (isProRequiredResponse(response, bodyText)) {
+							setAnalyticsLoadingPanel('', false);
+							analyticsLoading.innerHTML = proLockPanelHTML('Teacher Pro', 'Date ranges outside the current calendar month require Teacher Pro. Use the current month or upgrade your plan.');
+							analyticsLoading.hidden = false;
+							analyticsContent.hidden = true;
+							return;
+						}
 						throw new Error('Failed to load analytics');
 					}
-					const data = await response.json();
+					const data = JSON.parse(bodyText);
 					analyticsCache = data;
 					renderAnalyticsData(data);
 					analyticsLoading.hidden = true;
 					analyticsContent.hidden = false;
 				} catch (err) {
-					setAnalyticsLoadingPanel('Error loading analytics.', false);
+					setAnalyticsLoadingPanel('Could not load analytics. Try again.', false);
 					analyticsContent.hidden = true;
 				}
 			}

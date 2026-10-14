@@ -357,8 +357,9 @@ func cancelScheduledClassByID(ctx context.Context, user auth.User, scheduleID in
 	if err := insertClassRecordFromSchedule(ctx, user, existing, scheduleID, "cancelled", reason, notes); err != nil {
 		return err
 	}
-	insertAuditLogAs(ctx, user, "classes", fmt.Sprintf("recorded class for student id %d (teacher id %d, date %s, status cancelled)", existing.StudentID, existing.TeacherID, existing.ScheduledDate))
-	insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("cancelled scheduled class id %d (student id %d, date %s)", scheduleID, existing.StudentID, existing.ScheduledDate))
+	parties := auditPartiesFromScheduled(existing)
+	insertAuditLogAs(ctx, user, "classes", formatRecordedClassAudit(parties, existing.ScheduledDate, "cancelled"))
+	insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("cancelled scheduled class id %d (%s, date %s)", scheduleID, parties, existing.ScheduledDate))
 	return nil
 }
 
@@ -382,6 +383,6 @@ func deleteScheduledClassByID(ctx context.Context, user auth.User, scheduleID in
 	}); err != nil {
 		return err
 	}
-	insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("deleted scheduled class id %d (student id %d, date %s, reason: %s)", scheduleID, existing.StudentID, existing.ScheduledDate, reason))
+	insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("deleted scheduled class id %d (%s, date %s, reason: %s)", scheduleID, auditPartiesFromScheduled(existing), existing.ScheduledDate, reason))
 	return nil
 }

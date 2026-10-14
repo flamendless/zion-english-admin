@@ -1,0 +1,306 @@
+package frontend
+
+import "fmt"
+import "zion-english/internal/utils"
+
+templ AnalyticsEmbedSection(teacherID string, isPro bool) {
+	@HubPanelHeader("Analytics", utils.URL("/analytics"))
+	@ProFeatureLockStyles()
+	if !isPro {
+		<p class="analytics-hint">Free plan: summary and trial analytics use the current calendar month (PHT). Upgrade to Teacher Pro for full breakdowns on the full analytics page.</p>
+	}
+	<div
+		id="hub-analytics-embed"
+		class="analytics-page analytics-embed"
+		data-teacher-id={ teacherID }
+		data-is-pro={ fmt.Sprintf("%t", isPro) }
+		data-api-url={ utils.URL("/api/analytics") }
+	>
+		<div class="list-toolbar hub-toolbar" id="hubAnalyticsToolbar">
+			@HubMonthPicker("hubAnalyticsMonth", utils.URL("/hub/partials/analytics-date-preset"), "hubDatePresetGroup", "hubDatePreset")
+			@DatePresetForMonthScoped(utils.CurrentMonthPHT(), true, "hubDatePresetGroup", "hubDatePreset")
+			@SortControls("", "asc", ListSortKindAnalytics)
+			<div class="form-group list-toolbar-action">
+				<label for="hubFilterBtn">&nbsp;</label>
+				<button type="button" id="hubFilterBtn">Filter</button>
+			</div>
+			@CutoffLegend()
+		</div>
+		<div id="hubAnalyticsLoading" class="empty-state">
+			@FetchBodyLoading("Loading analytics...")
+		</div>
+		<div id="hubAnalyticsContent" hidden>
+			<div class="analytics-summary" id="hubSummaryCards"></div>
+			<div class="analytics-section">
+				<h2>Trial classes</h2>
+				<div class="analytics-summary" id="hubTrialSummaryCards"></div>
+				<div class="analytics-chart-card">
+					<h2>Conducted trials by week</h2>
+					<div class="analytics-chart-wrap">
+						<canvas id="trialWeeklyChart"></canvas>
+					</div>
+				</div>
+			</div>
+			<div class="analytics-charts">
+				<div class="analytics-chart-card">
+					<h2>Class Status</h2>
+					if isPro {
+						<div class="analytics-chart-wrap">
+							<canvas id="classStatusChart"></canvas>
+						</div>
+					} else {
+						<div class="analytics-chart-wrap is-pro-locked">
+							@ProFeatureLock(ProLockTitle, ProLockAnalyticsDetail)
+						</div>
+					}
+				</div>
+				<div class="analytics-chart-card">
+					<h2>Weekly Trend</h2>
+					if isPro {
+						<div class="analytics-chart-wrap">
+							<canvas id="weeklyTrendChart"></canvas>
+						</div>
+					} else {
+						<div class="analytics-chart-wrap is-pro-locked">
+							@ProFeatureLock(ProLockTitle, ProLockAnalyticsDetail)
+						</div>
+					}
+				</div>
+			</div>
+			<div class="analytics-section">
+				<h2>By Student</h2>
+				<div class="table-wrapper data-list-view-root">
+					<table class="table-stack-mobile">
+						<thead>
+							<tr>
+								<th>Student</th>
+								<th>Conducted</th>
+								<th>Cancelled</th>
+								<th>Rescheduled</th>
+								<th>Cancellation Rate</th>
+							</tr>
+						</thead>
+						<tbody id="hubStudentTableBody">
+							if !isPro {
+								@ProLockedTableRow(5, ProLockTitle, ProLockAnalyticsDetail)
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="analytics-section">
+				<h2>Student Retention</h2>
+				if isPro {
+					<div class="analytics-summary" id="hubRetentionCards"></div>
+					<div class="analytics-chart-card">
+						<h2>Inactive Reasons</h2>
+						<div class="analytics-chart-wrap">
+							<canvas id="inactiveReasonsChart"></canvas>
+						</div>
+					</div>
+				} else {
+					<div class="table-wrapper data-list-view-root">
+						<table class="table-stack-mobile">
+							<thead>
+								<tr>
+									<th>Insight</th>
+								</tr>
+							</thead>
+							<tbody>
+								@ProLockedTableRow(1, ProLockTitle, ProLockAnalyticsDetail)
+							</tbody>
+						</table>
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src={ utils.URL("/static/js/analytics-charts.js") }></script>
+	@AnalyticsEmbedScript()
+}
+
+templ AnalyticsEmbedScript() {
+	<script>
+		(function () {
+			const embedRoot = document.getElementById('hub-analytics-embed');
+			if (!embedRoot) return;
+			const teacherId = embedRoot.dataset.teacherId || '';
+			const isPro = embedRoot.dataset.isPro === 'true';
+			const analyticsAPIURL = embedRoot.dataset.apiUrl || '/api/analytics';
+			const filterBtn = document.getElementById('hubFilterBtn');
+			const analyticsLoading = document.getElementById('hubAnalyticsLoading');
+			const analyticsContent = document.getElementById('hubAnalyticsContent');
+
+			function setDateRangeFromPreset(select) {
+				if (!select || !select.value) return;
+				const parts = select.value.split('|');
+				if (parts.length !== 2) return;
+				select.dataset.startDate = parts[0];
+				select.dataset.endDate = parts[1];
+			}
+
+			function bindDatePreset() {
+				const preset = document.getElementById('hubDatePreset');
+				if (!preset) return;
+				setDateRangeFromPreset(preset);
+				preset.addEventListener('change', function () { setDateRangeFromPreset(preset); });
+			}
+			bindDatePreset();
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id === 'hubDatePresetGroup') bindDatePreset();
+			});
+
+			function escapeHTML(value) {
+				const div = document.createElement('div');
+				div.textContent = value == null ? '' : String(value);
+				return div.innerHTML;
+			}
+			function formatPct(value) { return Number(value || 0).toFixed(2) + '%'; }
+			function formatMinutes(minutes) {
+				const hrs = Math.floor(minutes / 60);
+				const mins = minutes % 60;
+				return hrs > 0 ? hrs + 'h ' + mins + 'm' : mins + 'm';
+			}
+
+			function renderSummary(summary) {
+				const cards = [
+					{ label: 'Utilization', value: formatPct(summary.utilizationPct), sub: formatMinutes(summary.conductedMinutes) + ' / ' + formatMinutes(summary.scheduledMinutes) },
+					{ label: 'Cancellation Rate', value: formatPct(summary.cancellationRate), sub: summary.cancelled + ' cancelled' },
+					{ label: 'Conducted', value: summary.conducted, sub: summary.rescheduled + ' rescheduled' },
+					{ label: 'No-Shows', value: summary.noShowCount, sub: 'past due scheduled' }
+				];
+				document.getElementById('hubSummaryCards').innerHTML = cards.map(function (card) {
+					return '<div class="stat-card"><span class="stat-label">' + escapeHTML(card.label) +
+						'</span><span class="stat-value">' + escapeHTML(String(card.value)) +
+						'</span><span class="stat-sub">' + escapeHTML(card.sub) + '</span></div>';
+				}).join('');
+			}
+
+			function renderTrialSummary(trial) {
+				if (!trial) return;
+				const cards = [
+					{ label: 'Conducted trials', value: trial.trialConducted, sub: trial.regularConducted + ' regular conducted' },
+					{ label: 'Trial share', value: formatPct(trial.trialSharePct), sub: 'of conducted classes' },
+					{ label: 'Scheduled trials', value: trial.trialScheduled, sub: 'upcoming in period' }
+				];
+				document.getElementById('hubTrialSummaryCards').innerHTML = cards.map(function (card) {
+					return '<div class="stat-card"><span class="stat-label">' + escapeHTML(card.label) +
+						'</span><span class="stat-value">' + escapeHTML(String(card.value)) +
+						'</span><span class="stat-sub">' + escapeHTML(card.sub) + '</span></div>';
+				}).join('');
+			}
+
+			function proLockPanelHTML(title, detail) {
+				return '<div class="pro-feature-lock" role="status">' +
+					'<span class="pro-feature-lock__icon" aria-hidden="true">' +
+					'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+					'<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>' +
+					'<path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>' +
+					'<p class="pro-feature-lock__title">' + escapeHTML(title) + '</p>' +
+					'<p class="pro-feature-lock__detail">' + escapeHTML(detail) + '</p></div>';
+			}
+
+			function isProRequiredBody(bodyText) {
+				if (!bodyText) return false;
+				return bodyText.indexOf('[ENTITLEMENTS]') !== -1 || bodyText.indexOf('Teacher Pro') !== -1;
+			}
+
+			function showProRequiredLock(detail) {
+				analyticsLoading.className = 'empty-state';
+				analyticsLoading.innerHTML = proLockPanelHTML('Teacher Pro', detail || 'This view requires Teacher Pro. Contact your administrator to upgrade your plan.');
+				analyticsLoading.hidden = false;
+				analyticsContent.hidden = true;
+			}
+
+			function renderStudents(rows) {
+				const tbody = document.getElementById('hubStudentTableBody');
+				if (!tbody || !isPro) return;
+				if (!rows || rows.length === 0) {
+					tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No student data for this period.</td></tr>';
+					return;
+				}
+				tbody.innerHTML = rows.map(function (row) {
+					return '<tr><td data-label="Student">' + escapeHTML(row.studentName) +
+						'</td><td data-label="Conducted">' + row.conducted +
+						'</td><td data-label="Cancelled">' + row.cancelled +
+						'</td><td data-label="Rescheduled">' + row.rescheduled +
+						'</td><td data-label="Cancellation Rate">' + formatPct(row.cancellationRate) + '</td></tr>';
+				}).join('');
+			}
+
+			function renderRetention(retention) {
+				const container = document.getElementById('hubRetentionCards');
+				if (!container || !retention) return;
+				const cards = [
+					{ label: 'Active Students', value: retention.activeCount },
+					{ label: 'Inactive Students', value: retention.inactiveCount },
+					{ label: 'Churned in Period', value: retention.churnedInPeriod },
+					{ label: 'Median Tenure', value: retention.medianTenureDays + ' days' }
+				];
+				container.innerHTML = cards.map(function (card) {
+					return '<div class="stat-card"><span class="stat-label">' + escapeHTML(card.label) +
+						'</span><span class="stat-value">' + escapeHTML(String(card.value)) + '</span></div>';
+				}).join('');
+			}
+
+			async function loadAnalytics() {
+				const preset = document.getElementById('hubDatePreset');
+				const startDate = preset && preset.dataset.startDate;
+				const endDate = preset && preset.dataset.endDate;
+				if (!startDate || !endDate) {
+					analyticsLoading.textContent = 'Select a date range.';
+					analyticsLoading.hidden = false;
+					analyticsContent.hidden = true;
+					return;
+				}
+				analyticsLoading.hidden = false;
+				analyticsContent.hidden = true;
+				if (window.analyticsCharts) window.analyticsCharts.destroyAll();
+
+				const params = new URLSearchParams({ startDate: startDate, endDate: endDate });
+				if (teacherId) params.set('teacherId', teacherId);
+
+				try {
+					const response = await fetch(analyticsAPIURL + '?' + params.toString(), {
+						credentials: 'same-origin',
+						headers: window.getCSRFHeaders ? window.getCSRFHeaders() : {}
+					});
+					const bodyText = await response.text();
+					if (!response.ok) {
+						if (isProRequiredBody(bodyText)) {
+							showProRequiredLock('Date ranges outside the current calendar month require Teacher Pro. Use the current month or upgrade your plan.');
+							return;
+						}
+						throw new Error('failed');
+					}
+					let data;
+					try {
+						data = JSON.parse(bodyText);
+					} catch (parseErr) {
+						if (isProRequiredBody(bodyText)) {
+							showProRequiredLock('This breakdown requires Teacher Pro. Contact your administrator to upgrade your plan.');
+							return;
+						}
+						throw parseErr;
+					}
+					renderSummary(data.summary);
+					renderTrialSummary(data.trialSummary);
+					if (window.analyticsCharts) window.analyticsCharts.renderAll(data);
+					if (isPro) {
+						renderStudents(data.byStudent);
+						renderRetention(data.retention);
+					}
+					analyticsLoading.hidden = true;
+					analyticsContent.hidden = false;
+				} catch (err) {
+					analyticsLoading.className = 'empty-state';
+					analyticsLoading.textContent = 'Could not load analytics. Try again.';
+					analyticsContent.hidden = true;
+				}
+			}
+
+			if (filterBtn) filterBtn.addEventListener('click', loadAnalytics);
+			loadAnalytics();
+		})();
+	</script>
+}

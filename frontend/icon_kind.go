@@ -24,6 +24,7 @@ const (
 	IconKindSortDesc    IconKind = "sort-desc"
 	IconKindPayment     IconKind = "payment"
 	IconKindCopy        IconKind = "copy"
+	IconKindHub         IconKind = "hub"
 )
 
 func iconActionClass(kind IconKind) string {

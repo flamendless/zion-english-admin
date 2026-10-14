@@ -183,3 +183,58 @@ WHERE s.status = 'active'
 			AND t_valid.deleted = 0
 			AND t_valid.status = 'approved'
 	);
+
+-- name: GetTestSeedStudents :many
+SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
+FROM tbl_students
+WHERE is_test_seed = 1
+ORDER BY id ASC;
+
+-- name: HardDeleteTestSeedClassCalendarEvents :exec
+DELETE FROM tbl_class_calendar_event
+WHERE class_id IN (
+	SELECT id FROM tbl_scheduled_classes
+	WHERE student_id IN (SELECT id FROM tbl_students WHERE is_test_seed = 1)
+);
+
+-- name: HardDeleteTestSeedClassMeetingRooms :exec
+DELETE FROM tbl_class_meeting_room
+WHERE class_id IN (
+	SELECT id FROM tbl_scheduled_classes
+	WHERE student_id IN (SELECT id FROM tbl_students WHERE is_test_seed = 1)
+);
+
+-- name: HardDeleteTestSeedScheduledClassLearningMaterials :exec
+DELETE FROM tbl_scheduled_class_learning_materials
+WHERE scheduled_class_id IN (
+	SELECT id FROM tbl_scheduled_classes
+	WHERE student_id IN (SELECT id FROM tbl_students WHERE is_test_seed = 1)
+);
+
+-- name: HardDeleteTestSeedScheduledClasses :exec
+DELETE FROM tbl_scheduled_classes
+WHERE student_id IN (SELECT id FROM tbl_students WHERE is_test_seed = 1);
+
+-- name: HardDeleteTestSeedClassRecordLearningMaterials :exec
+DELETE FROM tbl_class_record_learning_materials
+WHERE class_record_id IN (
+	SELECT id FROM tbl_class_records
+	WHERE student_id IN (SELECT id FROM tbl_students WHERE is_test_seed = 1)
+);
+
+-- name: HardDeleteTestSeedClassRecords :exec
+DELETE FROM tbl_class_records
+WHERE student_id IN (SELECT id FROM tbl_students WHERE is_test_seed = 1);
+
+-- name: HardDeleteTestSeedStudentRelationships :exec
+DELETE FROM tbl_student_relationships
+WHERE student_id IN (SELECT id FROM tbl_students WHERE is_test_seed = 1)
+	OR related_student_id IN (SELECT id FROM tbl_students WHERE is_test_seed = 1);
+
+-- name: HardDeleteTestSeedTeacherStudentLinks :exec
+DELETE FROM tbl_teachers_students_m2m
+WHERE student_id IN (SELECT id FROM tbl_students WHERE is_test_seed = 1);
+
+-- name: HardDeleteTestSeedStudents :exec
+DELETE FROM tbl_students
+WHERE is_test_seed = 1;

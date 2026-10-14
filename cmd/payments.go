@@ -58,7 +58,15 @@ func handlePaymentsDatePresetPartial(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	month := strings.TrimSpace(r.URL.Query().Get("month"))
+	groupID := strings.TrimSpace(r.URL.Query().Get("groupId"))
+	selectID := strings.TrimSpace(r.URL.Query().Get("selectId"))
 	writeHTML(w)
+	if groupID != "" && selectID != "" {
+		if err := frontend.DatePresetForMonthScoped(month, true, groupID, selectID).Render(r.Context(), w); err != nil {
+			HttpError(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
 	if err := frontend.DatePresetForMonth(month, true).Render(r.Context(), w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -88,7 +96,19 @@ func handlePaymentsPartial(w http.ResponseWriter, r *http.Request) {
 
 	page := utils.ParsePageQuery(r)
 
-	allRows, err := loadPaymentRows(r.Context(), paymentsTeacherScope(role, auth.GetUser(r.Context()).ID), startDate, endDate, q, status)
+	scopeTeacherID := paymentsTeacherScope(role, auth.GetUser(r.Context()).ID)
+	if auth.HasAdminAccess(role) {
+		teacherIDStr := strings.TrimSpace(r.URL.Query().Get("teacherId"))
+		if teacherIDStr != "" {
+			parsedID, parseErr := strconv.ParseInt(teacherIDStr, 10, 64)
+			if parseErr != nil || parsedID <= 0 {
+				HttpError(w, ErrInvalidTeacherID.Error(), http.StatusBadRequest)
+				return
+			}
+			scopeTeacherID = parsedID
+		}
+	}
+	allRows, err := loadPaymentRows(r.Context(), scopeTeacherID, startDate, endDate, q, status)
 	if err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -101,13 +121,23 @@ func handlePaymentsPartial(w http.ResponseWriter, r *http.Request) {
 		emptyMsg = "No payments recorded yet."
 	}
 
-	showTeacherColumn := auth.HasAdminAccess(role)
+	showTeacherColumn := auth.HasAdminAccess(role) && scopeTeacherID == 0
 	pagination := frontend.BuildPaginationData(page.Number, page.Size, page.Total)
 	partialsURL := utils.URL("/payments/partials/rows")
 	includeSelector := "#paymentsFilters"
 	targetSelector := "#paymentsTableBody"
+	if ts := strings.TrimSpace(r.URL.Query().Get("hxTarget")); ts != "" {
+		targetSelector = ts
+	}
+	if inc := strings.TrimSpace(r.URL.Query().Get("hxInclude")); inc != "" {
+		includeSelector = inc
+	}
 
-	renderHTMLComponent(r.Context(), w, "render payments partial", frontend.PaymentsPartial(rows, emptyMsg, showTeacherColumn, pagination, partialsURL, includeSelector, targetSelector))
+	paginationOOBID := "paginationBottom"
+	if id := strings.TrimSpace(r.URL.Query().Get("paginationOOBID")); id != "" {
+		paginationOOBID = id
+	}
+	renderHTMLComponent(r.Context(), w, "render payments partial", frontend.PaymentsPartial(rows, emptyMsg, showTeacherColumn, pagination, partialsURL, includeSelector, targetSelector, paginationOOBID))
 }
 
 func paymentsTeacherScope(role auth.Role, userID int64) int64 {

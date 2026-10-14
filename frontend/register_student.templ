@@ -4,7 +4,8 @@ import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 type RegisterStudentData struct {
-	IsSuperuser bool
+	IsSuperuser      bool
+	CanEditTestSeed  bool
 }
 
 templ RegisterStudent(data RegisterStudentData) {
@@ -55,13 +56,16 @@ templ RegisterStudent(data RegisterStudentData) {
 					</div>
 				}
 
-				if data.IsSuperuser {
+				if data.CanEditTestSeed {
 					<div class="form-group">
 						<label class="checkbox-label">
 							<input type="checkbox" name="isTestSeed" value="1"/>
 							Test or seed student (excluded from reports and default lists)
 						</label>
 					</div>
+				}
+
+				if data.IsSuperuser {
 					<div class="form-row">
 						<div class="form-group">
 							<label for="parentName">Parent's Name</label>

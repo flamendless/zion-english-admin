@@ -78,9 +78,9 @@ templ ClassRecordTableRows(records []ClassRecordRowData, showTeacher bool, empty
 	}
 }
 
-templ ClassRecordsPartial(records []ClassRecordRowData, showTeacher bool, emptyColspan int, emptyMessage string, page PaginationData, partialsURL string, includeSelector string) {
+templ ClassRecordsPartial(records []ClassRecordRowData, showTeacher bool, emptyColspan int, emptyMessage string, page PaginationData, partialsURL string, includeSelector string, targetSelector string, paginationOOBID string) {
 	@ClassRecordTableRows(records, showTeacher, emptyColspan, emptyMessage)
-	<div id="paginationBottom" hx-swap-oob={ HxSwapInnerHTML }>
-		@PaginationBarHTMX(partialsURL, includeSelector, "#classesTableBody", page)
+	<div id={ paginationOOBID } hx-swap-oob={ HxSwapInnerHTML }>
+		@PaginationBarHTMX(partialsURL, includeSelector, targetSelector, page)
 	</div>
 }

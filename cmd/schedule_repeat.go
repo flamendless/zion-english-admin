@@ -148,7 +148,7 @@ func handleScheduleRepeatConfirm(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("created repeating series with %d classes for student id %d (teacher id %d)", len(createdIDs), base.StudentID, base.TeacherID))
+	insertAuditLogAs(ctx, user, "schedule", fmt.Sprintf("created repeating series with %d classes for %s, %s", len(createdIDs), auditStudentRefCtx(ctx, base.StudentID), auditTeacherRefCtx(ctx, base.TeacherID)))
 
 	dateLabels := make([]string, 0, len(dates))
 	for _, date := range dates {

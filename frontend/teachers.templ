@@ -221,6 +221,7 @@ templ Teachers(data TeacherData) {
 												"hx-swap":   "innerHTML",
 											})
 											if !teacher.Deleted {
+												@IconActionLink(utils.URL("/teachers/"+teacher.ID+"/hub"), "Hub", IconKindHub)
 												@IconActionLink(utils.URL("/teachers/" + teacher.ID + "/edit"), "Edit", IconKindEdit)
 												if teacher.Status == constants.TeacherStatusPending {
 													@IconActionButton("Approve", IconKindApprove, templ.Attributes{

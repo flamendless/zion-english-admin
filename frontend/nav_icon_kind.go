@@ -12,6 +12,7 @@ const (
 	NavIconTeachers            NavIconKind = "teachers"
 	NavIconStudents            NavIconKind = "students"
 	NavIconMyStudents          NavIconKind = "my-students"
+	NavIconHub                 NavIconKind = "hub"
 	NavIconClasses             NavIconKind = "classes"
 	NavIconSchedule            NavIconKind = "schedule"
 	NavIconScheduleSeries      NavIconKind = "schedule-series"
@@ -63,6 +64,7 @@ var navIconByPath = map[string]NavIconKind{
 	"/schedule":              NavIconSchedule,
 	"/schedule/series":       NavIconScheduleSeries,
 	"/my-students":           NavIconMyStudents,
+	"/hub":                   NavIconHub,
 	"/reports":               NavIconReports,
 	"/reports/history":       NavIconReportsHistory,
 	"/affiliate-ads/reports": NavIconAffiliateAdsReports,
@@ -103,6 +105,7 @@ var navIconToneByKind = map[NavIconKind]NavIconTone{
 	NavIconTeachers:            NavIconToneSuccess,
 	NavIconStudents:            NavIconToneSuccess,
 	NavIconMyStudents:          NavIconToneSuccess,
+	NavIconHub:                 NavIconTonePrimary,
 	NavIconClasses:             NavIconTonePrimary,
 	NavIconSchedule:            NavIconTonePrimary,
 	NavIconScheduleSeries:      NavIconToneInfo,

@@ -495,6 +495,7 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 			return
 		}
 		data.IsSuperuser = isSuperuser
+		data.CanEditTestSeed = role == auth.RoleSuperuser
 
 		writeHTML(w)
 		frontend.EditStudent(data).Render(ctx, w)
@@ -559,6 +560,11 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 			return
 		}
 
+		isTestSeed := existing.IsTestSeed
+		if role == auth.RoleSuperuser {
+			isTestSeed = parseIsTestSeedForm(r.FormValue("isTestSeed"))
+		}
+
 		err = dbRW.GetQueries().UpdateStudent(ctx, queries.UpdateStudentParams{
 			Name:           req.Name,
 			StudentNumber:  studentNumber,
@@ -573,7 +579,7 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 			Status:         req.Status,
 			InactiveReason: sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
 			DeletedReason:  existing.DeletedReason,
-			IsTestSeed:     parseIsTestSeedForm(r.FormValue("isTestSeed")),
+			IsTestSeed:     isTestSeed,
 			ID:             studentID,
 		})
 		if err != nil {

@@ -1,0 +1,885 @@
+package frontend
+
+import (
+	"zion-english/internal/constants"
+	"zion-english/internal/utils"
+)
+
+type HubDocumentSummary struct {
+	Type     string
+	Status   constants.TeacherDocumentStatus
+	Filename string
+	ViewURL  string
+}
+
+type HubIntroSummary struct {
+	Status     constants.TeacherIntroVideoStatus
+	ViewURL    string
+	UploadedAt string
+}
+
+type HubLearningMaterialSummary struct {
+	ID     string
+	Title  string
+	Status string
+}
+
+type HubResourcesData struct {
+	Documents         []HubDocumentSummary
+	IntroVideo        HubIntroSummary
+	LearningMaterials []HubLearningMaterialSummary
+}
+
+type HubData struct {
+	ViewAsAdmin     bool
+	TeacherID       string
+	TeacherName     string
+	Avatar          AvatarProps
+	Status          constants.TeacherStatus
+	CutoffStartDate string
+	CutoffEndDate   string
+	TodayDate       string
+	Resources       HubResourcesData
+	IsPro           bool
+}
+
+templ HubNavTile(sectionID string, title string, hint string) {
+	<a class="hub-nav-tile" href={ "#" + sectionID }>
+		<span class="hub-nav-tile__title">{ title }</span>
+		<span class="hub-nav-tile__hint">{ hint }</span>
+	</a>
+}
+
+templ HubPanelHeader(title string, fullPageURL string) {
+	<div class="hub-panel-header">
+		<h2 class="hub-panel-title">{ title }</h2>
+		if fullPageURL != "" {
+			<a class="hub-open-full btn btn-secondary" href={ fullPageURL }>Full page</a>
+		}
+	</div>
+}
+
+templ HubUploadLogTableRows(logs []UploadLogItem) {
+	for _, log := range logs {
+		<tr>
+			<td data-label="ID">{ log.ID }</td>
+			<td data-label="Module">{ log.Module }</td>
+			<td class={ uploadLogOutcomeClass(log.Outcome) } data-label="Status">{ uploadLogOutcomeLabel(log.Outcome) }</td>
+			<td data-label="Type">
+				@Pill(log.Kind.Label(), uploadLogKindPillTone(log.Kind))
+			</td>
+			<td data-label="Details">{ log.Summary }</td>
+			<td class="date-cell" data-label="Created">{ log.CreatedAt }</td>
+			<td data-label="Actions">
+				<div class="table-actions upload-log-row-actions">
+					@IconActionButton("View", IconKindView, templ.Attributes{
+						"type": "button",
+						"data-upload-log-view": "true",
+						"data-upload-log-filename": log.Filename,
+						"data-upload-log-filesize": log.FileSizeDisplay,
+						"data-upload-log-preset": log.PresetDisplay,
+						"data-upload-log-type": log.Kind.Label(),
+						"data-upload-log-status": uploadLogOutcomeLabel(log.Outcome),
+						"data-upload-log-summary": log.Summary,
+					})
+				</div>
+			</td>
+		</tr>
+	}
+}
+
+templ HubUploadLogsPartial(logs []UploadLogItem, emptyMessage string, page PaginationData, partialsURL string, includeSelector string, targetSelector string, paginationOOBID string) {
+	if len(logs) == 0 {
+		<tr>
+			<td colspan="6" class="empty-state">{ emptyMessage }</td>
+		</tr>
+	} else {
+		@HubUploadLogTableRows(logs)
+	}
+	<div id={ paginationOOBID } hx-swap-oob={ HxSwapInnerHTML }>
+		@PaginationBarHTMX(partialsURL, includeSelector, targetSelector, page)
+	</div>
+}
+
+templ HubMonthPicker(inputID string, partialURL string, groupID string, selectID string) {
+	<div class="form-group report-month-group">
+		<label for={ inputID }>Month</label>
+		<input
+			type="month"
+			id={ inputID }
+			name="month"
+			value={ utils.CurrentMonthPHT() }
+			hx-get={ partialURL + "?groupId=" + groupID + "&selectId=" + selectID }
+			hx-target={ "#" + groupID }
+			hx-swap={ HxSwapOuterHTML }
+			hx-include="this"
+			hx-trigger="change"
+		/>
+	</div>
+}
+
+templ Hub(data HubData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		if data.ViewAsAdmin {
+			@AdminPageHead("Teacher Hub - Zion English Admin Tool")
+		} else {
+			@AdminPageHead("My Hub - Zion English Admin Tool")
+		}
+		@AvatarStyles()
+		@ScrTimeRangeJS()
+		@ScrChartJS()
+		@ScrCutoffRowClass()
+		@ClassViewModalScripts()
+		@LearningMaterialViewModalStyles()
+		@SortToggleScript()
+		<style>
+			.hub-page {
+				padding-bottom: var(--space-10);
+			}
+
+			.hub-admin-back {
+				margin: 0 0 var(--space-4);
+				font-size: 0.875rem;
+			}
+
+			.hub-admin-back a {
+				color: var(--color-muted-foreground);
+				text-decoration: none;
+			}
+
+			.hub-admin-back a:hover {
+				color: var(--color-primary);
+			}
+
+			.hub-hero {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				justify-content: space-between;
+				gap: var(--space-4);
+				padding: var(--space-5) var(--space-6);
+				margin-bottom: var(--space-6);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-lg);
+				background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-surface) 55%, var(--color-surface) 100%);
+				box-shadow: var(--shadow-sm);
+			}
+
+			.hub-hero__copy {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-2);
+				min-width: 0;
+			}
+
+			.hub-hero__eyebrow {
+				margin: 0;
+				font-size: 0.75rem;
+				font-weight: 600;
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				color: var(--color-primary);
+			}
+
+			.hub-hero__title {
+				margin: 0;
+				font-size: 1.75rem;
+				line-height: 1.2;
+				font-weight: 700;
+			}
+
+			.hub-hero__subtitle {
+				margin: 0;
+				max-width: 36rem;
+				font-size: 0.9375rem;
+				color: var(--color-muted-foreground);
+				line-height: 1.5;
+			}
+
+			.hub-hero__identity {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: var(--space-3);
+			}
+
+			.hub-nav-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+				gap: var(--space-3);
+				margin-bottom: var(--space-8);
+			}
+
+			.hub-nav-tile {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-1);
+				padding: var(--space-3) var(--space-4);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-lg);
+				background: var(--color-surface);
+				text-decoration: none;
+				color: inherit;
+				box-shadow: var(--shadow-sm);
+				transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+			}
+
+			.hub-nav-tile:hover {
+				border-color: var(--color-primary);
+				box-shadow: var(--shadow-md);
+				transform: translateY(-2px);
+			}
+
+			.hub-nav-tile:focus-visible {
+				outline: 2px solid var(--color-primary);
+				outline-offset: 2px;
+			}
+
+			.hub-nav-tile__title {
+				font-size: 0.875rem;
+				font-weight: 600;
+			}
+
+			.hub-nav-tile__hint {
+				font-size: 0.75rem;
+				color: var(--color-muted-foreground);
+				line-height: 1.35;
+			}
+
+			.hub-panel {
+				margin-bottom: var(--space-6);
+				padding: var(--space-5);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-lg);
+				background: var(--color-surface);
+				box-shadow: var(--shadow-sm);
+			}
+
+			.hub-panel-header {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				justify-content: space-between;
+				gap: var(--space-3);
+				margin-bottom: var(--space-4);
+				padding-bottom: var(--space-3);
+				border-bottom: 1px solid var(--color-border-subtle);
+			}
+
+			.hub-panel-title {
+				margin: 0;
+				padding-left: var(--space-3);
+				border-left: 4px solid var(--color-primary);
+				font-size: 1.125rem;
+				font-weight: 600;
+				line-height: 1.3;
+			}
+
+			.hub-open-full.btn.btn-secondary {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				box-sizing: border-box;
+				margin-top: 0;
+				height: 36px;
+				padding: 0 var(--space-3);
+				font-size: 0.8125rem;
+				line-height: 1;
+			}
+
+			.hub-resources-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+				gap: var(--space-3);
+				margin-bottom: var(--space-4);
+			}
+
+			.hub-resource-card {
+				padding: var(--space-3);
+				border: 1px solid var(--color-border-subtle);
+				border-radius: var(--radius-md);
+				background: var(--color-background);
+			}
+
+			.hub-resource-card strong {
+				display: block;
+				margin-bottom: var(--space-2);
+				font-size: 0.8125rem;
+			}
+
+			.hub-resource-links {
+				display: flex;
+				flex-wrap: wrap;
+				gap: var(--space-2);
+				margin-top: var(--space-4);
+			}
+
+			.hub-resource-links a {
+				display: inline-flex;
+				align-items: center;
+				padding: var(--space-1) var(--space-3);
+				border: var(--pill-border);
+				border-radius: var(--radius-full);
+				font-size: 0.8125rem;
+				text-decoration: none;
+				color: var(--color-foreground);
+				background: var(--color-muted);
+			}
+
+			.hub-resource-links a:hover {
+				border-color: var(--color-primary);
+				color: var(--color-primary);
+			}
+
+			.list-toolbar.hub-toolbar {
+				margin-bottom: var(--space-4);
+				padding: var(--space-3);
+				background: var(--color-background);
+				border: none;
+			}
+
+			.hub-schedule-list {
+				margin-top: var(--space-2);
+			}
+
+			.hub-page .analytics-embed .analytics-summary {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+				gap: var(--space-4);
+				margin-bottom: var(--space-4);
+			}
+
+			.hub-page .analytics-embed .analytics-chart-wrap {
+				position: relative;
+				height: 280px;
+			}
+
+			@media (max-width: 640px) {
+				.hub-hero {
+					padding: var(--space-4);
+				}
+
+				.hub-hero__title {
+					font-size: 1.375rem;
+				}
+
+				.hub-nav-grid {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container hub-page">
+			@HeaderSimple()
+			@SuccessBanner()
+			@ErrorBanner()
+
+			if data.ViewAsAdmin {
+				<p class="hub-admin-back"><a href={ utils.URL("/teachers") }>Back to Teachers</a></p>
+			}
+
+			<header class="hub-hero">
+				<div class="hub-hero__copy">
+					if data.ViewAsAdmin {
+						<p class="hub-hero__eyebrow">Teacher hub</p>
+						<h1 class="hub-hero__title">Hub</h1>
+						<p class="hub-hero__subtitle">Everything for this teacher in one place: resources, students, classes, payroll, schedule, and analytics.</p>
+					} else {
+						<p class="hub-hero__eyebrow">Command center</p>
+						<h1 class="hub-hero__title">My Hub</h1>
+						<p class="hub-hero__subtitle">Jump to any area: your documents, students, this cutoff&apos;s classes, payments, earnings, schedule, and analytics.</p>
+					}
+				</div>
+				<div class="hub-hero__identity">
+					@TeacherNameCell(data.TeacherName, data.Avatar)
+					@StatusPill(data.Status.Label(), TeacherStatusPillTone(data.Status, false), false)
+				</div>
+			</header>
+
+			<nav class="hub-nav-grid" aria-label="Hub sections">
+				@HubNavTile("hub-resources", "Resources", "Docs and materials")
+				@HubNavTile("hub-students", "Students", "Assigned roster")
+				@HubNavTile("hub-classes", "Classes", "This cutoff")
+				@HubNavTile("hub-payments", "Payments", "History")
+				@HubNavTile("hub-earnings", "Earnings", "By cutoff")
+				@HubNavTile("hub-schedule", "Schedule", "By day")
+				@HubNavTile("hub-upload-logs", "Upload logs", "File activity")
+				@HubNavTile("hub-analytics", "Analytics", "Insights")
+			</nav>
+
+			<section class="hub-panel" id="hub-resources">
+				@HubPanelHeader("Resources", "")
+				<div class="hub-resources-grid">
+					if len(data.Resources.Documents) == 0 {
+						<p class="empty-state">No documents uploaded yet.</p>
+					} else {
+						for _, doc := range data.Resources.Documents {
+							<div class="hub-resource-card">
+								<strong>{ doc.Type }</strong>
+								<div>@StatusPill(doc.Status.Label(), DocumentStatusPillTone(doc.Status), false)</div>
+								<p style="margin: var(--space-2) 0 0; font-size: 0.875rem;">{ getDisplayValue(doc.Filename) }</p>
+								if doc.ViewURL != "" {
+									<a href={ doc.ViewURL } target="_blank" rel="noopener noreferrer" style="font-size: 0.875rem;">View</a>
+								}
+							</div>
+						}
+					}
+				</div>
+				if data.Resources.IntroVideo.Status != "" {
+					<p>
+						Intro video:
+						@StatusPill(data.Resources.IntroVideo.Status.Label(), IntroVideoStatusPillTone(data.Resources.IntroVideo.Status), false)
+						if data.Resources.IntroVideo.ViewURL != "" {
+							<a href={ data.Resources.IntroVideo.ViewURL } target="_blank" rel="noopener noreferrer">View</a>
+						}
+					</p>
+				}
+				if len(data.Resources.LearningMaterials) > 0 {
+					<h3 style="font-size: 1rem;">Learning materials created</h3>
+					<ul>
+						for _, lm := range data.Resources.LearningMaterials {
+							<li>
+								<a href={ utils.URL("/learning-materials") }>{ lm.Title }</a>
+								<span style="color: var(--color-muted-foreground);"> ({ lm.Status })</span>
+							</li>
+						}
+					</ul>
+				}
+				<div class="hub-resource-links">
+					<a href={ utils.URL("/profile") }>Profile</a>
+					<a href={ utils.URL("/documents") }>Documents</a>
+					<a href={ utils.URL("/intro-videos") }>Intro video</a>
+					<a href={ utils.URL("/learning-materials") }>Learning library</a>
+					<a href={ utils.URL("/training-materials") }>Training</a>
+				</div>
+			</section>
+
+			<section class="hub-panel" id="hub-students">
+				@HubPanelHeader("Students", HubStudentsFullPageURL(data.ViewAsAdmin, data.TeacherID))
+				<div class="list-toolbar hub-toolbar" id="hubStudentsToolbar">
+					<input type="hidden" name="teacherId" value={ data.TeacherID }/>
+					<div class="form-group">
+						<label for="hubStudentsQ">Search</label>
+						<input type="text" id="hubStudentsQ" name="q" placeholder="Search student name..."/>
+					</div>
+					<div class="form-group">
+						<label for="hubStudentsStatus">Status</label>
+						<select id="hubStudentsStatus" name="status">
+							<option value="">All</option>
+							for _, opt := range StudentFilterStatusOptions {
+								<option value={ opt.Value }>{ opt.Label }</option>
+							}
+						</select>
+					</div>
+					@SortControls("", "asc", ListSortKindMyStudent)
+					<input type="hidden" id="hubStudentsPage" name="page" value="1"/>
+					@DataListViewToggle()
+					<div class="form-group list-toolbar-action">
+						<label for="hubStudentsFilterBtn">&nbsp;</label>
+						<button
+							type="button"
+							id="hubStudentsFilterBtn"
+							hx-get={ utils.URL("/hub/partials/students") }
+							hx-include="#hubStudentsToolbar"
+							hx-target="#hubStudentsTableBody"
+							hx-swap={ HxSwapInnerHTML }
+						>Filter</button>
+					</div>
+				</div>
+				<div class="table-wrapper data-list-view-root">
+					<table class="table-stack-mobile">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Contact</th>
+								<th>Parent</th>
+								<th>Rate</th>
+								<th>Status</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody
+							id="hubStudentsTableBody"
+							data-loading-label="Loading students..."
+							hx-get={ utils.URL("/hub/partials/students") }
+							hx-include="#hubStudentsToolbar"
+							hx-trigger={ HxTriggerLoad }
+							hx-swap={ HxSwapInnerHTML }
+						>
+							@TableBodyLoadingRow(6, "Loading students...")
+						</tbody>
+					</table>
+				</div>
+				<div id="hubStudentsPagination" class="pagination-bar"></div>
+			</section>
+
+			<section class="hub-panel" id="hub-classes">
+				@HubPanelHeader("Classes this cutoff", utils.URL("/classes"))
+				<div class="list-toolbar hub-toolbar" id="hubClassesToolbar">
+					<input type="hidden" id="hubTeacherId" name="teacherId" value={ data.TeacherID }/>
+					<input type="hidden" name="paginationOOBID" value="hubClassesPagination"/>
+					<input type="hidden" name="hxTarget" value="#hubClassesTableBody"/>
+					<input type="hidden" name="hideTeacherColumn" value="1"/>
+					<div class="form-group">
+						<label>Teacher</label>
+						<input type="text" value={ data.TeacherName } disabled/>
+					</div>
+					<div class="form-group">
+						<label for="hubStudentSearch">Student</label>
+						<input type="text" id="hubStudentSearch" name="studentQ" placeholder="Search student name..."/>
+					</div>
+					@HubMonthPicker("hubClassesMonth", utils.URL("/classes/partials/date-preset"), "hubClassesDatePresetGroup", "hubClassesDatePreset")
+					@DatePresetForMonthScoped(utils.CurrentMonthPHT(), true, "hubClassesDatePresetGroup", "hubClassesDatePreset")
+					<input type="hidden" id="hubClassesStartDate" name="startDate" value={ data.CutoffStartDate }/>
+					<input type="hidden" id="hubClassesEndDate" name="endDate" value={ data.CutoffEndDate }/>
+					@ClassesStatusFilterDropdownWithValue(constants.ClassListFilterStatus(""))
+					<div class="form-group">
+						<label for="hubTestSeedFilter">Test/seed</label>
+						<select id="hubTestSeedFilter" name="testSeedFilter">
+							for _, opt := range StudentTestSeedFilterOptions {
+								<option value={ opt.Value }>{ opt.Label }</option>
+							}
+						</select>
+					</div>
+					@SortControls("", "desc", ListSortKindClass)
+					<input type="hidden" id="hubClassesPage" name="page" value="1"/>
+					@DataListViewToggle()
+					<div class="form-group list-toolbar-action">
+						<label for="hubClassesFilterBtn">&nbsp;</label>
+						<button
+							type="button"
+							id="hubClassesFilterBtn"
+							hx-get={ utils.URL("/classes/partials/rows") }
+							hx-include="#hubClassesToolbar"
+							hx-target="#hubClassesTableBody"
+							hx-swap={ HxSwapInnerHTML }
+						>Filter</button>
+					</div>
+					@CutoffLegend()
+				</div>
+				<div class="table-wrapper data-list-view-root">
+					<table id="hubClassesTable" class="table-stack-mobile">
+						<thead>
+							<tr>
+								<th class="class-record-status-col" scope="col"><span class="sr-only">Status</span></th>
+								<th>Date</th>
+								<th>Time</th>
+								<th>Student</th>
+								<th>Rate</th>
+								<th>Note / Reason</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody
+							id="hubClassesTableBody"
+							data-loading-label="Loading classes..."
+							hx-get={ utils.URL("/classes/partials/rows") }
+							hx-include="#hubClassesToolbar"
+							hx-trigger="load, classesRefresh from:body"
+							hx-swap={ HxSwapInnerHTML }
+						>
+							@TableBodyLoadingRow(7, "Loading classes...")
+						</tbody>
+					</table>
+				</div>
+				<div id="hubClassesPagination" class="pagination-bar"></div>
+			</section>
+
+			<section class="hub-panel" id="hub-payments">
+				@HubPanelHeader("Payments", utils.URL("/payments"))
+				<div class="list-toolbar hub-toolbar" id="hubPaymentsToolbar">
+					<div id="hubPaymentsFilters" class="payments-filters" style="display: contents;">
+						<input type="hidden" name="teacherId" value={ data.TeacherID }/>
+						<input type="hidden" name="paginationOOBID" value="hubPaymentsPagination"/>
+						<input type="hidden" name="hxTarget" value="#hubPaymentsTableBody"/>
+						<input type="hidden" name="hxInclude" value="#hubPaymentsFilters"/>
+						@HubMonthPicker("hubPaymentsMonth", utils.URL("/payments/partials/date-preset"), "hubPaymentsDatePresetGroup", "hubPaymentsDatePreset")
+						@DatePresetForMonthScoped(utils.CurrentMonthPHT(), true, "hubPaymentsDatePresetGroup", "hubPaymentsDatePreset")
+						<div class="form-group">
+							<label for="hubPaymentStatusFilter">Status</label>
+							<select id="hubPaymentStatusFilter" name="status">
+								<option value="">All</option>
+								for _, opt := range PaymentStatusFilterOptions {
+									<option value={ opt.Value }>{ opt.Label }</option>
+								}
+							</select>
+						</div>
+						<input type="hidden" id="hubPaymentsPage" name="page" value="1"/>
+						@DataListViewToggle()
+						<div class="form-group list-toolbar-action">
+							<label for="hubPaymentsFilterBtn">&nbsp;</label>
+							<button
+								type="button"
+								id="hubPaymentsFilterBtn"
+								hx-get={ utils.URL("/payments/partials/rows") }
+								hx-include="#hubPaymentsFilters"
+								hx-target="#hubPaymentsTableBody"
+								hx-swap={ HxSwapInnerHTML }
+							>Filter</button>
+						</div>
+						@CutoffLegend()
+					</div>
+				</div>
+				<div class="table-wrapper data-list-view-root">
+					<table class="table-stack-mobile">
+						<thead>
+							<tr>
+								<th>Period</th>
+								<th>Method</th>
+								<th>Reference #</th>
+								<th>Amount</th>
+								<th>Status</th>
+								<th>Sent by</th>
+								<th>Sent at</th>
+								<th>Received at</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody
+							id="hubPaymentsTableBody"
+							data-loading-label="Loading payments..."
+							hx-get={ utils.URL("/payments/partials/rows") }
+							hx-include="#hubPaymentsFilters"
+							hx-trigger={ HxTriggerLoad }
+							hx-swap={ HxSwapInnerHTML }
+						>
+							@TableBodyLoadingRow(9, "Loading payments...")
+						</tbody>
+					</table>
+				</div>
+				<div id="hubPaymentsPagination" class="pagination-bar"></div>
+			</section>
+
+			<section class="hub-panel" id="hub-earnings">
+				@HubPanelHeader("Earnings by cutoff", utils.URL("/my-earnings"))
+				<input type="hidden" id="hubEarningsTeacherId" name="teacherId" value={ data.TeacherID }/>
+				<div class="table-wrapper data-list-view-root">
+					<table class="table-stack-mobile earnings-cutoff-table">
+						<thead>
+							<tr>
+								<th>Month</th>
+								<th>Cutoff</th>
+								<th>Period</th>
+								<th>Earnings</th>
+								<th>Conducted</th>
+							</tr>
+						</thead>
+						<tbody
+							id="hubEarningsTableBody"
+							data-loading-label="Loading earnings..."
+							hx-get={ utils.URL("/hub/partials/earnings") }
+							hx-include="#hubEarningsTeacherId"
+							hx-trigger={ HxTriggerLoad }
+							hx-swap={ HxSwapInnerHTML }
+						>
+							@TableBodyLoadingRow(5, "Loading earnings...")
+						</tbody>
+					</table>
+				</div>
+			</section>
+
+			<section class="hub-panel" id="hub-schedule">
+				@HubPanelHeader("Schedule", utils.URL("/schedule"))
+				<div class="list-toolbar hub-toolbar" id="hubScheduleToolbar">
+					<input type="hidden" id="hubScheduleTeacherId" name="teacherId" value={ data.TeacherID }/>
+					<div class="form-group">
+						<label for="hubScheduleDate">Date</label>
+						<input type="date" id="hubScheduleDate" name="startDate" value={ data.TodayDate }/>
+					</div>
+					<input type="hidden" name="endDate" value={ data.TodayDate } id="hubScheduleEndDate"/>
+					<div class="form-group list-toolbar-action">
+						<label for="hubScheduleFilterBtn">&nbsp;</label>
+						<button
+							type="button"
+							id="hubScheduleFilterBtn"
+							hx-get={ utils.URL("/schedule/partials/list") }
+							hx-include="#hubScheduleToolbar"
+							hx-target="#hubScheduleList"
+							hx-swap={ HxSwapInnerHTML }
+						>Filter</button>
+					</div>
+				</div>
+				<div
+					id="hubScheduleList"
+					class="hub-schedule-list"
+					data-loading-label="Loading schedule..."
+					hx-get={ utils.URL("/schedule/partials/list") }
+					hx-include="#hubScheduleToolbar"
+					hx-trigger={ HxTriggerLoad }
+					hx-swap={ HxSwapInnerHTML }
+				>
+					@FetchBodyLoading("Loading schedule...")
+				</div>
+			</section>
+
+			<section class="hub-panel" id="hub-upload-logs">
+				@HubPanelHeader("Upload logs", utils.URL("/upload-logs"))
+				<div class="list-toolbar hub-toolbar" id="hubUploadLogsToolbar">
+					<input type="hidden" name="teacherId" value={ data.TeacherID }/>
+					<div class="form-group">
+						<label for="hubUploadLogsQ">Search</label>
+						<input type="text" id="hubUploadLogsQ" name="q" placeholder="Search message..."/>
+					</div>
+					<div class="form-group">
+						<label for="hubUploadLogsModule">Module</label>
+						<input type="text" id="hubUploadLogsModule" name="module" placeholder="Module"/>
+					</div>
+					<div class="form-group">
+						<label for="hubUploadLogsStart">Start date</label>
+						<input type="date" id="hubUploadLogsStart" name="startDate"/>
+					</div>
+					<div class="form-group">
+						<label for="hubUploadLogsEnd">End date</label>
+						<input type="date" id="hubUploadLogsEnd" name="endDate"/>
+					</div>
+					@SortControls("", "desc", ListSortKindUploadLog)
+					<input type="hidden" id="hubUploadLogsPage" name="page" value="1"/>
+					@DataListViewToggle()
+					<div class="form-group list-toolbar-action">
+						<label for="hubUploadLogsFilterBtn">&nbsp;</label>
+						<button
+							type="button"
+							id="hubUploadLogsFilterBtn"
+							hx-get={ utils.URL("/hub/partials/upload-logs") }
+							hx-include="#hubUploadLogsToolbar"
+							hx-target="#hubUploadLogsTableBody"
+							hx-swap={ HxSwapInnerHTML }
+						>Filter</button>
+					</div>
+				</div>
+				<div class="table-wrapper data-list-view-root">
+					<table class="table-stack-mobile">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Module</th>
+								<th>Status</th>
+								<th>Type</th>
+								<th>Details</th>
+								<th>Created At</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody
+							id="hubUploadLogsTableBody"
+							data-loading-label="Loading upload logs..."
+							hx-get={ utils.URL("/hub/partials/upload-logs") }
+							hx-include="#hubUploadLogsToolbar"
+							hx-trigger={ HxTriggerLoad }
+							hx-swap={ HxSwapInnerHTML }
+						>
+							@TableBodyLoadingRow(7, "Loading upload logs...")
+						</tbody>
+					</table>
+				</div>
+				<div id="hubUploadLogsPagination" class="pagination-bar"></div>
+			</section>
+
+			<section class="hub-panel" id="hub-analytics">
+				@AnalyticsEmbedSection(data.TeacherID, data.IsPro)
+			</section>
+
+			@DeleteClassModal()
+			@ScheduledClassModals()
+			<div id="classViewModalHost"></div>
+			<div id="lmViewModalHost"></div>
+			<div id="paymentReceiptModalHost"></div>
+			@UploadLogDetailModal()
+			@LearningMaterialViewModalScripts()
+		</div>
+
+		@HubPageScripts()
+	@LayoutEnd()
+	</body>
+	</html>
+}
+
+templ HubPageScripts() {
+	<script>
+		(function () {
+			function bindDatePresetInToolbar(toolbarId, selectId, startInputId, endInputId, onChange) {
+				const toolbar = document.getElementById(toolbarId);
+				if (!toolbar) return;
+				const select = toolbar.querySelector('#' + selectId) || document.getElementById(selectId);
+				if (!select) return;
+				function apply() {
+					if (!select.value) return;
+					const parts = select.value.split('|');
+					if (parts.length !== 2) return;
+					select.dataset.startDate = parts[0];
+					select.dataset.endDate = parts[1];
+					const startEl = startInputId ? document.getElementById(startInputId) : null;
+					const endEl = endInputId ? document.getElementById(endInputId) : null;
+					if (startEl) startEl.value = parts[0];
+					if (endEl) endEl.value = parts[1];
+					if (onChange) onChange();
+				}
+				apply();
+				select.addEventListener('change', apply);
+			}
+
+			bindDatePresetInToolbar('hubClassesToolbar', 'hubClassesDatePreset', 'hubClassesStartDate', 'hubClassesEndDate', function () {
+				const page = document.getElementById('hubClassesPage');
+				if (page) page.value = '1';
+				if (typeof htmx !== 'undefined') htmx.trigger('#hubClassesTableBody', 'load');
+			});
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id === 'hubClassesDatePresetGroup') {
+					bindDatePresetInToolbar('hubClassesToolbar', 'hubClassesDatePreset', 'hubClassesStartDate', 'hubClassesEndDate', function () {
+						if (typeof htmx !== 'undefined') htmx.trigger('#hubClassesTableBody', 'load');
+					});
+				}
+				if (evt.detail.target.id === 'hubPaymentsDatePresetGroup') {
+					bindDatePresetInToolbar('hubPaymentsToolbar', 'hubPaymentsDatePreset', null, null, function () {
+						if (typeof htmx !== 'undefined') htmx.trigger('#hubPaymentsTableBody', 'load');
+					});
+				}
+			});
+
+			document.getElementById('hubScheduleDate')?.addEventListener('change', function (e) {
+				const end = document.getElementById('hubScheduleEndDate');
+				if (end) end.value = e.target.value;
+			});
+
+			function wirePagination(pageInputId, paginationId) {
+				document.body.addEventListener('click', function (e) {
+					const pageBtn = e.target.closest('#' + paginationId + ' .pagination-btn[hx-get]');
+					if (!pageBtn) return;
+					const pageInput = document.getElementById(pageInputId);
+					if (!pageInput) return;
+					const vals = pageBtn.getAttribute('hx-vals');
+					if (!vals) return;
+					try {
+						const parsed = JSON.parse(vals.replace(/'/g, '"'));
+						if (parsed.page) pageInput.value = String(parsed.page);
+					} catch (err) { /* ignore */ }
+				});
+			}
+			wirePagination('hubStudentsPage', 'hubStudentsPagination');
+			wirePagination('hubClassesPage', 'hubClassesPagination');
+			wirePagination('hubPaymentsPage', 'hubPaymentsPagination');
+			wirePagination('hubUploadLogsPage', 'hubUploadLogsPagination');
+
+			document.getElementById('hubStudentsFilterBtn')?.addEventListener('click', function () {
+				const p = document.getElementById('hubStudentsPage');
+				if (p) p.value = '1';
+			});
+			document.getElementById('hubClassesFilterBtn')?.addEventListener('click', function () {
+				const p = document.getElementById('hubClassesPage');
+				if (p) p.value = '1';
+			});
+			document.getElementById('hubPaymentsFilterBtn')?.addEventListener('click', function () {
+				const p = document.getElementById('hubPaymentsPage');
+				if (p) p.value = '1';
+			});
+			document.getElementById('hubUploadLogsFilterBtn')?.addEventListener('click', function () {
+				const p = document.getElementById('hubUploadLogsPage');
+				if (p) p.value = '1';
+			});
+		})();
+	</script>
+}

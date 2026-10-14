@@ -19,6 +19,40 @@ type MyStudentsData struct {
 	FilterPath     string
 }
 
+templ MyStudentsTableRows(students []StudentItem) {
+	for _, s := range students {
+		<tr>
+			<td data-label="Name">
+				@StudentNameCell(s.Name, s.StudentNumber, s.Avatar)
+			</td>
+			<td data-label="Contact">{ getDisplayValue(s.Contact) }</td>
+			<td data-label="Parent">{ getDisplayValue(s.ParentName) }</td>
+			<td class="rate-cell" data-label="Rate">{ formatRate(s.RatePerClass, s.Currency) }</td>
+			<td data-label="Status">
+				@StatusPill(capitalizeStatus(s.Status), StudentStatusPillTone(s.Status), false)
+			</td>
+			<td data-label="Actions">
+				<div class="table-actions">
+					@IconActionLink(utils.URL("/students/" + s.ID + "/edit"), "Edit", IconKindEdit)
+				</div>
+			</td>
+		</tr>
+	}
+}
+
+templ MyStudentsListPartial(students []StudentItem, emptyMessage string, page PaginationData, partialsURL string, includeSelector string, targetSelector string, paginationOOBID string) {
+	if len(students) == 0 {
+		<tr>
+			<td colspan="6" class="empty-state">{ emptyMessage }</td>
+		</tr>
+	} else {
+		@MyStudentsTableRows(students)
+	}
+	<div id={ paginationOOBID } hx-swap-oob={ HxSwapInnerHTML }>
+		@PaginationBarHTMX(partialsURL, includeSelector, targetSelector, page)
+	</div>
+}
+
 templ MyStudents(data MyStudentsData) {
 	<!DOCTYPE html>
 	<html lang="en">
@@ -47,24 +81,7 @@ templ MyStudents(data MyStudentsData) {
 							</tr>
 						</thead>
 						<tbody>
-							for _, s := range data.Students {
-								<tr>
-									<td data-label="Name">
-										@StudentNameCell(s.Name, s.StudentNumber, s.Avatar)
-									</td>
-									<td data-label="Contact">{ getDisplayValue(s.Contact) }</td>
-									<td data-label="Parent">{ getDisplayValue(s.ParentName) }</td>
-									<td class="rate-cell" data-label="Rate">{ formatRate(s.RatePerClass, s.Currency) }</td>
-									<td data-label="Status">
-										@StatusPill(capitalizeStatus(s.Status), StudentStatusPillTone(s.Status), false)
-									</td>
-									<td data-label="Actions">
-										<div class="table-actions">
-											@IconActionLink(utils.URL("/students/" + s.ID + "/edit"), "Edit", IconKindEdit)
-										</div>
-									</td>
-								</tr>
-							}
+							@MyStudentsTableRows(data.Students)
 						</tbody>
 					</table>
 				</div>

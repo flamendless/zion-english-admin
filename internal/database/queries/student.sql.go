@@ -553,6 +553,177 @@ func (q *Queries) GetStudentsFiltered(ctx context.Context, arg GetStudentsFilter
 	return items, nil
 }
 
+const getTestSeedStudents = `-- name: GetTestSeedStudents :many
+SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
+FROM tbl_students
+WHERE is_test_seed = 1
+ORDER BY id ASC
+`
+
+type GetTestSeedStudentsRow struct {
+	ID             int64
+	Name           string
+	StudentNumber  sql.NullString
+	ParentNumber   sql.NullString
+	Currency       string
+	Contact        sql.NullString
+	RatePerClass   float64
+	ParentName     sql.NullString
+	ParentRate     sql.NullFloat64
+	ParentCurrency sql.NullString
+	AssignedColor  string
+	Status         string
+	InactiveReason sql.NullString
+	DeletedReason  sql.NullString
+	IsTestSeed     int64
+	CreatedAt      sql.NullTime
+	UpdatedAt      sql.NullTime
+}
+
+func (q *Queries) GetTestSeedStudents(ctx context.Context) ([]GetTestSeedStudentsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTestSeedStudents)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTestSeedStudentsRow
+	for rows.Next() {
+		var i GetTestSeedStudentsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.StudentNumber,
+			&i.ParentNumber,
+			&i.Currency,
+			&i.Contact,
+			&i.RatePerClass,
+			&i.ParentName,
+			&i.ParentRate,
+			&i.ParentCurrency,
+			&i.AssignedColor,
+			&i.Status,
+			&i.InactiveReason,
+			&i.DeletedReason,
+			&i.IsTestSeed,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const hardDeleteTestSeedClassCalendarEvents = `-- name: HardDeleteTestSeedClassCalendarEvents :exec
+DELETE FROM tbl_class_calendar_event
+WHERE class_id IN (
+	SELECT id FROM tbl_scheduled_classes
+	WHERE student_id IN (SELECT id FROM tbl_students WHERE is_test_seed = 1)
+)
+`
+
+func (q *Queries) HardDeleteTestSeedClassCalendarEvents(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, hardDeleteTestSeedClassCalendarEvents)
+	return err
+}
+
+const hardDeleteTestSeedClassMeetingRooms = `-- name: HardDeleteTestSeedClassMeetingRooms :exec
+DELETE FROM tbl_class_meeting_room
+WHERE class_id IN (
+	SELECT id FROM tbl_scheduled_classes
+	WHERE student_id IN (SELECT id FROM tbl_students WHERE is_test_seed = 1)
+)
+`
+
+func (q *Queries) HardDeleteTestSeedClassMeetingRooms(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, hardDeleteTestSeedClassMeetingRooms)
+	return err
+}
+
+const hardDeleteTestSeedClassRecordLearningMaterials = `-- name: HardDeleteTestSeedClassRecordLearningMaterials :exec
+DELETE FROM tbl_class_record_learning_materials
+WHERE class_record_id IN (
+	SELECT id FROM tbl_class_records
+	WHERE student_id IN (SELECT id FROM tbl_students WHERE is_test_seed = 1)
+)
+`
+
+func (q *Queries) HardDeleteTestSeedClassRecordLearningMaterials(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, hardDeleteTestSeedClassRecordLearningMaterials)
+	return err
+}
+
+const hardDeleteTestSeedClassRecords = `-- name: HardDeleteTestSeedClassRecords :exec
+DELETE FROM tbl_class_records
+WHERE student_id IN (SELECT id FROM tbl_students WHERE is_test_seed = 1)
+`
+
+func (q *Queries) HardDeleteTestSeedClassRecords(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, hardDeleteTestSeedClassRecords)
+	return err
+}
+
+const hardDeleteTestSeedScheduledClassLearningMaterials = `-- name: HardDeleteTestSeedScheduledClassLearningMaterials :exec
+DELETE FROM tbl_scheduled_class_learning_materials
+WHERE scheduled_class_id IN (
+	SELECT id FROM tbl_scheduled_classes
+	WHERE student_id IN (SELECT id FROM tbl_students WHERE is_test_seed = 1)
+)
+`
+
+func (q *Queries) HardDeleteTestSeedScheduledClassLearningMaterials(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, hardDeleteTestSeedScheduledClassLearningMaterials)
+	return err
+}
+
+const hardDeleteTestSeedScheduledClasses = `-- name: HardDeleteTestSeedScheduledClasses :exec
+DELETE FROM tbl_scheduled_classes
+WHERE student_id IN (SELECT id FROM tbl_students WHERE is_test_seed = 1)
+`
+
+func (q *Queries) HardDeleteTestSeedScheduledClasses(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, hardDeleteTestSeedScheduledClasses)
+	return err
+}
+
+const hardDeleteTestSeedStudentRelationships = `-- name: HardDeleteTestSeedStudentRelationships :exec
+DELETE FROM tbl_student_relationships
+WHERE student_id IN (SELECT id FROM tbl_students WHERE is_test_seed = 1)
+	OR related_student_id IN (SELECT id FROM tbl_students WHERE is_test_seed = 1)
+`
+
+func (q *Queries) HardDeleteTestSeedStudentRelationships(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, hardDeleteTestSeedStudentRelationships)
+	return err
+}
+
+const hardDeleteTestSeedStudents = `-- name: HardDeleteTestSeedStudents :exec
+DELETE FROM tbl_students
+WHERE is_test_seed = 1
+`
+
+func (q *Queries) HardDeleteTestSeedStudents(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, hardDeleteTestSeedStudents)
+	return err
+}
+
+const hardDeleteTestSeedTeacherStudentLinks = `-- name: HardDeleteTestSeedTeacherStudentLinks :exec
+DELETE FROM tbl_teachers_students_m2m
+WHERE student_id IN (SELECT id FROM tbl_students WHERE is_test_seed = 1)
+`
+
+func (q *Queries) HardDeleteTestSeedTeacherStudentLinks(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, hardDeleteTestSeedTeacherStudentLinks)
+	return err
+}
+
 const insertStudent = `-- name: InsertStudent :one
 INSERT INTO tbl_students (name, student_number, parent_number, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

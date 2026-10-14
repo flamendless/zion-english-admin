@@ -133,6 +133,10 @@ func syncTeacherRoles(ctx context.Context, q *queries.Queries, teacherID int64, 
 }
 
 func handleTeachersPath(w http.ResponseWriter, r *http.Request) {
+	if id, ok := extractPathID(r, "teachers", "/hub"); ok {
+		handleHubForTeacher(w, r, id)
+		return
+	}
 	if id, ok := extractPathID(r, "teachers", "/edit"); ok {
 		handleTeacherEdit(w, r, id)
 		return

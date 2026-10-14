@@ -466,6 +466,10 @@ func Teachers(data TeacherData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				if !teacher.Deleted {
+					templ_7745c5c3_Err = IconActionLink(utils.URL("/teachers/"+teacher.ID+"/hub"), "Hub", IconKindHub).Render(ctx, templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
 					templ_7745c5c3_Err = IconActionLink(utils.URL("/teachers/"+teacher.ID+"/edit"), "Edit", IconKindEdit).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
