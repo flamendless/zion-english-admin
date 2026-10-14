@@ -6,14 +6,17 @@ import (
 )
 
 type HubDocumentSummary struct {
-	Type     string
-	Status   constants.TeacherDocumentStatus
-	Filename string
-	ViewURL  string
+	Type           string
+	Status         constants.TeacherDocumentStatus
+	Filename       string
+	FileExtension  string
+	ViewURL        string
 }
 
 type HubIntroSummary struct {
 	Status     constants.TeacherIntroVideoStatus
+	SourceType constants.TeacherIntroVideoSourceType
+	LinkLabel  string
 	ViewURL    string
 	UploadedAt string
 }
@@ -289,48 +292,128 @@ templ Hub(data HubData) {
 				line-height: 1;
 			}
 
+			.hub-resources-block {
+				margin-bottom: var(--space-5);
+			}
+
+			.hub-resources-block:last-child {
+				margin-bottom: 0;
+			}
+
+			.hub-resources-block__title {
+				margin: 0 0 var(--space-3);
+				font-size: 0.875rem;
+				font-weight: 600;
+				color: var(--color-muted-foreground);
+			}
+
 			.hub-resources-grid {
 				display: grid;
 				grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 				gap: var(--space-3);
-				margin-bottom: var(--space-4);
 			}
 
 			.hub-resource-card {
-				padding: var(--space-3);
+				display: flex;
+				flex-direction: column;
+				min-width: 0;
 				border: 1px solid var(--color-border-subtle);
 				border-radius: var(--radius-md);
-				background: var(--color-background);
+				background: var(--color-surface);
+				overflow: hidden;
 			}
 
-			.hub-resource-card strong {
+			.hub-resource-card__media {
 				display: block;
-				margin-bottom: var(--space-2);
-				font-size: 0.8125rem;
+				position: relative;
+				aspect-ratio: 4 / 3;
+				background: var(--color-muted);
+				border-bottom: 1px solid var(--color-border-subtle);
 			}
 
-			.hub-resource-links {
+			.hub-resource-card__media img,
+			.hub-resource-card__media video {
+				display: block;
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+
+			.hub-resource-card__media--icon {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: var(--color-muted-foreground);
+				text-decoration: none;
+			}
+
+			.hub-resource-card__media--icon:hover {
+				color: var(--color-primary);
+			}
+
+			.hub-resource-card__media--learning {
+				color: var(--color-primary);
+				background: var(--color-primary-light);
+			}
+
+			.hub-resource-card__media--empty {
+				pointer-events: none;
+			}
+
+			.hub-file-type-icon {
+				flex-shrink: 0;
+			}
+
+			.hub-resource-card__body {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-2);
+				padding: var(--space-3);
+				flex: 1;
+			}
+
+			.hub-resource-card__badges {
 				display: flex;
 				flex-wrap: wrap;
-				gap: var(--space-2);
-				margin-top: var(--space-4);
-			}
-
-			.hub-resource-links a {
-				display: inline-flex;
 				align-items: center;
-				padding: var(--space-1) var(--space-3);
-				border: var(--pill-border);
-				border-radius: var(--radius-full);
-				font-size: 0.8125rem;
-				text-decoration: none;
-				color: var(--color-foreground);
-				background: var(--color-muted);
+				gap: var(--space-2);
 			}
 
-			.hub-resource-links a:hover {
-				border-color: var(--color-primary);
+			.hub-resource-card__filename,
+			.hub-resource-card__title {
+				margin: 0;
+				font-size: 0.8125rem;
+				font-weight: 500;
+				line-height: 1.35;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.hub-resource-card__title {
+				font-size: 0.875rem;
+				white-space: normal;
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+			}
+
+			.hub-resource-card__meta {
+				margin: 0;
+				font-size: 0.75rem;
+				color: var(--color-muted-foreground);
+			}
+
+			.hub-resource-card__link {
+				margin-top: auto;
+				font-size: 0.8125rem;
+				font-weight: 500;
+				text-decoration: none;
 				color: var(--color-primary);
+			}
+
+			.hub-resource-card__link:hover {
+				text-decoration: underline;
 			}
 
 			.list-toolbar.hub-toolbar {
@@ -412,49 +495,35 @@ templ Hub(data HubData) {
 
 			<section class="hub-panel" id="hub-resources">
 				@HubPanelHeader("Resources", "")
-				<div class="hub-resources-grid">
+				<div class="hub-resources-block">
 					if len(data.Resources.Documents) == 0 {
 						<p class="empty-state">No documents uploaded yet.</p>
 					} else {
-						for _, doc := range data.Resources.Documents {
-							<div class="hub-resource-card">
-								<strong>{ doc.Type }</strong>
-								<div>@StatusPill(doc.Status.Label(), DocumentStatusPillTone(doc.Status), false)</div>
-								<p style="margin: var(--space-2) 0 0; font-size: 0.875rem;">{ getDisplayValue(doc.Filename) }</p>
-								if doc.ViewURL != "" {
-									<a href={ doc.ViewURL } target="_blank" rel="noopener noreferrer" style="font-size: 0.875rem;">View</a>
-								}
-							</div>
-						}
+						<div class="hub-resources-grid">
+							for _, doc := range data.Resources.Documents {
+								@HubDocumentResourceCard(doc)
+							}
+						</div>
 					}
 				</div>
 				if data.Resources.IntroVideo.Status != "" {
-					<p>
-						Intro video:
-						@StatusPill(data.Resources.IntroVideo.Status.Label(), IntroVideoStatusPillTone(data.Resources.IntroVideo.Status), false)
-						if data.Resources.IntroVideo.ViewURL != "" {
-							<a href={ data.Resources.IntroVideo.ViewURL } target="_blank" rel="noopener noreferrer">View</a>
-						}
-					</p>
+					<div class="hub-resources-block">
+						<h3 class="hub-resources-block__title">Intro video</h3>
+						<div class="hub-resources-grid">
+							@HubIntroVideoResourceCard(data.Resources.IntroVideo)
+						</div>
+					</div>
 				}
 				if len(data.Resources.LearningMaterials) > 0 {
-					<h3 style="font-size: 1rem;">Learning materials created</h3>
-					<ul>
-						for _, lm := range data.Resources.LearningMaterials {
-							<li>
-								<a href={ utils.URL("/learning-materials") }>{ lm.Title }</a>
-								<span style="color: var(--color-muted-foreground);"> ({ lm.Status })</span>
-							</li>
-						}
-					</ul>
+					<div class="hub-resources-block">
+						<h3 class="hub-resources-block__title">Learning materials created</h3>
+						<div class="hub-resources-grid">
+							for _, lm := range data.Resources.LearningMaterials {
+								@HubLearningMaterialResourceCard(lm)
+							}
+						</div>
+					</div>
 				}
-				<div class="hub-resource-links">
-					<a href={ utils.URL("/profile") }>Profile</a>
-					<a href={ utils.URL("/documents") }>Documents</a>
-					<a href={ utils.URL("/intro-videos") }>Intro video</a>
-					<a href={ utils.URL("/learning-materials") }>Learning library</a>
-					<a href={ utils.URL("/training-materials") }>Training</a>
-				</div>
 			</section>
 
 			<section class="hub-panel" id="hub-students">

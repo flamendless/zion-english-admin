@@ -14,14 +14,17 @@ import (
 )
 
 type HubDocumentSummary struct {
-	Type     string
-	Status   constants.TeacherDocumentStatus
-	Filename string
-	ViewURL  string
+	Type          string
+	Status        constants.TeacherDocumentStatus
+	Filename      string
+	FileExtension string
+	ViewURL       string
 }
 
 type HubIntroSummary struct {
 	Status     constants.TeacherIntroVideoStatus
+	SourceType constants.TeacherIntroVideoSourceType
+	LinkLabel  string
 	ViewURL    string
 	UploadedAt string
 }
@@ -79,7 +82,7 @@ func HubNavTile(sectionID string, title string, hint string) templ.Component {
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs("#" + sectionID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 47, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 50, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -92,7 +95,7 @@ func HubNavTile(sectionID string, title string, hint string) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 48, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 51, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -105,7 +108,7 @@ func HubNavTile(sectionID string, title string, hint string) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(hint)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 49, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 52, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -147,7 +150,7 @@ func HubPanelHeader(title string, fullPageURL string) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 55, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 58, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -165,7 +168,7 @@ func HubPanelHeader(title string, fullPageURL string) templ.Component {
 			var templ_7745c5c3_Var7 templ.SafeURL
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(fullPageURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 57, Col: 64}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 60, Col: 64}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -213,7 +216,7 @@ func HubUploadLogTableRows(logs []UploadLogItem) templ.Component {
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(log.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 65, Col: 31}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 68, Col: 31}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
@@ -226,7 +229,7 @@ func HubUploadLogTableRows(logs []UploadLogItem) templ.Component {
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(log.Module)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 66, Col: 39}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 69, Col: 39}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -261,7 +264,7 @@ func HubUploadLogTableRows(logs []UploadLogItem) templ.Component {
 			var templ_7745c5c3_Var13 string
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(uploadLogOutcomeLabel(log.Outcome))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 67, Col: 108}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 70, Col: 108}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
@@ -282,7 +285,7 @@ func HubUploadLogTableRows(logs []UploadLogItem) templ.Component {
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(log.Summary)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 71, Col: 41}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 74, Col: 41}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
@@ -295,7 +298,7 @@ func HubUploadLogTableRows(logs []UploadLogItem) templ.Component {
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(log.CreatedAt)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 72, Col: 61}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 75, Col: 61}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -356,7 +359,7 @@ func HubUploadLogsPartial(logs []UploadLogItem, emptyMessage string, page Pagina
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(emptyMessage)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 94, Col: 53}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 97, Col: 53}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
@@ -379,7 +382,7 @@ func HubUploadLogsPartial(logs []UploadLogItem, emptyMessage string, page Pagina
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue(paginationOOBID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 99, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 102, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
 		if templ_7745c5c3_Err != nil {
@@ -392,7 +395,7 @@ func HubUploadLogsPartial(logs []UploadLogItem, emptyMessage string, page Pagina
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 99, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 102, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var19)
 		if templ_7745c5c3_Err != nil {
@@ -442,7 +445,7 @@ func HubMonthPicker(inputID string, partialURL string, groupID string, selectID 
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.ResolveAttributeValue(inputID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 106, Col: 22}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 109, Col: 22}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var21)
 		if templ_7745c5c3_Err != nil {
@@ -455,7 +458,7 @@ func HubMonthPicker(inputID string, partialURL string, groupID string, selectID 
 		var templ_7745c5c3_Var22 string
 		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.ResolveAttributeValue(inputID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 109, Col: 15}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 112, Col: 15}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var22)
 		if templ_7745c5c3_Err != nil {
@@ -468,7 +471,7 @@ func HubMonthPicker(inputID string, partialURL string, groupID string, selectID 
 		var templ_7745c5c3_Var23 string
 		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.CurrentMonthPHT())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 111, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 114, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var23)
 		if templ_7745c5c3_Err != nil {
@@ -481,7 +484,7 @@ func HubMonthPicker(inputID string, partialURL string, groupID string, selectID 
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.ResolveAttributeValue(partialURL + "?groupId=" + groupID + "&selectId=" + selectID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 112, Col: 72}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 115, Col: 72}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
 		if templ_7745c5c3_Err != nil {
@@ -494,7 +497,7 @@ func HubMonthPicker(inputID string, partialURL string, groupID string, selectID 
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.ResolveAttributeValue("#" + groupID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 113, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 116, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var25)
 		if templ_7745c5c3_Err != nil {
@@ -507,7 +510,7 @@ func HubMonthPicker(inputID string, partialURL string, groupID string, selectID 
 		var templ_7745c5c3_Var26 string
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapOuterHTML)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 114, Col: 28}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 117, Col: 28}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
 		if templ_7745c5c3_Err != nil {
@@ -585,7 +588,7 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<style>\r\n\t\t\t.hub-page {\r\n\t\t\t\tpadding-bottom: var(--space-10);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-admin-back {\r\n\t\t\t\tmargin: 0 0 var(--space-4);\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-admin-back a {\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\ttext-decoration: none;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-admin-back a:hover {\r\n\t\t\t\tcolor: var(--color-primary);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-hero {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tjustify-content: space-between;\r\n\t\t\t\tgap: var(--space-4);\r\n\t\t\t\tpadding: var(--space-5) var(--space-6);\r\n\t\t\t\tmargin-bottom: var(--space-6);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\t\tbackground: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-surface) 55%, var(--color-surface) 100%);\r\n\t\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-hero__copy {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-hero__eyebrow {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tfont-size: 0.75rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tletter-spacing: 0.06em;\r\n\t\t\t\ttext-transform: uppercase;\r\n\t\t\t\tcolor: var(--color-primary);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-hero__title {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tfont-size: 1.75rem;\r\n\t\t\t\tline-height: 1.2;\r\n\t\t\t\tfont-weight: 700;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-hero__subtitle {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tmax-width: 36rem;\r\n\t\t\t\tfont-size: 0.9375rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tline-height: 1.5;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-hero__identity {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-nav-grid {\r\n\t\t\t\tdisplay: grid;\r\n\t\t\t\tgrid-template-columns: repeat(auto-fill, minmax(140px, 1fr));\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t\tmargin-bottom: var(--space-8);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-nav-tile {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-1);\r\n\t\t\t\tpadding: var(--space-3) var(--space-4);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\ttext-decoration: none;\r\n\t\t\t\tcolor: inherit;\r\n\t\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\t\ttransition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-nav-tile:hover {\r\n\t\t\t\tborder-color: var(--color-primary);\r\n\t\t\t\tbox-shadow: var(--shadow-md);\r\n\t\t\t\ttransform: translateY(-2px);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-nav-tile:focus-visible {\r\n\t\t\t\toutline: 2px solid var(--color-primary);\r\n\t\t\t\toutline-offset: 2px;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-nav-tile__title {\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-nav-tile__hint {\r\n\t\t\t\tfont-size: 0.75rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tline-height: 1.35;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-panel {\r\n\t\t\t\tmargin-bottom: var(--space-6);\r\n\t\t\t\tpadding: var(--space-5);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-panel-header {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tjustify-content: space-between;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\t\tpadding-bottom: var(--space-3);\r\n\t\t\t\tborder-bottom: 1px solid var(--color-border-subtle);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-panel-title {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tpadding-left: var(--space-3);\r\n\t\t\t\tborder-left: 4px solid var(--color-primary);\r\n\t\t\t\tfont-size: 1.125rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tline-height: 1.3;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-open-full.btn.btn-secondary {\r\n\t\t\t\tdisplay: inline-flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tjustify-content: center;\r\n\t\t\t\tbox-sizing: border-box;\r\n\t\t\t\tmargin-top: 0;\r\n\t\t\t\theight: 36px;\r\n\t\t\t\tpadding: 0 var(--space-3);\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\tline-height: 1;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resources-grid {\r\n\t\t\t\tdisplay: grid;\r\n\t\t\t\tgrid-template-columns: repeat(auto-fill, minmax(200px, 1fr));\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-card {\r\n\t\t\t\tpadding: var(--space-3);\r\n\t\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-background);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-card strong {\r\n\t\t\t\tdisplay: block;\r\n\t\t\t\tmargin-bottom: var(--space-2);\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-links {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tmargin-top: var(--space-4);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-links a {\r\n\t\t\t\tdisplay: inline-flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tpadding: var(--space-1) var(--space-3);\r\n\t\t\t\tborder: var(--pill-border);\r\n\t\t\t\tborder-radius: var(--radius-full);\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\ttext-decoration: none;\r\n\t\t\t\tcolor: var(--color-foreground);\r\n\t\t\t\tbackground: var(--color-muted);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-links a:hover {\r\n\t\t\t\tborder-color: var(--color-primary);\r\n\t\t\t\tcolor: var(--color-primary);\r\n\t\t\t}\r\n\r\n\t\t\t.list-toolbar.hub-toolbar {\r\n\t\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\t\tpadding: var(--space-3);\r\n\t\t\t\tbackground: var(--color-background);\r\n\t\t\t\tborder: none;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-schedule-list {\r\n\t\t\t\tmargin-top: var(--space-2);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-page .analytics-embed .analytics-summary {\r\n\t\t\t\tdisplay: grid;\r\n\t\t\t\tgrid-template-columns: repeat(auto-fill, minmax(160px, 1fr));\r\n\t\t\t\tgap: var(--space-4);\r\n\t\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-page .analytics-embed .analytics-chart-wrap {\r\n\t\t\t\tposition: relative;\r\n\t\t\t\theight: 280px;\r\n\t\t\t}\r\n\r\n\t\t\t@media (max-width: 640px) {\r\n\t\t\t\t.hub-hero {\r\n\t\t\t\t\tpadding: var(--space-4);\r\n\t\t\t\t}\r\n\r\n\t\t\t\t.hub-hero__title {\r\n\t\t\t\t\tfont-size: 1.375rem;\r\n\t\t\t\t}\r\n\r\n\t\t\t\t.hub-nav-grid {\r\n\t\t\t\t\tgrid-template-columns: repeat(2, minmax(0, 1fr));\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t</style></head><body><div class=\"container hub-page\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<style>\r\n\t\t\t.hub-page {\r\n\t\t\t\tpadding-bottom: var(--space-10);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-admin-back {\r\n\t\t\t\tmargin: 0 0 var(--space-4);\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-admin-back a {\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\ttext-decoration: none;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-admin-back a:hover {\r\n\t\t\t\tcolor: var(--color-primary);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-hero {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tjustify-content: space-between;\r\n\t\t\t\tgap: var(--space-4);\r\n\t\t\t\tpadding: var(--space-5) var(--space-6);\r\n\t\t\t\tmargin-bottom: var(--space-6);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\t\tbackground: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-surface) 55%, var(--color-surface) 100%);\r\n\t\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-hero__copy {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-hero__eyebrow {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tfont-size: 0.75rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tletter-spacing: 0.06em;\r\n\t\t\t\ttext-transform: uppercase;\r\n\t\t\t\tcolor: var(--color-primary);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-hero__title {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tfont-size: 1.75rem;\r\n\t\t\t\tline-height: 1.2;\r\n\t\t\t\tfont-weight: 700;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-hero__subtitle {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tmax-width: 36rem;\r\n\t\t\t\tfont-size: 0.9375rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tline-height: 1.5;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-hero__identity {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-nav-grid {\r\n\t\t\t\tdisplay: grid;\r\n\t\t\t\tgrid-template-columns: repeat(auto-fill, minmax(140px, 1fr));\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t\tmargin-bottom: var(--space-8);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-nav-tile {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-1);\r\n\t\t\t\tpadding: var(--space-3) var(--space-4);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\ttext-decoration: none;\r\n\t\t\t\tcolor: inherit;\r\n\t\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\t\ttransition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-nav-tile:hover {\r\n\t\t\t\tborder-color: var(--color-primary);\r\n\t\t\t\tbox-shadow: var(--shadow-md);\r\n\t\t\t\ttransform: translateY(-2px);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-nav-tile:focus-visible {\r\n\t\t\t\toutline: 2px solid var(--color-primary);\r\n\t\t\t\toutline-offset: 2px;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-nav-tile__title {\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-nav-tile__hint {\r\n\t\t\t\tfont-size: 0.75rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\tline-height: 1.35;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-panel {\r\n\t\t\t\tmargin-bottom: var(--space-6);\r\n\t\t\t\tpadding: var(--space-5);\r\n\t\t\t\tborder: 1px solid var(--color-border);\r\n\t\t\t\tborder-radius: var(--radius-lg);\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-panel-header {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tjustify-content: space-between;\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\t\tpadding-bottom: var(--space-3);\r\n\t\t\t\tborder-bottom: 1px solid var(--color-border-subtle);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-panel-title {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tpadding-left: var(--space-3);\r\n\t\t\t\tborder-left: 4px solid var(--color-primary);\r\n\t\t\t\tfont-size: 1.125rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tline-height: 1.3;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-open-full.btn.btn-secondary {\r\n\t\t\t\tdisplay: inline-flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tjustify-content: center;\r\n\t\t\t\tbox-sizing: border-box;\r\n\t\t\t\tmargin-top: 0;\r\n\t\t\t\theight: 36px;\r\n\t\t\t\tpadding: 0 var(--space-3);\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\tline-height: 1;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resources-block {\r\n\t\t\t\tmargin-bottom: var(--space-5);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resources-block:last-child {\r\n\t\t\t\tmargin-bottom: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resources-block__title {\r\n\t\t\t\tmargin: 0 0 var(--space-3);\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\tfont-weight: 600;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resources-grid {\r\n\t\t\t\tdisplay: grid;\r\n\t\t\t\tgrid-template-columns: repeat(auto-fill, minmax(200px, 1fr));\r\n\t\t\t\tgap: var(--space-3);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-card {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tmin-width: 0;\r\n\t\t\t\tborder: 1px solid var(--color-border-subtle);\r\n\t\t\t\tborder-radius: var(--radius-md);\r\n\t\t\t\tbackground: var(--color-surface);\r\n\t\t\t\toverflow: hidden;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-card__media {\r\n\t\t\t\tdisplay: block;\r\n\t\t\t\tposition: relative;\r\n\t\t\t\taspect-ratio: 4 / 3;\r\n\t\t\t\tbackground: var(--color-muted);\r\n\t\t\t\tborder-bottom: 1px solid var(--color-border-subtle);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-card__media img,\r\n\t\t\t.hub-resource-card__media video {\r\n\t\t\t\tdisplay: block;\r\n\t\t\t\twidth: 100%;\r\n\t\t\t\theight: 100%;\r\n\t\t\t\tobject-fit: cover;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-card__media--icon {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tjustify-content: center;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t\ttext-decoration: none;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-card__media--icon:hover {\r\n\t\t\t\tcolor: var(--color-primary);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-card__media--learning {\r\n\t\t\t\tcolor: var(--color-primary);\r\n\t\t\t\tbackground: var(--color-primary-light);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-card__media--empty {\r\n\t\t\t\tpointer-events: none;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-file-type-icon {\r\n\t\t\t\tflex-shrink: 0;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-card__body {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-direction: column;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t\tpadding: var(--space-3);\r\n\t\t\t\tflex: 1;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-card__badges {\r\n\t\t\t\tdisplay: flex;\r\n\t\t\t\tflex-wrap: wrap;\r\n\t\t\t\talign-items: center;\r\n\t\t\t\tgap: var(--space-2);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-card__filename,\r\n\t\t\t.hub-resource-card__title {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\tfont-weight: 500;\r\n\t\t\t\tline-height: 1.35;\r\n\t\t\t\toverflow: hidden;\r\n\t\t\t\ttext-overflow: ellipsis;\r\n\t\t\t\twhite-space: nowrap;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-card__title {\r\n\t\t\t\tfont-size: 0.875rem;\r\n\t\t\t\twhite-space: normal;\r\n\t\t\t\tdisplay: -webkit-box;\r\n\t\t\t\t-webkit-line-clamp: 2;\r\n\t\t\t\t-webkit-box-orient: vertical;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-card__meta {\r\n\t\t\t\tmargin: 0;\r\n\t\t\t\tfont-size: 0.75rem;\r\n\t\t\t\tcolor: var(--color-muted-foreground);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-card__link {\r\n\t\t\t\tmargin-top: auto;\r\n\t\t\t\tfont-size: 0.8125rem;\r\n\t\t\t\tfont-weight: 500;\r\n\t\t\t\ttext-decoration: none;\r\n\t\t\t\tcolor: var(--color-primary);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-resource-card__link:hover {\r\n\t\t\t\ttext-decoration: underline;\r\n\t\t\t}\r\n\r\n\t\t\t.list-toolbar.hub-toolbar {\r\n\t\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\t\tpadding: var(--space-3);\r\n\t\t\t\tbackground: var(--color-background);\r\n\t\t\t\tborder: none;\r\n\t\t\t}\r\n\r\n\t\t\t.hub-schedule-list {\r\n\t\t\t\tmargin-top: var(--space-2);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-page .analytics-embed .analytics-summary {\r\n\t\t\t\tdisplay: grid;\r\n\t\t\t\tgrid-template-columns: repeat(auto-fill, minmax(160px, 1fr));\r\n\t\t\t\tgap: var(--space-4);\r\n\t\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\t}\r\n\r\n\t\t\t.hub-page .analytics-embed .analytics-chart-wrap {\r\n\t\t\t\tposition: relative;\r\n\t\t\t\theight: 280px;\r\n\t\t\t}\r\n\r\n\t\t\t@media (max-width: 640px) {\r\n\t\t\t\t.hub-hero {\r\n\t\t\t\t\tpadding: var(--space-4);\r\n\t\t\t\t}\r\n\r\n\t\t\t\t.hub-hero__title {\r\n\t\t\t\t\tfont-size: 1.375rem;\r\n\t\t\t\t}\r\n\r\n\t\t\t\t.hub-nav-grid {\r\n\t\t\t\t\tgrid-template-columns: repeat(2, minmax(0, 1fr));\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t</style></head><body><div class=\"container hub-page\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -609,7 +612,7 @@ func Hub(data HubData) templ.Component {
 			var templ_7745c5c3_Var28 templ.SafeURL
 			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/teachers"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 381, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 464, Col: 62}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 			if templ_7745c5c3_Err != nil {
@@ -691,7 +694,7 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<div class=\"hub-resources-grid\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<div class=\"hub-resources-block\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -701,228 +704,56 @@ func Hub(data HubData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<div class=\"hub-resources-grid\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 			for _, doc := range data.Resources.Documents {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<div class=\"hub-resource-card\"><strong>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var29 string
-				templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(doc.Type)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 421, Col: 26}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "</strong><div>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = StatusPill(doc.Status.Label(), DocumentStatusPillTone(doc.Status), false).Render(ctx, templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</div><p style=\"margin: var(--space-2) 0 0; font-size: 0.875rem;\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var30 string
-				templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(doc.Filename))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 423, Col: 99}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</p>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				if doc.ViewURL != "" {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "<a href=\"")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					var templ_7745c5c3_Var31 templ.SafeURL
-					templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinURLErrs(doc.ViewURL)
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 425, Col: 30}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"font-size: 0.875rem;\">View</a>")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</div>")
+				templ_7745c5c3_Err = HubDocumentResourceCard(doc).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 47, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.Resources.IntroVideo.Status != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "<p>Intro video:")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "<div class=\"hub-resources-block\"><h3 class=\"hub-resources-block__title\">Intro video</h3><div class=\"hub-resources-grid\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = StatusPill(data.Resources.IntroVideo.Status.Label(), IntroVideoStatusPillTone(data.Resources.IntroVideo.Status), false).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = HubIntroVideoResourceCard(data.Resources.IntroVideo).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if data.Resources.IntroVideo.ViewURL != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "<a href=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var32 templ.SafeURL
-				templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinURLErrs(data.Resources.IntroVideo.ViewURL)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 436, Col: 50}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "\" target=\"_blank\" rel=\"noopener noreferrer\">View</a>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
 		if len(data.Resources.LearningMaterials) > 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "<h3 style=\"font-size: 1rem;\">Learning materials created</h3><ul>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<div class=\"hub-resources-block\"><h3 class=\"hub-resources-block__title\">Learning materials created</h3><div class=\"hub-resources-grid\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, lm := range data.Resources.LearningMaterials {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "<li><a href=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var33 templ.SafeURL
-				templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/learning-materials"))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 445, Col: 50}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var34 string
-				templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(lm.Title)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 445, Col: 63}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</a> <span style=\"color: var(--color-muted-foreground);\">(")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var35 string
-				templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(lm.Status)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 446, Col: 73}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, ")</span></li>")
+				templ_7745c5c3_Err = HubLearningMaterialResourceCard(lm).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</ul>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "<div class=\"hub-resource-links\"><a href=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var36 templ.SafeURL
-		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/profile"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 452, Col: 36}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "\">Profile</a> <a href=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var37 templ.SafeURL
-		templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/documents"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 453, Col: 38}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "\">Documents</a> <a href=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var38 templ.SafeURL
-		templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/intro-videos"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 454, Col: 41}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "\">Intro video</a> <a href=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var39 templ.SafeURL
-		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/learning-materials"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 455, Col: 47}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "\">Learning library</a> <a href=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var40 templ.SafeURL
-		templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/training-materials"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 456, Col: 47}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "\">Training</a></div></section><section class=\"hub-panel\" id=\"hub-students\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</section><section class=\"hub-panel\" id=\"hub-students\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -930,56 +761,56 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "<div class=\"list-toolbar hub-toolbar\" id=\"hubStudentsToolbar\"><input type=\"hidden\" name=\"teacherId\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "<div class=\"list-toolbar hub-toolbar\" id=\"hubStudentsToolbar\"><input type=\"hidden\" name=\"teacherId\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var41 string
-		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
+		var templ_7745c5c3_Var29 string
+		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 463, Col: 65}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 532, Col: 65}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var41)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var29)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "\"><div class=\"form-group\"><label for=\"hubStudentsQ\">Search</label> <input type=\"text\" id=\"hubStudentsQ\" name=\"q\" placeholder=\"Search student name...\"></div><div class=\"form-group\"><label for=\"hubStudentsStatus\">Status</label> <select id=\"hubStudentsStatus\" name=\"status\"><option value=\"\">All</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "\"><div class=\"form-group\"><label for=\"hubStudentsQ\">Search</label> <input type=\"text\" id=\"hubStudentsQ\" name=\"q\" placeholder=\"Search student name...\"></div><div class=\"form-group\"><label for=\"hubStudentsStatus\">Status</label> <select id=\"hubStudentsStatus\" name=\"status\"><option value=\"\">All</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, opt := range StudentFilterStatusOptions {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "<option value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<option value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var42 string
-			templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
+			var templ_7745c5c3_Var30 string
+			templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 473, Col: 33}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 542, Col: 33}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var42)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var30)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var43 string
-			templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 473, Col: 47}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "</option>")
+			var templ_7745c5c3_Var31 string
+			templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 542, Col: 47}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "</option>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "</select></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "</select></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -987,7 +818,7 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "<input type=\"hidden\" id=\"hubStudentsPage\" name=\"page\" value=\"1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "<input type=\"hidden\" id=\"hubStudentsPage\" name=\"page\" value=\"1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -995,72 +826,72 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "<div class=\"form-group list-toolbar-action\"><label for=\"hubStudentsFilterBtn\">&nbsp;</label> <button type=\"button\" id=\"hubStudentsFilterBtn\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "<div class=\"form-group list-toolbar-action\"><label for=\"hubStudentsFilterBtn\">&nbsp;</label> <button type=\"button\" id=\"hubStudentsFilterBtn\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var44 string
-		templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/hub/partials/students"))
+		var templ_7745c5c3_Var32 string
+		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/hub/partials/students"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 485, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 554, Col: 51}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var44)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "\" hx-include=\"#hubStudentsToolbar\" hx-target=\"#hubStudentsTableBody\" hx-swap=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var32)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var45 string
-		templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 488, Col: 32}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var45)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "\" hx-include=\"#hubStudentsToolbar\" hx-target=\"#hubStudentsTableBody\" hx-swap=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "\">Filter</button></div></div><div class=\"table-wrapper data-list-view-root\"><table class=\"table-stack-mobile\"><thead><tr><th>Name</th><th>Contact</th><th>Parent</th><th>Rate</th><th>Status</th><th>Actions</th></tr></thead> <tbody id=\"hubStudentsTableBody\" data-loading-label=\"Loading students...\" hx-get=\"")
+		var templ_7745c5c3_Var33 string
+		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 557, Col: 32}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var33)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var46 string
-		templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/hub/partials/students"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 507, Col: 51}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var46)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "\">Filter</button></div></div><div class=\"table-wrapper data-list-view-root\"><table class=\"table-stack-mobile\"><thead><tr><th>Name</th><th>Contact</th><th>Parent</th><th>Rate</th><th>Status</th><th>Actions</th></tr></thead> <tbody id=\"hubStudentsTableBody\" data-loading-label=\"Loading students...\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "\" hx-include=\"#hubStudentsToolbar\" hx-trigger=\"")
+		var templ_7745c5c3_Var34 string
+		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/hub/partials/students"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 576, Col: 51}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var34)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var47 string
-		templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 509, Col: 33}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var47)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "\" hx-include=\"#hubStudentsToolbar\" hx-trigger=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "\" hx-swap=\"")
+		var templ_7745c5c3_Var35 string
+		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 578, Col: 33}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var35)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var48 string
-		templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 510, Col: 32}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var48)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "\" hx-swap=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "\">")
+		var templ_7745c5c3_Var36 string
+		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 579, Col: 32}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var36)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1068,7 +899,7 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "</tbody></table></div><div id=\"hubStudentsPagination\" class=\"pagination-bar\"></div></section><section class=\"hub-panel\" id=\"hub-classes\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "</tbody></table></div><div id=\"hubStudentsPagination\" class=\"pagination-bar\"></div></section><section class=\"hub-panel\" id=\"hub-classes\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1076,33 +907,33 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "<div class=\"list-toolbar hub-toolbar\" id=\"hubClassesToolbar\"><input type=\"hidden\" id=\"hubTeacherId\" name=\"teacherId\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "<div class=\"list-toolbar hub-toolbar\" id=\"hubClassesToolbar\"><input type=\"hidden\" id=\"hubTeacherId\" name=\"teacherId\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var49 string
-		templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
+		var templ_7745c5c3_Var37 string
+		templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 522, Col: 83}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 591, Col: 83}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var49)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "\"> <input type=\"hidden\" name=\"paginationOOBID\" value=\"hubClassesPagination\"> <input type=\"hidden\" name=\"hxTarget\" value=\"#hubClassesTableBody\"> <input type=\"hidden\" name=\"hideTeacherColumn\" value=\"1\"><div class=\"form-group\"><label>Teacher</label> <input type=\"text\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var37)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var50 string
-		templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherName)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 528, Col: 49}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var50)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "\"> <input type=\"hidden\" name=\"paginationOOBID\" value=\"hubClassesPagination\"> <input type=\"hidden\" name=\"hxTarget\" value=\"#hubClassesTableBody\"> <input type=\"hidden\" name=\"hideTeacherColumn\" value=\"1\"><div class=\"form-group\"><label>Teacher</label> <input type=\"text\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, "\" disabled></div><div class=\"form-group\"><label for=\"hubStudentSearch\">Student</label> <input type=\"text\" id=\"hubStudentSearch\" name=\"studentQ\" placeholder=\"Search student name...\"></div>")
+		var templ_7745c5c3_Var38 string
+		templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherName)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 597, Col: 49}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var38)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "\" disabled></div><div class=\"form-group\"><label for=\"hubStudentSearch\">Student</label> <input type=\"text\" id=\"hubStudentSearch\" name=\"studentQ\" placeholder=\"Search student name...\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1114,33 +945,33 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "<input type=\"hidden\" id=\"hubClassesStartDate\" name=\"startDate\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "<input type=\"hidden\" id=\"hubClassesStartDate\" name=\"startDate\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var51 string
-		templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.CutoffStartDate)
+		var templ_7745c5c3_Var39 string
+		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.CutoffStartDate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 536, Col: 96}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 605, Col: 96}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var51)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "\"> <input type=\"hidden\" id=\"hubClassesEndDate\" name=\"endDate\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var39)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var52 string
-		templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.CutoffEndDate)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 537, Col: 90}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var52)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "\"> <input type=\"hidden\" id=\"hubClassesEndDate\" name=\"endDate\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "\">")
+		var templ_7745c5c3_Var40 string
+		templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.CutoffEndDate)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 606, Col: 90}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var40)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1148,43 +979,43 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "<div class=\"form-group\"><label for=\"hubTestSeedFilter\">Test/seed</label> <select id=\"hubTestSeedFilter\" name=\"testSeedFilter\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "<div class=\"form-group\"><label for=\"hubTestSeedFilter\">Test/seed</label> <select id=\"hubTestSeedFilter\" name=\"testSeedFilter\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, opt := range StudentTestSeedFilterOptions {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, "<option value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, "<option value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var53 string
-			templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
+			var templ_7745c5c3_Var41 string
+			templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 543, Col: 33}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 612, Col: 33}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var53)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var41)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var54 string
-			templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 543, Col: 47}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var54))
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "</option>")
+			var templ_7745c5c3_Var42 string
+			templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 612, Col: 47}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "</option>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "</select></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "</select></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1192,7 +1023,7 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 94, "<input type=\"hidden\" id=\"hubClassesPage\" name=\"page\" value=\"1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "<input type=\"hidden\" id=\"hubClassesPage\" name=\"page\" value=\"1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1200,33 +1031,33 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 95, "<div class=\"form-group list-toolbar-action\"><label for=\"hubClassesFilterBtn\">&nbsp;</label> <button type=\"button\" id=\"hubClassesFilterBtn\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, "<div class=\"form-group list-toolbar-action\"><label for=\"hubClassesFilterBtn\">&nbsp;</label> <button type=\"button\" id=\"hubClassesFilterBtn\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var55 string
-		templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/classes/partials/rows"))
+		var templ_7745c5c3_Var43 string
+		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/classes/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 555, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 624, Col: 51}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var55)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 96, "\" hx-include=\"#hubClassesToolbar\" hx-target=\"#hubClassesTableBody\" hx-swap=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var43)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var56 string
-		templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 558, Col: 32}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var56)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "\" hx-include=\"#hubClassesToolbar\" hx-target=\"#hubClassesTableBody\" hx-swap=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 97, "\">Filter</button></div>")
+		var templ_7745c5c3_Var44 string
+		templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 627, Col: 32}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var44)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "\">Filter</button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1234,33 +1065,33 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 98, "</div><div class=\"table-wrapper data-list-view-root\"><table id=\"hubClassesTable\" class=\"table-stack-mobile\"><thead><tr><th class=\"class-record-status-col\" scope=\"col\"><span class=\"sr-only\">Status</span></th><th>Date</th><th>Time</th><th>Student</th><th>Rate</th><th>Note / Reason</th><th>Actions</th></tr></thead> <tbody id=\"hubClassesTableBody\" data-loading-label=\"Loading classes...\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "</div><div class=\"table-wrapper data-list-view-root\"><table id=\"hubClassesTable\" class=\"table-stack-mobile\"><thead><tr><th class=\"class-record-status-col\" scope=\"col\"><span class=\"sr-only\">Status</span></th><th>Date</th><th>Time</th><th>Student</th><th>Rate</th><th>Note / Reason</th><th>Actions</th></tr></thead> <tbody id=\"hubClassesTableBody\" data-loading-label=\"Loading classes...\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var57 string
-		templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/classes/partials/rows"))
+		var templ_7745c5c3_Var45 string
+		templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/classes/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 579, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 648, Col: 51}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var57)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 99, "\" hx-include=\"#hubClassesToolbar\" hx-trigger=\"load, classesRefresh from:body\" hx-swap=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var45)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var58 string
-		templ_7745c5c3_Var58, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 582, Col: 32}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var58)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "\" hx-include=\"#hubClassesToolbar\" hx-trigger=\"load, classesRefresh from:body\" hx-swap=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 100, "\">")
+		var templ_7745c5c3_Var46 string
+		templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 651, Col: 32}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var46)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1268,7 +1099,7 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 101, "</tbody></table></div><div id=\"hubClassesPagination\" class=\"pagination-bar\"></div></section><section class=\"hub-panel\" id=\"hub-payments\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, "</tbody></table></div><div id=\"hubClassesPagination\" class=\"pagination-bar\"></div></section><section class=\"hub-panel\" id=\"hub-payments\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1276,20 +1107,20 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "<div class=\"list-toolbar hub-toolbar\" id=\"hubPaymentsToolbar\"><div id=\"hubPaymentsFilters\" class=\"payments-filters\" style=\"display: contents;\"><input type=\"hidden\" name=\"teacherId\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "<div class=\"list-toolbar hub-toolbar\" id=\"hubPaymentsToolbar\"><div id=\"hubPaymentsFilters\" class=\"payments-filters\" style=\"display: contents;\"><input type=\"hidden\" name=\"teacherId\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var59 string
-		templ_7745c5c3_Var59, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
+		var templ_7745c5c3_Var47 string
+		templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 595, Col: 66}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 664, Col: 66}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var59)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var47)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, "\"> <input type=\"hidden\" name=\"paginationOOBID\" value=\"hubPaymentsPagination\"> <input type=\"hidden\" name=\"hxTarget\" value=\"#hubPaymentsTableBody\"> <input type=\"hidden\" name=\"hxInclude\" value=\"#hubPaymentsFilters\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "\"> <input type=\"hidden\" name=\"paginationOOBID\" value=\"hubPaymentsPagination\"> <input type=\"hidden\" name=\"hxTarget\" value=\"#hubPaymentsTableBody\"> <input type=\"hidden\" name=\"hxInclude\" value=\"#hubPaymentsFilters\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1301,43 +1132,43 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "<div class=\"form-group\"><label for=\"hubPaymentStatusFilter\">Status</label> <select id=\"hubPaymentStatusFilter\" name=\"status\"><option value=\"\">All</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "<div class=\"form-group\"><label for=\"hubPaymentStatusFilter\">Status</label> <select id=\"hubPaymentStatusFilter\" name=\"status\"><option value=\"\">All</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, opt := range PaymentStatusFilterOptions {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 105, "<option value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "<option value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var60 string
-			templ_7745c5c3_Var60, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
+			var templ_7745c5c3_Var48 string
+			templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 606, Col: 34}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 675, Col: 34}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var60)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 106, "\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var48)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var61 string
-			templ_7745c5c3_Var61, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 606, Col: 48}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var61))
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, "\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 107, "</option>")
+			var templ_7745c5c3_Var49 string
+			templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 675, Col: 48}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var49))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "</option>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 108, "</select></div><input type=\"hidden\" id=\"hubPaymentsPage\" name=\"page\" value=\"1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "</select></div><input type=\"hidden\" id=\"hubPaymentsPage\" name=\"page\" value=\"1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1345,33 +1176,33 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 109, "<div class=\"form-group list-toolbar-action\"><label for=\"hubPaymentsFilterBtn\">&nbsp;</label> <button type=\"button\" id=\"hubPaymentsFilterBtn\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "<div class=\"form-group list-toolbar-action\"><label for=\"hubPaymentsFilterBtn\">&nbsp;</label> <button type=\"button\" id=\"hubPaymentsFilterBtn\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var62 string
-		templ_7745c5c3_Var62, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/payments/partials/rows"))
+		var templ_7745c5c3_Var50 string
+		templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/payments/partials/rows"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 617, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 686, Col: 53}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var62)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 110, "\" hx-include=\"#hubPaymentsFilters\" hx-target=\"#hubPaymentsTableBody\" hx-swap=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var50)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var63 string
-		templ_7745c5c3_Var63, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 620, Col: 33}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var63)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 94, "\" hx-include=\"#hubPaymentsFilters\" hx-target=\"#hubPaymentsTableBody\" hx-swap=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 111, "\">Filter</button></div>")
+		var templ_7745c5c3_Var51 string
+		templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 689, Col: 33}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var51)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 95, "\">Filter</button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1379,27 +1210,215 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 112, "</div></div><div class=\"table-wrapper data-list-view-root\"><table class=\"table-stack-mobile\"><thead><tr><th>Period</th><th>Method</th><th>Reference #</th><th>Amount</th><th>Status</th><th>Sent by</th><th>Sent at</th><th>Received at</th><th>Actions</th></tr></thead> <tbody id=\"hubPaymentsTableBody\" data-loading-label=\"Loading payments...\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 96, "</div></div><div class=\"table-wrapper data-list-view-root\"><table class=\"table-stack-mobile\"><thead><tr><th>Period</th><th>Method</th><th>Reference #</th><th>Amount</th><th>Status</th><th>Sent by</th><th>Sent at</th><th>Received at</th><th>Actions</th></tr></thead> <tbody id=\"hubPaymentsTableBody\" data-loading-label=\"Loading payments...\" hx-get=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var52 string
+		templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/payments/partials/rows"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 713, Col: 52}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var52)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 97, "\" hx-include=\"#hubPaymentsFilters\" hx-trigger=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var53 string
+		templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 715, Col: 33}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var53)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 98, "\" hx-swap=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var54 string
+		templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 716, Col: 32}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var54)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 99, "\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = TableBodyLoadingRow(9, "Loading payments...").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 100, "</tbody></table></div><div id=\"hubPaymentsPagination\" class=\"pagination-bar\"></div></section><section class=\"hub-panel\" id=\"hub-earnings\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = HubPanelHeader("Earnings by cutoff", utils.URL("/my-earnings")).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 101, "<input type=\"hidden\" id=\"hubEarningsTeacherId\" name=\"teacherId\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var55 string
+		templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 727, Col: 90}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var55)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "\"><div class=\"table-wrapper data-list-view-root\"><table class=\"table-stack-mobile earnings-cutoff-table\"><thead><tr><th>Month</th><th>Cutoff</th><th>Period</th><th>Earnings</th><th>Conducted</th></tr></thead> <tbody id=\"hubEarningsTableBody\" data-loading-label=\"Loading earnings...\" hx-get=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var56 string
+		templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/hub/partials/earnings"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 742, Col: 51}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var56)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, "\" hx-include=\"#hubEarningsTeacherId\" hx-trigger=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var57 string
+		templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 744, Col: 33}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var57)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "\" hx-swap=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var58 string
+		templ_7745c5c3_Var58, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 745, Col: 32}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var58)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 105, "\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = TableBodyLoadingRow(5, "Loading earnings...").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 106, "</tbody></table></div></section><section class=\"hub-panel\" id=\"hub-schedule\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = HubPanelHeader("Schedule", utils.URL("/schedule")).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 107, "<div class=\"list-toolbar hub-toolbar\" id=\"hubScheduleToolbar\"><input type=\"hidden\" id=\"hubScheduleTeacherId\" name=\"teacherId\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var59 string
+		templ_7745c5c3_Var59, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 756, Col: 91}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var59)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 108, "\"><div class=\"form-group\"><label for=\"hubScheduleDate\">Date</label> <input type=\"date\" id=\"hubScheduleDate\" name=\"startDate\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var60 string
+		templ_7745c5c3_Var60, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TodayDate)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 759, Col: 85}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var60)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 109, "\"></div><input type=\"hidden\" name=\"endDate\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var61 string
+		templ_7745c5c3_Var61, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TodayDate)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 761, Col: 63}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var61)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 110, "\" id=\"hubScheduleEndDate\"><div class=\"form-group list-toolbar-action\"><label for=\"hubScheduleFilterBtn\">&nbsp;</label> <button type=\"button\" id=\"hubScheduleFilterBtn\" hx-get=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var62 string
+		templ_7745c5c3_Var62, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/schedule/partials/list"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 767, Col: 52}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var62)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 111, "\" hx-include=\"#hubScheduleToolbar\" hx-target=\"#hubScheduleList\" hx-swap=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var63 string
+		templ_7745c5c3_Var63, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 770, Col: 32}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var63)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 112, "\">Filter</button></div></div><div id=\"hubScheduleList\" class=\"hub-schedule-list\" data-loading-label=\"Loading schedule...\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var64 string
-		templ_7745c5c3_Var64, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/payments/partials/rows"))
+		templ_7745c5c3_Var64, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/schedule/partials/list"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 644, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 778, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var64)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 113, "\" hx-include=\"#hubPaymentsFilters\" hx-trigger=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 113, "\" hx-include=\"#hubScheduleToolbar\" hx-trigger=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var65 string
 		templ_7745c5c3_Var65, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 646, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 780, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var65)
 		if templ_7745c5c3_Err != nil {
@@ -1412,7 +1431,7 @@ func Hub(data HubData) templ.Component {
 		var templ_7745c5c3_Var66 string
 		templ_7745c5c3_Var66, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 647, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 781, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var66)
 		if templ_7745c5c3_Err != nil {
@@ -1422,199 +1441,11 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = TableBodyLoadingRow(9, "Loading payments...").Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 116, "</tbody></table></div><div id=\"hubPaymentsPagination\" class=\"pagination-bar\"></div></section><section class=\"hub-panel\" id=\"hub-earnings\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = HubPanelHeader("Earnings by cutoff", utils.URL("/my-earnings")).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 117, "<input type=\"hidden\" id=\"hubEarningsTeacherId\" name=\"teacherId\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var67 string
-		templ_7745c5c3_Var67, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 658, Col: 90}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var67)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 118, "\"><div class=\"table-wrapper data-list-view-root\"><table class=\"table-stack-mobile earnings-cutoff-table\"><thead><tr><th>Month</th><th>Cutoff</th><th>Period</th><th>Earnings</th><th>Conducted</th></tr></thead> <tbody id=\"hubEarningsTableBody\" data-loading-label=\"Loading earnings...\" hx-get=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var68 string
-		templ_7745c5c3_Var68, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/hub/partials/earnings"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 673, Col: 51}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var68)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 119, "\" hx-include=\"#hubEarningsTeacherId\" hx-trigger=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var69 string
-		templ_7745c5c3_Var69, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 675, Col: 33}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var69)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 120, "\" hx-swap=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var70 string
-		templ_7745c5c3_Var70, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 676, Col: 32}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var70)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 121, "\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = TableBodyLoadingRow(5, "Loading earnings...").Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 122, "</tbody></table></div></section><section class=\"hub-panel\" id=\"hub-schedule\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = HubPanelHeader("Schedule", utils.URL("/schedule")).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 123, "<div class=\"list-toolbar hub-toolbar\" id=\"hubScheduleToolbar\"><input type=\"hidden\" id=\"hubScheduleTeacherId\" name=\"teacherId\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var71 string
-		templ_7745c5c3_Var71, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 687, Col: 91}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var71)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 124, "\"><div class=\"form-group\"><label for=\"hubScheduleDate\">Date</label> <input type=\"date\" id=\"hubScheduleDate\" name=\"startDate\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var72 string
-		templ_7745c5c3_Var72, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TodayDate)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 690, Col: 85}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var72)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 125, "\"></div><input type=\"hidden\" name=\"endDate\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var73 string
-		templ_7745c5c3_Var73, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TodayDate)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 692, Col: 63}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var73)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 126, "\" id=\"hubScheduleEndDate\"><div class=\"form-group list-toolbar-action\"><label for=\"hubScheduleFilterBtn\">&nbsp;</label> <button type=\"button\" id=\"hubScheduleFilterBtn\" hx-get=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var74 string
-		templ_7745c5c3_Var74, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/schedule/partials/list"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 698, Col: 52}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var74)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 127, "\" hx-include=\"#hubScheduleToolbar\" hx-target=\"#hubScheduleList\" hx-swap=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var75 string
-		templ_7745c5c3_Var75, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 701, Col: 32}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var75)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 128, "\">Filter</button></div></div><div id=\"hubScheduleList\" class=\"hub-schedule-list\" data-loading-label=\"Loading schedule...\" hx-get=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var76 string
-		templ_7745c5c3_Var76, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/schedule/partials/list"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 709, Col: 50}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var76)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 129, "\" hx-include=\"#hubScheduleToolbar\" hx-trigger=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var77 string
-		templ_7745c5c3_Var77, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 711, Col: 31}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var77)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 130, "\" hx-swap=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var78 string
-		templ_7745c5c3_Var78, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 712, Col: 30}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var78)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 131, "\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
 		templ_7745c5c3_Err = FetchBodyLoading("Loading schedule...").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 132, "</div></section><section class=\"hub-panel\" id=\"hub-upload-logs\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 116, "</div></section><section class=\"hub-panel\" id=\"hub-upload-logs\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1622,20 +1453,20 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 133, "<div class=\"list-toolbar hub-toolbar\" id=\"hubUploadLogsToolbar\"><input type=\"hidden\" name=\"teacherId\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 117, "<div class=\"list-toolbar hub-toolbar\" id=\"hubUploadLogsToolbar\"><input type=\"hidden\" name=\"teacherId\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var79 string
-		templ_7745c5c3_Var79, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
+		var templ_7745c5c3_Var67 string
+		templ_7745c5c3_Var67, templ_7745c5c3_Err = templ.ResolveAttributeValue(data.TeacherID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 721, Col: 65}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 790, Col: 65}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var79)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var67)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 134, "\"><div class=\"form-group\"><label for=\"hubUploadLogsQ\">Search</label> <input type=\"text\" id=\"hubUploadLogsQ\" name=\"q\" placeholder=\"Search message...\"></div><div class=\"form-group\"><label for=\"hubUploadLogsModule\">Module</label> <input type=\"text\" id=\"hubUploadLogsModule\" name=\"module\" placeholder=\"Module\"></div><div class=\"form-group\"><label for=\"hubUploadLogsStart\">Start date</label> <input type=\"date\" id=\"hubUploadLogsStart\" name=\"startDate\"></div><div class=\"form-group\"><label for=\"hubUploadLogsEnd\">End date</label> <input type=\"date\" id=\"hubUploadLogsEnd\" name=\"endDate\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 118, "\"><div class=\"form-group\"><label for=\"hubUploadLogsQ\">Search</label> <input type=\"text\" id=\"hubUploadLogsQ\" name=\"q\" placeholder=\"Search message...\"></div><div class=\"form-group\"><label for=\"hubUploadLogsModule\">Module</label> <input type=\"text\" id=\"hubUploadLogsModule\" name=\"module\" placeholder=\"Module\"></div><div class=\"form-group\"><label for=\"hubUploadLogsStart\">Start date</label> <input type=\"date\" id=\"hubUploadLogsStart\" name=\"startDate\"></div><div class=\"form-group\"><label for=\"hubUploadLogsEnd\">End date</label> <input type=\"date\" id=\"hubUploadLogsEnd\" name=\"endDate\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1643,7 +1474,7 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 135, "<input type=\"hidden\" id=\"hubUploadLogsPage\" name=\"page\" value=\"1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 119, "<input type=\"hidden\" id=\"hubUploadLogsPage\" name=\"page\" value=\"1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1651,72 +1482,72 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 136, "<div class=\"form-group list-toolbar-action\"><label for=\"hubUploadLogsFilterBtn\">&nbsp;</label> <button type=\"button\" id=\"hubUploadLogsFilterBtn\" hx-get=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 120, "<div class=\"form-group list-toolbar-action\"><label for=\"hubUploadLogsFilterBtn\">&nbsp;</label> <button type=\"button\" id=\"hubUploadLogsFilterBtn\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var80 string
-		templ_7745c5c3_Var80, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/hub/partials/upload-logs"))
+		var templ_7745c5c3_Var68 string
+		templ_7745c5c3_Var68, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/hub/partials/upload-logs"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 746, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 815, Col: 54}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var80)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 137, "\" hx-include=\"#hubUploadLogsToolbar\" hx-target=\"#hubUploadLogsTableBody\" hx-swap=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var68)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var81 string
-		templ_7745c5c3_Var81, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 749, Col: 32}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var81)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 121, "\" hx-include=\"#hubUploadLogsToolbar\" hx-target=\"#hubUploadLogsTableBody\" hx-swap=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 138, "\">Filter</button></div></div><div class=\"table-wrapper data-list-view-root\"><table class=\"table-stack-mobile\"><thead><tr><th>ID</th><th>Module</th><th>Status</th><th>Type</th><th>Details</th><th>Created At</th><th>Actions</th></tr></thead> <tbody id=\"hubUploadLogsTableBody\" data-loading-label=\"Loading upload logs...\" hx-get=\"")
+		var templ_7745c5c3_Var69 string
+		templ_7745c5c3_Var69, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 818, Col: 32}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var69)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var82 string
-		templ_7745c5c3_Var82, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/hub/partials/upload-logs"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 769, Col: 54}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var82)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 122, "\">Filter</button></div></div><div class=\"table-wrapper data-list-view-root\"><table class=\"table-stack-mobile\"><thead><tr><th>ID</th><th>Module</th><th>Status</th><th>Type</th><th>Details</th><th>Created At</th><th>Actions</th></tr></thead> <tbody id=\"hubUploadLogsTableBody\" data-loading-label=\"Loading upload logs...\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 139, "\" hx-include=\"#hubUploadLogsToolbar\" hx-trigger=\"")
+		var templ_7745c5c3_Var70 string
+		templ_7745c5c3_Var70, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/hub/partials/upload-logs"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 838, Col: 54}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var70)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var83 string
-		templ_7745c5c3_Var83, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 771, Col: 33}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var83)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 123, "\" hx-include=\"#hubUploadLogsToolbar\" hx-trigger=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 140, "\" hx-swap=\"")
+		var templ_7745c5c3_Var71 string
+		templ_7745c5c3_Var71, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxTriggerLoad)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 840, Col: 33}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var71)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var84 string
-		templ_7745c5c3_Var84, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 772, Col: 32}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var84)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 124, "\" hx-swap=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 141, "\">")
+		var templ_7745c5c3_Var72 string
+		templ_7745c5c3_Var72, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/hub.templ`, Line: 841, Col: 32}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var72)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 125, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1724,7 +1555,7 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 142, "</tbody></table></div><div id=\"hubUploadLogsPagination\" class=\"pagination-bar\"></div></section><section class=\"hub-panel\" id=\"hub-analytics\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 126, "</tbody></table></div><div id=\"hubUploadLogsPagination\" class=\"pagination-bar\"></div></section><section class=\"hub-panel\" id=\"hub-analytics\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1732,7 +1563,7 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 143, "</section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 127, "</section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1744,7 +1575,7 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 144, "<div id=\"classViewModalHost\"></div><div id=\"lmViewModalHost\"></div><div id=\"paymentReceiptModalHost\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 128, "<div id=\"classViewModalHost\"></div><div id=\"lmViewModalHost\"></div><div id=\"paymentReceiptModalHost\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1756,7 +1587,7 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 145, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 129, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1768,7 +1599,7 @@ func Hub(data HubData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 146, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 130, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1792,12 +1623,12 @@ func HubPageScripts() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var85 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var85 == nil {
-			templ_7745c5c3_Var85 = templ.NopComponent
+		templ_7745c5c3_Var73 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var73 == nil {
+			templ_7745c5c3_Var73 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 147, "<script>\r\n\t\t(function () {\r\n\t\t\tfunction bindDatePresetInToolbar(toolbarId, selectId, startInputId, endInputId, onChange) {\r\n\t\t\t\tconst toolbar = document.getElementById(toolbarId);\r\n\t\t\t\tif (!toolbar) return;\r\n\t\t\t\tconst select = toolbar.querySelector('#' + selectId) || document.getElementById(selectId);\r\n\t\t\t\tif (!select) return;\r\n\t\t\t\tfunction apply() {\r\n\t\t\t\t\tif (!select.value) return;\r\n\t\t\t\t\tconst parts = select.value.split('|');\r\n\t\t\t\t\tif (parts.length !== 2) return;\r\n\t\t\t\t\tselect.dataset.startDate = parts[0];\r\n\t\t\t\t\tselect.dataset.endDate = parts[1];\r\n\t\t\t\t\tconst startEl = startInputId ? document.getElementById(startInputId) : null;\r\n\t\t\t\t\tconst endEl = endInputId ? document.getElementById(endInputId) : null;\r\n\t\t\t\t\tif (startEl) startEl.value = parts[0];\r\n\t\t\t\t\tif (endEl) endEl.value = parts[1];\r\n\t\t\t\t\tif (onChange) onChange();\r\n\t\t\t\t}\r\n\t\t\t\tapply();\r\n\t\t\t\tselect.addEventListener('change', apply);\r\n\t\t\t}\r\n\r\n\t\t\tbindDatePresetInToolbar('hubClassesToolbar', 'hubClassesDatePreset', 'hubClassesStartDate', 'hubClassesEndDate', function () {\r\n\t\t\t\tconst page = document.getElementById('hubClassesPage');\r\n\t\t\t\tif (page) page.value = '1';\r\n\t\t\t\tif (typeof htmx !== 'undefined') htmx.trigger('#hubClassesTableBody', 'load');\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tif (evt.detail.target.id === 'hubClassesDatePresetGroup') {\r\n\t\t\t\t\tbindDatePresetInToolbar('hubClassesToolbar', 'hubClassesDatePreset', 'hubClassesStartDate', 'hubClassesEndDate', function () {\r\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') htmx.trigger('#hubClassesTableBody', 'load');\r\n\t\t\t\t\t});\r\n\t\t\t\t}\r\n\t\t\t\tif (evt.detail.target.id === 'hubPaymentsDatePresetGroup') {\r\n\t\t\t\t\tbindDatePresetInToolbar('hubPaymentsToolbar', 'hubPaymentsDatePreset', null, null, function () {\r\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') htmx.trigger('#hubPaymentsTableBody', 'load');\r\n\t\t\t\t\t});\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.getElementById('hubScheduleDate')?.addEventListener('change', function (e) {\r\n\t\t\t\tconst end = document.getElementById('hubScheduleEndDate');\r\n\t\t\t\tif (end) end.value = e.target.value;\r\n\t\t\t});\r\n\r\n\t\t\tfunction wirePagination(pageInputId, paginationId) {\r\n\t\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\t\tconst pageBtn = e.target.closest('#' + paginationId + ' .pagination-btn[hx-get]');\r\n\t\t\t\t\tif (!pageBtn) return;\r\n\t\t\t\t\tconst pageInput = document.getElementById(pageInputId);\r\n\t\t\t\t\tif (!pageInput) return;\r\n\t\t\t\t\tconst vals = pageBtn.getAttribute('hx-vals');\r\n\t\t\t\t\tif (!vals) return;\r\n\t\t\t\t\ttry {\r\n\t\t\t\t\t\tconst parsed = JSON.parse(vals.replace(/'/g, '\"'));\r\n\t\t\t\t\t\tif (parsed.page) pageInput.value = String(parsed.page);\r\n\t\t\t\t\t} catch (err) { /* ignore */ }\r\n\t\t\t\t});\r\n\t\t\t}\r\n\t\t\twirePagination('hubStudentsPage', 'hubStudentsPagination');\r\n\t\t\twirePagination('hubClassesPage', 'hubClassesPagination');\r\n\t\t\twirePagination('hubPaymentsPage', 'hubPaymentsPagination');\r\n\t\t\twirePagination('hubUploadLogsPage', 'hubUploadLogsPagination');\r\n\r\n\t\t\tdocument.getElementById('hubStudentsFilterBtn')?.addEventListener('click', function () {\r\n\t\t\t\tconst p = document.getElementById('hubStudentsPage');\r\n\t\t\t\tif (p) p.value = '1';\r\n\t\t\t});\r\n\t\t\tdocument.getElementById('hubClassesFilterBtn')?.addEventListener('click', function () {\r\n\t\t\t\tconst p = document.getElementById('hubClassesPage');\r\n\t\t\t\tif (p) p.value = '1';\r\n\t\t\t});\r\n\t\t\tdocument.getElementById('hubPaymentsFilterBtn')?.addEventListener('click', function () {\r\n\t\t\t\tconst p = document.getElementById('hubPaymentsPage');\r\n\t\t\t\tif (p) p.value = '1';\r\n\t\t\t});\r\n\t\t\tdocument.getElementById('hubUploadLogsFilterBtn')?.addEventListener('click', function () {\r\n\t\t\t\tconst p = document.getElementById('hubUploadLogsPage');\r\n\t\t\t\tif (p) p.value = '1';\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 131, "<script>\r\n\t\t(function () {\r\n\t\t\tfunction bindDatePresetInToolbar(toolbarId, selectId, startInputId, endInputId, onChange) {\r\n\t\t\t\tconst toolbar = document.getElementById(toolbarId);\r\n\t\t\t\tif (!toolbar) return;\r\n\t\t\t\tconst select = toolbar.querySelector('#' + selectId) || document.getElementById(selectId);\r\n\t\t\t\tif (!select) return;\r\n\t\t\t\tfunction apply() {\r\n\t\t\t\t\tif (!select.value) return;\r\n\t\t\t\t\tconst parts = select.value.split('|');\r\n\t\t\t\t\tif (parts.length !== 2) return;\r\n\t\t\t\t\tselect.dataset.startDate = parts[0];\r\n\t\t\t\t\tselect.dataset.endDate = parts[1];\r\n\t\t\t\t\tconst startEl = startInputId ? document.getElementById(startInputId) : null;\r\n\t\t\t\t\tconst endEl = endInputId ? document.getElementById(endInputId) : null;\r\n\t\t\t\t\tif (startEl) startEl.value = parts[0];\r\n\t\t\t\t\tif (endEl) endEl.value = parts[1];\r\n\t\t\t\t\tif (onChange) onChange();\r\n\t\t\t\t}\r\n\t\t\t\tapply();\r\n\t\t\t\tselect.addEventListener('change', apply);\r\n\t\t\t}\r\n\r\n\t\t\tbindDatePresetInToolbar('hubClassesToolbar', 'hubClassesDatePreset', 'hubClassesStartDate', 'hubClassesEndDate', function () {\r\n\t\t\t\tconst page = document.getElementById('hubClassesPage');\r\n\t\t\t\tif (page) page.value = '1';\r\n\t\t\t\tif (typeof htmx !== 'undefined') htmx.trigger('#hubClassesTableBody', 'load');\r\n\t\t\t});\r\n\r\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\t\tif (evt.detail.target.id === 'hubClassesDatePresetGroup') {\r\n\t\t\t\t\tbindDatePresetInToolbar('hubClassesToolbar', 'hubClassesDatePreset', 'hubClassesStartDate', 'hubClassesEndDate', function () {\r\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') htmx.trigger('#hubClassesTableBody', 'load');\r\n\t\t\t\t\t});\r\n\t\t\t\t}\r\n\t\t\t\tif (evt.detail.target.id === 'hubPaymentsDatePresetGroup') {\r\n\t\t\t\t\tbindDatePresetInToolbar('hubPaymentsToolbar', 'hubPaymentsDatePreset', null, null, function () {\r\n\t\t\t\t\t\tif (typeof htmx !== 'undefined') htmx.trigger('#hubPaymentsTableBody', 'load');\r\n\t\t\t\t\t});\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tdocument.getElementById('hubScheduleDate')?.addEventListener('change', function (e) {\r\n\t\t\t\tconst end = document.getElementById('hubScheduleEndDate');\r\n\t\t\t\tif (end) end.value = e.target.value;\r\n\t\t\t});\r\n\r\n\t\t\tfunction wirePagination(pageInputId, paginationId) {\r\n\t\t\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\t\t\tconst pageBtn = e.target.closest('#' + paginationId + ' .pagination-btn[hx-get]');\r\n\t\t\t\t\tif (!pageBtn) return;\r\n\t\t\t\t\tconst pageInput = document.getElementById(pageInputId);\r\n\t\t\t\t\tif (!pageInput) return;\r\n\t\t\t\t\tconst vals = pageBtn.getAttribute('hx-vals');\r\n\t\t\t\t\tif (!vals) return;\r\n\t\t\t\t\ttry {\r\n\t\t\t\t\t\tconst parsed = JSON.parse(vals.replace(/'/g, '\"'));\r\n\t\t\t\t\t\tif (parsed.page) pageInput.value = String(parsed.page);\r\n\t\t\t\t\t} catch (err) { /* ignore */ }\r\n\t\t\t\t});\r\n\t\t\t}\r\n\t\t\twirePagination('hubStudentsPage', 'hubStudentsPagination');\r\n\t\t\twirePagination('hubClassesPage', 'hubClassesPagination');\r\n\t\t\twirePagination('hubPaymentsPage', 'hubPaymentsPagination');\r\n\t\t\twirePagination('hubUploadLogsPage', 'hubUploadLogsPagination');\r\n\r\n\t\t\tdocument.getElementById('hubStudentsFilterBtn')?.addEventListener('click', function () {\r\n\t\t\t\tconst p = document.getElementById('hubStudentsPage');\r\n\t\t\t\tif (p) p.value = '1';\r\n\t\t\t});\r\n\t\t\tdocument.getElementById('hubClassesFilterBtn')?.addEventListener('click', function () {\r\n\t\t\t\tconst p = document.getElementById('hubClassesPage');\r\n\t\t\t\tif (p) p.value = '1';\r\n\t\t\t});\r\n\t\t\tdocument.getElementById('hubPaymentsFilterBtn')?.addEventListener('click', function () {\r\n\t\t\t\tconst p = document.getElementById('hubPaymentsPage');\r\n\t\t\t\tif (p) p.value = '1';\r\n\t\t\t});\r\n\t\t\tdocument.getElementById('hubUploadLogsFilterBtn')?.addEventListener('click', function () {\r\n\t\t\t\tconst p = document.getElementById('hubUploadLogsPage');\r\n\t\t\t\tif (p) p.value = '1';\r\n\t\t\t});\r\n\t\t})();\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

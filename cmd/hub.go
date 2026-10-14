@@ -192,10 +192,11 @@ func loadHubResources(ctx context.Context, teacherID int64) (frontend.HubResourc
 	docs := make([]frontend.HubDocumentSummary, 0, len(docRows))
 	for _, row := range docRows {
 		docs = append(docs, frontend.HubDocumentSummary{
-			Type:     row.Type,
-			Status:   constants.TeacherDocumentStatus(row.Status),
-			Filename: row.OriginalFilename,
-			ViewURL:  utils.URL("/documents/" + strconv.FormatInt(row.ID, 10) + "/file"),
+			Type:          row.Type,
+			Status:        constants.TeacherDocumentStatus(row.Status),
+			Filename:      row.OriginalFilename,
+			FileExtension: row.FileExtension,
+			ViewURL:       utils.URL("/documents/" + strconv.FormatInt(row.ID, 10) + "/file"),
 		})
 	}
 
@@ -207,6 +208,8 @@ func loadHubResources(ctx context.Context, teacherID int64) (frontend.HubResourc
 	if len(introRows) > 0 {
 		item := mapIntroVideoItem(introRows[0])
 		intro.Status = item.Status
+		intro.SourceType = item.SourceType
+		intro.LinkLabel = item.LinkLabel
 		intro.ViewURL = item.ViewURL
 		intro.UploadedAt = item.UploadedAt
 	}

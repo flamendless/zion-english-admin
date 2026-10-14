@@ -1,0 +1,148 @@
+package frontend
+
+import (
+	"strings"
+	"zion-english/internal/constants"
+	"zion-english/internal/utils"
+)
+
+type HubFilePreviewKind string
+
+const (
+	HubFilePreviewKindImage    HubFilePreviewKind = "image"
+	HubFilePreviewKindPDF      HubFilePreviewKind = "pdf"
+	HubFilePreviewKindVideo    HubFilePreviewKind = "video"
+	HubFilePreviewKindDocument HubFilePreviewKind = "document"
+)
+
+func hubFilePreviewKind(ext string) HubFilePreviewKind {
+	ext = strings.ToLower(strings.TrimPrefix(strings.TrimSpace(ext), "."))
+	switch ext {
+	case "png", "jpg", "jpeg", "webp", "gif":
+		return HubFilePreviewKindImage
+	case "pdf":
+		return HubFilePreviewKindPDF
+	case "mp4", "webm", "mov", "m4v", "avi", "mkv", "ogv", "3gp":
+		return HubFilePreviewKindVideo
+	default:
+		return HubFilePreviewKindDocument
+	}
+}
+
+func introVideoHubShowsFilePreview(sourceType constants.TeacherIntroVideoSourceType, viewURL string) bool {
+	if viewURL == "" {
+		return false
+	}
+	switch sourceType {
+	case constants.TeacherIntroVideoSourceYouTube, constants.TeacherIntroVideoSourceGoogleDrive:
+		return false
+	default:
+		return true
+	}
+}
+
+templ HubFileTypeIcon(kind HubFilePreviewKind) {
+	switch kind {
+	case HubFilePreviewKindPDF:
+		<svg class="hub-file-type-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+			<polyline points="14 2 14 8 20 8"></polyline>
+			<path d="M9 13h6"></path>
+			<path d="M9 17h4"></path>
+		</svg>
+	case HubFilePreviewKindVideo:
+		<svg class="hub-file-type-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<polygon points="23 7 16 12 23 17 23 7"></polygon>
+			<rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+		</svg>
+	default:
+		<svg class="hub-file-type-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+			<polyline points="14 2 14 8 20 8"></polyline>
+		</svg>
+	}
+}
+
+templ HubResourceFilePreview(viewURL string, filename string, ext string) {
+	{{ kind := hubFilePreviewKind(ext) }}
+	if viewURL != "" && kind == HubFilePreviewKindImage {
+		<a class="hub-resource-card__media" href={ viewURL } target="_blank" rel="noopener noreferrer">
+			<img src={ viewURL } alt={ filename } loading="lazy"/>
+		</a>
+	} else if viewURL != "" {
+		<a class="hub-resource-card__media hub-resource-card__media--icon" href={ viewURL } target="_blank" rel="noopener noreferrer">
+			@HubFileTypeIcon(kind)
+		</a>
+	} else {
+		<div class="hub-resource-card__media hub-resource-card__media--icon hub-resource-card__media--empty">
+			@HubFileTypeIcon(kind)
+		</div>
+	}
+}
+
+templ HubDocumentResourceCard(doc HubDocumentSummary) {
+	<article class="hub-resource-card">
+		@HubResourceFilePreview(doc.ViewURL, doc.Filename, doc.FileExtension)
+		<div class="hub-resource-card__body">
+			<div class="hub-resource-card__badges">
+				@Pill(documentTypeLabel(doc.Type), PillToneInfo)
+				@StatusPill(doc.Status.Label(), DocumentStatusPillTone(doc.Status), false)
+			</div>
+			<p class="hub-resource-card__filename" title={ doc.Filename }>{ getDisplayValue(doc.Filename) }</p>
+			if doc.ViewURL != "" {
+				<a class="hub-resource-card__link" href={ doc.ViewURL } target="_blank" rel="noopener noreferrer">View</a>
+			}
+		</div>
+	</article>
+}
+
+templ HubIntroVideoResourceCard(intro HubIntroSummary) {
+	<article class="hub-resource-card">
+		if introVideoHubShowsFilePreview(intro.SourceType, intro.ViewURL) {
+			<a class="hub-resource-card__media hub-resource-card__media--video" href={ intro.ViewURL } target="_blank" rel="noopener noreferrer">
+				<video src={ intro.ViewURL } preload="metadata" muted playsinline></video>
+			</a>
+		} else if intro.ViewURL != "" {
+			<a class="hub-resource-card__media hub-resource-card__media--icon" href={ intro.ViewURL } target="_blank" rel="noopener noreferrer">
+				@HubFileTypeIcon(HubFilePreviewKindVideo)
+			</a>
+		} else {
+			<div class="hub-resource-card__media hub-resource-card__media--icon hub-resource-card__media--empty">
+				@HubFileTypeIcon(HubFilePreviewKindVideo)
+			</div>
+		}
+		<div class="hub-resource-card__body">
+			<div class="hub-resource-card__badges">
+				@Pill("Intro video", PillTonePrimary)
+				@StatusPill(intro.Status.Label(), IntroVideoStatusPillTone(intro.Status), false)
+			</div>
+			if intro.LinkLabel != "" {
+				<p class="hub-resource-card__filename" title={ intro.LinkLabel }>{ introVideoLinkDisplay(intro.LinkLabel) }</p>
+			}
+			if intro.UploadedAt != "" {
+				<p class="hub-resource-card__meta">Uploaded { intro.UploadedAt }</p>
+			}
+			if intro.ViewURL != "" {
+				<a class="hub-resource-card__link" href={ intro.ViewURL } target="_blank" rel="noopener noreferrer">{ introVideoViewLinkLabel(intro.SourceType) }</a>
+			}
+		</div>
+	</article>
+}
+
+templ HubLearningMaterialResourceCard(lm HubLearningMaterialSummary) {
+	<article class="hub-resource-card hub-resource-card--learning">
+		<div class="hub-resource-card__media hub-resource-card__media--icon hub-resource-card__media--learning">
+			<svg class="hub-file-type-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+				<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+				<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+			</svg>
+		</div>
+		<div class="hub-resource-card__body">
+			<div class="hub-resource-card__badges">
+				@StatusPill(learningMaterialViewStatusLabel(lm.Status), learningMaterialViewStatusTone(lm.Status), false)
+			</div>
+			<h3 class="hub-resource-card__title">{ lm.Title }</h3>
+			<a class="hub-resource-card__link" href={ utils.URL("/learning-materials") }>Open library</a>
+		</div>
+	</article>
+}
