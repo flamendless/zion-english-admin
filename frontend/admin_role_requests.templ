@@ -1,0 +1,102 @@
+package frontend
+
+import "zion-english/internal/constants"
+import "zion-english/internal/utils"
+
+type AdminRoleRequestItem struct {
+	ID              string
+	TargetName      string
+	TargetAvatar    AvatarProps
+	RequesterName   string
+	RequesterAvatar AvatarProps
+	RequestedAt     string
+	CanReview       bool
+}
+
+type AdminRoleRequestsPageData struct {
+	Status constants.TeacherAdminRoleRequestStatus
+	Items  []AdminRoleRequestItem
+}
+
+templ AdminRoleRequestTableRow(item AdminRoleRequestItem) {
+	<tr>
+		<td data-label="Teacher">
+			@TeacherNameCell(item.TargetName, item.TargetAvatar)
+		</td>
+		<td data-label="Requested by">
+			@TeacherNameCell(item.RequesterName, item.RequesterAvatar)
+		</td>
+		<td data-label="Requested at">{ item.RequestedAt }</td>
+		if item.CanReview {
+			<td data-label="Actions">
+				<div class="table-actions">
+					<form method="POST" action={ utils.URL("/admin-role-requests/" + item.ID + "/approve") } class="table-action-form">
+						@IconActionSubmit("Approve", IconKindApprove)
+					</form>
+					<form method="POST" action={ utils.URL("/admin-role-requests/" + item.ID + "/reject") } class="table-action-form" onsubmit="return confirm('Reject this admin role grant?');">
+						@IconActionSubmit("Reject", IconKindReject)
+					</form>
+				</div>
+			</td>
+		}
+	</tr>
+}
+
+templ AdminRoleRequestsPage(data AdminRoleRequestsPageData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		@AdminPageHead("Admin Role Requests - Zion English Admin Tool")
+		@AvatarStyles()
+		@DocumentsStyles()
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			<div class="page-header">
+				<h1>Admin role requests</h1>
+				<p class="page-subtitle">Review admin role grants requested by teacher administrators.</p>
+			</div>
+			<form method="GET" action={ utils.URL("/admin-role-requests") } class="toolbar">
+				<div class="form-group">
+					<label for="adminRoleRequestStatus">Status</label>
+					<select id="adminRoleRequestStatus" name="status" onchange="this.form.submit()">
+						<option value="pending" selected?={ data.Status == constants.TeacherAdminRoleRequestStatusPending }>Pending</option>
+						<option value="approved" selected?={ data.Status == constants.TeacherAdminRoleRequestStatusApproved }>Approved</option>
+						<option value="rejected" selected?={ data.Status == constants.TeacherAdminRoleRequestStatusRejected }>Rejected</option>
+					</select>
+				</div>
+			</form>
+			<div class="table-wrapper data-list-view-root documents-table-wrapper">
+				<table class="documents-table table-stack-mobile">
+					<thead>
+						<tr>
+							<th>Teacher</th>
+							<th>Requested by</th>
+							<th>Requested at</th>
+							if data.Status == constants.TeacherAdminRoleRequestStatusPending {
+								<th>Actions</th>
+							}
+						</tr>
+					</thead>
+					<tbody>
+						if len(data.Items) == 0 {
+							<tr>
+								if data.Status == constants.TeacherAdminRoleRequestStatusPending {
+									<td colspan="4" class="empty-state">No admin role requests in this status.</td>
+								} else {
+									<td colspan="3" class="empty-state">No admin role requests in this status.</td>
+								}
+							</tr>
+						} else {
+							for _, item := range data.Items {
+								@AdminRoleRequestTableRow(item)
+							}
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</body>
+	</html>
+}

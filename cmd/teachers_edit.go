@@ -103,6 +103,11 @@ func teacherHasAdminRole(roles []constants.TeacherRole) bool {
 	return slices.Contains(roles, constants.TeacherRoleAdmin)
 }
 
+func teacherHasPendingAdminRoleGrant(ctx context.Context, teacherID int64) bool {
+	_, err := dbRO.GetQueries().GetPendingTeacherAdminRoleRequestByTargetTeacherID(ctx, teacherID)
+	return err == nil
+}
+
 func availableRoleOptions(assigned []constants.TeacherRole) []constants.TeacherRole {
 	assignedSet := make(map[constants.TeacherRole]struct{}, len(assigned))
 	for _, role := range assigned {
@@ -567,6 +572,7 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 			DefaultResignationDate: utils.TodayPHT(),
 			Roles:                  existingRoles,
 			RoleOptions:            availableRoleOptions(existingRoles),
+			PendingAdminRoleGrant:  teacherHasPendingAdminRoleGrant(ctx, teacherID),
 		}).Render(ctx, w)
 		return
 	}
@@ -626,6 +632,8 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 	}
 
 	var submittedRoles []constants.TeacherRole
+	var rolesToSync []constants.TeacherRole
+	var pendingAdminGrant bool
 	if canManageRoles {
 		submittedRoles, err = teachers.ParseTeacherRoles(r.Form["roles"])
 		if err != nil {
@@ -635,6 +643,11 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		if err := teachers.ValidateRoleAssignment(string(actorRole), targetHasAdmin, submittedRoles); err != nil {
 			sendErrorLog(w, err.Error())
 			return
+		}
+		pendingAdminGrant = teachers.AdminRoleGrantNeedsApproval(string(actorRole), existingRoles, submittedRoles)
+		rolesToSync = submittedRoles
+		if pendingAdminGrant {
+			rolesToSync = teachers.RolesWithoutAdmin(submittedRoles)
 		}
 	}
 
@@ -688,9 +701,33 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 	}
 
 	if canManageRoles {
-		if err := syncTeacherRoles(ctx, qtx, teacherID, submittedRoles); err != nil {
+		if err := syncTeacherRoles(ctx, qtx, teacherID, rolesToSync); err != nil {
 			sendErrorLog(w, err.Error())
 			return
+		}
+		if pendingAdminGrant {
+			requester := auth.GetUser(ctx)
+			if err := qtx.DeletePendingTeacherAdminRoleRequestByTarget(ctx, teacherID); err != nil {
+				sendErrorLog(w, err.Error())
+				return
+			}
+			if err := qtx.InsertTeacherAdminRoleRequest(ctx, queries.InsertTeacherAdminRoleRequestParams{
+				TargetTeacherID:      teacherID,
+				RequestedByTeacherID: requester.ID,
+			}); err != nil {
+				sendErrorLog(w, err.Error())
+				return
+			}
+		} else if actorRole == auth.RoleSuperuser && teachers.HasRole(submittedRoles, constants.TeacherRoleAdmin) {
+			if err := qtx.DeletePendingTeacherAdminRoleRequestByTarget(ctx, teacherID); err != nil {
+				sendErrorLog(w, err.Error())
+				return
+			}
+		} else if actorRole == auth.RoleAdmin && !teachers.HasRole(submittedRoles, constants.TeacherRoleAdmin) {
+			if err := qtx.DeletePendingTeacherAdminRoleRequestByTarget(ctx, teacherID); err != nil {
+				sendErrorLog(w, err.Error())
+				return
+			}
 		}
 	}
 
@@ -706,8 +743,11 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 	}
 	auditMessage := formatTeacherAudit(existing, updated)
 	if canManageRoles {
-		if roleDiff := teachers.FormatRoleDiff(existingRoles, submittedRoles); roleDiff != "" {
+		if roleDiff := teachers.FormatRoleDiff(existingRoles, rolesToSync); roleDiff != "" {
 			auditMessage += "; roles: " + roleDiff
+		}
+		if pendingAdminGrant {
+			auditMessage += "; roles: admin grant pending superuser approval"
 		}
 	}
 	insertAuditLogAs(ctx, auth.GetUser(ctx), "teachers", auditMessage)
@@ -715,7 +755,11 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 	notifyTeacher(ctx, teacherID, teacherName, auth.GetUser(ctx), notifications.KindProfileUpdated,
 		"Your profile was updated by an administrator", "")
 
-	if err := respondFormMutation(w, "Teacher updated successfully!", "/teachers"); err != nil {
+	successMsg := "Teacher updated successfully!"
+	if pendingAdminGrant {
+		successMsg = MsgAdminRoleGrantPending
+	}
+	if err := respondFormMutation(w, successMsg, "/teachers"); err != nil {
 		sendErrorLog(w, err.Error())
 	}
 }

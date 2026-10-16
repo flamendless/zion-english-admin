@@ -413,18 +413,24 @@ SELECT
 	t.first_name AS teacher_first_name,
 	t.middle_name AS teacher_middle_name,
 	t.last_name AS teacher_last_name,
+	t.rate_per_class AS teacher_rate_per_class,
 	cr.student_id,
 	s.name AS student_name,
 	s.student_number AS student_number,
 	s.parent_rate,
 	s.parent_currency,
-	cr.date
+	cr.date,
+	cr.status,
+	cr.rate,
+	cr.currency,
+	cr.is_trial_class
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE cr.date >= ? AND cr.date <= ?
 	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
 	AND cr.deleted_at IS NULL
+	AND cr.is_trial_class = 0
 	AND s.is_test_seed = 0
 	AND t.status = 'approved' AND t.deleted = 0
 	AND NOT EXISTS (
@@ -472,17 +478,22 @@ type GetReportSummaryRowsParams struct {
 }
 
 type GetReportSummaryRowsRow struct {
-	TeacherID         int64
-	TeacherName       string
-	TeacherFirstName  string
-	TeacherMiddleName string
-	TeacherLastName   string
-	StudentID         int64
-	StudentName       string
-	StudentNumber     sql.NullString
-	ParentRate        sql.NullFloat64
-	ParentCurrency    sql.NullString
-	Date              string
+	TeacherID           int64
+	TeacherName         string
+	TeacherFirstName    string
+	TeacherMiddleName   string
+	TeacherLastName     string
+	TeacherRatePerClass float64
+	StudentID           int64
+	StudentName         string
+	StudentNumber       sql.NullString
+	ParentRate          sql.NullFloat64
+	ParentCurrency      sql.NullString
+	Date                string
+	Status              string
+	Rate                float64
+	Currency            string
+	IsTrialClass        int64
 }
 
 func (q *Queries) GetReportSummaryRows(ctx context.Context, arg GetReportSummaryRowsParams) ([]GetReportSummaryRowsRow, error) {
@@ -512,12 +523,17 @@ func (q *Queries) GetReportSummaryRows(ctx context.Context, arg GetReportSummary
 			&i.TeacherFirstName,
 			&i.TeacherMiddleName,
 			&i.TeacherLastName,
+			&i.TeacherRatePerClass,
 			&i.StudentID,
 			&i.StudentName,
 			&i.StudentNumber,
 			&i.ParentRate,
 			&i.ParentCurrency,
 			&i.Date,
+			&i.Status,
+			&i.Rate,
+			&i.Currency,
+			&i.IsTrialClass,
 		); err != nil {
 			return nil, err
 		}

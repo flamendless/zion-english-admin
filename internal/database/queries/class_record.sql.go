@@ -1075,12 +1075,26 @@ func (q *Queries) SoftDeleteClassRecord(ctx context.Context, arg SoftDeleteClass
 }
 
 const sumConductedParentRateByCurrencyAndDateRange = `-- name: SumConductedParentRateByCurrencyAndDateRange :many
-SELECT s.parent_currency AS currency, COALESCE(SUM(s.parent_rate), 0) AS total_rate
+SELECT
+	s.parent_currency AS currency,
+	COALESCE(SUM(
+		CASE
+			WHEN cr.status IN ('cancelled', 'rescheduled')
+				AND cr.rate > 0
+				AND t.rate_per_class > 0
+				AND ABS(cr.rate - t.rate_per_class * 0.5) < 0.01
+				THEN s.parent_rate * 0.5
+			ELSE s.parent_rate
+		END
+	), 0) AS total_rate
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
+JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE cr.date >= ? AND cr.date <= ?
 	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
 	AND cr.deleted_at IS NULL
+	AND cr.is_trial_class = 0
+	AND s.is_test_seed = 0
 	AND s.parent_rate IS NOT NULL
 	AND s.parent_currency IS NOT NULL
 	AND s.parent_currency != ''
@@ -1100,6 +1114,7 @@ type SumConductedParentRateByCurrencyAndDateRangeRow struct {
 	TotalRate any
 }
 
+// Parent bill per row: billing.EffectiveParentBillAmount (halve cancelled/rescheduled when class rate is half of teacher rate).
 func (q *Queries) SumConductedParentRateByCurrencyAndDateRange(ctx context.Context, arg SumConductedParentRateByCurrencyAndDateRangeParams) ([]SumConductedParentRateByCurrencyAndDateRangeRow, error) {
 	rows, err := q.db.QueryContext(ctx, sumConductedParentRateByCurrencyAndDateRange,
 		arg.Date,

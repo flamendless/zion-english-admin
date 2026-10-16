@@ -27,7 +27,8 @@ type DashboardData struct {
 	TestSeedStudents       int64
 	PendingTeachers        int64
 	PendingDocuments       int64
-	PendingIntroVideos     int64
+	PendingIntroVideos      int64
+	PendingAdminRoleGrants  int64
 	MyStudentCount         int64
 	ClassesConductedWeek   int64
 	ClassesCancelledWeek   int64
@@ -238,28 +239,36 @@ templ DashboardSectionedCurrencyStatCard(label string, adminOnly bool, sections 
 	</div>
 }
 
-templ DashboardPendingStatCard(pendingTeachers int64, pendingDocuments int64, pendingIntroVideos int64) {
+templ DashboardPendingStatCard(data DashboardData) {
 	<div class="stat-card">
 		@AdminOnlyStatLabel("Pending Review")
 		<div class="stat-link-rows">
 			@DashboardStatLinkRow(
 				"Teachers",
 				utils.URL("/teachers?status=pending"),
-				pendingTeachers,
+				data.PendingTeachers,
 				"View unapproved teachers",
 			)
 			@DashboardStatLinkRow(
 				"Documents",
 				utils.URL("/documents?status=submitted"),
-				pendingDocuments,
+				data.PendingDocuments,
 				"View submitted documents",
 			)
 			@DashboardStatLinkRow(
 				"Intro videos",
 				utils.URL("/intro-videos?status=submitted"),
-				pendingIntroVideos,
+				data.PendingIntroVideos,
 				"View submitted intro videos",
 			)
+			if data.Role == auth.RoleSuperuser {
+				@DashboardStatLinkRow(
+					"Admin role grants",
+					utils.URL("/admin-role-requests?status=pending"),
+					data.PendingAdminRoleGrants,
+					"View pending admin role grants",
+				)
+			}
 		</div>
 	</div>
 }
@@ -362,7 +371,7 @@ templ DashboardStats(data DashboardData) {
 					)
 				</div>
 			</div>
-			@DashboardPendingStatCard(data.PendingTeachers, data.PendingDocuments, data.PendingIntroVideos)
+			@DashboardPendingStatCard(data)
 			@DashboardTeachersStatCard(data.TotalTeachers, data.TeachersWithoutZoom, data.TeachersWithoutGoogleCal, data.TeachersWithoutCV, data.TeachersWithoutValidDocuments, data.TeachersWithoutProfileAvatar)
 			@DashboardParentGapStatCard(data.StudentsWithoutParent, data.StudentsWithoutParentRate)
 		}

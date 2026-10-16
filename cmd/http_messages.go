@@ -15,6 +15,7 @@ const (
 	MsgTooManyLoginAttempts      = "Too many login attempts. Please try again later."
 
 	MsgFailedToLoadTeacherRoles    = "Failed to load teacher roles"
+	MsgAdminRoleGrantPending       = "Teacher updated. Admin role is pending superuser approval."
 	MsgFailedToFetchStudents       = "Failed to fetch students"
 	MsgFailedToLoadAnalytics       = "Failed to load analytics"
 	MsgAnalyticsRangeRequiresPro   = "[ENTITLEMENTS] date range outside the current month requires Teacher Pro"

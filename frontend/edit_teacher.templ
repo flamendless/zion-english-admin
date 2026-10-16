@@ -26,8 +26,9 @@ type EditTeacherData struct {
 	ResignedAt      string
 	ResignedReason  string
 	DefaultResignationDate string
-	Roles           []constants.TeacherRole
-	RoleOptions     []constants.TeacherRole
+	Roles                  []constants.TeacherRole
+	RoleOptions            []constants.TeacherRole
+	PendingAdminRoleGrant  bool
 }
 
 templ EditTeacher(data EditTeacherData) {
@@ -176,6 +177,11 @@ templ EditTeacher(data EditTeacherData) {
 							syncResignationFields();
 						})();
 					</script>
+				}
+				if data.PendingAdminRoleGrant {
+					<div class="form-group">
+						<p class="field-hint">An admin role grant for this teacher is pending superuser approval. The admin role is not active until approved.</p>
+					</div>
 				}
 				if data.CanManageRoles {
 					@TeacherRoleEditor(data.Roles, data.RoleOptions)

@@ -238,18 +238,24 @@ SELECT
 	t.first_name AS teacher_first_name,
 	t.middle_name AS teacher_middle_name,
 	t.last_name AS teacher_last_name,
+	t.rate_per_class AS teacher_rate_per_class,
 	cr.student_id,
 	s.name AS student_name,
 	s.student_number AS student_number,
 	s.parent_rate,
 	s.parent_currency,
-	cr.date
+	cr.date,
+	cr.status,
+	cr.rate,
+	cr.currency,
+	cr.is_trial_class
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
 JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE cr.date >= ? AND cr.date <= ?
 	AND cr.status IN ('conducted', 'cancelled', 'rescheduled')
 	AND cr.deleted_at IS NULL
+	AND cr.is_trial_class = 0
 	AND s.is_test_seed = 0
 	AND t.status = 'approved' AND t.deleted = 0
 	AND NOT EXISTS (

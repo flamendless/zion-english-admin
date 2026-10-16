@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/xuri/excelize/v2"
+	"zion-english/internal/constants"
 )
 
 func TestSaveSummaryReport(t *testing.T) {
@@ -19,10 +20,26 @@ func TestSaveSummaryReport(t *testing.T) {
 				{
 					StudentName: "Student One",
 					Classes: []SummaryClassRow{
-						{DateDisplay: "August 1", RateDisplay: "20.00 KRW", RateValue: 20, HasRate: true},
-						{DateDisplay: "August 2", RateDisplay: "20.00 KRW", RateValue: 20, HasRate: true},
+						{
+							Status:           constants.ClassStatusConducted,
+							StatusDisplay:    "Conducted",
+							DateDisplay:      "August 1",
+							RateDisplay:      "20.00 KRW",
+							RateValue:        20,
+							HasRate:          true,
+							ClassRateDisplay: "15.00 KRW",
+						},
+						{
+							Status:           constants.ClassStatusCancelled,
+							StatusDisplay:    "Cancelled",
+							DateDisplay:      "August 2",
+							RateDisplay:      "10.00 KRW",
+							RateValue:        10,
+							HasRate:          true,
+							ClassRateDisplay: "0.00 KRW",
+						},
 					},
-					Total:    40,
+					Total:    30,
 					Currency: "KRW",
 					HasTotal: true,
 				},
@@ -50,19 +67,25 @@ func TestSaveSummaryReport(t *testing.T) {
 	if got, _ := f.GetCellValue(sheetName, "A1"); got != "Don Teacher" {
 		t.Fatalf("A1 = %q", got)
 	}
-	if got, _ := f.GetCellValue(sheetName, "A2"); got != "Student One" {
-		t.Fatalf("A2 = %q", got)
+	if got, _ := f.GetCellValue(sheetName, "B2"); got != "Student One" {
+		t.Fatalf("B2 = %q", got)
 	}
-	if got, _ := f.GetCellValue(sheetName, "A3"); got != "August 1" {
+	if got, _ := f.GetCellValue(sheetName, "A3"); got != "Conducted" {
 		t.Fatalf("A3 = %q", got)
 	}
-	if got, _ := f.GetCellValue(sheetName, "B3"); got != "20.00 KRW" {
+	if got, _ := f.GetCellValue(sheetName, "B3"); got != "August 1" {
 		t.Fatalf("B3 = %q", got)
 	}
-	if got, _ := f.GetCellValue(sheetName, "A5"); got != "total in krw" {
-		t.Fatalf("A5 = %q", got)
+	if got, _ := f.GetCellValue(sheetName, "C3"); got != "20.00 KRW" {
+		t.Fatalf("C3 = %q", got)
 	}
-	if got, _ := f.GetCellValue(sheetName, "B5"); got != "40" {
+	if got, _ := f.GetCellValue(sheetName, "D3"); got != "15.00 KRW" {
+		t.Fatalf("D3 = %q", got)
+	}
+	if got, _ := f.GetCellValue(sheetName, "B5"); got != "total in krw" {
 		t.Fatalf("B5 = %q", got)
+	}
+	if got, _ := f.GetCellValue(sheetName, "C5"); got != "30" {
+		t.Fatalf("C5 = %q", got)
 	}
 }

@@ -43,6 +43,34 @@ func TestParseTeacherRolesRequiresTeacher(t *testing.T) {
 	}
 }
 
+func TestAdminRoleGrantNeedsApproval(t *testing.T) {
+	existing := []constants.TeacherRole{constants.TeacherRoleTeacher}
+	submitted := []constants.TeacherRole{constants.TeacherRoleTeacher, constants.TeacherRoleAdmin}
+	if !AdminRoleGrantNeedsApproval("admin", existing, submitted) {
+		t.Fatal("admin granting admin should need approval")
+	}
+	if AdminRoleGrantNeedsApproval("superuser", existing, submitted) {
+		t.Fatal("superuser should not need approval")
+	}
+	if AdminRoleGrantNeedsApproval("admin", []constants.TeacherRole{constants.TeacherRoleTeacher, constants.TeacherRoleAdmin}, submitted) {
+		t.Fatal("target already admin should not need approval path")
+	}
+	if AdminRoleGrantNeedsApproval("admin", existing, []constants.TeacherRole{constants.TeacherRoleTeacher}) {
+		t.Fatal("no admin in submitted should not need approval")
+	}
+}
+
+func TestRolesWithoutAdmin(t *testing.T) {
+	roles := RolesWithoutAdmin([]constants.TeacherRole{
+		constants.TeacherRoleTeacher,
+		constants.TeacherRoleAdmin,
+		constants.TeacherRoleDeveloper,
+	})
+	if len(roles) != 2 || roles[1] != constants.TeacherRoleDeveloper {
+		t.Fatalf("unexpected roles: %v", roles)
+	}
+}
+
 func TestValidateRoleAssignment(t *testing.T) {
 	submitted := []constants.TeacherRole{constants.TeacherRoleTeacher, constants.TeacherRoleDeveloper}
 	if err := ValidateRoleAssignment("admin", true, submitted); err != ErrRolesForbidden {

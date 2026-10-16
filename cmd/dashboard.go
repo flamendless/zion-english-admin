@@ -166,6 +166,12 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 			data.PendingIntroVideos = pendingIntroVideos
 		}
+		if role == auth.RoleSuperuser {
+			pendingAdminRoles, err := dbRO.GetQueries().CountTeacherAdminRoleRequestsByStatus(ctx, string(constants.TeacherAdminRoleRequestStatusPending))
+			if err == nil {
+				data.PendingAdminRoleGrants = pendingAdminRoles
+			}
+		}
 		withoutParent, err := dbRO.GetQueries().CountActiveStudentsWithoutParent(ctx)
 		if err == nil {
 			data.StudentsWithoutParent = withoutParent

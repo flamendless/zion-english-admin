@@ -13,6 +13,7 @@ import (
 	"time"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
+	"zion-english/internal/billing"
 	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
@@ -820,6 +821,9 @@ func buildSummaryTeacherSheets(summaries []queries.GetReportTeacherSummariesRow,
 	teacherStudentOrder := map[int64][]int64{}
 
 	for _, row := range rows {
+		if row.IsTrialClass != 0 {
+			continue
+		}
 		if _, ok := teacherStudents[row.TeacherID]; !ok {
 			teacherStudents[row.TeacherID] = map[int64]*summaryStudentData{}
 			teacherStudentOrder[row.TeacherID] = []int64{}
@@ -857,20 +861,33 @@ func buildSummaryTeacherSheets(summaries []queries.GetReportTeacherSummariesRow,
 }
 
 func summaryClassRowFromRecord(row queries.GetReportSummaryRowsRow) processor.SummaryClassRow {
-	display, value, hasRate := formatParentRateDisplay(row.ParentRate, row.ParentCurrency)
+	status := constants.ClassStatus(row.Status)
+	parentDisplay, parentValue, hasParent := effectiveSummaryParentRate(row.ParentRate, row.ParentCurrency, status, row.Rate, row.TeacherRatePerClass)
 	return processor.SummaryClassRow{
-		DateDisplay: formatReportSummaryClassDate(row.Date),
-		RateDisplay: display,
-		RateValue:   value,
-		HasRate:     hasRate,
+		Status:           status,
+		StatusDisplay:    status.Label(),
+		DateDisplay:      formatReportSummaryClassDate(row.Date),
+		RateDisplay:      parentDisplay,
+		RateValue:        parentValue,
+		HasRate:          hasParent,
+		ClassRateDisplay: formatSummaryClassRateDisplay(row.Rate, row.Currency),
 	}
 }
 
-func formatParentRateDisplay(rate sql.NullFloat64, currency sql.NullString) (string, float64, bool) {
-	if !rate.Valid || !currency.Valid || currency.String == "" {
+func effectiveSummaryParentRate(parentRate sql.NullFloat64, parentCurrency sql.NullString, status constants.ClassStatus, classRate, teacherRate float64) (string, float64, bool) {
+	if !parentRate.Valid || !parentCurrency.Valid || parentCurrency.String == "" {
 		return "-", 0, false
 	}
-	return utils.FormatCurrencyAmountFixed(rate.Float64, currency.String) + " " + currency.String, rate.Float64, true
+	amount := billing.EffectiveParentBillAmount(status, parentRate.Float64, classRate, teacherRate)
+	currency := parentCurrency.String
+	return utils.FormatCurrencyAmountFixed(amount, currency) + " " + currency, amount, true
+}
+
+func formatSummaryClassRateDisplay(rate float64, currency string) string {
+	if currency == "" {
+		return "-"
+	}
+	return utils.FormatCurrencyAmountFixed(rate, currency) + " " + currency
 }
 
 func formatReportSummaryClassDate(dateStr string) string {

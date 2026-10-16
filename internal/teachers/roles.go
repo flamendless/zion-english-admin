@@ -56,6 +56,26 @@ func ParseTeacherRoles(values []string) ([]constants.TeacherRole, error) {
 	return roles, nil
 }
 
+func AdminRoleGrantNeedsApproval(actorRole string, existing, submitted []constants.TeacherRole) bool {
+	if actorRole != "admin" {
+		return false
+	}
+	if HasRole(existing, constants.TeacherRoleAdmin) {
+		return false
+	}
+	return HasRole(submitted, constants.TeacherRoleAdmin)
+}
+
+func RolesWithoutAdmin(roles []constants.TeacherRole) []constants.TeacherRole {
+	out := make([]constants.TeacherRole, 0, len(roles))
+	for _, role := range roles {
+		if role != constants.TeacherRoleAdmin {
+			out = append(out, role)
+		}
+	}
+	return out
+}
+
 func ValidateRoleAssignment(actorRole string, targetHasAdmin bool, submitted []constants.TeacherRole) error {
 	if !CanManageTeacherRoles(actorRole, targetHasAdmin) {
 		return ErrRolesForbidden

@@ -5,14 +5,18 @@ import (
 	"strings"
 
 	"github.com/xuri/excelize/v2"
+	"zion-english/internal/constants"
 	"zion-english/internal/utils"
 )
 
 type SummaryClassRow struct {
-	DateDisplay string
-	RateDisplay string
-	RateValue   float64
-	HasRate     bool
+	Status           constants.ClassStatus
+	StatusDisplay    string
+	DateDisplay      string
+	RateDisplay      string
+	RateValue        float64
+	HasRate          bool
+	ClassRateDisplay string
 }
 
 type SummaryStudentBlock struct {
@@ -28,6 +32,46 @@ type SummaryTeacherSheet struct {
 	Students    []SummaryStudentBlock
 }
 
+type summaryRowStyles struct {
+	status int
+	date   int
+	rate   int
+}
+
+func summaryStatusFillColor(status constants.ClassStatus) string {
+	switch status {
+	case constants.ClassStatusConducted:
+		return "ECFDF5"
+	case constants.ClassStatusCancelled:
+		return "FEE2E2"
+	case constants.ClassStatusRescheduled:
+		return "FFFBEB"
+	default:
+		return "FFFFFF"
+	}
+}
+
+func newSummaryRowStyles(f *excelize.File, status constants.ClassStatus) (summaryRowStyles, error) {
+	fill := summaryStatusFillColor(status)
+	baseFill := excelize.Fill{Type: "pattern", Pattern: 1, Color: []string{fill}}
+	statusStyle, err := f.NewStyle(&excelize.Style{Fill: baseFill})
+	if err != nil {
+		return summaryRowStyles{}, err
+	}
+	dateStyle, err := f.NewStyle(&excelize.Style{
+		Fill:      baseFill,
+		Alignment: &excelize.Alignment{Horizontal: "right", Vertical: "center"},
+	})
+	if err != nil {
+		return summaryRowStyles{}, err
+	}
+	rateStyle, err := f.NewStyle(&excelize.Style{Fill: baseFill})
+	if err != nil {
+		return summaryRowStyles{}, err
+	}
+	return summaryRowStyles{status: statusStyle, date: dateStyle, rate: rateStyle}, nil
+}
+
 func SaveSummaryReport(sheets []SummaryTeacherSheet, outputPath string) error {
 	f := excelize.NewFile()
 	defer func() {
@@ -39,18 +83,14 @@ func SaveSummaryReport(sheets []SummaryTeacherSheet, outputPath string) error {
 	}
 
 	usedNames := map[string]int{}
-	rightAlignStyle, err := f.NewStyle(&excelize.Style{
-		Alignment: &excelize.Alignment{Horizontal: "right", Vertical: "center"},
-	})
-	if err != nil {
-		return err
-	}
 	boldStyle, err := f.NewStyle(&excelize.Style{
 		Font: &excelize.Font{Bold: true},
 	})
 	if err != nil {
 		return err
 	}
+
+	rowStyleCache := map[constants.ClassStatus]summaryRowStyles{}
 
 	for i, sheet := range sheets {
 		sheetName := uniqueSheetName(sheet.TeacherName, usedNames)
@@ -75,26 +115,44 @@ func SaveSummaryReport(sheets []SummaryTeacherSheet, outputPath string) error {
 		rowNum++
 
 		for _, student := range sheet.Students {
-			cell, _ = excelize.CoordinatesToCellName(1, rowNum)
+			cell, _ = excelize.CoordinatesToCellName(2, rowNum)
 			f.SetCellValue(sheetName, cell, student.StudentName)
 			f.SetCellStyle(sheetName, cell, cell, boldStyle)
 			rowNum++
 
 			for _, classRow := range student.Classes {
+				styles, ok := rowStyleCache[classRow.Status]
+				if !ok {
+					styles, err = newSummaryRowStyles(f, classRow.Status)
+					if err != nil {
+						return err
+					}
+					rowStyleCache[classRow.Status] = styles
+				}
+
 				cellA, _ := excelize.CoordinatesToCellName(1, rowNum)
-				f.SetCellValue(sheetName, cellA, classRow.DateDisplay)
-				f.SetCellStyle(sheetName, cellA, cellA, rightAlignStyle)
+				f.SetCellValue(sheetName, cellA, classRow.StatusDisplay)
+				f.SetCellStyle(sheetName, cellA, cellA, styles.status)
 
 				cellB, _ := excelize.CoordinatesToCellName(2, rowNum)
-				f.SetCellValue(sheetName, cellB, classRow.RateDisplay)
+				f.SetCellValue(sheetName, cellB, classRow.DateDisplay)
+				f.SetCellStyle(sheetName, cellB, cellB, styles.date)
+
+				cellC, _ := excelize.CoordinatesToCellName(3, rowNum)
+				f.SetCellValue(sheetName, cellC, classRow.RateDisplay)
+				f.SetCellStyle(sheetName, cellC, cellC, styles.rate)
+
+				cellD, _ := excelize.CoordinatesToCellName(4, rowNum)
+				f.SetCellValue(sheetName, cellD, classRow.ClassRateDisplay)
+				f.SetCellStyle(sheetName, cellD, cellD, styles.rate)
 				rowNum++
 			}
 
 			if student.HasTotal {
-				cellA, _ := excelize.CoordinatesToCellName(1, rowNum)
-				f.SetCellValue(sheetName, cellA, fmt.Sprintf("total in %s", strings.ToLower(student.Currency)))
 				cellB, _ := excelize.CoordinatesToCellName(2, rowNum)
-				f.SetCellValue(sheetName, cellB, student.Total)
+				f.SetCellValue(sheetName, cellB, fmt.Sprintf("total in %s", strings.ToLower(student.Currency)))
+				cellC, _ := excelize.CoordinatesToCellName(3, rowNum)
+				f.SetCellValue(sheetName, cellC, student.Total)
 				rowNum++
 			}
 

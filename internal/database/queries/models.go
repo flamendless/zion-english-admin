@@ -371,6 +371,16 @@ type TblTeacher struct {
 	ResignedReason    sql.NullString
 }
 
+type TblTeacherAdminRoleRequest struct {
+	ID                   int64
+	TargetTeacherID      int64
+	RequestedByTeacherID int64
+	Status               string
+	ReviewedBy           sql.NullInt64
+	CreatedAt            string
+	ReviewedAt           sql.NullString
+}
+
 type TblTeacherDocument struct {
 	ID               int64
 	TeacherID        int64
