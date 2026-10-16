@@ -58,7 +58,7 @@ func handleTeacherAdminRoleRequests(w http.ResponseWriter, r *http.Request) {
 		items[i] = frontend.AdminRoleRequestItem{
 			ID:          strconv.FormatInt(row.ID, 10),
 			RequestedAt: utils.FormatPlanDateTimePHT(row.CreatedAt),
-			TargetName: targetName,
+			TargetName:  targetName,
 			TargetAvatar: buildTeacherListAvatarProps(
 				row.TargetTeacherID,
 				row.TargetFirstName,

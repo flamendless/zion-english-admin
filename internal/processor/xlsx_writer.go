@@ -19,11 +19,25 @@ func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colI
 	sheetName := "Sheet1"
 	f.SetActiveSheet(0)
 
+	numCols := 5
+	if colIndices.StartTime >= 0 {
+		numCols++
+	}
+	if colIndices.EndTime >= 0 {
+		numCols++
+	}
+	if colIndices.Link >= 0 {
+		numCols++
+	}
+	colWidths := newNameColumnWidthTracker(numCols)
+
 	rowNum := 1
 
 	if name != "" {
+		teacherLine := fmt.Sprintf("Teacher Name: %s", name)
 		cell, _ := excelize.CoordinatesToCellName(1, rowNum)
-		f.SetCellValue(sheetName, cell, fmt.Sprintf("Teacher Name: %s", name))
+		f.SetCellValue(sheetName, cell, teacherLine)
+		colWidths.Note(1, teacherLine)
 		rowNum++
 		if summary != nil {
 			summaryRows := []string{
@@ -35,6 +49,7 @@ func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colI
 			for _, line := range summaryRows {
 				cell, _ = excelize.CoordinatesToCellName(1, rowNum)
 				f.SetCellValue(sheetName, cell, line)
+				colWidths.Note(1, line)
 				rowNum++
 			}
 		}
@@ -46,26 +61,31 @@ func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colI
 	for _, header := range headers {
 		cell, _ := excelize.CoordinatesToCellName(colIndex, rowNum)
 		f.SetCellValue(sheetName, cell, header)
+		colWidths.Note(colIndex, header)
 		colIndex++
 	}
 
 	if colIndices.StartTime >= 0 {
 		cell, _ := excelize.CoordinatesToCellName(colIndex, rowNum)
 		f.SetCellValue(sheetName, cell, "StartTime")
+		colWidths.Note(colIndex, "StartTime")
 		colIndex++
 	}
 	if colIndices.EndTime >= 0 {
 		cell, _ := excelize.CoordinatesToCellName(colIndex, rowNum)
 		f.SetCellValue(sheetName, cell, "EndTime")
+		colWidths.Note(colIndex, "EndTime")
 		colIndex++
 	}
 	if colIndices.Link >= 0 {
 		cell, _ := excelize.CoordinatesToCellName(colIndex, rowNum)
 		f.SetCellValue(sheetName, cell, "GoogleLink")
+		colWidths.Note(colIndex, "GoogleLink")
 		colIndex++
 	}
 	cell, _ := excelize.CoordinatesToCellName(colIndex, rowNum)
 	f.SetCellValue(sheetName, cell, "Status")
+	colWidths.Note(colIndex, "Status")
 
 	// Style header row
 	headerStyle, err := f.NewStyle(&excelize.Style{
@@ -107,28 +127,34 @@ func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colI
 		// Name
 		cell, _ := excelize.CoordinatesToCellName(colIndex, rowNum)
 		f.SetCellValue(sheetName, cell, rec.Name)
+		colWidths.Note(colIndex, rec.Name)
 		colIndex++
 
 		// Date
 		cell, _ = excelize.CoordinatesToCellName(colIndex, rowNum)
 		f.SetCellValue(sheetName, cell, rec.Date)
+		colWidths.Note(colIndex, rec.Date)
 		colIndex++
 
 		// Duration
 		cell, _ = excelize.CoordinatesToCellName(colIndex, rowNum)
 		f.SetCellValue(sheetName, cell, rec.DurationInMinutes)
+		colWidths.NoteFloat(colIndex, float64(rec.DurationInMinutes))
 		colIndex++
 
 		// Rate
 		cell, _ = excelize.CoordinatesToCellName(colIndex, rowNum)
 		f.SetCellValue(sheetName, cell, rec.Rate)
+		colWidths.NoteFloat(colIndex, rec.Rate)
 		colIndex++
 
 		// StartTime
 		if colIndices.StartTime >= 0 {
 			cell, _ = excelize.CoordinatesToCellName(colIndex, rowNum)
 			if rec.StartTime != nil {
-				f.SetCellValue(sheetName, cell, rec.StartTime.Format("15:04"))
+				start := rec.StartTime.Format("15:04")
+				f.SetCellValue(sheetName, cell, start)
+				colWidths.Note(colIndex, start)
 			}
 			colIndex++
 		}
@@ -137,7 +163,9 @@ func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colI
 		if colIndices.EndTime >= 0 {
 			cell, _ = excelize.CoordinatesToCellName(colIndex, rowNum)
 			if rec.EndTime != nil {
-				f.SetCellValue(sheetName, cell, rec.EndTime.Format("15:04"))
+				end := rec.EndTime.Format("15:04")
+				f.SetCellValue(sheetName, cell, end)
+				colWidths.Note(colIndex, end)
 			}
 			colIndex++
 		}
@@ -146,12 +174,14 @@ func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colI
 		if colIndices.Link >= 0 {
 			cell, _ = excelize.CoordinatesToCellName(colIndex, rowNum)
 			f.SetCellValue(sheetName, cell, rec.GoogleLink)
+			colWidths.Note(colIndex, rec.GoogleLink)
 			colIndex++
 		}
 
 		// Status
 		cell, _ = excelize.CoordinatesToCellName(colIndex, rowNum)
 		f.SetCellValue(sheetName, cell, rec.Status)
+		colWidths.Note(colIndex, rec.Status)
 
 		// Apply color to entire row
 		rowStyle, err := f.NewStyle(&excelize.Style{
@@ -174,6 +204,8 @@ func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colI
 	colIndex += 3
 	cell, _ = excelize.CoordinatesToCellName(colIndex, rowNum)
 	f.SetCellValue(sheetName, cell, total)
+	colWidths.Note(1, "TOTAL")
+	colWidths.NoteFloat(colIndex, total)
 
 	// Style total row
 	totalStyle, err := f.NewStyle(&excelize.Style{
@@ -186,6 +218,10 @@ func (w *XLSXWriter) WriteRecords(records []ClassRecord, outputPath string, colI
 	}
 	lastCol := getColumnLetter(colIndex)
 	f.SetCellStyle(sheetName, fmt.Sprintf("A%d", rowNum), fmt.Sprintf("%s%d", lastCol, rowNum), totalStyle)
+
+	if err := colWidths.Apply(f, sheetName); err != nil {
+		return err
+	}
 
 	return f.SaveAs(outputPath)
 }

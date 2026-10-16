@@ -1079,6 +1079,7 @@ SELECT
 	s.parent_currency AS currency,
 	COALESCE(SUM(
 		CASE
+			WHEN cr.status IN ('cancelled', 'rescheduled') AND cr.rate = 0 THEN 0
 			WHEN cr.status IN ('cancelled', 'rescheduled')
 				AND cr.rate > 0
 				AND t.rate_per_class > 0
@@ -1114,7 +1115,7 @@ type SumConductedParentRateByCurrencyAndDateRangeRow struct {
 	TotalRate any
 }
 
-// Parent bill per row: billing.EffectiveParentBillAmount (halve cancelled/rescheduled when class rate is half of teacher rate).
+// Parent bill per row: billing.EffectiveParentBillAmount (zero / half / full rules for cancelled/rescheduled).
 func (q *Queries) SumConductedParentRateByCurrencyAndDateRange(ctx context.Context, arg SumConductedParentRateByCurrencyAndDateRangeParams) ([]SumConductedParentRateByCurrencyAndDateRangeRow, error) {
 	rows, err := q.db.QueryContext(ctx, sumConductedParentRateByCurrencyAndDateRange,
 		arg.Date,

@@ -28,7 +28,8 @@ func TestEffectiveParentBillAmount(t *testing.T) {
 	}{
 		{constants.ClassStatusConducted, 100, 100, 200, 100},
 		{constants.ClassStatusCancelled, 100, 50, 100, 50},
-		{constants.ClassStatusCancelled, 100, 0, 100, 100},
+		{constants.ClassStatusCancelled, 100, 0, 100, 0},
+		{constants.ClassStatusRescheduled, 80, 0, 80, 0},
 		{constants.ClassStatusCancelled, 100, 100, 100, 100},
 		{constants.ClassStatusRescheduled, 80, 40, 80, 40},
 	}
