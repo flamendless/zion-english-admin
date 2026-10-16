@@ -1,0 +1,23 @@
+package frontend
+
+import "strconv"
+import "zion-english/internal/constants"
+import "zion-english/internal/utils"
+
+templ RateDurationSelect(fieldID string, fieldName string, selected int64) {
+	<div class="form-group">
+		<label for={ fieldID }>Rate duration *</label>
+		<select id={ fieldID } name={ fieldName } required>
+			for _, opt := range constants.RateDurationOptions() {
+				<option value={ strconv.Itoa(opt.Value) } selected?={ selected == int64(opt.Value) }>{ opt.Label }</option>
+			}
+		</select>
+	</div>
+}
+
+func formatRatePerDurationDisplay(rate float64, currency string, durationMinutes int64) string {
+	if durationMinutes <= 0 {
+		durationMinutes = int64(constants.DefaultRateDurationMinutes)
+	}
+	return utils.FormatRatePerDuration(rate, currency, int(durationMinutes))
+}

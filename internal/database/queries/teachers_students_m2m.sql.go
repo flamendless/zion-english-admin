@@ -129,7 +129,7 @@ func (q *Queries) GetAllStudentTeacherNames(ctx context.Context) ([]GetAllStuden
 }
 
 const getStudentsByTeacherID = `-- name: GetStudentsByTeacherID :many
-SELECT s.id, s.name, s.student_number, s.parent_number, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
+SELECT s.id, s.name, s.student_number, s.parent_number, s.currency, s.contact, s.rate_per_class, s.rate_duration_minutes, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
 FROM tbl_students s
 INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?
@@ -138,18 +138,19 @@ ORDER BY s.name ASC
 `
 
 type GetStudentsByTeacherIDRow struct {
-	ID            int64
-	Name          string
-	StudentNumber sql.NullString
-	ParentNumber  sql.NullString
-	Currency      string
-	Contact       sql.NullString
-	RatePerClass  float64
-	ParentName    sql.NullString
-	AssignedColor string
-	Status        string
-	CreatedAt     sql.NullTime
-	UpdatedAt     sql.NullTime
+	ID                  int64
+	Name                string
+	StudentNumber       sql.NullString
+	ParentNumber        sql.NullString
+	Currency            string
+	Contact             sql.NullString
+	RatePerClass        float64
+	RateDurationMinutes int64
+	ParentName          sql.NullString
+	AssignedColor       string
+	Status              string
+	CreatedAt           sql.NullTime
+	UpdatedAt           sql.NullTime
 }
 
 func (q *Queries) GetStudentsByTeacherID(ctx context.Context, teacherID int64) ([]GetStudentsByTeacherIDRow, error) {
@@ -169,6 +170,7 @@ func (q *Queries) GetStudentsByTeacherID(ctx context.Context, teacherID int64) (
 			&i.Currency,
 			&i.Contact,
 			&i.RatePerClass,
+			&i.RateDurationMinutes,
 			&i.ParentName,
 			&i.AssignedColor,
 			&i.Status,
@@ -189,7 +191,7 @@ func (q *Queries) GetStudentsByTeacherID(ctx context.Context, teacherID int64) (
 }
 
 const getStudentsByTeacherIDFiltered = `-- name: GetStudentsByTeacherIDFiltered :many
-SELECT s.id, s.name, s.student_number, s.parent_number, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
+SELECT s.id, s.name, s.student_number, s.parent_number, s.currency, s.contact, s.rate_per_class, s.rate_duration_minutes, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
 FROM tbl_students s
 INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?
@@ -212,18 +214,19 @@ type GetStudentsByTeacherIDFilteredParams struct {
 }
 
 type GetStudentsByTeacherIDFilteredRow struct {
-	ID            int64
-	Name          string
-	StudentNumber sql.NullString
-	ParentNumber  sql.NullString
-	Currency      string
-	Contact       sql.NullString
-	RatePerClass  float64
-	ParentName    sql.NullString
-	AssignedColor string
-	Status        string
-	CreatedAt     sql.NullTime
-	UpdatedAt     sql.NullTime
+	ID                  int64
+	Name                string
+	StudentNumber       sql.NullString
+	ParentNumber        sql.NullString
+	Currency            string
+	Contact             sql.NullString
+	RatePerClass        float64
+	RateDurationMinutes int64
+	ParentName          sql.NullString
+	AssignedColor       string
+	Status              string
+	CreatedAt           sql.NullTime
+	UpdatedAt           sql.NullTime
 }
 
 func (q *Queries) GetStudentsByTeacherIDFiltered(ctx context.Context, arg GetStudentsByTeacherIDFilteredParams) ([]GetStudentsByTeacherIDFilteredRow, error) {
@@ -251,6 +254,7 @@ func (q *Queries) GetStudentsByTeacherIDFiltered(ctx context.Context, arg GetStu
 			&i.Currency,
 			&i.Contact,
 			&i.RatePerClass,
+			&i.RateDurationMinutes,
 			&i.ParentName,
 			&i.AssignedColor,
 			&i.Status,
@@ -271,7 +275,7 @@ func (q *Queries) GetStudentsByTeacherIDFiltered(ctx context.Context, arg GetStu
 }
 
 const getTeachersByStudentID = `-- name: GetTeachersByStudentID :many
-SELECT t.id, t.first_name, t.middle_name, t.last_name, t.birthdate, t.address, t.joining_date, t.mobile_number, t.email, t.certifications, t.assigned_color, t.rate_per_class, t.currency, t.drive_url, t.sex, t.password, t.created_at, t.updated_at, t.profile_picture, t.status
+SELECT t.id, t.first_name, t.middle_name, t.last_name, t.birthdate, t.address, t.joining_date, t.mobile_number, t.email, t.certifications, t.assigned_color, t.rate_per_class, t.rate_duration_minutes, t.currency, t.drive_url, t.sex, t.password, t.created_at, t.updated_at, t.profile_picture, t.status
 FROM tbl_teachers t
 INNER JOIN tbl_teachers_students_m2m m2m ON t.id = m2m.teacher_id
 WHERE m2m.student_id = ?
@@ -279,26 +283,27 @@ ORDER BY t.last_name ASC, t.first_name ASC, t.middle_name ASC
 `
 
 type GetTeachersByStudentIDRow struct {
-	ID             int64
-	FirstName      string
-	MiddleName     string
-	LastName       string
-	Birthdate      string
-	Address        string
-	JoiningDate    string
-	MobileNumber   string
-	Email          string
-	Certifications sql.NullString
-	AssignedColor  string
-	RatePerClass   float64
-	Currency       string
-	DriveUrl       string
-	Sex            sql.NullString
-	Password       string
-	CreatedAt      sql.NullTime
-	UpdatedAt      sql.NullTime
-	ProfilePicture sql.NullString
-	Status         string
+	ID                  int64
+	FirstName           string
+	MiddleName          string
+	LastName            string
+	Birthdate           string
+	Address             string
+	JoiningDate         string
+	MobileNumber        string
+	Email               string
+	Certifications      sql.NullString
+	AssignedColor       string
+	RatePerClass        float64
+	RateDurationMinutes int64
+	Currency            string
+	DriveUrl            string
+	Sex                 sql.NullString
+	Password            string
+	CreatedAt           sql.NullTime
+	UpdatedAt           sql.NullTime
+	ProfilePicture      sql.NullString
+	Status              string
 }
 
 func (q *Queries) GetTeachersByStudentID(ctx context.Context, studentID int64) ([]GetTeachersByStudentIDRow, error) {
@@ -323,6 +328,7 @@ func (q *Queries) GetTeachersByStudentID(ctx context.Context, studentID int64) (
 			&i.Certifications,
 			&i.AssignedColor,
 			&i.RatePerClass,
+			&i.RateDurationMinutes,
 			&i.Currency,
 			&i.DriveUrl,
 			&i.Sex,

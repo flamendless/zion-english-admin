@@ -6,7 +6,7 @@ import "zion-english/internal/utils"
 
 func formatDurationMinutes(minutes int64) string {
 	if minutes <= 0 {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	if minutes < 60 {
 		if minutes == 1 {

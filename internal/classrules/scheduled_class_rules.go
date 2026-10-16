@@ -67,7 +67,7 @@ func conflictStatusLabel(status string) string {
 		return "Scheduled"
 	}
 	if status == "" {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	return status
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"zion-english/internal/constants"
 	"zion-english/internal/utils"
 )
 
@@ -28,7 +29,7 @@ func (r ReportAllTeachersRow) ClassesLabel() string {
 
 func (r ReportAllTeachersRow) EarningsHTML() string {
 	if len(r.Earnings) == 0 {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	parts := make([]string, 0, len(r.Earnings))
 	for _, item := range r.Earnings {

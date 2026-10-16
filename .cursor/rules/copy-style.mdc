@@ -9,7 +9,7 @@ Do not use em dashes (`—`, U+2014) in user-facing copy, README, changelogs, ha
 
 Prefer:
 
-- **Hyphen `-`** for compounds, empty UI placeholders, and simple separators (e.g. table cell `-`, `PNG, JPEG, or PDF (max 5 MB)`, `Zion English - %s`)
+- **Hyphen `-`** for compounds and simple separators in prose (e.g. `PNG, JPEG, or PDF (max 5 MB)`, `Zion English - %s`). For empty table cells and unset detail fields in code, use `constants.DisplayNotSet` (renders as `-`), not a hardcoded `"-"` literal.
 - **Comma, period, or colon** to join or break clauses in prose
 - **Pipe `|`** for HTML `<title>` separators when needed (e.g. `Zion English | Admin Portal`)
 

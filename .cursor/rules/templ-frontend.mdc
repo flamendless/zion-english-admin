@@ -134,6 +134,10 @@ Prefer server-side rendering with templ components and HTMX partial fetches over
 
 Always use `utils.URL("/path")`: prepends `/zion-english-admin` in local dev.
 
+## Empty display placeholder
+
+For missing or blank values in tables, modals, and detail views, use `constants.DisplayNotSet` or `getDisplayValue` from `common.templ`. Do not use a literal `"-"` in `frontend/*.go` helpers or bare `-` in templ markup; use `{ constants.DisplayNotSet }` in else branches.
+
 ## Currency and amount fields
 
 Use `@CurrencyAmountField` from `currency_amount.templ` whenever a form collects currency + amount together. Do not stack separate currency and amount `.form-group` blocks.

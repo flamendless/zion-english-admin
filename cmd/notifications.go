@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
+	"zion-english/internal/constants"
 	"zion-english/internal/database/queries"
 	"zion-english/internal/utils"
 )
@@ -198,7 +199,7 @@ func formatNotificationCreatedAt(value string) string {
 	t, err := parseNotificationCreatedAt(value)
 	if err != nil {
 		if value == "" {
-			return "-"
+			return constants.DisplayNotSet
 		}
 		return value
 	}

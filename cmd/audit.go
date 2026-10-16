@@ -212,6 +212,9 @@ func formatTeacherAudit(before, after queries.GetTeacherFullByIDRow) string {
 	if before.RatePerClass != after.RatePerClass {
 		parts = append(parts, fmt.Sprintf("rate %.2f -> %.2f", before.RatePerClass, after.RatePerClass))
 	}
+	if before.RateDurationMinutes != after.RateDurationMinutes {
+		parts = append(parts, fmt.Sprintf("rate duration %d -> %d min", before.RateDurationMinutes, after.RateDurationMinutes))
+	}
 	if before.Currency != after.Currency {
 		parts = append(parts, fmt.Sprintf("currency '%s' -> '%s'", before.Currency, after.Currency))
 	}
@@ -253,6 +256,9 @@ func formatStudentAudit(before, after queries.GetStudentByIDRow, teachersBefore,
 	}
 	if before.RatePerClass != after.RatePerClass {
 		parts = append(parts, fmt.Sprintf("rate %.2f -> %.2f", before.RatePerClass, after.RatePerClass))
+	}
+	if before.RateDurationMinutes != after.RateDurationMinutes {
+		parts = append(parts, fmt.Sprintf("rate duration %d -> %d min", before.RateDurationMinutes, after.RateDurationMinutes))
 	}
 	if before.Currency != after.Currency {
 		parts = append(parts, fmt.Sprintf("currency '%s' -> '%s'", before.Currency, after.Currency))

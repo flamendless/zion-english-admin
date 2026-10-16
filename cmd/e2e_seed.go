@@ -70,22 +70,23 @@ var cmdE2ESeed = &cobra.Command{
 		}
 
 		if err := q.InsertTeacher(ctx, queries.InsertTeacherParams{
-			FirstName:      "E2E",
-			MiddleName:     "",
-			LastName:       "Teacher",
-			Birthdate:      "1990-01-01",
-			Address:        "E2E Address",
-			JoiningDate:    "2020-01-01",
-			MobileNumber:   "+6391700000001",
-			Email:          e2eTeacherEmail,
-			Certifications: sql.NullString{},
-			AssignedColor:  constants.DefaultTeacherAssignedColor,
-			RatePerClass:   500,
-			Currency:       "PHP",
-			DriveUrl:       "",
-			Sex:            sql.NullString{},
-			Password:       string(hashed),
-			Status:         string(constants.TeacherStatusApproved),
+			FirstName:           "E2E",
+			MiddleName:          "",
+			LastName:            "Teacher",
+			Birthdate:           "1990-01-01",
+			Address:             "E2E Address",
+			JoiningDate:         "2020-01-01",
+			MobileNumber:        "+6391700000001",
+			Email:               e2eTeacherEmail,
+			Certifications:      sql.NullString{},
+			AssignedColor:       constants.DefaultTeacherAssignedColor,
+			RatePerClass:        500,
+			RateDurationMinutes: int64(constants.DefaultRateDurationMinutes),
+			Currency:            "PHP",
+			DriveUrl:            "",
+			Sex:                 sql.NullString{},
+			Password:            string(hashed),
+			Status:              string(constants.TeacherStatusApproved),
 		}); err != nil {
 			panic(fmt.Sprintf("failed to insert teacher: %v", err))
 		}
@@ -102,18 +103,19 @@ var cmdE2ESeed = &cobra.Command{
 		}
 
 		studentID, err := q.InsertStudent(ctx, queries.InsertStudentParams{
-			Name:           e2eStudentName,
-			Currency:       "PHP",
-			Contact:        sql.NullString{},
-			RatePerClass:   500,
-			ParentName:     sql.NullString{String: e2eParentName, Valid: true},
-			ParentRate:     sql.NullFloat64{},
-			ParentCurrency: sql.NullString{},
-			AssignedColor:  constants.DefaultAssignedColor,
-			Status:         string(constants.StudentStatusActive),
-			InactiveReason: sql.NullString{},
-			DeletedReason:  sql.NullString{},
-			IsTestSeed:     1,
+			Name:                e2eStudentName,
+			Currency:            "PHP",
+			Contact:             sql.NullString{},
+			RatePerClass:        500,
+			RateDurationMinutes: int64(constants.DefaultRateDurationMinutes),
+			ParentName:          sql.NullString{String: e2eParentName, Valid: true},
+			ParentRate:          sql.NullFloat64{},
+			ParentCurrency:      sql.NullString{},
+			AssignedColor:       constants.DefaultAssignedColor,
+			Status:              string(constants.StudentStatusActive),
+			InactiveReason:      sql.NullString{},
+			DeletedReason:       sql.NullString{},
+			IsTestSeed:          1,
 		})
 		if err != nil {
 			panic(fmt.Sprintf("failed to insert student: %v", err))
@@ -127,17 +129,18 @@ var cmdE2ESeed = &cobra.Command{
 		}
 
 		siblingID, err := q.InsertStudent(ctx, queries.InsertStudentParams{
-			Name:           e2eSiblingStudentName,
-			Currency:       "PHP",
-			Contact:        sql.NullString{},
-			RatePerClass:   500,
-			ParentName:     sql.NullString{String: e2eParentName, Valid: true},
-			ParentRate:     sql.NullFloat64{},
-			ParentCurrency: sql.NullString{},
-			AssignedColor:  constants.DefaultAssignedColor,
-			Status:         string(constants.StudentStatusActive),
-			InactiveReason: sql.NullString{},
-			DeletedReason:  sql.NullString{},
+			Name:                e2eSiblingStudentName,
+			Currency:            "PHP",
+			Contact:             sql.NullString{},
+			RatePerClass:        500,
+			RateDurationMinutes: int64(constants.DefaultRateDurationMinutes),
+			ParentName:          sql.NullString{String: e2eParentName, Valid: true},
+			ParentRate:          sql.NullFloat64{},
+			ParentCurrency:      sql.NullString{},
+			AssignedColor:       constants.DefaultAssignedColor,
+			Status:              string(constants.StudentStatusActive),
+			InactiveReason:      sql.NullString{},
+			DeletedReason:       sql.NullString{},
 		})
 		if err != nil {
 			panic(fmt.Sprintf("failed to insert sibling student: %v", err))
@@ -149,8 +152,15 @@ var cmdE2ESeed = &cobra.Command{
 		}); err != nil {
 			panic(fmt.Sprintf("failed to insert student relationship: %v", err))
 		}
+		if err := q.InsertTeacherStudentM2M(ctx, queries.InsertTeacherStudentM2MParams{
+			TeacherID: teacher.ID,
+			StudentID: siblingID,
+		}); err != nil {
+			panic(fmt.Sprintf("failed to link teacher and sibling student: %v", err))
+		}
 
-		effectiveStart := utils.TodayPHT() + " 00:00:00"
+		// PHT calendar date vs SQLite datetime('now') (UTC): "today" at 00:00 PHT can be after UTC now.
+		effectiveStart := "2020-01-01 00:00:00"
 		if _, err := q.InsertTeacherPlanTransaction(ctx, queries.InsertTeacherPlanTransactionParams{
 			TeacherID:          teacher.ID,
 			Tier:               string(constants.TeacherPlanTierPro),
@@ -169,22 +179,23 @@ var cmdE2ESeed = &cobra.Command{
 			panic(fmt.Sprintf("failed to hash admin password: %v", err))
 		}
 		if err := q.InsertTeacher(ctx, queries.InsertTeacherParams{
-			FirstName:      "E2E",
-			MiddleName:     "",
-			LastName:       "Admin",
-			Birthdate:      "1990-01-01",
-			Address:        "E2E Address",
-			JoiningDate:    "2020-01-01",
-			MobileNumber:   "+6391700000002",
-			Email:          e2eAdminEmail,
-			Certifications: sql.NullString{},
-			AssignedColor:  constants.DefaultTeacherAssignedColor,
-			RatePerClass:   500,
-			Currency:       "PHP",
-			DriveUrl:       "",
-			Sex:            sql.NullString{},
-			Password:       string(adminHashed),
-			Status:         string(constants.TeacherStatusApproved),
+			FirstName:           "E2E",
+			MiddleName:          "",
+			LastName:            "Admin",
+			Birthdate:           "1990-01-01",
+			Address:             "E2E Address",
+			JoiningDate:         "2020-01-01",
+			MobileNumber:        "+6391700000002",
+			Email:               e2eAdminEmail,
+			Certifications:      sql.NullString{},
+			AssignedColor:       constants.DefaultTeacherAssignedColor,
+			RatePerClass:        500,
+			RateDurationMinutes: int64(constants.DefaultRateDurationMinutes),
+			Currency:            "PHP",
+			DriveUrl:            "",
+			Sex:                 sql.NullString{},
+			Password:            string(adminHashed),
+			Status:              string(constants.TeacherStatusApproved),
 		}); err != nil {
 			panic(fmt.Sprintf("failed to insert admin teacher: %v", err))
 		}
@@ -230,7 +241,7 @@ var cmdE2ESeed = &cobra.Command{
 			panic(fmt.Sprintf("failed to insert conducted class: %v", err))
 		}
 		_, err = q.InsertScheduledClass(ctx, queries.InsertScheduledClassParams{
-			StudentID:       studentID,
+			StudentID:       siblingID,
 			TeacherID:       teacher.ID,
 			ScheduledDate:   overdueDate,
 			StartTime:       sql.NullString{String: "06:00", Valid: true},

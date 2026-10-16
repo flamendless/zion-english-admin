@@ -414,12 +414,14 @@ SELECT
 	t.middle_name AS teacher_middle_name,
 	t.last_name AS teacher_last_name,
 	t.rate_per_class AS teacher_rate_per_class,
+	t.rate_duration_minutes AS teacher_rate_duration_minutes,
 	cr.student_id,
 	s.name AS student_name,
 	s.student_number AS student_number,
 	s.parent_rate,
 	s.parent_currency,
 	cr.date,
+	cr.duration_minutes,
 	cr.status,
 	cr.rate,
 	cr.currency,
@@ -478,22 +480,24 @@ type GetReportSummaryRowsParams struct {
 }
 
 type GetReportSummaryRowsRow struct {
-	TeacherID           int64
-	TeacherName         string
-	TeacherFirstName    string
-	TeacherMiddleName   string
-	TeacherLastName     string
-	TeacherRatePerClass float64
-	StudentID           int64
-	StudentName         string
-	StudentNumber       sql.NullString
-	ParentRate          sql.NullFloat64
-	ParentCurrency      sql.NullString
-	Date                string
-	Status              string
-	Rate                float64
-	Currency            string
-	IsTrialClass        int64
+	TeacherID                  int64
+	TeacherName                string
+	TeacherFirstName           string
+	TeacherMiddleName          string
+	TeacherLastName            string
+	TeacherRatePerClass        float64
+	TeacherRateDurationMinutes int64
+	StudentID                  int64
+	StudentName                string
+	StudentNumber              sql.NullString
+	ParentRate                 sql.NullFloat64
+	ParentCurrency             sql.NullString
+	Date                       string
+	DurationMinutes            int64
+	Status                     string
+	Rate                       float64
+	Currency                   string
+	IsTrialClass               int64
 }
 
 func (q *Queries) GetReportSummaryRows(ctx context.Context, arg GetReportSummaryRowsParams) ([]GetReportSummaryRowsRow, error) {
@@ -524,12 +528,14 @@ func (q *Queries) GetReportSummaryRows(ctx context.Context, arg GetReportSummary
 			&i.TeacherMiddleName,
 			&i.TeacherLastName,
 			&i.TeacherRatePerClass,
+			&i.TeacherRateDurationMinutes,
 			&i.StudentID,
 			&i.StudentName,
 			&i.StudentNumber,
 			&i.ParentRate,
 			&i.ParentCurrency,
 			&i.Date,
+			&i.DurationMinutes,
 			&i.Status,
 			&i.Rate,
 			&i.Currency,

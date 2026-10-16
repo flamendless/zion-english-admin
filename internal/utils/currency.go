@@ -24,6 +24,13 @@ func FormatCurrency(amount float64, currency string) string {
 	return fmt.Sprintf("%s %s", FormatCurrencyAmountFixed(amount, currency), currency)
 }
 
+func FormatRatePerDuration(amount float64, currency string, durationMinutes int) string {
+	if durationMinutes <= 0 {
+		return FormatCurrency(amount, currency)
+	}
+	return fmt.Sprintf("%s %s per %d minutes", FormatCurrencyAmountFixed(amount, currency), currency, durationMinutes)
+}
+
 func formatPHPAmount(amount float64) string {
 	negative := amount < 0
 	if negative {

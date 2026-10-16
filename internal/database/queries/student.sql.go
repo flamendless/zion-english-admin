@@ -217,7 +217,7 @@ func (q *Queries) CountTestSeedStudents(ctx context.Context) (int64, error) {
 }
 
 const getActiveStudents = `-- name: GetActiveStudents :many
-SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
+SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, rate_duration_minutes, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
 FROM tbl_students
 WHERE status = 'active'
 	AND is_test_seed = 0
@@ -225,23 +225,24 @@ ORDER BY name ASC
 `
 
 type GetActiveStudentsRow struct {
-	ID             int64
-	Name           string
-	StudentNumber  sql.NullString
-	ParentNumber   sql.NullString
-	Currency       string
-	Contact        sql.NullString
-	RatePerClass   float64
-	ParentName     sql.NullString
-	ParentRate     sql.NullFloat64
-	ParentCurrency sql.NullString
-	AssignedColor  string
-	Status         string
-	InactiveReason sql.NullString
-	DeletedReason  sql.NullString
-	IsTestSeed     int64
-	CreatedAt      sql.NullTime
-	UpdatedAt      sql.NullTime
+	ID                  int64
+	Name                string
+	StudentNumber       sql.NullString
+	ParentNumber        sql.NullString
+	Currency            string
+	Contact             sql.NullString
+	RatePerClass        float64
+	RateDurationMinutes int64
+	ParentName          sql.NullString
+	ParentRate          sql.NullFloat64
+	ParentCurrency      sql.NullString
+	AssignedColor       string
+	Status              string
+	InactiveReason      sql.NullString
+	DeletedReason       sql.NullString
+	IsTestSeed          int64
+	CreatedAt           sql.NullTime
+	UpdatedAt           sql.NullTime
 }
 
 func (q *Queries) GetActiveStudents(ctx context.Context) ([]GetActiveStudentsRow, error) {
@@ -261,6 +262,7 @@ func (q *Queries) GetActiveStudents(ctx context.Context) ([]GetActiveStudentsRow
 			&i.Currency,
 			&i.Contact,
 			&i.RatePerClass,
+			&i.RateDurationMinutes,
 			&i.ParentName,
 			&i.ParentRate,
 			&i.ParentCurrency,
@@ -286,29 +288,30 @@ func (q *Queries) GetActiveStudents(ctx context.Context) ([]GetActiveStudentsRow
 }
 
 const getAllStudents = `-- name: GetAllStudents :many
-SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
+SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, rate_duration_minutes, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
 FROM tbl_students
 ORDER BY created_at DESC
 `
 
 type GetAllStudentsRow struct {
-	ID             int64
-	Name           string
-	StudentNumber  sql.NullString
-	ParentNumber   sql.NullString
-	Currency       string
-	Contact        sql.NullString
-	RatePerClass   float64
-	ParentName     sql.NullString
-	ParentRate     sql.NullFloat64
-	ParentCurrency sql.NullString
-	AssignedColor  string
-	Status         string
-	InactiveReason sql.NullString
-	DeletedReason  sql.NullString
-	IsTestSeed     int64
-	CreatedAt      sql.NullTime
-	UpdatedAt      sql.NullTime
+	ID                  int64
+	Name                string
+	StudentNumber       sql.NullString
+	ParentNumber        sql.NullString
+	Currency            string
+	Contact             sql.NullString
+	RatePerClass        float64
+	RateDurationMinutes int64
+	ParentName          sql.NullString
+	ParentRate          sql.NullFloat64
+	ParentCurrency      sql.NullString
+	AssignedColor       string
+	Status              string
+	InactiveReason      sql.NullString
+	DeletedReason       sql.NullString
+	IsTestSeed          int64
+	CreatedAt           sql.NullTime
+	UpdatedAt           sql.NullTime
 }
 
 func (q *Queries) GetAllStudents(ctx context.Context) ([]GetAllStudentsRow, error) {
@@ -328,6 +331,7 @@ func (q *Queries) GetAllStudents(ctx context.Context) ([]GetAllStudentsRow, erro
 			&i.Currency,
 			&i.Contact,
 			&i.RatePerClass,
+			&i.RateDurationMinutes,
 			&i.ParentName,
 			&i.ParentRate,
 			&i.ParentCurrency,
@@ -353,29 +357,30 @@ func (q *Queries) GetAllStudents(ctx context.Context) ([]GetAllStudentsRow, erro
 }
 
 const getStudentByID = `-- name: GetStudentByID :one
-SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
+SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, rate_duration_minutes, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
 FROM tbl_students
 WHERE id = ?
 `
 
 type GetStudentByIDRow struct {
-	ID             int64
-	Name           string
-	StudentNumber  sql.NullString
-	ParentNumber   sql.NullString
-	Currency       string
-	Contact        sql.NullString
-	RatePerClass   float64
-	ParentName     sql.NullString
-	ParentRate     sql.NullFloat64
-	ParentCurrency sql.NullString
-	AssignedColor  string
-	Status         string
-	InactiveReason sql.NullString
-	DeletedReason  sql.NullString
-	IsTestSeed     int64
-	CreatedAt      sql.NullTime
-	UpdatedAt      sql.NullTime
+	ID                  int64
+	Name                string
+	StudentNumber       sql.NullString
+	ParentNumber        sql.NullString
+	Currency            string
+	Contact             sql.NullString
+	RatePerClass        float64
+	RateDurationMinutes int64
+	ParentName          sql.NullString
+	ParentRate          sql.NullFloat64
+	ParentCurrency      sql.NullString
+	AssignedColor       string
+	Status              string
+	InactiveReason      sql.NullString
+	DeletedReason       sql.NullString
+	IsTestSeed          int64
+	CreatedAt           sql.NullTime
+	UpdatedAt           sql.NullTime
 }
 
 func (q *Queries) GetStudentByID(ctx context.Context, id int64) (GetStudentByIDRow, error) {
@@ -389,6 +394,7 @@ func (q *Queries) GetStudentByID(ctx context.Context, id int64) (GetStudentByIDR
 		&i.Currency,
 		&i.Contact,
 		&i.RatePerClass,
+		&i.RateDurationMinutes,
 		&i.ParentName,
 		&i.ParentRate,
 		&i.ParentCurrency,
@@ -404,7 +410,7 @@ func (q *Queries) GetStudentByID(ctx context.Context, id int64) (GetStudentByIDR
 }
 
 const getStudentsFiltered = `-- name: GetStudentsFiltered :many
-SELECT DISTINCT s.id, s.name, s.student_number, s.parent_number, s.currency, s.contact, s.rate_per_class, s.parent_name, s.parent_rate, s.parent_currency, s.assigned_color, s.status, s.inactive_reason, s.deleted_reason, s.is_test_seed, s.created_at, s.updated_at
+SELECT DISTINCT s.id, s.name, s.student_number, s.parent_number, s.currency, s.contact, s.rate_per_class, s.rate_duration_minutes, s.parent_name, s.parent_rate, s.parent_currency, s.assigned_color, s.status, s.inactive_reason, s.deleted_reason, s.is_test_seed, s.created_at, s.updated_at
 FROM tbl_students s
 LEFT JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE (? = '' OR s.name LIKE '%' || ? || '%')
@@ -475,23 +481,24 @@ type GetStudentsFilteredParams struct {
 }
 
 type GetStudentsFilteredRow struct {
-	ID             int64
-	Name           string
-	StudentNumber  sql.NullString
-	ParentNumber   sql.NullString
-	Currency       string
-	Contact        sql.NullString
-	RatePerClass   float64
-	ParentName     sql.NullString
-	ParentRate     sql.NullFloat64
-	ParentCurrency sql.NullString
-	AssignedColor  string
-	Status         string
-	InactiveReason sql.NullString
-	DeletedReason  sql.NullString
-	IsTestSeed     int64
-	CreatedAt      sql.NullTime
-	UpdatedAt      sql.NullTime
+	ID                  int64
+	Name                string
+	StudentNumber       sql.NullString
+	ParentNumber        sql.NullString
+	Currency            string
+	Contact             sql.NullString
+	RatePerClass        float64
+	RateDurationMinutes int64
+	ParentName          sql.NullString
+	ParentRate          sql.NullFloat64
+	ParentCurrency      sql.NullString
+	AssignedColor       string
+	Status              string
+	InactiveReason      sql.NullString
+	DeletedReason       sql.NullString
+	IsTestSeed          int64
+	CreatedAt           sql.NullTime
+	UpdatedAt           sql.NullTime
 }
 
 func (q *Queries) GetStudentsFiltered(ctx context.Context, arg GetStudentsFilteredParams) ([]GetStudentsFilteredRow, error) {
@@ -529,6 +536,7 @@ func (q *Queries) GetStudentsFiltered(ctx context.Context, arg GetStudentsFilter
 			&i.Currency,
 			&i.Contact,
 			&i.RatePerClass,
+			&i.RateDurationMinutes,
 			&i.ParentName,
 			&i.ParentRate,
 			&i.ParentCurrency,
@@ -554,30 +562,31 @@ func (q *Queries) GetStudentsFiltered(ctx context.Context, arg GetStudentsFilter
 }
 
 const getTestSeedStudents = `-- name: GetTestSeedStudents :many
-SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
+SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, rate_duration_minutes, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
 FROM tbl_students
 WHERE is_test_seed = 1
 ORDER BY id ASC
 `
 
 type GetTestSeedStudentsRow struct {
-	ID             int64
-	Name           string
-	StudentNumber  sql.NullString
-	ParentNumber   sql.NullString
-	Currency       string
-	Contact        sql.NullString
-	RatePerClass   float64
-	ParentName     sql.NullString
-	ParentRate     sql.NullFloat64
-	ParentCurrency sql.NullString
-	AssignedColor  string
-	Status         string
-	InactiveReason sql.NullString
-	DeletedReason  sql.NullString
-	IsTestSeed     int64
-	CreatedAt      sql.NullTime
-	UpdatedAt      sql.NullTime
+	ID                  int64
+	Name                string
+	StudentNumber       sql.NullString
+	ParentNumber        sql.NullString
+	Currency            string
+	Contact             sql.NullString
+	RatePerClass        float64
+	RateDurationMinutes int64
+	ParentName          sql.NullString
+	ParentRate          sql.NullFloat64
+	ParentCurrency      sql.NullString
+	AssignedColor       string
+	Status              string
+	InactiveReason      sql.NullString
+	DeletedReason       sql.NullString
+	IsTestSeed          int64
+	CreatedAt           sql.NullTime
+	UpdatedAt           sql.NullTime
 }
 
 func (q *Queries) GetTestSeedStudents(ctx context.Context) ([]GetTestSeedStudentsRow, error) {
@@ -597,6 +606,7 @@ func (q *Queries) GetTestSeedStudents(ctx context.Context) ([]GetTestSeedStudent
 			&i.Currency,
 			&i.Contact,
 			&i.RatePerClass,
+			&i.RateDurationMinutes,
 			&i.ParentName,
 			&i.ParentRate,
 			&i.ParentCurrency,
@@ -725,26 +735,27 @@ func (q *Queries) HardDeleteTestSeedTeacherStudentLinks(ctx context.Context) err
 }
 
 const insertStudent = `-- name: InsertStudent :one
-INSERT INTO tbl_students (name, student_number, parent_number, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO tbl_students (name, student_number, parent_number, currency, contact, rate_per_class, rate_duration_minutes, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 RETURNING id
 `
 
 type InsertStudentParams struct {
-	Name           string
-	StudentNumber  sql.NullString
-	ParentNumber   sql.NullString
-	Currency       string
-	Contact        sql.NullString
-	RatePerClass   float64
-	ParentName     sql.NullString
-	ParentRate     sql.NullFloat64
-	ParentCurrency sql.NullString
-	AssignedColor  string
-	Status         string
-	InactiveReason sql.NullString
-	DeletedReason  sql.NullString
-	IsTestSeed     int64
+	Name                string
+	StudentNumber       sql.NullString
+	ParentNumber        sql.NullString
+	Currency            string
+	Contact             sql.NullString
+	RatePerClass        float64
+	RateDurationMinutes int64
+	ParentName          sql.NullString
+	ParentRate          sql.NullFloat64
+	ParentCurrency      sql.NullString
+	AssignedColor       string
+	Status              string
+	InactiveReason      sql.NullString
+	DeletedReason       sql.NullString
+	IsTestSeed          int64
 }
 
 func (q *Queries) InsertStudent(ctx context.Context, arg InsertStudentParams) (int64, error) {
@@ -755,6 +766,7 @@ func (q *Queries) InsertStudent(ctx context.Context, arg InsertStudentParams) (i
 		arg.Currency,
 		arg.Contact,
 		arg.RatePerClass,
+		arg.RateDurationMinutes,
 		arg.ParentName,
 		arg.ParentRate,
 		arg.ParentCurrency,
@@ -770,7 +782,7 @@ func (q *Queries) InsertStudent(ctx context.Context, arg InsertStudentParams) (i
 }
 
 const searchStudentsByName = `-- name: SearchStudentsByName :many
-SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
+SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, rate_duration_minutes, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
 FROM tbl_students
 WHERE name LIKE '%' || ? || '%'
 	AND status != 'deleted'
@@ -780,23 +792,24 @@ LIMIT 10
 `
 
 type SearchStudentsByNameRow struct {
-	ID             int64
-	Name           string
-	StudentNumber  sql.NullString
-	ParentNumber   sql.NullString
-	Currency       string
-	Contact        sql.NullString
-	RatePerClass   float64
-	ParentName     sql.NullString
-	ParentRate     sql.NullFloat64
-	ParentCurrency sql.NullString
-	AssignedColor  string
-	Status         string
-	InactiveReason sql.NullString
-	DeletedReason  sql.NullString
-	IsTestSeed     int64
-	CreatedAt      sql.NullTime
-	UpdatedAt      sql.NullTime
+	ID                  int64
+	Name                string
+	StudentNumber       sql.NullString
+	ParentNumber        sql.NullString
+	Currency            string
+	Contact             sql.NullString
+	RatePerClass        float64
+	RateDurationMinutes int64
+	ParentName          sql.NullString
+	ParentRate          sql.NullFloat64
+	ParentCurrency      sql.NullString
+	AssignedColor       string
+	Status              string
+	InactiveReason      sql.NullString
+	DeletedReason       sql.NullString
+	IsTestSeed          int64
+	CreatedAt           sql.NullTime
+	UpdatedAt           sql.NullTime
 }
 
 func (q *Queries) SearchStudentsByName(ctx context.Context, dollar_1 sql.NullString) ([]SearchStudentsByNameRow, error) {
@@ -816,6 +829,7 @@ func (q *Queries) SearchStudentsByName(ctx context.Context, dollar_1 sql.NullStr
 			&i.Currency,
 			&i.Contact,
 			&i.RatePerClass,
+			&i.RateDurationMinutes,
 			&i.ParentName,
 			&i.ParentRate,
 			&i.ParentCurrency,
@@ -858,26 +872,27 @@ func (q *Queries) SoftDeleteStudent(ctx context.Context, arg SoftDeleteStudentPa
 
 const updateStudent = `-- name: UpdateStudent :exec
 UPDATE tbl_students
-SET name = ?, student_number = ?, parent_number = ?, currency = ?, contact = ?, rate_per_class = ?, parent_name = ?, parent_rate = ?, parent_currency = ?, assigned_color = ?, status = ?, inactive_reason = ?, deleted_reason = ?, is_test_seed = ?, updated_at = datetime('now')
+SET name = ?, student_number = ?, parent_number = ?, currency = ?, contact = ?, rate_per_class = ?, rate_duration_minutes = ?, parent_name = ?, parent_rate = ?, parent_currency = ?, assigned_color = ?, status = ?, inactive_reason = ?, deleted_reason = ?, is_test_seed = ?, updated_at = datetime('now')
 WHERE id = ?
 `
 
 type UpdateStudentParams struct {
-	Name           string
-	StudentNumber  sql.NullString
-	ParentNumber   sql.NullString
-	Currency       string
-	Contact        sql.NullString
-	RatePerClass   float64
-	ParentName     sql.NullString
-	ParentRate     sql.NullFloat64
-	ParentCurrency sql.NullString
-	AssignedColor  string
-	Status         string
-	InactiveReason sql.NullString
-	DeletedReason  sql.NullString
-	IsTestSeed     int64
-	ID             int64
+	Name                string
+	StudentNumber       sql.NullString
+	ParentNumber        sql.NullString
+	Currency            string
+	Contact             sql.NullString
+	RatePerClass        float64
+	RateDurationMinutes int64
+	ParentName          sql.NullString
+	ParentRate          sql.NullFloat64
+	ParentCurrency      sql.NullString
+	AssignedColor       string
+	Status              string
+	InactiveReason      sql.NullString
+	DeletedReason       sql.NullString
+	IsTestSeed          int64
+	ID                  int64
 }
 
 func (q *Queries) UpdateStudent(ctx context.Context, arg UpdateStudentParams) error {
@@ -888,6 +903,7 @@ func (q *Queries) UpdateStudent(ctx context.Context, arg UpdateStudentParams) er
 		arg.Currency,
 		arg.Contact,
 		arg.RatePerClass,
+		arg.RateDurationMinutes,
 		arg.ParentName,
 		arg.ParentRate,
 		arg.ParentCurrency,

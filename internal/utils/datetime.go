@@ -30,7 +30,7 @@ func DateTimeSecondsPHT(t time.Time) string {
 
 func FormatNullDateTimePHT(t sql.NullTime) string {
 	if !t.Valid {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	return DateTimePHT(t.Time)
 }
@@ -49,7 +49,7 @@ func TodayPHT() string {
 func FormatPlanDateTimePHT(value string) string {
 	value = strings.TrimSpace(value)
 	if value == "" {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	layouts := []string{constants.DateTimeSecondsLayout, constants.DateTimeLayout, constants.DateLayout}
 	for _, layout := range layouts {
@@ -122,7 +122,7 @@ type compactDateRun struct {
 
 func FormatCompactDateRanges(dates []string) string {
 	if len(dates) == 0 {
-		return "-"
+		return constants.DisplayNotSet
 	}
 
 	seen := make(map[string]struct{}, len(dates))
@@ -143,7 +143,7 @@ func FormatCompactDateRanges(dates []string) string {
 		parsed = append(parsed, t)
 	}
 	if len(parsed) == 0 {
-		return "-"
+		return constants.DisplayNotSet
 	}
 
 	sort.Slice(parsed, func(i, j int) bool {
@@ -172,7 +172,7 @@ func FormatCompactDateRanges(dates []string) string {
 
 	segments := formatCompactDateSegments(runs, allSameYear)
 	if len(segments) == 0 {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	out := strings.Join(segments, ", ")
 	if allSameYear {

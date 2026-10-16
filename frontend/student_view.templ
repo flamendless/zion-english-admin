@@ -1,7 +1,6 @@
 package frontend
 
 import "zion-english/internal/constants"
-import "zion-english/internal/utils"
 
 templ StudentViewModal(data EditStudentData) {
 	<div class="modal-overlay" id="studentViewModal" role="presentation">
@@ -20,10 +19,8 @@ templ StudentViewModal(data EditStudentData) {
 							@StatusPill(capitalizeStatus(data.Status), StudentStatusPillTone(data.Status), true)
 							<div class="entity-view-rate-block">
 								<div class="entity-view-rate-highlight">
-									<span class="entity-view-rate-highlight-amount">{ utils.FormatCurrencyAmountFixed(data.RatePerClass, data.Currency) }</span>
-									<span class="entity-view-rate-highlight-currency">{ data.Currency }</span>
+									<span class="entity-view-rate-highlight-amount">{ formatRatePerDurationDisplay(data.RatePerClass, data.Currency, data.RateDurationMinutes) }</span>
 								</div>
-								<span class="entity-view-rate-caption">per class</span>
 							</div>
 						</div>
 					</div>
@@ -34,7 +31,7 @@ templ StudentViewModal(data EditStudentData) {
 								@ProfileDetailField("Parent", displayOrDash(data.ParentName))
 								@ProfileDetailField("Parent number", displayOrDash(data.ParentNumber))
 								@AdminOnlyProfileDetailField("Contact", displayOrDash(data.Contact))
-								@AdminOnlyProfileDetailField("Parent rate", formatOptionalParentRate(data.ParentRate, data.ParentCurrency, data.HasParentRate))
+								@AdminOnlyProfileDetailField("Parent rate", formatOptionalParentRatePerDuration(data.ParentRate, data.ParentCurrency, data.RateDurationMinutes, data.HasParentRate))
 							</div>
 						}
 						if data.Status == constants.StudentStatusInactive && data.InactiveReason != "" {

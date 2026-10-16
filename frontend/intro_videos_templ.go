@@ -49,7 +49,7 @@ func introVideoLinkDisplay(label string) string {
 }
 
 func introVideoSizesEqual(original, processed string) bool {
-	return original != "-" && processed != "-" && original == processed
+	return original != constants.DisplayNotSet && processed != constants.DisplayNotSet && original == processed
 }
 
 func introVideoRowClass(status constants.TeacherIntroVideoStatus) string {
@@ -353,7 +353,7 @@ func IntroVideoSizeBadges(original, processed string) templ.Component {
 			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		if original == "-" && processed == "-" {
+		if original == constants.DisplayNotSet && processed == constants.DisplayNotSet {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<span>-</span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -368,13 +368,13 @@ func IntroVideoSizeBadges(original, processed string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if original != "-" {
+			if original != constants.DisplayNotSet {
 				templ_7745c5c3_Err = Pill(original, PillToneWarning).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			if processed != "-" {
+			if processed != constants.DisplayNotSet {
 				templ_7745c5c3_Err = Pill(processed, PillToneSuccess).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err

@@ -110,14 +110,14 @@ func (r ClassRecordRowData) RateLabel() string {
 
 func (r ClassRecordRowData) StartTimeDisplay() string {
 	if r.StartTime == "" {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	return r.StartTime
 }
 
 func (r ClassRecordRowData) EndTimeDisplay() string {
 	if r.EndTime == "" {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	return r.EndTime
 }
@@ -140,7 +140,7 @@ func (r ClassRecordRowData) timeRangeEnd() string {
 func (r ClassRecordRowData) TimeRangeStartLine() string {
 	start := normalizeDisplayTime(r.StartTime)
 	if start == "" {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	return start + " -"
 }
@@ -148,7 +148,7 @@ func (r ClassRecordRowData) TimeRangeStartLine() string {
 func (r ClassRecordRowData) TimeRangeEndLine() string {
 	end := r.timeRangeEnd()
 	if end == "" {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	return end
 }

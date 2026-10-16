@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"zion-english/internal/constants"
 	"zion-english/internal/logs"
 
 	"go.uber.org/zap"
@@ -214,7 +215,7 @@ func parseTeacherRecord(record []string, date time.Time, colIndices ColumnIndice
 	rate := 0.0
 	if colIndices.Rate >= 0 && len(record) > colIndices.Rate {
 		rateStr := strings.TrimSpace(record[colIndices.Rate])
-		if rateStr != "-" && rateStr != "" {
+		if rateStr != constants.DisplayNotSet && rateStr != "" {
 			if parsed, err := strconv.ParseFloat(rateStr, 64); err == nil {
 				rate = parsed
 			}

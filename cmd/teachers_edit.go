@@ -220,8 +220,8 @@ func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		}
 	}
 	showResignationTab := row.Status == string(constants.TeacherStatusResigned)
-	resignationDate := "-"
-	resignationReason := "-"
+	resignationDate := constants.DisplayNotSet
+	resignationReason := constants.DisplayNotSet
 	canDownloadFinalReport := false
 	showFinalReportDisabledButton := false
 	finalReportUnavailableMessage := ""
@@ -282,6 +282,7 @@ func handleTeacherView(w http.ResponseWriter, r *http.Request, teacherID int64) 
 		Certifications:                   certifications,
 		AssignedColor:                    row.AssignedColor,
 		RatePerClass:                     row.RatePerClass,
+		RateDurationMinutes:              row.RateDurationMinutes,
 		Currency:                         row.Currency,
 		DriveUrl:                         row.DriveUrl,
 		Sex:                              sex,
@@ -560,6 +561,7 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 			Certifications:         existing.Certifications.String,
 			AssignedColor:          existing.AssignedColor,
 			RatePerClass:           existing.RatePerClass,
+			RateDurationMinutes:    existing.RateDurationMinutes,
 			Currency:               existing.Currency,
 			DriveUrl:               existing.DriveUrl,
 			Sex:                    existing.Sex.String,
@@ -661,22 +663,23 @@ func handleTeacherEdit(w http.ResponseWriter, r *http.Request, teacherID int64) 
 	qtx := dbRW.GetQueries().WithTx(tx)
 
 	err = qtx.UpdateTeacherBySuperuser(ctx, queries.UpdateTeacherBySuperuserParams{
-		FirstName:      req.FirstName,
-		MiddleName:     req.MiddleName,
-		LastName:       req.LastName,
-		Birthdate:      req.Birthdate,
-		Address:        req.Address,
-		JoiningDate:    req.JoiningDate,
-		MobileNumber:   req.MobileNumber,
-		Email:          req.Email,
-		Certifications: sql.NullString{String: req.Certifications, Valid: req.Certifications != ""},
-		AssignedColor:  req.AssignedColor,
-		RatePerClass:   req.RatePerClass,
-		Currency:       req.Currency,
-		DriveUrl:       req.DriveUrl,
-		Sex:            sql.NullString{String: req.Sex, Valid: req.Sex != ""},
-		Template:       sql.NullString{String: template, Valid: template != ""},
-		ID:             teacherID,
+		FirstName:           req.FirstName,
+		MiddleName:          req.MiddleName,
+		LastName:            req.LastName,
+		Birthdate:           req.Birthdate,
+		Address:             req.Address,
+		JoiningDate:         req.JoiningDate,
+		MobileNumber:        req.MobileNumber,
+		Email:               req.Email,
+		Certifications:      sql.NullString{String: req.Certifications, Valid: req.Certifications != ""},
+		AssignedColor:       req.AssignedColor,
+		RatePerClass:        req.RatePerClass,
+		RateDurationMinutes: req.RateDurationMinutes,
+		Currency:            req.Currency,
+		DriveUrl:            req.DriveUrl,
+		Sex:                 sql.NullString{String: req.Sex, Valid: req.Sex != ""},
+		Template:            sql.NullString{String: template, Valid: template != ""},
+		ID:                  teacherID,
 	})
 	if err != nil {
 		sendErrorLog(w, err.Error())

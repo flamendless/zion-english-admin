@@ -311,16 +311,17 @@ func loadMyStudentsPage(ctx context.Context, teacherID int64, q, status string, 
 	viewStudents := make([]frontend.StudentItem, len(students))
 	for i, s := range students {
 		viewStudents[i] = frontend.StudentItem{
-			ID:            strconv.FormatInt(s.ID, 10),
-			Name:          s.Name,
-			StudentNumber: studentNumberString(s.StudentNumber),
-			Currency:      s.Currency,
-			Contact:       s.Contact.String,
-			RatePerClass:  s.RatePerClass,
-			ParentName:    s.ParentName.String,
-			AssignedColor: s.AssignedColor,
-			Status:        constants.StudentStatus(s.Status),
-			Avatar:        frontend.StudentAvatarProps(s.Name, s.AssignedColor, false, "sm"),
+			ID:                  strconv.FormatInt(s.ID, 10),
+			Name:                s.Name,
+			StudentNumber:       studentNumberString(s.StudentNumber),
+			Currency:            s.Currency,
+			Contact:             s.Contact.String,
+			RatePerClass:        s.RatePerClass,
+			RateDurationMinutes: s.RateDurationMinutes,
+			ParentName:          s.ParentName.String,
+			AssignedColor:       s.AssignedColor,
+			Status:              constants.StudentStatus(s.Status),
+			Avatar:              frontend.StudentAvatarProps(s.Name, s.AssignedColor, false, "sm"),
 		}
 	}
 	return viewStudents, page, nil

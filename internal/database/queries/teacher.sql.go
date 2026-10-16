@@ -212,33 +212,34 @@ func (q *Queries) CountTeachersFiltered(ctx context.Context, arg CountTeachersFi
 }
 
 const getAllTeachers = `-- name: GetAllTeachers :many
-SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
+SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, rate_duration_minutes, currency, drive_url, sex, password, template, created_at, updated_at, status
 FROM tbl_teachers
 WHERE deleted = 0
 ORDER BY CASE WHEN deleted = 1 THEN 2 WHEN status = 'pending' THEN 0 ELSE 1 END, last_name ASC, first_name ASC, middle_name ASC
 `
 
 type GetAllTeachersRow struct {
-	ID             int64
-	FirstName      string
-	MiddleName     string
-	LastName       string
-	Birthdate      string
-	Address        string
-	JoiningDate    string
-	MobileNumber   string
-	Email          string
-	Certifications sql.NullString
-	AssignedColor  string
-	RatePerClass   float64
-	Currency       string
-	DriveUrl       string
-	Sex            sql.NullString
-	Password       string
-	Template       sql.NullString
-	CreatedAt      sql.NullTime
-	UpdatedAt      sql.NullTime
-	Status         string
+	ID                  int64
+	FirstName           string
+	MiddleName          string
+	LastName            string
+	Birthdate           string
+	Address             string
+	JoiningDate         string
+	MobileNumber        string
+	Email               string
+	Certifications      sql.NullString
+	AssignedColor       string
+	RatePerClass        float64
+	RateDurationMinutes int64
+	Currency            string
+	DriveUrl            string
+	Sex                 sql.NullString
+	Password            string
+	Template            sql.NullString
+	CreatedAt           sql.NullTime
+	UpdatedAt           sql.NullTime
+	Status              string
 }
 
 func (q *Queries) GetAllTeachers(ctx context.Context) ([]GetAllTeachersRow, error) {
@@ -263,6 +264,7 @@ func (q *Queries) GetAllTeachers(ctx context.Context) ([]GetAllTeachersRow, erro
 			&i.Certifications,
 			&i.AssignedColor,
 			&i.RatePerClass,
+			&i.RateDurationMinutes,
 			&i.Currency,
 			&i.DriveUrl,
 			&i.Sex,
@@ -286,7 +288,7 @@ func (q *Queries) GetAllTeachers(ctx context.Context) ([]GetAllTeachersRow, erro
 }
 
 const getApprovedTeachers = `-- name: GetApprovedTeachers :many
-SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status
+SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, rate_duration_minutes, currency, drive_url, sex, password, template, created_at, updated_at, status
 FROM tbl_teachers
 WHERE status = 'approved' AND deleted = 0
 	AND NOT EXISTS (
@@ -297,26 +299,27 @@ ORDER BY last_name ASC, first_name ASC, middle_name ASC
 `
 
 type GetApprovedTeachersRow struct {
-	ID             int64
-	FirstName      string
-	MiddleName     string
-	LastName       string
-	Birthdate      string
-	Address        string
-	JoiningDate    string
-	MobileNumber   string
-	Email          string
-	Certifications sql.NullString
-	AssignedColor  string
-	RatePerClass   float64
-	Currency       string
-	DriveUrl       string
-	Sex            sql.NullString
-	Password       string
-	Template       sql.NullString
-	CreatedAt      sql.NullTime
-	UpdatedAt      sql.NullTime
-	Status         string
+	ID                  int64
+	FirstName           string
+	MiddleName          string
+	LastName            string
+	Birthdate           string
+	Address             string
+	JoiningDate         string
+	MobileNumber        string
+	Email               string
+	Certifications      sql.NullString
+	AssignedColor       string
+	RatePerClass        float64
+	RateDurationMinutes int64
+	Currency            string
+	DriveUrl            string
+	Sex                 sql.NullString
+	Password            string
+	Template            sql.NullString
+	CreatedAt           sql.NullTime
+	UpdatedAt           sql.NullTime
+	Status              string
 }
 
 func (q *Queries) GetApprovedTeachers(ctx context.Context) ([]GetApprovedTeachersRow, error) {
@@ -341,6 +344,7 @@ func (q *Queries) GetApprovedTeachers(ctx context.Context) ([]GetApprovedTeacher
 			&i.Certifications,
 			&i.AssignedColor,
 			&i.RatePerClass,
+			&i.RateDurationMinutes,
 			&i.Currency,
 			&i.DriveUrl,
 			&i.Sex,
@@ -493,35 +497,36 @@ func (q *Queries) GetTeacherCountByMobileExcludingID(ctx context.Context, arg Ge
 }
 
 const getTeacherFullByID = `-- name: GetTeacherFullByID :one
-SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted, resigned_at, resigned_reason
+SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, rate_duration_minutes, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted, resigned_at, resigned_reason
 FROM tbl_teachers
 WHERE id = ?
 `
 
 type GetTeacherFullByIDRow struct {
-	ID             int64
-	FirstName      string
-	MiddleName     string
-	LastName       string
-	Birthdate      string
-	Address        string
-	JoiningDate    string
-	MobileNumber   string
-	Email          string
-	Certifications sql.NullString
-	AssignedColor  string
-	RatePerClass   float64
-	Currency       string
-	DriveUrl       string
-	Sex            sql.NullString
-	Password       string
-	Template       sql.NullString
-	CreatedAt      sql.NullTime
-	UpdatedAt      sql.NullTime
-	Status         string
-	Deleted        int64
-	ResignedAt     sql.NullString
-	ResignedReason sql.NullString
+	ID                  int64
+	FirstName           string
+	MiddleName          string
+	LastName            string
+	Birthdate           string
+	Address             string
+	JoiningDate         string
+	MobileNumber        string
+	Email               string
+	Certifications      sql.NullString
+	AssignedColor       string
+	RatePerClass        float64
+	RateDurationMinutes int64
+	Currency            string
+	DriveUrl            string
+	Sex                 sql.NullString
+	Password            string
+	Template            sql.NullString
+	CreatedAt           sql.NullTime
+	UpdatedAt           sql.NullTime
+	Status              string
+	Deleted             int64
+	ResignedAt          sql.NullString
+	ResignedReason      sql.NullString
 }
 
 func (q *Queries) GetTeacherFullByID(ctx context.Context, id int64) (GetTeacherFullByIDRow, error) {
@@ -540,6 +545,7 @@ func (q *Queries) GetTeacherFullByID(ctx context.Context, id int64) (GetTeacherF
 		&i.Certifications,
 		&i.AssignedColor,
 		&i.RatePerClass,
+		&i.RateDurationMinutes,
 		&i.Currency,
 		&i.DriveUrl,
 		&i.Sex,
@@ -567,36 +573,37 @@ func (q *Queries) GetTeacherPasswordByID(ctx context.Context, id int64) (string,
 }
 
 const getTeacherProfileByID = `-- name: GetTeacherProfileByID :one
-SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, template, status, profile_picture, password_changed_at, mobile_changed_at, created_at, updated_at, resigned_at, resigned_reason
+SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, rate_duration_minutes, currency, drive_url, sex, template, status, profile_picture, password_changed_at, mobile_changed_at, created_at, updated_at, resigned_at, resigned_reason
 FROM tbl_teachers
 WHERE id = ?
 `
 
 type GetTeacherProfileByIDRow struct {
-	ID                int64
-	FirstName         string
-	MiddleName        string
-	LastName          string
-	Birthdate         string
-	Address           string
-	JoiningDate       string
-	MobileNumber      string
-	Email             string
-	Certifications    sql.NullString
-	AssignedColor     string
-	RatePerClass      float64
-	Currency          string
-	DriveUrl          string
-	Sex               sql.NullString
-	Template          sql.NullString
-	Status            string
-	ProfilePicture    sql.NullString
-	PasswordChangedAt sql.NullTime
-	MobileChangedAt   sql.NullTime
-	CreatedAt         sql.NullTime
-	UpdatedAt         sql.NullTime
-	ResignedAt        sql.NullString
-	ResignedReason    sql.NullString
+	ID                  int64
+	FirstName           string
+	MiddleName          string
+	LastName            string
+	Birthdate           string
+	Address             string
+	JoiningDate         string
+	MobileNumber        string
+	Email               string
+	Certifications      sql.NullString
+	AssignedColor       string
+	RatePerClass        float64
+	RateDurationMinutes int64
+	Currency            string
+	DriveUrl            string
+	Sex                 sql.NullString
+	Template            sql.NullString
+	Status              string
+	ProfilePicture      sql.NullString
+	PasswordChangedAt   sql.NullTime
+	MobileChangedAt     sql.NullTime
+	CreatedAt           sql.NullTime
+	UpdatedAt           sql.NullTime
+	ResignedAt          sql.NullString
+	ResignedReason      sql.NullString
 }
 
 func (q *Queries) GetTeacherProfileByID(ctx context.Context, id int64) (GetTeacherProfileByIDRow, error) {
@@ -615,6 +622,7 @@ func (q *Queries) GetTeacherProfileByID(ctx context.Context, id int64) (GetTeach
 		&i.Certifications,
 		&i.AssignedColor,
 		&i.RatePerClass,
+		&i.RateDurationMinutes,
 		&i.Currency,
 		&i.DriveUrl,
 		&i.Sex,
@@ -676,7 +684,7 @@ func (q *Queries) GetTeacherStatusesByIDs(ctx context.Context, teacherIds []int6
 }
 
 const getTeachersFiltered = `-- name: GetTeachersFiltered :many
-SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted, deleted_at, profile_picture
+SELECT id, first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, rate_duration_minutes, currency, drive_url, sex, password, template, created_at, updated_at, status, deleted, deleted_at, profile_picture
 FROM tbl_teachers
 WHERE (? = '' OR trim(first_name || CASE WHEN middle_name != '' THEN ' ' || middle_name ELSE '' END || CASE WHEN last_name != '' THEN ' ' || last_name ELSE '' END) LIKE '%' || ? || '%' OR email LIKE '%' || ? || '%')
 	AND (
@@ -822,29 +830,30 @@ type GetTeachersFilteredParams struct {
 }
 
 type GetTeachersFilteredRow struct {
-	ID             int64
-	FirstName      string
-	MiddleName     string
-	LastName       string
-	Birthdate      string
-	Address        string
-	JoiningDate    string
-	MobileNumber   string
-	Email          string
-	Certifications sql.NullString
-	AssignedColor  string
-	RatePerClass   float64
-	Currency       string
-	DriveUrl       string
-	Sex            sql.NullString
-	Password       string
-	Template       sql.NullString
-	CreatedAt      sql.NullTime
-	UpdatedAt      sql.NullTime
-	Status         string
-	Deleted        int64
-	DeletedAt      sql.NullTime
-	ProfilePicture sql.NullString
+	ID                  int64
+	FirstName           string
+	MiddleName          string
+	LastName            string
+	Birthdate           string
+	Address             string
+	JoiningDate         string
+	MobileNumber        string
+	Email               string
+	Certifications      sql.NullString
+	AssignedColor       string
+	RatePerClass        float64
+	RateDurationMinutes int64
+	Currency            string
+	DriveUrl            string
+	Sex                 sql.NullString
+	Password            string
+	Template            sql.NullString
+	CreatedAt           sql.NullTime
+	UpdatedAt           sql.NullTime
+	Status              string
+	Deleted             int64
+	DeletedAt           sql.NullTime
+	ProfilePicture      sql.NullString
 }
 
 func (q *Queries) GetTeachersFiltered(ctx context.Context, arg GetTeachersFilteredParams) ([]GetTeachersFilteredRow, error) {
@@ -902,6 +911,7 @@ func (q *Queries) GetTeachersFiltered(ctx context.Context, arg GetTeachersFilter
 			&i.Certifications,
 			&i.AssignedColor,
 			&i.RatePerClass,
+			&i.RateDurationMinutes,
 			&i.Currency,
 			&i.DriveUrl,
 			&i.Sex,
@@ -928,27 +938,28 @@ func (q *Queries) GetTeachersFiltered(ctx context.Context, arg GetTeachersFilter
 }
 
 const insertTeacher = `-- name: InsertTeacher :exec
-INSERT INTO tbl_teachers (first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, currency, drive_url, sex, password, status)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO tbl_teachers (first_name, middle_name, last_name, birthdate, address, joining_date, mobile_number, email, certifications, assigned_color, rate_per_class, rate_duration_minutes, currency, drive_url, sex, password, status)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 type InsertTeacherParams struct {
-	FirstName      string
-	MiddleName     string
-	LastName       string
-	Birthdate      string
-	Address        string
-	JoiningDate    string
-	MobileNumber   string
-	Email          string
-	Certifications sql.NullString
-	AssignedColor  string
-	RatePerClass   float64
-	Currency       string
-	DriveUrl       string
-	Sex            sql.NullString
-	Password       string
-	Status         string
+	FirstName           string
+	MiddleName          string
+	LastName            string
+	Birthdate           string
+	Address             string
+	JoiningDate         string
+	MobileNumber        string
+	Email               string
+	Certifications      sql.NullString
+	AssignedColor       string
+	RatePerClass        float64
+	RateDurationMinutes int64
+	Currency            string
+	DriveUrl            string
+	Sex                 sql.NullString
+	Password            string
+	Status              string
 }
 
 func (q *Queries) InsertTeacher(ctx context.Context, arg InsertTeacherParams) error {
@@ -964,6 +975,7 @@ func (q *Queries) InsertTeacher(ctx context.Context, arg InsertTeacherParams) er
 		arg.Certifications,
 		arg.AssignedColor,
 		arg.RatePerClass,
+		arg.RateDurationMinutes,
 		arg.Currency,
 		arg.DriveUrl,
 		arg.Sex,
@@ -1118,28 +1130,29 @@ func (q *Queries) UnapproveTeacher(ctx context.Context, id int64) error {
 const updateTeacherBySuperuser = `-- name: UpdateTeacherBySuperuser :exec
 UPDATE tbl_teachers
 SET first_name = ?, middle_name = ?, last_name = ?, birthdate = ?, address = ?, joining_date = ?,
-	mobile_number = ?, email = ?, certifications = ?, assigned_color = ?, rate_per_class = ?, currency = ?,
+	mobile_number = ?, email = ?, certifications = ?, assigned_color = ?, rate_per_class = ?, rate_duration_minutes = ?, currency = ?,
 	drive_url = ?, sex = ?, template = ?, updated_at = datetime('now')
 WHERE id = ?
 `
 
 type UpdateTeacherBySuperuserParams struct {
-	FirstName      string
-	MiddleName     string
-	LastName       string
-	Birthdate      string
-	Address        string
-	JoiningDate    string
-	MobileNumber   string
-	Email          string
-	Certifications sql.NullString
-	AssignedColor  string
-	RatePerClass   float64
-	Currency       string
-	DriveUrl       string
-	Sex            sql.NullString
-	Template       sql.NullString
-	ID             int64
+	FirstName           string
+	MiddleName          string
+	LastName            string
+	Birthdate           string
+	Address             string
+	JoiningDate         string
+	MobileNumber        string
+	Email               string
+	Certifications      sql.NullString
+	AssignedColor       string
+	RatePerClass        float64
+	RateDurationMinutes int64
+	Currency            string
+	DriveUrl            string
+	Sex                 sql.NullString
+	Template            sql.NullString
+	ID                  int64
 }
 
 func (q *Queries) UpdateTeacherBySuperuser(ctx context.Context, arg UpdateTeacherBySuperuserParams) error {
@@ -1155,6 +1168,7 @@ func (q *Queries) UpdateTeacherBySuperuser(ctx context.Context, arg UpdateTeache
 		arg.Certifications,
 		arg.AssignedColor,
 		arg.RatePerClass,
+		arg.RateDurationMinutes,
 		arg.Currency,
 		arg.DriveUrl,
 		arg.Sex,

@@ -520,11 +520,12 @@ func handleReportView(w http.ResponseWriter, r *http.Request, teacherID int64) {
 	classes := make([]frontend.ReportClassItem, 0, len(records))
 	for _, record := range records {
 		classes = append(classes, frontend.ReportClassItem{
-			Date:        record.Date,
-			StudentName: studentDisplayName(record.StudentName, record.StudentNumber),
-			Rate:        utils.FormatCurrency(record.Rate, record.Currency),
-			TimeRange:   formatReportTimeRange(record.StartTime, record.EndTime),
-			Status:      constants.ClassStatus(record.Status),
+			Date:            record.Date,
+			StudentName:     studentDisplayName(record.StudentName, record.StudentNumber),
+			Rate:            utils.FormatCurrency(record.Rate, record.Currency),
+			DurationMinutes: record.DurationMinutes,
+			TimeRange:       formatReportTimeRange(record.StartTime, record.EndTime),
+			Status:          constants.ClassStatus(record.Status),
 		})
 	}
 
@@ -874,11 +875,15 @@ func buildSummaryTeacherSheets(summaries []queries.GetReportTeacherSummariesRow,
 
 func summaryClassRowFromRecord(row queries.GetReportSummaryRowsRow) processor.SummaryClassRow {
 	status := constants.ClassStatus(row.Status)
-	parentDisplay, parentValue, hasParent := effectiveSummaryParentRate(row.ParentRate, row.ParentCurrency, status, row.Rate, row.TeacherRatePerClass)
+	parentDisplay, parentValue, hasParent := effectiveSummaryParentRate(
+		row.ParentRate, row.ParentCurrency, status, row.Rate, row.TeacherRatePerClass,
+		row.DurationMinutes, row.TeacherRateDurationMinutes,
+	)
 	return processor.SummaryClassRow{
 		Status:           status,
 		StatusDisplay:    status.Label(),
 		DateDisplay:      formatReportSummaryClassDate(row.Date),
+		DurationDisplay:  formatSummaryClassDurationDisplay(row.DurationMinutes),
 		RateDisplay:      parentDisplay,
 		RateValue:        parentValue,
 		HasRate:          hasParent,
@@ -886,18 +891,34 @@ func summaryClassRowFromRecord(row queries.GetReportSummaryRowsRow) processor.Su
 	}
 }
 
-func effectiveSummaryParentRate(parentRate sql.NullFloat64, parentCurrency sql.NullString, status constants.ClassStatus, classRate, teacherRate float64) (string, float64, bool) {
-	if !parentRate.Valid || !parentCurrency.Valid || parentCurrency.String == "" {
-		return "-", 0, false
+func formatSummaryClassDurationDisplay(durationMinutes int64) string {
+	if durationMinutes <= 0 {
+		return constants.DisplayNotSet
 	}
-	amount := billing.EffectiveParentBillAmount(status, parentRate.Float64, classRate, teacherRate)
+	return fmt.Sprintf("%d", durationMinutes)
+}
+
+func effectiveSummaryParentRate(
+	parentRate sql.NullFloat64,
+	parentCurrency sql.NullString,
+	status constants.ClassStatus,
+	classRate, teacherRate float64,
+	classDurationMinutes, teacherRateDurationMinutes int64,
+) (string, float64, bool) {
+	if !parentRate.Valid || !parentCurrency.Valid || parentCurrency.String == "" {
+		return constants.DisplayNotSet, 0, false
+	}
+	amount := billing.EffectiveParentBillAmount(
+		status, parentRate.Float64, classRate, teacherRate,
+		classDurationMinutes, teacherRateDurationMinutes,
+	)
 	currency := parentCurrency.String
 	return utils.FormatCurrencyAmountFixed(amount, currency) + " " + currency, amount, true
 }
 
 func formatSummaryClassRateDisplay(rate float64, currency string) string {
 	if currency == "" {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	return utils.FormatCurrencyAmountFixed(rate, currency) + " " + currency
 }
@@ -932,7 +953,7 @@ func formatReportTimeRange(startTime, endTime sql.NullString) string {
 	if endTime.Valid {
 		return endTime.String
 	}
-	return "-"
+	return constants.DisplayNotSet
 }
 
 func buildReportTeacherAvatarProps(teacherID int64, row queries.GetTeacherProfileByIDRow) frontend.AvatarProps {

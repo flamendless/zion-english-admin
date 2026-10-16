@@ -76,18 +76,21 @@ var cmdAssignStudentColors = &cobra.Command{
 			}
 
 			if err := dbRW.GetQueries().UpdateStudent(ctx, queries.UpdateStudentParams{
-				Name:           s.Name,
-				Currency:       s.Currency,
-				Contact:        s.Contact,
-				RatePerClass:   s.RatePerClass,
-				ParentName:     s.ParentName,
-				ParentRate:     s.ParentRate,
-				ParentCurrency: s.ParentCurrency,
-				AssignedColor:  newColor,
-				Status:         s.Status,
-				InactiveReason: s.InactiveReason,
-				DeletedReason:  s.DeletedReason,
-				ID:             s.ID,
+				Name:                s.Name,
+				StudentNumber:       s.StudentNumber,
+				ParentNumber:        s.ParentNumber,
+				Currency:            s.Currency,
+				Contact:             s.Contact,
+				RatePerClass:        s.RatePerClass,
+				RateDurationMinutes: s.RateDurationMinutes,
+				ParentName:          s.ParentName,
+				ParentRate:          s.ParentRate,
+				ParentCurrency:      s.ParentCurrency,
+				AssignedColor:       newColor,
+				Status:              s.Status,
+				InactiveReason:      s.InactiveReason,
+				DeletedReason:       s.DeletedReason,
+				ID:                  s.ID,
 			}); err != nil {
 				panic(err)
 			}

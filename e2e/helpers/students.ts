@@ -10,6 +10,7 @@ export async function registerStudent(page: Page, opts: RegisterStudentOptions) 
 	await page.goto("students/register");
 	await page.locator("#name").fill(opts.name);
 	await page.locator("#ratePerClass").fill(opts.rate);
+	await page.locator("#rateDurationMinutes").selectOption("25");
 	await page.locator("#currency").selectOption({ value: opts.currency ?? "PHP" });
 	await Promise.all([
 		page.waitForResponse(

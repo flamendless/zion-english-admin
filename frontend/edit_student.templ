@@ -22,8 +22,9 @@ type EditStudentData struct {
 	ParentNumber   string
 	Currency       string
 	Contact        string
-	RatePerClass   float64
-	ParentName     string
+	RatePerClass          float64
+	RateDurationMinutes   int64
+	ParentName            string
 	ParentRate     float64
 	ParentCurrency string
 	HasParentRate  bool
@@ -124,12 +125,12 @@ templ EditStudent(data EditStudentData) {
 					</div>
 					<div class="form-group">
 						<label for="ratePerClass">Rate Per Class</label>
-						<input type="text" id="ratePerClass" value={ formatFloat(data.RatePerClass) } disabled/>
+						<input type="text" id="ratePerClass" value={ formatRatePerDurationDisplay(data.RatePerClass, data.Currency, data.RateDurationMinutes) } disabled/>
 					</div>
 					<div class="form-row">
 						<div class="form-group">
 							@AdminOnlyFormLabel("parentRate", "Parent Rate")
-							<input type="text" id="parentRate" value={ formatOptionalParentRate(data.ParentRate, data.ParentCurrency, data.HasParentRate) } disabled/>
+							<input type="text" id="parentRate" value={ formatOptionalParentRatePerDuration(data.ParentRate, data.ParentCurrency, data.RateDurationMinutes, data.HasParentRate) } disabled/>
 						</div>
 					</div>
 					<div class="form-group">
@@ -206,6 +207,7 @@ templ EditStudent(data EditStudentData) {
 						<label for="ratePerClass">Rate Per Class *</label>
 						<input type="number" id="ratePerClass" name="ratePerClass" required step="0.01" min="0" value={ formatFloat(data.RatePerClass) }/>
 					</div>
+					@RateDurationSelect("rateDurationMinutes", "rateDurationMinutes", data.RateDurationMinutes)
 					<div class="form-row">
 						<div class="form-group">
 							@AdminOnlyFormLabel("parentRate", "Parent Rate")
@@ -306,6 +308,7 @@ templ EditStudent(data EditStudentData) {
 						<label for="ratePerClass">Rate Per Class *</label>
 						<input type="number" id="ratePerClass" name="ratePerClass" required step="0.01" min="0" value={ formatFloat(data.RatePerClass) }/>
 					</div>
+					@RateDurationSelect("rateDurationMinutes", "rateDurationMinutes", data.RateDurationMinutes)
 					<div class="form-group">
 						<label for="parentName">Parent's Name</label>
 						<input type="text" id="parentName" name="parentName" value={ data.ParentName }/>

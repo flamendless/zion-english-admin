@@ -5,11 +5,12 @@ import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 type ReportClassItem struct {
-	Date        string
-	StudentName string
-	Rate        string
-	TimeRange   string
-	Status      constants.ClassStatus
+	Date            string
+	StudentName     string
+	Rate            string
+	DurationMinutes int64
+	TimeRange       string
+	Status          constants.ClassStatus
 }
 
 type ReportViewData struct {
@@ -66,6 +67,7 @@ templ ReportViewModal(data ReportViewData) {
 									<th>Date</th>
 									<th>Student</th>
 									<th>Rate</th>
+									<th>Duration (min)</th>
 									<th>Time</th>
 									<th>Status</th>
 								</tr>
@@ -78,6 +80,7 @@ templ ReportViewModal(data ReportViewData) {
 											@TableTruncatedText(class.StudentName)
 										</td>
 										<td data-label="Rate">{ class.Rate }</td>
+										<td data-label="Duration (min)">{ formatReportClassDuration(class.DurationMinutes) }</td>
 										<td data-label="Time">{ class.TimeRange }</td>
 										<td data-label="Status">
 											@StatusPill(capitalizeStatus(class.Status), ClassRecordStatusPillTone(class.Status), false)

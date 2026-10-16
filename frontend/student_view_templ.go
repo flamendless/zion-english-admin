@@ -9,7 +9,6 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import "zion-english/internal/constants"
-import "zion-english/internal/utils"
 
 func StudentViewModal(data EditStudentData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -61,32 +60,19 @@ func StudentViewModal(data EditStudentData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(utils.FormatCurrencyAmountFixed(data.RatePerClass, data.Currency))
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(formatRatePerDurationDisplay(data.RatePerClass, data.Currency, data.RateDurationMinutes))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/student_view.templ`, Line: 23, Col: 124}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/student_view.templ`, Line: 22, Col: 147}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span> <span class=\"entity-view-rate-highlight-currency\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span></div></div></div></div><div class=\"entity-view-card\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.Currency)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/student_view.templ`, Line: 24, Col: 74}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span></div><span class=\"entity-view-rate-caption\">per class</span></div></div></div><div class=\"entity-view-card\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Var4 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Var3 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 			if !templ_7745c5c3_IsBuffer {
@@ -98,7 +84,7 @@ func StudentViewModal(data EditStudentData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"profile-details\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"profile-details\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -118,22 +104,22 @@ func StudentViewModal(data EditStudentData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = AdminOnlyProfileDetailField("Parent rate", formatOptionalParentRate(data.ParentRate, data.ParentCurrency, data.HasParentRate)).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = AdminOnlyProfileDetailField("Parent rate", formatOptionalParentRatePerDuration(data.ParentRate, data.ParentCurrency, data.RateDurationMinutes, data.HasParentRate)).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = EntityViewSection("Contact").Render(templ.WithChildren(ctx, templ_7745c5c3_Var4), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = EntityViewSection("Contact").Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if data.Status == constants.StudentStatusInactive && data.InactiveReason != "" {
-			templ_7745c5c3_Var5 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_Var4 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 				templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 				templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 				if !templ_7745c5c3_IsBuffer {
@@ -151,13 +137,13 @@ func StudentViewModal(data EditStudentData) templ.Component {
 				}
 				return nil
 			})
-			templ_7745c5c3_Err = EntityViewSectionAdminOnly("Status").Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = EntityViewSectionAdminOnly("Status").Render(templ.WithChildren(ctx, templ_7745c5c3_Var4), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
 		if data.Status == constants.StudentStatusDeleted && data.DeletedReason != "" {
-			templ_7745c5c3_Var6 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_Var5 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 				templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 				templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 				if !templ_7745c5c3_IsBuffer {
@@ -175,13 +161,13 @@ func StudentViewModal(data EditStudentData) templ.Component {
 				}
 				return nil
 			})
-			templ_7745c5c3_Err = EntityViewSectionAdminOnly("Status").Render(templ.WithChildren(ctx, templ_7745c5c3_Var6), templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = EntityViewSectionAdminOnly("Status").Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
 		if len(data.Teachers) > 0 {
-			templ_7745c5c3_Var7 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_Var6 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 				templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 				templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 				if !templ_7745c5c3_IsBuffer {
@@ -199,13 +185,13 @@ func StudentViewModal(data EditStudentData) templ.Component {
 				}
 				return nil
 			})
-			templ_7745c5c3_Err = EntityViewSectionAdminOnly("Teachers").Render(templ.WithChildren(ctx, templ_7745c5c3_Var7), templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = EntityViewSectionAdminOnly("Teachers").Render(templ.WithChildren(ctx, templ_7745c5c3_Var6), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
 		if len(data.Relationships) > 0 {
-			templ_7745c5c3_Var8 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_Var7 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 				templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 				templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
 				if !templ_7745c5c3_IsBuffer {
@@ -223,12 +209,12 @@ func StudentViewModal(data EditStudentData) templ.Component {
 				}
 				return nil
 			})
-			templ_7745c5c3_Err = EntityViewSectionAdminOnly("Related to").Render(templ.WithChildren(ctx, templ_7745c5c3_Var8), templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = EntityViewSectionAdminOnly("Related to").Render(templ.WithChildren(ctx, templ_7745c5c3_Var7), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -252,12 +238,12 @@ func StudentViewModalScripts() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var9 == nil {
-			templ_7745c5c3_Var9 = templ.NopComponent
+		templ_7745c5c3_Var8 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var8 == nil {
+			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<script>\r\n\t\twindow.closeStudentViewModal = function () {\r\n\t\t\tconst host = document.getElementById('studentViewModalHost');\r\n\t\t\tif (host) host.innerHTML = '';\r\n\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t};\r\n\r\n\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\tif (evt.detail.target.id !== 'studentViewModalHost') return;\r\n\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\tconst overlay = evt.detail.target.querySelector('#studentViewModal');\r\n\t\t\tconst closeBtn = overlay && overlay.querySelector('.student-view-close');\r\n\t\t\tif (closeBtn) closeBtn.focus();\r\n\t\t});\r\n\r\n\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\tif (e.target.closest('.student-view-close')) {\r\n\t\t\t\twindow.closeStudentViewModal();\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tconst overlay = e.target.closest('#studentViewModal');\r\n\t\t\tif (overlay && e.target === overlay) window.closeStudentViewModal();\r\n\t\t});\r\n\r\n\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\tif (e.key === 'Escape' && document.getElementById('studentViewModal')) {\r\n\t\t\t\twindow.closeStudentViewModal();\r\n\t\t\t}\r\n\t\t});\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<script>\r\n\t\twindow.closeStudentViewModal = function () {\r\n\t\t\tconst host = document.getElementById('studentViewModalHost');\r\n\t\t\tif (host) host.innerHTML = '';\r\n\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t};\r\n\r\n\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\tif (evt.detail.target.id !== 'studentViewModalHost') return;\r\n\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\tconst overlay = evt.detail.target.querySelector('#studentViewModal');\r\n\t\t\tconst closeBtn = overlay && overlay.querySelector('.student-view-close');\r\n\t\t\tif (closeBtn) closeBtn.focus();\r\n\t\t});\r\n\r\n\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\tif (e.target.closest('.student-view-close')) {\r\n\t\t\t\twindow.closeStudentViewModal();\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tconst overlay = e.target.closest('#studentViewModal');\r\n\t\t\tif (overlay && e.target === overlay) window.closeStudentViewModal();\r\n\t\t});\r\n\r\n\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\tif (e.key === 'Escape' && document.getElementById('studentViewModal')) {\r\n\t\t\t\twindow.closeStudentViewModal();\r\n\t\t\t}\r\n\t\t});\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -2,6 +2,7 @@ package frontend
 
 import "fmt"
 import "time"
+import "zion-english/internal/constants"
 import "zion-english/internal/models"
 import "zion-english/internal/utils"
 
@@ -9,7 +10,7 @@ func getDisplayValue(value string) string {
 	if value != "" {
 		return value
 	}
-	return "-"
+	return constants.DisplayNotSet
 }
 
 templ TableTruncatedText(fullText string) {
@@ -25,10 +26,17 @@ func formatRateAmount(rate float64, currency string) string {
 }
 
 func formatOptionalParentRate(rate float64, currency string, hasRate bool) string {
+	return formatOptionalParentRatePerDuration(rate, currency, 0, hasRate)
+}
+
+func formatOptionalParentRatePerDuration(rate float64, currency string, durationMinutes int64, hasRate bool) string {
 	if !hasRate {
-		return "-"
+		return constants.DisplayNotSet
 	}
-	return utils.FormatCurrencyAmountFixed(rate, currency) + " " + currency
+	if durationMinutes <= 0 {
+		durationMinutes = int64(constants.DefaultRateDurationMinutes)
+	}
+	return utils.FormatRatePerDuration(rate, currency, int(durationMinutes))
 }
 
 var onceScrPassword = templ.NewOnceHandle()
@@ -82,6 +90,7 @@ templ TeacherOptions(teachers []models.TeacherAPIResponse, selectedID string) {
 		<option
 			value={ fmt.Sprintf("%d", t.ID) }
 			data-rate={ fmt.Sprintf("%.2f", t.RatePerClass) }
+			data-rate-duration={ fmt.Sprintf("%d", t.RateDurationMinutes) }
 			data-id={ t.ID }
 			data-name={ t.Name }
 			data-driveurl={ t.DriveUrl }
@@ -138,6 +147,7 @@ templ TeacherSearchResults(teachers []models.TeacherAPIResponse, hiddenID string
 				data-driveurl={ t.DriveUrl }
 				data-template={ t.Template }
 				data-rate={ fmt.Sprintf("%.2f", t.RatePerClass) }
+				data-rate-duration={ fmt.Sprintf("%d", t.RateDurationMinutes) }
 				_={ teacherSearchSelectScript(hiddenID, inputID, resultsID) }
 			>
 				{ t.Name }

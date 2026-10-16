@@ -318,6 +318,10 @@ SELECT
 	s.parent_currency AS currency,
 	COALESCE(SUM(
 		CASE
+			WHEN cr.status = 'conducted'
+				AND cr.duration_minutes > 0
+				AND t.rate_duration_minutes > 0
+				THEN s.parent_rate * (cr.duration_minutes * 1.0 / t.rate_duration_minutes)
 			WHEN cr.status IN ('cancelled', 'rescheduled') AND cr.rate = 0 THEN 0
 			WHEN cr.status IN ('cancelled', 'rescheduled')
 				AND cr.rate > 0

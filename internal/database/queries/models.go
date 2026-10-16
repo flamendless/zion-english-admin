@@ -315,23 +315,24 @@ type TblScheduledClassSeries struct {
 }
 
 type TblStudent struct {
-	ID             int64
-	Name           string
-	Currency       string
-	Contact        sql.NullString
-	RatePerClass   float64
-	ParentName     sql.NullString
-	ParentRate     sql.NullFloat64
-	ParentCurrency sql.NullString
-	AssignedColor  string
-	Status         string
-	CreatedAt      sql.NullTime
-	UpdatedAt      sql.NullTime
-	InactiveReason sql.NullString
-	DeletedReason  sql.NullString
-	IsTestSeed     int64
-	StudentNumber  sql.NullString
-	ParentNumber   sql.NullString
+	ID                  int64
+	Name                string
+	Currency            string
+	Contact             sql.NullString
+	RatePerClass        float64
+	ParentName          sql.NullString
+	ParentRate          sql.NullFloat64
+	ParentCurrency      sql.NullString
+	AssignedColor       string
+	Status              string
+	CreatedAt           sql.NullTime
+	UpdatedAt           sql.NullTime
+	InactiveReason      sql.NullString
+	DeletedReason       sql.NullString
+	IsTestSeed          int64
+	StudentNumber       sql.NullString
+	ParentNumber        sql.NullString
+	RateDurationMinutes int64
 }
 
 type TblStudentRelationship struct {
@@ -342,33 +343,34 @@ type TblStudentRelationship struct {
 }
 
 type TblTeacher struct {
-	ID                int64
-	FirstName         string
-	MiddleName        string
-	LastName          string
-	Birthdate         string
-	Address           string
-	JoiningDate       string
-	MobileNumber      string
-	Email             string
-	Certifications    sql.NullString
-	AssignedColor     string
-	RatePerClass      float64
-	Currency          string
-	DriveUrl          string
-	Sex               sql.NullString
-	Password          string
-	Template          sql.NullString
-	Status            string
-	CreatedAt         sql.NullTime
-	UpdatedAt         sql.NullTime
-	ProfilePicture    sql.NullString
-	PasswordChangedAt sql.NullTime
-	MobileChangedAt   sql.NullTime
-	Deleted           int64
-	DeletedAt         sql.NullTime
-	ResignedAt        sql.NullString
-	ResignedReason    sql.NullString
+	ID                  int64
+	FirstName           string
+	MiddleName          string
+	LastName            string
+	Birthdate           string
+	Address             string
+	JoiningDate         string
+	MobileNumber        string
+	Email               string
+	Certifications      sql.NullString
+	AssignedColor       string
+	RatePerClass        float64
+	Currency            string
+	DriveUrl            string
+	Sex                 sql.NullString
+	Password            string
+	Template            sql.NullString
+	Status              string
+	CreatedAt           sql.NullTime
+	UpdatedAt           sql.NullTime
+	ProfilePicture      sql.NullString
+	PasswordChangedAt   sql.NullTime
+	MobileChangedAt     sql.NullTime
+	Deleted             int64
+	DeletedAt           sql.NullTime
+	ResignedAt          sql.NullString
+	ResignedReason      sql.NullString
+	RateDurationMinutes int64
 }
 
 type TblTeacherAdminRoleRequest struct {

@@ -135,7 +135,7 @@ func affiliateProviderFilterOptions() []StatusOption {
 
 func AffiliateURLPreview(s string) string {
 	if s == "" {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	if len(s) > 56 {
 		return s[:53] + "..."
@@ -555,7 +555,7 @@ func AffiliatesPage(data AffiliatesPageData) templ.Component {
 
 func affiliateCellText(s string) string {
 	if s == "" {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	return s
 }
@@ -1707,14 +1707,14 @@ func affiliateStagedFieldName(index int, field string) string {
 
 func affiliateImportSummaryText(s string) string {
 	if s == "" {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	return s
 }
 
 func affiliateImportLogItemID(id string) string {
 	if id == "" {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	return id
 }

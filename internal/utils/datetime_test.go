@@ -18,8 +18,8 @@ func TestDateTimePHT(t *testing.T) {
 }
 
 func TestFormatNullDateTimePHT(t *testing.T) {
-	if got := FormatNullDateTimePHT(sql.NullTime{}); got != "-" {
-		t.Fatalf("invalid null = %q, want %q", got, "-")
+	if got := FormatNullDateTimePHT(sql.NullTime{}); got != constants.DisplayNotSet {
+		t.Fatalf("invalid null = %q, want %q", got, constants.DisplayNotSet)
 	}
 
 	utc := time.Date(2026, 1, 1, 16, 0, 0, 0, time.UTC)
@@ -38,7 +38,7 @@ func TestFormatCompactDateRanges(t *testing.T) {
 		{
 			name:  "empty",
 			dates: nil,
-			want:  "-",
+			want:  constants.DisplayNotSet,
 		},
 		{
 			name:  "single date",

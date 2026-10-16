@@ -690,7 +690,7 @@ func AffiliateAdsReportsPage(data AffiliateAdsReportsPageData) templ.Component {
 
 func affiliateAdsReportCellText(s string) string {
 	if s == "" {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	return s
 }

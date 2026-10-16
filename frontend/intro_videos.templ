@@ -41,7 +41,7 @@ func introVideoLinkDisplay(label string) string {
 }
 
 func introVideoSizesEqual(original, processed string) bool {
-	return original != "-" && processed != "-" && original == processed
+	return original != constants.DisplayNotSet && processed != constants.DisplayNotSet && original == processed
 }
 
 func introVideoRowClass(status constants.TeacherIntroVideoStatus) string {
@@ -125,16 +125,16 @@ templ IntroVideoCompressPresetPill(preset constants.IntroVideoCompressPreset) {
 }
 
 templ IntroVideoSizeBadges(original, processed string) {
-	if original == "-" && processed == "-" {
+	if original == constants.DisplayNotSet && processed == constants.DisplayNotSet {
 		<span>-</span>
 	} else if introVideoSizesEqual(original, processed) {
 		@Pill(original, PillToneInfo)
 	} else {
 		<div class="intro-video-size-badges">
-			if original != "-" {
+			if original != constants.DisplayNotSet {
 				@Pill(original, PillToneWarning)
 			}
-			if processed != "-" {
+			if processed != constants.DisplayNotSet {
 				@Pill(processed, PillToneSuccess)
 			}
 		</div>

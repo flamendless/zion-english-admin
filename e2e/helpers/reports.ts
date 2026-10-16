@@ -21,8 +21,8 @@ export async function filterReportsByTeacherQuery(page: Page, query: string) {
 	expect(rowsResponse[0].ok()).toBeTruthy();
 }
 
-export async function openSendPaymentForTeacherRow(page: Page, teacherName: string) {
-	const row = page.locator("#reportsTableBody tr", { hasText: teacherName });
+export async function openSendPaymentForTeacherRow(page: Page, teacherNameMatch: string) {
+	const row = page.locator("#reportsTableBody tr", { hasText: teacherNameMatch });
 	await expect(row).toBeVisible({ timeout: 15_000 });
 	await row.getByRole("button", { name: "Send payment" }).click();
 	await expect(page.getByRole("heading", { name: "Send payment" })).toBeVisible({

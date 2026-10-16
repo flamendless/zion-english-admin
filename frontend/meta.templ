@@ -39,7 +39,7 @@ type MetaTagFormData struct {
 
 func MetaTagPreview(s string) string {
 	if s == "" {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	if len(s) > 48 {
 		return s[:45] + "..."

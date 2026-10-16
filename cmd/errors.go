@@ -55,6 +55,7 @@ var (
 
 	ErrNameRequired                 = errors.New("name is required")
 	ErrRatePerClassCannotBeNegative = errors.New("rate per class cannot be negative")
+	ErrInvalidRateDurationMinutes   = errors.New("invalid rate duration. Must be 25 or 50 minutes")
 	ErrAssignedColorRequired        = errors.New("assigned color is required")
 	ErrInvalidStudentStatus         = errors.New("invalid status. Must be active or inactive")
 	ErrInactiveReasonRequired       = errors.New("inactive reason is required when status is inactive")

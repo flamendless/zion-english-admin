@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { loadCredentials } from "../helpers/credentials";
+import { teacherCompactDisplayName } from "../helpers/display-names";
 import { loginAsSuperuser, loginAsTeacher } from "../helpers/login";
 import {
 	filterReportsByTeacherQuery,
@@ -16,7 +17,7 @@ test.describe.configure({ mode: "serial" });
 test("superuser sends payment from reports", async ({ page }) => {
 	await loginAsSuperuser(page, creds);
 	await filterReportsByTeacherQuery(page, "");
-	await openSendPaymentForTeacherRow(page, "E2E Teacher");
+	await openSendPaymentForTeacherRow(page, teacherCompactDisplayName("E2E Teacher"));
 	await submitReportPaymentModal(page, { referenceNumber: paymentRef, amount: "500" });
 	await expect(page.locator("#successBanner, #errorBanner")).toBeVisible({ timeout: 10_000 });
 });

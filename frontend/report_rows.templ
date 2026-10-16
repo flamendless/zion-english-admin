@@ -2,6 +2,7 @@ package frontend
 
 import (
 	"fmt"
+	"zion-english/internal/constants"
 	"zion-english/internal/utils"
 )
 
@@ -14,7 +15,7 @@ templ ReportTableRow(row ReportRowData, startDate string, endDate string, swapOO
 			if row.HasPaymentStatus() {
 				@StatusPill(row.PaymentStatus.Label(), PaymentStatusPillTone(row.PaymentStatus), false)
 			} else {
-				-
+				{ constants.DisplayNotSet }
 			}
 		</td>
 		<td data-label="Total Classes">{ row.ClassesLabel() }</td>
@@ -105,7 +106,7 @@ templ ReportsSummaryCards(data ReportsSummaryData) {
 			if data.CutoffLabel != "" {
 				<span class="stat-sub">{ data.CutoffLabel }</span>
 			}
-			<span class="stat-currency-row">-</span>
+			<span class="stat-currency-row">{ constants.DisplayNotSet }</span>
 		</div>
 	} else {
 		@DashboardSectionedCurrencyStatCard("Total Earnings", true, []DashboardCurrencySection{

@@ -477,6 +477,18 @@ func studentParentRateView(rate sql.NullFloat64, currency sql.NullString) (float
 	return rate.Float64, currency.String, true
 }
 
+func parseRateDurationMinutes(raw string) (int64, error) {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return int64(constants.DefaultRateDurationMinutes), nil
+	}
+	n, err := strconv.ParseInt(raw, 10, 64)
+	if err != nil || !constants.ValidRateDurationMinutes(int(n)) {
+		return 0, ErrInvalidRateDurationMinutes
+	}
+	return n, nil
+}
+
 func parseOptionalStudentIdentifier(raw string, invalidErr error) (sql.NullString, error) {
 	s := strings.TrimSpace(raw)
 	if s == "" {
@@ -1024,6 +1036,11 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		sendErrorLog(w, err.Error())
 		return
 	}
+	rateDurationMinutes, err := parseRateDurationMinutes(r.FormValue("rateDurationMinutes"))
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
 
 	var teacherIDs []int64
 	if isSuperuser {
@@ -1052,11 +1069,12 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req := models.StudentRegisterRequest{
-		Name:         r.FormValue("name"),
-		Currency:     r.FormValue("currency"),
-		RatePerClass: ratePerClass,
-		Status:       r.FormValue("status"),
-		ParentName:   r.FormValue("parentName"),
+		Name:                r.FormValue("name"),
+		Currency:            r.FormValue("currency"),
+		RatePerClass:        ratePerClass,
+		RateDurationMinutes: rateDurationMinutes,
+		Status:              r.FormValue("status"),
+		ParentName:          r.FormValue("parentName"),
 	}
 	if isSuperuser {
 		req.Contact = r.FormValue("contact")
@@ -1119,20 +1137,21 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		isTestSeed = parseIsTestSeedForm(r.FormValue("isTestSeed"))
 	}
 	studentID, err := qtx.InsertStudent(r.Context(), queries.InsertStudentParams{
-		Name:           req.Name,
-		StudentNumber:  studentNumber,
-		ParentNumber:   parentNumber,
-		Currency:       req.Currency,
-		Contact:        sql.NullString{String: req.Contact, Valid: req.Contact != ""},
-		RatePerClass:   req.RatePerClass,
-		ParentName:     sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
-		ParentRate:     parentRate,
-		ParentCurrency: parentCurrency,
-		AssignedColor:  req.AssignedColor,
-		Status:         req.Status,
-		InactiveReason: sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
-		DeletedReason:  sql.NullString{},
-		IsTestSeed:     isTestSeed,
+		Name:                req.Name,
+		StudentNumber:       studentNumber,
+		ParentNumber:        parentNumber,
+		Currency:            req.Currency,
+		Contact:             sql.NullString{String: req.Contact, Valid: req.Contact != ""},
+		RatePerClass:        req.RatePerClass,
+		RateDurationMinutes: req.RateDurationMinutes,
+		ParentName:          sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
+		ParentRate:          parentRate,
+		ParentCurrency:      parentCurrency,
+		AssignedColor:       req.AssignedColor,
+		Status:              req.Status,
+		InactiveReason:      sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
+		DeletedReason:       sql.NullString{},
+		IsTestSeed:          isTestSeed,
 	})
 	if err != nil {
 		sendErrorLog(w, "Failed to register student")
@@ -1206,6 +1225,9 @@ func validateStudentRequest(req *models.StudentRegisterRequest) error {
 
 	if req.RatePerClass < 0 {
 		return ErrRatePerClassCannotBeNegative
+	}
+	if !constants.ValidRateDurationMinutes(int(req.RateDurationMinutes)) {
+		return ErrInvalidRateDurationMinutes
 	}
 
 	if req.AssignedColor == "" {
@@ -1339,22 +1361,23 @@ func handleTeacherRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = dbRW.GetQueries().InsertTeacher(r.Context(), queries.InsertTeacherParams{
-		FirstName:      req.FirstName,
-		MiddleName:     req.MiddleName,
-		LastName:       req.LastName,
-		Birthdate:      req.Birthdate,
-		Address:        req.Address,
-		JoiningDate:    req.JoiningDate,
-		MobileNumber:   req.MobileNumber,
-		Email:          req.Email,
-		Certifications: sql.NullString{String: req.Certifications, Valid: req.Certifications != ""},
-		AssignedColor:  req.AssignedColor,
-		RatePerClass:   req.RatePerClass,
-		Currency:       req.Currency,
-		DriveUrl:       req.DriveUrl,
-		Sex:            sql.NullString{String: req.Sex, Valid: req.Sex != ""},
-		Password:       string(hashedPassword),
-		Status:         teacherStatus,
+		FirstName:           req.FirstName,
+		MiddleName:          req.MiddleName,
+		LastName:            req.LastName,
+		Birthdate:           req.Birthdate,
+		Address:             req.Address,
+		JoiningDate:         req.JoiningDate,
+		MobileNumber:        req.MobileNumber,
+		Email:               req.Email,
+		Certifications:      sql.NullString{String: req.Certifications, Valid: req.Certifications != ""},
+		AssignedColor:       req.AssignedColor,
+		RatePerClass:        req.RatePerClass,
+		RateDurationMinutes: req.RateDurationMinutes,
+		Currency:            req.Currency,
+		DriveUrl:            req.DriveUrl,
+		Sex:                 sql.NullString{String: req.Sex, Valid: req.Sex != ""},
+		Password:            string(hashedPassword),
+		Status:              teacherStatus,
 	})
 	if err != nil {
 		sendErrorLog(w, err.Error())
@@ -1417,21 +1440,26 @@ func parseTeacherForm(r *http.Request, includePassword bool) (models.TeacherRegi
 	if err != nil {
 		return models.TeacherRegisterRequest{}, err
 	}
+	rateDurationMinutes, err := parseRateDurationMinutes(r.FormValue("rateDurationMinutes"))
+	if err != nil {
+		return models.TeacherRegisterRequest{}, err
+	}
 	req := models.TeacherRegisterRequest{
-		FirstName:      strings.TrimSpace(r.FormValue("firstName")),
-		MiddleName:     strings.TrimSpace(r.FormValue("middleName")),
-		LastName:       strings.TrimSpace(r.FormValue("lastName")),
-		Birthdate:      r.FormValue("birthdate"),
-		Address:        strings.TrimSpace(r.FormValue("address")),
-		JoiningDate:    r.FormValue("joiningDate"),
-		MobileNumber:   strings.TrimSpace(r.FormValue("mobileNumber")),
-		Email:          utils.NormalizeEmail(r.FormValue("email")),
-		Certifications: r.FormValue("certifications"),
-		AssignedColor:  r.FormValue("assignedColor"),
-		RatePerClass:   ratePerClass,
-		Currency:       r.FormValue("currency"),
-		DriveUrl:       r.FormValue("driveUrl"),
-		Sex:            r.FormValue("sex"),
+		FirstName:           strings.TrimSpace(r.FormValue("firstName")),
+		MiddleName:          strings.TrimSpace(r.FormValue("middleName")),
+		LastName:            strings.TrimSpace(r.FormValue("lastName")),
+		Birthdate:           r.FormValue("birthdate"),
+		Address:             strings.TrimSpace(r.FormValue("address")),
+		JoiningDate:         r.FormValue("joiningDate"),
+		MobileNumber:        strings.TrimSpace(r.FormValue("mobileNumber")),
+		Email:               utils.NormalizeEmail(r.FormValue("email")),
+		Certifications:      r.FormValue("certifications"),
+		AssignedColor:       r.FormValue("assignedColor"),
+		RatePerClass:        ratePerClass,
+		RateDurationMinutes: rateDurationMinutes,
+		Currency:            r.FormValue("currency"),
+		DriveUrl:            r.FormValue("driveUrl"),
+		Sex:                 r.FormValue("sex"),
 	}
 	if includePassword {
 		req.Password = r.FormValue("password")
@@ -1485,6 +1513,9 @@ func validateTeacherFields(req *models.TeacherRegisterRequest) error {
 
 	if req.RatePerClass < 0 {
 		return ErrRatePerClassCannotBeNegative
+	}
+	if !constants.ValidRateDurationMinutes(int(req.RateDurationMinutes)) {
+		return ErrInvalidRateDurationMinutes
 	}
 
 	if err := utils.ValidateDriveSpreadsheetURL(req.DriveUrl); err != nil {
@@ -1669,12 +1700,17 @@ func handleGetTeachers(w http.ResponseWriter, r *http.Request) {
 		if t.Template.Valid {
 			template = t.Template.String
 		}
+		duration := t.RateDurationMinutes
+		if duration <= 0 {
+			duration = int64(constants.DefaultRateDurationMinutes)
+		}
 		teacherResponses = append(teacherResponses, models.TeacherAPIResponse{
-			ID:           t.ID,
-			Name:         utils.ComposePersonName(t.FirstName, t.MiddleName, t.LastName),
-			DriveUrl:     t.DriveUrl,
-			RatePerClass: t.RatePerClass,
-			Template:     template,
+			ID:                  t.ID,
+			Name:                utils.ComposePersonName(t.FirstName, t.MiddleName, t.LastName),
+			DriveUrl:            t.DriveUrl,
+			RatePerClass:        t.RatePerClass,
+			RateDurationMinutes: duration,
+			Template:            template,
 		})
 	}
 	if err := frontend.TeacherOptions(teacherResponses, r.URL.Query().Get("selected")).Render(r.Context(), w); err != nil {
@@ -1788,11 +1824,12 @@ func handleSearchTeachers(w http.ResponseWriter, r *http.Request) {
 			template = t.Template.String
 		}
 		teacherResponses = append(teacherResponses, models.TeacherAPIResponse{
-			ID:           t.ID,
-			Name:         utils.ComposePersonName(t.FirstName, t.MiddleName, t.LastName),
-			DriveUrl:     t.DriveUrl,
-			RatePerClass: t.RatePerClass,
-			Template:     template,
+			ID:                  t.ID,
+			Name:                utils.ComposePersonName(t.FirstName, t.MiddleName, t.LastName),
+			DriveUrl:            t.DriveUrl,
+			RatePerClass:        t.RatePerClass,
+			RateDurationMinutes: int64(constants.DefaultRateDurationMinutes),
+			Template:            template,
 		})
 	}
 

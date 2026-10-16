@@ -160,6 +160,7 @@ templ RegisterTeacher(loggedIn bool, role auth.Role) {
 								placeholder="0.00"
 							/>
 						</div>
+						@RateDurationSelect("rateDurationMinutes", "rateDurationMinutes", int64(constants.DefaultRateDurationMinutes))
 						<div class="form-group">
 							<label for="assignedColor">Assigned Color (optional)</label>
 							<div class="color-group">

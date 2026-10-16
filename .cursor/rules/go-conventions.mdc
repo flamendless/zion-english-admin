@@ -132,6 +132,13 @@ w.Header().Set("HX-Redirect", utils.URL("/"))
 - Reuse `internal/utils` for shared string/format helpers (e.g. `utils.NormalizeEmail`, `utils.FormatNullDateTimePHT`) rather than re-wrapping them in `cmd/`.
 - Small helpers are fine when they add real logic (branching, param assembly, validation) or deduplicate non-trivial blocks used in multiple places.
 
+## Empty display placeholder
+
+Use `constants.DisplayNotSet` (`internal/constants/display.go`) for missing, blank, or unset values shown in tables and detail views. Do not use the literal `"-"` for that purpose in handlers, `internal/`, or `frontend/`.
+
+- Compare against `constants.DisplayNotSet` only when the field is known to carry the display placeholder (for example intro video filename labels from handlers), not for arbitrary strings.
+- Do not use `DisplayNotSet` for date/time layouts, URLs, or punctuation in prose.
+
 ## Dates & Times (PHT)
 
 All user-facing dates and datetimes are shown in **Philippines time** (`Asia/Manila`).

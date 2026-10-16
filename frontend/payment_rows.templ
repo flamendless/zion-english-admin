@@ -45,7 +45,7 @@ templ PaymentTableRow(row PaymentRowData, showTeacherColumn bool, swapOOB bool) 
 			if row.ReceivedAt != "" {
 				{ row.ReceivedAt }
 			} else {
-				-
+				{ constants.DisplayNotSet }
 			}
 		</td>
 		<td data-label="Actions">

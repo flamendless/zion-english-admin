@@ -46,7 +46,7 @@ templ ReportPaymentModal(data ReportPaymentFormData) {
 								{ utils.FormatCurrency(earning.Total, earning.Currency) }
 							}
 						} else {
-							-
+							{ constants.DisplayNotSet }
 						}
 					</p>
 					<p class="report-payment-period">{ data.CutoffLabel }</p>

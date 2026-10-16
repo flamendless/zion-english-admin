@@ -18,8 +18,9 @@ type TeacherViewData struct {
 	MobileNumber   string
 	Certifications string
 	AssignedColor  string
-	RatePerClass   float64
-	Currency       string
+	RatePerClass          float64
+	RateDurationMinutes   int64
+	Currency              string
 	DriveUrl       string
 	Sex            string
 	Status         constants.TeacherStatus
@@ -121,7 +122,7 @@ templ TeacherViewModal(data TeacherViewData) {
 							<div class="profile-details">
 								@ProfileDetailField("Email", data.Email)
 								@ProfileDetailField("Mobile number", data.MobileNumber)
-								@ProfileDetailField("Rate per class", utils.FormatCurrency(data.RatePerClass, data.Currency))
+								@ProfileDetailField("Rate per class", formatRatePerDurationDisplay(data.RatePerClass, data.Currency, data.RateDurationMinutes))
 								@ProfileDetailField("Certifications", displayOrDash(data.Certifications))
 								if data.ZoomConfigured && (data.ZoomConnected || data.ZoomIntegrationVisible) {
 									<div class="profile-detail">

@@ -159,28 +159,29 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 	parentRate, parentCurrency, hasParentRate := studentParentRateView(existing.ParentRate, existing.ParentCurrency)
 
 	return frontend.EditStudentData{
-		ID:             strconv.FormatInt(studentID, 10),
-		Readonly:       readonly || existing.Status == string(constants.StudentStatusDeleted),
-		Name:           existing.Name,
-		StudentNumber:  studentNumberString(existing.StudentNumber),
-		ParentNumber:   studentNumberString(existing.ParentNumber),
-		Currency:       existing.Currency,
-		Contact:        existing.Contact.String,
-		RatePerClass:   existing.RatePerClass,
-		ParentName:     existing.ParentName.String,
-		ParentRate:     parentRate,
-		ParentCurrency: parentCurrency,
-		HasParentRate:  hasParentRate,
-		AssignedColor:  existing.AssignedColor,
-		Avatar:         frontend.StudentAvatarProps(existing.Name, existing.AssignedColor, existing.IsTestSeed == 1, "md"),
-		Status:         constants.StudentStatus(existing.Status),
-		InactiveReason: inactiveReason,
-		DeletedReason:  deletedReason,
-		IsTestSeed:     existing.IsTestSeed == 1,
-		TeacherIDs:     teacherIDs,
-		TeacherNames:   teacherNames,
-		Teachers:       teachers,
-		Relationships:  relItems,
+		ID:                  strconv.FormatInt(studentID, 10),
+		Readonly:            readonly || existing.Status == string(constants.StudentStatusDeleted),
+		Name:                existing.Name,
+		StudentNumber:       studentNumberString(existing.StudentNumber),
+		ParentNumber:        studentNumberString(existing.ParentNumber),
+		Currency:            existing.Currency,
+		Contact:             existing.Contact.String,
+		RatePerClass:        existing.RatePerClass,
+		RateDurationMinutes: existing.RateDurationMinutes,
+		ParentName:          existing.ParentName.String,
+		ParentRate:          parentRate,
+		ParentCurrency:      parentCurrency,
+		HasParentRate:       hasParentRate,
+		AssignedColor:       existing.AssignedColor,
+		Avatar:              frontend.StudentAvatarProps(existing.Name, existing.AssignedColor, existing.IsTestSeed == 1, "md"),
+		Status:              constants.StudentStatus(existing.Status),
+		InactiveReason:      inactiveReason,
+		DeletedReason:       deletedReason,
+		IsTestSeed:          existing.IsTestSeed == 1,
+		TeacherIDs:          teacherIDs,
+		TeacherNames:        teacherNames,
+		Teachers:            teachers,
+		Relationships:       relItems,
 	}, nil
 }
 
@@ -409,23 +410,24 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 	for i, s := range students {
 		parentRate, parentCurrency, hasParentRate := studentParentRateView(s.ParentRate, s.ParentCurrency)
 		viewStudents[i] = frontend.StudentItem{
-			ID:               strconv.FormatInt(s.ID, 10),
-			Name:             s.Name,
-			StudentNumber:    studentNumberString(s.StudentNumber),
-			Avatar:           frontend.StudentAvatarProps(s.Name, s.AssignedColor, s.IsTestSeed == 1, "sm"),
-			Currency:         s.Currency,
-			Contact:          s.Contact.String,
-			RatePerClass:     s.RatePerClass,
-			ParentName:       s.ParentName.String,
-			ParentRate:       parentRate,
-			ParentCurrency:   parentCurrency,
-			HasParentRate:    hasParentRate,
-			AssignedColor:    s.AssignedColor,
-			Status:           constants.StudentStatus(s.Status),
-			Teachers:         teachersByStudent[s.ID],
-			RelatedToDisplay: formatStudentRelationships(relationshipsByStudent[s.ID]),
-			CreatedAt:        utils.FormatNullDateTimeSecondsPHT(s.CreatedAt),
-			UpdatedAt:        utils.FormatNullDateTimeSecondsPHT(s.UpdatedAt),
+			ID:                  strconv.FormatInt(s.ID, 10),
+			Name:                s.Name,
+			StudentNumber:       studentNumberString(s.StudentNumber),
+			Avatar:              frontend.StudentAvatarProps(s.Name, s.AssignedColor, s.IsTestSeed == 1, "sm"),
+			Currency:            s.Currency,
+			Contact:             s.Contact.String,
+			RatePerClass:        s.RatePerClass,
+			RateDurationMinutes: s.RateDurationMinutes,
+			ParentName:          s.ParentName.String,
+			ParentRate:          parentRate,
+			ParentCurrency:      parentCurrency,
+			HasParentRate:       hasParentRate,
+			AssignedColor:       s.AssignedColor,
+			Status:              constants.StudentStatus(s.Status),
+			Teachers:            teachersByStudent[s.ID],
+			RelatedToDisplay:    formatStudentRelationships(relationshipsByStudent[s.ID]),
+			CreatedAt:           utils.FormatNullDateTimeSecondsPHT(s.CreatedAt),
+			UpdatedAt:           utils.FormatNullDateTimeSecondsPHT(s.UpdatedAt),
 		}
 	}
 
@@ -521,6 +523,11 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		sendErrorLog(w, err.Error())
 		return
 	}
+	rateDurationMinutes, err := parseRateDurationMinutes(r.FormValue("rateDurationMinutes"))
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
 
 	teachersBefore := teacherIDsString(assignedTeachers)
 
@@ -532,16 +539,17 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		}
 
 		req := models.StudentRegisterRequest{
-			Name:           r.FormValue("name"),
-			StudentNumber:  r.FormValue("studentNumber"),
-			ParentNumber:   r.FormValue("parentNumber"),
-			Currency:       r.FormValue("currency"),
-			Contact:        r.FormValue("contact"),
-			RatePerClass:   ratePerClass,
-			ParentName:     r.FormValue("parentName"),
-			AssignedColor:  r.FormValue("assignedColor"),
-			Status:         r.FormValue("status"),
-			InactiveReason: r.FormValue("inactiveReason"),
+			Name:                r.FormValue("name"),
+			StudentNumber:       r.FormValue("studentNumber"),
+			ParentNumber:        r.FormValue("parentNumber"),
+			Currency:            r.FormValue("currency"),
+			Contact:             r.FormValue("contact"),
+			RatePerClass:        ratePerClass,
+			RateDurationMinutes: rateDurationMinutes,
+			ParentName:          r.FormValue("parentName"),
+			AssignedColor:       r.FormValue("assignedColor"),
+			Status:              r.FormValue("status"),
+			InactiveReason:      r.FormValue("inactiveReason"),
 		}
 		if err := validateStudentRequest(&req); err != nil {
 			sendErrorLog(w, err.Error())
@@ -566,21 +574,22 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		}
 
 		err = dbRW.GetQueries().UpdateStudent(ctx, queries.UpdateStudentParams{
-			Name:           req.Name,
-			StudentNumber:  studentNumber,
-			ParentNumber:   parentNumber,
-			Currency:       req.Currency,
-			Contact:        sql.NullString{String: req.Contact, Valid: req.Contact != ""},
-			RatePerClass:   req.RatePerClass,
-			ParentName:     sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
-			ParentRate:     parentRate,
-			ParentCurrency: parentCurrency,
-			AssignedColor:  req.AssignedColor,
-			Status:         req.Status,
-			InactiveReason: sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
-			DeletedReason:  existing.DeletedReason,
-			IsTestSeed:     isTestSeed,
-			ID:             studentID,
+			Name:                req.Name,
+			StudentNumber:       studentNumber,
+			ParentNumber:        parentNumber,
+			Currency:            req.Currency,
+			Contact:             sql.NullString{String: req.Contact, Valid: req.Contact != ""},
+			RatePerClass:        req.RatePerClass,
+			RateDurationMinutes: req.RateDurationMinutes,
+			ParentName:          sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
+			ParentRate:          parentRate,
+			ParentCurrency:      parentCurrency,
+			AssignedColor:       req.AssignedColor,
+			Status:              req.Status,
+			InactiveReason:      sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
+			DeletedReason:       existing.DeletedReason,
+			IsTestSeed:          isTestSeed,
+			ID:                  studentID,
 		})
 		if err != nil {
 			sendErrorLog(w, err.Error())
@@ -629,15 +638,16 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 	}
 
 	req := models.StudentRegisterRequest{
-		Name:           r.FormValue("name"),
-		StudentNumber:  r.FormValue("studentNumber"),
-		ParentNumber:   r.FormValue("parentNumber"),
-		Currency:       r.FormValue("currency"),
-		RatePerClass:   ratePerClass,
-		ParentName:     r.FormValue("parentName"),
-		AssignedColor:  r.FormValue("assignedColor"),
-		Status:         existing.Status,
-		InactiveReason: inactiveReason,
+		Name:                r.FormValue("name"),
+		StudentNumber:       r.FormValue("studentNumber"),
+		ParentNumber:        r.FormValue("parentNumber"),
+		Currency:            r.FormValue("currency"),
+		RatePerClass:        ratePerClass,
+		RateDurationMinutes: rateDurationMinutes,
+		ParentName:          r.FormValue("parentName"),
+		AssignedColor:       r.FormValue("assignedColor"),
+		Status:              existing.Status,
+		InactiveReason:      inactiveReason,
 	}
 	if err := validateStudentRequest(&req); err != nil {
 		sendErrorLog(w, err.Error())
@@ -651,21 +661,22 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 	}
 
 	err = dbRW.GetQueries().UpdateStudent(ctx, queries.UpdateStudentParams{
-		Name:           req.Name,
-		StudentNumber:  studentNumber,
-		ParentNumber:   parentNumber,
-		Currency:       req.Currency,
-		Contact:        existing.Contact,
-		RatePerClass:   req.RatePerClass,
-		ParentName:     sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
-		ParentRate:     existing.ParentRate,
-		ParentCurrency: existing.ParentCurrency,
-		AssignedColor:  req.AssignedColor,
-		Status:         existing.Status,
-		InactiveReason: existing.InactiveReason,
-		DeletedReason:  existing.DeletedReason,
-		IsTestSeed:     existing.IsTestSeed,
-		ID:             studentID,
+		Name:                req.Name,
+		StudentNumber:       studentNumber,
+		ParentNumber:        parentNumber,
+		Currency:            req.Currency,
+		Contact:             existing.Contact,
+		RatePerClass:        req.RatePerClass,
+		RateDurationMinutes: req.RateDurationMinutes,
+		ParentName:          sql.NullString{String: req.ParentName, Valid: req.ParentName != ""},
+		ParentRate:          existing.ParentRate,
+		ParentCurrency:      existing.ParentCurrency,
+		AssignedColor:       req.AssignedColor,
+		Status:              existing.Status,
+		InactiveReason:      existing.InactiveReason,
+		DeletedReason:       existing.DeletedReason,
+		IsTestSeed:          existing.IsTestSeed,
+		ID:                  studentID,
 	})
 	if err != nil {
 		sendErrorLog(w, err.Error())

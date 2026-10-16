@@ -219,5 +219,12 @@ func capitalizeStatus[S ~string](status S) string {
 }
 
 func ratePillAriaLabel(rate float64, currency string) string {
+	return ratePillAriaLabelWithDuration(rate, currency, 0)
+}
+
+func ratePillAriaLabelWithDuration(rate float64, currency string, durationMinutes int) string {
+	if durationMinutes > 0 {
+		return formatRatePerDurationDisplay(rate, currency, int64(durationMinutes))
+	}
 	return formatRate(rate, currency)
 }

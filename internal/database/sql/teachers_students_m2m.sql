@@ -9,7 +9,7 @@ SELECT COUNT(*) as count FROM tbl_teachers_students_m2m WHERE teacher_id = ? AND
 DELETE FROM tbl_teachers_students_m2m WHERE student_id = ?;
 
 -- name: GetStudentsByTeacherID :many
-SELECT s.id, s.name, s.student_number, s.parent_number, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
+SELECT s.id, s.name, s.student_number, s.parent_number, s.currency, s.contact, s.rate_per_class, s.rate_duration_minutes, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
 FROM tbl_students s
 INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?
@@ -27,7 +27,7 @@ WHERE m2m.teacher_id = ?
 	AND (? = '' OR s.status = ?);
 
 -- name: GetStudentsByTeacherIDFiltered :many
-SELECT s.id, s.name, s.student_number, s.parent_number, s.currency, s.contact, s.rate_per_class, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
+SELECT s.id, s.name, s.student_number, s.parent_number, s.currency, s.contact, s.rate_per_class, s.rate_duration_minutes, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
 FROM tbl_students s
 INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?
@@ -46,7 +46,7 @@ WHERE m2m.teacher_id = ?
 	AND s.is_test_seed = 0;
 
 -- name: GetTeachersByStudentID :many
-SELECT t.id, t.first_name, t.middle_name, t.last_name, t.birthdate, t.address, t.joining_date, t.mobile_number, t.email, t.certifications, t.assigned_color, t.rate_per_class, t.currency, t.drive_url, t.sex, t.password, t.created_at, t.updated_at, t.profile_picture, t.status
+SELECT t.id, t.first_name, t.middle_name, t.last_name, t.birthdate, t.address, t.joining_date, t.mobile_number, t.email, t.certifications, t.assigned_color, t.rate_per_class, t.rate_duration_minutes, t.currency, t.drive_url, t.sex, t.password, t.created_at, t.updated_at, t.profile_picture, t.status
 FROM tbl_teachers t
 INNER JOIN tbl_teachers_students_m2m m2m ON t.id = m2m.teacher_id
 WHERE m2m.student_id = ?

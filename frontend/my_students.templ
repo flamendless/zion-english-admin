@@ -27,7 +27,7 @@ templ MyStudentsTableRows(students []StudentItem) {
 			</td>
 			<td data-label="Contact">{ getDisplayValue(s.Contact) }</td>
 			<td data-label="Parent">{ getDisplayValue(s.ParentName) }</td>
-			<td class="rate-cell" data-label="Rate">{ formatRate(s.RatePerClass, s.Currency) }</td>
+			<td class="rate-cell" data-label="Rate">{ formatRatePerDurationDisplay(s.RatePerClass, s.Currency, s.RateDurationMinutes) }</td>
 			<td data-label="Status">
 				@StatusPill(capitalizeStatus(s.Status), StudentStatusPillTone(s.Status), false)
 			</td>

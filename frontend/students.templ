@@ -32,8 +32,9 @@ type StudentItem struct {
 	StudentNumber    string
 	Currency         string
 	Contact          string
-	RatePerClass     float64
-	ParentName       string
+	RatePerClass          float64
+	RateDurationMinutes   int64
+	ParentName            string
 	ParentRate       float64
 	ParentCurrency   string
 	HasParentRate    bool
@@ -186,12 +187,12 @@ templ Students(data StudentData) {
 												}
 											</div>
 										} else {
-											-
+											{ constants.DisplayNotSet }
 										}
 									</td>
 									<td class="rate-cell" data-label="Rate">
 										<span class="rate-value">
-											<span class="rate-amount">{ utils.FormatCurrencyAmountFixed(student.RatePerClass, student.Currency) }</span>
+											<span class="rate-amount">{ formatRatePerDurationDisplay(student.RatePerClass, student.Currency, student.RateDurationMinutes) }</span>
 											<span class="rate-currency">{ student.Currency }</span>
 										</span>
 									</td>

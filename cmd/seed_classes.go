@@ -313,22 +313,23 @@ func insertSeedTeacher(ctx context.Context, q *queries.Queries, plan seedTeacher
 	}
 
 	if err := q.InsertTeacher(ctx, queries.InsertTeacherParams{
-		FirstName:      plan.FirstName,
-		MiddleName:     "",
-		LastName:       plan.LastName,
-		Birthdate:      "1990-01-01",
-		Address:        "Seed address",
-		JoiningDate:    plan.JoiningDate,
-		MobileNumber:   plan.MobileNumber,
-		Email:          plan.Email,
-		Certifications: sql.NullString{},
-		AssignedColor:  constants.DefaultTeacherAssignedColor,
-		RatePerClass:   seedDefaultRate,
-		Currency:       "PHP",
-		DriveUrl:       seedTeacherDriveURL,
-		Sex:            sql.NullString{},
-		Password:       string(hashed),
-		Status:         plan.Status,
+		FirstName:           plan.FirstName,
+		MiddleName:          "",
+		LastName:            plan.LastName,
+		Birthdate:           "1990-01-01",
+		Address:             "Seed address",
+		JoiningDate:         plan.JoiningDate,
+		MobileNumber:        plan.MobileNumber,
+		Email:               plan.Email,
+		Certifications:      sql.NullString{},
+		AssignedColor:       constants.DefaultTeacherAssignedColor,
+		RatePerClass:        seedDefaultRate,
+		RateDurationMinutes: int64(constants.DefaultRateDurationMinutes),
+		Currency:            "PHP",
+		DriveUrl:            seedTeacherDriveURL,
+		Sex:                 sql.NullString{},
+		Password:            string(hashed),
+		Status:              plan.Status,
 	}); err != nil {
 		return 0, err
 	}
@@ -363,18 +364,19 @@ func insertSeedStudents(ctx context.Context, q *queries.Queries, teacherID int64
 	for i := range students {
 		color := processor.StudentColorHex(i)
 		studentID, err := q.InsertStudent(ctx, queries.InsertStudentParams{
-			Name:           students[i].Name,
-			Currency:       "PHP",
-			Contact:        sql.NullString{},
-			RatePerClass:   seedDefaultRate,
-			ParentName:     sql.NullString{},
-			ParentRate:     sql.NullFloat64{},
-			ParentCurrency: sql.NullString{},
-			AssignedColor:  color,
-			Status:         string(constants.StudentStatusActive),
-			InactiveReason: sql.NullString{},
-			DeletedReason:  sql.NullString{},
-			IsTestSeed:     1,
+			Name:                students[i].Name,
+			Currency:            "PHP",
+			Contact:             sql.NullString{},
+			RatePerClass:        seedDefaultRate,
+			RateDurationMinutes: int64(constants.DefaultRateDurationMinutes),
+			ParentName:          sql.NullString{},
+			ParentRate:          sql.NullFloat64{},
+			ParentCurrency:      sql.NullString{},
+			AssignedColor:       color,
+			Status:              string(constants.StudentStatusActive),
+			InactiveReason:      sql.NullString{},
+			DeletedReason:       sql.NullString{},
+			IsTestSeed:          1,
 		})
 		if err != nil {
 			return students, err

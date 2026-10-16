@@ -13,6 +13,7 @@ type SummaryClassRow struct {
 	Status           constants.ClassStatus
 	StatusDisplay    string
 	DateDisplay      string
+	DurationDisplay  string
 	RateDisplay      string
 	RateValue        float64
 	HasRate          bool
@@ -108,7 +109,7 @@ func SaveSummaryReport(sheets []SummaryTeacherSheet, outputPath string) error {
 		}
 		f.SetActiveSheet(sheetIndex)
 
-		colWidths := newColWidthTracker(4, 10, []float64{28, 48, 28, 28})
+		colWidths := newColWidthTracker(5, 10, []float64{28, 48, 16, 28, 28})
 
 		rowNum := 1
 		cell, _ := excelize.CoordinatesToCellName(1, rowNum)
@@ -145,14 +146,19 @@ func SaveSummaryReport(sheets []SummaryTeacherSheet, outputPath string) error {
 				f.SetCellStyle(sheetName, cellB, cellB, styles.date)
 
 				cellC, _ := excelize.CoordinatesToCellName(3, rowNum)
-				f.SetCellValue(sheetName, cellC, classRow.RateDisplay)
-				colWidths.Note(3, classRow.RateDisplay)
+				f.SetCellValue(sheetName, cellC, classRow.DurationDisplay)
+				colWidths.Note(3, classRow.DurationDisplay)
 				f.SetCellStyle(sheetName, cellC, cellC, styles.rate)
 
 				cellD, _ := excelize.CoordinatesToCellName(4, rowNum)
-				f.SetCellValue(sheetName, cellD, classRow.ClassRateDisplay)
-				colWidths.Note(4, classRow.ClassRateDisplay)
+				f.SetCellValue(sheetName, cellD, classRow.RateDisplay)
+				colWidths.Note(4, classRow.RateDisplay)
 				f.SetCellStyle(sheetName, cellD, cellD, styles.rate)
+
+				cellE, _ := excelize.CoordinatesToCellName(5, rowNum)
+				f.SetCellValue(sheetName, cellE, classRow.ClassRateDisplay)
+				colWidths.Note(5, classRow.ClassRateDisplay)
+				f.SetCellStyle(sheetName, cellE, cellE, styles.rate)
 				rowNum++
 			}
 
@@ -161,9 +167,9 @@ func SaveSummaryReport(sheets []SummaryTeacherSheet, outputPath string) error {
 				cellB, _ := excelize.CoordinatesToCellName(2, rowNum)
 				f.SetCellValue(sheetName, cellB, totalLabel)
 				colWidths.Note(2, totalLabel)
-				cellC, _ := excelize.CoordinatesToCellName(3, rowNum)
-				f.SetCellValue(sheetName, cellC, student.Total)
-				colWidths.NoteFloat(3, student.Total)
+				cellD, _ := excelize.CoordinatesToCellName(4, rowNum)
+				f.SetCellValue(sheetName, cellD, student.Total)
+				colWidths.NoteFloat(4, student.Total)
 				rowNum++
 			}
 

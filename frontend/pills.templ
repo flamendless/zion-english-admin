@@ -6,9 +6,16 @@ templ Pill(label string, tone PillTone) {
 }
 
 templ RatePill(rate float64, currency string) {
-	<span class={ pillClass(PillToneInfo) + " rate-pill" } aria-label={ ratePillAriaLabel(rate, currency) }>
+	@RatePillWithDuration(rate, currency, 0)
+}
+
+templ RatePillWithDuration(rate float64, currency string, durationMinutes int) {
+	<span class={ pillClass(PillToneInfo) + " rate-pill" } aria-label={ ratePillAriaLabelWithDuration(rate, currency, durationMinutes) }>
 		<span class="rate-pill-amount">{ formatRateAmount(rate, currency) }</span>
 		<span class="rate-pill-currency">{ currency }</span>
+		if durationMinutes > 0 {
+			<span class="rate-pill-unit">per { strconv.Itoa(durationMinutes) } min</span>
+		}
 	</span>
 }
 

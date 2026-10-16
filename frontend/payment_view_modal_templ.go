@@ -173,12 +173,17 @@ func PaymentViewModal(data PaymentViewData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "-")
+			var templ_7745c5c3_Var8 string
+			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(constants.DisplayNotSet)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payment_view_modal.templ`, Line: 78, Col: 33}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</dd></div></dl></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary payment-view-close\" onclick=\"window.closePaymentReceiptModal()\">Close</button></div></div></div><script>\r\n\t\t(function () {\r\n\t\t\tconst overlay = document.getElementById('paymentViewModal');\r\n\t\t\tif (!overlay) return;\r\n\t\t\toverlay.hidden = false;\r\n\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\tconst closeBtn = overlay.querySelector('.payment-view-close');\r\n\t\t\tif (closeBtn) closeBtn.focus();\r\n\t\t})();\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</dd></div></dl></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-secondary payment-view-close\" onclick=\"window.closePaymentReceiptModal()\">Close</button></div></div></div><script>\r\n\t\t(function () {\r\n\t\t\tconst overlay = document.getElementById('paymentViewModal');\r\n\t\t\tif (!overlay) return;\r\n\t\t\toverlay.hidden = false;\r\n\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\tconst closeBtn = overlay.querySelector('.payment-view-close');\r\n\t\t\tif (closeBtn) closeBtn.focus();\r\n\t\t})();\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -51,20 +51,21 @@ type LogView struct {
 }
 
 type StudentRegisterRequest struct {
-	Name             string  `json:"name"`
-	StudentNumber    string  `json:"studentNumber"`
-	ParentNumber     string  `json:"parentNumber"`
-	Currency         string  `json:"currency"`
-	Contact          string  `json:"contact"`
-	RatePerClass     float64 `json:"ratePerClass"`
-	ParentName       string  `json:"parentName"`
-	ParentRate       float64 `json:"parentRate,omitempty"`
-	ParentCurrency   string  `json:"parentCurrency,omitempty"`
-	AssignedColor    string  `json:"assignedColor"`
-	Status           string  `json:"status"`
-	InactiveReason   string  `json:"inactiveReason"`
-	Relationship     string  `json:"relationship"`
-	RelatedStudentID int64   `json:"relatedStudentId"`
+	Name                string  `json:"name"`
+	StudentNumber       string  `json:"studentNumber"`
+	ParentNumber        string  `json:"parentNumber"`
+	Currency            string  `json:"currency"`
+	Contact             string  `json:"contact"`
+	RatePerClass        float64 `json:"ratePerClass"`
+	RateDurationMinutes int64   `json:"rateDurationMinutes"`
+	ParentName          string  `json:"parentName"`
+	ParentRate          float64 `json:"parentRate,omitempty"`
+	ParentCurrency      string  `json:"parentCurrency,omitempty"`
+	AssignedColor       string  `json:"assignedColor"`
+	Status              string  `json:"status"`
+	InactiveReason      string  `json:"inactiveReason"`
+	Relationship        string  `json:"relationship"`
+	RelatedStudentID    int64   `json:"relatedStudentId"`
 }
 
 type StudentRegisterResponse struct {
@@ -74,23 +75,24 @@ type StudentRegisterResponse struct {
 }
 
 type TeacherRegisterRequest struct {
-	FirstName      string  `json:"firstName"`
-	MiddleName     string  `json:"middleName"`
-	LastName       string  `json:"lastName"`
-	Name           string  `json:"name"`
-	Birthdate      string  `json:"birthdate"`
-	Address        string  `json:"address"`
-	JoiningDate    string  `json:"joiningDate"`
-	MobileNumber   string  `json:"mobileNumber"`
-	Email          string  `json:"email"`
-	Certifications string  `json:"certifications"`
-	AssignedColor  string  `json:"assignedColor"`
-	RatePerClass   float64 `json:"ratePerClass"`
-	Currency       string  `json:"currency"`
-	DriveUrl       string  `json:"driveUrl"`
-	Sex            string  `json:"sex"`
-	Password       string  `json:"password"`
-	RetypePassword string  `json:"retypePassword"`
+	FirstName           string  `json:"firstName"`
+	MiddleName          string  `json:"middleName"`
+	LastName            string  `json:"lastName"`
+	Name                string  `json:"name"`
+	Birthdate           string  `json:"birthdate"`
+	Address             string  `json:"address"`
+	JoiningDate         string  `json:"joiningDate"`
+	MobileNumber        string  `json:"mobileNumber"`
+	Email               string  `json:"email"`
+	Certifications      string  `json:"certifications"`
+	AssignedColor       string  `json:"assignedColor"`
+	RatePerClass        float64 `json:"ratePerClass"`
+	RateDurationMinutes int64   `json:"rateDurationMinutes"`
+	Currency            string  `json:"currency"`
+	DriveUrl            string  `json:"driveUrl"`
+	Sex                 string  `json:"sex"`
+	Password            string  `json:"password"`
+	RetypePassword      string  `json:"retypePassword"`
 }
 
 type TeacherRegisterResponse struct {
@@ -111,11 +113,12 @@ type LoginResponse struct {
 }
 
 type TeacherAPIResponse struct {
-	ID           int64   `json:"id"`
-	Name         string  `json:"name"`
-	DriveUrl     string  `json:"driveUrl"`
-	RatePerClass float64 `json:"ratePerClass"`
-	Template     string  `json:"template"`
+	ID                  int64   `json:"id"`
+	Name                string  `json:"name"`
+	DriveUrl            string  `json:"driveUrl"`
+	RatePerClass        float64 `json:"ratePerClass"`
+	RateDurationMinutes int64   `json:"rateDurationMinutes"`
+	Template            string  `json:"template"`
 }
 
 type StudentAPIResponse struct {

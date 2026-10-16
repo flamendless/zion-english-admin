@@ -2,6 +2,7 @@ package frontend
 
 import (
 	"fmt"
+	"zion-english/internal/constants"
 	"zion-english/internal/utils"
 )
 
@@ -104,7 +105,7 @@ templ EditSchedule(data EditScheduleData) {
 
 func formatScheduleTimeRange(start, end string) string {
 	if start == "" && end == "" {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	if end == "" {
 		return start

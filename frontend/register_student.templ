@@ -38,6 +38,7 @@ templ RegisterStudent(data RegisterStudentData) {
 						PlaceholderAmount: "0.00",
 						Required:          true,
 					})
+					@RateDurationSelect("rateDurationMinutes", "rateDurationMinutes", int64(constants.DefaultRateDurationMinutes))
 					@StudentStatusDropdown()
 				</div>
 

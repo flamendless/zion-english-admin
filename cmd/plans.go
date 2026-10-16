@@ -350,7 +350,7 @@ func formatPlanTxnDate(value string) string {
 
 func formatPlanTxnEnd(end sql.NullString) string {
 	if !end.Valid || end.String == "" {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	return utils.FormatPlanDateTimePHT(end.String)
 }

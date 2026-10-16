@@ -12,27 +12,32 @@ func TestEffectiveSummaryParentRate(t *testing.T) {
 	parent := sql.NullFloat64{Float64: 100, Valid: true}
 	currency := sql.NullString{String: "KRW", Valid: true}
 
-	display, amount, ok := effectiveSummaryParentRate(parent, currency, constants.ClassStatusConducted, 100, 200)
+	display, amount, ok := effectiveSummaryParentRate(parent, currency, constants.ClassStatusConducted, 100, 200, 25, 25)
 	if !ok || amount != 100 || display != "100.00 KRW" {
 		t.Fatalf("conducted: display=%q amount=%v ok=%v", display, amount, ok)
 	}
 
-	display, amount, ok = effectiveSummaryParentRate(parent, currency, constants.ClassStatusCancelled, 50, 100)
+	display, amount, ok = effectiveSummaryParentRate(parent, currency, constants.ClassStatusConducted, 200, 90, 50, 25)
+	if !ok || amount != 200 || display != "200.00 KRW" {
+		t.Fatalf("conducted scaled: display=%q amount=%v ok=%v", display, amount, ok)
+	}
+
+	display, amount, ok = effectiveSummaryParentRate(parent, currency, constants.ClassStatusCancelled, 50, 100, 25, 25)
 	if !ok || amount != 50 || display != "50.00 KRW" {
 		t.Fatalf("cancelled half class rate: display=%q amount=%v ok=%v", display, amount, ok)
 	}
 
-	display, amount, ok = effectiveSummaryParentRate(parent, currency, constants.ClassStatusCancelled, 0, 100)
+	display, amount, ok = effectiveSummaryParentRate(parent, currency, constants.ClassStatusCancelled, 0, 100, 25, 25)
 	if !ok || amount != 0 || display != "0.00 KRW" {
 		t.Fatalf("cancelled zero class rate: display=%q amount=%v want 0", display, amount)
 	}
 
-	display, amount, ok = effectiveSummaryParentRate(parent, currency, constants.ClassStatusRescheduled, 40, 80)
+	display, amount, ok = effectiveSummaryParentRate(parent, currency, constants.ClassStatusRescheduled, 40, 80, 25, 25)
 	if !ok || amount != 50 {
 		t.Fatalf("rescheduled half class rate: amount=%v", amount)
 	}
 
-	display, amount, ok = effectiveSummaryParentRate(parent, currency, constants.ClassStatusRescheduled, 0, 80)
+	display, amount, ok = effectiveSummaryParentRate(parent, currency, constants.ClassStatusRescheduled, 0, 80, 25, 25)
 	if !ok || amount != 0 {
 		t.Fatalf("rescheduled zero class rate: amount=%v want 0", amount)
 	}
@@ -40,13 +45,15 @@ func TestEffectiveSummaryParentRate(t *testing.T) {
 
 func TestSummaryClassRowFromRecord(t *testing.T) {
 	row := queries.GetReportSummaryRowsRow{
-		Date:                "2026-08-15",
-		Status:              string(constants.ClassStatusCancelled),
-		Rate:                0,
-		Currency:            "KRW",
-		TeacherRatePerClass: 200,
-		ParentRate:          sql.NullFloat64{Float64: 90, Valid: true},
-		ParentCurrency:      sql.NullString{String: "KRW", Valid: true},
+		Date:                       "2026-08-15",
+		Status:                     string(constants.ClassStatusCancelled),
+		Rate:                       0,
+		Currency:                   "KRW",
+		DurationMinutes:            25,
+		TeacherRatePerClass:        200,
+		TeacherRateDurationMinutes: 25,
+		ParentRate:                 sql.NullFloat64{Float64: 90, Valid: true},
+		ParentCurrency:             sql.NullString{String: "KRW", Valid: true},
 	}
 	classRow := summaryClassRowFromRecord(row)
 	if classRow.RateValue != 0 {
@@ -60,8 +67,9 @@ func TestSummaryClassRowFromRecord(t *testing.T) {
 	}
 
 	row.Status = string(constants.ClassStatusConducted)
+	row.DurationMinutes = 50
 	classRow = summaryClassRowFromRecord(row)
-	if classRow.RateValue != 90 {
-		t.Fatalf("conducted: parent bill = %v, want 90", classRow.RateValue)
+	if classRow.RateValue != 180 {
+		t.Fatalf("conducted 50 min: parent bill = %v, want 180", classRow.RateValue)
 	}
 }

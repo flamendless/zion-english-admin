@@ -9,6 +9,7 @@ import {
 	openConductWizard,
 	openScheduleWizard,
 } from "../helpers/wizard";
+import { classTableRowWithStatus, filterClassesTable } from "../helpers/classes";
 import { clickScheduleAction, gotoSchedule, scheduleRowForStudent } from "../helpers/schedule";
 
 const creds = loadCredentials();
@@ -27,9 +28,8 @@ test("record past class conducted", async ({ page }) => {
 	await openConductWizard(page);
 	await fillConductWizard(page, { studentName: creds.studentName, date, status: "conducted" });
 	await page.goto("classes");
-	await page.locator("#studentSearch").fill(creds.studentName);
-	await expect(page.locator("#classesTable")).toContainText(creds.studentName);
-	await expect(page.locator("#classesTable")).toContainText("Conducted");
+	await filterClassesTable(page, { studentName: creds.studentName, testSeedFilter: "all" });
+	await expect(classTableRowWithStatus(page, creds.studentName, "Conducted").first()).toBeVisible();
 });
 
 test("record past class cancelled", async ({ page }) => {
@@ -42,8 +42,8 @@ test("record past class cancelled", async ({ page }) => {
 		reason: "Student unavailable E2E",
 	});
 	await page.goto("classes");
-	await page.locator("#studentSearch").fill(creds.studentName);
-	await expect(page.locator("#classesTable")).toContainText("Cancelled");
+	await filterClassesTable(page, { studentName: creds.studentName, testSeedFilter: "all" });
+	await expect(classTableRowWithStatus(page, creds.studentName, "Cancelled").first()).toBeVisible();
 });
 
 test("record past class rescheduled", async ({ page }) => {
@@ -56,8 +56,8 @@ test("record past class rescheduled", async ({ page }) => {
 		reason: "E2E reschedule reason",
 	});
 	await page.goto("classes");
-	await page.locator("#studentSearch").fill(creds.studentName);
-	await expect(page.locator("#classesTable")).toContainText("Rescheduled");
+	await filterClassesTable(page, { studentName: creds.studentName, testSeedFilter: "all" });
+	await expect(classTableRowWithStatus(page, creds.studentName, "Rescheduled").first()).toBeVisible();
 });
 
 test("schedule upcoming class", async ({ page }) => {
@@ -135,10 +135,8 @@ test("delete scheduled class", async ({ page }) => {
 
 test("edit class record", async ({ page }) => {
 	await page.goto("classes");
-	await page.locator("#studentSearch").fill(creds.studentName);
-	const conductedRow = page.locator("#classesTable tr", {
-		hasText: creds.studentName,
-	}).filter({ hasText: "Conducted" });
+	await filterClassesTable(page, { studentName: creds.studentName, testSeedFilter: "all" });
+	const conductedRow = classTableRowWithStatus(page, creds.studentName, "Conducted");
 	const editHref = await conductedRow.first().getByRole("link", { name: "Edit" }).getAttribute("href");
 	expect(editHref).toBeTruthy();
 	await page.goto(editHref!);
@@ -150,10 +148,8 @@ test("edit class record", async ({ page }) => {
 
 test("delete class record", async ({ page }) => {
 	await page.goto("classes");
-	await page.locator("#studentSearch").fill(creds.studentName);
-	const conductedRow = page.locator("#classesTable tr", {
-		hasText: creds.studentName,
-	}).filter({ hasText: "Conducted" });
+	await filterClassesTable(page, { studentName: creds.studentName, testSeedFilter: "all" });
+	const conductedRow = classTableRowWithStatus(page, creds.studentName, "Conducted");
 	await conductedRow.first().getByRole("button", { name: "Delete" }).click();
 	await page.locator("#deleteClassReason").fill("E2E delete record");
 	await page.locator("#deleteClassForm").getByRole("button", { name: "Delete" }).click();

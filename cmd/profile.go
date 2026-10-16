@@ -221,6 +221,7 @@ func handleProfile(w http.ResponseWriter, r *http.Request) {
 		Certifications:            certifications,
 		AssignedColor:             row.AssignedColor,
 		RatePerClass:              row.RatePerClass,
+		RateDurationMinutes:       row.RateDurationMinutes,
 		Currency:                  row.Currency,
 		DriveUrl:                  row.DriveUrl,
 		Sex:                       sex,

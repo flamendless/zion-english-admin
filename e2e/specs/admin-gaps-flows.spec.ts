@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 import { loadCredentials } from "../helpers/credentials";
 import { addDaysPHT, todayPHT } from "../helpers/dates";
 import { loginAsSuperuser } from "../helpers/login";
+import { teacherCompactDisplayName } from "../helpers/display-names";
 import { expectTeachersListReady } from "../helpers/teachers-admin";
 
 const creds = loadCredentials();
@@ -30,7 +31,7 @@ test("superuser views seeded teacher row", async ({ page }) => {
 	await expectTeachersListReady(page);
 	const row = page.locator("#teachersTable tbody tr", { hasText: creds.email });
 	await expect(row).toBeVisible({ timeout: 15_000 });
-	await row.getByRole("button", { name: "E2E Teacher" }).click();
+	await row.getByRole("button", { name: teacherCompactDisplayName("E2E Teacher") }).click();
 	await expect(page.locator("#teacherViewModalHost .modal-dialog")).toBeVisible({
 		timeout: 20_000,
 	});

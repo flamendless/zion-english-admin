@@ -298,7 +298,7 @@ func normalizeDisplayTime(value string) string {
 
 func FormatScheduledClassDateDisplay(date string) string {
 	if date == "" {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	t, err := time.ParseInLocation(constants.DateLayout, date, constants.LocationPHT)
 	if err != nil {

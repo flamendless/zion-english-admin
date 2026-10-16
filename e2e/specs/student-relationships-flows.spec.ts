@@ -15,6 +15,9 @@ test.beforeEach(async ({ page }) => {
 
 test("student relationship diagram focuses seeded student", async ({ page }) => {
 	await gotoStudentRelationships(page);
-	await focusStudentOnDiagram(page, creds.studentName);
+	if (!creds.siblingStudentName) {
+		throw new Error("siblingStudentName required in e2e credentials");
+	}
+	await focusStudentOnDiagram(page, creds.siblingStudentName);
 	await expectDiagramLoaded(page);
 });

@@ -19,8 +19,9 @@ type ProfileData struct {
 	MobileNumber         string
 	Certifications       string
 	AssignedColor        string
-	RatePerClass         float64
-	Currency             string
+	RatePerClass          float64
+	RateDurationMinutes   int64
+	Currency              string
 	DriveUrl             string
 	Sex                  string
 	Status               constants.TeacherStatus
@@ -765,7 +766,7 @@ templ Profile(data ProfileData) {
 									</div>
 									<div class="profile-detail">
 										<span class="profile-detail-label">Rate per class</span>
-										<span class="profile-detail-value">{ utils.FormatCurrency(data.RatePerClass, data.Currency) }</span>
+										<span class="profile-detail-value">{ formatRatePerDurationDisplay(data.RatePerClass, data.Currency, data.RateDurationMinutes) }</span>
 									</div>
 									<div class="profile-detail">
 										<span class="profile-detail-label">Certifications</span>
@@ -1179,14 +1180,14 @@ func displayProfileName(stored string, editable bool) string {
 		if editable {
 			return "Not set"
 		}
-		return "-"
+		return constants.DisplayNotSet
 	}
 	return strings.TrimSpace(stored)
 }
 
 func displayOrDash(value string) string {
 	if value == "" {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	return value
 }

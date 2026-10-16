@@ -43,8 +43,7 @@ export async function approvePendingTeacher(page: Page, email: string) {
 	await page.waitForURL("**/teachers**");
 	await expect(page.getByRole("heading", { name: "Teachers" })).toBeVisible({ timeout: 15_000 });
 	row = await filterTeacherRow(page, email);
-	await expect(row).toContainText("Approved", { timeout: 15_000 });
-	await expect(row.getByRole("button", { name: "Un-approve" })).toBeVisible();
+	await expect(row.getByRole("button", { name: "Un-approve" })).toBeVisible({ timeout: 15_000 });
 }
 
 export async function deletePendingTeacher(page: Page, email: string) {
@@ -75,6 +74,7 @@ export async function unapproveTeacher(page: Page, email: string) {
 	await page.waitForURL("**/teachers**");
 	await expect(page.getByRole("heading", { name: "Teachers" })).toBeVisible({ timeout: 15_000 });
 	row = await filterTeacherRow(page, email);
-	await expect(row).toContainText("Pending", { timeout: 15_000 });
-	await expect(row.getByRole("button", { name: "Approve", exact: true })).toBeVisible();
+	await expect(row.getByRole("button", { name: "Approve", exact: true })).toBeVisible({
+		timeout: 15_000,
+	});
 }

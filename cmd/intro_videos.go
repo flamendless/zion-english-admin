@@ -30,7 +30,7 @@ func introVideoLinkLabel(url sql.NullString, filename sql.NullString) string {
 	if filename.Valid && filename.String != "" {
 		return filename.String
 	}
-	return "-"
+	return constants.DisplayNotSet
 }
 
 func introVideoViewURL(id int64, url sql.NullString, status string) string {
@@ -52,7 +52,7 @@ func introVideoSourceType(sourceType sql.NullString) constants.TeacherIntroVideo
 
 func formatIntroVideoFileSize(size sql.NullInt64) string {
 	if !size.Valid {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	return utils.FormatFileSize(size.Int64)
 }

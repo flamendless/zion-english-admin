@@ -60,7 +60,7 @@ func NormalizeEmail(email string) string {
 }
 
 // ProfileNameEditable reports whether a teacher may set this name field on their profile.
-// It checks the raw stored database value only; display placeholders such as "-" are never used.
+// It checks the raw stored database value only; display placeholders such as constants.DisplayNotSet are never used.
 func ProfileNameEditable(stored string) bool {
 	return stored == ""
 }
@@ -78,7 +78,7 @@ func ComposePersonName(first, middle, last string) string {
 // TeacherCompactDisplayName shortens a full person name for list cells: first word plus last-name initial.
 func TeacherCompactDisplayName(fullName string) string {
 	fullName = strings.TrimSpace(fullName)
-	if fullName == "" || fullName == "-" {
+	if fullName == "" || fullName == constants.DisplayNotSet {
 		return fullName
 	}
 	parts := strings.Fields(fullName)

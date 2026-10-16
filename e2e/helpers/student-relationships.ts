@@ -6,7 +6,13 @@ export async function gotoStudentRelationships(page: Page) {
 }
 
 export async function focusStudentOnDiagram(page: Page, studentName: string) {
-	await page.locator("#diagramStudentSearch").fill(studentName);
+	await Promise.all([
+		page.waitForResponse(
+			(r) => r.url().includes("/student-relationships/partials/student-search") && r.ok(),
+			{ timeout: 20_000 },
+		),
+		page.locator("#diagramStudentSearch").fill(studentName),
+	]);
 	await expect(page.locator(".entity-search-item", { hasText: studentName })).toBeVisible({
 		timeout: 15_000,
 	});

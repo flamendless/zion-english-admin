@@ -16,19 +16,20 @@ func GetAllStudents(db Service) ([]Student, error) {
 	students := make([]Student, len(rows))
 	for i, row := range rows {
 		students[i] = Student{
-			ID:             row.ID,
-			Name:           row.Name,
-			Currency:       row.Currency,
-			Contact:        row.Contact,
-			RatePerClass:   row.RatePerClass,
-			ParentName:     row.ParentName,
-			ParentRate:     row.ParentRate,
-			ParentCurrency: row.ParentCurrency,
-			AssignedColor:  row.AssignedColor,
-			Status:         row.Status,
-			InactiveReason: row.InactiveReason,
-			CreatedAt:      row.CreatedAt,
-			UpdatedAt:      row.UpdatedAt,
+			ID:                  row.ID,
+			Name:                row.Name,
+			Currency:            row.Currency,
+			Contact:             row.Contact,
+			RatePerClass:        row.RatePerClass,
+			RateDurationMinutes: row.RateDurationMinutes,
+			ParentName:          row.ParentName,
+			ParentRate:          row.ParentRate,
+			ParentCurrency:      row.ParentCurrency,
+			AssignedColor:       row.AssignedColor,
+			Status:              row.Status,
+			InactiveReason:      row.InactiveReason,
+			CreatedAt:           row.CreatedAt,
+			UpdatedAt:           row.UpdatedAt,
 		}
 	}
 	return students, nil

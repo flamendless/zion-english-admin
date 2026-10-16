@@ -26,6 +26,7 @@ export async function fillRegisterTeacherForm(page: Page, data: RegisterTeacherD
 	await page.locator("#retypePassword").fill(data.password);
 	await page.locator("#currency").selectOption(data.currency);
 	await page.locator("#ratePerClass").fill(data.ratePerClass);
+	await page.locator("#rateDurationMinutes").selectOption("25");
 }
 
 export async function registerTeacher(page: Page, data: RegisterTeacherData) {
@@ -52,5 +53,5 @@ export async function registerTeacherAsSuperuser(page: Page, data: RegisterTeach
 	await page.locator("#q").fill(data.email);
 	await page.locator("#listFilterSubmit").click();
 	const row = page.locator("#teachersTable tbody tr", { hasText: data.email });
-	await expect(row).toContainText("Approved", { timeout: 15_000 });
+	await expect(row.getByRole("button", { name: "Un-approve" })).toBeVisible({ timeout: 15_000 });
 }

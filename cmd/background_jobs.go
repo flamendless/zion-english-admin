@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"zion-english/frontend"
 	"zion-english/internal/auth"
+	"zion-english/internal/constants"
 	"zion-english/internal/utils"
 )
 
@@ -16,7 +17,7 @@ func backgroundJobsForTeacher(ctx context.Context, teacherID int64) ([]frontend.
 	}
 	jobs := make([]frontend.PersistentJobView, 0, len(rows))
 	for _, row := range rows {
-		detail := "-"
+		detail := constants.DisplayNotSet
 		if row.OriginalFilename.Valid && row.OriginalFilename.String != "" {
 			detail = row.OriginalFilename.String
 		}

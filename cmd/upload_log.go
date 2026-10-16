@@ -66,7 +66,7 @@ func mapUploadLogFields(
 		kindEnum = inferUploadLogKindFromSummary(summary)
 	}
 
-	filenameDisplay := "-"
+	filenameDisplay := constants.DisplayNotSet
 	if filename.Valid && filename.String != "" {
 		filenameDisplay = filename.String
 	} else {
@@ -122,14 +122,14 @@ func parseUploadLogFilenameFromSummary(summary string) string {
 
 func formatUploadLogFileSize(size sql.NullInt64) string {
 	if !size.Valid {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	return utils.FormatFileSize(size.Int64)
 }
 
 func formatUploadLogCompressPreset(preset sql.NullString) string {
 	if !preset.Valid || preset.String == "" {
-		return "-"
+		return constants.DisplayNotSet
 	}
 	if !constants.ValidIntroVideoCompressPreset(preset.String) {
 		return preset.String

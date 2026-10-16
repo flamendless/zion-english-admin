@@ -1,6 +1,50 @@
 import { expect, Page } from "@playwright/test";
 import { loadCredentials } from "./credentials";
 
+const calendarMonthNames = [
+	"January",
+	"February",
+	"March",
+	"April",
+	"May",
+	"June",
+	"July",
+	"August",
+	"September",
+	"October",
+	"November",
+	"December",
+];
+
+function parseCalMonthLabel(label: string): { year: number; month: number } {
+	const parts = label.trim().split(/\s+/);
+	const year = parseInt(parts[parts.length - 1], 10);
+	const month = calendarMonthNames.indexOf(parts[0]) + 1;
+	return { year, month };
+}
+
+/** Schedule calendar only renders the visible month; jump prev/next until isoDate is on screen. */
+async function ensureScheduleCalendarShowsDate(page: Page, isoDate: string) {
+	const [targetYear, targetMonth] = isoDate.split("-").map((v) => parseInt(v, 10));
+	const dayBtn = page.locator(`#calendarGrid button.calendar-day[data-date="${isoDate}"]`);
+	const monthLabel = page.locator("#calMonthLabel");
+	for (let i = 0; i < 24; i++) {
+		if (await dayBtn.isVisible()) {
+			return;
+		}
+		const text = (await monthLabel.textContent())?.trim() ?? "";
+		const { year, month } = parseCalMonthLabel(text);
+		const nav = targetYear > year || (targetYear === year && targetMonth > month)
+			? page.locator("#calNext")
+			: page.locator("#calPrev");
+		await Promise.all([
+			page.waitForResponse((r) => r.url().includes("/api/scheduled-classes") && r.ok()),
+			nav.click(),
+		]);
+	}
+	await expect(dayBtn).toBeVisible({ timeout: 15_000 });
+}
+
 export async function gotoSchedule(page: Page) {
 	await page.goto("schedule");
 	await expect(page.getByRole("heading", { name: "Class Schedule" })).toBeVisible();
@@ -20,15 +64,15 @@ export async function expectCalendarMonthChanges(page: Page) {
 
 export async function openScheduleDay(page: Page, isoDate: string) {
 	await gotoSchedule(page);
+	await ensureScheduleCalendarShowsDate(page, isoDate);
 	const dayBtn = page.locator(`#calendarGrid button.calendar-day[data-date="${isoDate}"]`);
-	await expect(dayBtn).toBeVisible({ timeout: 15_000 });
-	await Promise.all([
-		page.waitForResponse(
-			(r) => r.url().includes("/schedule/partials/day-timeline") && r.ok(),
-		),
-		dayBtn.click(),
-	]);
-	await expect(page.locator("#scheduleModal")).toBeVisible();
+	await dayBtn.click();
+	await expect(page.locator("#scheduleModal")).toBeVisible({ timeout: 20_000 });
+	await page
+		.waitForResponse((r) => r.url().includes("/schedule/partials/day-timeline") && r.ok(), {
+			timeout: 20_000,
+		})
+		.catch(() => {});
 }
 
 function viewClassButton(page: Page, studentName: string) {
@@ -66,7 +110,8 @@ export async function openOverdueScheduledClass(page: Page) {
 	if (!isoDate) {
 		throw new Error("overdueScheduledDate missing from e2e credentials");
 	}
-	return openScheduledClassView(page, creds.studentName, isoDate);
+	const studentName = creds.siblingStudentName ?? creds.studentName;
+	return openScheduledClassView(page, studentName, isoDate);
 }
 
 export async function rescheduleViaEditModal(
