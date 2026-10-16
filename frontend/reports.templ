@@ -22,7 +22,8 @@ templ Reports() {
 				flex-shrink: 0;
 			}
 
-			.reports-header-actions .btn {
+			.reports-header-actions .btn,
+			.reports-header-actions .add-btn {
 				margin-top: 0;
 				width: auto;
 			}
@@ -52,36 +53,63 @@ templ Reports() {
 				document.body.classList.remove('modal-open');
 			};
 
-			document.body.addEventListener('htmx:afterSwap', function (evt) {
-				if (evt.detail.target.id === 'reportViewModalHost') {
-					document.body.classList.add('modal-open');
-					const overlay = evt.detail.target.querySelector('.modal-overlay');
-					const closeBtn = overlay && overlay.querySelector('.report-view-close');
-					if (closeBtn) closeBtn.focus();
-					return;
-				}
-				if (evt.detail.target.id === 'reportPaymentModalHost') {
-					document.body.classList.add('modal-open');
-					const overlay = evt.detail.target.querySelector('.modal-overlay');
-					const closeBtn = overlay && overlay.querySelector('.report-payment-close');
-					if (closeBtn) closeBtn.focus();
-				}
-			});
+			window.closeReportSummaryModal = function () {
+				const modal = document.getElementById('reportSummaryModal');
+				if (modal) modal.hidden = true;
+				document.body.classList.remove('modal-open');
+			};
 
-			document.body.addEventListener('click', function (e) {
-				if (e.target.closest('.report-view-close')) {
-					window.closeReportViewModal();
-					return;
-				}
-				if (e.target.closest('.report-payment-close')) {
-					window.closeReportPaymentModal();
-					return;
-				}
-				const viewOverlay = e.target.closest('#reportViewModal');
-				if (viewOverlay && e.target === viewOverlay) window.closeReportViewModal();
-				const paymentOverlay = e.target.closest('#reportPaymentModal');
-				if (paymentOverlay && e.target === paymentOverlay) window.closeReportPaymentModal();
-			});
+			function initReportsModalUI() {
+				if (!document.body) return;
+				document.body.addEventListener('htmx:afterSwap', function (evt) {
+					if (evt.detail.target.id === 'reportViewModalHost') {
+						document.body.classList.add('modal-open');
+						const overlay = evt.detail.target.querySelector('.modal-overlay');
+						const closeBtn = overlay && overlay.querySelector('.report-view-close');
+						if (closeBtn) closeBtn.focus();
+						return;
+					}
+					if (evt.detail.target.id === 'reportPaymentModalHost') {
+						document.body.classList.add('modal-open');
+						const overlay = evt.detail.target.querySelector('.modal-overlay');
+						const closeBtn = overlay && overlay.querySelector('.report-payment-close');
+						if (closeBtn) closeBtn.focus();
+					}
+				});
+
+				document.body.addEventListener('click', function (e) {
+					if (e.target.closest('.report-view-close')) {
+						window.closeReportViewModal();
+						return;
+					}
+					if (e.target.closest('.report-payment-close')) {
+						window.closeReportPaymentModal();
+						return;
+					}
+					if (e.target.closest('[data-open-report-summary-modal]')) {
+						if (typeof window.openReportSummaryModal === 'function') {
+							window.openReportSummaryModal();
+						}
+						return;
+					}
+					if (e.target.closest('.report-summary-close')) {
+						window.closeReportSummaryModal();
+						return;
+					}
+					const viewOverlay = e.target.closest('#reportViewModal');
+					if (viewOverlay && e.target === viewOverlay) window.closeReportViewModal();
+					const paymentOverlay = e.target.closest('#reportPaymentModal');
+					if (paymentOverlay && e.target === paymentOverlay) window.closeReportPaymentModal();
+					const summaryOverlay = e.target.closest('#reportSummaryModal');
+					if (summaryOverlay && e.target === summaryOverlay) window.closeReportSummaryModal();
+				});
+			}
+
+			if (document.body) {
+				initReportsModalUI();
+			} else {
+				document.addEventListener('DOMContentLoaded', initReportsModalUI);
+			}
 
 			document.addEventListener('keydown', function (e) {
 				if (e.key === 'Escape' && document.getElementById('reportViewModalHost')?.innerHTML) {
@@ -89,6 +117,10 @@ templ Reports() {
 				}
 				if (e.key === 'Escape' && document.getElementById('reportPaymentModalHost')?.innerHTML) {
 					window.closeReportPaymentModal();
+				}
+				const summaryModal = document.getElementById('reportSummaryModal');
+				if (e.key === 'Escape' && summaryModal && !summaryModal.hidden) {
+					window.closeReportSummaryModal();
 				}
 			});
 		</script>
@@ -102,6 +134,7 @@ templ Reports() {
 				<div class="reports-header-actions">
 					<a href={ utils.URL("/reports/history") } class="btn btn-secondary">View History</a>
 					<a href={ utils.URL("/payments") } class="btn btn-secondary">View Payment History</a>
+					<button type="button" class="add-btn" data-open-report-summary-modal>Generate Summary</button>
 				</div>
 			</div>
 
@@ -134,19 +167,6 @@ templ Reports() {
 					>Filter</button>
 					@CutoffLegend()
 				</div>
-				<form
-					method="GET"
-					action={ utils.URL("/reports/summary") }
-					id="reportSummaryForm"
-					class="report-summary-form"
-					onsubmit="syncReportSummaryForm(event)"
-				>
-					<input type="hidden" name="q" id="summaryQ" value=""/>
-					<input type="hidden" name="datePreset" id="summaryDatePreset" value=""/>
-					<input type="hidden" name="roleTeacher" id="summaryRoleTeacher" value=""/>
-					<input type="hidden" name="roleAdmin" id="summaryRoleAdmin" value=""/>
-					<button type="submit" class="btn">Generate Summary</button>
-				</form>
 			</div>
 
 			<div class="table-wrapper data-list-view-root">
@@ -177,11 +197,10 @@ templ Reports() {
 
 			<div id="reportViewModalHost"></div>
 			<div id="reportPaymentModalHost"></div>
+			@ReportSummaryModal()
 		</div>
 
 		<script>
-			const reportSearch = document.getElementById('reportSearch');
-
 			function setDateRangeFromPreset(select) {
 				if (!select) return;
 				if (!select.value) {
@@ -195,24 +214,97 @@ templ Reports() {
 				select.dataset.endDate = parts[1];
 			}
 
+			let toolbarDatePresetBound = false;
 			function bindDatePresetSelect() {
 				const datePresetSelect = document.getElementById('datePreset');
-				if (!datePresetSelect) return;
+				if (!datePresetSelect || toolbarDatePresetBound) return;
+				toolbarDatePresetBound = true;
 				setDateRangeFromPreset(datePresetSelect);
 				datePresetSelect.addEventListener('change', () => {
 					setDateRangeFromPreset(datePresetSelect);
 				});
 			}
 
+			let summaryDatePresetBound = false;
+			function bindSummaryDatePresetSelect() {
+				const datePresetSelect = document.getElementById('summaryDatePreset');
+				if (!datePresetSelect) return;
+				setDateRangeFromPreset(datePresetSelect);
+				if (summaryDatePresetBound) return;
+				summaryDatePresetBound = true;
+				datePresetSelect.addEventListener('change', () => {
+					setDateRangeFromPreset(datePresetSelect);
+				});
+			}
+
+			window.validateReportSummaryForm = function (e) {
+				const presetField = document.getElementById('summaryDatePreset');
+				if (!presetField || !presetField.value) {
+					e.preventDefault();
+					alert('Select a date range first.');
+					return false;
+				}
+				return true;
+			};
+
+			window.openReportSummaryModal = function () {
+				const modal = document.getElementById('reportSummaryModal');
+				if (!modal) return;
+				const toolbarMonth = document.getElementById('reportMonth');
+				const summaryMonth = document.getElementById('summaryReportMonth');
+				const toolbarPreset = document.getElementById('datePreset');
+				let monthChanged = false;
+				if (toolbarMonth && summaryMonth) {
+					monthChanged = toolbarMonth.value !== summaryMonth.value;
+					summaryMonth.value = toolbarMonth.value;
+				}
+				const applyPresetAndRoles = function () {
+					const summaryPreset = document.getElementById('summaryDatePreset');
+					if (toolbarPreset && summaryPreset && toolbarPreset.value) {
+						summaryPreset.value = toolbarPreset.value;
+						setDateRangeFromPreset(summaryPreset);
+					}
+					const srcTeacher = document.querySelector('#reportsFilters input[name="roleTeacher"]');
+					const srcAdmin = document.querySelector('#reportsFilters input[name="roleAdmin"]');
+					const dstTeacher = document.querySelector('#reportSummaryForm input[name="roleTeacher"]');
+					const dstAdmin = document.querySelector('#reportSummaryForm input[name="roleAdmin"]');
+					if (srcTeacher && dstTeacher) dstTeacher.checked = srcTeacher.checked;
+					if (srcAdmin && dstAdmin) dstAdmin.checked = srcAdmin.checked;
+				};
+				if (monthChanged && summaryMonth) {
+					window._reportSummaryPrefillAfterSwap = applyPresetAndRoles;
+					summaryMonth.dispatchEvent(new Event('change', { bubbles: true }));
+				} else {
+					applyPresetAndRoles();
+					bindSummaryDatePresetSelect();
+				}
+				modal.hidden = false;
+				document.body.classList.add('modal-open');
+				const closeBtn = modal.querySelector('.report-summary-close');
+				if (closeBtn) closeBtn.focus();
+			};
+
 			bindDatePresetSelect();
+			bindSummaryDatePresetSelect();
 
 			document.body.addEventListener('htmx:afterSwap', function (evt) {
-				if (evt.detail.target.id !== 'datePresetGroup') return;
-				bindDatePresetSelect();
-				const reportsPage = document.getElementById('reportsPage');
-				if (reportsPage) reportsPage.value = '1';
-				if (typeof htmx !== 'undefined') {
-					htmx.trigger('#reportsTableBody', 'load');
+				if (evt.detail.target.id === 'datePresetGroup') {
+					toolbarDatePresetBound = false;
+					bindDatePresetSelect();
+					const reportsPage = document.getElementById('reportsPage');
+					if (reportsPage) reportsPage.value = '1';
+					if (typeof htmx !== 'undefined') {
+						htmx.trigger('#reportsTableBody', 'load');
+					}
+					return;
+				}
+				if (evt.detail.target.id === 'summaryDatePresetGroup') {
+					summaryDatePresetBound = false;
+					bindSummaryDatePresetSelect();
+					if (typeof window._reportSummaryPrefillAfterSwap === 'function') {
+						window._reportSummaryPrefillAfterSwap();
+						window._reportSummaryPrefillAfterSwap = null;
+					}
 				}
 			});
 
@@ -224,15 +316,18 @@ templ Reports() {
 				});
 			}
 
-			reportSearch.addEventListener('keydown', function (e) {
-				if (e.key === 'Enter') {
-					e.preventDefault();
-					if (reportsPage) reportsPage.value = '1';
-					if (typeof htmx !== 'undefined') {
-						htmx.trigger('#reportsTableBody', 'load');
+			const reportSearch = document.getElementById('reportSearch');
+			if (reportSearch) {
+				reportSearch.addEventListener('keydown', function (e) {
+					if (e.key === 'Enter') {
+						e.preventDefault();
+						if (reportsPage) reportsPage.value = '1';
+						if (typeof htmx !== 'undefined') {
+							htmx.trigger('#reportsTableBody', 'load');
+						}
 					}
-				}
-			});
+				});
+			}
 
 			document.body.addEventListener('click', function (e) {
 				const pageBtn = e.target.closest('#paginationBottom .pagination-btn[hx-get]');
@@ -245,32 +340,6 @@ templ Reports() {
 				} catch (err) { /* ignore */ }
 			});
 
-			window.syncReportSummaryForm = function (e) {
-				const search = document.getElementById('reportSearch');
-				const preset = document.getElementById('datePreset');
-				const qField = document.getElementById('summaryQ');
-				const presetField = document.getElementById('summaryDatePreset');
-				const roleTeacher = document.querySelector('#reportsFilters input[name="roleTeacher"]');
-				const roleAdmin = document.querySelector('#reportsFilters input[name="roleAdmin"]');
-				const summaryRoleTeacher = document.getElementById('summaryRoleTeacher');
-				const summaryRoleAdmin = document.getElementById('summaryRoleAdmin');
-				if (search && qField) {
-					qField.value = search.value || '';
-				}
-				if (preset && presetField) {
-					presetField.value = preset.value || '';
-				}
-				if (summaryRoleTeacher) {
-					summaryRoleTeacher.value = roleTeacher && roleTeacher.checked ? '1' : '';
-				}
-				if (summaryRoleAdmin) {
-					summaryRoleAdmin.value = roleAdmin && roleAdmin.checked ? '1' : '';
-				}
-				if (!presetField || !presetField.value) {
-					e.preventDefault();
-					alert('Select a date range first.');
-				}
-			};
 		</script>
 	@LayoutEnd()
 	</body>

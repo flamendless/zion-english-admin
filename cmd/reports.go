@@ -76,6 +76,18 @@ func handleReportsDatePresetPartial(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleReportsSummaryDatePresetPartial(w http.ResponseWriter, r *http.Request) {
+	if !requireMethod(w, r, http.MethodGet) {
+		return
+	}
+
+	month := strings.TrimSpace(r.URL.Query().Get("month"))
+	writeHTML(w)
+	if err := frontend.DatePresetForMonthScoped(month, true, "summaryDatePresetGroup", "summaryDatePreset").Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func handleReportsPartial(w http.ResponseWriter, r *http.Request) {
 	if !requireMethod(w, r, http.MethodGet) {
 		return

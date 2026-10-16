@@ -1,0 +1,48 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+templ ReportSummaryModal() {
+	<div class="modal-overlay" id="reportSummaryModal" hidden role="presentation">
+		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="reportSummaryTitle">
+			<form
+				method="GET"
+				action={ utils.URL("/reports/summary") }
+				id="reportSummaryForm"
+				onsubmit="return validateReportSummaryForm(event)"
+			>
+				<div class="modal-header">
+					<h3 id="reportSummaryTitle">Generate summary</h3>
+					<button type="button" class="modal-close report-summary-close" aria-label="Close">&times;</button>
+				</div>
+				<div class="modal-body report-summary-modal-body">
+					@MonthPickerTarget("summaryReportMonth", utils.URL("/reports/partials/summary-date-preset"), "summaryDatePresetGroup")
+					@DatePresetForMonthScoped(utils.CurrentMonthPHT(), true, "summaryDatePresetGroup", "summaryDatePreset")
+					@ReportRolesFilterDropdownScoped(true, false, "summaryRolesFilterLabel")
+				</div>
+				<div class="modal-footer report-summary-modal-footer">
+					<button type="button" class="btn btn-secondary report-summary-close">Cancel</button>
+					<button type="submit" class="btn">Generate</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<style>
+		.report-summary-modal-body {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-4);
+		}
+
+		.report-summary-modal-footer {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-2);
+		}
+
+		.report-summary-modal-footer .btn {
+			margin-top: 0;
+		}
+	</style>
+}

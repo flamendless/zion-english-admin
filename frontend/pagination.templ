@@ -127,13 +127,17 @@ func reportRolesFilterSummary(roleTeacher bool, roleAdmin bool) string {
 }
 
 templ ReportRolesFilterDropdown(roleTeacher bool, roleAdmin bool) {
+	@ReportRolesFilterDropdownScoped(roleTeacher, roleAdmin, "rolesFilterLabel")
+}
+
+templ ReportRolesFilterDropdownScoped(roleTeacher bool, roleAdmin bool, labelID string) {
 	<div class="form-group">
-		<span class="toolbar-filter-dropdown-label" id="rolesFilterLabel">Roles</span>
+		<span class="toolbar-filter-dropdown-label" id={ labelID }>Roles</span>
 		<details class="toolbar-filter-dropdown">
-			<summary class="toolbar-filter-dropdown-trigger" aria-labelledby="rolesFilterLabel">
+			<summary class="toolbar-filter-dropdown-trigger" aria-labelledby={ labelID }>
 				{ reportRolesFilterSummary(roleTeacher, roleAdmin) }
 			</summary>
-			<div class="toolbar-filter-dropdown-panel" role="group" aria-labelledby="rolesFilterLabel">
+			<div class="toolbar-filter-dropdown-panel" role="group" aria-labelledby={ labelID }>
 				<label class="checkbox-label">
 					<input type="checkbox" name="roleTeacher" value="1" checked?={ roleTeacher }/>
 					{ featureFlagRoleLabel(constants.TeacherRoleTeacher) }
