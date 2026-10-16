@@ -36,20 +36,13 @@ templ Classes(data ClassesData) {
 		@ScrTimeRangeJS()
 		@AvatarStyles()
 		<style>
-			.time-range-cell {
-				font-variant-numeric: tabular-nums;
-				vertical-align: top;
-			}
-
-			.time-range-stack {
-				display: flex;
-				flex-direction: column;
-				gap: 2px;
-				line-height: 1.25;
-			}
-
-			.time-range-stack__line {
+			#classesTable .class-record-date-cell,
+			#classesTable .time-range-cell,
+			#hubClassesTable .class-record-date-cell,
+			#hubClassesTable .time-range-cell {
 				white-space: nowrap;
+				font-variant-numeric: tabular-nums;
+				vertical-align: middle;
 			}
 
 			#classesTable td[data-label="Teacher"],
@@ -58,7 +51,9 @@ templ Classes(data ClassesData) {
 			}
 
 			#classesTable th.class-record-status-col,
-			#classesTable td.class-record-status-cell {
+			#classesTable td.class-record-status-cell,
+			#hubClassesTable th.class-record-status-col,
+			#hubClassesTable td.class-record-status-cell {
 				width: 2.75rem;
 				max-width: 2.75rem;
 				padding-left: 12px;

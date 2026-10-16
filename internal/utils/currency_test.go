@@ -50,3 +50,30 @@ func TestFormatCurrency(t *testing.T) {
 		t.Fatalf("FormatCurrency(13775, PHP) = %q, want %q", got, "13,775.00 PHP")
 	}
 }
+
+func TestFormatCurrencyCompact(t *testing.T) {
+	got := FormatCurrencyCompact(90, "PHP")
+	if got != "₱90" {
+		t.Fatalf("FormatCurrencyCompact(90, PHP) = %q, want %q", got, "₱90")
+	}
+}
+
+func TestFormatRatePerDuration(t *testing.T) {
+	tests := []struct {
+		amount   float64
+		currency string
+		minutes  int
+		expected string
+	}{
+		{90, "PHP", 25, "₱90/25 min."},
+		{90.5, "PHP", 25, "₱90.50/25 min."},
+		{13775, "KRW", 25, "₩13775/25 min."},
+		{100, "PHP", 0, "₱100"},
+	}
+	for _, tc := range tests {
+		got := FormatRatePerDuration(tc.amount, tc.currency, tc.minutes)
+		if got != tc.expected {
+			t.Fatalf("FormatRatePerDuration(%v, %q, %d) = %q, want %q", tc.amount, tc.currency, tc.minutes, got, tc.expected)
+		}
+	}
+}

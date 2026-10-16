@@ -77,7 +77,7 @@ func TableTruncatedText(fullText string) templ.Component {
 }
 
 func formatRate(rate float64, currency string) string {
-	return utils.FormatCurrency(rate, currency)
+	return utils.FormatCurrencyCompact(rate, currency)
 }
 
 func formatRateAmount(rate float64, currency string) string {

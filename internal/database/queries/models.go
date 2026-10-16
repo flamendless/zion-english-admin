@@ -314,6 +314,32 @@ type TblScheduledClassSeries struct {
 	CreatedAt     string
 }
 
+type TblSqlConsoleQueryLog struct {
+	ID             int64
+	QueryText      string
+	SavedQueryID   sql.NullInt64
+	Outcome        string
+	ErrorMessage   sql.NullString
+	DurationMs     sql.NullInt64
+	ColumnCount    sql.NullInt64
+	RowsReturned   sql.NullInt64
+	QueryLength    sql.NullInt64
+	Truncated      int64
+	ExecutedBy     sql.NullInt64
+	ExecutedByName string
+	CreatedAt      string
+}
+
+type TblSqlConsoleSavedQuery struct {
+	ID            int64
+	Name          string
+	QueryText     string
+	CreatedBy     sql.NullInt64
+	CreatedByName string
+	CreatedAt     string
+	UpdatedAt     string
+}
+
 type TblStudent struct {
 	ID                  int64
 	Name                string

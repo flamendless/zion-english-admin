@@ -105,7 +105,7 @@ func (r ClassRecordRowData) RowClass() string {
 }
 
 func (r ClassRecordRowData) RateLabel() string {
-	return fmt.Sprintf("%g %s", r.Rate, r.Currency)
+	return utils.FormatCurrencyCompact(r.Rate, r.Currency)
 }
 
 func (r ClassRecordRowData) StartTimeDisplay() string {
@@ -124,33 +124,6 @@ func (r ClassRecordRowData) EndTimeDisplay() string {
 
 func (r ClassRecordRowData) TimeRangeDisplay() string {
 	return FormatScheduledClassTimeRange(r.StartTime, r.EndTime, r.DurationMinutes)
-}
-
-func (r ClassRecordRowData) timeRangeEnd() string {
-	end := normalizeDisplayTime(r.EndTime)
-	if end == "" {
-		start := normalizeDisplayTime(r.StartTime)
-		if start != "" && r.DurationMinutes > 0 {
-			end = utils.EndTimeFromStartAndDuration(start, r.DurationMinutes)
-		}
-	}
-	return end
-}
-
-func (r ClassRecordRowData) TimeRangeStartLine() string {
-	start := normalizeDisplayTime(r.StartTime)
-	if start == "" {
-		return constants.DisplayNotSet
-	}
-	return start + " -"
-}
-
-func (r ClassRecordRowData) TimeRangeEndLine() string {
-	end := r.timeRangeEnd()
-	if end == "" {
-		return constants.DisplayNotSet
-	}
-	return end
 }
 
 func (r ClassRecordRowData) StatusIconLabel() string {

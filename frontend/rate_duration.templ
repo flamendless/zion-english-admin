@@ -21,3 +21,10 @@ func formatRatePerDurationDisplay(rate float64, currency string, durationMinutes
 	}
 	return utils.FormatRatePerDuration(rate, currency, int(durationMinutes))
 }
+
+func formatRatePillLabel(rate float64, currency string, durationMinutes int) string {
+	if durationMinutes > 0 {
+		return formatRatePerDurationDisplay(rate, currency, int64(durationMinutes))
+	}
+	return utils.FormatCurrencyCompact(rate, currency)
+}

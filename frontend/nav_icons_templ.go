@@ -250,6 +250,11 @@ func NavIconSVG(kind NavIconKind) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+		case NavIconSQLConsole:
+			templ_7745c5c3_Err = navIconSVGCode().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		case NavIconMeta:
 			templ_7745c5c3_Err = navIconSVGCode().Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {

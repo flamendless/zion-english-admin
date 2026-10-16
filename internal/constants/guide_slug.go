@@ -12,5 +12,6 @@ const (
 	GuideSlugReportsAndGeneration  GuideSlug = "reports-and-generation"
 	GuideSlugAds                   GuideSlug = "ads"
 	GuideSlugAffiliates            GuideSlug = "affiliates"
+	GuideSlugSQLConsole            GuideSlug = "sql-console"
 	GuideSlugFAQ                   GuideSlug = "faq"
 )

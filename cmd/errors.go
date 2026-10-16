@@ -10,6 +10,7 @@ var (
 	ErrUnauthorized                = errors.New(MsgUnauthorized)
 	ErrNotFound                    = errors.New(MsgNotFound)
 	ErrAccessDenied                = errors.New(MsgAccessDenied)
+	ErrSQLConsoleInvalidForm       = errors.New("[SQL CONSOLE] invalid form submission")
 	ErrMissingRequiredParameters   = errors.New("missing required parameters")
 	ErrMissingNumericValue         = errors.New("missing numeric value")
 	ErrMissingIntegerValue         = errors.New("missing integer value")

@@ -339,6 +339,7 @@ func scheduledClassDetailAttrs(item ScheduledClassItemData) templ.Attributes {
 		"data-time-range":          item.TimeRange,
 		"data-duration":            formatDurationMinutes(item.DurationMinutes),
 		"data-rate":                formatRateAmount(item.Rate, item.Currency),
+		"data-rate-display":        utils.FormatCurrencyCompact(item.Rate, item.Currency),
 		"data-currency":            item.Currency,
 		"data-teacher-initials":    item.TeacherAvatar.Initials,
 		"data-teacher-color":       item.TeacherAvatar.AssignedColor,

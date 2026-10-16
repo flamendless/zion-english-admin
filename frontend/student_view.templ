@@ -18,9 +18,7 @@ templ StudentViewModal(data EditStudentData) {
 							@StudentNameCell(data.Name, data.StudentNumber, data.Avatar)
 							@StatusPill(capitalizeStatus(data.Status), StudentStatusPillTone(data.Status), true)
 							<div class="entity-view-rate-block">
-								<div class="entity-view-rate-highlight">
-									<span class="entity-view-rate-highlight-amount">{ formatRatePerDurationDisplay(data.RatePerClass, data.Currency, data.RateDurationMinutes) }</span>
-								</div>
+								<div class="entity-view-rate-highlight">{ formatRatePerDurationDisplay(data.RatePerClass, data.Currency, data.RateDurationMinutes) }</div>
 							</div>
 						</div>
 					</div>

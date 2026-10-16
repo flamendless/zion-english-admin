@@ -1,6 +1,7 @@
 unreleased:
   breaking_changes: []
-  new_features: []
+  new_features:
+    - text: "Superusers get a SQL console under Admin to run read-only SELECT queries with execution stats, saved queries, and query history."
   improvements: []
   bug_fixes: []
   removed: []

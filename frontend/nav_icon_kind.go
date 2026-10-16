@@ -27,6 +27,7 @@ const (
 	NavIconProcess             NavIconKind = "process"
 	NavIconFeatureFlags        NavIconKind = "feature-flags"
 	NavIconSettings            NavIconKind = "settings"
+	NavIconSQLConsole          NavIconKind = "sql-console"
 	NavIconMeta                NavIconKind = "meta"
 	NavIconAffiliates          NavIconKind = "affiliates"
 	NavIconAds                 NavIconKind = "ads"
@@ -76,6 +77,7 @@ var navIconByPath = map[string]NavIconKind{
 	"/process":               NavIconProcess,
 	"/feature-flags":         NavIconFeatureFlags,
 	"/settings":              NavIconSettings,
+	"/sql-console":           NavIconSQLConsole,
 	"/meta":                  NavIconMeta,
 	"/affiliates":            NavIconAffiliates,
 	"/ads":                   NavIconAds,
@@ -120,6 +122,7 @@ var navIconToneByKind = map[NavIconKind]NavIconTone{
 	NavIconProcess:             NavIconToneWarning,
 	NavIconFeatureFlags:        NavIconToneWarning,
 	NavIconSettings:            NavIconToneWarning,
+	NavIconSQLConsole:          NavIconToneWarning,
 	NavIconMeta:                NavIconToneWarning,
 	NavIconAffiliates:          NavIconToneWarning,
 	NavIconAds:                 NavIconToneWarning,

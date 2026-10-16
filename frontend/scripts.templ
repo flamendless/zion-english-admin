@@ -35,6 +35,46 @@ templ ScrClipboardHelpers() {
 	</script>
 }
 
+templ ScrCurrencyCompact() {
+	<script>
+		window.zionCurrencySymbol = function (code) {
+			switch (code) {
+				case 'KRW': return '₩';
+				case 'CAD': return 'C$';
+				case 'YEN': return '¥';
+				case 'PHP': return '₱';
+				default: return '';
+			}
+		};
+
+		window.zionFormatCurrencyCompact = function (amount, currency) {
+			var sym = window.zionCurrencySymbol(currency);
+			var n = parseFloat(amount);
+			if (isNaN(n)) {
+				return sym + String(amount || '');
+			}
+			var s = currency === 'PHP'
+				? n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+				: n.toFixed(2);
+			if (s.endsWith('.00')) {
+				s = s.slice(0, -3);
+			}
+			return sym + s;
+		};
+
+		window.zionFillRatePill = function (el, label) {
+			if (!el) return;
+			var text = label || '-';
+			el.textContent = '';
+			var pill = document.createElement('span');
+			pill.className = 'pill pill--info rate-pill';
+			pill.setAttribute('aria-label', text);
+			pill.textContent = text;
+			el.appendChild(pill);
+		};
+	</script>
+}
+
 templ ScrTeacherCompactName() {
 	<script>
 		window.formatTeacherCompactName = function (fullName) {

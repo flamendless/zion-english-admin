@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"zion-english/internal/constants"
 )
 
 func FormatCurrencyAmount(amount float64, currency string) string {
@@ -24,11 +26,24 @@ func FormatCurrency(amount float64, currency string) string {
 	return fmt.Sprintf("%s %s", FormatCurrencyAmountFixed(amount, currency), currency)
 }
 
+func FormatCurrencyCompact(amount float64, currency string) string {
+	return constants.CurrencySymbol(currency) + formatCompactCurrencyAmount(amount, currency)
+}
+
 func FormatRatePerDuration(amount float64, currency string, durationMinutes int) string {
+	labeled := FormatCurrencyCompact(amount, currency)
 	if durationMinutes <= 0 {
-		return FormatCurrency(amount, currency)
+		return labeled
 	}
-	return fmt.Sprintf("%s %s per %d minutes", FormatCurrencyAmountFixed(amount, currency), currency, durationMinutes)
+	return fmt.Sprintf("%s/%d min.", labeled, durationMinutes)
+}
+
+func formatCompactCurrencyAmount(amount float64, currency string) string {
+	s := FormatCurrencyAmountFixed(amount, currency)
+	if strings.HasSuffix(s, ".00") {
+		return s[:len(s)-3]
+	}
+	return s
 }
 
 func formatPHPAmount(amount float64) string {

@@ -350,6 +350,9 @@ templ EntityViewModalStyles() {
 			border-radius: var(--radius-full);
 			background: var(--color-surface);
 			border: 1px solid var(--color-border-subtle);
+			font-size: 1rem;
+			font-weight: 700;
+			color: var(--color-foreground);
 			font-variant-numeric: tabular-nums;
 		}
 
@@ -481,8 +484,7 @@ templ EntityViewRateStat(amount float64, currency string) {
 	<div class="entity-view-stat">
 		<span class="entity-view-stat-label">Rate</span>
 		<span class="entity-view-stat-value entity-view-stat-value--rate">
-			{ utils.FormatCurrencyAmountFixed(amount, currency) }
-			<span class="entity-view-rate-currency">{ currency }</span>
+			{ utils.FormatCurrencyCompact(amount, currency) }
 		</span>
 	</div>
 }

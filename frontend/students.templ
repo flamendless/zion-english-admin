@@ -70,23 +70,9 @@ templ Students(data StudentData) {
 				color: var(--color-muted-foreground);
 			}
 
-			.rate-value {
-				display: inline-flex;
-				align-items: baseline;
-				gap: var(--space-1);
-				font-variant-numeric: tabular-nums;
-			}
-
-			.rate-amount {
+			#studentsTable .rate-cell {
 				font-weight: 600;
-				color: var(--color-foreground);
-			}
-
-			.rate-currency {
-				font-size: 0.8125rem;
-				font-weight: 500;
-				color: var(--color-muted-foreground);
-				letter-spacing: 0.02em;
+				font-variant-numeric: tabular-nums;
 			}
 
 			.list-active-filter-note {
@@ -190,12 +176,7 @@ templ Students(data StudentData) {
 											{ constants.DisplayNotSet }
 										}
 									</td>
-									<td class="rate-cell" data-label="Rate">
-										<span class="rate-value">
-											<span class="rate-amount">{ formatRatePerDurationDisplay(student.RatePerClass, student.Currency, student.RateDurationMinutes) }</span>
-											<span class="rate-currency">{ student.Currency }</span>
-										</span>
-									</td>
+									<td class="rate-cell" data-label="Rate">{ formatRatePerDurationDisplay(student.RatePerClass, student.Currency, student.RateDurationMinutes) }</td>
 									<td data-label="Related To">{ getDisplayValue(student.RelatedToDisplay) }</td>
 									<td data-label="Actions">
 										<div class="table-actions">

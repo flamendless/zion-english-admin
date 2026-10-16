@@ -386,6 +386,88 @@ templ GuideAffiliates() {
 	</html>
 }
 
+templ GuideSQLConsole() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		@AdminPageHead("SQL Console - Guides - Zion English Admin Tool")
+		@GuideStyles()
+	</head>
+	<body>
+		<div class="container guides-page">
+			@HeaderSimple()
+
+			<nav class="guides-breadcrumb" aria-label="Breadcrumb">
+				<a href={ utils.URL("/guides") } class="guides-breadcrumb-link">Guides</a>
+				<span class="guides-breadcrumb-sep" aria-hidden="true">/</span>
+				<span class="guides-breadcrumb-current" aria-current="page">SQL Console</span>
+			</nav>
+
+			<div class="hub-header">
+				<h2 class="hub-title admin-only-label-wrap">
+					SQL Console
+					@AdminOnlyIndicator()
+				</h2>
+			</div>
+
+			<div class="guides-hero">
+				<p class="guides-subtitle">
+					How superusers run read-only SELECT queries against the application database, save named queries, and review execution history.
+				</p>
+			</div>
+
+			<div class="guide-content">
+				@GuideSection(
+					"sql-console-run",
+					"Running queries",
+					utils.URL("/sql-console"),
+					"Open SQL Console under Admin.",
+					[]string{
+						"Only SELECT and WITH queries are accepted. INSERT, UPDATE, DELETE, DDL, EXPLAIN, and PRAGMA are blocked.",
+						"Each run shows elapsed time, column count, rows returned, row limit, truncation, and query size.",
+						"Results are capped (500 rows by default). Truncation means more rows matched but were not loaded.",
+						"Runs use a read-only database connection with query_only enabled.",
+					},
+					false,
+				)
+				@GuideSection(
+					"sql-console-saved",
+					"Saved queries",
+					utils.URL("/sql-console"),
+					"Use Save query to store the editor text under a unique name.",
+					[]string{
+						"Load fills the editor and links the next run to that saved query in history.",
+						"Edit updates the name and SQL. Delete removes the bookmark (history rows keep the SQL text).",
+					},
+					false,
+				)
+				@GuideSection(
+					"sql-console-history",
+					"Query history",
+					utils.URL("/sql-console"),
+					"Every Run attempt is logged in the history panel.",
+					[]string{
+						"Outcomes: succeeded, failed (database error), or rejected (validation failed).",
+						"History stores the full query text and stats. It is not purged automatically; use pagination to browse older runs.",
+						"SQLite does not report table rows scanned without EXPLAIN; rows returned is the count loaded into the UI.",
+					},
+					false,
+				)
+			</div>
+
+			<div class="guides-footer">
+				<a href={ utils.URL("/guides") } class="guides-back-link">
+					@GuideBackIcon()
+					All guides
+				</a>
+			</div>
+		</div>
+		@GuideAnchorScript()
+	@LayoutEnd()
+	</body>
+	</html>
+}
+
 templ GuideAds() {
 	<!DOCTYPE html>
 	<html lang="en">

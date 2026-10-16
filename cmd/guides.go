@@ -78,6 +78,12 @@ func handleGuides(w http.ResponseWriter, r *http.Request) {
 				Description: "Import Shopee product CSVs, manage the catalog, and track affiliate link clicks.",
 				Access:      "superuser",
 			},
+			{
+				Slug:        constants.GuideSlugSQLConsole,
+				Title:       "SQL Console",
+				Description: "Run read-only SELECT queries, save bookmarks, and review query history.",
+				Access:      "superuser",
+			},
 		},
 	}
 
@@ -114,6 +120,8 @@ func handleGuidesPath(w http.ResponseWriter, r *http.Request) {
 		handleGuideAds(w, r)
 	case constants.GuideSlugAffiliates:
 		handleGuideAffiliates(w, r)
+	case constants.GuideSlugSQLConsole:
+		handleGuideSQLConsole(w, r)
 	default:
 		HttpError(w, MsgNotFound, http.StatusNotFound)
 	}
@@ -206,6 +214,16 @@ func handleGuideAffiliates(w http.ResponseWriter, r *http.Request) {
 
 	if err := frontend.GuideAffiliates().Render(r.Context(), w); err != nil {
 		logs.Log().Error("failed to render affiliates guide", zap.Error(err))
+	}
+}
+
+func handleGuideSQLConsole(w http.ResponseWriter, r *http.Request) {
+	if !requireMethod(w, r, http.MethodGet) {
+		return
+	}
+
+	if err := frontend.GuideSQLConsole().Render(r.Context(), w); err != nil {
+		logs.Log().Error("failed to render sql console guide", zap.Error(err))
 	}
 }
 

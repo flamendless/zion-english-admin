@@ -834,13 +834,11 @@ templ ClassWizardScript() {
 					'</span>';
 			}
 
-			function fillRatePill(el, rate, currency) {
-				if (!el) return;
-				el.innerHTML =
-					'<span class="pill pill--info rate-pill" aria-label="' + escapeHtml(rate + ' ' + currency) + '">' +
-					'<span class="rate-pill-amount">' + escapeHtml(rate) + '</span>' +
-					'<span class="rate-pill-currency">' + escapeHtml(currency) + '</span>' +
-					'</span>';
+			function fillRatePill(el, rate, currency, rateDisplay) {
+				const label = rateDisplay
+					|| (window.zionFormatCurrencyCompact && window.zionFormatCurrencyCompact(rate, currency))
+					|| (rate + ' ' + currency);
+				window.zionFillRatePill(el, label);
 			}
 
 			function fillDurationPill(el, label) {

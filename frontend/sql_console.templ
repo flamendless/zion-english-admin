@@ -1,0 +1,514 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/constants"
+	"zion-english/internal/utils"
+)
+
+type SQLConsoleData struct {
+	Saved       []SQLConsoleSavedItem
+	History     []SQLConsoleHistoryItem
+	HistoryPage PaginationData
+	HistoryURL  string
+}
+
+type SQLConsoleSavedItem struct {
+	ID        string
+	Name      string
+	QueryText string
+}
+
+type SQLConsoleHistoryItem struct {
+	ID           string
+	QueryPreview string
+	QueryText    string
+	Outcome      constants.SQLConsoleQueryOutcome
+	StatsLine    string
+	CreatedAt    string
+}
+
+type SQLConsoleStatsView struct {
+	DurationMs   int64
+	ColumnCount  int
+	RowsReturned int
+	RowLimit     int
+	Truncated    bool
+	QueryLength  int
+}
+
+type SQLConsoleResultView struct {
+	Columns      []string
+	Rows         [][]string
+	Stats        SQLConsoleStatsView
+	ErrorMessage string
+}
+
+func sqlConsoleOutcomeLabel(outcome constants.SQLConsoleQueryOutcome) string {
+	switch outcome {
+	case constants.SQLConsoleOutcomeSucceeded:
+		return "Succeeded"
+	case constants.SQLConsoleOutcomeFailed:
+		return "Failed"
+	case constants.SQLConsoleOutcomeRejected:
+		return "Rejected"
+	default:
+		return string(outcome)
+	}
+}
+
+func sqlConsoleOutcomeTone(outcome constants.SQLConsoleQueryOutcome) PillTone {
+	switch outcome {
+	case constants.SQLConsoleOutcomeSucceeded:
+		return PillToneSuccess
+	case constants.SQLConsoleOutcomeFailed:
+		return PillToneError
+	case constants.SQLConsoleOutcomeRejected:
+		return PillToneWarning
+	default:
+		return PillToneNeutral
+	}
+}
+
+templ SQLConsole(data SQLConsoleData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		@AdminPageHead("SQL Console - Zion English Admin Tool")
+		@SQLConsoleStyles()
+		@SQLConsoleScript()
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			<div class="page-header">
+				<h1>SQL console</h1>
+				<p class="page-subtitle">Run read-only SELECT queries against the application database.</p>
+			</div>
+
+			<div class="sql-console-callout" role="note">
+				<p>Queries are limited to SELECT and WITH. Results are capped and timed. Every run is stored in query history. This tool can read sensitive data; use it only when necessary.</p>
+			</div>
+
+			<div class="sql-console-layout">
+				<div class="sql-console-main">
+					<form
+						id="sql-console-run-form"
+						hx-post={ utils.URL("/sql-console/run") }
+						hx-target="#sql-console-results"
+						hx-swap={ HxSwapInnerHTML }
+						hx-include="#sql-console-run-form"
+					>
+						<input type="hidden" id="sql-console-saved-id" name="saved_query_id" value=""/>
+						<div class="form-group">
+							<label for="sql-console-query">SQL</label>
+							<textarea id="sql-console-query" name="query" class="sql-console-editor" rows="12" placeholder="SELECT 1" required></textarea>
+						</div>
+						<div class="sql-console-main-actions">
+							<button type="submit" class="btn">Run</button>
+							<button type="button" class="btn btn-secondary" data-open-sql-console-save-modal>Save query</button>
+						</div>
+					</form>
+					<div id="sql-console-results" class="sql-console-results"></div>
+				</div>
+
+				<aside class="sql-console-aside">
+					<section class="sql-console-panel">
+						<h2 class="sql-console-panel-title">Saved queries</h2>
+						<div id="sql-console-saved-list">
+							@SQLConsoleSavedList(data.Saved)
+						</div>
+					</section>
+					<section class="sql-console-panel">
+						<h2 class="sql-console-panel-title">Query history</h2>
+						<div id="sql-console-history-panel">
+							@SQLConsoleHistoryPanel(data.History, data.HistoryPage, data.HistoryURL)
+						</div>
+					</section>
+				</aside>
+			</div>
+		</div>
+
+		@SQLConsoleSaveModal()
+		@SQLConsoleEditModal()
+	</body>
+	</html>
+}
+
+templ SQLConsoleSavedList(items []SQLConsoleSavedItem) {
+	if len(items) == 0 {
+		<p class="sql-console-empty">No saved queries yet.</p>
+	} else {
+		<ul class="sql-console-saved-list">
+			for _, item := range items {
+				<li class="sql-console-saved-item">
+					<div class="sql-console-saved-name">{ item.Name }</div>
+					<div class="sql-console-saved-actions">
+						<button
+							type="button"
+							class="btn btn-secondary sql-console-load-btn"
+							data-sql-console-load
+							data-query={ item.QueryText }
+							data-saved-id={ item.ID }
+						>Load</button>
+						<button
+							type="button"
+							class="btn btn-secondary sql-console-edit-btn"
+							data-open-sql-console-edit-modal
+							data-edit-id={ item.ID }
+							data-edit-name={ item.Name }
+							data-edit-query={ item.QueryText }
+						>Edit</button>
+						<form
+							method="POST"
+							action={ utils.URL("/sql-console/saved") }
+							class="sql-console-inline-form"
+							onsubmit="return confirm('Delete this saved query?');"
+						>
+							<input type="hidden" name="action" value="delete"/>
+							<input type="hidden" name="id" value={ item.ID }/>
+							<button type="submit" class="btn btn-danger sql-console-delete-btn">Delete</button>
+						</form>
+					</div>
+				</li>
+			}
+		</ul>
+	}
+}
+
+templ SQLConsoleHistoryPanel(items []SQLConsoleHistoryItem, page PaginationData, historyURL string) {
+	if len(items) == 0 {
+		<p class="sql-console-empty">No query runs yet.</p>
+	} else {
+		<div class="table-wrapper sql-console-history-table-wrap">
+			<table class="data-table sql-console-history-table">
+				<thead>
+					<tr>
+						<th>Time</th>
+						<th>Outcome</th>
+						<th>Query</th>
+						<th>Stats</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					for _, item := range items {
+						<tr>
+							<td class="sql-console-history-time">{ item.CreatedAt }</td>
+							<td>
+								@StatusPill(sqlConsoleOutcomeLabel(item.Outcome), sqlConsoleOutcomeTone(item.Outcome), true)
+							</td>
+							<td class="sql-console-history-query" title={ item.QueryText }>{ item.QueryPreview }</td>
+							<td class="sql-console-history-stats">{ item.StatsLine }</td>
+							<td>
+								<button
+									type="button"
+									class="btn btn-secondary sql-console-load-btn"
+									data-sql-console-load
+									data-query={ item.QueryText }
+									data-saved-id=""
+								>Load</button>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+		@PaginationBarHTMX(historyURL, "", "#sql-console-history-panel", page)
+	}
+}
+
+templ SQLConsoleResults(data SQLConsoleResultView) {
+	if data.ErrorMessage != "" {
+		<div class="sql-console-error" role="alert">{ data.ErrorMessage }</div>
+	}
+	if data.Stats.DurationMs > 0 || data.Stats.QueryLength > 0 || data.ErrorMessage == "" {
+		@SQLConsoleStatsBar(data.Stats)
+	}
+	if len(data.Columns) > 0 {
+		<div class="table-wrapper">
+			<table class="data-table">
+				<thead>
+					<tr>
+						for _, col := range data.Columns {
+							<th>{ col }</th>
+						}
+					</tr>
+				</thead>
+				<tbody>
+					if len(data.Rows) == 0 {
+						<tr>
+							<td colspan={ fmt.Sprintf("%d", len(data.Columns)) } class="empty-state">No rows returned.</td>
+						</tr>
+					} else {
+						for _, row := range data.Rows {
+							<tr>
+								for _, cell := range row {
+									<td>{ cell }</td>
+								}
+							</tr>
+						}
+					}
+				</tbody>
+			</table>
+		</div>
+	}
+}
+
+templ SQLConsoleStatsBar(stats SQLConsoleStatsView) {
+	<div class="sql-console-stats">
+		@Pill(fmt.Sprintf("Elapsed: %d ms", stats.DurationMs), PillTonePrimary)
+		@Pill(fmt.Sprintf("Columns: %d", stats.ColumnCount), PillToneInfo)
+		@Pill(fmt.Sprintf("Rows returned: %d", stats.RowsReturned), PillToneInfo)
+		@Pill(fmt.Sprintf("Row limit: %d", stats.RowLimit), PillToneNeutral)
+		if stats.Truncated {
+			@Pill("Truncated: yes", PillToneWarning)
+		} else {
+			@Pill("Truncated: no", PillToneNeutral)
+		}
+		@Pill(fmt.Sprintf("Query size: %d B", stats.QueryLength), PillToneNeutral)
+		<span class="sql-console-stats-hint">Max runtime: { fmt.Sprintf("%d", constants.SQLConsoleQueryTimeoutSec) }s</span>
+	</div>
+}
+
+templ SQLConsoleSaveModal() {
+	<div id="sqlConsoleSaveModal" class="modal" hidden>
+		<div class="modal-dialog">
+			<div class="modal-header">
+				<h2>Save query</h2>
+				<button type="button" class="modal-close" data-close-sql-console-save-modal aria-label="Close">&times;</button>
+			</div>
+			<form method="POST" action={ utils.URL("/sql-console/saved") }>
+				<div class="modal-body">
+					<input type="hidden" name="action" value="create"/>
+					<div class="form-group">
+						<label for="sqlConsoleSaveName">Name</label>
+						<input type="text" id="sqlConsoleSaveName" name="name" required maxlength={ fmt.Sprintf("%d", constants.SQLConsoleMaxSavedNameLen) }/>
+					</div>
+					<div class="form-group">
+						<label for="sqlConsoleSaveQuery">SQL</label>
+						<textarea id="sqlConsoleSaveQuery" name="query" rows="8" required></textarea>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-close-sql-console-save-modal>Cancel</button>
+					<button type="submit" class="btn">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+}
+
+templ SQLConsoleEditModal() {
+	<div id="sqlConsoleEditModal" class="modal" hidden>
+		<div class="modal-dialog">
+			<div class="modal-header">
+				<h2>Edit saved query</h2>
+				<button type="button" class="modal-close" data-close-sql-console-edit-modal aria-label="Close">&times;</button>
+			</div>
+			<form method="POST" action={ utils.URL("/sql-console/saved") }>
+				<div class="modal-body">
+					<input type="hidden" name="action" value="update"/>
+					<input type="hidden" id="sqlConsoleEditID" name="id" value=""/>
+					<div class="form-group">
+						<label for="sqlConsoleEditName">Name</label>
+						<input type="text" id="sqlConsoleEditName" name="name" required maxlength={ fmt.Sprintf("%d", constants.SQLConsoleMaxSavedNameLen) }/>
+					</div>
+					<div class="form-group">
+						<label for="sqlConsoleEditQuery">SQL</label>
+						<textarea id="sqlConsoleEditQuery" name="query" rows="8" required></textarea>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-close-sql-console-edit-modal>Cancel</button>
+					<button type="submit" class="btn">Save changes</button>
+				</div>
+			</form>
+		</div>
+	</div>
+}
+
+templ SQLConsoleStyles() {
+	<style>
+		.sql-console-callout {
+			margin-bottom: var(--space-5);
+			padding: var(--space-3) var(--space-4);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-lg);
+			background: var(--color-warning-bg);
+			color: var(--color-foreground, #0f172a);
+			font-size: 0.875rem;
+		}
+		.sql-console-callout p {
+			margin: 0;
+		}
+		.sql-console-layout {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) minmax(18rem, 22rem);
+			gap: var(--space-5);
+			align-items: start;
+		}
+		@media (max-width: 960px) {
+			.sql-console-layout {
+				grid-template-columns: 1fr;
+			}
+		}
+		.sql-console-editor {
+			width: 100%;
+			font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+			font-size: 0.8125rem;
+			line-height: 1.5;
+			min-height: 12rem;
+		}
+		.sql-console-main-actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-2);
+		}
+		.sql-console-main-actions .btn {
+			margin-top: 0;
+		}
+		.sql-console-results {
+			margin-top: var(--space-5);
+		}
+		.sql-console-error {
+			margin-bottom: var(--space-3);
+			padding: var(--space-3);
+			border-radius: var(--radius-md);
+			border: 1px solid var(--color-destructive);
+			background: rgba(220, 38, 38, 0.08);
+			color: var(--color-destructive);
+			font-size: 0.875rem;
+		}
+		.sql-console-stats {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-2);
+			margin-bottom: var(--space-3);
+		}
+		.sql-console-stats-hint {
+			font-size: 0.75rem;
+			color: var(--color-muted-foreground);
+		}
+		.sql-console-panel {
+			background: var(--color-surface);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-lg);
+			padding: var(--space-4);
+			margin-bottom: var(--space-4);
+		}
+		.sql-console-panel-title {
+			margin: 0 0 var(--space-3);
+			font-size: 0.9375rem;
+			font-weight: 600;
+		}
+		.sql-console-empty {
+			margin: 0;
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+		}
+		.sql-console-saved-list {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-3);
+		}
+		.sql-console-saved-name {
+			font-weight: 600;
+			font-size: 0.875rem;
+			margin-bottom: var(--space-2);
+		}
+		.sql-console-saved-actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-2);
+		}
+		.sql-console-saved-actions .btn,
+		.sql-console-load-btn {
+			margin-top: 0;
+			height: 36px;
+			padding: 0 var(--space-3);
+			font-size: 0.8125rem;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+		}
+		.sql-console-inline-form {
+			display: inline;
+			margin: 0;
+		}
+		.sql-console-history-table-wrap {
+			margin-bottom: var(--space-3);
+		}
+		.sql-console-history-query {
+			font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+			font-size: 0.75rem;
+			max-width: 10rem;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+		.sql-console-history-stats {
+			font-size: 0.75rem;
+			color: var(--color-muted-foreground);
+			white-space: nowrap;
+		}
+		.sql-console-history-time {
+			font-size: 0.75rem;
+			white-space: nowrap;
+		}
+	</style>
+}
+
+templ SQLConsoleScript() {
+	<script>
+		(function () {
+			function openModal(id) {
+				var el = document.getElementById(id);
+				if (el) el.hidden = false;
+			}
+			function closeModal(id) {
+				var el = document.getElementById(id);
+				if (el) el.hidden = true;
+			}
+			document.addEventListener('click', function (e) {
+				var loadBtn = e.target.closest('[data-sql-console-load]');
+				if (loadBtn) {
+					var ta = document.getElementById('sql-console-query');
+					var saved = document.getElementById('sql-console-saved-id');
+					if (ta) ta.value = loadBtn.getAttribute('data-query') || '';
+					if (saved) saved.value = loadBtn.getAttribute('data-saved-id') || '';
+					return;
+				}
+				if (e.target.closest('[data-open-sql-console-save-modal]')) {
+					var ta = document.getElementById('sql-console-query');
+					var saveTa = document.getElementById('sqlConsoleSaveQuery');
+					if (ta && saveTa) saveTa.value = ta.value;
+					openModal('sqlConsoleSaveModal');
+					return;
+				}
+				if (e.target.closest('[data-close-sql-console-save-modal]')) {
+					closeModal('sqlConsoleSaveModal');
+					return;
+				}
+				if (e.target.closest('[data-open-sql-console-edit-modal]')) {
+					var btn = e.target.closest('[data-open-sql-console-edit-modal]');
+					document.getElementById('sqlConsoleEditID').value = btn.getAttribute('data-edit-id') || '';
+					document.getElementById('sqlConsoleEditName').value = btn.getAttribute('data-edit-name') || '';
+					document.getElementById('sqlConsoleEditQuery').value = btn.getAttribute('data-edit-query') || '';
+					openModal('sqlConsoleEditModal');
+					return;
+				}
+				if (e.target.closest('[data-close-sql-console-edit-modal]')) {
+					closeModal('sqlConsoleEditModal');
+					return;
+				}
+			});
+		})();
+	</script>
+}
