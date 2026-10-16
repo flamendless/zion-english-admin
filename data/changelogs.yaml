@@ -9,6 +9,35 @@ unreleased:
   internal: []
 
 versions:
+  - version: "2026.10.17"
+    date: "2026-10-17"
+    released: true
+    breaking_changes: []
+    new_features:
+      - text: "Teacher and student rates now include a rate duration (25 or 50 minutes). Lists, profiles, and class forms show pay per duration unit, and conducted-class payroll scales when a class is shorter or longer than that duration."
+        commit: "bffd005"
+      - text: "Granting a teacher the Admin role from their edit page creates a pending request; superusers review and approve or reject grants from the new Admin Role Requests page, with a pending count on the dashboard."
+        commit: "c0e0d9d"
+      - text: "Generate Summary on Reports opens in a modal with month picker, payroll cutoff presets, and role filters before you download the all-teachers XLSX."
+        commit: "4260fc1"
+      - text: "My Hub includes a Resources section for documents, introduction video, and learning materials linked from the teacher profile."
+        commit: "457d9ee"
+    improvements:
+      - text: "Parent-rate totals on reports and summary exports use the same duration-based billing rules as teacher earnings for conducted, cancelled, and rescheduled classes."
+        commit: "4e224fb"
+      - text: "All-teachers summary spreadsheets use clearer column widths and row styling by class status."
+        commit: "4e224fb"
+      - text: "Missing or blank values in tables and detail views use a consistent placeholder across the admin UI."
+        commit: "bffd005"
+    bug_fixes:
+      - text: "Fixed report and parent-billing totals after rate duration was introduced so conducted classes bill correctly against each teacher's duration setting."
+        commit: "c0e0d9d"
+    removed: []
+    security: []
+    deprecated: []
+    internal:
+      - text: "Added delete_test_seed_students CLI to soft-delete or hard-delete all students marked test/seed (dry-run by default)."
+        commit: "457d9ee"
   - version: "2026.10.14"
     date: "2026-10-14"
     released: true
