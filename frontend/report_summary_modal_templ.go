@@ -64,7 +64,33 @@ func ReportSummaryModal() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div><div class=\"modal-footer report-summary-modal-footer\"><button type=\"button\" class=\"btn btn-secondary report-summary-close\">Cancel</button> <button type=\"submit\" class=\"btn\">Generate</button></div></form></div></div><style>\r\n\t\t.report-summary-modal-body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.report-summary-modal-footer {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.report-summary-modal-footer .btn {\r\n\t\t\tmargin-top: 0;\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div><div class=\"modal-footer report-summary-modal-footer\"><button type=\"button\" class=\"btn btn-secondary report-summary-close\">Cancel</button> <button type=\"button\" class=\"btn btn-secondary\" id=\"reportSummaryViewBtn\" hx-get=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var3 string
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/reports/summary/view"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/report_summary_modal.templ`, Line: 30, Col: 49}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" hx-include=\"#reportSummaryForm\" hx-target=\"#reportViewModalHost\" hx-swap=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var4 string
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/report_summary_modal.templ`, Line: 33, Col: 31}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" onclick=\"return window.openReportSummaryView(event)\">View</button> <button type=\"submit\" class=\"btn\">Generate</button></div></form></div></div><style>\r\n\t\t.report-summary-modal-body {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-direction: column;\r\n\t\t\tgap: var(--space-4);\r\n\t\t}\r\n\r\n\t\t.report-summary-modal-footer {\r\n\t\t\tdisplay: flex;\r\n\t\t\tflex-wrap: wrap;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.report-summary-modal-footer .btn {\r\n\t\t\tmargin-top: 0;\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

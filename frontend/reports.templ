@@ -244,12 +244,30 @@ templ Reports() {
 				});
 			}
 
-			window.validateReportSummaryForm = function (e) {
+			window.reportSummaryDatePresetValid = function () {
 				const presetField = document.getElementById('summaryDatePreset');
 				if (!presetField || !presetField.value) {
-					e.preventDefault();
 					alert('Select a date range first.');
 					return false;
+				}
+				return true;
+			};
+
+			window.validateReportSummaryForm = function (e) {
+				if (!window.reportSummaryDatePresetValid()) {
+					e.preventDefault();
+					return false;
+				}
+				return true;
+			};
+
+			window.openReportSummaryView = function (e) {
+				if (!window.reportSummaryDatePresetValid()) {
+					e.preventDefault();
+					return false;
+				}
+				if (typeof window.closeReportSummaryModal === 'function') {
+					window.closeReportSummaryModal();
 				}
 				return true;
 			};

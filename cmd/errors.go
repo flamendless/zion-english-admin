@@ -15,6 +15,7 @@ var (
 	ErrMissingNumericValue         = errors.New("missing numeric value")
 	ErrMissingIntegerValue         = errors.New("missing integer value")
 
+	errNoTeachersForSummary   = errors.New("no teachers found for summary")
 	ErrEndDateBeforeStart     = errors.New("end date must be after start date")
 	ErrMissingDateRange       = errors.New("missing date range")
 	ErrInvalidDateRange       = errors.New("invalid date range")

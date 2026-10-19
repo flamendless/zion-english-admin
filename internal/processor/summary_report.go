@@ -185,6 +185,7 @@ func SaveSummaryReport(sheets []SummaryTeacherSheet, outputPath string) error {
 }
 
 type TeachersPayrollRow struct {
+	TeacherID       int64
 	TeacherFullName string
 	CutoffLabel     string
 	TotalClasses    int64

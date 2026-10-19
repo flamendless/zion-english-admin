@@ -148,6 +148,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/reports/partials/date-preset", auth.RequireRole(auth.AdminAccessRoles()...)(handleReportsDatePresetPartial))
 		authMux.HandleFunc(basePath+"/reports/partials/summary-date-preset", auth.RequireRole(auth.AdminAccessRoles()...)(handleReportsSummaryDatePresetPartial))
 		authMux.HandleFunc(basePath+"/reports/partials/rows", auth.RequireRole(auth.AdminAccessRoles()...)(handleReportsPartial))
+		authMux.HandleFunc(basePath+"/reports/summary/view", auth.RequireRole(auth.AdminAccessRoles()...)(handleReportSummaryView))
 		authMux.HandleFunc(basePath+"/reports/summary", auth.RequireRole(auth.AdminAccessRoles()...)(handleReportSummary))
 		authMux.HandleFunc(basePath+"/reports/", auth.RequireRole(auth.AdminAccessRoles()...)(handleReportsPath))
 		authMux.HandleFunc(basePath+"/reports", auth.RequireRole(auth.AdminAccessRoles()...)(handleReports))

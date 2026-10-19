@@ -23,6 +23,16 @@ templ ReportSummaryModal() {
 				</div>
 				<div class="modal-footer report-summary-modal-footer">
 					<button type="button" class="btn btn-secondary report-summary-close">Cancel</button>
+					<button
+						type="button"
+						class="btn btn-secondary"
+						id="reportSummaryViewBtn"
+						hx-get={ utils.URL("/reports/summary/view") }
+						hx-include="#reportSummaryForm"
+						hx-target="#reportViewModalHost"
+						hx-swap={ HxSwapInnerHTML }
+						onclick="return window.openReportSummaryView(event)"
+					>View</button>
 					<button type="submit" class="btn">Generate</button>
 				</div>
 			</form>

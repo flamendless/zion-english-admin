@@ -197,30 +197,58 @@ func handleReportSummary(w http.ResponseWriter, r *http.Request) {
 	handleParentsSummaryReport(w, r, startDate, endDate)
 }
 
+func handleReportSummaryView(w http.ResponseWriter, r *http.Request) {
+	if !requireMethod(w, r, http.MethodGet) {
+		return
+	}
+
+	startDate, endDate, err := requireReportDateRange(r)
+	if err != nil {
+		HttpError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	kind := constants.ParseSummaryReportKind(strings.TrimSpace(r.URL.Query().Get("kind")))
+	if kind == constants.SummaryReportKindTeachersPayroll {
+		handleTeachersPayrollSummaryView(w, r, startDate, endDate)
+		return
+	}
+	handleParentsSummaryView(w, r, startDate, endDate)
+}
+
+func loadParentsSummarySheets(ctx context.Context, q, startDate, endDate string, roleFilters reportRoleFilters) ([]queries.GetReportTeacherSummariesRow, []processor.SummaryTeacherSheet, []queries.GetReportSummaryRowsRow, error) {
+	summaries, err := dbRO.GetQueries().GetReportTeacherSummaries(ctx, reportSearchParams(q, startDate, endDate, roleFilters))
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	if len(summaries) == 0 {
+		return nil, nil, nil, errNoTeachersForSummary
+	}
+
+	summaryRows, err := dbRO.GetQueries().GetReportSummaryRows(ctx, reportSummaryParams(q, startDate, endDate, roleFilters))
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	sheets := buildSummaryTeacherSheets(summaries, summaryRows)
+	return summaries, sheets, summaryRows, nil
+}
+
 func handleParentsSummaryReport(w http.ResponseWriter, r *http.Request, startDate, endDate string) {
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
 	roleFilters := parseReportRoleFilters(r)
 	ctx := r.Context()
 
-	summaries, err := dbRO.GetQueries().GetReportTeacherSummaries(ctx, reportSearchParams(q, startDate, endDate, roleFilters))
+	_, sheets, summaryRows, err := loadParentsSummarySheets(ctx, q, startDate, endDate, roleFilters)
 	if err != nil {
+		if errors.Is(err, errNoTeachersForSummary) {
+			HttpError(w, "No teachers found.", http.StatusBadRequest)
+			return
+		}
 		logs.Log().Error("load report summaries for summary export", zap.Error(err))
 		HttpError(w, "Failed to load report data", http.StatusInternalServerError)
 		return
 	}
-	if len(summaries) == 0 {
-		HttpError(w, "No teachers found.", http.StatusBadRequest)
-		return
-	}
-
-	summaryRows, err := dbRO.GetQueries().GetReportSummaryRows(ctx, reportSummaryParams(q, startDate, endDate, roleFilters))
-	if err != nil {
-		logs.Log().Error("load report summary rows", zap.Error(err))
-		HttpError(w, "Failed to load report data", http.StatusInternalServerError)
-		return
-	}
-
-	sheets := buildSummaryTeacherSheets(summaries, summaryRows)
 	filename := fmt.Sprintf("summary_%s_%s_%s.xlsx", startDate, endDate, utils.RandomString(8))
 	outputPath := filepath.Join("tmp", filename)
 	if err := processor.SaveSummaryReport(sheets, outputPath); err != nil {
@@ -267,6 +295,61 @@ func handleParentsSummaryReport(w http.ResponseWriter, r *http.Request, startDat
 
 	if !serveReportDownload(w, r, filename) {
 		HttpError(w, "Failed to download summary report", http.StatusInternalServerError)
+	}
+}
+
+func handleParentsSummaryView(w http.ResponseWriter, r *http.Request, startDate, endDate string) {
+	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	roleFilters := parseReportRoleFilters(r)
+	ctx := r.Context()
+
+	summaries, sheets, _, err := loadParentsSummarySheets(ctx, q, startDate, endDate, roleFilters)
+	if err != nil {
+		if errors.Is(err, errNoTeachersForSummary) {
+			HttpError(w, "No teachers found.", http.StatusBadRequest)
+			return
+		}
+		logs.Log().Error("load parents summary for view", zap.Error(err))
+		HttpError(w, "Failed to load report data", http.StatusInternalServerError)
+		return
+	}
+
+	writeHTML(w)
+	if err := frontend.ReportSummaryViewModal(buildParentsSummaryViewData(summaries, sheets, startDate, endDate)).Render(ctx, w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func handleTeachersPayrollSummaryView(w http.ResponseWriter, r *http.Request, startDate, endDate string) {
+	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	roleFilters := parseReportRoleFilters(r)
+	ctx := r.Context()
+
+	payrollRows, err := buildTeachersPayrollRows(ctx, q, startDate, endDate, roleFilters)
+	if err != nil {
+		logs.Log().Error("build teachers payroll rows for view", zap.Error(err))
+		HttpError(w, "Failed to load report data", http.StatusInternalServerError)
+		return
+	}
+	if len(payrollRows) == 0 {
+		HttpError(w, "No class data for the selected range.", http.StatusBadRequest)
+		return
+	}
+
+	summaries, err := dbRO.GetQueries().GetReportTeacherSummaries(ctx, reportSearchParams(q, startDate, endDate, roleFilters))
+	if err != nil {
+		logs.Log().Error("load teacher summaries for payroll view", zap.Error(err))
+		HttpError(w, "Failed to load report data", http.StatusInternalServerError)
+		return
+	}
+	avatarByTeacher := map[int64]frontend.AvatarProps{}
+	for _, summary := range summaries {
+		avatarByTeacher[summary.TeacherID] = buildReportSummaryAvatarProps(summary)
+	}
+
+	writeHTML(w)
+	if err := frontend.ReportSummaryViewModal(buildTeachersPayrollSummaryViewData(payrollRows, avatarByTeacher, startDate, endDate)).Render(ctx, w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
@@ -1041,6 +1124,7 @@ func buildTeachersPayrollRows(ctx context.Context, q, startDate, endDate string,
 			}
 			fullName := utils.ComposePersonName(summary.TeacherFirstName, summary.TeacherMiddleName, summary.TeacherLastName)
 			cutoffsByTeacher[summary.TeacherID] = append(cutoffsByTeacher[summary.TeacherID], processor.TeachersPayrollRow{
+				TeacherID:       summary.TeacherID,
 				TeacherFullName: fullName,
 				CutoffLabel:     cutoffLabel,
 				TotalClasses:    summary.TotalClasses,
@@ -1136,6 +1220,70 @@ func buildReportTeacherAvatarProps(teacherID int64, row queries.GetTeacherProfil
 		PictureURL:    teacherPictureURL(teacherID, hasPicture),
 		HasPicture:    hasPicture,
 		Alt:           displayName + " avatar",
+	}
+}
+
+func buildParentsSummaryViewData(summaries []queries.GetReportTeacherSummariesRow, sheets []processor.SummaryTeacherSheet, startDate, endDate string) frontend.ReportSummaryViewData {
+	teachers := make([]frontend.ParentsSummaryTeacherBlock, 0, len(sheets))
+	for i, sheet := range sheets {
+		var avatar frontend.AvatarProps
+		if i < len(summaries) {
+			avatar = buildReportSummaryAvatarProps(summaries[i])
+		}
+		students := make([]frontend.ParentsSummaryStudentBlock, 0, len(sheet.Students))
+		for _, student := range sheet.Students {
+			classes := make([]frontend.ParentsSummaryClassRow, 0, len(student.Classes))
+			for _, classRow := range student.Classes {
+				classes = append(classes, frontend.ParentsSummaryClassRow{
+					Status:     classRow.Status,
+					Date:       classRow.DateDisplay,
+					Duration:   classRow.DurationDisplay,
+					ParentRate: classRow.RateDisplay,
+					ClassRate:  classRow.ClassRateDisplay,
+				})
+			}
+			block := frontend.ParentsSummaryStudentBlock{
+				StudentName: student.StudentName,
+				Classes:     classes,
+				HasTotal:    student.HasTotal,
+			}
+			if student.HasTotal {
+				block.TotalLabel = fmt.Sprintf("total in %s", strings.ToLower(student.Currency))
+				block.TotalDisplay = utils.FormatCurrencyAmountFixed(student.Total, student.Currency) + " " + student.Currency
+			}
+			students = append(students, block)
+		}
+		teachers = append(teachers, frontend.ParentsSummaryTeacherBlock{
+			TeacherName: sheet.TeacherName,
+			Avatar:      avatar,
+			Students:    students,
+		})
+	}
+	return frontend.ReportSummaryViewData{
+		Kind:        constants.SummaryReportKindParents,
+		Title:       "Parents summary",
+		CutoffLabel: formatReportCutoffLabel(startDate, endDate),
+		Parents:     teachers,
+	}
+}
+
+func buildTeachersPayrollSummaryViewData(rows []processor.TeachersPayrollRow, avatarByTeacher map[int64]frontend.AvatarProps, startDate, endDate string) frontend.ReportSummaryViewData {
+	viewRows := make([]frontend.TeachersPayrollSummaryRow, 0, len(rows))
+	for _, row := range rows {
+		avatar := avatarByTeacher[row.TeacherID]
+		viewRows = append(viewRows, frontend.TeachersPayrollSummaryRow{
+			TeacherName:     row.TeacherFullName,
+			TeacherAvatar:   avatar,
+			CutoffLabel:     row.CutoffLabel,
+			TotalClasses:    row.TotalClasses,
+			EarningsDisplay: row.EarningsDisplay,
+		})
+	}
+	return frontend.ReportSummaryViewData{
+		Kind:        constants.SummaryReportKindTeachersPayroll,
+		Title:       "Teachers payroll",
+		CutoffLabel: formatReportCutoffLabel(startDate, endDate),
+		Payroll:     viewRows,
 	}
 }
 
