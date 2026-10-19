@@ -1011,7 +1011,7 @@ func buildTeachersPayrollRows(ctx context.Context, q, startDate, endDate string,
 		return nil, nil
 	}
 
-	var rows []processor.TeachersPayrollRow
+	cutoffsByTeacher := map[int64][]processor.TeachersPayrollRow{}
 	for _, preset := range presets {
 		cutoffStart, cutoffEnd := utils.CutoffDatesFromPreset(preset)
 		if cutoffStart == "" || cutoffEnd == "" {
@@ -1040,13 +1040,27 @@ func buildTeachersPayrollRows(ctx context.Context, q, startDate, endDate string,
 				continue
 			}
 			fullName := utils.ComposePersonName(summary.TeacherFirstName, summary.TeacherMiddleName, summary.TeacherLastName)
-			rows = append(rows, processor.TeachersPayrollRow{
+			cutoffsByTeacher[summary.TeacherID] = append(cutoffsByTeacher[summary.TeacherID], processor.TeachersPayrollRow{
 				TeacherFullName: fullName,
 				CutoffLabel:     cutoffLabel,
 				TotalClasses:    summary.TotalClasses,
 				EarningsDisplay: formatTeachersPayrollEarnings(earningsByTeacher[summary.TeacherID]),
 			})
 		}
+	}
+
+	orderSummaries, err := dbRO.GetQueries().GetReportTeacherSummaries(ctx, reportSearchParams(q, startDate, endDate, roleFilters))
+	if err != nil {
+		return nil, err
+	}
+
+	var rows []processor.TeachersPayrollRow
+	for _, summary := range orderSummaries {
+		teacherRows := cutoffsByTeacher[summary.TeacherID]
+		if len(teacherRows) == 0 {
+			continue
+		}
+		rows = append(rows, teacherRows...)
 	}
 	return rows, nil
 }
