@@ -67,15 +67,20 @@ func handleReportsHistoryPartial(w http.ResponseWriter, r *http.Request) {
 
 func parseReportHistoryKindFilter(r *http.Request) string {
 	kind := strings.TrimSpace(r.URL.Query().Get("kind"))
-	if kind == string(constants.ReportGenerationKindSummary) {
+	switch constants.ReportGenerationKind(kind) {
+	case constants.ReportGenerationKindSummary, constants.ReportGenerationKindTeachersPayroll:
 		return kind
+	default:
+		return ""
 	}
-	return ""
 }
 
 func reportHistoryEmptyMessage(startDate, endDate, q, kindFilter string) string {
 	if kindFilter == string(constants.ReportGenerationKindSummary) {
 		return "No payroll summary reports found."
+	}
+	if kindFilter == string(constants.ReportGenerationKindTeachersPayroll) {
+		return "No teachers payroll reports found."
 	}
 	if startDate == "" && endDate == "" && q == "" && kindFilter == "" {
 		return "No reports generated yet."
@@ -95,7 +100,8 @@ func loadReportHistoryRows(ctx context.Context, startDate, endDate, q, kindFilte
 		Column7:   qNull,
 		Column8:   qNull,
 		Column9:   qNull,
-		Column10:  kindFilter,
+		Column10:  qNull,
+		Column11:  kindFilter,
 		Kind:      kindFilter,
 	})
 	if err != nil {
@@ -104,7 +110,9 @@ func loadReportHistoryRows(ctx context.Context, startDate, endDate, q, kindFilte
 
 	teacherIDs := make([]int64, 0, len(dbRows))
 	for _, row := range dbRows {
-		if row.Kind == string(constants.ReportGenerationKindSummary) || !row.TeacherID.Valid {
+		if row.Kind == string(constants.ReportGenerationKindSummary) ||
+			row.Kind == string(constants.ReportGenerationKindTeachersPayroll) ||
+			!row.TeacherID.Valid {
 			continue
 		}
 		teacherIDs = append(teacherIDs, row.TeacherID.Int64)
@@ -137,6 +145,8 @@ func mapReportHistoryRow(ctx context.Context, row queries.GetReportGenerationsFi
 	}
 	if row.Kind == string(constants.ReportGenerationKindSummary) {
 		item.TeacherName = constants.ReportHistorySummaryLabel
+	} else if row.Kind == string(constants.ReportGenerationKindTeachersPayroll) {
+		item.TeacherName = constants.ReportHistoryTeachersPayrollLabel
 	} else {
 		teacherID := row.TeacherID.Int64
 		teacherName := utils.ComposePersonName(

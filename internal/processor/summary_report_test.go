@@ -24,6 +24,7 @@ func TestSaveSummaryReport(t *testing.T) {
 							Status:           constants.ClassStatusConducted,
 							StatusDisplay:    "Conducted",
 							DateDisplay:      "August 1",
+							DurationDisplay:  "25",
 							RateDisplay:      "20.00 KRW",
 							RateValue:        20,
 							HasRate:          true,
@@ -33,6 +34,7 @@ func TestSaveSummaryReport(t *testing.T) {
 							Status:           constants.ClassStatusCancelled,
 							StatusDisplay:    "Cancelled",
 							DateDisplay:      "August 2",
+							DurationDisplay:  "25",
 							RateDisplay:      "10.00 KRW",
 							RateValue:        10,
 							HasRate:          true,
@@ -76,16 +78,19 @@ func TestSaveSummaryReport(t *testing.T) {
 	if got, _ := f.GetCellValue(sheetName, "B3"); got != "August 1" {
 		t.Fatalf("B3 = %q", got)
 	}
-	if got, _ := f.GetCellValue(sheetName, "C3"); got != "20.00 KRW" {
+	if got, _ := f.GetCellValue(sheetName, "C3"); got != "25" {
 		t.Fatalf("C3 = %q", got)
 	}
-	if got, _ := f.GetCellValue(sheetName, "D3"); got != "15.00 KRW" {
+	if got, _ := f.GetCellValue(sheetName, "D3"); got != "20.00 KRW" {
 		t.Fatalf("D3 = %q", got)
+	}
+	if got, _ := f.GetCellValue(sheetName, "E3"); got != "15.00 KRW" {
+		t.Fatalf("E3 = %q", got)
 	}
 	if got, _ := f.GetCellValue(sheetName, "B5"); got != "total in krw" {
 		t.Fatalf("B5 = %q", got)
 	}
-	if got, _ := f.GetCellValue(sheetName, "C5"); got != "30" {
-		t.Fatalf("C5 = %q", got)
+	if got, _ := f.GetCellValue(sheetName, "D5"); got != "30" {
+		t.Fatalf("D5 = %q", got)
 	}
 }

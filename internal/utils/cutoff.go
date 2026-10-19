@@ -188,6 +188,48 @@ func CutoffHalfForPeriod(startDate, endDate string) (CutoffHalf, bool) {
 	return "", false
 }
 
+// CutoffPresetsContainedInRange returns standard first/second cutoff presets fully inside
+// [startDate, endDate] (YYYY-MM-DD, PHT), in chronological order.
+func CutoffPresetsContainedInRange(startDate, endDate string) []string {
+	startDate = strings.TrimSpace(startDate)
+	endDate = strings.TrimSpace(endDate)
+	if startDate == "" || endDate == "" || startDate > endDate {
+		return nil
+	}
+	rangeStart, err := time.ParseInLocation(constants.DateLayout, startDate, constants.LocationPHT)
+	if err != nil {
+		return nil
+	}
+	rangeEnd, err := time.ParseInLocation(constants.DateLayout, endDate, constants.LocationPHT)
+	if err != nil {
+		return nil
+	}
+
+	var presets []string
+	y, m := rangeStart.Year(), rangeStart.Month()
+	for {
+		firstPreset, secondPreset := CutoffRangeForMonth(y, m)
+		for _, preset := range []string{firstPreset, secondPreset} {
+			presetStart, presetEnd := CutoffDatesFromPreset(preset)
+			if presetStart == "" || presetEnd == "" {
+				continue
+			}
+			if presetStart >= startDate && presetEnd <= endDate {
+				presets = append(presets, preset)
+			}
+		}
+		if y == rangeEnd.Year() && m == rangeEnd.Month() {
+			break
+		}
+		m++
+		if m > time.December {
+			m = time.January
+			y++
+		}
+	}
+	return presets
+}
+
 // CutoffDatesFromPreset parses a cutoff preset (YYYY-MM-DD|YYYY-MM-DD) into start and end dates.
 func CutoffDatesFromPreset(preset string) (startDate, endDate string) {
 	parts := splitCutoff(preset)

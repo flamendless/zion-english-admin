@@ -140,6 +140,24 @@ func TestCurrentCutoffRange(t *testing.T) {
 	}
 }
 
+func TestCutoffPresetsContainedInRange(t *testing.T) {
+	got := CutoffPresetsContainedInRange("2026-10-01", "2026-10-31")
+	if len(got) != 2 || got[0] != "2026-10-01|2026-10-15" || got[1] != "2026-10-16|2026-10-31" {
+		t.Fatalf("full month: %v", got)
+	}
+	got = CutoffPresetsContainedInRange("2026-10-01", "2026-10-15")
+	if len(got) != 1 || got[0] != "2026-10-01|2026-10-15" {
+		t.Fatalf("first half: %v", got)
+	}
+	got = CutoffPresetsContainedInRange("2026-10-16", "2026-10-31")
+	if len(got) != 1 || got[0] != "2026-10-16|2026-10-31" {
+		t.Fatalf("second half: %v", got)
+	}
+	if CutoffPresetsContainedInRange("", "2026-10-15") != nil {
+		t.Fatal("expected nil for empty start")
+	}
+}
+
 func TestFinalReportRangeFromResignationDate(t *testing.T) {
 	start, end, err := FinalReportRangeFromResignationDate("2026-09-10")
 	if err != nil {

@@ -1,0 +1,17 @@
+package frontend
+
+import "zion-english/internal/constants"
+
+templ SummaryReportKindField() {
+	<div class="form-group">
+		<label for="summaryReportKind">Kind</label>
+		<select id="summaryReportKind" name="kind">
+			for _, opt := range SummaryReportKindOptions {
+				<option
+					value={ opt.Value }
+					selected?={ opt.Value == string(constants.SummaryReportKindParents) }
+				>{ opt.Label }</option>
+			}
+		</select>
+	</div>
+}

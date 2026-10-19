@@ -42,10 +42,10 @@ func handleSQLConsole(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := frontend.SQLConsoleData{
-		Saved:   mapSQLConsoleSavedItems(saved),
-		History: history,
+		Saved:       mapSQLConsoleSavedItems(saved),
+		History:     history,
 		HistoryPage: historyPage,
-		HistoryURL: utils.URL("/sql-console/history"),
+		HistoryURL:  utils.URL("/sql-console/history"),
 	}
 	if err := frontend.SQLConsole(data).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
@@ -131,10 +131,10 @@ func handleSQLConsoleSaved(w http.ResponseWriter, r *http.Request) {
 		switch action {
 		case "create":
 			id, err := dbRW.GetQueries().InsertSQLConsoleSavedQuery(ctx, queries.InsertSQLConsoleSavedQueryParams{
-				Name:           name,
-				QueryText:      queryText,
-				CreatedBy:      createdBy,
-				CreatedByName:  createdByName,
+				Name:          name,
+				QueryText:     queryText,
+				CreatedBy:     createdBy,
+				CreatedByName: createdByName,
 			})
 			if err != nil {
 				if isSQLConsoleUniqueViolation(err) {

@@ -183,7 +183,7 @@ func ReportTableRow(row ReportRowData, startDate string, endDate string, swapOOB
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = IconActionButton("View", IconKindView, templ.Attributes{
+		templ_7745c5c3_Err = IconActionButton("View teacher classes", IconKindView, templ.Attributes{
 			"hx-get":    utils.URL("/reports/" + row.TeacherID + "/view?startDate=" + startDate + "&endDate=" + endDate),
 			"hx-target": "#reportViewModalHost",
 			"hx-swap":   "innerHTML",

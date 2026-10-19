@@ -156,6 +156,13 @@ WHERE kind = 'summary'
 	AND start_date = ?
 	AND end_date = ?;
 
+-- name: GetTeachersPayrollReportGeneration :one
+SELECT id, kind, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at
+FROM tbl_report_generations
+WHERE kind = 'teachers_payroll'
+	AND start_date = ?
+	AND end_date = ?;
+
 -- name: GetReportGenerationsForRange :many
 SELECT id, kind, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at
 FROM tbl_report_generations
@@ -181,11 +188,23 @@ ON CONFLICT(start_date, end_date) WHERE kind = 'summary' DO UPDATE SET
 	record_count = excluded.record_count,
 	generated_at = datetime('now');
 
+-- name: UpsertTeachersPayrollReportGeneration :exec
+INSERT INTO tbl_report_generations (kind, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at)
+VALUES ('teachers_payroll', NULL, ?, ?, ?, ?, ?, datetime('now'))
+ON CONFLICT(start_date, end_date) WHERE kind = 'teachers_payroll' DO UPDATE SET
+	content_hash = excluded.content_hash,
+	output_path = excluded.output_path,
+	record_count = excluded.record_count,
+	generated_at = datetime('now');
+
 -- name: GetReportGenerationByOutputBasename :one
 SELECT rg.id, rg.kind, rg.teacher_id, rg.start_date, rg.end_date, rg.content_hash, rg.output_path, rg.record_count, rg.generated_at,
 	COALESCE(
 		trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END),
-		'Payroll summary'
+		CASE rg.kind
+			WHEN 'teachers_payroll' THEN 'Teachers payroll'
+			ELSE 'Payroll summary'
+		END
 	) AS teacher_name
 FROM tbl_report_generations rg
 LEFT JOIN tbl_teachers t ON rg.teacher_id = t.id
@@ -209,7 +228,7 @@ FROM tbl_report_generations rg
 LEFT JOIN tbl_teachers t ON t.id = rg.teacher_id
 WHERE (
 		(rg.kind = 'teacher' AND t.deleted = 0)
-		OR rg.kind = 'summary'
+		OR rg.kind IN ('summary', 'teachers_payroll')
 	)
 	AND (? = '' OR rg.start_date >= ?)
 	AND (? = '' OR rg.end_date <= ?)
@@ -226,6 +245,10 @@ WHERE (
 		OR (
 			rg.kind = 'summary'
 			AND 'Payroll summary' LIKE '%' || ? || '%'
+		)
+		OR (
+			rg.kind = 'teachers_payroll'
+			AND 'Teachers payroll' LIKE '%' || ? || '%'
 		)
 	)
 	AND (? = '' OR rg.kind = ?)

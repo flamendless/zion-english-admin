@@ -184,6 +184,62 @@ func SaveSummaryReport(sheets []SummaryTeacherSheet, outputPath string) error {
 	return f.SaveAs(outputPath)
 }
 
+type TeachersPayrollRow struct {
+	TeacherFullName string
+	CutoffLabel     string
+	TotalClasses    int64
+	EarningsDisplay string
+}
+
+func SaveTeachersPayrollReport(rows []TeachersPayrollRow, outputPath string) error {
+	f := excelize.NewFile()
+	defer func() {
+		_ = f.Close()
+	}()
+
+	sheetName := "Teachers payroll"
+	if err := f.SetSheetName("Sheet1", sheetName); err != nil {
+		return err
+	}
+
+	boldStyle, err := f.NewStyle(&excelize.Style{
+		Font: &excelize.Font{Bold: true},
+	})
+	if err != nil {
+		return err
+	}
+
+	colWidths := newColWidthTracker(4, 10, []float64{32, 28, 16, 28})
+	headers := []string{"Teacher", "Cutoff", "Total classes", "Total earnings"}
+	for i, header := range headers {
+		cell, _ := excelize.CoordinatesToCellName(i+1, 1)
+		f.SetCellValue(sheetName, cell, header)
+		colWidths.Note(i+1, header)
+		f.SetCellStyle(sheetName, cell, cell, boldStyle)
+	}
+
+	for i, row := range rows {
+		rowNum := i + 2
+		cellA, _ := excelize.CoordinatesToCellName(1, rowNum)
+		f.SetCellValue(sheetName, cellA, row.TeacherFullName)
+		colWidths.Note(1, row.TeacherFullName)
+		cellB, _ := excelize.CoordinatesToCellName(2, rowNum)
+		f.SetCellValue(sheetName, cellB, row.CutoffLabel)
+		colWidths.Note(2, row.CutoffLabel)
+		cellC, _ := excelize.CoordinatesToCellName(3, rowNum)
+		f.SetCellValue(sheetName, cellC, row.TotalClasses)
+		colWidths.NoteFloat(3, float64(row.TotalClasses))
+		cellD, _ := excelize.CoordinatesToCellName(4, rowNum)
+		f.SetCellValue(sheetName, cellD, row.EarningsDisplay)
+		colWidths.Note(4, row.EarningsDisplay)
+	}
+
+	if err := colWidths.Apply(f, sheetName); err != nil {
+		return err
+	}
+	return f.SaveAs(outputPath)
+}
+
 func uniqueSheetName(name string, used map[string]int) string {
 	base := utils.SanitizeSheetName(name)
 	if base == "" {

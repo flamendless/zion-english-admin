@@ -189,6 +189,15 @@ func handleReportSummary(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	kind := constants.ParseSummaryReportKind(strings.TrimSpace(r.URL.Query().Get("kind")))
+	if kind == constants.SummaryReportKindTeachersPayroll {
+		handleTeachersPayrollSummary(w, r, startDate, endDate)
+		return
+	}
+	handleParentsSummaryReport(w, r, startDate, endDate)
+}
+
+func handleParentsSummaryReport(w http.ResponseWriter, r *http.Request, startDate, endDate string) {
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
 	roleFilters := parseReportRoleFilters(r)
 	ctx := r.Context()
@@ -252,12 +261,77 @@ func handleReportSummary(w http.ResponseWriter, r *http.Request) {
 
 	user := auth.GetUser(ctx)
 	insertAuditLogAs(ctx, user, "reports", fmt.Sprintf(
-		"generated summary report (%s to %s): %s",
+		"generated parents summary report (%s to %s): %s",
 		startDate, endDate, filename,
 	))
 
 	if !serveReportDownload(w, r, filename) {
 		HttpError(w, "Failed to download summary report", http.StatusInternalServerError)
+	}
+}
+
+func handleTeachersPayrollSummary(w http.ResponseWriter, r *http.Request, startDate, endDate string) {
+	q := strings.TrimSpace(r.URL.Query().Get("q"))
+	roleFilters := parseReportRoleFilters(r)
+	ctx := r.Context()
+
+	payrollRows, err := buildTeachersPayrollRows(ctx, q, startDate, endDate, roleFilters)
+	if err != nil {
+		logs.Log().Error("build teachers payroll rows", zap.Error(err))
+		HttpError(w, "Failed to load report data", http.StatusInternalServerError)
+		return
+	}
+	if len(payrollRows) == 0 {
+		HttpError(w, "No class data for the selected range.", http.StatusBadRequest)
+		return
+	}
+
+	filename := fmt.Sprintf("teachers_payroll_%s_%s_%s.xlsx", startDate, endDate, utils.RandomString(8))
+	outputPath := filepath.Join("tmp", filename)
+	if err := processor.SaveTeachersPayrollReport(payrollRows, outputPath); err != nil {
+		logs.Log().Error("save teachers payroll report xlsx", zap.Error(err))
+		HttpError(w, "Failed to generate teachers payroll report", http.StatusInternalServerError)
+		return
+	}
+
+	if err := putReportFile(ctx, filename, outputPath); err != nil {
+		logs.Log().Error("upload teachers payroll report to storage", zap.Error(err))
+		HttpError(w, "Failed to save teachers payroll report", http.StatusInternalServerError)
+		return
+	}
+
+	existing, existingErr := dbRO.GetQueries().GetTeachersPayrollReportGeneration(ctx, queries.GetTeachersPayrollReportGenerationParams{
+		StartDate: startDate,
+		EndDate:   endDate,
+	})
+	if existingErr == nil && existing.OutputPath != "" {
+		oldBase := reportOutputBasename(existing.OutputPath)
+		if oldBase != "" && oldBase != filename {
+			_ = storage.Default().Delete(ctx, storage.CategoryReports, oldBase)
+			_ = os.Remove(filepath.Join("tmp", oldBase))
+		}
+	}
+
+	if err := dbRW.GetQueries().UpsertTeachersPayrollReportGeneration(ctx, queries.UpsertTeachersPayrollReportGenerationParams{
+		StartDate:   startDate,
+		EndDate:     endDate,
+		ContentHash: string(constants.ReportGenerationKindTeachersPayroll),
+		OutputPath:  filename,
+		RecordCount: int64(len(payrollRows)),
+	}); err != nil {
+		logs.Log().Error("upsert teachers payroll report generation", zap.Error(err))
+		HttpError(w, "Failed to save teachers payroll report", http.StatusInternalServerError)
+		return
+	}
+
+	user := auth.GetUser(ctx)
+	insertAuditLogAs(ctx, user, "reports", fmt.Sprintf(
+		"generated teachers payroll report (%s to %s): %s",
+		startDate, endDate, filename,
+	))
+
+	if !serveReportDownload(w, r, filename) {
+		HttpError(w, "Failed to download teachers payroll report", http.StatusInternalServerError)
 	}
 }
 
@@ -929,6 +1003,84 @@ func formatReportSummaryClassDate(dateStr string) string {
 		return dateStr
 	}
 	return t.Format("January 2")
+}
+
+func buildTeachersPayrollRows(ctx context.Context, q, startDate, endDate string, roleFilters reportRoleFilters) ([]processor.TeachersPayrollRow, error) {
+	presets := utils.CutoffPresetsContainedInRange(startDate, endDate)
+	if len(presets) == 0 {
+		return nil, nil
+	}
+
+	var rows []processor.TeachersPayrollRow
+	for _, preset := range presets {
+		cutoffStart, cutoffEnd := utils.CutoffDatesFromPreset(preset)
+		if cutoffStart == "" || cutoffEnd == "" {
+			continue
+		}
+		cutoffLabel := formatPayrollCutoffPeriodLabel(cutoffStart, cutoffEnd)
+
+		summaries, err := dbRO.GetQueries().GetReportTeacherSummaries(ctx, reportSearchParams(q, cutoffStart, cutoffEnd, roleFilters))
+		if err != nil {
+			return nil, err
+		}
+		earningsRows, err := dbRO.GetQueries().GetReportTeacherEarnings(ctx, reportEarningsParams(q, cutoffStart, cutoffEnd, roleFilters))
+		if err != nil {
+			return nil, err
+		}
+		earningsByTeacher := map[int64][]reportEarningJSON{}
+		for _, row := range earningsRows {
+			earningsByTeacher[row.TeacherID] = append(earningsByTeacher[row.TeacherID], reportEarningJSON{
+				Currency: row.Currency,
+				Total:    sqlNumericToFloat64(row.TotalRate),
+			})
+		}
+
+		for _, summary := range summaries {
+			if summary.TotalClasses == 0 {
+				continue
+			}
+			fullName := utils.ComposePersonName(summary.TeacherFirstName, summary.TeacherMiddleName, summary.TeacherLastName)
+			rows = append(rows, processor.TeachersPayrollRow{
+				TeacherFullName: fullName,
+				CutoffLabel:     cutoffLabel,
+				TotalClasses:    summary.TotalClasses,
+				EarningsDisplay: formatTeachersPayrollEarnings(earningsByTeacher[summary.TeacherID]),
+			})
+		}
+	}
+	return rows, nil
+}
+
+func formatTeachersPayrollEarnings(earnings []reportEarningJSON) string {
+	if len(earnings) == 0 {
+		return constants.DisplayNotSet
+	}
+	parts := make([]string, 0, len(earnings))
+	for _, item := range earnings {
+		if item.Total == 0 {
+			continue
+		}
+		parts = append(parts, utils.FormatCurrency(item.Total, item.Currency))
+	}
+	if len(parts) == 0 {
+		return constants.DisplayNotSet
+	}
+	return strings.Join(parts, ", ")
+}
+
+func formatPayrollCutoffPeriodLabel(startDate, endDate string) string {
+	start, err := time.ParseInLocation(constants.DateLayout, startDate, constants.LocationPHT)
+	if err != nil {
+		return startDate + " - " + endDate
+	}
+	end, err := time.ParseInLocation(constants.DateLayout, endDate, constants.LocationPHT)
+	if err != nil {
+		return startDate + " - " + endDate
+	}
+	if start.Month() == end.Month() && start.Year() == end.Year() {
+		return fmt.Sprintf("%s %d - %d", start.Format("January"), start.Day(), end.Day())
+	}
+	return fmt.Sprintf("%s %d - %s %d", start.Format("January"), start.Day(), end.Format("January"), end.Day())
 }
 
 func formatReportCutoffLabel(startDate, endDate string) string {

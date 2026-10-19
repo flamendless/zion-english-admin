@@ -49,7 +49,7 @@ templ ReportTableRow(row ReportRowData, startDate string, endDate string, swapOO
 						</a>
 					}
 				</span>
-				@IconActionButton("View", IconKindView, templ.Attributes{
+				@IconActionButton("View teacher classes", IconKindView, templ.Attributes{
 					"hx-get":    utils.URL("/reports/" + row.TeacherID + "/view?startDate=" + startDate + "&endDate=" + endDate),
 					"hx-target": "#reportViewModalHost",
 					"hx-swap":   "innerHTML",

@@ -16,6 +16,7 @@ templ ReportSummaryModal() {
 					<button type="button" class="modal-close report-summary-close" aria-label="Close">&times;</button>
 				</div>
 				<div class="modal-body report-summary-modal-body">
+					@SummaryReportKindField()
 					@MonthPickerTarget("summaryReportMonth", utils.URL("/reports/partials/summary-date-preset"), "summaryDatePresetGroup")
 					@DatePresetForMonthScoped(utils.CurrentMonthPHT(), true, "summaryDatePresetGroup", "summaryDatePreset")
 					@ReportRolesFilterDropdownScoped(true, false, "summaryRolesFilterLabel")

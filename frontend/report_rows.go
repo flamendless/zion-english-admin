@@ -49,9 +49,9 @@ func (r ReportRowData) ClassesLabel() string {
 
 func (r ReportRowData) GenerateLabel() string {
 	if r.DownloadReady {
-		return "Regenerate"
+		return "Regenerate teacher classes report"
 	}
-	return "Generate report"
+	return "Generate teacher classes report"
 }
 
 func (r ReportRowData) GenerateKind() IconKind {

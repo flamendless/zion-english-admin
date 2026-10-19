@@ -204,7 +204,10 @@ const getReportGenerationByOutputBasename = `-- name: GetReportGenerationByOutpu
 SELECT rg.id, rg.kind, rg.teacher_id, rg.start_date, rg.end_date, rg.content_hash, rg.output_path, rg.record_count, rg.generated_at,
 	COALESCE(
 		trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END),
-		'Payroll summary'
+		CASE rg.kind
+			WHEN 'teachers_payroll' THEN 'Teachers payroll'
+			ELSE 'Payroll summary'
+		END
 	) AS teacher_name
 FROM tbl_report_generations rg
 LEFT JOIN tbl_teachers t ON rg.teacher_id = t.id
@@ -260,7 +263,7 @@ FROM tbl_report_generations rg
 LEFT JOIN tbl_teachers t ON t.id = rg.teacher_id
 WHERE (
 		(rg.kind = 'teacher' AND t.deleted = 0)
-		OR rg.kind = 'summary'
+		OR rg.kind IN ('summary', 'teachers_payroll')
 	)
 	AND (? = '' OR rg.start_date >= ?)
 	AND (? = '' OR rg.end_date <= ?)
@@ -278,6 +281,10 @@ WHERE (
 			rg.kind = 'summary'
 			AND 'Payroll summary' LIKE '%' || ? || '%'
 		)
+		OR (
+			rg.kind = 'teachers_payroll'
+			AND 'Teachers payroll' LIKE '%' || ? || '%'
+		)
 	)
 	AND (? = '' OR rg.kind = ?)
 ORDER BY rg.generated_at DESC
@@ -293,7 +300,8 @@ type GetReportGenerationsFilteredParams struct {
 	Column7   sql.NullString
 	Column8   sql.NullString
 	Column9   sql.NullString
-	Column10  any
+	Column10  sql.NullString
+	Column11  any
 	Kind      string
 }
 
@@ -324,6 +332,7 @@ func (q *Queries) GetReportGenerationsFiltered(ctx context.Context, arg GetRepor
 		arg.Column8,
 		arg.Column9,
 		arg.Column10,
+		arg.Column11,
 		arg.Kind,
 	)
 	if err != nil {
@@ -889,6 +898,36 @@ func (q *Queries) GetTeacherReportClassRecords(ctx context.Context, arg GetTeach
 	return items, nil
 }
 
+const getTeachersPayrollReportGeneration = `-- name: GetTeachersPayrollReportGeneration :one
+SELECT id, kind, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at
+FROM tbl_report_generations
+WHERE kind = 'teachers_payroll'
+	AND start_date = ?
+	AND end_date = ?
+`
+
+type GetTeachersPayrollReportGenerationParams struct {
+	StartDate string
+	EndDate   string
+}
+
+func (q *Queries) GetTeachersPayrollReportGeneration(ctx context.Context, arg GetTeachersPayrollReportGenerationParams) (TblReportGeneration, error) {
+	row := q.db.QueryRowContext(ctx, getTeachersPayrollReportGeneration, arg.StartDate, arg.EndDate)
+	var i TblReportGeneration
+	err := row.Scan(
+		&i.ID,
+		&i.Kind,
+		&i.TeacherID,
+		&i.StartDate,
+		&i.EndDate,
+		&i.ContentHash,
+		&i.OutputPath,
+		&i.RecordCount,
+		&i.GeneratedAt,
+	)
+	return i, err
+}
+
 const upsertReportGeneration = `-- name: UpsertReportGeneration :exec
 INSERT INTO tbl_report_generations (kind, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at)
 VALUES ('teacher', ?, ?, ?, ?, ?, ?, datetime('now'))
@@ -940,6 +979,35 @@ type UpsertSummaryReportGenerationParams struct {
 
 func (q *Queries) UpsertSummaryReportGeneration(ctx context.Context, arg UpsertSummaryReportGenerationParams) error {
 	_, err := q.db.ExecContext(ctx, upsertSummaryReportGeneration,
+		arg.StartDate,
+		arg.EndDate,
+		arg.ContentHash,
+		arg.OutputPath,
+		arg.RecordCount,
+	)
+	return err
+}
+
+const upsertTeachersPayrollReportGeneration = `-- name: UpsertTeachersPayrollReportGeneration :exec
+INSERT INTO tbl_report_generations (kind, teacher_id, start_date, end_date, content_hash, output_path, record_count, generated_at)
+VALUES ('teachers_payroll', NULL, ?, ?, ?, ?, ?, datetime('now'))
+ON CONFLICT(start_date, end_date) WHERE kind = 'teachers_payroll' DO UPDATE SET
+	content_hash = excluded.content_hash,
+	output_path = excluded.output_path,
+	record_count = excluded.record_count,
+	generated_at = datetime('now')
+`
+
+type UpsertTeachersPayrollReportGenerationParams struct {
+	StartDate   string
+	EndDate     string
+	ContentHash string
+	OutputPath  string
+	RecordCount int64
+}
+
+func (q *Queries) UpsertTeachersPayrollReportGeneration(ctx context.Context, arg UpsertTeachersPayrollReportGenerationParams) error {
+	_, err := q.db.ExecContext(ctx, upsertTeachersPayrollReportGeneration,
 		arg.StartDate,
 		arg.EndDate,
 		arg.ContentHash,

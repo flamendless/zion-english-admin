@@ -48,6 +48,10 @@ func ReportSummaryModal() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = SummaryReportKindField().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = MonthPickerTarget("summaryReportMonth", utils.URL("/reports/partials/summary-date-preset"), "summaryDatePresetGroup").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

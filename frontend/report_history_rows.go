@@ -10,6 +10,7 @@ const reportHistoryDownloadMissingTooltip = "Report file is no longer available"
 
 var ReportHistoryKindFilterOptions = []StatusOption{
 	{Value: string(constants.ReportGenerationKindSummary), Label: constants.ReportHistorySummaryLabel},
+	{Value: string(constants.ReportGenerationKindTeachersPayroll), Label: constants.ReportHistoryTeachersPayrollLabel},
 }
 
 type ReportHistoryRowData struct {
@@ -26,7 +27,16 @@ type ReportHistoryRowData struct {
 }
 
 func (r ReportHistoryRowData) IsSummary() bool {
-	return r.Kind == constants.ReportGenerationKindSummary
+	return r.IsAggregateReport()
+}
+
+func (r ReportHistoryRowData) IsAggregateReport() bool {
+	switch r.Kind {
+	case constants.ReportGenerationKindSummary, constants.ReportGenerationKindTeachersPayroll:
+		return true
+	default:
+		return false
+	}
 }
 
 func (r ReportHistoryRowData) RecordsLabel() string {

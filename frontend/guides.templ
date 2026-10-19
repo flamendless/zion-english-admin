@@ -270,11 +270,26 @@ templ GuideReportsGeneration() {
 					utils.URL("/reports"),
 					"Build a spreadsheet from recorded classes and download it for payroll.",
 					[]string{
-						"Click Generate report on the teacher's row for the selected date range.",
+						"Click Generate teacher classes report on the teacher's row for the selected date range.",
 						"When generation finishes, Download XLSX becomes available for that row.",
 						"If class records have not changed since the last export, the system skips regeneration and keeps the existing file.",
 						"Click Regenerate after teachers update class records if you need a fresh XLSX.",
 						"The downloaded file uses the same format as the Process pipeline output.",
+					},
+					false,
+				)
+				@GuideSection(
+					"generate-summary",
+					"Generate summary",
+					utils.URL("/reports"),
+					"Export payroll data for many teachers at once from the Generate Summary modal.",
+					[]string{
+						"Click Generate Summary on the Reports page.",
+						"Choose Kind: Parents summary (default) or Teachers payroll.",
+						"Select month, date range preset, and optional teacher role filters, then click Generate.",
+						"Parents summary downloads one sheet per teacher with student blocks, class status, date, duration, parent rate, and class rate.",
+						"Teachers payroll downloads a single sheet with teacher name, cutoff period, total classes, and total earnings for each cutoff in the selected range.",
+						"Both exports appear in Report History with their type label.",
 					},
 					false,
 				)

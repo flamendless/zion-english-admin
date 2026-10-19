@@ -22,10 +22,17 @@ templ Reports() {
 				flex-shrink: 0;
 			}
 
-			.reports-header-actions .btn,
-			.reports-header-actions .add-btn {
+			.reports-header-actions .btn {
 				margin-top: 0;
 				width: auto;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				height: 36px;
+				padding: 0 var(--space-4);
+				font-size: 0.875rem;
+				line-height: 1;
+				box-sizing: border-box;
 			}
 
 			.hub-header > .btn,
@@ -134,7 +141,7 @@ templ Reports() {
 				<div class="reports-header-actions">
 					<a href={ utils.URL("/reports/history") } class="btn btn-secondary">View History</a>
 					<a href={ utils.URL("/payments") } class="btn btn-secondary">View Payment History</a>
-					<button type="button" class="add-btn" data-open-report-summary-modal>Generate Summary</button>
+					<button type="button" class="btn" data-open-report-summary-modal>Generate Report</button>
 				</div>
 			</div>
 
