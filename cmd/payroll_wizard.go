@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"strings"
 	"zion-english/frontend"
-	"zion-english/internal/conf"
 	"zion-english/internal/constants"
 	"zion-english/internal/logs"
 	"zion-english/internal/parentpaymentocr"
@@ -61,13 +60,14 @@ func handlePayrollWizardParentPaymentsOCR(w http.ResponseWriter, r *http.Request
 	}
 
 	reader := bytes.NewReader(imageBytes)
-	if _, err := validateDocumentUpload(reader, header.Filename, int64(len(imageBytes))); err != nil {
+	ext, err := validateDocumentUpload(reader, header.Filename, int64(len(imageBytes)))
+	if err != nil {
 		renderParentPaymentsVerificationError(w, r, userFacingUploadError(err))
 		return
 	}
 
 	ctx := r.Context()
-	text, ocrErr := parentpaymentocr.DetectDocumentText(ctx, conf.Conf().GoogleVisionAPIKey, imageBytes)
+	text, ocrErr := parentpaymentocr.DetectDocumentText(ctx, imageBytes, ext)
 	if ocrErr != nil {
 		logs.Log().Error("parent payments OCR", zap.Error(ocrErr))
 		renderParentPaymentsVerificationError(w, r, ocrErr.Error())
