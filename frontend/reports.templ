@@ -141,6 +141,7 @@ templ Reports() {
 				<div class="reports-header-actions">
 					<a href={ utils.URL("/reports/history") } class="btn btn-secondary">View History</a>
 					<a href={ utils.URL("/payments") } class="btn btn-secondary">View Payment History</a>
+					<button type="button" class="btn btn-secondary" data-open-payroll-wizard>Payroll wizard</button>
 					<button type="button" class="btn" data-open-report-summary-modal>Generate Report</button>
 				</div>
 			</div>
@@ -205,6 +206,7 @@ templ Reports() {
 			<div id="reportViewModalHost"></div>
 			<div id="reportPaymentModalHost"></div>
 			@ReportSummaryModal()
+			@PayrollWizardModal()
 		</div>
 
 		<script>

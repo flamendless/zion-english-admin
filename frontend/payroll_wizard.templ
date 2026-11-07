@@ -1,0 +1,371 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+templ PayrollWizardModal() {
+	<div class="modal-overlay modal-overlay-front" id="payrollWizardModal" hidden role="presentation">
+		<div class="modal-dialog modal-dialog-wizard" role="dialog" aria-modal="true" aria-labelledby="payrollWizardTitle">
+			<div class="modal-header">
+				<div class="wizard-header-text">
+					<h3 id="payrollWizardTitle">Payroll wizard</h3>
+					<p class="wizard-step-label" id="payrollWizardStepLabel" aria-live="polite">Step 1 of 3</p>
+				</div>
+				<button type="button" class="modal-close payroll-wizard-close" data-tooltip="Close" aria-label="Close">&times;</button>
+			</div>
+			<form id="payrollWizardForm" class="payroll-wizard-form" novalidate>
+				<div class="modal-body class-wizard-body">
+					<div id="payrollWizardMessage" class="form-message" role="alert" aria-live="assertive" hidden></div>
+
+					<div class="wizard-step is-active" data-step="1" data-required="true">
+						<p class="wizard-step-lead">Choose the payroll cutoff you are processing.</p>
+						@MonthPickerTarget("payrollWizardMonth", utils.URL("/reports/partials/summary-date-preset"), "payrollWizardDatePresetGroup")
+						@DatePresetForMonthScoped(utils.CurrentMonthPHT(), true, "payrollWizardDatePresetGroup", "payrollWizardDatePreset")
+						<input type="hidden" id="payrollWizard_startDate" name="startDate" value=""/>
+						<input type="hidden" id="payrollWizard_endDate" name="endDate" value=""/>
+					</div>
+
+					<div class="wizard-step" data-step="2">
+						<p class="wizard-step-lead">Review teacher payroll on the Reports table for this cutoff: generate XLSX reports and send payments before importing parent payment proofs.</p>
+						<ul class="payroll-wizard-checklist">
+							<li>Confirm each teacher row shows the correct totals for the selected cutoff.</li>
+							<li>Generate and download payroll XLSX where needed.</li>
+							<li>Record teacher payments with reference numbers.</li>
+						</ul>
+					</div>
+
+					<div class="wizard-step" data-step="3">
+						<p class="wizard-step-lead">Upload a parent payment screenshot or receipt image. OCR extracts legal names and amounts for verification against parent totals in this cutoff.</p>
+						<div class="payroll-wizard-import-actions">
+							<button type="button" class="btn" id="openParentPaymentsUploadBtn">Upload image</button>
+						</div>
+						<div id="parentPaymentsVerificationHost">
+							@ParentPaymentsVerificationEmpty()
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer wizard-footer">
+					<button type="button" class="btn btn-secondary wizard-nav-btn wizard-nav-prev" id="payrollWizardPrev" hidden>Previous</button>
+					<button type="button" class="btn wizard-nav-btn" id="payrollWizardNext">Next</button>
+					<button type="button" class="btn wizard-nav-btn" id="payrollWizardDone" hidden>Done</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	@ParentPaymentsUploadModal()
+	@ClassWizardStyles()
+	@PayrollWizardStyles()
+	@PayrollWizardScript()
+}
+
+templ ParentPaymentsUploadModal() {
+	<div class="modal-overlay modal-overlay-front" id="parentPaymentsUploadModal" hidden role="presentation">
+		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="parentPaymentsUploadTitle">
+			<form
+				id="parentPaymentsUploadForm"
+				hx-post={ utils.URL("/reports/payroll-wizard/parent-payments/ocr") }
+				hx-encoding="multipart/form-data"
+				hx-target="#parentPaymentsVerificationHost"
+				hx-swap={ HxSwapInnerHTML }
+				hx-include="#payrollWizardForm"
+			>
+				<div class="modal-header">
+					<h3 id="parentPaymentsUploadTitle">Upload parent payments image</h3>
+					<button type="button" class="modal-close parent-payments-upload-close" aria-label="Close">&times;</button>
+				</div>
+				<div class="modal-body">
+					<p class="field-hint">PNG or JPEG, up to 5 MB. Image should list legal names (Korean or other) with payment amounts.</p>
+					<div class="upload-zone" id="parentPaymentsUploadZone">
+						<label class="upload-zone-label" for="parentPaymentsImageInput">
+							<span class="upload-zone-icon" aria-hidden="true">
+								<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+							</span>
+							<span class="upload-zone-meta">
+								<span>Choose image</span>
+								<span class="upload-zone-hint">PNG or JPEG</span>
+							</span>
+							<input type="file" id="parentPaymentsImageInput" name="image" accept="image/png,image/jpeg,image/jpg" required/>
+						</label>
+						<p class="upload-filename" id="parentPaymentsFilename" aria-live="polite"></p>
+					</div>
+					<div id="parentPaymentsUploadError" class="form-message form-message--error" role="alert" hidden></div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary parent-payments-upload-close">Cancel</button>
+					<button type="submit" class="btn" id="parentPaymentsUploadSubmit">Scan image</button>
+				</div>
+			</form>
+		</div>
+	</div>
+}
+
+templ ParentPaymentsVerificationEmpty() {
+	<p class="empty-state payroll-wizard-empty-verify">No image scanned yet. Upload a parent payments image to see verification rows.</p>
+}
+
+templ ParentPaymentsVerificationPanel(data ParentPaymentsVerificationData) {
+	if data.OCRFailed {
+		<div class="form-message form-message--error" role="alert">{ data.ErrorMsg }</div>
+	}
+	if data.CutoffLabel != "" {
+		<p class="payroll-wizard-verify-cutoff">{ data.CutoffLabel }</p>
+	}
+	if len(data.Rows) == 0 && !data.OCRFailed {
+		<p class="empty-state">No legal name and amount pairs were detected. Try a clearer image or check the layout.</p>
+	} else if len(data.Rows) > 0 {
+		<div class="table-wrapper data-list-view-root">
+			<table class="table-stack-mobile payroll-parent-payments-table">
+				<thead>
+					<tr>
+						<th>Legal name (OCR)</th>
+						<th>Amount (OCR)</th>
+						<th>Matched student</th>
+						<th>Expected total</th>
+						<th>Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					for _, row := range data.Rows {
+						<tr>
+							<td data-label="Legal name (OCR)">{ row.LegalName }</td>
+							<td data-label="Amount (OCR)">{ row.ParsedAmount }</td>
+							<td data-label="Matched student">{ row.StudentLabel }</td>
+							<td data-label="Expected total">{ row.ExpectedAmount }</td>
+							<td data-label="Status">
+								@StatusPill(row.StatusLabel, row.Status.PillTone(), false)
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	}
+}
+
+templ PayrollWizardStyles() {
+	<style>
+		.payroll-wizard-checklist {
+			margin: 0;
+			padding-left: 1.25rem;
+			color: var(--color-foreground);
+			font-size: 0.875rem;
+			line-height: 1.5;
+		}
+
+		.payroll-wizard-checklist li {
+			margin-bottom: var(--space-2);
+		}
+
+		.payroll-wizard-import-actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-2);
+			margin-bottom: var(--space-4);
+		}
+
+		.payroll-wizard-import-actions .btn {
+			margin-top: 0;
+		}
+
+		.payroll-wizard-empty-verify {
+			margin: 0;
+		}
+
+		.payroll-wizard-verify-cutoff {
+			margin: 0 0 var(--space-3);
+			font-size: 0.875rem;
+			color: var(--color-muted-foreground);
+		}
+
+		.payroll-parent-payments-table .status-pill {
+			white-space: nowrap;
+		}
+
+		#parentPaymentsUploadModal .modal-footer {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-2);
+		}
+
+		#parentPaymentsUploadModal .modal-footer .btn {
+			margin-top: 0;
+		}
+	</style>
+}
+
+templ PayrollWizardScript() {
+	<script>
+		(function () {
+			if (window.__payrollWizardReady) return;
+			window.__payrollWizardReady = true;
+
+			const modal = document.getElementById('payrollWizardModal');
+			const uploadModal = document.getElementById('parentPaymentsUploadModal');
+			const form = document.getElementById('payrollWizardForm');
+			if (!modal || !form) return;
+
+			const totalSteps = 3;
+			let currentStep = 1;
+
+			function steps() {
+				return form.querySelectorAll('.wizard-step');
+			}
+
+			function showMessage(text) {
+				const el = document.getElementById('payrollWizardMessage');
+				if (!el) return;
+				if (!text) {
+					el.hidden = true;
+					el.textContent = '';
+					return;
+				}
+				el.hidden = false;
+				el.textContent = text;
+			}
+
+			function syncDatesFromPreset() {
+				const preset = document.getElementById('payrollWizardDatePreset');
+				const start = document.getElementById('payrollWizard_startDate');
+				const end = document.getElementById('payrollWizard_endDate');
+				if (!preset || !preset.value || !start || !end) return false;
+				const parts = preset.value.split('|');
+				if (parts.length !== 2) return false;
+				start.value = parts[0];
+				end.value = parts[1];
+				return true;
+			}
+
+			function stepValid(step) {
+				if (step === 1) {
+					return syncDatesFromPreset();
+				}
+				return true;
+			}
+
+			function updateNav() {
+				const label = document.getElementById('payrollWizardStepLabel');
+				const prev = document.getElementById('payrollWizardPrev');
+				const next = document.getElementById('payrollWizardNext');
+				const done = document.getElementById('payrollWizardDone');
+				if (label) label.textContent = 'Step ' + currentStep + ' of ' + totalSteps;
+				if (prev) prev.hidden = currentStep <= 1;
+				if (next) next.hidden = currentStep >= totalSteps;
+				if (done) done.hidden = currentStep < totalSteps;
+				if (next) next.disabled = !stepValid(currentStep);
+			}
+
+			function goToStep(step) {
+				currentStep = Math.max(1, Math.min(totalSteps, step));
+				steps().forEach(function (el) {
+					const n = parseInt(el.getAttribute('data-step'), 10);
+					el.classList.toggle('is-active', n === currentStep);
+				});
+				showMessage('');
+				updateNav();
+			}
+
+			function openPayrollWizard() {
+				const toolbarPreset = document.getElementById('datePreset');
+				const wizardPreset = document.getElementById('payrollWizardDatePreset');
+				if (toolbarPreset && wizardPreset && toolbarPreset.value) {
+					wizardPreset.value = toolbarPreset.value;
+					wizardPreset.dispatchEvent(new Event('change', { bubbles: true }));
+				}
+				syncDatesFromPreset();
+				goToStep(1);
+				modal.hidden = false;
+				document.body.classList.add('modal-open');
+			}
+
+			function closePayrollWizard() {
+				modal.hidden = true;
+				document.body.classList.remove('modal-open');
+			}
+
+			function openUploadModal() {
+				if (!uploadModal) return;
+				if (!syncDatesFromPreset()) {
+					showMessage('Select a payroll cutoff in step 1 first.');
+					goToStep(1);
+					return;
+				}
+				uploadModal.hidden = false;
+			}
+
+			function closeUploadModal() {
+				if (uploadModal) uploadModal.hidden = true;
+			}
+
+			document.body.addEventListener('click', function (e) {
+				if (e.target.closest('[data-open-payroll-wizard]')) {
+					openPayrollWizard();
+					return;
+				}
+				if (e.target.closest('.payroll-wizard-close')) {
+					closePayrollWizard();
+					return;
+				}
+				if (e.target.closest('#openParentPaymentsUploadBtn')) {
+					openUploadModal();
+					return;
+				}
+				if (e.target.closest('.parent-payments-upload-close')) {
+					closeUploadModal();
+					return;
+				}
+				if (e.target === modal) {
+					closePayrollWizard();
+				}
+				if (uploadModal && e.target === uploadModal) {
+					closeUploadModal();
+				}
+			});
+
+			document.getElementById('payrollWizardPrev')?.addEventListener('click', function () {
+				goToStep(currentStep - 1);
+			});
+			document.getElementById('payrollWizardNext')?.addEventListener('click', function () {
+				if (!stepValid(currentStep)) {
+					showMessage('Select a payroll cutoff date range.');
+					return;
+				}
+				goToStep(currentStep + 1);
+			});
+			document.getElementById('payrollWizardDone')?.addEventListener('click', closePayrollWizard);
+
+			document.getElementById('payrollWizardDatePreset')?.addEventListener('change', function () {
+				syncDatesFromPreset();
+				updateNav();
+			});
+
+			const fileInput = document.getElementById('parentPaymentsImageInput');
+			const filenameEl = document.getElementById('parentPaymentsFilename');
+			fileInput?.addEventListener('change', function () {
+				if (filenameEl) {
+					filenameEl.textContent = fileInput.files && fileInput.files[0] ? fileInput.files[0].name : '';
+				}
+			});
+
+			document.body.addEventListener('htmx:afterSwap', function (evt) {
+				if (evt.detail.target.id === 'parentPaymentsVerificationHost') {
+					closeUploadModal();
+					const uploadForm = document.getElementById('parentPaymentsUploadForm');
+					if (uploadForm) uploadForm.reset();
+					if (filenameEl) filenameEl.textContent = '';
+				}
+			});
+
+			document.addEventListener('keydown', function (e) {
+				if (e.key !== 'Escape') return;
+				if (uploadModal && !uploadModal.hidden) {
+					closeUploadModal();
+					return;
+				}
+				if (!modal.hidden) closePayrollWizard();
+			});
+
+			window.openPayrollWizard = openPayrollWizard;
+		})();
+	</script>
+}
