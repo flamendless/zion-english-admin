@@ -427,6 +427,7 @@ SELECT
 	cr.student_id,
 	s.name AS student_name,
 	s.student_number AS student_number,
+	s.legal_name AS student_legal_name,
 	s.parent_rate,
 	s.parent_currency,
 	cr.date,
@@ -499,6 +500,7 @@ type GetReportSummaryRowsRow struct {
 	StudentID                  int64
 	StudentName                string
 	StudentNumber              sql.NullString
+	StudentLegalName           sql.NullString
 	ParentRate                 sql.NullFloat64
 	ParentCurrency             sql.NullString
 	Date                       string
@@ -541,6 +543,7 @@ func (q *Queries) GetReportSummaryRows(ctx context.Context, arg GetReportSummary
 			&i.StudentID,
 			&i.StudentName,
 			&i.StudentNumber,
+			&i.StudentLegalName,
 			&i.ParentRate,
 			&i.ParentCurrency,
 			&i.Date,
@@ -819,6 +822,7 @@ SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time,
 	cr.created_at, cr.updated_at, cr.recorded_by_role,
 	s.name AS student_name,
 	s.student_number AS student_number,
+	s.legal_name AS student_legal_name,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name
 FROM tbl_class_records cr
 JOIN tbl_students s ON cr.student_id = s.id
@@ -836,24 +840,25 @@ type GetTeacherReportClassRecordsParams struct {
 }
 
 type GetTeacherReportClassRecordsRow struct {
-	ID              int64
-	StudentID       int64
-	TeacherID       int64
-	Date            string
-	StartTime       sql.NullString
-	EndTime         sql.NullString
-	DurationMinutes int64
-	Rate            float64
-	Currency        string
-	Status          string
-	Reason          sql.NullString
-	Notes           sql.NullString
-	CreatedAt       string
-	UpdatedAt       string
-	RecordedByRole  string
-	StudentName     string
-	StudentNumber   sql.NullString
-	TeacherName     string
+	ID               int64
+	StudentID        int64
+	TeacherID        int64
+	Date             string
+	StartTime        sql.NullString
+	EndTime          sql.NullString
+	DurationMinutes  int64
+	Rate             float64
+	Currency         string
+	Status           string
+	Reason           sql.NullString
+	Notes            sql.NullString
+	CreatedAt        string
+	UpdatedAt        string
+	RecordedByRole   string
+	StudentName      string
+	StudentNumber    sql.NullString
+	StudentLegalName sql.NullString
+	TeacherName      string
 }
 
 func (q *Queries) GetTeacherReportClassRecords(ctx context.Context, arg GetTeacherReportClassRecordsParams) ([]GetTeacherReportClassRecordsRow, error) {
@@ -883,6 +888,7 @@ func (q *Queries) GetTeacherReportClassRecords(ctx context.Context, arg GetTeach
 			&i.RecordedByRole,
 			&i.StudentName,
 			&i.StudentNumber,
+			&i.StudentLegalName,
 			&i.TeacherName,
 		); err != nil {
 			return nil, err
