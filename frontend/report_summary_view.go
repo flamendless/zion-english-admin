@@ -8,11 +8,11 @@ import (
 )
 
 type ParentsSummaryClassRow struct {
-	Status      constants.ClassStatus
-	Date        string
-	Duration    string
-	ParentRate  string
-	ClassRate   string
+	Status     constants.ClassStatus
+	Date       string
+	Duration   string
+	ParentRate string
+	ClassRate  string
 }
 
 type ParentsSummaryStudentBlock struct {
@@ -42,11 +42,11 @@ func (r TeachersPayrollSummaryRow) ClassesLabel() string {
 }
 
 type ReportSummaryViewData struct {
-	Kind          constants.SummaryReportKind
-	Title         string
-	CutoffLabel   string
-	Parents       []ParentsSummaryTeacherBlock
-	Payroll       []TeachersPayrollSummaryRow
+	Kind        constants.SummaryReportKind
+	Title       string
+	CutoffLabel string
+	Parents     []ParentsSummaryTeacherBlock
+	Payroll     []TeachersPayrollSummaryRow
 }
 
 func (d ReportSummaryViewData) IsParents() bool {

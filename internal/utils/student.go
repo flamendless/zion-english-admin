@@ -5,18 +5,29 @@ import (
 	"strings"
 )
 
-func StudentDisplayName(name, studentNumber string) string {
+func StudentDisplayName(name, studentNumber, legalName string) string {
 	name = strings.TrimSpace(name)
 	num := strings.TrimSpace(studentNumber)
-	if num == "" {
-		return name
+	legalName = strings.TrimSpace(legalName)
+
+	base := name
+	if num != "" {
+		base = name + " (" + num + ")"
 	}
-	return name + " (" + num + ")"
+	if legalName != "" {
+		return base + " (" + legalName + ")"
+	}
+	return base
 }
 
-func StudentDisplayNameFromNull(name string, studentNumber sql.NullString) string {
-	if !studentNumber.Valid {
-		return name
+func StudentDisplayNameFromNull(name string, studentNumber, legalName sql.NullString) string {
+	num := ""
+	if studentNumber.Valid {
+		num = studentNumber.String
 	}
-	return StudentDisplayName(name, studentNumber.String)
+	legal := ""
+	if legalName.Valid {
+		legal = legalName.String
+	}
+	return StudentDisplayName(name, num, legal)
 }

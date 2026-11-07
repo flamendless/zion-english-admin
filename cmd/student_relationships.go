@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -83,7 +82,7 @@ func handleStudentRelationshipStudentSearch(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	students, err := dbRO.GetQueries().SearchStudentsByName(r.Context(), sql.NullString{String: q, Valid: true})
+	students, err := dbRO.GetQueries().SearchStudentsByName(r.Context(), studentSearchParams(q))
 	if err != nil {
 		HttpError(w, MsgFailedToSearchStudents, http.StatusInternalServerError)
 		return

@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"context"
+	"database/sql"
 	"strconv"
 
-	"zion-english/frontend"
 	"zion-english/internal/models"
 )
 
@@ -12,8 +12,8 @@ func studentTestSeedFilterTriplet(filter string) (string, string, string) {
 	return filter, filter, filter
 }
 
-func studentAvatarView(name, assignedColor string, isTestSeed int64) models.AvatarView {
-	props := frontend.StudentAvatarProps(name, assignedColor, isTestSeed == 1, "sm")
+func studentAvatarView(name, assignedColor string, isTestSeed int64, nationalityID sql.NullString, flags map[string]string) models.AvatarView {
+	props := buildStudentAvatarProps(name, assignedColor, isTestSeed == 1, "sm", nationalityID, flags)
 	return models.AvatarView{
 		Initials:      props.Initials,
 		AssignedColor: props.AssignedColor,
@@ -21,6 +21,7 @@ func studentAvatarView(name, assignedColor string, isTestSeed int64) models.Avat
 		HasPicture:    props.HasPicture,
 		Alt:           props.Alt,
 		RoleBadge:     props.RoleBadge,
+		FlagURL:       props.FlagURL,
 	}
 }
 
@@ -50,7 +51,7 @@ func appendSelectedStudentIfMissing(ctx context.Context, responses []models.Stud
 	}
 	return append(responses, models.StudentAPIResponse{
 		ID:           row.ID,
-		Name:         studentDisplayName(row.Name, row.StudentNumber),
+		Name:         studentDisplayName(row.Name, row.StudentNumber, row.LegalName),
 		Currency:     row.Currency,
 		RatePerClass: row.RatePerClass,
 	})

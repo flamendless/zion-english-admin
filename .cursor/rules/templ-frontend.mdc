@@ -87,6 +87,16 @@ Whenever a teacher name is shown in the UI, render it with `@TeacherNameCell(nam
 - View structs that carry a teacher name should also carry `AvatarProps` (e.g. `TeacherAvatar`, `Avatar`).
 - Include `@AvatarStyles()` on pages that render teacher names outside `GlobalIncludes` partials that already load avatar CSS.
 
+## Student name display
+
+Whenever a student name is shown in the UI, render it with `@StudentNameCell(name, studentNumber, legalName, avatar)` from `avatar.templ`. **Never render a bare student name string** in tables, modals, cards, or detail views.
+
+- Use `utils.StudentDisplayName(name, studentNumber, legalName)` for display strings (number and legal name in parentheses, in that order).
+- Populate student `AvatarProps` via `buildStudentAvatarProps` in handlers so nationality flags appear on the avatar when `nationality_id` is set.
+- Handlers should load nationality flag URLs with `nationalityFlagMap` once per request when building multiple student avatars.
+- Nationality pickers use `@NationalityDropdownWithValue`; read-only nationality uses `@NationalityDisplay` (flag plus country name). **Show a country flag wherever a nationality is displayed.**
+- Include `@AvatarStyles()` on pages that render student avatars outside `GlobalIncludes`.
+
 ## Icon actions
 
 Action icon kinds are typed as `IconKind` in [`icon_kind.go`](icon_kind.go). Use `@IconActionLink`, `@IconActionButton`, and `@IconActionSubmit` with `IconKind` constants: never build action buttons in client-side JavaScript.

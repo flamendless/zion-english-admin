@@ -74,6 +74,9 @@ func listSearchPlaceholder(statusType ListFilterKind) string {
 	if statusType == ListFilterKindTeacher {
 		return "Name or email..."
 	}
+	if statusType == ListFilterKindStudent || statusType == ListFilterKindMyStudent {
+		return "Name or legal name..."
+	}
 	return "Name..."
 }
 

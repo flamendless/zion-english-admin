@@ -1,28 +1,28 @@
 -- name: InsertStudent :one
-INSERT INTO tbl_students (name, student_number, parent_number, currency, contact, rate_per_class, rate_duration_minutes, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO tbl_students (name, student_number, parent_number, currency, contact, rate_per_class, rate_duration_minutes, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, legal_name, nationality_id)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 RETURNING id;
 
 -- name: GetAllStudents :many
-SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, rate_duration_minutes, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
+SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, rate_duration_minutes, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, legal_name, nationality_id, created_at, updated_at
 FROM tbl_students
 ORDER BY created_at DESC;
 
 -- name: GetActiveStudents :many
-SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, rate_duration_minutes, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
+SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, rate_duration_minutes, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, legal_name, nationality_id, created_at, updated_at
 FROM tbl_students
 WHERE status = 'active'
 	AND is_test_seed = 0
 ORDER BY name ASC;
 
 -- name: GetStudentByID :one
-SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, rate_duration_minutes, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
+SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, rate_duration_minutes, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, legal_name, nationality_id, created_at, updated_at
 FROM tbl_students
 WHERE id = ?;
 
 -- name: UpdateStudent :exec
 UPDATE tbl_students
-SET name = ?, student_number = ?, parent_number = ?, currency = ?, contact = ?, rate_per_class = ?, rate_duration_minutes = ?, parent_name = ?, parent_rate = ?, parent_currency = ?, assigned_color = ?, status = ?, inactive_reason = ?, deleted_reason = ?, is_test_seed = ?, updated_at = datetime('now')
+SET name = ?, student_number = ?, parent_number = ?, currency = ?, contact = ?, rate_per_class = ?, rate_duration_minutes = ?, parent_name = ?, parent_rate = ?, parent_currency = ?, assigned_color = ?, status = ?, inactive_reason = ?, deleted_reason = ?, is_test_seed = ?, legal_name = ?, nationality_id = ?, updated_at = datetime('now')
 WHERE id = ?;
 
 -- name: SoftDeleteStudent :exec
@@ -31,9 +31,12 @@ SET status = 'deleted', deleted_reason = ?, updated_at = datetime('now')
 WHERE id = ? AND status != 'deleted';
 
 -- name: SearchStudentsByName :many
-SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, rate_duration_minutes, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
+SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, rate_duration_minutes, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, legal_name, nationality_id, created_at, updated_at
 FROM tbl_students
-WHERE name LIKE '%' || ? || '%'
+WHERE (
+		name LIKE '%' || ? || '%'
+		OR COALESCE(legal_name, '') LIKE '%' || ? || '%'
+	)
 	AND status != 'deleted'
 	AND is_test_seed = 0
 ORDER BY name ASC
@@ -43,7 +46,11 @@ LIMIT 10;
 SELECT COUNT(DISTINCT s.id) as count
 FROM tbl_students s
 LEFT JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
-WHERE (? = '' OR s.name LIKE '%' || ? || '%')
+WHERE (
+		? = ''
+		OR s.name LIKE '%' || ? || '%'
+		OR COALESCE(s.legal_name, '') LIKE '%' || ? || '%'
+	)
 	AND (
 		(? = '' AND s.status != 'deleted')
 		OR (? != '' AND s.status = ?)
@@ -88,10 +95,14 @@ WHERE (? = '' OR s.name LIKE '%' || ? || '%')
 	);
 
 -- name: GetStudentsFiltered :many
-SELECT DISTINCT s.id, s.name, s.student_number, s.parent_number, s.currency, s.contact, s.rate_per_class, s.rate_duration_minutes, s.parent_name, s.parent_rate, s.parent_currency, s.assigned_color, s.status, s.inactive_reason, s.deleted_reason, s.is_test_seed, s.created_at, s.updated_at
+SELECT DISTINCT s.id, s.name, s.student_number, s.parent_number, s.currency, s.contact, s.rate_per_class, s.rate_duration_minutes, s.parent_name, s.parent_rate, s.parent_currency, s.assigned_color, s.status, s.inactive_reason, s.deleted_reason, s.is_test_seed, s.legal_name, s.nationality_id, s.created_at, s.updated_at
 FROM tbl_students s
 LEFT JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
-WHERE (? = '' OR s.name LIKE '%' || ? || '%')
+WHERE (
+		? = ''
+		OR s.name LIKE '%' || ? || '%'
+		OR COALESCE(s.legal_name, '') LIKE '%' || ? || '%'
+	)
 	AND (
 		(? = '' AND s.status != 'deleted')
 		OR (? != '' AND s.status = ?)
@@ -185,7 +196,7 @@ WHERE s.status = 'active'
 	);
 
 -- name: GetTestSeedStudents :many
-SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, rate_duration_minutes, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, created_at, updated_at
+SELECT id, name, student_number, parent_number, currency, contact, rate_per_class, rate_duration_minutes, parent_name, parent_rate, parent_currency, assigned_color, status, inactive_reason, deleted_reason, is_test_seed, legal_name, nationality_id, created_at, updated_at
 FROM tbl_students
 WHERE is_test_seed = 1
 ORDER BY id ASC;

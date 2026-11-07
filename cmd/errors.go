@@ -61,6 +61,8 @@ var (
 	ErrAssignedColorRequired        = errors.New("assigned color is required")
 	ErrInvalidStudentStatus         = errors.New("invalid status. Must be active or inactive")
 	ErrInactiveReasonRequired       = errors.New("inactive reason is required when status is inactive")
+	ErrLegalNameTooLong             = errors.New("legal name must be at most 64 characters")
+	ErrInvalidNationality           = errors.New("invalid nationality")
 
 	ErrParentRateRequiredWhenCurrencySet = errors.New("parent rate is required when parent currency is set")
 	ErrParentCurrencyRequiredWhenRateSet = errors.New("parent currency is required when parent rate is set")

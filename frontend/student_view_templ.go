@@ -47,7 +47,7 @@ func StudentViewModal(data EditStudentData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = StudentNameCell(data.Name, data.StudentNumber, data.Avatar).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = StudentNameCell(data.Name, data.StudentNumber, data.LegalName, data.Avatar).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -92,6 +92,29 @@ func StudentViewModal(data EditStudentData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+			templ_7745c5c3_Err = ProfileDetailField("Legal name", displayOrDash(data.LegalName)).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if data.HasNationality {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"profile-detail\"><span class=\"profile-detail-label\">Nationality</span> <span class=\"profile-detail-value\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = NationalityDisplay(data.Nationality).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</span></div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			} else {
+				templ_7745c5c3_Err = ProfileDetailField("Nationality", constants.DisplayNotSet).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
 			templ_7745c5c3_Err = ProfileDetailField("Parent", displayOrDash(data.ParentName)).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -108,7 +131,7 @@ func StudentViewModal(data EditStudentData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -214,7 +237,7 @@ func StudentViewModal(data EditStudentData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div></div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -243,7 +266,7 @@ func StudentViewModalScripts() templ.Component {
 			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<script>\r\n\t\twindow.closeStudentViewModal = function () {\r\n\t\t\tconst host = document.getElementById('studentViewModalHost');\r\n\t\t\tif (host) host.innerHTML = '';\r\n\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t};\r\n\r\n\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\tif (evt.detail.target.id !== 'studentViewModalHost') return;\r\n\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\tconst overlay = evt.detail.target.querySelector('#studentViewModal');\r\n\t\t\tconst closeBtn = overlay && overlay.querySelector('.student-view-close');\r\n\t\t\tif (closeBtn) closeBtn.focus();\r\n\t\t});\r\n\r\n\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\tif (e.target.closest('.student-view-close')) {\r\n\t\t\t\twindow.closeStudentViewModal();\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tconst overlay = e.target.closest('#studentViewModal');\r\n\t\t\tif (overlay && e.target === overlay) window.closeStudentViewModal();\r\n\t\t});\r\n\r\n\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\tif (e.key === 'Escape' && document.getElementById('studentViewModal')) {\r\n\t\t\t\twindow.closeStudentViewModal();\r\n\t\t\t}\r\n\t\t});\r\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<script>\r\n\t\twindow.closeStudentViewModal = function () {\r\n\t\t\tconst host = document.getElementById('studentViewModalHost');\r\n\t\t\tif (host) host.innerHTML = '';\r\n\t\t\tdocument.body.classList.remove('modal-open');\r\n\t\t};\r\n\r\n\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\r\n\t\t\tif (evt.detail.target.id !== 'studentViewModalHost') return;\r\n\t\t\tdocument.body.classList.add('modal-open');\r\n\t\t\tconst overlay = evt.detail.target.querySelector('#studentViewModal');\r\n\t\t\tconst closeBtn = overlay && overlay.querySelector('.student-view-close');\r\n\t\t\tif (closeBtn) closeBtn.focus();\r\n\t\t});\r\n\r\n\t\tdocument.body.addEventListener('click', function (e) {\r\n\t\t\tif (e.target.closest('.student-view-close')) {\r\n\t\t\t\twindow.closeStudentViewModal();\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tconst overlay = e.target.closest('#studentViewModal');\r\n\t\t\tif (overlay && e.target === overlay) window.closeStudentViewModal();\r\n\t\t});\r\n\r\n\t\tdocument.addEventListener('keydown', function (e) {\r\n\t\t\tif (e.key === 'Escape' && document.getElementById('studentViewModal')) {\r\n\t\t\t\twindow.closeStudentViewModal();\r\n\t\t\t}\r\n\t\t});\r\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

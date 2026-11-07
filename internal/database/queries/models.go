@@ -220,6 +220,13 @@ type TblMetaTag struct {
 	Scope     string
 }
 
+type TblNationality struct {
+	ID          string
+	CountryName string
+	Language    sql.NullString
+	FlagPath    string
+}
+
 type TblNotification struct {
 	ID            int64
 	FromTeacherID sql.NullInt64
@@ -359,6 +366,8 @@ type TblStudent struct {
 	StudentNumber       sql.NullString
 	ParentNumber        sql.NullString
 	RateDurationMinutes int64
+	LegalName           sql.NullString
+	NationalityID       sql.NullString
 }
 
 type TblStudentRelationship struct {

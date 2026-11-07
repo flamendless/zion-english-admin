@@ -66,6 +66,8 @@ type StudentRegisterRequest struct {
 	InactiveReason      string  `json:"inactiveReason"`
 	Relationship        string  `json:"relationship"`
 	RelatedStudentID    int64   `json:"relatedStudentId"`
+	LegalName           string  `json:"legalName"`
+	NationalityID       string  `json:"nationalityId"`
 }
 
 type StudentRegisterResponse struct {
@@ -150,25 +152,26 @@ type ClassRecordResponse struct {
 }
 
 type ClassRecordView struct {
-	ID              int64      `json:"id"`
-	StudentID       int64      `json:"studentId"`
-	TeacherID       int64      `json:"teacherId"`
-	StudentName     string     `json:"studentName"`
-	StudentNumber   string     `json:"studentNumber"`
-	StudentAvatar   AvatarView `json:"studentAvatar"`
-	TeacherName     string     `json:"teacherName"`
-	Date            string     `json:"date"`
-	StartTime       string     `json:"startTime"`
-	EndTime         string     `json:"endTime"`
-	DurationMinutes int64      `json:"durationMinutes"`
-	Rate            float64    `json:"rate"`
-	Currency        string     `json:"currency"`
-	Status          string     `json:"status"`
-	Reason          string     `json:"reason"`
-	Notes           string     `json:"notes"`
-	TeacherAvatar   AvatarView `json:"teacherAvatar"`
-	CreatedAt       string     `json:"createdAt"`
-	Source          string     `json:"source"`
+	ID               int64      `json:"id"`
+	StudentID        int64      `json:"studentId"`
+	TeacherID        int64      `json:"teacherId"`
+	StudentName      string     `json:"studentName"`
+	StudentNumber    string     `json:"studentNumber"`
+	StudentLegalName string     `json:"studentLegalName"`
+	StudentAvatar    AvatarView `json:"studentAvatar"`
+	TeacherName      string     `json:"teacherName"`
+	Date             string     `json:"date"`
+	StartTime        string     `json:"startTime"`
+	EndTime          string     `json:"endTime"`
+	DurationMinutes  int64      `json:"durationMinutes"`
+	Rate             float64    `json:"rate"`
+	Currency         string     `json:"currency"`
+	Status           string     `json:"status"`
+	Reason           string     `json:"reason"`
+	Notes            string     `json:"notes"`
+	TeacherAvatar    AvatarView `json:"teacherAvatar"`
+	CreatedAt        string     `json:"createdAt"`
+	Source           string     `json:"source"`
 }
 
 type ScheduledClassRequest struct {
@@ -189,6 +192,7 @@ type AvatarView struct {
 	PictureURL           string `json:"pictureURL"`
 	Alt                  string `json:"alt"`
 	RoleBadge            string `json:"roleBadge,omitempty"`
+	FlagURL              string `json:"flagURL,omitempty"`
 	TeacherAccountStatus string `json:"teacherAccountStatus,omitempty"`
 }
 

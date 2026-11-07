@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"database/sql"
 	"encoding/csv"
 	"fmt"
 	"net/http"
@@ -81,7 +82,7 @@ func handleExportClasses(w http.ResponseWriter, r *http.Request) {
 			row.Date,
 			row.StartTime.String,
 			row.EndTime.String,
-			studentDisplayName(row.StudentName, row.StudentNumber),
+			studentDisplayName(row.StudentName, row.StudentNumber, sql.NullString{}),
 			row.Status,
 			fmt.Sprintf("%.2f", row.Rate),
 			row.Currency,
@@ -162,7 +163,7 @@ func handleExportSchedule(w http.ResponseWriter, r *http.Request) {
 			row.Date,
 			row.StartTime.String,
 			row.EndTime.String,
-			studentDisplayName(row.StudentName, row.StudentNumber),
+			studentDisplayName(row.StudentName, row.StudentNumber, sql.NullString{}),
 			fmt.Sprintf("%d", row.DurationMinutes),
 			row.Status,
 		})

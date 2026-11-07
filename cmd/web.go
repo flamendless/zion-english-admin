@@ -999,7 +999,7 @@ func formatStudentRelationships(rels []queries.GetAllStudentRelationshipsRow) st
 	}
 	parts := make([]string, len(rels))
 	for i, r := range rels {
-		relatedName := studentDisplayName(r.RelatedStudentName, r.RelatedStudentNumber)
+		relatedName := studentDisplayName(r.RelatedStudentName, r.RelatedStudentNumber, sql.NullString{})
 		if r.Relationship.Valid && r.Relationship.String != "" {
 			parts[i] = fmt.Sprintf("%s → %s", r.Relationship.String, relatedName)
 		} else {
@@ -1016,10 +1016,16 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 	isSuperuser := auth.HasAdminAccess(role)
 
 	if r.Method == http.MethodGet {
+		nationalities, err := loadNationalityOptions(ctx)
+		if err != nil {
+			HttpError(w, "Failed to load nationalities", http.StatusInternalServerError)
+			return
+		}
 		writeHTML(w)
 		frontend.RegisterStudent(frontend.RegisterStudentData{
 			IsSuperuser:     isSuperuser,
 			CanEditTestSeed: role == auth.RoleSuperuser,
+			Nationalities:   nationalities,
 		}).Render(ctx, w)
 		return
 	}
@@ -1117,6 +1123,16 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		sendErrorLog(w, err.Error())
 		return
 	}
+	legalName, err := parseStudentLegalName(r.FormValue("legalName"))
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+	nationalityID, err := parseStudentNationalityID(r.Context(), r.FormValue("nationalityId"))
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
 
 	rl.add(fmt.Sprintf("Registering student: %s", req.Name))
 
@@ -1161,6 +1177,8 @@ func handleStudentRegister(w http.ResponseWriter, r *http.Request) {
 		InactiveReason:      sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
 		DeletedReason:       sql.NullString{},
 		IsTestSeed:          isTestSeed,
+		LegalName:           legalName,
+		NationalityID:       nationalityID,
 	})
 	if err != nil {
 		sendErrorLog(w, "Failed to register student")
@@ -2216,7 +2234,7 @@ func handleSearchStudents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	students, err := dbRO.GetQueries().SearchStudentsByName(r.Context(), sql.NullString{String: q, Valid: true})
+	students, err := dbRO.GetQueries().SearchStudentsByName(r.Context(), studentSearchParams(q))
 	if err != nil {
 		HttpError(w, MsgFailedToSearchStudents, http.StatusInternalServerError)
 		return
@@ -2226,7 +2244,7 @@ func handleSearchStudents(w http.ResponseWriter, r *http.Request) {
 	for _, s := range students {
 		studentResponses = append(studentResponses, models.StudentAPIResponse{
 			ID:           s.ID,
-			Name:         studentDisplayName(s.Name, s.StudentNumber),
+			Name:         studentDisplayName(s.Name, s.StudentNumber, sql.NullString{}),
 			Currency:     s.Currency,
 			RatePerClass: s.RatePerClass,
 		})
@@ -2271,7 +2289,7 @@ func handleGetStudents(w http.ResponseWriter, r *http.Request) {
 		for _, s := range students {
 			studentResponses = append(studentResponses, models.StudentAPIResponse{
 				ID:           s.ID,
-				Name:         studentDisplayName(s.Name, s.StudentNumber),
+				Name:         studentDisplayName(s.Name, s.StudentNumber, sql.NullString{}),
 				Currency:     s.Currency,
 				RatePerClass: s.RatePerClass,
 			})
@@ -2285,7 +2303,7 @@ func handleGetStudents(w http.ResponseWriter, r *http.Request) {
 		for _, s := range students {
 			studentResponses = append(studentResponses, models.StudentAPIResponse{
 				ID:           s.ID,
-				Name:         studentDisplayName(s.Name, s.StudentNumber),
+				Name:         studentDisplayName(s.Name, s.StudentNumber, sql.NullString{}),
 				Currency:     s.Currency,
 				RatePerClass: s.RatePerClass,
 			})
@@ -2324,7 +2342,7 @@ func handleGetMyStudents(w http.ResponseWriter, r *http.Request) {
 	for _, s := range students {
 		studentResponses = append(studentResponses, models.StudentAPIResponse{
 			ID:           s.ID,
-			Name:         studentDisplayName(s.Name, s.StudentNumber),
+			Name:         studentDisplayName(s.Name, s.StudentNumber, sql.NullString{}),
 			Currency:     s.Currency,
 			RatePerClass: s.RatePerClass,
 		})

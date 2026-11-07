@@ -23,7 +23,7 @@ templ MyStudentsTableRows(students []StudentItem) {
 	for _, s := range students {
 		<tr>
 			<td data-label="Name">
-				@StudentNameCell(s.Name, s.StudentNumber, s.Avatar)
+				@StudentNameCell(s.Name, s.StudentNumber, s.LegalName, s.Avatar)
 			</td>
 			<td data-label="Contact">{ getDisplayValue(s.Contact) }</td>
 			<td data-label="Parent">{ getDisplayValue(s.ParentName) }</td>

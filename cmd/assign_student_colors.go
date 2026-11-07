@@ -90,6 +90,9 @@ var cmdAssignStudentColors = &cobra.Command{
 				Status:              s.Status,
 				InactiveReason:      s.InactiveReason,
 				DeletedReason:       s.DeletedReason,
+				IsTestSeed:          s.IsTestSeed,
+				LegalName:           s.LegalName,
+				NationalityID:       s.NationalityID,
 				ID:                  s.ID,
 			}); err != nil {
 				panic(err)

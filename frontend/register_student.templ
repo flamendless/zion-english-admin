@@ -4,8 +4,9 @@ import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 type RegisterStudentData struct {
-	IsSuperuser      bool
-	CanEditTestSeed  bool
+	IsSuperuser     bool
+	CanEditTestSeed bool
+	Nationalities   []NationalityOption
 }
 
 templ RegisterStudent(data RegisterStudentData) {
@@ -26,6 +27,15 @@ templ RegisterStudent(data RegisterStudentData) {
 					<input type="text" id="name" name="name" required
 					       placeholder="Enter student name">
 					<div class="error-message" id="nameError">Name is required</div>
+				</div>
+
+				<div class="form-row">
+					<div class="form-group">
+						<label for="legalName">Legal Name</label>
+						<input type="text" id="legalName" name="legalName" maxlength="64"
+						       placeholder="Optional, max 64 characters"/>
+					</div>
+					@NationalityDropdownWithValue(data.Nationalities, "")
 				</div>
 
 				<div class="form-row">

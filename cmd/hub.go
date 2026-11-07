@@ -279,11 +279,13 @@ func handleHubStudentsPartial(w http.ResponseWriter, r *http.Request) {
 }
 
 func loadMyStudentsPage(ctx context.Context, teacherID int64, q, status string, sort utils.SortParams, page utils.Page) ([]frontend.StudentItem, utils.Page, error) {
+	qLike := sql.NullString{String: q, Valid: true}
 	filter := queries.CountStudentsByTeacherIDFilteredParams{
 		TeacherID: teacherID,
 		Column2:   q,
-		Column3:   sql.NullString{String: q, Valid: true},
-		Column4:   status,
+		Column3:   qLike,
+		Column4:   qLike,
+		Column5:   status,
 		Status:    status,
 	}
 
@@ -296,8 +298,9 @@ func loadMyStudentsPage(ctx context.Context, teacherID int64, q, status string, 
 	allStudents, err := dbRO.GetQueries().GetStudentsByTeacherIDFiltered(ctx, queries.GetStudentsByTeacherIDFilteredParams{
 		TeacherID: teacherID,
 		Column2:   q,
-		Column3:   sql.NullString{String: q, Valid: true},
-		Column4:   status,
+		Column3:   qLike,
+		Column4:   qLike,
+		Column5:   status,
 		Status:    status,
 		Limit:     total,
 		Offset:    0,
@@ -308,12 +311,18 @@ func loadMyStudentsPage(ctx context.Context, teacherID int64, q, status string, 
 	sortMyStudentRows(allStudents, sort)
 	students := paginateSlice(allStudents, page)
 
+	flags, err := nationalityFlagMap(ctx)
+	if err != nil {
+		return nil, page, err
+	}
+
 	viewStudents := make([]frontend.StudentItem, len(students))
 	for i, s := range students {
 		viewStudents[i] = frontend.StudentItem{
 			ID:                  strconv.FormatInt(s.ID, 10),
 			Name:                s.Name,
 			StudentNumber:       studentNumberString(s.StudentNumber),
+			LegalName:           studentLegalNameString(s.LegalName),
 			Currency:            s.Currency,
 			Contact:             s.Contact.String,
 			RatePerClass:        s.RatePerClass,
@@ -321,7 +330,7 @@ func loadMyStudentsPage(ctx context.Context, teacherID int64, q, status string, 
 			ParentName:          s.ParentName.String,
 			AssignedColor:       s.AssignedColor,
 			Status:              constants.StudentStatus(s.Status),
-			Avatar:              frontend.StudentAvatarProps(s.Name, s.AssignedColor, false, "sm"),
+			Avatar:              buildStudentAvatarProps(s.Name, s.AssignedColor, false, "sm", s.NationalityID, flags),
 		}
 	}
 	return viewStudents, page, nil

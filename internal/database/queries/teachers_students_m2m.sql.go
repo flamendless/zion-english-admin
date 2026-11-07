@@ -32,7 +32,11 @@ INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?
 	AND s.status != 'deleted'
 	AND s.is_test_seed = 0
-	AND (? = '' OR s.name LIKE '%' || ? || '%')
+	AND (
+		? = ''
+		OR s.name LIKE '%' || ? || '%'
+		OR COALESCE(s.legal_name, '') LIKE '%' || ? || '%'
+	)
 	AND (? = '' OR s.status = ?)
 `
 
@@ -40,7 +44,8 @@ type CountStudentsByTeacherIDFilteredParams struct {
 	TeacherID int64
 	Column2   any
 	Column3   sql.NullString
-	Column4   any
+	Column4   sql.NullString
+	Column5   any
 	Status    string
 }
 
@@ -50,6 +55,7 @@ func (q *Queries) CountStudentsByTeacherIDFiltered(ctx context.Context, arg Coun
 		arg.Column2,
 		arg.Column3,
 		arg.Column4,
+		arg.Column5,
 		arg.Status,
 	)
 	var count int64
@@ -191,13 +197,32 @@ func (q *Queries) GetStudentsByTeacherID(ctx context.Context, teacherID int64) (
 }
 
 const getStudentsByTeacherIDFiltered = `-- name: GetStudentsByTeacherIDFiltered :many
-SELECT s.id, s.name, s.student_number, s.parent_number, s.currency, s.contact, s.rate_per_class, s.rate_duration_minutes, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
+SELECT
+	s.id,
+	s.name,
+	s.student_number,
+	s.parent_number,
+	s.currency,
+	s.contact,
+	s.rate_per_class,
+	s.rate_duration_minutes,
+	s.parent_name,
+	s.assigned_color,
+	s.status,
+	s.legal_name,
+	s.nationality_id,
+	s.created_at,
+	s.updated_at
 FROM tbl_students s
 INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?
 	AND s.status != 'deleted'
 	AND s.is_test_seed = 0
-	AND (? = '' OR s.name LIKE '%' || ? || '%')
+	AND (
+		? = ''
+		OR s.name LIKE '%' || ? || '%'
+		OR COALESCE(s.legal_name, '') LIKE '%' || ? || '%'
+	)
 	AND (? = '' OR s.status = ?)
 ORDER BY s.name ASC
 LIMIT ? OFFSET ?
@@ -207,7 +232,8 @@ type GetStudentsByTeacherIDFilteredParams struct {
 	TeacherID int64
 	Column2   any
 	Column3   sql.NullString
-	Column4   any
+	Column4   sql.NullString
+	Column5   any
 	Status    string
 	Limit     int64
 	Offset    int64
@@ -225,6 +251,8 @@ type GetStudentsByTeacherIDFilteredRow struct {
 	ParentName          sql.NullString
 	AssignedColor       string
 	Status              string
+	LegalName           sql.NullString
+	NationalityID       sql.NullString
 	CreatedAt           sql.NullTime
 	UpdatedAt           sql.NullTime
 }
@@ -235,6 +263,7 @@ func (q *Queries) GetStudentsByTeacherIDFiltered(ctx context.Context, arg GetStu
 		arg.Column2,
 		arg.Column3,
 		arg.Column4,
+		arg.Column5,
 		arg.Status,
 		arg.Limit,
 		arg.Offset,
@@ -258,6 +287,8 @@ func (q *Queries) GetStudentsByTeacherIDFiltered(ctx context.Context, arg GetStu
 			&i.ParentName,
 			&i.AssignedColor,
 			&i.Status,
+			&i.LegalName,
+			&i.NationalityID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {

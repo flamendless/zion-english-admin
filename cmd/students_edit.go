@@ -58,22 +58,24 @@ func requireStudentAssignedToTeacher(ctx context.Context, teacherID, studentID i
 
 func studentFilterParams(q, status string, teacherID int64, parentFilter string, teacherAssignmentFilter string, testSeedFilter string) queries.CountStudentsFilteredParams {
 	ts1, ts2, ts3 := studentTestSeedFilterTriplet(testSeedFilter)
+	qLike := sql.NullString{String: q, Valid: true}
 	return queries.CountStudentsFilteredParams{
 		Column1:   q,
-		Column2:   sql.NullString{String: q, Valid: true},
-		Column3:   status,
+		Column2:   qLike,
+		Column3:   qLike,
 		Column4:   status,
+		Column5:   status,
 		Status:    status,
-		Column6:   teacherID,
+		Column7:   teacherID,
 		TeacherID: teacherID,
-		Column8:   parentFilter,
 		Column9:   parentFilter,
 		Column10:  parentFilter,
-		Column11:  teacherAssignmentFilter,
+		Column11:  parentFilter,
 		Column12:  teacherAssignmentFilter,
-		Column13:  ts1,
-		Column14:  ts2,
-		Column15:  ts3,
+		Column13:  teacherAssignmentFilter,
+		Column14:  ts1,
+		Column15:  ts2,
+		Column16:  ts3,
 	}
 }
 
@@ -98,6 +100,16 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 	if err != nil {
 		return frontend.EditStudentData{}, err
 	}
+
+	nationalities, err := loadNationalityOptions(ctx)
+	if err != nil {
+		return frontend.EditStudentData{}, err
+	}
+	flags, err := nationalityFlagMap(ctx)
+	if err != nil {
+		return frontend.EditStudentData{}, err
+	}
+	nationality, hasNationality := nationalityFieldsForStudent(ctx, existing.NationalityID)
 
 	assignedTeachers, err := dbRO.GetQueries().GetTeachersByStudentID(ctx, studentID)
 	if err != nil {
@@ -143,7 +155,7 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 		}
 		relItems[i] = frontend.StudentRelationshipItem{
 			RelatedStudentID:   strconv.FormatInt(rel.RelatedStudentID, 10),
-			RelatedStudentName: studentDisplayName(rel.RelatedStudentName, rel.RelatedStudentNumber),
+			RelatedStudentName: studentDisplayName(rel.RelatedStudentName, rel.RelatedStudentNumber, sql.NullString{}),
 			Relationship:       relationship,
 		}
 	}
@@ -173,7 +185,12 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 		ParentCurrency:      parentCurrency,
 		HasParentRate:       hasParentRate,
 		AssignedColor:       existing.AssignedColor,
-		Avatar:              frontend.StudentAvatarProps(existing.Name, existing.AssignedColor, existing.IsTestSeed == 1, "md"),
+		LegalName:           studentLegalNameString(existing.LegalName),
+		NationalityID:       studentNationalityIDString(existing.NationalityID),
+		HasNationality:      hasNationality,
+		Nationality:         nationality,
+		Nationalities:       nationalities,
+		Avatar:              buildStudentAvatarProps(existing.Name, existing.AssignedColor, existing.IsTestSeed == 1, "md", existing.NationalityID, flags),
 		Status:              constants.StudentStatus(existing.Status),
 		InactiveReason:      inactiveReason,
 		DeletedReason:       deletedReason,
@@ -335,10 +352,10 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		Column2:   filter.Column2,
 		Column3:   filter.Column3,
 		Column4:   filter.Column4,
+		Column5:   filter.Column5,
 		Status:    filter.Status,
-		Column6:   filter.Column6,
+		Column7:   filter.Column7,
 		TeacherID: filter.TeacherID,
-		Column8:   filter.Column8,
 		Column9:   filter.Column9,
 		Column10:  filter.Column10,
 		Column11:  filter.Column11,
@@ -346,6 +363,7 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		Column13:  filter.Column13,
 		Column14:  filter.Column14,
 		Column15:  filter.Column15,
+		Column16:  filter.Column16,
 		Limit:     total,
 		Offset:    0,
 	})
@@ -365,6 +383,12 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 	relationshipsByStudent := make(map[int64][]queries.GetAllStudentRelationshipsRow)
 	for _, rel := range relationships {
 		relationshipsByStudent[rel.StudentID] = append(relationshipsByStudent[rel.StudentID], rel)
+	}
+
+	flags, err := nationalityFlagMap(ctx)
+	if err != nil {
+		HttpError(w, "Failed to load nationalities", http.StatusInternalServerError)
+		return
 	}
 
 	teacherAssignments, err := dbRO.GetQueries().GetAllStudentTeacherNames(ctx)
@@ -413,7 +437,8 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 			ID:                  strconv.FormatInt(s.ID, 10),
 			Name:                s.Name,
 			StudentNumber:       studentNumberString(s.StudentNumber),
-			Avatar:              frontend.StudentAvatarProps(s.Name, s.AssignedColor, s.IsTestSeed == 1, "sm"),
+			LegalName:           studentLegalNameString(s.LegalName),
+			Avatar:              buildStudentAvatarProps(s.Name, s.AssignedColor, s.IsTestSeed == 1, "sm", s.NationalityID, flags),
 			Currency:            s.Currency,
 			Contact:             s.Contact.String,
 			RatePerClass:        s.RatePerClass,
@@ -561,6 +586,16 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 			sendErrorLog(w, err.Error())
 			return
 		}
+		legalName, err := parseStudentLegalName(r.FormValue("legalName"))
+		if err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
+		nationalityID, err := parseStudentNationalityID(ctx, r.FormValue("nationalityId"))
+		if err != nil {
+			sendErrorLog(w, err.Error())
+			return
+		}
 
 		parentRate, parentCurrency, err := parseStudentParentRateFields(r.FormValue("parentRate"), r.FormValue("parentCurrency"))
 		if err != nil {
@@ -589,6 +624,8 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 			InactiveReason:      sql.NullString{String: req.InactiveReason, Valid: req.InactiveReason != ""},
 			DeletedReason:       existing.DeletedReason,
 			IsTestSeed:          isTestSeed,
+			LegalName:           legalName,
+			NationalityID:       nationalityID,
 			ID:                  studentID,
 		})
 		if err != nil {
@@ -659,6 +696,16 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		sendErrorLog(w, err.Error())
 		return
 	}
+	legalName, err := parseStudentLegalName(r.FormValue("legalName"))
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+	nationalityID, err := parseStudentNationalityID(ctx, r.FormValue("nationalityId"))
+	if err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
 
 	err = dbRW.GetQueries().UpdateStudent(ctx, queries.UpdateStudentParams{
 		Name:                req.Name,
@@ -676,6 +723,8 @@ func handleStudentEdit(w http.ResponseWriter, r *http.Request, studentID int64) 
 		InactiveReason:      existing.InactiveReason,
 		DeletedReason:       existing.DeletedReason,
 		IsTestSeed:          existing.IsTestSeed,
+		LegalName:           legalName,
+		NationalityID:       nationalityID,
 		ID:                  studentID,
 	})
 	if err != nil {

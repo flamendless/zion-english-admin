@@ -23,17 +23,40 @@ INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?
 	AND s.status != 'deleted'
 	AND s.is_test_seed = 0
-	AND (? = '' OR s.name LIKE '%' || ? || '%')
+	AND (
+		? = ''
+		OR s.name LIKE '%' || ? || '%'
+		OR COALESCE(s.legal_name, '') LIKE '%' || ? || '%'
+	)
 	AND (? = '' OR s.status = ?);
 
 -- name: GetStudentsByTeacherIDFiltered :many
-SELECT s.id, s.name, s.student_number, s.parent_number, s.currency, s.contact, s.rate_per_class, s.rate_duration_minutes, s.parent_name, s.assigned_color, s.status, s.created_at, s.updated_at
+SELECT
+	s.id,
+	s.name,
+	s.student_number,
+	s.parent_number,
+	s.currency,
+	s.contact,
+	s.rate_per_class,
+	s.rate_duration_minutes,
+	s.parent_name,
+	s.assigned_color,
+	s.status,
+	s.legal_name,
+	s.nationality_id,
+	s.created_at,
+	s.updated_at
 FROM tbl_students s
 INNER JOIN tbl_teachers_students_m2m m2m ON s.id = m2m.student_id
 WHERE m2m.teacher_id = ?
 	AND s.status != 'deleted'
 	AND s.is_test_seed = 0
-	AND (? = '' OR s.name LIKE '%' || ? || '%')
+	AND (
+		? = ''
+		OR s.name LIKE '%' || ? || '%'
+		OR COALESCE(s.legal_name, '') LIKE '%' || ? || '%'
+	)
 	AND (? = '' OR s.status = ?)
 ORDER BY s.name ASC
 LIMIT ? OFFSET ?;
