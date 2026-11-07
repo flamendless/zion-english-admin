@@ -53,7 +53,7 @@ func MyStudentsTableRows(students []StudentItem) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = StudentNameCell(s.Name, s.StudentNumber, s.Avatar).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = StudentNameCell(s.Name, s.StudentNumber, s.LegalName, s.Avatar).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

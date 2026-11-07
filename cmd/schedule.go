@@ -154,7 +154,7 @@ func handleScheduleCreate(w http.ResponseWriter, r *http.Request) {
 		student, studentErr := dbRO.GetQueries().GetStudentByID(ctx, req.StudentID)
 		studentName := "student"
 		if studentErr == nil {
-			studentName = studentDisplayName(student.Name, student.StudentNumber)
+			studentName = studentDisplayName(student.Name, student.StudentNumber, sql.NullString{})
 		}
 		if err := meetingSvc.SyncRoomForSchedule(ctx, meetings.ScheduledClassMeetingInput{
 			ScheduleID:      scheduleID,
@@ -590,7 +590,7 @@ func handleRescheduleScheduledClass(w http.ResponseWriter, r *http.Request, sche
 		student, studentErr := dbRO.GetQueries().GetStudentByID(ctx, existing.StudentID)
 		studentName := "student"
 		if studentErr == nil {
-			studentName = studentDisplayName(student.Name, student.StudentNumber)
+			studentName = studentDisplayName(student.Name, student.StudentNumber, sql.NullString{})
 		}
 		if err := meetingSvc.SyncRoomForSchedule(ctx, meetings.ScheduledClassMeetingInput{
 			ScheduleID:      scheduleID,
@@ -1411,7 +1411,7 @@ func scheduledClassViewFromRow(sc queries.GetScheduledClassesFilteredRow) models
 		ID:              sc.ID,
 		StudentID:       sc.StudentID,
 		TeacherID:       sc.TeacherID,
-		StudentName:     studentDisplayName(sc.StudentName, sc.StudentNumber),
+		StudentName:     studentDisplayName(sc.StudentName, sc.StudentNumber, sql.NullString{}),
 		TeacherName:     sc.TeacherName,
 		TeacherAvatar:   scheduledClassTeacherAvatar(sc),
 		ScheduledDate:   sc.ScheduledDate,
@@ -1441,7 +1441,7 @@ func syncCalendarForSchedule(ctx context.Context, scheduleID, teacherID, student
 	student, studentErr := dbRO.GetQueries().GetStudentByID(ctx, studentID)
 	studentName := "student"
 	if studentErr == nil {
-		studentName = studentDisplayName(student.Name, student.StudentNumber)
+		studentName = studentDisplayName(student.Name, student.StudentNumber, sql.NullString{})
 	}
 	if err := calendarSvc.SyncEventForSchedule(ctx, calendar.ScheduledClassCalendarInput{
 		ScheduleID:      scheduleID,

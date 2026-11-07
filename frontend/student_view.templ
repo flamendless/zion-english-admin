@@ -15,7 +15,7 @@ templ StudentViewModal(data EditStudentData) {
 				<div class="entity-view-layout entity-view-layout--split">
 					<div class="entity-view-card">
 						<div class="entity-view-identity">
-							@StudentNameCell(data.Name, data.StudentNumber, data.Avatar)
+							@StudentNameCell(data.Name, data.StudentNumber, data.LegalName, data.Avatar)
 							@StatusPill(capitalizeStatus(data.Status), StudentStatusPillTone(data.Status), true)
 							<div class="entity-view-rate-block">
 								<div class="entity-view-rate-highlight">{ formatRatePerDurationDisplay(data.RatePerClass, data.Currency, data.RateDurationMinutes) }</div>
@@ -26,6 +26,15 @@ templ StudentViewModal(data EditStudentData) {
 						@EntityViewSection("Contact") {
 							<div class="profile-details">
 								@ProfileDetailField("Student number", displayOrDash(data.StudentNumber))
+								@ProfileDetailField("Legal name", displayOrDash(data.LegalName))
+								if data.HasNationality {
+									<div class="profile-detail">
+										<span class="profile-detail-label">Nationality</span>
+										<span class="profile-detail-value">@NationalityDisplay(data.Nationality)</span>
+									</div>
+								} else {
+									@ProfileDetailField("Nationality", constants.DisplayNotSet)
+								}
 								@ProfileDetailField("Parent", displayOrDash(data.ParentName))
 								@ProfileDetailField("Parent number", displayOrDash(data.ParentNumber))
 								@AdminOnlyProfileDetailField("Contact", displayOrDash(data.Contact))

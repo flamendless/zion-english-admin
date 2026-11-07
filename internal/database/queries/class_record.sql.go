@@ -118,7 +118,11 @@ JOIN tbl_students s ON cr.student_id = s.id
 WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
 	AND (? = '' OR cr.status = ?)
-	AND (? = '' OR s.name LIKE '%' || ? || '%')
+	AND (
+		? = ''
+		OR s.name LIKE '%' || ? || '%'
+		OR COALESCE(s.legal_name, '') LIKE '%' || ? || '%'
+	)
 	AND s.is_test_seed = 0
 `
 
@@ -131,6 +135,7 @@ type CountClassRecordsFilteredParams struct {
 	Status    string
 	Column7   any
 	Column8   sql.NullString
+	Column9   sql.NullString
 }
 
 func (q *Queries) CountClassRecordsFiltered(ctx context.Context, arg CountClassRecordsFilteredParams) (int64, error) {
@@ -143,6 +148,7 @@ func (q *Queries) CountClassRecordsFiltered(ctx context.Context, arg CountClassR
 		arg.Status,
 		arg.Column7,
 		arg.Column8,
+		arg.Column9,
 	)
 	var count int64
 	err := row.Scan(&count)
@@ -158,7 +164,11 @@ SELECT (
 		AND ((? = 'deleted' AND cr.deleted_at IS NOT NULL) OR (? != 'deleted' AND cr.deleted_at IS NULL))
 		AND (? = '' OR (? != 'scheduled' AND ? != 'overdue'))
 		AND (? = '' OR ? = 'deleted' OR cr.status = ?)
-		AND (? = '' OR s.name LIKE '%' || ? || '%')
+		AND (
+		? = ''
+		OR s.name LIKE '%' || ? || '%'
+		OR COALESCE(s.legal_name, '') LIKE '%' || ? || '%'
+	)
 		AND (
 			? = 'all'
 			OR (? = 'only' AND s.is_test_seed = 1)
@@ -183,7 +193,11 @@ SELECT (
 				END
 			) < datetime(?)
 		)
-		AND (? = '' OR s.name LIKE '%' || ? || '%')
+		AND (
+		? = ''
+		OR s.name LIKE '%' || ? || '%'
+		OR COALESCE(s.legal_name, '') LIKE '%' || ? || '%'
+	)
 		AND (
 			? = 'all'
 			OR (? = 'only' AND s.is_test_seed = 1)
@@ -207,26 +221,28 @@ type CountClassesListFilteredParams struct {
 	Status          string
 	Column13        any
 	Column14        sql.NullString
-	Column15        any
+	Column15        sql.NullString
 	Column16        any
 	Column17        any
 	Column18        any
+	Column19        any
 	TeacherID_2     int64
 	ScheduledDate   string
 	ScheduledDate_2 string
-	Column22        any
 	Column23        any
 	Column24        any
 	Column25        any
 	Column26        any
 	Column27        any
 	Column28        any
+	Column29        any
 	Datetime        any
-	Column30        any
-	Column31        sql.NullString
-	Column32        any
-	Column33        any
+	Column31        any
+	Column32        sql.NullString
+	Column33        sql.NullString
 	Column34        any
+	Column35        any
+	Column36        any
 }
 
 func (q *Queries) CountClassesListFiltered(ctx context.Context, arg CountClassesListFilteredParams) (int64, error) {
@@ -249,22 +265,24 @@ func (q *Queries) CountClassesListFiltered(ctx context.Context, arg CountClasses
 		arg.Column16,
 		arg.Column17,
 		arg.Column18,
+		arg.Column19,
 		arg.TeacherID_2,
 		arg.ScheduledDate,
 		arg.ScheduledDate_2,
-		arg.Column22,
 		arg.Column23,
 		arg.Column24,
 		arg.Column25,
 		arg.Column26,
 		arg.Column27,
 		arg.Column28,
+		arg.Column29,
 		arg.Datetime,
-		arg.Column30,
 		arg.Column31,
 		arg.Column32,
 		arg.Column33,
 		arg.Column34,
+		arg.Column35,
+		arg.Column36,
 	)
 	var count int64
 	err := row.Scan(&count)
@@ -317,6 +335,8 @@ const getClassRecordByID = `-- name: GetClassRecordByID :one
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.is_trial_class, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
 	s.name as student_name,
 	s.student_number as student_number,
+	s.legal_name as student_legal_name,
+	s.nationality_id as student_nationality_id,
 	s.assigned_color as student_assigned_color,
 	s.is_test_seed as student_is_test_seed,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name,
@@ -350,6 +370,8 @@ type GetClassRecordByIDRow struct {
 	RecordedByRole        string
 	StudentName           string
 	StudentNumber         sql.NullString
+	StudentLegalName      sql.NullString
+	StudentNationalityID  sql.NullString
 	StudentAssignedColor  string
 	StudentIsTestSeed     int64
 	TeacherName           string
@@ -382,6 +404,8 @@ func (q *Queries) GetClassRecordByID(ctx context.Context, id int64) (GetClassRec
 		&i.RecordedByRole,
 		&i.StudentName,
 		&i.StudentNumber,
+		&i.StudentLegalName,
+		&i.StudentNationalityID,
 		&i.StudentAssignedColor,
 		&i.StudentIsTestSeed,
 		&i.TeacherName,
@@ -549,7 +573,11 @@ JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
 	AND (? = '' OR cr.status = ?)
-	AND (? = '' OR s.name LIKE '%' || ? || '%')
+	AND (
+		? = ''
+		OR s.name LIKE '%' || ? || '%'
+		OR COALESCE(s.legal_name, '') LIKE '%' || ? || '%'
+	)
 	AND s.is_test_seed = 0
 ORDER BY CASE WHEN cr.date = date('now', 'localtime') THEN 0 ELSE 1 END, cr.date DESC, cr.created_at DESC
 LIMIT ? OFFSET ?
@@ -564,6 +592,7 @@ type GetClassRecordsFilteredParams struct {
 	Status    string
 	Column7   any
 	Column8   sql.NullString
+	Column9   sql.NullString
 	Limit     int64
 	Offset    int64
 }
@@ -599,6 +628,7 @@ func (q *Queries) GetClassRecordsFiltered(ctx context.Context, arg GetClassRecor
 		arg.Status,
 		arg.Column7,
 		arg.Column8,
+		arg.Column9,
 		arg.Limit,
 		arg.Offset,
 	)
@@ -643,7 +673,7 @@ func (q *Queries) GetClassRecordsFiltered(ctx context.Context, arg GetClassRecor
 }
 
 const getClassesListFiltered = `-- name: GetClassesListFiltered :many
-SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_minutes, rate, currency, status, reason, notes, created_at, student_name, student_number, student_assigned_color, student_is_test_seed, teacher_name, teacher_first_name, teacher_middle_name, teacher_last_name, teacher_assigned_color, teacher_profile_picture FROM (
+SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_minutes, rate, currency, status, reason, notes, created_at, student_name, student_number, student_legal_name, student_nationality_id, student_assigned_color, student_is_test_seed, teacher_name, teacher_first_name, teacher_middle_name, teacher_last_name, teacher_assigned_color, teacher_profile_picture FROM (
 	SELECT
 		cr.id,
 	'record' AS source,
@@ -661,6 +691,8 @@ SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_
 	cr.created_at,
 	s.name AS student_name,
 	s.student_number AS student_number,
+	s.legal_name AS student_legal_name,
+	s.nationality_id AS student_nationality_id,
 	s.assigned_color AS student_assigned_color,
 	s.is_test_seed AS student_is_test_seed,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
@@ -676,7 +708,11 @@ SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_
 		AND ((? = 'deleted' AND cr.deleted_at IS NOT NULL) OR (? != 'deleted' AND cr.deleted_at IS NULL))
 		AND (? = '' OR (? != 'scheduled' AND ? != 'overdue'))
 		AND (? = '' OR ? = 'deleted' OR cr.status = ?)
-		AND (? = '' OR s.name LIKE '%' || ? || '%')
+		AND (
+		? = ''
+		OR s.name LIKE '%' || ? || '%'
+		OR COALESCE(s.legal_name, '') LIKE '%' || ? || '%'
+	)
 		AND (
 			? = 'all'
 			OR (? = 'only' AND s.is_test_seed = 1)
@@ -702,6 +738,8 @@ SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_
 	sc.created_at,
 	s.name AS student_name,
 	s.student_number AS student_number,
+	s.legal_name AS student_legal_name,
+	s.nationality_id AS student_nationality_id,
 	s.assigned_color AS student_assigned_color,
 	s.is_test_seed AS student_is_test_seed,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
@@ -728,7 +766,11 @@ SELECT id, source, student_id, teacher_id, date, start_time, end_time, duration_
 				END
 			) < datetime(?)
 		)
-		AND (? = '' OR s.name LIKE '%' || ? || '%')
+		AND (
+		? = ''
+		OR s.name LIKE '%' || ? || '%'
+		OR COALESCE(s.legal_name, '') LIKE '%' || ? || '%'
+	)
 		AND (
 			? = 'all'
 			OR (? = 'only' AND s.is_test_seed = 1)
@@ -754,26 +796,28 @@ type GetClassesListFilteredParams struct {
 	Status          string
 	Column13        any
 	Column14        sql.NullString
-	Column15        any
+	Column15        sql.NullString
 	Column16        any
 	Column17        any
 	Column18        any
+	Column19        any
 	TeacherID_2     int64
 	ScheduledDate   string
 	ScheduledDate_2 string
-	Column22        any
 	Column23        any
 	Column24        any
 	Column25        any
 	Column26        any
 	Column27        any
 	Column28        any
+	Column29        any
 	Datetime        any
-	Column30        any
-	Column31        sql.NullString
-	Column32        any
-	Column33        any
+	Column31        any
+	Column32        sql.NullString
+	Column33        sql.NullString
 	Column34        any
+	Column35        any
+	Column36        any
 	Limit           int64
 	Offset          int64
 }
@@ -795,6 +839,8 @@ type GetClassesListFilteredRow struct {
 	CreatedAt             string
 	StudentName           string
 	StudentNumber         sql.NullString
+	StudentLegalName      sql.NullString
+	StudentNationalityID  sql.NullString
 	StudentAssignedColor  string
 	StudentIsTestSeed     int64
 	TeacherName           string
@@ -825,22 +871,24 @@ func (q *Queries) GetClassesListFiltered(ctx context.Context, arg GetClassesList
 		arg.Column16,
 		arg.Column17,
 		arg.Column18,
+		arg.Column19,
 		arg.TeacherID_2,
 		arg.ScheduledDate,
 		arg.ScheduledDate_2,
-		arg.Column22,
 		arg.Column23,
 		arg.Column24,
 		arg.Column25,
 		arg.Column26,
 		arg.Column27,
 		arg.Column28,
+		arg.Column29,
 		arg.Datetime,
-		arg.Column30,
 		arg.Column31,
 		arg.Column32,
 		arg.Column33,
 		arg.Column34,
+		arg.Column35,
+		arg.Column36,
 		arg.Limit,
 		arg.Offset,
 	)
@@ -868,6 +916,8 @@ func (q *Queries) GetClassesListFiltered(ctx context.Context, arg GetClassesList
 			&i.CreatedAt,
 			&i.StudentName,
 			&i.StudentNumber,
+			&i.StudentLegalName,
+			&i.StudentNationalityID,
 			&i.StudentAssignedColor,
 			&i.StudentIsTestSeed,
 			&i.TeacherName,

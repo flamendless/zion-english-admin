@@ -80,7 +80,7 @@ func auditStr(v sql.NullString) string {
 }
 
 func auditStudentRef(id int64, name string, studentNumber sql.NullString) string {
-	return fmt.Sprintf("student id %d (%s)", id, studentDisplayName(name, studentNumber))
+	return fmt.Sprintf("student id %d (%s)", id, studentDisplayName(name, studentNumber, sql.NullString{}))
 }
 
 func auditTeacherRef(id int64, name string) string {

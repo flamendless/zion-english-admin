@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"database/sql"
 	"net/http"
 
 	"zion-english/frontend"
@@ -70,7 +71,7 @@ func handlePersistentOverdueClassesPartial(w http.ResponseWriter, r *http.Reques
 		}
 		panelRows = append(panelRows, frontend.OverdueClassPanelItem{
 			ID:              row.ID,
-			StudentName:     studentDisplayName(row.StudentName, row.StudentNumber),
+			StudentName:     studentDisplayName(row.StudentName, row.StudentNumber, sql.NullString{}),
 			ScheduledDate:   row.ScheduledDate,
 			StartTime:       startTime,
 			DurationMinutes: row.DurationMinutes,

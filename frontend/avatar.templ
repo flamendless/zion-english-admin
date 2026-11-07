@@ -11,6 +11,7 @@ type AvatarProps struct {
 	HasPicture    bool   `json:"hasPicture"`
 	Alt           string `json:"alt"`
 	RoleBadge            string                    `json:"roleBadge,omitempty"`
+	FlagURL              string                    `json:"flagURL,omitempty"`
 	TeacherAccountStatus constants.TeacherStatus   `json:"teacherAccountStatus,omitempty"`
 }
 
@@ -27,8 +28,8 @@ templ TeacherNameCell(name string, avatar AvatarProps) {
 	</div>
 }
 
-templ StudentNameCell(name string, studentNumber string, avatar AvatarProps) {
-	{{ displayName := utils.StudentDisplayName(name, studentNumber) }}
+templ StudentNameCell(name string, studentNumber string, legalName string, avatar AvatarProps) {
+	{{ displayName := utils.StudentDisplayName(name, studentNumber, legalName) }}
 	<div class="teacher-name-cell">
 		@Avatar(avatar)
 		<span class="teacher-name-cell-text" data-full-text={ displayName }>{ displayName }</span>
@@ -50,10 +51,15 @@ templ avatarCircle(props AvatarProps) {
 }
 
 templ Avatar(props AvatarProps) {
-	if props.RoleBadge != "" {
+	if props.RoleBadge != "" || props.FlagURL != "" {
 		<div class="avatar-with-role">
 			@avatarCircle(props)
-			<span class={ "avatar-role-badge " + pillClass(AvatarRoleBadgeToneForProps(props)) }>{ props.RoleBadge }</span>
+			if props.FlagURL != "" {
+				<img src={ props.FlagURL } alt="" class="avatar-nationality-flag" aria-hidden="true"/>
+			}
+			if props.RoleBadge != "" {
+				<span class={ "avatar-role-badge " + pillClass(AvatarRoleBadgeToneForProps(props)) }>{ props.RoleBadge }</span>
+			}
 		</div>
 	} else {
 		@avatarCircle(props)
@@ -201,6 +207,38 @@ templ AvatarStyles() {
 		.avatar-with-role .avatar-role-badge.pill--neutral {
 			background: var(--color-surface);
 			color: var(--color-foreground);
+		}
+
+		.avatar-nationality-flag {
+			position: absolute;
+			bottom: 0;
+			left: 50%;
+			transform: translate(-50%, 35%);
+			z-index: 2;
+			width: 18px;
+			height: 12px;
+			object-fit: cover;
+			border-radius: 2px;
+			border: 1px solid var(--color-surface);
+			box-shadow: var(--shadow-sm);
+			background: var(--color-surface);
+			pointer-events: none;
+		}
+
+		.avatar-with-role:has(.avatar-sm) .avatar-nationality-flag,
+		.avatar-with-role:has(.avatar-nav) .avatar-nationality-flag {
+			width: 14px;
+			height: 10px;
+		}
+
+		.avatar-with-role:has(.avatar-lg) .avatar-nationality-flag,
+		.avatar-with-role:has(.avatar-xl) .avatar-nationality-flag {
+			width: 24px;
+			height: 16px;
+		}
+
+		.avatar-with-role:has(.avatar-nationality-flag) .avatar-role-badge {
+			transform: translate(-50%, 115%);
 		}
 	</style>
 }

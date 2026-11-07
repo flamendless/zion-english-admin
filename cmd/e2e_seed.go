@@ -116,6 +116,8 @@ var cmdE2ESeed = &cobra.Command{
 			InactiveReason:      sql.NullString{},
 			DeletedReason:       sql.NullString{},
 			IsTestSeed:          1,
+			LegalName:           sql.NullString{},
+			NationalityID:       sql.NullString{},
 		})
 		if err != nil {
 			panic(fmt.Sprintf("failed to insert student: %v", err))
@@ -141,6 +143,9 @@ var cmdE2ESeed = &cobra.Command{
 			Status:              string(constants.StudentStatusActive),
 			InactiveReason:      sql.NullString{},
 			DeletedReason:       sql.NullString{},
+			IsTestSeed:          1,
+			LegalName:           sql.NullString{},
+			NationalityID:       sql.NullString{},
 		})
 		if err != nil {
 			panic(fmt.Sprintf("failed to insert sibling student: %v", err))

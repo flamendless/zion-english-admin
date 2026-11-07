@@ -36,7 +36,12 @@ type EditStudentData struct {
 	TeacherIDs     []string
 	TeacherNames   []string
 	Teachers       []TeacherListItem
-	Relationships  []StudentRelationshipItem
+	Relationships   []StudentRelationshipItem
+	LegalName       string
+	NationalityID   string
+	HasNationality  bool
+	Nationality     NationalityOption
+	Nationalities   []NationalityOption
 }
 
 templ EditStudent(data EditStudentData) {
@@ -85,7 +90,7 @@ templ EditStudent(data EditStudentData) {
 			if data.Readonly {
 				<div class="form-readonly">
 					<div class="form-group">
-						@StudentNameCell(data.Name, data.StudentNumber, data.Avatar)
+						@StudentNameCell(data.Name, data.StudentNumber, data.LegalName, data.Avatar)
 					</div>
 					<div class="form-row">
 						<div class="form-group">
@@ -95,6 +100,20 @@ templ EditStudent(data EditStudentData) {
 						<div class="form-group">
 							<label for="parentNumber">Parent Number</label>
 							<input type="text" id="parentNumber" value={ data.ParentNumber } disabled/>
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="form-group">
+							<label for="legalName">Legal Name</label>
+							<input type="text" id="legalName" value={ displayOrDash(data.LegalName) } disabled/>
+						</div>
+						<div class="form-group">
+							<label for="nationality">Nationality</label>
+							if data.HasNationality {
+								<div id="nationality">@NationalityDisplay(data.Nationality)</div>
+							} else {
+								<input type="text" id="nationality" value={ constants.DisplayNotSet } disabled/>
+							}
 						</div>
 					</div>
 					<div class="form-row">
@@ -175,7 +194,7 @@ templ EditStudent(data EditStudentData) {
 					hx-target="#logOutput"
 				>
 					<div class="form-group">
-						@StudentNameCell(data.Name, data.StudentNumber, data.Avatar)
+						@StudentNameCell(data.Name, data.StudentNumber, data.LegalName, data.Avatar)
 					</div>
 					<div class="form-group">
 						<label for="name">Student Name *</label>
@@ -190,6 +209,13 @@ templ EditStudent(data EditStudentData) {
 							<label for="parentNumber">Parent Number</label>
 							<input type="text" id="parentNumber" name="parentNumber" maxlength="16" value={ data.ParentNumber } placeholder="Optional"/>
 						</div>
+					</div>
+					<div class="form-row">
+						<div class="form-group">
+							<label for="legalName">Legal Name</label>
+							<input type="text" id="legalName" name="legalName" maxlength="64" value={ data.LegalName } placeholder="Optional, max 64 characters"/>
+						</div>
+						@NationalityDropdownWithValue(data.Nationalities, data.NationalityID)
 					</div>
 					<div class="form-row">
 						@CurrencyDropdownWithValue(data.Currency)
@@ -285,7 +311,7 @@ templ EditStudent(data EditStudentData) {
 					hx-target="#logOutput"
 				>
 					<div class="form-group">
-						@StudentNameCell(data.Name, data.StudentNumber, data.Avatar)
+						@StudentNameCell(data.Name, data.StudentNumber, data.LegalName, data.Avatar)
 					</div>
 					<div class="form-group">
 						<label for="name">Student Name *</label>
@@ -300,6 +326,13 @@ templ EditStudent(data EditStudentData) {
 							<label for="parentNumber">Parent Number</label>
 							<input type="text" id="parentNumber" name="parentNumber" maxlength="16" value={ data.ParentNumber } placeholder="Optional"/>
 						</div>
+					</div>
+					<div class="form-row">
+						<div class="form-group">
+							<label for="legalName">Legal Name</label>
+							<input type="text" id="legalName" name="legalName" maxlength="64" value={ data.LegalName } placeholder="Optional, max 64 characters"/>
+						</div>
+						@NationalityDropdownWithValue(data.Nationalities, data.NationalityID)
 					</div>
 					<div class="form-group">
 						@CurrencyDropdownWithValue(data.Currency)

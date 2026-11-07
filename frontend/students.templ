@@ -44,6 +44,7 @@ type StudentItem struct {
 	RelatedToDisplay string
 	CreatedAt        string
 	UpdatedAt        string
+	LegalName        string
 	Avatar           AvatarProps
 }
 
@@ -162,7 +163,7 @@ templ Students(data StudentData) {
 							for _, student := range data.Students {
 								<tr class={ getStudentRowClass(student.Status) }>
 									<td class="students-col-wrap" data-label="Name">
-										@StudentNameCell(student.Name, student.StudentNumber, student.Avatar)
+										@StudentNameCell(student.Name, student.StudentNumber, student.LegalName, student.Avatar)
 									</td>
 									<td class="students-col-wrap" data-label="Parent">{ getDisplayValue(student.ParentName) }</td>
 									<td class="students-col-wrap" data-label="Teacher">
@@ -189,7 +190,7 @@ templ Students(data StudentData) {
 												@IconActionLink(utils.URL("/students/" + student.ID + "/edit"), "Edit", IconKindEdit)
 												@IconActionTrigger("Delete", IconKindDelete, templ.Attributes{
 													"data-student-delete-url": StudentDeleteURL(student.ID),
-													"data-student-name":       utils.StudentDisplayName(student.Name, student.StudentNumber),
+													"data-student-name":       utils.StudentDisplayName(student.Name, student.StudentNumber, student.LegalName),
 												})
 											}
 										</div>

@@ -120,6 +120,10 @@ func classEditClassData(ctx context.Context, recordID int64, readonly bool) (fro
 	if err != nil {
 		return frontend.EditClassData{}, err
 	}
+	flags, err := nationalityFlagMap(ctx)
+	if err != nil {
+		return frontend.EditClassData{}, err
+	}
 	return frontend.EditClassData{
 		OverdueGracePeriodMinutes: classOverdueGracePeriodMinutes(ctx),
 		RecordID:                  strconv.FormatInt(recordID, 10),
@@ -129,7 +133,8 @@ func classEditClassData(ctx context.Context, recordID int64, readonly bool) (fro
 		TeacherID:                 strconv.FormatInt(existing.TeacherID, 10),
 		StudentName:               existing.StudentName,
 		StudentNumber:             studentNumberString(existing.StudentNumber),
-		StudentAvatar:             frontend.StudentAvatarProps(existing.StudentName, existing.StudentAssignedColor, existing.StudentIsTestSeed == 1, "md"),
+		StudentLegalName:          studentLegalNameString(existing.StudentLegalName),
+		StudentAvatar:             buildStudentAvatarProps(existing.StudentName, existing.StudentAssignedColor, existing.StudentIsTestSeed == 1, "md", existing.StudentNationalityID, flags),
 		TeacherName:               existing.TeacherName,
 		TeacherAvatar:             avatarWithTeacherRoles(classRecordTeacherAvatar(existing), teacherRoles, teacherStatus),
 		Date:                      existing.Date,
@@ -394,7 +399,7 @@ func classesListTeacherAvatar(row queries.GetClassesListFilteredRow) models.Avat
 	}
 }
 
-func classesListViewFromRow(row queries.GetClassesListFilteredRow) models.ClassRecordView {
+func classesListViewFromRow(row queries.GetClassesListFilteredRow, flags map[string]string) models.ClassRecordView {
 	startTime := ""
 	if row.StartTime.Valid {
 		startTime = row.StartTime.String
@@ -414,25 +419,26 @@ func classesListViewFromRow(row queries.GetClassesListFilteredRow) models.ClassR
 		notes = row.Notes.String
 	}
 	return models.ClassRecordView{
-		ID:              row.ID,
-		StudentID:       row.StudentID,
-		TeacherID:       row.TeacherID,
-		StudentName:     row.StudentName,
-		StudentNumber:   studentNumberString(row.StudentNumber),
-		StudentAvatar:   studentAvatarView(row.StudentName, row.StudentAssignedColor, row.StudentIsTestSeed),
-		TeacherName:     row.TeacherName,
-		TeacherAvatar:   classesListTeacherAvatar(row),
-		Date:            row.Date,
-		StartTime:       startTime,
-		EndTime:         endTime,
-		DurationMinutes: row.DurationMinutes,
-		Rate:            row.Rate,
-		Currency:        row.Currency,
-		Status:          row.Status,
-		Reason:          reason,
-		Notes:           notes,
-		CreatedAt:       row.CreatedAt,
-		Source:          row.Source,
+		ID:               row.ID,
+		StudentID:        row.StudentID,
+		TeacherID:        row.TeacherID,
+		StudentName:      row.StudentName,
+		StudentNumber:    studentNumberString(row.StudentNumber),
+		StudentLegalName: studentLegalNameString(row.StudentLegalName),
+		StudentAvatar:    studentAvatarView(row.StudentName, row.StudentAssignedColor, row.StudentIsTestSeed, row.StudentNationalityID, flags),
+		TeacherName:      row.TeacherName,
+		TeacherAvatar:    classesListTeacherAvatar(row),
+		Date:             row.Date,
+		StartTime:        startTime,
+		EndTime:          endTime,
+		DurationMinutes:  row.DurationMinutes,
+		Rate:             row.Rate,
+		Currency:         row.Currency,
+		Status:           row.Status,
+		Reason:           reason,
+		Notes:            notes,
+		CreatedAt:        row.CreatedAt,
+		Source:           row.Source,
 	}
 }
 
@@ -454,26 +460,28 @@ func classesListCountParams(teacherID int64, startDate, endDate, statusFilter, n
 		Status:          statusFilter,
 		Column13:        nameFilter,
 		Column14:        nameNull,
-		Column15:        ts1,
-		Column16:        ts2,
-		Column17:        ts3,
+		Column15:        nameNull,
+		Column16:        ts1,
+		Column17:        ts2,
 		Column18:        ts3,
+		Column19:        ts3,
 		TeacherID_2:     teacherID,
 		ScheduledDate:   startDate,
 		ScheduledDate_2: endDate,
-		Column22:        statusFilter,
 		Column23:        statusFilter,
 		Column24:        statusFilter,
 		Column25:        statusFilter,
 		Column26:        statusFilter,
 		Column27:        statusFilter,
 		Column28:        statusFilter,
+		Column29:        statusFilter,
 		Datetime:        overdueCutoff,
-		Column30:        nameFilter,
-		Column31:        nameNull,
-		Column32:        ts1,
-		Column33:        ts2,
-		Column34:        ts3,
+		Column31:        nameFilter,
+		Column32:        nameNull,
+		Column33:        nameNull,
+		Column34:        ts1,
+		Column35:        ts2,
+		Column36:        ts3,
 	}
 }
 
@@ -495,26 +503,28 @@ func classesListListParams(teacherID int64, startDate, endDate, statusFilter, na
 		Status:          statusFilter,
 		Column13:        nameFilter,
 		Column14:        nameNull,
-		Column15:        ts1,
-		Column16:        ts2,
-		Column17:        ts3,
+		Column15:        nameNull,
+		Column16:        ts1,
+		Column17:        ts2,
 		Column18:        ts3,
+		Column19:        ts3,
 		TeacherID_2:     teacherID,
 		ScheduledDate:   startDate,
 		ScheduledDate_2: endDate,
-		Column22:        statusFilter,
 		Column23:        statusFilter,
 		Column24:        statusFilter,
 		Column25:        statusFilter,
 		Column26:        statusFilter,
 		Column27:        statusFilter,
 		Column28:        statusFilter,
+		Column29:        statusFilter,
 		Datetime:        overdueCutoff,
-		Column30:        nameFilter,
-		Column31:        nameNull,
-		Column32:        ts1,
-		Column33:        ts2,
-		Column34:        ts3,
+		Column31:        nameFilter,
+		Column32:        nameNull,
+		Column33:        nameNull,
+		Column34:        ts1,
+		Column35:        ts2,
+		Column36:        ts3,
 		Limit:           limit,
 		Offset:          offset,
 	}
@@ -530,6 +540,7 @@ func classRecordsCountParams(teacherID int64, startDate, endDate, statusFilter, 
 		Status:    statusFilter,
 		Column7:   nameFilter,
 		Column8:   sql.NullString{String: nameFilter, Valid: true},
+		Column9:   sql.NullString{String: nameFilter, Valid: true},
 	}
 }
 
@@ -543,6 +554,7 @@ func classRecordsListParams(teacherID int64, startDate, endDate, statusFilter, n
 		Status:    statusFilter,
 		Column7:   nameFilter,
 		Column8:   sql.NullString{String: nameFilter, Valid: true},
+		Column9:   sql.NullString{String: nameFilter, Valid: true},
 		Limit:     limit,
 		Offset:    offset,
 	}
@@ -669,10 +681,16 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 
 	gracePeriod := classOverdueGracePeriodMinutes(ctx)
 	now := time.Now()
+	flags, err := nationalityFlagMap(ctx)
+	if err != nil {
+		HttpError(w, "Failed to load nationalities", http.StatusInternalServerError)
+		return
+	}
+
 	views := make([]models.ClassRecordView, 0, len(records))
 	teacherIDs := make([]int64, 0, len(records))
 	for _, cr := range records {
-		views = append(views, classesListViewFromRow(cr))
+		views = append(views, classesListViewFromRow(cr, flags))
 		teacherIDs = append(teacherIDs, cr.TeacherID)
 	}
 	uniqueIDs := uniqueTeacherIDs(teacherIDs)
@@ -949,7 +967,7 @@ func parseRecordClassPrefill(r *http.Request) models.RecordClassPrefill {
 		}
 	}
 
-	prefill.StudentName = studentDisplayName(existing.StudentName, existing.StudentNumber)
+	prefill.StudentName = studentDisplayName(existing.StudentName, existing.StudentNumber, sql.NullString{})
 	prefill.TeacherName = existing.TeacherName
 	prefill.StudentID = strconv.FormatInt(existing.StudentID, 10)
 	prefill.TeacherID = strconv.FormatInt(existing.TeacherID, 10)

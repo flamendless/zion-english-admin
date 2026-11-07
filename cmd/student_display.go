@@ -6,8 +6,8 @@ import (
 	"zion-english/internal/utils"
 )
 
-func studentDisplayName(name string, studentNumber sql.NullString) string {
-	return utils.StudentDisplayNameFromNull(name, studentNumber)
+func studentDisplayName(name string, studentNumber, legalName sql.NullString) string {
+	return utils.StudentDisplayNameFromNull(name, studentNumber, legalName)
 }
 
 func studentNumberString(studentNumber sql.NullString) string {

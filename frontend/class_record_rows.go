@@ -9,34 +9,36 @@ import (
 )
 
 type ClassRecordRowData struct {
-	ID              int64
-	StudentID       int64
-	TeacherID       int64
-	StudentName     string
-	StudentNumber   string
-	StudentAvatar   AvatarProps
-	TeacherName     string
-	TeacherAvatar   AvatarProps
-	Date            string
-	StartTime       string
-	EndTime         string
-	DurationMinutes int64
-	Rate            float64
-	Currency        string
-	Status          constants.ClassListFilterStatus
-	Overdue         bool
-	Reason          string
-	Notes           string
-	Source          ClassRecordSource
+	ID               int64
+	StudentID        int64
+	TeacherID        int64
+	StudentName      string
+	StudentNumber    string
+	StudentLegalName string
+	StudentAvatar    AvatarProps
+	TeacherName      string
+	TeacherAvatar    AvatarProps
+	Date             string
+	StartTime        string
+	EndTime          string
+	DurationMinutes  int64
+	Rate             float64
+	Currency         string
+	Status           constants.ClassListFilterStatus
+	Overdue          bool
+	Reason           string
+	Notes            string
+	Source           ClassRecordSource
 }
 
 func ClassRecordRowFromView(v models.ClassRecordView) ClassRecordRowData {
 	return ClassRecordRowData{
-		ID:            v.ID,
-		StudentID:     v.StudentID,
-		TeacherID:     v.TeacherID,
-		StudentName:   v.StudentName,
-		StudentNumber: v.StudentNumber,
+		ID:               v.ID,
+		StudentID:        v.StudentID,
+		TeacherID:        v.TeacherID,
+		StudentName:      v.StudentName,
+		StudentNumber:    v.StudentNumber,
+		StudentLegalName: v.StudentLegalName,
 		StudentAvatar: AvatarProps{
 			Size:          "sm",
 			Initials:      v.StudentAvatar.Initials,
@@ -45,6 +47,7 @@ func ClassRecordRowFromView(v models.ClassRecordView) ClassRecordRowData {
 			HasPicture:    v.StudentAvatar.HasPicture,
 			Alt:           v.StudentAvatar.Alt,
 			RoleBadge:     v.StudentAvatar.RoleBadge,
+			FlagURL:       v.StudentAvatar.FlagURL,
 		},
 		TeacherName: v.TeacherName,
 		TeacherAvatar: AvatarProps{
@@ -167,7 +170,7 @@ func (r ClassRecordRowData) ScheduledItemData() ScheduledClassItemData {
 		ID:              r.ID,
 		StudentID:       r.StudentID,
 		TeacherID:       r.TeacherID,
-		StudentName:     utils.StudentDisplayName(r.StudentName, r.StudentNumber),
+		StudentName:     utils.StudentDisplayName(r.StudentName, r.StudentNumber, r.StudentLegalName),
 		TeacherName:     r.TeacherName,
 		ScheduledDate:   r.Date,
 		StartTime:       r.StartTime,

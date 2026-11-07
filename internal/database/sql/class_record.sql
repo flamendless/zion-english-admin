@@ -26,6 +26,8 @@ WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
 SELECT cr.id, cr.student_id, cr.teacher_id, cr.date, cr.start_time, cr.end_time, cr.duration_minutes, cr.rate, cr.currency, cr.is_trial_class, cr.status, cr.reason, cr.notes, cr.created_at, cr.updated_at, cr.recorded_by_role,
 	s.name as student_name,
 	s.student_number as student_number,
+	s.legal_name as student_legal_name,
+	s.nationality_id as student_nationality_id,
 	s.assigned_color as student_assigned_color,
 	s.is_test_seed as student_is_test_seed,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) as teacher_name,
@@ -90,7 +92,11 @@ JOIN tbl_students s ON cr.student_id = s.id
 WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
 	AND (? = '' OR cr.status = ?)
-	AND (? = '' OR s.name LIKE '%' || ? || '%')
+	AND (
+		? = ''
+		OR s.name LIKE '%' || ? || '%'
+		OR COALESCE(s.legal_name, '') LIKE '%' || ? || '%'
+	)
 	AND s.is_test_seed = 0;
 
 -- name: GetClassRecordsFiltered :many
@@ -104,7 +110,11 @@ JOIN tbl_teachers t ON cr.teacher_id = t.id
 WHERE (? = 0 OR cr.teacher_id = ?) AND cr.date >= ? AND cr.date <= ?
 	AND cr.deleted_at IS NULL
 	AND (? = '' OR cr.status = ?)
-	AND (? = '' OR s.name LIKE '%' || ? || '%')
+	AND (
+		? = ''
+		OR s.name LIKE '%' || ? || '%'
+		OR COALESCE(s.legal_name, '') LIKE '%' || ? || '%'
+	)
 	AND s.is_test_seed = 0
 ORDER BY CASE WHEN cr.date = date('now', 'localtime') THEN 0 ELSE 1 END, cr.date DESC, cr.created_at DESC
 LIMIT ? OFFSET ?;
@@ -118,7 +128,11 @@ SELECT (
 		AND ((? = 'deleted' AND cr.deleted_at IS NOT NULL) OR (? != 'deleted' AND cr.deleted_at IS NULL))
 		AND (? = '' OR (? != 'scheduled' AND ? != 'overdue'))
 		AND (? = '' OR ? = 'deleted' OR cr.status = ?)
-		AND (? = '' OR s.name LIKE '%' || ? || '%')
+		AND (
+		? = ''
+		OR s.name LIKE '%' || ? || '%'
+		OR COALESCE(s.legal_name, '') LIKE '%' || ? || '%'
+	)
 		AND (
 			? = 'all'
 			OR (? = 'only' AND s.is_test_seed = 1)
@@ -143,7 +157,11 @@ SELECT (
 				END
 			) < datetime(?)
 		)
-		AND (? = '' OR s.name LIKE '%' || ? || '%')
+		AND (
+		? = ''
+		OR s.name LIKE '%' || ? || '%'
+		OR COALESCE(s.legal_name, '') LIKE '%' || ? || '%'
+	)
 		AND (
 			? = 'all'
 			OR (? = 'only' AND s.is_test_seed = 1)
@@ -170,6 +188,8 @@ SELECT * FROM (
 	cr.created_at,
 	s.name AS student_name,
 	s.student_number AS student_number,
+	s.legal_name AS student_legal_name,
+	s.nationality_id AS student_nationality_id,
 	s.assigned_color AS student_assigned_color,
 	s.is_test_seed AS student_is_test_seed,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
@@ -185,7 +205,11 @@ SELECT * FROM (
 		AND ((? = 'deleted' AND cr.deleted_at IS NOT NULL) OR (? != 'deleted' AND cr.deleted_at IS NULL))
 		AND (? = '' OR (? != 'scheduled' AND ? != 'overdue'))
 		AND (? = '' OR ? = 'deleted' OR cr.status = ?)
-		AND (? = '' OR s.name LIKE '%' || ? || '%')
+		AND (
+		? = ''
+		OR s.name LIKE '%' || ? || '%'
+		OR COALESCE(s.legal_name, '') LIKE '%' || ? || '%'
+	)
 		AND (
 			? = 'all'
 			OR (? = 'only' AND s.is_test_seed = 1)
@@ -211,6 +235,8 @@ SELECT * FROM (
 	sc.created_at,
 	s.name AS student_name,
 	s.student_number AS student_number,
+	s.legal_name AS student_legal_name,
+	s.nationality_id AS student_nationality_id,
 	s.assigned_color AS student_assigned_color,
 	s.is_test_seed AS student_is_test_seed,
 	trim(t.first_name || CASE WHEN t.middle_name != '' THEN ' ' || t.middle_name ELSE '' END || CASE WHEN t.last_name != '' THEN ' ' || t.last_name ELSE '' END) AS teacher_name,
@@ -237,7 +263,11 @@ SELECT * FROM (
 				END
 			) < datetime(?)
 		)
-		AND (? = '' OR s.name LIKE '%' || ? || '%')
+		AND (
+		? = ''
+		OR s.name LIKE '%' || ? || '%'
+		OR COALESCE(s.legal_name, '') LIKE '%' || ? || '%'
+	)
 		AND (
 			? = 'all'
 			OR (? = 'only' AND s.is_test_seed = 1)
