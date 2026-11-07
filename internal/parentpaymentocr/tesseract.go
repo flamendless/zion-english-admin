@@ -49,7 +49,8 @@ func DetectDocumentText(ctx context.Context, image []byte, fileExt string) (stri
 		lang = defaultTesseractLanguages
 	}
 
-	cmd := exec.CommandContext(ctx, "tesseract", imagePath, "stdout", "-l", lang, "--psm", "6")
+	// PSM 4: single column — fits stacked mobile banking transaction lists.
+	cmd := exec.CommandContext(ctx, "tesseract", imagePath, "stdout", "-l", lang, "--psm", "4")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		msg := strings.TrimSpace(string(out))
