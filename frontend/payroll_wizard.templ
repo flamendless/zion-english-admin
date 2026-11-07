@@ -109,9 +109,9 @@ templ ParentPaymentsVerificationPanel(data ParentPaymentsVerificationData) {
 	if data.CutoffLabel != "" {
 		<p class="payroll-wizard-verify-cutoff">{ data.CutoffLabel }</p>
 	}
-	if len(data.Rows) == 0 && !data.OCRFailed {
-		<p class="empty-state">No legal name and amount pairs were detected. Try a clearer image or check the layout.</p>
-	} else if len(data.Rows) > 0 {
+	if len(data.Rows) == 0 {
+		<p class="empty-state">No rows to verify. Try a clearer image or check the layout.</p>
+	} else {
 		<div class="table-wrapper data-list-view-root">
 			<table class="table-stack-mobile payroll-parent-payments-table">
 				<thead>
@@ -128,8 +128,8 @@ templ ParentPaymentsVerificationPanel(data ParentPaymentsVerificationData) {
 						<tr>
 							<td data-label="Legal name (OCR)">{ row.LegalName }</td>
 							<td data-label="Amount (OCR)">{ row.ParsedAmount }</td>
-							<td data-label="Matched student">{ row.StudentLabel }</td>
-							<td data-label="Expected total">{ row.ExpectedAmount }</td>
+							<td data-label="Matched student">{ getDisplayValue(row.StudentLabel) }</td>
+							<td data-label="Expected total">{ getDisplayValue(row.ExpectedAmount) }</td>
 							<td data-label="Status">
 								@StatusPill(row.StatusLabel, row.Status.PillTone(), false)
 							</td>

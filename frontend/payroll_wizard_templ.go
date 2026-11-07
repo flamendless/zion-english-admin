@@ -218,12 +218,12 @@ func ParentPaymentsVerificationPanel(data ParentPaymentsVerificationData) templ.
 				return templ_7745c5c3_Err
 			}
 		}
-		if len(data.Rows) == 0 && !data.OCRFailed {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<p class=\"empty-state\">No legal name and amount pairs were detected. Try a clearer image or check the layout.</p>")
+		if len(data.Rows) == 0 {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<p class=\"empty-state\">No rows to verify. Try a clearer image or check the layout.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-		} else if len(data.Rows) > 0 {
+		} else {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"table-wrapper data-list-view-root\"><table class=\"table-stack-mobile payroll-parent-payments-table\"><thead><tr><th>Legal name (OCR)</th><th>Amount (OCR)</th><th>Matched student</th><th>Expected total</th><th>Status</th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -260,9 +260,9 @@ func ParentPaymentsVerificationPanel(data ParentPaymentsVerificationData) templ.
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var11 string
-				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(row.StudentLabel)
+				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(row.StudentLabel))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payroll_wizard.templ`, Line: 131, Col: 58}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payroll_wizard.templ`, Line: 131, Col: 75}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -273,9 +273,9 @@ func ParentPaymentsVerificationPanel(data ParentPaymentsVerificationData) templ.
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var12 string
-				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(row.ExpectedAmount)
+				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(row.ExpectedAmount))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payroll_wizard.templ`, Line: 132, Col: 59}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payroll_wizard.templ`, Line: 132, Col: 76}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {

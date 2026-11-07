@@ -22,21 +22,57 @@ type ParsedLine struct {
 	RawLine   string
 }
 
-// ParsePaymentLines scans OCR output for lines that pair a name with a payment amount.
-// Supports a single "name amount" line and mobile-banking layouts where the payer name
-// is on one line and "+59,360원" is on the next.
+// PaymentOCREntry is one row candidate from OCR, complete or partial.
+type PaymentOCREntry struct {
+	LegalName  string
+	Amount     float64
+	HasName    bool
+	HasAmount  bool
+	RawLine    string
+	ScanFailed bool
+}
+
+// Complete reports whether both name and a positive amount were read.
+func (e PaymentOCREntry) Complete() bool {
+	return e.HasName && e.HasAmount && e.Amount > 0 && strings.TrimSpace(e.LegalName) != ""
+}
+
+// ParsePaymentLines returns only complete name and amount pairs.
 func ParsePaymentLines(text string) []ParsedLine {
 	var out []ParsedLine
+	for _, e := range ParsePaymentEntries(text) {
+		if !e.Complete() {
+			continue
+		}
+		out = append(out, ParsedLine{
+			LegalName: e.LegalName,
+			Amount:    e.Amount,
+			RawLine:   e.RawLine,
+		})
+	}
+	return out
+}
+
+// ParsePaymentEntries scans OCR output and returns every payment row candidate, including
+// partial reads (name without amount, amount without name, or whole-scan failure markers).
+func ParsePaymentEntries(text string) []PaymentOCREntry {
+	var out []PaymentOCREntry
 	var pendingName string
+
+	appendEntry := func(e PaymentOCREntry) {
+		out = append(out, e)
+	}
 
 	appendPair := func(name, raw string, amount float64) {
 		name = strings.TrimSpace(name)
 		if name == "" || amount <= 0 {
 			return
 		}
-		out = append(out, ParsedLine{
+		appendEntry(PaymentOCREntry{
 			LegalName: name,
 			Amount:    amount,
+			HasName:   true,
+			HasAmount: true,
 			RawLine:   raw,
 		})
 	}
@@ -50,11 +86,22 @@ func ParsePaymentLines(text string) []ParsedLine {
 
 		if m := bankCreditLineRE.FindStringSubmatch(line); m != nil {
 			amount, ok := parseAmount(m[1])
-			if ok && pendingName != "" {
+			if !ok || amount <= 0 {
+				appendEntry(PaymentOCREntry{RawLine: line, HasAmount: false, HasName: false})
+				pendingName = ""
+				continue
+			}
+			if pendingName != "" {
 				appendPair(pendingName, pendingName+" | "+line, amount)
 				pendingName = ""
 				continue
 			}
+			appendEntry(PaymentOCREntry{
+				Amount:    amount,
+				HasAmount: true,
+				RawLine:   line,
+			})
+			continue
 		}
 
 		if loc := lineAmountRE.FindStringSubmatchIndex(line); loc != nil {
@@ -63,8 +110,19 @@ func ParsePaymentLines(text string) []ParsedLine {
 			name = strings.TrimRight(name, ":：-|")
 			name = strings.TrimSpace(name)
 			amount, ok := parseAmount(amountStr)
-			if ok && name != "" && !isBankSkipLine(name) {
+			if ok && amount > 0 && name != "" && !isBankSkipLine(name) {
 				appendPair(name, line, amount)
+				pendingName = ""
+				continue
+			}
+			if ok && amount > 0 {
+				appendEntry(PaymentOCREntry{
+					LegalName: name,
+					Amount:    amount,
+					HasName:   name != "",
+					HasAmount: true,
+					RawLine:   line,
+				})
 				pendingName = ""
 				continue
 			}
@@ -78,6 +136,14 @@ func ParsePaymentLines(text string) []ParsedLine {
 		if looksLikePayerName(line) {
 			pendingName = line
 		}
+	}
+
+	if pendingName != "" {
+		appendEntry(PaymentOCREntry{
+			LegalName: pendingName,
+			HasName:   true,
+			RawLine:   pendingName,
+		})
 	}
 	return out
 }
