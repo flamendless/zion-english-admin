@@ -1,0 +1,23 @@
+package frontend
+
+import "zion-english/internal/nationalities"
+
+templ NationalityFlag(iso string, class string) {
+	switch nationalities.NormalizeISO(iso) {
+	case "":
+	default:
+		if flagMarkup(iso, class) != "" {
+			@templ.Raw(flagMarkup(iso, class))
+		}
+	}
+}
+
+templ NationalityFlagPreview(iso string) {
+	<div id="nationalityFlagPreview" class="nationality-flag-preview-host">
+		if nationalities.NormalizeISO(iso) != "" {
+			@NationalityFlag(iso, "nationality-flag-preview")
+		} else {
+			<span class="nationality-flag-preview nationality-flag-preview--empty" aria-hidden="true"></span>
+		}
+	</div>
+}

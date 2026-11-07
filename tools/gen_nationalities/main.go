@@ -1,11 +1,10 @@
-// Command gen_nationalities downloads country metadata and flag SVGs, then writes
-// a Goose seed migration and static flag assets.
+// Command gen_nationalities downloads country metadata and writes a Goose seed migration.
+// Flag SVG markup lives in internal/nationalities/flags.go (regenerate via tools/embed_flags).
 package main
 
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -50,14 +49,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	flagsDir := filepath.Join(repoRoot, "static", "flags")
-	if err := os.MkdirAll(flagsDir, 0o755); err != nil {
-		fmt.Fprintln(os.Stderr, "mkdir flags:", err)
-		os.Exit(1)
-	}
-
 	type row struct {
-		id, name, language, flagPath string
+		id, name, language string
 	}
 	var rows []row
 
@@ -78,14 +71,7 @@ func main() {
 			language = lang
 			break
 		}
-		flagURL := fmt.Sprintf("https://flagcdn.com/%s.svg", id)
-		flagFile := filepath.Join(flagsDir, id+".svg")
-		if err := downloadFile(client, flagURL, flagFile); err != nil {
-			fmt.Fprintf(os.Stderr, "skip %s flag: %v\n", id, err)
-			continue
-		}
-		flagPath := "/static/flags/" + id + ".svg"
-		rows = append(rows, row{id: id, name: name, language: language, flagPath: flagPath})
+		rows = append(rows, row{id: id, name: name, language: language})
 	}
 
 	sort.Slice(rows, func(i, j int) bool { return rows[i].name < rows[j].name })
@@ -102,11 +88,10 @@ func main() {
 	fmt.Fprintln(f, "-- +goose StatementBegin")
 	for _, r := range rows {
 		fmt.Fprintf(f,
-			"INSERT INTO tbl_nationalities (id, country_name, language, flag_path) VALUES ('%s', %s, %s, '%s');\n",
+			"INSERT INTO tbl_nationalities (id, country_name, language) VALUES ('%s', %s, %s);\n",
 			sqlEscape(r.id),
 			sqlString(r.name),
 			sqlString(r.language),
-			sqlEscape(r.flagPath),
 		)
 	}
 	fmt.Fprintln(f, "-- +goose StatementEnd")
@@ -134,24 +119,6 @@ func findRepoRoot() (string, error) {
 		}
 		dir = parent
 	}
-}
-
-func downloadFile(client *http.Client, url, dest string) error {
-	resp, err := client.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("status %d", resp.StatusCode)
-	}
-	out, err := os.Create(dest)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-	_, err = io.Copy(out, resp.Body)
-	return err
 }
 
 func sqlEscape(s string) string {

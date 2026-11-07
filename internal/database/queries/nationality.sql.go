@@ -13,8 +13,7 @@ const getAllNationalities = `-- name: GetAllNationalities :many
 SELECT
 	id,
 	country_name,
-	language,
-	flag_path
+	language
 FROM tbl_nationalities
 ORDER BY country_name ASC
 `
@@ -28,12 +27,7 @@ func (q *Queries) GetAllNationalities(ctx context.Context) ([]TblNationality, er
 	var items []TblNationality
 	for rows.Next() {
 		var i TblNationality
-		if err := rows.Scan(
-			&i.ID,
-			&i.CountryName,
-			&i.Language,
-			&i.FlagPath,
-		); err != nil {
+		if err := rows.Scan(&i.ID, &i.CountryName, &i.Language); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -51,8 +45,7 @@ const getNationalityByID = `-- name: GetNationalityByID :one
 SELECT
 	id,
 	country_name,
-	language,
-	flag_path
+	language
 FROM tbl_nationalities
 WHERE id = ?
 `
@@ -60,11 +53,6 @@ WHERE id = ?
 func (q *Queries) GetNationalityByID(ctx context.Context, id string) (TblNationality, error) {
 	row := q.db.QueryRowContext(ctx, getNationalityByID, id)
 	var i TblNationality
-	err := row.Scan(
-		&i.ID,
-		&i.CountryName,
-		&i.Language,
-		&i.FlagPath,
-	)
+	err := row.Scan(&i.ID, &i.CountryName, &i.Language)
 	return i, err
 }

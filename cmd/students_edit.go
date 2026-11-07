@@ -105,10 +105,6 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 	if err != nil {
 		return frontend.EditStudentData{}, err
 	}
-	flags, err := nationalityFlagMap(ctx)
-	if err != nil {
-		return frontend.EditStudentData{}, err
-	}
 	nationality, hasNationality := nationalityFieldsForStudent(ctx, existing.NationalityID)
 
 	assignedTeachers, err := dbRO.GetQueries().GetTeachersByStudentID(ctx, studentID)
@@ -190,7 +186,7 @@ func studentEditStudentData(ctx context.Context, studentID int64, readonly bool)
 		HasNationality:      hasNationality,
 		Nationality:         nationality,
 		Nationalities:       nationalities,
-		Avatar:              buildStudentAvatarProps(existing.Name, existing.AssignedColor, existing.IsTestSeed == 1, "md", existing.NationalityID, flags),
+		Avatar:              buildStudentAvatarProps(existing.Name, existing.AssignedColor, existing.IsTestSeed == 1, "md", existing.NationalityID),
 		Status:              constants.StudentStatus(existing.Status),
 		InactiveReason:      inactiveReason,
 		DeletedReason:       deletedReason,
@@ -385,12 +381,6 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 		relationshipsByStudent[rel.StudentID] = append(relationshipsByStudent[rel.StudentID], rel)
 	}
 
-	flags, err := nationalityFlagMap(ctx)
-	if err != nil {
-		HttpError(w, "Failed to load nationalities", http.StatusInternalServerError)
-		return
-	}
-
 	teacherAssignments, err := dbRO.GetQueries().GetAllStudentTeacherNames(ctx)
 	if err != nil {
 		HttpError(w, fmt.Sprintf("Failed to fetch teacher assignments: %v", err), http.StatusInternalServerError)
@@ -438,7 +428,7 @@ func handleStudents(w http.ResponseWriter, r *http.Request) {
 			Name:                s.Name,
 			StudentNumber:       studentNumberString(s.StudentNumber),
 			LegalName:           studentLegalNameString(s.LegalName),
-			Avatar:              buildStudentAvatarProps(s.Name, s.AssignedColor, s.IsTestSeed == 1, "sm", s.NationalityID, flags),
+			Avatar:              buildStudentAvatarProps(s.Name, s.AssignedColor, s.IsTestSeed == 1, "sm", s.NationalityID),
 			Currency:            s.Currency,
 			Contact:             s.Contact.String,
 			RatePerClass:        s.RatePerClass,

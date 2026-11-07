@@ -192,7 +192,7 @@ type AvatarView struct {
 	PictureURL           string `json:"pictureURL"`
 	Alt                  string `json:"alt"`
 	RoleBadge            string `json:"roleBadge,omitempty"`
-	FlagURL              string `json:"flagURL,omitempty"`
+	NationalityISO       string `json:"nationalityISO,omitempty"`
 	TeacherAccountStatus string `json:"teacherAccountStatus,omitempty"`
 }
 

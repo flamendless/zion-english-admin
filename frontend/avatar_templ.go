@@ -19,7 +19,7 @@ type AvatarProps struct {
 	HasPicture           bool                    `json:"hasPicture"`
 	Alt                  string                  `json:"alt"`
 	RoleBadge            string                  `json:"roleBadge,omitempty"`
-	FlagURL              string                  `json:"flagURL,omitempty"`
+	NationalityISO       string                  `json:"nationalityISO,omitempty"`
 	TeacherAccountStatus constants.TeacherStatus `json:"teacherAccountStatus,omitempty"`
 }
 
@@ -304,7 +304,7 @@ func Avatar(props AvatarProps) templ.Component {
 			templ_7745c5c3_Var15 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		if props.RoleBadge != "" || props.FlagURL != "" {
+		if props.RoleBadge != "" || props.NationalityISO != "" {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<div class=\"avatar-with-role\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -313,28 +313,23 @@ func Avatar(props AvatarProps) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if props.FlagURL != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<img src=\"")
+			if props.NationalityISO != "" {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<span class=\"avatar-nationality-flag\" aria-hidden=\"true\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var16 string
-				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(props.FlagURL)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/avatar.templ`, Line: 58, Col: 28}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
+				templ_7745c5c3_Err = NationalityFlag(props.NationalityISO, "").Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" alt=\"\" class=\"avatar-nationality-flag\" aria-hidden=\"true\"> ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</span> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 			if props.RoleBadge != "" {
-				var templ_7745c5c3_Var17 = []any{"avatar-role-badge " + pillClass(AvatarRoleBadgeToneForProps(props))}
-				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var17...)
+				var templ_7745c5c3_Var16 = []any{"avatar-role-badge " + pillClass(AvatarRoleBadgeToneForProps(props))}
+				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var16...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -342,12 +337,12 @@ func Avatar(props AvatarProps) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var18 string
-				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var17).String())
+				var templ_7745c5c3_Var17 string
+				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.CSSClasses(templ_7745c5c3_Var16).String())
 				if templ_7745c5c3_Err != nil {
 					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/avatar.templ`, Line: 1, Col: 0}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var18)
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var17)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -355,12 +350,12 @@ func Avatar(props AvatarProps) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var19 string
-				templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(props.RoleBadge)
+				var templ_7745c5c3_Var18 string
+				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(props.RoleBadge)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/avatar.templ`, Line: 61, Col: 106}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/avatar.templ`, Line: 63, Col: 106}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -399,12 +394,12 @@ func AvatarStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var20 == nil {
-			templ_7745c5c3_Var20 = templ.NopComponent
+		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var19 == nil {
+			templ_7745c5c3_Var19 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<style>\r\n\t\t.avatar {\r\n\t\t\tposition: relative;\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\toverflow: hidden;\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tborder: 2px solid var(--color-surface);\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\tcolor: var(--color-on-primary);\r\n\t\t\tfont-weight: 600;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tuser-select: none;\r\n\t\t}\r\n\r\n\t\t.avatar-sm {\r\n\t\t\twidth: 32px;\r\n\t\t\theight: 32px;\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t}\r\n\r\n\t\t.avatar-md {\r\n\t\t\twidth: 48px;\r\n\t\t\theight: 48px;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.avatar-nav {\r\n\t\t\twidth: 72px;\r\n\t\t\theight: 72px;\r\n\t\t\tfont-size: 1.125rem;\r\n\t\t}\r\n\r\n\t\t.avatar-lg {\r\n\t\t\twidth: 96px;\r\n\t\t\theight: 96px;\r\n\t\t\tfont-size: 1.75rem;\r\n\t\t}\r\n\r\n\t\t.avatar-xl {\r\n\t\t\twidth: 128px;\r\n\t\t\theight: 128px;\r\n\t\t\tfont-size: 2.25rem;\r\n\t\t}\r\n\r\n\t\t.avatar-image {\r\n\t\t\twidth: 100%;\r\n\t\t\theight: 100%;\r\n\t\t\tobject-fit: cover;\r\n\t\t\tdisplay: block;\r\n\t\t}\r\n\r\n\t\t.avatar-initials {\r\n\t\t\tline-height: 1;\r\n\t\t\tletter-spacing: 0.02em;\r\n\t\t}\r\n\r\n\t\t.header-avatar-link {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\ttext-decoration: none;\r\n\t\t\tline-height: 0;\r\n\t\t}\r\n\r\n\t\t.header-avatar-link:hover .avatar {\r\n\t\t\tbox-shadow: var(--shadow-md);\r\n\t\t}\r\n\r\n\t\t.teacher-name-cell {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmin-width: 0;\r\n\t\t}\r\n\r\n\t\t.entity-view-identity .teacher-name-cell {\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.entity-view-identity .teacher-name-cell .avatar-with-role {\r\n\t\t\tmargin-bottom: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.entity-view-identity .teacher-name-cell h2 {\r\n\t\t\tmargin: 0;\r\n\t\t}\r\n\r\n\t\t.teacher-name-cell .avatar-with-role,\r\n\t\t.analytics-teacher-cell .avatar-with-role,\r\n\t\t.reports-teacher-cell .avatar-with-role,\r\n\t\t.documents-uploader-cell .avatar-with-role {\r\n\t\t\tmargin-bottom: 0;\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tmargin-inline-end: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.day-class-header .avatar-with-role {\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tmargin-inline-end: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.teacher-name-cell-text {\r\n\t\t\tmin-width: 0;\r\n\t\t\toverflow: hidden;\r\n\t\t\ttext-overflow: ellipsis;\r\n\t\t\twhite-space: nowrap;\r\n\t\t}\r\n\r\n\t\t.avatar-with-role {\r\n\t\t\tposition: relative;\r\n\t\t\tdisplay: inline-block;\r\n\t\t\tmargin-bottom: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.avatar-role-badge {\r\n\t\t\tposition: absolute;\r\n\t\t\tbottom: 0;\r\n\t\t\tleft: 50%;\r\n\t\t\ttransform: translate(-50%, 50%);\r\n\t\t\tz-index: 1;\r\n\t\t\tfont-size: 0.625rem;\r\n\t\t\tpadding: 2px 8px;\r\n\t\t\twhite-space: nowrap;\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\ttext-transform: lowercase;\r\n\t\t}\r\n\r\n\t\t.avatar-with-role:has(.avatar-sm) .avatar-role-badge,\r\n\t\t.avatar-with-role:has(.avatar-nav) .avatar-role-badge {\r\n\t\t\tfont-size: 0.5625rem;\r\n\t\t\tpadding: 1px 6px;\r\n\t\t}\r\n\r\n\t\t.avatar-with-role .avatar-role-badge.pill--neutral {\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.avatar-nationality-flag {\r\n\t\t\tposition: absolute;\r\n\t\t\tbottom: 0;\r\n\t\t\tleft: 50%;\r\n\t\t\ttransform: translate(-50%, 35%);\r\n\t\t\tz-index: 2;\r\n\t\t\twidth: 18px;\r\n\t\t\theight: 12px;\r\n\t\t\tobject-fit: cover;\r\n\t\t\tborder-radius: 2px;\r\n\t\t\tborder: 1px solid var(--color-surface);\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tpointer-events: none;\r\n\t\t}\r\n\r\n\t\t.avatar-with-role:has(.avatar-sm) .avatar-nationality-flag,\r\n\t\t.avatar-with-role:has(.avatar-nav) .avatar-nationality-flag {\r\n\t\t\twidth: 14px;\r\n\t\t\theight: 10px;\r\n\t\t}\r\n\r\n\t\t.avatar-with-role:has(.avatar-lg) .avatar-nationality-flag,\r\n\t\t.avatar-with-role:has(.avatar-xl) .avatar-nationality-flag {\r\n\t\t\twidth: 24px;\r\n\t\t\theight: 16px;\r\n\t\t}\r\n\r\n\t\t.avatar-with-role:has(.avatar-nationality-flag) .avatar-role-badge {\r\n\t\t\ttransform: translate(-50%, 115%);\r\n\t\t}\r\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<style>\r\n\t\t.avatar {\r\n\t\t\tposition: relative;\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\talign-items: center;\r\n\t\t\tjustify-content: center;\r\n\t\t\tborder-radius: var(--radius-full);\r\n\t\t\toverflow: hidden;\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tborder: 2px solid var(--color-surface);\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\tcolor: var(--color-on-primary);\r\n\t\t\tfont-weight: 600;\r\n\t\t\ttext-transform: uppercase;\r\n\t\t\tuser-select: none;\r\n\t\t}\r\n\r\n\t\t.avatar-sm {\r\n\t\t\twidth: 32px;\r\n\t\t\theight: 32px;\r\n\t\t\tfont-size: 0.6875rem;\r\n\t\t}\r\n\r\n\t\t.avatar-md {\r\n\t\t\twidth: 48px;\r\n\t\t\theight: 48px;\r\n\t\t\tfont-size: 0.875rem;\r\n\t\t}\r\n\r\n\t\t.avatar-nav {\r\n\t\t\twidth: 72px;\r\n\t\t\theight: 72px;\r\n\t\t\tfont-size: 1.125rem;\r\n\t\t}\r\n\r\n\t\t.avatar-lg {\r\n\t\t\twidth: 96px;\r\n\t\t\theight: 96px;\r\n\t\t\tfont-size: 1.75rem;\r\n\t\t}\r\n\r\n\t\t.avatar-xl {\r\n\t\t\twidth: 128px;\r\n\t\t\theight: 128px;\r\n\t\t\tfont-size: 2.25rem;\r\n\t\t}\r\n\r\n\t\t.avatar-image {\r\n\t\t\twidth: 100%;\r\n\t\t\theight: 100%;\r\n\t\t\tobject-fit: cover;\r\n\t\t\tdisplay: block;\r\n\t\t}\r\n\r\n\t\t.avatar-initials {\r\n\t\t\tline-height: 1;\r\n\t\t\tletter-spacing: 0.02em;\r\n\t\t}\r\n\r\n\t\t.header-avatar-link {\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\ttext-decoration: none;\r\n\t\t\tline-height: 0;\r\n\t\t}\r\n\r\n\t\t.header-avatar-link:hover .avatar {\r\n\t\t\tbox-shadow: var(--shadow-md);\r\n\t\t}\r\n\r\n\t\t.teacher-name-cell {\r\n\t\t\tdisplay: flex;\r\n\t\t\talign-items: center;\r\n\t\t\tgap: var(--space-2);\r\n\t\t\tmin-width: 0;\r\n\t\t}\r\n\r\n\t\t.entity-view-identity .teacher-name-cell {\r\n\t\t\tflex-direction: column;\r\n\t\t\talign-items: flex-start;\r\n\t\t\tgap: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.entity-view-identity .teacher-name-cell .avatar-with-role {\r\n\t\t\tmargin-bottom: var(--space-2);\r\n\t\t}\r\n\r\n\t\t.entity-view-identity .teacher-name-cell h2 {\r\n\t\t\tmargin: 0;\r\n\t\t}\r\n\r\n\t\t.teacher-name-cell .avatar-with-role,\r\n\t\t.analytics-teacher-cell .avatar-with-role,\r\n\t\t.reports-teacher-cell .avatar-with-role,\r\n\t\t.documents-uploader-cell .avatar-with-role {\r\n\t\t\tmargin-bottom: 0;\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tmargin-inline-end: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.day-class-header .avatar-with-role {\r\n\t\t\tmargin-bottom: var(--space-4);\r\n\t\t\tflex-shrink: 0;\r\n\t\t\tmargin-inline-end: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.teacher-name-cell-text {\r\n\t\t\tmin-width: 0;\r\n\t\t\toverflow: hidden;\r\n\t\t\ttext-overflow: ellipsis;\r\n\t\t\twhite-space: nowrap;\r\n\t\t}\r\n\r\n\t\t.avatar-with-role {\r\n\t\t\tposition: relative;\r\n\t\t\tdisplay: inline-block;\r\n\t\t\tmargin-bottom: var(--space-3);\r\n\t\t}\r\n\r\n\t\t.avatar-role-badge {\r\n\t\t\tposition: absolute;\r\n\t\t\tbottom: 0;\r\n\t\t\tleft: 50%;\r\n\t\t\ttransform: translate(-50%, 50%);\r\n\t\t\tz-index: 1;\r\n\t\t\tfont-size: 0.625rem;\r\n\t\t\tpadding: 2px 8px;\r\n\t\t\twhite-space: nowrap;\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\ttext-transform: lowercase;\r\n\t\t}\r\n\r\n\t\t.avatar-with-role:has(.avatar-sm) .avatar-role-badge,\r\n\t\t.avatar-with-role:has(.avatar-nav) .avatar-role-badge {\r\n\t\t\tfont-size: 0.5625rem;\r\n\t\t\tpadding: 1px 6px;\r\n\t\t}\r\n\r\n\t\t.avatar-with-role .avatar-role-badge.pill--neutral {\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tcolor: var(--color-foreground);\r\n\t\t}\r\n\r\n\t\t.avatar-nationality-flag {\r\n\t\t\tposition: absolute;\r\n\t\t\tbottom: 0;\r\n\t\t\tleft: 50%;\r\n\t\t\ttransform: translate(-50%, 35%);\r\n\t\t\tz-index: 2;\r\n\t\t\tdisplay: inline-flex;\r\n\t\t\tline-height: 0;\r\n\t\t\tborder-radius: 2px;\r\n\t\t\tborder: 1px solid var(--color-surface);\r\n\t\t\tbox-shadow: var(--shadow-sm);\r\n\t\t\tbackground: var(--color-surface);\r\n\t\t\tpointer-events: none;\r\n\t\t\toverflow: hidden;\r\n\t\t}\r\n\r\n\t\t.avatar-nationality-flag svg {\r\n\t\t\tdisplay: block;\r\n\t\t\twidth: 18px;\r\n\t\t\theight: 12px;\r\n\t\t}\r\n\r\n\t\t.avatar-with-role:has(.avatar-sm) .avatar-nationality-flag svg,\r\n\t\t.avatar-with-role:has(.avatar-nav) .avatar-nationality-flag svg {\r\n\t\t\twidth: 14px;\r\n\t\t\theight: 10px;\r\n\t\t}\r\n\r\n\t\t.avatar-with-role:has(.avatar-lg) .avatar-nationality-flag svg,\r\n\t\t.avatar-with-role:has(.avatar-xl) .avatar-nationality-flag svg {\r\n\t\t\twidth: 24px;\r\n\t\t\theight: 16px;\r\n\t\t}\r\n\r\n\t\t.avatar-with-role:has(.avatar-nationality-flag) .avatar-role-badge {\r\n\t\t\ttransform: translate(-50%, 115%);\r\n\t\t}\r\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -428,9 +423,9 @@ func ProfileAvatar(props AvatarProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var21 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var21 == nil {
-			templ_7745c5c3_Var21 = templ.NopComponent
+		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var20 == nil {
+			templ_7745c5c3_Var20 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = AvatarStyles().Render(ctx, templ_7745c5c3_Buffer)
@@ -461,9 +456,9 @@ func HeaderAvatar(props AvatarProps) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var22 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var22 == nil {
-			templ_7745c5c3_Var22 = templ.NopComponent
+		templ_7745c5c3_Var21 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var21 == nil {
+			templ_7745c5c3_Var21 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = AvatarStyles().Render(ctx, templ_7745c5c3_Buffer)
@@ -474,12 +469,12 @@ func HeaderAvatar(props AvatarProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var23 templ.SafeURL
-		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/dashboard"))
+		var templ_7745c5c3_Var22 templ.SafeURL
+		templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/dashboard"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/avatar.templ`, Line: 253, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/avatar.templ`, Line: 261, Col: 34}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -515,21 +510,21 @@ func HeaderAvatarPlaceholder() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var24 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var24 == nil {
-			templ_7745c5c3_Var24 = templ.NopComponent
+		templ_7745c5c3_Var23 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var23 == nil {
+			templ_7745c5c3_Var23 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "<div class=\"header-avatar-slot\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var25 string
-		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/header-avatar"))
+		var templ_7745c5c3_Var24 string
+		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/header-avatar"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/avatar.templ`, Line: 261, Col: 38}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/avatar.templ`, Line: 269, Col: 38}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var25)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var24)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -537,12 +532,12 @@ func HeaderAvatarPlaceholder() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var26 string
-		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapOuterHTML)
+		var templ_7745c5c3_Var25 string
+		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapOuterHTML)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/avatar.templ`, Line: 263, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/avatar.templ`, Line: 271, Col: 27}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var25)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

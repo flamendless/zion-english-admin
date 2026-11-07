@@ -12,16 +12,16 @@ func studentTestSeedFilterTriplet(filter string) (string, string, string) {
 	return filter, filter, filter
 }
 
-func studentAvatarView(name, assignedColor string, isTestSeed int64, nationalityID sql.NullString, flags map[string]string) models.AvatarView {
-	props := buildStudentAvatarProps(name, assignedColor, isTestSeed == 1, "sm", nationalityID, flags)
+func studentAvatarView(name, assignedColor string, isTestSeed int64, nationalityID sql.NullString) models.AvatarView {
+	props := buildStudentAvatarProps(name, assignedColor, isTestSeed == 1, "sm", nationalityID)
 	return models.AvatarView{
-		Initials:      props.Initials,
-		AssignedColor: props.AssignedColor,
-		PictureURL:    props.PictureURL,
-		HasPicture:    props.HasPicture,
-		Alt:           props.Alt,
-		RoleBadge:     props.RoleBadge,
-		FlagURL:       props.FlagURL,
+		Initials:       props.Initials,
+		AssignedColor:  props.AssignedColor,
+		PictureURL:     props.PictureURL,
+		HasPicture:     props.HasPicture,
+		Alt:            props.Alt,
+		RoleBadge:      props.RoleBadge,
+		NationalityISO: props.NationalityISO,
 	}
 }
 
