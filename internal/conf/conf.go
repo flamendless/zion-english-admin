@@ -38,16 +38,15 @@ type StorageConfig struct {
 }
 
 type Config struct {
-	BasePath           string
-	AppEnv             string `env:"APP_ENV" env-required:""`
-	Port               int    `env:"PORT" env-default:"8080"`
-	SuperuserUsername  string `env:"SUPERUSER_USERNAME" env-required:""`
-	SuperuserPassword  string `env:"SUPERUSER_PASSWORD" env-required:""`
-	Secret             string `env:"SECRET" env-required:""`
-	GoogleVisionAPIKey string `env:"GOOGLE_VISION_API_KEY"`
-	Meeting            MeetingConfig
-	Calendar           CalendarConfig
-	Storage            StorageConfig
+	BasePath          string
+	AppEnv            string `env:"APP_ENV" env-required:""`
+	Port              int    `env:"PORT" env-default:"8080"`
+	SuperuserUsername string `env:"SUPERUSER_USERNAME" env-required:""`
+	SuperuserPassword string `env:"SUPERUSER_PASSWORD" env-required:""`
+	Secret            string `env:"SECRET" env-required:""`
+	Meeting           MeetingConfig
+	Calendar          CalendarConfig
+	Storage           StorageConfig
 }
 
 type GoogleCalendarConfig struct {
