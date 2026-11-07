@@ -5,19 +5,22 @@ import "zion-english/internal/constants"
 type ParentPaymentVerificationStatus string
 
 const (
-	ParentPaymentVerified   ParentPaymentVerificationStatus = "verified"
-	ParentPaymentMismatch   ParentPaymentVerificationStatus = "mismatch"
-	ParentPaymentUnmatched  ParentPaymentVerificationStatus = "unmatched"
-	ParentPaymentNoExpected ParentPaymentVerificationStatus = "no_expected"
+	ParentPaymentVerified      ParentPaymentVerificationStatus = "verified"
+	ParentPaymentMismatch      ParentPaymentVerificationStatus = "mismatch"
+	ParentPaymentNotInDatabase ParentPaymentVerificationStatus = "not_in_database"
+	ParentPaymentNoExpected    ParentPaymentVerificationStatus = "no_expected"
+	ParentPaymentIncompleteOCR ParentPaymentVerificationStatus = "incomplete_ocr"
+	ParentPaymentUnreadableOCR ParentPaymentVerificationStatus = "unreadable_ocr"
+	ParentPaymentOCRScanFailed ParentPaymentVerificationStatus = "scan_failed"
 )
 
 type ParentPaymentVerificationRow struct {
-	LegalName       string
-	ParsedAmount    string
-	StudentLabel    string
-	ExpectedAmount  string
-	Status          ParentPaymentVerificationStatus
-	StatusLabel     string
+	LegalName      string
+	ParsedAmount   string
+	StudentLabel   string
+	ExpectedAmount string
+	Status         ParentPaymentVerificationStatus
+	StatusLabel    string
 }
 
 type ParentPaymentsVerificationData struct {
@@ -33,8 +36,10 @@ func (s ParentPaymentVerificationStatus) PillTone() PillTone {
 		return PillToneSuccess
 	case ParentPaymentMismatch:
 		return PillToneError
-	case ParentPaymentUnmatched, ParentPaymentNoExpected:
+	case ParentPaymentNotInDatabase, ParentPaymentNoExpected, ParentPaymentIncompleteOCR:
 		return PillToneWarning
+	case ParentPaymentUnreadableOCR, ParentPaymentOCRScanFailed:
+		return PillToneNeutral
 	default:
 		return PillToneNeutral
 	}
@@ -46,10 +51,16 @@ func ParentPaymentStatusLabel(status ParentPaymentVerificationStatus) string {
 		return "Match"
 	case ParentPaymentMismatch:
 		return "Mismatch"
-	case ParentPaymentUnmatched:
-		return "No student"
+	case ParentPaymentNotInDatabase:
+		return "Not in database"
 	case ParentPaymentNoExpected:
 		return "No classes"
+	case ParentPaymentIncompleteOCR:
+		return "Incomplete OCR"
+	case ParentPaymentUnreadableOCR:
+		return "Unreadable"
+	case ParentPaymentOCRScanFailed:
+		return "Scan failed"
 	default:
 		return constants.DisplayNotSet
 	}

@@ -66,6 +66,25 @@ JENNY MOM
 	}
 }
 
+func TestParsePaymentEntriesIncomplete(t *testing.T) {
+	text := `+59,360원
+신정훈`
+
+	entries := ParsePaymentEntries(text)
+	var orphanAmount, nameOnly int
+	for _, e := range entries {
+		if e.HasAmount && !e.HasName {
+			orphanAmount++
+		}
+		if e.HasName && !e.HasAmount {
+			nameOnly++
+		}
+	}
+	if orphanAmount != 1 || nameOnly != 1 {
+		t.Fatalf("got %v", entries)
+	}
+}
+
 func TestNormalizeLegalName(t *testing.T) {
 	if got := NormalizeLegalName("  김  영희  "); got != "김 영희" {
 		t.Fatalf("normalize: %q", got)
