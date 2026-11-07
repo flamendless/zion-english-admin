@@ -29,6 +29,43 @@ header only
 	}
 }
 
+func TestParsePaymentLinesBankStatement(t *testing.T) {
+	// Layout from a typical Korean mobile banking transaction history (name, then +amount line).
+	text := `11.07 07:08:07 | 전자금융
+김현주
++59,360원
+8,380,550
+11.07 01:46:05 | 전자금융
+원정윤
++85,500원
+8.321.190원
+11.06 17:26:28 | 전자금융
+JENNY MOM
++30,000원
+11.06 13:48:59 | 스마트출금
+신정훈
++45,000원`
+
+	lines := ParsePaymentLines(text)
+	if len(lines) != 4 {
+		t.Fatalf("got %d lines, want 4: %+v", len(lines), lines)
+	}
+	want := []struct {
+		name   string
+		amount float64
+	}{
+		{"김현주", 59360},
+		{"원정윤", 85500},
+		{"JENNY MOM", 30000},
+		{"신정훈", 45000},
+	}
+	for i, w := range want {
+		if lines[i].LegalName != w.name || lines[i].Amount != w.amount {
+			t.Fatalf("line %d: got %+v want %s %.0f", i, lines[i], w.name, w.amount)
+		}
+	}
+}
+
 func TestNormalizeLegalName(t *testing.T) {
 	if got := NormalizeLegalName("  김  영희  "); got != "김 영희" {
 		t.Fatalf("normalize: %q", got)
