@@ -200,6 +200,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/api/teacher-row", auth.RequireRole(auth.AdminAccessRoles()...)(handleGetTeacherRow))
 		authMux.HandleFunc(basePath+"/api/students", auth.RequireRole(auth.AdminAccessRoles()...)(handleGetStudents))
 		authMux.HandleFunc(basePath+"/api/students/search", auth.RequireRole(auth.AdminAccessRoles()...)(handleSearchStudents))
+		authMux.HandleFunc(basePath+"/partials/nationality-flag", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher)(handleNationalityFlagPartial))
 		// RoleTester can search learning materials when linking resources during class record/schedule flows.
 		authMux.HandleFunc(basePath+"/api/learning-materials/search", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleSearchLearningMaterials))
 		authMux.HandleFunc(basePath+"/api/me/students", auth.RequireRole(auth.RoleSuperuser, auth.RoleAdmin, auth.RoleTeacher, auth.RoleTester)(handleGetMyStudents))
@@ -322,6 +323,7 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/header-avatar", authHandler)
 		rootMux.Handle(basePath+"/refresh", authHandler)
 		rootMux.Handle(basePath+"/students", authHandler)
+		rootMux.Handle(basePath+"/partials/nationality-flag", authHandler)
 		rootMux.Handle(basePath+"/students/", authHandler)
 		rootMux.Handle(basePath+"/teachers", authHandler)
 		rootMux.Handle(basePath+"/teachers/", authHandler)

@@ -503,6 +503,9 @@ func listSearchPlaceholder(statusType ListFilterKind) string {
 	if statusType == ListFilterKindTeacher {
 		return "Name or email..."
 	}
+	if statusType == ListFilterKindStudent {
+		return "Name or legal name..."
+	}
 	return "Name..."
 }
 
@@ -548,7 +551,7 @@ func TeacherConnectionsFilterDropdown(connectionZoom bool, connectionGoogle bool
 		var templ_7745c5c3_Var29 string
 		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(teacherConnectionsFilterSummary(connectionZoom, connectionGoogle))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 99, Col: 71}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 102, Col: 71}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 		if templ_7745c5c3_Err != nil {
@@ -653,7 +656,7 @@ func ReportRolesFilterDropdownScoped(roleTeacher bool, roleAdmin bool, labelID s
 		var templ_7745c5c3_Var32 string
 		templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.ResolveAttributeValue(labelID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 135, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 138, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var32)
 		if templ_7745c5c3_Err != nil {
@@ -666,7 +669,7 @@ func ReportRolesFilterDropdownScoped(roleTeacher bool, roleAdmin bool, labelID s
 		var templ_7745c5c3_Var33 string
 		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.ResolveAttributeValue(labelID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 137, Col: 77}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 140, Col: 77}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var33)
 		if templ_7745c5c3_Err != nil {
@@ -679,7 +682,7 @@ func ReportRolesFilterDropdownScoped(roleTeacher bool, roleAdmin bool, labelID s
 		var templ_7745c5c3_Var34 string
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(reportRolesFilterSummary(roleTeacher, roleAdmin))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 138, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 141, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {
@@ -692,7 +695,7 @@ func ReportRolesFilterDropdownScoped(roleTeacher bool, roleAdmin bool, labelID s
 		var templ_7745c5c3_Var35 string
 		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.ResolveAttributeValue(labelID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 140, Col: 84}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 143, Col: 84}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var35)
 		if templ_7745c5c3_Err != nil {
@@ -715,7 +718,7 @@ func ReportRolesFilterDropdownScoped(roleTeacher bool, roleAdmin bool, labelID s
 		var templ_7745c5c3_Var36 string
 		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(featureFlagRoleLabel(constants.TeacherRoleTeacher))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 143, Col: 57}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 146, Col: 57}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 		if templ_7745c5c3_Err != nil {
@@ -738,7 +741,7 @@ func ReportRolesFilterDropdownScoped(roleTeacher bool, roleAdmin bool, labelID s
 		var templ_7745c5c3_Var37 string
 		templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(featureFlagRoleLabel(constants.TeacherRoleAdmin))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 147, Col: 55}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 150, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 		if templ_7745c5c3_Err != nil {
@@ -751,7 +754,7 @@ func ReportRolesFilterDropdownScoped(roleTeacher bool, roleAdmin bool, labelID s
 		var templ_7745c5c3_Var38 string
 		templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(featureFlagRoleLabel(constants.TeacherRoleDeveloper))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 151, Col: 59}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 154, Col: 59}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 		if templ_7745c5c3_Err != nil {
@@ -764,7 +767,7 @@ func ReportRolesFilterDropdownScoped(roleTeacher bool, roleAdmin bool, labelID s
 		var templ_7745c5c3_Var39 string
 		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(featureFlagRoleLabel(constants.TeacherRoleTester))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 155, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 158, Col: 56}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 		if templ_7745c5c3_Err != nil {
@@ -806,7 +809,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 		var templ_7745c5c3_Var41 templ.SafeURL
 		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinURLErrs(actionPath)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 163, Col: 60}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 166, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 		if templ_7745c5c3_Err != nil {
@@ -819,7 +822,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 		var templ_7745c5c3_Var42 string
 		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.ResolveAttributeValue(query)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 166, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 169, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var42)
 		if templ_7745c5c3_Err != nil {
@@ -832,7 +835,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 		var templ_7745c5c3_Var43 string
 		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.ResolveAttributeValue(listSearchPlaceholder(statusType))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 166, Col: 101}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 169, Col: 101}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var43)
 		if templ_7745c5c3_Err != nil {
@@ -861,7 +864,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 				var templ_7745c5c3_Var44 string
 				templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 176, Col: 31}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 179, Col: 31}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var44)
 				if templ_7745c5c3_Err != nil {
@@ -884,7 +887,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 				var templ_7745c5c3_Var45 string
 				templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 176, Col: 87}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 179, Col: 87}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 				if templ_7745c5c3_Err != nil {
@@ -914,7 +917,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 					var templ_7745c5c3_Var46 string
 					templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 188, Col: 32}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 191, Col: 32}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var46)
 					if templ_7745c5c3_Err != nil {
@@ -937,7 +940,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 					var templ_7745c5c3_Var47 string
 					templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 188, Col: 80}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 191, Col: 80}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var47))
 					if templ_7745c5c3_Err != nil {
@@ -957,7 +960,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 					var templ_7745c5c3_Var48 string
 					templ_7745c5c3_Var48, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 192, Col: 32}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 195, Col: 32}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var48)
 					if templ_7745c5c3_Err != nil {
@@ -980,7 +983,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 					var templ_7745c5c3_Var49 string
 					templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 192, Col: 80}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 195, Col: 80}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var49))
 					if templ_7745c5c3_Err != nil {
@@ -1000,7 +1003,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 					var templ_7745c5c3_Var50 string
 					templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 196, Col: 32}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 199, Col: 32}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var50)
 					if templ_7745c5c3_Err != nil {
@@ -1023,7 +1026,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 					var templ_7745c5c3_Var51 string
 					templ_7745c5c3_Var51, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 196, Col: 80}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 199, Col: 80}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var51))
 					if templ_7745c5c3_Err != nil {
@@ -1054,7 +1057,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 			var templ_7745c5c3_Var52 string
 			templ_7745c5c3_Var52, templ_7745c5c3_Err = templ.ResolveAttributeValue(email)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 208, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 211, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var52)
 			if templ_7745c5c3_Err != nil {
@@ -1073,7 +1076,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 			var templ_7745c5c3_Var53 string
 			templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.ResolveAttributeValue(module)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 214, Col: 63}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 217, Col: 63}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var53)
 			if templ_7745c5c3_Err != nil {
@@ -1092,7 +1095,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 			var templ_7745c5c3_Var54 string
 			templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.ResolveAttributeValue(startDate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 220, Col: 72}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 223, Col: 72}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var54)
 			if templ_7745c5c3_Err != nil {
@@ -1105,7 +1108,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 			var templ_7745c5c3_Var55 string
 			templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.ResolveAttributeValue(endDate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 224, Col: 66}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 227, Col: 66}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var55)
 			if templ_7745c5c3_Err != nil {
@@ -1132,7 +1135,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 			var templ_7745c5c3_Var56 string
 			templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.ResolveAttributeValue(parentFilter)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 230, Col: 64}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 233, Col: 64}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var56)
 			if templ_7745c5c3_Err != nil {
@@ -1151,7 +1154,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 			var templ_7745c5c3_Var57 string
 			templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.ResolveAttributeValue(teacherAssignmentFilter)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 233, Col: 86}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 236, Col: 86}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var57)
 			if templ_7745c5c3_Err != nil {
@@ -1170,7 +1173,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 			var templ_7745c5c3_Var58 string
 			templ_7745c5c3_Var58, templ_7745c5c3_Err = templ.ResolveAttributeValue(connectionFilter)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 236, Col: 72}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 239, Col: 72}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var58)
 			if templ_7745c5c3_Err != nil {
@@ -1189,7 +1192,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 			var templ_7745c5c3_Var59 string
 			templ_7745c5c3_Var59, templ_7745c5c3_Err = templ.ResolveAttributeValue(profilePictureFilter)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 239, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 242, Col: 80}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var59)
 			if templ_7745c5c3_Err != nil {
@@ -1208,7 +1211,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 			var templ_7745c5c3_Var60 string
 			templ_7745c5c3_Var60, templ_7745c5c3_Err = templ.ResolveAttributeValue(testSeedFilter)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 242, Col: 68}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 245, Col: 68}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var60)
 			if templ_7745c5c3_Err != nil {
@@ -1236,7 +1239,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 				var templ_7745c5c3_Var61 string
 				templ_7745c5c3_Var61, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(TeacherTableColumnDocsStatus))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 251, Col: 91}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 254, Col: 91}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var61)
 				if templ_7745c5c3_Err != nil {
@@ -1254,7 +1257,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 					var templ_7745c5c3_Var62 string
 					templ_7745c5c3_Var62, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 256, Col: 33}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 259, Col: 33}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var62)
 					if templ_7745c5c3_Err != nil {
@@ -1277,7 +1280,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 					var templ_7745c5c3_Var63 string
 					templ_7745c5c3_Var63, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 256, Col: 85}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 259, Col: 85}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var63))
 					if templ_7745c5c3_Err != nil {
@@ -1301,7 +1304,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 				var templ_7745c5c3_Var64 string
 				templ_7745c5c3_Var64, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(TeacherTableColumnResumeStatus))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 262, Col: 93}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 265, Col: 93}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var64)
 				if templ_7745c5c3_Err != nil {
@@ -1319,7 +1322,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 					var templ_7745c5c3_Var65 string
 					templ_7745c5c3_Var65, templ_7745c5c3_Err = templ.ResolveAttributeValue(opt.Value)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 267, Col: 33}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 270, Col: 33}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var65)
 					if templ_7745c5c3_Err != nil {
@@ -1342,7 +1345,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 					var templ_7745c5c3_Var66 string
 					templ_7745c5c3_Var66, templ_7745c5c3_Err = templ.JoinStringErrs(opt.Label)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 267, Col: 87}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 270, Col: 87}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var66))
 					if templ_7745c5c3_Err != nil {
@@ -1366,7 +1369,7 @@ func ListFilterForm(actionPath string, query string, status string, statusType L
 				var templ_7745c5c3_Var67 string
 				templ_7745c5c3_Var67, templ_7745c5c3_Err = templ.ResolveAttributeValue(string(TeacherTableColumnConnections))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 273, Col: 73}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/pagination.templ`, Line: 276, Col: 73}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var67)
 				if templ_7745c5c3_Err != nil {

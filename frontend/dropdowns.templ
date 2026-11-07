@@ -246,24 +246,23 @@ templ ParentCurrencyDropdownWithValue(selected string) {
 }
 
 templ NationalityDropdownWithValue(options []NationalityOption, selected string) {
-	{{ previewFlag := NationalityFlagForSelected(options, selected) }}
 	<div class="form-group nationality-field">
 		<label for="nationalityId">Nationality</label>
 		<div class="nationality-select-row">
-			if previewFlag != "" {
-				<img id="nationalityFlagPreview" class="nationality-flag-preview" src={ previewFlag } alt="" aria-hidden="true"/>
-			} else {
-				<span id="nationalityFlagPreview" class="nationality-flag-preview nationality-flag-preview--empty" aria-hidden="true"></span>
-			}
+			@NationalityFlagPreview(selected)
 			<select
 				id="nationalityId"
 				name="nationalityId"
 				class="nationality-select"
-				data-nationality-flags="true"
+				hx-get={ utils.URL("/partials/nationality-flag") }
+				hx-trigger="change"
+				hx-target="#nationalityFlagPreview"
+				hx-swap={ HxSwapOuterHTML }
+				hx-include="#nationalityId"
 			>
-				<option value="" data-flag-url="">Not set</option>
+				<option value="" selected?={ selected == "" }>Not set</option>
 				for _, opt := range options {
-					<option value={ opt.ID } data-flag-url={ opt.FlagURL } selected?={ selected == opt.ID }>{ opt.CountryName }</option>
+					<option value={ opt.ID } selected?={ selected == opt.ID }>{ opt.CountryName }</option>
 				}
 			</select>
 		</div>
@@ -275,74 +274,50 @@ templ NationalityDropdownWithValue(options []NationalityOption, selected string)
 			align-items: center;
 			gap: var(--space-2);
 		}
-		.nationality-flag-preview {
+		.nationality-flag-preview-host {
+			flex-shrink: 0;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			line-height: 0;
+		}
+		.nationality-flag-preview-host .nationality-flag-preview,
+		.nationality-flag-preview-host svg {
 			width: 28px;
 			height: 20px;
-			object-fit: cover;
 			border-radius: 2px;
 			border: var(--pill-border);
-			flex-shrink: 0;
 		}
 		.nationality-flag-preview--empty {
 			display: inline-block;
+			width: 28px;
+			height: 20px;
 			background: var(--color-muted);
+			border-radius: 2px;
+			border: var(--pill-border);
 		}
 		.nationality-select {
 			flex: 1;
 			min-width: 0;
-		}
-		.nationality-flag-inline {
-			width: 20px;
-			height: 14px;
-			object-fit: cover;
-			border-radius: 2px;
-			border: var(--pill-border);
-			vertical-align: middle;
-			margin-inline-end: var(--space-1);
 		}
 		.nationality-display {
 			display: inline-flex;
 			align-items: center;
 			gap: var(--space-1);
 		}
+		.nationality-display svg {
+			width: 20px;
+			height: 14px;
+			border-radius: 2px;
+			border: var(--pill-border);
+			flex-shrink: 0;
+		}
 	</style>
-	<script>
-		(function () {
-			const select = document.getElementById('nationalityId');
-			const preview = document.getElementById('nationalityFlagPreview');
-			if (!select || !preview || !select.dataset.nationalityFlags) return;
-			function syncFlag() {
-				const opt = select.options[select.selectedIndex];
-				const url = opt ? opt.getAttribute('data-flag-url') : '';
-				if (!url) {
-					if (preview.tagName === 'IMG') {
-						const span = document.createElement('span');
-						span.id = 'nationalityFlagPreview';
-						span.className = 'nationality-flag-preview nationality-flag-preview--empty';
-						span.setAttribute('aria-hidden', 'true');
-						preview.replaceWith(span);
-					}
-					return;
-				}
-				if (preview.tagName !== 'IMG') {
-					const img = document.createElement('img');
-					img.id = 'nationalityFlagPreview';
-					img.className = 'nationality-flag-preview';
-					img.alt = '';
-					img.setAttribute('aria-hidden', 'true');
-					preview.replaceWith(img);
-				}
-				const img = document.getElementById('nationalityFlagPreview');
-				if (img) img.src = url;
-			}
-			select.addEventListener('change', syncFlag);
-		})();
-	</script>
 }
 
 templ NationalityDisplay(opt NationalityOption) {
 	<span class="nationality-display">
-		<img src={ opt.FlagURL } alt="" class="nationality-flag-inline" aria-hidden="true"/>
+		@NationalityFlag(opt.ID, "nationality-flag-inline")
 		<span>{ opt.CountryName }</span>
 	</span>
 }

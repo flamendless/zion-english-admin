@@ -120,10 +120,6 @@ func classEditClassData(ctx context.Context, recordID int64, readonly bool) (fro
 	if err != nil {
 		return frontend.EditClassData{}, err
 	}
-	flags, err := nationalityFlagMap(ctx)
-	if err != nil {
-		return frontend.EditClassData{}, err
-	}
 	return frontend.EditClassData{
 		OverdueGracePeriodMinutes: classOverdueGracePeriodMinutes(ctx),
 		RecordID:                  strconv.FormatInt(recordID, 10),
@@ -134,7 +130,7 @@ func classEditClassData(ctx context.Context, recordID int64, readonly bool) (fro
 		StudentName:               existing.StudentName,
 		StudentNumber:             studentNumberString(existing.StudentNumber),
 		StudentLegalName:          studentLegalNameString(existing.StudentLegalName),
-		StudentAvatar:             buildStudentAvatarProps(existing.StudentName, existing.StudentAssignedColor, existing.StudentIsTestSeed == 1, "md", existing.StudentNationalityID, flags),
+		StudentAvatar:             buildStudentAvatarProps(existing.StudentName, existing.StudentAssignedColor, existing.StudentIsTestSeed == 1, "md", existing.StudentNationalityID),
 		TeacherName:               existing.TeacherName,
 		TeacherAvatar:             avatarWithTeacherRoles(classRecordTeacherAvatar(existing), teacherRoles, teacherStatus),
 		Date:                      existing.Date,
@@ -399,7 +395,7 @@ func classesListTeacherAvatar(row queries.GetClassesListFilteredRow) models.Avat
 	}
 }
 
-func classesListViewFromRow(row queries.GetClassesListFilteredRow, flags map[string]string) models.ClassRecordView {
+func classesListViewFromRow(row queries.GetClassesListFilteredRow) models.ClassRecordView {
 	startTime := ""
 	if row.StartTime.Valid {
 		startTime = row.StartTime.String
@@ -425,7 +421,7 @@ func classesListViewFromRow(row queries.GetClassesListFilteredRow, flags map[str
 		StudentName:      row.StudentName,
 		StudentNumber:    studentNumberString(row.StudentNumber),
 		StudentLegalName: studentLegalNameString(row.StudentLegalName),
-		StudentAvatar:    studentAvatarView(row.StudentName, row.StudentAssignedColor, row.StudentIsTestSeed, row.StudentNationalityID, flags),
+		StudentAvatar:    studentAvatarView(row.StudentName, row.StudentAssignedColor, row.StudentIsTestSeed, row.StudentNationalityID),
 		TeacherName:      row.TeacherName,
 		TeacherAvatar:    classesListTeacherAvatar(row),
 		Date:             row.Date,
@@ -681,16 +677,10 @@ func handleClassRecordsPartial(w http.ResponseWriter, r *http.Request) {
 
 	gracePeriod := classOverdueGracePeriodMinutes(ctx)
 	now := time.Now()
-	flags, err := nationalityFlagMap(ctx)
-	if err != nil {
-		HttpError(w, "Failed to load nationalities", http.StatusInternalServerError)
-		return
-	}
-
 	views := make([]models.ClassRecordView, 0, len(records))
 	teacherIDs := make([]int64, 0, len(records))
 	for _, cr := range records {
-		views = append(views, classesListViewFromRow(cr, flags))
+		views = append(views, classesListViewFromRow(cr))
 		teacherIDs = append(teacherIDs, cr.TeacherID)
 	}
 	uniqueIDs := uniqueTeacherIDs(teacherIDs)

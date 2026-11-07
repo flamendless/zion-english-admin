@@ -3,27 +3,16 @@ package cmd
 import (
 	"context"
 	"database/sql"
+	"net/http"
 	"strings"
 	"unicode/utf8"
 
 	"zion-english/frontend"
 	"zion-english/internal/database/queries"
-	"zion-english/internal/utils"
+	"zion-english/internal/nationalities"
 )
 
 const studentLegalNameMaxRunes = 64
-
-func nationalityFlagMap(ctx context.Context) (map[string]string, error) {
-	rows, err := dbRO.GetQueries().GetAllNationalities(ctx)
-	if err != nil {
-		return nil, err
-	}
-	flags := make(map[string]string, len(rows))
-	for _, row := range rows {
-		flags[row.ID] = utils.URL(row.FlagPath)
-	}
-	return flags, nil
-}
 
 func loadNationalityOptions(ctx context.Context) ([]frontend.NationalityOption, error) {
 	rows, err := dbRO.GetQueries().GetAllNationalities(ctx)
@@ -40,7 +29,6 @@ func loadNationalityOptions(ctx context.Context) ([]frontend.NationalityOption, 
 			ID:          row.ID,
 			CountryName: row.CountryName,
 			Language:    lang,
-			FlagURL:     utils.URL(row.FlagPath),
 		}
 	}
 	return options, nil
@@ -72,23 +60,21 @@ func parseStudentLegalName(raw string) (sql.NullString, error) {
 }
 
 func parseStudentNationalityID(ctx context.Context, raw string) (sql.NullString, error) {
-	raw = strings.ToLower(strings.TrimSpace(raw))
-	if raw == "" {
+	iso := nationalities.NormalizeISO(raw)
+	if iso == "" {
 		return sql.NullString{}, nil
 	}
-	_, err := dbRO.GetQueries().GetNationalityByID(ctx, raw)
+	_, err := dbRO.GetQueries().GetNationalityByID(ctx, string(iso))
 	if err != nil {
 		return sql.NullString{}, ErrInvalidNationality
 	}
-	return sql.NullString{String: raw, Valid: true}, nil
+	return sql.NullString{String: string(iso), Valid: true}, nil
 }
 
-func buildStudentAvatarProps(name, assignedColor string, isTestSeed bool, size string, nationalityID sql.NullString, flags map[string]string) frontend.AvatarProps {
+func buildStudentAvatarProps(name, assignedColor string, isTestSeed bool, size string, nationalityID sql.NullString) frontend.AvatarProps {
 	props := frontend.StudentAvatarProps(name, assignedColor, isTestSeed, size)
-	if nationalityID.Valid && flags != nil {
-		if flagURL, ok := flags[nationalityID.String]; ok {
-			props.FlagURL = flagURL
-		}
+	if nationalityID.Valid && nationalityID.String != "" {
+		props.NationalityISO = string(nationalities.NormalizeISO(nationalityID.String))
 	}
 	return props
 }
@@ -114,6 +100,16 @@ func nationalityFieldsForStudent(ctx context.Context, nationalityID sql.NullStri
 		ID:          row.ID,
 		CountryName: row.CountryName,
 		Language:    lang,
-		FlagURL:     utils.URL(row.FlagPath),
 	}, true
+}
+
+func handleNationalityFlagPartial(w http.ResponseWriter, r *http.Request) {
+	if !requireMethod(w, r, http.MethodGet) {
+		return
+	}
+	iso := r.URL.Query().Get("nationalityId")
+	writeHTML(w)
+	if err := frontend.NationalityFlagPreview(iso).Render(r.Context(), w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
 }

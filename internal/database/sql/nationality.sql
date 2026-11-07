@@ -2,8 +2,7 @@
 SELECT
 	id,
 	country_name,
-	language,
-	flag_path
+	language
 FROM tbl_nationalities
 ORDER BY country_name ASC;
 
@@ -11,7 +10,6 @@ ORDER BY country_name ASC;
 SELECT
 	id,
 	country_name,
-	language,
-	flag_path
+	language
 FROM tbl_nationalities
 WHERE id = ?;

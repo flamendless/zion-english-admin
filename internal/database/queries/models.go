@@ -224,7 +224,6 @@ type TblNationality struct {
 	ID          string
 	CountryName string
 	Language    sql.NullString
-	FlagPath    string
 }
 
 type TblNotification struct {

@@ -311,11 +311,6 @@ func loadMyStudentsPage(ctx context.Context, teacherID int64, q, status string, 
 	sortMyStudentRows(allStudents, sort)
 	students := paginateSlice(allStudents, page)
 
-	flags, err := nationalityFlagMap(ctx)
-	if err != nil {
-		return nil, page, err
-	}
-
 	viewStudents := make([]frontend.StudentItem, len(students))
 	for i, s := range students {
 		viewStudents[i] = frontend.StudentItem{
@@ -330,7 +325,7 @@ func loadMyStudentsPage(ctx context.Context, teacherID int64, q, status string, 
 			ParentName:          s.ParentName.String,
 			AssignedColor:       s.AssignedColor,
 			Status:              constants.StudentStatus(s.Status),
-			Avatar:              buildStudentAvatarProps(s.Name, s.AssignedColor, false, "sm", s.NationalityID, flags),
+			Avatar:              buildStudentAvatarProps(s.Name, s.AssignedColor, false, "sm", s.NationalityID),
 		}
 	}
 	return viewStudents, page, nil
