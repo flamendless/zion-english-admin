@@ -137,16 +137,16 @@ func handlePayroll(w http.ResponseWriter, r *http.Request) {
 			finishedAt = formatPayrollTimestamp(row.FinishedAt.String)
 		}
 		items = append(items, frontend.PayrollSessionListItem{
-			ID:             strconv.FormatInt(row.ID, 10),
-			PeriodLabel:    payroll.CutoffLabel(row.PeriodStart, row.PeriodEnd),
-			Status:         constants.PayrollSessionStatus(row.Status),
-			RolesLabel:     frontend.ReportRolesFilterSummary(row.RoleTeacher == 1, row.RoleAdmin == 1),
-			TeacherCount:   row.TeacherCount,
-			ProgressLabel:  fmt.Sprintf("%d/%d", row.SalaryReceivedCount, row.TeacherCount),
-			StartedAt:      formatPayrollTimestamp(row.StartedAt),
-			FinishedAt:     finishedAt,
-			StartedByName:  startedBy,
-			IsActive:       row.Status == string(constants.PayrollSessionStatusActive),
+			ID:            strconv.FormatInt(row.ID, 10),
+			PeriodLabel:   payroll.CutoffLabel(row.PeriodStart, row.PeriodEnd),
+			Status:        constants.PayrollSessionStatus(row.Status),
+			RolesLabel:    frontend.ReportRolesFilterSummary(row.RoleTeacher == 1, row.RoleAdmin == 1),
+			TeacherCount:  row.TeacherCount,
+			ProgressLabel: fmt.Sprintf("%d/%d", row.SalaryReceivedCount, row.TeacherCount),
+			StartedAt:     formatPayrollTimestamp(row.StartedAt),
+			FinishedAt:    finishedAt,
+			StartedByName: startedBy,
+			IsActive:      row.Status == string(constants.PayrollSessionStatusActive),
 		})
 	}
 
@@ -498,8 +498,8 @@ func buildPayrollTeacherRows(ctx context.Context, session queries.TblPayrollSess
 		reportRow, _ := loadReportRow(ctx, row.TeacherID, session.PeriodStart, session.PeriodEnd)
 		earningsHTML := reportRow.EarningsHTML()
 		payrollRow := frontend.PayrollTeacherRow{
-			TeacherID:       strconv.FormatInt(row.TeacherID, 10),
-			TeacherName:     name,
+			TeacherID:   strconv.FormatInt(row.TeacherID, 10),
+			TeacherName: name,
 			Avatar: avatarWithTeacherRoles(
 				buildTeacherListAvatarProps(row.TeacherID, row.TeacherFirstName, row.TeacherMiddleName, row.TeacherLastName, constants.DefaultTeacherAssignedColor, row.TeacherProfilePicture),
 				rolesMap[row.TeacherID],

@@ -14,9 +14,14 @@ func flagMarkup(iso, class string) string {
 	if class == "" {
 		return svg
 	}
-	const open = "<svg "
-	if !strings.HasPrefix(svg, open) {
+	const open = "<svg"
+	before, after, ok := strings.Cut(svg, open)
+	if !ok {
 		return svg
 	}
-	return strings.Replace(svg, open, `<svg class="`+class+`" `, 1)
+	rest := strings.TrimSpace(after)
+	if strings.HasPrefix(rest, "class=") {
+		return svg
+	}
+	return before + `<svg class="` + class + `" ` + rest
 }

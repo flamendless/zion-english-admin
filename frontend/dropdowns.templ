@@ -287,6 +287,8 @@ templ NationalityDropdownWithValue(options []NationalityOption, selected string)
 			height: 20px;
 			border-radius: 2px;
 			border: var(--pill-border);
+			display: block;
+			background: var(--color-muted);
 		}
 		.nationality-flag-preview--empty {
 			display: inline-block;
@@ -303,14 +305,16 @@ templ NationalityDropdownWithValue(options []NationalityOption, selected string)
 		.nationality-display {
 			display: inline-flex;
 			align-items: center;
-			gap: var(--space-1);
+			gap: var(--space-2);
 		}
 		.nationality-display svg {
-			width: 20px;
-			height: 14px;
+			width: 24px;
+			height: 16px;
 			border-radius: 2px;
 			border: var(--pill-border);
 			flex-shrink: 0;
+			display: block;
+			background: var(--color-muted);
 		}
 	</style>
 }

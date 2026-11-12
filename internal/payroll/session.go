@@ -11,7 +11,6 @@ import (
 	"zion-english/internal/utils"
 )
 
-
 type RoleFilters struct {
 	Teacher bool
 	Admin   bool
@@ -50,10 +49,10 @@ func StartSession(
 	}
 
 	sessionID, err := q.InsertPayrollSession(ctx, queries.InsertPayrollSessionParams{
-		PeriodStart:         startDate,
-		PeriodEnd:           endDate,
-		RoleTeacher:         teacherFlag,
-		RoleAdmin:           adminFlag,
+		PeriodStart:        startDate,
+		PeriodEnd:          endDate,
+		RoleTeacher:        teacherFlag,
+		RoleAdmin:          adminFlag,
 		StartedByTeacherID: startedByTeacherID,
 	})
 	if err != nil {

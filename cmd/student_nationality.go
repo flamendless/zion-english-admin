@@ -19,17 +19,24 @@ func loadNationalityOptions(ctx context.Context) ([]frontend.NationalityOption, 
 	if err != nil {
 		return nil, err
 	}
-	options := make([]frontend.NationalityOption, len(rows))
-	for i, row := range rows {
+	enabled := make(map[string]struct{}, len(nationalities.EnabledISO))
+	for _, iso := range nationalities.EnabledISO {
+		enabled[string(iso)] = struct{}{}
+	}
+	var options []frontend.NationalityOption
+	for _, row := range rows {
+		if _, ok := enabled[row.ID]; !ok {
+			continue
+		}
 		lang := ""
 		if row.Language.Valid {
 			lang = row.Language.String
 		}
-		options[i] = frontend.NationalityOption{
+		options = append(options, frontend.NationalityOption{
 			ID:          row.ID,
 			CountryName: row.CountryName,
 			Language:    lang,
-		}
+		})
 	}
 	return options, nil
 }

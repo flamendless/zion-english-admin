@@ -14,9 +14,9 @@ type contextKey string
 const bannerKey contextKey = "payroll_session_banner"
 
 type Banner struct {
-	SessionID              int64
-	PeriodLabel            string
-	NeedsDailyLogsConfirm  bool
+	SessionID             int64
+	PeriodLabel           string
+	NeedsDailyLogsConfirm bool
 }
 
 func GetBanner(ctx context.Context) *Banner {
