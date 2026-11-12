@@ -252,6 +252,42 @@ type TblPasswordResetEvent struct {
 	ExpiresAt  sql.NullString
 }
 
+type TblPayrollSession struct {
+	ID                 int64
+	PeriodStart        string
+	PeriodEnd          string
+	RoleTeacher        int64
+	RoleAdmin          int64
+	Status             string
+	StartedByTeacherID int64
+	StartedAt          string
+	FinishedAt         sql.NullString
+	CreatedAt          string
+	UpdatedAt          string
+}
+
+type TblPayrollSessionTeacher struct {
+	SessionID                  int64
+	TeacherID                  int64
+	Status                     string
+	PaymentID                  sql.NullInt64
+	DailyLogsDismissedAccessID sql.NullInt64
+	CreatedAt                  string
+	UpdatedAt                  string
+}
+
+type TblPayrollSessionTeacherStatusEvent struct {
+	ID                 int64
+	SessionID          int64
+	TeacherID          int64
+	FromStatus         sql.NullString
+	ToStatus           string
+	Reason             sql.NullString
+	ChangedByTeacherID int64
+	ChangedAt          string
+	ChangedByName      string
+}
+
 type TblProcessingLog struct {
 	ID             int64
 	GoogleDriveUrl string

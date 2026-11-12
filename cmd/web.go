@@ -27,6 +27,7 @@ import (
 	"zion-english/internal/metatags"
 	"zion-english/internal/models"
 	"zion-english/internal/notifications"
+	"zion-english/internal/payroll"
 	"zion-english/internal/processor"
 	"zion-english/internal/sheet"
 	"zion-english/internal/startup"
@@ -210,6 +211,13 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/announcements", auth.RequireRole(auth.AdminAccessRoles()...)(handleAnnouncements))
 		authMux.HandleFunc(basePath+"/announcements/register", auth.RequireRole(auth.AdminAccessRoles()...)(handleAnnouncementRegister))
 		authMux.HandleFunc(basePath+"/announcements/", auth.RequireRole(auth.AdminAccessRoles()...)(handleAnnouncementsPath))
+		payrollSuper := auth.RequireRole(auth.RoleSuperuser)
+		authMux.HandleFunc(basePath+"/payroll/partials/date-preset", payrollSuper(handlePayrollDatePresetPartial))
+		authMux.HandleFunc(basePath+"/payroll/start", payrollSuper(handlePayrollStart))
+		authMux.HandleFunc(basePath+"/payroll/daily-logs/confirm", auth.RequireRole(auth.RoleTeacher, auth.RoleTester)(handlePayrollDailyLogsConfirm))
+		authMux.HandleFunc(basePath+"/payroll/daily-logs/defer", auth.RequireRole(auth.RoleTeacher, auth.RoleTester)(handlePayrollDailyLogsDefer))
+		authMux.HandleFunc(basePath+"/payroll/sessions/", payrollSuper(handlePayrollPath))
+		authMux.HandleFunc(basePath+"/payroll", payrollSuper(handlePayroll))
 		authMux.HandleFunc(basePath+"/meta", auth.RequireRole(auth.AdminAccessRoles()...)(handleMeta))
 		authMux.HandleFunc(basePath+"/meta/", auth.RequireRole(auth.AdminAccessRoles()...)(handleMetaPath))
 		affiliatesRole := auth.RequireRole(auth.RoleSuperuser)
@@ -256,7 +264,7 @@ var cmdWeb = &cobra.Command{
 		authMux.HandleFunc(basePath+"/notifications/read-all", notificationsRole(handleNotificationsReadAll))
 		authMux.HandleFunc(basePath+"/notifications/", notificationsRole(handleNotificationsPath))
 
-		authHandler := auth.Middleware(cfg, dbRO.GetQueries(), auth.CSRFMiddleware(cfg, announcements.Middleware(dbRO.GetQueries(), authMux)))
+		authHandler := auth.Middleware(cfg, dbRO.GetQueries(), auth.CSRFMiddleware(cfg, payroll.Middleware(dbRO.GetQueries(), announcements.Middleware(dbRO.GetQueries(), authMux))))
 
 		rootMux := http.NewServeMux()
 
@@ -361,6 +369,8 @@ var cmdWeb = &cobra.Command{
 		rootMux.Handle(basePath+"/api/me/students", authHandler)
 		rootMux.Handle(basePath+"/announcements", authHandler)
 		rootMux.Handle(basePath+"/announcements/", authHandler)
+		rootMux.Handle(basePath+"/payroll", authHandler)
+		rootMux.Handle(basePath+"/payroll/", authHandler)
 		rootMux.Handle(basePath+"/meta", authHandler)
 		rootMux.Handle(basePath+"/meta/", authHandler)
 		rootMux.Handle(basePath+"/affiliate-link/", authHandler)

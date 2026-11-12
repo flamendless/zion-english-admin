@@ -1,0 +1,206 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/payroll"
+	"zion-english/internal/utils"
+)
+
+templ PayrollSessionBanner() {
+	{{
+		item := payroll.GetBanner(ctx)
+	}}
+	if item != nil {
+		<div class="announcement-banners payroll-session-banners" role="region" aria-label="Payroll session">
+			<div class="announcement-banner announcement-banner--info" role="status">
+				<div class="announcement-banner__content">
+					<p class="announcement-banner__title">Payroll in progress</p>
+					if item.NeedsDailyLogsConfirm {
+						<p class="announcement-banner__description">Cutoff { item.PeriodLabel }: finish your daily logs, then confirm on the dashboard.</p>
+					} else {
+						<p class="announcement-banner__description">Cutoff period { item.PeriodLabel }.</p>
+					}
+				</div>
+			</div>
+		</div>
+	}
+}
+
+templ PayrollList(data PayrollListData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		@AdminPageHead("Payroll - Zion English Admin Tool")
+		@AvatarStyles()
+		<style>
+			.payroll-header-actions {
+				display: flex;
+				flex-wrap: wrap;
+				gap: var(--space-2);
+				align-items: center;
+				justify-content: flex-end;
+				flex-shrink: 0;
+			}
+			.payroll-header-actions .btn {
+				margin-top: 0;
+				height: 36px;
+				display: inline-flex;
+				align-items: center;
+				padding: 0 var(--space-4);
+				font-size: 0.875rem;
+			}
+			.payroll-continue-callout {
+				margin-bottom: var(--space-4);
+				padding: var(--space-3) var(--space-4);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-md);
+				background: var(--color-primary-light);
+			}
+			.payroll-continue-callout a {
+				font-weight: 600;
+			}
+			.payroll-start-modal-body {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+			}
+			.payroll-start-modal-footer {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: var(--space-2);
+			}
+			.payroll-start-modal-footer .btn {
+				margin-top: 0;
+			}
+			tr.payroll-session-active td {
+				background: var(--color-primary-light);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@SuccessBanner()
+			@ErrorBanner()
+			<div class="hub-header">
+				<h2 class="hub-title">Payroll</h2>
+				<div class="payroll-header-actions">
+					if data.HasActiveSession {
+						<span data-tooltip="Finish the active payroll session before starting another">
+							<button type="button" class="btn" disabled>Start Payroll</button>
+						</span>
+					} else {
+						<button type="button" class="btn" id="openPayrollStartModal">Start Payroll</button>
+					}
+				</div>
+			</div>
+			if data.HasActiveSession {
+				<div class="payroll-continue-callout">
+					<p>Active payroll: { data.ActiveSessionLabel }. <a href={ utils.URL("/payroll/sessions/" + data.ActiveSessionID) }>Continue payroll</a></p>
+				</div>
+			}
+			<div class="table-wrapper data-list-view-root">
+				<table class="table-stack-mobile">
+					<thead>
+						<tr>
+							<th>Cutoff period</th>
+							<th>Status</th>
+							<th>Roles</th>
+							<th>Teachers</th>
+							<th>Progress</th>
+							<th>Started</th>
+							<th>Finished</th>
+							<th>Started by</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						if len(data.Sessions) == 0 {
+							<tr>
+								<td colspan="9" class="empty-state">No payroll sessions yet.</td>
+							</tr>
+						}
+						for _, row := range data.Sessions {
+							<tr class={ templ.KV("payroll-session-active", row.IsActive) }>
+								<td data-label="Cutoff period">{ row.PeriodLabel }</td>
+								<td data-label="Status">
+									@StatusPill(row.Status.Label(), PayrollSessionStatusPillTone(row.Status), false)
+								</td>
+								<td data-label="Roles">{ row.RolesLabel }</td>
+								<td data-label="Teachers">{ fmt.Sprintf("%d", row.TeacherCount) }</td>
+								<td data-label="Progress">{ row.ProgressLabel }</td>
+								<td data-label="Started">{ row.StartedAt }</td>
+								<td data-label="Finished">{ row.FinishedAt }</td>
+								<td data-label="Started by">{ row.StartedByName }</td>
+								<td data-label="Actions">
+									<a class="btn btn-secondary" href={ utils.URL("/payroll/sessions/" + row.ID) }>{ row.OpenLabel() }</a>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+			@PaginationBar(data.Pagination.HasPrev, data.PrevURL, data.Pagination.HasNext, data.NextURL, data.Pagination.Number, data.Pagination.TotalPages, data.Pagination.Total)
+			@PayrollStartModal()
+		</div>
+		<script>
+			(function () {
+				const openBtn = document.getElementById('openPayrollStartModal');
+				const overlay = document.getElementById('payrollStartModal');
+				if (!openBtn || !overlay) return;
+				const closeEls = overlay.querySelectorAll('.payroll-start-close');
+				const startBtn = document.getElementById('payrollStartSubmit');
+				const preset = document.getElementById('payrollDatePreset');
+				function syncStartDisabled() {
+					if (!startBtn || !preset) return;
+					startBtn.disabled = !preset.value;
+				}
+				openBtn.addEventListener('click', () => {
+					overlay.hidden = false;
+					document.body.classList.add('modal-open');
+					syncStartDisabled();
+				});
+				closeEls.forEach((el) => el.addEventListener('click', () => {
+					overlay.hidden = true;
+					document.body.classList.remove('modal-open');
+				}));
+				if (preset) {
+					preset.addEventListener('change', syncStartDisabled);
+				}
+				document.body.addEventListener('htmx:afterSwap', function (evt) {
+					const target = evt.detail.target;
+					if (!target || target.id !== 'payrollDatePresetGroup') return;
+					const nextPreset = document.getElementById('payrollDatePreset');
+					if (nextPreset) {
+						nextPreset.addEventListener('change', syncStartDisabled);
+						syncStartDisabled();
+					}
+				});
+			})();
+		</script>
+	</body>
+	</html>
+}
+
+templ PayrollStartModal() {
+	<div class="modal-overlay" id="payrollStartModal" hidden role="presentation">
+		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="payrollStartTitle">
+			<form method="POST" action={ utils.URL("/payroll/start") } id="payrollStartForm">
+				<div class="modal-header">
+					<h3 id="payrollStartTitle">Start payroll</h3>
+					<button type="button" class="modal-close payroll-start-close" aria-label="Close">&times;</button>
+				</div>
+				<div class="modal-body payroll-start-modal-body">
+					@MonthPickerTarget("payrollStartMonth", utils.URL("/payroll/partials/date-preset"), "payrollDatePresetGroup")
+					@DatePresetForMonthScoped(utils.CurrentMonthPHT(), true, "payrollDatePresetGroup", "payrollDatePreset")
+					@ReportRolesFilterDropdownScoped(true, false, "payrollRolesFilterLabel")
+				</div>
+				<div class="modal-footer payroll-start-modal-footer">
+					<button type="button" class="btn btn-secondary payroll-start-close">Cancel</button>
+					<button type="submit" class="btn" id="payrollStartSubmit" disabled>Start payroll</button>
+				</div>
+			</form>
+		</div>
+	</div>
+}

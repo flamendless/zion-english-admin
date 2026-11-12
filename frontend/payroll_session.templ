@@ -1,0 +1,272 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+templ PayrollSession(data PayrollSessionData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		@AdminPageHead("Payroll session - Zion English Admin Tool")
+		@AvatarStyles()
+		<style>
+			.payroll-session-header-actions {
+				display: flex;
+				flex-wrap: wrap;
+				gap: var(--space-2);
+				align-items: center;
+				justify-content: flex-end;
+			}
+			.payroll-session-header-actions .btn {
+				margin-top: 0;
+				height: 36px;
+				display: inline-flex;
+				align-items: center;
+				padding: 0 var(--space-4);
+				font-size: 0.875rem;
+			}
+			.payroll-session-back {
+				margin: 0 0 var(--space-3);
+				font-size: 0.875rem;
+			}
+			.payroll-session-back a {
+				color: var(--color-muted-foreground);
+				text-decoration: none;
+			}
+			.payroll-session-back a:hover {
+				color: var(--color-primary);
+			}
+		</style>
+		<script>
+			window.closeReportViewModal = function () {
+				const host = document.getElementById('reportViewModalHost');
+				if (host) host.innerHTML = '';
+				document.body.classList.remove('modal-open');
+			};
+			window.closeReportPaymentModal = function () {
+				const host = document.getElementById('reportPaymentModalHost');
+				if (host) host.innerHTML = '';
+				document.body.classList.remove('modal-open');
+			};
+			window.closeReportSummaryModal = function () {
+				const modal = document.getElementById('reportSummaryModal');
+				if (modal) modal.hidden = true;
+				document.body.classList.remove('modal-open');
+			};
+			window.openReportSummaryModal = function () {
+				const modal = document.getElementById('reportSummaryModal');
+				if (!modal) return;
+				const monthInput = document.getElementById('summaryReportMonth');
+				const presetSelect = document.getElementById('summaryDatePreset');
+				const roleTeacher = document.querySelector('#reportSummaryForm input[name="roleTeacher"]');
+				const roleAdmin = document.querySelector('#reportSummaryForm input[name="roleAdmin"]');
+				const sessionMonth = document.getElementById('payrollSessionMonth');
+				const sessionPreset = document.getElementById('payrollSessionPreset');
+				const sessionRoleTeacher = document.getElementById('payrollSessionRoleTeacher');
+				const sessionRoleAdmin = document.getElementById('payrollSessionRoleAdmin');
+				if (monthInput && sessionMonth) monthInput.value = sessionMonth.value;
+				if (presetSelect && sessionPreset) presetSelect.value = sessionPreset.value;
+				if (roleTeacher && sessionRoleTeacher) roleTeacher.checked = sessionRoleTeacher.value === '1';
+				if (roleAdmin && sessionRoleAdmin) roleAdmin.checked = sessionRoleAdmin.value === '1';
+				modal.hidden = false;
+				document.body.classList.add('modal-open');
+			};
+			document.addEventListener('DOMContentLoaded', function () {
+				document.body.addEventListener('click', function (e) {
+					if (e.target.closest('[data-open-report-summary-modal]')) {
+						window.openReportSummaryModal();
+					}
+					if (e.target.closest('.report-summary-close')) window.closeReportSummaryModal();
+					if (e.target.closest('.report-view-close')) window.closeReportViewModal();
+					if (e.target.closest('.report-payment-close')) window.closeReportPaymentModal();
+					const auditTrigger = e.target.closest('[data-open-payroll-audit-modal]');
+					if (auditTrigger && window.openPayrollAuditModal) {
+						e.preventDefault();
+						window.openPayrollAuditModal(
+							auditTrigger.getAttribute('data-audit-url'),
+							auditTrigger.getAttribute('data-teacher-name'),
+						);
+					}
+					if (e.target.closest('.payroll-audit-close')) window.closePayrollAuditModal();
+				});
+				document.body.addEventListener('htmx:afterSwap', function (evt) {
+					if (evt.detail.target.id === 'payrollTeachersTableBody' && window.closePayrollAuditModal) {
+						window.closePayrollAuditModal();
+					}
+					if (evt.detail.target.id === 'payrollTeacherEditModalHost') {
+						document.body.classList.add('modal-open');
+					}
+					if (evt.detail.target.id === 'payrollTeachersTableBody') {
+						const host = document.getElementById('payrollTeacherEditModalHost');
+						if (host) host.innerHTML = '';
+						document.body.classList.remove('modal-open');
+					}
+					if (evt.detail.target.id === 'reportViewModalHost' || evt.detail.target.id === 'reportPaymentModalHost') {
+						document.body.classList.add('modal-open');
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@SuccessBanner()
+			@ErrorBanner()
+			<p class="payroll-session-back"><a href={ utils.URL("/payroll") }>Back to payroll sessions</a></p>
+			<input type="hidden" id="payrollSessionMonth" value={ data.SessionMonth() }/>
+			<input type="hidden" id="payrollSessionPreset" value={ data.SessionPreset() }/>
+			<input type="hidden" id="payrollSessionRoleTeacher" value={ data.RoleTeacherWire() }/>
+			<input type="hidden" id="payrollSessionRoleAdmin" value={ data.RoleAdminWire() }/>
+			<div class="hub-header">
+				<div>
+					<h2 class="hub-title">{ data.PeriodLabel }</h2>
+					<p class="hub-subtitle">Payroll session · { data.Status.Label() }</p>
+				</div>
+				<div class="payroll-session-header-actions">
+					<button type="button" class="btn" data-open-report-summary-modal>Generate Report</button>
+					if data.IsActive {
+						if data.CanFinish {
+							<button type="button" class="btn btn-danger" id="openPayrollFinishModal">Finish payroll</button>
+						} else {
+							<span data-tooltip={ data.FinishBlockedReason }>
+								<button type="button" class="btn btn-danger" disabled>Finish payroll</button>
+							</span>
+						}
+					}
+				</div>
+			</div>
+			<div class="table-wrapper data-list-view-root">
+				<table class="table-stack-mobile">
+					<thead>
+						<tr>
+							<th>Teacher</th>
+							<th>Status</th>
+							<th>Total Classes</th>
+							<th>Total Earnings</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody
+						id="payrollTeachersTableBody"
+						if data.IsActive {
+							hx-get={ utils.URL("/payroll/sessions/" + data.SessionID + "/partials/teachers") }
+							hx-trigger="every 30s"
+							hx-swap={ HxSwapInnerHTML }
+						}
+					>
+						for _, row := range data.Teachers {
+							@PayrollTeacherTableRow(row, data.StartDate, data.EndDate, data.IsActive, false)
+						}
+					</tbody>
+				</table>
+			</div>
+			<div id="reportViewModalHost"></div>
+			<div id="reportPaymentModalHost"></div>
+			<div id="payrollTeacherEditModalHost"></div>
+			@ReportSummaryModal()
+			if data.IsActive {
+				@PayrollFinishModal(data.SessionID)
+				@PayrollAuditConfirmModal()
+			}
+		</div>
+	</body>
+	</html>
+}
+
+templ PayrollFinishModal(sessionID string) {
+	<div class="modal-overlay" id="payrollFinishModal" hidden role="presentation">
+		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="payrollFinishTitle">
+			<form method="POST" action={ utils.URL("/payroll/sessions/" + sessionID + "/finish") }>
+				<div class="modal-header">
+					<h3 id="payrollFinishTitle">Finish payroll</h3>
+					<button type="button" class="modal-close payroll-finish-close" aria-label="Close">&times;</button>
+				</div>
+				<div class="modal-body">
+					<p>Mark this payroll session as finished? All teachers have confirmed salary received.</p>
+				</div>
+				<div class="modal-footer" style="display: flex; gap: var(--space-2);">
+					<button type="button" class="btn btn-secondary payroll-finish-close" style="margin-top: 0;">Cancel</button>
+					<button type="submit" class="btn btn-danger" style="margin-top: 0;">Finish payroll</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<script>
+		(function () {
+			const openBtn = document.getElementById('openPayrollFinishModal');
+			const overlay = document.getElementById('payrollFinishModal');
+			if (!openBtn || !overlay) return;
+			openBtn.addEventListener('click', () => {
+				overlay.hidden = false;
+				document.body.classList.add('modal-open');
+			});
+			overlay.querySelectorAll('.payroll-finish-close').forEach((el) => {
+				el.addEventListener('click', () => {
+					overlay.hidden = true;
+					document.body.classList.remove('modal-open');
+				});
+			});
+		})();
+	</script>
+}
+
+templ PayrollAuditConfirmModal() {
+	<div class="modal-overlay" id="payrollAuditModal" hidden role="presentation">
+		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="payrollAuditTitle">
+			<div class="modal-header">
+				<h3 id="payrollAuditTitle">Confirm audit</h3>
+				<button type="button" class="modal-close payroll-audit-close" aria-label="Close">&times;</button>
+			</div>
+			<div class="modal-body">
+				<p>Mark daily logs as audited for <strong id="payrollAuditTeacherName"></strong>? They can receive salary after you send payment.</p>
+			</div>
+			<div class="modal-footer payroll-audit-modal-footer">
+				<button type="button" class="btn btn-secondary payroll-audit-close">Cancel</button>
+				<button
+					type="button"
+					class="btn"
+					id="payrollAuditConfirmBtn"
+					hx-target="#payrollTeachersTableBody"
+					hx-swap={ HxSwapInnerHTML }
+				>Confirm audit</button>
+			</div>
+		</div>
+	</div>
+	<style>
+		.payroll-audit-modal-footer {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--space-2);
+			align-items: center;
+		}
+		.payroll-audit-modal-footer .btn {
+			margin-top: 0;
+		}
+	</style>
+	<script>
+		(function () {
+			const modal = document.getElementById('payrollAuditModal');
+			const nameEl = document.getElementById('payrollAuditTeacherName');
+			const confirmBtn = document.getElementById('payrollAuditConfirmBtn');
+			if (!modal || !nameEl || !confirmBtn) return;
+
+			window.openPayrollAuditModal = function (auditURL, teacherName) {
+				confirmBtn.setAttribute('hx-post', auditURL || '');
+				if (typeof htmx !== 'undefined') {
+					htmx.process(confirmBtn);
+				}
+				nameEl.textContent = teacherName || '-';
+				modal.hidden = false;
+				document.body.classList.add('modal-open');
+				confirmBtn.focus();
+			};
+
+			window.closePayrollAuditModal = function () {
+				modal.hidden = true;
+				document.body.classList.remove('modal-open');
+				nameEl.textContent = '';
+				confirmBtn.removeAttribute('hx-post');
+			};
+		})();
+	</script>
+}

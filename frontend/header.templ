@@ -24,6 +24,7 @@ templ Header(loggedIn bool, role auth.Role) {
 			@DigitalClock("compact")
 		</div>
 		@AnnouncementBanners()
+		@PayrollSessionBanner()
 		if loggedIn {
 			@WelcomeRole()
 		}

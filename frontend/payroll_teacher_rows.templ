@@ -1,0 +1,106 @@
+package frontend
+
+import (
+	"fmt"
+	"zion-english/internal/constants"
+	"zion-english/internal/utils"
+)
+
+templ PayrollTeachersPartial(rows []PayrollTeacherRow, emptyMsg string, startDate string, endDate string, isActive bool) {
+	if len(rows) == 0 {
+		<tr>
+			<td colspan="5" class="empty-state">{ emptyMsg }</td>
+		</tr>
+	} else {
+		for _, row := range rows {
+			@PayrollTeacherTableRow(row, startDate, endDate, isActive, false)
+		}
+	}
+}
+
+templ PayrollTeacherTableRow(row PayrollTeacherRow, startDate string, endDate string, isActive bool, swapOOB bool) {
+	<tr data-teacher-id={ row.TeacherID } if swapOOB { hx-swap-oob={ HxSwapOuterHTML } }>
+		<td data-label="Teacher">
+			@TeacherNameCell(row.TeacherName, row.Avatar)
+		</td>
+		<td data-label="Status">
+			@StatusPill(PayrollTeacherStatusLabel(row.Status), PayrollTeacherStatusPillTone(row.Status), false)
+		</td>
+		<td data-label="Total Classes">{ row.ClassesLabel() }</td>
+		<td data-label="Total Earnings">
+			@templ.Raw(row.EarningsHTML)
+		</td>
+		<td data-label="Actions">
+			<div class="table-actions">
+				@IconActionButton("Edit payroll status", IconKindEdit, templ.Attributes{
+					"hx-get":    utils.URL("/payroll/sessions/" + row.SessionID + "/teachers/" + row.TeacherID + "/edit"),
+					"hx-target": "#payrollTeacherEditModalHost",
+					"hx-swap":   HxSwapInnerHTML,
+				})
+				if row.ShowReportActions {
+					if row.CanViewReport {
+						@IconActionButton("View daily logs report", IconKindView, templ.Attributes{
+							"hx-get":    utils.URL("/reports/" + row.TeacherID + "/view?startDate=" + startDate + "&endDate=" + endDate),
+							"hx-target": "#reportViewModalHost",
+							"hx-swap":   HxSwapInnerHTML,
+						})
+					} else {
+						<span data-tooltip={ payrollReportActionsDisabledTooltip }>
+							<button type="button" class="icon-action-btn icon-action-btn--view is-disabled" aria-label="View daily logs report" aria-disabled="true">
+								@IconSVG(IconKindView)
+							</button>
+						</span>
+					}
+					if row.CanGenerate {
+						@IconActionButton(row.GenerateLabel, row.GenerateKind, templ.Attributes{
+							"hx-post":   utils.URL("/payroll/sessions/" + row.SessionID + "/teachers/" + row.TeacherID + "/generate"),
+							"hx-vals":   fmt.Sprintf(`{"startDate":"%s","endDate":"%s"}`, startDate, endDate),
+							"hx-target": "closest tr",
+							"hx-swap":   "outerHTML",
+						})
+						<span class="download-report-wrap" if !row.DownloadReady { data-tooltip={ downloadDisabledTooltip } }>
+							if row.DownloadReady {
+								@IconActionLink(row.DownloadURL, "Download XLSX", IconKindDownload)
+							} else {
+								<a class="icon-action-btn icon-action-btn--download download-report-btn is-disabled" href="#" aria-label="Download XLSX" aria-disabled="true">
+									@IconSVG(IconKindDownload)
+								</a>
+							}
+						</span>
+					} else {
+						<span data-tooltip={ payrollReportActionsDisabledTooltip }>
+							<button type="button" class={ iconActionClass(row.GenerateKind) + " is-disabled" } aria-label={ row.GenerateLabel } aria-disabled="true">
+								@IconSVG(row.GenerateKind)
+							</button>
+						</span>
+						<span class="download-report-wrap" data-tooltip={ payrollReportActionsDisabledTooltip }>
+							<a class="icon-action-btn icon-action-btn--download download-report-btn is-disabled" href="#" aria-label="Download XLSX" aria-disabled="true">
+								@IconSVG(IconKindDownload)
+							</a>
+						</span>
+					}
+				}
+				if row.CanAudit {
+					@IconActionTrigger("Confirm audit", IconKindApprove, templ.Attributes{
+						"data-open-payroll-audit-modal": "",
+						"data-audit-url":                utils.URL("/payroll/sessions/" + row.SessionID + "/teachers/" + row.TeacherID + "/audit"),
+						"data-teacher-name":             row.TeacherName,
+					})
+				}
+				if row.CanSendSalary {
+					@IconActionButton("Send salary", IconKindPayment, templ.Attributes{
+						"hx-get":    utils.URL("/reports/" + row.TeacherID + "/payment?startDate=" + startDate + "&endDate=" + endDate),
+						"hx-target": "#reportPaymentModalHost",
+						"hx-swap":   HxSwapInnerHTML,
+					})
+				} else if isActive && row.Status == constants.PayrollTeacherStatusAudited {
+					<span data-tooltip={ row.SendPaymentTooltip }>
+						<button type="button" class="icon-action-btn icon-action-btn--payment is-disabled" aria-label="Send salary" aria-disabled="true">
+							@IconSVG(IconKindPayment)
+						</button>
+					</span>
+				}
+			</div>
+		</td>
+	</tr>
+}

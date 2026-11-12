@@ -10,6 +10,7 @@ const (
 	GuideSlugIntroVideos           GuideSlug = "intro-videos"
 	GuideSlugPayments              GuideSlug = "payments"
 	GuideSlugReportsAndGeneration  GuideSlug = "reports-and-generation"
+	GuideSlugPayrollWizard         GuideSlug = "payroll-wizard"
 	GuideSlugAds                   GuideSlug = "ads"
 	GuideSlugAffiliates            GuideSlug = "affiliates"
 	GuideSlugSQLConsole            GuideSlug = "sql-console"

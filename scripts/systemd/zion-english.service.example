@@ -1,0 +1,26 @@
+# Copy to the server (runs as root; clone at /root/zion-english-admin).
+#
+#   cp scripts/systemd/zion-english.service.example /etc/systemd/system/zion-english.service
+#   systemctl daemon-reload
+#   systemctl enable --now zion-english
+#
+# For dev tier, use --dev and WorkingDirectory /root/zion-english-dev.
+
+[Unit]
+Description=Zion English admin web
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/root/zion-english-admin
+EnvironmentFile=-/root/zion-english-admin/.env
+ExecStartPre=/root/zion-english-admin/scripts/linode-start.sh --prod preflight
+ExecStart=/root/zion-english-admin/scripts/linode-start.sh --prod foreground
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

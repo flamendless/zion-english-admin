@@ -15,6 +15,7 @@ import (
 	"zion-english/internal/database/queries"
 	"zion-english/internal/logs"
 	"zion-english/internal/notifications"
+	"zion-english/internal/payroll"
 	"zion-english/internal/utils"
 
 	"go.uber.org/zap"
@@ -418,6 +419,17 @@ func handleReportPaymentSubmit(w http.ResponseWriter, r *http.Request, teacherID
 		return
 	}
 
+	paymentID, payErr := dbRW.GetQueries().GetLatestTeacherPaymentIDForPeriod(ctx, queries.GetLatestTeacherPaymentIDForPeriodParams{
+		TeacherID:   teacherID,
+		PeriodStart: startDate,
+		PeriodEnd:   endDate,
+	})
+	if payErr == nil {
+		if err := payroll.OnPaymentSent(ctx, dbRW.GetQueries(), teacherID, startDate, endDate, paymentID, user.ID, user.Name); err != nil {
+			logs.Log().Warn("payroll on payment sent", zap.Error(err))
+		}
+	}
+
 	teacherName := utils.ComposePersonName(profile.FirstName, profile.MiddleName, profile.LastName)
 	insertAuditLogAs(ctx, user, "payments", fmt.Sprintf(
 		"sent payment to %s (%s %s, ref %s)",
@@ -617,6 +629,10 @@ func handlePaymentReceived(w http.ResponseWriter, r *http.Request, paymentID int
 	}); err != nil {
 		sendErrorLog(w, "failed to confirm payment")
 		return
+	}
+
+	if err := payroll.OnPaymentReceived(ctx, dbRW.GetQueries(), paymentID, user.ID, user.Name); err != nil {
+		logs.Log().Warn("payroll on payment received", zap.Error(err))
 	}
 
 	teacherName := user.Name

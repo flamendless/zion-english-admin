@@ -1,0 +1,84 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+templ PayrollDailyLogsDashboardReminder(data PayrollDailyLogsData) {
+	<div class="announcement-banners payroll-daily-logs-dashboard-reminder" role="region" aria-label="Payroll daily logs reminder">
+		<div class="announcement-banner announcement-banner--warning" role="status">
+			<div class="announcement-banner__content">
+				<p class="announcement-banner__title">Confirm daily logs for payroll</p>
+				<p class="announcement-banner__description">
+					Cutoff { data.PeriodLabel } is in progress. Accomplish your daily logs for this period, then confirm below or in the popup.
+				</p>
+				<p class="announcement-banner__description" style="margin-top: var(--space-2);">
+					<button type="button" class="btn payroll-daily-logs-open" style="margin-top: 0; height: 36px; padding: 0 var(--space-3); font-size: 0.8125rem;">Open confirmation</button>
+				</p>
+			</div>
+		</div>
+	</div>
+}
+
+templ PayrollDailyLogsModal(data PayrollDailyLogsData) {
+	<div class="modal-overlay" id="payrollDailyLogsModal" hidden role="presentation">
+		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="payrollDailyLogsTitle">
+			<div class="modal-header">
+				<h3 id="payrollDailyLogsTitle">Confirm daily logs complete</h3>
+				<button type="button" class="modal-close payroll-daily-logs-close" aria-label="Close">&times;</button>
+			</div>
+			<div class="modal-body">
+				<p>Payroll cutoff { data.PeriodLabel } is active. Accomplish your daily logs for this period, then confirm when they are complete.</p>
+			</div>
+			<div class="modal-footer payroll-daily-logs-modal-footer">
+				<button type="button" class="btn btn-secondary payroll-daily-logs-close">Not yet</button>
+				<button
+					type="button"
+					class="btn btn-secondary payroll-daily-logs-close"
+				>Remind me on next visit</button>
+				<button
+					type="button"
+					class="btn"
+					hx-post={ utils.URL("/payroll/daily-logs/confirm") }
+					hx-swap="none"
+					onclick="window.closePayrollDailyLogsModal()"
+				>Yes, daily logs are complete</button>
+			</div>
+		</div>
+	</div>
+	<style>
+		.payroll-daily-logs-modal-footer {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--space-2);
+			align-items: center;
+		}
+		.payroll-daily-logs-modal-footer .btn {
+			margin-top: 0;
+		}
+	</style>
+	<script>
+		window.openPayrollDailyLogsModal = function () {
+			const overlay = document.getElementById('payrollDailyLogsModal');
+			if (!overlay) return;
+			overlay.hidden = false;
+			document.body.classList.add('modal-open');
+			const closeBtn = overlay.querySelector('.payroll-daily-logs-close');
+			if (closeBtn) closeBtn.focus();
+		};
+		window.closePayrollDailyLogsModal = function () {
+			const overlay = document.getElementById('payrollDailyLogsModal');
+			if (overlay) overlay.hidden = true;
+			document.body.classList.remove('modal-open');
+		};
+		(function () {
+			window.openPayrollDailyLogsModal();
+			document.querySelectorAll('.payroll-daily-logs-open').forEach((el) => {
+				el.addEventListener('click', window.openPayrollDailyLogsModal);
+			});
+			const overlay = document.getElementById('payrollDailyLogsModal');
+			if (!overlay) return;
+			overlay.querySelectorAll('.payroll-daily-logs-close').forEach((el) => {
+				el.addEventListener('click', window.closePayrollDailyLogsModal);
+			});
+		})();
+	</script>
+}

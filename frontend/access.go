@@ -112,6 +112,7 @@ var navItemDefs = []navItemDef{
 	{Path: "/logs", LinkID: "logsLink", Title: "Logs", TeacherTitle: "My Activity", Description: "View system logs", TeacherDesc: "View your recent actions"},
 	{Path: "/upload-logs", LinkID: "uploadLogsLink", Title: "Upload Logs", TeacherTitle: "My Upload Logs", Description: "Teacher file upload activity", TeacherDesc: "View success and failure for your file uploads", AdminOnlyCard: true},
 	{Path: "/announcements", LinkID: "announcementsLink", Title: "Announcements", Description: "Create and manage system-wide banners", AdminOnlyCard: true},
+	{Path: "/payroll", LinkID: "payrollLink", Title: "Payroll", Description: "Run payroll sessions and track teacher cutoff progress", AdminOnlyCard: true},
 }
 
 var navGroupDefs = []navGroupDef{
@@ -119,7 +120,7 @@ var navGroupDefs = []navGroupDef{
 	{ID: "people", Label: "People", Description: "Manage teachers and students", AdminOnlyCard: true, Paths: []string{"/teachers", "/students"}},
 	{ID: "resources", Label: "Resources", Description: "Guides, documents, learning materials, and training videos", TeacherDesc: "Guides, your documents, learning materials, and training videos", FeatureCard: true, Paths: []string{"/guides", "/documents", "/intro-videos", "/learning-materials", "/training-materials"}},
 	{ID: "insights", Label: "Insights", Description: "Payroll reports and analytics", AdminOnlyCard: true, Paths: []string{"/reports", "/reports/history", "/analytics", "/my-earnings", "/payments", "/student-relationships", "/affiliate-ads/reports"}},
-	{ID: "admin", Label: "Admin", Description: "Process CSV files, feature flags, meta tags, affiliates, ads, plans, settings, SQL console, logs, upload logs, and announcements", AdminOnlyCard: true, Paths: []string{"/process", "/feature-flags", "/meta", "/affiliates", "/ads", "/plans", "/settings", "/sql-console", "/logs", "/upload-logs", "/teachers-earnings", "/announcements"}},
+	{ID: "admin", Label: "Admin", Description: "Process CSV files, feature flags, meta tags, affiliates, ads, plans, settings, SQL console, logs, upload logs, and announcements", AdminOnlyCard: true, Paths: []string{"/process", "/feature-flags", "/meta", "/affiliates", "/ads", "/plans", "/settings", "/sql-console", "/logs", "/upload-logs", "/teachers-earnings", "/announcements", "/payroll"}},
 }
 
 var adminNavLayout = []navLayoutEntry{
@@ -386,7 +387,7 @@ func IsNavAccessible(role auth.Role, path string) bool {
 		if role == auth.RoleSuperuser && path == "/profile" {
 			return false
 		}
-		if path == "/feature-flags" || path == "/settings" || path == "/sql-console" || path == "/affiliates" || path == "/ads" || path == "/plans" || path == "/affiliate-ads/reports" {
+		if path == "/feature-flags" || path == "/settings" || path == "/sql-console" || path == "/affiliates" || path == "/ads" || path == "/plans" || path == "/affiliate-ads/reports" || path == "/payroll" {
 			return role == auth.RoleSuperuser
 		}
 		return true

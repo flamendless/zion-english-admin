@@ -74,7 +74,7 @@ func teacherDashboardCount(ctx context.Context, connectionFilter, docsStatus, re
 }
 
 func parseConnectionCheckboxFilter(r *http.Request, name string) bool {
-	return r.URL.Query().Get(name) == "1"
+	return r.FormValue(name) == "1"
 }
 
 func parseTeacherDocsStatusFilter(value string) string {

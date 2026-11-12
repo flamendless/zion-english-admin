@@ -131,6 +131,15 @@ FROM tbl_teacher_payments
 WHERE id = ?
 LIMIT 1;
 
+-- name: GetLatestTeacherPaymentIDForPeriod :one
+SELECT id
+FROM tbl_teacher_payments
+WHERE teacher_id = ?
+	AND period_start = ?
+	AND period_end = ?
+ORDER BY sent_at DESC
+LIMIT 1;
+
 -- name: MarkTeacherPaymentReceived :exec
 UPDATE tbl_teacher_payments
 SET

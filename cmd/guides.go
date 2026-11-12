@@ -67,6 +67,12 @@ func handleGuides(w http.ResponseWriter, r *http.Request) {
 				Access:      "superuser",
 			},
 			{
+				Slug:        constants.GuideSlugPayrollWizard,
+				Title:       "Payroll wizard",
+				Description: "Start payroll sessions, track teacher daily logs, audit, and salary confirmation.",
+				Access:      "superuser",
+			},
+			{
 				Slug:        constants.GuideSlugAds,
 				Title:       "Ads",
 				Description: "Configure affiliate ad placements, rotation, and draft or published status.",
@@ -116,6 +122,8 @@ func handleGuidesPath(w http.ResponseWriter, r *http.Request) {
 		handleGuideFAQ(w, r)
 	case constants.GuideSlugReportsAndGeneration:
 		handleGuideReportsGeneration(w, r)
+	case constants.GuideSlugPayrollWizard:
+		handleGuidePayrollWizard(w, r)
 	case constants.GuideSlugAds:
 		handleGuideAds(w, r)
 	case constants.GuideSlugAffiliates:
@@ -194,6 +202,16 @@ func handleGuideReportsGeneration(w http.ResponseWriter, r *http.Request) {
 
 	if err := frontend.GuideReportsGeneration().Render(r.Context(), w); err != nil {
 		logs.Log().Error("failed to render reports and generation guide", zap.Error(err))
+	}
+}
+
+func handleGuidePayrollWizard(w http.ResponseWriter, r *http.Request) {
+	if !requireMethod(w, r, http.MethodGet) {
+		return
+	}
+
+	if err := frontend.GuidePayrollWizard().Render(r.Context(), w); err != nil {
+		logs.Log().Error("failed to render payroll wizard guide", zap.Error(err))
 	}
 }
 

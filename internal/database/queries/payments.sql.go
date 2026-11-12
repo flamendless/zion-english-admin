@@ -31,6 +31,29 @@ func (q *Queries) DeferTeacherPaymentReceipt(ctx context.Context, arg DeferTeach
 	return err
 }
 
+const getLatestTeacherPaymentIDForPeriod = `-- name: GetLatestTeacherPaymentIDForPeriod :one
+SELECT id
+FROM tbl_teacher_payments
+WHERE teacher_id = ?
+	AND period_start = ?
+	AND period_end = ?
+ORDER BY sent_at DESC
+LIMIT 1
+`
+
+type GetLatestTeacherPaymentIDForPeriodParams struct {
+	TeacherID   int64
+	PeriodStart string
+	PeriodEnd   string
+}
+
+func (q *Queries) GetLatestTeacherPaymentIDForPeriod(ctx context.Context, arg GetLatestTeacherPaymentIDForPeriodParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getLatestTeacherPaymentIDForPeriod, arg.TeacherID, arg.PeriodStart, arg.PeriodEnd)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
 const getPendingPaymentForTeacherReceipt = `-- name: GetPendingPaymentForTeacherReceipt :one
 SELECT
 	p.id,

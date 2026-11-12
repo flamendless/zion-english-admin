@@ -1942,6 +1942,80 @@ templ GuideStyles() {
 	</style>
 }
 
+templ GuidePayrollWizard() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		@AdminPageHead("Payroll wizard - Guides - Zion English Admin Tool")
+		@GuideStyles()
+	</head>
+	<body>
+		<div class="container guides-page">
+			@HeaderSimple()
+			<nav class="guides-breadcrumb" aria-label="Breadcrumb">
+				<a href={ utils.URL("/guides") } class="guides-breadcrumb-link">Guides</a>
+				<span class="guides-breadcrumb-sep" aria-hidden="true">/</span>
+				<span class="guides-breadcrumb-current" aria-current="page">Payroll wizard</span>
+			</nav>
+			<div class="hub-header">
+				<h2 class="hub-title admin-only-label-wrap">
+					Payroll wizard
+					@AdminOnlyIndicator()
+				</h2>
+			</div>
+			<div class="guides-hero">
+				<p class="guides-subtitle">
+					Run a payroll session for one cutoff period, track each teacher through daily logs, audit, send salary, and receipt confirmation.
+				</p>
+			</div>
+			<div class="guide-content">
+				@GuideSection(
+					"payroll-start",
+					"Start a session",
+					utils.URL("/payroll"),
+					"Open Payroll under Admin and use Start Payroll to pick month, cutoff, and roles.",
+					[]string{
+						"Only one active payroll session can run at a time.",
+						"Teachers on the roster match the Reports role filters you select at start.",
+						"After start, open the session workspace to manage each teacher.",
+					},
+					true,
+				)
+				@GuideSection(
+					"payroll-teacher-flow",
+					"Teacher steps",
+					"",
+					"Teachers see a payroll banner while the session is active.",
+					[]string{
+						"Near cutoff end, teachers get a dashboard prompt to confirm daily logs are complete.",
+						"After you send salary, they confirm receipt using the same payment modal as Payments.",
+					},
+					false,
+				)
+				@GuideSection(
+					"payroll-finish",
+					"Finish payroll",
+					utils.URL("/payroll"),
+					"Finish payroll when every teacher reaches Salary received.",
+					[]string{
+						"Use Generate Report on the session page for bulk XLSX export when needed.",
+						"Finished sessions stay in the payroll history table for reference.",
+					},
+					true,
+				)
+			</div>
+			<div class="guides-footer-nav">
+				<a href={ utils.URL("/guides") } class="guides-back-link">
+					@GuideBackIcon()
+					All guides
+				</a>
+			</div>
+			@GuideAnchorScript()
+		</div>
+	</body>
+	</html>
+}
+
 templ GuideBookIcon() {
 	<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 		<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>

@@ -86,6 +86,7 @@ var navIconByPath = map[string]NavIconKind{
 	"/logs":                  NavIconLogs,
 	"/upload-logs":           NavIconUploadLogs,
 	"/announcements":         NavIconAnnouncements,
+	"/payroll":               NavIconPayments,
 	"/changelogs":            NavIconChangelogs,
 }
 

@@ -1,0 +1,138 @@
+package frontend
+
+import (
+	"zion-english/internal/constants"
+	"zion-english/internal/utils"
+)
+
+templ PayrollTeacherEditModal(data PayrollTeacherEditModalData) {
+	<div class="modal-overlay" id="payrollTeacherEditModal" role="presentation">
+		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="payrollTeacherEditTitle">
+			<form
+				class="payroll-teacher-edit-form"
+				hx-post={ utils.URL("/payroll/sessions/" + data.SessionID + "/teachers/" + data.TeacherID + "/status") }
+				hx-target="#payrollTeachersTableBody"
+				hx-swap={ HxSwapInnerHTML }
+			>
+				<div class="modal-header">
+					<h3 id="payrollTeacherEditTitle">Edit payroll status</h3>
+					<button type="button" class="modal-close payroll-teacher-edit-close" aria-label="Close">&times;</button>
+				</div>
+				<div class="modal-body">
+					<p class="payroll-teacher-edit-lead">{ data.TeacherName }</p>
+					<h4 class="payroll-teacher-edit-section-title">Status history</h4>
+					if len(data.Events) == 0 {
+						<p class="payroll-teacher-edit-empty">{ constants.DisplayNotSet }</p>
+					} else {
+						<ul class="payroll-teacher-status-history">
+							for _, event := range data.Events {
+								<li>
+									<span class="payroll-teacher-status-history-when">{ event.ChangedAtLabel }</span>
+									<span class="payroll-teacher-status-history-change">{ event.FromLabel } → { event.ToLabel }</span>
+									if event.ActionLabel != constants.DisplayNotSet {
+										<span class="payroll-teacher-status-history-reason">Action: { event.ActionLabel }</span>
+									}
+									<span class="payroll-teacher-status-history-by">By { event.ChangedByName }</span>
+								</li>
+							}
+						</ul>
+					}
+					<div class="form-group">
+						<label for="payrollTeacherStatusOverride">Override status</label>
+						<select id="payrollTeacherStatusOverride" name="status" required>
+							for _, opt := range PayrollTeacherStatusOptions {
+								<option value={ opt.Value } selected?={ data.CurrentStatus == constants.PayrollTeacherStatus(opt.Value) }>{ opt.Label }</option>
+							}
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="payrollTeacherStatusReason">Override reason *</label>
+						<input
+							type="text"
+							id="payrollTeacherStatusReason"
+							name="reason"
+							required
+							placeholder="Why is this status being overridden?"
+						/>
+					</div>
+				</div>
+				<div class="modal-footer payroll-teacher-edit-footer">
+					<button type="button" class="btn btn-secondary payroll-teacher-edit-close">Cancel</button>
+					<button type="submit" class="btn">Save</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<style>
+		.payroll-teacher-edit-lead {
+			margin: 0 0 var(--space-4);
+			font-weight: 600;
+		}
+		.payroll-teacher-edit-section-title {
+			margin: 0 0 var(--space-2);
+			font-size: 0.875rem;
+			font-weight: 600;
+		}
+		.payroll-teacher-status-history {
+			list-style: none;
+			margin: 0 0 var(--space-4);
+			padding: 0;
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-2);
+			max-height: 14rem;
+			overflow: auto;
+		}
+		.payroll-teacher-status-history li {
+			padding: var(--space-2) var(--space-3);
+			border: 1px solid var(--color-border-subtle);
+			border-radius: var(--radius-md);
+			background: var(--color-surface);
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-1);
+			font-size: 0.8125rem;
+		}
+		.payroll-teacher-status-history-when {
+			font-weight: 600;
+			color: var(--color-foreground);
+		}
+		.payroll-teacher-status-history-change {
+			color: var(--color-foreground);
+		}
+		.payroll-teacher-status-history-reason,
+		.payroll-teacher-status-history-by {
+			color: var(--color-muted-foreground);
+		}
+		.payroll-teacher-edit-empty {
+			margin: 0 0 var(--space-4);
+			color: var(--color-muted-foreground);
+		}
+		.payroll-teacher-edit-footer {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--space-2);
+			align-items: center;
+		}
+		.payroll-teacher-edit-footer .btn {
+			margin-top: 0;
+		}
+	</style>
+	<script>
+		(function () {
+			const overlay = document.getElementById('payrollTeacherEditModal');
+			if (!overlay) return;
+			overlay.hidden = false;
+			document.body.classList.add('modal-open');
+			const reason = document.getElementById('payrollTeacherStatusReason');
+			if (reason) reason.focus();
+			overlay.querySelectorAll('.payroll-teacher-edit-close').forEach((el) => {
+				el.addEventListener('click', function () {
+					const host = document.getElementById('payrollTeacherEditModalHost');
+					if (host) host.innerHTML = '';
+					document.body.classList.remove('modal-open');
+				});
+			});
+		})();
+	</script>
+}

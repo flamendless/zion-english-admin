@@ -56,6 +56,8 @@ type DashboardData struct {
 	TeachersWithoutProfileAvatar  int64
 	ShowPaymentReceipt                bool
 	PaymentReceipt                    PaymentReceiptData
+	ShowPayrollDailyLogs              bool
+	PayrollDailyLogs                  PayrollDailyLogsData
 }
 
 templ Home(data DashboardData) {
@@ -152,6 +154,9 @@ templ Home(data DashboardData) {
 				@WelcomeRole()
 				@DigitalClock("hero")
 				@AnnouncementBanners()
+				if data.ShowPayrollDailyLogs {
+					@PayrollDailyLogsDashboardReminder(data.PayrollDailyLogs)
+				}
 			</div>
 
 			@DashboardStats(data)
@@ -186,6 +191,11 @@ templ Home(data DashboardData) {
 			@RecordClassFlowModals(ClassWizardPageDataForContext(ctx))
 			if data.ShowPaymentReceipt {
 				@PaymentReceiptModal(data.PaymentReceipt)
+			}
+			if data.ShowPayrollDailyLogs {
+				<div id="payrollDailyLogsModalHost">
+					@PayrollDailyLogsModal(data.PayrollDailyLogs)
+				</div>
 			}
 			if data.Role == auth.RoleTeacher {
 				@PersistentPanelStack()
