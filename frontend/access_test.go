@@ -105,3 +105,12 @@ func TestAnnouncementsInAdminNavGroup(t *testing.T) {
 		t.Fatal("admin should access /announcements")
 	}
 }
+
+func TestIsNavAccessibleAdminPayroll(t *testing.T) {
+	if !IsNavAccessible(auth.RoleAdmin, "/payroll") {
+		t.Fatal("admin should access /payroll")
+	}
+	if IsNavAccessible(auth.RoleTeacher, "/payroll") {
+		t.Fatal("teacher should not access /payroll via nav")
+	}
+}

@@ -387,7 +387,7 @@ func IsNavAccessible(role auth.Role, path string) bool {
 		if role == auth.RoleSuperuser && path == "/profile" {
 			return false
 		}
-		if path == "/feature-flags" || path == "/settings" || path == "/sql-console" || path == "/affiliates" || path == "/ads" || path == "/plans" || path == "/affiliate-ads/reports" || path == "/payroll" {
+		if path == "/feature-flags" || path == "/settings" || path == "/sql-console" || path == "/affiliates" || path == "/ads" || path == "/plans" || path == "/affiliate-ads/reports" {
 			return role == auth.RoleSuperuser
 		}
 		return true
