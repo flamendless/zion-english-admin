@@ -1,0 +1,113 @@
+package frontend
+
+import "zion-english/internal/constants"
+
+type AccessesData struct {
+	Matrix []NavAccessMatrixRow
+}
+
+templ Accesses(data AccessesData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		@AdminPageHead("Accesses - Zion English Admin Tool")
+		<style>
+			.accesses-layout {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-4);
+				max-width: 72rem;
+			}
+
+			.accesses-panel {
+				background: var(--color-surface);
+				border: 1px solid var(--color-border);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-sm, 0 1px 2px rgba(15, 23, 42, 0.05));
+				padding: var(--space-4) var(--space-5) var(--space-5);
+			}
+
+			.accesses-intro {
+				margin: 0 0 var(--space-4);
+				font-size: 0.875rem;
+				color: var(--color-muted-foreground);
+				line-height: 1.5;
+			}
+
+			.accesses-matrix-table th,
+			.accesses-matrix-table td {
+				text-align: center;
+				vertical-align: middle;
+			}
+
+			.accesses-matrix-table th.accesses-module-col,
+			.accesses-matrix-table td.accesses-module-col {
+				text-align: left;
+				min-width: 12rem;
+			}
+
+			.accesses-matrix-table th.accesses-path-col,
+			.accesses-matrix-table td.accesses-path-col {
+				text-align: left;
+				font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+				font-size: 0.8125rem;
+				color: var(--color-muted-foreground);
+			}
+
+			.accesses-cell-yes {
+				font-weight: 600;
+				color: var(--color-success);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			@HubHeader("Accesses", "", "Who sees each portal module in the nav and dashboard", false)
+			<div class="accesses-layout">
+				<div class="accesses-panel">
+					<p class="accesses-intro">
+						Read-only reference for nav and dashboard visibility. Direct URLs may still use separate route guards in the server.
+						Editing access here is not available yet.
+					</p>
+					<div class="table-wrapper">
+						<table class="accesses-matrix-table table-stack-mobile">
+							<thead>
+								<tr>
+									<th class="accesses-module-col">Module</th>
+									<th class="accesses-path-col">Path</th>
+									<th>Superuser</th>
+									<th>Admin</th>
+									<th>Teacher</th>
+									<th>Tester</th>
+								</tr>
+							</thead>
+							<tbody>
+								for _, row := range data.Matrix {
+									<tr>
+										<td class="accesses-module-col" data-label="Module">{ row.Title }</td>
+										<td class="accesses-path-col" data-label="Path">{ row.Path }</td>
+										<td data-label="Superuser">@NavAccessMatrixCell(row.Superuser)</td>
+										<td data-label="Admin">@NavAccessMatrixCell(row.Admin)</td>
+										<td data-label="Teacher">@NavAccessMatrixCell(row.Teacher)</td>
+										<td data-label="Tester">@NavAccessMatrixCell(row.Tester)</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		@LayoutEnd()
+	</body>
+	</html>
+}
+
+templ NavAccessMatrixCell(allowed bool) {
+	if allowed {
+		<span class="accesses-cell-yes">Yes</span>
+	} else {
+		{ constants.DisplayNotSet }
+	}
+}

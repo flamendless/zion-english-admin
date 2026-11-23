@@ -126,3 +126,40 @@ func TestIsNavAccessibleParentPaymentOCR(t *testing.T) {
 		t.Fatal("teacher should not access /parent-payment-ocr via nav")
 	}
 }
+
+func TestIsNavAccessibleSuperuserAccesses(t *testing.T) {
+	if !IsNavAccessible(auth.RoleSuperuser, "/accesses") {
+		t.Fatal("superuser should access /accesses via nav")
+	}
+	if IsNavAccessible(auth.RoleAdmin, "/accesses") {
+		t.Fatal("admin should not access /accesses via nav")
+	}
+	if IsNavAccessible(auth.RoleTeacher, "/accesses") {
+		t.Fatal("teacher should not access /accesses via nav")
+	}
+}
+
+func TestNavAccessMatrixRows_MatchesIsNavAccessible(t *testing.T) {
+	for _, row := range NavAccessMatrixRows() {
+		if !navAccessMatrixRowMatchesIsNavAccessible(row) {
+			t.Fatalf("matrix row %s out of sync with IsNavAccessible", row.Path)
+		}
+	}
+	spotCheck := map[string]struct {
+		teacher bool
+		admin   bool
+	}{
+		"/hub":      {teacher: true, admin: false},
+		"/settings": {teacher: false, admin: false},
+		"/payroll":  {teacher: false, admin: true},
+	}
+	for _, row := range NavAccessMatrixRows() {
+		want, ok := spotCheck[row.Path]
+		if !ok {
+			continue
+		}
+		if row.Teacher != want.teacher || row.Admin != want.admin {
+			t.Fatalf("matrix spot check failed for %s: teacher=%v admin=%v", row.Path, row.Teacher, row.Admin)
+		}
+	}
+}

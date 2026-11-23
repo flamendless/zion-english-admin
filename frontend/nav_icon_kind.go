@@ -77,6 +77,7 @@ var navIconByPath = map[string]NavIconKind{
 	"/process":               NavIconProcess,
 	"/parent-payment-ocr":    NavIconProcess,
 	"/feature-flags":         NavIconFeatureFlags,
+	"/accesses":              NavIconSettings,
 	"/settings":              NavIconSettings,
 	"/sql-console":           NavIconSQLConsole,
 	"/meta":                  NavIconMeta,

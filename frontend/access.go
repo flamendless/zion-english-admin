@@ -103,6 +103,7 @@ var navItemDefs = []navItemDef{
 	{Path: "/process", LinkID: "processLink", Title: "Process", Description: "Process CSV files and view logs", AdminOnlyCard: true},
 	{Path: "/parent-payment-ocr", LinkID: "parentPaymentOcrLink", Title: "Parent payment OCR", Description: "Test Tesseract scan and parsing on payment screenshots", AdminOnlyCard: true},
 	{Path: "/feature-flags", LinkID: "featureFlagsLink", Title: "Feature Flags", Description: "Toggle integration connection availability", AdminOnlyCard: true},
+	{Path: "/accesses", LinkID: "accessesLink", Title: "Accesses", Description: "Reference matrix for who sees each portal module in nav and dashboard", AdminOnlyCard: true},
 	{Path: "/settings", LinkID: "settingsLink", Title: "Settings", Description: "View runtime configuration and server settings", AdminOnlyCard: true},
 	{Path: "/sql-console", LinkID: "sqlConsoleLink", Title: "SQL Console", Description: "Run read-only SELECT queries with saved queries and history", AdminOnlyCard: true},
 	{Path: "/meta", LinkID: "metaLink", Title: "Meta", Description: "Manage HTML head meta tags for site verification and integrations", AdminOnlyCard: true},
@@ -121,7 +122,7 @@ var navGroupDefs = []navGroupDef{
 	{ID: "people", Label: "People", Description: "Manage teachers and students", AdminOnlyCard: true, Paths: []string{"/teachers", "/students"}},
 	{ID: "resources", Label: "Resources", Description: "Guides, documents, learning materials, and training videos", TeacherDesc: "Guides, your documents, learning materials, and training videos", FeatureCard: true, Paths: []string{"/guides", "/documents", "/intro-videos", "/learning-materials", "/training-materials"}},
 	{ID: "insights", Label: "Insights", Description: "Payroll reports and analytics", AdminOnlyCard: true, Paths: []string{"/reports", "/reports/history", "/analytics", "/my-earnings", "/payments", "/student-relationships", "/affiliate-ads/reports"}},
-	{ID: "admin", Label: "Admin", Description: "Process CSV files, parent payment OCR, feature flags, meta tags, affiliates, ads, plans, settings, SQL console, logs, upload logs, and announcements", AdminOnlyCard: true, Paths: []string{"/process", "/parent-payment-ocr", "/feature-flags", "/meta", "/affiliates", "/ads", "/plans", "/settings", "/sql-console", "/logs", "/upload-logs", "/teachers-earnings", "/announcements", "/payroll"}},
+	{ID: "admin", Label: "Admin", Description: "Process CSV files, parent payment OCR, feature flags, accesses, meta tags, affiliates, ads, plans, settings, SQL console, logs, upload logs, and announcements", AdminOnlyCard: true, Paths: []string{"/process", "/parent-payment-ocr", "/feature-flags", "/accesses", "/meta", "/affiliates", "/ads", "/plans", "/settings", "/sql-console", "/logs", "/upload-logs", "/teachers-earnings", "/payroll", "/announcements"}},
 }
 
 var adminNavLayout = []navLayoutEntry{
@@ -388,7 +389,7 @@ func IsNavAccessible(role auth.Role, path string) bool {
 		if role == auth.RoleSuperuser && path == "/profile" {
 			return false
 		}
-		if path == "/feature-flags" || path == "/settings" || path == "/sql-console" || path == "/affiliates" || path == "/ads" || path == "/plans" || path == "/affiliate-ads/reports" {
+		if path == "/feature-flags" || path == "/accesses" || path == "/settings" || path == "/sql-console" || path == "/affiliates" || path == "/ads" || path == "/plans" || path == "/affiliate-ads/reports" {
 			return role == auth.RoleSuperuser
 		}
 		return true
