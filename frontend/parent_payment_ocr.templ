@@ -1,0 +1,235 @@
+package frontend
+
+import "zion-english/internal/utils"
+
+templ ParentPaymentOCRTool(data ParentPaymentOCRToolData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		@AdminPageHead("Parent payment OCR - Zion English Admin Tool")
+		@ParentPaymentOCRToolStyles()
+		@ParentPaymentOCRToolScript()
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			<div class="page-header">
+				<h1>Parent payment OCR</h1>
+				<p class="page-subtitle">Test Tesseract scan and payment parsing on screenshots. Production verification with expected totals stays in Reports payroll wizard.</p>
+			</div>
+
+			<div class="ppo-callout" role="note">
+				<p>PNG or JPEG, up to 5 MB. Works with mobile banking transaction lists: payer name on one line and a credit amount such as +59,360원 on the next.</p>
+			</div>
+
+			<div class="ppo-status-card">
+				<h2 class="ppo-status-title">Environment</h2>
+				<dl class="ppo-status-dl">
+					<div>
+						<dt>Tesseract</dt>
+						if data.TesseractInstalled {
+							<dd>@StatusPill("Installed", PillToneSuccess, false)</dd>
+						} else {
+							<dd>@StatusPill("Not installed", PillToneError, false)</dd>
+						}
+					</div>
+					<div>
+						<dt>Language packs</dt>
+						<dd><code class="ppo-mono">{ data.TesseractLanguages }</code></dd>
+					</div>
+				</dl>
+			</div>
+
+			<form
+				id="parentPaymentOcrForm"
+				class="ppo-form"
+				hx-post={ utils.URL("/parent-payment-ocr/scan") }
+				hx-encoding="multipart/form-data"
+				hx-target="#parentPaymentOcrResults"
+				hx-swap={ HxSwapInnerHTML }
+			>
+				<div class="upload-zone" id="parentPaymentOcrUploadZone">
+					<label class="upload-zone-label" for="parentPaymentOcrImageInput">
+						<span class="upload-zone-icon" aria-hidden="true">
+							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+						</span>
+						<span class="upload-zone-meta">
+							<span>Choose image</span>
+							<span class="upload-zone-hint">PNG or JPEG</span>
+						</span>
+						<input type="file" id="parentPaymentOcrImageInput" name="image" accept="image/png,image/jpeg,image/jpg" required/>
+					</label>
+					<p class="upload-filename" id="parentPaymentOcrFilename" aria-live="polite"></p>
+				</div>
+				<div class="ppo-form-actions">
+					<button type="submit" class="btn" id="parentPaymentOcrSubmit">Scan image</button>
+				</div>
+			</form>
+
+			<div id="parentPaymentOcrResults" class="ppo-results">
+				<p class="empty-state">Upload an image to see raw OCR text and parsed rows.</p>
+			</div>
+		</div>
+	</body>
+	</html>
+}
+
+templ ParentPaymentOCRToolScanResults(data ParentPaymentOCRToolScanData) {
+	if data.OCRFailed {
+		<div class="form-message form-message--error" role="alert">{ data.ErrorMsg }</div>
+	}
+	if data.RawText != "" {
+		<h2 class="ppo-section-title">Raw OCR text</h2>
+		<pre class="ppo-raw-text">{ data.RawText }</pre>
+	}
+	<h2 class="ppo-section-title">Parsed entries</h2>
+	if len(data.Rows) == 0 {
+		<p class="empty-state">No rows parsed. Try a clearer image or check the layout.</p>
+	} else {
+		<div class="table-wrapper data-list-view-root">
+			<table class="table-stack-mobile ppo-entries-table">
+				<thead>
+					<tr>
+						<th>Legal name</th>
+						<th>Amount</th>
+						<th>Complete</th>
+						<th>Raw line</th>
+					</tr>
+				</thead>
+				<tbody>
+					for _, row := range data.Rows {
+						<tr>
+							<td data-label="Legal name">{ row.LegalName }</td>
+							<td data-label="Amount">{ row.Amount }</td>
+							<td data-label="Complete">{ row.CompleteLabel }</td>
+							<td data-label="Raw line">{ row.RawLine }</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	}
+}
+
+templ ParentPaymentOCRToolStyles() {
+	<style>
+		.ppo-callout {
+			margin-bottom: var(--space-4);
+			padding: var(--space-3) var(--space-4);
+			background: var(--color-info-bg);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-lg);
+			font-size: 0.875rem;
+			line-height: 1.5;
+		}
+
+		.ppo-callout p {
+			margin: 0;
+		}
+
+		.ppo-status-card {
+			margin-bottom: var(--space-5);
+			padding: var(--space-4);
+			background: var(--color-surface);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-lg);
+		}
+
+		.ppo-status-title {
+			margin: 0 0 var(--space-3);
+			font-size: 0.9375rem;
+			font-weight: 600;
+		}
+
+		.ppo-status-dl {
+			margin: 0;
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-3);
+		}
+
+		.ppo-status-dl div {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-2);
+		}
+
+		.ppo-status-dl dt {
+			margin: 0;
+			min-width: 8rem;
+			font-size: 0.8125rem;
+			font-weight: 500;
+			color: var(--color-muted-foreground);
+		}
+
+		.ppo-status-dl dd {
+			margin: 0;
+		}
+
+		.ppo-mono {
+			font-family: ui-monospace, monospace;
+			font-size: 0.8125rem;
+		}
+
+		.ppo-form {
+			margin-bottom: var(--space-5);
+		}
+
+		.ppo-form-actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-2);
+			margin-top: var(--space-4);
+		}
+
+		.ppo-form-actions .btn {
+			margin-top: 0;
+		}
+
+		.ppo-results {
+			margin-top: var(--space-4);
+		}
+
+		.ppo-section-title {
+			margin: var(--space-4) 0 var(--space-3);
+			font-size: 0.9375rem;
+			font-weight: 600;
+		}
+
+		.ppo-raw-text {
+			margin: 0;
+			padding: var(--space-3);
+			max-height: 16rem;
+			overflow: auto;
+			font-family: ui-monospace, monospace;
+			font-size: 0.75rem;
+			line-height: 1.45;
+			white-space: pre-wrap;
+			word-break: break-word;
+			background: var(--color-muted);
+			border: 1px solid var(--color-border);
+			border-radius: var(--radius-md);
+		}
+
+		.ppo-entries-table td:last-child {
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+		}
+	</style>
+}
+
+templ ParentPaymentOCRToolScript() {
+	<script>
+		(function () {
+			const input = document.getElementById('parentPaymentOcrImageInput');
+			const filename = document.getElementById('parentPaymentOcrFilename');
+			if (!input || !filename) return;
+			input.addEventListener('change', function () {
+				const file = input.files && input.files[0];
+				filename.textContent = file ? file.name : '';
+			});
+		})();
+	</script>
+}

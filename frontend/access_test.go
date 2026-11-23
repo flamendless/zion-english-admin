@@ -114,3 +114,15 @@ func TestIsNavAccessibleAdminPayroll(t *testing.T) {
 		t.Fatal("teacher should not access /payroll via nav")
 	}
 }
+
+func TestIsNavAccessibleParentPaymentOCR(t *testing.T) {
+	if !IsNavAccessible(auth.RoleAdmin, "/parent-payment-ocr") {
+		t.Fatal("admin should access /parent-payment-ocr")
+	}
+	if !IsNavAccessible(auth.RoleSuperuser, "/parent-payment-ocr") {
+		t.Fatal("superuser should access /parent-payment-ocr")
+	}
+	if IsNavAccessible(auth.RoleTeacher, "/parent-payment-ocr") {
+		t.Fatal("teacher should not access /parent-payment-ocr via nav")
+	}
+}

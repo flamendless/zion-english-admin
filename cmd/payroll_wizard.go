@@ -67,31 +67,10 @@ func handlePayrollWizardParentPaymentsOCR(w http.ResponseWriter, r *http.Request
 	}
 
 	ctx := r.Context()
-	text, ocrErr := parentpaymentocr.DetectDocumentText(ctx, imageBytes, ext)
-
-	var entries []parentpaymentocr.PaymentOCREntry
-	ocrFailed := false
-	ocrMsg := ""
-	if ocrErr != nil {
-		logs.Log().Error("parent payments OCR", zap.Error(ocrErr))
-		ocrFailed = true
-		ocrMsg = ocrErr.Error()
-		entries = []parentpaymentocr.PaymentOCREntry{{
-			RawLine:    ocrMsg,
-			ScanFailed: true,
-		}}
-	} else {
-		entries = parentpaymentocr.ParsePaymentEntries(text)
-		if len(entries) == 0 {
-			entries = []parentpaymentocr.PaymentOCREntry{{
-				RawLine: strings.TrimSpace(text),
-				HasName: strings.TrimSpace(text) != "",
-			}}
-			if entries[0].HasName {
-				entries[0].LegalName = entries[0].RawLine
-			}
-		}
-	}
+	scan := scanParentPaymentImage(ctx, imageBytes, ext)
+	entries := scan.Entries
+	ocrFailed := scan.OCRFailed
+	ocrMsg := scan.OCRMsg
 
 	expectedByLegal, err := loadExpectedParentPaymentsByLegalName(ctx, startDate, endDate)
 	if err != nil {

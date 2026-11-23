@@ -11,6 +11,21 @@ import (
 
 const defaultTesseractLanguages = "kor+eng"
 
+// TesseractInstalled reports whether the tesseract binary is on PATH.
+func TesseractInstalled() bool {
+	_, err := exec.LookPath("tesseract")
+	return err == nil
+}
+
+// ResolvedTesseractLanguages returns TESSERACT_LANGUAGES or the default kor+eng pack list.
+func ResolvedTesseractLanguages() string {
+	lang := strings.TrimSpace(os.Getenv("TESSERACT_LANGUAGES"))
+	if lang == "" {
+		return defaultTesseractLanguages
+	}
+	return lang
+}
+
 // DetectDocumentText runs Tesseract OCR on image bytes (PNG or JPEG).
 func DetectDocumentText(ctx context.Context, image []byte, fileExt string) (string, error) {
 	if _, err := exec.LookPath("tesseract"); err != nil {
@@ -44,10 +59,7 @@ func DetectDocumentText(ctx context.Context, image []byte, fileExt string) (stri
 		return "", fmt.Errorf("%w: %v", ErrOCRFailed, err)
 	}
 
-	lang := strings.TrimSpace(os.Getenv("TESSERACT_LANGUAGES"))
-	if lang == "" {
-		lang = defaultTesseractLanguages
-	}
+	lang := ResolvedTesseractLanguages()
 
 	// PSM 4: single column — fits stacked mobile banking transaction lists.
 	cmd := exec.CommandContext(ctx, "tesseract", imagePath, "stdout", "-l", lang, "--psm", "4")
