@@ -284,8 +284,8 @@ type TblPayrollSessionTeacherStatusEvent struct {
 	ToStatus           string
 	Reason             sql.NullString
 	ChangedByTeacherID int64
-	ChangedAt          string
 	ChangedByName      string
+	ChangedAt          string
 }
 
 type TblProcessingLog struct {

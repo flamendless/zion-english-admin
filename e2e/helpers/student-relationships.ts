@@ -5,19 +5,25 @@ export async function gotoStudentRelationships(page: Page) {
 	await expect(page.getByRole("heading", { name: "Students Relationship Diagram" })).toBeVisible();
 }
 
-export async function focusStudentOnDiagram(page: Page, studentName: string) {
-	await Promise.all([
-		page.waitForResponse(
-			(r) => r.url().includes("/student-relationships/partials/student-search") && r.ok(),
-			{ timeout: 20_000 },
-		),
-		page.locator("#diagramStudentSearch").fill(studentName),
-	]);
-	await expect(page.locator(".entity-search-item", { hasText: studentName })).toBeVisible({
-		timeout: 15_000,
+export async function waitForRelationshipGraphReady(page: Page) {
+	await expect(page.locator("#student-relationship-graph")).not.toContainText("Loading diagram...", {
+		timeout: 20_000,
 	});
-	await page.locator(".entity-search-item", { hasText: studentName }).click();
-	await expect(page.locator("#diagramStudentFocusValue")).toContainText(studentName);
+}
+
+/** Test-seed students are omitted from diagram search; focus via prev/next over loaded graph nodes. */
+export async function focusStudentOnDiagram(page: Page, studentName: string) {
+	await waitForRelationshipGraphReady(page);
+	const next = page.locator("#diagramStudentNext");
+	const focus = page.locator("#diagramStudentFocusValue");
+	for (let i = 0; i < 40; i++) {
+		const text = (await focus.textContent()) ?? "";
+		if (text.includes(studentName)) {
+			return;
+		}
+		await next.click();
+	}
+	throw new Error(`Could not focus diagram on student ${studentName}`);
 }
 
 export async function expectDiagramLoaded(page: Page) {

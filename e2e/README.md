@@ -38,7 +38,7 @@ The same values are written to `e2e/.auth-credentials.json` for tests.
 | `specs/auth-flows2.spec.ts` | Invalid login, duplicate registration, superuser register, delete/unapprove, password reset |
 | `specs/auth-gaps-flows.spec.ts` | Admin teacher login and students hub |
 | `specs/class-flows.spec.ts` | Record/schedule/repeat/series/conduct/cancel/edit/delete class flows |
-| `specs/class-gaps-flows.spec.ts` | Trial class, LM on conduct, overdue panel, calendar nav |
+| `specs/class-gaps-flows.spec.ts` | Trial class, LM on conduct, overdue panel (test-seed excluded), calendar nav |
 | `specs/feature-flags-flows.spec.ts` | Feature flags no-op save |
 | `specs/guides-smoke.spec.ts` | Guides index and getting started |
 | `specs/insights-gaps-flows.spec.ts` | My earnings, analytics, Pro exports (after `class-flows`) |

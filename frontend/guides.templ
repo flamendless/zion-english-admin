@@ -1996,8 +1996,9 @@ templ GuidePayrollWizard() {
 					"payroll-finish",
 					"Finish payroll",
 					utils.URL("/payroll"),
-					"Finish payroll when every teacher reaches Salary received.",
+					"Finish payroll when every teacher reaches Salary received or is marked Skip.",
 					[]string{
+						"Use Edit payroll status to mark Skip when a teacher should not be included in this session's workflow.",
 						"Use Generate Report on the session page for bulk XLSX export when needed.",
 						"Finished sessions stay in the payroll history table for reference.",
 					},

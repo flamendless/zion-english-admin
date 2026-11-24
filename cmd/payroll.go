@@ -1,11 +1,13 @@
 package cmd
 
 import (
+	"cmp"
 	"context"
 	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"zion-english/frontend"
@@ -440,7 +442,7 @@ func buildPayrollSessionData(ctx context.Context, sessionID int64) (frontend.Pay
 		return frontend.PayrollSessionData{}, err
 	}
 	canFinish := session.Status == string(constants.PayrollSessionStatusActive) && remaining == 0 && len(teacherRows) > 0
-	finishBlocked := "All teachers must confirm salary received before finishing."
+	finishBlocked := "All teachers must confirm salary received or be marked Skip before finishing."
 	if len(teacherRows) == 0 {
 		finishBlocked = "No teachers in this session."
 	}
@@ -464,6 +466,17 @@ func buildPayrollTeacherRows(ctx context.Context, session queries.TblPayrollSess
 	if err != nil {
 		return nil, err
 	}
+	slices.SortFunc(pstRows, func(a, b queries.ListPayrollSessionTeachersRow) int {
+		sa := constants.PayrollTeacherStatus(a.Status)
+		sb := constants.PayrollTeacherStatus(b.Status)
+		if o := cmp.Compare(sa.SortOrder(), sb.SortOrder()); o != 0 {
+			return o
+		}
+		if o := strings.Compare(a.TeacherLastName, b.TeacherLastName); o != 0 {
+			return o
+		}
+		return strings.Compare(a.TeacherFirstName, b.TeacherFirstName)
+	})
 	isActive := session.Status == string(constants.PayrollSessionStatusActive)
 	filters := reportRoleFilters{
 		Teacher: session.RoleTeacher == 1,

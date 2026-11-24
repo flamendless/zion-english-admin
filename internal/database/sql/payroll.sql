@@ -81,7 +81,7 @@ SELECT
 		SELECT COUNT(*)
 		FROM tbl_payroll_session_teachers pst
 		WHERE pst.session_id = s.id
-			AND pst.status = 'salary_received'
+			AND pst.status IN ('salary_received', 'skip')
 	) AS salary_received_count
 FROM tbl_payroll_sessions s
 INNER JOIN tbl_teachers st ON st.id = s.started_by_teacher_id
@@ -179,7 +179,7 @@ WHERE session_id = ?
 SELECT COUNT(*)
 FROM tbl_payroll_session_teachers
 WHERE session_id = ?
-	AND status != 'salary_received';
+	AND status NOT IN ('salary_received', 'skip');
 
 -- name: GetActivePayrollSessionTeacherRow :one
 SELECT

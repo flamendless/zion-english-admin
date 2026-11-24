@@ -46,17 +46,17 @@ test("conduct class with learning material attached", async ({ page }) => {
 	});
 });
 
-test("persistent overdue classes panel on classes page", async ({ page }) => {
-	await Promise.all([
+test("persistent overdue panel skips test-seed overdue classes", async ({ page }) => {
+	const response = await Promise.all([
 		page.waitForResponse(
 			(r) => r.url().includes("/classes/overdue/persistent") && r.ok(),
 		),
 		page.goto("classes"),
 	]);
 	await expect(page.getByRole("heading", { name: "My Classes" })).toBeVisible();
-	await expect(page.locator("#persistentOverdueClassesHost")).toContainText("Overdue classes", {
-		timeout: 20_000,
-	});
+	// Seeded overdue schedule uses a test-seed student; production queries exclude them from this panel.
+	const body = await response[0].text();
+	expect(body.trim()).toBe("");
 });
 
 test("schedule calendar month navigation", async ({ page }) => {

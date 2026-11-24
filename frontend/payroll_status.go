@@ -18,6 +18,8 @@ func PayrollTeacherStatusPillTone(status constants.PayrollTeacherStatus) PillTon
 		return PillToneWarning
 	case constants.PayrollTeacherStatusSalaryReceived:
 		return PillToneSuccess
+	case constants.PayrollTeacherStatusSkip:
+		return PillToneNeutral
 	default:
 		return PillToneNeutral
 	}

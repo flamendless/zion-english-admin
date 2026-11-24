@@ -8,6 +8,7 @@ const (
 	PayrollTeacherStatusAudited             PayrollTeacherStatus = "audited"
 	PayrollTeacherStatusSentSalary          PayrollTeacherStatus = "sent_salary"
 	PayrollTeacherStatusSalaryReceived      PayrollTeacherStatus = "salary_received"
+	PayrollTeacherStatusSkip                PayrollTeacherStatus = "skip"
 )
 
 func (s PayrollTeacherStatus) String() string {
@@ -26,9 +27,25 @@ func (s PayrollTeacherStatus) Step() int {
 		return 4
 	case PayrollTeacherStatusSalaryReceived:
 		return 5
+	case PayrollTeacherStatusSkip:
+		return 0
 	default:
 		return 0
 	}
+}
+
+func (s PayrollTeacherStatus) SortOrder() int {
+	if s == PayrollTeacherStatusSkip {
+		return 100
+	}
+	if n := s.Step(); n > 0 {
+		return n
+	}
+	return 100
+}
+
+func (s PayrollTeacherStatus) CountsTowardSessionComplete() bool {
+	return s == PayrollTeacherStatusSalaryReceived || s == PayrollTeacherStatusSkip
 }
 
 func (s PayrollTeacherStatus) Label() string {
@@ -43,6 +60,8 @@ func (s PayrollTeacherStatus) Label() string {
 		return "Sent salary"
 	case PayrollTeacherStatusSalaryReceived:
 		return "Salary received"
+	case PayrollTeacherStatusSkip:
+		return "Skip"
 	default:
 		return string(s)
 	}
@@ -54,7 +73,8 @@ func ValidPayrollTeacherStatus(status string) bool {
 		PayrollTeacherStatusDoneDailyLogs,
 		PayrollTeacherStatusAudited,
 		PayrollTeacherStatusSentSalary,
-		PayrollTeacherStatusSalaryReceived:
+		PayrollTeacherStatusSalaryReceived,
+		PayrollTeacherStatusSkip:
 		return true
 	default:
 		return false
@@ -67,4 +87,5 @@ var PayrollTeacherStatuses = []PayrollTeacherStatus{
 	PayrollTeacherStatusAudited,
 	PayrollTeacherStatusSentSalary,
 	PayrollTeacherStatusSalaryReceived,
+	PayrollTeacherStatusSkip,
 }
