@@ -2016,6 +2016,72 @@ templ GuidePayrollWizard() {
 	</html>
 }
 
+templ GuideInstallTesseract() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		@AdminPageHead("Install Tesseract - Guides - Zion English Admin Tool")
+		@GuideStyles()
+	</head>
+	<body>
+		<div class="container guides-page">
+			@HeaderSimple()
+			<nav class="guides-breadcrumb" aria-label="Breadcrumb">
+				<a href={ utils.URL("/guides") } class="guides-breadcrumb-link">Guides</a>
+				<span class="guides-breadcrumb-sep" aria-hidden="true">/</span>
+				<span class="guides-breadcrumb-current" aria-current="page">Install Tesseract</span>
+			</nav>
+			<div class="hub-header">
+				<h2 class="hub-title admin-only-label-wrap">
+					Install Tesseract
+					@AdminOnlyIndicator()
+				</h2>
+			</div>
+			<div class="guides-hero">
+				<p class="guides-subtitle">
+					Install Tesseract OCR on the server host so parent payment image scan works in the payroll wizard and on Parent payment OCR.
+				</p>
+			</div>
+			<div class="guide-content">
+				@GuideSection(
+					"tesseract-install",
+					"Install on the server",
+					utils.URL("/parent-payment-ocr"),
+					"The admin app shells out to the tesseract binary. It must be on PATH for the user that runs the app.",
+					[]string{
+						"Ubuntu or Debian: sudo apt install tesseract-ocr tesseract-ocr-kor tesseract-ocr-eng",
+						"macOS (Homebrew): brew install tesseract tesseract-lang",
+						"Verify on the server: tesseract --version",
+						"Default language packs are kor+eng. Set TESSERACT_LANGUAGES in the environment to override (see .env.sample).",
+						"Restart the app after install, then open Parent payment OCR and confirm Environment shows Installed.",
+					},
+					true,
+				)
+				@GuideSection(
+					"tesseract-troubleshoot",
+					"If OCR still fails",
+					utils.URL("/parent-payment-ocr"),
+					"When Tesseract is installed but scans fail or Korean names are garbled:",
+					[]string{
+						"Confirm kor and eng are listed in tesseract --list-langs",
+						"Install the missing language pack package for your OS, then restart the app.",
+						"Use Parent payment OCR to test a sample banking screenshot before running payroll verification.",
+					},
+					true,
+				)
+			</div>
+			<div class="guides-footer-nav">
+				<a href={ utils.URL("/guides") } class="guides-back-link">
+					@GuideBackIcon()
+					All guides
+				</a>
+			</div>
+			@GuideAnchorScript()
+		</div>
+	</body>
+	</html>
+}
+
 templ GuideBookIcon() {
 	<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 		<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>

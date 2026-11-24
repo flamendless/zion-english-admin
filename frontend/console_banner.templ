@@ -1,0 +1,31 @@
+package frontend
+
+templ ScrConsoleBanner() {
+	@templ.JSONScript("zionConsoleBanner", BuildConsoleBannerData())
+	<script>
+		(function () {
+			if (window.__zionConsoleBanner) {
+				return;
+			}
+			var el = document.getElementById("zionConsoleBanner");
+			if (!el || !el.textContent) {
+				return;
+			}
+			var data = JSON.parse(el.textContent);
+			window.__zionConsoleBanner = true;
+
+			var titleStyle =
+				"font-size:14px;font-weight:600;color:#fff;background:#90C020;padding:4px 10px;border-radius:4px 0 0 4px;";
+			var envStyle =
+				"font-size:12px;font-weight:500;color:#fff;background:#64748B;padding:4px 10px;border-radius:0 4px 4px 0;";
+
+			console.log(
+				"%c " + data.appName + " %c " + data.appEnv + " ",
+				titleStyle,
+				envStyle
+			);
+			console.log(data.tagline);
+			console.log("commit: " + data.commit);
+		})();
+	</script>
+}

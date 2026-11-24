@@ -8,6 +8,7 @@ package frontend
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 func ParentPaymentOCRTool(data ParentPaymentOCRToolData) templ.Component {
@@ -73,7 +74,7 @@ func ParentPaymentOCRTool(data ParentPaymentOCRToolData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<dd>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<dd class=\"ppo-tesseract-status\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -81,51 +82,64 @@ func ParentPaymentOCRTool(data ParentPaymentOCRToolData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</dd>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<a href=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var2 templ.SafeURL
+			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/guides/" + string(constants.GuideSlugInstallTesseract)))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 36, Col: 85}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\">How to install or fix</a></dd>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div><div><dt>Language packs</dt><dd><code class=\"ppo-mono\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(data.TesseractLanguages)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 38, Col: 58}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</code></dd></div></dl></div><form id=\"parentPaymentOcrForm\" class=\"ppo-form\" hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div><div><dt>Language packs</dt><dd><code class=\"ppo-mono\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/parent-payment-ocr/scan"))
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.TesseractLanguages)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 46, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 42, Col: 58}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" hx-encoding=\"multipart/form-data\" hx-target=\"#parentPaymentOcrResults\" hx-swap=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</code></dd></div></dl></div><form id=\"parentPaymentOcrForm\" class=\"ppo-form\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/parent-payment-ocr/scan"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 49, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 50, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\"><div class=\"upload-zone\" id=\"parentPaymentOcrUploadZone\"><label class=\"upload-zone-label\" for=\"parentPaymentOcrImageInput\"><span class=\"upload-zone-icon\" aria-hidden=\"true\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\"></rect><circle cx=\"8.5\" cy=\"8.5\" r=\"1.5\"></circle><polyline points=\"21 15 16 10 5 21\"></polyline></svg></span> <span class=\"upload-zone-meta\"><span>Choose image</span> <span class=\"upload-zone-hint\">PNG or JPEG</span></span> <input type=\"file\" id=\"parentPaymentOcrImageInput\" name=\"image\" accept=\"image/png,image/jpeg,image/jpg\" required></label><p class=\"upload-filename\" id=\"parentPaymentOcrFilename\" aria-live=\"polite\"></p></div><div class=\"ppo-form-actions\"><button type=\"submit\" class=\"btn\" id=\"parentPaymentOcrSubmit\">Scan image</button></div></form><div id=\"parentPaymentOcrResults\" class=\"ppo-results\"><p class=\"empty-state\">Upload an image to see raw OCR text and parsed rows.</p></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" hx-encoding=\"multipart/form-data\" hx-target=\"#parentPaymentOcrResults\" hx-swap=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var5 string
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(HxSwapInnerHTML)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 53, Col: 29}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\"><div class=\"upload-zone\" id=\"parentPaymentOcrUploadZone\"><label class=\"upload-zone-label\" for=\"parentPaymentOcrImageInput\"><span class=\"upload-zone-icon\" aria-hidden=\"true\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\"></rect><circle cx=\"8.5\" cy=\"8.5\" r=\"1.5\"></circle><polyline points=\"21 15 16 10 5 21\"></polyline></svg></span> <span class=\"upload-zone-meta\"><span>Choose image</span> <span class=\"upload-zone-hint\">PNG or JPEG</span></span> <input type=\"file\" id=\"parentPaymentOcrImageInput\" name=\"image\" accept=\"image/png,image/jpeg,image/jpg\" required></label><p class=\"upload-filename\" id=\"parentPaymentOcrFilename\" aria-live=\"polite\"></p></div><div class=\"ppo-form-actions\"><button type=\"submit\" class=\"btn\" id=\"parentPaymentOcrSubmit\">Scan image</button></div></form><div id=\"parentPaymentOcrResults\" class=\"ppo-results\"><p class=\"empty-state\">Upload an image to see raw OCR text and parsed rows.</p></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -149,122 +163,122 @@ func ParentPaymentOCRToolScanResults(data ParentPaymentOCRToolScanData) templ.Co
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var5 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var5 == nil {
-			templ_7745c5c3_Var5 = templ.NopComponent
+		templ_7745c5c3_Var6 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var6 == nil {
+			templ_7745c5c3_Var6 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		if data.OCRFailed {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"form-message form-message--error\" role=\"alert\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var6 string
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(data.ErrorMsg)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 79, Col: 76}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		if data.RawText != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<h2 class=\"ppo-section-title\">Raw OCR text</h2><pre class=\"ppo-raw-text\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"form-message form-message--error\" role=\"alert\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
-			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(data.RawText)
+			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(data.ErrorMsg)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 83, Col: 42}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 83, Col: 76}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</pre>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<h2 class=\"ppo-section-title\">Parsed entries</h2>")
+		if data.RawText != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<h2 class=\"ppo-section-title\">Raw OCR text</h2><pre class=\"ppo-raw-text\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var8 string
+			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(data.RawText)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 87, Col: 42}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</pre>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<h2 class=\"ppo-section-title\">Parsed entries</h2>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(data.Rows) == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<p class=\"empty-state\">No rows parsed. Try a clearer image or check the layout.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<p class=\"empty-state\">No rows parsed. Try a clearer image or check the layout.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<div class=\"table-wrapper data-list-view-root\"><table class=\"table-stack-mobile ppo-entries-table\"><thead><tr><th>Legal name</th><th>Amount</th><th>Complete</th><th>Raw line</th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<div class=\"table-wrapper data-list-view-root\"><table class=\"table-stack-mobile ppo-entries-table\"><thead><tr><th>Legal name</th><th>Amount</th><th>Complete</th><th>Raw line</th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, row := range data.Rows {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<tr><td data-label=\"Legal name\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var8 string
-				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(row.LegalName)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 102, Col: 50}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</td><td data-label=\"Amount\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<tr><td data-label=\"Legal name\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var9 string
-				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(row.Amount)
+				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(row.LegalName)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 103, Col: 43}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 106, Col: 50}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</td><td data-label=\"Complete\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</td><td data-label=\"Amount\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var10 string
-				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(row.CompleteLabel)
+				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(row.Amount)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 104, Col: 52}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 107, Col: 43}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</td><td data-label=\"Raw line\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</td><td data-label=\"Complete\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var11 string
-				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(row.RawLine)
+				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(row.CompleteLabel)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 105, Col: 46}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 108, Col: 52}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</td><td data-label=\"Raw line\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var12 string
+				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(row.RawLine)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/parent_payment_ocr.templ`, Line: 109, Col: 46}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</tbody></table></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</tbody></table></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -289,12 +303,12 @@ func ParentPaymentOCRToolStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var12 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var12 == nil {
-			templ_7745c5c3_Var12 = templ.NopComponent
+		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var13 == nil {
+			templ_7745c5c3_Var13 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<style>\n\t\t.ppo-callout {\n\t\t\tmargin-bottom: var(--space-4);\n\t\t\tpadding: var(--space-3) var(--space-4);\n\t\t\tbackground: var(--color-info-bg);\n\t\t\tborder: 1px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-lg);\n\t\t\tfont-size: 0.875rem;\n\t\t\tline-height: 1.5;\n\t\t}\n\n\t\t.ppo-callout p {\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.ppo-status-card {\n\t\t\tmargin-bottom: var(--space-5);\n\t\t\tpadding: var(--space-4);\n\t\t\tbackground: var(--color-surface);\n\t\t\tborder: 1px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-lg);\n\t\t}\n\n\t\t.ppo-status-title {\n\t\t\tmargin: 0 0 var(--space-3);\n\t\t\tfont-size: 0.9375rem;\n\t\t\tfont-weight: 600;\n\t\t}\n\n\t\t.ppo-status-dl {\n\t\t\tmargin: 0;\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tgap: var(--space-3);\n\t\t}\n\n\t\t.ppo-status-dl div {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t}\n\n\t\t.ppo-status-dl dt {\n\t\t\tmargin: 0;\n\t\t\tmin-width: 8rem;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tfont-weight: 500;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.ppo-status-dl dd {\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.ppo-mono {\n\t\t\tfont-family: ui-monospace, monospace;\n\t\t\tfont-size: 0.8125rem;\n\t\t}\n\n\t\t.ppo-form {\n\t\t\tmargin-bottom: var(--space-5);\n\t\t}\n\n\t\t.ppo-form-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tmargin-top: var(--space-4);\n\t\t}\n\n\t\t.ppo-form-actions .btn {\n\t\t\tmargin-top: 0;\n\t\t}\n\n\t\t.ppo-results {\n\t\t\tmargin-top: var(--space-4);\n\t\t}\n\n\t\t.ppo-section-title {\n\t\t\tmargin: var(--space-4) 0 var(--space-3);\n\t\t\tfont-size: 0.9375rem;\n\t\t\tfont-weight: 600;\n\t\t}\n\n\t\t.ppo-raw-text {\n\t\t\tmargin: 0;\n\t\t\tpadding: var(--space-3);\n\t\t\tmax-height: 16rem;\n\t\t\toverflow: auto;\n\t\t\tfont-family: ui-monospace, monospace;\n\t\t\tfont-size: 0.75rem;\n\t\t\tline-height: 1.45;\n\t\t\twhite-space: pre-wrap;\n\t\t\tword-break: break-word;\n\t\t\tbackground: var(--color-muted);\n\t\t\tborder: 1px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-md);\n\t\t}\n\n\t\t.ppo-entries-table td:last-child {\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<style>\n\t\t.ppo-callout {\n\t\t\tmargin-bottom: var(--space-4);\n\t\t\tpadding: var(--space-3) var(--space-4);\n\t\t\tbackground: var(--color-info-bg);\n\t\t\tborder: 1px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-lg);\n\t\t\tfont-size: 0.875rem;\n\t\t\tline-height: 1.5;\n\t\t}\n\n\t\t.ppo-callout p {\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.ppo-status-card {\n\t\t\tmargin-bottom: var(--space-5);\n\t\t\tpadding: var(--space-4);\n\t\t\tbackground: var(--color-surface);\n\t\t\tborder: 1px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-lg);\n\t\t}\n\n\t\t.ppo-status-title {\n\t\t\tmargin: 0 0 var(--space-3);\n\t\t\tfont-size: 0.9375rem;\n\t\t\tfont-weight: 600;\n\t\t}\n\n\t\t.ppo-status-dl {\n\t\t\tmargin: 0;\n\t\t\tdisplay: flex;\n\t\t\tflex-direction: column;\n\t\t\tgap: var(--space-3);\n\t\t}\n\n\t\t.ppo-status-dl div {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t}\n\n\t\t.ppo-status-dl dt {\n\t\t\tmargin: 0;\n\t\t\tmin-width: 8rem;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tfont-weight: 500;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.ppo-status-dl dd {\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.ppo-tesseract-status {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t}\n\n\t\t.ppo-tesseract-status a {\n\t\t\tfont-size: 0.8125rem;\n\t\t\tfont-weight: 500;\n\t\t}\n\n\t\t.ppo-mono {\n\t\t\tfont-family: ui-monospace, monospace;\n\t\t\tfont-size: 0.8125rem;\n\t\t}\n\n\t\t.ppo-form {\n\t\t\tmargin-bottom: var(--space-5);\n\t\t}\n\n\t\t.ppo-form-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tmargin-top: var(--space-4);\n\t\t}\n\n\t\t.ppo-form-actions .btn {\n\t\t\tmargin-top: 0;\n\t\t}\n\n\t\t.ppo-results {\n\t\t\tmargin-top: var(--space-4);\n\t\t}\n\n\t\t.ppo-section-title {\n\t\t\tmargin: var(--space-4) 0 var(--space-3);\n\t\t\tfont-size: 0.9375rem;\n\t\t\tfont-weight: 600;\n\t\t}\n\n\t\t.ppo-raw-text {\n\t\t\tmargin: 0;\n\t\t\tpadding: var(--space-3);\n\t\t\tmax-height: 16rem;\n\t\t\toverflow: auto;\n\t\t\tfont-family: ui-monospace, monospace;\n\t\t\tfont-size: 0.75rem;\n\t\t\tline-height: 1.45;\n\t\t\twhite-space: pre-wrap;\n\t\t\tword-break: break-word;\n\t\t\tbackground: var(--color-muted);\n\t\t\tborder: 1px solid var(--color-border);\n\t\t\tborder-radius: var(--radius-md);\n\t\t}\n\n\t\t.ppo-entries-table td:last-child {\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -318,12 +332,12 @@ func ParentPaymentOCRToolScript() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var13 == nil {
-			templ_7745c5c3_Var13 = templ.NopComponent
+		templ_7745c5c3_Var14 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var14 == nil {
+			templ_7745c5c3_Var14 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<script>\n\t\t(function () {\n\t\t\tconst input = document.getElementById('parentPaymentOcrImageInput');\n\t\t\tconst filename = document.getElementById('parentPaymentOcrFilename');\n\t\t\tif (!input || !filename) return;\n\t\t\tinput.addEventListener('change', function () {\n\t\t\t\tconst file = input.files && input.files[0];\n\t\t\t\tfilename.textContent = file ? file.name : '';\n\t\t\t});\n\t\t})();\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<script>\n\t\t(function () {\n\t\t\tconst input = document.getElementById('parentPaymentOcrImageInput');\n\t\t\tconst filename = document.getElementById('parentPaymentOcrFilename');\n\t\t\tif (!input || !filename) return;\n\t\t\tinput.addEventListener('change', function () {\n\t\t\t\tconst file = input.files && input.files[0];\n\t\t\t\tfilename.textContent = file ? file.name : '';\n\t\t\t});\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

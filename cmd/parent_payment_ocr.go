@@ -57,7 +57,7 @@ func handleParentPaymentOCRTool(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := frontend.ParentPaymentOCRToolData{
-		TesseractInstalled:  parentpaymentocr.TesseractInstalled(),
+		TesseractInstalled: parentpaymentocr.TesseractInstalled(),
 		TesseractLanguages: parentpaymentocr.ResolvedTesseractLanguages(),
 	}
 	if err := frontend.ParentPaymentOCRTool(data).Render(r.Context(), w); err != nil {

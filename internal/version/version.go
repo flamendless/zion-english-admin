@@ -2,12 +2,18 @@ package version
 
 import (
 	"fmt"
+	"os/exec"
 	"runtime/debug"
+	"strings"
+	"sync"
 )
 
 var (
 	Commit = "unknown"
 	Tag    = ""
+
+	cachedCommit     string
+	cachedCommitOnce sync.Once
 )
 
 const GitHubRepo = "https://github.com/flamendless/zion-english-admin"
@@ -39,12 +45,43 @@ func resolveCommit() string {
 	if Commit != "" && Commit != "unknown" {
 		return Commit
 	}
-	if info, ok := debug.ReadBuildInfo(); ok {
-		for _, setting := range info.Settings {
-			if setting.Key == "vcs.revision" && setting.Value != "" {
-				return setting.Value
-			}
-		}
+	cachedCommitOnce.Do(func() {
+		cachedCommit = resolveCommitFromBuildInfoOrGit()
+	})
+	if cachedCommit != "" {
+		return cachedCommit
 	}
 	return "unknown"
+}
+
+func resolveCommitFromBuildInfoOrGit() string {
+	if rev := vcsRevisionFromBuildInfo(); rev != "" {
+		return rev
+	}
+	return gitHeadSHA()
+}
+
+func vcsRevisionFromBuildInfo() string {
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		return ""
+	}
+	for _, setting := range info.Settings {
+		if setting.Key == "vcs.revision" && setting.Value != "" {
+			return setting.Value
+		}
+	}
+	return ""
+}
+
+func gitHeadSHA() string {
+	out, err := exec.Command("git", "rev-parse", "HEAD").Output()
+	if err != nil {
+		return ""
+	}
+	sha := strings.TrimSpace(string(out))
+	if len(sha) < 7 {
+		return ""
+	}
+	return sha
 }

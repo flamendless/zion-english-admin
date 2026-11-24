@@ -1,5 +1,6 @@
 package frontend
 
+import "zion-english/internal/constants"
 import "zion-english/internal/utils"
 
 templ ParentPaymentOCRTool(data ParentPaymentOCRToolData) {
@@ -30,7 +31,10 @@ templ ParentPaymentOCRTool(data ParentPaymentOCRToolData) {
 						if data.TesseractInstalled {
 							<dd>@StatusPill("Installed", PillToneSuccess, false)</dd>
 						} else {
-							<dd>@StatusPill("Not installed", PillToneError, false)</dd>
+							<dd class="ppo-tesseract-status">
+								@StatusPill("Not installed", PillToneError, false)
+								<a href={ utils.URL("/guides/" + string(constants.GuideSlugInstallTesseract)) }>How to install or fix</a>
+							</dd>
 						}
 					</div>
 					<div>
@@ -165,6 +169,18 @@ templ ParentPaymentOCRToolStyles() {
 
 		.ppo-status-dl dd {
 			margin: 0;
+		}
+
+		.ppo-tesseract-status {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-2);
+		}
+
+		.ppo-tesseract-status a {
+			font-size: 0.8125rem;
+			font-weight: 500;
 		}
 
 		.ppo-mono {

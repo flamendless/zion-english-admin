@@ -97,6 +97,10 @@ func Home(data DashboardData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = ScrConsoleBanner().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n\t\t\t.stat-link-rows {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\tgap: var(--space-2);\n\t\t\t}\n\n\t\t\t.stat-link-row {\n\t\t\t\tdisplay: flex;\n\t\t\t\talign-items: baseline;\n\t\t\t\tjustify-content: space-between;\n\t\t\t\tgap: var(--space-3);\n\t\t\t\ttext-decoration: none;\n\t\t\t\tcolor: inherit;\n\t\t\t\tpadding: var(--space-1) 0;\n\t\t\t}\n\n\t\t\t.stat-link-row:hover .stat-link-row-value {\n\t\t\t\tcolor: var(--color-primary);\n\t\t\t}\n\n\t\t\t.stat-link-row-label {\n\t\t\t\tfont-size: 0.8rem;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t}\n\n\t\t\t.stat-link-row-value {\n\t\t\t\tfont-size: 1.1rem;\n\t\t\t\tfont-weight: 600;\n\t\t\t\tfont-variant-numeric: tabular-nums;\n\t\t\t\tline-height: 1.2;\n\t\t\t}\n\n\t\t\t.stat-value-signifier {\n\t\t\t\talign-self: stretch;\n\t\t\t\tborder-bottom: 1px dotted var(--color-primary);\n\t\t\t}\n\n\t\t\t.stat-link-row-value-wrap {\n\t\t\t\tdisplay: inline-flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\talign-items: flex-end;\n\t\t\t\twidth: fit-content;\n\t\t\t\tgap: var(--space-1);\n\t\t\t}\n\n\t\t\t.stat-section {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-direction: column;\n\t\t\t\tgap: var(--space-1);\n\t\t\t}\n\n\t\t\t.stat-section + .stat-section {\n\t\t\t\tmargin-top: var(--space-2);\n\t\t\t\tpadding-top: var(--space-2);\n\t\t\t\tborder-top: 1px solid var(--color-border-subtle);\n\t\t\t}\n\n\t\t\t.stat-section-title {\n\t\t\t\tfont-size: 0.75rem;\n\t\t\t\tfont-weight: 600;\n\t\t\t\tcolor: var(--color-muted-foreground);\n\t\t\t\ttext-transform: uppercase;\n\t\t\t\tletter-spacing: 0.03em;\n\t\t\t}\n\n\t\t\t.dashboard-setup-section {\n\t\t\t\tmargin-bottom: var(--space-6);\n\t\t\t}\n\t\t</style></head><body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -112,7 +116,7 @@ func Home(data DashboardData) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.ResolveAttributeValue(utils.URL("/static/logo.png"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 143, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 144, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2)
 		if templ_7745c5c3_Err != nil {
@@ -296,7 +300,7 @@ func DashboardStatLinkRow(label string, href string, count int64, tooltip string
 			var templ_7745c5c3_Var4 templ.SafeURL
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs(href)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 211, Col: 16}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 212, Col: 16}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -309,7 +313,7 @@ func DashboardStatLinkRow(label string, href string, count int64, tooltip string
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.ResolveAttributeValue(tooltip)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 211, Col: 63}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 212, Col: 63}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
 			if templ_7745c5c3_Err != nil {
@@ -322,7 +326,7 @@ func DashboardStatLinkRow(label string, href string, count int64, tooltip string
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 212, Col: 44}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 213, Col: 44}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -335,7 +339,7 @@ func DashboardStatLinkRow(label string, href string, count int64, tooltip string
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", count))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 214, Col: 64}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 215, Col: 64}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -353,7 +357,7 @@ func DashboardStatLinkRow(label string, href string, count int64, tooltip string
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 220, Col: 44}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 221, Col: 44}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -366,7 +370,7 @@ func DashboardStatLinkRow(label string, href string, count int64, tooltip string
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", count))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 221, Col: 63}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 222, Col: 63}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
@@ -419,7 +423,7 @@ func DashboardSectionedCurrencyStatCard(label string, adminOnly bool, sections [
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 231, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 232, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
@@ -449,7 +453,7 @@ func DashboardSectionedCurrencyStatCard(label string, adminOnly bool, sections [
 					var templ_7745c5c3_Var12 string
 					templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(section.Title)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 239, Col: 54}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 240, Col: 54}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 					if templ_7745c5c3_Err != nil {
@@ -473,7 +477,7 @@ func DashboardSectionedCurrencyStatCard(label string, adminOnly bool, sections [
 				var templ_7745c5c3_Var13 string
 				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(utils.FormatCurrency(total.Total, total.Currency))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 244, Col: 89}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 245, Col: 89}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
@@ -782,7 +786,7 @@ func DashboardStats(data DashboardData) templ.Component {
 			var templ_7745c5c3_Var18 string
 			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.TotalStudentsAll))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 367, Col: 71}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 368, Col: 71}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 			if templ_7745c5c3_Err != nil {
@@ -795,7 +799,7 @@ func DashboardStats(data DashboardData) templ.Component {
 			var templ_7745c5c3_Var19 string
 			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(dashboardStudentsOverviewSub(data.ActiveStudents, data.InactiveStudents, data.TestSeedStudents, data.DeletedStudents))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 368, Col: 146}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 369, Col: 146}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 			if templ_7745c5c3_Err != nil {
@@ -848,7 +852,7 @@ func DashboardStats(data DashboardData) templ.Component {
 			var templ_7745c5c3_Var20 templ.SafeURL
 			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinURLErrs(utils.URL("/my-students"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 389, Col: 38}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 390, Col: 38}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {
@@ -861,7 +865,7 @@ func DashboardStats(data DashboardData) templ.Component {
 			var templ_7745c5c3_Var21 string
 			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.MyStudentCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 391, Col: 69}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 392, Col: 69}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 			if templ_7745c5c3_Err != nil {
@@ -880,7 +884,7 @@ func DashboardStats(data DashboardData) templ.Component {
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", data.ScheduledToday))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 397, Col: 69}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 398, Col: 69}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
@@ -913,7 +917,7 @@ func DashboardStats(data DashboardData) templ.Component {
 		var templ_7745c5c3_Var23 string
 		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d total", data.ClassesConductedWeek+data.ClassesCancelledWeek+data.ClassesRescheduledWeek))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 406, Col: 138}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 407, Col: 138}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 		if templ_7745c5c3_Err != nil {
@@ -926,7 +930,7 @@ func DashboardStats(data DashboardData) templ.Component {
 		var templ_7745c5c3_Var24 string
 		templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d conducted, %d cancelled, %d rescheduled", data.ClassesConductedWeek, data.ClassesCancelledWeek, data.ClassesRescheduledWeek))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 407, Col: 168}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/home.templ`, Line: 408, Col: 168}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 		if templ_7745c5c3_Err != nil {

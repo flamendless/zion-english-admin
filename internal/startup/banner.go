@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"zion-english/internal/conf"
+	"zion-english/internal/constants"
 	"zion-english/internal/version"
 )
 
@@ -30,7 +31,7 @@ func startupBannerLines(opts Options) []string {
 	innerWidth := bannerInnerWidth(opts)
 	lines := []string{
 		"",
-		centerBannerLine(ansiBold+appName+ansiReset, innerWidth),
+		centerBannerLine(ansiBold+constants.AppName+ansiReset, innerWidth),
 		centerBannerLine(ansiDim+envLabel(opts.Cfg.AppEnv)+ansiReset, innerWidth),
 		"",
 		bannerHeading("Configuration"),
@@ -49,7 +50,7 @@ func startupBannerLines(opts Options) []string {
 }
 
 func bannerInnerWidth(opts Options) int {
-	width := visibleLen(appName)
+	width := visibleLen(constants.AppName)
 	for _, line := range startupConfigLines(opts) {
 		width = max(width, visibleLen(bannerListPrefix+line))
 	}

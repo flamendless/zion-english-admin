@@ -10,8 +10,6 @@ import (
 	"go.uber.org/zap"
 )
 
-const appName = "Zion English Admin"
-
 const dbPath = "data/zion.db"
 
 type IntegrationStatus struct {

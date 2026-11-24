@@ -130,6 +130,8 @@ func handleGuidesPath(w http.ResponseWriter, r *http.Request) {
 		handleGuideAffiliates(w, r)
 	case constants.GuideSlugSQLConsole:
 		handleGuideSQLConsole(w, r)
+	case constants.GuideSlugInstallTesseract:
+		handleGuideInstallTesseract(w, r)
 	default:
 		HttpError(w, MsgNotFound, http.StatusNotFound)
 	}
@@ -212,6 +214,16 @@ func handleGuidePayrollWizard(w http.ResponseWriter, r *http.Request) {
 
 	if err := frontend.GuidePayrollWizard().Render(r.Context(), w); err != nil {
 		logs.Log().Error("failed to render payroll wizard guide", zap.Error(err))
+	}
+}
+
+func handleGuideInstallTesseract(w http.ResponseWriter, r *http.Request) {
+	if !requireMethod(w, r, http.MethodGet) {
+		return
+	}
+
+	if err := frontend.GuideInstallTesseract().Render(r.Context(), w); err != nil {
+		logs.Log().Error("failed to render install tesseract guide", zap.Error(err))
 	}
 }
 

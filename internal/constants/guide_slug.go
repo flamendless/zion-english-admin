@@ -15,4 +15,5 @@ const (
 	GuideSlugAffiliates            GuideSlug = "affiliates"
 	GuideSlugSQLConsole            GuideSlug = "sql-console"
 	GuideSlugFAQ                   GuideSlug = "faq"
+	GuideSlugInstallTesseract      GuideSlug = "install-tesseract"
 )
