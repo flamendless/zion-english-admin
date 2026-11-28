@@ -17,6 +17,7 @@ const (
 type ParentPaymentVerificationRow struct {
 	LegalName      string
 	ParsedAmount   string
+	OtherDetails   string
 	StudentLabel   string
 	ExpectedAmount string
 	Status         ParentPaymentVerificationStatus

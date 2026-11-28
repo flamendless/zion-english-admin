@@ -100,6 +100,14 @@ templ PayrollTeacherTableRow(row PayrollTeacherRow, startDate string, endDate st
 						</button>
 					</span>
 				}
+				if row.CanNudge {
+					@IconActionButton("Nudge", IconKindPoke, templ.Attributes{
+						"hx-post":   utils.URL("/payroll/sessions/" + row.SessionID + "/teachers/" + row.TeacherID + "/nudge"),
+						"hx-vals":   fmt.Sprintf(`{"startDate":"%s","endDate":"%s"}`, startDate, endDate),
+						"hx-target": "closest tr",
+						"hx-swap":   "outerHTML",
+					})
+				}
 			</div>
 		</td>
 	</tr>

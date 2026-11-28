@@ -18,6 +18,7 @@ SET
 WHERE id = ?
 	AND teacher_id = ?
 	AND status = 'pending'
+	AND receipt_nudge = 0
 `
 
 type DeferTeacherPaymentReceiptParams struct {
@@ -65,12 +66,14 @@ SELECT
 	p.period_start,
 	p.period_end,
 	p.sent_at,
-	p.dismissed_access_id
+	p.dismissed_access_id,
+	p.receipt_nudge
 FROM tbl_teacher_payments p
 WHERE p.teacher_id = ?
 	AND p.status = 'pending'
 	AND (
-		p.dismissed_access_id IS NULL
+		p.receipt_nudge = 1
+		OR p.dismissed_access_id IS NULL
 		OR (
 			? > 0
 			AND p.dismissed_access_id != ?
@@ -97,6 +100,7 @@ type GetPendingPaymentForTeacherReceiptRow struct {
 	PeriodEnd         string
 	SentAt            string
 	DismissedAccessID sql.NullInt64
+	ReceiptNudge      int64
 }
 
 func (q *Queries) GetPendingPaymentForTeacherReceipt(ctx context.Context, arg GetPendingPaymentForTeacherReceiptParams) (GetPendingPaymentForTeacherReceiptRow, error) {
@@ -113,6 +117,7 @@ func (q *Queries) GetPendingPaymentForTeacherReceipt(ctx context.Context, arg Ge
 		&i.PeriodEnd,
 		&i.SentAt,
 		&i.DismissedAccessID,
+		&i.ReceiptNudge,
 	)
 	return i, err
 }
@@ -131,6 +136,7 @@ SELECT
 	period_end,
 	status,
 	dismissed_access_id,
+	receipt_nudge,
 	sent_at,
 	received_at
 FROM tbl_teacher_payments
@@ -151,6 +157,7 @@ type GetTeacherPaymentByIDRow struct {
 	PeriodEnd         string
 	Status            string
 	DismissedAccessID sql.NullInt64
+	ReceiptNudge      int64
 	SentAt            string
 	ReceivedAt        sql.NullString
 }
@@ -171,6 +178,7 @@ func (q *Queries) GetTeacherPaymentByID(ctx context.Context, id int64) (GetTeach
 		&i.PeriodEnd,
 		&i.Status,
 		&i.DismissedAccessID,
+		&i.ReceiptNudge,
 		&i.SentAt,
 		&i.ReceivedAt,
 	)
@@ -412,6 +420,7 @@ const markTeacherPaymentReceived = `-- name: MarkTeacherPaymentReceived :exec
 UPDATE tbl_teacher_payments
 SET
 	status = 'received',
+	receipt_nudge = 0,
 	received_at = datetime('now'),
 	updated_at = datetime('now')
 WHERE id = ?
@@ -426,6 +435,27 @@ type MarkTeacherPaymentReceivedParams struct {
 
 func (q *Queries) MarkTeacherPaymentReceived(ctx context.Context, arg MarkTeacherPaymentReceivedParams) error {
 	_, err := q.db.ExecContext(ctx, markTeacherPaymentReceived, arg.ID, arg.TeacherID)
+	return err
+}
+
+const nudgeTeacherPaymentReceipt = `-- name: NudgeTeacherPaymentReceipt :exec
+UPDATE tbl_teacher_payments
+SET
+	receipt_nudge = 1,
+	dismissed_access_id = NULL,
+	updated_at = datetime('now')
+WHERE id = ?
+	AND teacher_id = ?
+	AND status = 'pending'
+`
+
+type NudgeTeacherPaymentReceiptParams struct {
+	ID        int64
+	TeacherID int64
+}
+
+func (q *Queries) NudgeTeacherPaymentReceipt(ctx context.Context, arg NudgeTeacherPaymentReceiptParams) error {
+	_, err := q.db.ExecContext(ctx, nudgeTeacherPaymentReceipt, arg.ID, arg.TeacherID)
 	return err
 }
 

@@ -224,6 +224,7 @@ func buildParentPaymentVerificationRows(
 		row := frontend.ParentPaymentVerificationRow{
 			ExpectedAmount: constants.DisplayNotSet,
 			StudentLabel:   constants.DisplayNotSet,
+			OtherDetails:   displayOCROtherDetails(entry.OtherDetails),
 		}
 
 		if entry.ScanFailed {

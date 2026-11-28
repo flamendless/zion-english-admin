@@ -6,4 +6,5 @@ const (
 	StatusEventConfirmAudit     = "Confirm audit"
 	StatusEventSendSalary       = "Send salary"
 	StatusEventSalaryReceived   = "Confirm salary received"
+	StatusEventNudge            = "Nudge"
 )

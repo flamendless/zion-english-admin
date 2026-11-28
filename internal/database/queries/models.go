@@ -523,6 +523,7 @@ type TblTeacherPayment struct {
 	ReceivedAt        sql.NullString
 	CreatedAt         string
 	UpdatedAt         string
+	ReceiptNudge      int64
 }
 
 type TblTeacherPlanTransaction struct {

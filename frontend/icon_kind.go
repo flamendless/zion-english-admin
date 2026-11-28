@@ -25,6 +25,7 @@ const (
 	IconKindPayment     IconKind = "payment"
 	IconKindCopy        IconKind = "copy"
 	IconKindHub         IconKind = "hub"
+	IconKindPoke        IconKind = "poke"
 )
 
 func iconActionClass(kind IconKind) string {

@@ -397,7 +397,18 @@ func PayrollTeacherTableRow(row PayrollTeacherRow, startDate string, endDate str
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</button></span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</button></span> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		if row.CanNudge {
+			templ_7745c5c3_Err = IconActionButton("Nudge", IconKindPoke, templ.Attributes{
+				"hx-post":   utils.URL("/payroll/sessions/" + row.SessionID + "/teachers/" + row.TeacherID + "/nudge"),
+				"hx-vals":   fmt.Sprintf(`{"startDate":"%s","endDate":"%s"}`, startDate, endDate),
+				"hx-target": "closest tr",
+				"hx-swap":   "outerHTML",
+			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

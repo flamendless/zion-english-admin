@@ -211,3 +211,43 @@ func OnPaymentReceived(ctx context.Context, q *queries.Queries, paymentID, chang
 	}
 	return RecordTeacherStatusEvent(ctx, q, row.SessionID, row.TeacherID, changedByTeacherID, changedByName, prevStatus, constants.PayrollTeacherStatusSalaryReceived, StatusEventSalaryReceived)
 }
+
+func NudgeSalaryReceipt(ctx context.Context, q *queries.Queries, sessionID, teacherID, changedByTeacherID int64, changedByName string) error {
+	if err := requireActiveSessionTeacher(ctx, q, sessionID, teacherID); err != nil {
+		return err
+	}
+	row, err := q.GetPayrollSessionTeacher(ctx, queries.GetPayrollSessionTeacherParams{
+		SessionID: sessionID,
+		TeacherID: teacherID,
+	})
+	if err != nil {
+		return err
+	}
+	if row.Status != string(constants.PayrollTeacherStatusSentSalary) {
+		return ErrInvalidStatusTransition
+	}
+	if !row.PaymentID.Valid || row.PaymentID.Int64 <= 0 {
+		return ErrInvalidStatusTransition
+	}
+	payment, err := q.GetTeacherPaymentByID(ctx, row.PaymentID.Int64)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrInvalidStatusTransition
+		}
+		return err
+	}
+	if payment.Status != string(constants.PaymentStatusPending) {
+		return ErrInvalidStatusTransition
+	}
+	if payment.TeacherID != teacherID {
+		return ErrInvalidStatusTransition
+	}
+	if err := q.NudgeTeacherPaymentReceipt(ctx, queries.NudgeTeacherPaymentReceiptParams{
+		ID:        row.PaymentID.Int64,
+		TeacherID: teacherID,
+	}); err != nil {
+		return err
+	}
+	sentSalary := string(constants.PayrollTeacherStatusSentSalary)
+	return RecordTeacherStatusEvent(ctx, q, sessionID, teacherID, changedByTeacherID, changedByName, sentSalary, constants.PayrollTeacherStatusSentSalary, StatusEventNudge)
+}

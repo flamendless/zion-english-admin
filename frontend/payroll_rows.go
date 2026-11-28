@@ -62,6 +62,7 @@ type PayrollTeacherRow struct {
 	CanGenerate        bool
 	CanAudit           bool
 	CanSendSalary      bool
+	CanNudge           bool
 	DownloadReady      bool
 	DownloadURL        string
 	GenerateLabel      string
@@ -80,6 +81,7 @@ func (r *PayrollTeacherRow) ApplyActionGates(report ReportRowData) {
 	r.DownloadURL = report.DownloadURL()
 	r.CanAudit = r.IsActiveSession && r.Status == constants.PayrollTeacherStatusDoneDailyLogs
 	r.CanSendSalary = r.IsActiveSession && r.Status == constants.PayrollTeacherStatusAudited && report.CanSendPayment()
+	r.CanNudge = r.IsActiveSession && r.Status == constants.PayrollTeacherStatusSentSalary
 	r.SendPaymentTooltip = report.SendPaymentDisabledTooltip
 }
 

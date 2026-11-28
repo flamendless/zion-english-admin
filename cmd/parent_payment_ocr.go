@@ -112,6 +112,14 @@ func handleParentPaymentOCRToolScan(w http.ResponseWriter, r *http.Request) {
 	renderParentPaymentOCRToolScan(w, r, scan)
 }
 
+func displayOCROtherDetails(details string) string {
+	details = strings.TrimSpace(details)
+	if details == "" {
+		return constants.DisplayNotSet
+	}
+	return details
+}
+
 func renderParentPaymentOCRToolScan(w http.ResponseWriter, r *http.Request, scan parentPaymentScanResult) {
 	rows := make([]frontend.ParentPaymentOCRToolEntryRow, 0, len(scan.Entries))
 	for _, entry := range scan.Entries {
@@ -140,6 +148,7 @@ func renderParentPaymentOCRToolScan(w http.ResponseWriter, r *http.Request, scan
 		} else {
 			row.CompleteLabel = "No"
 		}
+		row.OtherDetails = displayOCROtherDetails(entry.OtherDetails)
 		rows = append(rows, row)
 	}
 

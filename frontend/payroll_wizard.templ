@@ -118,6 +118,7 @@ templ ParentPaymentsVerificationPanel(data ParentPaymentsVerificationData) {
 					<tr>
 						<th>Legal name (OCR)</th>
 						<th>Amount (OCR)</th>
+						<th>Other details</th>
 						<th>Matched student</th>
 						<th>Expected total</th>
 						<th>Status</th>
@@ -128,6 +129,7 @@ templ ParentPaymentsVerificationPanel(data ParentPaymentsVerificationData) {
 						<tr>
 							<td data-label="Legal name (OCR)">{ row.LegalName }</td>
 							<td data-label="Amount (OCR)">{ row.ParsedAmount }</td>
+							<td data-label="Other details" class="payroll-parent-other-details">{ getDisplayValue(row.OtherDetails) }</td>
 							<td data-label="Matched student">{ getDisplayValue(row.StudentLabel) }</td>
 							<td data-label="Expected total">{ getDisplayValue(row.ExpectedAmount) }</td>
 							<td data-label="Status">
@@ -174,6 +176,12 @@ templ PayrollWizardStyles() {
 		.payroll-wizard-verify-cutoff {
 			margin: 0 0 var(--space-3);
 			font-size: 0.875rem;
+			color: var(--color-muted-foreground);
+		}
+
+		.payroll-parent-other-details {
+			white-space: pre-line;
+			font-size: 0.8125rem;
 			color: var(--color-muted-foreground);
 		}
 

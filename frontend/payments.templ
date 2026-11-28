@@ -103,7 +103,15 @@ templ Payments(data PaymentsData) {
 		</div>
 
 		<script>
+			function paymentReceiptModalPersistent() {
+				const host = document.getElementById('paymentReceiptModalHost');
+				if (!host) return false;
+				const overlay = host.querySelector('#paymentReceiptModal[data-receipt-persistent="true"]');
+				return !!overlay;
+			}
+
 			window.closePaymentReceiptModal = function () {
+				if (paymentReceiptModalPersistent()) return;
 				const host = document.getElementById('paymentReceiptModalHost');
 				if (host) host.innerHTML = '';
 				document.body.classList.remove('modal-open');
@@ -120,6 +128,7 @@ templ Payments(data PaymentsData) {
 			});
 
 			document.body.addEventListener('click', function (e) {
+				if (paymentReceiptModalPersistent()) return;
 				if (e.target.closest('.payment-receipt-close, .payment-view-close')) {
 					window.closePaymentReceiptModal();
 					return;
@@ -130,6 +139,7 @@ templ Payments(data PaymentsData) {
 
 			document.addEventListener('keydown', function (e) {
 				if (e.key === 'Escape' && document.getElementById('paymentReceiptModalHost')?.innerHTML) {
+					if (paymentReceiptModalPersistent()) return;
 					window.closePaymentReceiptModal();
 				}
 			});

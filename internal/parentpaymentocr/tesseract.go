@@ -1,11 +1,13 @@
 package parentpaymentocr
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -63,18 +65,36 @@ func DetectDocumentText(ctx context.Context, image []byte, fileExt string) (stri
 
 	// PSM 4: single column — fits stacked mobile banking transaction lists.
 	cmd := exec.CommandContext(ctx, "tesseract", imagePath, "stdout", "-l", lang, "--psm", "4")
-	out, err := cmd.CombinedOutput()
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	out, err := cmd.Output()
 	if err != nil {
-		msg := strings.TrimSpace(string(out))
+		msg := strings.TrimSpace(stderr.String())
 		if msg == "" {
 			msg = err.Error()
 		}
 		return "", fmt.Errorf("%w: %s", ErrOCRFailed, msg)
 	}
 
-	text := strings.TrimSpace(string(out))
+	text := stripTesseractNoise(strings.TrimSpace(string(out)))
 	if text == "" {
 		return "", ErrOCRNoText
 	}
 	return text, nil
+}
+
+var tesseractDiagLineRE = regexp.MustCompile(`(?i)^Estimating resolution as \d+`)
+
+// stripTesseractNoise removes rare diagnostic lines when stderr was merged into pasted text.
+func stripTesseractNoise(text string) string {
+	lines := strings.Split(text, "\n")
+	out := lines[:0]
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "" || tesseractDiagLineRE.MatchString(trimmed) {
+			continue
+		}
+		out = append(out, line)
+	}
+	return strings.TrimSpace(strings.Join(out, "\n"))
 }

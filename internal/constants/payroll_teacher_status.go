@@ -61,7 +61,7 @@ func (s PayrollTeacherStatus) Label() string {
 	case PayrollTeacherStatusSalaryReceived:
 		return "Salary received"
 	case PayrollTeacherStatusSkip:
-		return "Skip"
+		return "Skipped"
 	default:
 		return string(s)
 	}

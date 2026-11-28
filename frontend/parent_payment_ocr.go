@@ -8,6 +8,7 @@ type ParentPaymentOCRToolData struct {
 type ParentPaymentOCRToolEntryRow struct {
 	LegalName     string
 	Amount        string
+	OtherDetails  string
 	CompleteLabel string
 	RawLine       string
 }

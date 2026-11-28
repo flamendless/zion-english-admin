@@ -224,7 +224,7 @@ func ParentPaymentsVerificationPanel(data ParentPaymentsVerificationData) templ.
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"table-wrapper data-list-view-root\"><table class=\"table-stack-mobile payroll-parent-payments-table\"><thead><tr><th>Legal name (OCR)</th><th>Amount (OCR)</th><th>Matched student</th><th>Expected total</th><th>Status</th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"table-wrapper data-list-view-root\"><table class=\"table-stack-mobile payroll-parent-payments-table\"><thead><tr><th>Legal name (OCR)</th><th>Amount (OCR)</th><th>Other details</th><th>Matched student</th><th>Expected total</th><th>Status</th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -236,7 +236,7 @@ func ParentPaymentsVerificationPanel(data ParentPaymentsVerificationData) templ.
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(row.LegalName)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payroll_wizard.templ`, Line: 129, Col: 56}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payroll_wizard.templ`, Line: 130, Col: 56}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -249,39 +249,52 @@ func ParentPaymentsVerificationPanel(data ParentPaymentsVerificationData) templ.
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(row.ParsedAmount)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payroll_wizard.templ`, Line: 130, Col: 55}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payroll_wizard.templ`, Line: 131, Col: 55}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</td><td data-label=\"Matched student\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</td><td data-label=\"Other details\" class=\"payroll-parent-other-details\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var11 string
-				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(row.StudentLabel))
+				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(row.OtherDetails))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payroll_wizard.templ`, Line: 131, Col: 75}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payroll_wizard.templ`, Line: 132, Col: 110}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</td><td data-label=\"Expected total\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</td><td data-label=\"Matched student\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var12 string
-				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(row.ExpectedAmount))
+				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(row.StudentLabel))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payroll_wizard.templ`, Line: 132, Col: 76}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payroll_wizard.templ`, Line: 133, Col: 75}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</td><td data-label=\"Status\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</td><td data-label=\"Expected total\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var13 string
+				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(getDisplayValue(row.ExpectedAmount))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `frontend/payroll_wizard.templ`, Line: 134, Col: 76}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</td><td data-label=\"Status\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -289,12 +302,12 @@ func ParentPaymentsVerificationPanel(data ParentPaymentsVerificationData) templ.
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</tbody></table></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</tbody></table></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -319,12 +332,12 @@ func PayrollWizardStyles() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var13 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var13 == nil {
-			templ_7745c5c3_Var13 = templ.NopComponent
+		templ_7745c5c3_Var14 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var14 == nil {
+			templ_7745c5c3_Var14 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<style>\n\t\t.payroll-wizard-checklist {\n\t\t\tmargin: 0;\n\t\t\tpadding-left: 1.25rem;\n\t\t\tcolor: var(--color-foreground);\n\t\t\tfont-size: 0.875rem;\n\t\t\tline-height: 1.5;\n\t\t}\n\n\t\t.payroll-wizard-checklist li {\n\t\t\tmargin-bottom: var(--space-2);\n\t\t}\n\n\t\t.payroll-wizard-import-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tmargin-bottom: var(--space-4);\n\t\t}\n\n\t\t.payroll-wizard-import-actions .btn {\n\t\t\tmargin-top: 0;\n\t\t}\n\n\t\t.payroll-wizard-empty-verify {\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.payroll-wizard-verify-cutoff {\n\t\t\tmargin: 0 0 var(--space-3);\n\t\t\tfont-size: 0.875rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.payroll-parent-payments-table .status-pill {\n\t\t\twhite-space: nowrap;\n\t\t}\n\n\t\t#parentPaymentsUploadModal .modal-footer {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t}\n\n\t\t#parentPaymentsUploadModal .modal-footer .btn {\n\t\t\tmargin-top: 0;\n\t\t}\n\t</style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<style>\n\t\t.payroll-wizard-checklist {\n\t\t\tmargin: 0;\n\t\t\tpadding-left: 1.25rem;\n\t\t\tcolor: var(--color-foreground);\n\t\t\tfont-size: 0.875rem;\n\t\t\tline-height: 1.5;\n\t\t}\n\n\t\t.payroll-wizard-checklist li {\n\t\t\tmargin-bottom: var(--space-2);\n\t\t}\n\n\t\t.payroll-wizard-import-actions {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t\tmargin-bottom: var(--space-4);\n\t\t}\n\n\t\t.payroll-wizard-import-actions .btn {\n\t\t\tmargin-top: 0;\n\t\t}\n\n\t\t.payroll-wizard-empty-verify {\n\t\t\tmargin: 0;\n\t\t}\n\n\t\t.payroll-wizard-verify-cutoff {\n\t\t\tmargin: 0 0 var(--space-3);\n\t\t\tfont-size: 0.875rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.payroll-parent-other-details {\n\t\t\twhite-space: pre-line;\n\t\t\tfont-size: 0.8125rem;\n\t\t\tcolor: var(--color-muted-foreground);\n\t\t}\n\n\t\t.payroll-parent-payments-table .status-pill {\n\t\t\twhite-space: nowrap;\n\t\t}\n\n\t\t#parentPaymentsUploadModal .modal-footer {\n\t\t\tdisplay: flex;\n\t\t\tflex-wrap: wrap;\n\t\t\talign-items: center;\n\t\t\tgap: var(--space-2);\n\t\t}\n\n\t\t#parentPaymentsUploadModal .modal-footer .btn {\n\t\t\tmargin-top: 0;\n\t\t}\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -348,12 +361,12 @@ func PayrollWizardScript() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var14 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var14 == nil {
-			templ_7745c5c3_Var14 = templ.NopComponent
+		templ_7745c5c3_Var15 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var15 == nil {
+			templ_7745c5c3_Var15 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<script>\n\t\t(function () {\n\t\t\tif (window.__payrollWizardReady) return;\n\t\t\twindow.__payrollWizardReady = true;\n\n\t\t\tconst modal = document.getElementById('payrollWizardModal');\n\t\t\tconst uploadModal = document.getElementById('parentPaymentsUploadModal');\n\t\t\tconst form = document.getElementById('payrollWizardForm');\n\t\t\tif (!modal || !form) return;\n\n\t\t\tconst totalSteps = 3;\n\t\t\tlet currentStep = 1;\n\n\t\t\tfunction steps() {\n\t\t\t\treturn form.querySelectorAll('.wizard-step');\n\t\t\t}\n\n\t\t\tfunction showMessage(text) {\n\t\t\t\tconst el = document.getElementById('payrollWizardMessage');\n\t\t\t\tif (!el) return;\n\t\t\t\tif (!text) {\n\t\t\t\t\tel.hidden = true;\n\t\t\t\t\tel.textContent = '';\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tel.hidden = false;\n\t\t\t\tel.textContent = text;\n\t\t\t}\n\n\t\t\tfunction syncDatesFromPreset() {\n\t\t\t\tconst preset = document.getElementById('payrollWizardDatePreset');\n\t\t\t\tconst start = document.getElementById('payrollWizard_startDate');\n\t\t\t\tconst end = document.getElementById('payrollWizard_endDate');\n\t\t\t\tif (!preset || !preset.value || !start || !end) return false;\n\t\t\t\tconst parts = preset.value.split('|');\n\t\t\t\tif (parts.length !== 2) return false;\n\t\t\t\tstart.value = parts[0];\n\t\t\t\tend.value = parts[1];\n\t\t\t\treturn true;\n\t\t\t}\n\n\t\t\tfunction stepValid(step) {\n\t\t\t\tif (step === 1) {\n\t\t\t\t\treturn syncDatesFromPreset();\n\t\t\t\t}\n\t\t\t\treturn true;\n\t\t\t}\n\n\t\t\tfunction updateNav() {\n\t\t\t\tconst label = document.getElementById('payrollWizardStepLabel');\n\t\t\t\tconst prev = document.getElementById('payrollWizardPrev');\n\t\t\t\tconst next = document.getElementById('payrollWizardNext');\n\t\t\t\tconst done = document.getElementById('payrollWizardDone');\n\t\t\t\tif (label) label.textContent = 'Step ' + currentStep + ' of ' + totalSteps;\n\t\t\t\tif (prev) prev.hidden = currentStep <= 1;\n\t\t\t\tif (next) next.hidden = currentStep >= totalSteps;\n\t\t\t\tif (done) done.hidden = currentStep < totalSteps;\n\t\t\t\tif (next) next.disabled = !stepValid(currentStep);\n\t\t\t}\n\n\t\t\tfunction goToStep(step) {\n\t\t\t\tcurrentStep = Math.max(1, Math.min(totalSteps, step));\n\t\t\t\tsteps().forEach(function (el) {\n\t\t\t\t\tconst n = parseInt(el.getAttribute('data-step'), 10);\n\t\t\t\t\tel.classList.toggle('is-active', n === currentStep);\n\t\t\t\t});\n\t\t\t\tshowMessage('');\n\t\t\t\tupdateNav();\n\t\t\t}\n\n\t\t\tfunction openPayrollWizard() {\n\t\t\t\tconst toolbarPreset = document.getElementById('datePreset');\n\t\t\t\tconst wizardPreset = document.getElementById('payrollWizardDatePreset');\n\t\t\t\tif (toolbarPreset && wizardPreset && toolbarPreset.value) {\n\t\t\t\t\twizardPreset.value = toolbarPreset.value;\n\t\t\t\t\twizardPreset.dispatchEvent(new Event('change', { bubbles: true }));\n\t\t\t\t}\n\t\t\t\tsyncDatesFromPreset();\n\t\t\t\tgoToStep(1);\n\t\t\t\tmodal.hidden = false;\n\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t}\n\n\t\t\tfunction closePayrollWizard() {\n\t\t\t\tmodal.hidden = true;\n\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t}\n\n\t\t\tfunction openUploadModal() {\n\t\t\t\tif (!uploadModal) return;\n\t\t\t\tif (!syncDatesFromPreset()) {\n\t\t\t\t\tshowMessage('Select a payroll cutoff in step 1 first.');\n\t\t\t\t\tgoToStep(1);\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tuploadModal.hidden = false;\n\t\t\t}\n\n\t\t\tfunction closeUploadModal() {\n\t\t\t\tif (uploadModal) uploadModal.hidden = true;\n\t\t\t}\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tif (e.target.closest('[data-open-payroll-wizard]')) {\n\t\t\t\t\topenPayrollWizard();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (e.target.closest('.payroll-wizard-close')) {\n\t\t\t\t\tclosePayrollWizard();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (e.target.closest('#openParentPaymentsUploadBtn')) {\n\t\t\t\t\topenUploadModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (e.target.closest('.parent-payments-upload-close')) {\n\t\t\t\t\tcloseUploadModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (e.target === modal) {\n\t\t\t\t\tclosePayrollWizard();\n\t\t\t\t}\n\t\t\t\tif (uploadModal && e.target === uploadModal) {\n\t\t\t\t\tcloseUploadModal();\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.getElementById('payrollWizardPrev')?.addEventListener('click', function () {\n\t\t\t\tgoToStep(currentStep - 1);\n\t\t\t});\n\t\t\tdocument.getElementById('payrollWizardNext')?.addEventListener('click', function () {\n\t\t\t\tif (!stepValid(currentStep)) {\n\t\t\t\t\tshowMessage('Select a payroll cutoff date range.');\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tgoToStep(currentStep + 1);\n\t\t\t});\n\t\t\tdocument.getElementById('payrollWizardDone')?.addEventListener('click', closePayrollWizard);\n\n\t\t\tdocument.getElementById('payrollWizardDatePreset')?.addEventListener('change', function () {\n\t\t\t\tsyncDatesFromPreset();\n\t\t\t\tupdateNav();\n\t\t\t});\n\n\t\t\tconst fileInput = document.getElementById('parentPaymentsImageInput');\n\t\t\tconst filenameEl = document.getElementById('parentPaymentsFilename');\n\t\t\tfileInput?.addEventListener('change', function () {\n\t\t\t\tif (filenameEl) {\n\t\t\t\t\tfilenameEl.textContent = fileInput.files && fileInput.files[0] ? fileInput.files[0].name : '';\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.id === 'parentPaymentsVerificationHost') {\n\t\t\t\t\tcloseUploadModal();\n\t\t\t\t\tconst uploadForm = document.getElementById('parentPaymentsUploadForm');\n\t\t\t\t\tif (uploadForm) uploadForm.reset();\n\t\t\t\t\tif (filenameEl) filenameEl.textContent = '';\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.addEventListener('keydown', function (e) {\n\t\t\t\tif (e.key !== 'Escape') return;\n\t\t\t\tif (uploadModal && !uploadModal.hidden) {\n\t\t\t\t\tcloseUploadModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (!modal.hidden) closePayrollWizard();\n\t\t\t});\n\n\t\t\twindow.openPayrollWizard = openPayrollWizard;\n\t\t})();\n\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<script>\n\t\t(function () {\n\t\t\tif (window.__payrollWizardReady) return;\n\t\t\twindow.__payrollWizardReady = true;\n\n\t\t\tconst modal = document.getElementById('payrollWizardModal');\n\t\t\tconst uploadModal = document.getElementById('parentPaymentsUploadModal');\n\t\t\tconst form = document.getElementById('payrollWizardForm');\n\t\t\tif (!modal || !form) return;\n\n\t\t\tconst totalSteps = 3;\n\t\t\tlet currentStep = 1;\n\n\t\t\tfunction steps() {\n\t\t\t\treturn form.querySelectorAll('.wizard-step');\n\t\t\t}\n\n\t\t\tfunction showMessage(text) {\n\t\t\t\tconst el = document.getElementById('payrollWizardMessage');\n\t\t\t\tif (!el) return;\n\t\t\t\tif (!text) {\n\t\t\t\t\tel.hidden = true;\n\t\t\t\t\tel.textContent = '';\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tel.hidden = false;\n\t\t\t\tel.textContent = text;\n\t\t\t}\n\n\t\t\tfunction syncDatesFromPreset() {\n\t\t\t\tconst preset = document.getElementById('payrollWizardDatePreset');\n\t\t\t\tconst start = document.getElementById('payrollWizard_startDate');\n\t\t\t\tconst end = document.getElementById('payrollWizard_endDate');\n\t\t\t\tif (!preset || !preset.value || !start || !end) return false;\n\t\t\t\tconst parts = preset.value.split('|');\n\t\t\t\tif (parts.length !== 2) return false;\n\t\t\t\tstart.value = parts[0];\n\t\t\t\tend.value = parts[1];\n\t\t\t\treturn true;\n\t\t\t}\n\n\t\t\tfunction stepValid(step) {\n\t\t\t\tif (step === 1) {\n\t\t\t\t\treturn syncDatesFromPreset();\n\t\t\t\t}\n\t\t\t\treturn true;\n\t\t\t}\n\n\t\t\tfunction updateNav() {\n\t\t\t\tconst label = document.getElementById('payrollWizardStepLabel');\n\t\t\t\tconst prev = document.getElementById('payrollWizardPrev');\n\t\t\t\tconst next = document.getElementById('payrollWizardNext');\n\t\t\t\tconst done = document.getElementById('payrollWizardDone');\n\t\t\t\tif (label) label.textContent = 'Step ' + currentStep + ' of ' + totalSteps;\n\t\t\t\tif (prev) prev.hidden = currentStep <= 1;\n\t\t\t\tif (next) next.hidden = currentStep >= totalSteps;\n\t\t\t\tif (done) done.hidden = currentStep < totalSteps;\n\t\t\t\tif (next) next.disabled = !stepValid(currentStep);\n\t\t\t}\n\n\t\t\tfunction goToStep(step) {\n\t\t\t\tcurrentStep = Math.max(1, Math.min(totalSteps, step));\n\t\t\t\tsteps().forEach(function (el) {\n\t\t\t\t\tconst n = parseInt(el.getAttribute('data-step'), 10);\n\t\t\t\t\tel.classList.toggle('is-active', n === currentStep);\n\t\t\t\t});\n\t\t\t\tshowMessage('');\n\t\t\t\tupdateNav();\n\t\t\t}\n\n\t\t\tfunction openPayrollWizard() {\n\t\t\t\tconst toolbarPreset = document.getElementById('datePreset');\n\t\t\t\tconst wizardPreset = document.getElementById('payrollWizardDatePreset');\n\t\t\t\tif (toolbarPreset && wizardPreset && toolbarPreset.value) {\n\t\t\t\t\twizardPreset.value = toolbarPreset.value;\n\t\t\t\t\twizardPreset.dispatchEvent(new Event('change', { bubbles: true }));\n\t\t\t\t}\n\t\t\t\tsyncDatesFromPreset();\n\t\t\t\tgoToStep(1);\n\t\t\t\tmodal.hidden = false;\n\t\t\t\tdocument.body.classList.add('modal-open');\n\t\t\t}\n\n\t\t\tfunction closePayrollWizard() {\n\t\t\t\tmodal.hidden = true;\n\t\t\t\tdocument.body.classList.remove('modal-open');\n\t\t\t}\n\n\t\t\tfunction openUploadModal() {\n\t\t\t\tif (!uploadModal) return;\n\t\t\t\tif (!syncDatesFromPreset()) {\n\t\t\t\t\tshowMessage('Select a payroll cutoff in step 1 first.');\n\t\t\t\t\tgoToStep(1);\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tuploadModal.hidden = false;\n\t\t\t}\n\n\t\t\tfunction closeUploadModal() {\n\t\t\t\tif (uploadModal) uploadModal.hidden = true;\n\t\t\t}\n\n\t\t\tdocument.body.addEventListener('click', function (e) {\n\t\t\t\tif (e.target.closest('[data-open-payroll-wizard]')) {\n\t\t\t\t\topenPayrollWizard();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (e.target.closest('.payroll-wizard-close')) {\n\t\t\t\t\tclosePayrollWizard();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (e.target.closest('#openParentPaymentsUploadBtn')) {\n\t\t\t\t\topenUploadModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (e.target.closest('.parent-payments-upload-close')) {\n\t\t\t\t\tcloseUploadModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (e.target === modal) {\n\t\t\t\t\tclosePayrollWizard();\n\t\t\t\t}\n\t\t\t\tif (uploadModal && e.target === uploadModal) {\n\t\t\t\t\tcloseUploadModal();\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.getElementById('payrollWizardPrev')?.addEventListener('click', function () {\n\t\t\t\tgoToStep(currentStep - 1);\n\t\t\t});\n\t\t\tdocument.getElementById('payrollWizardNext')?.addEventListener('click', function () {\n\t\t\t\tif (!stepValid(currentStep)) {\n\t\t\t\t\tshowMessage('Select a payroll cutoff date range.');\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tgoToStep(currentStep + 1);\n\t\t\t});\n\t\t\tdocument.getElementById('payrollWizardDone')?.addEventListener('click', closePayrollWizard);\n\n\t\t\tdocument.getElementById('payrollWizardDatePreset')?.addEventListener('change', function () {\n\t\t\t\tsyncDatesFromPreset();\n\t\t\t\tupdateNav();\n\t\t\t});\n\n\t\t\tconst fileInput = document.getElementById('parentPaymentsImageInput');\n\t\t\tconst filenameEl = document.getElementById('parentPaymentsFilename');\n\t\t\tfileInput?.addEventListener('change', function () {\n\t\t\t\tif (filenameEl) {\n\t\t\t\t\tfilenameEl.textContent = fileInput.files && fileInput.files[0] ? fileInput.files[0].name : '';\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.body.addEventListener('htmx:afterSwap', function (evt) {\n\t\t\t\tif (evt.detail.target.id === 'parentPaymentsVerificationHost') {\n\t\t\t\t\tcloseUploadModal();\n\t\t\t\t\tconst uploadForm = document.getElementById('parentPaymentsUploadForm');\n\t\t\t\t\tif (uploadForm) uploadForm.reset();\n\t\t\t\t\tif (filenameEl) filenameEl.textContent = '';\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tdocument.addEventListener('keydown', function (e) {\n\t\t\t\tif (e.key !== 'Escape') return;\n\t\t\t\tif (uploadModal && !uploadModal.hidden) {\n\t\t\t\t\tcloseUploadModal();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tif (!modal.hidden) closePayrollWizard();\n\t\t\t});\n\n\t\t\twindow.openPayrollWizard = openPayrollWizard;\n\t\t})();\n\t</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

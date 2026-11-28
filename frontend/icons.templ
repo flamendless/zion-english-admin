@@ -116,6 +116,15 @@ templ iconSVGSortDesc() {
 	</svg>
 }
 
+templ iconSVGPoke() {
+	<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2"></path>
+		<path d="M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v2"></path>
+		<path d="M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8"></path>
+		<path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-2.87-2.87a2 2 0 0 1 2.82-2.82l.78.79V6a2 2 0 0 1 2-2 2 2 0 0 1 2 2v2"></path>
+	</svg>
+}
+
 templ iconSVGHub() {
 	<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 		<rect width="7" height="7" x="3" y="3" rx="1"></rect>
@@ -208,6 +217,8 @@ templ IconSVG(kind IconKind) {
 			@iconSVGCopy()
 		case IconKindHub:
 			@iconSVGHub()
+		case IconKindPoke:
+			@iconSVGPoke()
 	}
 }
 

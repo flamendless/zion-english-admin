@@ -98,6 +98,73 @@ hooks-install() {
 	echo "Skip once: SKIP_E2E=1 git commit ..."
 }
 
+deps_os() {
+	if "${ISMAC}"; then
+		echo mac
+	elif [[ -f /etc/arch-release ]]; then
+		echo arch
+	elif command -v apt-get >/dev/null 2>&1; then
+		echo debian
+	else
+		echo unknown
+	fi
+}
+
+deps_verify() {
+	local missing=0
+	for bin in ffmpeg ffprobe tesseract; do
+		if command -v "${bin}" >/dev/null 2>&1; then
+			echo "ok: ${bin}"
+		else
+			echo "missing: ${bin}"
+			missing=1
+		fi
+	done
+	if command -v tesseract >/dev/null 2>&1; then
+		if tesseract --list-langs 2>/dev/null | grep -qxF eng && tesseract --list-langs 2>/dev/null | grep -qxF kor; then
+			echo "ok: tesseract languages (eng, kor)"
+		else
+			echo "missing: tesseract language packs eng and/or kor (tesseract --list-langs)"
+			missing=1
+		fi
+	fi
+	return "${missing}"
+}
+
+deps() {
+	echo "Installing host dependencies (ffmpeg, Tesseract OCR with kor+eng)..."
+	case "$(deps_os)" in
+	mac)
+		if ! command -v brew >/dev/null 2>&1; then
+			echo "Homebrew is required on macOS: https://brew.sh"
+			exit 1
+		fi
+		brew install ffmpeg tesseract tesseract-lang
+		;;
+	debian)
+		sudo apt-get update
+		sudo apt-get install -y ffmpeg tesseract-ocr tesseract-ocr-eng tesseract-ocr-kor
+		;;
+	arch)
+		sudo pacman -Sy --needed --noconfirm ffmpeg tesseract tesseract-data-eng tesseract-data-kor
+		;;
+	*)
+		echo "Unsupported OS for automatic install. Install manually:"
+		echo "  macOS: brew install ffmpeg tesseract tesseract-lang"
+		echo "  Ubuntu/Debian: sudo apt install ffmpeg tesseract-ocr tesseract-ocr-eng tesseract-ocr-kor"
+		echo "  Arch: sudo pacman -S ffmpeg tesseract tesseract-data-eng tesseract-data-kor"
+		exit 1
+		;;
+	esac
+	echo ""
+	if deps_verify; then
+		echo "All host dependencies are ready."
+	else
+		echo "Some dependencies are still missing; fix the items above and re-run ./run.sh deps"
+		exit 1
+	fi
+}
+
 gofmt() {
 	mapfile -t go_files < <(git ls-files '*.go' | grep -Ev '^(internal/database/queries/|frontend/.*_templ\.go$)' || true)
 	if ((${#go_files[@]} == 0)); then
@@ -125,6 +192,7 @@ if [ "$#" -eq 0 ]; then
 	echo "    gofmt"
 	echo "    test"
 	echo "    e2e"
+	echo "    deps"
 	echo "    hooks-install"
 else
 	echo "Running ${1}"

@@ -76,6 +76,16 @@ func handlePayrollPath(w http.ResponseWriter, r *http.Request) {
 			handlePayrollTeacherGenerate(w, r, sessionID, teacherID)
 			return
 		}
+		if strings.HasPrefix(tail, "teachers/") && strings.HasSuffix(tail, "/nudge") && r.Method == http.MethodPost {
+			mid := strings.TrimSuffix(strings.TrimPrefix(tail, "teachers/"), "/nudge")
+			teacherID, err := strconv.ParseInt(mid, 10, 64)
+			if err != nil || teacherID <= 0 {
+				HttpError(w, MsgNotFound, http.StatusNotFound)
+				return
+			}
+			handlePayrollTeacherNudge(w, r, sessionID, teacherID)
+			return
+		}
 		HttpError(w, MsgNotFound, http.StatusNotFound)
 	}
 }
@@ -307,6 +317,41 @@ func handlePayrollTeacherAudit(w http.ResponseWriter, r *http.Request, sessionID
 	insertAuditLogAs(ctx, user, "payroll", fmt.Sprintf("Confirmed audit for teacher #%d in payroll session #%d", teacherID, sessionID))
 	w.Header().Set(headerHXTrigger, `{"showSuccessBanner":"Audit confirmed"}`)
 	writePayrollTeachersPartial(w, ctx, sessionID)
+}
+
+func handlePayrollTeacherNudge(w http.ResponseWriter, r *http.Request, sessionID, teacherID int64) {
+	if !requireMethod(w, r, http.MethodPost) {
+		return
+	}
+	ctx := r.Context()
+	user := auth.GetUser(ctx)
+	if err := payroll.NudgeSalaryReceipt(ctx, dbRW.GetQueries(), sessionID, teacherID, user.ID, user.Name); err != nil {
+		sendErrorLog(w, err.Error())
+		return
+	}
+	insertAuditLogAs(ctx, user, "payroll", fmt.Sprintf("Nudged teacher #%d to confirm salary receipt in payroll session #%d", teacherID, sessionID))
+	session, err := dbRO.GetQueries().GetPayrollSessionByID(ctx, sessionID)
+	if err != nil {
+		sendErrorLog(w, "failed to load payroll session")
+		return
+	}
+	rows, err := buildPayrollTeacherRows(ctx, session)
+	if err != nil {
+		sendErrorLog(w, "failed to load teacher row")
+		return
+	}
+	var row frontend.PayrollTeacherRow
+	for _, candidate := range rows {
+		if candidate.TeacherID == strconv.FormatInt(teacherID, 10) {
+			row = candidate
+			break
+		}
+	}
+	w.Header().Set(headerHXTrigger, `{"showSuccessBanner":"Teacher nudged to confirm receipt"}`)
+	writeHTML(w)
+	if err := frontend.PayrollTeacherTableRow(row, session.PeriodStart, session.PeriodEnd, session.Status == string(constants.PayrollSessionStatusActive), false).Render(ctx, w); err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func handlePayrollTeacherGenerate(w http.ResponseWriter, r *http.Request, sessionID, teacherID int64) {

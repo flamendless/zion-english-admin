@@ -574,6 +574,7 @@ func handlePaymentReceiptForm(w http.ResponseWriter, r *http.Request, paymentID 
 		return
 	}
 
+	persistent := payment.ReceiptNudge != 0
 	writeHTML(w)
 	if err := frontend.PaymentReceiptModal(frontend.PaymentReceiptData{
 		PaymentID:       strconv.FormatInt(payment.ID, 10),
@@ -583,7 +584,8 @@ func handlePaymentReceiptForm(w http.ResponseWriter, r *http.Request, paymentID 
 		Currency:        payment.Currency,
 		PeriodLabel:     formatReportCutoffLabel(payment.PeriodStart, payment.PeriodEnd),
 		SentAt:          formatPaymentTimestamp(payment.SentAt),
-		ShowDeferAction: false,
+		ShowDeferAction: !persistent,
+		Persistent:      persistent,
 	}).Render(ctx, w); err != nil {
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -696,6 +698,10 @@ func handlePaymentDefer(w http.ResponseWriter, r *http.Request, paymentID int64)
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
+	if payment.ReceiptNudge != 0 {
+		HttpError(w, MsgForbidden, http.StatusForbidden)
+		return
+	}
 
 	accessID, err := dbRO.GetQueries().GetLatestOpenAccessByTeacherID(ctx, user.ID)
 	if err != nil {
@@ -738,6 +744,7 @@ func populatePaymentReceipt(ctx context.Context, data *frontend.DashboardData, t
 		return
 	}
 
+	persistent := payment.ReceiptNudge != 0
 	data.ShowPaymentReceipt = true
 	data.PaymentReceipt = frontend.PaymentReceiptData{
 		PaymentID:       strconv.FormatInt(payment.ID, 10),
@@ -747,7 +754,8 @@ func populatePaymentReceipt(ctx context.Context, data *frontend.DashboardData, t
 		Currency:        payment.Currency,
 		PeriodLabel:     formatReportCutoffLabel(payment.PeriodStart, payment.PeriodEnd),
 		SentAt:          formatPaymentTimestamp(payment.SentAt),
-		ShowDeferAction: true,
+		ShowDeferAction: !persistent,
+		Persistent:      persistent,
 	}
 }
 

@@ -96,6 +96,7 @@ templ ParentPaymentOCRToolScanResults(data ParentPaymentOCRToolScanData) {
 					<tr>
 						<th>Legal name</th>
 						<th>Amount</th>
+						<th>Other details</th>
 						<th>Complete</th>
 						<th>Raw line</th>
 					</tr>
@@ -105,6 +106,7 @@ templ ParentPaymentOCRToolScanResults(data ParentPaymentOCRToolScanData) {
 						<tr>
 							<td data-label="Legal name">{ row.LegalName }</td>
 							<td data-label="Amount">{ row.Amount }</td>
+							<td data-label="Other details" class="ppo-other-details">{ row.OtherDetails }</td>
 							<td data-label="Complete">{ row.CompleteLabel }</td>
 							<td data-label="Raw line">{ row.RawLine }</td>
 						</tr>
@@ -230,6 +232,12 @@ templ ParentPaymentOCRToolStyles() {
 		}
 
 		.ppo-entries-table td:last-child {
+			font-size: 0.8125rem;
+			color: var(--color-muted-foreground);
+		}
+
+		.ppo-other-details {
+			white-space: pre-line;
 			font-size: 0.8125rem;
 			color: var(--color-muted-foreground);
 		}

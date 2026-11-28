@@ -12,21 +12,34 @@ type PaymentReceiptData struct {
 	PeriodLabel     string
 	SentAt          string
 	ShowDeferAction bool
+	Persistent      bool
 }
 
 templ PaymentReceiptModal(data PaymentReceiptData) {
-	<div class="modal-overlay" id="paymentReceiptModal" hidden role="presentation">
+	<div
+		class="modal-overlay"
+		id="paymentReceiptModal"
+		hidden
+		role="presentation"
+		if data.Persistent {
+			data-receipt-persistent="true"
+		}
+	>
 		<div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="paymentReceiptTitle">
 			<div class="modal-header">
 				<h3 id="paymentReceiptTitle">Confirm payment received</h3>
-				if !data.ShowDeferAction {
+				if !data.ShowDeferAction && !data.Persistent {
 					<button type="button" class="modal-close payment-receipt-close" data-tooltip="Close" aria-label="Close" onclick="window.closePaymentReceiptModal()">&times;</button>
 				}
 			</div>
 			<div class="modal-body">
 				@PaymentReceiptModalStyles()
 				@PaymentMethodStyles()
-				<p class="payment-receipt-intro">A payment was sent to you. Please confirm once you have received it.</p>
+				if data.Persistent {
+					<p class="payment-receipt-intro">Your administrator is waiting for you to confirm this payment. You must tap Received once the funds are in your account.</p>
+				} else {
+					<p class="payment-receipt-intro">A payment was sent to you. Please confirm once you have received it.</p>
+				}
 				<dl class="payment-receipt-details">
 					<div class="payment-receipt-row">
 						<dt>Payment method</dt>
@@ -53,18 +66,20 @@ templ PaymentReceiptModal(data PaymentReceiptData) {
 				</dl>
 			</div>
 			<div class="modal-footer payment-receipt-footer">
-				if data.ShowDeferAction {
-					<button
-						type="button"
-						class="btn btn-secondary"
-						hx-post={ utils.URL("/payments/" + data.PaymentID + "/defer") }
-						hx-swap={ HxSwapNone }
-						onclick="window.closePaymentReceiptModal()"
-					>Not Yet Received</button>
-				} else {
-					<button type="button" class="btn btn-secondary payment-receipt-close" onclick="window.closePaymentReceiptModal()">Cancel</button>
+				if !data.Persistent {
+					if data.ShowDeferAction {
+						<button
+							type="button"
+							class="btn btn-secondary"
+							hx-post={ utils.URL("/payments/" + data.PaymentID + "/defer") }
+							hx-swap={ HxSwapNone }
+							onclick="window.closePaymentReceiptModal()"
+						>Not Yet Received</button>
+					} else {
+						<button type="button" class="btn btn-secondary payment-receipt-close" onclick="window.closePaymentReceiptModal()">Cancel</button>
+					}
 				}
-				if data.ShowDeferAction {
+				if data.ShowDeferAction || data.Persistent {
 					<button
 						type="button"
 						class="btn payment-receipt-confirm"
@@ -84,6 +99,11 @@ templ PaymentReceiptModal(data PaymentReceiptData) {
 		</div>
 	</div>
 	<script>
+		function paymentReceiptPersistent() {
+			const overlay = document.getElementById('paymentReceiptModal');
+			return overlay && overlay.getAttribute('data-receipt-persistent') === 'true';
+		}
+
 		function openPaymentReceiptModal() {
 			const overlay = document.getElementById('paymentReceiptModal');
 			if (!overlay) return;
@@ -94,6 +114,7 @@ templ PaymentReceiptModal(data PaymentReceiptData) {
 		}
 
 		window.closePaymentReceiptModal = function () {
+			if (paymentReceiptPersistent()) return;
 			const host = document.getElementById('paymentReceiptModalHost');
 			if (host) {
 				host.innerHTML = '';

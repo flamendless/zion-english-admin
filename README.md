@@ -19,16 +19,22 @@ Admin portal for Zion English teachers and administrators. Manage students, clas
 
    Set `SECRET`, `SUPERUSER_USERNAME`, and `SUPERUSER_PASSWORD` in `.env`.
 
-3. Make the run script executable and start the dev server:
+3. Install optional host tools (ffmpeg, Tesseract for intro video and parent payment OCR):
 
    ```bash
    chmod +x run.sh
+   ./run.sh deps
+   ```
+
+4. Start the dev server:
+
+   ```bash
    ./run.sh serve
    ```
 
    This generates SQL and templ code, runs database migrations, and starts the app.
 
-4. Open [http://localhost:8080/zion-english-admin](http://localhost:8080/zion-english-admin).
+5. Open [http://localhost:8080/zion-english-admin](http://localhost:8080/zion-english-admin).
 
 ### Cloudflare R2 (optional)
 
