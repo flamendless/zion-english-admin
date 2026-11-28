@@ -33,6 +33,15 @@ type HubResourcesData struct {
 	LearningMaterials []HubLearningMaterialSummary
 }
 
+type HubTimeOffItem struct {
+	LeaveType   constants.LeaveRequestType
+	StartDate   string
+	EndDate     string
+	Reason      string
+	Status      constants.LeaveRequestStatus
+	SubmittedAt string
+}
+
 type HubData struct {
 	ViewAsAdmin     bool
 	TeacherID       string
@@ -42,8 +51,28 @@ type HubData struct {
 	CutoffStartDate string
 	CutoffEndDate   string
 	TodayDate       string
+	TimeOffs        []HubTimeOffItem
 	Resources       HubResourcesData
 	IsPro           bool
+}
+
+templ HubTimeOffTableRows(items []HubTimeOffItem) {
+	for _, item := range items {
+		<tr>
+			<td data-label="Type">
+				@Pill(item.LeaveType.Label(), PillToneInfo)
+			</td>
+			<td data-label="Start">{ item.StartDate }</td>
+			<td data-label="End">{ item.EndDate }</td>
+			<td data-label="Reason" class="hub-time-off-reason">
+				<span class="truncated-cell" data-full-text={ item.Reason }>{ item.Reason }</span>
+			</td>
+			<td data-label="Status">
+				@StatusPill(item.Status.Label(), LeaveRequestStatusPillTone(item.Status), true)
+			</td>
+			<td data-label="Submitted">{ item.SubmittedAt }</td>
+		</tr>
+	}
 }
 
 templ HubNavTile(sectionID string, title string, hint string) {
@@ -292,6 +321,10 @@ templ Hub(data HubData) {
 				line-height: 1;
 			}
 
+			.hub-time-off-reason {
+				max-width: 14rem;
+			}
+
 			.hub-resources-block {
 				margin-bottom: var(--space-5);
 			}
@@ -483,6 +516,7 @@ templ Hub(data HubData) {
 			</header>
 
 			<nav class="hub-nav-grid" aria-label="Hub sections">
+				@HubNavTile("hub-time-off", "Time-off", "Requests and status")
 				@HubNavTile("hub-resources", "Resources", "Docs and materials")
 				@HubNavTile("hub-students", "Students", "Assigned roster")
 				@HubNavTile("hub-classes", "Classes", "This cutoff")
@@ -492,6 +526,33 @@ templ Hub(data HubData) {
 				@HubNavTile("hub-upload-logs", "Upload logs", "File activity")
 				@HubNavTile("hub-analytics", "Analytics", "Insights")
 			</nav>
+
+			<section class="hub-panel" id="hub-time-off">
+				@HubPanelHeader("Time-off requests", utils.URL("/leave-requests"))
+				<div class="table-wrapper data-list-view-root">
+					<table class="table-stack-mobile hub-time-off-table">
+						<thead>
+							<tr>
+								<th>Type</th>
+								<th>Start</th>
+								<th>End</th>
+								<th>Reason</th>
+								<th>Status</th>
+								<th>Submitted</th>
+							</tr>
+						</thead>
+						<tbody>
+							if len(data.TimeOffs) == 0 {
+								<tr>
+									<td colspan="6" class="empty-state">No time-off requests yet. Open the full page to submit one.</td>
+								</tr>
+							} else {
+								@HubTimeOffTableRows(data.TimeOffs)
+							}
+						</tbody>
+					</table>
+				</div>
+			</section>
 
 			<section class="hub-panel" id="hub-resources">
 				@HubPanelHeader("Resources", "")
@@ -861,6 +922,7 @@ templ Hub(data HubData) {
 		</div>
 
 		@HubPageScripts()
+	@ScrTableTruncationTooltips()
 	@LayoutEnd()
 	</body>
 	</html>

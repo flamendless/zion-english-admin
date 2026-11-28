@@ -57,16 +57,22 @@ templ NavDropdownScript() {
 	</script>
 }
 
+templ NavGroupCardTitle(group NavGroup) {
+	if group.SuperuserOnlyCard {
+		@SuperuserOnlyCardTitle(group.Label)
+	} else if group.AdminOnlyCard {
+		@AdminOnlyCardTitle(group.Label)
+	} else {
+		<h2>{ group.Label }</h2>
+	}
+}
+
 templ NavGroupActionCard(group NavGroup) {
 	if group.FeatureCard {
 		<button type="button" class="card card-feature" data-open-nav-group-modal={ group.ID }>
 			<div class="card__head">
 				@NavIconBadge(group.Icon)
-				if group.AdminOnlyCard {
-					@AdminOnlyCardTitle(group.Label)
-				} else {
-					<h2>{ group.Label }</h2>
-				}
+				@NavGroupCardTitle(group)
 			</div>
 			<p>{ group.Description }</p>
 		</button>
@@ -74,11 +80,7 @@ templ NavGroupActionCard(group NavGroup) {
 		<button type="button" class="card" data-open-nav-group-modal={ group.ID }>
 			<div class="card__head">
 				@NavIconBadge(group.Icon)
-				if group.AdminOnlyCard {
-					@AdminOnlyCardTitle(group.Label)
-				} else {
-					<h2>{ group.Label }</h2>
-				}
+				@NavGroupCardTitle(group)
 			</div>
 			<p>{ group.Description }</p>
 		</button>

@@ -9,6 +9,7 @@ const (
 	CategoryPayments   Category = "payments"
 	CategoryIntroVideo Category = "intro_video"
 	CategoryAccount    Category = "account"
+	CategoryLeave      Category = "leave"
 )
 
 type CategoryDefinition struct {
@@ -49,6 +50,11 @@ func TeacherNotificationCategories() []CategoryDefinition {
 			Label:       "Account",
 			Description: "Approval status and profile updates from administrators.",
 		},
+		{
+			Category:    CategoryLeave,
+			Label:       "Time-off",
+			Description: "Submitted time-off requests and review outcomes.",
+		},
 	}
 }
 
@@ -66,6 +72,8 @@ func CategoryForKind(kind string) (Category, bool) {
 		return CategoryIntroVideo, true
 	case KindTeacherApproved, KindProfileUpdated:
 		return CategoryAccount, true
+	case KindLeaveRequestSubmitted, KindLeaveRequestReviewed:
+		return CategoryLeave, true
 	default:
 		return "", false
 	}

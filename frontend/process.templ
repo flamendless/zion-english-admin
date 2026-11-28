@@ -11,6 +11,7 @@ templ Process() {
 		<body>
 			<div class="container">
 				@HeaderSimple()
+				@DeprecatedFeatureBanner()
 				<div class="button-group">
 					<a href={ utils.URL("/process-logs") } class="add-btn">View Processing Logs</a>
 				</div>

@@ -1,6 +1,7 @@
 package frontend
 
 const adminOnlyTooltip = "Admin only. Not visible to teachers."
+const superuserOnlyTooltip = "Superuser only. Not visible to teachers or admins."
 
 templ AdminOnlyIndicator() {
 	<span
@@ -11,6 +12,18 @@ templ AdminOnlyIndicator() {
 		aria-label={ adminOnlyTooltip }
 	>
 		@iconSVGEyeOff()
+	</span>
+}
+
+templ SuperuserOnlyIndicator() {
+	<span
+		class="superuser-only-indicator"
+		data-tooltip={ superuserOnlyTooltip }
+		tabindex="0"
+		role="img"
+		aria-label={ superuserOnlyTooltip }
+	>
+		@iconSVGAlertCircle()
 	</span>
 }
 
@@ -48,6 +61,13 @@ templ AdminOnlyCardTitle(title string) {
 	<h2 class="admin-only-label-wrap">
 		{ title }
 		@AdminOnlyIndicator()
+	</h2>
+}
+
+templ SuperuserOnlyCardTitle(title string) {
+	<h2 class="superuser-only-label-wrap">
+		{ title }
+		@SuperuserOnlyIndicator()
 	</h2>
 }
 
@@ -152,12 +172,12 @@ templ AdminOnlyTooltipScript() {
 			}
 
 			document.addEventListener('mouseover', function (e) {
-				const el = e.target.closest('.admin-only-indicator[data-tooltip]');
+				const el = e.target.closest('.admin-only-indicator[data-tooltip], .superuser-only-indicator[data-tooltip]');
 				if (el) showTip(el);
 			});
 
 			document.addEventListener('mouseout', function (e) {
-				const el = e.target.closest('.admin-only-indicator[data-tooltip]');
+				const el = e.target.closest('.admin-only-indicator[data-tooltip], .superuser-only-indicator[data-tooltip]');
 				if (!el) return;
 				const related = e.relatedTarget;
 				if (related && el.contains(related)) return;
@@ -165,12 +185,12 @@ templ AdminOnlyTooltipScript() {
 			});
 
 			document.addEventListener('focusin', function (e) {
-				const el = e.target.closest('.admin-only-indicator[data-tooltip]');
+				const el = e.target.closest('.admin-only-indicator[data-tooltip], .superuser-only-indicator[data-tooltip]');
 				if (el) showTip(el);
 			});
 
 			document.addEventListener('focusout', function (e) {
-				const el = e.target.closest('.admin-only-indicator[data-tooltip]');
+				const el = e.target.closest('.admin-only-indicator[data-tooltip], .superuser-only-indicator[data-tooltip]');
 				if (el) hideTip();
 			});
 

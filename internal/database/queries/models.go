@@ -486,6 +486,19 @@ type TblTeacherIntroVideo struct {
 	CompressPreset   sql.NullString
 }
 
+type TblTeacherLeaveRequest struct {
+	ID         int64
+	TeacherID  int64
+	LeaveType  string
+	StartDate  string
+	EndDate    string
+	Reason     string
+	Status     string
+	ReviewedBy sql.NullInt64
+	CreatedAt  string
+	ReviewedAt sql.NullString
+}
+
 type TblTeacherMeetingAccount struct {
 	ID             int64
 	TeacherID      int64

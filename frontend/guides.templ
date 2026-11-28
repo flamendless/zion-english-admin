@@ -930,6 +930,106 @@ templ GuidePayments() {
 	</html>
 }
 
+templ GuideLeaveRequests() {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		@AdminPageHead("Time-off requests - Guides - Zion English Admin Tool")
+		@GuideStyles()
+	</head>
+	<body>
+		<div class="container guides-page">
+			@HeaderSimple()
+
+			<nav class="guides-breadcrumb" aria-label="Breadcrumb">
+				<a href={ utils.URL("/guides") } class="guides-breadcrumb-link">Guides</a>
+				<span class="guides-breadcrumb-sep" aria-hidden="true">/</span>
+				<span class="guides-breadcrumb-current" aria-current="page">Time-off requests</span>
+			</nav>
+
+			@HubHeader("Time-off requests", "", "", false)
+
+			<div class="guides-hero">
+				<p class="guides-subtitle">
+					Teachers submit time-off through a short wizard. Administrators review submitted requests from the list or the dashboard pending card.
+				</p>
+			</div>
+
+			<div class="guide-content">
+				@GuideSection(
+					"leave-overview",
+					"Time-off requests page",
+					utils.URL("/leave-requests"),
+					"Open Time-off requests from the dashboard quick actions or navigation.",
+					[]string{
+						"Teachers see only their own rows. Administrators see all teachers.",
+						"Filter by status: Submitted, Approved, or Rejected. Teachers may also view All.",
+						"Each row shows type, start and end dates, reason, status, and when it was submitted.",
+					},
+					false,
+				)
+				@GuideSection(
+					"leave-wizard",
+					"Submit a request (wizard)",
+					utils.URL("/leave-requests"),
+					"Teachers click Request time-off to open the four-step wizard.",
+					[]string{
+						"Step 1: choose time-off type (sick, vacation, maternity, personal, bereavement, or unpaid).",
+						"Step 2: pick start and end dates. End date must be on or after the start date.",
+						"Step 3: enter a reason. All fields are required.",
+						"Step 4: review the summary, then click Submit request. It is not saved until you submit.",
+						"Administrators receive an in-app notification when a request is submitted.",
+					},
+					false,
+				)
+				@GuideSection(
+					"leave-dashboard-teacher",
+					"Dashboard overview (teacher)",
+					utils.URL("/dashboard"),
+					"Track open submissions from the Overview section.",
+					[]string{
+						"When you have submitted requests awaiting review, the Time-off card shows a count.",
+						"Click the row to open the list filtered to Submitted.",
+					},
+					false,
+				)
+				@GuideSection(
+					"leave-dashboard-admin",
+					"Dashboard pending review",
+					utils.URL("/dashboard"),
+					"Administrators see submitted time-off counts on the Pending Review card.",
+					[]string{
+						"Open Time-off requests from that card to review the submission queue.",
+					},
+					true,
+				)
+				@GuideSection(
+					"leave-review",
+					"Approve or reject",
+					utils.URL("/leave-requests?status=submitted"),
+					"Review actions are available on rows with Submitted status.",
+					[]string{
+						"Filter to Submitted to focus on the queue.",
+						"Use the approve or reject icons on each row.",
+						"The teacher is notified when a decision is made.",
+					},
+					true,
+				)
+			</div>
+
+			<div class="guides-footer-nav">
+				<a href={ utils.URL("/guides") } class="guides-back-link">
+					@GuideBackIcon()
+					All guides
+				</a>
+			</div>
+		</div>
+		@GuideAnchorScript()
+	@LayoutEnd()
+	</body>
+	</html>
+}
+
 templ GuideConnectZoom() {
 	<!DOCTYPE html>
 	<html lang="en">

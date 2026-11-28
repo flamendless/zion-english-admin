@@ -29,6 +29,8 @@ type DashboardData struct {
 	PendingDocuments       int64
 	PendingIntroVideos      int64
 	PendingAdminRoleGrants  int64
+	PendingLeaveRequests    int64
+	MySubmittedLeaveRequests int64
 	MyStudentCount         int64
 	ClassesConductedWeek   int64
 	ClassesCancelledWeek   int64
@@ -272,6 +274,12 @@ templ DashboardPendingStatCard(data DashboardData) {
 				data.PendingIntroVideos,
 				"View submitted intro videos",
 			)
+			@DashboardStatLinkRow(
+				"Time-off requests",
+				utils.URL("/leave-requests?status=submitted"),
+				data.PendingLeaveRequests,
+				"View submitted time-off requests",
+			)
 			if data.Role == auth.RoleSuperuser {
 				@DashboardStatLinkRow(
 					"Admin role grants",
@@ -391,6 +399,19 @@ templ DashboardStats(data DashboardData) {
 				<span class="stat-label">My Students</span>
 				<span class="stat-value">{ fmt.Sprintf("%d", data.MyStudentCount) }</span>
 			</a>
+			if data.MySubmittedLeaveRequests > 0 {
+				<div class="stat-card">
+					<span class="stat-label">Time-off</span>
+					<div class="stat-link-rows">
+						@DashboardStatLinkRow(
+							"Awaiting review",
+							utils.URL("/leave-requests?status=submitted"),
+							data.MySubmittedLeaveRequests,
+							"View your submitted time-off requests",
+						)
+					</div>
+				</div>
+			}
 		}
 		if data.Role == auth.RoleTeacher || data.Role == auth.RoleTester {
 			<div class="stat-card stat-card-accent">

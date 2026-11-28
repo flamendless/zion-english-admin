@@ -148,6 +148,11 @@ var (
 	ErrEmptyNotificationCreatedAt   = errors.New("[NOTIFICATION] empty created at")
 	ErrInvalidNotificationCreatedAt = errors.New("[NOTIFICATION] invalid created at")
 
+	ErrInvalidLeaveRequestType    = errors.New("[TIME-OFF REQUEST] invalid time-off type")
+	ErrInvalidLeaveRequestStatus  = errors.New("[TIME-OFF REQUEST] invalid status")
+	ErrLeaveRequestReasonRequired = errors.New("[TIME-OFF REQUEST] reason is required")
+	ErrLeaveRequestEndBeforeStart = errors.New("[TIME-OFF REQUEST] end date must be on or after start date")
+
 	ErrSettingsInvalidPassword = errors.New("[SETTINGS] invalid superuser password")
 	ErrSettingsInvalidField    = errors.New("[SETTINGS] invalid settings field")
 )

@@ -1,0 +1,240 @@
+package frontend
+
+import "zion-english/internal/constants"
+import "zion-english/internal/utils"
+
+templ LeaveRequestWizardModal(todayPHT string, listStatus constants.LeaveRequestStatus) {
+	<div class="modal-overlay modal-overlay-front" id="leaveRequestWizardModal" hidden role="presentation">
+		<div class="modal-dialog modal-dialog-wizard" role="dialog" aria-modal="true" aria-labelledby="leaveRequestWizardTitle">
+			<div class="modal-header">
+				<div class="wizard-header-text">
+					<h3 id="leaveRequestWizardTitle">Request time-off</h3>
+					<p class="wizard-step-label" id="leaveWizardStepLabel" aria-live="polite">Step 1 of 4</p>
+				</div>
+				<button type="button" class="modal-close leave-wizard-close" data-tooltip="Close" aria-label="Close">&times;</button>
+			</div>
+			<form
+				id="leaveRequestWizardForm"
+				class="class-wizard-form"
+				method="POST"
+				action={ utils.URL("/leave-requests") }
+				hx-post={ utils.URL("/leave-requests") }
+				hx-swap={ HxSwapNone }
+				novalidate
+			>
+				<input type="hidden" name="list_status" value={ string(listStatus) }/>
+				<div class="modal-body class-wizard-body">
+					<div id="leaveWizardMessage" class="form-message" role="alert" aria-live="assertive" hidden></div>
+
+					<div class="wizard-step is-active" data-step="1" data-required="true">
+						<p class="wizard-step-lead">Choose the time-off type.</p>
+						<div class="form-group">
+							<label for="leaveWizard_leaveType">Type *</label>
+							<select id="leaveWizard_leaveType" name="leave_type" required>
+								<option value="">Select type...</option>
+								for _, opt := range LeaveRequestTypeOptions {
+									<option value={ opt.Value }>{ opt.Label }</option>
+								}
+							</select>
+						</div>
+					</div>
+
+					<div class="wizard-step" data-step="2" data-required="true">
+						<p class="wizard-step-lead">Choose the start and end dates for your time-off.</p>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="leaveWizard_startDate">Start date *</label>
+								<input type="date" id="leaveWizard_startDate" name="start_date" required value={ todayPHT }/>
+							</div>
+							<div class="form-group">
+								<label for="leaveWizard_endDate">End date *</label>
+								<input type="date" id="leaveWizard_endDate" name="end_date" required value={ todayPHT }/>
+							</div>
+						</div>
+					</div>
+
+					<div class="wizard-step" data-step="3" data-required="true">
+						<p class="wizard-step-lead">Explain why you need this time-off.</p>
+						<div class="form-group">
+							<label for="leaveWizard_reason">Reason *</label>
+							<textarea id="leaveWizard_reason" name="reason" rows="4" required placeholder="Required details for your administrator"></textarea>
+						</div>
+					</div>
+
+					<div class="wizard-step" data-step="4" data-required="true">
+						<p class="wizard-step-lead">Review your details, then click Submit request. An administrator will review it after you send it in.</p>
+						<dl class="leave-wizard-review">
+							<dt>Type</dt>
+							<dd id="leaveWizardReviewType">{ constants.DisplayNotSet }</dd>
+							<dt>Start date</dt>
+							<dd id="leaveWizardReviewStart">{ constants.DisplayNotSet }</dd>
+							<dt>End date</dt>
+							<dd id="leaveWizardReviewEnd">{ constants.DisplayNotSet }</dd>
+							<dt>Reason</dt>
+							<dd id="leaveWizardReviewReason">{ constants.DisplayNotSet }</dd>
+						</dl>
+					</div>
+				</div>
+				<div class="modal-footer wizard-footer">
+					<button type="button" class="btn btn-secondary wizard-nav-btn wizard-nav-prev" id="leaveWizardPrev" hidden>Previous</button>
+					<button type="button" class="btn wizard-nav-btn" id="leaveWizardNext">Next</button>
+					<button type="submit" class="btn wizard-nav-btn" id="leaveWizardSubmit" hidden>Submit request</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	@ClassWizardStyles()
+	@LeaveRequestWizardScript()
+}
+
+templ LeaveRequestWizardScript() {
+	<script>
+		(function () {
+			if (window.__leaveWizardReady) return;
+			window.__leaveWizardReady = true;
+
+			const modal = document.getElementById('leaveRequestWizardModal');
+			const form = document.getElementById('leaveRequestWizardForm');
+			if (!modal || !form) return;
+
+			const totalSteps = 4;
+			let currentStep = 1;
+
+			const typeEl = document.getElementById('leaveWizard_leaveType');
+			const startEl = document.getElementById('leaveWizard_startDate');
+			const endEl = document.getElementById('leaveWizard_endDate');
+			const reasonEl = document.getElementById('leaveWizard_reason');
+
+			function steps() {
+				return form.querySelectorAll('.wizard-step');
+			}
+
+			function showMessage(text) {
+				const el = document.getElementById('leaveWizardMessage');
+				if (!el) return;
+				if (!text) {
+					el.hidden = true;
+					el.textContent = '';
+					return;
+				}
+				el.hidden = false;
+				el.textContent = text;
+			}
+
+			function typeLabel() {
+				if (!typeEl || !typeEl.value) return '';
+				const opt = typeEl.options[typeEl.selectedIndex];
+				return opt ? opt.text : typeEl.value;
+			}
+
+			function syncReview() {
+				const t = document.getElementById('leaveWizardReviewType');
+				const s = document.getElementById('leaveWizardReviewStart');
+				const e = document.getElementById('leaveWizardReviewEnd');
+				const r = document.getElementById('leaveWizardReviewReason');
+				if (t) t.textContent = typeLabel() || '-';
+				if (s) s.textContent = startEl && startEl.value ? startEl.value : '-';
+				if (e) e.textContent = endEl && endEl.value ? endEl.value : '-';
+				if (r) r.textContent = reasonEl && reasonEl.value.trim() ? reasonEl.value.trim() : '-';
+			}
+
+			function datesValid() {
+				if (!startEl || !startEl.value || !endEl || !endEl.value) {
+					return false;
+				}
+				if (endEl.value < startEl.value) {
+					showMessage('End date must be on or after start date.');
+					return false;
+				}
+				showMessage('');
+				return true;
+			}
+
+			function stepValid(step) {
+				switch (step) {
+					case 1:
+						return typeEl && typeEl.value !== '';
+					case 2:
+						return datesValid();
+					case 3:
+						return reasonEl && reasonEl.value.trim() !== '';
+					case 4:
+						return stepValid(1) && stepValid(2) && stepValid(3);
+					default:
+						return true;
+				}
+			}
+
+			function updateNav() {
+				const label = document.getElementById('leaveWizardStepLabel');
+				const prev = document.getElementById('leaveWizardPrev');
+				const next = document.getElementById('leaveWizardNext');
+				const submit = document.getElementById('leaveWizardSubmit');
+				if (label) label.textContent = 'Step ' + currentStep + ' of ' + totalSteps;
+				if (prev) prev.hidden = currentStep <= 1;
+				if (next) next.hidden = currentStep >= totalSteps;
+				if (submit) submit.hidden = currentStep < totalSteps;
+				if (next && currentStep < totalSteps) next.disabled = !stepValid(currentStep);
+				if (currentStep === totalSteps) syncReview();
+			}
+
+			function goToStep(step) {
+				if (step > currentStep && !stepValid(currentStep)) {
+					updateNav();
+					return;
+				}
+				currentStep = Math.max(1, Math.min(totalSteps, step));
+				steps().forEach(function (el) {
+					const n = parseInt(el.getAttribute('data-step'), 10);
+					el.classList.toggle('is-active', n === currentStep);
+				});
+				showMessage('');
+				updateNav();
+			}
+
+			function openLeaveWizard() {
+				if (form.reset) form.reset();
+				goToStep(1);
+				modal.hidden = false;
+				document.body.classList.add('modal-open');
+			}
+
+			function closeLeaveWizard() {
+				modal.hidden = true;
+				document.body.classList.remove('modal-open');
+			}
+
+			document.body.addEventListener('click', function (e) {
+				if (e.target.closest('[data-open-leave-wizard]')) {
+					openLeaveWizard();
+					return;
+				}
+				if (e.target.closest('.leave-wizard-close')) {
+					closeLeaveWizard();
+					return;
+				}
+			});
+
+			document.getElementById('leaveWizardPrev')?.addEventListener('click', function () {
+				goToStep(currentStep - 1);
+			});
+			document.getElementById('leaveWizardNext')?.addEventListener('click', function () {
+				goToStep(currentStep + 1);
+			});
+
+			modal.addEventListener('click', function (e) {
+				if (e.target === modal) closeLeaveWizard();
+			});
+
+			form.addEventListener('submit', function (e) {
+				if (!stepValid(4)) {
+					e.preventDefault();
+					goToStep(3);
+				}
+			});
+
+			form.addEventListener('input', updateNav);
+			form.addEventListener('change', updateNav);
+		})();
+	</script>
+}

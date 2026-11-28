@@ -1,0 +1,229 @@
+package frontend
+
+import "fmt"
+import "zion-english/internal/constants"
+import "zion-english/internal/utils"
+
+type LeaveRequestItem struct {
+	ID            string
+	TeacherName   string
+	TeacherAvatar AvatarProps
+	ShowTeacher   bool
+	LeaveType     constants.LeaveRequestType
+	StartDate     string
+	EndDate       string
+	Reason        string
+	Status        constants.LeaveRequestStatus
+	SubmittedAt   string
+	CanReview     bool
+}
+
+func leaveRequestsShowAdminActions(data LeaveRequestsPageData) bool {
+	if !data.ShowTeacherColumn {
+		return false
+	}
+	return data.Status == "" || data.Status == constants.LeaveRequestStatusSubmitted
+}
+
+func leaveRequestsEmptyColspan(showTeacher bool, showActions bool) int {
+	colspan := 6
+	if showTeacher {
+		colspan++
+	}
+	if showActions {
+		colspan++
+	}
+	return colspan
+}
+
+type LeaveRequestsPageData struct {
+	Title             string
+	Description       string
+	Status            constants.LeaveRequestStatus
+	Items             []LeaveRequestItem
+	ShowTeacherColumn bool
+	ShowTeacherFilter bool
+	TeacherFilterID   string
+	TeacherFilterName string
+	CanRequestLeave   bool
+	TodayPHT          string
+}
+
+templ LeaveRequestStatusFilter(selected constants.LeaveRequestStatus, allowAll bool) {
+	<div class="form-group">
+		<label for="leaveRequestStatus">Status</label>
+		<select id="leaveRequestStatus" name="status">
+			if allowAll {
+				<option value="" selected?={ selected == "" }>All</option>
+			}
+			for _, opt := range LeaveRequestStatusOptions {
+				<option value={ opt.Value } selected?={ string(selected) == opt.Value }>{ opt.Label }</option>
+			}
+		</select>
+	</div>
+}
+
+templ LeaveRequestTableRow(item LeaveRequestItem, showActions bool) {
+	<tr>
+		if item.ShowTeacher {
+			<td data-label="Teacher">
+				@TeacherNameCell(item.TeacherName, item.TeacherAvatar)
+			</td>
+		}
+		<td data-label="Type">
+			@Pill(item.LeaveType.Label(), PillToneInfo)
+		</td>
+		<td data-label="Start">{ item.StartDate }</td>
+		<td data-label="End">{ item.EndDate }</td>
+		<td data-label="Reason" class="leave-reason-cell">
+			<span class="truncated-cell" data-full-text={ item.Reason }>{ item.Reason }</span>
+		</td>
+		<td data-label="Status">
+			@StatusPill(item.Status.Label(), LeaveRequestStatusPillTone(item.Status), true)
+		</td>
+		<td data-label="Submitted at">{ item.SubmittedAt }</td>
+		if showActions {
+			<td data-label="Actions">
+				if item.CanReview {
+					<div class="table-actions">
+						<form method="POST" action={ utils.URL("/leave-requests/" + item.ID + "/approve") } class="table-action-form">
+							@IconActionSubmit("Approve", IconKindApprove)
+						</form>
+						<form method="POST" action={ utils.URL("/leave-requests/" + item.ID + "/reject") } class="table-action-form" onsubmit="return confirm('Reject this time-off request?');">
+							@IconActionSubmit("Reject", IconKindReject)
+						</form>
+					</div>
+				} else {
+					{ constants.DisplayNotSet }
+				}
+			</td>
+		}
+	</tr>
+}
+
+templ LeaveRequestsPage(data LeaveRequestsPageData) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		@AdminPageHead(data.Title + " - Zion English Admin Tool")
+		@AvatarStyles()
+		@LeaveRequestsStyles()
+	</head>
+	<body>
+		<div class="container">
+			@HeaderSimple()
+			<div class="page-header leave-requests-header">
+				<div class="leave-requests-heading">
+					<h1>{ data.Title }</h1>
+					if data.Description != "" {
+						<p class="page-subtitle">{ data.Description }</p>
+					}
+				</div>
+				if data.CanRequestLeave {
+					<div class="leave-requests-header-actions">
+						<button type="button" class="add-btn" data-open-leave-wizard>Request time-off</button>
+					</div>
+				}
+			</div>
+			<form method="GET" action={ utils.URL("/leave-requests") } class="toolbar" id="leaveRequestsToolbar">
+				if data.ShowTeacherFilter {
+					@LeaveRequestStatusFilter(data.Status, true)
+					@TeacherFilterDropdown(data.TeacherFilterID, data.TeacherFilterName)
+					<button type="submit" class="btn filter-btn">Filter</button>
+				} else {
+					<div class="form-group">
+						<label for="leaveRequestStatus">Status</label>
+						<select id="leaveRequestStatus" name="status" onchange="this.form.submit()">
+							<option value="" selected?={ data.Status == "" }>All</option>
+							for _, opt := range LeaveRequestStatusOptions {
+								<option value={ opt.Value } selected?={ string(data.Status) == opt.Value }>{ opt.Label }</option>
+							}
+						</select>
+					</div>
+				}
+			</form>
+			<div class="table-wrapper data-list-view-root documents-table-wrapper">
+				<table class="documents-table table-stack-mobile">
+					<thead>
+						<tr>
+							if data.ShowTeacherColumn {
+								<th>Teacher</th>
+							}
+							<th>Type</th>
+							<th>Start</th>
+							<th>End</th>
+							<th>Reason</th>
+							<th>Status</th>
+							<th>Submitted at</th>
+							if leaveRequestsShowAdminActions(data) {
+								<th>Actions</th>
+							}
+						</tr>
+					</thead>
+					<tbody>
+						if len(data.Items) == 0 {
+							<tr>
+								<td colspan={ fmt.Sprintf("%d", leaveRequestsEmptyColspan(data.ShowTeacherColumn, leaveRequestsShowAdminActions(data))) } class="empty-state">No time-off requests found.</td>
+							</tr>
+						} else {
+							for _, item := range data.Items {
+								@LeaveRequestTableRow(item, leaveRequestsShowAdminActions(data))
+							}
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+		if data.CanRequestLeave {
+			@LeaveRequestWizardModal(data.TodayPHT, data.Status)
+		}
+		@ScrTableTruncationTooltips()
+	@LayoutEnd()
+	</body>
+	</html>
+}
+
+templ LeaveRequestsStyles() {
+	<style>
+		.leave-requests-header {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: flex-start;
+			justify-content: space-between;
+			gap: var(--space-3);
+		}
+		.leave-requests-heading {
+			min-width: 0;
+		}
+		.leave-requests-header-actions {
+			display: flex;
+			align-items: center;
+			gap: var(--space-2);
+			flex-shrink: 0;
+		}
+		.leave-requests-header-actions .add-btn {
+			margin-top: 0;
+		}
+		.leave-reason-cell {
+			max-width: 16rem;
+		}
+		#leaveRequestsToolbar.filter-btn,
+		#leaveRequestsToolbar .btn.filter-btn {
+			margin-top: 0;
+		}
+		.leave-wizard-review {
+			display: flex;
+			flex-direction: column;
+			gap: var(--space-2);
+			font-size: 0.9375rem;
+		}
+		.leave-wizard-review dt {
+			font-weight: 600;
+			color: var(--color-muted-foreground);
+			font-size: 0.8125rem;
+		}
+		.leave-wizard-review dd {
+			margin: 0 0 var(--space-2);
+		}
+	</style>
+}

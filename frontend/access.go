@@ -34,13 +34,14 @@ type NavBarEntry struct {
 }
 
 type NavGroup struct {
-	ID            string
-	Label         string
-	Description   string
-	Icon          NavIconKind
-	FeatureCard   bool
-	AdminOnlyCard bool
-	Items         []NavItem
+	ID                string
+	Label             string
+	Description       string
+	Icon              NavIconKind
+	FeatureCard       bool
+	AdminOnlyCard     bool
+	SuperuserOnlyCard bool
+	Items             []NavItem
 }
 
 type navItemDef struct {
@@ -56,13 +57,14 @@ type navItemDef struct {
 }
 
 type navGroupDef struct {
-	ID            string
-	Label         string
-	Description   string
-	TeacherDesc   string
-	FeatureCard   bool
-	AdminOnlyCard bool
-	Paths         []string
+	ID                string
+	Label             string
+	Description       string
+	TeacherDesc       string
+	FeatureCard       bool
+	AdminOnlyCard     bool
+	SuperuserOnlyCard bool
+	Paths             []string
 }
 
 type navLayoutEntry struct {
@@ -84,6 +86,7 @@ var navItemDefs = []navItemDef{
 	{Path: "/learning-materials", LinkID: "learningMaterialsLink", Title: "Learning Library", Description: "Browse and share teaching materials and resources", FeatureCard: true},
 	{Path: "/training-materials", LinkID: "trainingMaterialsLink", Title: "Training Materials", Description: "Watch admin-curated training videos and track your progress", FeatureCard: true},
 	{Path: "/documents", LinkID: "documentsLink", Title: "Documents", TeacherTitle: "My Documents", Description: "Review teacher uploads and ID documents", TeacherDesc: "View your uploaded profile photos and ID documents"},
+	{Path: "/leave-requests", LinkID: "leaveRequestsLink", Title: "Time-offs", Description: "Review submitted teacher time-off requests", TeacherTitle: "Time-off Requests", TeacherDesc: "Submit and track your time-off requests", FeatureCard: true},
 	{Path: "/intro-videos", LinkID: "introVideosLink", Title: "Intro Videos", TeacherTitle: "My Intro Video", Description: "Review teacher introduction video submissions", TeacherDesc: "View your submitted introduction video"},
 	{Path: "/guides", LinkID: "guidesLink", Title: "Guides", Description: "Step-by-step help for using the admin tool"},
 	{Path: "/teachers", LinkID: "teachersLink", Title: "Teachers", Description: "View and manage teachers", AdminOnlyCard: true},
@@ -100,7 +103,7 @@ var navItemDefs = []navItemDef{
 	{Path: "/payments", LinkID: "paymentsLink", Title: "Payments", TeacherTitle: "My Payment History", Description: "View teacher payment records and receipt status", TeacherDesc: "View your payment records and receipt status", AdminOnlyCard: true},
 	{Path: "/student-relationships", LinkID: "studentRelationshipsLink", Title: "Students Relationship Diagram", Description: "Visual family groupings and linked student relationships", AdminOnlyCard: true},
 	{Path: "/affiliate-ads/reports", LinkID: "affiliateAdsReportsLink", Title: "Ads/Affiliates", Description: "Affiliate link click totals and ad placement summaries", AdminOnlyCard: true},
-	{Path: "/process", LinkID: "processLink", Title: "Process", Description: "Process CSV files and view logs", AdminOnlyCard: true},
+	{Path: "/process", LinkID: "processLink", Title: "Process", Description: "Process CSV files from Google Drive", AdminOnlyCard: true, HideFromNav: true},
 	{Path: "/parent-payment-ocr", LinkID: "parentPaymentOcrLink", Title: "Parent payment OCR", Description: "Test Tesseract scan and parsing on payment screenshots", AdminOnlyCard: true},
 	{Path: "/feature-flags", LinkID: "featureFlagsLink", Title: "Feature Flags", Description: "Toggle integration connection availability", AdminOnlyCard: true},
 	{Path: "/accesses", LinkID: "accessesLink", Title: "Accesses", Description: "Reference matrix for who sees each portal module in nav and dashboard", AdminOnlyCard: true},
@@ -111,7 +114,7 @@ var navItemDefs = []navItemDef{
 	{Path: "/ads", LinkID: "adsLink", Title: "Ads", Description: "Configure affiliate ad placements across portal pages", AdminOnlyCard: true},
 	{Path: "/plans", LinkID: "plansLink", Title: "Plans", Description: "Grant Teacher Pro and view plan transaction history", AdminOnlyCard: true},
 	{Path: "/exports", LinkID: "exportsLink", Title: "My data export", Description: "Export your classes, students, and schedule for personal use", TeacherTitle: "My data export", TeacherDesc: "Export your classes, students, and schedule for personal use", FeatureCard: true},
-	{Path: "/logs", LinkID: "logsLink", Title: "Logs", TeacherTitle: "My Activity", Description: "View system logs", TeacherDesc: "View your recent actions"},
+	{Path: "/logs", LinkID: "logsLink", Title: "Audit Logs", TeacherTitle: "My Activity", Description: "View system audit logs", TeacherDesc: "View your recent actions"},
 	{Path: "/upload-logs", LinkID: "uploadLogsLink", Title: "Upload Logs", TeacherTitle: "My Upload Logs", Description: "Teacher file upload activity", TeacherDesc: "View success and failure for your file uploads", AdminOnlyCard: true},
 	{Path: "/announcements", LinkID: "announcementsLink", Title: "Announcements", Description: "Create and manage system-wide banners", AdminOnlyCard: true},
 	{Path: "/payroll", LinkID: "payrollLink", Title: "Payroll", Description: "Run payroll sessions and track teacher cutoff progress", AdminOnlyCard: true},
@@ -121,8 +124,10 @@ var navGroupDefs = []navGroupDef{
 	{ID: "classes", Label: "Classes", Description: "View classes, schedules, and repeating series", TeacherDesc: "View and record classes, schedules, and repeating series", FeatureCard: true, Paths: []string{"/classes", "/schedule", "/schedule/series"}},
 	{ID: "people", Label: "People", Description: "Manage teachers and students", AdminOnlyCard: true, Paths: []string{"/teachers", "/students"}},
 	{ID: "resources", Label: "Resources", Description: "Guides, documents, learning materials, and training videos", TeacherDesc: "Guides, your documents, learning materials, and training videos", FeatureCard: true, Paths: []string{"/guides", "/documents", "/intro-videos", "/learning-materials", "/training-materials"}},
-	{ID: "insights", Label: "Insights", Description: "Payroll reports and analytics", AdminOnlyCard: true, Paths: []string{"/reports", "/reports/history", "/analytics", "/my-earnings", "/payments", "/student-relationships", "/affiliate-ads/reports"}},
-	{ID: "admin", Label: "Admin", Description: "Process CSV files, parent payment OCR, feature flags, accesses, meta tags, affiliates, ads, plans, settings, SQL console, logs, upload logs, and announcements", AdminOnlyCard: true, Paths: []string{"/process", "/parent-payment-ocr", "/feature-flags", "/accesses", "/meta", "/affiliates", "/ads", "/plans", "/settings", "/sql-console", "/logs", "/upload-logs", "/teachers-earnings", "/payroll", "/announcements"}},
+	{ID: "insights", Label: "Insights", Description: "Payroll reports and analytics", AdminOnlyCard: true, Paths: []string{"/reports", "/reports/history", "/analytics", "/my-earnings", "/payments", "/student-relationships"}},
+	{ID: "admin", Label: "Admin", Description: "Parent payment OCR, teachers earnings, payroll, announcements, and time-offs", AdminOnlyCard: true, Paths: []string{"/parent-payment-ocr", "/teachers-earnings", "/payroll", "/announcements", "/leave-requests"}},
+	{ID: "logs", Label: "Logs", Description: "Audit logs and teacher upload activity", AdminOnlyCard: true, Paths: []string{"/logs", "/upload-logs"}},
+	{ID: "superuser", Label: "Superuser", Description: "Feature flags, settings, affiliates, ads, meta tags, SQL console, and related tools", SuperuserOnlyCard: true, Paths: []string{"/feature-flags", "/accesses", "/meta", "/affiliates", "/ads", "/plans", "/settings", "/sql-console", "/affiliate-ads/reports"}},
 }
 
 var adminNavLayout = []navLayoutEntry{
@@ -133,6 +138,8 @@ var adminNavLayout = []navLayoutEntry{
 	{GroupID: "classes"},
 	{GroupID: "insights"},
 	{GroupID: "admin"},
+	{GroupID: "logs"},
+	{GroupID: "superuser"},
 }
 
 var teacherNavLayout = []navLayoutEntry{
@@ -142,6 +149,7 @@ var teacherNavLayout = []navLayoutEntry{
 	{GroupID: "resources"},
 	{LinkPath: "/my-students"},
 	{GroupID: "classes"},
+	{LinkPath: "/leave-requests"},
 	{LinkPath: "/analytics"},
 	{LinkPath: "/my-earnings"},
 	{LinkPath: "/exports"},
@@ -296,13 +304,14 @@ func navGroupForRole(role auth.Role, groupID string) *NavGroup {
 			desc = def.TeacherDesc
 		}
 		return &NavGroup{
-			ID:            def.ID,
-			Label:         def.Label,
-			Description:   desc,
-			Icon:          NavIconForGroupID(def.ID),
-			FeatureCard:   def.FeatureCard,
-			AdminOnlyCard: def.AdminOnlyCard,
-			Items:         items,
+			ID:                def.ID,
+			Label:             def.Label,
+			Description:       desc,
+			Icon:              NavIconForGroupID(def.ID),
+			FeatureCard:       def.FeatureCard,
+			AdminOnlyCard:     def.AdminOnlyCard,
+			SuperuserOnlyCard: def.SuperuserOnlyCard,
+			Items:             items,
 		}
 	}
 	return nil
@@ -411,7 +420,7 @@ func IsNavAccessible(role auth.Role, path string) bool {
 		return false
 	case "/students/register":
 		return true
-	case "/hub", "/classes", "/classes/record", "/schedule", "/schedule/record", "/schedule/repeat", "/schedule/series", "/profile", "/logs", "/upload-logs", "/my-students", "/documents", "/intro-videos", "/analytics", "/my-earnings", "/exports", "/payments", "/guides", "/learning-materials", "/training-materials":
+	case "/hub", "/classes", "/classes/record", "/schedule", "/schedule/record", "/schedule/repeat", "/schedule/series", "/profile", "/logs", "/upload-logs", "/my-students", "/documents", "/intro-videos", "/leave-requests", "/analytics", "/my-earnings", "/exports", "/payments", "/guides", "/learning-materials", "/training-materials":
 		return true
 	default:
 		return false

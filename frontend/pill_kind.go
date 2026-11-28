@@ -95,6 +95,19 @@ func PaymentStatusPillTone(status constants.PaymentStatus) PillTone {
 	}
 }
 
+func LeaveRequestStatusPillTone(status constants.LeaveRequestStatus) PillTone {
+	switch status {
+	case constants.LeaveRequestStatusSubmitted:
+		return PillToneWarning
+	case constants.LeaveRequestStatusApproved:
+		return PillToneSuccess
+	case constants.LeaveRequestStatusRejected:
+		return PillToneError
+	default:
+		return PillToneNeutral
+	}
+}
+
 func DocumentStatusPillTone(status constants.TeacherDocumentStatus) PillTone {
 	switch status {
 	case constants.TeacherDocumentStatusSubmitted:

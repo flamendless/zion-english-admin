@@ -60,6 +60,55 @@ templ ActionCardContent(item NavItem) {
 	<p>{ item.Description }</p>
 }
 
+templ DeprecatedFeatureBanner() {
+	<div class="deprecated-feature-banner" role="status">
+		<div class="deprecated-feature-banner__icon" aria-hidden="true">
+			@iconSVGAlertCircle()
+		</div>
+		<div class="deprecated-feature-banner__content">
+			<p class="deprecated-feature-banner__title">Deprecated feature</p>
+			<p class="deprecated-feature-banner__description">CSV processing from Google Drive is legacy. Prefer reports and payroll workflows going forward.</p>
+		</div>
+	</div>
+	<style>
+		.deprecated-feature-banner {
+			display: flex;
+			align-items: flex-start;
+			gap: var(--space-3);
+			margin-bottom: var(--space-5);
+			padding: var(--space-4) var(--space-5);
+			border: var(--pill-border);
+			border-radius: var(--radius-md);
+			background: var(--color-warning-bg);
+			color: var(--color-foreground);
+		}
+
+		.deprecated-feature-banner__icon {
+			flex-shrink: 0;
+			color: var(--color-warning);
+		}
+
+		.deprecated-feature-banner__icon svg {
+			width: 28px;
+			height: 28px;
+		}
+
+		.deprecated-feature-banner__title {
+			margin: 0;
+			font-size: 1.25rem;
+			font-weight: 700;
+			line-height: 1.3;
+		}
+
+		.deprecated-feature-banner__description {
+			margin: var(--space-1) 0 0;
+			font-size: 0.9rem;
+			color: var(--color-muted-foreground);
+			line-height: 1.45;
+		}
+	</style>
+}
+
 templ ActionCard(item NavItem) {
 	<a href={ utils.URL(item.Path) } class="card">
 		@ActionCardContent(item)

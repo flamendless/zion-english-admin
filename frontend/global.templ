@@ -2157,31 +2157,40 @@ templ GlobalIncludes() {
 		}
 
 		.table-header-label,
-		.admin-only-label-wrap {
+		.admin-only-label-wrap,
+		.superuser-only-label-wrap {
 			display: inline-flex;
 			align-items: center;
 			gap: var(--space-1);
 		}
 
-		.admin-only-indicator {
+		.admin-only-indicator,
+		.superuser-only-indicator {
 			display: inline-flex;
 			color: var(--color-muted-foreground);
 			cursor: help;
 			flex-shrink: 0;
 		}
 
-		.admin-only-indicator svg {
+		.superuser-only-indicator {
+			color: var(--color-warning);
+		}
+
+		.admin-only-indicator svg,
+		.superuser-only-indicator svg {
 			width: 14px;
 			height: 14px;
 		}
 
-		.card h2.admin-only-label-wrap {
+		.card h2.admin-only-label-wrap,
+		.card h2.superuser-only-label-wrap {
 			display: inline-flex;
 			align-items: center;
 			gap: var(--space-1);
 		}
 
-		.admin-only-indicator[data-tooltip]::after {
+		.admin-only-indicator[data-tooltip]::after,
+		.superuser-only-indicator[data-tooltip]::after {
 			display: none;
 		}
 

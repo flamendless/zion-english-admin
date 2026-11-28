@@ -66,6 +66,7 @@ var navIconByPath = map[string]NavIconKind{
 	"/schedule/series":       NavIconScheduleSeries,
 	"/my-students":           NavIconMyStudents,
 	"/hub":                   NavIconHub,
+	"/leave-requests":        NavIconProfile,
 	"/reports":               NavIconReports,
 	"/reports/history":       NavIconReportsHistory,
 	"/affiliate-ads/reports": NavIconAffiliateAdsReports,
@@ -98,6 +99,8 @@ var navIconByGroupID = map[string]NavIconKind{
 	"resources": NavIconResourcesGroup,
 	"insights":  NavIconInsightsGroup,
 	"admin":     NavIconAdminGroup,
+	"logs":      NavIconLogs,
+	"superuser": NavIconSettings,
 }
 
 var navIconToneByKind = map[NavIconKind]NavIconTone{

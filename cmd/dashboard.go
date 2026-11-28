@@ -166,6 +166,10 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 			data.PendingIntroVideos = pendingIntroVideos
 		}
+		pendingLeave, err := dbRO.GetQueries().CountTeacherLeaveRequestsByStatus(ctx, string(constants.LeaveRequestStatusSubmitted))
+		if err == nil {
+			data.PendingLeaveRequests = pendingLeave
+		}
 		if role == auth.RoleSuperuser {
 			pendingAdminRoles, err := dbRO.GetQueries().CountTeacherAdminRoleRequestsByStatus(ctx, string(constants.TeacherAdminRoleRequestStatusPending))
 			if err == nil {
@@ -225,6 +229,13 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 	case auth.RoleTeacher, auth.RoleTester:
 		user := auth.GetUser(ctx)
 		if role == auth.RoleTeacher {
+			mySubmittedLeave, err := dbRO.GetQueries().CountTeacherLeaveRequestsByTeacherAndStatus(ctx, queries.CountTeacherLeaveRequestsByTeacherAndStatusParams{
+				TeacherID: user.ID,
+				Status:    string(constants.LeaveRequestStatusSubmitted),
+			})
+			if err == nil {
+				data.MySubmittedLeaveRequests = mySubmittedLeave
+			}
 			checklist, err := loadTeacherOnboardingChecklist(ctx, user.ID)
 			if err == nil {
 				completed, total := onboarding.Summary(checklist)

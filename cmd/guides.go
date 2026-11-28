@@ -55,6 +55,12 @@ func handleGuides(w http.ResponseWriter, r *http.Request) {
 				Access:      "teacher",
 			},
 			{
+				Slug:        constants.GuideSlugLeaveRequests,
+				Title:       "Time-off requests",
+				Description: "Submit time-off through the wizard and track approval status.",
+				Access:      "teacher",
+			},
+			{
 				Slug:        constants.GuideSlugFAQ,
 				Title:       "FAQ",
 				Description: "Answers about scheduled vs recorded classes, absences, earnings, and more.",
@@ -118,6 +124,8 @@ func handleGuidesPath(w http.ResponseWriter, r *http.Request) {
 		handleGuideIntroVideos(w, r)
 	case constants.GuideSlugPayments:
 		handleGuidePayments(w, r)
+	case constants.GuideSlugLeaveRequests:
+		handleGuideLeaveRequests(w, r)
 	case constants.GuideSlugFAQ:
 		handleGuideFAQ(w, r)
 	case constants.GuideSlugReportsAndGeneration:
@@ -194,6 +202,16 @@ func handleGuidePayments(w http.ResponseWriter, r *http.Request) {
 
 	if err := frontend.GuidePayments().Render(r.Context(), w); err != nil {
 		logs.Log().Error("failed to render payments guide", zap.Error(err))
+	}
+}
+
+func handleGuideLeaveRequests(w http.ResponseWriter, r *http.Request) {
+	if !requireMethod(w, r, http.MethodGet) {
+		return
+	}
+
+	if err := frontend.GuideLeaveRequests().Render(r.Context(), w); err != nil {
+		logs.Log().Error("failed to render leave requests guide", zap.Error(err))
 	}
 }
 

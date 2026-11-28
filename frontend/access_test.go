@@ -72,6 +72,33 @@ func TestTeacherDashboardQuickActionsMyHubBeforeProfile(t *testing.T) {
 	}
 }
 
+func TestTeacherDashboardQuickActionsTimeOffRequests(t *testing.T) {
+	entries := DashboardQuickActionEntries(auth.RoleTeacher)
+	var sawClasses bool
+	for _, entry := range entries {
+		if entry.Kind == NavBarEntryGroup && entry.Group.ID == "classes" {
+			sawClasses = true
+			continue
+		}
+		if entry.Kind != NavBarEntryLink {
+			continue
+		}
+		if entry.Item.Path == "/leave-requests" {
+			if !sawClasses {
+				t.Fatal("Time-off Requests should appear after the Classes quick action card")
+			}
+			if entry.Item.Title != "Time-off Requests" {
+				t.Fatalf("time-off quick action title = %q, want Time-off Requests", entry.Item.Title)
+			}
+			if !entry.Item.FeatureCard {
+				t.Fatal("time-off quick action should be a feature card")
+			}
+			return
+		}
+	}
+	t.Fatal("teacher dashboard quick actions should include Time-off Requests")
+}
+
 func TestIsNavAccessibleHub(t *testing.T) {
 	if !IsNavAccessible(auth.RoleTeacher, "/hub") {
 		t.Fatal("teacher should access /hub")
@@ -93,8 +120,19 @@ func TestAnnouncementsInAdminNavGroup(t *testing.T) {
 		t.Fatal("admin nav group should have items")
 	}
 	last := group.Items[len(group.Items)-1]
-	if last.Path != "/announcements" {
-		t.Fatalf("expected announcements last in admin group, got %s", last.Path)
+	if last.Path != "/leave-requests" {
+		t.Fatalf("expected time-offs last in admin group, got %s", last.Path)
+	}
+	if last.Title != "Time-offs" {
+		t.Fatalf("admin group time-offs title = %q, want Time-offs", last.Title)
+	}
+	for _, item := range group.Items {
+		if item.Path == "/process" {
+			t.Fatal("process should not be in admin nav group")
+		}
+		if item.Path == "/feature-flags" || item.Path == "/logs" {
+			t.Fatalf("unexpected %s in admin group", item.Path)
+		}
 	}
 	for _, item := range DashboardExtraItems(auth.RoleAdmin) {
 		if item.Path == "/announcements" {
@@ -124,6 +162,71 @@ func TestIsNavAccessibleParentPaymentOCR(t *testing.T) {
 	}
 	if IsNavAccessible(auth.RoleTeacher, "/parent-payment-ocr") {
 		t.Fatal("teacher should not access /parent-payment-ocr via nav")
+	}
+}
+
+func TestLogsNavGroup(t *testing.T) {
+	group := navGroupForRole(auth.RoleAdmin, "logs")
+	if group == nil {
+		t.Fatal("logs nav group expected for admin")
+	}
+	if group.Label != "Logs" {
+		t.Fatalf("logs group label = %q, want Logs", group.Label)
+	}
+	var sawAudit, sawUpload bool
+	for _, item := range group.Items {
+		switch item.Path {
+		case "/logs":
+			sawAudit = true
+			if item.Title != "Audit Logs" {
+				t.Fatalf("logs item title = %q, want Audit Logs", item.Title)
+			}
+		case "/upload-logs":
+			sawUpload = true
+		}
+	}
+	if !sawAudit || !sawUpload {
+		t.Fatal("logs group should include audit logs and upload logs")
+	}
+}
+
+func TestSuperuserNavGroup(t *testing.T) {
+	group := navGroupForRole(auth.RoleSuperuser, "superuser")
+	if group == nil {
+		t.Fatal("superuser nav group expected")
+	}
+	if !group.SuperuserOnlyCard {
+		t.Fatal("superuser group should use SuperuserOnlyCard")
+	}
+	var sawFeatureFlags bool
+	for _, item := range group.Items {
+		if item.Path == "/feature-flags" {
+			sawFeatureFlags = true
+		}
+	}
+	if !sawFeatureFlags {
+		t.Fatal("superuser group should include feature flags")
+	}
+	var sawSuperuserCard bool
+	for _, entry := range DashboardQuickActionEntries(auth.RoleAdmin) {
+		if entry.Kind == NavBarEntryGroup && entry.Group.ID == "superuser" {
+			sawSuperuserCard = true
+			break
+		}
+	}
+	if sawSuperuserCard {
+		t.Fatal("admin dashboard should not show superuser quick action card")
+	}
+}
+
+func TestProcessHiddenFromNavBarItems(t *testing.T) {
+	for _, item := range NavBarItems(auth.RoleAdmin) {
+		if item.Path == "/process" {
+			t.Fatal("process should be hidden from navbar items")
+		}
+	}
+	if !IsNavAccessible(auth.RoleAdmin, "/process") {
+		t.Fatal("admin should still access /process by URL")
 	}
 }
 

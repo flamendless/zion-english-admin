@@ -86,6 +86,11 @@ func handleHubPage(w http.ResponseWriter, r *http.Request, pathTeacherID int64) 
 		HttpError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	timeOffs, err := loadHubTimeOffs(ctx, teacherID)
+	if err != nil {
+		HttpError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	isPro := false
 	plan, planErr := entitlements.TeacherPlan(ctx, dbRO.GetQueries(), teacherID)
@@ -103,6 +108,7 @@ func handleHubPage(w http.ResponseWriter, r *http.Request, pathTeacherID int64) 
 		CutoffStartDate: cutoffStart,
 		CutoffEndDate:   cutoffEnd,
 		TodayDate:       utils.TodayPHT(),
+		TimeOffs:        timeOffs,
 		Resources:       resources,
 		IsPro:           isPro,
 	}
@@ -182,6 +188,29 @@ func resolveHubTeacherIDFromRequest(ctx context.Context, r *http.Request) (int64
 		return 0, err
 	}
 	return parsedID, nil
+}
+
+func loadHubTimeOffs(ctx context.Context, teacherID int64) ([]frontend.HubTimeOffItem, error) {
+	rows, err := dbRO.GetQueries().GetTeacherLeaveRequests(ctx, queries.GetTeacherLeaveRequestsParams{
+		TeacherID: teacherID,
+		Column2:   "",
+		Status:    "",
+	})
+	if err != nil {
+		return nil, err
+	}
+	items := make([]frontend.HubTimeOffItem, len(rows))
+	for i, row := range rows {
+		items[i] = frontend.HubTimeOffItem{
+			LeaveType:   constants.LeaveRequestType(row.LeaveType),
+			StartDate:   utils.NormalizeDatePHT(row.StartDate),
+			EndDate:     utils.NormalizeDatePHT(row.EndDate),
+			Reason:      row.Reason,
+			Status:      constants.LeaveRequestStatus(row.Status),
+			SubmittedAt: utils.FormatPlanDateTimePHT(row.CreatedAt),
+		}
+	}
+	return items, nil
 }
 
 func loadHubResources(ctx context.Context, teacherID int64) (frontend.HubResourcesData, error) {
